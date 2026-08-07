@@ -15527,7 +15527,685 @@ edit
   Handles Real-time Interaction, State, and Navigation
 -->
 
+<script>
+/**
+   * 1. GLOBAL STATE
+*/
 
+let state = {
+  user: null,
+  branchId: null,
+  cart: [],
+  products: [],
+  recipes: [],         
+  deductionFeed: [], 
+  currentMemberPoint: 0,
+  currentTable: null,
+  currentMember: null,
+  paymentMethod: null,
+  recipeMap: {},
+  memberCurrentPage: 1,
+  memberPerPage: 10,
+
+  settings: {
+    tax: 11,
+    service: 5,
+    discount: 0,
+    point_ratio: 10000
+  },
+
+  dashboardData: null,
+  growthData: null,
+
+  isRedeemOpen: false,
+  loadingRedeem: false
+
+};
+window.state = state;
+let isProcessing = false;
+let memberSearchValue = "";
+let selectedTier = "ALL";
+
+
+function isLoggedIn() {
+  return state.user && state.branchId;
+}
+
+function isAdmin() {
+  return state.user && state.user.role === "admin";
+}
+
+function isKasir() {
+  return state.user && state.user.role === "kasir";
+}
+
+function requireBranch() {
+  if (!state.branchId) {
+    navigate("loginPage");
+    return false;
+  }
+  return true;
+}
+
+
+let editingMember = null;
+let liveLock = false;
+let selectedTableId = null;
+let selectedRecipeId = null;
+let selectedRecipeName = "";
+let sellingPrice = 0;
+let currentIngredients = [];
+let currentTransaction = null;
+let activeTransaction = null;
+
+
+// PAGINATION RECENTTRANSAKSI
+let recentCurrentPage = 1;
+const recentItemsPerPage = 10;
+let recentData = [];
+let analyticsTimeout = null;
+
+// PAGINATION ROW MATERIAL
+let rawMaterialData = [];
+let rawMaterialPage = 1;
+const rawMaterialPerPage = 10;;
+
+// PAGINATION TOP REVENUE
+let topRevenueCurrentPage = 1;
+const topRevenueItemsPerPage = 10;
+let allTopRevenueData = [];
+
+
+// PAGINATION INVENTORY
+let inventoryCurrentPage = 1;
+const inventoryItemsPerPage = 10;
+let allInventoryData = [];
+
+// PAGINATION SUPPLIER
+let supplierCurrentPage = 1;
+const supplierItemsPerPage = 5;
+let allSupplierData = [];
+
+// PAGINATION RECIPES
+let recipeCurrentPage = 1;
+const recipeItemsPerPage = 5;
+let allRecipesData = [];
+
+// PAGINATION EXPENSES
+let currentPage = 1;
+const itemsPerPage = 10;
+let activeExpenseData = [];
+let allExpenseData = [];
+let currentBudget = 0;
+
+// PAGINATION OTHER INCOME
+let allOtherIncomeData = [];
+let filteredOtherIncomeData = [];
+let otherIncomeCurrentPage = 1;
+const otherIncomeRowsPerPage = 10;
+
+// PAGINATION BRANCH
+let allBranches = [];
+let branchCurrentPage = 1;
+const branchPerPage = 5;
+
+// PAGINATION USERS
+let allUsers = [];
+let userCurrentPage = 1;
+const userPerPage = 5;
+
+// PAGINATION REWARD
+let rewardData = [];
+let rewardPage = 1;
+const rewardLimit = 5;
+
+      const api = {
+
+  products: async (cb) => {
+
+
+    const user =
+      state.user;
+
+
+    let branchFilter = "";
+
+
+    // ==========================
+    // ACCESS RULE
+    // ==========================
+
+    if (
+      user.role === "owner"
+    ) {
+
+      // owner ikut branch yang sedang dipilih
+      branchFilter =
+        state.branchId || "ALL";
+
+
+    } else {
+
+      // admin & kasir tetap branch sendiri
+      branchFilter =
+        user.branchId;
+
+    }
+
+
+
+    // ==================================
+    // SUPABASE QUERY (OFF DULU)
+    // ==================================
+
+    /*
+    
+    const {
+      data,
+      error
+    } =
+    await supabase
+      .from("Produk")
+      .select("*")
+      .eq(
+        "branchId",
+        branchFilter
+      );
+
+
+    if(error){
+      console.error(error);
+      return;
+    }
+
+
+    cb(data);
+
+
+    */
+
+
+
+    // ==================================
+    // TEMP DATA VERCEL
+    // ==================================
+
+    const products = [
+
+      {
+        id:"P001",
+        name:"Es Kopi Susu",
+        branchId:
+          branchFilter,
+        price:10000
+      },
+
+      {
+        id:"P002",
+        name:"Matcha Latte",
+        branchId:
+          branchFilter,
+        price:12000
+      }
+
+    ];
+
+
+
+    cb(
+      products
+    );
+
+
+  }
+
+};
+
+
+let sidebarOpen = true;
+
+function toggleSidebar() {
+
+  const sidebar =
+    document.getElementById("sidebar");
+
+  const main =
+    document.getElementById("mainContent");
+
+  sidebarOpen = !sidebarOpen;
+
+  if (!sidebarOpen) {
+
+    sidebar.classList.add("-translate-x-full");
+
+    main.classList.remove("ml-72");
+    main.classList.add("ml-0");
+
+  } else {
+
+    sidebar.classList.remove("-translate-x-full");
+
+    main.classList.remove("ml-0");
+    main.classList.add("ml-72");
+
+  }
+}
+
+let billingOpen = true;
+
+function toggleBillingSidebar(mode = "table") {
+
+  const sidebar =
+    document.getElementById("billingSidebar");
+
+  billingOpen = !billingOpen;
+
+
+  const width =
+    mode === "pos"
+      ? "w-[520px]"
+      : "w-[350px]";
+
+
+  if (billingOpen) {
+
+    sidebar.classList.remove(
+      "translate-x-[120%]",
+      "opacity-0",
+      "pointer-events-none",
+      "w-0",
+      "w-[350px]",
+      "w-[520px]"
+    );
+
+    sidebar.classList.add(width);
+
+
+  } else {
+
+    sidebar.classList.add(
+      "translate-x-[120%]",
+      "opacity-0",
+      "pointer-events-none",
+      "w-0"
+    );
+
+    sidebar.classList.remove(
+      "w-[350px]",
+      "w-[520px]"
+    );
+
+  }
+
+}
+
+function setActiveCategory(el){
+
+  document.querySelectorAll(".category-btn")
+    .forEach(btn=>{
+      btn.classList.remove("active-category");
+    });
+
+  el.classList.add("active-category");
+}
+
+function waitBranch(callback) {
+  const check = () => {
+    if (state.branchId) {
+      callback();
+    } else {
+      setTimeout(check, 50);
+    }
+  };
+  check();
+}
+
+
+
+function updateDeductionStats(totalQty) {
+
+  const dailyEl = document.getElementById("dailyDeductionValue");
+
+  if (dailyEl) {
+    dailyEl.innerText = totalQty + " Unit";
+  }
+
+}
+
+function filterByBranch(data) {
+  if (!state.branchId) return [];
+
+  return (data || []).filter(item => {
+    return !item.branchId || item.branchId === state.branchId;
+  });
+}
+
+
+function formatIDR(amount) {
+  if (!amount || isNaN(amount)) amount = 0;
+
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+function formatIDR(value) {
+  return "Rp " + Math.round(value).toLocaleString("id-ID");
+}
+
+function setValue(id, value) {
+
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.value = value;
+  }
+
+}
+
+function setHTML(id, value) {
+
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.innerHTML = value;
+  }
+
+}
+
+function setText(id, value) {
+
+  const el = document.getElementById(id);
+
+  if (el) {
+    el.innerText = value;
+  }
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+
+
+const params =
+new URLSearchParams(
+  window.location.search
+);
+
+
+const page =
+params.get("page") ||
+window.__ACTIVE_PAGE ||
+null;
+
+
+
+function bootApp(targetPage = "dashboardPage") {
+  const ok =
+    restoreSession();
+
+  if (!ok) {
+    navigate("loginPage");
+    return;
+  }
+
+  const role =
+    state.user?.role?.toLowerCase();
+
+
+  // BRANCH CONTEXT
+  if (role === "owner") {
+    // owner pilih branch nanti
+    state.branchId =
+      localStorage.getItem(
+        "pos_branchId"
+      ) || "";
+    
+  } else {
+
+    // admin / kasir
+    state.branchId =
+      state.user?.branchId ||
+      localStorage.getItem(
+        "pos_branchId"
+      ) ||
+      "";
+
+  }
+
+
+  console.log(
+    "ROLE:",
+    role,
+    "BRANCH:",
+    state.branchId
+  );
+  
+  loadIngredientStockAlertTemplate();
+  loadWhatsAppModal();
+
+  window.__ACTIVE_PAGE =
+    targetPage;
+  navigate(targetPage);
+
+}
+
+// ROUTING
+if(page){
+
+  window.__ACTIVE_PAGE =
+    page;
+  bootApp(page);
+
+} else {
+
+  bootApp(
+    "dashboardPage"
+  );
+}
+});
+
+function bootApp(targetPage = "dashboardPage") {
+
+  const ok = restoreSession();
+  if (!ok) { navigate("loginPage");
+    return;
+  }
+
+  state.user =
+    JSON.parse(localStorage.getItem("pos_user"));
+
+  state.branchId = localStorage.getItem("pos_branchId");
+
+  if (!state.branchId && state.user?.branchId ) {
+      state.branchId = state.user.branchId;
+  }
+  window.__ACTIVE_PAGE =  targetPage;
+  navigate(targetPage);
+}
+
+function restoreSession() {
+  const user = localStorage.getItem("pos_user");
+  const branchId = localStorage.getItem("pos_branchId");
+    if (!user) return false;
+  
+  state.user = JSON.parse(user);
+  state.branchId = branchId;
+  
+  return true;
+}
+
+function navigate(pageId, params = {}) {
+
+  const role =
+    state.user?.role?.toLowerCase() || "";
+
+    if (params.roles) {
+
+      const allowedRoles = params.roles.map(r => r.toLowerCase());
+
+      if (!allowedRoles.includes(role)) {
+        alert("You do not have permission to access this page.");
+        return;
+      }
+    }
+
+  // OWNER ONLY PAGE
+  const ownerPages = [
+    "cashFlowPage"
+  ];
+
+  if (ownerPages.includes(pageId) && role !== "owner") {
+    showToast("Access denied");
+    return;
+  }
+  const template = document.getElementById(pageId);
+  const app = document.getElementById("app");
+
+  if (!template || !app) {
+    return;
+  }
+  app.innerHTML = "";
+  document.querySelectorAll(".page-overlay").forEach(e => e.remove());
+  app.appendChild(template.content.cloneNode(true));
+
+  setTimeout(() => {
+    loadBranchName();
+  }, 0);
+
+  // HEADER USER
+  const headerUsername = document.getElementById("headerUsername");
+  const headerRole = document.getElementById("headerRole");
+
+  if (headerUsername) {headerUsername.textContent = state.user?.username || "-";}
+  if (headerRole) {headerRole.textContent = state.user?.role || "-";}
+
+  // SETTINGS MENU
+  // Owner + Admin
+  document.querySelectorAll(".settingsMenu").forEach(menu => {
+    menu.style.display =
+      (role === "owner" || role === "admin")
+        ? "flex"
+        : "none";
+  });
+
+  // OWNER ONLY MENU
+  document.querySelectorAll(".ownerOnly").forEach(menu => {
+    menu.style.display =
+      (role === "owner")
+        ? "flex"
+        : "none";
+  });
+
+  currentPage = pageId;
+
+  if (window.dashboardInterval) {
+    clearInterval(window.dashboardInterval);
+    window.dashboardInterval = null;
+  }
+
+  setTimeout(() => {
+    initModule(pageId, params);
+  }, 50);
+
+}
+
+async function handleLogin() {
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+  try {
+  
+  
+    // ==================================
+    // SUPABASE LOGIN (NANTI)
+    // ==================================
+  
+    /*
+    
+    const { data, error } =
+      await supabase
+      .from("Users")
+      .select("*")
+      .eq("username", username)
+      .single();
+  
+  
+    if(error){
+      throw error;
+    }
+  
+  
+    // cek password di sini
+  
+  
+    const user = data;
+  
+  
+    */
+    
+    // TEMP VERCEL LOGIN
+
+    const user = {
+  
+      id: "demo",
+      username: username || "owner",
+      name: "Demo Owner",
+      role: "owner",
+      branchId: ""
+    };
+    
+    state.user = user;
+    state.branchId = user.branchId || "";
+    localStorage.setItem(
+      "pos_user",
+      JSON.stringify(user)
+    );
+  
+    if(state.branchId){
+      localStorage.setItem(
+        "pos_branchId",
+        state.branchId
+      );
+    }
+  
+    navigate("dashboardPage");
+  }
+  catch(err){
+   console.error(
+    "Login error:",
+    err
+   );
+  
+   alert(
+    "Login gagal"
+   );
+  }
+}
+
+function logout() {
+  localStorage.removeItem("pos_user");
+  localStorage.removeItem("pos_branchId");
+  state.user = null;
+  state.branchId = null;
+  state.cart = [];
+  state.products = [];
+  
+  navigate(
+    "loginPage"
+  );
+}
+
+
+
+
+
+
+
+  
+      
+</script>
 
 
 
