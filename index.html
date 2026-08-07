@@ -19017,6 +19017,447 @@ function filterProducts(category) {
   renderProducts(filtered); 
 }
 
+
+function renderCart() {
+  
+  const container = document.getElementById("cart-items");
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  let subtotal = 0;
+
+  if (state.cart.length === 0) {
+    container.innerHTML = "<p class='text-slate-500 text-sm'>Cart kosong</p>";
+    updateSummary(0);
+    return;
+  }
+
+  state.cart.forEach((item, index) => {
+    subtotal += item.price * item.qty;
+    const label = item.isRedeem ? "(REDEEM)" : "";
+    container.innerHTML += `
+          <div class=" p-4 rounded-xl">
+              <h4 class="font-bold">${item.name} ${label}</h4>
+              <p class="text-sm text-slate-400">${format(item.price)}</p>
+
+              <input 
+                  placeholder="Catatan..."
+                  value="${item.note || ''}"
+                  oninput="updateNote(${index}, this.value)"
+                  class="w-full mt-2 p-1 rounded bg-slate-800 text-white text-xs"
+              >
+
+              <div class="flex items-center gap-2 mt-2">
+                  <button onclick="decreaseQty(${index})">-</button>
+                  <span class="min-w-[20px] text-center">${item.qty}</span>
+                  <button onclick="increaseQty(${index})">+</button>
+                  <button onclick="removeItemById('${item.id}')" class="text-red-500 ml-2"> 🗑️
+                  </button>
+              </div>
+          </div>
+      `;
+  });
+
+
+  updateSummary(subtotal);
+  
+}
+
+function selectProduct(index) {
+  const product = state.products[index];
+  if (!product) return;
+
+  addToCartFromFilter(product.ID_Produk);
+}
+
+function selectProductById(id) {
+  addToCartFromFilter(id);
+}
+  
+function removeItemById(id) {
+  const index = state.cart.findIndex(i => i.id === id);
+  if (index !== -1) {
+    state.cart.splice(index, 1); // hapus dari cart lokal
+    renderCart();
+
+
+    // optional: hapus juga dari Sheet transaksi
+    if (state.user) {
+      google.script.run
+        .withSuccessHandler(res => {
+          if(res.success) showToast("Item dihapus dari transaksi", "success");
+        })
+        .removeItemFromCart(state.user.id, id);
+    }
+  }
+}
+
+
+function updateSummary(subtotal, member = null) {
+  const el = document.getElementById("pos-cart-summary");
+  if (!el) return;
+  const taxRate = state.settings?.tax || 0;
+  const serviceRate = state.settings?.service || 0;
+  const isMember = state.currentMember && state.currentMember !== "";
+  const discountRate = isMember
+    ? (state.settings?.discount || 0)
+    : 0;
+
+  const discount = isMember
+    ? subtotal * discountRate / 100
+    : 0;
+  const base = subtotal - discount;
+
+  const tax = base * taxRate / 100;
+  const service = base * serviceRate / 100;
+
+  const total = base + tax + service;
+
+  el.innerHTML = `
+    <div class="flex justify-between m-3 text-sm">
+      <span>Subtotal</span>
+      <span>${format(subtotal)}</span>
+    </div>
+
+    <div class="flex justify-between m-3 text-sm">
+      <span>Tax (${taxRate}%)</span>
+      <span>${format(tax)}</span>
+    </div>
+
+    <div class="flex justify-between m-3 text-sm">
+      <span>Service (${serviceRate}%)</span>
+      <span>${format(service)}</span>
+    </div>
+
+    <div class="flex justify-between m-3 text-sm text-tertiary">
+      <span>Discount (${discountRate}%)</span>
+      <span>- ${format(discount)}</span>
+    </div>
+
+    <div class="h-[1px] my-2"></div>
+
+    <div class="flex justify-between m-3 font-bold text-lg">
+      <span>Total</span>
+      <span>${format(total)}</span>
+    </div>
+  `;
+}
+
+function calculateTotal() {
+  const subtotal = state.cart.reduce(
+    (sum, item) => sum + (item.price * item.qty),
+    0
+  );
+
+  const isMember = state.currentMember && state.currentMember !== "";
+
+  const discountRate = isMember
+    ? (state.settings?.discount || 0)
+    : 0;
+
+  const discount = subtotal * discountRate / 100;
+  const base = subtotal - discount;
+
+  const tax = base * (state.settings?.tax || 0) / 100;
+  const service = base * (state.settings?.service || 0) / 100;
+
+  return {
+    subtotal,
+    discount,
+    tax,
+    service,
+    total: base + tax + service,
+  };
+}
+
+function clearCart() {
+  state.cart = [];
+  state.currentMember = null;
+  state.currentTable = null;
+  state.currentMemberPoint = 0;
+  state.paymentMethod = null;
+
+  const memberInput = document.getElementById("member-input");
+  const tableInput = document.getElementById("table-input");
+
+  if (memberInput) memberInput.value = "";
+  if (tableInput) tableInput.value = "";
+
+  renderCart();
+}
+
+function format(num) {
+  return "IDR " + Number(num || 0).toLocaleString("id-ID");
+}
+
+function increaseQty(index) {
+  state.cart[index].qty++;
+  state.cart[index].subtotal = state.cart[index].qty * state.cart[index].price;
+  renderCart();
+}
+
+function decreaseQty(index) {
+  if (state.cart[index].qty > 1) {
+    state.cart[index].qty--;
+  } else {
+    state.cart.splice(index, 1);
+  }
+  renderCart();
+}
+
+function updateNote(index, value) {
+  state.cart[index].note = value;
+}
+
+async function openRedeem() {
+  if (!state.currentMember) {
+    alert("Pilih member dulu!");
+    return;
+  }
+  if (!state.branchId) {
+    alert("Branch belum dipilih!");
+    return;
+  }
+  showToast(
+    "Loading reward...",
+    "info"
+  );
+  try {
+
+    const res =
+      await getRewardsRPC(
+        state.currentMember,
+        state.branchId
+      );
+
+
+    showRedeemPopup(res);
+
+
+  }
+  catch(err){
+
+    console.error(
+      err
+    );
+
+
+    alert(
+      "Gagal ambil reward"
+    );
+
+  }
+
+}
+
+function resetPOSMember() {
+  state.selectedMember = null;
+  state.currentMember = null;
+  const memberInput =
+    document.getElementById("memberSearch");
+  if (memberInput) {
+    memberInput.value = "";
+  }
+  const memberId =
+    document.getElementById("member-id");
+
+  if (memberId) {
+    memberId.value = "";
+  }
+  const result =
+    document.getElementById("memberResult");
+  if (result) {
+    result.style.display = "none";
+  }
+}
+
+function selectMember(member) {
+  document.getElementById("memberSearch").value = member.nama;
+  document.getElementById("member-id").value = member.id;
+
+  state.selectedMember = member;
+  state.currentMember = member.id;
+
+  document.getElementById("memberResult").style.display = "none";
+
+  // INI WAJIB (BIAR DISKON LANGSUNG UPDATE)
+  const subtotal = state.cart.reduce(
+    (sum, item) => sum + (item.price * item.qty),
+    0
+  );
+
+  updateSummary(subtotal);
+}
+
+function showRedeemPopup(data) {
+
+  //  1. Ambil template
+  const template = document.getElementById("redeempointModal");
+
+  if (!template) {
+    return;
+  }
+
+  //  2. Clone template
+  const clone = template.content.cloneNode(true);
+
+  //  3. Wrapper biar bisa dihapus nanti
+  const wrapper = document.createElement("div");
+  wrapper.id = "redeemModalWrapper";
+
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+
+  //  4. SEKARANG element SUDAH ADA
+  wrapper.querySelector("#redeemMemberName").innerText = data.member.nama;
+  wrapper.querySelector("#redeemMemberId").innerText = data.member.id;
+  wrapper.querySelector("#redeemPoint").innerText = data.member.point;
+
+  //  SIMPAN STATE
+  state.rewards = data.rewards;
+  state.currentMemberPoint = data.member.point;
+
+  //  RENDER REWARD
+  const container = wrapper.querySelector("#rewardContainer");
+  container.innerHTML = "";
+
+  data.rewards.forEach(r => {
+    const canRedeem = data.member.point >= r.point;
+
+    const div = document.createElement("div");
+
+    div.innerHTML = `
+      <div class="
+          glass-panel
+          rounded-xl
+          border border-white/5
+          p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+          transition-all
+          duration-200
+          hover:bg-background-high
+          ${!canRedeem ? 'opacity-50' : ''}
+      ">
+
+          <div class="flex items-start justify-between">
+
+              <div class="flex gap-3">
+
+                  <div class="
+                      w-11 h-11
+                      rounded-lg
+                      bg-background-high
+                      flex items-center justify-center
+                      text-primary
+                  ">
+                      <span class="material-symbols-outlined">
+                          card_giftcard
+                      </span>
+                  </div>
+
+                  <div>
+
+                      <h5 class="font-semibold text-on-surface">
+                          ${r.nama}
+                      </h5>
+
+                      <p class="text-xs text-on-surface-variant mt-1">
+                          ${Number(r.point).toLocaleString()} Points
+                      </p>
+
+                  </div>
+
+              </div>
+
+          </div>
+
+          <button
+              ${!canRedeem ? 'disabled' : ''}
+              onclick="selectReward('${String(r.ID_Reward)}')"
+              class="
+                  mt-4
+                  w-full
+                  h-11
+                  rounded-lg
+                  transition
+                  active:scale-95
+
+                  ${
+                      canRedeem
+                      ? `
+                      bg-primary
+                      text-background
+                      hover:brightness-110
+                      `
+                      : `
+                      bg-background-high
+                      text-on-surface-variant
+                      cursor-not-allowed
+                      `
+                  }
+              "
+          >
+              ${canRedeem ? 'Redeem' : 'Insufficient Points'}
+          </button>
+
+      </div>
+      `;
+
+    container.appendChild(div);
+  });
+
+}
+
+function selectReward(rewardId) {
+  const reward = state.rewards.find(r => r.ID_Reward == rewardId);
+  if (!reward) {
+    alert("Reward tidak ditemukan");
+    return;
+  }
+
+  const product = state.products.find(p => p.ID_Produk == reward.Produk_ID);
+  if (!product) {
+    alert("Produk tidak ditemukan");
+    return;
+  }
+
+  // HITUNG POINT YANG SUDAH DIPAKAI
+  const totalPointUsed = state.cart
+    .filter(i => i.isRedeem)
+    .reduce((sum, i) => {
+      const prod = state.products.find(p => p.ID_Produk == i.id);
+      return sum + ((Number(prod?.Redeem_Point) || 0) * i.qty);
+    }, 0);
+
+  // CEK POINT
+  if ((state.currentMemberPoint - totalPointUsed) < (Number(product.Redeem_Point) || 0)) {
+    alert("Point tidak cukup");
+    return;
+  }
+
+  // CEK MAX REDEEM
+  const usedQty = state.cart
+    .filter(i => i.isRedeem && i.id === product.ID_Produk)
+    .reduce((sum, i) => sum + i.qty, 0);
+
+  if (reward.Max_Redeem && usedQty >= reward.Max_Redeem) {
+    alert("Maksimal redeem tercapai");
+    return;
+  }
+
+  // MASUK CART (INI YANG HARUS KONSISTEN)
+  addToCart(product, true, reward.ID_Reward);
+
+  renderCart();
+  closeRedeem();
+}
+
+function closeRedeem() {
+  const modal = document.getElementById("redeemModalWrapper");
+    if (modal) modal.remove();
+}
+
+    
     
     // =========================
     // MEMBERS PAGE
