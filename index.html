@@ -18894,80 +18894,69 @@ function addToCart(product, isRedeem = false, rewardId = null) {
 }
 
 async function loadProducts(callback) {
+
+	const role =
+	  state.user?.role?.toLowerCase() || "";
+	const branchId =
+	  state.branchId;
+		
 	console.log("LOAD PRODUCTS RUN");
-console.log("BRANCH:", state.branchId);
-console.log("ROLE:", role);
-  const role =
-    state.user?.role?.toLowerCase() || "";
-  const branchId =
-    state.branchId;
-  if (!branchId) {
-    return;
-  }
-  if (
-    state.products &&
-    state.productsBranchId === branchId &&
-    state.productsRole === role
-  ) {
-    renderProducts(
-      state.products
-    );
-    if(callback){
-      callback();
-    }
-    return;
-  }
-    
-  try {
-
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data:products, error } =
-      await supabase.rpc(
-        "get_products",
-        {
-          p_branch_id: branchId,
-          p_role: role
-        }
-      );
-
-
-    if(error){
-
-      throw error;
-
-    }
-    */
-
-    // SUPABASE RPC
-    const products = await getProductsRPC(branchId, role);
-    state.products =
-      products || [];
-    state.productsBranchId =
-      branchId;
-    state.productsRole =
-      role;
-    loadNotifications();
-    renderProducts(
-      state.products
-    );
-    if(callback){
-      callback();
-    }
-  }
-  catch(err){
-    console.error(
-      "Load Products:",
-      err
-    );
-    showToast(
-      "Gagal memuat produk",
-      "error"
-    );
-  }
+	console.log("BRANCH:", branchId);
+	console.log("ROLE:", role);
+	
+	if (!branchId) {
+	  return;
+	}
+	
+	if (
+	  state.products &&
+	  state.productsBranchId === branchId &&
+	  state.productsRole === role
+	) {
+	  renderProducts(
+	    state.products
+	  );
+	  if(callback){
+	    callback();
+	  }
+	  return;
+	}
+	
+	try {
+	  const products =
+	    await getProductsRPC(
+	      branchId,
+	      role
+	    );
+	
+	  console.log(
+	    "PRODUCT RPC RESULT:",
+	    products
+	  );
+	  state.products =
+	    products || [];
+	  state.productsBranchId =
+	    branchId;
+	  state.productsRole =
+	    role;
+	  loadNotifications();
+	  renderProducts(
+	    state.products
+	  );
+	  if(callback){
+	    callback();
+	  }
+	}
+	catch(err){
+	  console.error(
+	    "Load Products:",
+	    err
+	  );
+	  showToast(
+	    "Gagal memuat produk",
+	    "error"
+	  );
+	}
 }
     
 function initSearch() {
