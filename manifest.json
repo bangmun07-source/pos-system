@@ -1,1 +1,11 @@
-
+{
+  "name": "Sistem POS",
+  "short_name": "POS",
+  "description": "Sistem Point of Sale",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0B0F14",
+  "theme_color": "#0B0F14",
+  "orientation": "portrait",
+  "icons": []
+}
