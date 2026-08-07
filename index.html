@@ -16336,7 +16336,75 @@ function initApp() {
 
 
 
+function loadBranchName() {
 
+  if (state.branchInfo) {
+    const el =
+      document.getElementById(
+        "appBrandName"
+      );
+
+    if (el) {
+      el.innerText =
+      (
+        state.branchInfo.branchName ||
+        "SISTEM KASIR"
+      ).toUpperCase();
+    }
+    return;
+  }
+
+
+
+  // ==================================
+  // SUPABASE QUERY (NANTI)
+  // ==================================
+
+  /*
+  
+  const { data, error } =
+    await supabase
+    .from("Branches")
+    .select("*")
+    .eq(
+      "branchId",
+      state.branchId
+    )
+    .single();
+
+
+  if(!error){
+
+    state.branchInfo = data;
+
+  }
+
+  */
+
+  // ==================================
+  // TEMP VERCEL
+  // ==================================
+
+  state.branchInfo = {
+    branchName:
+      state.branchId
+      ? "SISTEM KASIR"
+      : "PILIH OUTLET"
+  };
+
+  const el =
+    document.getElementById(
+      "appBrandName"
+    );
+
+  if(el){
+    el.innerText =
+    state.branchInfo.branchName
+    .toUpperCase();
+  }
+
+
+}
   
       
 </script>
