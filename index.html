@@ -18260,10 +18260,7 @@ function renderTopRevenueTable() {
   const end = start + topRevenueItemsPerPage;
   const data = allTopRevenueData.slice(start, end);
 
-  // =========================
   // RENDER
-  // =========================
-
   data.forEach(item => {
     const img = (item.image || "")
       .replace(
@@ -18354,8 +18351,681 @@ function renderTopRevenueTable() {
     }
 }
 
+
     // =========================
-    // MEMBERS
+    // POS PAGE
+    // =========================
+
+function goPOS(){
+    navigate('posPage');
+}
+    
+function validateStock() {
+  for (const item of state.cart) {
+    const product =
+      state.products.find(
+        p => String(p.ID_Produk) === String(item.id)
+      );
+    if (!product) {
+      showToast("Produk tidak ditemukan","error");
+      return false;
+    }
+    const stock =
+      Number(product.Stok ?? product.stock ?? 0);
+    if (item.qty > stock) {
+      showToast(
+        `Stok ${product.Nama_Produk} tidak cukup`,
+        "error"
+      );
+      return false;
+    }
+  }
+  return true;
+}
+
+function deductStock() {
+  state.cart.forEach(item => {
+    const product = state.products.find(p => p.ID_Produk === item.id);
+    if (product) {
+      product.Stok = (Number(product.Stok || 0)) - item.qty;
+    }
+  });
+}
+
+function selectTable(id) {
+  state.currentTable = id;
+  selectedTableId = id; 
+  document.getElementById("billing-table-info").innerText = "Table " + id;
+
+  loadBilling(id); 
+  toggleBillingSidebar();
+}
+
+async function preloadRecipeMap() {
+  const branchId = state.branchId;
+  if (!branchId) {
+    return;
+  }
+  if (
+    state.recipeMap &&
+    state.recipeMapBranchId === branchId
+  ) {
+    return;
+  }
+
+  try {
+
+    // ==================================
+    // SUPABASE (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data: recipe, error } =
+      await supabase.rpc(
+        "get_recipe_master_ledger",
+        {
+          p_branch_id: branchId
+        }
+      );
+
+    if(error){
+      throw error;
+    }
+    */
+
+    // TEMP DATA VERCEL
+    const recipe = [];
+    const norm = v =>
+      String(v || "")
+        .trim()
+        .toUpperCase();
+    state.recipeMap = {};
+    (recipe || []).forEach(r => {
+      state.recipeMap[
+        norm(r.productId)
+      ] = r;
+      state.recipeMap[
+        norm(r.name)
+      ] = r;
+    });
+    state.recipeMapBranchId =
+      branchId;
+  }
+  catch(err){
+    console.error(
+      "Preload Recipe Map:",
+      err
+    );
+  }
+}
+
+function checkout() { 
+  const btn = document.getElementById("btnCheckout");
+  if (btn?.disabled) return;
+  if (!state.branchId) {
+    alert("Branch tidak valid");
+    return;
+  }
+  if (isProcessing) return; 
+  const table = state.currentTable || document.getElementById("table-input")?.value;
+  if (!table) return alert("Pilih meja dulu");
+  state.currentTable = table; 
+  if (!state.user) return alert("User belum login");
+  if (state.cart.length === 0) return alert("Keranjang kosong");
+  if (!state.paymentMethod) return alert("Pilih pembayaran");
+  isProcessing = true; //  kunci mulai
+  if (btn) btn.disabled = true;
+  const memberId = state.currentMember ? String(state.currentMember).trim() : null;
+  const calc = calculateTotal();
+  const totalPointUsed = state.cart
+      .filter(i => i.isRedeem)
+      .reduce((sum, i) => sum + (i.pointUsed || 0), 0);
+
+  const payload = {
+      requestId: crypto.randomUUID(),
+      userId: state.user.username,
+      branchId: state.branchId, 
+      mejaId: state.currentTable,
+      memberId: memberId,
+      pointUsed: totalPointUsed,
+
+  items: state.cart.map(i => ({
+    id: i.id,
+    name: i.name,
+    qty: i.qty,
+    price: i.price,
+    category: i.category || "",
+    subtotal: i.qty * i.price,
+    isRedeem: i.isRedeem || false,
+    pointUsed: i.pointUsed || 0 ,
+    rewardId: i.isRedeem ? i.rewardId : null 
+  })),
+
+      subtotal: calc.subtotal,
+      discount: calc.discount,
+      tax: calc.tax,
+      service: calc.service,
+      total: calc.total,
+      paymentMethod: state.paymentMethod
+  };
+
+  function hitungHPPDanKirim(payload) {
+      let hppTotal = 0;
+      const norm = v =>
+        String(v || "").trim().toUpperCase();
+      state.cart.forEach(item => {
+        const r =
+          state.recipeMap[norm(item.id)] ||
+          state.recipeMap[norm(item.name)];
+        if (!r) {
+          return;
+        }
+
+        const cost = Number(r.cost) || 0;
+        hppTotal += cost * item.qty;
+      });
+      payload.hppTotal = hppTotal;
+      sendTransaction(payload);
+  } 
+    
+  if (memberId) {
+    // ==================================
+    // SUPABASE RPC (AKTIFKAN NANTI)
+    // ==================================
+    
+    /*
+    const { data:member, error } =
+     await supabase.rpc(
+       "check_member",
+       {
+         p_member_id: memberId
+       }
+     );
+    
+    if(error){
+     throw error;
+    }
+    */
+    
+    // TEMP DATA VERCEL
+    const member = {
+      id: memberId
+    };
+    if (!member) {
+      alert(
+        "Member tidak ditemukan ❌"
+      );
+      isProcessing = false;
+      const btn =
+        document.getElementById(
+          "btnCheckout"
+        );
+      if(btn){
+        btn.disabled = false;
+      }
+      return;
+    }
+    // pastikan pakai ID asli
+    payload.memberId =
+    member.id;
+    // LANGSUNG HITUNG HPP
+    hitungHPPDanKirim(payload); 
+}
+
+
+
+
+
+
+
+
+    
+
+async function sendTransaction(payload){
+  if (!payload) {
+    alert("Payload NULL");
+    return;
+  }
+
+  try {
+    isProcessing = true;
+    const btn =
+      document.getElementById(
+        "btnCheckout"
+      );
+    if(btn){
+      btn.disabled = true;
+    }
+      
+    // ==================================
+    // SUPABASE RPC (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data:res, error } =
+      await supabase.rpc(
+        "process_transaction",
+        {
+          p_payload: payload
+        }
+      );
+
+
+    if(error){
+      throw error;
+    }
+    */
+
+    // TEMP DATA VERCEL
+    const res = {
+      success:true,
+      message:
+      "Transaksi berhasil"
+    };
+    isProcessing = false;
+    if(btn){
+      btn.disabled = false;
+    }
+
+    if(!res){
+      alert(
+        "Backend mengembalikan NULL"
+      );
+      return;
+    }
+
+    if(res.success){
+      showToast(
+        "Transaksi berhasil ✔",
+        "success"
+      );
+
+      if(payload.memberId){
+        state.memberPageData = null;
+        state.members = null;
+      }
+      state.recentTransactionsData = null;
+      state.recentTransactionsFilter = null;
+      state.recentSummaryData = null;
+      state.recentSummaryFilter = null;
+      state.analyticsData = null;
+      state.analyticsFilter = null;
+      state.cashFlowData = null;
+      state.cashFlowFilter = null;
+      state.dashboardData = null;
+      state.tableData = null;
+      state.inventoryData = null;
+      state.inventoryFilter = null;
+      state.products = null;
+      state.cart = [];
+      state.currentMember = null;
+      state.selectedMember = null;
+      state.currentMemberPoint = 0;
+      state.paymentMethod = null;
+      state.discountActive = false;
+
+      const memberInput =
+        document.getElementById(
+          "member-input"
+        );
+      const tableInput =
+        document.getElementById(
+          "table-input"
+        );
+      if(memberInput){
+        memberInput.value = "";
+      }
+      if(tableInput){
+        tableInput.value = "";
+      }
+      renderCart();
+      updateSummary(0);
+    }
+    else{
+      showToast(
+        "Gagal: " + res.message,
+        "error"
+      );
+    }
+  }
+  catch(err){
+    isProcessing = false;
+    const btn =
+      document.getElementById(
+        "btnCheckout"
+      );
+    if(btn){
+      btn.disabled = false;
+    }
+    alert(
+      err.message ||
+      "Error server!"
+    );
+  }
+}
+
+function setTable(value) {
+  state.currentTable = value.trim();
+}
+
+function selectPayment(method) {
+  state.paymentMethod = method;
+    //  reset semua tombol dulu
+    ["Cash", "QRIS", "Bank"].forEach(m => {
+      const btn = document.getElementById("pay-" + m);
+      if (!btn) return;
+      btn.classList.remove(
+        "bg-primary-container",
+        "text-on-primary-container",
+        "ring-1",
+        "ring-primary-container"
+      );
+      btn.classList.add(
+        "bg-surface-container-low",
+        "text-slate-400"
+      );
+    });
+    //  aktifkan tombol yang dipilih
+    const activeBtn = document.getElementById("pay-" + method);
+    if (activeBtn) {
+      activeBtn.classList.remove("bg-surface-container-low", "text-slate-400");
+      activeBtn.classList.add(
+        "bg-primary-container",
+        "text-on-primary-container",
+        "ring-1",
+        "ring-primary-container"
+      );
+    }
+    // optional tampilkan info
+    updatePaymentUI(method);
+}	
+
+function updatePaymentUI(method) {
+    const el = document.getElementById("payment-info");
+    if (!el) return;
+    if(method === "QRIS") {
+        el.innerHTML = `<img src="${qrisImage}" style="max-width:150px;">`;
+    } else if(method === "Bank") {
+        el.innerHTML = `<p>Nomor Rekening: 123456789</p>`;
+    } else {
+        el.innerHTML = `<p>Bayar Tunai di kasir</p>`;
+    }
+}
+
+function renderProducts(products) {
+  const el = document.getElementById("product-list");
+  if (!el) return;
+  el.innerHTML = products.map(p => {
+    const id = p.ID_Produk || p.id || "-";
+    const name = p.Nama_Produk || p.nama || "Unknown Product";
+    const price = Number(p.Harga || p.harga || 0);
+    const stock = p.Stok ?? p.stock ?? 0;
+    const category = p.Kategori || p.category || "-";
+
+    return `
+    <div 
+      class="glass-panel rounded-xl overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)] cursor-pointer hover:scale-[1.02] transition"
+      onclick="addToCartById('${id}')"
+    >
+
+      <div class="h-24 overflow-hidden">
+        <img 
+          src="${p.Gambar || 'https://via.placeholder.com/150'}"
+          class="w-full h-full object-cover block"
+        />
+      </div>
+
+      <div class="p-3">
+        <h4 class="font-bold text-sm">${name}</h4>
+
+        <div class="flex justify-between items-center mt-1">
+          <span class="text-sm text-slate-300">
+            ${format(price)}
+          </span>
+
+          <span class="text-xs px-2 py-1 rounded bg-primary-container text-black">
+            ${category}
+          </span>
+        </div>
+
+        <p class="text-xs text-slate-500 mt-1">
+          Stock: ${stock}
+        </p>
+      </div>
+
+    </div>
+  `;
+  }).join("");
+}
+
+async function loadOrders() {
+  const el =
+    document.getElementById(
+      "order-list"
+    );
+  if (!el) return;
+  try {
+
+    // ==================================
+    // SUPABASE RPC (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data, error } =
+      await supabase.rpc(
+        "get_orders"
+      );
+
+
+    if(error){
+
+      throw error;
+
+    }
+    */
+
+    // TEMP DATA VERCEL
+    const data = [];
+    el.innerHTML =
+      data.map(o => `
+        <div>
+          <p>${o.id}</p>
+          <p>${o.total}</p>
+          <p>${o.date}</p>
+        </div>
+      `).join("");
+  }
+  catch(err){
+    console.error(
+      "Load Orders:",
+      err
+    );
+    el.innerHTML =
+      `
+      <p>
+          Gagal memuat order
+      </p>
+      `;
+  }
+}
+
+function addToCartFromFilter(id) {
+  const product = state.recipes.find(r =>
+    String(r.id || r.ID || r.productId).toLowerCase() === String(id).toLowerCase()
+  );
+  if (!product) return;
+  const existing = state.cart.find(i => i.id === id);
+  if (existing) {
+    existing.qty++;
+  } else {
+      state.cart.push({
+        id: product.ID_Produk,
+        name: product.Nama_Produk,
+        price: Number(product.Harga || 0),
+        qty: 1,
+        note: "",
+        isRedeem: false,
+        productId: product.ID_Produk,
+        rewardId: null
+      });
+  }
+  renderCart(); 
+}
+
+function addToCartById(id, isRedeem = false, rewardId = null) {
+  const product = state.products.find(p => p.ID_Produk === id);
+  if (!product) return;
+  addToCart(product, isRedeem, rewardId);
+}
+
+function addToCart(product, isRedeem = false, rewardId = null) {
+  // VALIDASI MEMBER kalau redeem
+  if (isRedeem) {
+    if (!state.currentMember) {
+      alert("Pilih member dulu!");
+      return;
+    }
+    if (!state.currentMemberPoint) {
+      alert("Point member belum dimuat");
+      return;
+    }
+    if (!rewardId) {
+      alert("Reward tidak valid!");
+      return;
+    }
+  }
+  const existing = state.cart.find(
+    i => i.id === product.ID_Produk && i.isRedeem === isRedeem
+  );
+  if (existing) {
+    existing.qty++;
+    //  PENTING: paksa rewardId tetap ada
+    if (isRedeem) {
+      existing.rewardId = rewardId;
+    }
+  } else {
+    state.cart.push({
+      id: product.ID_Produk,
+      name: product.Nama_Produk,
+      price: isRedeem ? 0 : Number(product.Harga || 0),
+      qty: 1,
+      note: "",
+      isRedeem: isRedeem,
+      productId: product.ID_Produk,
+      rewardId: isRedeem ? rewardId : null
+    });
+  }
+  renderCart();
+}
+
+async function loadProducts(callback) {
+  const role =
+    state.user?.role?.toLowerCase() || "";
+  const branchId =
+    state.branchId;
+  if (!branchId) {
+    return;
+  }
+  if (
+    state.products &&
+    state.productsBranchId === branchId &&
+    state.productsRole === role
+  ) {
+    renderProducts(
+      state.products
+    );
+    if(callback){
+      callback();
+    }
+    return;
+  }
+    
+  try {
+
+    // ==================================
+    // SUPABASE RPC (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data:products, error } =
+      await supabase.rpc(
+        "get_products",
+        {
+          p_branch_id: branchId,
+          p_role: role
+        }
+      );
+
+
+    if(error){
+
+      throw error;
+
+    }
+    */
+
+    // TEMP DATA VERCEL
+    const products = [];
+    state.products =
+      products || [];
+    state.productsBranchId =
+      branchId;
+    state.productsRole =
+      role;
+    loadNotifications();
+    renderProducts(
+      state.products
+    );
+    if(callback){
+      callback();
+    }
+  }
+  catch(err){
+    console.error(
+      "Load Products:",
+      err
+    );
+    showToast(
+      "Gagal memuat produk",
+      "error"
+    );
+  }
+}
+    
+function initSearch() {
+  const input = document.getElementById("searchInput");
+  if (!input) {
+    return;
+  }
+  input.addEventListener("input", function(e) {
+    const keyword = e.target.value.toLowerCase();
+    if (!state.products) return;
+    if (!keyword) {
+      renderProducts(state.products);
+      return;
+    }
+    const hasil = state.products.filter(p =>
+      (p.Nama_Produk || "").toLowerCase().includes(keyword) ||
+      (p.Kategori || "").toLowerCase().includes(keyword)
+    );
+    renderProducts(hasil);
+  });
+}
+
+function filterProducts(category) {
+  if (!state.products || state.products.length === 0) return;
+  let filtered = state.products;
+  if (category && category !== "All") {
+    filtered = state.products.filter(p =>
+      p.Kategori.toLowerCase() === category.toLowerCase()
+    );
+  }
+  renderProducts(filtered); 
+}
+
+    
+    // =========================
+    // MEMBERS PAGE
     // =========================
 
 
