@@ -16197,8 +16197,142 @@ function logout() {
   );
 }
 
+async function loadDashboard() {
+const cacheKey =
+  JSON.stringify({
+    branchId: state.branchId
+  });
+
+if (
+  state.dashboardData &&
+  state.dashboardFilter === cacheKey
+) {
+      
+  renderDashboard(
+    state.dashboardData
+  );
+  return;
+}
+
+try {
 
 
+  // ==================================
+  // SUPABASE QUERY (NANTI AKTIF)
+  // ==================================
+
+  /*
+  
+  const {
+    data,
+    error
+  } =
+  await supabase.rpc(
+    "get_dashboard_data",
+    {
+      p_branch_id:
+        state.branchId
+    }
+  );
+
+
+  if(error){
+    throw error;
+  }
+
+
+  const dashboardData =
+    data;
+
+
+  */
+
+  // ==================================
+  // TEMP DATA VERCEL
+  // ==================================
+
+  const dashboardData = {
+    revenue: 0,
+    orders: 0,
+    aov: 0,
+    occupancy: {occupied: 0,total: 0,percent: 0},
+    recentTransactions: [],
+    lowStock: [],
+    shift: {
+      pagi:{orders:0,revenue:0},
+      siang:{orders:0,revenue:0},
+      malam:{orders:0,revenue:0}
+    }
+  };
+
+  state.dashboardData = dashboardData;
+  state.dashboardFilter = cacheKey;
+      
+  renderDashboard(
+    dashboardData
+  );
+}
+catch(err){
+  console.error(
+    "Dashboard error:",
+    err
+  );
+}
+}
+
+function initApp() {
+  const params = new URLSearchParams(window.location.search);
+  const page = params.get("page");
+  const user = localStorage.getItem("pos_user");
+      
+  if (!user) {
+    navigate(
+      "loginPage"
+    );
+    return;
+  }
+
+  state.user = JSON.parse(user);
+  const role = state.user?.role?.toLowerCase();
+
+  // ==========================
+  // BRANCH CONTEXT
+  // ==========================
+  if(role === "owner") {
+    // owner ambil branch terakhir yang dipilih
+    state.branchId =
+      localStorage.getItem(
+        "pos_branchId"
+      ) || "";
+        
+  } else {
+    // admin / kasir
+    state.branchId =
+      state.user?.branchId ||
+      localStorage.getItem(
+        "pos_branchId"
+      ) ||
+      "";
+  }
+
+  console.log(
+    "ROLE:",
+    role,
+    "BRANCH:",
+    state.branchId
+  );
+
+  if(page) {
+    window.__ACTIVE_PAGE =
+      page;
+    navigate(page);
+    return;
+  }
+
+  navigate(
+    "dashboardPage"
+  );
+}
 
 
 
