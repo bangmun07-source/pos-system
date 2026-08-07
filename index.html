@@ -17286,10 +17286,40 @@ function closeViewTransactionModal() {
 
 
 function fetchSettings(callback) {
+
+  // ==========================
+  // VERCEL MODE (NO GAS)
+  // ==========================
+
+  if (
+    typeof google === "undefined" ||
+    !google.script ||
+    !google.script.run
+  ) {
+
+    console.log(
+      "Vercel mode: skip getSettingsPageData"
+    );
+
+    state.settings = {};
+
+    if (callback) callback();
+
+    return;
+  }
+
+
+  // ==========================
+  // GOOGLE APPS SCRIPT MODE
+  // ==========================
+
   google.script.run
     .withSuccessHandler(data => {
+
       state.settings = data.settings;
+
       if (callback) callback();
+
     })
     .getSettingsPageData();
 }
