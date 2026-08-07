@@ -17429,13 +17429,124 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
             },100);
 }
 
+function goToRecentTransactions() {
+  navigate("recentTransactionsPage");
+}
+
+function renderReceipt(data) {
+
+  const tpl = document.getElementById("receiptTemplate");
+  const clone = tpl.content.cloneNode(true);
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "absolute";
+  wrapper.style.left = "-9999px";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  wrapper.querySelector("#receiptId").textContent = data.trxId;
+  wrapper.querySelector("#receiptDate").textContent = data.date;
+  wrapper.querySelector("#receiptTable").textContent = data.table;
+  wrapper.querySelector("#receiptTotal").textContent = data.total;
+  wrapper.querySelector("#receiptSubtotal").textContent = data.total;
+  wrapper.querySelector("#receiptTax").textContent = data.tax;
+  wrapper.querySelector("#receiptService").textContent = data.service;
+  wrapper.querySelector("#receiptDiscount").textContent = data.discount;
+  const canvas = wrapper.querySelector("#receiptCanvas");
+  html2canvas(canvas, {
+    scale: 1,
+    useCORS: true,
+    backgroundColor: "#0B0F14"
+  }).then(canvas => {
+
+    const image =
+      canvas.toDataURL(
+        "image/jpeg",
+        0.65
+      );
+    console.log(
+      "Receipt size:",
+      Math.round(image.length / 1024),
+      "KB"
+    );
+    wrapper.remove();
+
+  });
+}
+
+document.addEventListener("click", function(e) {
+  if (e.target.closest("#closeReceiptModal")) {
+    document
+      .getElementById("sendDigitalReceiptModal")
+      ?.remove();
+  }
+});
+
+function closeTransactionModal() {
+  document
+    .querySelectorAll(
+      "#transactionModalWrapper, #viewTransactionModalWrapper"
+    )
+    .forEach(el => el.remove());
+}
+
+function closeViewTransactionModal() {
+  document
+    .getElementById("viewTransactionModalWrapper")
+    ?.remove();
+  openTransactionModal(currentTransaction);
+}
+
+async function fetchSettings(callback) {
+
+  try {
+
+    // ==================================
+    // SUPABASE / API NANTI
+    // ==================================
+
+    /*
+    const res = await fetch("/api/settings");
+
+    const data = await res.json();
+
+    state.settings = data.settings;
+    */
+
+
+    // ==================================
+    // TEMP DUMMY
+    // HAPUS SETELAH API AKTIF
+    // ==================================
+
+    const data = {
+
+      settings: {
+        tax: 11,
+        service: 5,
+        discount: 0,
+        point_ratio: 10000
+      }
+
+    };
+    state.settings =
+      data.settings;
+    if (callback) {
+      callback();
+    }
+  } catch(err) {
+    console.error(
+      "Fetch settings error:",
+      err
+    );
+
+  }
+
+}
 
 
 
-
-
-
-
+    // ==================================
+    // GROSS REVENUE
+    // ==================================      
 
       
 
