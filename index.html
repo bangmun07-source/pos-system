@@ -15993,9 +15993,20 @@ function navigate(pageId, params = {}) {
     window.dashboardInterval = null;
   }
 
-  setTimeout(() => {
-    initModule(pageId, params);
-  }, 50);
+setTimeout(() => {
+
+console.log(
+  "BEFORE INIT MODULE",
+  pageId
+);
+
+initModule(pageId, params);
+
+console.log(
+  "AFTER INIT MODULE"
+);
+
+}, 50);
 
 }
 
