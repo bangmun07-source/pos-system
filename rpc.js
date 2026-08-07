@@ -34,3 +34,23 @@ async function getProductsRPC(branchId, role){
   }
   return data || [];
 }
+
+async function getRewardsRPC(memberId, branchId) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_rewards",
+      {
+        p_member_id: memberId,
+        p_branch_id: branchId
+      }
+    );
+
+  if(error){
+    console.error(
+      "get_rewards error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
