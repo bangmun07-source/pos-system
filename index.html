@@ -17846,45 +17846,57 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   // ======================
   const canvas = wrapper.querySelector("#receiptCanvas");
 
-  setTimeout(() => {
+  setTimeout(async () => {
 
-    html2canvas(canvas, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#0B0F14"
-    }).then(canvas => {
-
-      const image = canvas.toDataURL("image/jpeg", 0.65);
-
-      const response =
-            await fetch(
-              "/api/handle-receipt-upload",
-              {
-                method:"POST",
-                headers:{
-                  "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-            
-                  base64:image,
-            
-                  trxId:trx.id
-            
-                })
-              }
-            );
-            
-            
-            const result =
-            await response.json();
-            
-            
-            const url =
-            result.url;
-
-    });
-
-  }, 100);
+        const receiptCanvas =
+          await html2canvas(canvas, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: "#0B0F14"
+          });
+      
+      
+        const image =
+          receiptCanvas.toDataURL(
+            "image/jpeg",
+            0.65
+          );
+      
+      
+        const response =
+          await fetch(
+            "/api/handle-receipt-upload",
+            {
+              method:"POST",
+              headers:{
+                "Content-Type":"application/json"
+              },
+              body:JSON.stringify({
+      
+                base64:image,
+      
+                trxId:trx.id
+      
+              })
+            }
+          );
+      
+      
+        const result =
+          await response.json();
+      
+      
+        const url =
+          result.url;
+      
+      
+        console.log(
+          "Receipt URL:",
+          url
+        );
+      
+      
+      },100);
 }
 
 function renderReceipt(data) {
