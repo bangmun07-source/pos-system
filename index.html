@@ -16261,6 +16261,11 @@ function formatPercent(val) {
   return (num >= 0 ? "+" : "") + num.toFixed(1) + "%";
 }
 
+function format(value) {
+  return "IDR " + Number(value || 0)
+    .toLocaleString("id-ID");
+}
+
 let clockInterval;
 
 function startClock() {
@@ -16900,6 +16905,7 @@ document.addEventListener("click", function(e) {
   }
 
 });
+
 
 function formatCurrency(value) {
   return "IDR " + Number(value || 0).toLocaleString("id-ID");
