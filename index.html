@@ -16276,92 +16276,306 @@ function startClock() {
 }
 
 
+function initModule(pageId) {
+
+  switch(pageId) {
+
+    case "dashboardPage":
+        loadDashboard();
+        startClock();
+      break;
+
+
+    case "grossRevenuePage": {
+
+      initDatePicker();
+
+      const startEl = document.getElementById("startDate");
+      const endEl = document.getElementById("endDate");
+
+      if (!startEl || !endEl) break;
+
+      const today = new Date();
+      const past = new Date();
+
+      past.setDate(today.getDate() - 7);
+
+      startEl.value = past.toISOString().split("T")[0];
+      endEl.value = today.toISOString().split("T")[0];
+
+      updateDateLabel(  startEl.value, endEl.value );
+      loadGrossRevenuePage();
+      break;
+    }
+
+
+    case "recentTransactionsPage":{
+          const startEl = document.getElementById("startDate");
+          const endEl = document.getElementById("endDate");
+          if (startEl && endEl) {
+            const today = new Date();
+            const past = new Date();
+            past.setDate(today.getDate() - 7);
+
+            startEl.value = past.toISOString().split("T")[0];
+            endEl.value = today.toISOString().split("T")[0];
+          }
+          // 1. INIT LISTENER DULU
+          initTransactionFilters();
+          // 2. BARU LOAD DATA
+          loadRecentTransactionsPage();
+          loadRecentTransactionSummary();
+    break;
+    }
+
+    case "posPage":
+      resetPOSMember();
+      waitBranch(() => {
+        loadNotifications();
+        loadProducts(() => {
+          initSearch();
+        });
+        
+        
+        fetchSettings(() => {
+          renderCart();
+        });
+        preloadRecipeMap();
+        loadRecipes(state.branchId);
+      });
+    break;
+
+
+    case "orderPage":
+      loadOrders(state.branchId);
+      break;
+
+    case "memberPage":
+
+      waitBranch(() => {
+        loadMembers(() => {
+          loadMemberStats();
+          loadMemberGrowth();
+          loadNotifications();
+          initMemberSearch();
+          initTierFilter();
+          initExportPDF();
+        });
+      });
+    break;
+
+    case "tablePage":
+        loadTables(state.branchId);
+    break;
+
+    case "inventoryPage":
+
+      waitBranch(() => {
+
+        loadInventoryPage(state.branchId);
+
+        initIngredientExportDate();
+
+      });
+
+    break;
+
+    break;
+
+    case "analyticsPage": {
+      initAnalyticsDate();
+      loadAnalyticsPage();
+      break;
+    }
+   
+
+    case "settingsPage":
+      loadSettingsPage();
+    break;
+
+    case "loyaltysettingPage":
+      initLoyaltyPage();
+    break;
+
+    case "expensessettingPage":{
+
+        const startEl = document.getElementById("expenseStartDate");
+        const endEl = document.getElementById("expenseEndDate");
+        const today = new Date();
+        const past = new Date();
+
+        past.setDate(today.getDate() - 6);
+        if (startEl) { startEl.value = past.toISOString().split("T")[0]; }
+
+        if (endEl) { endEl.value = today.toISOString().split("T")[0]; }
+
+        initExpenseSettingPage();
+        initOtherIncomeEvents();
+
+    break;
+    }
+
+    case "cashFlowPage":
+
+      initCashFlowPage();
+      loadCashFlowNotification()
+
+    break;
+
+  }
+}
+
+	
   // ==================================
   // DASHBOARD
   // ==================================
 
+async function getDashboardCached(cb) {
 
-async function loadDashboard() {
-const cacheKey =
-  JSON.stringify({
-    branchId: state.branchId
-  });
-
-if (
-  state.dashboardData &&
-  state.dashboardFilter === cacheKey
-) {
-      
-  renderDashboard(
-    state.dashboardData
-  );
-  return;
-}
-
-try {
-
-
-  // ==================================
-  // SUPABASE QUERY (NANTI AKTIF)
-  // ==================================
-
-  /*
-  
-  const {
-    data,
-    error
-  } =
-  await supabase.rpc(
-    "get_dashboard_data",
-    {
-      p_branch_id:
-        state.branchId
-    }
-  );
-
-
-  if(error){
-    throw error;
+  if (state.dashboardData) {
+    cb(state.dashboardData);
+    return;
   }
 
+  try {
 
-  const dashboardData =
-    data;
+    // ==================================
+    // SUPABASE QUERY (AKTIFKAN NANTI)
+    // ==================================
 
+    /*
+    const { data, error } =
+      await supabase.rpc(
+        "get_dashboard_data",
+        {
+          p_branch_id: state.branchId
+        }
+      );
 
-  */
+    if (error) throw error;
 
-  // ==================================
-  // TEMP DATA VERCEL
-  // ==================================
+    const dashboardData = data;
+    */
 
-  const dashboardData = {
-    revenue: 1000000,
-    orders: 23,
-    aov: 25040,
-    occupancy: {occupied: 0,total: 0,percent: 0},
-    recentTransactions: [],
-    lowStock: [],
-    shift: {
-      pagi:{orders:0,revenue:0},
-      siang:{orders:0,revenue:0},
-      malam:{orders:0,revenue:0}
-    }
-  };
+    // ==================================
+    // TEMP DATA VERCEL
+    // ==================================
 
-  state.dashboardData = dashboardData;
-  state.dashboardFilter = cacheKey;
-      
-  renderDashboard(
-    dashboardData
-  );
+    const dashboardData = {
+      revenue: 0,
+      orders: 0,
+      aov: 0,
+      occupancy: {
+        occupied: 0,
+        total: 0,
+        percent: 0
+      },
+      recentTransactions: [],
+      lowStock: [],
+      shift: {
+        pagi: { orders: 0, revenue: 0 },
+        siang: { orders: 0, revenue: 0 },
+        malam: { orders: 0, revenue: 0 }
+      }
+    };
+
+    state.dashboardData = dashboardData;
+
+    cb(dashboardData);
+
+  } catch (err) {
+
+    console.error(
+      "Dashboard cache error:",
+      err
+    );
+
+  }
+
 }
-catch(err){
-  console.error(
-    "Dashboard error:",
-    err
-  );
-}
+
+	
+async function loadDashboard() {
+	const cacheKey =
+	  JSON.stringify({
+	    branchId: state.branchId
+	  });
+	
+	if (
+	  state.dashboardData &&
+	  state.dashboardFilter === cacheKey
+	) {
+	      
+	  renderDashboard(
+	    state.dashboardData
+	  );
+	  return;
+	}
+	
+	try {
+	
+	
+	  // ==================================
+	  // SUPABASE QUERY (NANTI AKTIF)
+	  // ==================================
+	
+	  /*
+	  
+	  const {
+	    data,
+	    error
+	  } =
+	  await supabase.rpc(
+	    "get_dashboard_data",
+	    {
+	      p_branch_id:
+	        state.branchId
+	    }
+	  );
+	
+	
+	  if(error){
+	    throw error;
+	  }
+	
+	
+	  const dashboardData =
+	    data;
+	
+	
+	  */
+	
+	  // ==================================
+	  // TEMP DATA VERCEL
+	  // ==================================
+	
+	  const dashboardData = {
+	    revenue: 1000000,
+	    orders: 23,
+	    aov: 25040,
+	    occupancy: {occupied: 0,total: 0,percent: 0},
+	    recentTransactions: [],
+	    lowStock: [],
+	    shift: {
+	      pagi:{orders:0,revenue:0},
+	      siang:{orders:0,revenue:0},
+	      malam:{orders:0,revenue:0}
+	    }
+	  };
+	
+	  state.dashboardData = dashboardData;
+	  state.dashboardFilter = cacheKey;
+	      
+	  renderDashboard(
+	    dashboardData
+	  );
+	}
+	catch(err){
+	  console.error(
+	    "Dashboard error:",
+	    err
+	  );
+	}
 }
 
 function updateDateTime() {
@@ -17573,165 +17787,3058 @@ async function fetchSettings(callback) {
     // GROSS REVENUE
     // ==================================      
 
-      
+async function loadGrossRevenuePage() {
 
+  const branchId = state.branchId || "";
 
+  const startDate =
+    document.getElementById("startDate")?.value || "";
 
+  const endDate =
+    document.getElementById("endDate")?.value || "";
 
+  const cacheKey = JSON.stringify({
+    branchId,
+    startDate,
+    endDate
+  });
 
+  // ==========================
+  // CACHE FRONTEND
+  // ==========================
 
+  if (
+    state.grossRevenueData &&
+    state.grossRevenueFilter === cacheKey
+  ) {
 
-      
+    const res = state.grossRevenueData;
 
+    renderGrossRevenue(
+      res.summary || {}
+    );
 
-function initModule(pageId) {
+    renderRevenueTrend(
+      res.trend || []
+    );
 
-  switch(pageId) {
+    renderDonut(
+      res.category || []
+    );
 
-    case "dashboardPage":
-        loadDashboard();
-        startClock();
-      break;
+    renderRecentTransactions(
+      res.recentTransactions || []
+    );
 
+    allTopRevenueData =
+      res.topRevenue || [];
 
-    case "grossRevenuePage": {
+    topRevenueCurrentPage = 1;
 
-      initDatePicker();
+    renderTopRevenueTable();
 
-      const startEl = document.getElementById("startDate");
-      const endEl = document.getElementById("endDate");
-
-      if (!startEl || !endEl) break;
-
-      const today = new Date();
-      const past = new Date();
-
-      past.setDate(today.getDate() - 7);
-
-      startEl.value = past.toISOString().split("T")[0];
-      endEl.value = today.toISOString().split("T")[0];
-
-      updateDateLabel(  startEl.value, endEl.value );
-      loadGrossRevenuePage();
-      break;
-    }
-
-
-    case "recentTransactionsPage":{
-          const startEl = document.getElementById("startDate");
-          const endEl = document.getElementById("endDate");
-          if (startEl && endEl) {
-            const today = new Date();
-            const past = new Date();
-            past.setDate(today.getDate() - 7);
-
-            startEl.value = past.toISOString().split("T")[0];
-            endEl.value = today.toISOString().split("T")[0];
-          }
-          // 1. INIT LISTENER DULU
-          initTransactionFilters();
-          // 2. BARU LOAD DATA
-          loadRecentTransactionsPage();
-          loadRecentTransactionSummary();
-    break;
-    }
-
-    case "posPage":
-      resetPOSMember();
-      waitBranch(() => {
-        loadNotifications();
-        loadProducts(() => {
-          initSearch();
-        });
-        
-        
-        fetchSettings(() => {
-          renderCart();
-        });
-        preloadRecipeMap();
-        loadRecipes(state.branchId);
-      });
-    break;
-
-
-    case "orderPage":
-      loadOrders(state.branchId);
-      break;
-
-    case "memberPage":
-
-      waitBranch(() => {
-        loadMembers(() => {
-          loadMemberStats();
-          loadMemberGrowth();
-          loadNotifications();
-          initMemberSearch();
-          initTierFilter();
-          initExportPDF();
-        });
-      });
-    break;
-
-    case "tablePage":
-        loadTables(state.branchId);
-    break;
-
-    case "inventoryPage":
-
-      waitBranch(() => {
-
-        loadInventoryPage(state.branchId);
-
-        initIngredientExportDate();
-
-      });
-
-    break;
-
-    break;
-
-    case "analyticsPage": {
-      initAnalyticsDate();
-      loadAnalyticsPage();
-      break;
-    }
-   
-
-    case "settingsPage":
-      loadSettingsPage();
-    break;
-
-    case "loyaltysettingPage":
-      initLoyaltyPage();
-    break;
-
-    case "expensessettingPage":{
-
-        const startEl = document.getElementById("expenseStartDate");
-        const endEl = document.getElementById("expenseEndDate");
-        const today = new Date();
-        const past = new Date();
-
-        past.setDate(today.getDate() - 6);
-        if (startEl) { startEl.value = past.toISOString().split("T")[0]; }
-
-        if (endEl) { endEl.value = today.toISOString().split("T")[0]; }
-
-        initExpenseSettingPage();
-        initOtherIncomeEvents();
-
-    break;
-    }
-
-    case "cashFlowPage":
-
-      initCashFlowPage();
-      loadCashFlowNotification()
-
-    break;
+    return;
 
   }
+
+  try {
+
+    // ==================================
+    // SUPABASE RPC (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data, error } =
+      await supabase.rpc(
+        "get_gross_revenue_data",
+        {
+          p_branch_id: branchId,
+          p_start_date: startDate,
+          p_end_date: endDate
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    const res = data;
+    */
+
+    // ==================================
+    // TEMP DATA VERCEL
+    // ==================================
+
+    const res = {
+
+      summary: {},
+
+      trend: [],
+
+      category: [],
+
+      recentTransactions: [],
+
+      topRevenue: []
+
+    };
+
+    // ==========================
+    // SIMPAN CACHE
+    // ==========================
+
+    state.grossRevenueData = res;
+
+    state.grossRevenueFilter = cacheKey;
+
+    renderGrossRevenue(
+      res.summary || {}
+    );
+
+    renderRevenueTrend(
+      res.trend || []
+    );
+
+    renderDonut(
+      res.category || []
+    );
+
+    renderRecentTransactions(
+      res.recentTransactions || []
+    );
+
+    allTopRevenueData =
+      res.topRevenue || [];
+
+    topRevenueCurrentPage = 1;
+
+    renderTopRevenueTable();
+
+  } catch (err) {
+
+    console.error(err);
+
+    showToast(
+      "Gagal memuat Gross Revenue",
+      "error"
+    );
+
+  }
+
 }
+
+async function applyDateFilter() {
+
+  const branchId = state.branchId || "";
+
+  // Owner belum pilih outlet
+  if (!branchId) return;
+
+  const start =
+    document.getElementById("startDate")?.value;
+
+  const end =
+    document.getElementById("endDate")?.value;
+
+  if (!start || !end) return;
+
+  toggleLoading(true);
+
+  try {
+
+    // ==================================
+    // SUPABASE RPC (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data, error } =
+      await supabase.rpc(
+        "get_gross_revenue_by_date",
+        {
+          p_branch_id: branchId,
+          p_start_date: start,
+          p_end_date: end
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    const res = data;
+    */
+
+    // ==================================
+    // TEMP DATA VERCEL
+    // ==================================
+
+    const res = {
+      summary: {},
+      trend: [],
+      category: [],
+      recentTransactions: [],
+      topRevenue: []
+    };
+
+    toggleLoading(false);
+
+    state.grossRevenueData = res;
+
+    state.grossRevenueFilter =
+      JSON.stringify({
+        branchId,
+        startDate: start,
+        endDate: end
+      });
+
+    renderGrossRevenue(
+      res.summary || {}
+    );
+
+    document
+      .getElementById("grossRevenueDonut")
+      ?.replaceChildren();
+
+    document
+      .getElementById("revenueTrendContainer")
+      ?.replaceChildren();
+
+    renderRevenueTrend(
+      res.trend || []
+    );
+
+    renderDonut(
+      res.category || []
+    );
+
+    renderRecentTransactions(
+      res.recentTransactions || []
+    );
+
+    updateDiscountBar(
+      res.summary?.totalDiscount || 0,
+      res.summary?.totalRevenue || 0
+    );
+
+    allTopRevenueData =
+      res.topRevenue || [];
+
+    topRevenueCurrentPage = 1;
+
+    renderTopRevenueTable();
+
+  } catch (err) {
+
+    toggleLoading(false);
+
+    console.error(
+      "Gross Revenue:",
+      err
+    );
+
+  }
+
+}
+
+async function exportPDFReport() {
+
+  const start =
+    document.getElementById("startDate")?.value;
+
+  const end =
+    document.getElementById("endDate")?.value;
+
+  if (!start || !end) {
+    alert("Pilih tanggal dulu");
+    return;
+  }
+
+  const pdfWindow = window.open("", "_blank");
+
+  if (!pdfWindow) {
+    alert("Popup diblokir browser.");
+    return;
+  }
+
+  try {
+
+    const res = await fetch("/api/export-pdf-report", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        start,
+        end,
+        branchId: state.branchId
+      })
+    });
+
+    const html = await res.text();
+
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
+    pdfWindow.document.close();
+
+  } catch (err) {
+
+    pdfWindow.document.open();
+    pdfWindow.document.write(`
+      <h2>Export Failed</h2>
+      <pre>${err.message}</pre>
+    `);
+    pdfWindow.document.close();
+
+  }
+
+}
+
+
+function calcGrowth(today, yesterday) {
+  today = Number(today) || 0;
+  yesterday = Number(yesterday) || 0;
+
+  if (yesterday === 0) return 0; 
+
+  return ((today - yesterday) / yesterday) * 100;
+}    
+
+
+function renderRevenueTrend(data) {
+
+  const container =
+    document.getElementById("revenueTrendContainer");
+
+  if (!container) return;
+
+  container.innerHTML = "";
+
+  if (!Array.isArray(data) || data.length === 0) {
+    container.innerHTML =
+      "<p class='text-xs text-slate-400'>No data</p>";
+    return;
+  }
+
+  const max =
+    Math.max(
+      ...data.map(d => d.total || 0),
+      1
+    );
+
+  let html =
+    `<div class="flex items-end gap-3 min-w-max h-full">`;
+
+  data.forEach(item => {
+
+    const height =
+      ((item.total || 0) / max) * 180;
+
+    html += `
+      <div class="w-10 flex flex-col items-center justify-end gap-1 flex-shrink-0">
+        <div
+          class="w-6 bg-primary rounded-t-sm"
+          style="height:${height}px">
+        </div>
+
+        <span class="text-[10px] text-slate-400 whitespace-nowrap">
+          ${item.date ? item.date.slice(5, 10) : "-"}
+        </span>
+      </div>
+    `;
+
+  });
+
+  html += `</div>`;
+
+  container.innerHTML = html;
+
+}
+
+ // ================= RENDER SUMMARY =================
+function renderGrossRevenue(data) {
+  if (!data) return;
+
+  const revenueEl = document.getElementById("gr-total-revenue");
+  const discountEl = document.getElementById("gr-total-discount");
+  const taxEl = document.getElementById("gr-total-tax");
+  const aovEl = document.getElementById("gr-average");
+
+  if (discountEl) discountEl.innerText = format(data.totalDiscount);
+  if (taxEl) taxEl.innerText = format(data.totalTax);
+  if (revenueEl) revenueEl.innerText = format(data.totalSubtotal);
+  if (aovEl) aovEl.innerText = format(data.aov);
+
+  // FIX DISCOUNT BAR (PAKAI ID HTML YANG SUDAH ADA)
+  setTimeout(() => {
+    const bar = document.getElementById("discountBarFill");
+    if (!bar) return;
+
+    const percent =
+    data.totalSubtotal > 0
+      ? (data.totalDiscount / data.totalSubtotal) * 100
+      : 0;
+
+    bar.style.width = percent + "%";
+    bar.style.transition = "width 0.4s ease";
+  }, 50);
+}
+
+
+ function renderDonut(data) {
+  const svg = document.getElementById("grossRevenueDonut");
+  const legend = document.getElementById("donutLegend");
+
+  if (!svg || !legend) return;
+
+  svg.innerHTML = `
+    <circle cx="80" cy="80" r="50"
+      stroke="#222a3d"
+      stroke-width="12"
+      fill="transparent"></circle>
+  `;
+
+  legend.innerHTML = "";
+
+  const cleanData = (data || [])
+  .map(d => ({
+    category: (d.category || "").trim(),
+    value: Number(d.grossRevenue) || 0
+  }))
+  .filter(d => d.category && d.value > 0);;
+
+  if (!cleanData.length) return;
+
+  const total = cleanData.reduce((a, b) => a + b.value, 0);
+  const radius = 50;
+  const circumference = 2 * Math.PI * radius;
+
+  const colors = ["#f59e0b", "#8fd5ff", "#34d399", "#f472b6", "#a78bfa", "#ff5733", "#33c1ff"];
+
+  let offset = 0;
+
+  cleanData.forEach((item, index) =>  {
+    const percent = item.value / total;
+    const dash = circumference * percent;
+
+    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+
+    circle.setAttribute("cx", "80");
+    circle.setAttribute("cy", "80");
+    circle.setAttribute("r", "50");
+    circle.setAttribute("fill", "transparent");
+    circle.setAttribute("stroke", colors[index % colors.length]);
+    circle.setAttribute("stroke-width", "12");
+
+    // FIX: TIDAK PAKAI ROTATE LAGI
+    circle.setAttribute("stroke-dasharray", `${dash} ${circumference}`);
+    circle.setAttribute("stroke-dashoffset", -offset);
+
+    svg.appendChild(circle);
+
+    offset += dash;
+  });
+
+  legend.innerHTML = cleanData.map((item, index) => {
+    const percent = ((item.value / total) * 100).toFixed(0);
+
+    return `
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="w-2 h-2 rounded-full"
+            style="background:${colors[index % colors.length]}"></span>
+          <span class="text-sm font-medium">${item.category}</span>
+        </div>
+        <span class="text-sm font-bold">${percent}%</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function openDateFilter() {
+  const start = document.getElementById("startDate");
+
+  if (!start) return;
+
+  setTimeout(() => {
+    if (start.showPicker) {
+      start.showPicker();
+    } else {
+      start.focus();
+      start.click();
+    }
+  }, 10);
+}
+
+
+function initDatePicker() {
+    setTimeout(() => {
+      const start = document.getElementById("startDate");
+      const end = document.getElementById("endDate");
+
+      if (!start || !end) return;
+
+      const trigger = () => {
+        if (start.value && end.value) {
+          updateDateLabel(start.value, end.value);
+          applyDateFilter();
+        }
+      };
+
+      start.addEventListener("change", trigger);
+      end.addEventListener("change", trigger);
+
+    }, 50);
+  }
+
+  function updateDateLabel(start, end) {
+  const label = document.getElementById("dateRangeLabel");
+  if (!label) return;
+
+  const s = new Date(start).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  });
+
+  const e = new Date(end).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  });
+
+  label.childNodes[2].nodeValue = ` ${s} - ${e} `;
+}
+
+ function updateDiscountBar(discount, revenue) {
+  const bar = document.getElementById("discountBarFill");
+  if (!bar) return;
+
+  const percent = revenue > 0 ? (discount / revenue) * 100 : 0;
+
+  bar.style.width = percent + "%";
+}
+
+
+function renderTopRevenueTable() {
+  const tbody = document.getElementById("topRevenueTable");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  // =========================
+  // PAGINATION
+  // =========================
+
+  const totalData = allTopRevenueData.length;
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(totalData / topRevenueItemsPerPage)
+    );
+
+  const start = (topRevenueCurrentPage - 1) * topRevenueItemsPerPage;
+  const end = start + topRevenueItemsPerPage;
+  const data = allTopRevenueData.slice(start, end);
+
+  // =========================
+  // RENDER
+  // =========================
+
+  data.forEach(item => {
+    const img = (item.image || "")
+      .replace(
+        /https:\/\/drive\.google\.com\/file\/d\/([^/]+)\/view.*/,
+        "https://drive.google.com/thumbnail?id=$1&sz=w2000"
+      );
+
+    tbody.innerHTML += `
+      <tr class="hover:bg-white/5 transition-colors">
+        <td class="px-8 py-5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
+              <img src="${img}" class="w-full h-full object-cover"/>
+            </div>
+            <div>
+              <p class="text-sm font-bold">${item.name || "-"}</p>
+              <p class="text-[10px] text-on-surface-variant">
+                ${item.category || "-"}
+              </p>
+            </div>
+          </div>
+        </td>
+
+        <td class="px-8 py-5">
+          <span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">
+            ${item.category || "-"}
+          </span>
+        </td>
+
+        <td class="px-8 py-5 text-center font-medium">
+          ${(item.units || 0).toLocaleString("id-ID")}
+        </td>
+
+        <td class="px-8 py-5 text-right font-headline font-bold">
+          Rp ${(item.revenue || 0).toLocaleString("id-ID")}
+        </td>
+
+        <td class="px-8 py-5 text-right">
+          <span class="material-symbols-outlined text-sm text-primary">
+            trending_up
+          </span>
+        </td>
+
+      </tr>
+    `;
+
+  });
+
+    // =========================
+    // FOOTER
+    // =========================
+
+    const info = document.getElementById("topRevenueInfo");
+
+    if (info) {
+      const from = totalData === 0 ? 0 : start + 1;
+      const to = Math.min(end, totalData);
+      info.innerText = `Showing ${from}-${to} of ${totalData} Products`;
+    }
+
+    // =========================
+    // BUTTON
+    // =========================
+
+    const prevBtn = document.getElementById("topRevenuePrevBtn");
+    const nextBtn = document.getElementById("topRevenueNextBtn");
+
+    if (prevBtn) {
+      prevBtn.disabled = topRevenueCurrentPage <= 1;
+      prevBtn.onclick = () => {
+
+        if (topRevenueCurrentPage > 1) {
+          topRevenueCurrentPage--;
+          renderTopRevenueTable();
+        }
+      };
+    }
+
+    if (nextBtn) {
+      nextBtn.disabled =
+        topRevenueCurrentPage >= totalPages;
+      nextBtn.onclick = () => {
+        if (topRevenueCurrentPage < totalPages) {
+          topRevenueCurrentPage++;
+          renderTopRevenueTable();
+        }
+      };
+    }
+}
+
+    // =========================
+    // MEMBERS
+    // =========================
+
+
+function calculatePoints(total){
+  return Math.floor(total / state.settings.point_ratio)
+}
+
+function getMemberDetailPage(memberId, branchId) {
+  return fetch("/api/member-detail", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      memberId,
+      branchId
+    })
+  })
+  .then(res => res.json());
+}
+
+
+async function loadMembers(callback) {
+
+  const el = document.getElementById("member-table-body");
+  if (!el) return;
+  if (state.memberPageData) {
+    const data = state.memberPageData;
+    state.members = data.members || [];
+    state.settings = data.settings || {};
+    renderTierFilter(state.settings);
+    renderTierSettings(state.settings);
+    renderMembers(state.members);
+    if (callback) callback();
+    return;
+  }
+  traceCall("loadMembers");
+  try {
+
+
+    // ==================================
+    // SUPABASE (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const { data, error } =
+      await supabase
+      .from("Member")
+      .select("*")
+      .eq(
+        "branchId",
+        state.branchId
+      );
+
+
+    if(error){
+      throw error;
+    }
+
+
+    const result = {
+      members:data,
+      settings:{}
+    };
+    */
+
+
+    // ==================================
+    // TEMP DATA VERCEL
+    // ==================================
+
+    const result = {
+      members: [],
+      settings: {}
+    };
+    state.memberPageData = result;
+    state.members = result.members || [];
+    state.settings = result.settings || {};
+    renderTierFilter( state.settings );
+    renderTierSettings( state.settings );
+    renderMembers( state.members );
+
+    if (callback)
+      callback();
+
+  } catch(err) {
+    console.error(
+      "Members:",
+      err
+    );
+    showToast(
+      "Terjadi kesalahan saat memproses data",
+      "error"
+    );
+  }
+}
+	
+function updateTierOptions(s) {
+  const update = (id, value) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = value;
+    el.value = value;
+  };
+  update("filter_tier_1", s.tier_1_name_value);
+  update("filter_tier_2", s.tier_2_name_value);
+  update("filter_tier_3", s.tier_3_name_value);
+  update("filter_tier_4", s.tier_4_name_value);
+  update("filter_tier_5", s.tier_5_name_value);
+}
+
+function renderTierFilter(settings) {
+  const select = document.getElementById("tierFilter");
+  if (!select || !settings) return;
+  select.innerHTML = `
+    <option value="all">All Tier</option>
+    <option value="${settings.tier_1_name_value}">${settings.tier_1_name_value}</option>
+    <option value="${settings.tier_2_name_value}">${settings.tier_2_name_value}</option>
+    <option value="${settings.tier_3_name_value}">${settings.tier_3_name_value}</option>
+    <option value="${settings.tier_4_name_value}">${settings.tier_4_name_value}</option>
+    <option value="${settings.tier_5_name_value}">${settings.tier_5_name_value}</option>
+  `;
+}
+
+
+function renderMembers(data = state.members) {
+  const tbody = document.getElementById("member-table-body");
+  if (!tbody) return;
+
+  // =========================
+  // INIT PAGINATION
+  // =========================
+
+  if (!state.memberCurrentPage)
+    state.memberCurrentPage = 1;
+  if (!state.memberPerPage)
+    state.memberPerPage = 10;
+  const currentPage = state.memberCurrentPage;
+  const perPage = state.memberPerPage;
+
+  // =========================
+  // EMPTY
+  // =========================
+
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7"
+            class="text-center text-slate-400 py-6">
+          No members
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  // =========================
+  // PAGINATION
+  // =========================
+  const totalData = data.length;
+  const totalPages = Math.ceil(totalData / perPage);
+  const start = (currentPage - 1) * perPage;
+  const end = start + perPage;
+  const paginatedData = data.slice(start, end);
+
+  // =========================
+  // RENDER
+  // =========================
+
+  tbody.innerHTML = paginatedData.map(m => `
+
+    <tr class="hover:bg-white/5">
+      <td class="px-8 py-5 text-sm font-mono text-primary">
+        ${m.ID_Member}
+      </td>
+      <td class="px-8 py-5">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full
+                      bg-background
+                      flex items-center justify-center
+                      font-bold text-xs">
+
+            ${(m.Nama || "")
+              .substring(0,2)
+              .toUpperCase()}
+          </div>
+          <span class="text-sm font-semibold">
+            ${m.Nama}
+          </span>
+        </div>
+      </td>
+
+      <td class="px-8 py-5 text-sm">
+        ${m.Level_Current || "Kenal"}
+      </td>
+      <td class="px-8 py-5 text-sm text-right">
+        Rp ${(
+          Number(
+            String(m.Total_Spend || 0)
+            .replace(/\./g,"")
+          )
+        ).toLocaleString("id-ID")}
+
+      </td>
+      <td class="px-8 py-5 text-sm font-bold text-right">
+        ${m.Point || 0}
+      </td>
+
+      <td class="px-8 py-5 text-center">
+      <button 
+        onclick="handleMemberCard(this)"
+        data-phone="${m.WA || ''}"
+        data-name="${m.Nama || ''}"
+        data-memberid="${m.ID_Member || ''}"
+        data-level="${m.Level_Current || ''}"
+        data-point="${m.Point || 0}"
+        class="text-tertiary"
+      >
+        <span class="material-symbols-outlined">chat</span>
+      </button>
+      </td>
+      <td class="px-8 py-5 text-right">
+        <button
+          class="text-slate-400 hover:text-primary transition-colors"
+          onclick="openMemberProfile('${String(m.ID_Member).trim()}')"
+        >
+          <span class="material-symbols-outlined">
+            more_vert
+          </span>
+        </button>
+      </td>
+    </tr>
+  `).join("");
+
+  // =========================
+  // FOOTER TEXT
+  // =========================
+
+  const footerText = document.querySelector("#memberPage .text-xs.text-on-surface-variant.font-medium");
+  if (footerText) {
+    footerText.innerText = `Showing ${paginatedData.length} of ${totalData} members`;
+  }
+  // =========================
+  // PAGINATION BUTTON
+  // =========================
+
+  const prevBtn = document.getElementById("memberPrevBtn");
+  const nextBtn = document.getElementById("memberNextBtn");
+  // PREV
+  if (prevBtn) {
+    prevBtn.disabled =
+      currentPage <= 1;
+    prevBtn.onclick = () => {
+      if (state.memberCurrentPage > 1) {
+        state.memberCurrentPage--;
+        renderMembers(data);
+      }
+    };
+  }
+
+  // NEXT
+  if (nextBtn) {
+    nextBtn.disabled =
+      currentPage >= totalPages;
+    nextBtn.onclick = () => {
+      if (state.memberCurrentPage < totalPages) {
+        state.memberCurrentPage++;
+        renderMembers(data);
+      }
+    };
+  }
+}
+
+
+function loadWhatsAppModal(){
+  const template = document.getElementById("whatsAppMessageModalTemplate");
+  if (!template) return;
+  document.body.appendChild(
+    template.content.cloneNode(true)
+  );
+
+}
+
+function loadIngredientStockAlertTemplate(){
+  const template = document.getElementById("ingredientStockAlertTemplate");
+  if(!template) return;
+  if(document.getElementById("ingredientStockAlertModal")) return;
+  const clone = template.content.cloneNode(true);
+  document.body.appendChild(clone);
+
+}
+
+window.ingredientStockData = [];
+function openIngredientStockAlert(data = []) {
+  const modal = document.getElementById("ingredientStockAlertModal");
+  const list = document.getElementById("ingredientStockAlertList");
+  if (!modal || !list) return;
+
+  list.innerHTML = "";
+
+  data.forEach(item => {
+    const qty =  Number(item.qty || 0);
+    const min = Number(item.min || 0);
+    const statusClass =
+      qty <= 0
+        ? "text-red-500"
+        : "text-orange-400";
+
+    const statusText =
+      qty <= 0
+        ? "OUT"
+        : "LOW";
+
+    list.innerHTML += `
+      <div class="py-5 border-b border-white/5">
+        <div class="flex justify-between gap-4">
+        <div class="flex items-start gap-3">
+        <div
+        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 ">
+
+          <span class="material-symbols-outlined text-primary text-xl">
+            inventory_2
+          </span>
+
+        </div>
+          <div>
+            <p class="font-bold text-sm text-on-surface">
+              ${item.name || "-"}
+            </p>
+
+            <p class="text-xs text-on-surface-variant mt-2">
+              Current Stock :
+              <span class="font-semibold text-on-surface">
+                ${qty} ${item.unit || ""}
+              </span>
+            </p>
+
+            <p class="text-xs text-on-surface-variant mt-1">
+              Minimum Stock :
+              <span class="font-semibold text-on-surface">
+                ${min} ${item.unit || ""}
+              </span>
+            </p>
+          </div>
+          <span class="text-xs font-bold ${statusClass}">
+            ${status}
+          </span>
+        </div>
+      </div>
+
+      `;
+  });
+  modal.classList.remove("hidden");
+}
+
+function closeIngredientStockAlert(){
+  const modal = document.getElementById("ingredientStockAlertModal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+
+}
+
+let whatsappComposerData = null;
+function openWhatsAppComposer({phone,title,message,type = null,trxId}) {
+  whatsappComposerData = { phone, title, message, type, trxId };
+
+  // TITLE
+  const titleEl = document.getElementById("waModalTitle");
+  if (titleEl) {
+    titleEl.innerText = title || "WhatsApp Message";
+  }
+  // PHONE
+  const phoneEl = document.getElementById("waRecipient");
+  if (phoneEl) {
+    phoneEl.value = phone || "";
+  }
+  // MESSAGE
+  const messageEl = document.getElementById("waMessage");
+  if (messageEl) {
+    messageEl.value = message || "";
+  }
+
+  updateWhatsAppCounter();
+  const modal = ocument.getElementById("whatsapp-message-modal");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+
+  const sendBtn = document.getElementById("waSendButton");
+    if(sendBtn){
+        sendBtn.onclick =
+        sendWhatsAppComposer;
+    }
+}
+
+function closeWhatsAppModal() {
+  const modal = document.getElementById( "whatsapp-message-modal" );
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+  whatsappComposerData = null;
+
+}
+
+async function sendWhatsAppComposer() {
+  if (!whatsappComposerData) {
+    return;
+  }
+  const messageEl = document.getElementById("waMessage");
+  const message = messageEl
+      ? messageEl.value
+      : "";
+	
+  if (!message.trim()) {
+    alert("Message masih kosong");
+    return;
+  }
+  if (whatsappComposerData.type === "transaction") {
+    try {
+
+
+      // ==================================
+      // SUPABASE (AKTIFKAN NANTI)
+      // ==================================
+
+      /*
+      const { data: trx, error } =
+        await supabase
+        .rpc(
+          "get_receipt_data",
+          {
+            p_trx_id:
+              whatsappComposerData.trxId
+          }
+        );
+
+
+      if(error){
+        throw error;
+      }
+      */
+
+      // ==================================
+      // TEMP DATA VERCEL
+      // ==================================
+
+      const trx = null;
+      if (!trx) {
+
+        alert(
+          "Data transaksi belum tersedia"
+        );
+        return;
+      }
+
+      sendReceiptWhatsappWithData(
+        trx,
+        whatsappComposerData.phone,
+        message
+      );
+
+      closeWhatsAppModal();
+    } catch(err) {
+      console.error(
+        "Receipt:",
+        err
+      );
+    }
+    return;
+  }
+
+  let wa =
+    String(
+      whatsappComposerData.phone || ""
+    )
+    .replace(/\D/g,"");
+
+  if (wa.startsWith("0")) {
+    wa =
+      "62" +
+      wa.slice(1);
+  } else if (!wa.startsWith("62")) {
+    wa =
+      "62" +
+      wa;
+  }
+
+  const url =
+    "https://api.whatsapp.com/send?phone=" +
+    wa +
+    "&text=" +
+    encodeURIComponent(message);
+  window.open(
+    url,
+    "_blank"
+  );
+  closeWhatsAppModal();
+}
+
+
+function resetWhatsAppMessage() {
+  if (!whatsappComposerData) {
+    return;
+  }
+  const messageEl = document.getElementById("waMessage");
+  if (messageEl) {
+    messageEl.value =
+      whatsappComposerData.message || "";
+  }
+  updateWhatsAppCounter();
+}
+
+function copyWhatsAppMessage() {
+  const messageEl = document.getElementById("waMessage");
+  if (!messageEl) {
+    return;
+  }
+  navigator.clipboard.writeText(
+    messageEl.value
+  );
+}
+
+function updateWhatsAppCounter() {
+  const messageEl = document.getElementById("waMessage");
+  const counterEl = document.getElementById("waCounter");
+  if (!messageEl || !counterEl) {
+    return;
+  }
+
+  const length = messageEl.value.length;
+  counterEl.innerText =
+    `${length} Characters`;
+}
+
+function createMemberInfoMessage({name,memberId,level,point}) {
+
+  return `
+    MEMBER INFORMATION 📢
+
+    Nama : *${name || "-"}*
+    Member ID : *${memberId || "-"}*
+    Level : *${level || "-"}*
+    Total Point : *${Number(point || 0).toLocaleString("id-ID")}*
+
+    Terima kasih telah menjadi member kami.
+
+    Silakan tunjukkan Nama/Member ID Anda setiap transaksi untuk mendapatkan point dan menikmati 
+    berbagai reward member.
+
+    Sampai jumpa kembali.
+  `;  
+}
+
+	
+function createBirthdayMessage({ name }) {
+
+  return ` 
+  *Happy Birthday, ${name}!* 🎉🥳
+
+  Semoga selalu diberikan kesehatan, kebahagiaan, dan rezeki yang lancar.
+
+  Semoga semua yang diinginkan segera tercapai
+  dan pastinya makin banyak alasan untuk tersenyum 😉
+
+  Salam hangat,
+  Tim Kami
+  `;
+
+}
+
+function createTransactionMessage({name,total,point,invoice}){
+  return `
+    HALLO ${name || "-"},
+    Terima kasih telah bertransaksi hari ini.
+    No. Transaksi
+    ${invoice || "-"}
+
+    Total Transaksi
+    Rp ${Number(total || 0).toLocaleString("id-ID")}
+
+    Point Diperoleh
+    ${Number(point || 0).toLocaleString("id-ID")} Point
+
+    Kami tunggu kunjungan Anda kembali.
+    Salam hangat.
+    `;
+}
+
+	
+function sendMemberCard(phone, name, memberId, level, point) {
+  if (!phone) return;
+
+  // ==========================
+  // NORMALISASI NOMOR WA
+  // ==========================
+  let wa = String(phone)
+    .replace(/\D/g, "");
+
+  if (wa.startsWith("0")) {
+    wa = "62" + wa.slice(1);
+  } else if (!wa.startsWith("62")) {
+    wa = "62" + wa;
+  }
+
+  // ==========================
+  // FORMAT POINT
+  // ==========================
+  const totalPoint =
+    Number(point || 0).toLocaleString("id-ID");
+
+  // ==========================
+  // PESAN
+  // ==========================
+  const message =
+  "MEMBER INFORMATION\n\n" +
+
+  "Nama\n" + (name || "-") + "\n\n" +
+
+  "Member ID\n" + (memberId || "-") + "\n\n" +
+
+  "Level\n" + (level || "-") + "\n\n" +
+	  
+  "Total Point\n" +
+  Number(point || 0).toLocaleString("id-ID") + "\n\n" +
+  "Terima kasih telah menjadi member kami.\n\n" +
+  "Silakan tunjukkan Member ID Anda setiap melakukan transaksi untuk mendapatkan point dan menikmati berbagai reward member.\n\n" +
+  "Sampai jumpa kembali";
+
+  // ==========================
+  // BUKA WHATSAPP
+  // ==========================
+  window.open(
+    "https://wa.me/" +
+      wa +
+      "?text=" +
+      encodeURIComponent(message),
+    "_blank"
+  );
+}
+
+function handleMemberCard(btn){
+  const phone = btn.dataset.phone;
+  const message =
+    createMemberInfoMessage({
+      name: btn.dataset.name,
+      memberId: btn.dataset.memberid,
+      level: btn.dataset.level,
+      point: btn.dataset.point
+    });
+
+  openWhatsAppComposer({
+    phone,
+    title: "Member Information",
+    message
+
+  });
+
+}
+
+function handleBirthday(btn){
+  const phone = tn.dataset.phone;
+  const message = 
+  createBirthdayMessage({
+	name: btn.dataset.name});
+  openWhatsAppComposer({
+    phone,
+    title: "Birthday Greeting",
+    message
+
+  });
+
+}
+
+function handleTransaction(btn){
+  const message =
+    createTransactionMessage({
+      name: btn.dataset.name,
+      total: btn.dataset.total,
+      point: btn.dataset.point,
+      invoice: btn.dataset.invoice
+
+    });
+
+    openWhatsAppComposer({
+      phone: btn.dataset.phone,
+      title: "Thank You",
+      message,
+      trxId: btn.dataset.trxid,
+      type: "transaction"
+    });
+
+}
+
+function handleNotification(btn){
+  const type =
+    btn.dataset.type;
+  if(type === "ingredient"){
+    openIngredientStockAlert(
+      window.ingredientStockData
+    );
+
+  }
+
+}
+
+function handleMemberSearch(value) {
+  const keyword = value.toLowerCase();
+  const filtered = state.members.filter(m => {
+    return (
+      (m.Nama || "").toLowerCase().includes(keyword) ||
+      (m.ID_Member || "").toLowerCase().includes(keyword) ||
+      (m.WA || "").toLowerCase().includes(keyword)
+    );
+
+  });
+
+  renderMembers(filtered);
+}
+
+function handleTierFilter(tier) {
+  let filtered = state.members;
+  if (tier !== "all") {
+    filtered = state.members.filter(m =>
+      (m.Level_Current || "kenal") === tier
+    );
+  }
+  renderMembers(filtered);
+}
+
+function initMemberSearch() {
+  const input = document.getElementById("memberSearchInput");
+  if (!input) {
+    return;
+  }
+  input.addEventListener("input", (e) => {
+    handleMemberSearch(e.target.value);
+  });
+}
+
+function initTierFilter() {
+  const select = document.getElementById("tierFilter");
+  if (!select) {
+    return;
+  }
+  select.addEventListener("change", (e) => {
+    handleTierFilter(e.target.value);
+  });
+
+}
+
+function loadMemberStats(){
+  const res = state.memberPageData?.stats;
+  if(!res) return;
+  document.getElementById("total-members").innerText =
+    formatNumber(res.total);
+  document.getElementById("total-top-tier").innerText =
+    formatNumber(res.topTier);
+  document.getElementById("total-points").innerText =
+    formatCompact(res.points);
+  document.getElementById("top-tier-label").innerText =
+    `${res.topTierName} Tier`;
+}
+
+function loadMemberGrowth() {
+  const res = state.memberPageData;
+  if (!res) return;
+  const el = document.getElementById("member-growth");
+  if (!el) return;
+  const growth = res.growth?.growth || 0;
+  const sign = growth >= 0 ? "+" : "";
+  el.innerText =
+    `${sign}${growth}% vs last month`;
+}
+
+function applyFilters() {
+  const keyword = document.getElementById("memberSearchInput")?.value.toLowerCase() || "";
+  const tier = document.getElementById("tierFilter")?.value || "all";
+  let data = state.members;
+
+  if (tier !== "all") {
+    data = data.filter(m => (m.Level_Current || "Kenal") === tier);
+  }
+  if (keyword) {
+    data = data.filter(m =>
+      (m.Nama || "").toLowerCase().includes(keyword) ||
+      (m.ID_Member || "").toLowerCase().includes(keyword)
+    );
+  }
+  renderMembers(data);
+}
+
+function initExportPDF() {
+  const btn = document.getElementById("memberExportPdfBtn");
+  const tierSelect = document.getElementById("tierFilter");
+  if (!btn) return;
+  btn.addEventListener("click", async () => {
+
+    // OPEN TAB FIRST
+    const win = window.open("", "_blank");
+    if (!win) {
+      alert("Popup blocked by browser");
+      return;
+    }
+
+    win.document.write(`
+      <html>
+      <head>
+        <title>Generating PDF...</title>
+        <style>
+          body{
+            font-family:Arial;
+            background:#0B0F14;
+            color:white;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <h2>
+          Generating Member PDF...
+        </h2>
+
+      </body>
+
+      </html>
+    `);
+
+    try {
+      const tier = tierSelect?.value || "ALL";
+
+      // ==================================
+      // SUPABASE BACKEND (AKTIFKAN NANTI)
+      // ==================================
+
+      /*
+      const response =
+        await fetch(
+          "/api/export-members-pdf",
+          {
+            method:"POST",
+
+            headers:{
+              "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+              tier,
+
+              branchId:
+                state.branchId
+
+            })
+
+          }
+        );
+
+
+      const html =
+        await response.text();
+
+
+      win.document.open();
+
+      win.document.write(html);
+
+      win.document.close();
+
+      */
+
+
+
+      // ==================================
+      // TEMP VERCEL
+      // ==================================
+
+      win.document.open();
+      win.document.write(`
+
+        <html>
+	        <body style="
+	          font-family:Arial;
+	          padding:40px;
+	        ">
+		          <h2>
+		            Export Member PDF
+		          </h2>
+		
+		          <p>
+		            Backend Supabase belum aktif.
+		          </p>
+				  
+		          <p>
+		            Tier:
+		            ${tier}
+		          </p>
+	        </body>
+        </html>
+      `);
+
+      win.document.close();
+    } catch(err) {
+      console.error(
+        "Export Member PDF:",
+        err
+      );
+      win.document.open();
+      win.document.write(`
+        <html>
+	        <body style="
+	          font-family:Arial;
+	          padding:40px;
+	        ">
+		          <h2>
+		            Export Failed
+		          </h2>
+		          <pre>
+		          ${err}
+		          </pre>
+	        </body>
+        </html>
+      `);
+      win.document.close();
+    }
+  });
+}
+
+function openAddMemberModal() {
+  const template = document.getElementById("addmemeberModalTemplate");
+  const clone = template.content.cloneNode(true);
+  const modalWrapper = document.createElement("div");
+  modalWrapper.id = "addMemberModalWrapper";
+  modalWrapper.appendChild(clone);
+  document.body.appendChild(modalWrapper);
+  // CLOSE BUTTON (FIXED)
+  const closeBtn = modalWrapper.querySelector("#closeAddMemberModal");
+  if (closeBtn) {
+    closeBtn.onclick = () => {
+      modalWrapper.remove();
+    };
+  }
+  // CLICK OUTSIDE CLOSE
+  modalWrapper.addEventListener("click", (e) => {
+    if (e.target === modalWrapper) {
+      modalWrapper.remove();
+    }
+  });
+  // OPTIONAL: ESC KEY CLOSE
+  document.addEventListener("keydown", function escClose(e) {
+    if (e.key === "Escape") {
+      modalWrapper.remove();
+      document.removeEventListener("keydown", escClose);
+    }
+  });
+}
+
+function saveMember() {
+  const modal = document.getElementById("addMemberModalWrapper");
+  const name = modal.querySelector('input[placeholder="e.g. Julian Vane"]').value;
+  const wa = modal.querySelector('input[type="tel"]').value;
+  const email = modal.querySelector('input[type="email"]').value;
+  modal.remove();
+}
+
+async function submitMember() {
+
+  const payload = {
+    ID_Member: document.querySelector("#memberID").value,
+    Nama: document.querySelector("#memberName").value,
+    Tgl_Lahir: document.querySelector("#memberDOB").value,
+    WA: document.querySelector("#memberWA").value,
+    Email: document.querySelector("#memberEmail").value,
+    Instagram: document.querySelector("#memberIG").value,
+    Facebook: document.querySelector("#memberFB").value,
+    TikTok: document.querySelector("#memberTiktok").value,
+    Address: document.querySelector("#memberAddress").value,
+    branchId: state.branchId
+  };
+  try {
+
+
+    // ==================================
+    // SUPABASE BACKEND (AKTIFKAN NANTI)
+    // ==================================
+
+    /*
+    const response =
+      await fetch(
+        "/api/member",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+          body:
+            JSON.stringify(payload)
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if(!response.ok){
+      throw new Error(
+        result.message ||
+        "Gagal simpan member"
+      );
+    }
+    */
+
+    // ==================================
+    // TEMP VERCEL
+    // ==================================
+
+    console.log(
+      "TEMP SAVE MEMBER",
+      payload
+    );
+
+    resetMemberForm();
+    closeAddMemberModal();
+    loadMembers();
+  } catch(err) {
+    console.error(
+      "Submit Member:",
+      err
+    );
+	  
+    alert(
+      "Gagal simpan member!"
+    );
+  }
+}
+
+function closeAddMemberModal() {
+  const modal = document.getElementById("addMemberModalWrapper");
+  if (modal) {
+    modal.remove();
+  }
+
+}
+
+function updateDOBText() {
+  const input = document.getElementById("memberDOB");
+  const text = document.getElementById("dobText");
+  if (input.value) {
+    // format default YYYY-MM-DD → bisa langsung tampilkan
+    text.innerText = input.value;
+  } else {
+    text.innerText = "Select Date";
+  }
+}
+
+function resetMemberForm() {
+  // reset semua input
+  const inputs = document.querySelectorAll(
+    "#memberID, #memberName, #memberDOB, #memberWA, #memberEmail, #memberIG, #memberFB, #memberTiktok"
+  );
+  inputs.forEach(el => {
+    if (el) el.value = "";
+  });
+  // reset textarea (address)
+  const address = document.querySelector("#memberAddress");
+  if (address) address.value = "";
+  // reset DOB custom text UI
+  const dobText = document.getElementById("dobText");
+  if (dobText) dobText.innerText = "Select Date";
+  // safety reset date input (biar browser tertentu nggak nyangkut)
+  const dob = document.querySelector("#memberDOB");
+  if (dob) dob.value = "";
+}
+
+function initMemberTabs(modal) {
+  const tabs = modal.querySelectorAll("[data-tab]");
+  const contents = modal.querySelectorAll("[data-tab-content]");
+  function setTab(active) {
+
+    tabs.forEach(btn => {
+      const isActive = btn.dataset.tab === active;
+      btn.classList.toggle("border-b-2", isActive);
+      btn.classList.toggle("border-primary", isActive);
+      btn.classList.toggle("text-primary", isActive);
+      btn.classList.toggle("text-on-surface-variant", !isActive);
+    });
+    contents.forEach(sec => {
+      sec.classList.toggle("hidden", sec.dataset.tabContent !== active);
+    });
+  }
+  tabs.forEach(btn => {
+    btn.addEventListener("click", () => {
+      setTab(btn.dataset.tab);
+    });
+  });
+  setTab("personal");
+}
+
+function setField(modal, key, value) {
+  const el = modal.querySelector(`[data-field="${key}"]`);
+  if (!el) return;
+  el.textContent = value || "-";
+}
+
+function openMemberProfile(memberId) {
+  const member = state.members.find(m =>
+    String(m.ID_Member).trim() === String(memberId).trim()
+  );
+
+  if (!member) {
+    alert("Member tidak ditemukan di state");
+    return;
+  }
+    editingMember = member;
+
+  // REMOVE OLD MODAL
+  document.getElementById("member-modal-wrapper")?.remove();
+  const template = document.getElementById("profilmemberModalTemplate");
+  const clone = template.content.cloneNode(true);
+  const wrapper = document.createElement("div");
+  wrapper.id = "member-modal-wrapper";
+  wrapper.className = "fixed inset-0 z-[60]";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  const modal = wrapper.querySelector("[data-member-modal]");
+  if (!modal) return;
+
+  // =========================
+  // HEADER
+  // =========================
+  modal.querySelector("#memberName").innerText = member.Nama || "-";
+  modal.querySelector("#memberId").innerText = member.ID_Member || "-";
+  const tierBadge = modal.querySelector("#memberTierBadge");
+
+  if (tierBadge) {
+    const tier = member.Level_Current || "";
+    tierBadge.innerText = tier.toUpperCase();
+    tierBadge.className = "absolute bottom-1 right-1 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest z-20 shadow-lg";
+	  
+    const settings = window.loyaltySettings || {};
+    const tier1 = String(settings.tier_1_name_value || "") .toLowerCase();
+    const tier2 = String(settings.tier_2_name_value || "") .toLowerCase();
+    const tier3 = String(settings.tier_3_name_value || "") .toLowerCase();
+    const tier4 = String(settings.tier_4_name_value || "") .toLowerCase();
+    const tier5 = String(settings.tier_5_name_value || "") .toLowerCase();
+    const current = String(tier).toLowerCase();
+
+    if (current === tier5) {
+      tierBadge.classList.add(
+        "bg-cyan-400",
+        "text-black"
+      );
+    }
+
+    else if (current === tier4) {
+      tierBadge.classList.add(
+        "bg-slate-300",
+        "text-black"
+      );
+    }
+
+    else if (current === tier3) {
+      tierBadge.classList.add(
+        "bg-amber-500",
+        "text-black"
+      );
+    }
+
+    else if (current === tier2) {
+      tierBadge.classList.add(
+        "bg-slate-500",
+        "text-white"
+      );
+    }
+
+    else {
+      tierBadge.classList.add(
+        "bg-zinc-700",
+        "text-white"
+      );
+    }
+  }
+  const img = modal.querySelector("#memberPhoto");
+
+    if (img) {
+      let photoUrl = "";
+      const photo =
+        String(
+          member.Photo || ""
+        ).trim();
+		
+      if (photo) {
+        // ===== SUPABASE =====
+        if (
+          photo.includes("supabase.co")
+        ) {
+          photoUrl = photo;
+        }
+
+        // ===== GOOGLE DRIVE LINK =====
+        else if (
+          photo.includes(
+            "drive.google.com"
+          )
+        ) {
+          const match =
+            photo.match(
+              /\/d\/([^/]+)/
+            );
+
+          if (match) {
+            photoUrl =
+              "https://drive.google.com/thumbnail?id=" +
+              match[1] +
+              "&sz=w1000";
+          }
+        }
+
+        // ===== HANYA ID DRIVE =====
+        else {
+          photoUrl =
+            "https://drive.google.com/thumbnail?id=" +
+            photo +
+            "&sz=w1000";
+        }
+      }
+
+      img.src =
+        photoUrl ||
+        "https://ui-avatars.com/api/?name=" +
+        encodeURIComponent(
+          member.Nama || "Member"
+        );
+    }
+
+  // =========================
+  // FIELD MAPPING (FIXED SESUAI TABLE)
+  // =========================
+  const set = (id, val) => {
+    const el = modal.querySelector(`#${id}`);
+    if (el) el.innerText = val ?? "-";
+  };
+
+  set(
+  "joinDate",
+  member.Join_Date
+    ? new Date(member.Join_Date).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric"
+      })
+    : "-"
+  );
+
+  set(
+    "birthday",
+    member.Tgl_Lahir
+      ? new Date(member.Tgl_Lahir).toLocaleDateString("id-ID", {
+          day: "2-digit",
+          month: "long",
+          year: "numeric"
+        })
+      : "-"
+  );
+  set("whatsapp", member.WA);
+  set("address", member.Address);
+
+  // =========================
+  // MONEY
+  // =========================
+  const invest = modal.querySelector("#totalInvestment");
+  if (invest) {
+    invest.innerHTML = `IDR ${(Number(member.Total_Spend || 0)).toLocaleString("id-ID")}`;
+  }
+  const points = modal.querySelector("#loyaltyPoints");
+  if (points) {
+    points.innerHTML = `${member.Point || 0} <span class="text-xs ml-2">PTS</span>`;
+  }
+
+
+  // =========================
+  // TIER HISTORY
+  // =========================
+
+  getMemberDetailPage(
+    member.ID_Member,
+    state.branchId
+  )
+  .then(data => {
+    if(!data || !data.success){
+      renderTierProgression([]);
+      renderTierTimeline([], modal );
+      return;
+    }
+    const history = data.tierHistory?.history || [];
+    renderTierProgression(history);
+    renderTierTimeline(history, modal);
+  })
+  .catch(err => {
+    console.error(
+      "Member detail error:",
+      err
+    );
+    renderTierProgression([]);
+    renderTierTimeline(
+      [],
+      modal
+    );
+  });
+
+  document.body.style.overflow = "hidden";
+  initMemberTabs(modal);
+}
+
+function initMemberTabs(modal) {
+  const buttons = modal.querySelectorAll("[data-tab]");
+  const contents = modal.querySelectorAll(".tab-content");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+
+      // RESET BUTTON
+      buttons.forEach(b => {
+        b.classList.remove(
+          "border-b-2",
+          "border-primary",
+          "text-primary",
+          "font-semibold"
+        );
+        b.classList.add(
+          "text-on-surface-variant"
+        );
+
+      });
+      // ACTIVE BUTTON
+      btn.classList.add(
+        "border-b-2",
+        "border-primary",
+        "text-primary",
+        "font-semibold"
+      );
+      btn.classList.remove(
+        "text-on-surface-variant"
+      );
+      // HIDE CONTENT
+      contents.forEach(content => {
+        content.classList.add("hidden");
+      });
+      // SHOW TARGET
+      const activeTab =
+        modal.querySelector(`#${target}Tab`);
+      if (activeTab) {
+        activeTab.classList.remove("hidden");
+      }
+
+    });
+
+  });
+
+}
+
+function renderTierTimeline(history, modal) {
+  const container = modal.querySelector("#tierHistoryTimeline");
+  if (!container) return;
+  if (!history || !history.length) {
+    container.innerHTML = `
+      <div class="text-sm text-slate-400">
+        No tier history
+      </div>
+    `;
+    return;
+  }
+	
+  const settings = window.loyaltySettings || {};
+  const tier1 = String(settings.tier_1_name_value || "") .toLowerCase();
+  const tier2 = String(settings.tier_2_name_value || "") .toLowerCase();
+  const tier3 = String(settings.tier_3_name_value || "") .toLowerCase();
+  const tier4 = String(settings.tier_4_name_value || "") .toLowerCase();
+  const tier5 = String(settings.tier_5_name_value || "") .toLowerCase();
+	
+  container.innerHTML = history.map((h, index) => {
+    const current = index === 0;
+    const year = h.year || "-";
+    const tier = h.tier || settings.tier_1_name_value || "-";
+    let icon = "handshake";
+    const tierLower = String(tier).toLowerCase();
+    if (tierLower === tier5) { icon = "diamond";}
+    else if (tierLower === tier4) { icon = "workspace_premium"; }
+    else if (tierLower === tier3) { icon = "local_cafe"; }
+    else if (tierLower === tier2) { icon = "sentiment_very_satisfied"; }
+    else if (tierLower === tier1) { icon = "handshake"; }
+
+    let description = "Recently joined the loyalty ecosystem and started building customer activity.";
+    if (tierLower === tier5) { description = "Recognized as one of the highest loyalty members with exceptional spending activity and premium privileges."; }
+    else if (tierLower === tier4) { description = "Maintained outstanding transaction consistency and unlocked premium member benefits.";}
+    else if (tierLower === tier3) { description = "Demonstrated strong purchasing activity with enhanced loyalty rewards."; }
+    else if (tierLower === tier2) { description = "Actively engaged through recurring visits and steady transaction growth."; }
+
+
+
+    return `
+      <div class="relative pl-10">
+        <div class="
+          absolute left-[15px] top-2 bottom-0 w-px
+          ${current
+            ? "bg-gradient-to-b from-primary to-primary-container/20"
+            : "bg-outline-variant/30"}
+        "></div>
+        <div class="
+          absolute left-0 top-1
+          w-8 h-8 rounded-full
+          flex items-center justify-center
+          z-10
+          ${current
+            ? "bg-primary shadow-[0_0_15px_rgba(255,193,116,0.3)]"
+            : "bg-surface-container-highest border border-outline-variant/30"}
+        ">
+          <span class="
+            material-symbols-outlined text-sm
+            ${current
+              ? "text-on-primary"
+              : "text-secondary"}
+          ">
+            ${icon}
+          </span>
+        </div>
+
+        <div class="
+          p-5 rounded-xl
+
+          ${current
+            ? "bg-surface-container-low/40 border border-primary/20"
+            : "bg-surface-container-low/20 border border-outline-variant/10"}
+        ">
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h4 class="
+                font-headline text-lg font-bold
+                ${current
+                  ? "text-primary"
+                  : "text-on-surface"}
+              ">
+                ${tier} Status
+              </h4>
+			  
+              <p class="
+                font-label text-[10px]
+                text-on-surface-variant
+                uppercase tracking-widest
+                font-bold opacity-60
+              ">
+                ${year}
+              </p>
+			  
+              <p class="
+                text-xs
+                text-on-surface-variant
+                leading-relaxed
+                mt-2
+              ">
+                ${description}
+              </p>
+            </div>
+            ${
+              current
+                ? `
+                  <div class="
+                    bg-primary/10
+                    px-2 py-1
+                    rounded
+                    text-[10px]
+                    font-bold
+                    text-primary
+                    border border-primary/20
+                  ">
+                    CURRENT
+                  </div>
+                `
+                : ""
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+}
+
+function closeMemberProfile() {
+  document.getElementById("member-modal-wrapper")?.remove();
+  document.body.style.overflow = "";
+}
+
+document.addEventListener("click", function (e) {
+  // CLOSE BUTTON
+  const closeBtn = e.target.closest("[data-member-close]");
+  if (closeBtn) {
+    closeMemberProfile();
+    return;
+  }
+  // BACKDROP CLICK
+  const modal = e.target.closest("[data-member-modal]");
+  if (modal && e.target === modal) {
+    closeMemberProfile();
+  }
+});
+
+function enableEditMember() {
+  const modal = document.querySelector("[data-member-modal]");
+  if (!modal || !editingMember) return;
+  const makeInput = (id, value) => {
+    const el = modal.querySelector(`#${id}`);
+    if (!el) return;
+    el.innerHTML = `
+      <input class="w-full bg-surface-container p-2 rounded"
+        value="${value || ""}" id="edit-${id}">
+    `;
+  };
+  makeInput("memberName", editingMember.Nama);
+  makeInput("whatsapp", editingMember.WA);
+  makeInput("address", editingMember.Address);
+  makeInput("birthday", editingMember.Tgl_Lahir);
+  makeInput("joinDate", editingMember.Join_Date);
+  // ubah tombol jadi SAVE
+  const btn = document.querySelector(".btn-gradient");
+  if (btn) {
+    btn.innerHTML = "Save Changes";
+    btn.onclick = saveMemberEdit;
+  }
+}
+
+async function loadMembers(callback) {
+
+	const el = document.getElementById("member-table-body");
+	if (!el) return;
+	
+	if (state.memberPageData) {
+	
+	  const data = state.memberPageData;
+	  state.members = data.members || [];
+	  state.settings = data.settings || {};
+	  renderTierFilter(state.settings);
+	  renderTierSettings(state.settings);
+	  renderMembers(state.members);
+	  if(callback) callback();
+	  return;
+	}
+	
+	try {
+	
+    	
+    	// ==================================
+    	// SUPABASE AKTIFKAN NANTI
+    	// ==================================
+    	
+    	/*
+    	const { data, error } =
+    	await supabase.rpc(
+    	  "get_member_page_data",
+    	  {
+    	    p_branch_id: state.branchId
+    	  }
+    	);
+    	
+    	if(error){
+    	 throw error;
+    	}
+    	
+    	const res = data;
+    	*/
+    	
+    	
+    	// ==================================
+    	// TEMP DATA VERCEL
+    	// ==================================
+    	
+    	const res = {
+    	  members: [],
+    	  settings: {}
+    	};
+        	state.memberPageData = res;
+        	state.members = res.members || [];
+        	state.settings = res.settings || {};
+        	renderTierFilter(state.settings);
+        	renderTierSettings(state.settings);
+        	renderMembers(state.members);
+    	    if(callback) callback();
+	}
+    	catch(err){
+    		console.error(
+        		"Member Load Error:",
+        		err
+    	    );
+    	
+        	showToast(
+            	"Gagal memuat member",
+            	"error"
+        	);
+    	}
+}
+
+function renderTierProgression(history = []) {
+
+  const el =
+    document.getElementById("tierProgression");
+
+  if (!el) return;
+
+  if (!history.length) {
+
+    el.innerHTML = `
+      <p class="text-sm text-on-surface-variant">
+        No tier history
+      </p>
+    `;
+
+    return;
+  }
+
+  el.innerHTML = history.map((item, index) => {
+
+    const isCurrent = index === 0;
+
+    return `
+      <div class="relative flex items-center justify-between pl-8">
+
+        <div class="
+          absolute left-0 w-2 h-2 rounded-full
+          ${isCurrent
+            ? "bg-primary shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+            : "bg-outline-variant"}
+        "></div>
+
+        <div>
+          <p class="
+            text-[10px] font-bold tracking-widest uppercase
+            ${isCurrent
+              ? "text-primary"
+              : "text-on-surface-variant/60"}
+          ">
+            ${item.year}
+          </p>
+
+          <p class="
+            text-sm font-semibold
+            ${isCurrent
+              ? "text-on-surface"
+              : "text-on-surface/80"}
+          ">
+            ${item.tier}
+          </p>
+        </div>
+
+        ${
+          isCurrent
+            ? `
+            <span class="
+              text-[10px]
+              bg-primary-container/20
+              text-primary
+              border border-primary/30
+              px-2 py-0.5
+              rounded-full
+            ">
+              Current
+            </span>
+          `
+            : ""
+        }
+
+      </div>
+    `;
+  }).join("");
+}
+
+function loadNotifications() {
+
+      const res = state.memberPageData;
+      if (!res) return;
+
+      const badge = document.getElementById("notificationBadge");
+      const list = document.getElementById("notificationList");
+    
+      if (!badge || !list) return;
+      list.innerHTML = "";
+    
+      const members = res?.birthday || [];
+      const transactions = res?.transaction || [];
+      const ingredients = res?.ingredientStock || [];
+      window.ingredientStockData = ingredients;
+    
+      if (!res?.success || members.length === 0) {
+        badge.classList.add("hidden");
+        list.innerHTML = `
+          <div class="p-4 text-sm text-slate-400">
+            No Notifications
+          </div>
+        `;
+        return;
+      }
+      badge.classList.remove("hidden");
+      badge.innerText = "";
+      if (window.ingredientStockData.length > 0) {
+        list.innerHTML += `
+        <div
+     
+        onclick="handleNotification(this)"
+        data-type="ingredient"
+        class="
+        p-4 border-b border-outline-variant/5
+        hover:bg-white/10
+        cursor-pointer
+        transition-all
+        "
+        data-type="ingredient"
+        >
+          <div class="flex items-start gap-3">
+
+            <div
+            class="
+            w-10 h-10 rounded-full
+            bg-red-500/10
+            flex items-center justify-center
+            ">
+
+              <span
+              class="material-symbols-outlined text-red-500">
+                warning
+              </span>
+
+            </div>
+
+            <div class="flex-1">
+
+              <p class="font-semibold text-sm">
+                ⚠️ Ingredient Low Stock
+              </p>
+
+
+              <p class="text-xs text-on-surface-variant mt-1">
+                ${ingredients.length}
+                ingredient perlu restock
+
+                • Klik untuk melihat detail
+              </p>
+              
+            </div>
+          </div>
+        </div>
+
+        `;
+      }
+
+      members.forEach(member => {
+        list.innerHTML += `
+
+         <div
+            class="
+              p-4 border-b border-outline-variant/5
+              hover:bg-white/10
+              cursor-pointer
+              transition-all
+            "
+            onclick="handleBirthday(this)"
+            data-phone="${member.phone || ''}"
+            data-name="${member.name || ''}"
+          >
+
+            <div class="flex items-start gap-3">
+
+              <div class="
+                w-10 h-10 rounded-full
+                overflow-hidden
+                bg-background/80
+              ">
+
+              <img
+                src="${member.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name)}"
+                class="w-full h-full object-cover"
+              />
+
+            </div>
+
+              <div class="flex-1">
+              
+                <p class="font-semibold text-sm">
+                  ${
+                    member.daysLeft === 0
+                      ? `🎂 ${member.name} berulang tahun hari ini`
+                      : `🎂 ${member.name} ulang tahun ${member.daysLeft} hari lagi`
+                  }
+                </p>
+
+                <p class="text-xs text-on-surface-variant mt-1">
+                  Klik untuk mengirim ucapan WhatsApp
+                </p>
+                
+              </div>
+            </div>
+          </div>
+
+        `;
+      });
+
+      transactions.forEach(trx => {
+        list.innerHTML += `
+
+          <div
+            class="
+              p-4 border-b border-outline-variant/5
+              hover:bg-white/10
+              cursor-pointer
+              transition-all
+            "
+            onclick="handleTransaction(this)"
+            data-phone="${trx.phone || ''}"
+            data-name="${trx.name || ''}"
+            data-total="${trx.total || 0}"
+            data-point="${trx.point || 0}"
+            data-invoice="${trx.invoice || ''}"
+            data-trxid="${trx.id || trx.invoice || ''}"
+          >
+            <div class="flex items-start gap-3">
+              <div class="
+                w-10 h-10 rounded-full
+                overflow-hidden
+                bg-background/80
+              ">
+              <img
+                src="${trx.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(trx.name)}"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div class="flex-1">
+              <p class="font-semibold text-sm">
+                💰 ${trx.name} baru melakukan transaksi
+              </p>
+
+              <p class="text-xs text-on-surface-variant mt-1">
+                Rp ${Number(trx.total || 0).toLocaleString("id-ID")}
+                • Klik untuk mengirim ucapan terima kasih
+              </p>
+
+            </div>
+          </div>
+        `;
+      });
+}
+
+function toggleNotification() {
+  const el = document.getElementById("notificationDropdown");
+  if (!el) return;
+  el.classList.toggle("hidden");
+}
+
+let memberPhotoBase64 = null;
+    
+async function previewMemberPhoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const compressed = await compressImage(
+      file,
+      500,
+      0.6
+    );
+  memberPhotoBase64 = await fileToBase64(compressed);
+  document.getElementById("memberPhoto" ).src = memberPhotoBase64;
+}
+
+    	// ==================================
+    	// TABLES
+    	// ==================================
+
+function traceCall(name) {
+  console.log("SERVER CALL:", name);
+}
+
+async function loadTables() {
+    if (!state.branchId) {
+      return;
+    }
+    if (
+      state.tableData &&
+      state.tableDataBranchId === state.branchId
+    ) {
+      renderTableGrid(
+        state.tableData
+      );
+      return;
+    }
+    
+    try {
+    
+    // ==================================
+    // SUPABASE AKTIFKAN NANTI
+    // ==================================
+    
+    /*
+    const { data, error } =
+    await supabase.rpc(
+      "get_table_data",
+      {
+        p_branch_id:
+          state.branchId
+      }
+    );
+    
+    if(error){
+     throw error;
+    }
+    
+    const res = data;
+    */
+    
+    // ==================================
+    // TEMP VERCEL
+    // ==================================
+    
+    const res = [];
+        state.tableData = res;
+        state.tableDataBranchId =
+        state.branchId;
+        renderTableGrid(state.tableData);
+    }
+        
+    catch(err){
+        console.error(
+            "Load Table Error:",
+        err
+        );
+    
+        showToast(
+            "Gagal memuat meja",
+            "error"
+        );
+    }
+}
+
+async function loadBilling(mejaId){
+
+    try{
+    
+    
+    // ==================================
+    // SUPABASE NANTI
+    // ==================================
+    
+    /*
+    const {data,error} =
+    await supabase.rpc(
+    "get_latest_transaction_by_table",
+    {
+     p_meja_id: mejaId,
+     p_branch_id: state.branchId
+    }
+    );
+    
+    if(error)
+     throw error;
+    
+    
+    const res = data;
+    */
+    
+    
+    // TEMP
+    
+            const res = null;
+             renderBilling(res);
+        }
+        catch(err){
+            console.error(
+                "Billing Error:",
+                err
+            );
+        
+            showToast(
+                "Gagal load billing",
+                "error"
+            );
+        }
+}
+
+function renderTableGrid(data) {
+
+  const grid = document.getElementById("table-grid");
+  if (!grid) return;
+  let available = 0;
+  let occupied = 0;
+  let reserved = 0;
+  let html = "";
+
+  (data || []).forEach(t => {
+
+    const status = (t.status || "").toLowerCase().trim();
+    const tableNumber = String(t.name || "").padStart(2, "0");
+    if (status === "available") available++;
+    else if (status === "occupied") occupied++;
+    else if (status === "reserved") reserved++;
+    if (status === "occupied") {
+      html += `
+        <div
+          onclick="selectTable('${t.id}')"
+          class="glass-panel rounded-xl overflow-hidden
+            border border-white/5
+            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+            p-6 relative hover:bg-white/5 transition">
+          <div class="flex justify-between mb-2">
+            <span class="px-2 py-1 rounded-full bg-background/90 border border-white/5 font-bold text-2xl">${tableNumber}</span>
+            <span class="text-xs font-bold text-primary">Occupied</span>
+          </div>
+          <p>IDR ${t.total || 0}</p>
+          <p class="text-sm">${t.guest || "-"}</p>
+        </div>
+      `;
+    }
+
+    else if (status === "reserved") {
+      html += `
+        <div
+        onclick="selectTable('${t.id}')"
+        class="glass-panel rounded-xl overflow-hidden
+            border border-white/5
+            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+            p-6 relative hover:bg-white/5 transition">
+          <div class="flex justify-between mb-2">
+            <span class="font-bold text-2xl">${tableNumber}</span>
+            <span class="text-xs text-primary">Reserved</span>
+          </div>
+          <p>${t.guest || "-"}</p>
+          <p class="text-sm">${t.note || "-"}</p>
+        </div>
+      `;
+    }
+
+    else {
+      html += `
+        <div
+        onclick="selectTable('${t.id}')"
+        class="glass-panel rounded-xl overflow-hidden
+            border border-white/5
+            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+            p-6 relative hover:bg-white/5 transition flex flex-col items-center cursor-pointer">
+          <span class="text-2xl font-bold">${tableNumber}</span>
+
+          <button
+            class="mt-3 px-4 py-2 bg-primary/10 border border-primary/10 text-primary rounded-xl">
+            Open Table
+          </button>
+
+        </div>
+      `;
+    }
+
+  });
+
+  grid.innerHTML = html;
+  document.getElementById("availableCount").textContent = available;
+  document.getElementById("occupiedCount").textContent = occupied;
+  document.getElementById("reservedCount").textContent = reserved;
+}
+
+function assignTable(tableId, orderId, guest, total) {
+  table.status = "occupied";
+  table.orderId = orderId;
+  table.guest = guest;
+  table.total = total;
+  table.duration = 0;
+  renderTableGrid();
+}
+
+function reserveTable(tableId, guest, time, pax) {
+  table.status = "reserved";
+  table.guest = guest;
+  table.time = time;
+  table.pax = pax;
+  renderTableGrid();
+}
+
+function clearTable(tableId) {
+ 
+  table.status = "available";
+  table.orderId = null;
+  table.guest = null;
+  table.total = null;
+  table.duration = null;
+  renderTableGrid();
+}
+
+function openReserveModalFromSidebar() {
+  if (!selectedTableId) {
+    alert("Pilih meja dulu!");
+    return;
+  }
+  document.getElementById("billingActions").classList.add("hidden");
+  document.getElementById("reserveForm").classList.remove("hidden");
+}
+
+function cancelReserve() {
+  document.getElementById("reserveForm").classList.add("hidden");
+  document.getElementById("billingActions").classList.remove("hidden");
+}
+
+async function saveReserve() {
+
+    const name =
+    document.getElementById("reserveName").value;
+    
+    const note =
+    document.getElementById("reserveNote").value;
+    
+    
+        try {
+        
+        
+        // ==================================
+        // SUPABASE AKTIFKAN NANTI
+        // ==================================
+        
+        /*
+        const { data, error } =
+        await supabase.rpc(
+          "reserve_table",
+          {
+            p_table_id: selectedTableId,
+            p_name: name,
+            p_note: note,
+            p_branch_id: state.branchId
+          }
+        );
+        
+        if(error){
+          throw error;
+        }
+        */
+        
+        // TEMP
+            const res = true;
+            
+                if(res){
+                  state.tableData = null;
+                  cancelReserve();
+                  loadTables();
+                }
+            
+            
+            }
+            catch(err){
+            console.error(
+            "Reserve table error:",
+            err
+            );
+            
+            showToast(
+            "Gagal reserve meja",
+            "error"
+            );
+        }
+}
+
+async function clearSelectedTable() {
+
+    if (!selectedTableId) {
+      alert("Pilih meja dulu!");
+      return;
+    }
+    
+        
+        try {
+    
+    
+    // ==================================
+    // SUPABASE AKTIFKAN NANTI
+    // ==================================
+    
+    /*
+    const { data, error } =
+    await supabase.rpc(
+      "clear_table_status",
+      {
+        p_table_id: selectedTableId,
+        p_branch_id: state.branchId
+      }
+    );
+    
+    if(error){
+      throw error;
+    }
+    */
+    
+    // TEMP
+        const res = true;
+        if(res){
+          state.tableData = null;
+          loadTables();
+          selectedTableId = null;
+          const info =
+            document.getElementById(
+              "billing-table-info"
+            );
+          if(info){
+            info.innerText =
+              "No Table Selected";
+          }
+        }
+    }
+    catch(err){ 
+        console.error(
+            "Clear table error:",
+        err
+        );
+        showToast(
+            "Gagal reset meja",
+            "error"
+        );
+    }
+}
+
+function renderBilling(data) {
+  const container = document.getElementById("table-cart-items");
+  const summary = document.getElementById("table-cart-summary");
+
+  if (!data) {
+    container.innerHTML = "<p class='text-slate-400 text-sm'>No active transaction</p>";
+    return;
+  }
+
+  //  ITEMS
+  container.innerHTML = "";
+
+  data.items.forEach(item => {
+    container.innerHTML += `
+      <div class="flex justify-between items-center bg-background p-4 rounded-2xl">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 bg-primary-container/10 flex items-center justify-center rounded-xl text-primary-container font-bold text-sm">
+            ${item.qty}x
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-on-surface">${item.name}</p>
+            <p class="text-xs text-slate-500">${item.note || ""}</p>
+          </div>
+        </div>
+        <p class="text-sm font-bold text-on-surface">${formatRupiah(item.total)}</p>
+      </div>
+    `;
+  });
+
+  //  SUMMARY
+
+  summary.innerHTML = `
+    <div class="space-y-2">
+      <div class="flex justify-between text-sm">
+        <span class="text-slate-400">Subtotal</span>
+        <span>${formatRupiah(data.subtotal)}</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-slate-400">Tax</span>
+        <span>${formatRupiah(data.tax)}</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-slate-400">Service</span>
+        <span>${formatRupiah(data.service)}</span>
+      </div>
+      <div class="flex justify-between pt-4">
+        <span class="font-bold">Total</span>
+        <span class="font-bold text-primary-container">${formatRupiah(data.total)}</span>
+      </div>
+    </div>
+  `;
+}
+
+function initTablePage() {
+  loadTables();
+}
+
+function formatNumber(num) {
+  return Number(num || 0).toLocaleString("id-ID");
+}
+
+function formatCompact(num) {
+  num = Number(num || 0);
+  if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
+  if (num >= 1000) return (num / 1000).toFixed(1) + "K";
+  return num;
+}
+
+function openTable(mejaId) {
+  selectedTableId = mejaId;
+  document.getElementById("billing-table-info").innerText =
+    "Table " + mejaId;
+  loadBilling(mejaId);
+}
+
+function updateStockPreview() {
+  const qty = Number(document.getElementById("stockQty")?.value) || 0;
+  const price = Number(document.getElementById("purchasePrice")?.value.replace(/\D/g,'')) || 0;
+  const costEl = document.getElementById("totalCostPreview");
+  if (costEl) {
+    costEl.innerText = "Rp " + price.toLocaleString("id-ID");
+  }
+  const current = window.currentIngredientStock || 0;
+  const stockEl = document.getElementById("newStockPreview");
+  if (stockEl) {
+    stockEl.innerText = (current + qty).toLocaleString("id-ID") + "g,ml,pcs";
+  }
+}
+
+document.addEventListener("input", function(e) {
+  if (e.target.id === "stockQty" || e.target.id === "purchasePrice") {
+    updateStockPreview();
+  }
+});
+
+function openAddTableModal() {
+  const template = document.getElementById("addTableModalTemplate");
+  if (document.getElementById("addTableModal")) return;
+  const wrapper = document.createElement("div");
+  wrapper.id = "addTableModal";
+  wrapper.innerHTML = template.innerHTML;
+  document.body.appendChild(wrapper);
+}
+
+function closeAddTableModal() {
+  document.getElementById("addTableModal")?.remove();
+}
+	
+async function saveNewTable() {
+    const tableName = document.getElementById("newTableName")
+    .value
+    .trim();
+    
+    if (!tableName) {
+      alert(
+        "Table Name wajib diisi."
+      );
+      return;
+    }
+    try {
+
+
+// ==================================
+// SUPABASE AKTIFKAN NANTI
+// ==================================
+
+/*
+const { data, error } =
+await supabase
+.from("Meja")
+.insert({
+  name: tableName,
+  branch_id: state.branchId,
+  status: "available"
+});
+
+
+if(error){
+  throw error;
+}
+*/
+
+
+// TEMP
+
+        const res = true;
+        if(res){
+          closeAddTableModal();
+          // clear cache
+          state.tableData = null;
+          state.tableDataBranchId = null;
+          loadTables();
+        }
+    }
+        catch(err){
+        console.error(
+        "Add table error:",
+        err
+        );
+        
+        alert(
+        "Gagal menambahkan meja"
+        );
+    }
+}
+
+
+	
+
+
+	
+
+
+
+      
+
 
 
 
