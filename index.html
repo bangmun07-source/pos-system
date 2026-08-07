@@ -15928,83 +15928,83 @@ function setText(id, value) {
 
 document.addEventListener("DOMContentLoaded", () => {
 
-
-const params =
-new URLSearchParams(
-  window.location.search
-);
-
-
-const page =
-params.get("page") ||
-window.__ACTIVE_PAGE ||
-null;
-
-
-
-function bootApp(targetPage = "dashboardPage") {
-  const ok =
-    restoreSession();
-
-  if (!ok) {
-    navigate("loginPage");
-    return;
-  }
-
-  const role =
-    state.user?.role?.toLowerCase();
-
-
-  // BRANCH CONTEXT
-  if (role === "owner") {
-    // owner pilih branch nanti
-    state.branchId =
-      localStorage.getItem(
-        "pos_branchId"
-      ) || "";
-    
-  } else {
-
-    // admin / kasir
-    state.branchId =
-      state.user?.branchId ||
-      localStorage.getItem(
-        "pos_branchId"
-      ) ||
-      "";
-
-  }
-
-
-  console.log(
-    "ROLE:",
-    role,
-    "BRANCH:",
-    state.branchId
-  );
-  
-// loadIngredientStockAlertTemplate();
-// loadWhatsAppModal();
-
-  window.__ACTIVE_PAGE =
-    targetPage;
-  navigate(targetPage);
-
-}
-
-// ROUTING
-if(page){
-
-  window.__ACTIVE_PAGE =
-    page;
-  bootApp(page);
-
-} else {
-
-  bootApp(
-    "dashboardPage"
-  );
-}
+      
+      const params =
+      new URLSearchParams(
+        window.location.search
+      );
+      
+      
+      const page =
+      params.get("page") ||
+      window.__ACTIVE_PAGE ||
+      null;
+      
+      
+      
+      function bootApp(targetPage = "dashboardPage") {
+        const ok =
+          restoreSession();
+      
+        if (!ok) {
+          navigate("loginPage");
+          return;
+        }
+      
+        const role =
+          state.user?.role?.toLowerCase();
+      
+      
+        // BRANCH CONTEXT
+        if (role === "owner") {
+          // owner pilih branch nanti
+          state.branchId =
+            localStorage.getItem(
+              "pos_branchId"
+            ) || "";
+          
+        } else {
+      
+          // admin / kasir
+          state.branchId =
+            state.user?.branchId ||
+            localStorage.getItem(
+              "pos_branchId"
+            ) ||
+            "";
+      
+        }
+      
+      
+        console.log(
+          "ROLE:",
+          role,
+          "BRANCH:",
+          state.branchId
+        );
+        
+      // loadIngredientStockAlertTemplate();
+      // loadWhatsAppModal();
+      
+        window.__ACTIVE_PAGE =
+          targetPage;
+        navigate(targetPage);
+      
+      }
+      
+      // ROUTING
+      if(page){
+      
+        window.__ACTIVE_PAGE =
+          page;
+        bootApp(page);
+      
+      } else {
+      
+        bootApp(
+          "dashboardPage"
+        );
+      }
 });
 
 function bootApp(targetPage = "dashboardPage") {
@@ -17559,7 +17559,7 @@ async function fetchSettings(callback) {
       
 
 
-function initModule(pageId) {
+function initModule(pageId, params) {
 
   switch(pageId) {
 
