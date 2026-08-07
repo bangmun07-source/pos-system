@@ -18579,15 +18579,6 @@ function checkout() {
     }
 }
 
-
-
-
-
-
-
-
-    
-
 async function sendTransaction(payload){
   if (!payload) {
     alert("Payload NULL");
@@ -18624,11 +18615,7 @@ async function sendTransaction(payload){
     */
 
     // TEMP DATA VERCEL
-    const res = {
-      success:true,
-      message:
-      "Transaksi berhasil"
-    };
+  	const res = await checkoutTransaction(payload);
     isProcessing = false;
     if(btn){
       btn.disabled = false;
