@@ -18568,8 +18568,10 @@ function checkout() {
     // pastikan pakai ID asli
     payload.memberId =
     member.id;
-    // LANGSUNG HITUNG HPP
-    hitungHPPDanKirim(payload); 
+ 	} else {
+      // TANPA MEMBER → TETAP HITUNG HPP
+      hitungHPPDanKirim(payload);
+    }
 }
 
 
