@@ -1,11 +1,16 @@
 {
   "name": "Sistem POS",
   "short_name": "POS",
-  "description": "Sistem Point of Sale",
+  "description": "Point of Sale System",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B0F14",
-  "theme_color": "#0B0F14",
-  "orientation": "portrait",
-  "icons": []
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMA%202.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
