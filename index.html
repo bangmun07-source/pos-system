@@ -18958,8 +18958,8 @@ async function loadProducts(callback) {
     }
     */
 
-    // TEMP DATA VERCEL
-    const products = [];
+    // SUPABASE RPC
+    const products = await getProductsRPC(branchId, role);
     state.products =
       products || [];
     state.productsBranchId =
