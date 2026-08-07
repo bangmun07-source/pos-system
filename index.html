@@ -16013,36 +16013,64 @@ function navigate(pageId, params = {}) {
   /**
    * 4. AUTHENTICATION LOGIC & LOGOUT
    */
-  function handleLogin() {
+  async function handleLogin() {
 
   const username =
-    document.getElementById("username").value;
+    document.getElementById("username").value.trim();
 
   const password =
-    document.getElementById("password").value;
+    document.getElementById("password").value.trim();
 
 
-  const isGAS =
-    typeof google !== "undefined" &&
-    google.script &&
-    google.script.run;
+  try {
 
 
-  // ==========================
-  // VERCEL MODE
-  // ==========================
+    // ==================================
+    // SUPABASE LOGIN (ISI NANTI)
+    // ==================================
 
-  if (!isGAS) {
+    /*
+    
+    const { data, error } =
+      await supabase
+        .from("Users")
+        .select("*")
+        .eq("username", username)
+        .single();
 
-    console.log("Login Vercel mode");
 
+    if (error || !data) {
+      alert("Login gagal");
+      return;
+    }
+
+
+    state.user = data;
+
+    */
+
+
+    // ==================================
+    // TEMP USER VERCEL
+    // HAPUS SETELAH SUPABASE AKTIF
+    // ==================================
 
     state.user = {
+
       id: "demo",
-      username: username || "demo",
-      name: "Demo Owner",
-      role: "owner",
-      branchId: ""
+
+      username:
+        username || "demo",
+
+      name:
+        "Demo Owner",
+
+      role:
+        "owner",
+
+      branchId:
+        ""
+
     };
 
 
@@ -16055,126 +16083,81 @@ function navigate(pageId, params = {}) {
     );
 
 
+    if (state.branchId) {
+
+      localStorage.setItem(
+        "pos_branchId",
+        state.branchId
+      );
+
+    }
+
+
     navigate("dashboardPage");
 
-    return;
+
+  } catch (err) {
+
+    console.error(
+      "Login error:",
+      err
+    );
+
+    alert(
+      "Terjadi kesalahan saat login"
+    );
+
   }
-
-
-  // ==========================
-  // GOOGLE APPS SCRIPT MODE
-  // ==========================
-
-  google.script.run
-    .withSuccessHandler(res => {
-
-      if (res.success) {
-
-        state.user = res.user;
-
-        state.branchId =
-          res.user?.branchId ||
-          localStorage.getItem("pos_branchId");
-
-
-        localStorage.setItem(
-          "pos_user",
-          JSON.stringify(res.user)
-        );
-
-
-        if (state.branchId) {
-
-          localStorage.setItem(
-            "pos_branchId",
-            state.branchId
-          );
-
-        }
-
-
-        navigate("dashboardPage");
-
-      } 
-      else {
-
-        alert("Login gagal");
-
-      }
-
-    })
-    .loginUser(username, password);
 
 }
 
-
-
 function logout() {
 
-
-  const isGAS =
-    typeof google !== "undefined" &&
-    google.script &&
-    google.script.run;
-
-
-  // ==========================
-  // VERCEL MODE
-  // ==========================
-
-  if (!isGAS) {
+  try {
 
     localStorage.removeItem("pos_user");
+
     localStorage.removeItem("pos_branchId");
 
 
     state.user = null;
+
     state.branchId = null;
 
 
     navigate("loginPage");
 
-    return;
+
+  } catch (err) {
+
+    console.error(
+      "Logout error:",
+      err
+    );
+
+    // tetap paksa logout
+    localStorage.clear();
+
+    state.user = null;
+
+    state.branchId = null;
+
+    navigate("loginPage");
   }
-
-
-
-  // ==========================
-  // GOOGLE APPS SCRIPT MODE
-  // ==========================
-
-  google.script.run
-    .withSuccessHandler(() => {
-
-      localStorage.removeItem("pos_user");
-      localStorage.removeItem("pos_branchId");
-
-      state.user = null;
-      state.branchId = null;
-
-      navigate("loginPage");
-
-    })
-    .withFailureHandler(() => {
-
-      localStorage.removeItem("pos_user");
-      localStorage.removeItem("pos_branchId");
-
-      state.user = null;
-      state.branchId = null;
-
-      navigate("loginPage");
-
-    })
-    .logoutUser();
 
 }
 
-function loadDashboard() {
+      
+async function loadDashboard() {
 
   const cacheKey = JSON.stringify({
     branchId: state.branchId
   });
+
+
+  // ==========================
+  // CACHE FRONTEND
+  // ==========================
 
   if (
     state.dashboardData &&
@@ -16188,43 +16171,186 @@ function loadDashboard() {
     return;
   }
 
-  google.script.run
 
-  .withSuccessHandler(data => {
-    state.dashboardData = data;
-    state.dashboardFilter = cacheKey;
-    renderDashboard(data);
-  })
 
-  .getDashboardData(
-      state.branchId,
-      state.user?.role
-  );
+  try {
+
+
+    // ==================================
+    // SUPABASE QUERY (ISI NANTI)
+    // ==================================
+
+    /*
+    
+    const { data, error } =
+      await supabase.rpc(
+        "get_dashboard_data",
+        {
+          p_branch_id:
+            state.branchId
+        }
+      );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const dashboardData = data;
+
+    */
+
+
+    // ==================================
+    // TEMP DATA VERCEL
+    // HAPUS SETELAH RPC AKTIF
+    // ==================================
+
+    const dashboardData = {
+
+      revenue: 0,
+
+      orders: 0,
+
+      aov: 0,
+
+      occupancy: 0,
+
+      recentTransactions: [],
+
+      lowStock: []
+
+    };
+
+
+
+    state.dashboardData =
+      dashboardData;
+
+
+    state.dashboardFilter =
+      cacheKey;
+
+
+    renderDashboard(
+      dashboardData
+    );
+
+
+  } catch (err) {
+
+    console.error(
+      "Dashboard error:",
+      err
+    );
+
+  }
 
 }
 
-
 function initApp() {
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page");
 
-  const user = localStorage.getItem("pos_user");
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const page =
+    params.get("page");
+
+
+  const user =
+    localStorage.getItem("pos_user");
+
 
   if (!user) {
+
     navigate("loginPage");
+
     return;
+
   }
 
-  state.user = JSON.parse(user);
-  state.branchId = state.user?.branchId || null;
+
+  state.user =
+    JSON.parse(user);
+
+
+
+  const role =
+    state.user?.role?.toLowerCase();
+
+
+
+  // =========================
+  // BRANCH CONTEXT
+  // =========================
+
+  if (role === "owner") {
+
+    state.branchId = "";
+
+    localStorage.removeItem(
+      "pos_branchId"
+    );
+
+
+  } else {
+
+
+    state.branchId =
+      localStorage.getItem(
+        "pos_branchId"
+      )
+      ||
+      state.user?.branchId
+      ||
+      null;
+
+
+    if (state.branchId) {
+
+      localStorage.setItem(
+        "pos_branchId",
+        state.branchId
+      );
+
+    }
+
+  }
+
+
+
+  console.log(
+    "INIT USER:",
+    state.user
+  );
+
+
+  console.log(
+    "INIT BRANCH:",
+    state.branchId
+  );
+
+
 
   if (page) {
-    window.__ACTIVE_PAGE = page;
+
+    window.__ACTIVE_PAGE =
+      page;
+
     navigate(page);
+
     return;
+
   }
 
-  navigate("dashboardPage");
+
+  navigate(
+    "dashboardPage"
+  );
+
 }
 
 
@@ -16511,137 +16637,353 @@ function initTransactionFilters() {
   status?.addEventListener("change", trigger);
 }
 
-function loadRecentTransactionsPage() {
-   if (!state.branchId) {
+async function loadRecentTransactionsPage() {
+
+  if (!state.branchId) {
+
     recentData = [];
+
     paginateRecentTransactions([]);
+
     return;
   }
 
+
   const start =
     document.getElementById("startDate")?.value || "";
+
   const end =
     document.getElementById("endDate")?.value || "";
+
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
 
+
   const cacheKey =
     JSON.stringify({
+
       branchId: state.branchId,
+
       role: state.user?.role,
+
       start,
+
       end,
+
       status
+
     });
 
-  if(
+
+
+  // ==========================
+  // CACHE
+  // ==========================
+
+  if (
     state.recentTransactionsData &&
     state.recentTransactionsFilter === cacheKey
-  ){
+  ) {
+
     recentData =
-    state.recentTransactionsData;
+      state.recentTransactionsData;
+
+
     recentCurrentPage = 1;
+
+
     paginateRecentTransactions(
       recentData
     );
 
-    return;
 
+    return;
   }
 
-  google.script.run
 
-    .withSuccessHandler(data => {
-      // simpan global lama
-      recentData = data;
 
-      // simpan cache baru
-      state.recentTransactionsData =
-        data;
+  try {
 
-      state.recentTransactionsFilter =
-        cacheKey;
-      recentCurrentPage = 1;
-      paginateRecentTransactions(
-        data
+
+    // =====================================
+    // SUPABASE QUERY (ISI NANTI)
+    // =====================================
+
+    /*
+    
+    let query =
+      supabase
+      .from("Transaksi")
+      .select(`
+        id,
+        created_at,
+        total,
+        status,
+        meja
+      `)
+      .eq(
+        "branchId",
+        state.branchId
       );
-    })
 
-    .getRecentTransactions(
-      state.branchId,
-      state.user?.role,
-      start,
-      end,
-      status
+
+    if(start){
+      query =
+      query.gte(
+        "created_at",
+        start
+      );
+    }
+
+
+    if(end){
+      query =
+      query.lte(
+        "created_at",
+        end
+      );
+    }
+
+
+    if(status !== "ALL"){
+      query =
+      query.eq(
+        "status",
+        status
+      );
+    }
+
+
+    const {
+      data,
+      error
+    } = await query
+      .order(
+        "created_at",
+        {
+          ascending:false
+        }
+      );
+
+
+    if(error)
+      throw error;
+
+
+    const transactions =
+      data;
+
+    */
+
+
+    // =====================================
+    // TEMP DATA VERCEL
+    // =====================================
+
+    const transactions = [];
+
+
+
+    recentData =
+      transactions;
+
+
+    state.recentTransactionsData =
+      transactions;
+
+
+    state.recentTransactionsFilter =
+      cacheKey;
+
+
+    recentCurrentPage = 1;
+
+
+    paginateRecentTransactions(
+      transactions
     );
+
+
+  } catch(err) {
+
+    console.error(
+      "Recent transaction error:",
+      err
+    );
+
+    paginateRecentTransactions([]);
+
+  }
 
 }
 
 function initExportButton() {
 
-  const btn = document.getElementById("exportBtn");
+  const btn =
+    document.getElementById("exportBtn");
+
 
   if (!btn) return;
 
-  btn.onclick = () => {
 
-    const start = document.getElementById("startDate")?.value;
-    const end = document.getElementById("endDate")?.value;
-    const status = document.getElementById("statusFilter")?.value || "ALL";
+  btn.onclick = async () => {
 
-    // buka tab langsung
-    const pdfTab = window.open("", "_blank");
 
-    // optional loading text
+    const start =
+      document.getElementById("startDate")?.value;
+
+
+    const end =
+      document.getElementById("endDate")?.value;
+
+
+    const status =
+      document.getElementById("statusFilter")?.value || "ALL";
+
+
+
+    const pdfTab =
+      window.open("", "_blank");
+
+
+
     if (pdfTab) {
+
       pdfTab.document.write(`
+
         <html>
-          <head>
-            <title>Generating PDF...</title>
-            <style>
-              body{
-                font-family:Arial;
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                height:100vh;
-                background:#0B0F14;
-                color:white;
-              }
-              
-            </style>
-          </head>
-          <body>
-            <div>
-              <h2>Generating PDF...</h2>
-            </div>
-          </body>
+
+        <head>
+
+        <title>
+        Generating PDF...
+        </title>
+
+
+        <style>
+
+        body{
+          font-family:Arial;
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          height:100vh;
+          background:#0B0F14;
+          color:white;
+        }
+
+        </style>
+
+        </head>
+
+
+        <body>
+
+        <div>
+
+        <h2>
+        Generating PDF...
+        </h2>
+
+        </div>
+
+
+        </body>
+
         </html>
+
       `);
+
     }
 
-    google.script.run
-      .withSuccessHandler(url => {
 
-        if (pdfTab && url) {
-          pdfTab.location.href = url;
-        } else {
-          alert("Failed generate PDF");
-        }
 
-      })
-      .withFailureHandler(err => {
+    try {
 
-        if (pdfTab) {
-          pdfTab.document.body.innerHTML = `
-            <h2>Failed Generate PDF</h2>
-          `;
-        }
 
-      })
-      .exportPDFReport(start, end, state.branchId, status);
+      // ==================================
+      // VERCEL API / SUPABASE
+      // ==================================
+
+      /*
+      
+      const res =
+        await fetch("/api/export-pdf", {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
+
+          body:JSON.stringify({
+
+            start,
+            end,
+            status,
+            branchId:
+              state.branchId
+
+          })
+
+        });
+
+
+      const result =
+        await res.json();
+
+
+      if(pdfTab && result.url){
+
+        pdfTab.location.href =
+          result.url;
+
+      }
+
+      */
+
+
+      // TEMP
+
+      if(pdfTab){
+
+        pdfTab.document.body.innerHTML =
+        `
+        <h2>
+        PDF Export belum dipindahkan
+        </h2>
+        `;
+
+      }
+
+
+
+    } catch(err){
+
+
+      console.error(
+        "Export PDF error:",
+        err
+      );
+
+
+      if(pdfTab){
+
+        pdfTab.document.body.innerHTML =
+        `
+        <h2>
+        Failed Generate PDF
+        </h2>
+        `;
+
+      }
+
+    }
+
 
   };
+
 }
 
 function formatDate(date) {
@@ -16780,65 +17122,132 @@ function formatCurrency(value) {
   return "IDR " + Number(value || 0).toLocaleString("id-ID");
 }
 
-function loadRecentTransactionSummary() {
+async function loadRecentTransactionSummary() {
 
   const start =
     document.getElementById("startDate")?.value || "";
+
   const end =
     document.getElementById("endDate")?.value || "";
+
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
+
   const table =
     document.getElementById("tableFilter")?.value || "ALL";
+
+
   const branchId =
     state.branchId || "";
+
+
   const role =
     state.user?.role || "user";
 
+
+
   const cacheKey =
     JSON.stringify({
+
       branchId,
+
       role,
+
       start,
+
       end,
+
       status,
+
       table
+
     });
+
+
 
   if(
     state.recentSummaryData &&
     state.recentSummaryFilter === cacheKey
   ){
+
     renderRecentTransactionSummary(
       state.recentSummaryData
     );
+
     return;
+
   }
 
-  google.script.run
 
-  .withSuccessHandler(data=>{
-      state.recentSummaryData =
-        data;
-      state.recentSummaryFilter =
-        cacheKey;
-      renderRecentTransactionSummary(
-        data
+
+  try {
+
+
+    // =================================
+    // SUPABASE QUERY (ISI NANTI)
+    // =================================
+
+    /*
+    
+    const { data, error } =
+      await supabase.rpc(
+        "get_recent_transaction_summary",
+        {
+          p_branch_id: branchId,
+          p_start: start,
+          p_end: end,
+          p_status: status,
+          p_table: table
+        }
       );
-  })
 
-  .withFailureHandler(err => {
-    console.error(err);
-  })
 
-  .getRecentTransactionSummary(
-    branchId,
-    role,
-    start,
-    end,
-    status,
-    table
-  );
+    if(error){
+      throw error;
+    }
+
+
+    */
+
+
+    // TEMP DATA
+
+    const data = {
+
+      totalTransaction: 0,
+
+      totalRevenue: 0,
+
+      averageOrder: 0
+
+    };
+
+
+
+    state.recentSummaryData =
+      data;
+
+
+    state.recentSummaryFilter =
+      cacheKey;
+
+
+
+    renderRecentTransactionSummary(
+      data
+    );
+
+
+
+  } catch(err) {
+
+
+    console.error(
+      "Summary error:",
+      err
+    );
+
+  }
 
 }
 
@@ -16863,44 +17272,144 @@ function renderRecentTransactionSummary(data) {
 
 }
 
-function exportRecentTransactions() {
+async function exportRecentTransactions() {
 
-  const start = document.getElementById("startDate")?.value;
-  const end = document.getElementById("endDate")?.value;
-  const status = document.getElementById("statusFilter")?.value || "ALL";
+  const start =
+    document.getElementById("startDate")?.value;
+
+  const end =
+    document.getElementById("endDate")?.value;
+
+  const status =
+    document.getElementById("statusFilter")?.value || "ALL";
+
 
   if (!start || !end) {
+
     alert("Pilih tanggal dulu");
+
     return;
+
   }
 
-  const pdfWindow = window.open("", "_blank");
+
+
+  const pdfWindow =
+    window.open("", "_blank");
+
 
   if (!pdfWindow) {
+
     alert("Popup diblokir browser");
+
     return;
+
   }
 
-  google.script.run
-  .withSuccessHandler(html => {
+
+
+  pdfWindow.document.write(`
+
+    <html>
+
+    <body style="
+      font-family:Arial;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      height:100vh;
+    ">
+
+    <h2>
+    Generating PDF...
+    </h2>
+
+    </body>
+
+    </html>
+
+  `);
+
+
+
+  try {
+
+
+    // ==================================
+    // VERCEL API
+    // ==================================
+
+    /*
+    
+    const response =
+      await fetch(
+        "/api/export-recent-transactions-pdf",
+        {
+
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+            "application/json"
+          },
+
+          body:JSON.stringify({
+
+            start,
+
+            end,
+
+            status,
+
+            branchId:
+              state.branchId
+
+          })
+
+        }
+      );
+
+
+    const html =
+      await response.text();
+
 
     pdfWindow.document.open();
+
     pdfWindow.document.write(html);
+
     pdfWindow.document.close();
 
-  })
-  .withFailureHandler(err => {
+    */
+
+
+
+    // TEMP
+
+    pdfWindow.document.body.innerHTML = `
+
+      <h2>
+      Export PDF belum dipindahkan
+      </h2>
+
+    `;
+
+
+
+  } catch(err) {
+
+
+    console.error(
+      "Export error:",
+      err
+    );
+
 
     pdfWindow.document.body.innerHTML =
-    "Export Error";
+      "Export Error";
 
-  })
-  .exportRecentTransactionsPDF(
-    start,
-    end,
-    state.branchId,
-    status
-  );
+
+  }
 
 }
 
@@ -17093,45 +17602,143 @@ function openSendDigitalReceipt(data) {
   wrapper.querySelector("#receiptWhatsappInput").value = trx.phone || "";
 }
 
-function sendReceiptWhatsapp() {
+async function sendReceiptWhatsapp() {
 
-  const phone = document
-    .getElementById("receiptWhatsappInput")
-    .value
-    .replace(/\D/g, "");
+  const phone =
+    document
+      .getElementById("receiptWhatsappInput")
+      .value
+      .replace(/\D/g, "");
+
 
   if (!phone) {
+
     alert("Nomor belum diisi");
+
     return;
+
   }
 
-  // AMBIL DARI DOM YANG PASTI SUDAH RENDER
-  const trxIdEl = document.getElementById("receiptTransactionId");
+
+
+  // AMBIL DARI DOM
+  const trxIdEl =
+    document.getElementById(
+      "receiptTransactionId"
+    );
+
 
   if (!trxIdEl) {
-    alert("Modal belum siap (receiptTransactionId tidak ada)");
+
+    alert(
+      "Modal belum siap (receiptTransactionId tidak ada)"
+    );
+
     return;
+
   }
 
-  const trxId = trxIdEl.textContent.trim();
+
+
+  const trxId =
+    trxIdEl.textContent.trim();
+
+
 
   if (!trxId || trxId === "undefined") {
+
     alert("TRX ID kosong");
+
     return;
+
   }
 
-  google.script.run
-    .withSuccessHandler(function(trx) {
 
-      if (!trx) {
-        alert("Transaksi tidak ditemukan di server");
-        return;
-      }
 
-      sendReceiptWhatsappWithData(trx, phone, customMessage = null);
+  try {
 
-    })
-    .getReceiptData(trxId);
+
+    // ==================================
+    // SUPABASE QUERY
+    // ==================================
+
+    /*
+    
+    const { data, error } =
+      await supabase
+      .from("Transaksi")
+      .select(`
+        
+        *,
+        
+        Transaksi_Item(
+          *
+        )
+
+      `)
+      .eq(
+        "id",
+        trxId
+      )
+      .single();
+
+
+    if(error){
+
+      throw error;
+
+    }
+
+
+    const trx = data;
+
+
+    */
+
+
+
+    // TEMP
+
+    const trx = null;
+
+
+
+    if (!trx) {
+
+      alert(
+        "Transaksi tidak ditemukan"
+      );
+
+      return;
+
+    }
+
+
+
+    sendReceiptWhatsappWithData(
+      trx,
+      phone,
+      null
+    );
+
+
+
+  } catch(err) {
+
+
+    console.error(
+      "Receipt error:",
+      err
+    );
+
+
+    alert(
+      "Gagal mengambil data transaksi"
+    );
+
+
+  }
+
 }
 
 
@@ -17249,53 +17856,31 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 
       const image = canvas.toDataURL("image/jpeg", 0.65);
 
-      google.script.run
-        .withSuccessHandler((url) => {
-
-          let wa = String(phone || "")
-            .replace(/\D/g, "");
-
-          if (wa.startsWith("0")) {
-            wa = "62" + wa.slice(1);
-          } else if (!wa.startsWith("62")) {
-            wa = "62" + wa;
-          }
-
-          let finalMessage;
-
-            if (customMessage) {
-
-              // Dari Member Transaction
-              finalMessage =
-                customMessage +
-                "\n\n📎 Digital Receipt\n" +
-                url;
-
-            } else {
-
-              // Dari Recent Transaction
-              finalMessage =
-                "🧾 *Digital Receipt*\n\n" +
-                "Thank you for visiting.\n" +
-                "Enjoy the moment. Take it slow.\n\n" +
-                "Have a nice day.\n\n" +
-                "📎 Receipt:\n" +
-                url;
-
-            }
-
-          window.open(
-            "https://api.whatsapp.com/send?phone=" +
-              wa +
-              "&text=" +
-              encodeURIComponent(finalMessage),
-            "_blank"
-          );
-
-          wrapper.remove();
-
-        })
-        .handleReceiptUpload(image, trx.id);
+      const response =
+            await fetch(
+              "/api/handle-receipt-upload",
+              {
+                method:"POST",
+                headers:{
+                  "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+            
+                  base64:image,
+            
+                  trxId:trx.id
+            
+                })
+              }
+            );
+            
+            
+            const result =
+            await response.json();
+            
+            
+            const url =
+            result.url;
 
     });
 
