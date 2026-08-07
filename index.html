@@ -18913,6 +18913,9 @@ function addToCart(product, isRedeem = false, rewardId = null) {
 }
 
 async function loadProducts(callback) {
+	console.log("LOAD PRODUCTS RUN");
+console.log("BRANCH:", state.branchId);
+console.log("ROLE:", role);
   const role =
     state.user?.role?.toLowerCase() || "";
   const branchId =
