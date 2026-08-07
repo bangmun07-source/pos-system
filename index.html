@@ -16261,6 +16261,16 @@ function formatPercent(val) {
   return (num >= 0 ? "+" : "") + num.toFixed(1) + "%";
 }
 
+let clockInterval;
+
+function startClock() {
+  if (clockInterval) clearInterval(clockInterval);
+
+  updateDateTime();
+  clockInterval = setInterval(updateDateTime, 1000);
+}
+
+
   // ==================================
   // DASHBOARD
   // ==================================
