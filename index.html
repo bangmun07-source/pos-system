@@ -16250,7 +16250,16 @@ function initApp() {
     "dashboardPage"
   );
 }
+	
+function formatRupiah(angka) {
+  return "IDR " + Number(angka).toLocaleString("id-ID");
+}
 
+
+function formatPercent(val) {
+  let num = Number(val) || 0;
+  return (num >= 0 ? "+" : "") + num.toFixed(1) + "%";
+}
 
   // ==================================
   // DASHBOARD
