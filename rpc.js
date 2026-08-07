@@ -44,7 +44,6 @@ async function getRewardsRPC(memberId, branchId) {
         p_branch_id: branchId
       }
     );
-
   if(error){
     console.error(
       "get_rewards error:",
@@ -53,4 +52,19 @@ async function getRewardsRPC(memberId, branchId) {
     throw error;
   }
   return data || [];
+}
+
+async function loginUserRPC(username,password){
+  const {data,error} =
+    await supabaseClient.rpc(
+      "login_user",
+      {
+        p_username: username,
+        p_password: password
+      }
+    );
+  if(error){
+    throw error;
+  }
+  return data;
 }
