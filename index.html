@@ -26982,9 +26982,12 @@ function saveBusinessProfile(){
 }
 
 function loadBranchName() {
+
   if (state.branchInfo) {
+
     const el =
       document.getElementById("appBrandName");
+
     if (el) {
       el.innerText =
       (
@@ -26992,20 +26995,61 @@ function loadBranchName() {
         "SISTEM KASIR"
       ).toUpperCase();
     }
+
     return;
   }
 
+
+  // ==========================
+  // VERCEL MODE
+  // ==========================
+  if (
+    typeof google === "undefined" ||
+    !google.script ||
+    !google.script.run
+  ) {
+
+    console.log(
+      "Skip loadBranchName - Vercel mode"
+    );
+
+    state.branchInfo = {
+      branchName: "SISTEM KASIR"
+    };
+
+
+    const el =
+      document.getElementById("appBrandName");
+
+    if (el) {
+      el.innerText =
+      state.branchInfo.branchName.toUpperCase();
+    }
+
+    return;
+  }
+
+
+  // ==========================
+  // GOOGLE APPS SCRIPT MODE
+  // ==========================
   google.script.run
     .withSuccessHandler(res => {
-      state.branchInfo = res?.branch || {};
+
+      state.branchInfo =
+        res?.branch || {};
+
       const el =
         document.getElementById("appBrandName");
+
       if (!el) return;
+
       el.innerText =
       (
         state.branchInfo.branchName ||
         "SISTEM KASIR"
       ).toUpperCase();
+
     })
     .getBranchInfo(state.branchId);
 }
