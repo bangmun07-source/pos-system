@@ -18342,10 +18342,10 @@ function checkout() {
     return;
   }
 } else {
-  // TANPA MEMBER → TETAP HITUNG HPP
-  hitungHPPDanKirim(payload);
-
-}
+	  // TANPA MEMBER → TETAP HITUNG HPP
+	  hitungHPPDanKirim(payload);
+	}
+}	
 
 async function sendTransaction(payload){
   if (!payload) {
@@ -18541,15 +18541,17 @@ function renderProducts(products) {
 }
 
 async function loadOrders() {
+
   const el =
-    document.getElementById(
-      "order-list"
-    );
+    document.getElementById("order-list");
 
   if (!el) return;
+
   try {
+
     const data =
       await getOrdersRPC();
+
     el.innerHTML =
       data.map(o => `
         <div>
@@ -18558,11 +18560,14 @@ async function loadOrders() {
           <p>${o.date}</p>
         </div>
       `).join("");
+
   } catch (err) {
+
     console.error(
       "Load Orders:",
       err
     );
+
     el.innerHTML = `
       <p>
         Gagal memuat order
