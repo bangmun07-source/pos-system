@@ -412,6 +412,277 @@ async function getMemberPageDataRPC(branchId) {
   });
 }
 
+async function getTransactionNotificationsRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_transaction_notifications",
+    {
+      p_branch_id:
+        branchId || "ALL"
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_transaction_notifications error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
+async function getMemberDetailPageRPC(memberId, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_member_detail_page",
+    {
+      p_member_id: memberId,
+      p_branch_id: branchId || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_member_detail_page error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+
+async function getMembersRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_members",
+    {
+      p_branch_id: branchId || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_members error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
+async function searchMembersRPC(keyword, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "search_members",
+    {
+      p_keyword:
+        keyword || "",
+      p_branch_id:
+        branchId || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "search_members error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
+
+async function addMemberRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_member",
+    {
+      p_id_member:
+        data.ID_Member,
+      p_nama:
+        data.Nama,
+      p_tgl_lahir:
+        data.Tgl_Lahir,
+      p_wa:
+        data.WA,
+      p_email:
+        data.Email,
+      p_instagram:
+        data.Instagram || "",
+      p_facebook:
+        data.Facebook || "",
+      p_tiktok:
+        data.TikTok || "",
+      p_address:
+        data.Address || "",
+      p_join_date:
+        data.Join_Date || "",
+      p_photo:
+        data.Photo || "",
+      p_branch_id:
+        data.branchId || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_member error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function updateMemberRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_member",
+    {
+      p_id_member:
+        data.ID_Member,
+      p_nama:
+        data.Nama,
+      p_tgl_lahir:
+        data.Tgl_Lahir,
+      p_wa:
+        data.WA,
+      p_email:
+        data.Email,
+      p_total_spend:
+        String(data.Total_Spend || "0"),
+      p_level_current:
+        data.Level_Current || "Kenal",
+      p_point:
+        String(data.Point || "0"),
+      p_level_season:
+        data.Level_Season_Terakhir || "",
+      p_instagram:
+        data.Instagram || "",
+      p_facebook:
+        data.Facebook || "",
+      p_tiktok:
+        data.TikTok || "",
+      p_address:
+        data.Address || "",
+      p_join_date:
+        data.Join_Date || "",
+      p_photo:
+        data.Photo || "",
+      p_branch_id:
+        data.branchId || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_member error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+
+async function getMemberTierHistoryRPC(memberId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_member_tier_history",
+    {
+      p_member_id:
+        memberId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_member_tier_history error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
+async function getRewardsRPC(memberId, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_rewards",
+    {
+      p_member_id:
+        memberId,
+
+      p_branch_id:
+        branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_rewards error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
+
+async function getMemberDashboardRPC(memberId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_member_dashboard",
+    {
+      p_member_id:
+        memberId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_member_dashboard error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+
+
+
+
     // ===============================
     // INGREDIENT PAGE
     // ===============================
