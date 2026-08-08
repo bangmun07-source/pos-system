@@ -568,24 +568,19 @@ td {
 <!-- =========================
      WHITE REPORT
 ========================= -->
-<div class="header">
 
-  ${logoSrc ? `
-    <img
-      src="${logoSrc}"
-      class="logo"
-      alt="Sistem POS"
-    />
-  ` : ""}
-
-  <div class="title">
-    Recent Transactions Report
-  </div>
-
-</div>
 
 <div class="report">
-
+  <div class="header">
+  
+    ${logoSrc ? `
+      <img
+        src="${logoSrc}"
+        class="logo"
+        alt="Sistem POS"
+      />
+    ` : ""}
+  </div>
   <div class="title">
 
     Recent Transactions Report
