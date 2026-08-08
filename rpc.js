@@ -134,6 +134,122 @@ async function getReceiptDataRPC(trxId) {
   return data;
 }
 
+async function getSettingsPageDataRPC() {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_settings_page_data"
+  );
+  if (error) {
+    console.error(
+      "get_settings_page_data error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+    // ===============================
+    // GROSS RAVANUE PAGE
+    // ===============================
+
+async function getGrossRevenueDataRPC(branchId, startDate, endDate) {
+  try {
+      
+    // SUMMARY + TREND + CATEGORY
+    const summaryData =
+      await getGrossRevenueByDateRPC(
+        startDate,
+        endDate,
+        branchId
+      );
+
+    // RECENT TRANSACTIONS
+    const recentTransactions =
+      await getRecentTransactionsRPC(
+        branchId,
+        startDate,
+        endDate
+      );
+      
+    // TOP REVENUE PRODUCTS
+    const topRevenue =
+      await getTopRevenueProductsRPC(
+        startDate,
+        endDate,
+        branchId,
+        20
+      );
+
+    // GABUNGKAN
+    return {
+      summary:
+        summaryData?.summary || {},
+      trend:
+        summaryData?.trend || [],
+      category:
+        summaryData?.category || [],
+      recentTransactions:
+        recentTransactions || [],
+      topRevenue:
+        topRevenue || []
+    };
+  } catch (err) {
+    console.error(
+      "getGrossRevenueDataRPC error:",
+      err
+    );
+    throw err;
+  }
+}
+
+async function getGrossRevenueByDateRPC(start, end, branchId) {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_gross_revenue_by_date",
+    {
+      p_branch_id: branchId,
+      p_start: start || null,
+      p_end: end || null
+    }
+  );
+  if (error) {
+    console.error(
+      "get_gross_revenue_by_date error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function getTopRevenueProductsRPC(start, end, branchId,limit = 10) {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_top_revenue_products",
+    {
+      p_branch_id: branchId,
+      p_start: start || null,
+      p_end: end || null,
+      p_limit: limit
+    }
+  );
+  if (error) {
+    console.error(
+      "get_top_revenue_products error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
     // ===============================
     // LOGIC CHECKOUT
     // ===============================
