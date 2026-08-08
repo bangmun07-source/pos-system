@@ -17048,22 +17048,26 @@ function renderRecentTransactionSummary(data) {
   ).textContent =
     Number(data.itemsSold || 0)
       .toLocaleString("id-ID");
-
 }
 
 async function exportRecentTransactions() {
+
   const start =
     document.getElementById("startDate")?.value;
+
   const end =
     document.getElementById("endDate")?.value;
+
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
+
   if (!start || !end) {
     alert("Pilih tanggal dulu");
     return;
   }
-  const pdfWindow =
-    window.open("", "_blank");
+
+  const pdfWindow = window.open("", "_blank");
+
   if (!pdfWindow) {
     alert("Popup diblokir browser");
     return;
@@ -17071,72 +17075,105 @@ async function exportRecentTransactions() {
 
   pdfWindow.document.write(`
     <html>
-      <body
-        style="
-          font-family:Arial;
-          padding:40px
-        "
-      >
-        <h2>
-          Generating PDF...
-        </h2>
+      <body style="font-family:Arial;padding:40px">
+        <h2>Testing Export...</h2>
       </body>
     </html>
   `);
 
   try {
+
     const response =
       await fetch(
         "/api/export-recent-transactions",
         {
           method: "POST",
+
           headers: {
-            "Content-Type":
-              "application/json"
+            "Content-Type": "application/json"
           },
+
           body: JSON.stringify({
             start,
             end,
             status,
-            branchId:
-              state.branchId
+            branchId: state.branchId
           })
         }
       );
+
     if (!response.ok) {
       throw new Error(
         await response.text()
       );
     }
-    const html =
-      await response.text();
+
+    const result =
+      await response.json();
+
+    console.log(
+      "EXPORT RESULT:",
+      result
+    );
+
     pdfWindow.document.open();
-    pdfWindow.document.write(html);
+
+    pdfWindow.document.write(`
+      <html>
+        <body style="
+          font-family:Arial;
+          padding:40px;
+        ">
+
+          <h2>RPC Export Berhasil</h2>
+
+          <p>
+            Revenue:
+            <b>
+              ${Number(
+                result.summary?.revenue || 0
+              ).toLocaleString("id-ID")}
+            </b>
+          </p>
+
+          <p>
+            Items Sold:
+            <b>
+              ${result.summary?.itemsSold || 0}
+            </b>
+          </p>
+
+          <p>
+            Transactions:
+            <b>
+              ${
+                Array.isArray(result.transactions)
+                  ? result.transactions.length
+                  : 0
+              }
+            </b>
+          </p>
+
+        </body>
+      </html>
+    `);
+
     pdfWindow.document.close();
 
   }
   catch (err) {
+
     console.error(
       "Export Recent Transactions:",
       err
     );
+
     pdfWindow.document.body.innerHTML = `
-      <div
-        style="
-          font-family:Arial;
-          padding:40px;
-        "
-      >
-        <h2>
-          Export Error
-        </h2>
-        <p>
-          ${err.message || "Gagal membuat PDF"}
-        </p>
-      </div>
+      <h2>Export Error</h2>
+      <p>${err.message}</p>
     `;
   }
-}
+}	
 
 function openTransactionModal(trxId) {
 
