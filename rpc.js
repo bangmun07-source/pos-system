@@ -1,17 +1,82 @@
-async function getDashboardDataRPC(branchId) {
+    // ===============================
+    // DASHBOARD PAGE
+    // ===============================
 
-  const result =
-    await this.rpc(
+async function getDashboardDataRPC(branchId) {
+  const { data, error } =
+    await supabaseClient.rpc(
       "get_dashboard_data",
       {
         p_branch_id: branchId
-      },
-      300
+      }
     );
-
-  return result?.[0] || {};
-
+  if (error) {
+    throw error;
+  }
+  return data?.[0] || {};
 }
+
+async function getLowStockRPC(branchId) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_low_stock",
+      {
+        p_branch_id: branchId,
+        p_limit: 100
+      }
+    );
+  if (error) {
+    throw error;
+  }
+  return data || [];
+}
+
+async function getRecentTransactionsRPC(branchId) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_recent_transactions",
+      {
+        p_branch_id: branchId
+      }
+    );
+  if (error) {
+    throw error;
+  }
+  return data || [];
+}
+
+async function getShiftPerformanceRPC(branchId) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_shift_performance",
+      {
+        p_branch_id: branchId
+      }
+    );
+  if (error) {
+    throw error;
+  }
+  return data || [];
+}
+
+async function getTodayYesterdayRPC(branchId) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_today_yesterday_data",
+      {
+        p_branch_id: branchId
+      }
+    );
+  if (error) {
+    throw error;
+  }
+  return data || [];
+}
+
+
+    // ===============================
+    // DASHBOARD PAGE
+    // ===============================
 
 async function checkoutTransaction(payload){
   const { data, error } =
@@ -29,6 +94,22 @@ async function checkoutTransaction(payload){
     throw error;
   }
   return data;
+}
+
+async function getLowStockRPC(branchId) {
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_low_stock",
+      {
+        p_branch_id: branchId,
+        p_limit: 100
+      }
+    );
+
+  if (error) throw error;
+
+  return data || [];
 }
 
 async function getProductsRPC(branchId, role){
