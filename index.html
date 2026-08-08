@@ -19618,7 +19618,7 @@ function openWhatsAppComposer({phone,title,message,type = null,trxId}) {
   }
 
   updateWhatsAppCounter();
-  const modal = ocument.getElementById("whatsapp-message-modal");
+  const modal = document.getElementById("whatsapp-message-modal");
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
