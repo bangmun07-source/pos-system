@@ -247,7 +247,7 @@ export default async function handler(req, res) {
                   ${escapeHtml(member.name)}
                 </td>
 
-                <td class="center">
+                <td class="leaf">
                   ${escapeHtml(member.level)}
                 </td>
 
@@ -729,7 +729,7 @@ td {
             Name
           </th>
 
-          <th>
+          <th class="left">
             Tier
           </th>
 
