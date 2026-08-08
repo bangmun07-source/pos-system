@@ -1,3 +1,18 @@
+async function getDashboardDataRPC(branchId) {
+
+  const result =
+    await this.rpc(
+      "get_dashboard_data",
+      {
+        p_branch_id: branchId
+      },
+      300
+    );
+
+  return result?.[0] || {};
+
+}
+
 async function checkoutTransaction(payload){
   const { data, error } =
     await supabaseClient.rpc(
