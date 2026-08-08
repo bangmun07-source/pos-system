@@ -703,7 +703,54 @@ async function getMemberDashboardRPC(memberId) {
   return data;
 }
 
+async function addMemberRPC(data) {
 
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_member",
+    {
+      p_id_member:
+        data.ID_Member,
+      p_nama:
+        data.Nama,
+      p_tgl_lahir:
+        data.Tgl_Lahir,
+      p_wa:
+        data.WA,
+      p_email:
+        data.Email,
+      p_instagram:
+        data.Instagram || "",
+      p_facebook:
+        data.Facebook || "",
+      p_tiktok:
+        data.TikTok || "",
+      p_address:
+        data.Address || "",
+      p_join_date:
+        data.Join_Date || "",
+      p_photo:
+        data.Photo || "",
+      p_branch_id:
+        data.branchId || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_member error:",
+      error
+    );
+    throw error;
+  }
+  console.log(
+    "ADD MEMBER RPC:",
+    result
+  );
+  return result;
+}
 
 
 
