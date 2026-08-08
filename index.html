@@ -19598,8 +19598,15 @@ function closeIngredientStockAlert(){
 }
 
 let whatsappComposerData = null;
-function openWhatsAppComposer({phone,title,message,type = null,trxId}) {
-	  console.log(
+function openWhatsAppComposer({
+  phone,
+  title,
+  message,
+  type = null,
+  trxId
+}) {
+
+  console.log(
     "OPEN WHATSAPP COMPOSER",
     {
       phone,
@@ -19609,36 +19616,79 @@ function openWhatsAppComposer({phone,title,message,type = null,trxId}) {
       trxId
     }
   );
-  whatsappComposerData = { phone, title, message, type, trxId };
 
-  // TITLE
-  const titleEl = document.getElementById("waModalTitle");
+  whatsappComposerData = {
+    phone,
+    title,
+    message,
+    type,
+    trxId
+  };
+
+  const titleEl =
+    document.getElementById("waModalTitle");
+
   if (titleEl) {
-    titleEl.innerText = title || "WhatsApp Message";
+    titleEl.innerText =
+      title || "WhatsApp Message";
   }
-  // PHONE
-  const phoneEl = document.getElementById("waRecipient");
+
+  const phoneEl =
+    document.getElementById("waRecipient");
+
   if (phoneEl) {
-    phoneEl.value = phone || "";
+    phoneEl.value =
+      phone || "";
   }
-  // MESSAGE
-  const messageEl = document.getElementById("waMessage");
+
+  const messageEl =
+    document.getElementById("waMessage");
+
   if (messageEl) {
-    messageEl.value = message || "";
+    messageEl.value =
+      message || "";
   }
 
+  // =========================
+  // MODAL
+  // =========================
+
+  const modal =
+    document.getElementById(
+      "whatsapp-message-modal"
+    );
+
+  console.log(
+    "WHATSAPP MODAL:",
+    modal
+  );
+
+  if (!modal) {
+    console.error(
+      "whatsapp-message-modal TIDAK DITEMUKAN"
+    );
+    return;
+  }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  console.log(
+    "WHATSAPP MODAL OPENED"
+  );
+
+  // Counter setelah modal dibuka
   updateWhatsAppCounter();
-  const modal = document.getElementById("whatsapp-message-modal");
-  if (modal) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
 
-  const sendBtn = document.getElementById("waSendButton");
-    if(sendBtn){
-        sendBtn.onclick =
-        sendWhatsAppComposer;
-    }
+  const sendBtn =
+    document.getElementById(
+      "waSendButton"
+    );
+
+  if (sendBtn) {
+    sendBtn.onclick =
+      sendWhatsAppComposer;
+  }
 }
 
 function closeWhatsAppModal() {
