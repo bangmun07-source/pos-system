@@ -19307,12 +19307,9 @@ async function loadMembers(callback) {
     return;
   }
 
-  // ================================
   // LOAD FROM SUPABASE RPC
-  // ================================
-
   try {
-
+	  
     const res =
       await getMemberPageDataRPC(
         state.branchId
@@ -20367,73 +20364,74 @@ function saveMember() {
 async function submitMember() {
 
   const payload = {
-    ID_Member: document.querySelector("#memberID").value,
-    Nama: document.querySelector("#memberName").value,
-    Tgl_Lahir: document.querySelector("#memberDOB").value,
-    WA: document.querySelector("#memberWA").value,
-    Email: document.querySelector("#memberEmail").value,
-    Instagram: document.querySelector("#memberIG").value,
-    Facebook: document.querySelector("#memberFB").value,
-    TikTok: document.querySelector("#memberTiktok").value,
-    Address: document.querySelector("#memberAddress").value,
-    branchId: state.branchId
+    ID_Member:
+      document.querySelector("#memberID").value,
+    Nama:
+      document.querySelector("#memberName").value,
+    Tgl_Lahir:
+      document.querySelector("#memberDOB").value,
+    WA:
+      document.querySelector("#memberWA").value,
+    Email:
+      document.querySelector("#memberEmail").value,
+    Instagram:
+      document.querySelector("#memberIG").value,
+    Facebook:
+      document.querySelector("#memberFB").value,
+    TikTok:
+      document.querySelector("#memberTiktok").value,
+    Address:
+      document.querySelector("#memberAddress").value,
+    branchId:
+      state.branchId
   };
+
   try {
-
-
-    // ==================================
-    // SUPABASE BACKEND (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const response =
-      await fetch(
-        "/api/member",
-        {
-          method:"POST",
-
-          headers:{
-            "Content-Type":"application/json"
-          },
-
-          body:
-            JSON.stringify(payload)
-        }
-      );
-
-
+	  
+    // SUPABASE RPC
     const result =
-      await response.json();
-
-
-    if(!response.ok){
-      throw new Error(
-        result.message ||
-        "Gagal simpan member"
-      );
-    }
-    */
-
-    // ==================================
-    // TEMP VERCEL
-    // ==================================
-
+      await addMemberRPC(payload);
     console.log(
-      "TEMP SAVE MEMBER",
-      payload
+      "ADD MEMBER RESULT:",
+      result
     );
 
+    if (!result) {
+      throw new Error(
+        "Backend mengembalikan data kosong"
+      );
+    }
+
+    // Jika RPC mengembalikan success false
+    if (result.success === false) {
+      throw new Error(
+        result.message ||
+        "Gagal menyimpan member"
+      );
+    }
+
+    showToast(
+      "Member berhasil ditambahkan ✔",
+      "success"
+    );
+
+    // Reset cache member
+    state.memberPageData = null;
+    state.members = null;
     resetMemberForm();
     closeAddMemberModal();
-    loadMembers();
-  } catch(err) {
+    // Reload data member
+    await loadMembers();
+	
+  } catch (err) {
     console.error(
       "Submit Member:",
       err
     );
-	  
-    alert(
-      "Gagal simpan member!"
+    showToast(
+      err.message ||
+      "Gagal simpan member!",
+      "error"
     );
   }
 }
