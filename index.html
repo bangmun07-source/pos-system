@@ -17106,117 +17106,105 @@ async function exportRecentTransactions() {
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
 
+  if (!start || !end) {
+    alert("Pilih tanggal dulu");
+    return;
+  }
+
   const branchId =
     state.branchId || "";
 
-  // =========================
-  // VALIDATION
-  // =========================
-
   if (!branchId) {
-    alert("Branch belum dipilih.");
-    return;
-  }
-
-  if (!start || !end) {
-    alert("Pilih tanggal dulu.");
+    alert("Branch belum tersedia");
     return;
   }
 
   // =========================
-  // OPEN PDF WINDOW
+  // OPEN PDF / REPORT TAB
   // =========================
 
-  const pdfWindow = window.open("", "_blank");
+  const pdfWindow =
+    window.open("", "_blank");
 
   if (!pdfWindow) {
-    alert("Popup diblokir browser.");
+    alert("Popup diblokir browser");
     return;
   }
-
-  pdfWindow.document.open();
 
   pdfWindow.document.write(`
     <!DOCTYPE html>
+
     <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Generating PDF...</title>
 
-      <style>
-        html,
-        body {
-          margin: 0;
-          width: 100%;
-          height: 100%;
-          background: #0B0F14;
-          color: white;
-          font-family: Arial, sans-serif;
-        }
+      <head>
 
-        body {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-          gap: 12px;
-        }
+        <title>
+          Generating Report...
+        </title>
 
-        .loader {
-          width: 32px;
-          height: 32px;
-          border: 3px solid rgba(255,255,255,.2);
-          border-top-color: white;
-          border-radius: 50%;
-          animation: spin .8s linear infinite;
-        }
+        <style>
 
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
+          body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0B0F14;
+            color: white;
+            font-family: Arial, sans-serif;
           }
-        }
 
-        .muted {
-          color: #999;
-          font-size: 13px;
-        }
-      </style>
-    </head>
+          .box {
+            text-align: center;
+          }
 
-    <body>
+          .loader {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #ffffff33;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 20px;
+          }
 
-      <div class="loader"></div>
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
 
-      <h2>
-        Generating PDF...
-      </h2>
+        </style>
 
-      <div class="muted">
-        Please wait
-      </div>
+      </head>
 
-    </body>
+      <body>
+
+        <div class="box">
+
+          <div class="loader"></div>
+
+          <h2>
+            Generating Report...
+          </h2>
+
+          <p>
+            Please wait
+          </p>
+
+        </div>
+
+      </body>
+
     </html>
   `);
 
-  pdfWindow.document.close();
-
-  // =========================
-  // REQUEST API
-  // =========================
-
   try {
 
-    console.log(
-      "EXPORT REQUEST:",
-      {
-        start,
-        end,
-        status,
-        branchId
-      }
-    );
+    // =========================
+    // CALL VERCEL API
+    // =========================
 
     const response =
       await fetch(
@@ -17225,33 +17213,36 @@ async function exportRecentTransactions() {
           method: "POST",
 
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           },
 
           body: JSON.stringify({
+
             start,
             end,
             status,
             branchId
+
           })
         }
       );
 
     // =========================
-    // GET RESPONSE TEXT FIRST
+    // GET RESPONSE AS TEXT
     // =========================
 
-    const responseText =
+    const text =
       await response.text();
 
     console.log(
-      "EXPORT RESPONSE STATUS:",
+      "EXPORT API STATUS:",
       response.status
     );
 
     console.log(
-      "EXPORT RESPONSE:",
-      responseText
+      "EXPORT API RESPONSE:",
+      text
     );
 
     // =========================
@@ -17261,334 +17252,36 @@ async function exportRecentTransactions() {
     if (!response.ok) {
 
       throw new Error(
-        responseText ||
-        `HTTP ${response.status}`
+        text ||
+        "Export gagal"
       );
 
     }
 
     // =========================
-    // PARSE JSON
+    // VALIDATE HTML
     // =========================
 
-    let result;
-
-    try {
-
-      result =
-        JSON.parse(responseText);
-
-    }
-    catch (jsonError) {
-
-      console.error(
-        "JSON PARSE ERROR:",
-        jsonError
-      );
+    if (
+      !text ||
+      !text.trim()
+    ) {
 
       throw new Error(
-        "Response API bukan JSON valid."
-      );
-
-    }
-
-    console.log(
-      "EXPORT RESULT:",
-      result
-    );
-
-    // =========================
-    // API ERROR
-    // =========================
-
-    if (!result.success) {
-
-      throw new Error(
-        result.error ||
-        "Export gagal."
+        "Response API kosong."
       );
 
     }
 
     // =========================
-    // DATA
-    // =========================
-
-    const transactions =
-      result.transactions || [];
-
-    const summary =
-      result.summary || {};
-
-    console.log(
-      "TRANSACTIONS:",
-      transactions
-    );
-
-    console.log(
-      "SUMMARY:",
-      summary
-    );
-
-    // =========================
-    // UNTUK SEKARANG
-    // TEST DATA DULU
+    // WRITE REPORT
     // =========================
 
     pdfWindow.document.open();
 
-    pdfWindow.document.write(`
-
-      <!DOCTYPE html>
-
-      <html>
-
-      <head>
-
-        <meta charset="UTF-8">
-
-        <title>
-          Recent Transactions
-        </title>
-
-        <style>
-
-          body {
-            font-family: Arial, sans-serif;
-            padding: 40px;
-            color: #222;
-          }
-
-          h1 {
-            margin-bottom: 5px;
-          }
-
-          .subtitle {
-            color: #777;
-            margin-bottom: 30px;
-          }
-
-          .grid {
-            display: grid;
-            grid-template-columns:
-              repeat(3, 1fr);
-
-            gap: 15px;
-            margin-bottom: 30px;
-          }
-
-          .card {
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            padding: 20px;
-          }
-
-          .label {
-            font-size: 11px;
-            color: #777;
-            font-weight: bold;
-          }
-
-          .value {
-            font-size: 22px;
-            font-weight: bold;
-            margin-top: 8px;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
-
-          th,
-          td {
-            border-bottom: 1px solid #eee;
-            padding: 10px;
-            text-align: left;
-          }
-
-          th {
-            background: #f5f5f5;
-          }
-
-          .right {
-            text-align: right;
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        <h1>
-          Recent Transactions Report
-        </h1>
-
-        <div class="subtitle">
-
-          Periode:
-          ${start}
-          -
-          ${end}
-
-          <br>
-
-          Branch:
-          ${branchId}
-
-        </div>
-
-        <div class="grid">
-
-          <div class="card">
-
-            <div class="label">
-              TOTAL REVENUE
-            </div>
-
-            <div class="value">
-              Rp ${
-                Number(
-                  summary.revenue || 0
-                ).toLocaleString("id-ID")
-              }
-            </div>
-
-          </div>
-
-          <div class="card">
-
-            <div class="label">
-              ACTIVE GUEST
-            </div>
-
-            <div class="value">
-              ${
-                summary.activeGuests || 0
-              }
-            </div>
-
-          </div>
-
-          <div class="card">
-
-            <div class="label">
-              ITEMS SOLD
-            </div>
-
-            <div class="value">
-              ${
-                summary.itemsSold || 0
-              }
-            </div>
-
-          </div>
-
-        </div>
-
-        <h2>
-          Recent Transactions
-        </h2>
-
-        <table>
-
-          <thead>
-
-            <tr>
-
-              <th>ID</th>
-              <th>Date</th>
-              <th>Member</th>
-              <th>Status</th>
-              <th>Payment</th>
-              <th class="right">
-                Total
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody>
-
-            ${
-              transactions.length
-              ?
-
-              transactions.map(
-                r => `
-
-                  <tr>
-
-                    <td>
-                      ${r.id || ""}
-                    </td>
-
-                    <td>
-                      ${r.date || ""}
-                    </td>
-
-                    <td>
-                      ${r.member || "Guest"}
-                    </td>
-
-                    <td>
-                      ${r.status || ""}
-                    </td>
-
-                    <td>
-                      ${r.payment || ""}
-                    </td>
-
-                    <td class="right">
-
-                      Rp ${
-                        Number(
-                          r.total || 0
-                        ).toLocaleString(
-                          "id-ID"
-                        )
-                      }
-
-                    </td>
-
-                  </tr>
-
-                `
-              ).join("")
-
-              :
-
-              `
-
-                <tr>
-
-                  <td
-                    colspan="6"
-                    style="
-                      text-align:center;
-                      color:#777;
-                    "
-                  >
-                    No transactions
-                  </td>
-
-                </tr>
-
-              `
-            }
-
-          </tbody>
-
-        </table>
-
-      </body>
-
-      </html>
-
-    `);
+    pdfWindow.document.write(
+      text
+    );
 
     pdfWindow.document.close();
 
@@ -17601,11 +17294,7 @@ async function exportRecentTransactions() {
       err
     );
 
-    // =========================
-    // SHOW ERROR IN NEW TAB
-    // =========================
-
-    try {
+    if (pdfWindow) {
 
       pdfWindow.document.open();
 
@@ -17615,53 +17304,46 @@ async function exportRecentTransactions() {
 
         <html>
 
-        <body
-          style="
-            font-family:Arial;
-            padding:40px;
-            color:#222;
-          "
-        >
+          <head>
 
-          <h2>
-            Export Error
-          </h2>
+            <title>
+              Export Error
+            </title>
 
-          <p>
-            ${
-              String(
-                err.message ||
-                err
-              )
-            }
-          </p>
+            <style>
 
-          <hr>
+              body {
+                font-family: Arial;
+                padding: 40px;
+                background: #0B0F14;
+                color: white;
+              }
 
-          <pre
-            style="
-              white-space:pre-wrap;
-              color:#777;
-            "
-          >${
-            String(err.stack || "")
-          }</pre>
+              .error {
+                color: #ff6b6b;
+              }
 
-        </body>
+            </style>
+
+          </head>
+
+          <body>
+
+            <h2 class="error">
+              Export Error
+            </h2>
+
+            <p>
+              ${String(err.message || err)}
+            </p>
+
+          </body>
 
         </html>
 
       `);
 
       pdfWindow.document.close();
-
-    }
-    catch (windowError) {
-
-      console.error(
-        "PDF WINDOW ERROR:",
-        windowError
-      );
 
     }
 
