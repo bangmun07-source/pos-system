@@ -362,6 +362,29 @@ async function getOrdersRPC() {
   return data || [];
 }
 
+async function removeItemFromCartRPC(transId, productId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "remove_item_from_cart",
+    {
+      p_trans_id: transId,
+      p_product_id: productId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "remove_item_from_cart error:",
+      error
+    );
+
+    throw error;
+  }
+  return data;
+}
 
     // ===============================
     // MEMBER PAGE
