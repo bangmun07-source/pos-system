@@ -75,7 +75,52 @@ async function getTodayYesterdayRPC(branchId) {
 
 
     // ===============================
-    // DASHBOARD PAGE
+    // RECENTTRANSAKSI PAGE
+    // ===============================
+
+async function getRecentTransactionsPageRPC( branchId, startDate, endDate, status, table ) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_recent_transactions_page",
+      {
+        p_branch_id: branchId,
+        p_start: startDate || null,
+        p_end: endDate || null,
+        p_status: status || "ALL",
+        p_table: table || "ALL"
+      }
+    );
+
+  if (error) {
+    throw error;
+  }
+  return data || [];
+}
+
+
+async function getRecentTransactionSummaryRPC( branchId, startDate, endDate, status, table ) {
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_recent_transaction_summary",
+      {
+        p_branch_id: branchId,
+        p_start: startDate || null,
+        p_end: endDate || null,
+        p_status: status || "ALL",
+        p_table: table || "ALL"
+      }
+    );
+  if (error) {
+    throw error;
+  }
+  return data || {};
+}
+
+
+
+
+    // ===============================
+    // LOGIC CHECKOUT
     // ===============================
 
 async function checkoutTransaction(payload){
