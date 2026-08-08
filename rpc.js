@@ -10,10 +10,32 @@ async function getDashboardDataRPC(branchId) {
         p_branch_id: branchId
       }
     );
+
   if (error) {
     throw error;
   }
-  return data?.[0] || {};
+  const row =
+    data?.[0] || {};
+  return {
+    revenue:
+      Number(row.Total_Revenue) || 0,
+    orders:
+      Number(row.Total_Order) || 0,
+    aov:
+      Number(row.AOV) || 0,
+    branchId:
+      row.branchId || branchId,
+    lowStock:
+      row.lowStock || [],
+    recentTransactions:
+      row.recentTransactions || [],
+    shift:
+      row.shift || {},
+    occupancy:
+      row.occupancy || {},
+    growth:
+      row.growth || {}
+  };
 }
 
 async function getLowStockRPC(branchId) {
