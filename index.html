@@ -18348,61 +18348,71 @@ async function checkout() {
 	} 
     if (memberId) {
 
-  try {
-    const member =
-      await checkMemberRPC(memberId);
-console.log("CHECK MEMBER RESULT:", member);
-    if (!member) {
-      alert(
-        "Member tidak ditemukan ❌"
-      );
-      isProcessing = false;
-      const btn =
-        document.getElementById(
-          "btnCheckout"
-        );
-      if (btn) {
-        btn.disabled = false;
-      }
-      return;
-    }
-
-    // pastikan pakai ID asli
-    payload.memberId =
-      member.id;
-	  
-console.log(
-"FINAL MEMBER ID:",
-payload.memberId
-);
-
-console.log(
-"FINAL PAYLOAD:",
-payload
-);
-		  
-  } catch (error) {
-    console.error(
-      "CHECK MEMBER ERROR:",
-      error
-    );
-    alert(
-      "Gagal memeriksa member ❌"
-    );
-
-    isProcessing = false;
-    const btn =
-      document.getElementById(
-        "btnCheckout"
-      );
-    if (btn) {
-      btn.disabled = false;
-    }
-    return;
-  }
-} else {
-	  // TANPA MEMBER → TETAP HITUNG HPP
-	  hitungHPPDanKirim(payload);
+	  try {
+	
+	    const member =
+	      await checkMemberRPC(memberId);
+	
+	    console.log(
+	      "CHECK MEMBER RESULT:",
+	      member
+	    );
+	
+	    if (!member) {
+	
+	      alert(
+	        "Member tidak ditemukan ❌"
+	      );
+	
+	      isProcessing = false;
+	
+	      if (btn) {
+	        btn.disabled = false;
+	      }
+	
+	      return;
+	    }
+	
+	    payload.memberId =
+	      member.id;
+	
+	    console.log(
+	      "FINAL MEMBER ID:",
+	      payload.memberId
+	    );
+	
+	    console.log(
+	      "FINAL PAYLOAD:",
+	      payload
+	    );
+	
+	    // LANJUT HITUNG HPP + KIRIM TRANSAKSI
+	    await hitungHPPDanKirim(payload);
+	
+	  } catch (error) {
+	
+	    console.error(
+	      "CHECK MEMBER ERROR:",
+	      error
+	    );
+	
+	    alert(
+	      "Gagal memeriksa member ❌"
+	    );
+	
+	    isProcessing = false;
+	
+	    if (btn) {
+	      btn.disabled = false;
+	    }
+	
+	    return;
+	  }
+	
+	} else {
+	
+	  await hitungHPPDanKirim(payload);
+	
 	}
 }	
 
