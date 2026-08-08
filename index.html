@@ -19527,17 +19527,73 @@ function loadIngredientStockAlertTemplate(){
 
 }
 
+function ensureIngredientStockAlertModal() {
+
+  let modal =
+    document.getElementById(
+      "ingredientStockAlertModal"
+    );
+
+  if (modal) {
+    return modal;
+  }
+
+  const template =
+    document.getElementById(
+      "ingredientStockAlertTemplate"
+    );
+
+  if (!template) {
+    console.error(
+      "Template ingredientStockAlertTemplate tidak ditemukan"
+    );
+    return null;
+  }
+
+  const clone =
+    template.content.cloneNode(true);
+
+  document.body.appendChild(clone);
+
+  modal =
+    document.getElementById(
+      "ingredientStockAlertModal"
+    );
+
+  return modal;
+}
+	
 window.ingredientStockData = [];
 function openIngredientStockAlert(data = []) {
-  const modal = document.getElementById("ingredientStockAlertModal");
-  const list = document.getElementById("ingredientStockAlertList");
-  if (!modal || !list) return;
+  const modal =
+    ensureIngredientStockAlertModal();
+
+  if (!modal) {
+    return;
+  }
+
+  const list =
+    document.getElementById(
+      "ingredientStockAlertList"
+    );
+
+  if (!list) {
+    console.error(
+      "ingredientStockAlertList tidak ditemukan"
+    );
+    return;
+  }
 
   list.innerHTML = "";
 
   data.forEach(item => {
-    const qty =  Number(item.qty || 0);
-    const min = Number(item.min || 0);
+
+    const qty =
+      Number(item.qty || 0);
+
+    const min =
+      Number(item.min || 0);
+
     const statusClass =
       qty <= 0
         ? "text-red-500"
@@ -19550,44 +19606,78 @@ function openIngredientStockAlert(data = []) {
 
     list.innerHTML += `
       <div class="py-5 border-b border-white/5">
+
         <div class="flex justify-between gap-4">
-        <div class="flex items-start gap-3">
-        <div
-        class="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 ">
 
-          <span class="material-symbols-outlined text-primary text-xl">
-            inventory_2
-          </span>
+          <div class="flex items-start gap-3">
 
-        </div>
-          <div>
-            <p class="font-bold text-sm text-on-surface">
-              ${item.name || "-"}
-            </p>
+            <div
+              class="w-9 h-9 rounded-lg
+              bg-primary/10
+              flex items-center
+              justify-center
+              flex-shrink-0">
 
-            <p class="text-xs text-on-surface-variant mt-2">
-              Current Stock :
-              <span class="font-semibold text-on-surface">
-                ${qty} ${item.unit || ""}
+              <span
+                class="material-symbols-outlined
+                text-primary text-xl">
+                inventory_2
               </span>
-            </p>
 
-            <p class="text-xs text-on-surface-variant mt-1">
-              Minimum Stock :
-              <span class="font-semibold text-on-surface">
-                ${min} ${item.unit || ""}
-              </span>
-            </p>
+            </div>
+
+            <div>
+
+              <p
+                class="font-bold text-sm text-on-surface">
+                ${item.name || "-"}
+              </p>
+
+              <p
+                class="text-xs
+                text-on-surface-variant
+                mt-2">
+
+                Current Stock :
+
+                <span
+                  class="font-semibold text-on-surface">
+                  ${qty} ${item.unit || ""}
+                </span>
+
+              </p>
+
+              <p
+                class="text-xs
+                text-on-surface-variant
+                mt-1">
+
+                Minimum Stock :
+
+                <span
+                  class="font-semibold text-on-surface">
+                  ${min} ${item.unit || ""}
+                </span>
+
+              </p>
+
+            </div>
+
           </div>
-          <span class="text-xs font-bold ${statusClass}">
-            ${status}
-          </span>
-        </div>
-      </div>
 
-      `;
+          <span
+            class="text-xs font-bold ${statusClass}">
+            ${statusText}
+          </span>
+
+        </div>
+
+      </div>
+    `;
   });
+
   modal.classList.remove("hidden");
+  modal.classList.add("flex");
 }
 
 function closeIngredientStockAlert(){
@@ -19674,32 +19764,9 @@ function ensureWhatsAppModal() {
 }
 
 
-function openWhatsAppComposer({
-  phone,
-  title,
-  message,
-  type = null,
-  trxId
-}) {
+function openWhatsAppComposer({phone, title, message, type = null, trxId}) {
 
-  console.log(
-    "OPEN WHATSAPP COMPOSER",
-    {
-      phone,
-      title,
-      message,
-      type,
-      trxId
-    }
-  );
-
-  whatsappComposerData = {
-    phone,
-    title,
-    message,
-    type,
-    trxId
-  };
+  whatsappComposerData = {phone, title, message, type, trxId};
 
   // Pastikan modal sudah ada
   const modal =
@@ -20011,22 +20078,6 @@ function handleBirthday(btn){
 }
 
 function handleTransaction(btn){
-
-  console.log(
-    "TRANSACTION BUTTON:",
-    btn
-  );
-
-  console.log(
-    "PHONE:",
-    btn.dataset.phone
-  );
-
-  console.log(
-    "TRX ID:",
-    btn.dataset.trxid
-  );
-
   const message =
     createTransactionMessage({
       name: btn.dataset.name,
