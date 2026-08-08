@@ -491,19 +491,38 @@ async function searchMembersRPC(keyword, branchId) {
     {
       p_keyword:
         keyword || "",
+
       p_branch_id:
         branchId || null
     }
   );
 
   if (error) {
+
     console.error(
       "search_members error:",
       error
     );
+
     throw error;
   }
-  return data || [];
+
+  return (data || []).map(m => ({
+    id:
+      m.id ||
+      m.ID_Member ||
+      m.id_member,
+
+    nama:
+      m.nama ||
+      m.Nama ||
+      m.name,
+
+    level:
+      m.level ||
+      m.Level_Current ||
+      m.level_current
+  }));
 }
 
 
