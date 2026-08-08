@@ -18778,16 +18778,12 @@ function renderCart() {
           </div>
       `;
   });
-
-
   updateSummary(subtotal);
-  
 }
 
 function selectProduct(index) {
   const product = state.products[index];
   if (!product) return;
-
   addToCartFromFilter(product.ID_Produk);
 }
 
@@ -18801,7 +18797,6 @@ function removeItemById(id) {
     state.cart.splice(index, 1); // hapus dari cart lokal
     renderCart();
 
-
     // optional: hapus juga dari Sheet transaksi
     if (state.user) {
       google.script.run
@@ -18813,7 +18808,6 @@ function removeItemById(id) {
   }
 }
 
-
 function updateSummary(subtotal, member = null) {
   const el = document.getElementById("pos-cart-summary");
   if (!el) return;
@@ -18823,15 +18817,12 @@ function updateSummary(subtotal, member = null) {
   const discountRate = isMember
     ? (state.settings?.discount || 0)
     : 0;
-
   const discount = isMember
     ? subtotal * discountRate / 100
     : 0;
   const base = subtotal - discount;
-
   const tax = base * taxRate / 100;
   const service = base * serviceRate / 100;
-
   const total = base + tax + service;
 
   el.innerHTML = `
@@ -18869,19 +18860,14 @@ function calculateTotal() {
     (sum, item) => sum + (item.price * item.qty),
     0
   );
-
   const isMember = state.currentMember && state.currentMember !== "";
-
   const discountRate = isMember
     ? (state.settings?.discount || 0)
     : 0;
-
   const discount = subtotal * discountRate / 100;
   const base = subtotal - discount;
-
   const tax = base * (state.settings?.tax || 0) / 100;
   const service = base * (state.settings?.service || 0) / 100;
-
   return {
     subtotal,
     discount,
@@ -18897,13 +18883,10 @@ function clearCart() {
   state.currentTable = null;
   state.currentMemberPoint = 0;
   state.paymentMethod = null;
-
   const memberInput = document.getElementById("member-input");
   const tableInput = document.getElementById("table-input");
-
   if (memberInput) memberInput.value = "";
   if (tableInput) tableInput.value = "";
-
   renderCart();
 }
 
@@ -18950,25 +18933,16 @@ async function openRedeem() {
         state.currentMember,
         state.branchId
       );
-
-
     showRedeemPopup(res);
-
-
   }
   catch(err){
-
     console.error(
       err
     );
-
-
     alert(
       "Gagal ambil reward"
     );
-
   }
-
 }
 
 function resetPOSMember() {
@@ -19006,47 +18980,35 @@ function selectMember(member) {
     (sum, item) => sum + (item.price * item.qty),
     0
   );
-
   updateSummary(subtotal);
 }
 
 function showRedeemPopup(data) {
-
   //  1. Ambil template
   const template = document.getElementById("redeempointModal");
-
   if (!template) {
     return;
   }
-
   //  2. Clone template
   const clone = template.content.cloneNode(true);
-
   //  3. Wrapper biar bisa dihapus nanti
   const wrapper = document.createElement("div");
   wrapper.id = "redeemModalWrapper";
-
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
-
   //  4. SEKARANG element SUDAH ADA
   wrapper.querySelector("#redeemMemberName").innerText = data.member.nama;
   wrapper.querySelector("#redeemMemberId").innerText = data.member.id;
   wrapper.querySelector("#redeemPoint").innerText = data.member.point;
-
   //  SIMPAN STATE
   state.rewards = data.rewards;
   state.currentMemberPoint = data.member.point;
-
   //  RENDER REWARD
   const container = wrapper.querySelector("#rewardContainer");
   container.innerHTML = "";
-
   data.rewards.forEach(r => {
     const canRedeem = data.member.point >= r.point;
-
     const div = document.createElement("div");
-
     div.innerHTML = `
       <div class="
           glass-panel
@@ -19060,9 +19022,7 @@ function showRedeemPopup(data) {
       ">
 
           <div class="flex items-start justify-between">
-
               <div class="flex gap-3">
-
                   <div class="
                       w-11 h-11
                       rounded-lg
@@ -19076,7 +19036,6 @@ function showRedeemPopup(data) {
                   </div>
 
                   <div>
-
                       <h5 class="font-semibold text-on-surface">
                           ${r.nama}
                       </h5>
@@ -19084,11 +19043,8 @@ function showRedeemPopup(data) {
                       <p class="text-xs text-on-surface-variant mt-1">
                           ${Number(r.point).toLocaleString()} Points
                       </p>
-
                   </div>
-
               </div>
-
           </div>
 
           <button
@@ -19119,13 +19075,10 @@ function showRedeemPopup(data) {
           >
               ${canRedeem ? 'Redeem' : 'Insufficient Points'}
           </button>
-
       </div>
       `;
-
     container.appendChild(div);
   });
-
 }
 
 function selectReward(rewardId) {
@@ -19159,7 +19112,6 @@ function selectReward(rewardId) {
   const usedQty = state.cart
     .filter(i => i.isRedeem && i.id === product.ID_Produk)
     .reduce((sum, i) => sum + i.qty, 0);
-
   if (reward.Max_Redeem && usedQty >= reward.Max_Redeem) {
     alert("Maksimal redeem tercapai");
     return;
@@ -19167,7 +19119,6 @@ function selectReward(rewardId) {
 
   // MASUK CART (INI YANG HARUS KONSISTEN)
   addToCart(product, true, reward.ID_Reward);
-
   renderCart();
   closeRedeem();
 }
@@ -19182,7 +19133,6 @@ function closeRedeem() {
     // =========================
     // MEMBERS PAGE
     // =========================
-
 
 function calculatePoints(total){
   return Math.floor(total / state.settings.point_ratio)
@@ -19204,69 +19154,59 @@ function getMemberDetailPage(memberId, branchId) {
 
 
 async function loadMembers(callback) {
-
-  const el = document.getElementById("member-table-body");
+  const el =
+    document.getElementById(
+      "member-table-body"
+    );
   if (!el) return;
   if (state.memberPageData) {
-    const data = state.memberPageData;
-    state.members = data.members || [];
-    state.settings = data.settings || {};
-    renderTierFilter(state.settings);
-    renderTierSettings(state.settings);
-    renderMembers(state.members);
-    if (callback) callback();
+    const data =
+      state.memberPageData;
+    state.members =
+      data.members || [];
+    state.settings =
+      data.settings || {};
+    renderTierFilter(
+      state.settings
+    );
+    renderTierSettings(
+      state.settings
+    );
+    renderMembers(
+      state.members
+    );
+    if (callback) {
+      callback();
+    }
     return;
   }
   traceCall("loadMembers");
+
   try {
 
-
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase
-      .from("Member")
-      .select("*")
-      .eq(
-        "branchId",
+    const result =
+      await getMemberPageDataRPC(
         state.branchId
       );
-
-
-    if(error){
-      throw error;
-    }
-
-
-    const result = {
-      members:data,
-      settings:{}
-    };
-    */
-
-
-    // ==================================
-    // TEMP DATA VERCEL
-    // ==================================
-
-    const result = {
-      members: [],
-      settings: {}
-    };
-    state.memberPageData = result;
-    state.members = result.members || [];
-    state.settings = result.settings || {};
-    renderTierFilter( state.settings );
-    renderTierSettings( state.settings );
-    renderMembers( state.members );
-
-    if (callback)
+    state.memberPageData =
+      result;
+    state.members =
+      result.members || [];
+    state.settings =
+      result.settings || {};
+    renderTierFilter(
+      state.settings
+    );
+    renderTierSettings(
+      state.settings
+    );
+    renderMembers(
+      state.members
+    );
+    if (callback) {
       callback();
-
-  } catch(err) {
+    }
+  } catch (err) {
     console.error(
       "Members:",
       err
@@ -19309,11 +19249,8 @@ function renderTierFilter(settings) {
 function renderMembers(data = state.members) {
   const tbody = document.getElementById("member-table-body");
   if (!tbody) return;
-
-  // =========================
+	
   // INIT PAGINATION
-  // =========================
-
   if (!state.memberCurrentPage)
     state.memberCurrentPage = 1;
   if (!state.memberPerPage)
@@ -19321,10 +19258,7 @@ function renderMembers(data = state.members) {
   const currentPage = state.memberCurrentPage;
   const perPage = state.memberPerPage;
 
-  // =========================
   // EMPTY
-  // =========================
-
   if (!data || data.length === 0) {
     tbody.innerHTML = `
       <tr>
@@ -19337,19 +19271,14 @@ function renderMembers(data = state.members) {
     return;
   }
 
-  // =========================
   // PAGINATION
-  // =========================
   const totalData = data.length;
   const totalPages = Math.ceil(totalData / perPage);
   const start = (currentPage - 1) * perPage;
   const end = start + perPage;
   const paginatedData = data.slice(start, end);
 
-  // =========================
   // RENDER
-  // =========================
-
   tbody.innerHTML = paginatedData.map(m => `
 
     <tr class="hover:bg-white/5">
@@ -19415,18 +19344,13 @@ function renderMembers(data = state.members) {
     </tr>
   `).join("");
 
-  // =========================
   // FOOTER TEXT
-  // =========================
-
   const footerText = document.querySelector("#memberPage .text-xs.text-on-surface-variant.font-medium");
   if (footerText) {
     footerText.innerText = `Showing ${paginatedData.length} of ${totalData} members`;
   }
-  // =========================
-  // PAGINATION BUTTON
-  // =========================
 
+  // PAGINATION BUTTON
   const prevBtn = document.getElementById("memberPrevBtn");
   const nextBtn = document.getElementById("memberNextBtn");
   // PREV
@@ -19591,75 +19515,55 @@ async function sendWhatsAppComposer() {
   if (!whatsappComposerData) {
     return;
   }
-  const messageEl = document.getElementById("waMessage");
-  const message = messageEl
+  const messageEl =
+    document.getElementById("waMessage");
+  const message =
+    messageEl
       ? messageEl.value
       : "";
-	
   if (!message.trim()) {
     alert("Message masih kosong");
     return;
   }
-  if (whatsappComposerData.type === "transaction") {
+  if (
+    whatsappComposerData.type ===
+    "transaction"
+  ) {
+
     try {
-
-
-      // ==================================
-      // SUPABASE (AKTIFKAN NANTI)
-      // ==================================
-
-      /*
-      const { data: trx, error } =
-        await supabase
-        .rpc(
-          "get_receipt_data",
-          {
-            p_trx_id:
-              whatsappComposerData.trxId
-          }
+		
+      const trx =
+        await getReceiptDataRPC(
+          whatsappComposerData.trxId
         );
-
-
-      if(error){
-        throw error;
-      }
-      */
-
-      // ==================================
-      // TEMP DATA VERCEL
-      // ==================================
-
-      const trx = null;
       if (!trx) {
-
         alert(
           "Data transaksi belum tersedia"
         );
         return;
       }
-
       sendReceiptWhatsappWithData(
         trx,
         whatsappComposerData.phone,
         message
       );
-
       closeWhatsAppModal();
-    } catch(err) {
+    } catch (err) {
       console.error(
         "Receipt:",
         err
       );
+      alert(
+        "Gagal mengambil data transaksi"
+      );
     }
     return;
   }
-
   let wa =
     String(
       whatsappComposerData.phone || ""
     )
-    .replace(/\D/g,"");
-
+    .replace(/\D/g, "");
   if (wa.startsWith("0")) {
     wa =
       "62" +
@@ -19669,7 +19573,6 @@ async function sendWhatsAppComposer() {
       "62" +
       wa;
   }
-
   const url =
     "https://api.whatsapp.com/send?phone=" +
     wa +
@@ -19681,7 +19584,6 @@ async function sendWhatsAppComposer() {
   );
   closeWhatsAppModal();
 }
-
 
 function resetWhatsAppMessage() {
   if (!whatsappComposerData) {
@@ -19775,9 +19677,7 @@ function createTransactionMessage({name,total,point,invoice}){
 function sendMemberCard(phone, name, memberId, level, point) {
   if (!phone) return;
 
-  // ==========================
   // NORMALISASI NOMOR WA
-  // ==========================
   let wa = String(phone)
     .replace(/\D/g, "");
 
@@ -19787,33 +19687,23 @@ function sendMemberCard(phone, name, memberId, level, point) {
     wa = "62" + wa;
   }
 
-  // ==========================
   // FORMAT POINT
-  // ==========================
   const totalPoint =
     Number(point || 0).toLocaleString("id-ID");
-
-  // ==========================
+	
   // PESAN
-  // ==========================
   const message =
   "MEMBER INFORMATION\n\n" +
-
   "Nama\n" + (name || "-") + "\n\n" +
-
   "Member ID\n" + (memberId || "-") + "\n\n" +
-
   "Level\n" + (level || "-") + "\n\n" +
-	  
   "Total Point\n" +
   Number(point || 0).toLocaleString("id-ID") + "\n\n" +
   "Terima kasih telah menjadi member kami.\n\n" +
   "Silakan tunjukkan Member ID Anda setiap melakukan transaksi untuk mendapatkan point dan menikmati berbagai reward member.\n\n" +
   "Sampai jumpa kembali";
 
-  // ==========================
   // BUKA WHATSAPP
-  // ==========================
   window.open(
     "https://wa.me/" +
       wa +
@@ -19837,7 +19727,6 @@ function handleMemberCard(btn){
     phone,
     title: "Member Information",
     message
-
   });
 
 }
@@ -19851,9 +19740,7 @@ function handleBirthday(btn){
     phone,
     title: "Birthday Greeting",
     message
-
   });
-
 }
 
 function handleTransaction(btn){
@@ -19863,7 +19750,6 @@ function handleTransaction(btn){
       total: btn.dataset.total,
       point: btn.dataset.point,
       invoice: btn.dataset.invoice
-
     });
 
     openWhatsAppComposer({
@@ -19873,7 +19759,6 @@ function handleTransaction(btn){
       trxId: btn.dataset.trxid,
       type: "transaction"
     });
-
 }
 
 function handleNotification(btn){
@@ -19883,9 +19768,7 @@ function handleNotification(btn){
     openIngredientStockAlert(
       window.ingredientStockData
     );
-
   }
-
 }
 
 function handleMemberSearch(value) {
@@ -19896,9 +19779,7 @@ function handleMemberSearch(value) {
       (m.ID_Member || "").toLowerCase().includes(keyword) ||
       (m.WA || "").toLowerCase().includes(keyword)
     );
-
   });
-
   renderMembers(filtered);
 }
 
@@ -20005,13 +19886,10 @@ function initExportPDF() {
       </head>
 
       <body>
-
         <h2>
           Generating Member PDF...
         </h2>
-
       </body>
-
       </html>
     `);
 
