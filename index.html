@@ -17051,54 +17051,39 @@ function renderRecentTransactionSummary(data) {
 }
 
 async function exportRecentTransactions() {
-
   const start =
     document.getElementById("startDate")?.value || "";
-
   const end =
     document.getElementById("endDate")?.value || "";
-
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
-
   if (!start || !end) {
     alert("Pilih tanggal dulu");
     return;
   }
-
   const branchId =
     state.branchId || "";
-
   if (!branchId) {
     alert("Branch belum tersedia");
     return;
   }
-
-  // =========================
+	
   // OPEN PDF / REPORT TAB
-  // =========================
-
   const pdfWindow =
     window.open("", "_blank");
-
   if (!pdfWindow) {
     alert("Popup diblokir browser");
     return;
   }
-
   pdfWindow.document.write(`
     <!DOCTYPE html>
-
     <html>
-
       <head>
-
         <title>
           Generating Report...
         </title>
 
         <style>
-
           body {
             margin: 0;
             height: 100vh;
@@ -17109,11 +17094,9 @@ async function exportRecentTransactions() {
             color: white;
             font-family: Arial, sans-serif;
           }
-
           .box {
             text-align: center;
           }
-
           .loader {
             width: 32px;
             height: 32px;
@@ -17123,167 +17106,117 @@ async function exportRecentTransactions() {
             animation: spin .8s linear infinite;
             margin: 0 auto 20px;
           }
-
           @keyframes spin {
             to {
               transform: rotate(360deg);
             }
           }
-
         </style>
-
       </head>
 
       <body>
-
         <div class="box">
-
           <div class="loader"></div>
-
           <h2>
             Generating Report...
           </h2>
-
+		  
           <p>
             Please wait
           </p>
-
         </div>
-
       </body>
-
     </html>
   `);
 
   try {
 
-    // =========================
     // CALL VERCEL API
-    // =========================
-
     const response =
       await fetch(
         "/api/export-recent-transactions",
         {
           method: "POST",
-
           headers: {
             "Content-Type":
               "application/json"
           },
-
           body: JSON.stringify({
-
             start,
             end,
             status,
             branchId
-
           })
         }
       );
-
-    // =========================
+	  
     // GET RESPONSE AS TEXT
-    // =========================
-
     const text =
       await response.text();
-
     console.log(
       "EXPORT API STATUS:",
       response.status
     );
-
     console.log(
       "EXPORT API RESPONSE:",
       text
     );
-
-    // =========================
+	  
     // SERVER ERROR
-    // =========================
-
     if (!response.ok) {
-
       throw new Error(
         text ||
         "Export gagal"
       );
-
     }
-
-    // =========================
+	  
     // VALIDATE HTML
-    // =========================
-
     if (
       !text ||
       !text.trim()
     ) {
-
       throw new Error(
         "Response API kosong."
       );
-
     }
-
-    // =========================
+	  
     // WRITE REPORT
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(
       text
     );
-
     pdfWindow.document.close();
-
   }
 
   catch (err) {
-
     console.error(
       "Export Recent Transactions:",
       err
     );
-
     if (pdfWindow) {
-
       pdfWindow.document.open();
-
       pdfWindow.document.write(`
-
         <!DOCTYPE html>
-
         <html>
-
           <head>
-
             <title>
               Export Error
             </title>
 
             <style>
-
               body {
                 font-family: Arial;
                 padding: 40px;
                 background: #0B0F14;
                 color: white;
               }
-
               .error {
                 color: #ff6b6b;
               }
-
             </style>
-
           </head>
-
+		  
           <body>
-
             <h2 class="error">
               Export Error
             </h2>
@@ -17291,24 +17224,15 @@ async function exportRecentTransactions() {
             <p>
               ${String(err.message || err)}
             </p>
-
           </body>
-
         </html>
-
       `);
-
       pdfWindow.document.close();
-
     }
-
   }
-
 }
 
-
 function openTransactionModal(trxId) {
-
   // hapus modal lama
   document.getElementById("transactionModalWrapper")?.remove();
   const template = document.getElementById("transactionModalTemplate");
@@ -17363,13 +17287,7 @@ function openViewTransactionModal() {
   renderViewTransaction(wrapper, trx);
 }
 
-
-// =========================
-// RENDER SESUAI TEMPLATE
-// =========================
-
 function renderViewTransaction(wrapper, trx) {
-
   const n = (v) => Number(v || 0);
   const items = Array.isArray(trx.items) ? trx.items : [];
   wrapper.querySelector("#viewtrxid").innerText = trx.id || "-";
@@ -17429,7 +17347,6 @@ function renderViewTransaction(wrapper, trx) {
       <div class="col-span-3 text-right font-medium">
         ${((item.qty || 0) * (item.price || 0)).toLocaleString("id-ID")}
       </div>
-
     </div>
   `).join("");
 }
@@ -17451,7 +17368,6 @@ function openSendDigitalReceipt(data) {
 }
 
 async function sendReceiptWhatsapp() {
-
       const phone = document
       .getElementById("receiptWhatsappInput")
       .value
@@ -17461,15 +17377,10 @@ async function sendReceiptWhatsapp() {
             }
       const trxIdEl =document.getElementById( "receiptTransactionId");
             if (!trxIdEl) { alert("Modal belum siap (receiptTransactionId tidak ada)");
-                  return;
-            }
+                  return; }
       const trxId = trxIdEl.textContent.trim();
             if (!trxId || trxId === "undefined") { alert("TRX ID kosong");
-                  return;
-            }
-      
-      
-      
+                  return; }
       try {
 		  
 		      const trx = await getReceiptDataRPC(trxId);
@@ -17477,7 +17388,6 @@ async function sendReceiptWhatsapp() {
 				  alert("Transaksi tidak ditemukan");
 				  return;
 				}
-				
 				sendReceiptWhatsappWithData(
 				  trx,
 				  phone,
@@ -17492,20 +17402,16 @@ async function sendReceiptWhatsapp() {
 function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
         const tpl = document.getElementById("receiptTemplate");
         if (!tpl) return;
-      
         const wrapper = document.createElement("div");
         wrapper.style.position = "absolute";
         wrapper.style.left = "-9999px";
-      
         wrapper.appendChild(tpl.content.cloneNode(true));
         document.body.appendChild(wrapper);
         const n = (v) => Number(v || 0);
         const subtotal = n(trx.subtotal);
         const total = n(trx.total);
-      
-        // ======================
+	
         // HEADER
-        // ======================
         wrapper.querySelector("#receiptTitle").textContent =
           trx.branchName || "-";
         if (trx.logo_url) {
@@ -17532,18 +17438,14 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
               .replace(/\n/g, "<br>");
           }
         wrapper.querySelector("#receiptTotal").textContent = "Rp " + total.toLocaleString("id-ID");
-      
-        // ======================
+    
         // BREAKDOWN (FIXED)
-        // ======================
         wrapper.querySelector("#receiptSubtotal").textContent = "Rp " + subtotal.toLocaleString("id-ID");
         wrapper.querySelector("#receiptTax").textContent = "Rp " + n(trx.tax).toLocaleString("id-ID");
         wrapper.querySelector("#receiptService").textContent = "Rp " + n(trx.service).toLocaleString("id-ID");
         wrapper.querySelector("#receiptDiscount").textContent = "- Rp " + n(trx.discount).toLocaleString("id-ID");
       
-        // ======================
         // ITEMS
-        // ======================
         const container = wrapper.querySelector("#receiptItemsContainer");
         const items = trx.items || [];
         container.innerHTML = items.length
@@ -17559,27 +17461,21 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
             </div>
           `).join("")
           : `<div class="text-xs opacity-50 text-center">No items</div>`;
-      
-        // ======================
-        // RENDER + SEND
-        // ======================
-        const canvas = wrapper.querySelector("#receiptCanvas");
 
+        // RENDER + SEND
+        const canvas = wrapper.querySelector("#receiptCanvas");
             setTimeout(() => {
-            
               html2canvas(canvas, {
                 scale: 2,
                 useCORS: true,
                 backgroundColor: "#0B0F14"
               })
               .then(receiptCanvas => {
-            
                 const image =
                   receiptCanvas.toDataURL(
                     "image/jpeg",
                     0.65
                   );
-            
                 return fetch(
                   "/api/handle-receipt-upload",
                   {
@@ -17593,36 +17489,24 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
                     })
                   }
                 );
-            
               })
               .then(res => res.json())
               .then(result => {
-            
                 const url = result.url;
-            
-            
                 let wa = String(phone || "")
                   .replace(/\D/g,"");
-            
-            
                 if (wa.startsWith("0")) {
                   wa = "62" + wa.slice(1);
                 } 
                 else if (!wa.startsWith("62")) {
                   wa = "62" + wa;
                 }
-            
-            
                 let finalMessage;
-            
-            
                 if(customMessage){
-            
                   finalMessage =
                     customMessage +
                     "\n\n📎 Digital Receipt\n" +
                     url;
-            
                 } else {
             
                   finalMessage =
@@ -17632,10 +17516,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
                     "Have a nice day.\n\n" +
                     "📎 Receipt:\n" +
                     url;
-            
                 }
-            
-            
                 window.open(
                   "https://api.whatsapp.com/send?phone=" +
                   wa +
@@ -17643,22 +17524,15 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
                   encodeURIComponent(finalMessage),
                   "_blank"
                 );
-            
-            
                 wrapper.remove();
-            
-            
               })
               .catch(err => {
-            
                 console.error(
                   "Receipt upload error:",
                   err
                 );
             
               });
-            
-            
             },100);
 }
 
@@ -17667,7 +17541,6 @@ function goToRecentTransactions() {
 }
 
 function renderReceipt(data) {
-
   const tpl = document.getElementById("receiptTemplate");
   const clone = tpl.content.cloneNode(true);
   const wrapper = document.createElement("div");
@@ -17689,7 +17562,6 @@ function renderReceipt(data) {
     useCORS: true,
     backgroundColor: "#0B0F14"
   }).then(canvas => {
-
     const image =
       canvas.toDataURL(
         "image/jpeg",
@@ -17701,7 +17573,6 @@ function renderReceipt(data) {
       "KB"
     );
     wrapper.remove();
-
   });
 }
 
@@ -17729,52 +17600,32 @@ function closeViewTransactionModal() {
 }
 
 async function fetchSettings(callback) {
-
   try {
-
-    // ==================================
-    // SUPABASE / API NANTI
-    // ==================================
-
-    /*
-    const res = await fetch("/api/settings");
-
-    const data = await res.json();
-
-    state.settings = data.settings;
-    */
-
-
-    // ==================================
-    // TEMP DUMMY
-    // HAPUS SETELAH API AKTIF
-    // ==================================
-
-    const data = {
-
-      settings: {
-        tax: 11,
-        service: 5,
-        discount: 0,
-        point_ratio: 10000
-      }
-
-    };
-    state.settings =
-      data.settings;
+    const data =
+      await getSettingsPageDataRPC();
+    if (!data) {
+      throw new Error(
+        "Data settings tidak ditemukan"
+      );
+    }
+    state.settings = data;
+    console.log(
+      "SETTINGS:",
+      state.settings
+    );
     if (callback) {
       callback();
     }
-  } catch(err) {
+  } catch (err) {
     console.error(
       "Fetch settings error:",
       err
     );
-
+    alert(
+      "Gagal mengambil settings"
+    );
   }
-
 }
-
 
 
     // ==================================
@@ -17782,202 +17633,109 @@ async function fetchSettings(callback) {
     // ==================================      
 
 async function loadGrossRevenuePage() {
-
   const branchId = state.branchId || "";
-
   const startDate =
     document.getElementById("startDate")?.value || "";
-
   const endDate =
     document.getElementById("endDate")?.value || "";
-
   const cacheKey = JSON.stringify({
     branchId,
     startDate,
     endDate
   });
 
-  // ==========================
   // CACHE FRONTEND
-  // ==========================
-
   if (
     state.grossRevenueData &&
     state.grossRevenueFilter === cacheKey
   ) {
-
     const res = state.grossRevenueData;
-
     renderGrossRevenue(
       res.summary || {}
     );
-
     renderRevenueTrend(
       res.trend || []
     );
-
     renderDonut(
       res.category || []
     );
-
     renderRecentTransactions(
       res.recentTransactions || []
     );
-
     allTopRevenueData =
       res.topRevenue || [];
-
     topRevenueCurrentPage = 1;
-
     renderTopRevenueTable();
-
     return;
-
   }
-
   try {
 
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
+	  const res =
+	    await getGrossRevenueDataRPC(
+	      branchId,
+	      startDate,
+	      endDate
+	    );
 
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_gross_revenue_data",
-        {
-          p_branch_id: branchId,
-          p_start_date: startDate,
-          p_end_date: endDate
-        }
-      );
-
-    if (error) {
-      throw error;
-    }
-
-    const res = data;
-    */
-
-    // ==================================
-    // TEMP DATA VERCEL
-    // ==================================
-
-    const res = {
-
-      summary: {},
-
-      trend: [],
-
-      category: [],
-
-      recentTransactions: [],
-
-      topRevenue: []
-
-    };
-
-    // ==========================
-    // SIMPAN CACHE
-    // ==========================
-
-    state.grossRevenueData = res;
-
-    state.grossRevenueFilter = cacheKey;
-
-    renderGrossRevenue(
-      res.summary || {}
-    );
-
-    renderRevenueTrend(
-      res.trend || []
-    );
-
-    renderDonut(
-      res.category || []
-    );
-
-    renderRecentTransactions(
-      res.recentTransactions || []
-    );
-
-    allTopRevenueData =
-      res.topRevenue || [];
-
-    topRevenueCurrentPage = 1;
-
-    renderTopRevenueTable();
-
-  } catch (err) {
-
-    console.error(err);
-
-    showToast(
-      "Gagal memuat Gross Revenue",
-      "error"
-    );
-
-  }
-
+	  // SIMPAN CACHE
+	  state.grossRevenueData = res;
+	  state.grossRevenueFilter = cacheKey;
+	
+	  // RENDER
+	  renderGrossRevenue(
+	    res.summary || {}
+	  );
+	  renderRevenueTrend(
+	    res.trend || []
+	  );
+	  renderDonut(
+	    res.category || []
+	  );
+	  renderRecentTransactions(
+	    res.recentTransactions || []
+	  );
+	  allTopRevenueData =
+	    res.topRevenue || [];
+	  topRevenueCurrentPage = 1;
+	  renderTopRevenueTable();
+	}
+	catch (err) {
+	  console.error(
+	    "Load Gross Revenue error:",
+	    err
+	  );
+	
+	  showToast(
+	    "Gagal memuat Gross Revenue",
+	    "error"
+	  );
+	}
 }
 
 async function applyDateFilter() {
-
-  const branchId = state.branchId || "";
-
+  const branchId =
+    state.branchId || "";
   // Owner belum pilih outlet
   if (!branchId) return;
-
   const start =
     document.getElementById("startDate")?.value;
-
   const end =
     document.getElementById("endDate")?.value;
-
   if (!start || !end) return;
-
   toggleLoading(true);
 
   try {
-
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_gross_revenue_by_date",
-        {
-          p_branch_id: branchId,
-          p_start_date: start,
-          p_end_date: end
-        }
+	  
+    // GET GROSS REVENUE DATA
+    const res =
+      await getGrossRevenueDataRPC(
+        branchId,
+        start,
+        end
       );
-
-    if (error) {
-      throw error;
-    }
-
-    const res = data;
-    */
-
-    // ==================================
-    // TEMP DATA VERCEL
-    // ==================================
-
-    const res = {
-      summary: {},
-      trend: [],
-      category: [],
-      recentTransactions: [],
-      topRevenue: []
-    };
-
-    toggleLoading(false);
-
+	  
+    // CACHE
     state.grossRevenueData = res;
-
     state.grossRevenueFilter =
       JSON.stringify({
         branchId,
@@ -17985,77 +17743,76 @@ async function applyDateFilter() {
         endDate: end
       });
 
+    // RENDER SUMMARY
     renderGrossRevenue(
       res.summary || {}
     );
 
+    // CLEAR OLD CHART
     document
       .getElementById("grossRevenueDonut")
       ?.replaceChildren();
-
     document
       .getElementById("revenueTrendContainer")
       ?.replaceChildren();
 
+    // RENDER TREND
     renderRevenueTrend(
       res.trend || []
     );
 
+    // RENDER CATEGORY
     renderDonut(
       res.category || []
     );
 
+    // RECENT TRANSACTIONS
     renderRecentTransactions(
       res.recentTransactions || []
     );
 
+    // DISCOUNT
     updateDiscountBar(
       res.summary?.totalDiscount || 0,
       res.summary?.totalRevenue || 0
     );
 
+    // TOP PRODUCTS
     allTopRevenueData =
       res.topRevenue || [];
-
     topRevenueCurrentPage = 1;
-
     renderTopRevenueTable();
-
-  } catch (err) {
-
-    toggleLoading(false);
-
+  }
+  catch (err) {
     console.error(
       "Gross Revenue:",
       err
     );
-
+    showToast(
+      "Gagal memuat Gross Revenue",
+      "error"
+    );
   }
-
+  finally {
+    toggleLoading(false);
+  }
 }
 
 async function exportPDFReport() {
-
   const start =
     document.getElementById("startDate")?.value;
-
   const end =
     document.getElementById("endDate")?.value;
-
   if (!start || !end) {
     alert("Pilih tanggal dulu");
     return;
   }
-
   const pdfWindow = window.open("", "_blank");
-
   if (!pdfWindow) {
     alert("Popup diblokir browser.");
     return;
   }
-
   try {
-
     const res = await fetch("/api/export-pdf-report", {
       method: "POST",
       headers: {
@@ -18069,11 +17826,9 @@ async function exportPDFReport() {
     });
 
     const html = await res.text();
-
     pdfWindow.document.open();
     pdfWindow.document.write(html);
     pdfWindow.document.close();
-
   } catch (err) {
 
     pdfWindow.document.open();
@@ -18082,31 +17837,23 @@ async function exportPDFReport() {
       <pre>${err.message}</pre>
     `);
     pdfWindow.document.close();
-
   }
-
 }
 
 
 function calcGrowth(today, yesterday) {
   today = Number(today) || 0;
   yesterday = Number(yesterday) || 0;
-
   if (yesterday === 0) return 0; 
-
   return ((today - yesterday) / yesterday) * 100;
 }    
 
 
 function renderRevenueTrend(data) {
-
   const container =
     document.getElementById("revenueTrendContainer");
-
   if (!container) return;
-
   container.innerHTML = "";
-
   if (!Array.isArray(data) || data.length === 0) {
     container.innerHTML =
       "<p class='text-xs text-slate-400'>No data</p>";
@@ -18143,9 +17890,7 @@ function renderRevenueTrend(data) {
   });
 
   html += `</div>`;
-
   container.innerHTML = html;
-
 }
 
  // ================= RENDER SUMMARY =================
@@ -18181,7 +17926,6 @@ function renderGrossRevenue(data) {
  function renderDonut(data) {
   const svg = document.getElementById("grossRevenueDonut");
   const legend = document.getElementById("donutLegend");
-
   if (!svg || !legend) return;
 
   svg.innerHTML = `
@@ -18190,51 +17934,38 @@ function renderGrossRevenue(data) {
       stroke-width="12"
       fill="transparent"></circle>
   `;
-
   legend.innerHTML = "";
-
   const cleanData = (data || [])
   .map(d => ({
     category: (d.category || "").trim(),
     value: Number(d.grossRevenue) || 0
   }))
   .filter(d => d.category && d.value > 0);;
-
   if (!cleanData.length) return;
-
   const total = cleanData.reduce((a, b) => a + b.value, 0);
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
-
   const colors = ["#f59e0b", "#8fd5ff", "#34d399", "#f472b6", "#a78bfa", "#ff5733", "#33c1ff"];
-
   let offset = 0;
-
   cleanData.forEach((item, index) =>  {
     const percent = item.value / total;
     const dash = circumference * percent;
-
     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-
     circle.setAttribute("cx", "80");
     circle.setAttribute("cy", "80");
     circle.setAttribute("r", "50");
     circle.setAttribute("fill", "transparent");
     circle.setAttribute("stroke", colors[index % colors.length]);
     circle.setAttribute("stroke-width", "12");
-
     // FIX: TIDAK PAKAI ROTATE LAGI
     circle.setAttribute("stroke-dasharray", `${dash} ${circumference}`);
     circle.setAttribute("stroke-dashoffset", -offset);
-
     svg.appendChild(circle);
-
     offset += dash;
   });
 
   legend.innerHTML = cleanData.map((item, index) => {
     const percent = ((item.value / total) * 100).toFixed(0);
-
     return `
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
@@ -18250,9 +17981,7 @@ function renderGrossRevenue(data) {
 
 function openDateFilter() {
   const start = document.getElementById("startDate");
-
   if (!start) return;
-
   setTimeout(() => {
     if (start.showPicker) {
       start.showPicker();
@@ -18263,14 +17992,12 @@ function openDateFilter() {
   }, 10);
 }
 
-
 function initDatePicker() {
     setTimeout(() => {
       const start = document.getElementById("startDate");
       const end = document.getElementById("endDate");
 
       if (!start || !end) return;
-
       const trigger = () => {
         if (start.value && end.value) {
           updateDateLabel(start.value, end.value);
@@ -18284,32 +18011,27 @@ function initDatePicker() {
     }, 50);
   }
 
-  function updateDateLabel(start, end) {
-  const label = document.getElementById("dateRangeLabel");
-  if (!label) return;
-
-  const s = new Date(start).toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric"
-  });
-
-  const e = new Date(end).toLocaleDateString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric"
-  });
-
-  label.childNodes[2].nodeValue = ` ${s} - ${e} `;
+function updateDateLabel(start, end) {
+	  const label = document.getElementById("dateRangeLabel");
+	  if (!label) return;
+	  const s = new Date(start).toLocaleDateString("en-US", {
+	    month: "short",
+	    day: "2-digit",
+	    year: "numeric"
+	  });
+	  const e = new Date(end).toLocaleDateString("en-US", {
+	    month: "short",
+	    day: "2-digit",
+	    year: "numeric"
+	  });
+	  label.childNodes[2].nodeValue = ` ${s} - ${e} `;
 }
 
- function updateDiscountBar(discount, revenue) {
-  const bar = document.getElementById("discountBarFill");
-  if (!bar) return;
-
-  const percent = revenue > 0 ? (discount / revenue) * 100 : 0;
-
-  bar.style.width = percent + "%";
+function updateDiscountBar(discount, revenue) {
+	const bar = document.getElementById("discountBarFill");
+	if (!bar) return;
+	const percent = revenue > 0 ? (discount / revenue) * 100 : 0;
+	bar.style.width = percent + "%";
 }
 
 
@@ -18318,17 +18040,13 @@ function renderTopRevenueTable() {
   if (!tbody) return;
   tbody.innerHTML = "";
 
-  // =========================
   // PAGINATION
-  // =========================
-
   const totalData = allTopRevenueData.length;
   const totalPages =
     Math.max(
       1,
       Math.ceil(totalData / topRevenueItemsPerPage)
     );
-
   const start = (topRevenueCurrentPage - 1) * topRevenueItemsPerPage;
   const end = start + topRevenueItemsPerPage;
   const data = allTopRevenueData.slice(start, end);
@@ -18379,32 +18097,22 @@ function renderTopRevenueTable() {
 
       </tr>
     `;
-
   });
 
-    // =========================
     // FOOTER
-    // =========================
-
     const info = document.getElementById("topRevenueInfo");
-
     if (info) {
       const from = totalData === 0 ? 0 : start + 1;
       const to = Math.min(end, totalData);
       info.innerText = `Showing ${from}-${to} of ${totalData} Products`;
     }
 
-    // =========================
     // BUTTON
-    // =========================
-
     const prevBtn = document.getElementById("topRevenuePrevBtn");
     const nextBtn = document.getElementById("topRevenueNextBtn");
-
     if (prevBtn) {
       prevBtn.disabled = topRevenueCurrentPage <= 1;
       prevBtn.onclick = () => {
-
         if (topRevenueCurrentPage > 1) {
           topRevenueCurrentPage--;
           renderTopRevenueTable();
