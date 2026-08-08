@@ -16351,7 +16351,7 @@ function initModule(pageId) {
           loadNotifications();
           initMemberSearch();
           initTierFilter();
-          initExportPDF();
+          initMemberExport();
         });
       });
     break;
@@ -20262,7 +20262,19 @@ function applyFilters() {
   renderMembers(data);
 }
 
-async function initExportPDF() {
+function initMemberExport() {
+
+  const btn =
+    document.getElementById(
+      "btnExportMembersPDF"
+    );
+
+  if (!btn) return;
+
+  btn.onclick = exportMembersPDF;
+}
+
+async function exportMembersPDF() {
 
   const tier =
     document.getElementById("tierFilter")?.value || "ALL";
@@ -20471,7 +20483,9 @@ async function initExportPDF() {
     `);
 
     pdfWindow.document.close();
+
   }
+
 }
 
 
