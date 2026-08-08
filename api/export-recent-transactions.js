@@ -142,23 +142,23 @@ export default async function handler(req, res) {
             return `
               <tr>
 
-                <td>
+                <td class="left">
                   ${escapeHtml(row.id)}
                 </td>
 
-                <td>
+                <td class="left">
                   ${escapeHtml(row.date)}
                 </td>
 
-                <td>
+                <td class="left">
                   ${escapeHtml(row.member || "Guest")}
                 </td>
 
-                <td>
+                <td class="center">
                   ${escapeHtml(row.status || "-")}
                 </td>
 
-                <td class="right">
+                <td class="center">
                   ${itemsCount}
                 </td>
 
@@ -206,7 +206,7 @@ export default async function handler(req, res) {
               return `
                 <tr>
 
-                  <td>
+                  <td class="left">
                     ${escapeHtml(method)}
                   </td>
 
@@ -243,11 +243,11 @@ export default async function handler(req, res) {
             return `
               <tr>
 
-                <td>
+                <td class="left">
                   ${escapeHtml(member.name)}
                 </td>
 
-                <td>
+                <td class="center">
                   ${escapeHtml(member.level)}
                 </td>
 
@@ -491,6 +491,14 @@ td {
 
 .right {
   text-align: right;
+}
+
+.left {
+  text-align: left;
+}
+
+.center {
+  text-align: center;
 }
 
 .empty {
@@ -755,11 +763,8 @@ td {
         </h3>
     
         <table>
-    
           <thead>
-    
             <tr>
-    
               <th>
                 ID
               </th>
@@ -772,11 +777,11 @@ td {
                 Member
               </th>
     
-              <th>
+              <th class="center">
                 Status
               </th>
     
-              <th class="right">
+              <th class="center">
                 Items
               </th>
     
@@ -797,7 +802,7 @@ td {
         </table>
     
       </div>
-    
+    </div>
     
       <div class="footer">
     
@@ -808,7 +813,7 @@ td {
       </div>
     
     </div>
-  </div>
+  
 </body>
 
 </html>
