@@ -247,7 +247,7 @@ export default async function handler(req, res) {
                   ${escapeHtml(member.name)}
                 </td>
 
-                <td class="leaf">
+                <td class="center">
                   ${escapeHtml(member.level)}
                 </td>
 
