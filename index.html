@@ -3313,6 +3313,21 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 		            state.branchId
 		          );
 		
+		        console.log(
+		          "MEMBER SEARCH:",
+		          keyword
+		        );
+		
+		        console.log(
+		          "BRANCH:",
+		          state.branchId
+		        );
+		
+		        console.log(
+		          "RESULT:",
+		          data
+		        );
+		
 		        showMemberResult(
 		          data
 		        );
@@ -3323,42 +3338,81 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 		          "Search Member:",
 		          err
 		        );
-		
 		      }
 		    }
 		  }
 		);
-
-  // tampilkan hasil
-  function showMemberResult(data) {
-    const box = document.getElementById("memberResult");
-    box.innerHTML = "";
-
-    if (data.length === 0) {
-      box.style.display = "none";
-      return;
-    }
-
-    (data || []).forEach(m => {
-      const div = document.createElement("div");
-      div.style.padding = "10px";
-      div.style.cursor = "pointer";
-
-      div.innerHTML = `<b>${m.nama}</b><br><small>${m.level}</small>`;
-
-      div.onclick = () => {
-      setValue("memberSearch", m.nama);
-      setValue("member-id", m.id);
-
-      state.currentMember = m.id;
-
-      box.style.display = "none";
-    };
-      box.appendChild(div);
-    });
-
-    box.style.display = "block";
-  }
+		
+		
+		// ================================
+		// TAMPILKAN HASIL MEMBER
+		// ================================
+		
+		function showMemberResult(data) {
+		
+		  const box =
+		    document.getElementById(
+		      "memberResult"
+		    );
+		
+		  if (!box) return;
+		
+		  box.innerHTML = "";
+		
+		  if (
+		    !data ||
+		    data.length === 0
+		  ) {
+		
+		    box.style.display =
+		      "none";
+		
+		    return;
+		  }
+		
+		  data.forEach(m => {
+		
+		    const div =
+		      document.createElement(
+		        "div"
+		      );
+		
+		    div.style.padding =
+		      "10px";
+		
+		    div.style.cursor =
+		      "pointer";
+		
+		    div.innerHTML =
+		      `<b>${m.nama}</b>
+		       <br>
+		       <small>${m.level}</small>`;
+		
+		    div.onclick = () => {
+		
+		      setValue(
+		        "memberSearch",
+		        m.nama
+		      );
+		
+		      setValue(
+		        "member-id",
+		        m.id
+		      );
+		
+		      state.currentMember =
+		        m.id;
+		
+		      box.style.display =
+		        "none";
+		    };
+		
+		    box.appendChild(div);
+		
+		  });
+		  box.style.display =
+		    "block";
+		}
   </script>
 </template>
 
