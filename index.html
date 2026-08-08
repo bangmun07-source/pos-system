@@ -17471,34 +17471,19 @@ async function sendReceiptWhatsapp() {
       
       
       try {
-      
-      
-      
-      /*
-      
-      NANTI:
-      
-      const response =
-      await fetch(
-      "/api/get-receipt-data?id=" + trxId
-      );
-      
-      
-      const trx =
-      await response.json();
-      
-      
-      */
-            // TEMP DUMMY
-            
-            const trx = recentData.find(t => String(t.id) === String(trxId) );
-                  if (!trx) { alert( "Transaksi tidak ditemukan" );
-                        return;
-                  }
-            sendReceiptWhatsappWithData(trx, phone, null);
-            
-            
-            
+		  
+		      const trx = await getReceiptDataRPC(trxId);
+		
+				if (!trx) {
+				  alert("Transaksi tidak ditemukan");
+				  return;
+				}
+				
+				sendReceiptWhatsappWithData(
+				  trx,
+				  phone,
+				  null
+				);
             }
             catch(err){ console.error(err);
             alert("Gagal mengambil transaksi" );
