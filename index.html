@@ -19597,7 +19597,83 @@ function closeIngredientStockAlert(){
 
 }
 
+function ensureWhatsAppModal() {
+
+  let modal =
+    document.getElementById("whatsapp-message-modal");
+
+  if (modal) {
+    return modal;
+  }
+
+  const template =
+    document.getElementById(
+      "whatsAppMessageModalTemplate"
+    );
+
+  if (!template) {
+    console.error(
+      "Template WhatsApp tidak ditemukan"
+    );
+    return null;
+  }
+
+  const clone =
+    template.content.cloneNode(true);
+
+  document.body.appendChild(clone);
+
+  modal =
+    document.getElementById(
+      "whatsapp-message-modal"
+    );
+
+  return modal;
+}
+	
 let whatsappComposerData = null;
+
+function ensureWhatsAppModal() {
+
+  // Sudah ada di DOM
+  let modal =
+    document.getElementById(
+      "whatsapp-message-modal"
+    );
+
+  if (modal) {
+    return modal;
+  }
+
+  // Ambil template
+  const template =
+    document.getElementById(
+      "whatsAppMessageModalTemplate"
+    );
+
+  if (!template) {
+    console.error(
+      "Template WhatsApp tidak ditemukan"
+    );
+    return null;
+  }
+
+  // Clone isi template
+  const clone =
+    template.content.cloneNode(true);
+
+  document.body.appendChild(clone);
+
+  // Ambil kembali setelah masuk DOM
+  modal =
+    document.getElementById(
+      "whatsapp-message-modal"
+    );
+
+  return modal;
+}
+
+
 function openWhatsAppComposer({
   phone,
   title,
@@ -19625,43 +19701,9 @@ function openWhatsAppComposer({
     trxId
   };
 
-  const titleEl =
-    document.getElementById("waModalTitle");
-
-  if (titleEl) {
-    titleEl.innerText =
-      title || "WhatsApp Message";
-  }
-
-  const phoneEl =
-    document.getElementById("waRecipient");
-
-  if (phoneEl) {
-    phoneEl.value =
-      phone || "";
-  }
-
-  const messageEl =
-    document.getElementById("waMessage");
-
-  if (messageEl) {
-    messageEl.value =
-      message || "";
-  }
-
-  // =========================
-  // MODAL
-  // =========================
-
+  // Pastikan modal sudah ada
   const modal =
-    document.getElementById(
-      "whatsapp-message-modal"
-    );
-
-  console.log(
-    "WHATSAPP MODAL:",
-    modal
-  );
+    ensureWhatsAppModal();
 
   if (!modal) {
     console.error(
@@ -19670,16 +19712,51 @@ function openWhatsAppComposer({
     return;
   }
 
+  // TITLE
+  const titleEl =
+    document.getElementById(
+      "waModalTitle"
+    );
+
+  if (titleEl) {
+    titleEl.innerText =
+      title || "WhatsApp Message";
+  }
+
+
+  // PHONE
+  const phoneEl =
+    document.getElementById(
+      "waRecipient"
+    );
+
+  if (phoneEl) {
+    phoneEl.value =
+      phone || "";
+  }
+
+  // MESSAGE
+  const messageEl =
+    document.getElementById(
+      "waMessage"
+    );
+
+  if (messageEl) {
+    messageEl.value =
+      message || "";
+  }
+
+  // OPEN MODAL
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-
   console.log(
     "WHATSAPP MODAL OPENED"
   );
 
-  // Counter setelah modal dibuka
+  // COUNTER
   updateWhatsAppCounter();
 
+  // SEND BUTTON
   const sendBtn =
     document.getElementById(
       "waSendButton"
