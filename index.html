@@ -18836,19 +18836,54 @@ function selectProductById(id) {
   addToCartFromFilter(id);
 }
   
-function removeItemById(id) {
-  const index = state.cart.findIndex(i => i.id === id);
-  if (index !== -1) {
-    state.cart.splice(index, 1); // hapus dari cart lokal
-    renderCart();
 
-    // optional: hapus juga dari Sheet transaksi
-    if (state.user) {
-      google.script.run
-        .withSuccessHandler(res => {
-          if(res.success) showToast("Item dihapus dari transaksi", "success");
-        })
-        .removeItemFromCart(state.user.id, id);
+async function removeItemById(id) {
+
+  const index =
+    state.cart.findIndex(
+      i => i.id === id
+    );
+
+  if (index === -1) {
+    return;
+  }
+
+  // Hapus dari cart lokal
+  state.cart.splice(
+    index,
+    1
+  );
+
+  renderCart();
+  // Hapus dari transaksi di Supabase
+  if (state.user) {
+
+    try {
+
+      const res =
+        await removeItemFromCartRPC(
+          state.user.id,
+          id
+        );
+
+      if (res?.success) {
+        showToast(
+          "Item dihapus dari transaksi",
+          "success"
+        );
+
+      }
+
+    } catch (error) {
+      console.error(
+        "Remove item error:",
+        error
+      );
+
+      showToast(
+        "Gagal menghapus item dari transaksi",
+        "error"
+      );
     }
   }
 }
