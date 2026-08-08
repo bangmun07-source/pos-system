@@ -1,4 +1,23 @@
     // ===============================
+    // LOGIN PAGE
+    // ===============================
+
+async function loginUserRPC(username,password){
+  const {data,error} =
+    await supabaseClient.rpc(
+      "login_user",
+      {
+        p_username: username,
+        p_password: password
+      }
+    );
+  if(error){
+    throw error;
+  }
+  return data;
+}
+
+    // ===============================
     // DASHBOARD PAGE
     // ===============================
 
@@ -325,18 +344,70 @@ async function getRewardsRPC(memberId, branchId) {
   }
   return data || [];
 }
-
-async function loginUserRPC(username,password){
-  const {data,error} =
-    await supabaseClient.rpc(
-      "login_user",
-      {
-        p_username: username,
-        p_password: password
-      }
+async function getOrdersRPC() {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_orders"
+  );
+  if (error) {
+    console.error(
+      "get_orders error:",
+      error
     );
-  if(error){
+    throw error;
+  }
+  return data || [];
+}
+
+
+    // ===============================
+    // MEMBER PAGE
+    // ===============================
+
+async function checkMemberRPC(memberId) {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "check_member",
+    {
+      p_member_id: memberId
+    }
+  );
+  if (error) {
+    console.error(
+      "check_member error:",
+      error
+    );
     throw error;
   }
   return data;
 }
+
+    // ===============================
+    // INGREDIENT PAGE
+    // ===============================
+
+async function getRecipeMasterLedgerRPC(branchId) {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipe_master_ledger",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_recipe_master_ledger error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
