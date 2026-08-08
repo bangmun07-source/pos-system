@@ -275,7 +275,6 @@ export default async function handler(req, res) {
         padding: 40px 20px;
       }
       
-  // EXPORT HEADER
       .export-toolbar {
         width: 100%;
         max-width: 1100px;
@@ -296,8 +295,7 @@ export default async function handler(req, res) {
         cursor: pointer;
         font-weight: bold;
       }
-    
-  // WHITE REPORT      
+         
       .report {
         width: 100%;
         max-width: 1100px;    
@@ -309,7 +307,6 @@ export default async function handler(req, res) {
           0 20px 60px rgba(0,0,0,.45);
       }
     
-  // TITLE
       .title {
         font-size: 24px;
         font-weight: bold;
@@ -321,8 +318,7 @@ export default async function handler(req, res) {
         color: #777;
         margin-bottom: 3px;
       }
-
-  // KPI
+      
       .kpi-grid {
         display: grid;     
         grid-template-columns:
@@ -351,8 +347,7 @@ export default async function handler(req, res) {
         font-weight: bold;      
         color: #222;
       }
-    
- // CARDS
+
       .card {
         border: 1px solid #e5e5e5;      
         border-radius: 14px;      
@@ -366,8 +361,7 @@ export default async function handler(req, res) {
         margin-bottom: 12px;      
         font-size: 16px;
       }
-       
-  //TABLE
+
       table {
         width: 100%;    
         border-collapse: collapse;      
@@ -404,18 +398,14 @@ export default async function handler(req, res) {
         color: #777;      
         padding: 25px;
       }
-      
-  //FOOTER  
-        
+
       .footer {
         margin-top: 40px;      
         text-align: center;      
         font-size: 9px;      
         color: #888;
       }
-      
-  //PRINT / PDF
-      
+  
       @media print {      
         body {
           background: white;
