@@ -18422,7 +18422,18 @@ async function sendTransaction(payload){
       btn.disabled = true;
     }
     // TEMP DATA SUPABASE
-  	const res = await checkoutTransaction(payload);
+  	console.log(
+	  "SEND TRANSACTION PAYLOAD:",
+	  JSON.stringify(payload, null, 2)
+	);
+	
+	const res =
+	  await checkoutTransaction(payload);
+	
+	console.log(
+	  "CHECKOUT TRANSACTION RESULT:",
+	  res
+	);
     isProcessing = false;
     if(btn){
       btn.disabled = false;
