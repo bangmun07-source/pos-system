@@ -52,14 +52,14 @@ export default async function handler(req, res) {
     } = await supabase.rpc(
       "get_members",
       {
-        p_branch_id: branchId
+        p_branch_id: null
       }
     );
-
+    
     if (error) {
       throw error;
     }
-
+    
     console.log(
       "EXPORT MEMBERS:",
       members?.length
