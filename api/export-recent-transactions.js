@@ -6,6 +6,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY 
 );
 
+const logoSrc =
+  `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
+
 function rupiah(value) {
   return Number(value || 0).toLocaleString("id-ID");
 }
@@ -297,6 +300,19 @@ Recent Transactions Report
 }
 
 html,
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 170px;
+  height: auto;
+  max-height: 90px;
+  object-fit: contain;
+  margin-bottom: 12px;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -552,6 +568,21 @@ td {
 <!-- =========================
      WHITE REPORT
 ========================= -->
+<div class="header">
+
+  ${logoSrc ? `
+    <img
+      src="${logoSrc}"
+      class="logo"
+      alt="Sistem POS"
+    />
+  ` : ""}
+
+  <div class="title">
+    Recent Transactions Report
+  </div>
+
+</div>
 
 <div class="report">
 
