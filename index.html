@@ -16804,87 +16804,105 @@ async function loadRecentTransactionsPage() {
 }
 
 async function initExportButton() {
-      const btn = document.getElementById("exportBtn");
-      if (!btn) return;
-      
-      btn.onclick = async () => {
-      const start = document.getElementById("startDate")?.value || "";
-      const end = document.getElementById("endDate")?.value || "";
-      const status = document.getElementById("statusFilter")?.value || "ALL";
-      // buka tab dulu supaya tidak kena popup blocker
-      const pdfTab = window.open("", "_blank");
-      
-      if (pdfTab) {
+  const btn =
+    document.getElementById("exportBtn");
+  if (!btn) return;
+  btn.onclick = async () => {
+    const start =
+      document.getElementById("startDate")?.value || "";
+    const end =
+      document.getElementById("endDate")?.value || "";
+    const status =
+      document.getElementById("statusFilter")?.value || "ALL";
+    // Buka tab dulu agar tidak kena popup blocker
+    const pdfTab =
+      window.open("", "_blank");
+    if (pdfTab) {
       pdfTab.document.write(`
+        <html>
+          <head>
+            <title>
+              Generating PDF...
+            </title>
 
-      <html>
-      
-            <head>
-            
-                  <title>
-                  Generating PDF...
-                  </title>
-            
-                  <style>
-                  body{ font-family:Arial; display:flex; ustify-content:center; align-items:center;  height:100vh; background:#0B0F14; color:white;}
-                  </style>
-            
-            </head>
-      
-      
-            <body>
-                  <h2>
-                  Generating PDF...
-                  </h2>
-            </body>
-      
-      </html>
-
+            <style>
+              body {
+                font-family: Arial;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background: #0B0F14;
+                color: white;
+              }
+            </style>
+          </head>
+          <body>
+            <h2>
+              Generating PDF...
+            </h2>
+          </body>
+        </html>
       `);
+    }
+    try {
+      const res =
+        await fetch(
+          "/api/export-pdf-report",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
+            body: JSON.stringify({
+              start,
+              end,
+              status,
+              branchId:
+                state.branchId
+            })
+          }
+        );
+      if (!res.ok) {
+        throw new Error(
+          await res.text()
+        );
       }
-
-
-
-      try {
-	      const res =
-	      await fetch("/api/export-pdf-report",{
-	      
-	      method:"POST",
-	      
-	      headers:{
-	      "Content-Type":"application/json"
-	      },
-	      
-	      body:JSON.stringify({
-	      
-	      start,
-	      end,
-	      status,
-	      branchId:
-	      state.branchId
-	      
-	      })
-	      
-	      });
-	      
-	      const url =
-	      await res.text();
-	      if(pdfTab && url){
-	      pdfTab.location.href = url;
-    	}
+      const url =
+        await res.text();
+      if (pdfTab && url) {
+        pdfTab.location.href =
+          url;
       }
-            catch(err){
-                  console.error(err);
-                  if(pdfTab){
-                        pdfTab.document.body.innerHTML =`
-                              <h2>
-                              Failed Generate PDF
-                              </h2>
-                        `;
-                  }
-            }
-            };
+      else {
+        if (pdfTab) {
+          pdfTab.document.body.innerHTML = `
+            <h2>
+              PDF belum aktif
+            </h2>
+          `;
+        }
+      }
+    }
+    catch (err) {
+      console.error(
+        "Export PDF:",
+        err
+      );
+      if (pdfTab) {
+        pdfTab.document.body.innerHTML = `
+          <h2>
+            Failed Generate PDF
+          </h2>
+          <p>
+            ${err.message || ""}
+          </p>
+        `;
+      }
+    }
+  };
 }
 
 function paginateRecentTransactions(data) {
@@ -17034,89 +17052,91 @@ function renderRecentTransactionSummary(data) {
 }
 
 async function exportRecentTransactions() {
-      const start = document.getElementById("startDate")?.value;
-      const end = document.getElementById("endDate")?.value;
-      const status = document.getElementById("statusFilter")?.value || "ALL";
+  const start =
+    document.getElementById("startDate")?.value;
+  const end =
+    document.getElementById("endDate")?.value;
+  const status =
+    document.getElementById("statusFilter")?.value || "ALL";
+  if (!start || !end) {
+    alert("Pilih tanggal dulu");
+    return;
+  }
+  const pdfWindow =
+    window.open("", "_blank");
+  if (!pdfWindow) {
+    alert("Popup diblokir browser");
+    return;
+  }
 
-      if (!start || !end) { alert("Pilih tanggal dulu");
-            return;
-      }
-      
-      
-      
-      const pdfWindow = window.open("", "_blank");
-      if (!pdfWindow) { alert("Popup diblokir browser");
-            return;
-      }
-      
-      pdfWindow.document.write(`
-      
-      <html>
-            <body style="font-family:Arial;padding:40px">
-                  <h2>
-                        Generating PDF...
-                  </h2>
-            
-            </body>
-      </html>
-      
-      `);
-      
-      
-      
-      try {
-      
-      
-      /*
-      
-      NANTI:
-      
-      const response =
+  pdfWindow.document.write(`
+    <html>
+      <body
+        style="
+          font-family:Arial;
+          padding:40px
+        "
+      >
+        <h2>
+          Generating PDF...
+        </h2>
+      </body>
+    </html>
+  `);
+
+  try {
+    const response =
       await fetch(
-      "/api/export-recent-transactions",
-      {
-      method:"POST",
-      headers:{
-      "Content-Type":"application/json"
-      },
-      body:JSON.stringify({
-      
-      start,
-      end,
-      status,
-      branchId:
-      state.branchId
-      
-      })
-      });
-      
-      
-      const html =
+        "/api/export-recent-transactions",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify({
+            start,
+            end,
+            status,
+            branchId:
+              state.branchId
+          })
+        }
+      );
+    if (!response.ok) {
+      throw new Error(
+        await response.text()
+      );
+    }
+    const html =
       await response.text();
-      
-      
-      */
-      
-      
-      // TEMP
-            
-            const html = `
-                  <h2>
-                        PDF Export belum aktif
-                  </h2>
-            `;
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
+    pdfWindow.document.close();
 
-            pdfWindow.document.open();
-            pdfWindow.document.write(html);
-            pdfWindow.document.close();
-      }
-            catch(err){
-                  console.error(err);
-                  pdfWindow.document.body.innerHTML =
-                  "Export Error";
-            }
+  }
+  catch (err) {
+    console.error(
+      "Export Recent Transactions:",
+      err
+    );
+    pdfWindow.document.body.innerHTML = `
+      <div
+        style="
+          font-family:Arial;
+          padding:40px;
+        "
+      >
+        <h2>
+          Export Error
+        </h2>
+        <p>
+          ${err.message || "Gagal membuat PDF"}
+        </p>
+      </div>
+    `;
+  }
 }
-
 
 function openTransactionModal(trxId) {
 
@@ -17150,7 +17170,6 @@ function openTransactionModal(trxId) {
   });
 
 }
-
 
 function openViewTransactionModal() {
   document.getElementById("transactionModalWrapper")?.remove();
@@ -17316,8 +17335,6 @@ async function sendReceiptWhatsapp() {
             alert("Gagal mengambil transaksi" );
       }
 }
-
-
 
 function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
         const tpl = document.getElementById("receiptTemplate");
