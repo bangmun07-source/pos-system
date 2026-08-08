@@ -19599,6 +19599,16 @@ function closeIngredientStockAlert(){
 
 let whatsappComposerData = null;
 function openWhatsAppComposer({phone,title,message,type = null,trxId}) {
+	  console.log(
+    "OPEN WHATSAPP COMPOSER",
+    {
+      phone,
+      title,
+      message,
+      type,
+      trxId
+    }
+  );
   whatsappComposerData = { phone, title, message, type, trxId };
 
   // TITLE
@@ -19874,6 +19884,22 @@ function handleBirthday(btn){
 }
 
 function handleTransaction(btn){
+
+  console.log(
+    "TRANSACTION BUTTON:",
+    btn
+  );
+
+  console.log(
+    "PHONE:",
+    btn.dataset.phone
+  );
+
+  console.log(
+    "TRX ID:",
+    btn.dataset.trxid
+  );
+
   const message =
     createTransactionMessage({
       name: btn.dataset.name,
@@ -19882,13 +19908,13 @@ function handleTransaction(btn){
       invoice: btn.dataset.invoice
     });
 
-    openWhatsAppComposer({
-      phone: btn.dataset.phone,
-      title: "Thank You",
-      message,
-      trxId: btn.dataset.trxid,
-      type: "transaction"
-    });
+  openWhatsAppComposer({
+    phone: btn.dataset.phone,
+    title: "Thank You",
+    message,
+    trxId: btn.dataset.trxid,
+    type: "transaction"
+  });
 }
 
 function handleNotification(btn){
