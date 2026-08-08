@@ -18326,29 +18326,32 @@ async function checkout() {
       paymentMethod: state.paymentMethod
   };
 
-  function hitungHPPDanKirim(payload) {
-      let hppTotal = 0;
-      const norm = v =>
-        String(v || "").trim().toUpperCase();
-      state.cart.forEach(item => {
-        const r =
-          state.recipeMap[norm(item.id)] ||
-          state.recipeMap[norm(item.name)];
-        if (!r) {
-          return;
-        }
-
-        const cost = Number(r.cost) || 0;
-        hppTotal += cost * item.qty;
-      });
-      payload.hppTotal = hppTotal;
-      sendTransaction(payload);
-  } 
+  async function hitungHPPDanKirim(payload) {
+	  let hppTotal = 0;
+	  const norm = v =>
+	    String(v || "")
+	      .trim()
+	      .toUpperCase();
+		
+	  state.cart.forEach(item => {
+	    const r =
+	      state.recipeMap[norm(item.id)] ||
+	      state.recipeMap[norm(item.name)];
+	    if (!r) return;
+	    const cost =
+	      Number(r.cost) || 0;
+	    hppTotal +=
+	      cost * item.qty;
+	  });
+	  payload.hppTotal = hppTotal;
+	  await sendTransaction(payload);
+	} 
     if (memberId) {
 
   try {
     const member =
       await checkMemberRPC(memberId);
+console.log("CHECK MEMBER RESULT:", member);
     if (!member) {
       alert(
         "Member tidak ditemukan ❌"
@@ -18367,6 +18370,17 @@ async function checkout() {
     // pastikan pakai ID asli
     payload.memberId =
       member.id;
+	  
+console.log(
+"FINAL MEMBER ID:",
+payload.memberId
+);
+
+console.log(
+"FINAL PAYLOAD:",
+payload
+);
+		  
   } catch (error) {
     console.error(
       "CHECK MEMBER ERROR:",
