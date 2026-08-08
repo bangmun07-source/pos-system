@@ -458,7 +458,6 @@ async function getMemberDetailPageRPC(memberId, branchId) {
   return data;
 }
 
-
 async function getMembersRPC(branchId) {
 
   const {
@@ -481,7 +480,7 @@ async function getMembersRPC(branchId) {
   return data || [];
 }
 
-async function searchMembersRPC(keyword, branchId) {
+async function searchMembersRPC(keyword) {
 
   const {
     data,
@@ -490,20 +489,15 @@ async function searchMembersRPC(keyword, branchId) {
     "search_members",
     {
       p_keyword:
-        keyword || "",
-
-      p_branch_id:
-        branchId || null
+        keyword || ""
     }
   );
 
   if (error) {
-
     console.error(
       "search_members error:",
       error
     );
-
     throw error;
   }
 
@@ -511,10 +505,8 @@ async function searchMembersRPC(keyword, branchId) {
     "SEARCH RPC:",
     data
   );
-
   return data || [];
 }
-
 
 async function addMemberRPC(data) {
 
