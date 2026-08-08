@@ -16847,55 +16847,32 @@ async function initExportButton() {
 
 
       try {
-      
-      
-      /*
-      
-      NANTI:
-      
-      const res =
-      await fetch("/api/export-pdf-report",{
-      
-      method:"POST",
-      
-      headers:{
-      "Content-Type":"application/json"
-      },
-      
-      body:JSON.stringify({
-      
-      start,
-      end,
-      status,
-      branchId:
-      state.branchId
-      
-      })
-      
-      });
-      
-      
-      const url =
-      await res.text();
-      
-      
-      */
-      
-            // TEMP DUMMY
-            
-            const url = "";
-                  if(pdfTab && url){
-                        pdfTab.location.href = url;
-                  }
-            else {
-                  if(pdfTab){
-                  pdfTab.document.body.innerHTML = `
-                  <h2>
-                  PDF belum aktif
-                  </h2>
-                  `;
-                  }
-            }
+	      const res =
+	      await fetch("/api/export-pdf-report",{
+	      
+	      method:"POST",
+	      
+	      headers:{
+	      "Content-Type":"application/json"
+	      },
+	      
+	      body:JSON.stringify({
+	      
+	      start,
+	      end,
+	      status,
+	      branchId:
+	      state.branchId
+	      
+	      })
+	      
+	      });
+	      
+	      const url =
+	      await res.text();
+	      if(pdfTab && url){
+	      pdfTab.location.href = url;
+    	}
       }
             catch(err){
                   console.error(err);
