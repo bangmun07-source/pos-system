@@ -19154,47 +19154,70 @@ async function loadMembers(callback) {
     document.getElementById(
       "member-table-body"
     );
-  if (!el) return;
-  if (state.memberPageData) {
 
+  if (!el) return;
+
+  // ================================
+  // LOAD FROM CACHE
+  // ================================
+
+  if (state.memberPageData) {
     const data =
-	    state.memberPageData;
-	    state.members = res.members || [];
-	    state.settings = res.settings || {};
-	    renderTierFilter( state.settings);
-	    renderTierSettings(state.settings);
-	    renderMembers(state.members);
+      state.memberPageData;
+    state.members =
+      data.members || [];
+    state.settings =
+      data.settings || {};
+    renderTierFilter(
+      state.settings
+    );
+    renderTierSettings(
+      state.settings
+    );
+    renderMembers(
+      state.members
+    );
+
     if (callback) {
       callback();
     }
     return;
   }
 
+  // ================================
+  // LOAD FROM SUPABASE RPC
+  // ================================
+
   try {
-	
-    // SUPABASE RPC
+
     const res =
       await getMemberPageDataRPC(
         state.branchId
       );
-	
-    state.memberPageData = res;
-    state.members = res.members || [];
-    state.settings = res.settings || {};
-    renderTierFilter( state.settings);
-    renderTierSettings(state.settings);
-    renderMembers(state.members);
+    state.memberPageData =
+      res;
+    state.members =
+      res.members || [];
+    state.settings =
+      res.settings || {};
+    renderTierFilter(
+      state.settings
+    );
+    renderTierSettings(
+      state.settings
+    );
+    renderMembers(
+      state.members
+    );
 
     if (callback) {
       callback();
     }
-
   } catch (err) {
     console.error(
       "Member Load Error:",
       err
     );
-
     showToast(
       "Gagal memuat member",
       "error"
