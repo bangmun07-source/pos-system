@@ -729,7 +729,7 @@ td {
             Name
           </th>
 
-          <th class="left">
+          <th class="center">
             Tier
           </th>
 
