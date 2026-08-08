@@ -17368,172 +17368,171 @@ function openSendDigitalReceipt(data) {
 }
 
 async function sendReceiptWhatsapp() {
-      const phone = document
-      .getElementById("receiptWhatsappInput")
-      .value
-      .replace(/\D/g, "");
-            if (!phone) {alert("Nomor belum diisi");
-                  return;
-            }
-      const trxIdEl =document.getElementById( "receiptTransactionId");
-            if (!trxIdEl) { alert("Modal belum siap (receiptTransactionId tidak ada)");
-                  return; }
-      const trxId = trxIdEl.textContent.trim();
-            if (!trxId || trxId === "undefined") { alert("TRX ID kosong");
-                  return; }
-      try {
-		  
-		      const trx = await getReceiptDataRPC(trxId);
-				if (!trx) {
-				  alert("Transaksi tidak ditemukan");
-				  return;
-				}
-				sendReceiptWhatsappWithData(
-				  trx,
-				  phone,
-				  null
-				);
-            }
-            catch(err){ console.error(err);
-            alert("Gagal mengambil transaksi" );
-      }
+  const phone = document
+  .getElementById("receiptWhatsappInput")
+  .value
+  .replace(/\D/g, "");
+        if (!phone) {alert("Nomor belum diisi");
+              return;
+        }
+  const trxIdEl =document.getElementById( "receiptTransactionId");
+        if (!trxIdEl) { alert("Modal belum siap (receiptTransactionId tidak ada)");
+              return; }
+  const trxId = trxIdEl.textContent.trim();
+        if (!trxId || trxId === "undefined") { alert("TRX ID kosong");
+              return; }
+  try {
+  
+      const trx = await getReceiptDataRPC(trxId);
+    if (!trx) {
+      alert("Transaksi tidak ditemukan");
+      return;
+    }
+    sendReceiptWhatsappWithData(
+      trx,
+      phone,
+      null
+    );
+        }
+        catch(err){ console.error(err);
+        alert("Gagal mengambil transaksi" );
+  }
 }
 
 function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
-        const tpl = document.getElementById("receiptTemplate");
-        if (!tpl) return;
-        const wrapper = document.createElement("div");
-        wrapper.style.position = "absolute";
-        wrapper.style.left = "-9999px";
-        wrapper.appendChild(tpl.content.cloneNode(true));
-        document.body.appendChild(wrapper);
-        const n = (v) => Number(v || 0);
-        const subtotal = n(trx.subtotal);
-        const total = n(trx.total);
-	
-        // HEADER
-        wrapper.querySelector("#receiptTitle").textContent =
-          trx.branchName || "-";
-        if (trx.logo_url) {
-          wrapper.querySelector("#receiptLogo").src =
-            trx.logo_url;
-        }
-        const ig = wrapper.querySelector("#receiptInstagram");
-        if (ig) {
-          ig.textContent =
-            trx.instagram
-              ? "Instagram: " + trx.instagram
-              : "";
-        }
-        wrapper.querySelector("#receiptId").textContent = trx.id || "-";
-        wrapper.querySelector("#receiptDate").textContent = trx.date || "-";
-        wrapper.querySelector("#receiptTable").textContent = trx.table || "-";
-        wrapper.querySelector("#receiptPhone").textContent = trx.phone || "-";
-        wrapper.querySelector("#receiptAddress").textContent = trx.address || "-";
-        const footer = wrapper.querySelector("#receiptFooterText");
-          if (footer) {
-            footer.innerHTML =
-              (trx.receipt_footer || 
-              "Thank you for visiting.\nEnjoy the moment. Take it slow.\nHave a nice day.")
-              .replace(/\n/g, "<br>");
-          }
-        wrapper.querySelector("#receiptTotal").textContent = "Rp " + total.toLocaleString("id-ID");
-    
-        // BREAKDOWN (FIXED)
-        wrapper.querySelector("#receiptSubtotal").textContent = "Rp " + subtotal.toLocaleString("id-ID");
-        wrapper.querySelector("#receiptTax").textContent = "Rp " + n(trx.tax).toLocaleString("id-ID");
-        wrapper.querySelector("#receiptService").textContent = "Rp " + n(trx.service).toLocaleString("id-ID");
-        wrapper.querySelector("#receiptDiscount").textContent = "- Rp " + n(trx.discount).toLocaleString("id-ID");
-      
-        // ITEMS
-        const container = wrapper.querySelector("#receiptItemsContainer");
-        const items = trx.items || [];
-        container.innerHTML = items.length
-          ? items.map(i => `
-            <div class="flex justify-between text-sm mb-2">
-              <div>
-                <div>${i.name}</div>
-                <div class="text-xs opacity-60">Qty: ${i.qty}</div>
-              </div>
-              <div>
-                Rp ${(i.qty * i.price).toLocaleString("id-ID")}
-              </div>
-            </div>
-          `).join("")
-          : `<div class="text-xs opacity-50 text-center">No items</div>`;
+  const tpl = document.getElementById("receiptTemplate");
+  if (!tpl) return;
+  const wrapper = document.createElement("div");
+  wrapper.style.position = "absolute";
+  wrapper.style.left = "-9999px";
+  wrapper.appendChild(tpl.content.cloneNode(true));
+  document.body.appendChild(wrapper);
+  const n = (v) => Number(v || 0);
+  const subtotal = n(trx.subtotal);
+  const total = n(trx.total);
+  
+  // HEADER
+  wrapper.querySelector("#receiptTitle").textContent =
+  trx.branchName || "-";
+  if (trx.logo_url) {
+  wrapper.querySelector("#receiptLogo").src =
+    trx.logo_url;
+  }
+  const ig = wrapper.querySelector("#receiptInstagram");
+  if (ig) {
+  ig.textContent =
+    trx.instagram
+      ? "Instagram: " + trx.instagram
+      : "";
+  }
+  wrapper.querySelector("#receiptId").textContent = trx.id || "-";
+  wrapper.querySelector("#receiptDate").textContent = trx.date || "-";
+  wrapper.querySelector("#receiptTable").textContent = trx.table || "-";
+  wrapper.querySelector("#receiptPhone").textContent = trx.phone || "-";
+  wrapper.querySelector("#receiptAddress").textContent = trx.address || "-";
+  const footer = wrapper.querySelector("#receiptFooterText");
+  if (footer) {
+    footer.innerHTML =
+      (trx.receipt_footer || 
+      "Thank you for visiting.\nEnjoy the moment. Take it slow.\nHave a nice day.")
+      .replace(/\n/g, "<br>");
+  }
+  wrapper.querySelector("#receiptTotal").textContent = "Rp " + total.toLocaleString("id-ID");
+  // BREAKDOWN (FIXED)
+  wrapper.querySelector("#receiptSubtotal").textContent = "Rp " + subtotal.toLocaleString("id-ID");
+  wrapper.querySelector("#receiptTax").textContent = "Rp " + n(trx.tax).toLocaleString("id-ID");
+  wrapper.querySelector("#receiptService").textContent = "Rp " + n(trx.service).toLocaleString("id-ID");
+  wrapper.querySelector("#receiptDiscount").textContent = "- Rp " + n(trx.discount).toLocaleString("id-ID");
 
-        // RENDER + SEND
-        const canvas = wrapper.querySelector("#receiptCanvas");
-            setTimeout(() => {
-              html2canvas(canvas, {
-                scale: 2,
-                useCORS: true,
-                backgroundColor: "#0B0F14"
-              })
-              .then(receiptCanvas => {
-                const image =
-                  receiptCanvas.toDataURL(
-                    "image/jpeg",
-                    0.65
-                  );
-                return fetch(
-                  "/api/handle-receipt-upload",
-                  {
-                    method:"POST",
-                    headers:{
-                      "Content-Type":"application/json"
-                    },
-                    body:JSON.stringify({
-                      base64:image,
-                      trxId:trx.id
-                    })
-                  }
-                );
-              })
-              .then(res => res.json())
-              .then(result => {
-                const url = result.url;
-                let wa = String(phone || "")
-                  .replace(/\D/g,"");
-                if (wa.startsWith("0")) {
-                  wa = "62" + wa.slice(1);
-                } 
-                else if (!wa.startsWith("62")) {
-                  wa = "62" + wa;
-                }
-                let finalMessage;
-                if(customMessage){
-                  finalMessage =
-                    customMessage +
-                    "\n\n📎 Digital Receipt\n" +
-                    url;
-                } else {
-            
-                  finalMessage =
-                    "🧾 *Digital Receipt*\n\n" +
-                    "Thank you for visiting.\n" +
-                    "Enjoy the moment. Take it slow.\n\n" +
-                    "Have a nice day.\n\n" +
-                    "📎 Receipt:\n" +
-                    url;
-                }
-                window.open(
-                  "https://api.whatsapp.com/send?phone=" +
-                  wa +
-                  "&text=" +
-                  encodeURIComponent(finalMessage),
-                  "_blank"
-                );
-                wrapper.remove();
-              })
-              .catch(err => {
-                console.error(
-                  "Receipt upload error:",
-                  err
-                );
-            
-              });
-            },100);
+  // ITEMS
+  const container = wrapper.querySelector("#receiptItemsContainer");
+  const items = trx.items || [];
+  container.innerHTML = items.length
+  ? items.map(i => `
+    <div class="flex justify-between text-sm mb-2">
+      <div>
+        <div>${i.name}</div>
+        <div class="text-xs opacity-60">Qty: ${i.qty}</div>
+      </div>
+      <div>
+        Rp ${(i.qty * i.price).toLocaleString("id-ID")}
+      </div>
+    </div>
+  `).join("")
+  : `<div class="text-xs opacity-50 text-center">No items</div>`;
+  
+  // RENDER + SEND
+  const canvas = wrapper.querySelector("#receiptCanvas");
+    setTimeout(() => {
+      html2canvas(canvas, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#0B0F14"
+      })
+      .then(receiptCanvas => {
+        const image =
+          receiptCanvas.toDataURL(
+            "image/jpeg",
+            0.65
+          );
+        return fetch(
+          "/api/handle-receipt-upload",
+          {
+            method:"POST",
+            headers:{
+              "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+              base64:image,
+              trxId:trx.id
+            })
+          }
+        );
+      })
+      .then(res => res.json())
+      .then(result => {
+        const url = result.url;
+        let wa = String(phone || "")
+          .replace(/\D/g,"");
+        if (wa.startsWith("0")) {
+          wa = "62" + wa.slice(1);
+        } 
+        else if (!wa.startsWith("62")) {
+          wa = "62" + wa;
+        }
+        let finalMessage;
+        if(customMessage){
+          finalMessage =
+            customMessage +
+            "\n\n📎 Digital Receipt\n" +
+            url;
+        } else {
+    
+          finalMessage =
+            "🧾 *Digital Receipt*\n\n" +
+            "Thank you for visiting.\n" +
+            "Enjoy the moment. Take it slow.\n\n" +
+            "Have a nice day.\n\n" +
+            "📎 Receipt:\n" +
+            url;
+        }
+        window.open(
+          "https://api.whatsapp.com/send?phone=" +
+          wa +
+          "&text=" +
+          encodeURIComponent(finalMessage),
+          "_blank"
+        );
+        wrapper.remove();
+      })
+      .catch(err => {
+        console.error(
+          "Receipt upload error:",
+          err
+        );
+    
+      });
+  },100);
 }
 
 function goToRecentTransactions() {
@@ -18012,19 +18011,19 @@ function initDatePicker() {
   }
 
 function updateDateLabel(start, end) {
-	  const label = document.getElementById("dateRangeLabel");
-	  if (!label) return;
-	  const s = new Date(start).toLocaleDateString("en-US", {
-	    month: "short",
-	    day: "2-digit",
-	    year: "numeric"
-	  });
-	  const e = new Date(end).toLocaleDateString("en-US", {
-	    month: "short",
-	    day: "2-digit",
-	    year: "numeric"
-	  });
-	  label.childNodes[2].nodeValue = ` ${s} - ${e} `;
+  const label = document.getElementById("dateRangeLabel");
+  if (!label) return;
+  const s = new Date(start).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  });
+  const e = new Date(end).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric"
+  });
+  label.childNodes[2].nodeValue = ` ${s} - ${e} `;
 }
 
 function updateDiscountBar(discount, revenue) {
@@ -18034,102 +18033,101 @@ function updateDiscountBar(discount, revenue) {
 	bar.style.width = percent + "%";
 }
 
-
 function renderTopRevenueTable() {
-  const tbody = document.getElementById("topRevenueTable");
-  if (!tbody) return;
-  tbody.innerHTML = "";
+const tbody = document.getElementById("topRevenueTable");
+if (!tbody) return;
+tbody.innerHTML = "";
 
-  // PAGINATION
-  const totalData = allTopRevenueData.length;
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(totalData / topRevenueItemsPerPage)
+// PAGINATION
+const totalData = allTopRevenueData.length;
+const totalPages =
+  Math.max(
+    1,
+    Math.ceil(totalData / topRevenueItemsPerPage)
+  );
+const start = (topRevenueCurrentPage - 1) * topRevenueItemsPerPage;
+const end = start + topRevenueItemsPerPage;
+const data = allTopRevenueData.slice(start, end);
+
+// RENDER
+data.forEach(item => {
+  const img = (item.image || "")
+    .replace(
+      /https:\/\/drive\.google\.com\/file\/d\/([^/]+)\/view.*/,
+      "https://drive.google.com/thumbnail?id=$1&sz=w2000"
     );
-  const start = (topRevenueCurrentPage - 1) * topRevenueItemsPerPage;
-  const end = start + topRevenueItemsPerPage;
-  const data = allTopRevenueData.slice(start, end);
 
-  // RENDER
-  data.forEach(item => {
-    const img = (item.image || "")
-      .replace(
-        /https:\/\/drive\.google\.com\/file\/d\/([^/]+)\/view.*/,
-        "https://drive.google.com/thumbnail?id=$1&sz=w2000"
-      );
-
-    tbody.innerHTML += `
-      <tr class="hover:bg-white/5 transition-colors">
-        <td class="px-8 py-5">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
-              <img src="${img}" class="w-full h-full object-cover"/>
-            </div>
-            <div>
-              <p class="text-sm font-bold">${item.name || "-"}</p>
-              <p class="text-[10px] text-on-surface-variant">
-                ${item.category || "-"}
-              </p>
-            </div>
+  tbody.innerHTML += `
+    <tr class="hover:bg-white/5 transition-colors">
+      <td class="px-8 py-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
+            <img src="${img}" class="w-full h-full object-cover"/>
           </div>
-        </td>
+          <div>
+            <p class="text-sm font-bold">${item.name || "-"}</p>
+            <p class="text-[10px] text-on-surface-variant">
+              ${item.category || "-"}
+            </p>
+          </div>
+        </div>
+      </td>
 
-        <td class="px-8 py-5">
-          <span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">
-            ${item.category || "-"}
-          </span>
-        </td>
+      <td class="px-8 py-5">
+        <span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">
+          ${item.category || "-"}
+        </span>
+      </td>
 
-        <td class="px-8 py-5 text-center font-medium">
-          ${(item.units || 0).toLocaleString("id-ID")}
-        </td>
+      <td class="px-8 py-5 text-center font-medium">
+        ${(item.units || 0).toLocaleString("id-ID")}
+      </td>
 
-        <td class="px-8 py-5 text-right font-headline font-bold">
-          Rp ${(item.revenue || 0).toLocaleString("id-ID")}
-        </td>
+      <td class="px-8 py-5 text-right font-headline font-bold">
+        Rp ${(item.revenue || 0).toLocaleString("id-ID")}
+      </td>
 
-        <td class="px-8 py-5 text-right">
-          <span class="material-symbols-outlined text-sm text-primary">
-            trending_up
-          </span>
-        </td>
+      <td class="px-8 py-5 text-right">
+        <span class="material-symbols-outlined text-sm text-primary">
+          trending_up
+        </span>
+      </td>
 
-      </tr>
-    `;
-  });
+    </tr>
+  `;
+});
 
-    // FOOTER
-    const info = document.getElementById("topRevenueInfo");
-    if (info) {
-      const from = totalData === 0 ? 0 : start + 1;
-      const to = Math.min(end, totalData);
-      info.innerText = `Showing ${from}-${to} of ${totalData} Products`;
-    }
+  // FOOTER
+  const info = document.getElementById("topRevenueInfo");
+  if (info) {
+    const from = totalData === 0 ? 0 : start + 1;
+    const to = Math.min(end, totalData);
+    info.innerText = `Showing ${from}-${to} of ${totalData} Products`;
+  }
 
-    // BUTTON
-    const prevBtn = document.getElementById("topRevenuePrevBtn");
-    const nextBtn = document.getElementById("topRevenueNextBtn");
-    if (prevBtn) {
-      prevBtn.disabled = topRevenueCurrentPage <= 1;
-      prevBtn.onclick = () => {
-        if (topRevenueCurrentPage > 1) {
-          topRevenueCurrentPage--;
-          renderTopRevenueTable();
-        }
-      };
-    }
+  // BUTTON
+  const prevBtn = document.getElementById("topRevenuePrevBtn");
+  const nextBtn = document.getElementById("topRevenueNextBtn");
+  if (prevBtn) {
+    prevBtn.disabled = topRevenueCurrentPage <= 1;
+    prevBtn.onclick = () => {
+      if (topRevenueCurrentPage > 1) {
+        topRevenueCurrentPage--;
+        renderTopRevenueTable();
+      }
+    };
+  }
 
-    if (nextBtn) {
-      nextBtn.disabled =
-        topRevenueCurrentPage >= totalPages;
-      nextBtn.onclick = () => {
-        if (topRevenueCurrentPage < totalPages) {
-          topRevenueCurrentPage++;
-          renderTopRevenueTable();
-        }
-      };
-    }
+  if (nextBtn) {
+    nextBtn.disabled =
+      topRevenueCurrentPage >= totalPages;
+    nextBtn.onclick = () => {
+      if (topRevenueCurrentPage < totalPages) {
+        topRevenueCurrentPage++;
+        renderTopRevenueTable();
+      }
+    };
+  }
 }
 
 
@@ -18138,7 +18136,7 @@ function renderTopRevenueTable() {
     // =========================
 
 function goPOS(){
-    navigate('posPage');
+  navigate('posPage');
 }
     
 function validateStock() {
@@ -18187,39 +18185,30 @@ async function preloadRecipeMap() {
   if (!branchId) {
     return;
   }
+
+  // CACHE
   if (
     state.recipeMap &&
     state.recipeMapBranchId === branchId
   ) {
     return;
   }
-
+  
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data: recipe, error } =
-      await supabase.rpc(
-        "get_recipe_master_ledger",
-        {
-          p_branch_id: branchId
-        }
+    // SUPABASE RPC
+    const recipe =
+      await getRecipeMasterLedgerRPC(
+        branchId
       );
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const recipe = [];
+        
+    // NORMALIZE
     const norm = v =>
       String(v || "")
         .trim()
         .toUpperCase();
+    
+    // BUILD RECIPE MAP
     state.recipeMap = {};
     (recipe || []).forEach(r => {
       state.recipeMap[
@@ -18228,15 +18217,17 @@ async function preloadRecipeMap() {
       state.recipeMap[
         norm(r.name)
       ] = r;
+
     });
+
     state.recipeMapBranchId =
       branchId;
-  }
-  catch(err){
+  } catch (err) {
     console.error(
       "Preload Recipe Map:",
       err
     );
+
   }
 }
 
@@ -18308,30 +18299,11 @@ function checkout() {
       payload.hppTotal = hppTotal;
       sendTransaction(payload);
   } 
-    
-  if (memberId) {
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
-    
-    /*
-    const { data:member, error } =
-     await supabase.rpc(
-       "check_member",
-       {
-         p_member_id: memberId
-       }
-     );
-    
-    if(error){
-     throw error;
-    }
-    */
-    
-    // TEMP DATA VERCEL
-    const member = {
-      id: memberId
-    };
+    if (memberId) {
+
+  try {
+    const member =
+      await checkMemberRPC(memberId);
     if (!member) {
       alert(
         "Member tidak ditemukan ❌"
@@ -18341,18 +18313,38 @@ function checkout() {
         document.getElementById(
           "btnCheckout"
         );
-      if(btn){
+      if (btn) {
         btn.disabled = false;
       }
       return;
     }
+
     // pastikan pakai ID asli
     payload.memberId =
-    member.id;
- 	} else {
-      // TANPA MEMBER → TETAP HITUNG HPP
-      hitungHPPDanKirim(payload);
+      member.id;
+  } catch (error) {
+    console.error(
+      "CHECK MEMBER ERROR:",
+      error
+    );
+    alert(
+      "Gagal memeriksa member ❌"
+    );
+
+    isProcessing = false;
+    const btn =
+      document.getElementById(
+        "btnCheckout"
+      );
+    if (btn) {
+      btn.disabled = false;
     }
+    return;
+  }
+} else {
+  // TANPA MEMBER → TETAP HITUNG HPP
+  hitungHPPDanKirim(payload);
+
 }
 
 async function sendTransaction(payload){
@@ -18553,29 +18545,11 @@ async function loadOrders() {
     document.getElementById(
       "order-list"
     );
+
   if (!el) return;
   try {
-
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_orders"
-      );
-
-
-    if(error){
-
-      throw error;
-
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const data = [];
+    const data =
+      await getOrdersRPC();
     el.innerHTML =
       data.map(o => `
         <div>
@@ -18584,18 +18558,16 @@ async function loadOrders() {
           <p>${o.date}</p>
         </div>
       `).join("");
-  }
-  catch(err){
+  } catch (err) {
     console.error(
       "Load Orders:",
       err
     );
-    el.innerHTML =
-      `
+    el.innerHTML = `
       <p>
-          Gagal memuat order
+        Gagal memuat order
       </p>
-      `;
+    `;
   }
 }
 
