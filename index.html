@@ -19138,81 +19138,73 @@ function calculatePoints(total){
   return Math.floor(total / state.settings.point_ratio)
 }
 
-function getMemberDetailPage(memberId, branchId) {
-  return fetch("/api/member-detail", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      memberId,
-      branchId
-    })
-  })
-  .then(res => res.json());
+async function getMemberDetailPage(memberId, branchId) {
+
+  try {
+
+	const data =
+	  await getMemberDetailPageRPC(
+	    memberId,
+	    branchId
+	  );
+  } catch (error) {
+    console.error(
+      "Get Member Detail Page:",
+      error
+    );
+    throw error;
+  }
 }
 
-
 async function loadMembers(callback) {
+
   const el =
     document.getElementById(
       "member-table-body"
     );
   if (!el) return;
   if (state.memberPageData) {
+
     const data =
-      state.memberPageData;
-    state.members =
-      data.members || [];
-    state.settings =
-      data.settings || {};
-    renderTierFilter(
-      state.settings
-    );
-    renderTierSettings(
-      state.settings
-    );
-    renderMembers(
-      state.members
-    );
+	    state.memberPageData;
+	    state.members = res.members || [];
+	    state.settings = res.settings || {};
+	    renderTierFilter( state.settings);
+	    renderTierSettings(state.settings);
+	    renderMembers(state.members);
     if (callback) {
       callback();
     }
     return;
   }
-  traceCall("loadMembers");
 
   try {
-
-    const result =
+	
+    // SUPABASE RPC
+    const res =
       await getMemberPageDataRPC(
         state.branchId
       );
-    state.memberPageData =
-      result;
-    state.members =
-      result.members || [];
-    state.settings =
-      result.settings || {};
-    renderTierFilter(
-      state.settings
-    );
-    renderTierSettings(
-      state.settings
-    );
-    renderMembers(
-      state.members
-    );
+	
+    state.memberPageData = res;
+    state.members = res.members || [];
+    state.settings = res.settings || {};
+    renderTierFilter( state.settings);
+    renderTierSettings(state.settings);
+    renderMembers(state.members);
+
     if (callback) {
       callback();
     }
+
   } catch (err) {
     console.error(
-      "Members:",
+      "Member Load Error:",
       err
     );
+
     showToast(
-      "Terjadi kesalahan saat memproses data",
+      "Gagal memuat member",
       "error"
     );
   }
@@ -20597,76 +20589,6 @@ function enableEditMember() {
     btn.innerHTML = "Save Changes";
     btn.onclick = saveMemberEdit;
   }
-}
-
-async function loadMembers(callback) {
-
-	const el = document.getElementById("member-table-body");
-	if (!el) return;
-	
-	if (state.memberPageData) {
-	
-	  const data = state.memberPageData;
-	  state.members = data.members || [];
-	  state.settings = data.settings || {};
-	  renderTierFilter(state.settings);
-	  renderTierSettings(state.settings);
-	  renderMembers(state.members);
-	  if(callback) callback();
-	  return;
-	}
-	
-	try {
-	
-    	
-    	// ==================================
-    	// SUPABASE AKTIFKAN NANTI
-    	// ==================================
-    	
-    	/*
-    	const { data, error } =
-    	await supabase.rpc(
-    	  "get_member_page_data",
-    	  {
-    	    p_branch_id: state.branchId
-    	  }
-    	);
-    	
-    	if(error){
-    	 throw error;
-    	}
-    	
-    	const res = data;
-    	*/
-    	
-    	
-    	// ==================================
-    	// TEMP DATA VERCEL
-    	// ==================================
-    	
-    	const res = {
-    	  members: [],
-    	  settings: {}
-    	};
-        	state.memberPageData = res;
-        	state.members = res.members || [];
-        	state.settings = res.settings || {};
-        	renderTierFilter(state.settings);
-        	renderTierSettings(state.settings);
-        	renderMembers(state.members);
-    	    if(callback) callback();
-	}
-    	catch(err){
-    		console.error(
-        		"Member Load Error:",
-        		err
-    	    );
-    	
-        	showToast(
-            	"Gagal memuat member",
-            	"error"
-        	);
-    	}
 }
 
 function renderTierProgression(history = []) {
