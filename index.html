@@ -3285,57 +3285,49 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 	<script>
 	 
 	  document.addEventListener(
-	  "input",
-	  async function(e) {
-	    if (
-	      e.target.id === "memberSearch"
-	    ) {
-	      const keyword =
-	        e.target.value.toLowerCase();
-	      if(!keyword){
-	        document.getElementById(
-	          "memberResult"
-	        ).style.display = "none";
-	        return;
-	      }
-	      try {
-	
-	
-	        // ==================================
-	        // SUPABASE (AKTIFKAN NANTI)
-	        // ==================================
-	
-	        /*
-	        const { data, error } =
-	          await supabase
-	            .from("Member")
-	            .select("*")
-	            .ilike(
-	              "name",
-	              `%${keyword}%`
-	            );
-	
-	
-	        if(error){
-	          throw error;
-	        }
-	        */
-	
-	        // TEMP DATA VERCEL
-	        const data = [];
-	        showMemberResult(
-	          data
-	        );
-	      }
-	      catch(err){
-	        console.error(
-	          "Search Member:",
-	          err
-	        );
-	      }
-	    }
-	  }
-	);
+		  "input",
+		  async function(e) {
+		
+		    if (
+		      e.target.id === "memberSearch"
+		    ) {
+		
+		      const keyword =
+		        e.target.value
+		          .toLowerCase();
+		
+		      if (!keyword) {
+		
+		        document.getElementById(
+		          "memberResult"
+		        ).style.display = "none";
+		
+		        return;
+		      }
+		
+		      try {
+		
+		        const data =
+		          await searchMembersRPC(
+		            keyword,
+		            state.branchId
+		          );
+		
+		        showMemberResult(
+		          data
+		        );
+		
+		      } catch (err) {
+		
+		        console.error(
+		          "Search Member:",
+		          err
+		        );
+		
+		      }
+		    }
+		  }
+		);
 
   
   // tampilkan hasil
