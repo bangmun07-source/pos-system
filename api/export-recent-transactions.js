@@ -281,9 +281,7 @@ export default async function handler(req, res) {
 
     const html = `
 <!DOCTYPE html>
-
 <html>
-
 <head>
 
 <meta charset="UTF-8">
@@ -298,111 +296,90 @@ Recent Transactions Report
   box-sizing: border-box;
 }
 
+html,
 body {
-
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
   margin: 0;
-
-  background: #ffffff;
-
-  color: #333;
-
+  padding: 0;
+  min-height: 100%;
 }
 
-.toolbar {
-
-  height: 60px;
-
+body {
   background: #0B0F14;
+  font-family: Arial, sans-serif;
+  color: #333;
+  padding: 40px 20px;
+}
 
-  color: white;
+/* =========================
+   EXPORT HEADER
+========================= */
+
+.export-toolbar {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto 20px auto;
 
   display: flex;
-
+  justify-content: space-between;
   align-items: center;
 
-  justify-content: space-between;
-
-  padding: 0 24px;
-
-  position: sticky;
-
-  top: 0;
-
-  z-index: 100;
-
-}
-
-.toolbar-title {
-
+  color: white;
   font-size: 14px;
-
-  font-weight: bold;
-
 }
 
-.toolbar button {
+.export-toolbar button {
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.08);
+  color: white;
 
-  background: #ffffff;
-
-  color: #111;
-
-  border: none;
-
-  padding: 10px 18px;
-
-  border-radius: 8px;
+  padding: 10px 16px;
+  border-radius: 10px;
 
   cursor: pointer;
-
   font-weight: bold;
-
 }
 
-.report {
+/* =========================
+   WHITE REPORT
+========================= */
 
+.report {
+  width: 100%;
   max-width: 1100px;
 
   margin: 0 auto;
 
-  padding: 40px;
+  background: white;
 
+  padding: 45px;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,.45);
 }
 
-.header {
-
-  text-align: center;
-
-  margin-bottom: 30px;
-
-}
+/* =========================
+   TITLE
+========================= */
 
 .title {
-
-  font-size: 26px;
-
+  font-size: 24px;
   font-weight: bold;
-
   margin-bottom: 8px;
-
 }
 
 .subtitle {
-
   font-size: 12px;
-
   color: #777;
-
-  margin-top: 4px;
-
+  margin-bottom: 3px;
 }
 
-.kpi-grid {
+/* =========================
+   KPI
+========================= */
 
+.kpi-grid {
   display: grid;
 
   grid-template-columns:
@@ -411,25 +388,21 @@ body {
   gap: 16px;
 
   margin: 30px 0;
-
 }
 
 .kpi-card {
-
   border: 1px solid #e5e5e5;
 
   border-radius: 14px;
 
   padding: 22px;
 
-  text-align: center;
-
   background: #fafafa;
 
+  text-align: center;
 }
 
 .kpi-title {
-
   font-size: 11px;
 
   color: #666;
@@ -437,129 +410,118 @@ body {
   font-weight: bold;
 
   margin-bottom: 12px;
-
 }
 
 .kpi-value {
-
   font-size: 22px;
 
   font-weight: bold;
 
   color: #222;
-
 }
 
-.section {
-
-  margin-top: 30px;
-
-}
+/* =========================
+   CARDS
+========================= */
 
 .card {
-
   border: 1px solid #e5e5e5;
 
   border-radius: 14px;
 
-  padding: 20px;
+  padding: 18px;
 
+  margin-top: 20px;
+
+  background: #fff;
 }
 
 .card h3 {
-
   margin-top: 0;
-
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 
   font-size: 16px;
-
 }
 
-table {
+/* =========================
+   TABLE
+========================= */
 
+table {
   width: 100%;
 
   border-collapse: collapse;
 
   font-size: 11px;
 
+  margin-top: 10px;
 }
 
 th {
-
   background: #f5f5f5;
 
   padding: 10px;
 
   text-align: left;
 
-  border-bottom: 1px solid #ddd;
-
+  font-weight: bold;
 }
 
 td {
-
   padding: 10px;
 
   border-bottom: 1px solid #eee;
-
 }
 
 .right {
-
   text-align: right;
-
 }
 
 .empty {
-
   text-align: center;
 
   color: #777;
 
-  padding: 20px;
-
+  padding: 25px;
 }
 
-.page-break {
-
-  page-break-before: always;
-
-}
+/* =========================
+   FOOTER
+========================= */
 
 .footer {
-
-  margin-top: 50px;
+  margin-top: 40px;
 
   text-align: center;
 
-  color: #888;
-
   font-size: 9px;
 
+  color: #888;
 }
+
+/* =========================
+   PRINT / PDF
+========================= */
 
 @media print {
 
-  .toolbar {
+  body {
+    background: white;
+    padding: 0;
+  }
 
+  .export-toolbar {
     display: none;
-
   }
 
   .report {
-
     max-width: none;
 
-    padding: 20px;
+    box-shadow: none;
 
-  }
+    border-radius: 0;
 
-  body {
-
-    background: white;
-
+    padding: 25px;
   }
 
 }
@@ -568,81 +530,75 @@ td {
 
 </head>
 
-
 <body>
 
+<!-- =========================
+     BLACK BACKGROUND
+========================= -->
 
-<div class="toolbar">
+<div class="export-toolbar">
 
-  <div class="toolbar-title">
-
+  <div>
     📄 Recent Transactions Report
-
   </div>
 
   <button onclick="window.print()">
-
     Download / Print PDF
-
   </button>
 
 </div>
 
 
+<!-- =========================
+     WHITE REPORT
+========================= -->
+
 <div class="report">
 
+  <div class="title">
 
-  <div class="header">
+    Recent Transactions Report
 
-    <div class="title">
+  </div>
 
-      Recent Transactions Report
+  <div class="subtitle">
 
-    </div>
+    Periode:
+    ${escapeHtml(start || "-")}
+    -
+    ${escapeHtml(end || "-")}
 
-    <div class="subtitle">
+  </div>
 
-      Periode:
-      ${escapeHtml(start || "-")}
-      -
-      ${escapeHtml(end || "-")}
+  <div class="subtitle">
 
-    </div>
+    Branch:
+    ${escapeHtml(branchId)}
 
-    <div class="subtitle">
+  </div>
 
-      Branch:
-      ${escapeHtml(branchId)}
+  <div class="subtitle">
 
-    </div>
-
-    <div class="subtitle">
-
-      Status:
-      ${escapeHtml(status)}
-
-    </div>
+    Status:
+    ${escapeHtml(status)}
 
   </div>
 
 
-  <!-- KPI -->
+  <!-- =========================
+       KPI
+  ========================= -->
 
   <div class="kpi-grid">
 
-
     <div class="kpi-card">
 
       <div class="kpi-title">
-
         TOTAL REVENUE
-
       </div>
 
       <div class="kpi-value">
-
         Rp ${rupiah(reportSummary.revenue)}
-
       </div>
 
     </div>
@@ -651,15 +607,11 @@ td {
     <div class="kpi-card">
 
       <div class="kpi-title">
-
         ACTIVE GUEST
-
       </div>
 
       <div class="kpi-value">
-
         ${Number(reportSummary.activeGuests || 0)}
-
       </div>
 
     </div>
@@ -668,178 +620,155 @@ td {
     <div class="kpi-card">
 
       <div class="kpi-title">
-
         ITEMS SOLD
-
       </div>
 
       <div class="kpi-value">
-
         ${Number(reportSummary.itemsSold || 0)}
-
       </div>
 
     </div>
 
+  </div>
+
+
+  <!-- =========================
+       PAYMENT
+  ========================= -->
+
+  <div class="card">
+
+    <h3>
+      Payment Distribution
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Payment
+          </th>
+
+          <th class="right">
+            Total
+          </th>
+
+          <th class="right">
+            Percentage
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${paymentRows}
+
+      </tbody>
+
+    </table>
 
   </div>
 
 
-  <!-- PAYMENT -->
+  <!-- =========================
+       MEMBERS
+  ========================= -->
 
-  <div class="section">
+  <div class="card">
 
-    <div class="card">
+    <h3>
+      Active Members
+    </h3>
 
-      <h3>
+    <table>
 
-        Payment Distribution
+      <thead>
 
-      </h3>
+        <tr>
 
+          <th>
+            Name
+          </th>
 
-      <table>
+          <th>
+            Tier
+          </th>
 
-        <thead>
+          <th class="right">
+            Point
+          </th>
 
-          <tr>
+        </tr>
 
-            <th>
-              Payment
-            </th>
+      </thead>
 
-            <th class="right">
-              Total
-            </th>
+      <tbody>
 
-            <th class="right">
-              Percentage
-            </th>
+        ${memberRows}
 
-          </tr>
+      </tbody>
 
-        </thead>
-
-
-        <tbody>
-
-          ${paymentRows}
-
-        </tbody>
-
-      </table>
-
-    </div>
+    </table>
 
   </div>
 
 
-  <!-- MEMBERS -->
+  <!-- =========================
+       TRANSACTIONS
+  ========================= -->
 
-  <div class="section">
+  <div class="card">
 
-    <div class="card">
+    <h3>
+      Recent Transactions
+    </h3>
 
-      <h3>
+    <table>
 
-        Active Members
+      <thead>
 
-      </h3>
+        <tr>
 
+          <th>
+            ID
+          </th>
 
-      <table>
+          <th>
+            Date
+          </th>
 
-        <thead>
+          <th>
+            Member
+          </th>
 
-          <tr>
+          <th>
+            Status
+          </th>
 
-            <th>
-              Name
-            </th>
+          <th class="right">
+            Items
+          </th>
 
-            <th>
-              Tier
-            </th>
+          <th class="right">
+            Total
+          </th>
 
-            <th class="right">
-              Point
-            </th>
+        </tr>
 
-          </tr>
+      </thead>
 
-        </thead>
+      <tbody>
 
+        ${transactionRows}
 
-        <tbody>
+      </tbody>
 
-          ${memberRows}
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- TRANSACTIONS -->
-
-  <div class="section page-break">
-
-    <div class="card">
-
-      <h3>
-
-        Recent Transactions
-
-      </h3>
-
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              ID
-            </th>
-
-            <th>
-              Date
-            </th>
-
-            <th>
-              Member
-            </th>
-
-            <th>
-              Status
-            </th>
-
-            <th class="right">
-              Items
-            </th>
-
-            <th class="right">
-              Total
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody>
-
-          ${transactionRows}
-
-        </tbody>
-
-      </table>
-
-    </div>
+    </table>
 
   </div>
 
@@ -852,9 +781,7 @@ td {
 
   </div>
 
-
 </div>
-
 
 </body>
 
