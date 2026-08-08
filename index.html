@@ -16734,94 +16734,73 @@ function initTransactionFilters() {
   end.addEventListener("input", trigger);
   status?.addEventListener("change", trigger);
 }
+	
 async function loadRecentTransactionsPage() {
-if (!state.branchId) {
-  recentData = [];
-  paginateRecentTransactions([]);
-  return;
-}
-
-const start = document.getElementById("startDate")?.value || "";
-const end = document.getElementById("endDate")?.value || "";
-const status = document.getElementById("statusFilter")?.value || "ALL";
-const cacheKey =
-JSON.stringify({
-  branchId: state.branchId,
-  role: state.user?.role,
-  start,
-  end,
-  status
-});
-
-
-
-if(
-state.recentTransactionsData &&
-state.recentTransactionsFilter === cacheKey
-){
-  recentData = state.recentTransactionsData;
-  recentCurrentPage = 1;
-  paginateRecentTransactions(recentData);
-  return;
-}
-
-try {
-
-
-  // ==================================
-  // SUPABASE QUERY (NANTI)
-  // ==================================
-
-  /*
-  
-  const {
-    data,
-    error
-  } =
-  await supabase
-  .from("Transaksi")
-  .select("*")
-  .eq(
-    "branchId",
-    state.branchId
-  )
-  .order(
-    "created_at",
-    {
-      ascending:false
-    }
-  );
-
-
-  if(error){
-    throw error;
+  if (!state.branchId) {
+    recentData = [];
+    paginateRecentTransactions([]);
+    return;
   }
+  const start =
+    document.getElementById("startDate")?.value || "";
+  const end =
+    document.getElementById("endDate")?.value || "";
+  const status =
+    document.getElementById("statusFilter")?.value || "ALL";
+  const table =
+    document.getElementById("tableFilter")?.value || "ALL";
+  const cacheKey =
+    JSON.stringify({
+      branchId: state.branchId,
+      role: state.user?.role,
+      start,
+      end,
+      status,
+      table
+    });
 
-
-  const transactions = data;
-
-
-  */
-
-  // ==================================
-  // TEMP DATA VERCEL
-  // ==================================
-      
-  const transactions = [];
-  recentData = transactions;
-  state.recentTransactionsData = transactions;
-  state.recentTransactionsFilter = cacheKey;
-  recentCurrentPage = 1;
-  paginateRecentTransactions(transactions);
-}
-catch(err){
- console.error(
-  "Recent transaction error:",
-  err
- );
-
-}
-
+  if (
+    state.recentTransactionsData &&
+    state.recentTransactionsFilter === cacheKey
+  ) {
+    recentData =
+      state.recentTransactionsData;
+    recentCurrentPage = 1;
+    paginateRecentTransactions(
+      recentData
+    );
+    return;
+  }
+  try {
+    const transactions =
+      await getRecentTransactionsPageRPC(
+        state.branchId,
+        start,
+        end,
+        status,
+        table
+      );
+    console.log(
+      "RECENT TRANSACTIONS RPC:",
+      transactions
+    );
+    recentData =
+      transactions || [];
+    state.recentTransactionsData =
+      recentData;
+    state.recentTransactionsFilter =
+      cacheKey;
+    recentCurrentPage = 1;
+    paginateRecentTransactions(
+      recentData
+    );
+  }
+  catch(err) {
+    console.error(
+      "Recent transaction error:",
+      err
+    );
+  }
 }
 
 async function initExportButton() {
@@ -16985,11 +16964,8 @@ document.addEventListener("click", function(e) {
     if (recentCurrentPage < maxPage) {
       recentCurrentPage++;
       paginateRecentTransactions(recentData);
-
     }
-
   }
-
 });
 
 
@@ -16998,68 +16974,67 @@ function formatCurrency(value) {
 }
 
 async function loadRecentTransactionSummary() {
-      const start = document.getElementById("startDate")?.value || "";
-      const end = document.getElementById("endDate")?.value || "";
-      const status = document.getElementById("statusFilter")?.value || "ALL";
-      const table =  document.getElementById("tableFilter")?.value || "ALL";
-      const branchId = state.branchId || "";
-      const role = state.user?.role || "user";
-      const cacheKey = JSON.stringify({ branchId, role, start, end, status, table });
-      
-      if(
-            state.recentSummaryData &&
-            state.recentSummaryFilter === cacheKey
-            ){
-            renderRecentTransactionSummary( state.recentSummaryData );
-            return;
-            }
-      
-      
-      
-      try {
-      
-      /*
-      
-      NANTI SUPABASE:
-      
-      const {data,error} =
-      await supabase.rpc(
-      "get_recent_transaction_summary",
-      {
-       p_branch_id: branchId,
-       p_start: start,
-       p_end: end,
-       p_status: status,
-       p_table: table
-      }
-      );
-      
-      
-      if(error) throw error;
-      
-      
-      const summary = data;
-      
-      */
-      
-      
-      
-      // TEMP DUMMY
-      
-            const summary = { total:0, revenue:0, cash:0, qris:0 };
-                  state.recentSummaryData = summary;
-                  state.recentSummaryFilter = cacheKey;
-            renderRecentTransactionSummary( summary );
-      }
-            catch(err){
-            console.error(
-            "Summary error:",
-            err
-            );
-            
-            }
-}
+  const start =
+    document.getElementById("startDate")?.value || "";
+  const end =
+    document.getElementById("endDate")?.value || "";
+  const status =
+    document.getElementById("statusFilter")?.value || "ALL";
+  const table =
+    document.getElementById("tableFilter")?.value || "ALL";
+  const branchId =
+    state.branchId || "";
+  const role =
+    state.user?.role || "user";
+  const cacheKey =
+    JSON.stringify({
+      branchId,
+      role,
+      start,
+      end,
+      status,
+      table
+    });
 
+  if (
+    state.recentSummaryData &&
+    state.recentSummaryFilter === cacheKey
+  ) {
+    renderRecentTransactionSummary(
+      state.recentSummaryData
+    );
+    return;
+  }
+
+  try {
+    const summary =
+      await getRecentTransactionSummaryRPC(
+        branchId,
+        start,
+        end,
+        status,
+        table
+      );
+
+    console.log(
+      "RECENT SUMMARY RPC:",
+      summary
+    );
+    state.recentSummaryData =
+      summary || {};
+    state.recentSummaryFilter =
+      cacheKey;
+    renderRecentTransactionSummary(
+      state.recentSummaryData
+    );
+  }
+  catch(err) {
+    console.error(
+      "Summary error:",
+      err
+    );
+  }
+}
 
 function renderRecentTransactionSummary(data) {
   document.getElementById(
