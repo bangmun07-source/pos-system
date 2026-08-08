@@ -344,6 +344,7 @@ async function getRewardsRPC(memberId, branchId) {
   }
   return data || [];
 }
+
 async function getOrdersRPC() {
   const {
     data,
@@ -384,6 +385,31 @@ async function checkMemberRPC(memberId) {
     throw error;
   }
   return data;
+}
+
+async function getMemberPageDataRPC(branchId) {
+
+  return await supabaseClient.rpc(
+    "get_member_page_data",
+    {
+      p_branch_id: branchId || "ALL"
+    }
+  ).then(({ data, error }) => {
+
+    if (error) {
+      console.error(
+        "get_member_page_data error:",
+        error
+      );
+
+      throw error;
+    }
+
+    return data || {
+      members: [],
+      settings: {}
+    };
+  });
 }
 
     // ===============================
