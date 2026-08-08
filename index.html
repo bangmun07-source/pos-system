@@ -17095,269 +17095,214 @@ function renderRecentTransactionSummary(data) {
       .toLocaleString("id-ID");
 }
 
-function initExportPDF() {
+async function exportRecentTransactions() {
 
-  const btn =
-    document.getElementById(
-      "memberExportPdfBtn"
+  const start =
+    document.getElementById("startDate")?.value || "";
+
+  const end =
+    document.getElementById("endDate")?.value || "";
+
+  const status =
+    document.getElementById("statusFilter")?.value || "ALL";
+
+  if (!start || !end) {
+    alert("Pilih tanggal dulu");
+    return;
+  }
+
+  const branchId =
+    state.branchId || "";
+
+  if (!branchId) {
+    alert("Branch belum tersedia");
+    return;
+  }
+
+  // =========================
+  // OPEN PDF / REPORT TAB
+  // =========================
+
+  const pdfWindow =
+    window.open("", "_blank");
+
+  if (!pdfWindow) {
+    alert("Popup diblokir browser");
+    return;
+  }
+
+  pdfWindow.document.write(`
+    <!DOCTYPE html>
+
+    <html>
+
+      <head>
+
+        <title>
+          Generating Report...
+        </title>
+
+        <style>
+
+          body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0B0F14;
+            color: white;
+            font-family: Arial, sans-serif;
+          }
+
+          .box {
+            text-align: center;
+          }
+
+          .loader {
+            width: 32px;
+            height: 32px;
+            border: 3px solid #ffffff33;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+            margin: 0 auto 20px;
+          }
+
+          @keyframes spin {
+            to {
+              transform: rotate(360deg);
+            }
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="box">
+
+          <div class="loader"></div>
+
+          <h2>
+            Generating Report...
+          </h2>
+
+          <p>
+            Please wait
+          </p>
+
+        </div>
+
+      </body>
+
+    </html>
+  `);
+
+  try {
+
+    // =========================
+    // CALL VERCEL API
+    // =========================
+
+    const response =
+      await fetch(
+        "/api/export-recent-transactions",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            start,
+            end,
+            status,
+            branchId
+
+          })
+        }
+      );
+
+    // =========================
+    // GET RESPONSE AS TEXT
+    // =========================
+
+    const text =
+      await response.text();
+
+    console.log(
+      "EXPORT API STATUS:",
+      response.status
     );
 
-  const tierSelect =
-    document.getElementById(
-      "tierFilter"
+    console.log(
+      "EXPORT API RESPONSE:",
+      text
     );
 
-  if (!btn) return;
+    // =========================
+    // SERVER ERROR
+    // =========================
 
-  btn.addEventListener(
-    "click",
-    async () => {
+    if (!response.ok) {
 
-      const tier =
-        tierSelect?.value || "ALL";
+      throw new Error(
+        text ||
+        "Export gagal"
+      );
 
-      const branchId =
-        state.branchId || "";
+    }
 
-      if (!branchId) {
-        alert(
-          "Branch belum tersedia"
-        );
-        return;
-      }
+    // =========================
+    // VALIDATE HTML
+    // =========================
 
-      // =========================
-      // OPEN REPORT TAB
-      // =========================
+    if (
+      !text ||
+      !text.trim()
+    ) {
 
-      const pdfWindow =
-        window.open(
-          "",
-          "_blank"
-        );
+      throw new Error(
+        "Response API kosong."
+      );
 
-      if (!pdfWindow) {
-        alert(
-          "Popup diblokir browser"
-        );
-        return;
-      }
+    }
 
-      // =========================
-      // LOADING PAGE
-      // =========================
+    // =========================
+    // WRITE REPORT
+    // =========================
+
+    pdfWindow.document.open();
+
+    pdfWindow.document.write(
+      text
+    );
+
+    pdfWindow.document.close();
+
+  }
+
+  catch (err) {
+
+    console.error(
+      "Export Recent Transactions:",
+      err
+    );
+
+    if (pdfWindow) {
+
+      pdfWindow.document.open();
 
       pdfWindow.document.write(`
+
         <!DOCTYPE html>
 
         <html>
-
-        <head>
-
-          <title>
-            Generating Member Report...
-          </title>
-
-          <style>
-
-            body {
-
-              margin: 0;
-
-              height: 100vh;
-
-              display: flex;
-
-              align-items: center;
-
-              justify-content: center;
-
-              background: #0B0F14;
-
-              color: white;
-
-              font-family:
-                Arial,
-                sans-serif;
-
-            }
-
-            .box {
-
-              text-align: center;
-
-            }
-
-            .loader {
-
-              width: 32px;
-
-              height: 32px;
-
-              border:
-                3px solid
-                #ffffff33;
-
-              border-top-color:
-                white;
-
-              border-radius:
-                50%;
-
-              animation:
-                spin .8s linear infinite;
-
-              margin:
-                0 auto 20px;
-
-            }
-
-            @keyframes spin {
-
-              to {
-                transform:
-                  rotate(360deg);
-              }
-
-            }
-
-          </style>
-
-        </head>
-
-        <body>
-
-          <div class="box">
-
-            <div class="loader"></div>
-
-            <h2>
-              Generating Member Report...
-            </h2>
-
-            <p>
-              Please wait
-            </p>
-
-          </div>
-
-        </body>
-
-        </html>
-      `);
-
-      try {
-
-        // =========================
-        // CALL VERCEL API
-        // =========================
-
-        const response =
-          await fetch(
-            "/api/export-members-pdf",
-            {
-              method: "POST",
-
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
-
-              body:
-                JSON.stringify({
-
-                  tier,
-
-                  branchId
-
-                })
-
-            }
-          );
-
-
-        // =========================
-        // GET RESPONSE
-        // =========================
-
-        const text =
-          await response.text();
-
-
-        console.log(
-          "EXPORT MEMBER API STATUS:",
-          response.status
-        );
-
-        console.log(
-          "EXPORT MEMBER API RESPONSE:",
-          text
-        );
-
-
-        // =========================
-        // SERVER ERROR
-        // =========================
-
-        if (!response.ok) {
-
-          throw new Error(
-            text ||
-            "Export member gagal"
-          );
-
-        }
-
-
-        // =========================
-        // VALIDATE HTML
-        // =========================
-
-        if (
-          !text ||
-          !text.trim()
-        ) {
-
-          throw new Error(
-            "Response API kosong."
-          );
-
-        }
-
-
-        // =========================
-        // WRITE REPORT
-        // =========================
-
-        pdfWindow.document.open();
-
-        pdfWindow.document.write(
-          text
-        );
-
-        pdfWindow.document.close();
-
-      }
-
-      catch (err) {
-
-        console.error(
-          "Export Member PDF:",
-          err
-        );
-
-
-        // =========================
-        // ERROR PAGE
-        // =========================
-
-        pdfWindow.document.open();
-
-        pdfWindow.document.write(`
-
-          <!DOCTYPE html>
-
-          <html>
 
           <head>
 
@@ -17368,25 +17313,14 @@ function initExportPDF() {
             <style>
 
               body {
-
-                font-family:
-                  Arial,
-                  sans-serif;
-
+                font-family: Arial;
                 padding: 40px;
-
-                background:
-                  #0B0F14;
-
+                background: #0B0F14;
                 color: white;
-
               }
 
               .error {
-
-                color:
-                  #ff6b6b;
-
+                color: #ff6b6b;
               }
 
             </style>
@@ -17396,29 +17330,26 @@ function initExportPDF() {
           <body>
 
             <h2 class="error">
-
-              Export Member Error
-
+              Export Error
             </h2>
 
             <p>
-
-              ${String(
-                err.message ||
-                err
-              )}
-
+              ${String(err.message || err)}
             </p>
+
           </body>
-          </html>
-        `);
-        pdfWindow.document.close();
-      }
+
+        </html>
+
+      `);
+
+      pdfWindow.document.close();
+
     }
-  );
+
+  }
+
 }
-
-
 
 function openTransactionModal(trxId) {
   // hapus modal lama
