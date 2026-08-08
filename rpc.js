@@ -507,22 +507,12 @@ async function searchMembersRPC(keyword, branchId) {
     throw error;
   }
 
-  return (data || []).map(m => ({
-    id:
-      m.id ||
-      m.ID_Member ||
-      m.id_member,
+  console.log(
+    "SEARCH RPC:",
+    data
+  );
 
-    nama:
-      m.nama ||
-      m.Nama ||
-      m.name,
-
-    level:
-      m.level ||
-      m.Level_Current ||
-      m.level_current
-  }));
+  return data || [];
 }
 
 
