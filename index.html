@@ -19391,6 +19391,15 @@ async function loadMembers(callback) {
       await getMemberPageDataRPC(
         state.branchId
       );
+	  console.log(
+  "MEMBER PAGE DATA:",
+  res
+);
+
+console.log(
+  "TOTAL MEMBERS:",
+  res?.members?.length
+);
     state.memberPageData =
       res;
     state.members =
