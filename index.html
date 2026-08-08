@@ -16427,86 +16427,51 @@ async function getDashboardCached(cb) {
 
 	
 async function loadDashboard() {
-	const cacheKey =
-	  JSON.stringify({
-	    branchId: state.branchId
-	  });
-	
-	if (
-	  state.dashboardData &&
-	  state.dashboardFilter === cacheKey
-	) {
-	      
-	  renderDashboard(
-	    state.dashboardData
-	  );
-	  return;
-	}
-	
-	try {
-	
-	
-	  // ==================================
-	  // SUPABASE QUERY (NANTI AKTIF)
-	  // ==================================
-	
-	  /*
-	  
-	  const {
-	    data,
-	    error
-	  } =
-	  await supabase.rpc(
-	    "get_dashboard_data",
-	    {
-	      p_branch_id:
-	        state.branchId
-	    }
-	  );
-	
-	
-	  if(error){
-	    throw error;
-	  }
-	
-	
-	  const dashboardData =
-	    data;
-	
-	
-	  */
-	
-	  // ==================================
-	  // TEMP DATA VERCEL
-	  // ==================================
-	
-	  const dashboardData = {
-	    revenue: 1000000,
-	    orders: 23,
-	    aov: 25040,
-	    occupancy: {occupied: 0,total: 0,percent: 0},
-	    recentTransactions: [],
-	    lowStock: [],
-	    shift: {
-	      pagi:{orders:0,revenue:0},
-	      siang:{orders:0,revenue:0},
-	      malam:{orders:0,revenue:0}
-	    }
-	  };
-	
-	  state.dashboardData = dashboardData;
-	  state.dashboardFilter = cacheKey;
-	      
-	  renderDashboard(
-	    dashboardData
-	  );
-	}
-	catch(err){
-	  console.error(
-	    "Dashboard error:",
-	    err
-	  );
-	}
+  const branchId =
+    state.branchId;
+  const cacheKey =
+    JSON.stringify({
+      branchId: branchId
+    });
+  if (
+    state.dashboardData &&
+    state.dashboardFilter === cacheKey
+  ) {
+    renderDashboard(
+      state.dashboardData
+    );
+    return;
+  }
+  if (!branchId) {
+    return;
+  }
+  try {
+    const dashboardData =
+      await getDashboardDataRPC(
+        branchId
+      );
+    console.log(
+      "DASHBOARD RPC RESULT:",
+      dashboardData
+    );
+    state.dashboardData =
+      dashboardData || {};
+    state.dashboardFilter =
+      cacheKey;
+    renderDashboard(
+      state.dashboardData
+    );
+  }
+  catch(err) {
+    console.error(
+      "Dashboard error:",
+      err
+    );
+    showToast(
+      "Gagal memuat dashboard",
+      "error"
+    );
+  }
 }
 
 function updateDateTime() {
@@ -18575,27 +18540,7 @@ async function sendTransaction(payload){
     if(btn){
       btn.disabled = true;
     }
-      
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data:res, error } =
-      await supabase.rpc(
-        "process_transaction",
-        {
-          p_payload: payload
-        }
-      );
-
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
+    // TEMP DATA SUPABASE
   	const res = await checkoutTransaction(payload);
     isProcessing = false;
     if(btn){
