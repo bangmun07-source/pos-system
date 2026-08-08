@@ -116,19 +116,6 @@ async function getRecentTransactionSummaryRPC( branchId, startDate, endDate, sta
   return data || {};
 }
 
-async function getRecentTransactionsPageRPC( branchId, startDate, endDate, status, table  ) {
-  return await supabaseClient.rpc(
-    "get_recent_transactions_page",
-    {
-      p_branch_id: branchId,
-      p_start: start || null,
-      p_end: end || null,
-      p_status: status || "ALL",
-      p_table: "ALL"
-    }
-  );
-}
-
 async function getReceiptDataRPC(trxId) {
   const { data, error } =
     await supabaseClient.rpc(
