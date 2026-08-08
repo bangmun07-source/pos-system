@@ -1,75 +1,107 @@
-async function exportRecentTransactions() {
-  const start =
-    document.getElementById("startDate")?.value;
 
-  const end =
-    document.getElementById("endDate")?.value;
+import { createClient } from "@supabase/supabase-js";
 
-  const status =
-    document.getElementById("statusFilter")?.value || "ALL";
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-  if (!start || !end) {
-    alert("Pilih tanggal dulu");
-    return;
+export default async function handler(req, res) {
+
+  if (req.method !== "POST") {
+    return res.status(405).send("Method not allowed");
   }
-
-  const pdfWindow = window.open("", "_blank");
-
-  if (!pdfWindow) {
-    alert("Popup diblokir browser");
-    return;
-  }
-
-  pdfWindow.document.write(`
-    <html>
-      <body style="font-family:Arial;padding:40px">
-        <h2>Generating PDF...</h2>
-      </body>
-    </html>
-  `);
 
   try {
 
-    const response =
-      await fetch("/api/export-recent-transactions", {
-        method: "POST",
+    const {
+      start,
+      end,
+      status = "ALL",
+      branchId
+    } = req.body;
 
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-          start,
-          end,
-          status,
-          branchId: state.branchId
-        })
-      });
-
-    if (!response.ok) {
-      throw new Error(
-        await response.text()
+    if (!branchId) {
+      return res.status(400).send(
+        "branchId wajib diisi"
       );
     }
 
-    const html =
-      await response.text();
+    // =========================
+    // GET TRANSACTIONS
+    // =========================
 
-    pdfWindow.document.open();
-    pdfWindow.document.write(html);
-    pdfWindow.document.close();
+    const {
+      data: transactions,
+      error: trxError
+    } = await supabase.rpc(
+      "get_recent_transactions_page",
+      {
+        p_branch_id: branchId,
+        p_start: start || null,
+        p_end: end || null,
+        p_status: status,
+        p_table: "ALL"
+      }
+    );
+
+    if (trxError) {
+      throw trxError;
+    }
+
+    // =========================
+    // GET SUMMARY
+    // =========================
+
+    const {
+      data: summary,
+      error: summaryError
+    } = await supabase.rpc(
+      "get_recent_transaction_summary",
+      {
+        p_branch_id: branchId,
+        p_start: start || null,
+        p_end: end || null,
+        p_status: status,
+        p_table: "ALL"
+      }
+    );
+
+    if (summaryError) {
+      throw summaryError;
+    }
+
+    console.log(
+      "EXPORT TRANSACTIONS:",
+      transactions
+    );
+
+    console.log(
+      "EXPORT SUMMARY:",
+      summary
+    );
+
+    return res.status(200).json({
+      success: true,
+      transactions,
+      summary
+    });
 
   }
   catch (err) {
 
     console.error(
-      "Export Recent Transactions:",
+      "EXPORT RECENT TRANSACTIONS ERROR:",
       err
     );
 
-    pdfWindow.document.body.innerHTML = `
-      <h2>Export Error</h2>
-      <p>${err.message}</p>
-    `;
+    return res.status(500).json({
+      success: false,
+      error:
+        err.message ||
+        "Export gagal"
+    });
   }
 }
+
+
