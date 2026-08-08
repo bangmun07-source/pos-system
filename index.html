@@ -18739,20 +18739,15 @@ function filterProducts(category) {
 
 
 function renderCart() {
-  
   const container = document.getElementById("cart-items");
   if (!container) return;
-
   container.innerHTML = "";
-
   let subtotal = 0;
-
   if (state.cart.length === 0) {
     container.innerHTML = "<p class='text-slate-500 text-sm'>Cart kosong</p>";
     updateSummary(0);
     return;
   }
-
   state.cart.forEach((item, index) => {
     subtotal += item.price * item.qty;
     const label = item.isRedeem ? "(REDEEM)" : "";
