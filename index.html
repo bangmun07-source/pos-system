@@ -20931,6 +20931,97 @@ function enableEditMember() {
   }
 }
 
+async function saveMemberEdit() {
+	
+  const modal =
+    document.querySelector(
+      "[data-member-modal]"
+    );
+  if (!modal || !editingMember) {
+    return;
+  }
+  const payload = {
+    ...editingMember,
+    Nama:
+      document.querySelector(
+        "#edit-memberName"
+      ).value,
+    WA:
+      document.querySelector(
+        "#edit-whatsapp"
+      ).value,
+    Address:
+      document.querySelector(
+        "#edit-address"
+      ).value,
+    Tgl_Lahir:
+      document.querySelector(
+        "#edit-birthday"
+      ).value,
+    Join_Date:
+      document.querySelector(
+        "#edit-joinDate"
+      ).value,
+    PhotoBase64:
+      memberPhotoBase64,
+    branchId:
+      state.branchId
+  };
+
+  try {
+
+    console.log(
+      "UPDATE MEMBER PAYLOAD:",
+      payload
+    );
+
+    const res =
+      await updateMemberRPC(
+        payload
+      );
+
+    console.log(
+      "UPDATE MEMBER RESULT:",
+      res
+    );
+
+    if (!res) {
+      throw new Error(
+        "Backend mengembalikan data kosong"
+      );
+    }
+
+    if (res.success === false) {
+      throw new Error(
+        res.message ||
+        "Gagal update member"
+      );
+    }
+
+    showToast(
+      "Member berhasil diperbarui ✔",
+      "success"
+    );
+
+    // Clear cache member
+    state.memberPageData = null;
+    state.members = null;
+    closeMemberProfile();
+    await loadMembers();
+
+  } catch (err) {
+    console.error(
+      "Update Member:",
+      err
+    );
+    showToast(
+      err.message ||
+      "Gagal update member",
+      "error"
+    );
+  }
+}
+
 function renderTierProgression(history = []) {
 
   const el =
