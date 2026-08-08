@@ -1,4 +1,3 @@
-
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -6,8 +5,6 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-
-// HELPERS
 const logoSrc =
   `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
 
@@ -24,12 +21,12 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-
-// API
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-    return res.status(405).send("Method not allowed");
+    return res
+      .status(405)
+      .send("Method not allowed");
   }
 
   try {
@@ -40,23 +37,18 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     if (!branchId) {
-      return res.status(400).send(
-        "branchId wajib diisi"
-      );
+      return res
+        .status(400)
+        .send("branchId wajib diisi");
     }
 
     // =========================
-    // GET MEMBERS
+    // GET SEMUA MEMBER
     // =========================
-
-    /*
-      GANTI NAMA RPC DI BAWAH INI
-      jika RPC member kamu memiliki nama berbeda.
-    */
 
     const {
       data: members,
-      error: memberError
+      error
     } = await supabase.rpc(
       "get_members",
       {
@@ -64,13 +56,13 @@ export default async function handler(req, res) {
       }
     );
 
-    if (memberError) {
-      throw memberError;
+    if (error) {
+      throw error;
     }
 
     console.log(
       "EXPORT MEMBERS:",
-      members
+      members?.length
     );
 
     // =========================
@@ -98,13 +90,18 @@ export default async function handler(req, res) {
       tier.toUpperCase() !== "ALL"
     ) {
 
-      rows = rows.filter(row =>
-        String(row.tier || "")
+      rows = rows.filter(r =>
+        String(r.tier || "")
           .toUpperCase() ===
         tier.toUpperCase()
       );
 
     }
+
+    console.log(
+      "EXPORT MEMBER ROWS:",
+      rows.length
+    );
 
     // =========================
     // SUMMARY
@@ -114,16 +111,16 @@ export default async function handler(req, res) {
       rows.length;
 
     const totalRindu =
-      rows.filter(row =>
-        String(row.tier || "")
+      rows.filter(r =>
+        String(r.tier || "")
           .toUpperCase() === "RINDU"
       ).length;
 
     const totalPoints =
       rows.reduce(
-        (sum, row) =>
+        (sum, r) =>
           sum +
-          Number(row.points || 0),
+          Number(r.points || 0),
         0
       );
 
@@ -133,31 +130,32 @@ export default async function handler(req, res) {
 
     const memberRows =
       rows.length
-        ? rows.map(member => `
+
+        ? rows.map(m => `
             <tr>
 
               <td>
-                ${escapeHtml(member.id)}
+                ${escapeHtml(m.id)}
               </td>
 
               <td>
-                ${escapeHtml(member.name)}
+                ${escapeHtml(m.name)}
               </td>
 
               <td>
-                ${escapeHtml(member.tier)}
+                ${escapeHtml(m.tier)}
               </td>
 
               <td class="right">
-                Rp ${rupiah(member.spend)}
+                Rp ${rupiah(m.spend)}
               </td>
 
               <td class="right">
-                ${rupiah(member.points)}
+                ${rupiah(m.points)}
               </td>
 
               <td>
-                ${escapeHtml(member.wa)}
+                ${escapeHtml(m.wa)}
               </td>
 
             </tr>
@@ -180,6 +178,7 @@ export default async function handler(req, res) {
 
     const html = `
 <!DOCTYPE html>
+
 <html>
 
 <head>
@@ -196,327 +195,156 @@ Member Directory Report
   box-sizing: border-box;
 }
 
-html,
 body {
   margin: 0;
-  padding: 0;
-}
-
-body {
-
+  padding: 40px 20px;
   background: #0B0F14;
-
-  font-family:
-    Arial,
-    sans-serif;
-
+  font-family: Arial, sans-serif;
   color: #333;
-
-  padding:
-    40px 20px;
 }
-
-/* =========================
-   TOOLBAR
-========================= */
 
 .export-toolbar {
-
   width: 100%;
-
   max-width: 1100px;
-
-  margin:
-    0 auto 20px auto;
-
+  margin: 0 auto 20px;
   display: flex;
-
-  justify-content:
-    space-between;
-
+  justify-content: space-between;
   align-items: center;
-
   color: white;
-
-  font-size: 14px;
 }
 
 .export-toolbar button {
-
-  border:
-    1px solid
-    rgba(255,255,255,.15);
-
-  background:
-    rgba(255,255,255,.08);
-
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.08);
   color: white;
-
-  padding:
-    10px 16px;
-
-  border-radius:
-    10px;
-
+  padding: 10px 16px;
+  border-radius: 10px;
   cursor: pointer;
-
-  font-weight:
-    bold;
+  font-weight: bold;
 }
-
-/* =========================
-   REPORT
-========================= */
 
 .report {
-
   width: 100%;
-
   max-width: 1100px;
-
-  margin: 0 auto;
-
+  margin: auto;
   background: white;
-
   padding: 45px;
-
   border-radius: 4px;
-
-  box-shadow:
-    0 20px 60px
-    rgba(0,0,0,.45);
 }
 
-/* =========================
-   HEADER
-========================= */
-
 .header {
-
   text-align: center;
-
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
 
 .logo {
-
   width: 170px;
-
-  height: auto;
-
   max-height: 90px;
-
   object-fit: contain;
-
-  margin-bottom: 8px;
 }
 
-/* =========================
-   TITLE
-========================= */
-
 .title {
-
-  font-size: 22px;
-
+  font-size: 24px;
   font-weight: bold;
-
   margin-bottom: 8px;
 }
 
 .subtitle {
-
   font-size: 12px;
-
   color: #777;
+  margin-bottom: 3px;
 }
 
-/* =========================
-   SUMMARY
-========================= */
-
-.summary-grid {
-
+.kpi-grid {
   display: grid;
-
   grid-template-columns:
     repeat(3, 1fr);
-
-  gap: 14px;
-
-  margin-top: 25px;
-
-  margin-bottom: 25px;
+  gap: 16px;
+  margin: 30px 0;
 }
 
-.summary-card {
-
-  border:
-    1px solid #eee;
-
-  border-radius:
-    14px;
-
-  padding: 18px;
-
-  background:
-    #fff;
+.kpi-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  padding: 22px;
+  background: #fafafa;
+  text-align: center;
 }
 
-.summary-label {
-
+.kpi-title {
   font-size: 11px;
-
-  color: #777;
-
-  margin-bottom: 8px;
-}
-
-.summary-value {
-
-  font-size: 28px;
-
+  color: #666;
   font-weight: bold;
-
-  color: #222;
+  margin-bottom: 12px;
 }
 
-/* =========================
-   CARD
-========================= */
-
-.section {
-
-  margin-top: 25px;
+.kpi-value {
+  font-size: 22px;
+  font-weight: bold;
 }
 
 .card {
-
-  border:
-    1px solid #eee;
-
-  border-radius:
-    14px;
-
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
   padding: 18px;
-
-  width: 100%;
-
-  box-sizing: border-box;
-
-  background: #fff;
+  margin-top: 20px;
 }
 
 .card h3 {
-
   margin-top: 0;
-
-  margin-bottom: 5px;
-
   font-size: 16px;
 }
 
-/* =========================
-   TABLE
-========================= */
-
 table {
-
   width: 100%;
-
-  border-collapse:
-    collapse;
-
+  border-collapse: collapse;
   font-size: 11px;
-
-  margin-top: 15px;
+  margin-top: 10px;
 }
 
 th {
-
-  background:
-    #f5f5f5;
-
+  background: #f5f5f5;
   padding: 10px;
-
   text-align: left;
-
-  font-weight: bold;
 }
 
 td {
-
-  padding:
-    12px 10px;
-
-  border-bottom:
-    1px solid #eee;
+  padding: 10px;
+  border-bottom: 1px solid #eee;
 }
 
 .right {
-
   text-align: right;
 }
 
 .empty {
-
   text-align: center;
-
   color: #777;
-
   padding: 25px;
 }
 
-/* =========================
-   FOOTER
-========================= */
-
 .footer {
-
-  max-width: 1100px;
-
-  margin:
-    40px auto 0;
-
-  font-size: 9px;
-
+  margin-top: 40px;
   text-align: center;
-
+  font-size: 9px;
   color: #888;
 }
-
-/* =========================
-   PRINT
-========================= */
 
 @media print {
 
   body {
-
     background: white;
-
     padding: 0;
   }
 
   .export-toolbar {
-
     display: none;
   }
 
   .report {
-
     max-width: none;
-
     box-shadow: none;
-
     border-radius: 0;
-
-    padding: 25px;
-  }
-
-  .footer {
-
-    margin-top: 30px;
   }
 
 }
@@ -527,194 +355,132 @@ td {
 
 <body>
 
-<!-- TOOLBAR -->
-
 <div class="export-toolbar">
 
   <div>
     📄 Member Directory Report
   </div>
 
-  <button
-    onclick="window.print()">
-
+  <button onclick="window.print()">
     Download / Print PDF
-
   </button>
 
 </div>
 
-
-<!-- REPORT -->
-
 <div class="report">
-
-  <!-- LOGO -->
 
   <div class="header">
 
-    ${
-      logoSrc
-        ? `
-          <img
-            src="${logoSrc}"
-            class="logo"
-            alt="Sistem POS"
-          />
-        `
-        : ""
-    }
+    <img
+      src="${logoSrc}"
+      class="logo"
+      alt="Sistem POS"
+    >
 
   </div>
-
-
-  <!-- TITLE -->
 
   <div class="title">
-
     Member Directory Report
-
-  </div>
-
-
-  <div class="subtitle">
-
-    Tier Member:
-    ${escapeHtml(tier)}
-
   </div>
 
   <div class="subtitle">
-
     Branch:
     ${escapeHtml(branchId)}
-
   </div>
 
+  <div class="subtitle">
+    Tier:
+    ${escapeHtml(tier)}
+  </div>
 
-  <!-- SUMMARY -->
+  <div class="kpi-grid">
 
-  <div class="summary-grid">
+    <div class="kpi-card">
 
-    <div class="summary-card">
-
-      <div class="summary-label">
-        Total Members
+      <div class="kpi-title">
+        TOTAL MEMBERS
       </div>
 
-      <div class="summary-value">
-
+      <div class="kpi-value">
         ${rupiah(totalMembers)}
-
       </div>
 
     </div>
 
+    <div class="kpi-card">
 
-    <div class="summary-card">
-
-      <div class="summary-label">
-        Rindu Tier
+      <div class="kpi-title">
+        RINDU TIER
       </div>
 
-      <div class="summary-value">
-
+      <div class="kpi-value">
         ${rupiah(totalRindu)}
-
       </div>
 
     </div>
 
+    <div class="kpi-card">
 
-    <div class="summary-card">
-
-      <div class="summary-label">
-        Points Issued
+      <div class="kpi-title">
+        POINTS ISSUED
       </div>
 
-      <div class="summary-value">
-
+      <div class="kpi-value">
         ${rupiah(totalPoints)}
-
       </div>
 
     </div>
 
   </div>
 
+  <div class="card">
 
-  <!-- MEMBER DIRECTORY -->
+    <h3>
+      Member Directory
+    </h3>
 
-  <div class="section">
+    <table>
 
-    <div class="card">
+      <thead>
 
-      <h3>
-        Member Directory
-      </h3>
+        <tr>
 
-      <div class="subtitle">
+          <th>ID</th>
 
-        ${rows.length}
-        member(s)
+          <th>Name</th>
 
-      </div>
+          <th>Tier</th>
 
+          <th class="right">
+            Spend
+          </th>
 
-      <table>
+          <th class="right">
+            Points
+          </th>
 
-        <thead>
+          <th>
+            WhatsApp
+          </th>
 
-          <tr>
+        </tr>
 
-            <th>
-              ID
-            </th>
+      </thead>
 
-            <th>
-              Name
-            </th>
+      <tbody>
 
-            <th>
-              Tier
-            </th>
+        ${memberRows}
 
-            <th class="right">
-              Spend
-            </th>
+      </tbody>
 
-            <th class="right">
-              Points
-            </th>
-
-            <th>
-              WA
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody>
-
-          ${memberRows}
-
-        </tbody>
-
-      </table>
-
-    </div>
+    </table>
 
   </div>
-
-
-  <!-- FOOTER -->
 
   <div class="footer">
 
     Generated by Sistem POS
-    •
-    ${new Date().toLocaleString("id-ID")}
+    • ${new Date().toLocaleString("id-ID")}
 
   </div>
 
@@ -725,49 +491,27 @@ td {
 </html>
 `;
 
-    // =========================
-    // RETURN HTML
-    // =========================
-
-    res.setHeader(
-      "Content-Type",
-      "text/html; charset=utf-8"
-    );
-
     return res
       .status(200)
       .send(html);
 
   }
-
   catch (err) {
 
     console.error(
-      "EXPORT MEMBERS PDF ERROR:",
+      "EXPORT MEMBERS ERROR:",
       err
     );
 
-    console.error(
-      "ERROR MESSAGE:",
-      err?.message
-    );
-
-    console.error(
-      "ERROR STACK:",
-      err?.stack
-    );
-
-    return res.status(500).json({
-
-      success: false,
-
-      error:
-        err?.message ||
-        "Export member gagal"
-
-    });
+    return res
+      .status(500)
+      .json({
+        success: false,
+        error:
+          err?.message ||
+          "Export member gagal"
+      });
 
   }
 
 }
-
