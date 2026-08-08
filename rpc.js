@@ -752,6 +752,65 @@ async function addMemberRPC(data) {
   return result;
 }
 
+async function updateMemberRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_member",
+    {
+      p_id_member:
+        data.ID_Member,
+      p_nama:
+        data.Nama,
+      p_tgl_lahir:
+        data.Tgl_Lahir,
+      p_wa:
+        data.WA,
+      p_email:
+        data.Email,
+      p_total_spend:
+        String(data.Total_Spend || "0"),
+      p_level_current:
+        data.Level_Current || "",
+      p_point:
+        String(data.Point || "0"),
+      p_level_season:
+        data.Level_Season_Terakhir || "",
+      p_instagram:
+        data.Instagram || "",
+      p_facebook:
+        data.Facebook || "",
+      p_tiktok:
+        data.TikTok || "",
+      p_address:
+        data.Address || "",
+      p_join_date:
+        data.Join_Date || "",
+      p_photo:
+        data.Photo ||
+        data.PhotoBase64 ||
+        "",
+      p_branch_id:
+        data.branchId || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_member error:",
+      error
+    );
+    throw error;
+  }
+  console.log(
+    "UPDATE MEMBER RPC:",
+    result
+  );
+  return result;
+}
+
 
 
     // ===============================
