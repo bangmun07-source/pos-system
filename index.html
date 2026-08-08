@@ -17473,7 +17473,6 @@ async function sendReceiptWhatsapp() {
       try {
 		  
 		      const trx = await getReceiptDataRPC(trxId);
-		
 				if (!trx) {
 				  alert("Transaksi tidak ditemukan");
 				  return;
