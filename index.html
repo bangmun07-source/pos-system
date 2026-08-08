@@ -17050,118 +17050,234 @@ function renderRecentTransactionSummary(data) {
       .toLocaleString("id-ID");
 }
 
-
 async function exportRecentTransactions() {
+
+  // ============================================
+  // GET FILTER
+  // ============================================
+
   const start =
     document.getElementById("startDate")?.value || "";
+
   const end =
     document.getElementById("endDate")?.value || "";
+
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
+
   const branchId =
     state.branchId || "";
 
-  // VALIDASI
+
+  // ============================================
+  // VALIDATION
+  // ============================================
+
+  if (!branchId) {
+
+    alert(
+      "Branch belum tersedia"
+    );
+
+    return;
+  }
+
 
   if (!start || !end) {
-    alert("Pilih tanggal dulu");
-    return;
-  }
-  if (!branchId) {
-    alert("Branch belum tersedia");
+
+    alert(
+      "Pilih tanggal terlebih dahulu"
+    );
+
     return;
   }
 
-  // BUKA TAB DULU
-  // AGAR TIDAK KENA POPUP BLOCKER
+
+  // ============================================
+  // OPEN TAB FIRST
+  // Supaya tidak kena popup blocker
+  // ============================================
+
   const pdfWindow =
-    window.open("", "_blank");
+    window.open(
+      "",
+      "_blank"
+    );
+
 
   if (!pdfWindow) {
-    alert("Popup diblokir browser");
+
+    alert(
+      "Popup diblokir browser. Izinkan popup untuk export PDF."
+    );
+
     return;
   }
 
-  // LOADING PAGE
+
+  // ============================================
+  // TEMPORARY LOADING PAGE
+  // ============================================
+
   pdfWindow.document.open();
+
   pdfWindow.document.write(`
+
     <!DOCTYPE html>
+
     <html>
+
       <head>
+
+        <meta charset="UTF-8">
+
         <title>
-          Generating PDF...
+          Generating Report...
         </title>
+
         <style>
+
           * {
             box-sizing: border-box;
           }
 
-          html,
           body {
-            margin: 0;
-            width: 100%;
-            height: 100%;
-          }
 
-          body {
+            margin: 0;
+
+            min-height: 100vh;
+
             display: flex;
-            justify-content: center;
+
             align-items: center;
+
+            justify-content: center;
+
             background: #0B0F14;
+
             color: white;
+
             font-family:
               Arial,
+              Helvetica,
               sans-serif;
+
           }
+
           .box {
+
             text-align: center;
+
           }
+
           .spinner {
+
             width: 42px;
+
             height: 42px;
-            margin: 0 auto 20px;
-            border: 4px solid
+
+            border:
+              4px solid
               rgba(255,255,255,.15);
+
             border-top-color:
               white;
+
             border-radius: 50%;
+
             animation:
               spin .8s linear infinite;
+
+            margin:
+              0 auto 20px;
+
           }
 
           h2 {
+
             margin: 0 0 8px;
+
             font-size: 20px;
+
           }
+
           p {
+
             margin: 0;
-            color: #94a3b8;
+
+            color:
+              rgba(255,255,255,.6);
+
             font-size: 13px;
+
           }
+
           @keyframes spin {
+
             to {
-              transform: rotate(360deg);
+              transform:
+                rotate(360deg);
             }
+
           }
+
         </style>
+
       </head>
 
+
       <body>
+
         <div class="box">
+
           <div class="spinner"></div>
+
           <h2>
-            Generating PDF...
+            Generating Report...
           </h2>
+
           <p>
             Please wait...
           </p>
+
         </div>
+
       </body>
+
     </html>
+
   `);
+
   pdfWindow.document.close();
 
-  // CALL VERCEL API
+
+  // ============================================
+  // DISABLE BUTTON
+  // ============================================
+
+  const exportBtn =
+    document.getElementById(
+      "exportBtn"
+    );
+
+  const originalText =
+    exportBtn?.innerText || "";
+
+
+  if (exportBtn) {
+
+    exportBtn.disabled = true;
+
+    exportBtn.innerText =
+      "Generating...";
+
+    exportBtn.style.opacity =
+      "0.6";
+
+    exportBtn.style.pointerEvents =
+      "none";
+  }
+
 
   try {
 
@@ -17169,13 +17285,30 @@ async function exportRecentTransactions() {
       "EXPORT RECENT TRANSACTIONS"
     );
 
-    console.log({
-      start,
-      end,
-      status,
+    console.log(
+      "branchId:",
       branchId
-    });
+    );
 
+    console.log(
+      "start:",
+      start
+    );
+
+    console.log(
+      "end:",
+      end
+    );
+
+    console.log(
+      "status:",
+      status
+    );
+
+
+    // ============================================
+    // CALL VERCEL API
+    // ============================================
 
     const response =
       await fetch(
@@ -17194,10 +17327,17 @@ async function exportRecentTransactions() {
           body:
             JSON.stringify({
 
-              start,
-              end,
-              status,
-              branchId
+              start:
+                start,
+
+              end:
+                end,
+
+              status:
+                status,
+
+              branchId:
+                branchId
 
             })
 
@@ -17205,125 +17345,318 @@ async function exportRecentTransactions() {
       );
 
 
-    // =========================
-    // CEK RESPONSE
-
+    // ============================================
+    // HANDLE HTTP ERROR
+    // ============================================
 
     if (!response.ok) {
 
-      const errorText =
-        await response.text();
+      let errorMessage =
+        "Export gagal";
+
+      try {
+
+        const contentType =
+          response.headers
+            .get("content-type") || "";
+
+        if (
+          contentType.includes(
+            "application/json"
+          )
+        ) {
+
+          const errorData =
+            await response.json();
+
+          errorMessage =
+            errorData?.error ||
+            errorData?.message ||
+            errorMessage;
+
+        }
+
+        else {
+
+          const text =
+            await response.text();
+
+          if (text) {
+            errorMessage =
+              text;
+          }
+
+        }
+
+      }
+
+      catch (parseError) {
+
+        console.error(
+          "Error parsing API error:",
+          parseError
+        );
+
+      }
+
 
       throw new Error(
-        errorText ||
-        `HTTP ${response.status}`
+        errorMessage
       );
+
     }
 
 
-    // API MENGEMBALIKAN HTML
+    // ============================================
+    // GET HTML REPORT
+    // ============================================
+
     const html =
       await response.text();
+
+
     if (!html) {
+
       throw new Error(
-        "Server mengembalikan response kosong"
+        "Server mengembalikan report kosong"
       );
+
     }
 
-    // =========================
-    // TAMPILKAN PDF VIEWER
-    // =========================
+
+    console.log(
+      "EXPORT HTML RECEIVED:",
+      html.length,
+      "characters"
+    );
+
+
+    // ============================================
+    // WRITE REPORT TO NEW TAB
+    // ============================================
+
     pdfWindow.document.open();
+
     pdfWindow.document.write(
       html
     );
+
     pdfWindow.document.close();
 
+
+    // ============================================
+    // SUCCESS
+    // ============================================
+
+    console.log(
+      "Export Recent Transactions berhasil"
+    );
+
   }
+
   catch (err) {
+
     console.error(
       "Export Recent Transactions:",
       err
     );
 
-    // =========================
-    // TAMPILKAN ERROR DI TAB PDF
-    // =========================
-    try {
+
+    // ============================================
+    // SHOW ERROR IN PDF TAB
+    // ============================================
+
+    if (
+      pdfWindow &&
+      !pdfWindow.closed
+    ) {
+
       pdfWindow.document.open();
+
       pdfWindow.document.write(`
+
         <!DOCTYPE html>
+
         <html>
+
           <head>
+
+            <meta charset="UTF-8">
+
             <title>
               Export Error
             </title>
+
             <style>
+
               body {
+
                 margin: 0;
+
                 min-height: 100vh;
+
                 display: flex;
-                justify-content: center;
+
                 align-items: center;
+
+                justify-content: center;
+
                 background: #0B0F14;
+
                 color: white;
+
                 font-family:
                   Arial,
+                  Helvetica,
                   sans-serif;
+
               }
 
-              .error {
+              .error-box {
+
                 max-width: 600px;
+
                 padding: 30px;
+
                 text-align: center;
+
               }
+
+              .icon {
+
+                font-size: 50px;
+
+                margin-bottom: 20px;
+
+              }
+
               h2 {
-                color: #f87171;
-                margin-bottom: 15px;
+
+                margin:
+                  0 0 12px;
+
+                color:
+                  #ff6b6b;
+
               }
+
               p {
-                color: #cbd5e1;
-                word-break: break-word;
-                line-height: 1.6;
+
+                color:
+                  rgba(255,255,255,.65);
+
+                line-height:
+                  1.6;
+
+                word-break:
+                  break-word;
+
               }
 
               button {
+
                 margin-top: 20px;
-                padding: 10px 18px;
-                border: 0;
-                border-radius: 8px;
+
+                padding:
+                  10px 18px;
+
+                border: none;
+
+                border-radius:
+                  8px;
+
                 cursor: pointer;
+
+                font-weight: bold;
+
               }
+
             </style>
+
           </head>
+
+
           <body>
-            <div class="error">
+
+            <div class="error-box">
+
+              <div class="icon">
+                ⚠️
+              </div>
+
               <h2>
                 Export Error
               </h2>
+
               <p>
-                ${String(err.message || err)}
+                ${String(
+                  err?.message ||
+                  "Terjadi kesalahan saat membuat report"
+                )
+                .replace(
+                  /</g,
+                  "&lt;"
+                )
+                .replace(
+                  />/g,
+                  "&gt;"
+                )}
               </p>
+
               <button
                 onclick="window.close()"
               >
                 Close
               </button>
+
             </div>
+
           </body>
+
         </html>
 
       `);
 
       pdfWindow.document.close();
+
     }
-    catch (displayError) {
-      console.error(
-        "Failed displaying export error:",
-        displayError
+
+    else {
+
+      alert(
+        err?.message ||
+        "Export gagal"
       );
+
     }
+
   }
+
+  finally {
+
+    // ============================================
+    // RESTORE BUTTON
+    // ============================================
+
+    if (exportBtn) {
+
+      exportBtn.disabled =
+        false;
+
+      exportBtn.innerText =
+        originalText ||
+        "Export";
+
+      exportBtn.style.opacity =
+        "";
+
+      exportBtn.style.pointerEvents =
+        "";
+
+    }
+
+  }
+
 }
 
 function openTransactionModal(trxId) {
