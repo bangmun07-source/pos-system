@@ -26336,14 +26336,23 @@ function renderTopSellingItems(items){
   });
 }
 
-document.addEventListener("click", function(e){
-  const btn = e.target.closest("#btnExportAnalyticsPDF");
-  if(btn){
-    exportAnalyticsPDF();
-  }
-});
+document.addEventListener(
+  "click",
+  function(e) {
 
-  
+    const btn =
+      e.target.closest(
+        "#btnExportAnalyticsPDF"
+      );
+
+    if (!btn) return;
+
+    exportAnalyticsPDF();
+
+  }
+);
+
+
 async function exportAnalyticsPDF() {
 
   const start =
@@ -26359,77 +26368,150 @@ async function exportAnalyticsPDF() {
   const branchId =
     state.branchId;
 
+
   // =========================
   // VALIDASI
   // =========================
 
   if (!start || !end) {
-    alert("Pilih tanggal dulu");
+
+    alert(
+      "Pilih tanggal dulu"
+    );
+
     return;
+
   }
+
 
   if (!branchId) {
-    alert("Branch tidak valid");
+
+    alert(
+      "Branch tidak valid"
+    );
+
     return;
+
   }
 
+
   // =========================
-  // OPEN WINDOW
+  // OPEN TAB
   // =========================
 
-  const win =
-    window.open("", "_blank");
+  const pdfTab =
+    window.open(
+      "",
+      "_blank"
+    );
 
-  if (!win) {
+
+  if (!pdfTab) {
+
     alert(
       "Popup diblokir browser"
     );
+
     return;
+
   }
 
+
   // =========================
-  // LOADING
+  // LOADING PAGE
   // =========================
 
-  win.document.write(`
+  pdfTab.document.write(`
+    <!DOCTYPE html>
+
     <html>
 
-      <body style="
-        background:#0B0F14;
-        color:white;
-        font-family:Arial;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
-        margin:0;
-      ">
+    <head>
 
-        <div style="
+      <title>
+        Analytics Report
+      </title>
+
+      <style>
+
+        body {
+
+          background:#0B0F14;
+
+          color:white;
+
+          font-family:Arial;
+
+          display:flex;
+
+          align-items:center;
+
+          justify-content:center;
+
+          height:100vh;
+
+          margin:0;
+
+        }
+
+        .loading {
+
           text-align:center;
-        ">
 
-          <div style="
-            font-size:18px;
-            font-weight:bold;
-            margin-bottom:8px;
-          ">
-            Analytics Report
-          </div>
+        }
 
-          <div style="
-            font-size:13px;
-            opacity:.7;
-          ">
-            Generating PDF...
-          </div>
+        .title {
+
+          font-size:18px;
+
+          font-weight:bold;
+
+          margin-bottom:8px;
+
+        }
+
+        .subtitle {
+
+          font-size:13px;
+
+          opacity:.7;
+
+        }
+
+      </style>
+
+    </head>
+
+
+    <body>
+
+      <div class="loading">
+
+        <div class="title">
+
+          Analytics Report
 
         </div>
 
-      </body>
+        <div class="subtitle">
+
+          Generating PDF...
+
+        </div>
+
+      </div>
+
+    </body>
 
     </html>
   `);
+
+  pdfTab.document.close();
+
+
+  // =========================
+  // CALL VERCEL API
+  // =========================
 
   try {
 
@@ -26442,31 +26524,37 @@ async function exportAnalyticsPDF() {
       }
     );
 
-    // =========================
-    // CALL VERCEL API
-    // =========================
 
     const response =
       await fetch(
         "/api/export-analytics-pdf",
         {
-          method: "POST",
 
-          headers: {
+          method:"POST",
+
+          headers:{
+
             "Content-Type":
               "application/json"
+
           },
 
-          body: JSON.stringify({
+          body:JSON.stringify({
+
             branchId,
+
             start,
+
             end
+
           })
+
         }
       );
 
+
     // =========================
-    // HANDLE ERROR HTTP
+    // HTTP ERROR
     // =========================
 
     if (!response.ok) {
@@ -26478,89 +26566,126 @@ async function exportAnalyticsPDF() {
         errorText ||
         `Export gagal (${response.status})`
       );
+
     }
 
+
     // =========================
-    // GET HTML REPORT
+    // API RETURN
     // =========================
 
-    const html =
+    const result =
       await response.text();
 
-    if (!html) {
-      throw new Error(
-        "Server mengembalikan HTML kosong"
-      );
-    }
 
     console.log(
-      "EXPORT ANALYTICS HTML RECEIVED"
+      "EXPORT ANALYTICS RESULT:",
+      result
     );
 
+
+    if (!result) {
+
+      throw new Error(
+        "Server tidak mengembalikan hasil PDF"
+      );
+
+    }
+
+
     // =========================
-    // RENDER REPORT
+    // JIKA API RETURN URL
     // =========================
 
-    win.document.open();
+    if (
+      result.startsWith("http://") ||
+      result.startsWith("https://") ||
+      result.startsWith("/")
+    ) {
 
-    win.document.write(
-      html
+      pdfTab.location.href =
+        result;
+
+      return;
+
+    }
+
+
+    // =========================
+    // JIKA API RETURN HTML
+    // =========================
+
+    pdfTab.document.open();
+
+    pdfTab.document.write(
+      result
     );
 
-    win.document.close();
+    pdfTab.document.close();
 
   }
-  catch (err) {
+
+
+  // =========================
+  // ERROR
+  // =========================
+
+  catch(err) {
 
     console.error(
       "Export Analytics:",
       err
     );
 
-    // =========================
-    // ERROR PAGE
-    // =========================
 
-    win.document.open();
+    pdfTab.document.open();
 
-    win.document.write(`
+    pdfTab.document.write(`
+
+      <!DOCTYPE html>
+
       <html>
 
-        <body style="
-          background:#0B0F14;
-          color:white;
-          font-family:Arial;
-          padding:40px;
+      <body style="
+        background:#0B0F14;
+        color:white;
+        font-family:Arial;
+        padding:40px;
+      ">
+
+        <h2>
+          Failed Generate PDF
+        </h2>
+
+        <p style="
+          color:#aaa;
         ">
+          Gagal membuat Analytics Report.
+        </p>
 
-          <h2>
-            Export Failed
-          </h2>
+        <pre style="
+          white-space:pre-wrap;
+          background:#151A21;
+          padding:15px;
+          border-radius:10px;
+        ">${String(
+          err?.message ||
+          err
+        )}</pre>
 
-          <p style="
-            color:#aaa;
-          ">
-            Gagal membuat Analytics Report.
-          </p>
-
-          <pre style="
-            white-space:pre-wrap;
-            background:#151A21;
-            padding:15px;
-            border-radius:10px;
-          ">${String(
-            err?.message ||
-            err
-          )}</pre>
-
-        </body>
+      </body>
 
       </html>
+
     `);
 
-    win.document.close();
+    pdfTab.document.close();
+
   }
+
 }
+
+
 
 
 
