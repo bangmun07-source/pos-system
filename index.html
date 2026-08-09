@@ -20505,6 +20505,20 @@ function loadMemberStats() {
   const topTierEl =
     document.getElementById("total-top-tier");
 	const el = document.getElementById("total-top-tier");
+
+el.style.cssText = `
+  display: block !important;
+  height: auto !important;
+  min-height: 40px !important;
+  line-height: 1.2 !important;
+  font-size: 36px !important;
+  font-weight: 800 !important;
+  color: red !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+`;
+
+	
 console.log(
   "RECT:",
   el.getBoundingClientRect()
