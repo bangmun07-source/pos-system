@@ -811,7 +811,99 @@ async function updateMemberRPC(data) {
   return result;
 }
 
+    // ===============================
+    // TABLE PAGE
+    // ===============================
 
+async function getTableDataRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_table_data",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_table_data error:",
+      error
+    );
+    throw error;
+  }
+  return data || [];
+}
+
+async function getLatestTransactionByTableRPC(mejaId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_latest_transaction_by_table",
+    {
+      p_meja: mejaId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_latest_transaction_by_table error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function reserveTableRPC( mejaId, name, note ) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "reserve_table",
+    {
+      p_meja_id: mejaId,
+      p_name: name,
+      p_note: note || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "reserve_table error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function clearTableStatusRPC(mejaId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "clear_table_status",
+    {
+      p_meja_id: mejaId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "clear_table_status error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
 
     // ===============================
     // INGREDIENT PAGE
