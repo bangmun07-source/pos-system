@@ -1,4 +1,3 @@
-
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -6,12 +5,14 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// LOGO
 const logoSrc =
   `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
 
-// HELPERS
 function rupiah(value) {
+  return Number(value || 0).toLocaleString("id-ID");
+}
+
+function number(value) {
   return Number(value || 0).toLocaleString("id-ID");
 }
 
@@ -24,7 +25,10 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-// HANDLER
+function percent(value) {
+  return Number(value || 0).toFixed(1);
+}
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
@@ -41,8 +45,10 @@ export default async function handler(req, res) {
       branchId
     } = req.body || {};
 
-
+    // =========================
     // VALIDASI
+    // =========================
+
     if (!branchId) {
       return res
         .status(400)
@@ -52,7 +58,7 @@ export default async function handler(req, res) {
     if (!start || !end) {
       return res
         .status(400)
-        .send("Tanggal periode wajib diisi");
+        .send("Tanggal wajib diisi");
     }
 
     console.log(
@@ -64,9 +70,12 @@ export default async function handler(req, res) {
       }
     );
 
+    // =========================
     // GET ANALYTICS
+    // =========================
+
     const {
-      data: analytics,
+      data: analyticsData,
       error: analyticsError
     } = await supabase.rpc(
       "get_analytics",
@@ -82,12 +91,12 @@ export default async function handler(req, res) {
     }
 
     console.log(
-      "ANALYTICS RESULT:",
-      analytics
+      "EXPORT ANALYTICS DATA:",
+      analyticsData
     );
 
     // =========================
-    // GET PAYMENT DISTRIBUTION
+    // PAYMENT DISTRIBUTION
     // =========================
 
     const {
@@ -107,107 +116,126 @@ export default async function handler(req, res) {
     }
 
     console.log(
-      "PAYMENT DISTRIBUTION:",
+      "EXPORT PAYMENT:",
       paymentData
     );
 
     // =========================
-    // NORMALIZE ANALYTICS
+    // PEAK HOURS
     // =========================
 
-    const data =
-      analytics &&
-      typeof analytics === "object"
-        ? analytics
-        : {};
+    const {
+      data: peakData,
+      error: peakError
+    } = await supabase.rpc(
+      "get_peak_hours",
+      {
+        p_branch_id: branchId,
+        p_start: start,
+        p_end: end
+      }
+    );
 
-    const paymentDistribution =
+    if (peakError) {
+      throw peakError;
+    }
+
+    console.log(
+      "EXPORT PEAK HOURS:",
+      peakData
+    );
+
+    // =========================
+    // TOP SELLING ITEMS
+    // =========================
+
+    const {
+      data: topSellingData,
+      error: topSellingError
+    } = await supabase.rpc(
+      "get_top_selling_items",
+      {
+        p_branch_id: branchId,
+        p_start: start,
+        p_end: end
+      }
+    );
+
+    if (topSellingError) {
+      throw topSellingError;
+    }
+
+    console.log(
+      "EXPORT TOP SELLING:",
+      topSellingData
+    );
+
+    // =========================
+    // RAW MATERIAL ANALYSIS
+    // =========================
+
+    const {
+      data: rawMaterialData,
+      error: rawMaterialError
+    } = await supabase.rpc(
+      "get_raw_material_analysis",
+      {
+        p_branch_id: branchId,
+        p_start: start,
+        p_end: end
+      }
+    );
+
+    if (rawMaterialError) {
+      throw rawMaterialError;
+    }
+
+    console.log(
+      "EXPORT RAW MATERIAL:",
+      rawMaterialData
+    );
+
+    // =========================
+    // NORMALIZE
+    // =========================
+
+    const analytics =
+      analyticsData || {};
+
+    const payment =
       Array.isArray(paymentData)
         ? paymentData
         : [];
 
-    // =========================
-    // SAFE DATA
-    // =========================
-
-    const revenue =
-      Number(data.revenue || 0);
-
-    const hpp =
-      Number(data.hpp || 0);
-
-    const grossProfit =
-      Number(data.grossProfit || 0);
-
-    const operational =
-      Number(data.operational || 0);
-
-    const netProfitBeforeOtherIncome =
-      Number(
-        data.netProfitBeforeOtherIncome || 0
-      );
-
-    const otherIncome =
-      Number(data.otherIncome || 0);
-
-    const netProfit =
-      Number(data.netProfit || 0);
-
-    const growth =
-      Number(data.growth || 0);
-
-    const activeMembers =
-      Number(data.activeMembers || 0);
-
-    const weekly =
-      Array.isArray(data.weekly)
-        ? data.weekly
+    const peakHours =
+      Array.isArray(peakData)
+        ? peakData
         : [];
 
-    // =========================
-    // WEEKLY ROWS
-    // =========================
+    const topSelling =
+      Array.isArray(topSellingData)
+        ? topSellingData
+        : [];
 
-    const weeklyRows =
-      weekly.length
-
-        ? weekly.map((value, index) => `
-            <tr>
-              <td>
-                Week ${index + 1}
-              </td>
-
-              <td class="right">
-                Rp ${rupiah(value)}
-              </td>
-            </tr>
-          `).join("")
-
-        : `
-            <tr>
-              <td
-                colspan="2"
-                class="empty"
-              >
-                No weekly data
-              </td>
-            </tr>
-          `;
+    const rawMaterials =
+      Array.isArray(rawMaterialData)
+        ? rawMaterialData
+        : [];
 
     // =========================
     // PAYMENT ROWS
     // =========================
 
     const paymentRows =
-      paymentDistribution.length
+      payment.length
 
-        ? paymentDistribution.map(p => {
+        ? payment.map(p => {
 
             const method =
               p.method ??
               p.payment_method ??
               p.Payment_Method ??
-              "Unknown";
+              "-";
 
             const value =
               Number(
@@ -217,7 +245,7 @@ export default async function handler(req, res) {
                 0
               );
 
-            const percent =
+            const pct =
               Number(
                 p.percent ??
                 p.percentage ??
@@ -236,7 +264,7 @@ export default async function handler(req, res) {
                 </td>
 
                 <td class="right">
-                  ${percent.toFixed(1)}%
+                  ${percent(pct)}%
                 </td>
 
               </tr>
@@ -245,182 +273,56 @@ export default async function handler(req, res) {
           }).join("")
 
         : `
-            <tr>
-              <td
-                colspan="3"
-                class="empty"
-              >
-                No payment data
-              </td>
-            </tr>
-          `;
+          <tr>
+            <td
+              colspan="3"
+              class="empty"
+            >
+              No payment data
+            </td>
+          </tr>
+        `;
 
     // =========================
-    // HTML REPORT
+    // PEAK HOURS ROWS
     // =========================
 
-    const html = `
-      <!DOCTYPE html>
+    const peakRows =
+      peakHours.length
 
-      <html>
+        ? peakHours.map(p => {
 
-      <head>
+            const hour =
+              p.hour ??
+              p.jam ??
+              p.time ??
+              "-";
 
-        <meta charset="UTF-8">
+            const orders =
+              Number(
+                p.orders ??
+                p.total_orders ??
+                p.count ??
+                0
+              );
 
-        <title>
-          Analytics Report
-        </title>
+            const revenue =
+              Number(
+                p.revenue ??
+                p.total_revenue ??
+                p.value ??
+                0
+              );
 
-        <style>
-
-          body{
-            font-family:Arial,sans-serif;
-            color:#333;
-            padding:30px;
-            margin:0;
-          }
-
-          .header{
-            text-align:center;
-            margin-bottom:20px;
-          }
-
-          .logo{
-            width:170px;
-            height:auto;
-            object-fit:contain;
-            margin-bottom:8px;
-          }
-
-          .card{
-            border:1px solid #eee;
-            border-radius:14px;
-            padding:15px;
-            margin-bottom:20px;
-          }
-
-          h3{
-            margin:0 0 10px 0;
-          }
-
-          .subtitle{
-            font-size:12px;
-            color:#777;
-            margin-bottom:15px;
-            line-height:1.6;
-          }
-
-          table{
-            width:100%;
-            border-collapse:collapse;
-            font-size:11px;
-          }
-
-          th{
-            background:#f5f5f5;
-            padding:10px;
-            text-align:left;
-          }
-
-          td{
-            padding:10px;
-            border-bottom:1px solid #eee;
-          }
-
-          .right{
-            text-align:right;
-          }
-
-          .empty{
-            text-align:center;
-            color:#999;
-            padding:20px;
-          }
-
-          .footer{
-            margin-top:40px;
-            text-align:center;
-            font-size:8px;
-            color:#777;
-          }
-
-          @media print{
-
-            body{
-              padding:15px;
-            }
-
-            .card{
-              break-inside:avoid;
-            }
-
-          }
-
-        </style>
-
-      </head>
-
-      <body>
-
-        <div class="header">
-
-          <img
-            src="${logoSrc}"
-            class="logo"
-            alt="Sistem POS"
-          >
-
-        </div>
-
-        <!-- =========================
-             EXECUTIVE SUMMARY
-        ========================== -->
-
-        <div class="card">
-
-          <h3>
-            Executive Analytics Report
-          </h3>
-
-          <div class="subtitle">
-
-            Branch :
-            ${escapeHtml(branchId)}
-
-            <br>
-
-            Periode :
-            ${escapeHtml(start)}
-            -
-            ${escapeHtml(end)}
-
-          </div>
-
-          <table>
-
-            <thead>
-
-              <tr>
-
-                <th>
-                  Metric
-                </th>
-
-                <th class="right">
-                  Value
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
+            return `
               <tr>
 
                 <td>
-                  Net Revenue
+                  ${escapeHtml(hour)}
+                </td>
+
+                <td class="center">
+                  ${number(orders)}
                 </td>
 
                 <td class="right">
@@ -428,220 +330,1044 @@ export default async function handler(req, res) {
                 </td>
 
               </tr>
+            `;
 
+          }).join("")
+
+        : `
+          <tr>
+            <td
+              colspan="3"
+              class="empty"
+            >
+              No peak hour data
+            </td>
+          </tr>
+        `;
+
+    // =========================
+    // TOP SELLING ROWS
+    // =========================
+
+    const topSellingRows =
+      topSelling.length
+
+        ? topSelling.map((item, index) => {
+
+            const name =
+              item.name ??
+              item.product_name ??
+              item.Nama ??
+              "-";
+
+            const qty =
+              Number(
+                item.qty ??
+                item.quantity ??
+                item.total_qty ??
+                0
+              );
+
+            const revenue =
+              Number(
+                item.revenue ??
+                item.total_revenue ??
+                item.total ??
+                0
+              );
+
+            return `
               <tr>
 
+                <td class="center">
+                  ${index + 1}
+                </td>
+
                 <td>
-                  HPP
+                  ${escapeHtml(name)}
+                </td>
+
+                <td class="center">
+                  ${number(qty)}
                 </td>
 
                 <td class="right">
-                  Rp ${rupiah(hpp)}
+                  Rp ${rupiah(revenue)}
                 </td>
 
               </tr>
+            `;
 
+          }).join("")
+
+        : `
+          <tr>
+            <td
+              colspan="4"
+              class="empty"
+            >
+              No product data
+            </td>
+          </tr>
+        `;
+
+    // =========================
+    // RAW MATERIAL ROWS
+    // =========================
+
+    const rawMaterialRows =
+      rawMaterials.length
+
+        ? rawMaterials.map(item => {
+
+            const name =
+              item.name ??
+              item.ingredient ??
+              item.ingredient_name ??
+              item.Ingredient ??
+              "-";
+
+            const qty =
+              Number(
+                item.qty ??
+                item.quantity ??
+                item.total_qty ??
+                0
+              );
+
+            const cost =
+              Number(
+                item.cost ??
+                item.total_cost ??
+                item.value ??
+                0
+              );
+
+            return `
               <tr>
 
                 <td>
-                  Gross Profit
+                  ${escapeHtml(name)}
                 </td>
 
                 <td class="right">
-                  Rp ${rupiah(grossProfit)}
-                </td>
-
-              </tr>
-
-              <tr>
-
-                <td>
-                  Operational Expense
+                  ${number(qty)}
                 </td>
 
                 <td class="right">
-                  Rp ${rupiah(operational)}
+                  Rp ${rupiah(cost)}
                 </td>
 
               </tr>
+            `;
+
+          }).join("")
+
+        : `
+          <tr>
+            <td
+              colspan="3"
+              class="empty"
+            >
+              No raw material data
+            </td>
+          </tr>
+        `;
+
+    // =========================
+    // ANALYTICS VALUES
+    // =========================
+
+    const revenue =
+      Number(
+        analytics.revenue ??
+        analytics.netRevenue ??
+        analytics.net_revenue ??
+        0
+      );
+
+    const hpp =
+      Number(
+        analytics.hpp ??
+        analytics.hppTotal ??
+        analytics.hpp_total ??
+        0
+      );
+
+    const grossProfit =
+      Number(
+        analytics.grossProfit ??
+        analytics.gross_profit ??
+        revenue - hpp
+      );
+
+    const operational =
+      Number(
+        analytics.operational ??
+        analytics.operationalExpense ??
+        analytics.operational_expense ??
+        0
+      );
+
+    const otherIncome =
+      Number(
+        analytics.otherIncome ??
+        analytics.other_income ??
+        0
+      );
+
+    const netProfitBeforeOtherIncome =
+      Number(
+        analytics.netProfitBeforeOtherIncome ??
+        analytics.net_profit_before_other_income ??
+        grossProfit - operational
+      );
+
+    const netProfit =
+      Number(
+        analytics.netProfit ??
+        analytics.net_profit ??
+        netProfitBeforeOtherIncome +
+          otherIncome
+      );
+
+    const growth =
+      Number(
+        analytics.growth ??
+        0
+      );
+
+    const orders =
+      Number(
+        analytics.orders ??
+        analytics.totalOrders ??
+        analytics.total_orders ??
+        0
+      );
+
+    const aov =
+      Number(
+        analytics.aov ??
+        analytics.averageOrderValue ??
+        analytics.average_order_value ??
+        0
+      );
 
-              <tr>
+    const activeMembers =
+      Number(
+        analytics.activeMembers ??
+        analytics.active_members ??
+        0
+      );
 
-                <td>
-                  <b>
-                    Net Profit
-                    (Before Other Income)
-                  </b>
-                </td>
+    // =========================
+    // HTML REPORT
+    // =========================
 
-                <td class="right">
+    const html = `
+<!DOCTYPE html>
 
-                  <b>
-                    Rp ${rupiah(
-                      netProfitBeforeOtherIncome
-                    )}
-                  </b>
+<html>
 
-                </td>
+<head>
 
-              </tr>
+<meta charset="UTF-8">
 
-              <tr>
+<title>
+Analytics Report
+</title>
 
-                <td>
-                  Other Income
-                </td>
+<style>
 
-                <td class="right">
-                  Rp ${rupiah(otherIncome)}
-                </td>
+*{
+  box-sizing:border-box;
+}
 
-              </tr>
+html,
+body{
+  margin:0;
+  padding:0;
+}
 
-              <tr>
+body{
 
-                <td>
-                  <b>
-                    Final Net Profit
-                  </b>
-                </td>
+  background:#0B0F14;
 
-                <td class="right">
+  font-family:
+    Arial,
+    sans-serif;
 
-                  <b>
-                    Rp ${rupiah(netProfit)}
-                  </b>
+  color:#333;
 
-                </td>
+  padding:
+    40px 20px;
+}
 
-              </tr>
+.export-toolbar{
 
-              <tr>
+  width:100%;
 
-                <td>
-                  Growth
-                </td>
+  max-width:1100px;
 
-                <td class="right">
-                  ${growth.toFixed(2)}%
-                </td>
+  margin:
+    0 auto 20px auto;
 
-              </tr>
+  display:flex;
 
-              <tr>
+  justify-content:
+    space-between;
 
-                <td>
-                  Active Members
-                </td>
+  align-items:center;
 
-                <td class="right">
-                  ${rupiah(activeMembers)}
-                </td>
+  color:white;
 
-              </tr>
+  font-size:14px;
+}
 
-            </tbody>
+.export-toolbar button{
 
-          </table>
+  border:
+    1px solid
+    rgba(255,255,255,.15);
 
-        </div>
+  background:
+    rgba(255,255,255,.08);
 
-        <!-- =========================
-             WEEKLY PERFORMANCE
-        ========================== -->
+  color:white;
 
-        <div class="card">
+  padding:
+    10px 16px;
 
-          <h3>
-            Weekly Net Profit
-          </h3>
+  border-radius:10px;
 
-          <table>
+  cursor:pointer;
 
-            <thead>
+  font-weight:bold;
+}
 
-              <tr>
+.report{
 
-                <th>
-                  Week
-                </th>
+  width:100%;
 
-                <th class="right">
-                  Net Profit
-                </th>
+  max-width:1100px;
 
-              </tr>
+  margin:0 auto;
 
-            </thead>
+  background:white;
 
-            <tbody>
+  padding:45px;
 
-              ${weeklyRows}
+  border-radius:4px;
 
-            </tbody>
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.45);
+}
 
-          </table>
+.header{
 
-        </div>
+  text-align:center;
 
-        <!-- =========================
-             PAYMENT DISTRIBUTION
-        ========================== -->
+  margin-bottom:20px;
+}
 
-        <div class="card">
+.logo{
 
-          <h3>
-            Payment Distribution
-          </h3>
+  width:170px;
 
-          <table>
+  height:auto;
 
-            <thead>
+  max-height:90px;
 
-              <tr>
+  object-fit:contain;
 
-                <th>
-                  Payment Method
-                </th>
+  margin-bottom:12px;
+}
 
-                <th class="right">
-                  Value
-                </th>
+.title{
 
-                <th class="right">
-                  Percentage
-                </th>
+  font-size:24px;
 
-              </tr>
+  font-weight:bold;
 
-            </thead>
+  margin-bottom:8px;
+}
 
-            <tbody>
+.subtitle{
 
-              ${paymentRows}
+  font-size:12px;
 
-            </tbody>
+  color:#777;
 
-          </table>
+  margin-bottom:3px;
+}
 
-        </div>
+.kpi-grid{
 
-        <div class="footer">
+  display:grid;
 
-          Generated by Sistem POS
+  grid-template-columns:
+    repeat(3,1fr);
 
-          • ${new Date().toLocaleString("id-ID")}
+  gap:16px;
 
-        </div>
+  margin:30px 0;
+}
 
-      </body>
+.kpi-card{
 
-      </html>
-    `;
+  border:
+    1px solid #e5e5e5;
+
+  border-radius:14px;
+
+  padding:22px;
+
+  background:#fafafa;
+
+  text-align:center;
+}
+
+.kpi-title{
+
+  font-size:11px;
+
+  color:#666;
+
+  font-weight:bold;
+
+  margin-bottom:12px;
+}
+
+.kpi-value{
+
+  font-size:22px;
+
+  font-weight:bold;
+
+  color:#222;
+}
+
+.card{
+
+  border:
+    1px solid #e5e5e5;
+
+  border-radius:14px;
+
+  padding:18px;
+
+  margin-top:20px;
+
+  background:#fff;
+}
+
+.card h3{
+
+  margin-top:0;
+
+  margin-bottom:12px;
+
+  font-size:16px;
+}
+
+table{
+
+  width:100%;
+
+  border-collapse:collapse;
+
+  font-size:11px;
+
+  margin-top:10px;
+}
+
+th{
+
+  background:#f5f5f5;
+
+  padding:10px;
+
+  text-align:left;
+
+  font-weight:bold;
+}
+
+td{
+
+  padding:10px;
+
+  border-bottom:
+    1px solid #eee;
+}
+
+.right{
+  text-align:right;
+}
+
+.left{
+  text-align:left;
+}
+
+.center{
+  text-align:center;
+}
+
+.empty{
+
+  text-align:center;
+
+  color:#777;
+
+  padding:25px;
+}
+
+.metric{
+
+  display:flex;
+
+  justify-content:
+    space-between;
+
+  padding:10px 0;
+
+  border-bottom:
+    1px solid #eee;
+}
+
+.page-break{
+
+  page-break-before:always;
+
+  break-before:page;
+}
+
+.footer{
+
+  margin-top:40px;
+
+  text-align:center;
+
+  font-size:9px;
+
+  color:#888;
+}
+
+@media print{
+
+  body{
+
+    background:white;
+
+    padding:0;
+  }
+
+  .export-toolbar{
+
+    display:none;
+  }
+
+  .report{
+
+    max-width:none;
+
+    box-shadow:none;
+
+    border-radius:0;
+
+    padding:25px;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- TOOLBAR -->
+
+<div class="export-toolbar">
+
+  <div>
+    📊 Analytics Report
+  </div>
+
+  <button
+    onclick="window.print()"
+  >
+    Download / Print PDF
+  </button>
+
+</div>
+
+
+<!-- REPORT -->
+
+<div class="report">
+
+  <!-- LOGO -->
+
+  <div class="header">
+
+    ${
+      logoSrc
+        ? `
+          <img
+            src="${logoSrc}"
+            class="logo"
+            alt="Sistem POS"
+          />
+        `
+        : ""
+    }
+
+  </div>
+
+
+  <!-- TITLE -->
+
+  <div class="title">
+
+    Executive Analytics Report
+
+  </div>
+
+  <div class="subtitle">
+
+    Periode:
+    ${escapeHtml(start)}
+    -
+    ${escapeHtml(end)}
+
+  </div>
+
+  <div class="subtitle">
+
+    Branch:
+    ${escapeHtml(branchId)}
+
+  </div>
+
+
+  <!-- KPI -->
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        NET REVENUE
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(revenue)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        GROSS PROFIT
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(grossProfit)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        NET PROFIT
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(netProfit)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        TOTAL ORDERS
+      </div>
+
+      <div class="kpi-value">
+        ${number(orders)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        AOV
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(aov)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        ACTIVE MEMBERS
+      </div>
+
+      <div class="kpi-value">
+        ${number(activeMembers)}
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- EXECUTIVE SUMMARY -->
+
+  <div class="card">
+
+    <h3>
+      Executive Summary
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Metric
+          </th>
+
+          <th class="right">
+            Value
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            Net Revenue
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(revenue)}
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            HPP
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(hpp)}
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            Gross Profit
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(grossProfit)}
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            Operational Expense
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(operational)}
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            Net Profit Before Other Income
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(
+              netProfitBeforeOtherIncome
+            )}
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            Other Income
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(otherIncome)}
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            <b>
+              Final Net Profit
+            </b>
+          </td>
+
+          <td class="right">
+
+            <b>
+              Rp ${rupiah(netProfit)}
+            </b>
+
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            Growth
+          </td>
+
+          <td class="right">
+            ${growth.toFixed(2)}%
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- PAYMENT -->
+
+  <div class="card">
+
+    <h3>
+      Payment Distribution
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Payment
+          </th>
+
+          <th class="right">
+            Total
+          </th>
+
+          <th class="right">
+            Percentage
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${paymentRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- TOP PRODUCTS -->
+
+  <div class="card">
+
+    <h3>
+      Top Selling Products
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th class="center">
+            #
+          </th>
+
+          <th>
+            Product
+          </th>
+
+          <th class="center">
+            Qty
+          </th>
+
+          <th class="right">
+            Revenue
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${topSellingRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- PEAK HOURS -->
+
+  <div class="card">
+
+    <h3>
+      Peak Hours
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Hour
+          </th>
+
+          <th class="center">
+            Orders
+          </th>
+
+          <th class="right">
+            Revenue
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${peakRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- RAW MATERIAL -->
+
+  <div class="page-break"></div>
+
+  <div class="card">
+
+    <h3>
+      Raw Material Analysis
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Ingredient
+          </th>
+
+          <th class="right">
+            Quantity
+          </th>
+
+          <th class="right">
+            Cost
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${rawMaterialRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+
+    Generated by Sistem POS
+    • ${new Date().toLocaleString("id-ID")}
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+`;
 
     // =========================
     // RETURN HTML
     // =========================
+
+    res.setHeader(
+      "Content-Type",
+      "text/html; charset=utf-8"
+    );
 
     return res
       .status(200)
@@ -655,10 +1381,20 @@ export default async function handler(req, res) {
       err
     );
 
+    console.error(
+      "ERROR MESSAGE:",
+      err?.message
+    );
+
+    console.error(
+      "ERROR STACK:",
+      err?.stack
+    );
+
     return res
       .status(500)
       .json({
-        success:false,
+        success: false,
         error:
           err?.message ||
           "Export analytics gagal"
@@ -667,5 +1403,3 @@ export default async function handler(req, res) {
   }
 
 }
-
-
