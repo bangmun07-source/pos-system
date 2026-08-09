@@ -30922,42 +30922,63 @@ async function loadRewardProducts() {
     state.rewardProducts &&
     state.rewardProductsBranchId === branchId
   ) {
+
     rewardData =
       state.rewardProducts;
+
     rewardPage = 1;
+
     renderRewardProductsTable();
+
     return;
   }
 
   try {
 
-    // SUPABASE RPC
-    const data =
+    const res =
       await getRewardProductsRPC(
         branchId
       );
+
     console.log(
       "REWARD PRODUCTS:",
-      data
+      res
     );
+
+    // =========================
+    // AMBIL ARRAY REWARDS
+    // =========================
+
+    const data =
+      Array.isArray(res)
+        ? res
+        : Array.isArray(res?.rewards)
+          ? res.rewards
+          : [];
 
     // CACHE
     state.rewardProducts =
-      data || [];
+      data;
+
     state.rewardProductsBranchId =
       branchId;
 
     // RENDER
     rewardData =
       state.rewardProducts;
+
     rewardPage = 1;
+
     renderRewardProductsTable();
+
   }
   catch (err) {
+
     console.error(
       "Load Reward Products:",
       err
     );
+
     showToast(
       err?.message ||
       "Gagal memuat reward.",
