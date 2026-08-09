@@ -1296,6 +1296,9 @@ async function getSettingsRPC() {
 
 async function saveSettingsRPC(payload) {
 
+  // VALIDASI
+  validateSettings(payload);
+
   const {
     data,
     error
@@ -1307,16 +1310,15 @@ async function saveSettingsRPC(payload) {
   );
 
   if (error) {
+
     console.error(
       "save_settings error:",
       error
     );
+
     throw error;
   }
-    
-  // CLEAR FRONTEND STATE
-  state.settingsPageData = null;
-  state.memberPageData = null;
+
   return data;
 }
 
