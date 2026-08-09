@@ -905,6 +905,29 @@ async function clearTableStatusRPC(mejaId) {
   return data;
 }
 
+async function addNewTableRPC(tableName, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "add_new_table",
+    {
+      p_branch_id: branchId,
+      p_table_name: tableName
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_new_table error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
     // ===============================
     // INGREDIENT PAGE
     // ===============================
