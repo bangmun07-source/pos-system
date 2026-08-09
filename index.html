@@ -26437,49 +26437,50 @@ async function loadSettingsPage() {
 	);
 	}
 }
+	
 
 async function reloadSettingsPage() {
-	traceCall("reloadSettingsPage");
-	
-	try {
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data, error } =
-	  await supabase.rpc(
-	    "get_settings_page_data"
-	  );
-	
-	if(error){
-	  throw error;
-	}
-	*/
-	
 
-	// TEMP DATA VERCEL
-		const data = {
-		  settings: {},
-		  loyalty: {},
-		  branch: {},
-		  users: []
-		};
-		// UPDATE STATE
-		state.settingsPageData = data;
-		// APPLY UI
-		applySettingsPage(
-		  data
-		);
-	}
-	catch(err){
-	
-		showToast(
-		  err.message ||
-		  "Gagal reload Settings.",
-		  "error"
-		);
-	}
+  traceCall(
+    "reloadSettingsPage"
+  );
+
+  try {
+
+    // SUPABASE RPC
+    const data =
+      await getSettingsPageDataRPC();
+    console.log(
+      "SETTINGS PAGE DATA:",
+      data
+    );
+
+    // UPDATE STATE
+    state.settingsPageData =
+      data || {
+        settings: {},
+        loyalty: {},
+        branch: {},
+        users: []
+      };
+
+    // APPLY UI
+    applySettingsPage(
+      state.settingsPageData
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Settings Page Error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal reload Settings.",
+      "error"
+    );
+  }
 }
 
 function loadBranchSelector(branches) {
@@ -26664,119 +26665,145 @@ function closeAddBranchModal(){
   }
 }
 
-async function saveNewBranch(){
-	const data = {
-	  branchName: document.getElementById("newBranchName").value.trim(),
-	  manager: document.getElementById("newBranchManager").value.trim(),
-	  phone: document.getElementById("newBranchPhone").value.trim(),
-	  alamat: document.getElementById("newBranchAddress").value.trim()
-	};
-	if(!data.branchName){
-	  alert("Branch Name wajib diisi.");
-	  return;
-	}
-	if(!data.manager){
-	  alert("Manager wajib diisi.");
-	  return;
-	}
-	if(!data.alamat){
-	  alert("Address wajib diisi.");
-	  return;
-	}
+async function saveNewBranch() {
+
+  const data = {
+    branchName:
+      document
+        .getElementById("newBranchName")
+        ?.value
+        ?.trim() || "",
+    manager:
+      document
+        .getElementById("newBranchManager")
+        ?.value
+        ?.trim() || "",
+    phone:
+      document
+        .getElementById("newBranchPhone")
+        ?.value
+        ?.trim() || "",
+    alamat:
+      document
+        .getElementById("newBranchAddress")
+        ?.value
+        ?.trim() || ""
+  };
+
+  if (!data.branchName) {
+    alert(
+      "Branch Name wajib diisi."
+    );
+    return;
+  }
+
+  if (!data.manager) {
+    alert(
+      "Manager wajib diisi."
+    );
+    return;
+  }
+
+  if (!data.alamat) {
+    alert(
+      "Address wajib diisi."
+    );
+    return;
+  }
+
+  try {
 	
-	try {
+    // SUPABASE RPC
+    const res =
+      await addNewBranchRPC(
+        data
+      );
+    console.log(
+      "ADD BRANCH RESULT:",
+      res
+    );
+
+
+    // HANDLE RESPONSE
+    if (!res?.success) {
+      alert(
+        res?.message ||
+        "Gagal menambahkan outlet."
+      );
+      return;
+    }
+
+    closeAddBranchModal();
 	
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
+    // CLEAR STATE
+    state.settingsPageData = null;
 	
-	/*
-	const { data:res, error } =
-	 await supabase
-	 .from("Branches")
-	 .insert(data)
-	 .select()
-	 .single();
-	
-	if(error){
-	 throw error;
-	}
-	*/
-	
-		// TEMP DATA VERCEL
-		const res = {
-		  success:true
-		};
-		if(!res.success){
-		  alert(res.message);
-		  return;
-		}
-		// FLOW LAMA TETAP
-		closeAddBranchModal();
-		state.settingsPageData = null;
-		reloadSettingsPage();
-		showToast(
-		  "Outlet berhasil ditambahkan."
-		);
-	}
-		catch(err){
-		alert(
-		 err.message
-		);
-	}
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    showToast(
+      "Outlet berhasil ditambahkan."
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Add branch error:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal menambahkan outlet."
+    );
+  }
 }
 
 async function toggleBranchStatus(branchId, status) {
-	try {
-	
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data:res, error } =
-	  await supabase
-	  .from("Branches")
-	  .update({
-	    status: status
-	  })
-	  .eq(
-	    "branchId",
-	    branchId
-	  );
-	
-	if(error){
-	  throw error;
-	}
-	*/
-	
 
-		// TEMP DATA VERCEL
-		const res = {
-		  success:true
-		};
-		if(!res.success){
-		  throw new Error(
-		    "Gagal mengubah status outlet"
-		  );
-		}
-		// FLOW LAMA TETAP	
-		state.settingsPageData = null;
-		showToast(
-		  "Status outlet berhasil diubah"
-		);
-	}
-	catch(err){
-		console.error(
-		  "Toggle Branch Status:",
-		  err
-		);
-		showToast(
-		  err.message ||
-		  "Gagal mengubah status outlet",
-		  "error"
-		);
-	}
+  try {
+
+    // SUPABASE RPC
+    const res =
+      await updateBranchStatusRPC(
+        branchId,
+        status
+      );
+    console.log(
+      "UPDATE BRANCH STATUS:",
+      res
+    );
+
+    // HANDLE RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
+      throw new Error(
+        res.message ||
+        "Gagal mengubah status outlet."
+      );
+    }
+
+    // CLEAR STATE
+    state.settingsPageData = null;
+
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    showToast(
+      "Status outlet berhasil diubah"
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Update branch status error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal mengubah status outlet",
+      "error"
+    );
+  }
 }
 
 function openEditBranchModal(branchId){
@@ -26791,78 +26818,99 @@ function openEditBranchModal(branchId){
   document.getElementById("editBranchAddress").value = branch.alamat;
 }
 
-async function saveEditBranch(){
-	const data = {
-	  branchId: document.getElementById("editBranchId").value,
-	  branchName: document.getElementById("editBranchName").value.trim(),
-	  manager: document.getElementById("editBranchManager").value.trim(),
-	  alamat:  document.getElementById("editBranchAddress").value.trim()
-	};
-	if(!data.branchName){
-	  alert("Branch Name wajib diisi.");
-	  return;
-	}
-	if(!data.manager){
-	  alert("Manager wajib diisi.");
-	  return;
-	}
-	
-	
-	if(!data.alamat){
-	  alert("Address wajib diisi.");
-	  return;
-	}
-	
-	try {
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data:res, error } =
-	 await supabase
-	 .from("Branches")
-	 .update({
-	    branchName: data.branchName,
-	    manager: data.manager,
-	    alamat: data.alamat
-	 })
-	 .eq(
-	    "branchId",
-	    data.branchId
-	 )
-	 .select()
-	 .single();
-	
-	
-	if(error){
-	 throw error;
-	}
-	*/
+async function saveEditBranch() {
 
-	// TEMP DATA VERCEL
-		const res = {
-		 success:true
-		};
-		if(!res.success){
-		  alert(
-		    res.message
-		  );
-		  return;
-		}
-		// FLOW LAMA TETAP
-		closeEditBranchModal();
-		state.settingsPageData = null;
-		reloadSettingsPage();
-		showToast(
-		  "Outlet berhasil diperbarui."
-		);
-	}
-		catch(err){
-		  alert(
-			 err.message
-		);	
-	}	
+  const data = {
+    branchId:
+      document
+        .getElementById("editBranchId")
+        ?.value
+        ?.trim() || "",
+    branchName:
+      document
+        .getElementById("editBranchName")
+        ?.value
+        ?.trim() || "",
+    manager:
+      document
+        .getElementById("editBranchManager")
+        ?.value
+        ?.trim() || "",
+    alamat:
+      document
+        .getElementById("editBranchAddress")
+        ?.value
+        ?.trim() || ""
+  };
+
+  if (!data.branchName) {
+    alert(
+      "Branch Name wajib diisi."
+    );
+    return;
+  }
+
+  if (!data.manager) {
+    alert(
+      "Manager wajib diisi."
+    );
+    return;
+  }
+
+  if (!data.alamat) {
+    alert(
+      "Address wajib diisi."
+    );
+    return;
+  }
+
+  try {
+
+    // SUPABASE RPC
+    const res =
+      await updateBranchRPC(
+        data
+      );
+    console.log(
+      "UPDATE BRANCH RESULT:",
+      res
+    );
+
+    // HANDLE RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
+      alert(
+        res.message ||
+        "Gagal memperbarui outlet."
+      );
+      return;
+    }
+
+    // CLOSE MODAL
+    closeEditBranchModal();
+	  
+    // CLEAR STATE
+    state.settingsPageData = null;
+
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    showToast(
+      "Outlet berhasil diperbarui."
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Update branch error:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal memperbarui outlet."
+    );
+  }
 }
 
 function closeEditBranchModal(){
@@ -26872,13 +26920,80 @@ function closeEditBranchModal(){
   }
 }
 
-function loadUsers(users) {
+async function saveTaxSettings() {
 
+  const data = {
+    tax:
+      Number(
+        document
+          .getElementById("taxInput")
+          ?.value
+      ) || 0,
+    service:
+      Number(
+        document
+          .getElementById("serviceInput")
+          ?.value
+      ) || 0,
+    discount:
+      Number(
+        document
+          .getElementById("discountInput")
+          ?.value
+      ) || 0
+  };
+
+  try {
+
+    // SUPABASE RPC
+    const {
+      data: result,
+      error
+    } = await supabaseClient.rpc(
+      "save_settings",
+      {
+        p_settings: data
+      }
+    );
+
+    if (error) {
+      console.error(
+        "save_settings error:",
+        error
+      );
+      throw error;
+    }
+    console.log(
+      "SAVE SETTINGS RESULT:",
+      result
+    );
+
+    // CLEAR STATE
+    state.settingsPageData = null;
+
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    alert(
+      "Settings saved!"
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Save settings error:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal menyimpan settings."
+    );
+  }
+}
+
+function loadUsers(users) {
   window.userData = users || [];
   allUsers = users || [];
-
   renderUsers();
-
 }
 
 function renderUsers() {
@@ -27007,98 +27122,86 @@ function openEditUserModal(id){
 }
 
 async function saveEditUser() {
-	const data = {
-	  id: document.getElementById("editUserId").value,
-	  username: document.getElementById("editUsername").value.trim(),
-	  login_user_id: state.user.id
-	};
-	const password =
-	document.getElementById("editPassword")
-	.value
-	.trim();
-	
-	if (!data.username) {
-	  alert("Username wajib diisi.");
-	  return;
-	}
-	if (password !== "") {
-	  data.password = password;
-	}
-	
-	try {
-	
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const updateData = {
-	
-	  username:
-	    data.username
-	
-	};
-	
-	
-	if(data.password){
-	
-	  updateData.password =
-	    data.password;
-	
-	}
-	
-	
-	
-	const { data:res, error } =
-	await supabase
-	.from("Users")
-	.update(updateData)
-	.eq(
-	  "id",
-	  data.id
-	)
-	.select()
-	.single();
-	
-	
-	
-	if(error){
-	
-	  throw error;
-	
-	}
-	*/
 
-		// TEMP DATA VERCEL
-		const res = {
-		  success:true
-		};
-		
-		if(!res.success){
-		  alert(
-		    res.message
-		  );
-		  return;
-		}
+  const data = {
+    id:
+      document
+        .getElementById("editUserId")
+        ?.value
+        ?.trim() || "",
+    username:
+      document
+        .getElementById("editUsername")
+        ?.value
+        ?.trim() || "",
+    login_user_id:
+      state.user.id
 
-		// FLOW LAMA TETAP
-		closeEditUserModal();
-		state.settingsPageData = null;
-		reloadSettingsPage();
-		showToast(
-		  "User berhasil diperbarui."
-		);
-	}
-	catch(err){
-		console.error(
-		  "Save Edit User:",
-		  err
-		);
-		
-		alert(
-		  err.message
-		);
-	}
+  };
+  const password =
+    document
+      .getElementById("editPassword")
+      ?.value
+      ?.trim() || "";
+
+  if (!data.username) {
+    alert(
+      "Username wajib diisi."
+    );
+    return;
+  }
+
+  if (password !== "") {
+    data.password =
+      password;
+  }
+	
+  try {
+    // SUPABASE RPC
+    const res =
+      await updateUserRPC(
+        data
+      );
+    console.log(
+      "UPDATE USER RESULT:",
+      res
+    );
+
+    // HANDLE RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
+      alert(
+        res.message ||
+        "Gagal memperbarui user."
+      );
+      return;
+    }
+	
+    // CLOSE MODAL
+    closeEditUserModal();
+	  
+    // CLEAR STATE
+    state.settingsPageData = null;
+	
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    showToast(
+      "User berhasil diperbarui."
+    );
+  }
+  catch (err) {
+    console.error(
+      "Save Edit User:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal memperbarui user."
+    );
+
+  }
 }
 
 function closeEditUserModal(){
@@ -27107,74 +27210,84 @@ function closeEditUserModal(){
     modal.remove();
   }
 }
+	
+async function loadBranchOptions() {
 
-async function loadBranchOptions(){
+  try {
 
-	try {
-		
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
+    // SUPABASE RPC
+    const data =
+      await getBranchOptionsRPC({
+        loginUserId:
+          state.user.id
+      });
+    console.log(
+      "BRANCH OPTIONS:",
+      data
+    );
+
+  
+    // SELECT ELEMENT
+    const select =
+      document.getElementById(
+        "newUserBranch"
+      );
+    if (!select) {
+      return;
+    }
+    const branches =
+      data?.branches || [];
+    // CLEAR OPTIONS
+    select.innerHTML = "";
+
+    // ONLY ONE BRANCH
+    if (branches.length === 1) {
+      select.innerHTML = `
+        <option
+          value="${branches[0].branchId}"
+        >
+          ${branches[0].branchName}
+        </option>
+      `;
+      select.value =
+        branches[0].branchId;
+      select.disabled = true;
+    }
 	
-	/*
-	const { data, error } =
-	await supabase.rpc(
-	  "get_branch_options",
-	  {
-	    p_login_user_id:
-	      String(state.user.id)
-	  }
-	);
-	
-	
-	if(error){
-	  throw error;
-	}
-	*/
-	
-		// TEMP DATA VERCEL
-		const data = {
-		  branches: []
-		};
-		// FLOW LAMA TETAP
-		const select =
-		document.getElementById(
-		  "newUserBranch"
-		);
-		
-		if(!select) return;
-		const branches = data.branches || [];
-			select.innerHTML = "";
-		if(branches.length === 1){
-			select.innerHTML = `
-				<option value="${branches[0].branchId}">
-					${branches[0].branchName}
-				</option>
-		`;
-			select.value = branches[0].branchId;
-			select.disabled = true;
-	}
-		else {
-			select.disabled = false;
-			select.innerHTML = `
-				<option value="">
-					Select Outlet
-				</option>
-			`;
-		branches.forEach(branch => {
-			select.innerHTML += `
-				<option value="${branch.branchId}">
-					${branch.branchName}
-				</option>
-			`;
-			});
-		}
-	}
-	catch(err){
-		console.error(
-		  err
-		);
-	}
+    // MULTIPLE BRANCHES
+    else {
+
+      select.disabled = false;
+      select.innerHTML = `
+        <option value="">
+          Select Outlet
+        </option>
+      `;
+      branches.forEach(
+        branch => {
+          select.innerHTML += `
+            <option
+              value="${branch.branchId}"
+            >
+              ${branch.branchName}
+            </option>
+          `;
+        }
+      );
+    }
+  }
+
+  catch (err) {
+    console.error(
+      "Load Branch Options Error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal memuat outlet.",
+      "error"
+    );
+  }
 }
 
 function loadUserRoleOptions(){
@@ -27213,86 +27326,109 @@ function openAddUserModal(){
   loadUserRoleOptions();
 }
 
-async function saveNewUser(){
-	const data = {
-	  username: document.getElementById("newUsername")
-	    .value
-	    .trim(),
-	  password: document.getElementById("newPassword")
-	    .value
-	    .trim(),
-	  role: document.getElementById("newUserRole")
-	    .value,
-	  branchId: document.getElementById("newUserBranch").value ||
-	    state.user.branchId,
-	  createdBy: String(state.user.id)
-	};
-	if(!data.branchId){
-	  alert("Silakan pilih outlet.");
-	  return;
-	}
-	if(!data.username){
-	  alert("Username wajib diisi.");
-	  return;
-	}
-	if(!data.password){
-	  alert("Password wajib diisi.");
-	  return;
-	}
-	if(!data.role){
-	  alert("Role wajib dipilih.");
-	  return;
-	}
-	
-	try {
-	
-	
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data:res, error } =
-	await supabase
-	.from("Users")
-	.insert(data)
-	.select()
-	.single();
-	
-	
-	if(error){
-	  throw error;
-	}
-	*/
-	
+async function saveNewUser() {
 
-		// TEMP DATA VERCEL
-		const res = {
-		  success:true
-		};
-		if(!res.success){
-		  alert(
-		    res.message
-		  );
-		  return;
-		}
-		// FLOW LAMA TETAP
-		closeAddUserModal();
-		state.settingsPageData = null;
-		reloadSettingsPage();
-		showToast(
-		  "User berhasil ditambahkan."
-		);
-	}
-	catch(err){
-		console.error(
-		  "Save New User:",
-		  err
-		);
-		alert(
-		  err.message
-		);
-	}
+  const data = {
+    username:
+      document
+        .getElementById("newUsername")
+        ?.value
+        ?.trim() || "",
+    password:
+      document
+        .getElementById("newPassword")
+        ?.value
+        ?.trim() || "",
+    role:
+      document
+        .getElementById("newUserRole")
+        ?.value || "",
+    branchId:
+      document
+        .getElementById("newUserBranch")
+        ?.value ||
+      state.user.branchId,
+    createdBy:
+      String(
+        state.user.id
+      )
+  };
+
+  if (!data.branchId) {
+    alert(
+      "Silakan pilih outlet."
+    );
+    return;
+  }
+
+  if (!data.username) {
+    alert(
+      "Username wajib diisi."
+    );
+    return;
+  }
+
+  if (!data.password) {
+    alert(
+      "Password wajib diisi."
+    );
+    return;
+  }
+
+  if (!data.role) {
+    alert(
+      "Role wajib dipilih."
+    );
+    return;
+  }
+
+  try {
+
+    // SUPABASE RPC
+    const res =
+      await addNewUserRPC(
+        data
+      );
+    console.log(
+      "ADD USER RESULT:",
+      res
+    );
+
+    // HANDLE RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
+      alert(
+        res.message ||
+        "Gagal menambahkan user."
+      );
+      return;
+    }
+
+    // CLOSE MODAL
+    closeAddUserModal();
+	
+    // CLEAR STATE
+    state.settingsPageData = null;
+
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    showToast(
+      "User berhasil ditambahkan."
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Save New User:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal menambahkan user."
+    );
+  }
 }
 
 function closeAddUserModal(){
@@ -27303,55 +27439,61 @@ function closeAddUserModal(){
 }
 
 async function deleteUser(id) {
-	if (!confirm("Hapus user ini?")) return;
-	try {
-// ==================================
-// SUPABASE (AKTIFKAN NANTI)
-// ==================================
 
-/*
-const { data:res, error } =
-await supabase
-.from("Users")
-.delete()
-.eq(
-  "id",
-  id
-)
-.select();
+  if (
+    !confirm(
+      "Hapus user ini?"
+    )
+  ) {
+    return;
+  }
 
+  try {
 
-if(error){
-  throw error;
-}
-*/
+    // SUPABASE RPC
+    const res =
+      await deleteUserRPC({
+        id: id,
+        login_user_id:
+          state.user.id
+      });
+    console.log(
+      "DELETE USER RESULT:",
+      res
+    );
+	
+    // HANDLE RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
+      alert(
+        res.message ||
+        "Gagal menghapus user."
+      );
+      return;
+    }
 
-		// TEMP DATA VERCEL
-		const res = {
-		  success:true
-		};
-		if(!res.success){
-		  alert(
-		    res.message
-		  );
-		  return;
-		}
-		// FLOW LAMA TETAP
-		state.settingsPageData = null;
-		reloadSettingsPage();
-		showToast(
-		  "User berhasil dihapus."
-		);
-	}
-	catch(err){
-		console.error(
-		  "Delete User:",
-		  err
-		);
-		alert(
-		  err.message
-		);
-	}
+    // CLEAR STATE
+	
+    state.settingsPageData = null;
+    // RELOAD SETTINGS
+    await reloadSettingsPage();
+    showToast(
+      "User berhasil dihapus."
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Delete User:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal menghapus user."
+    );
+  }
 }
 
 function applyBusinessProfile(data){
@@ -27379,56 +27521,54 @@ function applyBusinessProfile(data){
 }
 
 async function loadBusinessProfile() {
-	if (state.businessProfile) {
-	  setTimeout(() => {
-	    applyBusinessProfile(
-	      state.businessProfile
-	    );
-	  }, 50);
-	  return;
-	}
 
-	try {
+  if (state.businessProfile) {
+    setTimeout(() => {
+      applyBusinessProfile(
+        state.businessProfile
+      );
 
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data, error } =
-	await supabase
-	.from("Business_Profile")
-	.select("*")
-	.single();
-	
-	
-	if(error){
-	  throw error;
-	}
-	*/
+    }, 50);
+    return;
+  }
 
-		// TEMP DATA VERCEL
-		const data = {
-		  businessName: "",
-		  phone: "",
-		  email: "",
-		  address: "",
-		  logo: ""
-		};
-		// CACHE TETAP
-		state.businessProfile = data;
-		// APPLY UI
-		applyBusinessProfile(
-		  data
-		);
-	}
-	catch(err){
-		showToast(
-		  err.message ||
-		  "Gagal memuat Business Profile",
-		  "error"
-		);
-	}
+  try {
+	
+    // SUPABASE RPC
+    const data =
+      await getBusinessProfileRPC();
+    console.log(
+      "BUSINESS PROFILE:",
+      data
+    );
+
+    // CACHE / STATE
+    state.businessProfile =
+      data || {
+        businessName: "",
+        phone: "",
+        email: "",
+        address: "",
+        logo: ""
+      };
+
+    // APPLY UI
+    applyBusinessProfile(
+      state.businessProfile
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Business Profile Error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal memuat Business Profile",
+      "error"
+    );
+  }
 }
 
 function initBusinessLogoPreview(){
@@ -27446,119 +27586,146 @@ function initBusinessLogoPreview(){
   };
 }
 
-async function saveBusinessProfile(){
-	const companyName = document.getElementById("businessCompanyName");
-	const instagram = document.getElementById("businessInstagram");
-	const receiptFooter = document.getElementById("businessReceiptFooter");
-	const logoPreview = document.getElementById("businessLogoPreview");
-	
-	if(
-	  !companyName ||
-	  !instagram ||
-	  !receiptFooter ||
-	  !logoPreview
-	){
-	  return;
-	}
-	const data = {
-	  company_name: companyName.value,
-	  instagram: instagram.value,
-	  receipt_footer: receiptFooter.value,
-	  logo_url: logoPreview.src || ""
-	};
-	const logoInput =
-	document.getElementById(
-	  "businessLogoInput"
-	);
-	const file = logoInput?.files[0];
-		function afterSave(){
-		  state.businessProfile = null;
-		  showToast(
-		    "Business Profile berhasil disimpan",
-		    "success"
-			);
-		  setTimeout(() => {
-			loadBusinessProfile();
-		  },100);
-		}
-	
-	try {
-		// ADA LOGO BARU
-		if(file){
-		const reader = new FileReader();
-		reader.onload = async function(e){
-	try {
-	
-	// ==================================
-	// SUPABASE STORAGE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const base64 =
-	e.target.result;
-	
-	const url =
-	await uploadBusinessLogo(
-	  base64
-	);
-	
-	data.logo_url = url;
-	*/
-	
-		// TEMP DATA VERCEL
-		const logoUrl = "";
-			data.logo_url = logoUrl;
-		await saveProfile();
-	}
-		catch(err){
-			showToast(
-			 err.message,
-			 "error"
-			);
-		}
-	};
-		reader.readAsDataURL(file);
-	}
-		else{
-		await saveProfile();
-		}
-	}
-		catch(err){
-			showToast(
-			 err.message ||
-			 "Gagal menyimpan Business Profile",
-			 "error"
-			);
-		}
-		async function saveProfile(){
-		// ==================================
-		// SUPABASE (AKTIFKAN NANTI)
-		// ==================================
-		
-		/*
-		const { error } =
-		await supabase
-		.from("Business_Profile")
-		.upsert(data);
-		
-		
-		if(error){
-		 throw error;
-		}
-		*/
-		// TEMP SUCCESS
-		const res = { success:true };
-		if(!res.success){
-		 throw new Error(
-		  "Gagal menyimpan profile"
-		 );
-	}
-	afterSave();
-	}
-}	
+async function saveBusinessProfile() {
 
-function loadBranchName() {
+  const companyName =
+    document.getElementById(
+      "businessCompanyName"
+    );
+  const instagram =
+    document.getElementById(
+      "businessInstagram"
+    );
+  const receiptFooter =
+    document.getElementById(
+      "businessReceiptFooter"
+    );
+  const logoPreview =
+    document.getElementById(
+      "businessLogoPreview"
+    );
 
+  if (
+    !companyName ||
+    !instagram ||
+    !receiptFooter ||
+    !logoPreview
+  ) {
+    return;
+  }
+
+  const data = {
+    company_name:
+      companyName.value,
+    instagram:
+      instagram.value,
+    receipt_footer:
+      receiptFooter.value,
+    logo_url:
+      logoPreview.src || ""
+  };
+  const logoInput =
+    document.getElementById(
+      "businessLogoInput"
+    );
+  const file =
+    logoInput?.files?.[0];
+
+
+  // AFTER SAVE
+  function afterSave() {
+    state.businessProfile =
+      null;
+    showToast(
+      "Business Profile berhasil disimpan",
+      "success"
+    );
+    setTimeout(() => {
+      loadBusinessProfile();
+    }, 100);
+  }
+
+  try {
+
+    // ADA LOGO BARU
+    if (file) {
+      const reader =
+        new FileReader();
+      reader.onload =
+        async function (e) {
+	
+          try {
+            const base64 =
+              e.target.result;
+            // Upload logo ke Supabase Storage
+            const logoUrl =
+              await uploadBusinessLogo(
+                base64
+              );
+            data.logo_url =
+              logoUrl;
+            // Simpan profile
+            await saveProfile();
+          }
+          catch (err) {
+            console.error(
+              "Upload Business Logo:",
+              err
+            );
+            showToast(
+              err?.message ||
+              "Gagal upload logo",
+              "error"
+            );
+          }
+        };
+      reader.readAsDataURL(file);
+    }
+
+    // TIDAK ADA LOGO BARU
+    else {
+      await saveProfile();
+    }
+  }
+  catch (err) {
+    console.error(
+      "Save Business Profile:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal menyimpan Business Profile",
+      "error"
+    );
+  }
+
+  // SAVE PROFILE VIA RPC
+  async function saveProfile() {
+    const result =
+      await saveBusinessProfileRPC(
+        data
+      );
+    console.log(
+      "SAVE BUSINESS PROFILE RESULT:",
+      result
+    );
+
+    if (
+      result &&
+      result.success === false
+    ) {
+      throw new Error(
+        result.message ||
+        "Gagal menyimpan profile"
+      );
+    }
+    afterSave();
+  }
+}
+	
+async function loadBranchName() {
+
+  // LOAD FROM STATE
   if (state.branchInfo) {
     const el =
       document.getElementById(
@@ -27567,64 +27734,75 @@ function loadBranchName() {
 
     if (el) {
       el.innerText =
-      (
-        state.branchInfo.branchName ||
-        "SISTEM KASIR"
-      ).toUpperCase();
+        (
+          state.branchInfo.branchName ||
+          "SISTEM KASIR"
+        ).toUpperCase();
     }
     return;
   }
 
-
-
-  // ==================================
-  // SUPABASE QUERY (NANTI)
-  // ==================================
-
-  /*
-  
-  const { data, error } =
-    await supabase
-    .from("Branches")
-    .select("*")
-    .eq(
-      "branchId",
-      state.branchId
-    )
-    .single();
-
-
-  if(!error){
-
-    state.branchInfo = data;
-
+  // VALIDATE BRANCH
+  if (!state.branchId) {
+    const el =
+      document.getElementById(
+        "appBrandName"
+      );
+    if (el) {
+      el.innerText =
+        "PILIH OUTLET";
+    }
+    return;
   }
 
-  */
+  try {
 
-  // ==================================
-  // TEMP VERCEL
-  // ==================================
-
-  state.branchInfo = {
-    branchName:
-      state.branchId
-      ? "SISTEM KASIR"
-      : "PILIH OUTLET"
-  };
-
-  const el =
-    document.getElementById(
-      "appBrandName"
+    // SUPABASE RPC
+    const data =
+      await getBranchInfoRPC(
+        state.branchId
+      );
+    console.log(
+      "BRANCH INFO:",
+      data
     );
 
-  if(el){
-    el.innerText =
-    state.branchInfo.branchName
-    .toUpperCase();
+    // SAVE STATE
+    state.branchInfo =
+      data || {
+        branchName:
+          "SISTEM KASIR"
+      };
+	
+    // APPLY UI
+    const el =
+      document.getElementById(
+        "appBrandName"
+      );
+
+    if (el) {
+      el.innerText =
+        (
+          state.branchInfo.branchName ||
+          "SISTEM KASIR"
+        ).toUpperCase();
+    }
   }
 
-
+  catch (err) {
+    console.error(
+      "Load Branch Name Error:",
+      err
+    );
+    const el =
+      document.getElementById(
+        "appBrandName"
+      );
+    if (el) {
+      el.innerText =
+        "SISTEM KASIR";
+    }
+  }
 }
 
 	
