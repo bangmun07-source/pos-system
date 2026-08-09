@@ -196,6 +196,36 @@ export default async function handler(req, res) {
     );
 
     // =========================
+// DEBUG EXPORT DATA
+// =========================
+
+console.log(
+  "EXPORT ANALYTICS DATA:",
+  analyticsData
+);
+
+console.log(
+  "EXPORT PAYMENT:",
+  paymentData
+);
+
+console.log(
+  "EXPORT PEAK HOURS:",
+  peakData
+);
+
+console.log(
+  "EXPORT TOP SELLING:",
+  topSellingData
+);
+
+console.log(
+  "EXPORT RAW MATERIAL:",
+  rawMaterialData
+);
+
+
+    // =========================
     // NORMALIZE
     // =========================
 
