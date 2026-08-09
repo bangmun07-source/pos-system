@@ -1280,8 +1280,6 @@ async function deleteUserRPC(data) {
   return result;
 }
 
-
-
 async function getSettingsRPC() {
 
   const {
@@ -1394,4 +1392,236 @@ async function getBranchInfoRPC(branchId) {
 }
 
 
+    // ===============================
+    // LOYALTY PAGE
+    // ===============================
+
+async function getRewardProductsRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_reward_products",
+    {
+      p_branch_id: branchId || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_reward_products error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function deleteRewardRPC(id) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "delete_reward",
+    {
+      p_id_reward: id
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "delete_reward error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function saveRewardProductRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_reward_product",
+    {
+      p_id_reward:
+        data.ID_Reward,
+
+      p_nama_reward:
+        data.Nama_Reward,
+
+      p_point_dibutuhkan:
+        Number(
+          data.Point_Dibutuhkan || 0
+        ),
+
+      p_produk_id:
+        data.Produk_ID || null,
+
+      p_status:
+        data.Status || "active",
+
+      p_branch_id:
+        data.Branch_ID || null,
+
+      p_max_redeem:
+        Number(
+          data.Max_Redeem || 0
+        ),
+
+      p_category:
+        data.Category || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "save_reward_product error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function getSeasonConfigRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_season_config"
+  );
+
+  if (error) {
+
+    console.error(
+      "get_season_config error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function setSeasonConfigRPC(
+  key,
+  value
+) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "set_season_config",
+    {
+      p_key: key,
+      p_value: String(value)
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "set_season_config error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function openSeasonRPC(
+  startDate,
+  endDate
+) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "open_season",
+    {
+      p_start_date: startDate,
+      p_end_date: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "open_season error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function closeSeasonRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "close_season"
+  );
+
+  if (error) {
+
+    console.error(
+      "close_season error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function toggleAutoSeasonRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "toggle_auto_season"
+  );
+
+  if (error) {
+
+    console.error(
+      "toggle_auto_season error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
 
