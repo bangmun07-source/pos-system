@@ -110,10 +110,26 @@ export default async function handler(req, res) {
     const totalMembers =
       rows.length;
 
-    const totalRindu =
+    const {
+      data: tier5Setting,
+      error: tier5Error
+    } = await supabase
+      .from("Settings")
+      .select("name_value")
+      .eq("key", "tier_5")
+      .maybeSingle();
+    
+    if (tier5Error) {
+      throw tier5Error;
+    }
+    
+    const topTierName =
+      tier5Setting?.name_value || "Top Tier";
+    
+    const totalTopTier =
       rows.filter(r =>
-        String(r.tier || "")
-          .toUpperCase() === "RINDU"
+        String(r.tier || "").toUpperCase() ===
+        String(topTierName).toUpperCase()
       ).length;
 
     const totalPoints =
@@ -410,13 +426,13 @@ td {
     <div class="kpi-card">
 
       <div class="kpi-title">
-        RINDU TIER
+        ${escapeHtml(topTierName)} TIER
       </div>
-
+    
       <div class="kpi-value">
-        ${rupiah(totalRindu)}
+        ${rupiah(totalTopTier)}
       </div>
-
+    
     </div>
 
     <div class="kpi-card">
