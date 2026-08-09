@@ -1043,6 +1043,177 @@ async function getRecipeMasterLedgerRPC(branchId) {
 }
 
 
+
+
+    // ===============================
+    // SETTINGS PAGE
+    // ===============================
+
+async function getAnalyticsDashboardRPC(branchId, startDate, endDate) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_analytics_dashboard",
+    {
+      p_branch_id: branchId,
+      p_start: startDate,
+      p_end: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_analytics_dashboard error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function getAnalyticsRPC(branchId, startDate, endDate) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_analytics",
+    {
+      p_branch_id: branchId,
+      p_start: startDate,
+      p_end: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_analytics error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function getPaymentDistributionRPC(branchId, startDate, endDate) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_payment_distribution",
+    {
+      p_branch_id: branchId,
+      p_start: startDate,
+      p_end: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_payment_distribution error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function getPeakHoursRPC(branchId, startDate, endDate ) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_peak_hours",
+    {
+      p_branch_id: branchId,
+      p_start: startDate,
+      p_end: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_peak_hours error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function getTopSellingItemsRPC(branchId, startDate, endDate) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_top_selling_items",
+    {
+      p_branch_id: branchId,
+      p_start: startDate,
+      p_end: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_top_selling_items error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+async function getRawMaterialAnalysisRPC(branchId, startDate, endDate) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_raw_material_analysis",
+    {
+      p_branch_id: branchId,
+      p_start: startDate,
+      p_end: endDate
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_raw_material_analysis error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
     // ===============================
     // SETTINGS PAGE
     // ===============================
