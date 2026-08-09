@@ -4257,9 +4257,10 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
     </p>
 
     <h3 id="total-top-tier"
-        class="text-4xl font-extrabold mt-1 text-on-surface">
-     
-    </h3>
+	    class="text-4xl font-extrabold mt-1"
+	    style="color: red !important;">
+	  0
+	</h3>
     </div>
   </div>
 
@@ -20505,6 +20506,16 @@ function loadMemberStats() {
 
   const topTierEl =
     document.getElementById("total-top-tier");
+	const el = document.getElementById("total-top-tier");
+
+console.log("ELEMENT:", el);
+console.log("TEXT:", el?.innerText);
+console.log("DISPLAY:", getComputedStyle(el).display);
+console.log("VISIBILITY:", getComputedStyle(el).visibility);
+console.log("OPACITY:", getComputedStyle(el).opacity);
+console.log("COLOR:", getComputedStyle(el).color);
+console.log("FONT SIZE:", getComputedStyle(el).fontSize);
+console.log("HEIGHT:", getComputedStyle(el).height);
 
   const pointsEl =
     document.getElementById("total-points");
