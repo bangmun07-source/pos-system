@@ -26343,105 +26343,225 @@ document.addEventListener("click", function(e){
   }
 });
 
+  
 async function exportAnalyticsPDF() {
-	const start = document.getElementById("analyticsStartDate")?.value;
-	const end = document.getElementById("analyticsEndDate")?.value;
-	if (!start || !end) {
-	  alert("Pilih tanggal dulu");
-	  return;
-	}
-	const win = window.open("", "_blank");
-	if (!win) {
-	  alert("Popup diblokir browser");
-	  return;
-	}
-	// loading sementara
-	win.document.write(`
-	<html>
-		<body style="
-		  background:#0B0F14;
-		  color:white;
-		  font-family:Arial;
-		  display:flex;
-		  align-items:center;
-		  justify-content:center;
-		  height:100vh;
-		">
-			Analytics Report...
-		</body>
-	</html>
-	`);
-	
-	// ==================================
-	// SUPABASE / API (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data:html, error } =
-	await supabase.rpc(
-	  "export_analytics_pdf",
-	  {
-	    p_branch_id: state.branchId,
-	    p_start_date: start,
-	    p_end_date: end
-	  }
-	);
-	
-	if(error){
-	  throw error;
-	}
-	
-	win.document.open();
-	win.document.write(html);
-	win.document.close();
-	
-	*/
-	
 
-	// TEMP VERCEL
-	try {
-	  const html = `
-	  <html>
-		  <body style="
-		    font-family:Arial;
-		    padding:40px;
-		  ">
-		    <h2>Analytics Export</h2>
-		    <p>
-		      Temporary disabled while migrating to Supabase.
-		    </p>
-		
-		    <p>
-		      Branch: ${state.branchId}
-		    </p>
-		
-		    <p>
-		      Period:
-		      ${start} - ${end}
-		    </p>
-		  </body>
-	  </html>
-	  `;
-	  win.document.open();
-	  win.document.write(html);
-	  win.document.close();
-	}
-	catch(err){
-	  win.document.open();
-	  win.document.write(`
-	    <html>
-		    <body style="
-		      font-family:Arial;
-		      padding:40px;
-		    ">
-		      <h2>Export Failed</h2>
-		      <pre>${err.message}</pre>
-		    </body>
-	    </html>
-	  `);
-	  win.document.close();
-	}
+  const start =
+    document.getElementById(
+      "analyticsStartDate"
+    )?.value;
+
+  const end =
+    document.getElementById(
+      "analyticsEndDate"
+    )?.value;
+
+  const branchId =
+    state.branchId;
+
+  // =========================
+  // VALIDASI
+  // =========================
+
+  if (!start || !end) {
+    alert("Pilih tanggal dulu");
+    return;
+  }
+
+  if (!branchId) {
+    alert("Branch tidak valid");
+    return;
+  }
+
+  // =========================
+  // OPEN WINDOW
+  // =========================
+
+  const win =
+    window.open("", "_blank");
+
+  if (!win) {
+    alert(
+      "Popup diblokir browser"
+    );
+    return;
+  }
+
+  // =========================
+  // LOADING
+  // =========================
+
+  win.document.write(`
+    <html>
+
+      <body style="
+        background:#0B0F14;
+        color:white;
+        font-family:Arial;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+        margin:0;
+      ">
+
+        <div style="
+          text-align:center;
+        ">
+
+          <div style="
+            font-size:18px;
+            font-weight:bold;
+            margin-bottom:8px;
+          ">
+            Analytics Report
+          </div>
+
+          <div style="
+            font-size:13px;
+            opacity:.7;
+          ">
+            Generating PDF...
+          </div>
+
+        </div>
+
+      </body>
+
+    </html>
+  `);
+
+  try {
+
+    console.log(
+      "EXPORT ANALYTICS:",
+      {
+        branchId,
+        start,
+        end
+      }
+    );
+
+    // =========================
+    // CALL VERCEL API
+    // =========================
+
+    const response =
+      await fetch(
+        "/api/export-analytics-pdf",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            branchId,
+            start,
+            end
+          })
+        }
+      );
+
+    // =========================
+    // HANDLE ERROR HTTP
+    // =========================
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      throw new Error(
+        errorText ||
+        `Export gagal (${response.status})`
+      );
+    }
+
+    // =========================
+    // GET HTML REPORT
+    // =========================
+
+    const html =
+      await response.text();
+
+    if (!html) {
+      throw new Error(
+        "Server mengembalikan HTML kosong"
+      );
+    }
+
+    console.log(
+      "EXPORT ANALYTICS HTML RECEIVED"
+    );
+
+    // =========================
+    // RENDER REPORT
+    // =========================
+
+    win.document.open();
+
+    win.document.write(
+      html
+    );
+
+    win.document.close();
+
+  }
+  catch (err) {
+
+    console.error(
+      "Export Analytics:",
+      err
+    );
+
+    // =========================
+    // ERROR PAGE
+    // =========================
+
+    win.document.open();
+
+    win.document.write(`
+      <html>
+
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          padding:40px;
+        ">
+
+          <h2>
+            Export Failed
+          </h2>
+
+          <p style="
+            color:#aaa;
+          ">
+            Gagal membuat Analytics Report.
+          </p>
+
+          <pre style="
+            white-space:pre-wrap;
+            background:#151A21;
+            padding:15px;
+            border-radius:10px;
+          ">${String(
+            err?.message ||
+            err
+          )}</pre>
+
+        </body>
+
+      </html>
+    `);
+
+    win.document.close();
+  }
 }
+
 
 
 	// ==================================
