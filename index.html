@@ -17736,16 +17736,14 @@ async function fetchSettings(callback) {
         "Data settings tidak ditemukan"
       );
     }
-    state.settings = data;
-console.log(
-  "SETTINGS PAGE DATA TYPE:",
-  typeof data
-);
+    // Ambil bagian settings saja
+    state.settings =
+      data.settings || {};
 
-console.log(
-  "SETTINGS PAGE DATA:",
-  data
-);
+    console.log(
+      "SETTINGS:",
+      state.settings
+    );
     if (callback) {
       callback();
     }
