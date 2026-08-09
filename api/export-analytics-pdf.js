@@ -12,10 +12,6 @@ function rupiah(value) {
   return Number(value || 0).toLocaleString("id-ID");
 }
 
-function number(value) {
-  return Number(value || 0).toLocaleString("id-ID");
-}
-
 function escapeHtml(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -25,16 +21,10 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-function percent(value) {
-  return Number(value || 0).toFixed(1);
-}
-
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-    return res
-      .status(405)
-      .send("Method not allowed");
+    return res.status(405).send("Method not allowed");
   }
 
   try {
@@ -45,211 +35,68 @@ export default async function handler(req, res) {
       branchId
     } = req.body || {};
 
-    // =========================
-    // VALIDASI
-    // =========================
-
     if (!branchId) {
-      return res
-        .status(400)
-        .send("branchId wajib diisi");
+      return res.status(400).send(
+        "branchId wajib diisi"
+      );
     }
-
-    if (!start || !end) {
-      return res
-        .status(400)
-        .send("Tanggal wajib diisi");
-    }
-
-    console.log(
-      "EXPORT ANALYTICS:",
-      {
-        branchId,
-        start,
-        end
-      }
-    );
 
     // =========================
-    // GET ANALYTICS
+    // GET ANALYTICS DASHBOARD
     // =========================
 
     const {
-      data: analyticsData,
-      error: analyticsError
+      data,
+      error
     } = await supabase.rpc(
-      "get_analytics",
+      "get_analytics_dashboard",
       {
         p_branch_id: branchId,
-        p_start: start,
-        p_end: end
+        p_start: start || null,
+        p_end: end || null
       }
     );
 
-    if (analyticsError) {
-      throw analyticsError;
+    if (error) {
+      throw error;
     }
 
     console.log(
       "EXPORT ANALYTICS DATA:",
-      analyticsData
+      data
     );
 
-    // =========================
-    // PAYMENT DISTRIBUTION
-    // =========================
-
-    const {
-      data: paymentData,
-      error: paymentError
-    } = await supabase.rpc(
-      "get_payment_distribution",
-      {
-        p_branch_id: branchId,
-        p_start: start,
-        p_end: end
-      }
-    );
-
-    if (paymentError) {
-      throw paymentError;
+    if (!data) {
+      throw new Error(
+        "Data analytics kosong"
+      );
     }
-
-    console.log(
-      "EXPORT PAYMENT:",
-      paymentData
-    );
-
-    // =========================
-    // PEAK HOURS
-    // =========================
-
-    const {
-      data: peakData,
-      error: peakError
-    } = await supabase.rpc(
-      "get_peak_hours",
-      {
-        p_branch_id: branchId,
-        p_start: start,
-        p_end: end
-      }
-    );
-
-    if (peakError) {
-      throw peakError;
-    }
-
-    console.log(
-      "EXPORT PEAK HOURS:",
-      peakData
-    );
-
-    // =========================
-    // TOP SELLING ITEMS
-    // =========================
-
-    const {
-      data: topSellingData,
-      error: topSellingError
-    } = await supabase.rpc(
-      "get_top_selling_items",
-      {
-        p_branch_id: branchId,
-        p_start: start,
-        p_end: end
-      }
-    );
-
-    if (topSellingError) {
-      throw topSellingError;
-    }
-
-    console.log(
-      "EXPORT TOP SELLING:",
-      topSellingData
-    );
-
-    // =========================
-    // RAW MATERIAL ANALYSIS
-    // =========================
-
-    const {
-      data: rawMaterialData,
-      error: rawMaterialError
-    } = await supabase.rpc(
-      "get_raw_material_analysis",
-      {
-        p_branch_id: branchId,
-        p_start: start,
-        p_end: end
-      }
-    );
-
-    if (rawMaterialError) {
-      throw rawMaterialError;
-    }
-
-    console.log(
-      "EXPORT RAW MATERIAL:",
-      rawMaterialData
-    );
-
-    // =========================
-// DEBUG EXPORT DATA
-// =========================
-
-console.log(
-  "EXPORT ANALYTICS DATA:",
-  analyticsData
-);
-
-console.log(
-  "EXPORT PAYMENT:",
-  paymentData
-);
-
-console.log(
-  "EXPORT PEAK HOURS:",
-  peakData
-);
-
-console.log(
-  "EXPORT TOP SELLING:",
-  topSellingData
-);
-
-console.log(
-  "EXPORT RAW MATERIAL:",
-  rawMaterialData
-);
-
 
     // =========================
     // NORMALIZE
     // =========================
 
     const analytics =
-      analyticsData || {};
+      data.analytics || {};
 
-    const payment =
-      Array.isArray(paymentData)
-        ? paymentData
+    const paymentDistribution =
+      Array.isArray(data.paymentDistribution)
+        ? data.paymentDistribution
         : [];
 
     const peakHours =
-      Array.isArray(peakData)
-        ? peakData
+      Array.isArray(data.peakHours)
+        ? data.peakHours
         : [];
 
     const topSelling =
-      Array.isArray(topSellingData)
-        ? topSellingData
+      Array.isArray(data.topSelling)
+        ? data.topSelling
         : [];
 
     const rawMaterials =
-      Array.isArray(rawMaterialData)
-        ? rawMaterialData
+      Array.isArray(data.rawMaterials)
+        ? data.rawMaterials
         : [];
 
     // =========================
@@ -257,50 +104,27 @@ console.log(
     // =========================
 
     const paymentRows =
-      payment.length
+      paymentDistribution.length
 
-        ? payment.map(p => {
+        ? paymentDistribution.map(p => `
+            <tr>
 
-            const method =
-              p.method ??
-              p.payment_method ??
-              p.Payment_Method ??
-              "-";
+              <td>
+                ${escapeHtml(p.method)}
+              </td>
 
-            const value =
-              Number(
-                p.value ??
-                p.total ??
-                p.amount ??
-                0
-              );
+              <td class="right">
+                Rp ${rupiah(p.value)}
+              </td>
 
-            const pct =
-              Number(
-                p.percent ??
-                p.percentage ??
-                0
-              );
+              <td class="right">
+                ${Number(
+                  p.percent || 0
+                ).toFixed(1)}%
+              </td>
 
-            return `
-              <tr>
-
-                <td>
-                  ${escapeHtml(method)}
-                </td>
-
-                <td class="right">
-                  Rp ${rupiah(value)}
-                </td>
-
-                <td class="right">
-                  ${percent(pct)}%
-                </td>
-
-              </tr>
-            `;
-
-          }).join("")
+            </tr>
+          `).join("")
 
         : `
           <tr>
@@ -314,55 +138,147 @@ console.log(
         `;
 
     // =========================
-    // PEAK HOURS ROWS
+    // TOP SELLING
     // =========================
 
+    const topSellingRows =
+      topSelling.length
+
+        ? topSelling.map((item, index) => `
+            <tr>
+
+              <td>
+                ${index + 1}
+              </td>
+
+              <td>
+                ${escapeHtml(item.name)}
+              </td>
+
+              <td class="right">
+                ${Number(
+                  item.qty || 0
+                ).toLocaleString("id-ID")}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(item.revenue)}
+              </td>
+
+            </tr>
+          `).join("")
+
+        : `
+          <tr>
+            <td
+              colspan="4"
+              class="empty"
+            >
+              No top selling data
+            </td>
+          </tr>
+        `;
+
+    // =========================
+    // RAW MATERIAL
+    // =========================
+
+    const rawMaterialRows =
+      rawMaterials.length
+
+        ? rawMaterials.map(item => `
+            <tr>
+
+              <td>
+                ${escapeHtml(item.id)}
+              </td>
+
+              <td>
+                ${escapeHtml(item.name)}
+              </td>
+
+              <td>
+                ${escapeHtml(item.unit)}
+              </td>
+
+              <td class="right">
+                ${Number(
+                  item.stock || 0
+                ).toLocaleString("id-ID")}
+              </td>
+
+              <td>
+                ${escapeHtml(item.status)}
+              </td>
+
+            </tr>
+          `).join("")
+
+        : `
+          <tr>
+            <td
+              colspan="5"
+              class="empty"
+            >
+              No raw material data
+            </td>
+          </tr>
+        `;
+
+    // =========================
+    // PEAK HOURS
+    // =========================
+
+    const peakHourRows = [];
+
+    peakHours.forEach(
+      (day, dayIndex) => {
+
+        if (!Array.isArray(day)) {
+          return;
+        }
+
+        day.forEach(
+          (count, hour) => {
+
+            const value =
+              Number(count || 0);
+
+            if (value > 0) {
+
+              peakHourRows.push(`
+                <tr>
+
+                  <td>
+                    Day ${dayIndex + 1}
+                  </td>
+
+                  <td>
+                    ${String(hour).padStart(
+                      2,
+                      "0"
+                    )}:00
+                  </td>
+
+                  <td class="right">
+                    ${value}
+                  </td>
+
+                </tr>
+              `);
+
+            }
+
+          }
+        );
+
+      }
+    );
+
     const peakRows =
-      peakHours.length
+      peakHourRows.length
 
-        ? peakHours.map(p => {
-
-            const hour =
-              p.hour ??
-              p.jam ??
-              p.time ??
-              "-";
-
-            const orders =
-              Number(
-                p.orders ??
-                p.total_orders ??
-                p.count ??
-                0
-              );
-
-            const revenue =
-              Number(
-                p.revenue ??
-                p.total_revenue ??
-                p.value ??
-                0
-              );
-
-            return `
-              <tr>
-
-                <td>
-                  ${escapeHtml(hour)}
-                </td>
-
-                <td class="center">
-                  ${number(orders)}
-                </td>
-
-                <td class="right">
-                  Rp ${rupiah(revenue)}
-                </td>
-
-              </tr>
-            `;
-
-          }).join("")
+        ? peakHourRows.join("")
 
         : `
           <tr>
@@ -376,122 +292,87 @@ console.log(
         `;
 
     // =========================
-    // TOP SELLING ROWS
+    // WEEKLY
     // =========================
 
-    const topSellingRows =
-      topSelling.length
+    const weekly =
+      Array.isArray(
+        analytics.weekly
+      )
+        ? analytics.weekly
+        : [];
 
-        ? topSelling.map((item, index) => {
+    const weeklyRows =
+      weekly.length
 
-            const name =
-              item.name ??
-              item.product_name ??
-              item.Nama ??
-              "-";
-
-            const qty =
-              Number(
-                item.qty ??
-                item.quantity ??
-                item.total_qty ??
-                0
-              );
-
-            const revenue =
-              Number(
-                item.revenue ??
-                item.total_revenue ??
-                item.total ??
-                0
-              );
-
-            return `
+        ? weekly.map(
+            (value, index) => `
               <tr>
 
-                <td class="center">
-                  ${index + 1}
-                </td>
-
                 <td>
-                  ${escapeHtml(name)}
-                </td>
-
-                <td class="center">
-                  ${number(qty)}
+                  Week ${index + 1}
                 </td>
 
                 <td class="right">
-                  Rp ${rupiah(revenue)}
+                  Rp ${rupiah(value)}
                 </td>
 
               </tr>
-            `;
-
-          }).join("")
+            `
+          ).join("")
 
         : `
           <tr>
             <td
-              colspan="4"
+              colspan="2"
               class="empty"
             >
-              No product data
+              No weekly data
             </td>
           </tr>
         `;
 
     // =========================
-    // RAW MATERIAL ROWS
+    // ACTIVE MEMBERS
     // =========================
 
-    const rawMaterialRows =
-      rawMaterials.length
+    const activeMembers =
+      Array.isArray(
+        analytics.activeMemberList
+      )
+        ? analytics.activeMemberList
+        : [];
 
-        ? rawMaterials.map(item => {
+    const memberRows =
+      activeMembers.length
 
-            const name =
-              item.name ??
-              item.ingredient ??
-              item.ingredient_name ??
-              item.Ingredient ??
-              "-";
-
-            const qty =
-              Number(
-                item.qty ??
-                item.quantity ??
-                item.total_qty ??
-                0
-              );
-
-            const cost =
-              Number(
-                item.cost ??
-                item.total_cost ??
-                item.value ??
-                0
-              );
-
-            return `
+        ? activeMembers.map(
+            member => `
               <tr>
 
                 <td>
-                  ${escapeHtml(name)}
+                  ${escapeHtml(
+                    member.name
+                  )}
+                </td>
+
+                <td>
+                  ${escapeHtml(
+                    member.level
+                  )}
                 </td>
 
                 <td class="right">
-                  ${number(qty)}
-                </td>
-
-                <td class="right">
-                  Rp ${rupiah(cost)}
+                  ${Number(
+                    member.point || 0
+                  ).toLocaleString(
+                    "id-ID"
+                  )} PTS
                 </td>
 
               </tr>
-            `;
-
-          }).join("")
+            `
+          ).join("")
 
         : `
           <tr>
@@ -499,96 +380,10 @@ console.log(
               colspan="3"
               class="empty"
             >
-              No raw material data
+              No active members
             </td>
           </tr>
         `;
-
-    // =========================
-    // ANALYTICS VALUES
-    // =========================
-
-    const revenue =
-      Number(
-        analytics.revenue ??
-        analytics.netRevenue ??
-        analytics.net_revenue ??
-        0
-      );
-
-    const hpp =
-      Number(
-        analytics.hpp ??
-        analytics.hppTotal ??
-        analytics.hpp_total ??
-        0
-      );
-
-    const grossProfit =
-      Number(
-        analytics.grossProfit ??
-        analytics.gross_profit ??
-        revenue - hpp
-      );
-
-    const operational =
-      Number(
-        analytics.operational ??
-        analytics.operationalExpense ??
-        analytics.operational_expense ??
-        0
-      );
-
-    const otherIncome =
-      Number(
-        analytics.otherIncome ??
-        analytics.other_income ??
-        0
-      );
-
-    const netProfitBeforeOtherIncome =
-      Number(
-        analytics.netProfitBeforeOtherIncome ??
-        analytics.net_profit_before_other_income ??
-        grossProfit - operational
-      );
-
-    const netProfit =
-      Number(
-        analytics.netProfit ??
-        analytics.net_profit ??
-        netProfitBeforeOtherIncome +
-          otherIncome
-      );
-
-    const growth =
-      Number(
-        analytics.growth ??
-        0
-      );
-
-    const orders =
-      Number(
-        analytics.orders ??
-        analytics.totalOrders ??
-        analytics.total_orders ??
-        0
-      );
-
-    const aov =
-      Number(
-        analytics.aov ??
-        analytics.averageOrderValue ??
-        analytics.average_order_value ??
-        0
-      );
-
-    const activeMembers =
-      Number(
-        analytics.activeMembers ??
-        analytics.active_members ??
-        0
-      );
 
     // =========================
     // HTML REPORT
@@ -613,230 +408,134 @@ Analytics Report
   box-sizing:border-box;
 }
 
-html,
 body{
   margin:0;
-  padding:0;
-}
-
-body{
-
+  padding:40px 20px;
   background:#0B0F14;
-
-  font-family:
-    Arial,
-    sans-serif;
-
+  font-family:Arial,sans-serif;
   color:#333;
-
-  padding:
-    40px 20px;
 }
 
 .export-toolbar{
-
   width:100%;
-
   max-width:1100px;
-
-  margin:
-    0 auto 20px auto;
-
+  margin:0 auto 20px;
   display:flex;
-
-  justify-content:
-    space-between;
-
+  justify-content:space-between;
   align-items:center;
-
   color:white;
-
   font-size:14px;
 }
 
 .export-toolbar button{
-
-  border:
-    1px solid
-    rgba(255,255,255,.15);
-
-  background:
-    rgba(255,255,255,.08);
-
+  border:1px solid rgba(255,255,255,.15);
+  background:rgba(255,255,255,.08);
   color:white;
-
-  padding:
-    10px 16px;
-
+  padding:10px 16px;
   border-radius:10px;
-
   cursor:pointer;
-
   font-weight:bold;
 }
 
 .report{
-
   width:100%;
-
   max-width:1100px;
-
   margin:0 auto;
-
   background:white;
-
   padding:45px;
-
   border-radius:4px;
-
   box-shadow:
-    0 20px 60px
-    rgba(0,0,0,.45);
+    0 20px 60px rgba(0,0,0,.45);
 }
 
 .header{
-
   text-align:center;
-
   margin-bottom:20px;
 }
 
 .logo{
-
   width:170px;
-
   height:auto;
-
   max-height:90px;
-
   object-fit:contain;
-
-  margin-bottom:12px;
 }
 
 .title{
-
   font-size:24px;
-
   font-weight:bold;
-
   margin-bottom:8px;
 }
 
 .subtitle{
-
   font-size:12px;
-
   color:#777;
-
-  margin-bottom:3px;
+  margin-bottom:4px;
 }
 
 .kpi-grid{
-
   display:grid;
-
   grid-template-columns:
     repeat(3,1fr);
-
   gap:16px;
-
   margin:30px 0;
 }
 
 .kpi-card{
-
-  border:
-    1px solid #e5e5e5;
-
+  border:1px solid #e5e5e5;
   border-radius:14px;
-
   padding:22px;
-
   background:#fafafa;
-
   text-align:center;
 }
 
 .kpi-title{
-
   font-size:11px;
-
   color:#666;
-
   font-weight:bold;
-
   margin-bottom:12px;
 }
 
 .kpi-value{
-
-  font-size:22px;
-
+  font-size:20px;
   font-weight:bold;
-
   color:#222;
 }
 
 .card{
-
-  border:
-    1px solid #e5e5e5;
-
+  border:1px solid #e5e5e5;
   border-radius:14px;
-
   padding:18px;
-
   margin-top:20px;
-
   background:#fff;
 }
 
 .card h3{
-
   margin-top:0;
-
   margin-bottom:12px;
-
   font-size:16px;
 }
 
 table{
-
   width:100%;
-
   border-collapse:collapse;
-
   font-size:11px;
-
   margin-top:10px;
 }
 
 th{
-
   background:#f5f5f5;
-
   padding:10px;
-
   text-align:left;
-
   font-weight:bold;
 }
 
 td{
-
   padding:10px;
-
-  border-bottom:
-    1px solid #eee;
+  border-bottom:1px solid #eee;
 }
 
 .right{
   text-align:right;
-}
-
-.left{
-  text-align:left;
 }
 
 .center{
@@ -844,67 +543,37 @@ td{
 }
 
 .empty{
-
   text-align:center;
-
   color:#777;
-
   padding:25px;
 }
 
-.metric{
-
-  display:flex;
-
-  justify-content:
-    space-between;
-
-  padding:10px 0;
-
-  border-bottom:
-    1px solid #eee;
+.footer{
+  margin-top:40px;
+  text-align:center;
+  font-size:9px;
+  color:#888;
 }
 
 .page-break{
-
   page-break-before:always;
-
-  break-before:page;
-}
-
-.footer{
-
-  margin-top:40px;
-
-  text-align:center;
-
-  font-size:9px;
-
-  color:#888;
 }
 
 @media print{
 
   body{
-
     background:white;
-
     padding:0;
   }
 
   .export-toolbar{
-
     display:none;
   }
 
   .report{
-
     max-width:none;
-
     box-shadow:none;
-
     border-radius:0;
-
     padding:25px;
   }
 
@@ -916,28 +585,19 @@ td{
 
 <body>
 
-<!-- TOOLBAR -->
-
 <div class="export-toolbar">
 
   <div>
     📊 Analytics Report
   </div>
 
-  <button
-    onclick="window.print()"
-  >
+  <button onclick="window.print()">
     Download / Print PDF
   </button>
 
 </div>
 
-
-<!-- REPORT -->
-
 <div class="report">
-
-  <!-- LOGO -->
 
   <div class="header">
 
@@ -955,29 +615,20 @@ td{
 
   </div>
 
-
-  <!-- TITLE -->
-
   <div class="title">
-
     Executive Analytics Report
-
   </div>
 
   <div class="subtitle">
-
-    Periode:
-    ${escapeHtml(start)}
-    -
-    ${escapeHtml(end)}
-
-  </div>
-
-  <div class="subtitle">
-
     Branch:
     ${escapeHtml(branchId)}
+  </div>
 
+  <div class="subtitle">
+    Periode:
+    ${escapeHtml(start || "-")}
+    -
+    ${escapeHtml(end || "-")}
   </div>
 
 
@@ -992,7 +643,9 @@ td{
       </div>
 
       <div class="kpi-value">
-        Rp ${rupiah(revenue)}
+        Rp ${rupiah(
+          analytics.revenue
+        )}
       </div>
 
     </div>
@@ -1005,7 +658,9 @@ td{
       </div>
 
       <div class="kpi-value">
-        Rp ${rupiah(grossProfit)}
+        Rp ${rupiah(
+          analytics.grossProfit
+        )}
       </div>
 
     </div>
@@ -1018,7 +673,9 @@ td{
       </div>
 
       <div class="kpi-value">
-        Rp ${rupiah(netProfit)}
+        Rp ${rupiah(
+          analytics.netProfit
+        )}
       </div>
 
     </div>
@@ -1027,11 +684,13 @@ td{
     <div class="kpi-card">
 
       <div class="kpi-title">
-        TOTAL ORDERS
+        HPP
       </div>
 
       <div class="kpi-value">
-        ${number(orders)}
+        Rp ${rupiah(
+          analytics.hpp
+        )}
       </div>
 
     </div>
@@ -1040,11 +699,13 @@ td{
     <div class="kpi-card">
 
       <div class="kpi-title">
-        AOV
+        OPERATIONAL
       </div>
 
       <div class="kpi-value">
-        Rp ${rupiah(aov)}
+        Rp ${rupiah(
+          analytics.operational
+        )}
       </div>
 
     </div>
@@ -1057,7 +718,9 @@ td{
       </div>
 
       <div class="kpi-value">
-        ${number(activeMembers)}
+        ${Number(
+          analytics.activeMembers || 0
+        ).toLocaleString("id-ID")}
       </div>
 
     </div>
@@ -1065,12 +728,12 @@ td{
   </div>
 
 
-  <!-- EXECUTIVE SUMMARY -->
+  <!-- PROFIT SUMMARY -->
 
   <div class="card">
 
     <h3>
-      Executive Summary
+      Profit Summary
     </h3>
 
     <table>
@@ -1078,15 +741,10 @@ td{
       <thead>
 
         <tr>
-
-          <th>
-            Metric
-          </th>
-
+          <th>Metric</th>
           <th class="right">
             Value
           </th>
-
         </tr>
 
       </thead>
@@ -1094,107 +752,89 @@ td{
       <tbody>
 
         <tr>
-
-          <td>
-            Net Revenue
-          </td>
-
+          <td>Revenue</td>
           <td class="right">
-            Rp ${rupiah(revenue)}
+            Rp ${rupiah(
+              analytics.revenue
+            )}
           </td>
-
         </tr>
 
         <tr>
-
-          <td>
-            HPP
-          </td>
-
+          <td>HPP</td>
           <td class="right">
-            Rp ${rupiah(hpp)}
+            Rp ${rupiah(
+              analytics.hpp
+            )}
           </td>
-
         </tr>
 
         <tr>
-
-          <td>
-            Gross Profit
-          </td>
-
+          <td>Gross Profit</td>
           <td class="right">
-            Rp ${rupiah(grossProfit)}
+            Rp ${rupiah(
+              analytics.grossProfit
+            )}
           </td>
-
         </tr>
 
         <tr>
-
-          <td>
-            Operational Expense
-          </td>
-
+          <td>Operational Expense</td>
           <td class="right">
-            Rp ${rupiah(operational)}
+            Rp ${rupiah(
+              analytics.operational
+            )}
           </td>
-
         </tr>
 
         <tr>
-
           <td>
             Net Profit Before Other Income
           </td>
 
           <td class="right">
             Rp ${rupiah(
-              netProfitBeforeOtherIncome
+              analytics.netProfitBeforeOtherIncome
             )}
           </td>
-
         </tr>
 
         <tr>
-
           <td>
             Other Income
           </td>
 
           <td class="right">
-            Rp ${rupiah(otherIncome)}
+            Rp ${rupiah(
+              analytics.otherIncome
+            )}
           </td>
-
         </tr>
 
         <tr>
-
           <td>
-            <b>
-              Final Net Profit
-            </b>
+            <b>Final Net Profit</b>
           </td>
 
           <td class="right">
-
             <b>
-              Rp ${rupiah(netProfit)}
+              Rp ${rupiah(
+                analytics.netProfit
+              )}
             </b>
-
           </td>
-
         </tr>
 
         <tr>
-
           <td>
             Growth
           </td>
 
           <td class="right">
-            ${growth.toFixed(2)}%
+            ${Number(
+              analytics.growth || 0
+            ).toFixed(2)}%
           </td>
-
         </tr>
 
       </tbody>
@@ -1245,9 +885,46 @@ td{
   </div>
 
 
-  <!-- TOP PRODUCTS -->
+  <!-- WEEKLY -->
 
   <div class="card">
+
+    <h3>
+      Weekly Net Profit
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Week
+          </th>
+
+          <th class="right">
+            Net Profit
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${weeklyRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- TOP SELLING -->
+
+  <div class="card page-break">
 
     <h3>
       Top Selling Products
@@ -1259,7 +936,7 @@ td{
 
         <tr>
 
-          <th class="center">
+          <th>
             #
           </th>
 
@@ -1267,8 +944,8 @@ td{
             Product
           </th>
 
-          <th class="center">
-            Qty
+          <th class="right">
+            Qty Sold
           </th>
 
           <th class="right">
@@ -1305,15 +982,15 @@ td{
         <tr>
 
           <th>
+            Day
+          </th>
+
+          <th>
             Hour
           </th>
 
-          <th class="center">
-            Orders
-          </th>
-
           <th class="right">
-            Revenue
+            Transactions
           </th>
 
         </tr>
@@ -1333,9 +1010,7 @@ td{
 
   <!-- RAW MATERIAL -->
 
-  <div class="page-break"></div>
-
-  <div class="card">
+  <div class="card page-break">
 
     <h3>
       Raw Material Analysis
@@ -1348,15 +1023,23 @@ td{
         <tr>
 
           <th>
-            Ingredient
+            ID
+          </th>
+
+          <th>
+            Material
+          </th>
+
+          <th>
+            Unit
           </th>
 
           <th class="right">
-            Quantity
+            Stock
           </th>
 
-          <th class="right">
-            Cost
+          <th>
+            Status
           </th>
 
         </tr>
@@ -1374,7 +1057,46 @@ td{
   </div>
 
 
-  <!-- FOOTER -->
+  <!-- ACTIVE MEMBERS -->
+
+  <div class="card">
+
+    <h3>
+      Active Members
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Name
+          </th>
+
+          <th>
+            Tier
+          </th>
+
+          <th class="right">
+            Point
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${memberRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
 
   <div class="footer">
 
@@ -1404,6 +1126,7 @@ td{
       .send(html);
 
   }
+
   catch (err) {
 
     console.error(
@@ -1411,23 +1134,13 @@ td{
       err
     );
 
-    console.error(
-      "ERROR MESSAGE:",
-      err?.message
-    );
-
-    console.error(
-      "ERROR STACK:",
-      err?.stack
-    );
-
     return res
       .status(500)
       .json({
-        success: false,
+        success:false,
         error:
           err?.message ||
-          "Export analytics gagal"
+          "Export Analytics gagal"
       });
 
   }
