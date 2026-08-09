@@ -1048,14 +1048,13 @@ async function getRecipeMasterLedgerRPC(branchId) {
     // ===============================
 
 async function getSettingsPageDataRPC() {
-
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_settings_page_data"
   );
-    
+
   if (error) {
     console.error(
       "get_settings_page_data error:",
@@ -1063,6 +1062,10 @@ async function getSettingsPageDataRPC() {
     );
     throw error;
   }
+  console.log(
+    "RAW SETTINGS RPC:",
+    data
+  );
   return data;
 }
 
