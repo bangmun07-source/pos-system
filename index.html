@@ -20490,86 +20490,19 @@ function initTierFilter() {
 
 }
 
-function loadMemberStats() {
-
+function loadMemberStats(){
   const res =
     state.memberPageData?.stats;
 
-  if (!res) return;
-
-  console.log(
-    "MEMBER STATS:",
-    res
-  );
-
-  // =========================
-  // TOTAL MEMBERS
-  // =========================
-
-  const totalEl =
-    document.getElementById(
-      "total-members"
-    );
-
-  if (totalEl) {
-
-    totalEl.innerText =
-      formatNumber(
-        res.total ?? 0
-      );
-
-  }
-
-
-  // =========================
-  // TOP TIER
-  // =========================
-
-  const labelEl =
-    document.getElementById(
-      "top-tier-label"
-    );
-
-  const valueEl =
-    document.getElementById(
-      "total-top-tier"
-    );
-
-  if (labelEl) {
-
-    labelEl.innerText =
-      `${res.topTierName || "Top"} Tier`;
-
-  }
-
-  if (valueEl) {
-
-    valueEl.innerText =
-      String(
-        res.topTier ?? 0
-      );
-
-  }
-
-
-  // =========================
-  // POINTS
-  // =========================
-
-  const pointsEl =
-    document.getElementById(
-      "total-points"
-    );
-
-  if (pointsEl) {
-
-    pointsEl.innerText =
-      formatCompact(
-        res.points ?? 0
-      );
-
-  }
-
+  if(!res) return;
+  document.getElementById("total-members").innerText =
+    formatNumber(res.total);
+  document.getElementById("total-top-tier").innerText =
+    formatNumber(res.topTier);
+  document.getElementById("total-points").innerText =
+    formatCompact(res.points);
+  document.getElementById("top-tier-label").innerText =
+    `${res.topTierName} Tier`;
 }
 
 function loadMemberGrowth() {
