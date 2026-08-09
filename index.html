@@ -21476,109 +21476,89 @@ function traceCall(name) {
 }
 
 async function loadTables() {
-    if (!state.branchId) {
-      return;
-    }
-    if (
-      state.tableData &&
-      state.tableDataBranchId === state.branchId
-    ) {
-      renderTableGrid(
-        state.tableData
-      );
-      return;
-    }
-    
-    try {
-    
-    // ==================================
-    // SUPABASE AKTIFKAN NANTI
-    // ==================================
-    
-    /*
-    const { data, error } =
-    await supabase.rpc(
-      "get_table_data",
-      {
-        p_branch_id:
-          state.branchId
-      }
+
+  if (!state.branchId) {
+    return;
+  }
+
+  // LOAD FROM CACHE
+  if (
+    state.tableData &&
+    state.tableDataBranchId === state.branchId
+  ) {
+    renderTableGrid(
+      state.tableData
     );
-    
-    if(error){
-     throw error;
-    }
-    
-    const res = data;
-    */
-    
-    // ==================================
-    // TEMP VERCEL
-    // ==================================
-    
-    const res = [];
-        state.tableData = res;
-        state.tableDataBranchId =
-        state.branchId;
-        renderTableGrid(state.tableData);
-    }
-        
-    catch(err){
-        console.error(
-            "Load Table Error:",
-        err
-        );
-    
-        showToast(
-            "Gagal memuat meja",
-            "error"
-        );
-    }
+    return;
+  }
+
+  try {
+
+    // SUPABASE RPC
+    const res =
+      await getTableDataRPC(
+        state.branchId
+      );
+    console.log(
+      "TABLE DATA:",
+      res
+    );
+    state.tableData =
+      res || [];
+    state.tableDataBranchId =
+      state.branchId;
+    renderTableGrid(
+      state.tableData
+    );
+
+  }
+
+  catch (err) {
+    console.error(
+      "Load Table Error:",
+      err
+    );
+    showToast(
+      "Gagal memuat meja",
+      "error"
+    );
+
+  }
 }
 
-async function loadBilling(mejaId){
+async function loadBilling(mejaId) {
 
-    try{
-    
-    
-    // ==================================
-    // SUPABASE NANTI
-    // ==================================
-    
-    /*
-    const {data,error} =
-    await supabase.rpc(
-    "get_latest_transaction_by_table",
-    {
-     p_meja_id: mejaId,
-     p_branch_id: state.branchId
+  try {
+	
+    if (!mejaId) {
+      renderBilling(null);
+      return;
     }
+
+    // SUPABASE RPC
+    const res =
+      await getLatestTransactionByTableRPC(
+        mejaId
+      );
+    console.log(
+      "BILLING DATA:",
+      res
     );
-    
-    if(error)
-     throw error;
-    
-    
-    const res = data;
-    */
-    
-    
-    // TEMP
-    
-            const res = null;
-             renderBilling(res);
-        }
-        catch(err){
-            console.error(
-                "Billing Error:",
-                err
-            );
-        
-            showToast(
-                "Gagal load billing",
-                "error"
-            );
-        }
+    renderBilling(
+      res || null
+    );
+  }
+
+  catch (err) {
+    console.error(
+      "Billing Error:",
+      err
+    );
+    showToast(
+      "Gagal load billing",
+      "error"
+    );
+  }
 }
 
 function renderTableGrid(data) {
@@ -21703,117 +21683,109 @@ function cancelReserve() {
 
 async function saveReserve() {
 
-    const name =
-    document.getElementById("reserveName").value;
-    
-    const note =
-    document.getElementById("reserveNote").value;
-    
-    
-        try {
-        
-        
-        // ==================================
-        // SUPABASE AKTIFKAN NANTI
-        // ==================================
-        
-        /*
-        const { data, error } =
-        await supabase.rpc(
-          "reserve_table",
-          {
-            p_table_id: selectedTableId,
-            p_name: name,
-            p_note: note,
-            p_branch_id: state.branchId
-          }
-        );
-        
-        if(error){
-          throw error;
-        }
-        */
-        
-        // TEMP
-            const res = true;
-            
-                if(res){
-                  state.tableData = null;
-                  cancelReserve();
-                  loadTables();
-                }
-            
-            
-            }
-            catch(err){
-            console.error(
-            "Reserve table error:",
-            err
-            );
-            
-            showToast(
-            "Gagal reserve meja",
-            "error"
-            );
-        }
+  const name =
+    document.getElementById(
+      "reserveName"
+    )?.value?.trim() || "";
+  const note =
+    document.getElementById(
+      "reserveNote"
+    )?.value?.trim() || "";
+
+  try {
+
+    if (!selectedTableId) {
+      showToast(
+        "Meja belum dipilih",
+        "error"
+      );
+      return;
+    }
+
+    // SUPABASE RPC
+    const res =
+      await reserveTableRPC(
+        selectedTableId,
+        name,
+        note
+      );
+
+    console.log(
+      "RESERVE TABLE RESULT:",
+      res
+    );
+
+    if (res) {
+      state.tableData = null;
+      cancelReserve();
+      await loadTables();
+    }
+  }
+
+  catch (err) {
+    console.error(
+      "Reserve table error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal reserve meja",
+      "error"
+    );
+  }
 }
 
 async function clearSelectedTable() {
 
-    if (!selectedTableId) {
-      alert("Pilih meja dulu!");
-      return;
-    }
-    
-        
-        try {
-    
-    
-    // ==================================
-    // SUPABASE AKTIFKAN NANTI
-    // ==================================
-    
-    /*
-    const { data, error } =
-    await supabase.rpc(
-      "clear_table_status",
-      {
-        p_table_id: selectedTableId,
-        p_branch_id: state.branchId
-      }
+  if (!selectedTableId) {
+    alert(
+      "Pilih meja dulu!"
     );
-    
-    if(error){
-      throw error;
-    }
-    */
-    
-    // TEMP
-        const res = true;
-        if(res){
-          state.tableData = null;
-          loadTables();
-          selectedTableId = null;
-          const info =
-            document.getElementById(
-              "billing-table-info"
-            );
-          if(info){
-            info.innerText =
-              "No Table Selected";
-          }
-        }
-    }
-    catch(err){ 
-        console.error(
-            "Clear table error:",
-        err
+    return;
+  }
+
+  try {
+	
+    // SUPABASE RPC
+    const res =
+      await clearTableStatusRPC(
+        selectedTableId
+      );
+    console.log(
+      "CLEAR TABLE RESULT:",
+      res
+    );
+
+    if (res) {
+      // Clear cache
+      state.tableData = null;
+      // Reload table
+      await loadTables();
+      // Reset selected table
+      selectedTableId = null;
+      const info =
+        document.getElementById(
+          "billing-table-info"
         );
-        showToast(
-            "Gagal reset meja",
-            "error"
-        );
+
+      if (info) {
+        info.innerText =
+          "No Table Selected";
+      }
     }
+  }
+  catch (err) {
+
+    console.error(
+      "Clear table error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal reset meja",
+      "error"
+    );
+  }
 }
 
 function renderBilling(data) {
@@ -21925,61 +21897,61 @@ function closeAddTableModal() {
 }
 	
 async function saveNewTable() {
-    const tableName = document.getElementById("newTableName")
-    .value
-    .trim();
-    
-    if (!tableName) {
-      alert(
-        "Table Name wajib diisi."
+
+  const tableName =
+    document
+      .getElementById("newTableName")
+      ?.value
+      ?.trim();
+  if (!tableName) {
+    alert(
+      "Table Name wajib diisi."
+    );
+    return;
+  }
+
+  if (!state.branchId) {
+    alert(
+      "Branch belum tersedia."
+    );
+    return;
+  }
+
+  try {
+	
+    // SUPABASE RPC
+    const res =
+      await addNewTableRPC(
+        tableName,
+        state.branchId
       );
-      return;
+    console.log(
+      "ADD TABLE RESULT:",
+      res
+    );
+
+    if (res) {
+      closeAddTableModal();
+
+      // CLEAR CACHE
+      state.tableData = null;
+      state.tableDataBranchId = null;
+
+      // RELOAD TABLE
+      await loadTables();
     }
-    try {
+  }
 
-
-// ==================================
-// SUPABASE AKTIFKAN NANTI
-// ==================================
-
-/*
-const { data, error } =
-await supabase
-.from("Meja")
-.insert({
-  name: tableName,
-  branch_id: state.branchId,
-  status: "available"
-});
-
-
-if(error){
-  throw error;
-}
-*/
-
-
-// TEMP
-
-        const res = true;
-        if(res){
-          closeAddTableModal();
-          // clear cache
-          state.tableData = null;
-          state.tableDataBranchId = null;
-          loadTables();
-        }
-    }
-        catch(err){
-        console.error(
-        "Add table error:",
-        err
-        );
-        
-        alert(
-        "Gagal menambahkan meja"
-        );
-    }
+  catch (err) {
+    console.error(
+      "Add table error:",
+      err
+    );
+    alert(
+      err?.message ||
+      "Gagal menambahkan meja"
+    );
+  }
 }
 
 
