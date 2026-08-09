@@ -25815,93 +25815,133 @@ function onDateChange() {
 
 let analyticsLoading = false;
 async function loadAnalyticsPage() {
+
   if (analyticsLoading) return;
+
   analyticsLoading = true;
 
   try {
-    const startEl = document.getElementById("analyticsStartDate");
-    const endEl = document.getElementById("analyticsEndDate");
+
+    const startEl =
+      document.getElementById(
+        "analyticsStartDate"
+      );
+
+    const endEl =
+      document.getElementById(
+        "analyticsEndDate"
+      );
+
     if (!startEl || !endEl) {
-      analyticsLoading = false;
       return;
     }
-    const startDate = startEl.value;
-    const endDate = endEl.value;
+
+    const startDate =
+      startEl.value;
+
+    const endDate =
+      endEl.value;
+
     if (!startDate || !endDate) {
-      analyticsLoading = false;
       return;
     }
+
     const cacheKey =
       JSON.stringify({
         branchId: state.branchId,
         startDate,
         endDate
       });
+
+
+    // ==========================
     // CACHE
+    // ==========================
+
     if (
       state.analyticsData &&
       state.analyticsFilter === cacheKey
     ) {
+
       renderAnalyticsPageData(
         state.analyticsData
       );
-      analyticsLoading = false;
+
       return;
     }
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_analytics_dashboard",
-        {
-          p_branch_id: state.branchId,
-          p_start_date: startDate,
-          p_end_date: endDate
-        }
+
+    // ==========================
+    // SUPABASE RPC
+    // ==========================
+
+    const res =
+      await getAnalyticsDashboardRPC(
+        state.branchId,
+        startDate,
+        endDate
       );
 
+    console.log(
+      "ANALYTICS DASHBOARD:",
+      res
+    );
 
-    if(error){
-      throw error;
+
+    // ==========================
+    // VALIDASI
+    // ==========================
+
+    if (!res) {
+      throw new Error(
+        "Data analytics tidak ditemukan"
+      );
     }
 
-    const res = data;
-    */
 
-    // TEMP DATA VERCEL
-    const res = {
-      summary: {},
-      revenueTrend: [],
-      category: [],
-      payment: [],
-      topProduct: []
-    };
-    // SIMPAN CACHE
-    state.analyticsData = res;
-    state.analyticsFilter = cacheKey;
+    // ==========================
+    // CACHE
+    // ==========================
+
+    state.analyticsData =
+      res;
+
+    state.analyticsFilter =
+      cacheKey;
+
+
+    // ==========================
     // RENDER
+    // ==========================
+
     renderAnalyticsPageData(
       res
     );
+
   }
-  catch(err){
+
+  catch (err) {
+
     console.error(
       "Analytics:",
       err
     );
+
     showToast(
+      err?.message ||
       "Gagal load analytics",
       "error"
     );
-  }
-  finally{
-    analyticsLoading = false;
-  }
-}	
 
+  }
+
+  finally {
+
+    analyticsLoading = false;
+
+  }
+
+}
 function renderAnalyticsPageData(data){
   renderAnalytics( data.analytics );
   renderPaymentDistribution( data.paymentDistribution );
