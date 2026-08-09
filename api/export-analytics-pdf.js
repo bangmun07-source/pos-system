@@ -228,58 +228,81 @@ export default async function handler(req, res) {
     // =========================
     // PEAK HOURS
     // =========================
-
+    
     const peakHourRows = [];
-
+    
+    const dayNames = [
+      "Minggu",
+      "Senin",
+      "Selasa",
+      "Rabu",
+      "Kamis",
+      "Jumat",
+      "Sabtu"
+    ];
+    
+    const startDateObj =
+      new Date(`${start}T00:00:00`);
+    
     peakHours.forEach(
       (day, dayIndex) => {
-
+    
         if (!Array.isArray(day)) {
           return;
         }
-
+    
+        const currentDate =
+          new Date(startDateObj);
+    
+        currentDate.setDate(
+          startDateObj.getDate() + dayIndex
+        );
+    
+        const dayName =
+          dayNames[currentDate.getDay()];
+    
         day.forEach(
           (count, hour) => {
-
+    
             const value =
               Number(count || 0);
-
+    
             if (value > 0) {
-
+    
               peakHourRows.push(`
                 <tr>
-
+    
                   <td>
-                    Day ${dayIndex + 1}
+                    ${dayName}
                   </td>
-
+    
                   <td>
                     ${String(hour).padStart(
                       2,
                       "0"
                     )}:00
                   </td>
-
+    
                   <td class="right">
                     ${value}
                   </td>
-
+    
                 </tr>
               `);
-
+    
             }
-
+    
           }
         );
-
+    
       }
     );
-
+    
     const peakRows =
       peakHourRows.length
-
+    
         ? peakHourRows.join("")
-
+    
         : `
           <tr>
             <td
@@ -290,7 +313,6 @@ export default async function handler(req, res) {
             </td>
           </tr>
         `;
-
     // =========================
     // WEEKLY
     // =========================
