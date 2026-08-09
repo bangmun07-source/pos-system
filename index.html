@@ -17730,10 +17730,15 @@ async function fetchSettings(callback) {
       );
     }
     state.settings = data;
-    console.log(
-      "SETTINGS:",
-      state.settings
-    );
+console.log(
+  "SETTINGS PAGE DATA TYPE:",
+  typeof data
+);
+
+console.log(
+  "SETTINGS PAGE DATA:",
+  data
+);
     if (callback) {
       callback();
     }
