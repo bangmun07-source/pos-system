@@ -20490,78 +20490,21 @@ function initTierFilter() {
 
 }
 
-function loadMemberStats() {
-
+function loadMemberStats(){
   const res =
     state.memberPageData?.stats;
 
-  if (!res) return;
-
-  console.log("MEMBER STATS:", res);
-
-  const totalEl =
-    document.getElementById("total-members");
-
-  const topTierEl =
-    document.getElementById("total-top-tier");
-	const el = document.getElementById("total-top-tier");
-
-el.style.cssText = `
-  display: block !important;
-  height: auto !important;
-  min-height: 40px !important;
-  line-height: 1.2 !important;
-  font-size: 36px !important;
-  font-weight: 800 !important;
-  color: red !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-`;
-
-	
-console.log(
-  "RECT:",
-  el.getBoundingClientRect()
-);
-
-console.log(
-  "PARENT RECT:",
-  el.parentElement.getBoundingClientRect()
-);
-
-console.log(
-  "CARD RECT:",
-  el.closest(".rounded-2xl")?.getBoundingClientRect()
-);
-
-
-  const pointsEl =
-    document.getElementById("total-points");
-
-  const topTierLabelEl =
-    document.getElementById("top-tier-label");
-
-  console.log("TOP TIER ELEMENT:", topTierEl);
-
-  if (totalEl) {
-    totalEl.innerText =
-      formatNumber(res.total);
-  }
-
-  if (topTierEl) {
-    topTierEl.innerText =
-      String(res.topTier ?? 0);
-  }
-
-  if (pointsEl) {
-    pointsEl.innerText =
-      formatCompact(res.points);
-  }
-
-  if (topTierLabelEl) {
-    topTierLabelEl.innerText =
-      `${res.topTierName || "Top"} Tier`;
-  }
+  if(!res) return;
+  document.getElementById("total-members").innerText =
+    formatNumber(res.total);
+	document.getElementById("top-tier-label").innerText =
+	`${res.topTierName} Tier`;
+  document.getElementById("total-top-tier").innerText =
+    formatNumber(res.topTier);
+console.log("LABEL:", label?.innerText);
+console.log("VALUE:", value?.innerText);
+  document.getElementById("total-points").innerText =
+    formatCompact(res.points);
 }
 
 function loadMemberGrowth() {
