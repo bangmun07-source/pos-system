@@ -357,10 +357,7 @@ export default async function handler(req, res) {
     // =========================
     // ACTIVE MEMBERS
     // =========================
-console.log(
-  "EXPORT ACTIVE MEMBERS:",
-  analyticsData?.analytics?.activeMemberList
-);
+
     const activeMembers =
       Array.isArray(
         analytics.activeMemberList
