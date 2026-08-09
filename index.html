@@ -20493,6 +20493,10 @@ function initTierFilter() {
 
 function loadMemberStats(){
   const res = state.memberPageData?.stats;
+	console.log(
+    "MEMBER STATS:",
+    res
+  );
   if(!res) return;
   document.getElementById("total-members").innerText =
     formatNumber(res.total);
