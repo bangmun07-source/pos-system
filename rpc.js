@@ -1,3 +1,92 @@
+async function uploadBusinessLogo(base64) {
+
+  if (!base64) {
+    return null;
+  }
+    
+  // VALIDATE BASE64
+  const matches =
+    base64.match(
+      /^data:(.+);base64,(.+)$/
+    );
+  if (!matches) {
+    throw new Error(
+      "Format gambar tidak valid"
+    );
+  }
+  const mime =
+    matches[1];
+  const base64Data =
+    matches[2];
+
+  // BASE64 → BINARY
+  const binary =
+    atob(base64Data);
+  const bytes =
+    new Uint8Array(
+      binary.length
+    );
+  for (
+    let i = 0;
+    i < binary.length;
+    i++
+  ) {
+    bytes[i] =
+      binary.charCodeAt(i);
+  }
+
+  // FILE EXTENSION
+  let ext =
+    mime.split("/")[1];
+  if (ext === "jpeg") {
+    ext = "jpg";
+  }
+
+  // FILE PATH
+  const path =
+    `business/logo_${Date.now()}.${ext}`;
+
+
+  // UPLOAD SUPABASE STORAGE
+  const {
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from("Logo_Digital_Recipes")
+      .upload(
+        path,
+        bytes,
+        {
+          contentType:
+            mime,
+          upsert:
+            true
+        }
+      );
+
+  if (error) {
+    console.error(
+      "Upload Business Logo Error:",
+      error
+    );
+    throw error;
+  }
+
+  // PUBLIC URL
+  const {
+    data
+  } =
+    supabaseClient
+      .storage
+      .from("Logo_Digital_Recipes")
+      .getPublicUrl(
+        path
+      );
+  return data.publicUrl;
+}
+
+
     // ===============================
     // LOGIN PAGE
     // ===============================
@@ -952,4 +1041,354 @@ async function getRecipeMasterLedgerRPC(branchId) {
   }
   return data;
 }
+
+
+    // ===============================
+    // SETTINGS PAGE
+    // ===============================
+
+async function getSettingsPageDataRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_settings_page_data"
+  );
+    
+  if (error) {
+    console.error(
+      "get_settings_page_data error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function getBranchOptionsRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "get_branch_options",
+    {
+      p_login_user_id:
+        String(data.loginUserId)
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_branch_options error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function addNewBranchRPC(data) {
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_new_branch",
+    {
+      p_branch_name: data.branchName,
+      p_alamat: data.alamat,
+      p_manager: data.manager,
+      p_phone: data.phone
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_new_branch error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function updateBranchStatusRPC(branchId, active) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "update_branch_status",
+    {
+      p_branch_id: branchId,
+      p_active: active
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_branch_status error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function updateBranchRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_branch",
+    {
+      p_branch_id:
+        data.branchId,
+      p_branch_name:
+        data.branchName,
+      p_alamat:
+        data.alamat,
+      p_manager:
+        data.manager
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_branch error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function getUsersRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_users"
+  );
+
+  if (error) {
+    console.error(
+      "get_users error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function addNewUserRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_new_user",
+    {
+      p_username:
+        data.username,
+      p_password:
+        data.password,
+      p_role:
+        data.role,
+      p_branch_id:
+        data.branchId,
+      p_created_by:
+        data.createdBy
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_new_user error:",
+      error
+    );
+    throw error;
+  }
+  // CLEAR SETTINGS STATE
+  state.settingsPageData = null;
+  return result;
+}
+
+async function updateUserRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_user",
+    {
+      p_id:
+        String(data.id),
+      p_username:
+        data.username,
+      p_password:
+        data.password || null,
+      p_login_user_id:
+        String(data.login_user_id)
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_user error:",
+      error
+    );
+    throw error;
+  }
+
+  // CLEAR STATE
+  state.settingsPageData = null;
+  return result;
+}
+
+async function deleteUserRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "delete_user",
+    {
+      p_id:
+        String(data.id),
+      p_login_user_id:
+        String(data.login_user_id)
+    }
+  );
+
+  if (error) {
+    console.error(
+      "delete_user error:",
+      error
+    );
+    throw error;
+  }
+
+  // CLEAR STATE
+  state.settingsPageData = null;
+  return result;
+}
+
+
+
+async function getSettingsRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_settings"
+  );
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+async function saveSettingsRPC(payload) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "save_settings",
+    {
+      p_settings: payload
+    }
+  );
+
+  if (error) {
+    console.error(
+      "save_settings error:",
+      error
+    );
+    throw error;
+  }
+    
+  // CLEAR FRONTEND STATE
+  state.settingsPageData = null;
+  state.memberPageData = null;
+  return data;
+}
+
+async function getBusinessProfileRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_business_profile"
+  );
+
+  if (error) {
+    console.error(
+      "get_business_profile error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+async function saveBusinessProfileRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_business_profile",
+    {
+      p_company_name:
+        data.company_name,
+      p_logo_url:
+        data.logo_url,
+      p_instagram:
+        data.instagram,
+      p_receipt_footer:
+        data.receipt_footer
+    }
+  );
+
+  if (error) {
+    console.error(
+      "save_business_profile error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function getBranchInfoRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_branch_info",
+    {
+      p_branch_id:
+        branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_branch_info error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
+
 
