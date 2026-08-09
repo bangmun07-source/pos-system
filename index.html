@@ -19064,6 +19064,51 @@ function calculateTotal() {
     (sum, item) => sum + (item.price * item.qty),
     0
   );
+
+// DEBUG SEMENTARA
+  console.log(
+    "=== CHECK SETTINGS CHECKOUT ==="
+  );
+
+  console.log(
+    "state.settings:",
+    state.settings
+  );
+
+  console.log(
+    "state.loyaltySettings:",
+    state.loyaltySettings
+  );
+
+  console.log(
+    "discount settings:",
+    state.settings?.discount
+  );
+
+  console.log(
+    "discount loyalty:",
+    state.loyaltySettings?.discount
+  );
+
+  console.log(
+    "tax settings:",
+    state.settings?.tax
+  );
+
+  console.log(
+    "tax loyalty:",
+    state.loyaltySettings?.tax
+  );
+
+  console.log(
+    "service settings:",
+    state.settings?.service
+  );
+
+  console.log(
+    "service loyalty:",
+    state.loyaltySettings?.service
+  );
   const isMember = state.currentMember && state.currentMember !== "";
   const discountRate = isMember
     ? (state.settings?.discount || 0)
