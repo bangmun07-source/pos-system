@@ -20497,62 +20497,79 @@ function loadMemberStats() {
 
   if (!res) return;
 
-  console.log("MEMBER STATS:", res);
+  console.log(
+    "MEMBER STATS:",
+    res
+  );
 
+  // =========================
   // TOTAL MEMBERS
+  // =========================
+
   const totalEl =
-    document.getElementById("total-members");
+    document.getElementById(
+      "total-members"
+    );
 
   if (totalEl) {
+
     totalEl.innerText =
-      formatNumber(res.total);
+      formatNumber(
+        res.total ?? 0
+      );
+
   }
 
+
+  // =========================
   // TOP TIER
+  // =========================
+
   const labelEl =
-    document.getElementById("top-tier-label");
+    document.getElementById(
+      "top-tier-label"
+    );
 
   const valueEl =
-    document.getElementById("total-top-tier");
-
-  console.log(
-    "TOP TIER LABEL ELEMENT:",
-    labelEl
-  );
-
-  console.log(
-    "TOP TIER LABEL TEXT:",
-    labelEl?.innerText
-  );
-
-  console.log(
-    "TOP TIER VALUE ELEMENT:",
-    valueEl
-  );
-
-  console.log(
-    "TOP TIER VALUE TEXT:",
-    valueEl?.innerText
-  );
+    document.getElementById(
+      "total-top-tier"
+    );
 
   if (labelEl) {
+
     labelEl.innerText =
       `${res.topTierName || "Top"} Tier`;
+
   }
 
   if (valueEl) {
+
     valueEl.innerText =
-      String(res.topTier ?? 0);
+      String(
+        res.topTier ?? 0
+      );
+
   }
 
+
+  // =========================
   // POINTS
+  // =========================
+
   const pointsEl =
-    document.getElementById("total-points");
+    document.getElementById(
+      "total-points"
+    );
 
   if (pointsEl) {
+
     pointsEl.innerText =
-      formatCompact(res.points);
+      formatCompact(
+        res.points ?? 0
+      );
+
   }
+
 }
 
 function loadMemberGrowth() {
