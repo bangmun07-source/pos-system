@@ -30531,6 +30531,45 @@ async function saveLoyaltySettings() {
   }
 }
 
+function validateSettings(p) {
+
+  if (
+    Number(p.tier_1) >=
+    Number(p.tier_2)
+  ) {
+    throw new Error(
+      "Tier 1 harus lebih kecil dari Tier 2"
+    );
+  }
+
+  if (
+    Number(p.tier_2) >=
+    Number(p.tier_3)
+  ) {
+    throw new Error(
+      "Tier 2 harus lebih kecil dari Tier 3"
+    );
+  }
+
+  if (
+    Number(p.tier_3) >=
+    Number(p.tier_4)
+  ) {
+    throw new Error(
+      "Tier 3 harus lebih kecil dari Tier 4"
+    );
+  }
+
+  if (
+    Number(p.tier_4) >=
+    Number(p.tier_5)
+  ) {
+    throw new Error(
+      "Tier 4 harus lebih kecil dari Tier 5"
+    );
+  }
+}
+	
 function parseNumber(id) {
   const val = document.getElementById(id)?.value || "0";
   return Number(val.replace(/\./g, "")) || 0;
