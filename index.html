@@ -20500,12 +20500,12 @@ function loadMemberStats(){
   if(!res) return;
   document.getElementById("total-members").innerText =
     formatNumber(res.total);
-  document.getElementById("total-top-tier").innerText =
-    formatNumber(res.topTier);
+	document.getElementById("total-top-tier").innerText =
+	  String(res.topTier ?? 0);
+	document.getElementById("top-tier-label").innerText =
+	  `${res.topTierName || "Top"} Tier`;
   document.getElementById("total-points").innerText =
     formatCompact(res.points);
-  document.getElementById("top-tier-label").innerText =
-    `${res.topTierName} Tier`;
 }
 
 function loadMemberGrowth() {
