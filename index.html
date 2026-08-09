@@ -17929,48 +17929,253 @@ async function applyDateFilter() {
   }
 }
 
-async function exportPDFReport() {
+document.addEventListener(
+  "click",
+  function(e) {
+
+    const btn =
+      e.target.closest(
+        "#btnExportGrossRevenuePDF"
+      );
+
+    if (!btn) return;
+
+    exportGrossRevenuePDF();
+
+  }
+);
+
+async function exportGrossRevenuePDF() {
+
   const start =
     document.getElementById("startDate")?.value;
+
   const end =
     document.getElementById("endDate")?.value;
+
+  const branchId =
+    state.branchId;
+
+  // =========================
+  // VALIDASI
+  // =========================
+
   if (!start || !end) {
     alert("Pilih tanggal dulu");
     return;
   }
-  const pdfWindow = window.open("", "_blank");
+
+  if (!branchId) {
+    alert("Branch tidak valid");
+    return;
+  }
+
+  // =========================
+  // OPEN WINDOW
+  // =========================
+
+  const pdfWindow =
+    window.open("", "_blank");
+
   if (!pdfWindow) {
     alert("Popup diblokir browser.");
     return;
   }
+
+  // =========================
+  // LOADING
+  // =========================
+
+  pdfWindow.document.write(`
+    <html>
+
+      <head>
+        <title>Generating Gross Revenue Report</title>
+
+        <style>
+
+          body {
+            margin: 0;
+            background: #0B0F14;
+            color: white;
+            font-family: Arial, sans-serif;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            height: 100vh;
+          }
+
+          .loading {
+            text-align: center;
+          }
+
+          .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+          }
+
+          .text {
+            font-size: 13px;
+            opacity: .7;
+          }
+
+        </style>
+
+      </head>
+
+      <body>
+
+        <div class="loading">
+
+          <div class="title">
+            Gross Revenue Report
+          </div>
+
+          <div class="text">
+            Generating PDF...
+          </div>
+
+        </div>
+
+      </body>
+
+    </html>
+  `);
+
   try {
-    const res = await fetch("/api/export-pdf-report", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
+
+    console.log(
+      "EXPORT GROSS REVENUE:",
+      {
+        branchId,
         start,
-        end,
-        branchId: state.branchId
-      })
-    });
+        end
+      }
+    );
 
-    const html = await res.text();
+    // =========================
+    // CALL VERCEL API
+    // =========================
+
+    const response =
+      await fetch(
+        "/api/export-gross-revenue-pdf",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            branchId,
+            start,
+            end
+          })
+        }
+      );
+
+    // =========================
+    // HTTP ERROR
+    // =========================
+
+    if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
+      throw new Error(
+        errorText ||
+        `Export gagal (${response.status})`
+      );
+    }
+
+    // =========================
+    // GET HTML REPORT
+    // =========================
+
+    const html =
+      await response.text();
+
+    if (!html) {
+
+      throw new Error(
+        "Server mengembalikan HTML kosong"
+      );
+    }
+
+    console.log(
+      "EXPORT GROSS REVENUE HTML RECEIVED"
+    );
+
+    // =========================
+    // RENDER REPORT
+    // =========================
+
     pdfWindow.document.open();
-    pdfWindow.document.write(html);
+
+    pdfWindow.document.write(
+      html
+    );
+
     pdfWindow.document.close();
-  } catch (err) {
+
+  }
+  catch (err) {
+
+    console.error(
+      "Export Gross Revenue:",
+      err
+    );
+
+    // =========================
+    // ERROR PAGE
+    // =========================
 
     pdfWindow.document.open();
+
     pdfWindow.document.write(`
-      <h2>Export Failed</h2>
-      <pre>${err.message}</pre>
+      <html>
+
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          padding:40px;
+        ">
+
+          <h2>
+            Export Failed
+          </h2>
+
+          <p style="
+            color:#aaa;
+          ">
+            Gagal membuat Gross Revenue Report.
+          </p>
+
+          <pre style="
+            white-space:pre-wrap;
+            background:#151A21;
+            padding:15px;
+            border-radius:10px;
+          ">${String(
+            err?.message ||
+            err
+          )}</pre>
+
+        </body>
+
+      </html>
     `);
+
     pdfWindow.document.close();
   }
 }
-
 
 function calcGrowth(today, yesterday) {
   today = Number(today) || 0;
