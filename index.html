@@ -26390,59 +26390,72 @@ function applySettingsPage(data) {
 }
 
 async function loadSettingsPage() {
-	if (state.settingsPageData) {
-	  applySettingsPage(
-	    state.settingsPageData
-	  );
-	  return;
-	}
 
-	try {
-		
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data, error } =
-	  await supabase.rpc(
-	    "get_settings_page_data"
-	  );
-	
-	if(error){
-	  throw error;
-	}
-	*/
-	
-	
-		// TEMP DATA VERCEL
-		const data = {
-		  settings: {},
-		  loyalty: {},
-		  branch: {},
-		  users: []
-		};
-		// CACHE TETAP
-		state.settingsPageData = data;
-		// APPLY UI TETAP
-		applySettingsPage(
-		  data
-		);
-	
-	}
-	catch(err){
-	console.error(
-	  "Settings Page:",
-	  err
-	);
-	showToast(
-	  err.message ||
-	  "Gagal memuat Settings.",
-	  "error"
-	);
-	}
+  if (state.settingsPageData) {
+
+    applySettingsPage(
+      state.settingsPageData
+    );
+
+    return;
+  }
+
+  try {
+
+    // =========================
+    // SUPABASE RPC
+    // =========================
+
+    const data =
+      await getSettingsPageDataRPC();
+
+    console.log(
+      "SETTINGS PAGE DATA:",
+      data
+    );
+
+    // =========================
+    // NORMALIZE RESPONSE
+    // =========================
+
+    const result =
+      data || {
+        settings: {},
+        loyalty: {},
+        branch: {},
+        users: []
+      };
+
+    // =========================
+    // CACHE
+    // =========================
+
+    state.settingsPageData =
+      result;
+
+    // =========================
+    // APPLY UI
+    // =========================
+
+    applySettingsPage(
+      state.settingsPageData
+    );
+
+  }
+  catch (err) {
+
+    console.error(
+      "Settings Page:",
+      err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat Settings.",
+      "error"
+    );
+  }
 }
-	
 
 async function reloadSettingsPage() {
 
