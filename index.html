@@ -25886,7 +25886,26 @@ async function loadAnalyticsPage() {
       "ANALYTICS DASHBOARD:",
       res
     );
-
+	  
+	console.log(
+	  "ANALYTICS TYPE:",
+	  typeof res
+	);
+	
+	console.log(
+	  "ANALYTICS KEYS:",
+	  Object.keys(res || {})
+	);
+	
+	console.log(
+	  "TOP SELLING:",
+	  res?.topSellingItems
+	);
+	
+	console.log(
+	  "TOP PRODUCT:",
+	  res?.topProduct
+	);
 
     // ==========================
     // VALIDASI
