@@ -61,9 +61,16 @@ export default async function handler(req, res) {
       throw error;
     }
 
+    const analyticsData = data;
+
     console.log(
       "EXPORT ANALYTICS DATA:",
-      data
+      analyticsData
+    );
+
+    console.log(
+      "EXPORT ACTIVE MEMBERS:",
+      analyticsData?.analytics?.activeMemberList
     );
 
     if (!data) {
