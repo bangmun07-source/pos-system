@@ -426,8 +426,7 @@ export default async function handler(req, res) {
       </style>      
       </head>      
       <body>
-    
-      // BLACK BACKGROUND
+      
       <div class="export-toolbar">      
         <div>
           📄 Recent Transactions Report
@@ -438,7 +437,6 @@ export default async function handler(req, res) {
         </button>      
       </div>
       
-      // WHITE REPORT
       <div class="report">
         <div class="header">
           ${logoSrc ? `
@@ -469,8 +467,7 @@ export default async function handler(req, res) {
           Status:
           ${escapeHtml(status)}      
         </div>
-  
-        // KPI
+        
         <div class="kpi-grid">   
           <div class="kpi-card">      
             <div class="kpi-title">
@@ -503,7 +500,6 @@ export default async function handler(req, res) {
           </div>      
         </div>
           
-        // PAYMENT
         <div class="card">      
           <h3>
             Payment Distribution
@@ -532,8 +528,6 @@ export default async function handler(req, res) {
           </table>      
         </div>
       
-      
-        //MEMBERS
         <div class="card">      
           <h3>
             Active Members
@@ -562,7 +556,6 @@ export default async function handler(req, res) {
           </table>      
         </div>
 
-           //TRANSACTIONS
           <div class="page-break"></div>
             <div class="card">      
               <h3>
