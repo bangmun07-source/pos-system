@@ -30242,6 +30242,8 @@ function initLoyaltyPage() {
 }
 
 async function loadLoyaltySettings() {
+
+  // LOAD FROM STATE
   if (state.loyaltySettings) {
     applyLoyaltySettings(
       state.loyaltySettings
@@ -30251,28 +30253,22 @@ async function loadLoyaltySettings() {
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // SUPABASE RPC
+    const s =
+      await getSettingsRPC();
+    console.log(
+      "LOYALTY SETTINGS:",
+      s
+    );
 
-    /*
-    const { data: s, error } =
-      await supabase
-        .from("Settings")
-        .select("*")
-        .single();
+    // CACHE / STATE
+    state.loyaltySettings =
+      s || {};
 
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const s = {};
-    // CACHE
-    state.loyaltySettings = s;
     // RENDER
-    applyLoyaltySettings(s);
+    applyLoyaltySettings(
+      state.loyaltySettings
+    );
   }
   catch (err) {
     console.error(
@@ -30280,7 +30276,7 @@ async function loadLoyaltySettings() {
       err
     );
     showToast(
-      err.message ||
+      err?.message ||
       "Gagal memuat Loyalty Settings",
       "error"
     );
@@ -30348,6 +30344,8 @@ function applyLoyaltySettings(s) {
 }
 
 async function loadLoyaltySettings() {
+
+  // LOAD FROM STATE
   if (state.loyaltySettings) {
     applyLoyaltySettings(
       state.loyaltySettings
@@ -30357,36 +30355,31 @@ async function loadLoyaltySettings() {
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // SUPABASE RPC
+    const s =
+      await getSettingsRPC();
+    console.log(
+      "LOYALTY SETTINGS:",
+      s
+    );
 
-    /*
-    const { data: s, error } =
-      await supabase
-        .from("Settings")
-        .select("*")
-        .single();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const s = {};
-    // CACHE
-    state.loyaltySettings = s;
-    // RENDER
-    applyLoyaltySettings(s);
+    // SAVE STATE
+    state.loyaltySettings =
+      s || {};
+	
+    // APPLY UI
+    applyLoyaltySettings(
+      state.loyaltySettings
+    );
   }
+
   catch (err) {
     console.error(
       "Load Loyalty Settings:",
       err
     );
     showToast(
-      err.message ||
+      err?.message ||
       "Gagal memuat Loyalty Settings",
       "error"
     );
@@ -30425,8 +30418,9 @@ function setInputValue(id, value) {
 }
 
 async function saveLoyaltySettings() {
+
   const payload = {
-    // Threshold Tier
+    // THRESHOLD TIER
     tier_1:
       parseNumber("tier_1"),
     tier_2:
@@ -30438,40 +30432,40 @@ async function saveLoyaltySettings() {
     tier_5:
       parseNumber("tier_5"),
 
-    // Nama Tier
+    // NAMA TIER
     tier_1_name:
       document
         .getElementById("tier_1_name")
-        .value
-        .trim(),
+        ?.value
+        ?.trim() || "",
     tier_2_name:
       document
         .getElementById("tier_2_name")
-        .value
-        .trim(),
+        ?.value
+        ?.trim() || "",
     tier_3_name:
       document
         .getElementById("tier_3_name")
-        .value
-        .trim(),
+        ?.value
+        ?.trim() || "",
     tier_4_name:
       document
         .getElementById("tier_4_name")
-        .value
-        .trim(),
+        ?.value
+        ?.trim() || "",
     tier_5_name:
       document
         .getElementById("tier_5_name")
-        .value
-        .trim(),
+        ?.value
+        ?.trim() || "",
 
-    // Point System
+    // POINT SYSTEM
     point_ratio:
       parseNumber("point_ratio"),
     point_reward:
       parseNumber("point_amount"),
-	  
-    // Reward
+
+    // REWARD
     reward_drink:
       parseNumber("reward_drink"),
     reward_snack:
@@ -30484,44 +30478,46 @@ async function saveLoyaltySettings() {
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // SUPABASE RPC
+    const res =
+      await saveSettingsRPC(
+        payload
+      );
+    console.log(
+      "SAVE LOYALTY SETTINGS RESULT:",
+      res
+    );
 
-    /*
-    const { data, error } =
-      await supabase
-        .from("Settings")
-        .update(payload)
-        .eq("id", 1)
-        .select()
-        .single();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if (!res.success) {
+    // HANDLE RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
       throw new Error(
         res.message ||
         "Gagal menyimpan Loyalty Settings"
       );
     }
-    // FLOW LAMA TETAP
+
+    // SUCCESS
     alert(
       "Loyalty settings saved!"
     );
-    // clear cache Loyalty
-    state.loyaltySettings = null;
-    // member tier bisa berubah
-    state.memberPageData = null;
-    // ambil data baru + render
-    loadLoyaltySettings();
+
+    // CLEAR STATE
+    state.loyaltySettings =
+      null;
+    // Karena perubahan tier
+    // bisa mempengaruhi member
+    state.memberPageData =
+      null;
+    // Settings page juga perlu
+    // mengambil data terbaru
+    state.settingsPageData =
+      null;
+
+    // RELOAD
+    await loadLoyaltySettings();
   }
   catch (err) {
     console.error(
@@ -30529,7 +30525,7 @@ async function saveLoyaltySettings() {
       err
     );
     alert(
-      err.message ||
+      err?.message ||
       "Gagal menyimpan Loyalty Settings"
     );
   }
@@ -30541,6 +30537,7 @@ function parseNumber(id) {
 }
 
 async function loadSeasonStatus() {
+
   const badge =
     document.getElementById(
       "season_status_badge"
@@ -30553,47 +30550,41 @@ async function loadSeasonStatus() {
     return;
   }
 
-  // CACHE
+  // LOAD FROM STATE
   if (state.seasonStatus) {
     updateSeasonUI(
       state.seasonStatus
     );
     return;
   }
+
   try {
-
-
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase
-        .from("Season_Settings")
-        .select("*")
-        .single();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const data = {};
-    // CACHE
-    state.seasonStatus =
-      data;
-
-    // RENDER
-    updateSeasonUI(
+	
+    // SUPABASE RPC
+    const data =
+      await getSeasonConfigRPC();
+    console.log(
+      "SEASON CONFIG:",
       data
     );
+
+    // CACHE
+    state.seasonStatus =
+      data || {};
+    // RENDER
+    updateSeasonUI(
+      state.seasonStatus
+    );
   }
-  catch(err) {
+  catch (err) {
     console.error(
       "Load Season Status:",
       err
+    );
+    showToast(
+      err?.message ||
+      "Gagal memuat Season Status",
+      "error"
     );
   }
 }
@@ -30614,6 +30605,7 @@ function refreshSeasonStatus(){
 }	
 
 async function openSeason() {
+
   const startDate =
     document.getElementById(
       "season_start"
@@ -30622,145 +30614,216 @@ async function openSeason() {
     document.getElementById(
       "season_end"
     )?.value;
+
+  // VALIDASI
+  if (!startDate) {
+    showToast(
+      "Start date wajib diisi",
+      "error"
+    );
+    return;
+  }
+
+  if (!endDate) {
+    showToast(
+      "End date wajib diisi",
+      "error"
+    );
+    return;
+  }
+
   try {
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    const { error } =
-      await supabase
-        .from("Season_Settings")
-        .update({
-          start_date: startDate,
-          end_date: endDate,
-          status: "OPEN"
-        })
-        .eq(
-          "id",
-          1
-        );
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success:true
-    };
-    if(!res.success){
+    // SUPABASE RPC
+    const res =
+      await openSeasonRPC(
+        startDate,
+        endDate
+      );
+    console.log(
+      "OPEN SEASON RESULT:",
+      res
+    );
+	
+    // CHECK RESPONSE
+    if (
+      res &&
+      res.success === false
+    ) {
       throw new Error(
+        res.message ||
         "Gagal membuka season"
       );
     }
-    refreshSeasonStatus();
+
+    // CLEAR CACHE STATE
+    state.seasonStatus = null;
+
+    // LOAD ULANG STATUS
+    await loadSeasonStatus();
+    showToast(
+      "Season berhasil dibuka",
+      "success"
+    );
   }
-  catch(err){
+
+  catch (err) {
     console.error(
       "Open Season:",
       err
     );
     showToast(
-      err.message,
+      err?.message ||
+      "Gagal membuka season",
       "error"
     );
   }
 }
 
 async function closeSeason() {
+
   try {
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    const { error } =
-      await supabase
-        .from("Season_Settings")
-        .update({
-          status:"CLOSED"
-        })
-        .eq(
-          "id",
-          1
-        );
+    // ================================
+    // KONFIRMASI
+    // ================================
 
-    if(error){
-      throw error;
+    const confirmed =
+      confirm(
+        "Tutup season sekarang?\n\n" +
+        "Semua member akan diproses " +
+        "untuk reset tier dan spend."
+      );
+
+    if (!confirmed) {
+      return;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const res = {
-      success:true
-    };
-    if(!res.success){
+
+    // ================================
+    // SUPABASE RPC
+    // ================================
+
+    const res =
+      await closeSeasonRPC();
+
+    console.log(
+      "CLOSE SEASON RESULT:",
+      res
+    );
+
+
+    // ================================
+    // CHECK RESULT
+    // ================================
+
+    if (
+      res &&
+      res.success === false
+    ) {
+
       throw new Error(
+        res.message ||
         "Gagal menutup season"
       );
+
     }
-    refreshSeasonStatus();
+
+
+    // ================================
+    // CLEAR STATE
+    // ================================
+
+    state.seasonStatus =
+      null;
+
+    state.memberPageData =
+      null;
+
+
+    // ================================
+    // LOAD ULANG SEASON
+    // ================================
+
+    await loadSeasonStatus();
+
+
+    // ================================
+    // NOTIFICATION
+    // ================================
+
+    showToast(
+      `Season berhasil ditutup. ${
+        res?.members_processed || 0
+      } member diproses.`,
+      "success"
+    );
+
   }
-  catch(err){
+
+  catch (err) {
+
     console.error(
       "Close Season:",
       err
     );
+
     showToast(
-      err.message,
+      err?.message ||
+      "Gagal menutup season",
       "error"
     );
+
   }
+
 }
 
 async function toggleAutoSeason() {
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const res =
+      await toggleAutoSeasonRPC();
 
-    /*
-    const { error } =
-      await supabase
-        .from("Season_Settings")
-        .update({
-          auto_season:
-            true
-        })
-        .eq(
-          "id",
-          1
-        );
+    console.log(
+      "TOGGLE AUTO SEASON:",
+      res
+    );
 
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success:true
-    };
-    if(!res.success){
+    if (!res?.success) {
       throw new Error(
+        res?.message ||
         "Gagal mengubah auto season"
       );
     }
-    refreshSeasonStatus();
+
+    // Refresh status season
+    state.seasonStatus = null;
+
+    await refreshSeasonStatus();
+
+    showToast(
+      res.message ||
+      "Auto Season berhasil diubah",
+      "success"
+    );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Toggle Auto Season:",
       err
     );
+
     showToast(
-      err.message,
+      err?.message ||
+      "Gagal mengubah auto season",
       "error"
     );
+
   }
+
 }
 
 function updateSeasonUI(res) {
@@ -30808,11 +30871,13 @@ function initRewardPagination() {
 }
 
 async function loadRewardProducts() {
+
   const branchId =
     document.getElementById(
       "rewardBranchFilter"
     )?.value ||
     state.branchId;
+
   // CACHE
   if (
     state.rewardProducts &&
@@ -30827,55 +30892,41 @@ async function loadRewardProducts() {
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // SUPABASE RPC
+    const data =
+      await getRewardProductsRPC(
+        branchId
+      );
+    console.log(
+      "REWARD PRODUCTS:",
+      data
+    );
 
-    /*
-    const { data, error } =
-      await supabase
-        .from("Products")
-        .select("*")
-        .eq(
-          "branchId",
-          branchId
-        )
-        .eq(
-          "is_reward",
-          true
-        );
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const data = [];
     // CACHE
     state.rewardProducts =
       data || [];
     state.rewardProductsBranchId =
       branchId;
+
     // RENDER
     rewardData =
       state.rewardProducts;
     rewardPage = 1;
     renderRewardProductsTable();
   }
-  catch(err) {
+  catch (err) {
     console.error(
       "Load Reward Products:",
       err
     );
     showToast(
-      err.message ||
+      err?.message ||
       "Gagal memuat reward.",
       "error"
     );
   }
 }
-
+	
 function renderRewardProductsTable() {
   const tbody =
     document.getElementById("rewardTableBody");
@@ -30974,6 +31025,7 @@ function updateRewardPagination() {
 }
 	
 async function deleteReward(id) {
+
   if (
     !confirm(
       "Hapus reward ini?"
@@ -30981,56 +31033,58 @@ async function deleteReward(id) {
   ) {
     return;
   }
-	
+
   try {
 
+    // =========================
+    // SUPABASE RPC
+    // =========================
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const res =
+      await deleteRewardRPC(id);
 
-    /*
-    const { error } =
-      await supabase
-        .from("Products")
-        .delete()
-        .eq(
-          "id",
-          id
-        );
+    console.log(
+      "DELETE REWARD:",
+      res
+    );
 
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success:true
-    };
-    if(!res.success){
+    if (!res?.success) {
       throw new Error(
+        res?.message ||
         "Gagal menghapus reward"
       );
     }
 
+    // =========================
     // CLEAR CACHE
+    // =========================
+
     state.rewardProducts = null;
     state.rewardProductsBranchId = null;
-    // reload data
-    loadRewardProducts();
+
+    // =========================
+    // RELOAD
+    // =========================
+
+    await loadRewardProducts();
+
     showToast(
-      "Reward berhasil dihapus."
+      "Reward berhasil dihapus.",
+      "success"
     );
+
   }
-  catch(err) {
+  catch (err) {
+
     console.error(
       "Delete Reward:",
       err
     );
-    alert(
-      err.message ||
-      "Gagal menghapus reward"
+
+    showToast(
+      err?.message ||
+      "Gagal menghapus reward",
+      "error"
     );
   }
 }
