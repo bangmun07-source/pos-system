@@ -364,33 +364,33 @@ export default async function handler(req, res) {
     // =========================
     // ACTIVE MEMBERS
     // =========================
-
+    
     const activeMembers =
       Array.isArray(
         analytics.activeMemberList
       )
         ? analytics.activeMemberList
         : [];
-
+    
     const memberRows =
       activeMembers.length
-
+    
         ? activeMembers.map(
             member => `
               <tr>
-
+    
                 <td>
                   ${escapeHtml(
                     member.name
                   )}
                 </td>
-
+    
                 <td>
                   ${escapeHtml(
-                    member.level
+                    member.tier || "-"
                   )}
                 </td>
-
+    
                 <td class="right">
                   ${Number(
                     member.point || 0
@@ -398,11 +398,11 @@ export default async function handler(req, res) {
                     "id-ID"
                   )} PTS
                 </td>
-
+    
               </tr>
             `
           ).join("")
-
+    
         : `
           <tr>
             <td
@@ -413,7 +413,6 @@ export default async function handler(req, res) {
             </td>
           </tr>
         `;
-
     // =========================
     // HTML REPORT
     // =========================
