@@ -20490,21 +20490,69 @@ function initTierFilter() {
 
 }
 
-function loadMemberStats(){
+function loadMemberStats() {
+
   const res =
     state.memberPageData?.stats;
 
-  if(!res) return;
-  document.getElementById("total-members").innerText =
-    formatNumber(res.total);
-	document.getElementById("top-tier-label").innerText =
-	`${res.topTierName} Tier`;
-  document.getElementById("total-top-tier").innerText =
-    formatNumber(res.topTier);
-console.log("LABEL:", label?.innerText);
-console.log("VALUE:", value?.innerText);
-  document.getElementById("total-points").innerText =
-    formatCompact(res.points);
+  if (!res) return;
+
+  console.log("MEMBER STATS:", res);
+
+  // TOTAL MEMBERS
+  const totalEl =
+    document.getElementById("total-members");
+
+  if (totalEl) {
+    totalEl.innerText =
+      formatNumber(res.total);
+  }
+
+  // TOP TIER
+  const labelEl =
+    document.getElementById("top-tier-label");
+
+  const valueEl =
+    document.getElementById("total-top-tier");
+
+  console.log(
+    "TOP TIER LABEL ELEMENT:",
+    labelEl
+  );
+
+  console.log(
+    "TOP TIER LABEL TEXT:",
+    labelEl?.innerText
+  );
+
+  console.log(
+    "TOP TIER VALUE ELEMENT:",
+    valueEl
+  );
+
+  console.log(
+    "TOP TIER VALUE TEXT:",
+    valueEl?.innerText
+  );
+
+  if (labelEl) {
+    labelEl.innerText =
+      `${res.topTierName || "Top"} Tier`;
+  }
+
+  if (valueEl) {
+    valueEl.innerText =
+      String(res.topTier ?? 0);
+  }
+
+  // POINTS
+  const pointsEl =
+    document.getElementById("total-points");
+
+  if (pointsEl) {
+    pointsEl.innerText =
+      formatCompact(res.points);
+  }
 }
 
 function loadMemberGrowth() {
