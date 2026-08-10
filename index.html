@@ -33217,7 +33217,17 @@ async function loadCashFlowPage() {
       )?.value || ""
 
   };
+console.log(
+    "CF FILTER:",
+    filter
+  );
 
+  console.log(
+    "CF BRANCH VALUE:",
+    document.getElementById(
+      "cf-branch"
+    )?.value
+  );
   const cacheKey =
     JSON.stringify(filter);
 
