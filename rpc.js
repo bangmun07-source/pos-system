@@ -2745,7 +2745,7 @@ async function restoreDatabaseBackupRPC(data = {}) {
   //  BACKUP VIA RPC
   // =========================
 
-async uploadDatabaseBackup(
+async function uploadDatabaseBackup(
   fileName,
   jsonData
 ) {
