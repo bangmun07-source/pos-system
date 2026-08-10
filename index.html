@@ -15772,6 +15772,21 @@ function toggleSidebar() {
   }
 }
 
+document.addEventListener("click", function (e) {
+    const sidebar = document.getElementById("sidebar");
+
+    if (!sidebar || !sidebarOpen) return;
+
+    // Klik di dalam sidebar → jangan tutup
+    if (sidebar.contains(e.target)) return;
+
+    // Klik tombol ☰ → jangan tutup otomatis
+    if (e.target.closest('[onclick="toggleSidebar()"]')) return;
+
+    // Klik di luar → tutup sidebar
+    toggleSidebar();
+});
+
 let billingOpen = false;
 
 function toggleBillingSidebar(mode = "table") {
