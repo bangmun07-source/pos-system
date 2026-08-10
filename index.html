@@ -16068,26 +16068,6 @@ function navigate(pageId, params = {}) {
   document.querySelectorAll(".page-overlay").forEach(e => e.remove());
   app.appendChild(template.content.cloneNode(true));
 
-	const sidebar = document.getElementById("sidebar");
-	const main = document.getElementById("mainContent");
-	
-	if (pageId === "dashboardPage") {
-	    sidebarOpen = false;
-	
-	    sidebar.classList.add("-translate-x-full");
-	
-	    main.classList.remove("ml-72");
-	    main.classList.add("ml-0");
-	} else {
-	    sidebarOpen = true;
-	
-	    sidebar.classList.remove("-translate-x-full");
-	
-	    main.classList.remove("ml-0");
-	    main.classList.add("ml-72");
-	}
-	
-
   setTimeout(() => {
     loadBranchName();
   }, 0);
