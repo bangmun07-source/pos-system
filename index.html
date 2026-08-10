@@ -28496,109 +28496,86 @@ function applyExpenseDashboard(data){
 
 async function loadExpenseDashboard() {
 
-	const filter = getExpenseFilters();
-	// tambahkan branch login
-	// untuk kalkulasi budget
-	filter.loginBranchId = state.branchId;
-	const filterKey = JSON.stringify(filter);
-	if (
-	  state.expenseDashboardData &&
-	  state.expenseDashboardFilter === filterKey
-	) {
-	  applyExpenseDashboard(
-	    state.expenseDashboardData
-	  );
-	  return;
-	}
+  const filter =
+    getExpenseFilters();
 
-	try {
-		
-		// ==================================
-		// SUPABASE (AKTIFKAN NANTI)
-		// ==================================
-		
-		/*
-		const { data, error } =
-		  await supabase.rpc(
-		    "get_expense_dashboard",
-		    {
-		      p_filter: filter
-		    }
-		  );
-		
-		
-		if(error){
-		  throw error;
-		}
-		*/
-	
-	
-		// TEMP DATA VERCEL
-		const data = {
-		  summary: {},
-		  expenses: [],
-		  budget: {}
-		};
-	
-		// CACHE
-		state.expenseDashboardData = data;
-		state.expenseDashboardFilter = filterKey;
-		// RENDER
-		applyExpenseDashboard(data);
-		
-	}
-		catch(err){
-			console.error(
-			  "Expense Dashboard Error:",
-			  err
-			);
-		showToast(
-		  "Gagal memuat data.",
-		  "error"
-		);
-	}
+  filter.loginBranchId =
+    state.branchId;
+
+  const filterKey =
+    JSON.stringify(filter);
+
+
+  if (
+    state.expenseDashboardData &&
+    state.expenseDashboardFilter === filterKey
+  ) {
+
+    applyExpenseDashboard(
+      state.expenseDashboardData
+    );
+
+    return;
+  }
+
+  try {
+
+    const data =
+      await getExpenseDashboardRPC(filter);
+
+    state.expenseDashboardData =
+      data;
+    state.expenseDashboardFilter =
+      filterKey;
+    applyExpenseDashboard(data);
+  }
+  catch (err) {
+
+    console.error(
+      "Expense Dashboard Error:",
+      err
+    );
+
+    showToast(
+      "Gagal memuat data.",
+      "error"
+    );
+  }
 }
 
 async function loadBudgetBranches() {
+
   try {
 
-	    // ==================================
-	    // SUPABASE (AKTIFKAN NANTI)
-	    // ==================================
-	
-	    /*
-	    const { data, error } =
-	      await supabase
-	        .from("Branches")
-	        .select("id, name");
-	
-	    if (error) {
-	      throw error;
-	    }
-	    */
-	
-	    // TEMP DATA VERCEL
-	    const data = [];
-	    const select = document.getElementById("budgetBranch");
-	    if (!select) return;
-	    select.innerHTML = "";
-	    data.forEach(b => {
-	      select.innerHTML += `
-	        <option value="${b.id}">
-	          ${b.name}
-	        </option>
-	      `;
-	    });
+    const data =
+      await getExpenseBranchesRPC();
+    const select =
+      document.getElementById(
+        "budgetBranch"
+      );
+
+    if (!select) return;
+
+    select.innerHTML = "";
+    data.forEach(b => {
+
+      select.innerHTML += `
+        <option value="${b.id}">
+          ${b.name}
+        </option>
+      `;
+    });
   }
-	  catch(err) {
-	    console.error(
-	      "Load Budget Branches:",
-	      err
-	    );
-	showToast(
-	  "Terjadi kesalahan.",
-	  "error"
-	);
+
+  catch (err) {
+    console.error(
+      "Load Budget Branches:",
+      err
+    );
+    showToast(
+      "Terjadi kesalahan.",
+      "error"
+    );
   }
 }
 
@@ -28617,55 +28594,54 @@ document.addEventListener("input",function(e){
 });
 
 async function saveExpenseBudget() {
+
   const payload = {
-    branchId: document.getElementById("budgetBranch").value,
-    Month: document.getElementById("budgetMonth").value,
-    Budget: Number(document.getElementById("budgetAmount").value)
+
+    branchId:
+      document.getElementById(
+        "budgetBranch"
+      ).value,
+
+    Month:
+      document.getElementById(
+        "budgetMonth"
+      ).value,
+
+    Budget:
+      Number(
+        document.getElementById(
+          "budgetAmount"
+        ).value
+      )
   };
 
   try {
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    await saveExpenseBudgetRPC(
+      payload
+    );
 
-    /*
-    const { data, error } =
-      await supabase
-        .from("Expense_Budget")
-        .insert(payload)
-        .select();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if (!res.success) {
-      throw new Error(
-        "Gagal menyimpan budget."
-      );
-    }
-    // FLOW LAMA TETAP
     closeBudgetModal();
+
+    // CLEAR CACHE
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
-    loadExpenseDashboard();
+
+    // LOAD ULANG
+    await loadExpenseDashboard();
     showToast(
       "Budget berhasil disimpan."
     );
   }
-  catch(err) {
+
+  catch (err) {
     console.error(
       "Save Expense Budget:",
       err
     );
+
     showToast(
-      err.message || err,
-      "error"
+      err?.message ||
+      "Gagal menyimpan budget."
     );
   }
 }
@@ -28872,12 +28848,16 @@ function showExpenseStatusModal(expense) {
 }
 
 async function saveExpenseStatus() {
-  const expense = expenseData[selectedExpenseIndex];
+
+  const expense =
+    expenseData[selectedExpenseIndex];
   if (!expense) return;
+
   const newStatus =
     document.getElementById(
       "expenseNewStatus"
     ).value;
+
   if (newStatus === expense.status) {
     showToast(
       "Status tidak berubah.",
@@ -28885,66 +28865,49 @@ async function saveExpenseStatus() {
     );
     return;
   }
-	
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const res =
+      await updateExpenseStatusRPC(
+        expense.refId,
+        newStatus
+      );
 
-    /*
-    const { data: res, error } =
-      await supabase
-        .from("Expenses")
-        .update({
-          status: newStatus
-        })
-        .eq(
-          "refId",
-          expense.refId
-        )
-        .select()
-        .single();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if (!res.success) {
+    if (!res?.success) {
       showToast(
-        res.message,
+        res?.message ||
+        "Gagal memperbarui status.",
         "error"
       );
       return;
     }
-    // FLOW LAMA TETAP
+
     showToast(
       "Status berhasil diperbarui.",
       "success"
     );
+
     closeExpenseStatusModal();
-    // clear Cash Flow cache
+    // CLEAR CACHE
     state.cashFlowData = null;
     state.cashFlowFilter = null;
-    selectedExpenseIndex = null;
-    // clear Expense Dashboard cache
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
-    // reload Expense Dashboard
-    loadExpenseDashboard();
+    selectedExpenseIndex = null;
+    // LOAD DATA TERBARU
+    await loadExpenseDashboard();
+
   }
-  catch(err) {
+
+  catch (err) {
     console.error(
-      "Save Expense Status:",
+      "Update Expense Status:",
       err
     );
     showToast(
-      err.message || err,
+      err?.message ||
+      "Gagal memperbarui status.",
       "error"
     );
   }
@@ -29179,10 +29142,10 @@ function removeExpenseAttachment() {
 }
 
 async function uploadExpenseAttachment() {
+
   const expense =
-    expenseData[
-      selectedAttachmentExpenseIndex
-    ];
+    expenseData[selectedAttachmentExpenseIndex];
+
   if (!expense) {
     showToast(
       "Expense tidak ditemukan",
@@ -29190,11 +29153,15 @@ async function uploadExpenseAttachment() {
     );
     return;
   }
+
   const input =
     document.getElementById(
       "expenseAttachmentInput"
     );
-  const file = input?.files?.[0];
+
+  const file =
+    input?.files?.[0];
+
   if (!file) {
     showToast(
       "Pilih file terlebih dahulu",
@@ -29204,106 +29171,106 @@ async function uploadExpenseAttachment() {
   }
 
   try {
-    const base64 =
-      await fileToBase64(file);
+
+    showLoading();
+
+    const ext =
+      file.name
+        .split(".")
+        .pop()
+        .toLowerCase() === "jpeg"
+        ? "jpg"
+        : file.name
+            .split(".")
+            .pop()
+            .toLowerCase();
+
+    const path =
+      `${expense.branchId}/${expense.refId}/${expense.refId}_${Date.now()}.${ext}`;
 
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // UPLOAD SUPABASE STORAGE
+    // =========================
 
-    /*
-    // 1. Upload file ke Supabase Storage
+    const {
+      error: uploadError
+    } = await supabaseClient.storage
+      .from("Expense_Attachment")
+      .upload(
+        path,
+        file,
+        {
+          contentType: file.type,
+          upsert: false
+        }
+      );
 
-    const filePath =
-      `expenses/${expense.branchId}/${expense.refId}/${file.name}`;
-
-    const { error:uploadError } =
-      await supabase.storage
-        .from("Expense-Attachment")
-        .upload(
-          filePath,
-          file,
-          {
-            upsert: true
-          }
-        );
-
-    if(uploadError){
+    if (uploadError) {
       throw uploadError;
     }
 
+    // =========================
+    // PUBLIC URL
+    // =========================
 
-    // 2. Ambil URL attachment
-
-    const { data:urlData } =
-      supabase.storage
-        .from("Expense-Attachment")
-        .getPublicUrl(
-          filePath
-        );
+    const {
+      data: publicData
+    } =
+      supabaseClient.storage
+        .from("Expense_Attachment")
+        .getPublicUrl(path);
 
     const url =
-      urlData?.publicUrl;
+      publicData?.publicUrl;
 
-
-    if(!url){
-      throw new Error(
-        "Upload gagal"
-      );
-    }
-
-
-    // 3. Update Expense
-
-    const { error:updateError } =
-      await supabase
-        .from("Expenses")
-        .update({
-          Attachment_URL: url
-        })
-        .eq(
-          "Ref_ID",
-          expense.refId
-        );
-
-    if(updateError){
-      throw updateError;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const url = "";
     if (!url) {
-      showToast(
-        "Upload gagal",
-        "error"
+      throw new Error(
+        "URL attachment tidak ditemukan"
       );
-      return;
     }
-    // FLOW SETELAH UPDATE BERHASIL
+
+    // =========================
+    // UPDATE DATABASE
+    // =========================
+
+    await updateExpenseAttachmentRPC({
+      Ref_ID:
+        expense.refId,
+
+      Attachment_URL:
+        url
+    });
+
     showToast(
       "Attachment berhasil disimpan",
       "success"
     );
+
     closeExpenseAddAttachmentModal();
-    // clear Expense Dashboard cache
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
-    // reload dashboard
-    loadExpenseDashboard();
+    await loadExpenseDashboard();
+
   }
-  catch(err) {
+  catch (err) {
+
     console.error(
-      "Upload Expense Attachment:",
+      "Upload expense attachment:",
       err
     );
-    hideLoading();
+
     showToast(
       err.message ||
-      "Upload gagal",
+      "Upload attachment gagal",
       "error"
     );
+
+  }
+  finally {
+
+    hideLoading();
+
   }
 }
 
@@ -29689,6 +29656,7 @@ function closeOtherIncomeStatusModal(){
 }	
 
 async function saveOtherIncomeStatus() {
+
   if (!selectedOtherIncome) {
     showToast(
       "Data tidak ditemukan",
@@ -29696,69 +29664,80 @@ async function saveOtherIncomeStatus() {
     );
     return;
   }
+
   const status =
     document.getElementById(
       "editOtherIncomeStatus"
-    ).value;
+    )?.value;
+
+  if (!status) {
+    showToast(
+      "Status tidak dipilih",
+      "warning"
+    );
+    return;
+  }
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const res =
+      await updateOtherIncomeStatusRPC(
+        selectedOtherIncome.refId,
+        status
+      );
 
-    /*
-    const { error } =
-      await supabase
-        .from("Other_Income")
-        .update({
-          status: status
-        })
-        .eq(
-          "refId",
-          selectedOtherIncome.refId
-        );
-
-    if (error) {
-      throw error;
-    }
-    */
-
-	  
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if (!res.success) {
+    if (
+      res &&
+      res.success === false
+    ) {
       throw new Error(
         res.message ||
         "Gagal mengubah status"
       );
     }
+
     showToast(
       "Status berhasil diubah",
       "success"
     );
-    // clear Cash Flow cache
+
+    // =========================
+    // CLEAR CASH FLOW CACHE
+    // =========================
     state.cashFlowData = null;
     state.cashFlowFilter = null;
+
+    // =========================
+    // CLOSE MODAL
+    // =========================
     closeOtherIncomeStatusModal();
-    // clear Expense Dashboard cache
+
+    // =========================
+    // CLEAR EXPENSE CACHE
+    // =========================
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
-    // reload dashboard
-    loadExpenseDashboard();
+
+    // =========================
+    // RELOAD
+    // =========================
+
+    await loadExpenseDashboard();
+
   }
   catch (err) {
+
     console.error(
       "Save Other Income Status:",
       err
     );
+
     showToast(
       err.message ||
       "Gagal mengubah status",
       "error"
     );
+
   }
 }
 
@@ -30272,11 +30251,23 @@ function closeAddExpensePopup() {
 }
 	
 async function saveExpense() {
+
   const branchSelect =
     document.getElementById(
       "expenseBranchSelect"
     );
+
+  if (!branchSelect) {
+    showToast(
+      "Branch tidak ditemukan",
+      "error"
+    );
+    return;
+  }
+
+
   const data = {
+
     branchId:
       branchSelect.value,
     tanggal:
@@ -30303,67 +30294,75 @@ async function saveExpense() {
       selectedExpenseMethod,
     createdBy:
       state.userName || "Admin",
+
     type:
       "Expense",
+
     outlet:
       branchSelect.options[
         branchSelect.selectedIndex
-      ].text,
+      ]?.text || "",
 
     status:
       "Paid"
   };
 
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // SUPABASE RPC
+    // =========================
+    const res =
+      await addExpenseRPC(data);
 
-    /*
-    const { data: res, error } =
-      await supabase
-        .from("Operations")
-        .insert(data)
-        .select();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if (!res.success) {
+    // =========================
+    // CHECK RESPONSE
+    // =========================
+    if (
+      res &&
+      res.success === false
+    ) {
       throw new Error(
         res.message ||
         "Gagal menyimpan expense"
       );
     }
+
+    // =========================
     // CLEAR CACHE
+    // =========================
     state.cashFlowData = null;
     state.cashFlowFilter = null;
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
+
+
+    // =========================
     // RELOAD
-    loadExpenseDashboard();
+    // =========================
+    await loadExpenseDashboard();
+
     showToast(
       "Expense berhasil disimpan",
       "success"
     );
+
   }
   catch (error) {
+
     console.error(
-      "Save Expense:",
+      "Save Expense Error:",
       error
     );
-    let message =
-      "Gagal menyimpan expense";
+
     const errText =
       error?.message ||
       JSON.stringify(error);
+
+
+    let message =
+      "Gagal menyimpan expense";
     if (
       errText.includes(
         "Saldo Cash tidak mencukupi"
@@ -30380,12 +30379,17 @@ async function saveExpense() {
       message =
         "Saldo Bank tidak mencukupi";
     }
-    else {
+
+    else if (errText) {
       message =
-        errText ||
-        message;
+        errText;
     }
-    alert(message);
+
+    showToast(
+      message,
+      "error"
+    );
+
   }
 }
 
@@ -30404,6 +30408,7 @@ function openAddNewOtherIncome() {
 }
 
 async function submitOtherIncome() {
+
   const data = {
     date:
       document.getElementById(
@@ -30436,57 +30441,56 @@ async function submitOtherIncome() {
         "otherIncomeNotes"
       ).value
   };
-	
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const res =
+      await saveOtherIncomeRPC(data);
 
-    /*
-    const { data: res, error } =
-      await supabase
-        .from("Other_Income")
-        .insert(data)
-        .select();
-
-    if (error) {
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if (!res.success) {
+    if (
+      res &&
+      res.success === false
+    ) {
       throw new Error(
         res.message ||
         "Gagal menyimpan Other Income"
       );
     }
 
-    // FLOW LAMA TETAP
+    // =========================
+    // CLOSE FORM
+    // =========================
     document
       .getElementById(
         "addNewOtherIncomeWrapper"
       )
       ?.remove();
-    // clear Expense Dashboard
+
+    // =========================
+    // CLEAR CACHE
+    // =========================
     state.expenseDashboardData = null;
-    // clear Cash Flow
+    state.expenseDashboardFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
-    // reload
-    loadExpenseDashboard();
+	
+    // =========================
+    // RELOAD
+    // =========================
+    await loadExpenseDashboard();
+    showToast(
+      "Other Income berhasil disimpan",
+      "success"
+    );
+
   }
   catch (err) {
     console.error(
-      "Submit Other Income:",
+      "Submit Other Income Error:",
       err
     );
     showToast(
-      err.message ||
+      err?.message ||
       "Gagal menyimpan Other Income",
       "error"
     );
