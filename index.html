@@ -15772,6 +15772,22 @@ function toggleSidebar() {
   }
 }
 
+document.addEventListener("mousedown", function (e) {
+
+    const sidebar = document.getElementById("sidebar");
+
+    if (!sidebar || !sidebarOpen) return;
+
+    // Klik di dalam sidebar
+    if (sidebar.contains(e.target)) return;
+
+    // Klik tombol toggle
+    if (e.target.closest('[onclick="toggleSidebar()"]')) return;
+
+    // Klik di luar sidebar
+    toggleSidebar();
+});
+
 
 
 let billingOpen = false;
