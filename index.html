@@ -16038,7 +16038,10 @@ function navigate(pageId, params = {}) {
   const role =
     state.user?.role?.toLowerCase() || "";
 
-	const wasSidebarOpen = sidebarOpen;
+	const currentSidebar = document.getElementById("sidebar");
+	const wasSidebarOpen =
+	    currentSidebar &&
+	    !currentSidebar.classList.contains("-translate-x-full");
 
     if (params.roles) {
 
@@ -16074,7 +16077,7 @@ function navigate(pageId, params = {}) {
 			
 			if (newSidebar && newMain) {
 			
-			    // Matikan transisi hanya saat pindah page
+			    // Matikan animasi saat pindah page
 			    newSidebar.style.transition = "none";
 			    newMain.style.transition = "none";
 			
@@ -16088,10 +16091,10 @@ function navigate(pageId, params = {}) {
 			        newMain.classList.add("ml-0");
 			    }
 			
-			    // Paksa browser menerapkan posisi dulu
+			    // Paksa posisi langsung diterapkan
 			    void newSidebar.offsetWidth;
 			
-			    // Kembalikan transisi untuk tombol ☰
+			    // Kembalikan animasi untuk tombol ☰
 			    newSidebar.style.transition = "";
 			    newMain.style.transition = "";
 			}	
