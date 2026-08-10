@@ -35243,15 +35243,13 @@ async function startBackupProcess() {
 }
 
 let isRestoring = false;
-
 async function restoreBackup(id) {
 
   if (isRestoring) return;
 
-
   if (
     !confirm(
-      `Restore ${id} ?
+      `Restore ${id}?
 
 Semua data sekarang akan diganti
 dengan backup ini.`
@@ -35260,14 +35258,9 @@ dengan backup ini.`
     return;
   }
 
-
   isRestoring = true;
-
-
   const progressId =
     "restore-progress-" + Date.now();
-
-
   addBackupChatMessage(
     "bot",
     `
@@ -35293,129 +35286,85 @@ dengan backup ini.`
     `
   );
 
-
   let progress = 5;
-
-
   const interval =
     setInterval(() => {
-
       progress +=
         Math.floor(
           Math.random() * 10
         ) + 5;
-
-
       if (progress >= 90) {
         progress = 90;
       }
-
-
       const bar =
         document.getElementById(
           progressId
         );
-
       const text =
         document.getElementById(
           progressId + "-text"
         );
-
-
       if (bar) {
         bar.style.width =
           progress + "%";
       }
-
-
       if (text) {
-
         if (progress < 20) {
-
           text.innerHTML =
             "Mengembalikan data Transaksi...";
-
         }
         else if (progress < 35) {
-
           text.innerHTML =
             "Mengembalikan data Member...";
-
         }
         else if (progress < 45) {
-
           text.innerHTML =
             "Mengembalikan data Ingredient...";
-
         }
         else if (progress < 65) {
-
           text.innerHTML =
             "Mengembalikan data Produk...";
-
         }
         else if (progress < 80) {
-
           text.innerHTML =
             "Membaca file backup JSON...";
-
         }
         else {
-
           text.innerHTML =
             "Menyusun kembali database...";
-
         }
-
       }
-
     }, 800);
 
 
   try {
-
-    // =========================
-    // RESTORE SUPABASE
-    // =========================
-
+	  
+    // RESTORE VIA VERCEL
     const res =
       await restoreBackupById(id);
-
 
     if (
       res?.success === false
     ) {
-
       throw new Error(
         res.message ||
         "Restore gagal"
       );
-
     }
-
-
     clearInterval(interval);
-
     isRestoring = false;
-
-
     const bar =
       document.getElementById(
         progressId
       );
-
     const text =
       document.getElementById(
         progressId + "-text"
       );
-
-
     if (bar) {
       bar.style.width =
         "100%";
     }
-
-
     if (text) {
       text.innerHTML =
         "Restore selesai";
@@ -35423,7 +35372,15 @@ dengan backup ini.`
 
 
     setTimeout(() => {
+      // Hapus progress message
+      const box =
+        document.getElementById(
+          progressId + "-box"
+        );
 
+      if (box) {
+        box.remove();
+      }
       addBackupChatMessage(
         "bot",
         `
@@ -35433,21 +35390,19 @@ dengan backup ini.`
         `
       );
 
+      // CLEAR CACHE
+      state.cashFlowData = null;
+      state.cashFlowFilter = null;
 
+      state.expenseDashboardData = null;
+      state.expenseDashboardFilter = null;
+
+      state.grossRevenueData = null;
+      state.grossRevenueFilter = null;
+
+      // Reload
       setTimeout(() => {
-
-        // clear cache karena seluruh database berubah
-        state.cashFlowData = null;
-        state.cashFlowFilter = null;
-
-        state.expenseDashboardData = null;
-        state.expenseDashboardFilter = null;
-
-        state.grossRevenueData = null;
-        state.grossRevenueFilter = null;
-
         loadCashFlowPage();
-
       }, 1000);
 
     }, 700);
@@ -35455,18 +35410,13 @@ dengan backup ini.`
 
   }
   catch (err) {
-
     clearInterval(interval);
 
     isRestoring = false;
-
-
     console.error(
       "Restore Backup:",
       err
     );
-
-
     addBackupChatMessage(
       "bot",
       `
@@ -35475,9 +35425,7 @@ dengan backup ini.`
       ${err.message}
       `
     );
-
   }
-
 }
 
 async function deleteBackup(id) {
