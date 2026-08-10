@@ -33215,8 +33215,8 @@ async function loadCashFlowPage() {
       document.getElementById(
         "cf-end-date"
       )?.value || ""
-  };
 
+  };
 
   const cacheKey =
     JSON.stringify(filter);
@@ -33262,7 +33262,7 @@ async function loadCashFlowPage() {
   try {
 
     console.log(
-      "SERVER CALL getCashFlowPageDataRPC"
+      "SERVER CALL get_cash_flow_page_data"
     );
 
 
@@ -33270,10 +33270,36 @@ async function loadCashFlowPage() {
     // SUPABASE RPC
     // =========================
 
-    const data =
-      await getCashFlowPageDataRPC(
-        filter
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.rpc(
+        "get_cash_flow_page_data",
+        {
+          p_login_user_id:
+            Number(
+              filter.loginUserId
+            ),
+
+          p_branch_id:
+            filter.branchId ||
+            "ALL",
+
+          p_start:
+            filter.startDate ||
+            null,
+
+          p_end:
+            filter.endDate ||
+            null
+        }
       );
+
+
+    if (error) {
+      throw error;
+    }
 
 
     // =========================
@@ -33300,7 +33326,7 @@ async function loadCashFlowPage() {
     // =========================
 
     state.cashFlowData =
-      data;
+      data || {};
 
     state.cashFlowFilter =
       cacheKey;
@@ -33311,27 +33337,27 @@ async function loadCashFlowPage() {
     // =========================
 
     renderAccountBalance(
-      data.account
+      data?.account
     );
 
     renderCashFlowSummary(
-      data.summary
+      data?.summary
     );
 
     renderCashFlowChart(
-      data.chart
+      data?.chart
     );
 
     renderTransferHistory(
-      data.transfers || []
+      data?.transfers || []
     );
 
     renderOwnerSummary(
-      data.ownerSummary
+      data?.ownerSummary
     );
 
     renderOwnerHistory(
-      data.ownerTransactions || []
+      data?.ownerTransactions || []
     );
 
   }
@@ -33347,7 +33373,6 @@ async function loadCashFlowPage() {
       "Gagal memuat Cash Flow.",
       "error"
     );
-
   }
 }
 
