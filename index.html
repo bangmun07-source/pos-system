@@ -16037,7 +16037,7 @@ function navigate(pageId, params = {}) {
 
   const role =
     state.user?.role?.toLowerCase() || "";
-
+	const wasSidebarOpen = sidebarOpen;
     if (params.roles) {
 
       const allowedRoles = params.roles.map(r => r.toLowerCase());
@@ -16071,15 +16071,19 @@ function navigate(pageId, params = {}) {
 		const newMain = document.getElementById("mainContent");
 		
 		if (newSidebar && newMain) {
+		
 		    newSidebar.style.transition = "none";
 		    newMain.style.transition = "none";
 		
-		    if (sidebarOpen) {
+		    if (wasSidebarOpen) {
 		        newSidebar.classList.remove("-translate-x-full");
+		
 		        newMain.classList.remove("ml-0");
 		        newMain.classList.add("ml-72");
+		
 		    } else {
 		        newSidebar.classList.add("-translate-x-full");
+		
 		        newMain.classList.remove("ml-72");
 		        newMain.classList.add("ml-0");
 		    }
