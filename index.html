@@ -16069,25 +16069,36 @@ function navigate(pageId, params = {}) {
   app.appendChild(template.content.cloneNode(true));
 
 		setTimeout(() => {
-			const newSidebar = document.getElementById("sidebar");
-			const newMain = document.getElementById("mainContent");
+	    const newSidebar = document.getElementById("sidebar");
+	    const newMain = document.getElementById("mainContent");
 	
-			if (newSidebar && newMain) {
+	    if (newSidebar && newMain) {
 	
-					// MATIKAN ANIMASI SAAT PINDAH PAGE
-					newSidebar.style.transition = "none";
-					newMain.style.transition = "none";
+	        // Matikan animasi saat pindah page
+	        newSidebar.style.transition = "none";
+	        newMain.style.transition = "none";
 	
-					if (wasSidebarOpen) {
-							newSidebar.classList.remove("-translate-x-full");
-							newMain.classList.remove("ml-0");
-							newMain.classList.add("ml-72");
-					} else {
-							newSidebar.classList.add("-translate-x-full");
-							newMain.classList.remove("ml-72");
-							newMain.classList.add("ml-0");
-					}
-			}
+	        if (wasSidebarOpen) {
+	
+	            newSidebar.classList.remove("-translate-x-full");
+	
+	            newMain.classList.remove("ml-0");
+	            newMain.classList.add("ml-72");
+	
+	            // Pastikan state tetap OPEN
+	            sidebarOpen = true;
+	
+	        } else {
+	
+	            newSidebar.classList.add("-translate-x-full");
+	
+	            newMain.classList.remove("ml-72");
+	            newMain.classList.add("ml-0");
+	
+	            // Pastikan state tetap CLOSED
+	            sidebarOpen = false;
+	        }
+	    }
 	}, 0);
 
 	
