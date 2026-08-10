@@ -35891,9 +35891,15 @@ async function exportCashFlowReport() {
     document.getElementById(
       "cf-branch"
     )?.value ||
-    state.branchId ||
+    state?.branchId ||
     "ALL";
 
+  // =========================
+  // LOGIN USER
+  // =========================
+
+  const loginUserId =
+    state?.user?.id || "";
 
   // =========================
   // VALIDASI
@@ -35906,9 +35912,7 @@ async function exportCashFlowReport() {
     );
 
     return;
-
   }
-
 
   if (!branch) {
 
@@ -35917,9 +35921,35 @@ async function exportCashFlowReport() {
     );
 
     return;
-
   }
 
+  if (!loginUserId) {
+
+    console.error(
+      "LOGIN USER ID KOSONG:",
+      state?.user
+    );
+
+    alert(
+      "User login tidak ditemukan."
+    );
+
+    return;
+  }
+
+  // =========================
+  // DEBUG
+  // =========================
+
+  console.log(
+    "EXPORT CASH FLOW:",
+    {
+      loginUserId,
+      branch,
+      startDate,
+      endDate
+    }
+  );
 
   // =========================
   // OPEN WINDOW
@@ -35931,7 +35961,6 @@ async function exportCashFlowReport() {
       "_blank"
     );
 
-
   if (!pdfWindow) {
 
     alert(
@@ -35939,9 +35968,7 @@ async function exportCashFlowReport() {
     );
 
     return;
-
   }
-
 
   // =========================
   // LOADING
@@ -36007,7 +36034,6 @@ async function exportCashFlowReport() {
 
       </head>
 
-
       <body>
 
         <div class="loading">
@@ -36028,54 +36054,42 @@ async function exportCashFlowReport() {
 
   `);
 
-
   try {
-
-    console.log(
-      "EXPORT CASH FLOW:",
-      {
-        branch,
-        startDate,
-        endDate
-      }
-    );
-
 
     // =========================
     // CALL VERCEL API
     // =========================
 
     const response =
-	  await fetch(
-	    "/api/export-cash-flow-pdf",
-	    {
-	
-	      method: "POST",
-	
-	      headers: {
-	        "Content-Type":
-	          "application/json"
-	      },
-	
-	      body: JSON.stringify({
-	
-	        branchId:
-	          branch,
-	
-	        start:
-	          startDate,
-	
-	        end:
-	          endDate,
-	
-	        loginUserId:
-	          state.user?.id
-	
-	      })
-	
-	    }
-	  );
+      await fetch(
+        "/api/export-cash-flow-pdf",
+        {
 
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            loginUserId:
+              loginUserId,
+
+            branchId:
+              branch,
+
+            start:
+              startDate,
+
+            end:
+              endDate
+
+          })
+
+        }
+      );
 
     // =========================
     // HTTP ERROR
@@ -36093,14 +36107,12 @@ async function exportCashFlowReport() {
 
     }
 
-
     // =========================
     // GET HTML REPORT
     // =========================
 
     const html =
       await response.text();
-
 
     if (!html) {
 
@@ -36110,11 +36122,9 @@ async function exportCashFlowReport() {
 
     }
 
-
     console.log(
       "EXPORT CASH FLOW HTML RECEIVED"
     );
-
 
     // =========================
     // RENDER REPORT
@@ -36128,15 +36138,14 @@ async function exportCashFlowReport() {
 
     pdfWindow.document.close();
 
-
   }
+
   catch (err) {
 
     console.error(
       "Export Cash Flow:",
       err
     );
-
 
     // =========================
     // ERROR PAGE
@@ -36184,7 +36193,6 @@ async function exportCashFlowReport() {
     pdfWindow.document.close();
 
   }
-
 }
 
 
