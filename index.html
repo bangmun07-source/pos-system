@@ -36046,32 +36046,35 @@ async function exportCashFlowReport() {
     // =========================
 
     const response =
-      await fetch(
-        "/api/export-cash-flow-pdf",
-        {
-
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            branchId:
-              branch,
-
-            start:
-              startDate,
-
-            end:
-              endDate
-
-          })
-
-        }
-      );
+	  await fetch(
+	    "/api/export-cash-flow-pdf",
+	    {
+	
+	      method: "POST",
+	
+	      headers: {
+	        "Content-Type":
+	          "application/json"
+	      },
+	
+	      body: JSON.stringify({
+	
+	        branchId:
+	          branch,
+	
+	        start:
+	          startDate,
+	
+	        end:
+	          endDate,
+	
+	        loginUserId:
+	          state.user?.id
+	
+	      })
+	
+	    }
+	  );
 
 
     // =========================
