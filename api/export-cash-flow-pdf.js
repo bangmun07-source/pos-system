@@ -527,68 +527,59 @@ export default async function handler(req, res) {
 
     const historyRows =
       history.length
-
-        ? history
-            .map(item => {
-
-              const amount =
-                number(
-                  item.amount ??
-                  item.Amount
-                );
-
-
-              return `
-                <tr>
-
-                  <td>
-                    ${escapeHtml(
-                      item.date ??
-                      item.Date ??
-                      "-"
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      item.type ??
-                      item.Type ??
-                      "-"
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      item.description ??
-                      item.Description ??
-                      item.note ??
-                      "-"
-                    )}
-                  </td>
-
-                  <td class="right">
-                    Rp ${rupiah(amount)}
-                  </td>
-
-                </tr>
-              `;
-
-            })
-            .join("")
-
-        : `
+    
+        ? history.map(item => `
+    
             <tr>
-
-              <td
-                colspan="4"
-                class="empty"
-              >
-                No Data
+    
+              <td>
+                ${escapeHtml(
+                  item.date ??
+                  item.Date ??
+                  "-"
+                )}
               </td>
-
+    
+              <td>
+                ${escapeHtml(
+                  item.type ??
+                  item.Type ??
+                  "-"
+                )}
+              </td>
+    
+              <td>
+                ${escapeHtml(
+                  item.description ??
+                  item.Description ??
+                  item.note ??
+                  item.Notes ??
+                  "-"
+                )}
+              </td>
+    
+              <td class="right">
+                Rp ${rupiah(
+                  item.amount ??
+                  item.Amount ??
+                  0
+                )}
+              </td>
+    
             </tr>
-          `;
-
+    
+          `).join("")
+    
+        : `
+          <tr>
+            <td
+              colspan="4"
+              class="empty"
+            >
+              No Data
+            </td>
+          </tr>
+        `;
 
     // ======================================
     // FUND TRANSFERS
