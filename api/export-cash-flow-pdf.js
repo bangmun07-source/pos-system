@@ -67,14 +67,14 @@ export default async function handler(req, res) {
       "get_cash_flow_page_data",
       {
         p_login_user_id:
-          req.body?.loginUserId || null,
-
+          loginUserId,
+    
         p_branch_id:
           branchId || "ALL",
-
+    
         p_start:
           start || null,
-
+    
         p_end:
           end || null
       }
