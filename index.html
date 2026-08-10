@@ -33883,17 +33883,37 @@ async function saveOwnerCapital() {
     loadCashFlowPage();
 }
 	
-function addOwnerTransaction(data) {
+async function addOwnerTransaction(data) {
 
-  return new Promise((resolve, reject) => {
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_owner_transaction",
+    {
+      p_branch_id:
+        data.branchId,
+      p_type:
+        data.type,
+      p_account:
+        data.account,
+      p_amount:
+        Number(data.amount),
+      p_note:
+        data.note || "",
+      p_created_by:
+        data.createdBy || ""
+    }
+  );
 
-    google.script.run
-      .withSuccessHandler(resolve)
-      .withFailureHandler(reject)
-      .addOwnerTransaction(data);
-
-  });
-
+  if (error) {
+    console.error(
+      "add_owner_transaction error:",
+      error
+    );
+    throw error;
+  }
+  return result;
 }
 
 let ownerTransactionType = "CAPITAL";
