@@ -1,5 +1,6 @@
 
 import { createClient } from "@supabase/supabase-js";
+import puppeteer from "puppeteer";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -37,12 +38,20 @@ function escapeHtml(value) {
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
+
     return res
       .status(405)
       .send("Method not allowed");
+
   }
 
+  let browser = null;
+
   try {
+
+    // ======================================
+    // REQUEST
+    // ======================================
 
     const {
       loginUserId,
@@ -50,28 +59,46 @@ export default async function handler(req, res) {
       end,
       branchId
     } = req.body || {};
-    
+
+
+    // ======================================
+    // VALIDATION
+    // ======================================
+
     if (!loginUserId) {
-    
+
       return res
         .status(400)
         .json({
           success: false,
           error: "loginUserId wajib diisi"
         });
-    
+
     }
-    
+
+
     if (!branchId) {
-    
+
       return res
         .status(400)
         .json({
           success: false,
           error: "branchId wajib diisi"
         });
-    
+
     }
+
+
+    console.log(
+      "EXPORT CASH FLOW REQUEST:",
+      {
+        loginUserId,
+        branchId,
+        start,
+        end
+      }
+    );
+
 
     // ======================================
     // GET CASH FLOW PAGE DATA
@@ -85,39 +112,48 @@ export default async function handler(req, res) {
       {
         p_login_user_id:
           loginUserId,
-    
+
         p_branch_id:
           branchId || "ALL",
-    
+
         p_start:
           start || null,
-    
+
         p_end:
           end || null
       }
     );
 
+
     if (error) {
       throw error;
     }
 
+
     if (!data) {
+
       throw new Error(
         "Data Cash Flow kosong"
       );
+
     }
 
+
     if (data.success === false) {
+
       throw new Error(
         data.message ||
         "Gagal mengambil data Cash Flow"
       );
+
     }
+
 
     console.log(
       "EXPORT CASH FLOW DATA:",
       data
     );
+
 
     // ======================================
     // NORMALIZE
@@ -134,16 +170,14 @@ export default async function handler(req, res) {
         ? data.transfers
         : [];
 
-    const ownerSummary =
-      data.ownerSummary || {};
-
     const ownerTransactions =
       Array.isArray(data.ownerTransactions)
         ? data.ownerTransactions
         : [];
 
+
     // ======================================
-    // SUPPORT BERBAGAI BENTUK SUMMARY
+    // KPI
     // ======================================
 
     const cashIn =
@@ -154,6 +188,7 @@ export default async function handler(req, res) {
         0
       );
 
+
     const cashOut =
       number(
         summary.cashOut ??
@@ -162,12 +197,14 @@ export default async function handler(req, res) {
         0
       );
 
+
     const netFlow =
       number(
         summary.netFlow ??
         summary.net_flow ??
         (cashIn - cashOut)
       );
+
 
     const cashBalance =
       number(
@@ -178,6 +215,7 @@ export default async function handler(req, res) {
         0
       );
 
+
     const bankBalance =
       number(
         account.bank ??
@@ -186,6 +224,7 @@ export default async function handler(req, res) {
         account.bank_balance ??
         0
       );
+
 
     const totalBalance =
       number(
@@ -196,18 +235,22 @@ export default async function handler(req, res) {
         (cashBalance + bankBalance)
       );
 
+
     const balanceBase =
       cashBalance + bankBalance;
+
 
     const cashPercent =
       balanceBase > 0
         ? (cashBalance / balanceBase) * 100
         : 0;
 
+
     const bankPercent =
       balanceBase > 0
         ? (bankBalance / balanceBase) * 100
         : 0;
+
 
     // ======================================
     // INCOME SOURCE
@@ -224,6 +267,7 @@ export default async function handler(req, res) {
           ? summary.income_source
           : [];
 
+
     const totalIncome =
       incomeSource.reduce(
         (sum, item) =>
@@ -235,6 +279,7 @@ export default async function handler(req, res) {
           ),
         0
       );
+
 
     const incomeRows =
       incomeSource.length
@@ -248,10 +293,12 @@ export default async function handler(req, res) {
                 item.value
               );
 
+
             const percent =
               totalIncome > 0
                 ? (amount / totalIncome) * 100
                 : 0;
+
 
             return `
               <tr>
@@ -280,11 +327,15 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-            <td colspan="3" class="empty">
+            <td
+              colspan="3"
+              class="empty"
+            >
               No income data
             </td>
           </tr>
         `;
+
 
     // ======================================
     // EXPENSE CATEGORY
@@ -301,6 +352,7 @@ export default async function handler(req, res) {
           ? summary.expense_category
           : [];
 
+
     const totalExpense =
       expenseCategory.reduce(
         (sum, item) =>
@@ -312,6 +364,7 @@ export default async function handler(req, res) {
           ),
         0
       );
+
 
     const expenseRows =
       expenseCategory.length
@@ -325,10 +378,12 @@ export default async function handler(req, res) {
                 item.value
               );
 
+
             const percent =
               totalExpense > 0
                 ? (amount / totalExpense) * 100
                 : 0;
+
 
             return `
               <tr>
@@ -356,11 +411,15 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-            <td colspan="3" class="empty">
+            <td
+              colspan="3"
+              class="empty"
+            >
               No expense data
             </td>
           </tr>
         `;
+
 
     // ======================================
     // CASH FLOW HISTORY
@@ -376,6 +435,7 @@ export default async function handler(req, res) {
           )
           ? summary.transactions
           : [];
+
 
     const historyRows =
       history.length
@@ -423,11 +483,17 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-            <td colspan="4" class="empty">
+
+            <td
+              colspan="4"
+              class="empty"
+            >
               No Data
             </td>
+
           </tr>
         `;
+
 
     // ======================================
     // FUND TRANSFERS
@@ -479,11 +545,17 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-            <td colspan="4" class="empty">
+
+            <td
+              colspan="4"
+              class="empty"
+            >
               No fund transfers
             </td>
+
           </tr>
         `;
+
 
     // ======================================
     // OWNER TRANSACTIONS
@@ -534,17 +606,25 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-            <td colspan="4" class="empty">
+
+            <td
+              colspan="4"
+              class="empty"
+            >
               No owner transactions
             </td>
+
           </tr>
         `;
 
+
     // ======================================
-    // HTML REPORT
+    // REPORT HTML
     // ======================================
 
-    const html = `
+    const reportHtml = `
+
+      <!DOCTYPE html>
 
       <html>
 
@@ -554,102 +634,170 @@ export default async function handler(req, res) {
 
         <style>
 
+          * {
+            box-sizing: border-box;
+          }
+
           body {
-            font-family: Arial, sans-serif;
+
+            font-family:
+              Arial,
+              sans-serif;
+
             padding: 20px;
+
             color: #333;
+
+            background: white;
+
           }
 
           .logo {
+
             width: 150px;
+
             height: auto;
+
             object-fit: contain;
+
             margin-bottom: 16px;
+
           }
 
           .header {
+
             text-align: center;
+
           }
 
           .card {
-            border: 1px solid #eee;
+
+            border:
+              1px solid #eee;
+
             border-radius: 12px;
+
             padding: 12px;
+
             margin-bottom: 20px;
+
           }
 
           .kpi {
+
             display: grid;
+
             grid-template-columns:
               repeat(4, 1fr);
+
             gap: 15px;
+
           }
 
           .kpi .card {
+
             width: 100%;
-            box-sizing: border-box;
+
             padding: 10px;
+
             text-align: center;
+
           }
 
           table {
+
             width: 100%;
+
             border-collapse:
               collapse;
+
             font-size: 11px;
+
           }
 
           th {
-            background: #f5f5f5;
+
+            background:
+              #f5f5f5;
+
             padding: 8px;
+
             text-align: left;
+
           }
 
           td {
+
             padding: 8px;
+
             border-bottom:
               1px solid #eee;
+
           }
 
           .right {
+
             text-align: right;
+
           }
 
           .empty {
+
             text-align: center;
+
             color: #777;
+
           }
 
           .page-break {
-            page-break-before: always;
+
+            page-break-before:
+              always;
+
           }
 
           h2 {
+
             font-size: 14px;
+
             margin: 8px 0;
+
           }
 
           h3 {
+
             font-size: 11px;
-            margin: 0 0 8px 0;
+
+            margin:
+              0 0 8px 0;
+
             font-weight: bold;
+
           }
 
           p {
+
             font-size: 8px;
+
             margin: 8px 0;
+
           }
 
           b {
+
             font-size: 11px;
+
             font-weight: bold;
+
           }
 
         </style>
 
       </head>
 
+
       <body>
+
 
         <div class="header">
 
@@ -662,13 +810,13 @@ export default async function handler(req, res) {
         </div>
 
 
-        <!-- KPI -->
-
         <div class="kpi">
 
           <div class="card">
 
-            <b>CASH IN</b>
+            <b>
+              CASH IN
+            </b>
 
             <br>
 
@@ -679,7 +827,9 @@ export default async function handler(req, res) {
 
           <div class="card">
 
-            <b>CASH OUT</b>
+            <b>
+              CASH OUT
+            </b>
 
             <br>
 
@@ -690,7 +840,9 @@ export default async function handler(req, res) {
 
           <div class="card">
 
-            <b>NET FLOW</b>
+            <b>
+              NET FLOW
+            </b>
 
             <br>
 
@@ -701,7 +853,9 @@ export default async function handler(req, res) {
 
           <div class="card">
 
-            <b>BALANCE</b>
+            <b>
+              BALANCE
+            </b>
 
             <br>
 
@@ -711,8 +865,6 @@ export default async function handler(req, res) {
 
         </div>
 
-
-        <!-- HEADER -->
 
         <div>
 
@@ -737,8 +889,6 @@ export default async function handler(req, res) {
         </div>
 
 
-        <!-- ACCOUNT BALANCE -->
-
         <div class="card">
 
           <h3>
@@ -750,27 +900,40 @@ export default async function handler(req, res) {
             <tr>
 
               <td>
+
                 Cash
+
                 <br>
+
                 Rp ${rupiah(cashBalance)}
+
               </td>
 
               <td class="right">
+
                 ${cashPercent.toFixed(1)}%
+
               </td>
 
             </tr>
 
+
             <tr>
 
               <td>
+
                 Bank
+
                 <br>
+
                 Rp ${rupiah(bankBalance)}
+
               </td>
 
               <td class="right">
+
                 ${bankPercent.toFixed(1)}%
+
               </td>
 
             </tr>
@@ -779,8 +942,6 @@ export default async function handler(req, res) {
 
         </div>
 
-
-        <!-- INCOME -->
 
         <div class="card">
 
@@ -813,8 +974,6 @@ export default async function handler(req, res) {
         </div>
 
 
-        <!-- EXPENSE -->
-
         <div class="card">
 
           <h3>
@@ -846,9 +1005,8 @@ export default async function handler(req, res) {
         </div>
 
 
-        <!-- CASH FLOW HISTORY -->
-
         <div class="page-break"></div>
+
 
         <div class="card">
 
@@ -860,9 +1018,17 @@ export default async function handler(req, res) {
 
             <tr>
 
-              <th>Date</th>
-              <th>Type</th>
-              <th>Description</th>
+              <th>
+                Date
+              </th>
+
+              <th>
+                Type
+              </th>
+
+              <th>
+                Description
+              </th>
 
               <th class="right">
                 Amount
@@ -877,8 +1043,6 @@ export default async function handler(req, res) {
         </div>
 
 
-        <!-- FUND TRANSFERS -->
-
         <div class="card">
 
           <h3>
@@ -889,9 +1053,17 @@ export default async function handler(req, res) {
 
             <tr>
 
-              <th>Date</th>
-              <th>From</th>
-              <th>To</th>
+              <th>
+                Date
+              </th>
+
+              <th>
+                From
+              </th>
+
+              <th>
+                To
+              </th>
 
               <th class="right">
                 Amount
@@ -906,8 +1078,6 @@ export default async function handler(req, res) {
         </div>
 
 
-        <!-- OWNER TRANSACTIONS -->
-
         <div class="card">
 
           <h3>
@@ -918,9 +1088,17 @@ export default async function handler(req, res) {
 
             <tr>
 
-              <th>Date</th>
-              <th>Type</th>
-              <th>Description</th>
+              <th>
+                Date
+              </th>
+
+              <th>
+                Type
+              </th>
+
+              <th>
+                Description
+              </th>
 
               <th class="right">
                 Amount
@@ -936,8 +1114,11 @@ export default async function handler(req, res) {
 
 
         <p>
+
           Generated by Sistem POS
-          • ${new Date().toLocaleString("id-ID")}
+          •
+          ${new Date().toLocaleString("id-ID")}
+
         </p>
 
 
@@ -947,18 +1128,97 @@ export default async function handler(req, res) {
 
     `;
 
+
     // ======================================
-    // RETURN HTML
+    // GENERATE PDF
+    // ======================================
+
+    console.log(
+      "Generating Cash Flow PDF..."
+    );
+
+
+    browser =
+      await puppeteer.launch({
+        headless: true,
+        args: [
+          "--no-sandbox",
+          "--disable-setuid-sandbox"
+        ]
+      });
+
+
+    const page =
+      await browser.newPage();
+
+
+    await page.setContent(
+      reportHtml,
+      {
+        waitUntil:
+          "networkidle0"
+      }
+    );
+
+
+    const pdfBuffer =
+      await page.pdf({
+
+        format: "A4",
+
+        printBackground: true,
+
+        margin: {
+
+          top: "12mm",
+
+          right: "10mm",
+
+          bottom: "12mm",
+
+          left: "10mm"
+
+        }
+
+      });
+
+
+    await browser.close();
+
+    browser = null;
+
+
+    // ======================================
+    // FILENAME
+    // ======================================
+
+    const filename =
+      `Cash Flow Report - ${branchId || "ALL"} - ${start || ""} - ${end || ""}.pdf`;
+
+
+    // ======================================
+    // RETURN PDF
     // ======================================
 
     res.setHeader(
       "Content-Type",
-      "text/html; charset=utf-8"
+      "application/pdf"
     );
+
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${filename}"`
+    );
+
+    res.setHeader(
+      "Content-Length",
+      pdfBuffer.length
+    );
+
 
     return res
       .status(200)
-      .send(html);
+      .send(pdfBuffer);
 
   }
 
@@ -968,6 +1228,17 @@ export default async function handler(req, res) {
       "EXPORT CASH FLOW ERROR:",
       err
     );
+
+
+    if (browser) {
+
+      try {
+        await browser.close();
+      }
+      catch (_) {}
+
+    }
+
 
     return res
       .status(500)
