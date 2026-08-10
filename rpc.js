@@ -2814,102 +2814,57 @@ async function downloadDatabaseBackup(filePath) {
   
   
   async function createFullBackup() {
-  
-    // =========================
-    // 1. CREATE BACKUP VIA RPC
-    // =========================
-  
-    const {
-      data: backup,
-      error
-    } =
-      await supabaseClient.rpc(
-        "create_database_backup",
-        {}
-      );
-  
-    if (error) {
-      throw error;
-    }
-  
-    if (
-      !backup?.backup_info?.backup_id
-    ) {
-  
-      throw new Error(
-        "Backup ID tidak ditemukan."
-      );
-    }
-  
-    const backupId =
-      backup
-        .backup_info
-        .backup_id;
-  
-    const fileName =
-      backupId + ".json";
-  
-  
-    // =========================
-    // 2. UPLOAD VIA VERCEL API
-    // =========================
-  
-    const upload =
-      await uploadDatabaseBackup(
-        fileName,
-        backup
-      );
-  
-    if (!upload?.path) {
-  
-      throw new Error(
-        "Upload backup gagal."
-      );
-    }
-  
-  
-    // =========================
-    // 3. UPDATE BACKUP HISTORY
-    // =========================
-  
-    const {
-      data: updateResult,
-      error: updateError
-    } =
-      await supabaseClient.rpc(
-        "update_backup_file_info",
-        {
-          p_backup_id:
-            backupId,
-  
-          p_file_path:
-            upload.path,
-  
-          p_file_size:
-            upload.size
-        }
-      );
-  
-    if (updateError) {
-      throw updateError;
-    }
-  
-  
-    return {
-  
-      success: true,
-  
-      backup_id:
-        backupId,
-  
-      file_path:
-        upload.path,
-  
-      file_size:
-        upload.size
-  
-    };
+
+  // =========================
+  // 1. CREATE BACKUP VIA RPC
+  // =========================
+
+  const {
+    data: backup,
+    error
+  } =
+    await supabaseClient.rpc(
+      "create_database_backup",
+      {}
+    );
+
+  if (error) {
+    throw error;
   }
+
+  if (
+    !backup?.backup_info?.backup_id
+  ) {
+    throw new Error(
+      "Backup ID tidak ditemukan."
+    );
+  }
+
+  const backupId =
+    backup
+      .backup_info
+      .backup_id;
+
+  const fileName =
+    backupId + ".json";
+
+
+  // =========================
+  // 2. UPLOAD VIA VERCEL API
+  // =========================
+
+  const upload =
+    await uploadDatabaseBackup(
+      fileName,
+      backup
+    );
+
+  if (!upload?.path) {
+    throw new Error(
+      "Upload backup gagal."
+    );
+  }
+
 
   // =========================
   // 3. UPDATE BACKUP HISTORY
@@ -2939,7 +2894,6 @@ async function downloadDatabaseBackup(filePath) {
 
 
   return {
-
     success: true,
 
     backup_id:
@@ -2950,10 +2904,8 @@ async function downloadDatabaseBackup(filePath) {
 
     file_size:
       upload.size
-
   };
 }
-
 
 // =========================
 // RESTORE BACKUP VIA VERCEL
