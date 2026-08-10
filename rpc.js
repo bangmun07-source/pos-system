@@ -2745,32 +2745,37 @@ async function restoreDatabaseBackupRPC(data = {}) {
   //  BACKUP VIA RPC
   // =========================
 
-async uploadDatabaseBackup(fileName, jsonData) {
+async uploadDatabaseBackup(
+  fileName,
+  jsonData
+) {
 
-  const response = await fetch(
-    "/api/backup/upload",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        fileName,
-        jsonData
-      })
-    }
-  );
+  const response =
+    await fetch(
+      "/api/backup/upload",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          fileName,
+          jsonData
+        })
+      }
+    );
 
   const result =
     await response.json();
 
   if (!response.ok) {
-
     throw new Error(
       result.error ||
       "Upload backup gagal"
     );
-
   }
 
   return {
