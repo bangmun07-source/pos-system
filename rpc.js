@@ -2745,89 +2745,38 @@ async function restoreDatabaseBackupRPC(data = {}) {
   //  BACKUP VIA RPC
   // =========================
 
-async function uploadDatabaseBackup(
-  fileName,
-  jsonData
-) {
+async uploadDatabaseBackup(fileName, jsonData) {
 
-  const bucket =
-    "database_backup";
+  const response = await fetch(
+    "/api/backup/upload",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        fileName,
+        jsonData
+      })
+    }
+  );
 
-  const now =
-    new Date();
+  const result =
+    await response.json();
 
-  const year =
-    now.getFullYear();
+  if (!response.ok) {
 
-  const month =
-    String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
-
-  const path =
-    `${year}/${month}/${fileName}`;
-
-
-  // JSON → Blob
-  const jsonString =
-    JSON.stringify(
-      jsonData,
-      null,
-      2
+    throw new Error(
+      result.error ||
+      "Upload backup gagal"
     );
 
-  const blob =
-    new Blob(
-      [jsonString],
-      {
-        type:
-          "application/json"
-      }
-    );
-
-
-  // Upload ke Supabase Storage
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .storage
-      .from(bucket)
-      .upload(
-        path,
-        blob,
-        {
-          contentType:
-            "application/json",
-
-          upsert:
-            true
-        }
-      );
-
-
-  if (error) {
-
-    console.error(
-      "Upload backup error:",
-      error
-    );
-
-    throw error;
   }
 
-
   return {
-
-    path:
-      data.path,
-
-    size:
-      blob.size
-
+    path: result.path,
+    size: result.size
   };
-
 }
 
 async function createFullBackup() {
