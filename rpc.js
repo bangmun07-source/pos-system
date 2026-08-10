@@ -2740,49 +2740,109 @@ async function restoreDatabaseBackupRPC(data = {}) {
   return result;
 }
 
+async function downloadDatabaseBackup(filePath) {
 
-  // =========================
-  //  BACKUP VIA RPC
-  // =========================
+  const bucket =
+    "database_backup";
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(bucket)
+      .download(filePath);
+
+  if (error) {
+
+    console.error(
+      "Download backup error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+
+ // =========================
+// BACKUP VIA RPC
+// =========================
 
 async function uploadDatabaseBackup(
   fileName,
   jsonData
 ) {
 
-  const response =
-    await fetch(
-      "/api/backup/upload",
+  const bucket =
+    "database_backup";
+
+  const now =
+    new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+  const path =
+    `${year}/${month}/${fileName}`;
+
+  const jsonString =
+    JSON.stringify(
+      jsonData,
+      null,
+      2
+    );
+
+  const blob =
+    new Blob(
+      [jsonString],
       {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          fileName,
-          jsonData
-        })
+        type:
+          "application/json"
       }
     );
 
-  const result =
-    await response.json();
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(bucket)
+      .upload(
+        path,
+        blob,
+        {
+          contentType:
+            "application/json",
+          upsert: false
+        }
+      );
 
-  if (!response.ok) {
-    throw new Error(
-      result.error ||
-      "Upload backup gagal"
+  if (error) {
+
+    console.error(
+      "Upload backup error:",
+      error
     );
+
+    throw error;
   }
 
   return {
-    path: result.path,
-    size: result.size
+    path: path,
+    size: blob.size
   };
 }
+
 
 async function createFullBackup() {
 
@@ -2793,34 +2853,36 @@ async function createFullBackup() {
   const {
     data: backup,
     error
-  } = await supabaseClient.rpc(
-    "create_database_backup",
-    {}
-  );
+  } =
+    await supabaseClient.rpc(
+      "create_database_backup",
+      {}
+    );
 
   if (error) {
     throw error;
   }
 
-
-  if (!backup?.backup_info?.backup_id) {
+  if (
+    !backup?.backup_info?.backup_id
+  ) {
 
     throw new Error(
       "Backup ID tidak ditemukan."
     );
-
   }
 
-
   const backupId =
-    backup.backup_info.backup_id;
+    backup
+      .backup_info
+      .backup_id;
 
   const fileName =
     backupId + ".json";
 
 
   // =========================
-  // 2. UPLOAD BACKUP
+  // 2. UPLOAD KE STORAGE
   // =========================
 
   const upload =
@@ -2829,30 +2891,35 @@ async function createFullBackup() {
       backup
     );
 
-
   if (!upload?.path) {
 
     throw new Error(
       "Upload backup gagal."
     );
-
   }
+
+
   // =========================
-  // 3. UPDATE HISTORY
+  // 3. UPDATE BACKUP HISTORY
   // =========================
 
   const {
     data: updateResult,
     error: updateError
-  } = await supabaseClient.rpc(
-    "update_backup_file_info",
-    {
-      p_backup_id: backupId,
-      p_file_path: upload.path,
-      p_file_size: upload.size
-    }
-  );
+  } =
+    await supabaseClient.rpc(
+      "update_backup_file_info",
+      {
+        p_backup_id:
+          backupId,
 
+        p_file_path:
+          upload.path,
+
+        p_file_size:
+          upload.size
+      }
+    );
 
   if (updateError) {
     throw updateError;
@@ -2873,129 +2940,18 @@ async function createFullBackup() {
       upload.size
 
   };
-
 }
+// =========================
+// RESTORE BACKUP VIA VERCEL
+// =========================
 
-async function downloadDatabaseBackup(filePath) {
-
-  const bucket =
-    "database_backup";
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .storage
-      .from(bucket)
-      .download(filePath);
-
-
-  if (error) {
-
-    console.error(
-      "Download backup error:",
-      error
-    );
-
-    throw error;
-  }
-
-
-  return data;
-}
-
-async function restoreBackupById(
-  p_backup_id
+async function restoreDatabaseBackupByPath(
+  filePath
 ) {
-
-  // =========================
-  // 1. AMBIL INFO BACKUP
-  // =========================
-
-  const {
-    data: history,
-    error: historyError
-  } =
-    await supabaseClient
-      .from("Backup_History")
-      .select("*")
-      .eq(
-        "backup_id",
-        p_backup_id
-      )
-      .single();
-
-
-  if (historyError) {
-    throw historyError;
-  }
-
-
-  if (!history) {
-
-    throw new Error(
-      "Backup tidak ditemukan"
-    );
-
-  }
-
-
-  // =========================
-  // 2. DOWNLOAD FILE
-  // =========================
-
-  const blob =
-    await downloadDatabaseBackup(
-      history.file_path
-    );
-
-
-  // =========================
-  // 3. PARSE JSON
-  // =========================
-
-  const text =
-    await blob.text();
-
-  const json =
-    JSON.parse(text);
-
-
-  // =========================
-  // 4. RESTORE VIA RPC
-  // =========================
-
-  const {
-    data: result,
-    error: restoreError
-  } =
-    await supabaseClient.rpc(
-      "restore_database_backup",
-      {
-        p_backup: json,
-
-        p_restored_by:
-          "SYSTEM"
-      }
-    );
-
-
-  if (restoreError) {
-    throw restoreError;
-  }
-
-
-  return result;
-}
-
-
-async function deleteDatabaseBackup(filePath) {
 
   const response =
     await fetch(
-      "/api/backup/delete",
+      "/api/backup/restore",
       {
         method: "POST",
 
@@ -3016,28 +2972,36 @@ async function deleteDatabaseBackup(filePath) {
   if (!response.ok) {
     throw new Error(
       result.error ||
-      "Gagal menghapus file backup"
+      "Restore backup gagal"
     );
   }
 
   return result;
 }
 
-async function deleteBackupById(
+
+async function restoreBackupById(
   backupId
 ) {
+
+  // =========================
+  // 1. AMBIL INFO BACKUP
+  // =========================
 
   const {
     data: history,
     error
-  } = await supabaseClient
-    .from("Backup_History")
-    .select("*")
-    .eq(
-      "backup_id",
-      backupId
-    )
-    .single();
+  } =
+    await supabaseClient
+      .from("Backup_History")
+      .select(
+        "backup_id,file_path"
+      )
+      .eq(
+        "backup_id",
+        backupId
+      )
+      .single();
 
   if (error) {
     throw error;
@@ -3049,30 +3013,165 @@ async function deleteBackupById(
     );
   }
 
-  // HAPUS FILE FISIK
+  if (!history.file_path) {
+    throw new Error(
+      "File backup tidak ditemukan"
+    );
+  }
+
+
+  // =========================
+  // 2. DOWNLOAD STORAGE
+  // =========================
+
+  const {
+    data: blob,
+    error: downloadError
+  } =
+    await supabaseClient
+      .storage
+      .from("database_backup")
+      .download(
+        history.file_path
+      );
+
+  if (downloadError) {
+    throw downloadError;
+  }
+
+
+  // =========================
+  // 3. PARSE JSON
+  // =========================
+
+  const text =
+    await blob.text();
+
+  const backup =
+    JSON.parse(text);
+
+
+  // =========================
+  // 4. RESTORE VIA RPC
+  // =========================
+
+  const {
+    data: result,
+    error: restoreError
+  } =
+    await supabaseClient.rpc(
+      "restore_database_backup",
+      {
+        p_backup: backup,
+        p_restored_by: "SYSTEM"
+      }
+    );
+
+  if (restoreError) {
+    throw restoreError;
+  }
+
+  return result;
+}
+
+
+async function deleteDatabaseBackup(
+  filePath
+) {
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from("database_backup")
+      .remove([
+        filePath
+      ]);
+
+  if (error) {
+
+    console.error(
+      "Delete backup file error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return true;
+}
+
+async function deleteBackupById(
+  backupId
+) {
+
+  // =========================
+  // 1. AMBIL INFO BACKUP
+  // =========================
+
+  const {
+    data: history,
+    error
+  } =
+    await supabaseClient
+      .from("Backup_History")
+      .select(
+        "backup_id,file_path"
+      )
+      .eq(
+        "backup_id",
+        backupId
+      )
+      .single();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!history) {
+    throw new Error(
+      "Backup tidak ditemukan"
+    );
+  }
+
+
+  // =========================
+  // 2. HAPUS FILE STORAGE
+  // =========================
+
   if (history.file_path) {
+
     await deleteDatabaseBackup(
       history.file_path
     );
   }
 
-  // HAPUS HISTORY
+
+  // =========================
+  // 3. HAPUS HISTORY
+  // =========================
+
   const {
     error: deleteError
-  } = await supabaseClient.rpc(
-    "delete_backup_history",
-    {
-      p_backup_id: backupId
-    }
-  );
+  } =
+    await supabaseClient.rpc(
+      "delete_backup_history",
+      {
+        p_backup_id:
+          backupId
+      }
+    );
 
   if (deleteError) {
     throw deleteError;
   }
 
+
   return {
     success: true,
-    backup_id: backupId
+    backup_id:
+      backupId
   };
 }
 
