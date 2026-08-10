@@ -16067,22 +16067,18 @@ function navigate(pageId, params = {}) {
   app.innerHTML = "";
   document.querySelectorAll(".page-overlay").forEach(e => e.remove());
   app.appendChild(template.content.cloneNode(true));
-
-		setTimeout(() => {
+	
 	    const newSidebar = document.getElementById("sidebar");
 	    const newMain = document.getElementById("mainContent");
-	
 	    if (newSidebar && newMain) {
-	
 	        if (wasSidebarOpen) {
-	
 	            sidebarOpen = true;
-	
+				sidebar.classList.add("-translate-x-full");
 	            newMain.classList.add("ml-72");
 	            newMain.classList.remove("ml-0");
 	        }
 	    }
-	}, 0);
+	
 
   setTimeout(() => {
     loadBranchName();
