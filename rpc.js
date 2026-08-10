@@ -2768,136 +2768,148 @@ async function downloadDatabaseBackup(filePath) {
 }
 
 
- // =========================
-// BACKUP VIA RPC
-// =========================
-
-async function uploadDatabaseBackup(
-  fileName,
-  jsonData
-) {
-
-  const bucket =
-    "database_backup";
-
-  const now =
-    new Date();
-
-  const year =
-    now.getFullYear();
-
-  const month =
-    String(
-      now.getMonth() + 1
-    ).padStart(2, "0");
-
-  const path =
-    `${year}/${month}/${fileName}`;
-
-  const jsonString =
-    JSON.stringify(
-      jsonData,
-      null,
-      2
-    );
-
-  const blob =
-    new Blob(
-      [jsonString],
-      {
-        type:
-          "application/json"
-      }
-    );
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .storage
-      .from(bucket)
-      .upload(
-        path,
-        blob,
+  // =========================
+  // BACKUP VIA RPC
+  // =========================
+  
+  async function uploadDatabaseBackup(
+    fileName,
+    jsonData
+  ) {
+  
+    const response =
+      await fetch(
+        "/api/backup/upload",
         {
-          contentType:
-            "application/json",
-          upsert: false
+          method: "POST",
+  
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+  
+          body: JSON.stringify({
+            fileName,
+            jsonData
+          })
         }
       );
-
-  if (error) {
-
-    console.error(
-      "Upload backup error:",
+  
+    const result =
+      await response.json();
+  
+    if (!response.ok) {
+  
+      throw new Error(
+        result.error ||
+        "Upload backup gagal"
+      );
+    }
+  
+    return {
+      path: result.path,
+      size: result.size
+    };
+  }
+  
+  
+  async function createFullBackup() {
+  
+    // =========================
+    // 1. CREATE BACKUP VIA RPC
+    // =========================
+  
+    const {
+      data: backup,
       error
-    );
-
-    throw error;
-  }
-
-  return {
-    path: path,
-    size: blob.size
-  };
-}
-
-
-async function createFullBackup() {
-
-  // =========================
-  // 1. CREATE BACKUP VIA RPC
-  // =========================
-
-  const {
-    data: backup,
-    error
-  } =
-    await supabaseClient.rpc(
-      "create_database_backup",
-      {}
-    );
-
-  if (error) {
-    throw error;
-  }
-
-  if (
-    !backup?.backup_info?.backup_id
-  ) {
-
-    throw new Error(
-      "Backup ID tidak ditemukan."
-    );
-  }
-
-  const backupId =
-    backup
-      .backup_info
-      .backup_id;
-
-  const fileName =
-    backupId + ".json";
-
-
-  // =========================
-  // 2. UPLOAD KE STORAGE
-  // =========================
-
-  const upload =
-    await uploadDatabaseBackup(
-      fileName,
+    } =
+      await supabaseClient.rpc(
+        "create_database_backup",
+        {}
+      );
+  
+    if (error) {
+      throw error;
+    }
+  
+    if (
+      !backup?.backup_info?.backup_id
+    ) {
+  
+      throw new Error(
+        "Backup ID tidak ditemukan."
+      );
+    }
+  
+    const backupId =
       backup
-    );
-
-  if (!upload?.path) {
-
-    throw new Error(
-      "Upload backup gagal."
-    );
+        .backup_info
+        .backup_id;
+  
+    const fileName =
+      backupId + ".json";
+  
+  
+    // =========================
+    // 2. UPLOAD VIA VERCEL API
+    // =========================
+  
+    const upload =
+      await uploadDatabaseBackup(
+        fileName,
+        backup
+      );
+  
+    if (!upload?.path) {
+  
+      throw new Error(
+        "Upload backup gagal."
+      );
+    }
+  
+  
+    // =========================
+    // 3. UPDATE BACKUP HISTORY
+    // =========================
+  
+    const {
+      data: updateResult,
+      error: updateError
+    } =
+      await supabaseClient.rpc(
+        "update_backup_file_info",
+        {
+          p_backup_id:
+            backupId,
+  
+          p_file_path:
+            upload.path,
+  
+          p_file_size:
+            upload.size
+        }
+      );
+  
+    if (updateError) {
+      throw updateError;
+    }
+  
+  
+    return {
+  
+      success: true,
+  
+      backup_id:
+        backupId,
+  
+      file_path:
+        upload.path,
+  
+      file_size:
+        upload.size
+  
+    };
   }
-
 
   // =========================
   // 3. UPDATE BACKUP HISTORY
@@ -2941,6 +2953,8 @@ async function createFullBackup() {
 
   };
 }
+
+
 // =========================
 // RESTORE BACKUP VIA VERCEL
 // =========================
@@ -2970,6 +2984,7 @@ async function restoreDatabaseBackupByPath(
     await response.json();
 
   if (!response.ok) {
+
     throw new Error(
       result.error ||
       "Restore backup gagal"
@@ -3008,12 +3023,14 @@ async function restoreBackupById(
   }
 
   if (!history) {
+
     throw new Error(
       "Backup tidak ditemukan"
     );
   }
 
   if (!history.file_path) {
+
     throw new Error(
       "File backup tidak ditemukan"
     );
@@ -3021,57 +3038,12 @@ async function restoreBackupById(
 
 
   // =========================
-  // 2. DOWNLOAD STORAGE
+  // 2. RESTORE VIA VERCEL API
   // =========================
 
-  const {
-    data: blob,
-    error: downloadError
-  } =
-    await supabaseClient
-      .storage
-      .from("database_backup")
-      .download(
-        history.file_path
-      );
-
-  if (downloadError) {
-    throw downloadError;
-  }
-
-
-  // =========================
-  // 3. PARSE JSON
-  // =========================
-
-  const text =
-    await blob.text();
-
-  const backup =
-    JSON.parse(text);
-
-
-  // =========================
-  // 4. RESTORE VIA RPC
-  // =========================
-
-  const {
-    data: result,
-    error: restoreError
-  } =
-    await supabaseClient.rpc(
-      "restore_database_backup",
-      {
-        p_backup: backup,
-        p_restored_by: "SYSTEM"
-      }
-    );
-
-  if (restoreError) {
-    throw restoreError;
-  }
-
-  return result;
+  return await restoreDatabaseBackupByPath(
+    history.file_path
+  );
 }
 
 
@@ -3079,28 +3051,37 @@ async function deleteDatabaseBackup(
   filePath
 ) {
 
-  const {
-    error
-  } =
-    await supabaseClient
-      .storage
-      .from("database_backup")
-      .remove([
-        filePath
-      ]);
+  const response =
+    await fetch(
+      "/api/backup/delete",
+      {
+        method: "POST",
 
-  if (error) {
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
 
-    console.error(
-      "Delete backup file error:",
-      error
+        body: JSON.stringify({
+          filePath
+        })
+      }
     );
 
-    throw error;
+  const result =
+    await response.json();
+
+  if (!response.ok) {
+
+    throw new Error(
+      result.error ||
+      "Gagal menghapus file backup"
+    );
   }
 
-  return true;
+  return result;
 }
+
 
 async function deleteBackupById(
   backupId
@@ -3130,6 +3111,7 @@ async function deleteBackupById(
   }
 
   if (!history) {
+
     throw new Error(
       "Backup tidak ditemukan"
     );
@@ -3137,7 +3119,7 @@ async function deleteBackupById(
 
 
   // =========================
-  // 2. HAPUS FILE STORAGE
+  // 2. HAPUS FILE VIA VERCEL
   // =========================
 
   if (history.file_path) {
