@@ -2248,3 +2248,916 @@ async function getOtherIncomeRPC(branchId) {
 
 
 
+    // ===============================
+    // CASH FLOW PAGE
+    // ===============================
+
+async function getCashFlowPageDataRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_cash_flow_page_data",
+    {
+      p_login_user_id:
+        Number(filter.loginUserId),
+
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_cash_flow_page_data error:",
+      error
+    );
+    throw error;
+  }
+
+  return data || {};
+}
+
+
+async function getAccountBalanceRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_account_balance",
+    {
+      p_branch_id:
+        branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_account_balance error:",
+      error
+    );
+    throw error;
+  }
+
+  return data || {};
+}
+
+
+async function getCashFlowSummaryRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_cash_flow_summary",
+    {
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_cash_flow_summary error:",
+      error
+    );
+    throw error;
+  }
+
+  return data || {};
+}
+
+
+async function getCashFlowChartRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_cash_flow_chart",
+    {
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_cash_flow_chart error:",
+      error
+    );
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getFundTransfersRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_fund_transfers",
+    {
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_fund_transfers error:",
+      error
+    );
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function transferFundsRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "transfer_funds",
+    {
+      p_branch_id:
+        data.branchId,
+
+      p_from_account:
+        data.fromAccount,
+
+      p_to_account:
+        data.toAccount,
+
+      p_amount:
+        Number(data.amount),
+
+      p_note:
+        data.note || "",
+
+      p_created_by:
+        data.createdBy || "Admin"
+    }
+  );
+
+  if (error) {
+    console.error(
+      "transfer_funds error:",
+      error
+    );
+    throw error;
+  }
+
+  return result;
+}
+
+async function getCashFlowReportDataRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_cash_flow_report_data",
+    {
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_cash_flow_report_data error:",
+      error
+    );
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function addOwnerTransactionRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_owner_transaction",
+    {
+      p_branch_id:
+        data.branchId,
+
+      p_type:
+        data.type,
+
+      p_account:
+        data.account,
+
+      p_amount:
+        Number(data.amount),
+
+      p_note:
+        data.note || "",
+
+      p_created_by:
+        data.createdBy || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_owner_transaction error:",
+      error
+    );
+    throw error;
+  }
+
+  return result;
+}
+
+async function getOwnerTransactionsRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_owner_transactions",
+    {
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_owner_transactions error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getOwnerSummaryRPC(filter = {}) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_owner_summary",
+    {
+      p_branch_id:
+        filter.branchId || "ALL",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_owner_summary error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function getYesterdayDashboardSummaryRPC(
+  branchId
+) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_yesterday_dashboard_summary",
+    {
+      p_branch_id:
+        branchId || "ALL"
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_yesterday_dashboard_summary error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function createDatabaseBackupRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "create_database_backup",
+    {}
+  );
+
+  if (error) {
+
+    console.error(
+      "create_database_backup error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function deleteBackupHistoryRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "delete_backup_history",
+    data
+  );
+
+  if (error) {
+
+    console.error(
+      "delete_backup_history error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function clearDatabase() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "clear_database",
+    {}
+  );
+
+  if (error) {
+
+    console.error(
+      "clear_database error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function getBackupHistoryRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_backup_history",
+    {}
+  );
+
+  if (error) {
+
+    console.error(
+      "get_backup_history error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function updateBackupFileInfoRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_backup_file_info",
+    data
+  );
+
+  if (error) {
+
+    console.error(
+      "update_backup_file_info error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function restoreDatabaseBackupRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "restore_database_backup",
+    data
+  );
+
+  if (error) {
+
+    console.error(
+      "restore_database_backup error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+
+  // =========================
+  //  BACKUP VIA RPC
+  // =========================
+
+async function uploadDatabaseBackup(
+  fileName,
+  jsonData
+) {
+
+  const bucket =
+    "database_backup";
+
+  const now =
+    new Date();
+
+  const year =
+    now.getFullYear();
+
+  const month =
+    String(
+      now.getMonth() + 1
+    ).padStart(2, "0");
+
+  const path =
+    `${year}/${month}/${fileName}`;
+
+
+  // JSON → Blob
+  const jsonString =
+    JSON.stringify(
+      jsonData,
+      null,
+      2
+    );
+
+  const blob =
+    new Blob(
+      [jsonString],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+
+  // Upload ke Supabase Storage
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(bucket)
+      .upload(
+        path,
+        blob,
+        {
+          contentType:
+            "application/json",
+
+          upsert:
+            true
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      "Upload backup error:",
+      error
+    );
+
+    throw error;
+  }
+
+
+  return {
+
+    path:
+      data.path,
+
+    size:
+      blob.size
+
+  };
+
+}
+
+async function createFullBackup() {
+
+  // =========================
+  // 1. CREATE BACKUP VIA RPC
+  // =========================
+
+  const {
+    data: backup,
+    error
+  } = await supabaseClient.rpc(
+    "create_database_backup",
+    {}
+  );
+
+  if (error) {
+    throw error;
+  }
+
+
+  if (!backup?.backup_info?.backup_id) {
+
+    throw new Error(
+      "Backup ID tidak ditemukan."
+    );
+
+  }
+
+
+  const backupId =
+    backup.backup_info.backup_id;
+
+  const fileName =
+    backupId + ".json";
+
+
+  // =========================
+  // 2. UPLOAD BACKUP
+  // =========================
+
+  const upload =
+    await uploadDatabaseBackup(
+      fileName,
+      backup
+    );
+
+
+  if (!upload?.path) {
+
+    throw new Error(
+      "Upload backup gagal."
+    );
+
+  }
+  // =========================
+  // 3. UPDATE HISTORY
+  // =========================
+
+  const {
+    data: updateResult,
+    error: updateError
+  } = await supabaseClient.rpc(
+    "update_backup_file_info",
+    {
+      p_backup_id: backupId,
+      p_file_path: upload.path,
+      p_file_size: upload.size
+    }
+  );
+
+
+  if (updateError) {
+    throw updateError;
+  }
+
+
+  return {
+
+    success: true,
+
+    backup_id:
+      backupId,
+
+    file_path:
+      upload.path,
+
+    file_size:
+      upload.size
+
+  };
+
+}
+
+async function downloadDatabaseBackup(filePath) {
+
+  const bucket =
+    "database_backup";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(bucket)
+      .download(filePath);
+
+
+  if (error) {
+
+    console.error(
+      "Download backup error:",
+      error
+    );
+
+    throw error;
+  }
+
+
+  return data;
+}
+
+async function restoreBackupById(
+  p_backup_id
+) {
+
+  // =========================
+  // 1. AMBIL INFO BACKUP
+  // =========================
+
+  const {
+    data: history,
+    error: historyError
+  } =
+    await supabaseClient
+      .from("Backup_History")
+      .select("*")
+      .eq(
+        "backup_id",
+        p_backup_id
+      )
+      .single();
+
+
+  if (historyError) {
+    throw historyError;
+  }
+
+
+  if (!history) {
+
+    throw new Error(
+      "Backup tidak ditemukan"
+    );
+
+  }
+
+
+  // =========================
+  // 2. DOWNLOAD FILE
+  // =========================
+
+  const blob =
+    await downloadDatabaseBackup(
+      history.file_path
+    );
+
+
+  // =========================
+  // 3. PARSE JSON
+  // =========================
+
+  const text =
+    await blob.text();
+
+  const json =
+    JSON.parse(text);
+
+
+  // =========================
+  // 4. RESTORE VIA RPC
+  // =========================
+
+  const {
+    data: result,
+    error: restoreError
+  } =
+    await supabaseClient.rpc(
+      "restore_database_backup",
+      {
+        p_backup: json,
+
+        p_restored_by:
+          "SYSTEM"
+      }
+    );
+
+
+  if (restoreError) {
+    throw restoreError;
+  }
+
+
+  return result;
+}
+
+
+async function deleteDatabaseBackup(filePath) {
+
+  const bucket =
+    "database_backup";
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(bucket)
+      .remove([
+        filePath
+      ]);
+
+
+  if (error) {
+
+    console.error(
+      "Delete backup file error:",
+      error
+    );
+
+    throw error;
+  }
+
+
+  return true;
+}
+
+async function deleteBackupById(
+  p_backup_id
+) {
+
+  // =========================
+  // 1. AMBIL DATA BACKUP
+  // =========================
+
+  const {
+    data: backup,
+    error: historyError
+  } =
+    await supabaseClient
+      .from("Backup_History")
+      .select("*")
+      .eq(
+        "backup_id",
+        p_backup_id
+      )
+      .single();
+
+
+  if (historyError) {
+    throw historyError;
+  }
+
+
+  if (!backup) {
+
+    throw new Error(
+      "Backup tidak ditemukan"
+    );
+
+  }
+
+
+  // =========================
+  // 2. HAPUS FILE STORAGE
+  // =========================
+
+  if (backup.file_path) {
+
+    await deleteDatabaseBackup(
+      backup.file_path
+    );
+
+  }
+
+
+  // =========================
+  // 3. HAPUS HISTORY
+  // =========================
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.rpc(
+      "delete_backup_history",
+      {
+        p_backup_id:
+          p_backup_id
+      }
+    );
+
+
+  if (error) {
+    throw error;
+  }
+
+
+  return data;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
