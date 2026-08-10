@@ -28506,6 +28506,10 @@ async function loadExpenseDashboard() {
     JSON.stringify(filter);
 
 
+  // =========================
+  // CACHE HIT
+  // =========================
+
   if (
     state.expenseDashboardData &&
     state.expenseDashboardFilter === filterKey
@@ -28518,16 +28522,39 @@ async function loadExpenseDashboard() {
     return;
   }
 
+
   try {
 
+    console.log(
+      "SERVER CALL getExpenseDashboardRPC"
+    );
+
+
     const data =
-      await getExpenseDashboardRPC(filter);
+      await getExpenseDashboardRPC(
+        filter
+      );
+
+
+    // =========================
+    // CACHE
+    // =========================
 
     state.expenseDashboardData =
       data;
+
     state.expenseDashboardFilter =
       filterKey;
-    applyExpenseDashboard(data);
+
+
+    // =========================
+    // RENDER
+    // =========================
+
+    applyExpenseDashboard(
+      data
+    );
+
   }
   catch (err) {
 
@@ -28537,9 +28564,11 @@ async function loadExpenseDashboard() {
     );
 
     showToast(
+      err?.message ||
       "Gagal memuat data.",
       "error"
     );
+
   }
 }
 
