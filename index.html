@@ -35859,102 +35859,119 @@ Lanjutkan?
 }
 	
 async function exportCashFlowReport() {
+
   const startDate =
     document.getElementById(
       "cf-start-date"
     )?.value;
+
   const endDate =
     document.getElementById(
       "cf-end-date"
     )?.value;
+
   const branch =
     document.getElementById(
       "cf-branch"
-    )?.value ||
-    "ALL";
+    )?.value || "ALL";
+
   const pdfWindow =
     window.open(
       "",
       "_blank"
     );
-  if(!pdfWindow){
+
+  if (!pdfWindow) {
+
     alert(
       "Popup diblokir browser"
     );
+
     return;
   }
+
   pdfWindow.document.write(`
-  <html>
-	  <body style="
-	    background:#0B0F14;
-	    color:white;
-	    font-family:Arial;
-	    display:flex;
-	    align-items:center;
-	    justify-content:center;
-	    height:100vh;
-	  ">
-	
-	    Generating Cash Flow Report...
-	
-	  </body>
-  </html>
+    <html>
+      <body>
+        Generating Cash Flow Report...
+      </body>
+    </html>
   `);
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const response =
+      await fetch(
+        "/api/export-cash-flow-pdf",
+        {
+          method: "POST",
 
-    /*
-    const html =
-      await exportCashFlowPDFSupabase(
-        startDate,
-        endDate,
-        branch
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            start: startDate,
+
+            end: endDate,
+
+            branchId: branch,
+
+            loginUserId:
+              state.user.id
+
+          })
+        }
       );
-    */
 
+    if (!response.ok) {
 
-    // TEMP DATA VERCEL
-    const html = `
-    <html>
-	    <body>
-	      <h2>
-	      	Cash Flow Report
-	      </h2>
-	
-	      <p>
-	      	Export belum aktif.
-	      </p>
-	    </body>
-    </html>
+      throw new Error(
+        await response.text()
+      );
 
-    `;
+    }
+
+    const html =
+      await response.text();
+
     pdfWindow.document.open();
+
     pdfWindow.document.write(
       html
     );
+
     pdfWindow.document.close();
+
   }
-  catch(err){
+
+  catch (err) {
+
     pdfWindow.document.open();
+
     pdfWindow.document.write(`
-      <h2>
-      Export Failed
-      </h2>
-	  
-      <pre>
-      ${err.message}
-      </pre>
+      <html>
+        <body>
+
+          <h2>
+            Export Failed
+          </h2>
+
+          <pre>
+			${escapeHtml(err.message)}
+          </pre>
+
+        </body>
+      </html>
     `);
+
     pdfWindow.document.close();
+
   }
+
 }
-	
-
-
 
 
 	
