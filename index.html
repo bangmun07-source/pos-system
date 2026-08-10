@@ -33353,12 +33353,8 @@ async function loadCashFlowPage() {
 
 async function loadCashFlowBranchOptions() {
 
+  // CACHE
   if (state.cashFlowBranches) {
-
-    console.log(
-      "CACHE CASH FLOW BRANCH:",
-      state.cashFlowBranches
-    );
 
     renderCashFlowBranchOptions(
       state.cashFlowBranches
@@ -33369,14 +33365,18 @@ async function loadCashFlowBranchOptions() {
 
   try {
 
-    const data =
-      await getExpenseBranchesRPC();
-
-    console.log(
-      "CASH FLOW BRANCH RPC:",
-      data
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_expense_branches"
     );
 
+    if (error) {
+      throw error;
+    }
+
+    // NORMALIZE DATA
     state.cashFlowBranches =
       data || [];
 
