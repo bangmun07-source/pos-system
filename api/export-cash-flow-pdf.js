@@ -1,6 +1,4 @@
-
 import { createClient } from "@supabase/supabase-js";
-import puppeteer from "puppeteer";
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -38,14 +36,10 @@ function escapeHtml(value) {
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
-
     return res
       .status(405)
       .send("Method not allowed");
-
   }
-
-  let browser = null;
 
   try {
 
@@ -54,40 +48,11 @@ export default async function handler(req, res) {
     // ======================================
 
     const {
-      loginUserId,
       start,
       end,
-      branchId
+      branchId,
+      loginUserId
     } = req.body || {};
-
-
-    // ======================================
-    // VALIDATION
-    // ======================================
-
-    if (!loginUserId) {
-
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "loginUserId wajib diisi"
-        });
-
-    }
-
-
-    if (!branchId) {
-
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "branchId wajib diisi"
-        });
-
-    }
-
 
     console.log(
       "EXPORT CASH FLOW REQUEST:",
@@ -99,6 +64,27 @@ export default async function handler(req, res) {
       }
     );
 
+    // ======================================
+    // VALIDATION
+    // ======================================
+
+    if (!loginUserId) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "loginUserId wajib diisi"
+        });
+    }
+
+    if (!branchId) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "branchId wajib diisi"
+        });
+    }
 
     // ======================================
     // GET CASH FLOW PAGE DATA
@@ -124,36 +110,32 @@ export default async function handler(req, res) {
       }
     );
 
-
     if (error) {
+      console.error(
+        "CASH FLOW RPC ERROR:",
+        error
+      );
+
       throw error;
     }
 
-
     if (!data) {
-
       throw new Error(
         "Data Cash Flow kosong"
       );
-
     }
 
-
     if (data.success === false) {
-
       throw new Error(
         data.message ||
         "Gagal mengambil data Cash Flow"
       );
-
     }
-
 
     console.log(
       "EXPORT CASH FLOW DATA:",
       data
     );
-
 
     // ======================================
     // NORMALIZE
@@ -175,7 +157,6 @@ export default async function handler(req, res) {
         ? data.ownerTransactions
         : [];
 
-
     // ======================================
     // KPI
     // ======================================
@@ -188,7 +169,6 @@ export default async function handler(req, res) {
         0
       );
 
-
     const cashOut =
       number(
         summary.cashOut ??
@@ -197,14 +177,12 @@ export default async function handler(req, res) {
         0
       );
 
-
     const netFlow =
       number(
         summary.netFlow ??
         summary.net_flow ??
         (cashIn - cashOut)
       );
-
 
     const cashBalance =
       number(
@@ -215,7 +193,6 @@ export default async function handler(req, res) {
         0
       );
 
-
     const bankBalance =
       number(
         account.bank ??
@@ -224,7 +201,6 @@ export default async function handler(req, res) {
         account.bank_balance ??
         0
       );
-
 
     const totalBalance =
       number(
@@ -235,22 +211,18 @@ export default async function handler(req, res) {
         (cashBalance + bankBalance)
       );
 
-
     const balanceBase =
       cashBalance + bankBalance;
-
 
     const cashPercent =
       balanceBase > 0
         ? (cashBalance / balanceBase) * 100
         : 0;
 
-
     const bankPercent =
       balanceBase > 0
         ? (bankBalance / balanceBase) * 100
         : 0;
-
 
     // ======================================
     // INCOME SOURCE
@@ -267,7 +239,6 @@ export default async function handler(req, res) {
           ? summary.income_source
           : [];
 
-
     const totalIncome =
       incomeSource.reduce(
         (sum, item) =>
@@ -279,7 +250,6 @@ export default async function handler(req, res) {
           ),
         0
       );
-
 
     const incomeRows =
       incomeSource.length
@@ -293,12 +263,10 @@ export default async function handler(req, res) {
                 item.value
               );
 
-
             const percent =
               totalIncome > 0
                 ? (amount / totalIncome) * 100
                 : 0;
-
 
             return `
               <tr>
@@ -336,7 +304,6 @@ export default async function handler(req, res) {
           </tr>
         `;
 
-
     // ======================================
     // EXPENSE CATEGORY
     // ======================================
@@ -352,7 +319,6 @@ export default async function handler(req, res) {
           ? summary.expense_category
           : [];
 
-
     const totalExpense =
       expenseCategory.reduce(
         (sum, item) =>
@@ -364,7 +330,6 @@ export default async function handler(req, res) {
           ),
         0
       );
-
 
     const expenseRows =
       expenseCategory.length
@@ -378,12 +343,10 @@ export default async function handler(req, res) {
                 item.value
               );
 
-
             const percent =
               totalExpense > 0
                 ? (amount / totalExpense) * 100
                 : 0;
-
 
             return `
               <tr>
@@ -420,7 +383,6 @@ export default async function handler(req, res) {
           </tr>
         `;
 
-
     // ======================================
     // CASH FLOW HISTORY
     // ======================================
@@ -435,7 +397,6 @@ export default async function handler(req, res) {
           )
           ? summary.transactions
           : [];
-
 
     const historyRows =
       history.length
@@ -483,17 +444,14 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-
             <td
               colspan="4"
               class="empty"
             >
               No Data
             </td>
-
           </tr>
         `;
-
 
     // ======================================
     // FUND TRANSFERS
@@ -545,17 +503,14 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-
             <td
               colspan="4"
               class="empty"
             >
               No fund transfers
             </td>
-
           </tr>
         `;
-
 
     // ======================================
     // OWNER TRANSACTIONS
@@ -606,622 +561,870 @@ export default async function handler(req, res) {
 
         : `
           <tr>
-
             <td
               colspan="4"
               class="empty"
             >
               No owner transactions
             </td>
-
           </tr>
         `;
-
-
-    // ======================================
-    // REPORT HTML
-    // ======================================
-
-    const reportHtml = `
-
-      <!DOCTYPE html>
-
-      <html>
-
-      <head>
-
-        <meta charset="UTF-8">
-
-        <style>
-
-          * {
-            box-sizing: border-box;
-          }
-
-          body {
-
-            font-family:
-              Arial,
-              sans-serif;
-
-            padding: 20px;
-
-            color: #333;
-
-            background: white;
-
-          }
-
-          .logo {
-
-            width: 150px;
-
-            height: auto;
-
-            object-fit: contain;
-
-            margin-bottom: 16px;
-
-          }
-
-          .header {
-
-            text-align: center;
-
-          }
-
-          .card {
-
-            border:
-              1px solid #eee;
-
-            border-radius: 12px;
-
-            padding: 12px;
-
-            margin-bottom: 20px;
-
-          }
-
-          .kpi {
-
-            display: grid;
-
-            grid-template-columns:
-              repeat(4, 1fr);
-
-            gap: 15px;
-
-          }
-
-          .kpi .card {
-
-            width: 100%;
-
-            padding: 10px;
-
-            text-align: center;
-
-          }
-
-          table {
-
-            width: 100%;
-
-            border-collapse:
-              collapse;
-
-            font-size: 11px;
-
-          }
-
-          th {
-
-            background:
-              #f5f5f5;
-
-            padding: 8px;
-
-            text-align: left;
-
-          }
-
-          td {
-
-            padding: 8px;
-
-            border-bottom:
-              1px solid #eee;
-
-          }
-
-          .right {
-
-            text-align: right;
-
-          }
-
-          .empty {
-
-            text-align: center;
-
-            color: #777;
-
-          }
-
-          .page-break {
-
-            page-break-before:
-              always;
-
-          }
-
-          h2 {
-
-            font-size: 14px;
-
-            margin: 8px 0;
-
-          }
-
-          h3 {
-
-            font-size: 11px;
-
-            margin:
-              0 0 8px 0;
-
-            font-weight: bold;
-
-          }
-
-          p {
-
-            font-size: 8px;
-
-            margin: 8px 0;
-
-          }
-
-          b {
-
-            font-size: 11px;
-
-            font-weight: bold;
-
-          }
-
-        </style>
-
-      </head>
-
-
-      <body>
-
-
-        <div class="header">
-
-          <img
-            src="${logoSrc}"
-            class="logo"
-            alt="Sistem POS"
-          >
-
-        </div>
-
-
-        <div class="kpi">
-
-          <div class="card">
-
-            <b>
-              CASH IN
-            </b>
-
-            <br>
-
-            Rp ${rupiah(cashIn)}
-
-          </div>
-
-
-          <div class="card">
-
-            <b>
-              CASH OUT
-            </b>
-
-            <br>
-
-            Rp ${rupiah(cashOut)}
-
-          </div>
-
-
-          <div class="card">
-
-            <b>
-              NET FLOW
-            </b>
-
-            <br>
-
-            Rp ${rupiah(netFlow)}
-
-          </div>
-
-
-          <div class="card">
-
-            <b>
-              BALANCE
-            </b>
-
-            <br>
-
-            Rp ${rupiah(totalBalance)}
-
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <h2>
-            CASH FLOW REPORT
-          </h2>
-
-          <p>
-
-            Period :
-            ${escapeHtml(start || "-")}
-            -
-            ${escapeHtml(end || "-")}
-
-            <br>
-
-            Branch :
-            ${escapeHtml(branchId || "ALL")}
-
-          </p>
-
-        </div>
-
-
-        <div class="card">
-
-          <h3>
-            ACCOUNT BALANCE
-          </h3>
-
-          <table>
-
-            <tr>
-
-              <td>
-
-                Cash
-
-                <br>
-
-                Rp ${rupiah(cashBalance)}
-
-              </td>
-
-              <td class="right">
-
-                ${cashPercent.toFixed(1)}%
-
-              </td>
-
-            </tr>
-
-
-            <tr>
-
-              <td>
-
-                Bank
-
-                <br>
-
-                Rp ${rupiah(bankBalance)}
-
-              </td>
-
-              <td class="right">
-
-                ${bankPercent.toFixed(1)}%
-
-              </td>
-
-            </tr>
-
-          </table>
-
-        </div>
-
-
-        <div class="card">
-
-          <h3>
-            INCOME SOURCE
-          </h3>
-
-          <table>
-
-            <tr>
-
-              <th>
-                Source
-              </th>
-
-              <th>
-                Amount
-              </th>
-
-              <th class="right">
-                Percent
-              </th>
-
-            </tr>
-
-            ${incomeRows}
-
-          </table>
-
-        </div>
-
-
-        <div class="card">
-
-          <h3>
-            EXPENSE CATEGORY
-          </h3>
-
-          <table>
-
-            <tr>
-
-              <th>
-                Category
-              </th>
-
-              <th>
-                Amount
-              </th>
-
-              <th class="right">
-                Percent
-              </th>
-
-            </tr>
-
-            ${expenseRows}
-
-          </table>
-
-        </div>
-
-
-        <div class="page-break"></div>
-
-
-        <div class="card">
-
-          <h3>
-            CASH FLOW HISTORY
-          </h3>
-
-          <table>
-
-            <tr>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                Type
-              </th>
-
-              <th>
-                Description
-              </th>
-
-              <th class="right">
-                Amount
-              </th>
-
-            </tr>
-
-            ${historyRows}
-
-          </table>
-
-        </div>
-
-
-        <div class="card">
-
-          <h3>
-            FUND TRANSFERS
-          </h3>
-
-          <table>
-
-            <tr>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                From
-              </th>
-
-              <th>
-                To
-              </th>
-
-              <th class="right">
-                Amount
-              </th>
-
-            </tr>
-
-            ${transferRows}
-
-          </table>
-
-        </div>
-
-
-        <div class="card">
-
-          <h3>
-            OWNER TRANSACTIONS
-          </h3>
-
-          <table>
-
-            <tr>
-
-              <th>
-                Date
-              </th>
-
-              <th>
-                Type
-              </th>
-
-              <th>
-                Description
-              </th>
-
-              <th class="right">
-                Amount
-              </th>
-
-            </tr>
-
-            ${ownerTransactionRows}
-
-          </table>
-
-        </div>
-
-
-        <p>
-
-          Generated by Sistem POS
-          •
-          ${new Date().toLocaleString("id-ID")}
-
-        </p>
-
-
-      </body>
-
-      </html>
-
-    `;
-
-
-    // ======================================
-    // GENERATE PDF
-    // ======================================
-
-    console.log(
-      "Generating Cash Flow PDF..."
-    );
-
-
-    browser =
-      await puppeteer.launch({
-        headless: true,
-        args: [
-          "--no-sandbox",
-          "--disable-setuid-sandbox"
-        ]
-      });
-
-
-    const page =
-      await browser.newPage();
-
-
-    await page.setContent(
-      reportHtml,
-      {
-        waitUntil:
-          "networkidle0"
-      }
-    );
-
-
-    const pdfBuffer =
-      await page.pdf({
-
-        format: "A4",
-
-        printBackground: true,
-
-        margin: {
-
-          top: "12mm",
-
-          right: "10mm",
-
-          bottom: "12mm",
-
-          left: "10mm"
-
-        }
-
-      });
-
-
-    await browser.close();
-
-    browser = null;
-
 
     // ======================================
     // FILENAME
     // ======================================
 
     const filename =
-      `Cash Flow Report - ${branchId || "ALL"} - ${start || ""} - ${end || ""}.pdf`;
-
+      `Cash Flow Report - ${branchId} (${start || "-"} - ${end || "-"}).pdf`;
 
     // ======================================
-    // RETURN PDF
+    // HTML REPORT
+    // ======================================
+
+    const html = `
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+  ${escapeHtml(filename)}
+</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+
+  background: #0B0F14;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  color: #333;
+
+  padding:
+    40px 20px;
+}
+
+/* =====================================
+   TOOLBAR
+===================================== */
+
+.export-toolbar {
+
+  width: 100%;
+
+  max-width: 1100px;
+
+  margin:
+    0 auto 20px auto;
+
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  color: white;
+
+  font-size: 14px;
+}
+
+.export-toolbar button {
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
+  background:
+    rgba(255,255,255,.08);
+
+  color: white;
+
+  padding:
+    10px 16px;
+
+  border-radius:
+    10px;
+
+  cursor: pointer;
+
+  font-weight: bold;
+}
+
+.export-toolbar button:hover {
+
+  background:
+    rgba(255,255,255,.15);
+}
+
+/* =====================================
+   REPORT
+===================================== */
+
+.report {
+
+  width: 100%;
+
+  max-width: 1100px;
+
+  margin: 0 auto;
+
+  background: white;
+
+  padding: 45px;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.45);
+}
+
+/* =====================================
+   HEADER
+===================================== */
+
+.header {
+
+  text-align: center;
+
+  margin-bottom: 20px;
+}
+
+.logo {
+
+  width: 170px;
+
+  height: auto;
+
+  max-height: 90px;
+
+  object-fit: contain;
+
+  margin-bottom: 12px;
+}
+
+.title {
+
+  font-size: 24px;
+
+  font-weight: bold;
+
+  margin-bottom: 8px;
+}
+
+.subtitle {
+
+  font-size: 12px;
+
+  color: #777;
+
+  margin-bottom: 4px;
+}
+
+/* =====================================
+   KPI
+===================================== */
+
+.kpi-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 16px;
+
+  margin: 30px 0;
+}
+
+.kpi-card {
+
+  border:
+    1px solid
+    #e5e5e5;
+
+  border-radius:
+    14px;
+
+  padding:
+    22px;
+
+  background:
+    #fafafa;
+
+  text-align:
+    center;
+}
+
+.kpi-title {
+
+  font-size:
+    11px;
+
+  color:
+    #666;
+
+  font-weight:
+    bold;
+
+  margin-bottom:
+    12px;
+}
+
+.kpi-value {
+
+  font-size:
+    22px;
+
+  font-weight:
+    bold;
+
+  color:
+    #222;
+}
+
+/* =====================================
+   CARD
+===================================== */
+
+.card {
+
+  border:
+    1px solid
+    #e5e5e5;
+
+  border-radius:
+    14px;
+
+  padding:
+    18px;
+
+  margin-top:
+    20px;
+
+  background:
+    #fff;
+}
+
+.card h3 {
+
+  margin-top:
+    0;
+
+  margin-bottom:
+    12px;
+
+  font-size:
+    16px;
+}
+
+/* =====================================
+   TABLE
+===================================== */
+
+table {
+
+  width: 100%;
+
+  border-collapse:
+    collapse;
+
+  font-size:
+    11px;
+
+  margin-top:
+    10px;
+}
+
+th {
+
+  background:
+    #f5f5f5;
+
+  padding:
+    10px;
+
+  text-align:
+    left;
+
+  font-weight:
+    bold;
+}
+
+td {
+
+  padding:
+    10px;
+
+  border-bottom:
+    1px solid
+    #eee;
+}
+
+.right {
+
+  text-align:
+    right;
+}
+
+.empty {
+
+  text-align:
+    center;
+
+  color:
+    #777;
+
+  padding:
+    25px;
+}
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.footer {
+
+  margin-top:
+    40px;
+
+  text-align:
+    center;
+
+  font-size:
+    9px;
+
+  color:
+    #888;
+}
+
+/* =====================================
+   PAGE BREAK
+===================================== */
+
+.page-break {
+
+  page-break-before:
+    always;
+}
+
+/* =====================================
+   PRINT
+===================================== */
+
+@media print {
+
+  body {
+
+    background:
+      white;
+
+    padding:
+      0;
+  }
+
+  .export-toolbar {
+
+    display:
+      none;
+  }
+
+  .report {
+
+    max-width:
+      none;
+
+    box-shadow:
+      none;
+
+    border-radius:
+      0;
+
+    padding:
+      25px;
+  }
+
+  .page-break {
+
+    page-break-before:
+      always;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =================================
+     TOOLBAR
+================================= -->
+
+<div class="export-toolbar">
+
+  <div>
+
+    📄 Cash Flow Report
+
+  </div>
+
+  <button
+    onclick="window.print()"
+  >
+    Download / Print PDF
+  </button>
+
+</div>
+
+
+<!-- =================================
+     REPORT
+================================= -->
+
+<div class="report">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    ${
+      logoSrc
+        ? `
+          <img
+            src="${logoSrc}"
+            class="logo"
+            alt="Sistem POS"
+          />
+        `
+        : ""
+    }
+
+    <div class="title">
+
+      Cash Flow Report
+
+    </div>
+
+    <div class="subtitle">
+
+      Periode:
+      ${escapeHtml(start || "-")}
+      -
+      ${escapeHtml(end || "-")}
+
+    </div>
+
+    <div class="subtitle">
+
+      Branch:
+      ${escapeHtml(branchId || "ALL")}
+
+    </div>
+
+  </div>
+
+
+  <!-- KPI -->
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        CASH IN
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(cashIn)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        CASH OUT
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(cashOut)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        NET FLOW
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(netFlow)}
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        BALANCE
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(totalBalance)}
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- ACCOUNT BALANCE -->
+
+  <div class="card">
+
+    <h3>
+      Account Balance
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Account
+          </th>
+
+          <th class="right">
+            Balance
+          </th>
+
+          <th class="right">
+            Percentage
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        <tr>
+
+          <td>
+            Cash
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(cashBalance)}
+          </td>
+
+          <td class="right">
+            ${cashPercent.toFixed(1)}%
+          </td>
+
+        </tr>
+
+        <tr>
+
+          <td>
+            Bank
+          </td>
+
+          <td class="right">
+            Rp ${rupiah(bankBalance)}
+          </td>
+
+          <td class="right">
+            ${bankPercent.toFixed(1)}%
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- INCOME -->
+
+  <div class="card">
+
+    <h3>
+      Income Source
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Source
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+          <th class="right">
+            Percentage
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${incomeRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- EXPENSE -->
+
+  <div class="card">
+
+    <h3>
+      Expense Category
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Category
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+          <th class="right">
+            Percentage
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${expenseRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- HISTORY -->
+
+  <div class="page-break"></div>
+
+  <div class="card">
+
+    <h3>
+      Cash Flow History
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Date
+          </th>
+
+          <th>
+            Type
+          </th>
+
+          <th>
+            Description
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${historyRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- TRANSFERS -->
+
+  <div class="card">
+
+    <h3>
+      Fund Transfers
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Date
+          </th>
+
+          <th>
+            From
+          </th>
+
+          <th>
+            To
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${transferRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- OWNER TRANSACTIONS -->
+
+  <div class="card">
+
+    <h3>
+      Owner Transactions
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Date
+          </th>
+
+          <th>
+            Type
+          </th>
+
+          <th>
+            Description
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${ownerTransactionRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+
+    Generated by Sistem POS
+    •
+    ${new Date().toLocaleString("id-ID")}
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+
+`;
+
+    // ======================================
+    // RETURN HTML
     // ======================================
 
     res.setHeader(
       "Content-Type",
-      "application/pdf"
+      "text/html; charset=utf-8"
     );
-
-    res.setHeader(
-      "Content-Disposition",
-      `inline; filename="${filename}"`
-    );
-
-    res.setHeader(
-      "Content-Length",
-      pdfBuffer.length
-    );
-
 
     return res
       .status(200)
-      .send(pdfBuffer);
+      .send(html);
 
   }
-
   catch (err) {
 
     console.error(
@@ -1229,30 +1432,25 @@ export default async function handler(req, res) {
       err
     );
 
+    console.error(
+      "ERROR MESSAGE:",
+      err?.message
+    );
 
-    if (browser) {
-
-      try {
-        await browser.close();
-      }
-      catch (_) {}
-
-    }
-
+    console.error(
+      "ERROR STACK:",
+      err?.stack
+    );
 
     return res
       .status(500)
       .json({
-
         success: false,
-
         error:
           err?.message ||
           "Export Cash Flow gagal"
-
       });
 
   }
 
 }
-
