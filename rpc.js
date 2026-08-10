@@ -1798,3 +1798,454 @@ async function toggleAutoSeasonRPC() {
   return data;
 }
 
+
+
+    // ===============================
+    // EXPENSES & OTHER INCOME PAGE
+    // ===============================
+
+async function getExpenseDashboardRPC(filter = {}) {
+
+  let branchId =
+    filter.branch;
+
+  if (
+    !branchId ||
+    branchId === "ALL"
+  ) {
+
+    branchId =
+      filter.loginBranchId || "ALL";
+  }
+
+  console.log(
+    "RPC EXPENSE BRANCH:",
+    branchId
+  );
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_expense_dashboard",
+    {
+      p_branch_id: branchId,
+
+      p_status:
+        filter.status === "All Status"
+          ? "ALL"
+          : filter.status,
+
+      p_category:
+        filter.category === "All Categories"
+          ? "ALL"
+          : filter.category,
+
+      p_keyword:
+        filter.keyword || "",
+
+      p_start:
+        filter.startDate || null,
+
+      p_end:
+        filter.endDate || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_expense_dashboard error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    summary: {},
+    expenses: [],
+    budget: {}
+  };
+}
+
+async function getExpenseBranchesRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_expense_branches"
+  );
+
+  if (error) {
+
+    console.error(
+      "get_expense_branches error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function saveExpenseBudgetRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_expense_budget",
+    {
+      p_branch_id:
+        String(data.branchId),
+
+      p_month:
+        String(data.Month),
+
+      p_budget:
+        Number(data.Budget)
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "save_expense_budget error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function updateExpenseStatusRPC(refId, status) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "update_expense_status",
+    {
+      p_ref_id: refId,
+      p_status: status
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "update_expense_status error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    success: false
+  };
+}
+
+async function updateExpenseAttachmentRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_expense_attachment",
+    {
+      p_ref_id:
+        data.Ref_ID,
+
+      p_url:
+        data.Attachment_URL
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "update_expense_attachment error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function updateOtherIncomeStatusRPC(
+  refId,
+  status
+) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "update_other_income_status",
+    {
+      p_refid: refId,
+
+      p_status: status
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "update_other_income_status error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function deleteOtherIncomeRPC(id) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "delete_other_income",
+    {
+      p_id: String(id)
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "delete_other_income error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function saveOtherIncomeRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_other_income",
+    {
+      p_id:
+        data.id,
+
+      p_date:
+        data.date,
+
+      p_ref_id:
+        data.refId,
+
+      p_description:
+        data.description,
+
+      p_category:
+        data.category,
+
+      p_method:
+        data.method,
+
+      p_amount:
+        data.amount,
+
+      p_status:
+        data.status,
+
+      p_branch_id:
+        data.branchId,
+
+      p_notes:
+        data.notes
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "save_other_income error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function addExpenseRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "add_expense",
+    {
+      p_branch_id:
+        data.branchId,
+
+      p_tanggal:
+        data.tanggal,
+
+      p_category:
+        data.category,
+
+      p_description:
+        data.description,
+
+      p_amount:
+        data.amount,
+
+      p_method:
+        data.method,
+
+      p_created_by:
+        data.createdBy,
+
+      p_type:
+        data.type,
+
+      p_status:
+        data.status,
+
+      p_ref_id:
+        data.refId
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "add_expense error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function getExpenseBudgetRPC(branchId) {
+
+  console.log(
+    "GET EXPENSE BUDGET BRANCH:",
+    branchId
+  );
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_expense_budget",
+    {
+      p_branch_id:
+        branchId
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_expense_budget error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function getCategoryBreakdownRPC(f = {}) {
+
+  const status =
+    f.status === "All Status"
+      ? "ALL"
+      : f.status;
+
+
+  const category =
+    f.category === "All Categories"
+      ? "ALL"
+      : f.category;
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_category_breakdown",
+    {
+      p_branch_id:
+        f.branch || "ALL",
+
+      p_status:
+        status,
+
+      p_category:
+        category,
+
+      p_keyword:
+        f.keyword || ""
+    }
+  );
+
+
+  if (error) {
+
+    console.error(
+      "get_category_breakdown error:",
+      error
+    );
+
+    throw error;
+  }
+
+
+  return data || [];
+}
+
+async function getOtherIncomeRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_other_income",
+    {
+      p_branch_id:
+        branchId || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "get_other_income error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+
+
