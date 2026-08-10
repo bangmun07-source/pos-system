@@ -16080,17 +16080,17 @@ function navigate(pageId, params = {}) {
 	
 	        if (wasSidebarOpen) {
 	
+	            // Tetap OPEN
 	            newSidebar.classList.remove("-translate-x-full");
 	
 	            newMain.classList.remove("ml-0");
 	            newMain.classList.add("ml-72");
 	
-	            // Pastikan state tetap OPEN
+	            // Pertahankan state OPEN untuk page berikutnya
 	            sidebarOpen = true;
 	        }
+	    }
 	}, 0);
-
-	
 
   setTimeout(() => {
     loadBranchName();
