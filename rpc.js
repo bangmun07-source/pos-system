@@ -3083,77 +3083,51 @@ async function deleteDatabaseBackup(
 }
 
 
-async function deleteBackupById(
-  backupId
-) {
-
-  // =========================
-  // 1. AMBIL INFO BACKUP
-  // =========================
+async function deleteBackupById(backupId) {
 
   const {
     data: history,
     error
-  } =
-    await supabaseClient
-      .from("Backup_History")
-      .select(
-        "backup_id,file_path"
-      )
-      .eq(
-        "backup_id",
-        backupId
-      )
-      .single();
+  } = await supabaseClient
+    .from("Backup_History")
+    .select("backup_id,file_path")
+    .eq("backup_id", backupId)
+    .single();
 
   if (error) {
     throw error;
   }
 
   if (!history) {
-
     throw new Error(
       "Backup tidak ditemukan"
     );
   }
-
-
-  // =========================
-  // 2. HAPUS FILE VIA VERCEL
-  // =========================
 
   if (history.file_path) {
 
     await deleteDatabaseBackup(
       history.file_path
     );
+
   }
-
-
-  // =========================
-  // 3. HAPUS HISTORY
-  // =========================
 
   const {
     error: deleteError
-  } =
-    await supabaseClient.rpc(
-      "delete_backup_history",
-      {
-        p_backup_id:
-          backupId
-      }
-    );
+  } = await supabaseClient.rpc(
+    "delete_backup_history",
+    {
+      p_backup_id: backupId
+    }
+  );
 
   if (deleteError) {
     throw deleteError;
   }
 
-
   return {
     success: true,
-    backup_id:
-      backupId
+    backup_id: backupId
   };
 }
 
