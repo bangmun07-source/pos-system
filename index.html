@@ -33435,21 +33435,27 @@ async function loadCashFlowBranchOptions() {
   }
 }
 	
-function renderCashFlowBranchOptions(branches){
+function renderCashFlowBranchOptions(branches) {
+
   const select =
     document.getElementById("cf-branch");
-  if(!select) return;
+
+  if (!select) return;
+
   select.innerHTML = `
     <option value="ALL">
       All Branch
     </option>
   `;
-  branches.forEach(branch=>{
+
+  branches.forEach(branch => {
+
     select.innerHTML += `
-      <option value="${branch.branchId}">
-        ${branch.branchName}
+      <option value="${branch.id}">
+        ${branch.name}
       </option>
     `;
+
   });
 }
 
