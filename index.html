@@ -16069,33 +16069,33 @@ function navigate(pageId, params = {}) {
   document.querySelectorAll(".page-overlay").forEach(e => e.remove());
   app.appendChild(template.content.cloneNode(true));
 
-		setTimeout(() => {
 	    const newSidebar = document.getElementById("sidebar");
-	    const newMain = document.getElementById("mainContent");
+			const newMain = document.getElementById("mainContent");
+			
+			if (newSidebar && newMain) {
+			
+			    // Matikan transisi hanya saat pindah page
+			    newSidebar.style.transition = "none";
+			    newMain.style.transition = "none";
+			
+			    if (wasSidebarOpen) {
+			        newSidebar.classList.remove("-translate-x-full");
+			        newMain.classList.remove("ml-0");
+			        newMain.classList.add("ml-72");
+			    } else {
+			        newSidebar.classList.add("-translate-x-full");
+			        newMain.classList.remove("ml-72");
+			        newMain.classList.add("ml-0");
+			    }
+			
+			    // Paksa browser menerapkan posisi dulu
+			    void newSidebar.offsetWidth;
+			
+			    // Kembalikan transisi untuk tombol ☰
+			    newSidebar.style.transition = "";
+			    newMain.style.transition = "";
+			}	
 	
-	    if (newSidebar && newMain) {
-	
-	        // Matikan animasi saat pindah page
-	        newSidebar.classList.remove("transition-all", "duration-300");
-	        newMain.classList.remove("transition-all", "duration-300");
-	
-	        if (wasSidebarOpen) {
-	            newSidebar.classList.remove("-translate-x-full");
-	            newMain.classList.remove("ml-0");
-	            newMain.classList.add("ml-72");
-	        } else {
-	            newSidebar.classList.add("-translate-x-full");
-	            newMain.classList.remove("ml-72");
-	            newMain.classList.add("ml-0");
-	        }
-	
-	        // Kembalikan animasi setelah posisi selesai
-	        requestAnimationFrame(() => {
-	            newSidebar.classList.add("transition-all", "duration-300");
-	            newMain.classList.add("transition-all", "duration-300");
-	        });
-	    }
-	}, 0);
 
   setTimeout(() => {
     loadBranchName();
