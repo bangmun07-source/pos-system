@@ -2993,108 +2993,87 @@ async function restoreBackupById(
 
 async function deleteDatabaseBackup(filePath) {
 
-  const bucket =
-    "database_backup";
-
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient
-      .storage
-      .from(bucket)
-      .remove([
-        filePath
-      ]);
-
-
-  if (error) {
-
-    console.error(
-      "Delete backup file error:",
-      error
-    );
-
-    throw error;
-  }
-
-
-  return true;
-}
-
-async function deleteBackupById(
-  p_backup_id
-) {
-
-  // =========================
-  // 1. AMBIL DATA BACKUP
-  // =========================
-
-  const {
-    data: backup,
-    error: historyError
-  } =
-    await supabaseClient
-      .from("Backup_History")
-      .select("*")
-      .eq(
-        "backup_id",
-        p_backup_id
-      )
-      .single();
-
-
-  if (historyError) {
-    throw historyError;
-  }
-
-
-  if (!backup) {
-
-    throw new Error(
-      "Backup tidak ditemukan"
-    );
-
-  }
-
-
-  // =========================
-  // 2. HAPUS FILE STORAGE
-  // =========================
-
-  if (backup.file_path) {
-
-    await deleteDatabaseBackup(
-      backup.file_path
-    );
-
-  }
-
-
-  // =========================
-  // 3. HAPUS HISTORY
-  // =========================
-
-  const {
-    data,
-    error
-  } =
-    await supabaseClient.rpc(
-      "delete_backup_history",
+  const response =
+    await fetch(
+      "/api/backup/delete",
       {
-        p_backup_id:
-          p_backup_id
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          filePath
+        })
       }
     );
 
+  const result =
+    await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      result.error ||
+      "Gagal menghapus file backup"
+    );
+  }
+
+  return result;
+}
+
+async function deleteBackupById(
+  backupId
+) {
+
+  const {
+    data: history,
+    error
+  } = await supabaseClient
+    .from("Backup_History")
+    .select("*")
+    .eq(
+      "backup_id",
+      backupId
+    )
+    .single();
 
   if (error) {
     throw error;
   }
 
+  if (!history) {
+    throw new Error(
+      "Backup tidak ditemukan"
+    );
+  }
 
-  return data;
+  // HAPUS FILE FISIK
+  if (history.file_path) {
+    await deleteDatabaseBackup(
+      history.file_path
+    );
+  }
+
+  // HAPUS HISTORY
+  const {
+    error: deleteError
+  } = await supabaseClient.rpc(
+    "delete_backup_history",
+    {
+      p_backup_id: backupId
+    }
+  );
+
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  return {
+    success: true,
+    backup_id: backupId
+  };
 }
 
 
