@@ -33353,8 +33353,12 @@ async function loadCashFlowPage() {
 
 async function loadCashFlowBranchOptions() {
 
-  // CACHE
   if (state.cashFlowBranches) {
+
+    console.log(
+      "CACHE CASH FLOW BRANCH:",
+      state.cashFlowBranches
+    );
 
     renderCashFlowBranchOptions(
       state.cashFlowBranches
@@ -33363,24 +33367,18 @@ async function loadCashFlowBranchOptions() {
     return;
   }
 
-
   try {
-
-    // =========================
-    // SUPABASE RPC
-    // =========================
 
     const data =
       await getExpenseBranchesRPC();
 
-
-    // =========================
-    // NORMALIZE DATA
-    // =========================
+    console.log(
+      "CASH FLOW BRANCH RPC:",
+      data
+    );
 
     state.cashFlowBranches =
       data || [];
-
 
     renderCashFlowBranchOptions(
       state.cashFlowBranches
