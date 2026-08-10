@@ -16069,6 +16069,23 @@ function navigate(pageId, params = {}) {
   document.querySelectorAll(".page-overlay").forEach(e => e.remove());
   app.appendChild(template.content.cloneNode(true));
 
+	setTimeout(() => {
+    const newSidebar = document.getElementById("sidebar");
+    const newMain = document.getElementById("mainContent");
+
+    if (newSidebar && newMain) {
+        if (wasSidebarOpen) {
+            newSidebar.classList.remove("-translate-x-full");
+            newMain.classList.remove("ml-0");
+            newMain.classList.add("ml-72");
+        } else {
+            newSidebar.classList.add("-translate-x-full");
+            newMain.classList.remove("ml-72");
+            newMain.classList.add("ml-0");
+        }
+    }
+}, 0);
+
   setTimeout(() => {
     loadBranchName();
   }, 0);
