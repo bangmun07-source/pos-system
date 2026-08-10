@@ -16038,6 +16038,8 @@ function navigate(pageId, params = {}) {
   const role =
     state.user?.role?.toLowerCase() || "";
 
+	const wasSidebarOpen = sidebarOpen;
+
     if (params.roles) {
 
       const allowedRoles = params.roles.map(r => r.toLowerCase());
