@@ -5,12 +5,9 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
-// ==========================================
-// LOGO
-// ==========================================
-
 const logoSrc =
   `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
+
 
 // ==========================================
 // HELPERS
@@ -20,18 +17,23 @@ function rupiah(value) {
   return Number(value || 0).toLocaleString("id-ID");
 }
 
+
 function number(value) {
   return Number(value || 0);
 }
 
+
 function escapeHtml(value) {
+
   return String(value ?? "")
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
 }
+
 
 // ==========================================
 // HANDLER
@@ -40,10 +42,13 @@ function escapeHtml(value) {
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
+
     return res
       .status(405)
       .send("Method not allowed");
+
   }
+
 
   try {
 
@@ -58,6 +63,7 @@ export default async function handler(req, res) {
       loginUserId
     } = req.body || {};
 
+
     console.log(
       "EXPORT CASH FLOW REQUEST:",
       {
@@ -68,174 +74,197 @@ export default async function handler(req, res) {
       }
     );
 
+
     // ======================================
     // VALIDATION
     // ======================================
 
-    if (
-      loginUserId === undefined ||
-      loginUserId === null ||
-      loginUserId === ""
-    ) {
+    if (!loginUserId) {
+
       return res
         .status(400)
         .json({
+
           success: false,
-          error: "loginUserId wajib diisi"
+
+          error:
+            "loginUserId wajib diisi"
+
         });
+
     }
+
 
     if (!branchId) {
+
       return res
         .status(400)
         .json({
+
           success: false,
-          error: "branchId wajib diisi"
+
+          error:
+            "branchId wajib diisi"
+
         });
+
     }
 
+
     // ======================================
-    // 1. GET CASH FLOW SUMMARY
+    // GET CASH FLOW PAGE DATA
     // ======================================
 
     const {
-      data: cashFlowSummary,
-      error: cashFlowError
-    } = await supabase.rpc(
-      "get_cash_flow_summary",
-      {
-        p_branch_id: branchId,
-        p_start: start || null,
-        p_end: end || null
-      }
-    );
-
-    if (cashFlowError) {
-
-      console.error(
-        "CASH FLOW SUMMARY ERROR:",
-        cashFlowError
-      );
-
-      throw cashFlowError;
-    }
-
-    console.log(
-      "CASH FLOW SUMMARY:",
-      cashFlowSummary
-    );
-
-    const cf =
-      cashFlowSummary || {};
-
-    // ======================================
-    // 2. GET CASH FLOW PAGE DATA
-    // ======================================
-    //
-    // Dipakai untuk:
-    // - Account Balance
-    // - Fund Transfers
-    // - Owner Transactions
-    //
-    // ======================================
-
-    const {
-      data: pageData,
-      error: pageError
+      data,
+      error
     } = await supabase.rpc(
       "get_cash_flow_page_data",
       {
+
         p_login_user_id:
-          String(loginUserId),
+          loginUserId,
 
         p_branch_id:
-          branchId || "ALL",
+          branchId,
 
         p_start:
           start || null,
 
         p_end:
           end || null
+
       }
     );
 
-    if (pageError) {
+
+    if (error) {
 
       console.error(
-        "CASH FLOW PAGE DATA ERROR:",
-        pageError
+        "CASH FLOW RPC ERROR:",
+        error
       );
 
-      throw pageError;
+      throw error;
+
     }
 
-    if (!pageData) {
+
+    if (!data) {
+
       throw new Error(
         "Data Cash Flow kosong"
       );
+
     }
 
-    if (pageData.success === false) {
+
+    if (data.success === false) {
+
       throw new Error(
-        pageData.message ||
+        data.message ||
         "Gagal mengambil data Cash Flow"
       );
+
     }
 
+
     console.log(
-      "CASH FLOW PAGE DATA:",
-      pageData
+      "EXPORT CASH FLOW DATA:",
+      data
     );
 
+
     // ======================================
-    // NORMALIZE PAGE DATA
+    // NORMALIZE
     // ======================================
 
     const account =
-      pageData.account || {};
+      data.account || {};
+
+
+    const summary =
+      data.summary || {};
+
+
+    // IMPORTANT:
+    // HISTORY SEKARANG DIAMBIL
+    // LANGSUNG DARI data.history
+
+    const history =
+      Array.isArray(data.history)
+        ? data.history
+        : [];
+
 
     const transfers =
-      Array.isArray(pageData.transfers)
-        ? pageData.transfers
+      Array.isArray(data.transfers)
+        ? data.transfers
         : [];
+
 
     const ownerTransactions =
       Array.isArray(
-        pageData.ownerTransactions
+        data.ownerTransactions
       )
-        ? pageData.ownerTransactions
+        ? data.ownerTransactions
         : [];
+
+
+    // ======================================
+    // DEBUG
+    // ======================================
+
+    console.log(
+      "CASH FLOW HISTORY COUNT:",
+      history.length
+    );
+
+
+    console.log(
+      "CASH FLOW TRANSFERS COUNT:",
+      transfers.length
+    );
+
+
+    console.log(
+      "OWNER TRANSACTIONS COUNT:",
+      ownerTransactions.length
+    );
+
 
     // ======================================
     // KPI
     // ======================================
-    //
-    // get_cash_flow_summary:
-    //
-    // income
-    // expense
-    // netFlow
-    //
-    // ======================================
 
     const cashIn =
       number(
-        cf.income
+        summary.cashIn ??
+        summary.cash_in ??
+        summary.totalCashIn ??
+        0
       );
+
 
     const cashOut =
       number(
-        cf.expense
+        summary.cashOut ??
+        summary.cash_out ??
+        summary.totalCashOut ??
+        0
       );
+
 
     const netFlow =
       number(
-        cf.netFlow
+        summary.netFlow ??
+        summary.net_flow ??
+        (
+          cashIn -
+          cashOut
+        )
       );
 
-    // ======================================
-    // ACCOUNT BALANCE
-    // ======================================
 
     const cashBalance =
       number(
@@ -246,6 +275,7 @@ export default async function handler(req, res) {
         0
       );
 
+
     const bankBalance =
       number(
         account.bank ??
@@ -255,18 +285,24 @@ export default async function handler(req, res) {
         0
       );
 
+
     const totalBalance =
       number(
         account.total ??
         account.Total ??
         account.balance ??
         account.Balance ??
-        (cashBalance + bankBalance)
+        (
+          cashBalance +
+          bankBalance
+        )
       );
+
 
     const balanceBase =
       cashBalance +
       bankBalance;
+
 
     const cashPercent =
       balanceBase > 0
@@ -276,6 +312,7 @@ export default async function handler(req, res) {
           ) * 100
         : 0;
 
+
     const bankPercent =
       balanceBase > 0
         ? (
@@ -284,51 +321,43 @@ export default async function handler(req, res) {
           ) * 100
         : 0;
 
+
     // ======================================
     // INCOME SOURCE
     // ======================================
-    //
-    // Dari get_cash_flow_summary:
-    //
-    // sales
-    // otherIncome
-    //
-    // ======================================
 
-    const sales =
-      number(
-        cf.sales
-      );
+    const incomeSource =
+      Array.isArray(
+        summary.incomeSource
+      )
+        ? summary.incomeSource
+        : Array.isArray(
+            summary.income_source
+          )
+          ? summary.income_source
+          : [];
 
-    const otherIncome =
-      number(
-        cf.otherIncome
-      );
-
-    const incomeSource = [
-
-      {
-        name: "Sales",
-        amount: sales
-      },
-
-      {
-        name: "Other Income",
-        amount: otherIncome
-      }
-
-    ].filter(
-      item =>
-        item.amount > 0
-    );
 
     const totalIncome =
       incomeSource.reduce(
-        (sum, item) =>
-          sum +
-          number(item.amount),
+        (
+          sum,
+          item
+        ) => {
+
+          return (
+            sum +
+            number(
+              item.amount ??
+              item.total ??
+              item.value
+            )
+          );
+
+        },
         0
       );
+
 
     const incomeRows =
       incomeSource.length
@@ -338,8 +367,11 @@ export default async function handler(req, res) {
 
               const amount =
                 number(
-                  item.amount
+                  item.amount ??
+                  item.total ??
+                  item.value
                 );
+
 
               const percent =
                 totalIncome > 0
@@ -349,19 +381,21 @@ export default async function handler(req, res) {
                     ) * 100
                   : 0;
 
+
               return `
                 <tr>
 
-                  <td class="left">
+                  <td>
                     ${escapeHtml(
-                      item.name
+                      item.name ??
+                      item.source ??
+                      item.type ??
+                      "-"
                     )}
                   </td>
 
                   <td class="right">
-                    Rp ${rupiah(
-                      amount
-                    )}
+                    Rp ${rupiah(amount)}
                   </td>
 
                   <td class="right">
@@ -387,51 +421,43 @@ export default async function handler(req, res) {
             </tr>
           `;
 
+
     // ======================================
     // EXPENSE CATEGORY
     // ======================================
-    //
-    // Dari get_cash_flow_summary:
-    //
-    // operationExpense
-    // ingredientPurchase
-    //
-    // ======================================
 
-    const operationExpense =
-      number(
-        cf.operationExpense
-      );
+    const expenseCategory =
+      Array.isArray(
+        summary.expenseCategory
+      )
+        ? summary.expenseCategory
+        : Array.isArray(
+            summary.expense_category
+          )
+          ? summary.expense_category
+          : [];
 
-    const ingredientPurchase =
-      number(
-        cf.ingredientPurchase
-      );
-
-    const expenseCategory = [
-
-      {
-        name: "Operational",
-        amount: operationExpense
-      },
-
-      {
-        name: "Ingredient Purchase",
-        amount: ingredientPurchase
-      }
-
-    ].filter(
-      item =>
-        item.amount > 0
-    );
 
     const totalExpense =
       expenseCategory.reduce(
-        (sum, item) =>
-          sum +
-          number(item.amount),
+        (
+          sum,
+          item
+        ) => {
+
+          return (
+            sum +
+            number(
+              item.amount ??
+              item.total ??
+              item.value
+            )
+          );
+
+        },
         0
       );
+
 
     const expenseRows =
       expenseCategory.length
@@ -441,8 +467,11 @@ export default async function handler(req, res) {
 
               const amount =
                 number(
-                  item.amount
+                  item.amount ??
+                  item.total ??
+                  item.value
                 );
+
 
               const percent =
                 totalExpense > 0
@@ -452,19 +481,20 @@ export default async function handler(req, res) {
                     ) * 100
                   : 0;
 
+
               return `
                 <tr>
 
-                  <td class="left">
+                  <td>
                     ${escapeHtml(
-                      item.name
+                      item.name ??
+                      item.category ??
+                      "-"
                     )}
                   </td>
 
                   <td class="right">
-                    Rp ${rupiah(
-                      amount
-                    )}
+                    Rp ${rupiah(amount)}
                   </td>
 
                   <td class="right">
@@ -490,70 +520,60 @@ export default async function handler(req, res) {
             </tr>
           `;
 
+
     // ======================================
     // CASH FLOW HISTORY
     // ======================================
-
-    const history =
-      Array.isArray(
-        pageData.history
-      )
-        ? pageData.history
-        : Array.isArray(
-            pageData.transactions
-          )
-          ? pageData.transactions
-          : Array.isArray(
-              pageData.summary?.history
-            )
-            ? pageData.summary.history
-            : [];
 
     const historyRows =
       history.length
 
         ? history
-            .map(item => `
+            .map(item => {
 
-              <tr>
+              const amount =
+                number(
+                  item.amount ??
+                  item.Amount
+                );
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.date ??
-                    item.Date ??
-                    item.tanggal ??
-                    "-"
-                  )}
-                </td>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.type ??
-                    item.Type ??
-                    "-"
-                  )}
-                </td>
+              return `
+                <tr>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.description ??
-                    item.Description ??
-                    item.note ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.date ??
+                      item.Date ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="right">
-                  Rp ${rupiah(
-                    item.amount ??
-                    item.Amount ??
-                    0
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.type ??
+                      item.Type ??
+                      "-"
+                    )}
+                  </td>
 
-              </tr>
+                  <td>
+                    ${escapeHtml(
+                      item.description ??
+                      item.Description ??
+                      item.note ??
+                      "-"
+                    )}
+                  </td>
 
-            `)
+                  <td class="right">
+                    Rp ${rupiah(amount)}
+                  </td>
+
+                </tr>
+              `;
+
+            })
             .join("")
 
         : `
@@ -569,6 +589,7 @@ export default async function handler(req, res) {
             </tr>
           `;
 
+
     // ======================================
     // FUND TRANSFERS
     // ======================================
@@ -577,47 +598,48 @@ export default async function handler(req, res) {
       transfers.length
 
         ? transfers
-            .map(item => `
+            .map(item => {
 
-              <tr>
+              return `
+                <tr>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.date ??
-                    item.Date ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.date ??
+                      item.Date ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.fromAccount ??
-                    item.from_account ??
-                    item.from ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.fromAccount ??
+                      item.from_account ??
+                      item.from ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.toAccount ??
-                    item.to_account ??
-                    item.to ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.toAccount ??
+                      item.to_account ??
+                      item.to ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="right">
-                  Rp ${rupiah(
-                    item.amount ??
-                    item.Amount ??
-                    0
-                  )}
-                </td>
+                  <td class="right">
+                    Rp ${rupiah(
+                      item.amount ??
+                      item.Amount
+                    )}
+                  </td>
 
-              </tr>
+                </tr>
+              `;
 
-            `)
+            })
             .join("")
 
         : `
@@ -633,6 +655,7 @@ export default async function handler(req, res) {
             </tr>
           `;
 
+
     // ======================================
     // OWNER TRANSACTIONS
     // ======================================
@@ -641,46 +664,47 @@ export default async function handler(req, res) {
       ownerTransactions.length
 
         ? ownerTransactions
-            .map(item => `
+            .map(item => {
 
-              <tr>
+              return `
+                <tr>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.date ??
-                    item.Date ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.date ??
+                      item.Date ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.type ??
-                    item.Type ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.type ??
+                      item.Type ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="left">
-                  ${escapeHtml(
-                    item.description ??
-                    item.Description ??
-                    item.note ??
-                    "-"
-                  )}
-                </td>
+                  <td>
+                    ${escapeHtml(
+                      item.description ??
+                      item.Description ??
+                      item.note ??
+                      "-"
+                    )}
+                  </td>
 
-                <td class="right">
-                  Rp ${rupiah(
-                    item.amount ??
-                    item.Amount ??
-                    0
-                  )}
-                </td>
+                  <td class="right">
+                    Rp ${rupiah(
+                      item.amount ??
+                      item.Amount
+                    )}
+                  </td>
 
-              </tr>
+                </tr>
+              `;
 
-            `)
+            })
             .join("")
 
         : `
@@ -696,814 +720,844 @@ export default async function handler(req, res) {
             </tr>
           `;
 
-    // ======================================
-    // FILENAME
-    // ======================================
-
-    const filename =
-      `Cash Flow Report - ${branchId} (${start || "-"} - ${end || "-"}).pdf`;
 
     // ======================================
-    // HTML REPORT
+    // HTML
     // ======================================
 
     const html = `
 
-      <!DOCTYPE html>
+<!DOCTYPE html>
 
-      <html>
+<html>
 
-      <head>
+<head>
 
-        <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-        <title>
-          Cash Flow Report
-        </title>
+<title>
+Cash Flow Report
+</title>
 
-        <style>
+<style>
 
-          * {
-            box-sizing: border-box;
-          }
+* {
+  box-sizing: border-box;
+}
 
-          html,
-          body {
-            margin: 0;
-            padding: 0;
-          }
+html {
+  background: #0B0F14;
+}
 
-          body {
-            background: #0B0F14;
-            font-family: Arial, sans-serif;
-            color: #333;
-            padding: 40px 20px;
-          }
+body {
 
-          .export-toolbar {
+  margin: 0;
 
-            width: 100%;
-            max-width: 1100px;
+  background: #0B0F14;
 
-            margin:
-              0 auto 20px auto;
+  font-family:
+    Arial,
+    sans-serif;
 
-            display: flex;
+  color: #333;
 
-            justify-content:
-              space-between;
+  padding:
+    40px 20px;
 
-            align-items: center;
+}
 
-            color: white;
+.export-toolbar {
 
-            font-size: 14px;
+  width: 100%;
 
-          }
+  max-width:
+    1100px;
 
-          .export-toolbar button {
+  margin:
+    0 auto 20px auto;
 
-            border:
-              1px solid
-              rgba(255,255,255,.15);
+  display:
+    flex;
 
-            background:
-              rgba(255,255,255,.08);
+  justify-content:
+    space-between;
 
-            color: white;
+  align-items:
+    center;
 
-            padding:
-              10px 16px;
+  color: white;
 
-            border-radius: 10px;
+  font-size:
+    14px;
 
-            cursor: pointer;
+}
 
-            font-weight: bold;
+.export-toolbar button {
 
-          }
+  border:
+    1px solid
+    rgba(255,255,255,.15);
 
-          .report {
+  background:
+    rgba(255,255,255,.08);
 
-            width: 100%;
+  color: white;
 
-            max-width: 1100px;
+  padding:
+    10px 16px;
 
-            margin: 0 auto;
+  border-radius:
+    10px;
 
-            background: white;
+  cursor:
+    pointer;
 
-            padding: 45px;
+  font-weight:
+    bold;
 
-            border-radius: 4px;
+}
 
-            box-shadow:
-              0 20px 60px
-              rgba(0,0,0,.45);
+.report {
 
-          }
+  width: 100%;
 
-          .header {
+  max-width:
+    1100px;
 
-            text-align: center;
+  margin:
+    0 auto;
 
-            margin-bottom: 20px;
+  background:
+    white;
 
-          }
+  padding:
+    45px;
 
-          .logo {
+  border-radius:
+    4px;
 
-            width: 170px;
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.45);
 
-            height: auto;
+}
 
-            max-height: 90px;
+.header {
 
-            object-fit: contain;
+  text-align:
+    center;
 
-            margin-bottom: 12px;
+  margin-bottom:
+    20px;
 
-          }
+}
 
-          .title {
+.logo {
 
-            font-size: 24px;
+  width:
+    170px;
 
-            font-weight: bold;
+  height:
+    auto;
 
-            margin-bottom: 8px;
+  max-height:
+    90px;
 
-          }
+  object-fit:
+    contain;
 
-          .subtitle {
+  margin-bottom:
+    12px;
 
-            font-size: 12px;
+}
 
-            color: #777;
+.title {
 
-            margin-bottom: 3px;
+  font-size:
+    24px;
 
-          }
+  font-weight:
+    bold;
 
-          .kpi-grid {
+  margin-bottom:
+    8px;
 
-            display: grid;
+}
 
-            grid-template-columns:
-              repeat(4, 1fr);
+.subtitle {
 
-            gap: 16px;
+  font-size:
+    12px;
 
-            margin: 30px 0;
+  color:
+    #777;
 
-          }
+  margin-bottom:
+    4px;
 
-          .kpi-card {
+}
 
-            border:
-              1px solid #e5e5e5;
+.kpi-grid {
 
-            border-radius: 14px;
+  display:
+    grid;
 
-            padding: 22px;
+  grid-template-columns:
+    repeat(4, 1fr);
 
-            background: #fafafa;
+  gap:
+    16px;
 
-            text-align: center;
+  margin:
+    30px 0;
 
-          }
+}
 
-          .kpi-title {
+.kpi-card {
 
-            font-size: 11px;
+  border:
+    1px solid
+    #e5e5e5;
 
-            color: #666;
+  border-radius:
+    14px;
 
-            font-weight: bold;
+  padding:
+    22px;
 
-            margin-bottom: 12px;
+  background:
+    #fafafa;
 
-          }
+  text-align:
+    center;
 
-          .kpi-value {
+}
 
-            font-size: 20px;
+.kpi-title {
 
-            font-weight: bold;
+  font-size:
+    11px;
 
-            color: #222;
+  color:
+    #666;
 
-          }
+  font-weight:
+    bold;
 
-          .card {
+  margin-bottom:
+    12px;
 
-            border:
-              1px solid #e5e5e5;
+}
 
-            border-radius: 14px;
+.kpi-value {
 
-            padding: 18px;
+  font-size:
+    20px;
 
-            margin-top: 20px;
+  font-weight:
+    bold;
 
-            background: #fff;
+  color:
+    #222;
 
-          }
+}
 
-          .card h3 {
+.card {
 
-            margin-top: 0;
+  border:
+    1px solid
+    #e5e5e5;
 
-            margin-bottom: 12px;
+  border-radius:
+    14px;
 
-            font-size: 16px;
+  padding:
+    18px;
 
-          }
+  margin-top:
+    20px;
 
-          table {
+  background:
+    #fff;
 
-            width: 100%;
+}
 
-            border-collapse:
-              collapse;
+.card h3 {
 
-            font-size: 11px;
+  margin-top:
+    0;
 
-            margin-top: 10px;
+  margin-bottom:
+    12px;
 
-          }
+  font-size:
+    16px;
 
-          th {
+}
 
-            background: #f5f5f5;
+table {
 
-            padding: 10px;
+  width:
+    100%;
 
-            text-align: left;
+  border-collapse:
+    collapse;
 
-            font-weight: bold;
+  font-size:
+    11px;
 
-          }
+  margin-top:
+    10px;
 
-          td {
+}
 
-            padding: 10px;
+th {
 
-            border-bottom:
-              1px solid #eee;
+  background:
+    #f5f5f5;
 
-          }
+  padding:
+    10px;
 
-          .right {
-            text-align: right;
-          }
+  text-align:
+    left;
 
-          .left {
-            text-align: left;
-          }
+  font-weight:
+    bold;
 
-          .empty {
+}
 
-            text-align: center;
+td {
 
-            color: #777;
+  padding:
+    10px;
 
-            padding: 25px;
+  border-bottom:
+    1px solid
+    #eee;
 
-          }
+}
 
-          .footer {
+.right {
+  text-align:
+    right;
+}
 
-            margin-top: 40px;
+.empty {
 
-            text-align: center;
+  text-align:
+    center;
 
-            font-size: 9px;
+  color:
+    #777;
 
-            color: #888;
+  padding:
+    25px;
 
-          }
+}
 
-          .page-break {
+.footer {
 
-            page-break-before:
-              always;
+  margin-top:
+    40px;
 
-          }
+  text-align:
+    center;
 
-          @media print {
+  font-size:
+    9px;
 
-            body {
+  color:
+    #888;
 
-              background: white;
+}
 
-              padding: 0;
+.page-break {
 
-            }
+  page-break-before:
+    always;
 
-            .export-toolbar {
+}
 
-              display: none;
+@media print {
 
-            }
+  body {
 
-            .report {
+    background:
+      white;
 
-              max-width: none;
+    padding:
+      0;
 
-              box-shadow: none;
+  }
 
-              border-radius: 0;
+  .export-toolbar {
 
-              padding: 25px;
+    display:
+      none;
 
-            }
+  }
 
-            .page-break {
+  .report {
 
-              page-break-before:
-                always;
+    max-width:
+      none;
 
-            }
+    box-shadow:
+      none;
 
-          }
+    border-radius:
+      0;
 
-        </style>
+    padding:
+      25px;
 
-      </head>
+  }
 
-      <body>
+  .card {
 
-        <!-- TOOLBAR -->
+    break-inside:
+      avoid;
 
-        <div class="export-toolbar">
+  }
 
-          <div>
-            📄 Cash Flow Report
-          </div>
+}
 
-          <button
-            onclick="window.print()"
-          >
-            Download / Print PDF
-          </button>
+</style>
 
-        </div>
+</head>
 
+<body>
 
-        <!-- REPORT -->
 
-        <div class="report">
+<div class="export-toolbar">
 
-          <!-- LOGO -->
+  <div>
+    📄 Cash Flow Report
+  </div>
 
-          <div class="header">
+  <button
+    onclick="window.print()"
+  >
+    Download / Print PDF
+  </button>
 
-            ${
-              logoSrc
-                ? `
-                  <img
-                    src="${logoSrc}"
-                    class="logo"
-                    alt="Sistem POS"
-                  />
-                `
-                : ""
-            }
+</div>
 
-          </div>
 
+<div class="report">
 
-          <!-- TITLE -->
 
-          <div class="title">
+  <div class="header">
 
-            Cash Flow Report
+    ${
+      logoSrc
+        ? `
+          <img
+            src="${logoSrc}"
+            class="logo"
+            alt="Sistem POS"
+          />
+        `
+        : ""
+    }
 
-          </div>
+  </div>
 
 
-          <div class="subtitle">
+  <div class="title">
 
-            Periode:
+    Cash Flow Report
 
-            ${escapeHtml(
-              start || "-"
-            )}
+  </div>
 
-            -
 
-            ${escapeHtml(
-              end || "-"
-            )}
+  <div class="subtitle">
 
-          </div>
+    Periode:
+    ${escapeHtml(start || "-")}
+    -
+    ${escapeHtml(end || "-")}
 
+  </div>
 
-          <div class="subtitle">
 
-            Branch:
+  <div class="subtitle">
 
-            ${escapeHtml(
-              branchId || "ALL"
-            )}
+    Branch:
+    ${escapeHtml(branchId || "ALL")}
 
-          </div>
+  </div>
 
 
-          <!-- KPI -->
+  <!-- KPI -->
 
-          <div class="kpi-grid">
+  <div class="kpi-grid">
 
 
-            <div class="kpi-card">
+    <div class="kpi-card">
 
-              <div class="kpi-title">
-                CASH IN
-              </div>
+      <div class="kpi-title">
+        CASH IN
+      </div>
 
-              <div class="kpi-value">
+      <div class="kpi-value">
+        Rp ${rupiah(cashIn)}
+      </div>
 
-                Rp ${rupiah(
-                  cashIn
-                )}
+    </div>
 
-              </div>
 
-            </div>
+    <div class="kpi-card">
 
+      <div class="kpi-title">
+        CASH OUT
+      </div>
 
-            <div class="kpi-card">
+      <div class="kpi-value">
+        Rp ${rupiah(cashOut)}
+      </div>
 
-              <div class="kpi-title">
-                CASH OUT
-              </div>
+    </div>
 
-              <div class="kpi-value">
 
-                Rp ${rupiah(
-                  cashOut
-                )}
+    <div class="kpi-card">
 
-              </div>
+      <div class="kpi-title">
+        NET FLOW
+      </div>
 
-            </div>
+      <div class="kpi-value">
+        Rp ${rupiah(netFlow)}
+      </div>
 
+    </div>
 
-            <div class="kpi-card">
 
-              <div class="kpi-title">
-                NET FLOW
-              </div>
+    <div class="kpi-card">
 
-              <div class="kpi-value">
+      <div class="kpi-title">
+        BALANCE
+      </div>
 
-                Rp ${rupiah(
-                  netFlow
-                )}
+      <div class="kpi-value">
+        Rp ${rupiah(totalBalance)}
+      </div>
 
-              </div>
+    </div>
 
-            </div>
 
+  </div>
 
-            <div class="kpi-card">
 
-              <div class="kpi-title">
-                BALANCE
-              </div>
+  <!-- ACCOUNT BALANCE -->
 
-              <div class="kpi-value">
+  <div class="card">
 
-                Rp ${rupiah(
-                  totalBalance
-                )}
+    <h3>
+      Account Balance
+    </h3>
 
-              </div>
+    <table>
 
-            </div>
+      <thead>
 
+        <tr>
 
-          </div>
+          <th>
+            Account
+          </th>
 
+          <th class="right">
+            Balance
+          </th>
 
-          <!-- ACCOUNT BALANCE -->
+          <th class="right">
+            Percentage
+          </th>
 
-          <div class="card">
+        </tr>
 
-            <h3>
-              Account Balance
-            </h3>
+      </thead>
 
-            <table>
+      <tbody>
 
-              <thead>
+        <tr>
 
-                <tr>
+          <td>
+            Cash
+          </td>
 
-                  <th>
-                    Account
-                  </th>
+          <td class="right">
+            Rp ${rupiah(cashBalance)}
+          </td>
 
-                  <th class="right">
-                    Balance
-                  </th>
+          <td class="right">
+            ${cashPercent.toFixed(1)}%
+          </td>
 
-                  <th class="right">
-                    Percentage
-                  </th>
+        </tr>
 
-                </tr>
 
-              </thead>
+        <tr>
 
-              <tbody>
+          <td>
+            Bank
+          </td>
 
-                <tr>
+          <td class="right">
+            Rp ${rupiah(bankBalance)}
+          </td>
 
-                  <td>
-                    Cash
-                  </td>
+          <td class="right">
+            ${bankPercent.toFixed(1)}%
+          </td>
 
-                  <td class="right">
-                    Rp ${rupiah(
-                      cashBalance
-                    )}
-                  </td>
+        </tr>
 
-                  <td class="right">
-                    ${cashPercent.toFixed(1)}%
-                  </td>
+      </tbody>
 
-                </tr>
+    </table>
 
+  </div>
 
-                <tr>
 
-                  <td>
-                    Bank
-                  </td>
+  <!-- INCOME -->
 
-                  <td class="right">
-                    Rp ${rupiah(
-                      bankBalance
-                    )}
-                  </td>
+  <div class="card">
 
-                  <td class="right">
-                    ${bankPercent.toFixed(1)}%
-                  </td>
+    <h3>
+      Income Source
+    </h3>
 
-                </tr>
+    <table>
 
-              </tbody>
+      <thead>
 
-            </table>
+        <tr>
 
-          </div>
+          <th>
+            Source
+          </th>
 
+          <th class="right">
+            Amount
+          </th>
 
-          <!-- INCOME SOURCE -->
+          <th class="right">
+            Percentage
+          </th>
 
-          <div class="card">
+        </tr>
 
-            <h3>
-              Income Source
-            </h3>
+      </thead>
 
-            <table>
+      <tbody>
 
-              <thead>
+        ${incomeRows}
 
-                <tr>
+      </tbody>
 
-                  <th>
-                    Source
-                  </th>
+    </table>
 
-                  <th class="right">
-                    Amount
-                  </th>
+  </div>
 
-                  <th class="right">
-                    Percentage
-                  </th>
 
-                </tr>
+  <!-- EXPENSE -->
 
-              </thead>
+  <div class="card">
 
-              <tbody>
+    <h3>
+      Expense Category
+    </h3>
 
-                ${incomeRows}
+    <table>
 
-              </tbody>
+      <thead>
 
-            </table>
+        <tr>
 
-          </div>
+          <th>
+            Category
+          </th>
 
+          <th class="right">
+            Amount
+          </th>
 
-          <!-- EXPENSE CATEGORY -->
+          <th class="right">
+            Percentage
+          </th>
 
-          <div class="card">
+        </tr>
 
-            <h3>
-              Expense Category
-            </h3>
+      </thead>
 
-            <table>
+      <tbody>
 
-              <thead>
+        ${expenseRows}
 
-                <tr>
+      </tbody>
 
-                  <th>
-                    Category
-                  </th>
+    </table>
 
-                  <th class="right">
-                    Amount
-                  </th>
+  </div>
 
-                  <th class="right">
-                    Percentage
-                  </th>
 
-                </tr>
+  <!-- HISTORY -->
 
-              </thead>
+  <div class="page-break"></div>
 
-              <tbody>
+  <div class="card">
 
-                ${expenseRows}
+    <h3>
+      Cash Flow History
+    </h3>
 
-              </tbody>
+    <table>
 
-            </table>
+      <thead>
 
-          </div>
+        <tr>
 
+          <th>
+            Date
+          </th>
 
-          <!-- HISTORY -->
+          <th>
+            Type
+          </th>
 
-          <div class="page-break"></div>
+          <th>
+            Description
+          </th>
 
-          <div class="card">
+          <th class="right">
+            Amount
+          </th>
 
-            <h3>
-              Cash Flow History
-            </h3>
+        </tr>
 
-            <table>
+      </thead>
 
-              <thead>
+      <tbody>
 
-                <tr>
+        ${historyRows}
 
-                  <th>
-                    Date
-                  </th>
+      </tbody>
 
-                  <th>
-                    Type
-                  </th>
+    </table>
 
-                  <th>
-                    Description
-                  </th>
+  </div>
 
-                  <th class="right">
-                    Amount
-                  </th>
 
-                </tr>
+  <!-- TRANSFERS -->
 
-              </thead>
+  <div class="card">
 
-              <tbody>
+    <h3>
+      Fund Transfers
+    </h3>
 
-                ${historyRows}
+    <table>
 
-              </tbody>
+      <thead>
 
-            </table>
+        <tr>
 
-          </div>
+          <th>
+            Date
+          </th>
 
+          <th>
+            From
+          </th>
 
-          <!-- TRANSFERS -->
+          <th>
+            To
+          </th>
 
-          <div class="card">
+          <th class="right">
+            Amount
+          </th>
 
-            <h3>
-              Fund Transfers
-            </h3>
+        </tr>
 
-            <table>
+      </thead>
 
-              <thead>
+      <tbody>
 
-                <tr>
+        ${transferRows}
 
-                  <th>
-                    Date
-                  </th>
+      </tbody>
 
-                  <th>
-                    From
-                  </th>
+    </table>
 
-                  <th>
-                    To
-                  </th>
+  </div>
 
-                  <th class="right">
-                    Amount
-                  </th>
 
-                </tr>
+  <!-- OWNER -->
 
-              </thead>
+  <div class="card">
 
-              <tbody>
+    <h3>
+      Owner Transactions
+    </h3>
 
-                ${transferRows}
+    <table>
 
-              </tbody>
+      <thead>
 
-            </table>
+        <tr>
 
-          </div>
+          <th>
+            Date
+          </th>
 
+          <th>
+            Type
+          </th>
 
-          <!-- OWNER -->
+          <th>
+            Description
+          </th>
 
-          <div class="card">
+          <th class="right">
+            Amount
+          </th>
 
-            <h3>
-              Owner Transactions
-            </h3>
+        </tr>
 
-            <table>
+      </thead>
 
-              <thead>
+      <tbody>
 
-                <tr>
+        ${ownerTransactionRows}
 
-                  <th>
-                    Date
-                  </th>
+      </tbody>
 
-                  <th>
-                    Type
-                  </th>
+    </table>
 
-                  <th>
-                    Description
-                  </th>
+  </div>
 
-                  <th class="right">
-                    Amount
-                  </th>
 
-                </tr>
+  <div class="footer">
 
-              </thead>
+    Generated by Sistem POS
+    •
+    ${new Date().toLocaleString("id-ID")}
 
-              <tbody>
+  </div>
 
-                ${ownerTransactionRows}
 
-              </tbody>
+</div>
 
-            </table>
 
-          </div>
+</body>
 
+</html>
+`;
 
-          <!-- FOOTER -->
-
-          <div class="footer">
-
-            Generated by Sistem POS
-
-            •
-
-            ${new Date().toLocaleString(
-              "id-ID"
-            )}
-
-          </div>
-
-        </div>
-
-
-      </body>
-
-      </html>
-
-    `;
 
     // ======================================
     // RETURN HTML
@@ -1514,12 +1568,13 @@ export default async function handler(req, res) {
       "text/html; charset=utf-8"
     );
 
+
     return res
       .status(200)
       .send(html);
 
-  }
 
+  }
   catch (err) {
 
     console.error(
@@ -1536,6 +1591,7 @@ export default async function handler(req, res) {
       "ERROR STACK:",
       err?.stack
     );
+
 
     return res
       .status(500)
