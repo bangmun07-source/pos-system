@@ -16073,6 +16073,11 @@ function navigate(pageId, params = {}) {
 			const newMain = document.getElementById("mainContent");
 	
 			if (newSidebar && newMain) {
+	
+					// MATIKAN ANIMASI SAAT PINDAH PAGE
+					newSidebar.style.transition = "none";
+					newMain.style.transition = "none";
+	
 					if (wasSidebarOpen) {
 							newSidebar.classList.remove("-translate-x-full");
 							newMain.classList.remove("ml-0");
