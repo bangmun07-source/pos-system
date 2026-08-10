@@ -1813,7 +1813,6 @@ async function getExpenseDashboardRPC(filter = {}) {
     !branchId ||
     branchId === "ALL"
   ) {
-
     branchId =
       filter.loginBranchId || "ALL";
   }
@@ -1834,12 +1833,12 @@ async function getExpenseDashboardRPC(filter = {}) {
       p_status:
         filter.status === "All Status"
           ? "ALL"
-          : filter.status,
+          : filter.status || "ALL",
 
       p_category:
         filter.category === "All Categories"
           ? "ALL"
-          : filter.category,
+          : filter.category || "ALL",
 
       p_keyword:
         filter.keyword || "",
