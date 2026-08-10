@@ -35858,22 +35858,72 @@ Lanjutkan?
   }
 }
 	
+document.addEventListener(
+  "click",
+  function(e) {
+
+    const btn =
+      e.target.closest(
+        "#btnExportCashFlowPDF"
+      );
+
+    if (!btn) return;
+
+    exportCashFlowReport();
+
+  }
+);
+
+
 async function exportCashFlowReport() {
 
   const startDate =
     document.getElementById(
       "cf-start-date"
-    )?.value;
+    )?.value || "";
 
   const endDate =
     document.getElementById(
       "cf-end-date"
-    )?.value;
+    )?.value || "";
 
   const branch =
     document.getElementById(
       "cf-branch"
-    )?.value || "ALL";
+    )?.value ||
+    state.branchId ||
+    "ALL";
+
+
+  // =========================
+  // VALIDASI
+  // =========================
+
+  if (!startDate || !endDate) {
+
+    alert(
+      "Pilih tanggal dulu"
+    );
+
+    return;
+
+  }
+
+
+  if (!branch) {
+
+    alert(
+      "Branch tidak valid"
+    );
+
+    return;
+
+  }
+
+
+  // =========================
+  // OPEN WINDOW
+  // =========================
 
   const pdfWindow =
     window.open(
@@ -35881,29 +35931,125 @@ async function exportCashFlowReport() {
       "_blank"
     );
 
+
   if (!pdfWindow) {
 
     alert(
-      "Popup diblokir browser"
+      "Popup diblokir browser."
     );
 
     return;
+
   }
 
+
+  // =========================
+  // LOADING
+  // =========================
+
   pdfWindow.document.write(`
+
     <html>
+
+      <head>
+
+        <title>
+          Generating Cash Flow Report
+        </title>
+
+        <style>
+
+          body {
+
+            margin: 0;
+
+            background: #0B0F14;
+
+            color: white;
+
+            font-family: Arial, sans-serif;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            height: 100vh;
+
+          }
+
+          .loading {
+
+            text-align: center;
+
+          }
+
+          .title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+
+          }
+
+          .text {
+
+            font-size: 13px;
+
+            opacity: .7;
+
+          }
+
+        </style>
+
+      </head>
+
+
       <body>
-        Generating Cash Flow Report...
+
+        <div class="loading">
+
+          <div class="title">
+            Cash Flow Report
+          </div>
+
+          <div class="text">
+            Generating PDF...
+          </div>
+
+        </div>
+
       </body>
+
     </html>
+
   `);
 
+
   try {
+
+    console.log(
+      "EXPORT CASH FLOW:",
+      {
+        branch,
+        startDate,
+        endDate
+      }
+    );
+
+
+    // =========================
+    // CALL VERCEL API
+    // =========================
 
     const response =
       await fetch(
         "/api/export-cash-flow-pdf",
         {
+
           method: "POST",
 
           headers: {
@@ -35913,29 +36059,63 @@ async function exportCashFlowReport() {
 
           body: JSON.stringify({
 
-            start: startDate,
+            branchId:
+              branch,
 
-            end: endDate,
+            start:
+              startDate,
 
-            branchId: branch,
-
-            loginUserId:
-              state.user.id
+            end:
+              endDate
 
           })
+
         }
       );
 
+
+    // =========================
+    // HTTP ERROR
+    // =========================
+
     if (!response.ok) {
 
+      const errorText =
+        await response.text();
+
       throw new Error(
-        await response.text()
+        errorText ||
+        `Export gagal (${response.status})`
       );
 
     }
 
+
+    // =========================
+    // GET HTML REPORT
+    // =========================
+
     const html =
       await response.text();
+
+
+    if (!html) {
+
+      throw new Error(
+        "Server mengembalikan HTML kosong"
+      );
+
+    }
+
+
+    console.log(
+      "EXPORT CASH FLOW HTML RECEIVED"
+    );
+
+
+    // =========================
+    // RENDER REPORT
+    // =========================
 
     pdfWindow.document.open();
 
@@ -35945,26 +36125,57 @@ async function exportCashFlowReport() {
 
     pdfWindow.document.close();
 
-  }
 
+  }
   catch (err) {
+
+    console.error(
+      "Export Cash Flow:",
+      err
+    );
+
+
+    // =========================
+    // ERROR PAGE
+    // =========================
 
     pdfWindow.document.open();
 
     pdfWindow.document.write(`
+
       <html>
-        <body>
+
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          padding:40px;
+        ">
 
           <h2>
             Export Failed
           </h2>
 
-          <pre>
-			${escapeHtml(err.message)}
-          </pre>
+          <p style="
+            color:#aaa;
+          ">
+            Gagal membuat Cash Flow Report.
+          </p>
+
+          <pre style="
+            white-space:pre-wrap;
+            background:#151A21;
+            padding:15px;
+            border-radius:10px;
+          ">${String(
+            err?.message ||
+            err
+          )}</pre>
 
         </body>
+
       </html>
+
     `);
 
     pdfWindow.document.close();
