@@ -16069,28 +16069,16 @@ function navigate(pageId, params = {}) {
   app.appendChild(template.content.cloneNode(true));
 
 		setTimeout(() => {
-	    const newSidebar = document.getElementById("sidebar");
-	    const newMain = document.getElementById("mainContent");
-	
-	    if (newSidebar && newMain) {
-	
-	        // Matikan animasi saat pindah page
-	        newSidebar.style.transition = "none";
-	        newMain.style.transition = "none";
-	
-	        if (wasSidebarOpen) {
-	
-	            // Tetap OPEN
-	            newSidebar.classList.remove("-translate-x-full");
-	
-	            newMain.classList.remove("ml-0");
-	            newMain.classList.add("ml-72");
-	
-	            // Pertahankan state OPEN untuk page berikutnya
-	            sidebarOpen = true;
-	        }
-	    }
-	}, 0);
+		    const newSidebar = document.getElementById("sidebar");
+		    const newMain = document.getElementById("mainContent");
+		
+		    if (newSidebar && newMain) {
+		        if (wasSidebarOpen) {
+					sidebarOpen = true;
+		            newMain.classList.add("ml-72");
+		        }
+		    }
+		}, 0);
 
   setTimeout(() => {
     loadBranchName();
