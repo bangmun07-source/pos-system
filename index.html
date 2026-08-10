@@ -33194,177 +33194,208 @@ function initCashFlowPage(){
 }
 
 async function loadCashFlowPage() {
+
   const filter = {
+
     loginUserId:
       state.user.id,
+
     branchId:
       document.getElementById(
         "cf-branch"
       )?.value ||
       state.branchId,
+
     startDate:
       document.getElementById(
         "cf-start-date"
-      )?.value ||
-      "",
+      )?.value || "",
+
     endDate:
       document.getElementById(
         "cf-end-date"
-      )?.value ||
-      ""
+      )?.value || ""
   };
+
+
   const cacheKey =
     JSON.stringify(filter);
 
-  // CACHE
 
-  if(
+  // =========================
+  // CACHE HIT
+  // =========================
+
+  if (
     state.cashFlowData &&
     state.cashFlowFilter === cacheKey
-  ){
+  ) {
+
     renderAccountBalance(
       state.cashFlowData.account
     );
+
     renderCashFlowSummary(
       state.cashFlowData.summary
     );
+
     renderCashFlowChart(
       state.cashFlowData.chart
     );
+
     renderTransferHistory(
       state.cashFlowData.transfers || []
     );
+
     renderOwnerSummary(
       state.cashFlowData.ownerSummary
     );
+
     renderOwnerHistory(
       state.cashFlowData.ownerTransactions || []
     );
+
     return;
   }
 
+
   try {
 
+    console.log(
+      "SERVER CALL getCashFlowPageDataRPC"
+    );
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_cash_flow_page_data",
-        {
-          p_filter: filter
-        }
+    // =========================
+    // SUPABASE RPC
+    // =========================
+
+    const data =
+      await getCashFlowPageDataRPC(
+        filter
       );
 
 
-    if(error){
-      throw error;
-    }
-    */
+    // =========================
+    // ACCESS CHECK
+    // =========================
 
+    if (
+      data &&
+      data.success === false
+    ) {
 
-    // TEMP DATA VERCEL
-    const data = {
-      success:true,
-      account:{},
-      summary:{},
-      chart:[],
-      transfers:[],
-      ownerSummary:{},
-      ownerTransactions:[]
-    };
-	  
-    if(!data.success){
       showToast(
         data.message ||
         "Access denied.",
         "error"
       );
+
       return;
     }
+
+
+    // =========================
     // CACHE
+    // =========================
+
     state.cashFlowData =
       data;
+
     state.cashFlowFilter =
       cacheKey;
+
+
+    // =========================
     // RENDER
+    // =========================
+
     renderAccountBalance(
       data.account
     );
+
     renderCashFlowSummary(
       data.summary
     );
+
     renderCashFlowChart(
       data.chart
     );
+
     renderTransferHistory(
       data.transfers || []
     );
+
     renderOwnerSummary(
       data.ownerSummary
     );
+
     renderOwnerHistory(
       data.ownerTransactions || []
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Cash Flow:",
       err
     );
+
     showToast(
-      err.message ||
+      err?.message ||
       "Gagal memuat Cash Flow.",
       "error"
     );
+
   }
 }
 
-async function loadCashFlowBranchOptions(){
-  if(state.cashFlowBranches){
+async function loadCashFlowBranchOptions() {
+
+  // CACHE
+  if (state.cashFlowBranches) {
+
     renderCashFlowBranchOptions(
       state.cashFlowBranches
     );
+
     return;
   }
 
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // SUPABASE RPC
+    // =========================
 
-    /*
-    const { data, error } =
-      await supabase
-        .from("Branches")
-        .select("*");
+    const data =
+      await getExpenseBranchesRPC();
 
-    if(error){
-      throw error;
-    }
-    */
-	  
-    // TEMP DATA VERCEL
-    const data = {
-      branches:[]
-    };
+
+    // =========================
+    // NORMALIZE DATA
+    // =========================
+
     state.cashFlowBranches =
-      data.branches || [];
+      data || [];
+
+
     renderCashFlowBranchOptions(
       state.cashFlowBranches
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Cash Flow Branch Options:",
       err
     );
+
     showToast(
-      err.message ||
+      err?.message ||
       "Gagal memuat branch.",
       "error"
     );
@@ -33390,67 +33421,48 @@ function renderCashFlowBranchOptions(branches){
 }
 
 async function loadAccountBalance() {
+
   const branchId =
-    document.getElementById(
-      "cf-branch"
-    ).value;
+    document.getElementById("cf-branch")?.value ||
+    state.branchId;
 
   // Jika ALL
   if (branchId === "ALL") {
-    document.getElementById(
-      "cf-cash"
-    ).textContent = "-";
-    document.getElementById(
-      "cf-bank"
-    ).textContent = "-";
-    document.getElementById(
-      "cf-total"
-    ).textContent = "-";
+
+    document.getElementById("cf-cash").textContent = "-";
+    document.getElementById("cf-bank").textContent = "-";
+    document.getElementById("cf-total").textContent = "-";
+
     return;
   }
-	
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    const data =
+      await getAccountBalanceRPC(branchId);
 
-    /*
-    const { data, error } =
-      await supabase
-        .from("Account_Balance")
-        .select("*")
-        .eq(
-          "branchId",
-          branchId
-        )
-        .single();
-
-
-    if(error){
-      throw error;
+    if (!data) {
+      throw new Error(
+        "Data account balance tidak ditemukan."
+      );
     }
-    */
 
-    // TEMP DATA VERCEL
-    const data = {
-      cash: 0,
-      bank: 0,
-      total: 0
-    };
-    renderAccountBalance(
-      data
-    );
+    renderAccountBalance(data);
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Account Balance:",
       err
     );
-    alert(
+
+    showToast(
       err.message ||
-      "Gagal memuat balance"
+      "Gagal memuat balance.",
+      "error"
     );
+
   }
 }
 
@@ -33647,113 +33659,121 @@ function openTransferModal(){
   document.body.appendChild(clone);
 }
 
-async function saveTransfer(){
+async function saveTransfer() {
+
   const data = {
+
     branchId:
       state.branchId,
+
     fromAccount:
       document.getElementById(
         "tf-from"
-      ).value,
+      )?.value,
+
     toAccount:
       document.getElementById(
         "tf-to"
-      ).value,
+      )?.value,
+
     amount:
       Number(
         document.getElementById(
           "tf-amount"
-        ).value
+        )?.value || 0
       ),
+
     note:
       document.getElementById(
         "tf-note"
-      ).value,
+      )?.value || "",
+
     createdBy:
       state.user?.username ||
       "Admin"
   };
+
+
+  // =========================
+  // VALIDASI
+  // =========================
+
   if (
     !data.amount ||
     data.amount <= 0
-  ){
-    alert(
-      "Jumlah transfer harus diisi"
+  ) {
+
+    showToast(
+      "Jumlah transfer harus diisi",
+      "warning"
     );
+
     return;
   }
 
+
   try {
 
+    // =========================
+    // SUPABASE RPC
+    // =========================
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data:res, error } =
-      await supabase
-        .rpc(
-          "transfer_funds",
-          {
-            p_branch_id:
-              data.branchId,
-
-            p_from_account:
-              data.fromAccount,
-
-            p_to_account:
-              data.toAccount,
-
-            p_amount:
-              data.amount,
-
-            p_note:
-              data.note,
-
-            p_created_by:
-              data.createdBy
-          }
-        );
+    const res =
+      await transferFundsRPC(data);
 
 
-    if(error){
-      throw error;
-    }
-    */
+    // =========================
+    // RESPONSE
+    // =========================
 
-    // TEMP DATA VERCEL
-    const res = {
-      success:true,
-      message:
-        "Transfer berhasil"
-    };
+    if (
+      res &&
+      res.success === false
+    ) {
 
-    if(!res.success){
       throw new Error(
         res.message ||
         "Transfer gagal"
       );
     }
-    alert(
-      res.message
+
+
+    showToast(
+      res?.message ||
+      "Transfer berhasil",
+      "success"
     );
 
-    // CLEAR CASH FLOW CACHE
+
+    // =========================
+    // CLEAR CACHE
+    // =========================
+
     state.cashFlowData = null;
     state.cashFlowFilter = null;
+
+
     closeTransferModal();
-    // reload
-    loadCashFlowPage();
+
+
+    // =========================
+    // RELOAD
+    // =========================
+
+    await loadCashFlowPage();
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Transfer Funds:",
       err
     );
-    alert(
-      err.message ||
-      "Transfer gagal"
+
+    showToast(
+      err?.message ||
+      "Transfer gagal",
+      "error"
     );
   }
 }
@@ -34001,71 +34021,91 @@ function toggleCashFlowNotification(){
 }
 
 async function loadCashFlowNotification() {
+
   const branchId =
-    document.getElementById(
-      "cf-branch"
-    ).value ||
+    document.getElementById("cf-branch")?.value ||
     "ALL";
 
+
+  // =========================
   // CACHE
+  // =========================
+
   if (
     state.cashFlowNotification &&
     state.cashFlowNotificationBranch === branchId
   ) {
+
     renderCashFlowNotification(
       state.cashFlowNotification
     );
+
     updateCashFlowBadge(
       state.cashFlowNotification
     );
+
     return;
   }
-	
+
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // SUPABASE RPC
+    // =========================
 
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_yesterday_dashboard_summary",
-        {
-          p_branch_id:
-            branchId
-        }
-      );
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_yesterday_dashboard_summary",
+      {
+        p_branch_id: branchId
+      }
+    );
 
 
-    if(error){
+    if (error) {
       throw error;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const data = {};
+
+    // =========================
     // CACHE
+    // =========================
+
     state.cashFlowNotification =
-      data;
+      data || {};
+
     state.cashFlowNotificationBranch =
       branchId;
+
+
+    // =========================
     // RENDER
+    // =========================
+
     renderCashFlowNotification(
-      data
+      data || {}
     );
+
     updateCashFlowBadge(
-      data
+      data || {}
     );
+
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Cash Flow Notification:",
       err
     );
-  }
-}
 
+  }
+
+}
+	
 function renderCashFlowNotification(data){
   const list =
     document.getElementById("cashFlowNotifList");
@@ -34850,36 +34890,34 @@ function handleAnalyticsCommand(message){
   }
 }
 
-async function getChatAnalytics(start, end, branchId, callback){
+async function getChatAnalytics(start, end, branchId, callback) {
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_analytics_dashboard",
-        {
-          p_branch_id: branchId,
-          p_start_date: start,
-          p_end_date: end
-        }
-      );
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_analytics_dashboard",
+      {
+        p_branch_id: branchId,
+        p_start_date: start || null,
+        p_end_date: end || null
+      }
+    );
 
 
-    if(error){
+    if (error) {
       throw error;
     }
-    */
 
-	  
-    // TEMP DATA VERCEL
-    const data = {};
-    callback(data);
+
+    callback(data || {});
+
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Chat Analytics:",
       err
@@ -34904,26 +34942,19 @@ async function loadBackupList(){
     // SUPABASE (AKTIFKAN NANTI)
     // ==================================
 
-    /*
-    const { data, error } =
-      await supabase
-        .from("Backup_History")
-        .select("*")
-        .order(
-          "created_at",
-          {
-            ascending:false
-          }
-        );
-
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const data = [];
+    const {
+	  data,
+	  error
+	} = await supabaseClient
+	  .from("Backup_History")
+	  .select("*")
+	  .order("created_at", {
+	    ascending: false
+	  });
+	
+	if (error) {
+	  throw error;
+	}
     if(data.length === 0){
 		
       addBackupChatMessage(
@@ -35026,7 +35057,8 @@ async function loadBackupList(){
   }
 }	
 
-async function startBackupProcess(){
+async function startBackupProcess() {
+
   const progressId =
     "backup-progress-" + Date.now();
 
@@ -35034,109 +35066,135 @@ async function startBackupProcess(){
     "bot",
     `
     Backup sedang diproses...
-    <br><br>
 
-    <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+    <div
+      id="${progressId}-box"
+      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+    >
       <div
         id="${progressId}"
         class="h-full bg-primary rounded-full transition-all duration-500"
-        style="width:5%">
-      </div>
+        style="width:5%"
+      ></div>
     </div>
-    <p 
-    id="${progressId}-text"
-    class="text-xs text-slate-400 mt-2">
+
+    <p
+      id="${progressId}-text"
+      class="text-xs text-slate-400 mt-2"
+    >
       Menyiapkan database...
     </p>
     `
   );
+
   let progress = 5;
-  const interval = setInterval(()=>{
+
+  const interval = setInterval(() => {
+
     progress +=
-      Math.floor(
-        Math.random() * 10
-      ) + 5;
-    if(progress >= 90){
+      Math.floor(Math.random() * 10) + 5;
+
+    if (progress >= 90) {
       progress = 90;
     }
+
     const bar =
-      document.getElementById(
-        progressId
-      );
+      document.getElementById(progressId);
+
     const text =
       document.getElementById(
         progressId + "-text"
       );
-    if(bar){
+
+    if (bar) {
       bar.style.width =
         progress + "%";
     }
-    if(text){
-      if(progress < 20){
+
+    if (text) {
+
+      if (progress < 20) {
         text.innerHTML =
           "Mengambil data Transaksi...";
       }
-      else if(progress < 35){
+      else if (progress < 35) {
         text.innerHTML =
           "Mengambil data Member...";
       }
-      else if(progress < 50){
+      else if (progress < 50) {
         text.innerHTML =
           "Mengambil data Ingredient...";
       }
-      else if(progress < 80){
+      else if (progress < 80) {
         text.innerHTML =
           "Mengambil data Produk...";
       }
-      else{
+      else {
         text.innerHTML =
           "Menyusun file backup JSON...";
       }
+
     }
-  },800);
+
+  }, 800);
+
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // BACKUP SUPABASE
+    // =========================
 
-    /*
     const result =
-      await createFullBackupSupabase();
-    */
+      await createFullBackup();
 
-    // TEMP DATA VERCEL
-    const result = {
-      backup_id:
-        "BACKUP-" + Date.now(),
-      file_size:
-        0
-    };
+
+    if (!result?.success) {
+
+      throw new Error(
+        result?.message ||
+        "Backup gagal"
+      );
+
+    }
+
+
     clearInterval(interval);
+
+
     const bar =
       document.getElementById(
         progressId
       );
+
     const text =
       document.getElementById(
         progressId + "-text"
       );
-    if(bar){
+
+
+    if (bar) {
       bar.style.width =
         "100%";
     }
-    if(text){
+
+    if (text) {
       text.innerHTML =
         "Backup selesai";
     }
-    setTimeout(()=>{
+
+
+    setTimeout(() => {
+
       const progressBox =
         document.getElementById(
           progressId + "-box"
         );
-      if(progressBox){
+
+      if (progressBox) {
         progressBox.remove();
       }
+
 
       addBackupChatMessage(
         "bot",
@@ -35146,20 +35204,30 @@ async function startBackupProcess(){
 
         File:
         <b>
-        	${result.backup_id}.json
+          ${result.backup_id}.json
         </b>
-		
+
         <br><br>
-		
+
         Ukuran:
         ${(result.file_size / 1024).toFixed(1)}
         KB
         `
       );
-    },700);
+
+    }, 700);
+
+
   }
-  catch(err){
+  catch (err) {
+
     clearInterval(interval);
+
+    console.error(
+      "Backup:",
+      err
+    );
+
 
     addBackupChatMessage(
       "bot",
@@ -35169,145 +35237,193 @@ async function startBackupProcess(){
       ${err.message}
       `
     );
+
   }
+
 }
 
 let isRestoring = false;
-async function restoreBackup(id){
-  if(isRestoring) return;
-  if(
+
+async function restoreBackup(id) {
+
+  if (isRestoring) return;
+
+
+  if (
     !confirm(
-      `
-		Restore ${id} ?
-		Semua data sekarang akan diganti dengan backup ini.
-      `
+      `Restore ${id} ?
+
+Semua data sekarang akan diganti
+dengan backup ini.`
     )
-  ) return;
+  ) {
+    return;
+  }
+
+
   isRestoring = true;
+
+
   const progressId =
     "restore-progress-" + Date.now();
+
 
   addBackupChatMessage(
     "bot",
     `
     Restore sedang diproses...
-    <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+
+    <div
+      id="${progressId}-box"
+      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+    >
       <div
-      id="${progressId}"
-      class="h-full bg-primary rounded-full transition-all duration-500"
-      style="width:5%">
-      </div>
+        id="${progressId}"
+        class="h-full bg-primary rounded-full transition-all duration-500"
+        style="width:5%"
+      ></div>
     </div>
+
     <p
-    id="${progressId}-text"
-    class="text-xs text-slate-400 mt-2">
+      id="${progressId}-text"
+      class="text-xs text-slate-400 mt-2"
+    >
       Menyiapkan restore...
     </p>
     `
   );
+
+
   let progress = 5;
+
+
   const interval =
-    setInterval(()=>{
+    setInterval(() => {
+
       progress +=
         Math.floor(
-          Math.random()*10
+          Math.random() * 10
         ) + 5;
-      if(progress >= 90){
+
+
+      if (progress >= 90) {
         progress = 90;
       }
+
+
       const bar =
         document.getElementById(
           progressId
         );
+
       const text =
         document.getElementById(
           progressId + "-text"
         );
-      if(bar){
+
+
+      if (bar) {
         bar.style.width =
           progress + "%";
       }
-      if(text){
-        if(progress < 20){
+
+
+      if (text) {
+
+        if (progress < 20) {
+
           text.innerHTML =
-          "Mengembalikan data Transaksi...";
+            "Mengembalikan data Transaksi...";
+
         }
-        else if(progress < 35){
+        else if (progress < 35) {
+
           text.innerHTML =
-          "Mengembalikan data Member...";
+            "Mengembalikan data Member...";
+
         }
-        else if(progress < 45){
+        else if (progress < 45) {
+
           text.innerHTML =
-          "Mengembalikan data Ingredient...";
+            "Mengembalikan data Ingredient...";
+
         }
-        else if(progress < 65){
+        else if (progress < 65) {
+
           text.innerHTML =
-          "Mengembalikan data Produk...";
+            "Mengembalikan data Produk...";
+
         }
-        else if(progress < 80){
+        else if (progress < 80) {
+
           text.innerHTML =
-          "Menyusun file backup JSON...";
+            "Membaca file backup JSON...";
+
         }
-        else{
+        else {
+
           text.innerHTML =
-          "Menyusun ke database...";
+            "Menyusun kembali database...";
+
         }
+
       }
-    },800);
+
+    }, 800);
+
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // RESTORE SUPABASE
+    // =========================
 
-    /*
-    const { data:res, error } =
-      await supabase
-        .rpc(
-          "restore_backup_by_id",
-          {
-            p_backup_id:id
-          }
-        );
+    const res =
+      await restoreBackupById(id);
 
 
-    if(error){
-      throw error;
-    }
-    */
+    if (
+      res?.success === false
+    ) {
 
-    // TEMP DATA VERCEL
-    const res = {
-      success:true,
-      message:
-      "Restore berhasil"
-    };
-    if(!res.success){
       throw new Error(
         res.message ||
         "Restore gagal"
       );
+
     }
+
+
     clearInterval(interval);
+
     isRestoring = false;
+
+
     const bar =
       document.getElementById(
         progressId
       );
+
     const text =
       document.getElementById(
         progressId + "-text"
       );
-    if(bar){
+
+
+    if (bar) {
       bar.style.width =
         "100%";
     }
-    if(text){
+
+
+    if (text) {
       text.innerHTML =
-      "Restore selesai";
+        "Restore selesai";
     }
-    setTimeout(()=>{
+
+
+    setTimeout(() => {
+
       addBackupChatMessage(
         "bot",
         `
@@ -35316,14 +35432,40 @@ async function restoreBackup(id){
         Database sudah dikembalikan.
         `
       );
-      setTimeout(()=>{
+
+
+      setTimeout(() => {
+
+        // clear cache karena seluruh database berubah
+        state.cashFlowData = null;
+        state.cashFlowFilter = null;
+
+        state.expenseDashboardData = null;
+        state.expenseDashboardFilter = null;
+
+        state.grossRevenueData = null;
+        state.grossRevenueFilter = null;
+
         loadCashFlowPage();
-      },1000);
-    },700);
+
+      }, 1000);
+
+    }, 700);
+
+
   }
-  catch(err){
+  catch (err) {
+
     clearInterval(interval);
+
     isRestoring = false;
+
+
+    console.error(
+      "Restore Backup:",
+      err
+    );
+
 
     addBackupChatMessage(
       "bot",
@@ -35333,136 +35475,170 @@ async function restoreBackup(id){
       ${err.message}
       `
     );
+
   }
+
 }
 
-async function deleteBackup(id){
-  if(
+async function deleteBackup(id) {
+
+  if (
     !confirm(
-      `
-	Hapus backup ${id} ?
-	File backup akan dihapus permanen.
-      `
+      `Hapus backup ${id} ?
+
+File backup akan dihapus permanen.`
     )
-  ) return;
+  ) {
+    return;
+  }
+
+
   const progressId =
     "delete-progress-" + Date.now();
+
 
   addBackupChatMessage(
     "bot",
     `
     Menghapus backup...
-    <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
 
+    <div
+      id="${progressId}-box"
+      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+    >
       <div
-      id="${progressId}"
-      class="h-full bg-red-400 rounded-full transition-all duration-500"
-      style="width:5%">
-      </div>
+        id="${progressId}"
+        class="h-full bg-red-400 rounded-full transition-all duration-500"
+        style="width:5%"
+      ></div>
     </div>
+
     <p
-    id="${progressId}-text"
-    class="text-xs text-slate-400 mt-2">
+      id="${progressId}-text"
+      class="text-xs text-slate-400 mt-2"
+    >
       Menyiapkan penghapusan...
     </p>
     `
   );
+
+
   let progress = 5;
+
+
   const interval =
-    setInterval(()=>{
+    setInterval(() => {
+
       progress +=
         Math.floor(
-          Math.random()*10
+          Math.random() * 10
         ) + 5;
-      if(progress >= 90){
+
+
+      if (progress >= 90) {
         progress = 90;
       }
+
+
       const bar =
         document.getElementById(
           progressId
         );
+
       const text =
         document.getElementById(
           progressId + "-text"
         );
 
-      if(bar){
+
+      if (bar) {
         bar.style.width =
           progress + "%";
       }
-      if(text){
-        if(progress < 20){
+
+
+      if (text) {
+
+        if (progress < 20) {
+
           text.innerHTML =
-          "Menghapus data Transaksi...";
+            "Mencari data backup...";
+
         }
-        else if(progress < 35){
+        else if (progress < 50) {
+
           text.innerHTML =
-          "Menghapus data Member...";
+            "Menghapus file backup JSON...";
+
         }
-        else if(progress < 50){
+        else if (progress < 80) {
+
           text.innerHTML =
-          "Menghapus data Ingredient...";
+            "Menghapus dari Storage...";
+
         }
-        else if(progress < 80){
+        else {
+
           text.innerHTML =
-          "Menghapus file backup JSON...";
+            "Menghapus riwayat backup...";
+
         }
-        else{
-          text.innerHTML =
-          "Menghapus dari Storage...";
-        }
+
       }
-    },800);
+
+    }, 800);
+
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // DELETE SUPABASE BACKUP
+    // =========================
 
-    /*
-    const { error } =
-      await supabase
-        .from("Backup_History")
-        .delete()
-        .eq(
-          "backup_id",
-          id
-        );
+    const res =
+      await deleteBackupById(id);
 
 
-    if(error){
-      throw error;
-    }
-    */
+    if (
+      res?.success === false
+    ) {
 
-    // TEMP DATA VERCEL
-    const res = {
-      success:true
-    };
-    if(!res.success){
       throw new Error(
+        res.message ||
         "Gagal menghapus backup"
       );
+
     }
+
+
     clearInterval(interval);
+
+
     const bar =
       document.getElementById(
         progressId
       );
+
     const text =
       document.getElementById(
         progressId + "-text"
       );
-    if(bar){
+
+
+    if (bar) {
       bar.style.width =
         "100%";
     }
-    if(text){
+
+
+    if (text) {
       text.innerHTML =
-      "Backup berhasil dihapus";
+        "Backup berhasil dihapus";
     }
-    setTimeout(()=>{
+
+
+    setTimeout(() => {
+
       addBackupChatMessage(
         "bot",
         `
@@ -35471,11 +35647,23 @@ async function deleteBackup(id){
         ${id}
         `
       );
+
+
       loadBackupList();
-    },700);
+
+    }, 700);
+
   }
-  catch(err){
+  catch (err) {
+
     clearInterval(interval);
+
+
+    console.error(
+      "Delete Backup:",
+      err
+    );
+
 
     addBackupChatMessage(
       "bot",
@@ -35485,26 +35673,34 @@ async function deleteBackup(id){
       ${err.message}
       `
     );
-  }
-}
 
-async function clearDatabaseConfirm(){
-  if(
-    !confirm(
-      `
+  }
+
+}
+	
+async function clearDatabaseConfirm() {
+
+  if (
+    !confirm(`
 ⚠️ PERINGATAN
+
 Semua data POS aktif akan dihapus:
+
 - Transaksi
 - Member
 - Produk
 - Inventory
 - Cashflow
 - Data operasional lainnya
-Pastikan data POS sudah backup terbaru
+
+Pastikan data POS sudah backup terbaru.
+
 Lanjutkan?
-      `
-    )
-  ) return;
+    `)
+  ) {
+    return;
+  }
+
   const progressId =
     "clear-progress-" + Date.now();
 
@@ -35512,31 +35708,35 @@ Lanjutkan?
     "bot",
     `
     Mengosongkan database...
-    <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
 
+    <div
+      id="${progressId}-box"
+      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+    >
       <div
-      id="${progressId}"
-      class="h-full bg-primary rounded-full transition-all duration-500"
-      style="width:5%">
-      </div>
-
+        id="${progressId}"
+        class="h-full bg-primary rounded-full transition-all duration-500"
+        style="width:5%"
+      ></div>
     </div>
-    <p
-    id="${progressId}-text"
-    class="text-xs text-slate-400 mt-2">
-      Menyiapkan clear database...
-    </p>
 
+    <p
+      id="${progressId}-text"
+      class="text-xs text-slate-400 mt-2"
+    >
+      Menyiapkan database...
+    </p>
     `
   );
+
   let progress = 5;
   const interval =
-    setInterval(()=>{
+    setInterval(() => {
       progress +=
         Math.floor(
-          Math.random()*10
+          Math.random() * 10
         ) + 5;
-      if(progress >= 90){
+      if (progress >= 90) {
         progress = 90;
       }
       const bar =
@@ -35547,65 +35747,52 @@ Lanjutkan?
         document.getElementById(
           progressId + "-text"
         );
-      if(bar){
+      if (bar) {
         bar.style.width =
           progress + "%";
       }
-      if(text){
-        if(progress < 20){
+      if (text) {
+        if (progress < 20) {
           text.innerHTML =
-          "Clear tabel Transaksi...";
+            "Clear tabel Transaksi...";
         }
-        else if(progress < 35){
+        else if (progress < 35) {
           text.innerHTML =
-          "Clear tabel Member...";
+            "Clear tabel Member...";
         }
-        else if(progress < 50){
+        else if (progress < 50) {
           text.innerHTML =
-          "Clear tabel Ingredient...";
+            "Clear tabel Ingredient...";
         }
-        else if(progress < 80){
+        else if (progress < 80) {
           text.innerHTML =
-          "Clear tabel History...";
+            "Clear tabel History...";
         }
-        else{
+        else {
           text.innerHTML =
-          "Clear database dari tabel...";
+            "Clear database...";
         }
       }
-    },800);
+    }, 800);
+
 
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // CLEAR DATABASE
+    const res =
+      await clearDatabaseRPC();
 
-    /*
-    const { data:res, error } =
-      await supabase
-        .rpc(
-          "clear_database"
-        );
+    if (
+      res?.success === false
+    ) {
 
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success:true,
-      message:
-      "Database berhasil dikosongkan"
-    };
-    if(!res.success){
       throw new Error(
         res.message ||
         "Clear database gagal"
       );
+
     }
+
     clearInterval(interval);
     const bar =
       document.getElementById(
@@ -35615,25 +35802,44 @@ Lanjutkan?
       document.getElementById(
         progressId + "-text"
       );
-    if(bar){
+    if (bar) {
       bar.style.width =
         "100%";
     }
-    if(text){
+    if (text) {
       text.innerHTML =
-      "Database berhasil dikosongkan";
+        "Database berhasil dikosongkan";
     }
+
+
     addBackupChatMessage(
       "bot",
       `
       Tabel database berhasil dikosongkan
       <br><br>
-      ${res.message}
+      ${res?.message || "Database berhasil dikosongkan."}
       `
     );
+
+    // CLEAR CACHE
+    state.cashFlowData = null;
+    state.cashFlowFilter = null;
+
+    state.expenseDashboardData = null;
+    state.expenseDashboardFilter = null;
+
+    state.grossRevenueData = null;
+    state.grossRevenueFilter = null;
   }
-  catch(err){
+  catch (err) {
     clearInterval(interval);
+
+
+    console.error(
+      "Clear Database:",
+      err
+    );
+
     addBackupChatMessage(
       "bot",
       `
@@ -35644,7 +35850,7 @@ Lanjutkan?
     );
   }
 }
-
+	
 async function exportCashFlowReport() {
   const startDate =
     document.getElementById(
