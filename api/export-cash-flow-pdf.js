@@ -45,15 +45,32 @@ export default async function handler(req, res) {
   try {
 
     const {
+      loginUserId,
       start,
       end,
       branchId
     } = req.body || {};
-
-    if (!branchId) {
+    
+    if (!loginUserId) {
+    
       return res
         .status(400)
-        .send("branchId wajib diisi");
+        .json({
+          success: false,
+          error: "loginUserId wajib diisi"
+        });
+    
+    }
+    
+    if (!branchId) {
+    
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "branchId wajib diisi"
+        });
+    
     }
 
     // ======================================
