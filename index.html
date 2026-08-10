@@ -16085,7 +16085,9 @@ function navigate(pageId, params = {}) {
 	    main.classList.remove("ml-0");
 	    main.classList.add("ml-72");
 	}
-
+console.log("PAGE:", pageId);
+console.log("SIDEBAR:", sidebar.className);
+console.log("OPEN:", sidebarOpen);
   setTimeout(() => {
     loadBranchName();
   }, 0);
