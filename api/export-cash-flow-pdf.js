@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -8,8 +9,16 @@ const supabase = createClient(
 const logoSrc =
   `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
 
+// ==========================================
+// HELPERS
+// ==========================================
+
 function rupiah(value) {
   return Number(value || 0).toLocaleString("id-ID");
+}
+
+function number(value) {
+  return Number(value || 0);
 }
 
 function escapeHtml(value) {
@@ -20,6 +29,10 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+// ==========================================
+// HANDLER
+// ==========================================
 
 export default async function handler(req, res) {
 
@@ -34,19 +47,8 @@ export default async function handler(req, res) {
     const {
       start,
       end,
-      branchId,
-      loginUserId
+      branchId
     } = req.body || {};
-
-    // =========================
-    // VALIDASI
-    // =========================
-
-    if (!loginUserId) {
-      return res
-        .status(400)
-        .send("loginUserId wajib diisi");
-    }
 
     if (!branchId) {
       return res
@@ -54,9 +56,9 @@ export default async function handler(req, res) {
         .send("branchId wajib diisi");
     }
 
-    // =========================
-    // CASH FLOW PAGE DATA
-    // =========================
+    // ======================================
+    // GET CASH FLOW PAGE DATA
+    // ======================================
 
     const {
       data,
@@ -65,7 +67,7 @@ export default async function handler(req, res) {
       "get_cash_flow_page_data",
       {
         p_login_user_id:
-          loginUserId,
+          req.body?.loginUserId || null,
 
         p_branch_id:
           branchId || "ALL",
@@ -82,40 +84,33 @@ export default async function handler(req, res) {
       throw error;
     }
 
-    console.log(
-      "EXPORT CASH FLOW DATA:",
-      data
-    );
-
     if (!data) {
       throw new Error(
         "Data Cash Flow kosong"
       );
     }
 
-    if (!data.success) {
-      return res
-        .status(403)
-        .json({
-          success: false,
-          message:
-            data.message ||
-            "Access denied"
-        });
+    if (data.success === false) {
+      throw new Error(
+        data.message ||
+        "Gagal mengambil data Cash Flow"
+      );
     }
 
-    // =========================
+    console.log(
+      "EXPORT CASH FLOW DATA:",
+      data
+    );
+
+    // ======================================
     // NORMALIZE
-    // =========================
+    // ======================================
 
     const account =
       data.account || {};
 
     const summary =
       data.summary || {};
-
-    const chart =
-      data.chart || {};
 
     const transfers =
       Array.isArray(data.transfers)
@@ -126,768 +121,818 @@ export default async function handler(req, res) {
       data.ownerSummary || {};
 
     const ownerTransactions =
-      Array.isArray(
-        data.ownerTransactions
-      )
+      Array.isArray(data.ownerTransactions)
         ? data.ownerTransactions
         : [];
 
-    console.log(
-      "ACCOUNT:",
-      account
-    );
+    // ======================================
+    // SUPPORT BERBAGAI BENTUK SUMMARY
+    // ======================================
 
-    console.log(
-      "SUMMARY:",
-      summary
-    );
+    const cashIn =
+      number(
+        summary.cashIn ??
+        summary.cash_in ??
+        summary.totalCashIn ??
+        0
+      );
 
-    console.log(
-      "OWNER SUMMARY:",
-      ownerSummary
-    );
+    const cashOut =
+      number(
+        summary.cashOut ??
+        summary.cash_out ??
+        summary.totalCashOut ??
+        0
+      );
 
-    console.log(
-      "OWNER TRANSACTIONS:",
-      ownerTransactions
-    );
+    const netFlow =
+      number(
+        summary.netFlow ??
+        summary.net_flow ??
+        (cashIn - cashOut)
+      );
 
-    // =========================
-    // HISTORY
-    // =========================
+    const cashBalance =
+      number(
+        account.cash ??
+        account.Cash ??
+        account.cashBalance ??
+        account.cash_balance ??
+        0
+      );
 
-    const history = [
-      ...transfers.map(t => ({
-        date:
-          t.date ||
-          t.Date ||
-          t.created_at ||
-          "-",
+    const bankBalance =
+      number(
+        account.bank ??
+        account.Bank ??
+        account.bankBalance ??
+        account.bank_balance ??
+        0
+      );
 
-        type:
-          "Transfer",
+    const totalBalance =
+      number(
+        account.total ??
+        account.Total ??
+        account.balance ??
+        account.Balance ??
+        (cashBalance + bankBalance)
+      );
 
-        description:
-          t.description ||
-          `${t.fromAccount || ""} → ${t.toAccount || ""}`,
+    const balanceBase =
+      cashBalance + bankBalance;
 
-        amount:
-          Number(
-            t.amount ||
-            t.Amount ||
-            0
-          )
-      })),
+    const cashPercent =
+      balanceBase > 0
+        ? (cashBalance / balanceBase) * 100
+        : 0;
 
-      ...ownerTransactions.map(t => ({
-        date:
-          t.date ||
-          t.Date ||
-          t.created_at ||
-          "-",
+    const bankPercent =
+      balanceBase > 0
+        ? (bankBalance / balanceBase) * 100
+        : 0;
 
-        type:
-          t.type ||
-          "Owner",
-
-        description:
-          t.description ||
-          t.note ||
-          "-",
-
-        amount:
-          Number(
-            t.amount ||
-            t.Amount ||
-            0
-          )
-      }))
-    ];
-
-    // =========================
-    // HISTORY ROWS
-    // =========================
-
-    const historyRows =
-      history.length
-
-        ? history.map(h => `
-            <tr>
-
-              <td>
-                ${escapeHtml(h.date)}
-              </td>
-
-              <td>
-                ${escapeHtml(h.type)}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  h.description
-                )}
-              </td>
-
-              <td class="right">
-                Rp ${rupiah(h.amount)}
-              </td>
-
-            </tr>
-          `).join("")
-
-        : `
-          <tr>
-            <td
-              colspan="4"
-              class="empty"
-            >
-              No Data
-            </td>
-          </tr>
-        `;
-
-    // =========================
+    // ======================================
     // INCOME SOURCE
-    // =========================
+    // ======================================
 
     const incomeSource =
       Array.isArray(
         summary.incomeSource
       )
         ? summary.incomeSource
-        : [];
+        : Array.isArray(
+            summary.income_source
+          )
+          ? summary.income_source
+          : [];
 
     const totalIncome =
       incomeSource.reduce(
-        (a, b) =>
-          a +
-          Number(
-            b.amount || 0
+        (sum, item) =>
+          sum +
+          number(
+            item.amount ??
+            item.total ??
+            item.value
           ),
         0
       );
 
-    incomeSource.forEach(i => {
-
-      i.percent =
-        totalIncome > 0
-          ? (
-              Number(
-                i.amount || 0
-              ) /
-              totalIncome
-            ) * 100
-          : 0;
-
-    });
-
     const incomeRows =
       incomeSource.length
 
-        ? incomeSource.map(i => `
-            <tr>
+        ? incomeSource.map(item => {
 
-              <td>
-                ${escapeHtml(
-                  i.name
-                )}
-              </td>
+            const amount =
+              number(
+                item.amount ??
+                item.total ??
+                item.value
+              );
 
-              <td>
-                Rp ${rupiah(
-                  i.amount
-                )}
-              </td>
+            const percent =
+              totalIncome > 0
+                ? (amount / totalIncome) * 100
+                : 0;
 
-              <td class="right">
-                ${Number(
-                  i.percent || 0
-                ).toFixed(1)}%
-              </td>
+            return `
+              <tr>
 
-            </tr>
-          `).join("")
+                <td>
+                  ${escapeHtml(
+                    item.name ??
+                    item.source ??
+                    item.type ??
+                    "-"
+                  )}
+                </td>
+
+                <td class="right">
+                  Rp ${rupiah(amount)}
+                </td>
+
+                <td class="right">
+                  ${percent.toFixed(1)}%
+                </td>
+
+              </tr>
+            `;
+
+          }).join("")
 
         : `
           <tr>
-            <td
-              colspan="3"
-              class="empty"
-            >
+            <td colspan="3" class="empty">
               No income data
             </td>
           </tr>
         `;
 
-    // =========================
+    // ======================================
     // EXPENSE CATEGORY
-    // =========================
+    // ======================================
 
     const expenseCategory =
       Array.isArray(
         summary.expenseCategory
       )
         ? summary.expenseCategory
-        : [];
+        : Array.isArray(
+            summary.expense_category
+          )
+          ? summary.expense_category
+          : [];
 
     const totalExpense =
       expenseCategory.reduce(
-        (a, b) =>
-          a +
-          Number(
-            b.amount || 0
+        (sum, item) =>
+          sum +
+          number(
+            item.amount ??
+            item.total ??
+            item.value
           ),
         0
       );
 
-    expenseCategory.forEach(e => {
-
-      e.percent =
-        totalExpense > 0
-          ? (
-              Number(
-                e.amount || 0
-              ) /
-              totalExpense
-            ) * 100
-          : 0;
-
-    });
-
     const expenseRows =
       expenseCategory.length
 
-        ? expenseCategory.map(e => `
-            <tr>
+        ? expenseCategory.map(item => {
 
-              <td>
-                ${escapeHtml(
-                  e.name
-                )}
-              </td>
+            const amount =
+              number(
+                item.amount ??
+                item.total ??
+                item.value
+              );
 
-              <td>
-                Rp ${rupiah(
-                  e.amount
-                )}
-              </td>
+            const percent =
+              totalExpense > 0
+                ? (amount / totalExpense) * 100
+                : 0;
 
-              <td class="right">
-                ${Number(
-                  e.percent || 0
-                ).toFixed(1)}%
-              </td>
+            return `
+              <tr>
 
-            </tr>
-          `).join("")
+                <td>
+                  ${escapeHtml(
+                    item.name ??
+                    item.category ??
+                    "-"
+                  )}
+                </td>
+
+                <td class="right">
+                  Rp ${rupiah(amount)}
+                </td>
+
+                <td class="right">
+                  ${percent.toFixed(1)}%
+                </td>
+
+              </tr>
+            `;
+
+          }).join("")
 
         : `
           <tr>
-            <td
-              colspan="3"
-              class="empty"
-            >
+            <td colspan="3" class="empty">
               No expense data
             </td>
           </tr>
         `;
 
-    // =========================
+    // ======================================
+    // CASH FLOW HISTORY
+    // ======================================
+
+    const history =
+      Array.isArray(
+        summary.history
+      )
+        ? summary.history
+        : Array.isArray(
+            summary.transactions
+          )
+          ? summary.transactions
+          : [];
+
+    const historyRows =
+      history.length
+
+        ? history.map(item => `
+
+            <tr>
+
+              <td>
+                ${escapeHtml(
+                  item.date ??
+                  item.Date ??
+                  item.tanggal ??
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  item.type ??
+                  item.Type ??
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  item.description ??
+                  item.Description ??
+                  item.note ??
+                  "-"
+                )}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(
+                  item.amount ??
+                  item.Amount
+                )}
+              </td>
+
+            </tr>
+
+          `).join("")
+
+        : `
+          <tr>
+            <td colspan="4" class="empty">
+              No Data
+            </td>
+          </tr>
+        `;
+
+    // ======================================
+    // FUND TRANSFERS
+    // ======================================
+
+    const transferRows =
+      transfers.length
+
+        ? transfers.map(item => `
+
+            <tr>
+
+              <td>
+                ${escapeHtml(
+                  item.date ??
+                  item.Date ??
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  item.fromAccount ??
+                  item.from_account ??
+                  item.from ??
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  item.toAccount ??
+                  item.to_account ??
+                  item.to ??
+                  "-"
+                )}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(
+                  item.amount ??
+                  item.Amount
+                )}
+              </td>
+
+            </tr>
+
+          `).join("")
+
+        : `
+          <tr>
+            <td colspan="4" class="empty">
+              No fund transfers
+            </td>
+          </tr>
+        `;
+
+    // ======================================
+    // OWNER TRANSACTIONS
+    // ======================================
+
+    const ownerTransactionRows =
+      ownerTransactions.length
+
+        ? ownerTransactions.map(item => `
+
+            <tr>
+
+              <td>
+                ${escapeHtml(
+                  item.date ??
+                  item.Date ??
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  item.type ??
+                  item.Type ??
+                  "-"
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  item.description ??
+                  item.Description ??
+                  item.note ??
+                  "-"
+                )}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(
+                  item.amount ??
+                  item.Amount
+                )}
+              </td>
+
+            </tr>
+
+          `).join("")
+
+        : `
+          <tr>
+            <td colspan="4" class="empty">
+              No owner transactions
+            </td>
+          </tr>
+        `;
+
+    // ======================================
     // HTML REPORT
-    // =========================
+    // ======================================
 
     const html = `
 
-<!DOCTYPE html>
-
-<html>
-
-<head>
-
-<meta charset="UTF-8">
-
-<title>
-Cash Flow Report
-</title>
-
-<style>
-
-body{
-  font-family:Arial,sans-serif;
-  padding:20px;
-  color:#333;
-}
-
-.logo{
-  width:150px;
-  height:auto;
-  object-fit:contain;
-  margin-bottom:16px;
-}
-
-.header{
-  text-align:center;
-}
+      <html>
+
+      <head>
+
+        <meta charset="UTF-8">
+
+        <style>
+
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #333;
+          }
+
+          .logo {
+            width: 150px;
+            height: auto;
+            object-fit: contain;
+            margin-bottom: 16px;
+          }
+
+          .header {
+            text-align: center;
+          }
 
-.kpi{
-  display:grid;
-  grid-template-columns:
-    repeat(4,1fr);
-  gap:15px;
-}
+          .card {
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 20px;
+          }
 
-.card{
-  border:1px solid #eee;
-  border-radius:12px;
-  padding:12px;
-  margin-bottom:20px;
-}
+          .kpi {
+            display: grid;
+            grid-template-columns:
+              repeat(4, 1fr);
+            gap: 15px;
+          }
 
-.kpi .card{
-  width:100%;
-  box-sizing:border-box;
-  padding:10px;
-  text-align:center;
-}
+          .kpi .card {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+            text-align: center;
+          }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-size:11px;
-}
+          table {
+            width: 100%;
+            border-collapse:
+              collapse;
+            font-size: 11px;
+          }
 
-th{
-  background:#f5f5f5;
-  padding:8px;
-  text-align:left;
-}
+          th {
+            background: #f5f5f5;
+            padding: 8px;
+            text-align: left;
+          }
 
-td{
-  padding:8px;
-  border-bottom:1px solid #eee;
-}
+          td {
+            padding: 8px;
+            border-bottom:
+              1px solid #eee;
+          }
 
-.right{
-  text-align:right;
-}
+          .right {
+            text-align: right;
+          }
 
-.empty{
-  text-align:center;
-  color:#888;
-}
+          .empty {
+            text-align: center;
+            color: #777;
+          }
 
-.page-break{
-  page-break-before:always;
-}
+          .page-break {
+            page-break-before: always;
+          }
 
-h2{
-  font-size:14px;
-  margin:8px 0;
-}
+          h2 {
+            font-size: 14px;
+            margin: 8px 0;
+          }
 
-h3{
-  font-size:11px;
-  margin:0 0 8px 0;
-  font-weight:bold;
-}
+          h3 {
+            font-size: 11px;
+            margin: 0 0 8px 0;
+            font-weight: bold;
+          }
 
-p{
-  font-size:8px;
-  margin:8px 0;
-}
+          p {
+            font-size: 8px;
+            margin: 8px 0;
+          }
 
-b{
-  font-size:11px;
-  font-weight:bold;
-}
+          b {
+            font-size: 11px;
+            font-weight: bold;
+          }
 
-</style>
+        </style>
 
-</head>
+      </head>
 
-<body>
+      <body>
 
-<div class="header">
+        <div class="header">
 
-<img
-  src="${logoSrc}"
-  class="logo"
-  alt="Sistem POS"
-/>
+          <img
+            src="${logoSrc}"
+            class="logo"
+            alt="Sistem POS"
+          >
 
-</div>
+        </div>
 
 
-<!-- =========================
-     KPI
-========================= -->
+        <!-- KPI -->
 
-<div class="kpi">
+        <div class="kpi">
 
+          <div class="card">
 
-<div class="card">
+            <b>CASH IN</b>
 
-<b>
-CASH IN
-</b>
+            <br>
 
-<br>
+            Rp ${rupiah(cashIn)}
 
-Rp ${rupiah(
-  summary.cashIn
-)}
+          </div>
 
-</div>
 
+          <div class="card">
 
-<div class="card">
+            <b>CASH OUT</b>
 
-<b>
-CASH OUT
-</b>
+            <br>
 
-<br>
+            Rp ${rupiah(cashOut)}
 
-Rp ${rupiah(
-  summary.cashOut
-)}
+          </div>
 
-</div>
 
+          <div class="card">
 
-<div class="card">
+            <b>NET FLOW</b>
 
-<b>
-NET FLOW
-</b>
+            <br>
 
-<br>
+            Rp ${rupiah(netFlow)}
 
-Rp ${rupiah(
-  summary.netFlow
-)}
+          </div>
 
-</div>
 
+          <div class="card">
 
-<div class="card">
+            <b>BALANCE</b>
 
-<b>
-BALANCE
-</b>
+            <br>
 
-<br>
+            Rp ${rupiah(totalBalance)}
 
-Rp ${rupiah(
-  summary.totalBalance
-)}
+          </div>
 
-</div>
+        </div>
 
 
-</div>
+        <!-- HEADER -->
 
+        <div>
 
-<!-- =========================
-     REPORT INFO
-========================= -->
+          <h2>
+            CASH FLOW REPORT
+          </h2>
 
-<div>
+          <p>
 
-<h2>
-CASH FLOW REPORT
-</h2>
+            Period :
+            ${escapeHtml(start || "-")}
+            -
+            ${escapeHtml(end || "-")}
 
-<p>
+            <br>
 
-Period :
-${escapeHtml(start || "-")}
--
-${escapeHtml(end || "-")}
+            Branch :
+            ${escapeHtml(branchId || "ALL")}
 
-<br>
+          </p>
 
-Branch :
-${escapeHtml(
-  branchId || "ALL"
-)}
+        </div>
 
-</p>
 
-</div>
+        <!-- ACCOUNT BALANCE -->
 
+        <div class="card">
 
-<!-- =========================
-     ACCOUNT BALANCE
-========================= -->
+          <h3>
+            ACCOUNT BALANCE
+          </h3>
 
-<div class="card">
+          <table>
 
-<h3>
-ACCOUNT BALANCE
-</h3>
+            <tr>
 
-<table>
+              <td>
+                Cash
+                <br>
+                Rp ${rupiah(cashBalance)}
+              </td>
 
-<tr>
+              <td class="right">
+                ${cashPercent.toFixed(1)}%
+              </td>
 
-<td>
-Cash
+            </tr>
 
-<br>
+            <tr>
 
-Rp ${rupiah(
-  account.cash ||
-  account.Cash ||
-  summary.cashBalance
-)}
+              <td>
+                Bank
+                <br>
+                Rp ${rupiah(bankBalance)}
+              </td>
 
-</td>
+              <td class="right">
+                ${bankPercent.toFixed(1)}%
+              </td>
 
-<td class="right">
-${Number(
-  account.cashPercent ||
-  summary.cashPercent ||
-  0
-).toFixed(1)}%
-</td>
+            </tr>
 
-</tr>
+          </table>
 
+        </div>
 
-<tr>
 
-<td>
-Bank
+        <!-- INCOME -->
 
-<br>
+        <div class="card">
 
-Rp ${rupiah(
-  account.bank ||
-  account.Bank ||
-  summary.bankBalance
-)}
+          <h3>
+            INCOME SOURCE
+          </h3>
 
-</td>
+          <table>
 
-<td class="right">
-${Number(
-  account.bankPercent ||
-  summary.bankPercent ||
-  0
-).toFixed(1)}%
-</td>
+            <tr>
 
-</tr>
+              <th>
+                Source
+              </th>
 
-</table>
+              <th>
+                Amount
+              </th>
 
-</div>
+              <th class="right">
+                Percent
+              </th>
 
+            </tr>
 
-<!-- =========================
-     INCOME SOURCE
-========================= -->
+            ${incomeRows}
 
-<div class="card">
+          </table>
 
-<h3>
-INCOME SOURCE
-</h3>
+        </div>
 
-<table>
 
-<tr>
+        <!-- EXPENSE -->
 
-<th>
-Source
-</th>
+        <div class="card">
 
-<th>
-Amount
-</th>
+          <h3>
+            EXPENSE CATEGORY
+          </h3>
 
-<th class="right">
-Percent
-</th>
+          <table>
 
-</tr>
+            <tr>
 
-${incomeRows}
+              <th>
+                Category
+              </th>
 
-</table>
+              <th>
+                Amount
+              </th>
 
-</div>
+              <th class="right">
+                Percent
+              </th>
 
+            </tr>
 
-<!-- =========================
-     EXPENSE CATEGORY
-========================= -->
+            ${expenseRows}
 
-<div class="card">
+          </table>
 
-<h3>
-EXPENSE CATEGORY
-</h3>
+        </div>
 
-<table>
 
-<tr>
+        <!-- CASH FLOW HISTORY -->
 
-<th>
-Category
-</th>
+        <div class="page-break"></div>
 
-<th>
-Amount
-</th>
+        <div class="card">
 
-<th class="right">
-Percent
-</th>
+          <h3>
+            CASH FLOW HISTORY
+          </h3>
 
-</tr>
+          <table>
 
-${expenseRows}
+            <tr>
 
-</table>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Description</th>
 
-</div>
+              <th class="right">
+                Amount
+              </th>
 
+            </tr>
 
-<!-- =========================
-     OWNER SUMMARY
-========================= -->
+            ${historyRows}
 
-<div class="card">
+          </table>
 
-<h3>
-OWNER SUMMARY
-</h3>
+        </div>
 
-<table>
 
-<tr>
+        <!-- FUND TRANSFERS -->
 
-<td>
-Total Owner In
-</td>
+        <div class="card">
 
-<td class="right">
+          <h3>
+            FUND TRANSFERS
+          </h3>
 
-Rp ${rupiah(
-  ownerSummary.totalIn ||
-  ownerSummary.ownerIn ||
-  0
-)}
+          <table>
 
-</td>
+            <tr>
 
-</tr>
+              <th>Date</th>
+              <th>From</th>
+              <th>To</th>
 
+              <th class="right">
+                Amount
+              </th>
 
-<tr>
+            </tr>
 
-<td>
-Total Owner Out
-</td>
+            ${transferRows}
 
-<td class="right">
+          </table>
 
-Rp ${rupiah(
-  ownerSummary.totalOut ||
-  ownerSummary.ownerOut ||
-  0
-)}
+        </div>
 
-</td>
 
-</tr>
+        <!-- OWNER TRANSACTIONS -->
 
+        <div class="card">
 
-<tr>
+          <h3>
+            OWNER TRANSACTIONS
+          </h3>
 
-<td>
-Net Owner Flow
-</td>
+          <table>
 
-<td class="right">
+            <tr>
 
-Rp ${rupiah(
-  ownerSummary.net ||
-  ownerSummary.netFlow ||
-  0
-)}
+              <th>Date</th>
+              <th>Type</th>
+              <th>Description</th>
 
-</td>
+              <th class="right">
+                Amount
+              </th>
 
-</tr>
+            </tr>
 
-</table>
+            ${ownerTransactionRows}
 
-</div>
+          </table>
 
+        </div>
 
-<div class="page-break"></div>
 
+        <p>
+          Generated by Sistem POS
+          • ${new Date().toLocaleString("id-ID")}
+        </p>
 
-<!-- =========================
-     HISTORY
-========================= -->
 
-<div class="card">
+      </body>
 
-<h3>
-CASH FLOW HISTORY
-</h3>
+      </html>
 
-<table>
+    `;
 
-<tr>
-
-<th>
-Date
-</th>
-
-<th>
-Type
-</th>
-
-<th>
-Description
-</th>
-
-<th class="right">
-Amount
-</th>
-
-</tr>
-
-${historyRows}
-
-</table>
-
-</div>
-
-
-<p>
-Generated by Sistem POS
-<br>
-• ${new Date().toLocaleString(
-  "id-ID"
-)}
-</p>
-
-
-</body>
-
-</html>
-
-`;
-
-    // =========================
+    // ======================================
     // RETURN HTML
-    // =========================
+    // ======================================
 
     res.setHeader(
       "Content-Type",
@@ -910,12 +955,16 @@ Generated by Sistem POS
     return res
       .status(500)
       .json({
-        success:false,
+
+        success: false,
+
         error:
           err?.message ||
           "Export Cash Flow gagal"
+
       });
 
   }
 
 }
+
