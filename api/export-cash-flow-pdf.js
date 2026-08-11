@@ -43,10 +43,7 @@ export default async function handler(req, res) {
 
   try {
 
-    // ======================================
     // REQUEST
-    // ======================================
-
     const {
       start,
       end,
@@ -64,10 +61,7 @@ export default async function handler(req, res) {
       }
     );
 
-    // ======================================
     // VALIDATION
-    // ======================================
-
     if (!loginUserId) {
       return res
         .status(400)
@@ -86,10 +80,7 @@ export default async function handler(req, res) {
         });
     }
 
-    // ======================================
     // GET CASH FLOW DATA
-    // ======================================
-
     const {
       data,
       error
@@ -130,10 +121,7 @@ export default async function handler(req, res) {
       data
     );
 
-    // ======================================
     // NORMALIZE
-    // ======================================
-
     const account =
       data.account || {};
 
@@ -155,10 +143,7 @@ export default async function handler(req, res) {
         ? data.ownerTransactions
         : [];
 
-    // ======================================
     // KPI
-    // ======================================
-
     const cashIn =
       number(
         summary.cashIn ??
@@ -222,10 +207,7 @@ export default async function handler(req, res) {
         ? (bankBalance / balanceBase) * 100
         : 0;
 
-    // ======================================
     // INCOME SOURCE
-    // ======================================
-
     const incomeSource =
       Array.isArray(summary.incomeSource)
         ? summary.incomeSource
@@ -307,10 +289,7 @@ export default async function handler(req, res) {
           </tr>
         `;
 
-    // ======================================
     // EXPENSE CATEGORY
-    // ======================================
-
     const expenseCategory =
       Array.isArray(summary.expenseCategory)
         ? summary.expenseCategory
@@ -391,10 +370,7 @@ export default async function handler(req, res) {
           </tr>
         `;
 
-    // ======================================
     // CASH FLOW HISTORY
-    // ======================================
-
     const historyRows =
       history.length
 
@@ -457,76 +433,65 @@ export default async function handler(req, res) {
           </tr>
         `;
 
-    // ======================================
     // FUND TRANSFERS
-    // ======================================
-
-    const transferRows =
-      transfers.length
-
-        ? transfers
-            .map(item => {
-
-              return `
-                <tr>
-
-                  <td>
-                    ${escapeHtml(
-                      item.date ??
-                      item.Date ??
-                      "-"
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      item.fromAccount ??
-                      item.from_account ??
-                      item.from ??
-                      "-"
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      item.toAccount ??
-                      item.to_account ??
-                      item.to ??
-                      "-"
-                    )}
-                  </td>
-
-                  <td class="right">
-                    IDR ${rupiah(
-                      item.amount ??
-                      item.Amount ??
-                      0
-                    )}
-                  </td>
-
-                </tr>
-              `;
-
-            })
-            .join("")
-
-        : `
-          <tr>
-
-            <td
-              colspan="4"
-              class="empty"
-            >
-              No fund transfers
-            </td>
-
-          </tr>
-        `;
-
-    // ======================================
+   const transferRows =
+    transfers.length
+  
+      ? transfers
+          .map(item => {
+  
+            return `
+              <tr>
+  
+                <td>
+                  ${escapeHtml(
+                    item.Date ??
+                    item.date ??
+                    "-"
+                  )}
+                </td>
+  
+                <td>
+                  ${escapeHtml(
+                    item.From_Account ??
+                    "-"
+                  )}
+                </td>
+  
+                <td>
+                  ${escapeHtml(
+                    item.To_Account ??
+                    "-"
+                  )}
+                </td>
+  
+                <td class="right">
+                  IDR ${rupiah(
+                    item.Amount ??
+                    0
+                  )}
+                </td>
+  
+              </tr>
+            `;
+  
+          })
+          .join("")
+  
+      : `
+        <tr>
+  
+          <td
+            colspan="4"
+            class="empty"
+          >
+            No fund transfers
+          </td>
+  
+        </tr>
+      `;
+    
     // OWNER TRANSACTIONS
-    // ======================================
-
     const ownerTransactionRows =
       ownerTransactions.length
 
@@ -556,7 +521,7 @@ export default async function handler(req, res) {
                     ${escapeHtml(
                       item.description ??
                       item.Description ??
-                      item.note ??
+                      item.Note ??
                       "-"
                     )}
                   </td>
@@ -588,18 +553,13 @@ export default async function handler(req, res) {
           </tr>
         `;
 
-    // ======================================
     // HTML REPORT
-    // ======================================
-
     const html = `
 
       <!DOCTYPE html>
 
       <html>
-
       <head>
-
         <meta charset="UTF-8">
 
         <title>
@@ -619,239 +579,127 @@ export default async function handler(req, res) {
           }
 
           body {
-
             background: #0B0F14;
-
-            font-family:
-              Arial,
-              sans-serif;
-
+            font-family: Arial, sans-serif;
             color: #333;
-
-            padding:
-              40px 20px;
-
+            padding: 40px 20px;
           }
 
           .export-toolbar {
-
             width: 100%;
-
             max-width: 1100px;
-
-            margin:
-              0 auto 20px auto;
-
+            margin: 0 auto 20px auto;
             display: flex;
-
-            justify-content:
-              space-between;
-
-            align-items:
-              center;
-
+            justify-content: space-between;
+            align-items: center;
             color: white;
-
             font-size: 14px;
-
           }
 
           .export-toolbar button {
-
-            border:
-              1px solid
-              rgba(255,255,255,.15);
-
-            background:
-              rgba(255,255,255,.08);
-
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
             color: white;
-
-            padding:
-              10px 16px;
-
-            border-radius:
-              10px;
-
+            padding: 10px 16px;
+            border-radius: 10px;
             cursor: pointer;
-
             font-weight: bold;
-
           }
 
           .report {
-
             width: 100%;
-
             max-width: 1100px;
-
             margin: 0 auto;
-
             background: white;
-
             padding: 45px;
-
             border-radius: 4px;
-
-            box-shadow:
-              0 20px 60px
-              rgba(0,0,0,.45);
-
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
           }
 
           .header {
-
             text-align: center;
-
             margin-bottom: 25px;
-
           }
 
           .logo {
-
             width: 170px;
-
             height: auto;
-
             max-height: 90px;
-
             object-fit: contain;
-
             margin-bottom: 12px;
-
           }
 
           .title {
-
             font-size: 24px;
-
             font-weight: bold;
-
             margin-bottom: 8px;
-
           }
 
           .subtitle {
-
             font-size: 12px;
-
             color: #777;
-
             margin-bottom: 3px;
-
           }
 
           .kpi-grid {
-
             display: grid;
-
-            grid-template-columns:
-              repeat(4, 1fr);
-
+            grid-template-columns: repeat(4, 1fr);
             gap: 16px;
-
-            margin:
-              30px 0;
-
+            margin: 30px 0;
           }
 
           .kpi-card {
-
-            border:
-              1px solid #e5e5e5;
-
-            border-radius:
-              14px;
-
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
             padding: 22px;
-
-            background:
-              #fafafa;
-
+            background: #fafafa;
             text-align: center;
-
           }
 
           .kpi-title {
-
             font-size: 11px;
-
             color: #666;
-
             font-weight: bold;
-
             margin-bottom: 12px;
-
           }
 
           .kpi-value {
-
             font-size: 22px;
-
             font-weight: bold;
-
             color: #222;
-
           }
 
           .card {
-
-            border:
-              1px solid #e5e5e5;
-
-            border-radius:
-              14px;
-
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
             padding: 18px;
-
             margin-top: 20px;
-
             background: #fff;
-
           }
 
           .card h3 {
-
             margin-top: 0;
-
             margin-bottom: 12px;
-
             font-size: 16px;
-
           }
 
           table {
-
             width: 100%;
-
-            border-collapse:
-              collapse;
-
+            border-collapse: collapse;
             font-size: 11px;
-
             margin-top: 10px;
-
           }
 
           th {
-
             background: #f5f5f5;
-
             padding: 10px;
-
             text-align: left;
-
             font-weight: bold;
-
           }
 
           td {
-
             padding: 10px;
-
-            border-bottom:
-              1px solid #eee;
-
+            border-bottom: 1px solid #eee;
           }
 
           .right {
@@ -859,67 +707,42 @@ export default async function handler(req, res) {
           }
 
           .empty {
-
             text-align: center;
-
             color: #777;
-
             padding: 25px;
-
           }
 
           .footer {
-
             margin-top: 40px;
-
             text-align: center;
-
             font-size: 9px;
-
             color: #888;
-
           }
 
           @media print {
-
             body {
-
               background: white;
-
               padding: 0;
-
             }
 
             .export-toolbar {
-
               display: none;
-
             }
 
             .report {
-
               max-width: none;
-
               box-shadow: none;
-
               border-radius: 0;
-
               padding: 25px;
-
             }
-
           }
-
         </style>
-
       </head>
 
       <body>
 
         <!-- TOOLBAR -->
-
         <div class="export-toolbar">
-
           <div>
             📄 Cash Flow Report
           </div>
@@ -934,11 +757,9 @@ export default async function handler(req, res) {
 
 
         <!-- REPORT -->
-
         <div class="report">
-
+        
           <!-- HEADER -->
-
           <div class="header">
 
             ${
@@ -958,7 +779,6 @@ export default async function handler(req, res) {
             </div>
 
             <div class="subtitle">
-
               Periode:
               ${escapeHtml(
                 start || "-"
@@ -967,27 +787,20 @@ export default async function handler(req, res) {
               ${escapeHtml(
                 end || "-"
               )}
-
             </div>
-
+            
             <div class="subtitle">
-
               Branch:
               ${escapeHtml(
                 branchId || "ALL"
               )}
-
             </div>
-
           </div>
-
 
           <!-- SUMMARY -->
 
           <div class="kpi-grid">
-
             <div class="kpi-card">
-
               <div class="kpi-title">
                 CASH IN
               </div>
@@ -995,12 +808,9 @@ export default async function handler(req, res) {
               <div class="kpi-value">
                 IDR ${rupiah(cashIn)}
               </div>
-
             </div>
 
-
             <div class="kpi-card">
-
               <div class="kpi-title">
                 CASH OUT
               </div>
@@ -1008,12 +818,9 @@ export default async function handler(req, res) {
               <div class="kpi-value">
                 IDR ${rupiah(cashOut)}
               </div>
-
             </div>
 
-
             <div class="kpi-card">
-
               <div class="kpi-title">
                 NET FLOW
               </div>
@@ -1021,12 +828,9 @@ export default async function handler(req, res) {
               <div class="kpi-value">
                 IDR ${rupiah(netFlow)}
               </div>
-
             </div>
-
-
+            
             <div class="kpi-card">
-
               <div class="kpi-title">
                 BALANCE
               </div>
@@ -1034,26 +838,18 @@ export default async function handler(req, res) {
               <div class="kpi-value">
                 IDR ${rupiah(totalBalance)}
               </div>
-
             </div>
-
           </div>
 
-
           <!-- ACCOUNT BALANCE -->
-
           <div class="card">
-
             <h3>
               Account Balance
             </h3>
 
             <table>
-
               <thead>
-
                 <tr>
-
                   <th>
                     Account
                   </th>
@@ -1065,15 +861,11 @@ export default async function handler(req, res) {
                   <th class="right">
                     Percentage
                   </th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 <tr>
-
                   <td>
                     Cash
                   </td>
@@ -1087,12 +879,9 @@ export default async function handler(req, res) {
                   <td class="right">
                     ${cashPercent.toFixed(1)}%
                   </td>
-
                 </tr>
 
-
                 <tr>
-
                   <td>
                     Bank
                   </td>
@@ -1108,16 +897,11 @@ export default async function handler(req, res) {
                   </td>
 
                 </tr>
-
               </tbody>
-
             </table>
-
           </div>
-
-
+          
           <!-- INCOME SOURCE -->
-
           <div class="card">
 
             <h3>
@@ -1141,36 +925,26 @@ export default async function handler(req, res) {
                   <th class="right">
                     Percentage
                   </th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 ${incomeRows}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- EXPENSE CATEGORY -->
 
           <div class="card">
-
             <h3>
               Expense Category
             </h3>
 
             <table>
-
               <thead>
-
                 <tr>
-
                   <th>
                     Category
                   </th>
@@ -1182,36 +956,26 @@ export default async function handler(req, res) {
                   <th class="right">
                     Percentage
                   </th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 ${expenseRows}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- CASH FLOW HISTORY -->
 
           <div class="card">
-
             <h3>
               Cash Flow History
             </h3>
 
             <table>
-
               <thead>
-
                 <tr>
-
                   <th>
                     Date
                   </th>
@@ -1229,38 +993,29 @@ export default async function handler(req, res) {
                   </th>
 
                 </tr>
-
               </thead>
-
+              
               <tbody>
-
                 ${historyRows}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- FUND TRANSFERS -->
 
           <div class="card">
-
             <h3>
               Fund Transfers
             </h3>
-
+            
             <table>
-
               <thead>
-
                 <tr>
-
                   <th>
                     Date
                   </th>
-
+                  
                   <th>
                     From
                   </th>
@@ -1272,40 +1027,29 @@ export default async function handler(req, res) {
                   <th class="right">
                     Amount
                   </th>
-
                 </tr>
-
               </thead>
 
               <tbody>
-
                 ${transferRows}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- OWNER TRANSACTIONS -->
-
           <div class="card">
-
             <h3>
               Owner Transactions
             </h3>
-
+            
             <table>
 
               <thead>
-
                 <tr>
-
                   <th>
                     Date
                   </th>
-
                   <th>
                     Type
                   </th>
@@ -1317,46 +1061,32 @@ export default async function handler(req, res) {
                   <th class="right">
                     Amount
                   </th>
-
                 </tr>
-
               </thead>
-
+              
               <tbody>
-
                 ${ownerTransactionRows}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- FOOTER -->
 
           <div class="footer">
-
             Generated by Sistem POS
             •
             ${new Date().toLocaleString(
               "id-ID"
             )}
-
           </div>
-
         </div>
-
       </body>
-
       </html>
 
     `;
 
-    // ======================================
     // RETURN HTML
-    // ======================================
-
     res.setHeader(
       "Content-Type",
       "text/html; charset=utf-8"
@@ -1392,7 +1122,5 @@ export default async function handler(req, res) {
           err?.message ||
           "Export Cash Flow gagal"
       });
-
   }
-
 }
