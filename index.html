@@ -570,164 +570,317 @@
 <aside
   id="sidebar"
   class="
-    fixed left-0 top-20 bottom-0 z-50 w-20 hover:w-72 rounded-md bg-background dark:bg-background border border-white/10 shadow-2xl flex flex-col
-    transition-all duration-300 ease-out overflow-hidden group ">
-<div class="px-6 mb-12 whitespace-nowrap">
-  <div class="text-2xl font-black text-[#f59e0b]
-              tracking-widest font-headline
-              opacity-0 group-hover:opacity-100
-              transition-opacity duration-200">
-    Elevate POS
+    fixed
+    left-0
+    top-20
+    bottom-0
+    z-50
+
+    w-[80px]
+
+    bg-background
+    dark:bg-background
+
+    shadow-2xl
+
+    flex flex-col
+
+    transition-all
+    duration-300
+    ease-out
+
+    overflow-hidden
+  "
+>
+
+  <!-- BRAND -->
+  <div class="h-20 flex items-center px-6 whitespace-nowrap">
+
+    <div>
+      <div
+        class="text-2xl font-black text-[#f59e0b]
+               tracking-widest font-headline"
+      >
+        Elevate POS
+      </div>
+
+      <div
+        class="text-[10px] font-['Manrope'] font-bold
+               tracking-[0.2em]
+               text-[#dae2fd]/50
+               uppercase mt-1"
+      >
+        MANAGEMENT SYSTEM
+      </div>
+    </div>
+
   </div>
-  <div class="text-[10px] font-['Manrope'] font-bold
-              tracking-[0.2em] text-[#dae2fd]/50
-              uppercase mt-1
-              opacity-0 group-hover:opacity-100
-              transition-opacity duration-200">
-    MANAGEMENT SYSTEM
-  </div>
 
-</div>
-<nav class="flex-1 space-y-1">
-<a
-  class="flex items-center justify-center group-hover:justify-start
-         gap-4 px-6 py-4
-         text-slate-200
-         transition-all whitespace-nowrap"
-  onclick="navigate('dashboardPage')"
->
-  <span class="material-symbols-outlined text-sm shrink-0">
-    dashboard
-  </span>
 
-  <span
-    class="font-semibold text-sm
-           opacity-0 group-hover:opacity-100
-           transition-opacity duration-200"
-  >
-    Dashboard
-  </span>
-</a>
-<a
-  class="flex items-center justify-center group-hover:justify-start gap-4 px-2 py-4
-         text-slate-400 hover:text-slate-200
-         hover:bg-white/5 transition-all whitespace-nowrap"
-  onclick="navigate('posPage')"
->
-  <span class="material-symbols-outlined text-sm shrink-0">
-    point_of_sale
-  </span>
+  <!-- MENU -->
+  <nav class="flex-1 space-y-1">
 
-  <span
-    class="font-semibold text-sm
-           opacity-0 group-hover:opacity-100
-           transition-opacity duration-200"
-  >
-    POS
-  </span>
-</a>
-<a
-  class="flex items-center justify-center group-hover:justify-start gap-4 px-0 py-4
-         text-slate-400 hover:text-slate-200
-         hover:bg-white/5 transition-all whitespace-nowrap"
-  onclick="navigate('tablePage')"
->
-  <span class="material-symbols-outlined text-sm shrink-0">
-    table_restaurant
-  </span>
+    <!-- DASHBOARD -->
+    <a
+      class="
+        flex items-center
+        justify-center
 
-  <span
-    class="font-semibold text-sm
-           opacity-0 group-hover:opacity-100
-           transition-opacity duration-200"
-  >
-    Table
-  </span>
-</a>
-<a
-  class="flex items-center justify-center group-hover:justify-start gap-4 px-0 py-4
-         text-slate-400 hover:text-slate-200
-         hover:bg-white/5 transition-all whitespace-nowrap"
-  onclick="navigate('memberPage')"
->
-  <span class="material-symbols-outlined text-sm shrink-0">
-    group
-  </span>
+        gap-4
+        px-0 py-4
 
-  <span
-    class="font-semibold text-sm
-           opacity-0 group-hover:opacity-100
-           transition-opacity duration-200"
-  >
-    Member
-  </span>
-</a>
-<a
-  class="settingsMenu flex items-center justify-center
-         group-hover:justify-start gap-4 px-0 py-4
-         text-slate-400 hover:text-slate-200
-         hover:bg-white/5 transition-all whitespace-nowrap"
-  onclick="navigate('settingsPage')"
-  style="display:none"
->
-  <span class="material-symbols-outlined text-sm shrink-0">
-    settings
-  </span>
+        text-[#f59e0b]
 
-  <span
-    class="font-semibold text-sm
-           opacity-0 group-hover:opacity-100
-           transition-opacity duration-200"
-  >
-    Settings
-  </span>
-</a>
-<a
-  class="flex items-center justify-center group-hover:justify-start gap-4 px-0 py-4
-         text-slate-400 hover:text-red-400
-         hover:bg-red-500/10 transition-all
-         mt-4 whitespace-nowrap"
-  onclick="logout()"
->
-  <span class="material-symbols-outlined text-sm shrink-0">
-    logout
-  </span>
+        transition-all
+        whitespace-nowrap
+      "
+      onclick="navigate('dashboardPage')"
+    >
 
-  <span
-    class="font-semibold text-sm
-           opacity-0 group-hover:opacity-100
-           transition-opacity duration-200"
-  >
-    Logout
-  </span>
-</a>
-</nav>
-<div
-  class="px-4 mt-auto
-         opacity-0 group-hover:opacity-100
-         transition-opacity duration-200"
->
-  <div
-    class="p-4 rounded-xl glass-panel
-           border border-white/5
-           bg-background/40
-           backdrop-blur-xl
-           shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-           whitespace-nowrap"
-  >
-    <p class="text-xs text-slate-500 font-medium">
-      SYSTEM STATUS
-    </p>
-
-    <div class="flex items-center gap-2 mt-2">
-      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-
-      <span class="text-xs text-on-surface font-semibold tracking-wide">
-        SERVER ACTIVE
+      <span
+        class="
+          material-symbols-outlined
+          shrink-0
+          w-6 h-6
+          flex items-center justify-center
+        "
+      >
+        dashboard
       </span>
+
+      <span class="font-semibold text-sm">
+        Dashboard
+      </span>
+
+    </a>
+
+
+    <!-- POS -->
+    <a
+      class="
+        flex items-center
+        justify-center
+
+        gap-4
+        px-0 py-4
+
+        text-slate-400
+        hover:text-slate-200
+        hover:bg-white/5
+
+        transition-all
+        whitespace-nowrap
+      "
+      onclick="navigate('posPage')"
+    >
+
+      <span
+        class="
+          material-symbols-outlined
+          shrink-0
+          w-6 h-6
+          flex items-center justify-center
+        "
+      >
+        point_of_sale
+      </span>
+
+      <span class="font-semibold text-sm">
+        POS
+      </span>
+
+    </a>
+
+
+    <!-- TABLE -->
+    <a
+      class="
+        flex items-center
+        justify-center
+
+        gap-4
+        px-0 py-4
+
+        text-slate-400
+        hover:text-slate-200
+        hover:bg-white/5
+
+        transition-all
+        whitespace-nowrap
+      "
+      onclick="navigate('tablePage')"
+    >
+
+      <span
+        class="
+          material-symbols-outlined
+          shrink-0
+          w-6 h-6
+          flex items-center justify-center
+        "
+      >
+        table_restaurant
+      </span>
+
+      <span class="font-semibold text-sm">
+        Table
+      </span>
+
+    </a>
+
+
+    <!-- MEMBER -->
+    <a
+      class="
+        flex items-center
+        justify-center
+
+        gap-4
+        px-0 py-4
+
+        text-slate-400
+        hover:text-slate-200
+        hover:bg-white/5
+
+        transition-all
+        whitespace-nowrap
+      "
+      onclick="navigate('memberPage')"
+    >
+
+      <span
+        class="
+          material-symbols-outlined
+          shrink-0
+          w-6 h-6
+          flex items-center justify-center
+        "
+      >
+        group
+      </span>
+
+      <span class="font-semibold text-sm">
+        Member
+      </span>
+
+    </a>
+
+
+    <!-- SETTINGS -->
+    <a
+      class="
+        settingsMenu
+        flex items-center
+        justify-center
+
+        gap-4
+        px-0 py-4
+
+        text-slate-400
+        hover:text-slate-200
+        hover:bg-white/5
+
+        transition-all
+        whitespace-nowrap
+      "
+      onclick="navigate('settingsPage')"
+      style="display:none"
+    >
+
+      <span
+        class="
+          material-symbols-outlined
+          shrink-0
+          w-6 h-6
+          flex items-center justify-center
+        "
+      >
+        settings
+      </span>
+
+      <span class="font-semibold text-sm">
+        Settings
+      </span>
+
+    </a>
+
+
+    <!-- LOGOUT -->
+    <a
+      class="
+        flex items-center
+        justify-center
+
+        gap-4
+        px-0 py-4
+
+        text-slate-400
+        hover:text-red-400
+        hover:bg-red-500/10
+
+        transition-all
+
+        whitespace-nowrap
+        mt-4
+      "
+      onclick="logout()"
+    >
+
+      <span
+        class="
+          material-symbols-outlined
+          shrink-0
+          w-6 h-6
+          flex items-center justify-center
+        "
+      >
+        logout
+      </span>
+
+      <span class="font-semibold text-sm">
+        Logout
+      </span>
+
+    </a>
+
+  </nav>
+
+
+  <!-- SYSTEM STATUS -->
+  <div class="px-4 pb-6">
+
+    <div
+      class="
+        p-4
+        rounded-xl
+
+        border border-white/5
+
+        bg-background/40
+        backdrop-blur-xl
+
+        shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+
+        whitespace-nowrap
+      "
+    >
+
+      <p class="text-xs text-slate-500 font-medium">
+        SYSTEM STATUS
+      </p>
+		
+      <div class="flex items-center gap-2 mt-2">
+        <span
+          class="w-2 h-2 rounded-full bg-primary animate-pulse"
+        ></span>
+		  
+        <span
+          class="text-xs text-on-surface font-semibold tracking-wide">
+          SERVER ACTIVE
+        </span>
+      </div>
     </div>
   </div>
-</div>
 </aside>
 
 <div
