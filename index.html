@@ -569,59 +569,167 @@
   
 <aside
   id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-<div class="px-8 mb-12">
-<div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">Elevate POS</div>
-<div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">MANAGEMENT SYSTEM</div>
+  class="group fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-20 hover:w-72 z-40 transition-all duration-300 overflow-hidden">
+<div class="px-6 mb-12 whitespace-nowrap">
+  <div class="text-2xl font-black text-[#f59e0b]
+              tracking-widest font-headline
+              opacity-0 group-hover:opacity-100
+              transition-opacity duration-200">
+    Elevate POS
+  </div>
+  <div class="text-[10px] font-['Manrope'] font-bold
+              tracking-[0.2em] text-[#dae2fd]/50
+              uppercase mt-1
+              opacity-0 group-hover:opacity-100
+              transition-opacity duration-200">
+    MANAGEMENT SYSTEM
+  </div>
+
 </div>
 <nav class="flex-1 space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all" onclick="navigate('dashboardPage')">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-semibold text-sm">Dashboard</span>
+<a
+  class="flex items-center justify-center group-hover:justify-start
+         gap-4 px-6 py-4
+         bg-gradient-to-r from-[#f59e0b]/20 to-transparent
+         text-[#f59e0b] border-l-4 border-[#f59e0b]
+         transition-all whitespace-nowrap"
+  onclick="navigate('dashboardPage')"
+>
+  <span class="material-symbols-outlined shrink-0">
+    dashboard
+  </span>
+
+  <span
+    class="font-semibold text-sm
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200"
+  >
+    Dashboard
+  </span>
 </a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('posPage')">
-<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
-<span class="font-semibold text-sm">POS</span>
+<a
+  class="flex items-center justify-center group-hover:justify-start
+         gap-4 px-6 py-4
+         text-slate-400 hover:text-slate-200
+         hover:bg-white/5 transition-all whitespace-nowrap"
+  onclick="navigate('posPage')"
+>
+  <span class="material-symbols-outlined shrink-0">
+    point_of_sale
+  </span>
+
+  <span
+    class="font-semibold text-sm
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200"
+  >
+    POS
+  </span>
 </a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('tablePage')">
-<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
-<span class="font-semibold text-sm">Table</span>
+<a
+  class="flex items-center justify-center group-hover:justify-start
+         gap-4 px-6 py-4
+         text-slate-400 hover:text-slate-200
+         hover:bg-white/5 transition-all whitespace-nowrap"
+  onclick="navigate('tablePage')"
+>
+  <span class="material-symbols-outlined shrink-0">
+    table_restaurant
+  </span>
+
+  <span
+    class="font-semibold text-sm
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200"
+  >
+    Table
+  </span>
 </a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('memberPage')">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-semibold text-sm">Member</span>
+<a
+  class="flex items-center justify-center group-hover:justify-start
+         gap-4 px-6 py-4
+         text-slate-400 hover:text-slate-200
+         hover:bg-white/5 transition-all whitespace-nowrap"
+  onclick="navigate('memberPage')"
+>
+  <span class="material-symbols-outlined shrink-0">
+    group
+  </span>
+
+  <span
+    class="font-semibold text-sm
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200"
+  >
+    Member
+  </span>
 </a>
-<a 
-  class="settingsMenu flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all"
+<a
+  class="settingsMenu flex items-center justify-center
+         group-hover:justify-start gap-4 px-6 py-4
+         text-slate-400 hover:text-slate-200
+         hover:bg-white/5 transition-all whitespace-nowrap"
   onclick="navigate('settingsPage')"
   style="display:none"
 >
-
-  <span class="material-symbols-outlined">
+  <span class="material-symbols-outlined shrink-0">
     settings
   </span>
 
-  <span class="font-semibold text-sm">
+  <span
+    class="font-semibold text-sm
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200"
+  >
     Settings
   </span>
-
 </a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-semibold text-sm">Logout</span>
-</a></nav>
-<div class="px-6 mt-auto">
-<div class="p-4 rounded-xl glass-panel
-border border-white/5
-bg-background -low/40
-backdrop-blur-xl
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<p class="text-xs text-slate-500 font-medium">SYSTEM STATUS</p>
-<div class="flex items-center gap-2 mt-2">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="text-xs text-on-surface font-semibold tracking-wide">SERVER ACTIVE</span>
-</div>
-</div>
+<a
+  class="flex items-center justify-center group-hover:justify-start
+         gap-4 px-6 py-4
+         text-slate-400 hover:text-red-400
+         hover:bg-red-500/10 transition-all
+         mt-4 whitespace-nowrap"
+  onclick="logout()"
+>
+  <span class="material-symbols-outlined shrink-0">
+    logout
+  </span>
+
+  <span
+    class="font-semibold text-sm
+           opacity-0 group-hover:opacity-100
+           transition-opacity duration-200"
+  >
+    Logout
+  </span>
+</a>
+</nav>
+<div
+  class="px-4 mt-auto
+         opacity-0 group-hover:opacity-100
+         transition-opacity duration-200"
+>
+  <div
+    class="p-4 rounded-xl glass-panel
+           border border-white/5
+           bg-background/40
+           backdrop-blur-xl
+           shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+           whitespace-nowrap"
+  >
+    <p class="text-xs text-slate-500 font-medium">
+      SYSTEM STATUS
+    </p>
+
+    <div class="flex items-center gap-2 mt-2">
+      <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+
+      <span class="text-xs text-on-surface font-semibold tracking-wide">
+        SERVER ACTIVE
+      </span>
+    </div>
+  </div>
 </div>
 </aside>
 
