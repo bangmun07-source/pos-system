@@ -149,7 +149,7 @@
 	  overflow: hidden;
 	  white-space: nowrap;	
 	  border-radius: 6px;	
-	  color: #94a3b8;	
+	  color: #b8c1cc;	
 	  cursor: pointer;	
 	  transition:
 	    background-color 150ms ease,
@@ -170,7 +170,7 @@
 	  align-items: center;
 	  justify-content: center;	
 	  flex-shrink: 0;	
-	  color: #94a3b8;	
+	  color: #b8c1cc;	
 	  font-size: 24px;	
 	  line-height: 1;	
 	  font-variation-settings:
@@ -181,6 +181,14 @@
 	}
 	
 	.sidebar-menu a:hover .sidebar-icon {
+	  color: #e2e8f0;
+	}
+
+	.sidebar-menu a.active {
+	  color: #e2e8f0;
+	}
+	
+	.sidebar-menu a.active .sidebar-icon {
 	  color: #e2e8f0;
 	}
 	
@@ -662,7 +670,7 @@
     
         <span
           class="sidebar-label">
-          DASHBOARD
+          Dashboard
         </span>
       </a>
       <!-- POS -->
@@ -679,11 +687,11 @@
       <!-- TABLE -->
       <a onclick="navigate('tablePage')">
          <span class="material-symbols-outlined sidebar-icon">
-          table
+          Table
         </span>
 
         <span class="sidebar-label">
-          TABLE
+          Table
         </span>
       </a>
 
@@ -707,7 +715,7 @@
         </span>
 
         <span class="sidebar-label">
-          SETTINGS
+          Settings
         </span>
       </a>
 
