@@ -1215,10 +1215,9 @@
 	  <div class="flex w-full items-center justify-between">
 	    <!-- LEFT -->
 	    <button onclick="toggleSidebar()"
-	      class="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-on-surface hover:hover:bg-white/5 transition-all">
-	
+	      class="w-11 h-11 rounded-xl flex items-center justify-center text-muted hover:text-on-surface hover:hover:bg-white/5 transition-all">
 	      <span class="material-symbols-outlined">
-	        menu
+	        dock_to_right
 	      </span>
 	    </button>
 	  </div>	
@@ -1228,7 +1227,7 @@
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <div class="flex flex-col gap-4">
 	<!-- Welcome Header -->
-	<section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	<section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 	  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 	      <img
 	        src="https://lh3.googleusercontent.com/d/14FwZsJGl8GFlccDscIB4NSi7MXuR_Ej7"
@@ -1239,17 +1238,13 @@
   <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
   <div class="relative min-h-[260px] flex flex-col justify-center px-12">
     <div>
-      <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
+      <span class="text-muted text-base font-medium tracking-[0.25em] uppercase">
      	 Revenue Analytics
       </span>
 			
-      <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
+      <h2 class="lg:text-5xl md:text-3xl font-black text-foreground mt-2 mb-4 leading-tight tracking-tight">
      	 Gross Revenue
       </h2>
-			
-      <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
-     	 Analyze sales performance, monitor revenue growth, and gain insights into your business income across selected periods.
-      </p>
     </div>
   </div>
 
@@ -1263,7 +1258,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-bacground rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
   <!-- START DATE -->
   <div class="flex flex-col gap-2 ">
-    <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">
+    <label class="text-muted text-base font-medium uppercase tracking-[0.25em]">
       Start Date
     </label>
 
@@ -1275,7 +1270,7 @@
 
   <!-- END DATE -->
   <div class="flex flex-col gap-2">
-    <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">
+    <label class="text-muted text-base font-medium uppercase tracking-[0.25em]">
       End Date
     </label>
 
@@ -1287,7 +1282,7 @@
 
   <!-- EXPORT -->
   <div class="flex flex-col gap-2">
-    <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">
+    <label class="text-muted text-base font-medium uppercase tracking-[0.25em]">
       Export
     </label>
 
@@ -1328,12 +1323,12 @@
     </div>
 
     <div class="mt-8">
-	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
+	    <p class="text-muted text-base font-medium uppercase tracking-widest">
         Total Gross Revenue
       </p>
 
       <h3 id="gr-total-revenue"
-          class="text-2xl font-extrabold text-on-surface mt-2">
+          class="text-2xl font-bold text-foreground mt-2">
         IDR 0
       </h3>
     </div>
@@ -1352,12 +1347,12 @@
     </div>
 
     <div class="mt-8">
-	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
+	    <p class="text-muted text-base font-medium uppercase tracking-widest">
         Total Discounts
       </p>
 
       <h3 id="gr-total-discount"
-          class="text-2xl font-extrabold text-on-surface mt-2">
+          class="text-2xl font-bold text-foreground mt-2">
         IDR 0
       </h3>
 
@@ -1380,12 +1375,12 @@
     </div>
 		
     <div class="mt-8">
-	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
+	    <p class="text-muted text-base font-medium uppercase tracking-widest">
         Total Tax (11%)
       </p>
 
       <h3 id="gr-total-tax"
-          class="text-2xl font-extrabold text-on-surface mt-2">
+          class="text-2xl font-bold text-foreground mt-2">
         IDR 0
       </h3>
     </div>
@@ -1403,12 +1398,12 @@
     </div>
 
     <div class="mt-8">
-	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
+	    <p class="text-muted text-base font-medium uppercase tracking-widest">
         Average Transaction
       </p>
 
       <h3 id="gr-average"
-          class="text-2xl font-extrabold text-on-surface mt-2">
+          class="text-2xl font-bold text-foreground mt-2">
         IDR 0
       </h3>
     </div>
@@ -1704,18 +1699,14 @@
   shadow-[0_2px_10px_rgba(0,0,0,0.15)]
   ">
 
-  <div
-  class="absolute inset-0 bg-cover bg-center opacity-70"
+  <div class="absolute inset-0 bg-cover bg-center opacity-70"
   style="background-image:url('https://lh3.googleusercontent.com/d/1uPJEKlJ9Qb8eDMB8GWfBP88Z1edQLkh8');">
   </div>
   <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
 
   <div class="relative min-h-[260px] flex flex-col justify-center px-12">
-
-
     <!-- LEFT -->
     <div>
-
       <span
         class="text-primary
         text-[11px]
