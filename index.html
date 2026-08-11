@@ -2937,20 +2937,13 @@
 <!-- Main Content Canvas -->
 
 <!-- Left: Menu Grid Section -->
-<header class="h-20 flex-shrink-0 z-40
-  bg-background -low/40
-  backdrop-blur-xl
-  border-b border-white/5
-  flex items-center px-8">
+<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">	
   <!-- LEFT -->
   <div class="flex items-center gap-4 flex-1">
-
     <!-- HAMBURGER -->
       <button
       onclick="toggleSidebar()"
-      class="w-11 h-11 rounded-md flex items-center justify-center
-      text-slate-400 hover:text-on-surface
-      hover:bg-white/5 transition-all">
+      class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-foreground transition-all">
 
       <span class="material-symbols-outlined">
         menu
@@ -2961,13 +2954,13 @@
     <!-- SEARCH -->
     <div class="relative w-full max-w-xl">
 
-      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
+      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground">
         search
       </span>
 
       <input
         id="searchInput"
-        class="w-full bg-background border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all placeholder:text-slate-500"
+        class="w-full bg-background border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all placeholder:text-foreground"
         placeholder="Search menu, categories, or tags..."
         type="text"
       />
@@ -2985,9 +2978,7 @@
 
         <button
           onclick="toggleNotification()"
-          class="w-10 h-10 rounded-md flex items-center justify-center
-          text-slate-400 hover:text-on-surface
-          hover:bg-white/5 transition-all">
+          class="class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-foreground transition-all">
 
           <span class="material-symbols-outlined">notifications</span>
 
@@ -3027,8 +3018,7 @@
       </div>
     <button
     onclick="toggleBillingSidebar('pos')"
-    class="w-11 h-11 rounded-md flex items-center justify-center
-      text-slate-400 hover:text-on-surface transition-all">
+   	class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-foreground transition-all">
     <span class="material-symbols-outlined">
       shopping_cart
     </span>
@@ -3104,10 +3094,10 @@
 
 <!-- Table Input Field -->
 <div class="mb-2">
-<label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1.5 block">Assign Table</label>
+<label class="text-muted text-xs font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary-container text-sm" data-icon="table_restaurant">table_restaurant</span>
-<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-sm focus:ring-1 focus:ring-primary-container placeholder:text-slate-600 font-bold" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
+<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-sm focus:ring-1 focus:white placeholder:text-muted font-bold" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
 </div>
 </div>
 
@@ -3121,7 +3111,7 @@
 <!-- Financial Modifiers -->
 <div class="grid grid-cols-6 gap-4 pb-2">
 <div class="col-span-6">
-<label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">Member ID</label>
+<label class="text-muted text-xs font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
 <div class="relative">
   
   <!-- ICON -->
@@ -3135,7 +3125,7 @@
     id="memberSearch"
     placeholder="Cari Member..."
     autocomplete="off"
-    class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs font-bold"
+    class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs placeholder:text-muted font-bold"
   />
 
   <input type="hidden" id="member-id">
@@ -3146,7 +3136,7 @@
 </div>
 <button 
   onclick="openRedeem()" 
-  class="mt-3 w-full bg-gradient-to-r from-primary to-primary-container py-2.5 rounded-md flex items-center justify-center gap-2 text-on-primary-container font-headline font-extrabold text-sm tracking-wide shadow-xl shadow-primary-container/20 hover:brightness-110 active:scale-[0.98] transition-all"
+  class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-on-primary-container font-headline font-extrabold border border-white/10 tracking-wide shadow-xl shadow-primary-container/20 hover:primary/10 transition-all"
 >
   <span class="material-symbols-outlined text-sm">redeem</span>
   <span>REDEEM</span>
@@ -3166,26 +3156,26 @@
 <div class="grid grid-cols-3 m-3 gap-2">
 
 <button id="pay-Cash" 
-   class="h-8 rounded-md bg-background text-slate-400 border border-white/10 flex items-center justify-center transition-all hover:text-on-surface"
+   class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground"
   onclick="selectPayment('Cash')">
   <span class="material-symbols-outlined text-2xl">payments</span>
 </button>
 
 <button id="pay-QRIS" 
-  class="h-8 rounded-md bg-background text-slate-400 border border-white/10 flex items-center justify-center transition-all hover:text-on-surface"
+  class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground"
   onclick="selectPayment('QRIS')">
   <span class="material-symbols-outlined text-2xl">qr_code_2</span>
 </button>
 
 <button id="pay-Bank" 
-   class="h-8 rounded-md bg-background text-slate-400 border border-white/10 flex items-center justify-center transition-all hover:text-on-surface"
+	class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground"
   onclick="selectPayment('Bank')">
   <span class="material-symbols-outlined text-2xl">account_balance</span>
 </button>
 
 </div>
 </div>
-<button id="btnCheckout" onclick="checkout()" class="mt-3 h-10 w-full bg-gradient-to-r from-primary to-primary-container py-2.5 flex items-center justify-center gap-2 text-on-primary-container font-headline font-extrabold text-sm tracking-wide shadow-xl shadow-primary-container/20 hover:brightness-110 active:scale-[0.98] transition-all">
+<button id="btnCheckout" onclick="checkout()" class="mt-3 h-10 w-full py-2.5 flex items-center justify-center gap-2 text-foreground font-headline font-extrabold text-lg tracking-wide shadow-xl shadow-primary-container/20 hover:primary/10 transition-all">
 <span>BUY</span>
 <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
 </button>
