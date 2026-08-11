@@ -62,8 +62,8 @@
                            TEXT
                         ========================= */
                     
-                        "on-background": "#777777",
-                        "on-surface": "#777777",
+                        "on-background": "#F5F5F5",
+                        "on-surface": "#F5F5F5",
                         "on-surface-variant": "#555555",
                     
                         /* =========================
@@ -152,7 +152,7 @@
                            INVERSE
                            ========================= */
                     
-                        "inverse-surface": "#777777",
+                        "inverse-surface": "#F5F5F5",
                         "inverse-on-surface": "#0B0F14",
                     
                         /* =========================
@@ -731,577 +731,402 @@
 
 <template id="dashboardPage" >
 	
-<!-- ================= SIDEBAR ================= -->
-<aside
-  id="sidebar"
-  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
-
-  <!-- SIDEBAR CONTENT -->
-  <div class="sidebar-menu flex flex-col h-full">
-    <!-- MENU -->
-    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-      <!-- DASHBOARD -->
-      <a class="active" onclick="navigate('dashboardPage')">
-        <span class="material-symbols-outlined sidebar-icon">
-          home
-        </span>
-    
-        <span
-          class="sidebar-label">
-          Dashboard
-        </span>
-      </a>
-      <!-- POS -->
-      <a onclick="navigate('posPage')">
-        <span class="material-symbols-outlined sidebar-icon">
-          shopping_cart
-        </span>
-
-        <span class="sidebar-label">
-          POS
-        </span>
-      </a>
-
-      <!-- TABLE -->
-      <a onclick="navigate('tablePage')">
-         <span class="material-symbols-outlined sidebar-icon">
-          Table
-        </span>
-
-        <span class="sidebar-label">
-          Table
-        </span>
-      </a>
-
-      <!-- MEMBER -->
-      <a onclick="navigate('memberPage')">
-        <span class="material-symbols-outlined sidebar-icon">
-          group
-        </span>
-
-        <span class="sidebar-label">
-          Member
-        </span>
-      </a>
-
-      <!-- SETTINGS -->
-      <a onclick="navigate('settingsPage')"
-         style="display:none"
-		  	 class="settingsMenu">
-        <span class="material-symbols-outlined sidebar-icon">
-          settings
-        </span>
-
-        <span class="sidebar-label">
-          Settings
-        </span>
-      </a>
-
-      <!-- LOGOUT -->
-      <a onclick="logout()">
-        <span class="material-symbols-outlined sidebar-icon">
-          logout
-        </span>
-
-        <span class="sidebar-label">
-	        LOGOUT
-        </span>
-      </a>
-
-    </nav>
-
-
-    <!-- FOOTER -->
-    <div class="mt-auto p-2 pb-2">
-      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
-
-        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-        </span>
-
-        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <p class="text-[10px] text-slate-500">
-            SYSTEM STATUS
-          </p>
-
-          <span class="sidebar-label">
-            SERVER ACTIVE
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</aside>
-
-
-
-<div
-  id="mainContent"
-  class="flex-1 flex flex-col h-screen">
-<header
-  class="h-20 flex-shrink-0 z-40
-  bg-background
-  border-b border-white/10
-  flex items-center px-8">
-
-  <div class="flex w-full items-center justify-between">
-
-    <!-- LEFT -->
-    <button
-      onclick="toggleSidebar()"
-      class="w-11 h-11 rounded-xl flex items-center justify-center
-      text-slate-400 hover:text-on-surface
-      hover:hover:bg-white/5 transition-all">
-
-      <span class="material-symbols-outlined">
-        dock_to_right
-      </span>
-
-    </button>
-
-    <!-- RIGHT -->
-    <div class="flex items-center gap-4">
-      <!-- BRAND -->
-      <div class="flex items-center gap-3">
-        <div class="hidden sm:block text-right">
-
-          <p id="appBrandName" class="text-sm font-bold text-slate-400 leading-none">
-          
-          </p>
-
-          <p class="text-[10px]
-            text-slate-400
-            font-semibold
-            tracking-[0.2em]
-            uppercase
-            mt-1">
-
-             <span id="headerUsername"></span>
-
-          </p>
-
-        </div>
-
-      </div>
-     
-
-      <!-- DIVIDER -->
-      <div class="h-8 w-px bg-white/5"></div>
-
-      <!-- SETTINGS -->
-      <button
-        class="settingsMenu w-10 h-10 rounded-xl flex items-center justify-center
-        text-slate-400 hover:text-on-surface
-        hover:bg-white/5 transition-all"
-        onclick="navigate('settingsPage')">
-
-        <span class="material-symbols-outlined">
-          settings
-        </span>
-      </button>
-    </div>
-  </div>
-</header>
+	<!-- ================= SIDEBAR ================= -->
+	<aside
+	  id="sidebar"
+	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 	
-<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+	  <!-- SIDEBAR CONTENT -->
+	  <div class="sidebar-menu flex flex-col h-full">
+	    <!-- MENU -->
+	    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+	      <!-- DASHBOARD -->
+	      <a class="active" onclick="navigate('dashboardPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          home
+	        </span>
+	    
+	        <span
+	          class="sidebar-label">
+	          Dashboard
+	        </span>
+	      </a>
+	      <!-- POS -->
+	      <a onclick="navigate('posPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          shopping_cart
+	        </span>
 	
-<section
-class="mb-10 mt-4 relative overflow-hidden
-rounded-md bg-background
-border border-white/10
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-">
-
-<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-    <img
-      src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
-      class="w-full h-full object-cover"
-      style="object-position: right 40%;"
-      alt="">
-  </div>
-
-<div class="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/40"></div>
-
-<div class="relative min-h-[260px] flex flex-col justify-center px-12">
-
-<span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
-Business Overview
-</span>
-
-<h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
-Welcome Back,
-<span class="text-primary">Let's Grow</span>
-</h2>
-
-<div class="flex items-center gap-4">
-
-<div class="
-flex items-center gap-2
-bg-background -low/60
-backdrop-blur-xl
-border border-white/5
-
-px-4 py-2
-rounded-xl">
-
-<span class="material-symbols-outlined text-primary text-sm">
-calendar_today
-</span>
-
-<span id="dash-date"
-class="text-xs font-semibold text-on-surface">
-Oct 24, 2023
-</span>
-
+	        <span class="sidebar-label">
+	          POS
+	        </span>
+	      </a>
+	
+	      <!-- TABLE -->
+	      <a onclick="navigate('tablePage')">
+	         <span class="material-symbols-outlined sidebar-icon">
+	          Table
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Table
+	        </span>
+	      </a>
+	
+	      <!-- MEMBER -->
+	      <a onclick="navigate('memberPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          group
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Member
+	        </span>
+	      </a>
+	
+	      <!-- SETTINGS -->
+	      <a onclick="navigate('settingsPage')"
+	         style="display:none"
+			  	 class="settingsMenu">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          settings
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Settings
+	        </span>
+	      </a>
+	
+	      <!-- LOGOUT -->
+	      <a onclick="logout()">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          logout
+	        </span>
+	
+	        <span class="sidebar-label">
+		        LOGOUT
+	        </span>
+	      </a>
+	
+	    </nav>
+	
+	
+	    <!-- FOOTER -->
+	    <div class="mt-auto p-2 pb-2">
+	      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+	
+	        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+	          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+	        </span>
+	
+	        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+	          <p class="text-[10px] text-slate-500">
+	            SYSTEM STATUS
+	          </p>
+	
+	          <span class="sidebar-label">
+	            SERVER ACTIVE
+	          </p>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</aside>
+	
+	<div id="mainContent"
+	  	 class="flex-1 flex flex-col h-screen">
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">	
+	  <div class="flex w-full items-center justify-between">	
+	    <!-- LEFT -->
+	    <button
+	      onclick="toggleSidebar()"
+	      class="w-11 h-11 rounded-xl flex items-center justify-center
+	      text-slate-400 hover:text-on-surface
+	      hover:hover:bg-white/5 transition-all">
+	
+	      <span class="material-symbols-outlined">
+	        dock_to_right
+	      </span>	
+	    </button>
+	
+	    <!-- RIGHT -->
+	    <div class="flex items-center gap-4">
+	      <!-- BRAND -->
+	      <div class="flex items-center gap-3">
+	        <div class="hidden sm:block text-right">
+	
+	          <p id="appBrandName" class="text-sm font-bold text-slate-400 leading-none">	          
+	          </p>
+	
+	          <p class="text-[10px] text-slate-400 ont-semibold tracking-[0.2em] uppercase mt-1">
+	             <span id="headerUsername"></span>
+	          </p>	
+	        </div>
+	      </div>	     
+	
+	      <!-- DIVIDER -->
+	      <div class="h-8 w-px bg-white/5"></div>
+	
+	      <!-- SETTINGS -->
+	      <button class="settingsMenu w-10 h-10 rounded-xl flex items-center justify-center text-slate-400 hover:text-on-surface hover:bg-white/5 transition-all"
+	        			onclick="navigate('settingsPage')">
+	        <span class="material-symbols-outlined">
+	          settings
+	        </span>
+	      </button>
+	    </div>
+	  </div>
+	</header>
+		
+	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+		
+	<section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+		<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+		    <img
+		      src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
+		      class="w-full h-full object-cover"
+		      style="object-position: right 40%;"
+		      alt="">
+		  </div>
+		
+		<div class="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-background/40"></div>
+		<div class="relative min-h-[260px] flex flex-col justify-center px-12">
+		
+			<span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
+				Business Overview
+			</span>
+			
+			<h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
+				Welcome Back,
+				<span class="text-primary">Let's Grow</span>
+			</h2>
+			
+				<div class="flex items-center gap-4">
+				
+					<div class="flex items-center gap-2 bg-background -low/60 backdrop-blur-xl border border-white/5 px-4 py-2 rounded-xl">
+						<span class="material-symbols-outlined text-primary text-sm">
+							calendar_today
+						</span>
+						
+						<span id="dash-date" class="text-xs font-semibold text-on-surface">
+							Oct 24, 2023
+						</span>				
+					</div>
+				
+					<div class=" flex items-center gap-2 bg-background -low/60 backdrop-blur-xl border border-white/5 px-4 py-2 rounded-xl">			
+						<span class="material-symbols-outlined text-primary text-sm">
+							schedule
+						</span>
+						
+						<span id="dash-time" class="text-xs font-semibold text-on-surface">
+							19:45 PM
+						</span>			
+					</div>			
+				</div>
+			</div>
+		<div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-full"></div>
+	</section>
+		
+	<section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">	
+		<!-- CARD 1 -->
+		<div class="bg-background rounded-md overflow-hidden border border-white/10 group shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative ">
+			<div class="absolute right-0 p-5 opacity-5 group-hover:opacity-20 transition-all  duration-700 group-hover:scale-90">
+				<span
+					class="material-symbols-outlined text-[150px] animate-float">
+					payments
+				</span>
+			</div>
+		
+			<div class="flex justify-between items-start">		
+				<div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
+						payments
+					</span>		
+				</div>
+		
+				<span id="dash-revenue-growth" class="text-xs font-bold text-foreground">
+				</span>		
+			</div>
+	
+			<div class="mt-8">		
+				<p class="text-muted text-sm font-medium uppercase tracking-widest">
+					Net Revenue
+				</p>
+		
+				<h3 id="dash-revenue" class="text-lg font-extrabold mt-1 text-foreground"
+						onclick="navigate('grossRevenuePage')">
+					IDR 0
+				</h3>		
+			</div>
+		</div>
+	
+	<!-- CARD 2 -->
+	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
+	  <div class="flex justify-between items-start">
+	    <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+	        shopping_bag
+	      </span>
+	    </div>
+	
+	    <span id="dash-orders-growth"
+	          class="text-xs font-bold text-foreground">
+	    </span>
+	  </div>
+	
+	  <div class="mt-8">
+	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
+	      Total Orders
+	    </p>
+			
+	    <h3 id="dash-orders" class="text-lg font-extrabold mt-1 text-foreground">
+	      0
+	    </h3>
+	  </div>
+	</div>
+	
+	<!-- CARD 3 -->
+	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
+	  <div class="flex justify-between items-start">
+	    <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+	        analytics
+	      </span>
+	    </div>
+	
+	    <span id="dash-aov-growth" class="text-xs font-bold text-foreground">
+	    </span>
+	  </div>
+	
+	  <div class="mt-8">
+	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
+	      AOV
+	    </p>
+	
+	    <h3 id="dash-aov" class="text-lg font-extrabold mt-1 text-foreground">
+	      IDR 0
+	    </h3>
+	  </div>
+	</div>
+	
+	</section>
+	<section class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
+	
+	  <!-- RECENT TRANSACTIONS -->
+	  <div class="lg:col-span-2 flex">
+	    <div class="bg-background flex flex-col w-full rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative">       
+	      <div class="flex justify-between items-center mt-4 p-6">
+	        <div class="flex items-center gap-4">
+		        <div class="main-icon-box">
+			        <span class="material-symbols-outlined text-3xl">receipt_long</span>
+			        </div>
+			        <h4 class="text-xl font-bold ">
+			            Recent Transactions
+			        </h4>
+		        </div>
+	
+		        <button
+		          class="text-primary text-xs font-bold tracking-wider hover:opacity-80 transition"
+		          onclick="goToRecentTransactions()">
+		          VIEW ALL
+		        </button>
+	      </div>
+	
+	      <div class="overflow-x-auto custom-scrollbar flex-1">
+	        <table class="w-full text-left border-separate border-spacing-y-4">
+	          <thead>
+	            <tr class="text-slate-500 text-[11px] uppercase tracking-widest font-bold border-b border-white/10">
+	              <th class="pb-3 pt-3 pl-6">Order ID</th>
+	              <th class="pb-3 pt-3 text-center ">Table</th>
+	              <th class="pb-3 pt-3 text-center">Total</th>
+	              <th class="pb-3 pt-3 pr-4 text-center">Status</th>
+	            </tr>
+	          </thead>
+	
+	          <tbody id="dash-transactions">
+	            <tr>
+	              <td colspan="5" class="text-center text-slate-500">
+	                Loading...
+	              </td>
+	            </tr>
+	          </tbody>
+	        </table>
+	      </div>
+	
+	      <!-- FOOTER PAGINATION -->
+	      <div class="px-8 py-4 border-t border-white/10 text-center">
+	        <p class="text-[8px] text-slate-500  uppercase tracking-widest font-medium">
+	          Showing the 20 most recent transactions
+	        </p>
+	      </div>
+	    </div>
+	  </div>
+	
+	  <!-- RIGHT COLUMN -->
+	  <div class="flex flex-col h-full gap-4">
+	    <!-- LOW STOCK -->
+	    <div class="bg-background flex flex-col flex-1 rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative h-[420px]">
+	      <div class="flex items-center gap-3 mb-6">
+	        <span
+	          class="material-symbols-outlined text-primary"
+	          style="font-variation-settings:'FILL' 1;">
+	          warning
+	        </span>
+	
+	        <h4 class="text-lg font-bold text-on-surface">
+	          Low Stock Alerts
+	        </h4>
+	      </div>
+	
+	      <div
+	        id="low-stock-list"
+	        class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
+	      </div>
+	
+	      <button class="w-full mt-6 py-4 rounded-md bg-background border border-white/10  text-white text-xs font-bold tracking-[0.15em] hover:bg-primary/20 transition-all uppercase">
+	        Open Inventory Manager
+	      </button>
+	    </div>
+	
+	    <!-- SHIFT PERFORMANCE -->
+	    <div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative ">
+	      <div class="relative">
+	        <div class="flex items-center gap-3 mb-4 mt-5">
+	          <span class="material-symbols-outlined">speed</span>
+	          
+	          <h4 class="font-bold text-on-surface2">
+	            Shift Performance
+	          </h4>
+	        </div>
+	        <div id="shift-performance"></div>
+	      </div>
+	    </div>
+	  </div>
+	</section>
+		
+	<footer class="mt-6 bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
+	  <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+	    <!-- LEFT -->
+	    <div>
+	      <p class="text-xs text-on-surface-variant font-medium">
+	        © 2026 SISTEM Kasir. Premium Point of Sale Systems.
+	      </p>
+	    </div>
+	
+	    <!-- RIGHT -->
+	    <div class="flex items-center gap-2 px-3 py-2 rounded-md bg-background -low/40 border border-white/10">
+	      <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+		      <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
+		        Version 1.01-Build
+		      </span>
+	    </div>
+	  </div>
+	</footer>
+	</main>
 </div>
-
-<div class="
-flex items-center gap-2
-bg-background -low/60
-backdrop-blur-xl
-border border-white/5
-px-4 py-2
-rounded-xl">
-
-<span class="material-symbols-outlined text-primary text-sm">
-schedule
-</span>
-
-<span id="dash-time"
-class="text-xs font-semibold text-on-surface">
-19:45 PM
-</span>
-
-</div>
-
-</div>
-
-</div>
-
-<div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-full"></div>
-
-</section>
-<section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
-
-<!-- CARD 1 -->
-<div class="bg-background rounded-md overflow-hidden
-            border border-white/10 group
-            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-            p-6 relative
-          ">
-    <div
-        class="absolute right-0 p-5
-        opacity-5
-        group-hover:opacity-20
-        transition-all
-        duration-700
-        group-hover:scale-90">
-
-        <span
-          class="material-symbols-outlined text-[150px] animate-float">
-          payments
-        </span>
-
-      </div>
-  <div class="flex justify-between items-start">
-
-    <div class="main-icon-box">
-                
-      <span class="material-symbols-outlined text-3xl"
-            style="font-variation-settings:'FILL' 1;">
-        payments
-      </span>
-
-    </div>
-
-    <span id="dash-revenue-growth"
-          class="text-xs font-bold text-foreground">
-    </span>
-
-  </div>
-
-  <div class="mt-8">
-
-    <p class="text-muted text-sm font-medium uppercase tracking-widest">
-      Net Revenue
-    </p>
-
-    <h3 id="dash-revenue"
-        onclick="navigate('grossRevenuePage')"
-        class="text-lg font-extrabold mt-1 text-foreground">
-      IDR 0
-    </h3>
-
-  </div>
-
-</div>
-
-<!-- CARD 2 -->
-<div class="bg-background rounded-md overflow-hidden
-            border border-white/10
-            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-            p-6 relative">
-
-  <div class="flex justify-between items-start">
-
-    <div class="main-icon-box">
-
-      <span class="material-symbols-outlined text-3xl"
-            style="font-variation-settings:'FILL' 1;">
-        shopping_bag
-      </span>
-
-    </div>
-
-    <span id="dash-orders-growth"
-          class="text-xs font-bold text-foreground">
-    </span>
-
-  </div>
-
-  <div class="mt-8">
-
-    <p class="text-muted text-sm font-medium uppercase tracking-widest">
-      Total Orders
-    </p>
-
-    <h3 id="dash-orders"
-       class="text-lg font-extrabold mt-1 text-foreground">
-      0
-    </h3>
-
-  </div>
-
-</div>
-
-<!-- CARD 3 -->
-<div class="bg-background rounded-md overflow-hidden
-            border border-white/10
-            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-            p-6 relative">
-
-  <div class="flex justify-between items-start">
-
-    <div class="main-icon-box">
-
-      <span class="material-symbols-outlined text-3xl"
-            style="font-variation-settings:'FILL' 1;">
-        analytics
-      </span>
-
-    </div>
-
-    <span id="dash-aov-growth"
-          class="text-xs font-bold text-foreground">
-    </span>
-
-  </div>
-
-  <div class="mt-8">
-
-    <p class="text-muted text-sm font-medium uppercase tracking-widest">
-      AOV
-    </p>
-
-    <h3 id="dash-aov"
-        class="text-lg font-extrabold mt-1 text-foreground">
-      IDR 0
-    </h3>
-
-  </div>
-
-</div>
-
-</section>
-<section class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-stretch">
-
-  <!-- RECENT TRANSACTIONS -->
-  <div class="lg:col-span-2 flex">
-
-    <div class="bg-background flex flex-col w-full rounded-md overflow-hidden
-     border border-white/10
-     shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-     relative">
-       
-
-      <div class="flex justify-between items-center mt-4 p-6">
-
-        <div class="flex items-center gap-4">
-        <div class="main-icon-box">
-        <span class="material-symbols-outlined text-3xl">receipt_long</span>
-        </div>
-        <h4 class="text-xl font-bold ">
-            Recent Transactions
-        </h4>
-        </div>
-
-
-        <button
-          class="text-primary text-xs font-bold tracking-wider hover:opacity-80 transition"
-          onclick="goToRecentTransactions()">
-
-          VIEW ALL
-
-        </button>
-
-      </div>
-
-      <div class="overflow-x-auto custom-scrollbar flex-1">
-
-        <table class="w-full text-left border-separate border-spacing-y-4">
-
-          <thead>
-
-            <tr class="text-slate-500 text-[11px] uppercase tracking-widest font-bold border-b border-white/10">
-
-              <th class="pb-3 pt-3 pl-6">Order ID</th>
-              <th class="pb-3 pt-3 text-center ">Table</th>
-              <th class="pb-3 pt-3 text-center">Total</th>
-              <th class="pb-3 pt-3 pr-4 text-center">Status</th>
-
-            </tr>
-
-          </thead>
-
-          <tbody id="dash-transactions">
-
-            <tr>
-              <td colspan="5" class="text-center text-slate-500">
-                Loading...
-              </td>
-            </tr>
-
-          </tbody>
-
-        </table>
-
-      </div>
-
-      <!-- FOOTER PAGINATION -->
-      <div class="px-8 py-4
-              border-t border-white/10
-              text-center">
-
-        <p class="text-[8px]
-              text-slate-500
-              uppercase
-              tracking-widest
-              font-medium">
-          Showing the 20 most recent transactions
-        </p>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- RIGHT COLUMN -->
-  <div class="flex flex-col h-full gap-4">
-
-    <!-- LOW STOCK -->
-    <div class="bg-background flex flex-col flex-1 rounded-md overflow-hidden
-            border border-white/10
-            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-            p-6 relative h-[420px]
-    ">
-
-      <div class="flex items-center gap-3 mb-6">
-
-        <span
-          class="material-symbols-outlined text-primary"
-          style="font-variation-settings:'FILL' 1;">
-          warning
-        </span>
-
-        <h4 class="text-lg font-bold text-on-surface">
-          Low Stock Alerts
-        </h4>
-
-      </div>
-
-      <div
-        id="low-stock-list"
-        class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
-      </div>
-
-      <button
-        class="
-        w-full mt-6 py-4
-        rounded-md
-        bg-background
-        border border-white/10
-        text-white
-        text-xs font-bold tracking-[0.15em]
-        hover:bg-primary/20
-        transition-all uppercase">
-
-        Open Inventory Manager
-
-      </button>
-
-    </div>
-
-    <!-- SHIFT PERFORMANCE -->
-    <div class="bg-background rounded-md overflow-hidden
-            border border-white/10
-            shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-            p-6 relative
-    ">
-      <div class="relative">
-        <div class="flex items-center gap-3 mb-4 mt-5">
-          <span class="material-symbols-outlined">speed</span>
-          
-          <h4 class="font-bold text-on-surface2">
-            Shift Performance
-          </h4>
-        </div>
-        <div id="shift-performance"></div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-<footer
-  class="mt-6
-  bg-background rounded-md overflow-hidden
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-  p-6 relative">
-
-  <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-
-    <!-- LEFT -->
-    <div>
-      <p class="text-xs text-on-surface-variant font-medium">
-        © 2026 SISTEM Kasir. Premium Point of Sale Systems.
-      </p>
-    </div>
-
-    <!-- RIGHT -->
-    <div
-      class="flex items-center gap-2 px-3 py-2 rounded-md
-      bg-background -low/40
-      border border-white/10">
-
-      <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-
-      <span
-        class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
-        Version 1.01-Build
-      </span>
-
-    </div>
-
-  </div>
-
-</footer>
-</main>
-</div>
-
 </template>
 
 
