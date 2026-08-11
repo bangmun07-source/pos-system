@@ -15730,43 +15730,38 @@ const rewardLimit = 5;
 };
 
 
-let sidebarOpen = true;
+let sidebarOpen = false;
 
 function toggleSidebar() {
-
     const sidebar = document.getElementById("sidebar");
 
     if (!sidebar) return;
 
     sidebarOpen = !sidebarOpen;
 
-    if (!sidebarOpen) {
-
-        sidebar.classList.add("sidebar-closed");
-
+    if (sidebarOpen) {
+        sidebar.style.width = "18rem"; // w-72
     } else {
-
-        sidebar.classList.remove("sidebar-closed");
-
+        sidebar.style.width = "4rem";  // w-16
     }
 }
 
 
-document.addEventListener("mousedown", function (e) {
+// CLOSE SAAT TAP DI LUAR — KHUSUS HP
+document.addEventListener("click", function (e) {
+
+    if (window.innerWidth >= 768) return;
 
     const sidebar = document.getElementById("sidebar");
 
     if (!sidebar || !sidebarOpen) return;
 
-    // Klik di dalam sidebar → jangan tutup
+    // Tap di dalam sidebar → jangan close
     if (sidebar.contains(e.target)) return;
 
-    // Klik tombol/icon toggle → jangan tutup
-    if (e.target.closest('[onclick="toggleSidebar()"]')) return;
-
-    // Klik di luar sidebar → kembali kecil
-    toggleSidebar();
-
+    // Tap di luar → close
+    sidebarOpen = false;
+    sidebar.style.width = "4rem";
 });
 
 
