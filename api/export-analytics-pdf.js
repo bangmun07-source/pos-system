@@ -380,6 +380,51 @@ export default async function handler(req, res) {
             </td>
           </tr>
         `;
+
+// =========================
+// WEEKLY
+// =========================
+
+const weekly =
+  Array.isArray(
+    analytics.weekly
+  )
+    ? analytics.weekly
+    : [];
+
+const weeklyRows =
+  weekly.length
+
+    ? weekly.map(
+        (value, index) => `
+          <tr>
+
+            <td>
+              Week ${index + 1}
+            </td>
+
+            <td class="right">
+              Rp ${rupiah(value)}
+            </td>
+
+          </tr>
+        `
+      ).join("")
+
+    : `
+      <tr>
+        <td
+          colspan="2"
+          class="empty"
+        >
+          No weekly data
+        </td>
+      </tr>
+    `;
+
+
+
+    
     // =========================
     // HTML REPORT
     // =========================
