@@ -570,356 +570,105 @@
 <!-- ================= SIDEBAR ================= -->
 <aside
   id="sidebar"
-  class="
-    fixed
-    left-0
-    top-20
-    bottom-0
-    z-50
-
-    w-16
-    hover:w-72
-
-    bg-background
-    border-r border-white/5
-    shadow-2xl
-
-    overflow-hidden
-    transition-[width]
-    duration-200
-    ease-out
-
-    group
-  "
->
+  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
   <!-- SIDEBAR CONTENT -->
   <div class="flex h-full w-full flex-col">
-
     <!-- MENU -->
     <nav class="flex-1 overflow-y-auto overflow-x-hidden p-2">
-
       <!-- DASHBOARD -->
       <a
         onclick="navigate('dashboardPage')"
-        class="
-          flex
-          h-10
-          w-full
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-
-          px-2
-
-          text-slate-400
-          hover:bg-white/5
-          hover:text-slate-200
-
-          transition-colors
-          cursor-pointer
-        "
-      >
-
-        <!-- ICON -->
+        class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
+      
         <span
-          class="
-            material-symbols-outlined
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
-        >
+          class="material-symbols-outlined font-light shrink-0 w-8  h-8 flex items-center justify-center">
           dashboard
         </span>
-
-        <!-- TEXT -->
+    
         <span
-          class="
-            whitespace-nowrap
-            text-sm
-            font-semibold
-
-            opacity-0
-            group-hover:opacity-100
-
-            transition-opacity
-            duration-150
-          "
-        >
+          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Dashboard
         </span>
-
       </a>
-
-
       <!-- POS -->
       <a
         onclick="navigate('posPage')"
-        class="
-          flex
-          h-10
-          w-full
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-          px-2
-
-          text-slate-400
-          hover:bg-white/5
-          hover:text-slate-200
-
-          transition-colors
-          cursor-pointer
-        "
-      >
+        class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer" >
 
         <span
-          class="
-            material-symbols-outlined
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
-        >
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center">
           point_of_sale
         </span>
 
         <span
-          class="
-            whitespace-nowrap
-            text-sm
-            font-semibold
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-          "
-        >
+          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           POS
         </span>
-
       </a>
-
 
       <!-- TABLE -->
       <a
         onclick="navigate('tablePage')"
-        class="
-          flex
-          h-10
-          w-full
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-          px-2
-
-          text-slate-400
-          hover:bg-white/5
-          hover:text-slate-200
-
-          transition-colors
-          cursor-pointer
-        "
-      >
+        class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
 
         <span
-          class="
-            material-symbols-outlined
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
-        >
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center " >
           table_restaurant
         </span>
 
         <span
-          class="
-            whitespace-nowrap
-            text-sm
-            font-semibold
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-          "
-        >
+          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Table
         </span>
-
       </a>
-
 
       <!-- MEMBER -->
       <a
         onclick="navigate('memberPage')"
-        class="
-          flex
-          h-10
-          w-full
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-          px-2
-
-          text-slate-400
-          hover:bg-white/5
-          hover:text-slate-200
-
-          transition-colors
-          cursor-pointer
-        "
-      >
+        class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
 
         <span
-          class="
-            material-symbols-outlined
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
-        >
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center">
           group
         </span>
 
         <span
-          class="
-            whitespace-nowrap
-            text-sm
-            font-semibold
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-          "
-        >
+          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Member
         </span>
-
       </a>
-
 
       <!-- SETTINGS -->
       <a
-        class="
-          settingsMenu
-          flex
-          h-10
-          w-full
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-          px-2
-
-          text-slate-400
-          hover:bg-white/5
-          hover:text-slate-200
-
-          transition-colors
-          cursor-pointer
-        "
+        class="settingsMenu flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer"
         onclick="navigate('settingsPage')"
-        style="display:none"
-      >
+        style="display:none">
 
         <span
-          class="
-            material-symbols-outlined
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
         >
           settings
         </span>
 
         <span
-          class="
-            whitespace-nowrap
-            text-sm
-            font-semibold
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-          "
-        >
+          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Settings
         </span>
-
       </a>
-
 
       <!-- LOGOUT -->
       <a
         onclick="logout()"
-        class="
-          flex
-          h-10
-          w-full
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-
-          px-2
-          mt-2
-
-          text-slate-400
-          hover:bg-red-500/10
-          hover:text-red-400
-
-          transition-colors
-          cursor-pointer
-        "
-      >
+        class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 mt-2 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer">
 
         <span
-          class="
-            material-symbols-outlined
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
-        >
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center">
           logout
         </span>
 
         <span
-          class="
-            whitespace-nowrap
-            text-sm
-            font-semibold
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-          "
-        >
+          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Logout
         </span>
 
@@ -930,51 +679,14 @@
 
     <!-- FOOTER -->
     <div class="p-2">
-
       <div
-        class="
-          flex
-          h-10
-          items-center
-          gap-3
-          overflow-hidden
-          rounded-md
-          px-2
+        class="flex h-10 items-center gap-3 overflow-hidden rounded-md px-2 bg-white/5">
 
-          bg-white/5
-        "
-      >
-
-        <span
-          class="
-            shrink-0
-            w-8
-            h-8
-            flex
-            items-center
-            justify-center
-          "
-        >
-          <span
-            class="
-              w-2
-              h-2
-              rounded-full
-              bg-primary
-              animate-pulse
-            "
-          ></span>
+        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
         </span>
 
-        <div
-          class="
-            whitespace-nowrap
-            opacity-0
-            group-hover:opacity-100
-            transition-opacity
-            duration-150
-          "
-        >
+        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           <p class="text-[10px] text-slate-500">
             SYSTEM STATUS
           </p>
@@ -983,20 +695,16 @@
             SERVER ACTIVE
           </p>
         </div>
-
       </div>
-
     </div>
-
   </div>
-
 </aside>
 
 
 
 <div
   id="mainContent"
-  class="flex-1 flex flex-col h-screen">
+  class="flex-1 flex flex-col h-screen pl-20">
 <header
   class="h-20 flex-shrink-0 z-40
   bg-background -low/40
