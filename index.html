@@ -570,7 +570,7 @@
 <aside
   id="sidebar"
   class="
-    fixed left-0 top-20 bottom-0 z-50 w-20 hover:w-72 rounded-md bg-background dark:bg-background backdrop-blur-xl border border-white/10 shadow-2xl flex flex-col
+    fixed left-0 top-20 bottom-0 z-50 w-20 hover:w-72 rounded-md bg-background dark:bg-background border border-white/10 shadow-2xl flex flex-col
     transition-all duration-300 ease-out overflow-hidden group ">
 <div class="px-6 mb-12 whitespace-nowrap">
   <div class="text-2xl font-black text-[#f59e0b]
@@ -15857,24 +15857,15 @@ function toggleSidebar() {
   const sidebar =
     document.getElementById("sidebar");
 
-  const main =
-    document.getElementById("mainContent");
-
   sidebarOpen = !sidebarOpen;
 
   if (!sidebarOpen) {
 
     sidebar.classList.add("-translate-x-full");
 
-    main.classList.remove("ml-72");
-    main.classList.add("ml-0");
-
   } else {
 
     sidebar.classList.remove("-translate-x-full");
-
-    main.classList.remove("ml-0");
-    main.classList.add("ml-72");
 
   }
 }
