@@ -575,20 +575,21 @@
   <!-- SIDEBAR CONTENT -->
   <div class="flex h-full w-full flex-col">
     <!-- MENU -->
-    <nav class="flex-1 overflow-y-auto overflow-x-hidden p-2">
+    <nav class="flex-1 overflow-y-auto overflow-x-hidden p-4">
       <!-- DASHBOARD -->
       <a
         onclick="navigate('dashboardPage')"
-        class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
+        class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
       
         <span
-          class="material-symbols-outlined font-light shrink-0 w-8  h-8 flex items-center justify-center">
-          dashboard
+          class="material-symbols-outlined text-slate-200 shrink-0 w-8 h-8 flex items-center justify-center"
+					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
+          home
         </span>
     
         <span
-          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          Dashboard
+          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          DASHBOARD
         </span>
       </a>
       <!-- POS -->
@@ -597,12 +598,13 @@
         class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer" >
 
         <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center">
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
+					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
           point_of_sale
         </span>
 
         <span
-          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           POS
         </span>
       </a>
@@ -613,13 +615,14 @@
         class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
 
         <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center " >
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center " 
+					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
           table_restaurant
         </span>
 
         <span
-          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          Table
+          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          TABLE
         </span>
       </a>
 
@@ -629,12 +632,13 @@
         class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
 
         <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center">
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
+					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
           group
         </span>
 
         <span
-          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           Member
         </span>
       </a>
@@ -647,13 +651,13 @@
 
         <span
           class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
-        >
+        	style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
           settings
         </span>
 
         <span
-          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          Settings
+          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          SETTINGS
         </span>
       </a>
 
@@ -663,13 +667,14 @@
         class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md px-2 mt-2 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer">
 
         <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center">
+          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
+					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
           logout
         </span>
 
         <span
-          class="whitespace-nowrap text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          Logout
+          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+	        LOGOUT
         </span>
 
       </a>
@@ -707,9 +712,8 @@
   class="flex-1 flex flex-col h-screen">
 <header
   class="h-20 flex-shrink-0 z-40
-  bg-background -low/40
-  backdrop-blur-xl
-  border-b border-white/5
+  bg-background
+  border-b border-white/10
   flex items-center px-8">
 
   <div class="flex w-full items-center justify-between">
