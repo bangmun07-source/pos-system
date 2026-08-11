@@ -721,8 +721,8 @@
   </div>
 </main>
 <!-- Visual Polish: Decorative Ambient Glows -->
-<div class="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary-container/5 rounded-full blur-[120px] pointer-events-none"></div>
-<div class="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-tertiary-container/5 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary-container/5 rounded-md blur-[120px] pointer-events-none"></div>
+<div class="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-tertiary-container/5 rounded-md blur-[100px] pointer-events-none"></div>
 
 </template>
 
@@ -815,7 +815,7 @@
 	      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
 	
 	        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-	          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+	          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
 	        </span>
 	
 	        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -916,13 +916,13 @@
 							schedule
 						</span>
 						
-						<span id="dash-time" lass="text-lg font-semibold text-foreground">
+						<span id="dash-time" class="text-lg font-semibold text-foreground">
 							19:45 PM
 						</span>			
 					</div>			
 				</div>
 			</div>
-		<div class="absolute-top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-full"></div>
+		<div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-md"></div>
 	</section>
 		
 	<section class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">	
@@ -1115,7 +1115,7 @@
 	
 	    <!-- RIGHT -->
 	    <div class="flex items-center gap-2 px-3 py-2 rounded-md bg-background -low/40 border border-white/10">
-	      <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+	      <div class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></div>
 		      <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest">
 		        Version 1.01-Build
 		      </span>
@@ -1191,7 +1191,7 @@
       <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
 
         <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
         </span>
 
         <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -1248,7 +1248,7 @@
 
   <div
     class="absolute -top-24 -right-24 w-72 h-72
-    bg-primary/10 blur-[120px] rounded-full">
+    bg-primary/10 blur-[120px] rounded-md">
   </div>
 </section>
 
@@ -1354,9 +1354,9 @@
         IDR 0
       </h3>
 
-      <div class="mt-5 h-2 w-full rounded-full bg-surface-container-lowest/60 overflow-hidden">
+      <div class="mt-5 h-2 w-full rounded-md bg-surface-container-lowest/60 overflow-hidden">
         <div id="discountBarFill"
-             class="h-full bg-tertiary rounded-full"></div>
+             class="h-full bg-tertiary rounded-md"></div>
       </div>
     </div>
   </div>
@@ -1425,7 +1425,7 @@
 
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2">
-          <span class="w-3 h-3 rounded-full bg-primary"></span>
+          <span class="w-3 h-3 rounded-md bg-primary"></span>
           <span class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
             DAY
           </span>
@@ -1445,7 +1445,7 @@
 
   <!-- Revenue by Category -->
   <div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8 relative">
-    <div class="absolute -top-20 -right-20 w-48 h-48 bg-primary/5 blur-[100px] rounded-full">
+    <div class="absolute -top-20 -right-20 w-48 h-48 bg-primary/5 blur-[100px] rounded-md">
     </div>
 
     <div class="relative z-10">
@@ -1643,7 +1643,7 @@
       <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
 
         <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
         </span>
 
         <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -2041,7 +2041,7 @@
   border border-white/10
   shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-8">
   <div class="flex items-center gap-4 py-8 px-6">
-    <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+    <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
     <span class="material-symbols-outlined text-secondary">receipt_long</span>
     </div>
     <h2 class="font-headline text-2xl font-bold tracking-tight">Recent Transactions</h2>
@@ -2053,11 +2053,7 @@
 
       <thead>
 
-        <tr
-          class="sticky top-0
-          text-[11px]
-          text-slate-500
-          uppercase tracking-widest">
+        <tr class="sticky top-0 text-muted text-base font-medium headline-font uppercase tracking-widest">
 
           <th class="px-6 py-4">Order ID</th>
           <th class="px-6 py-4">Date & Time</th>
@@ -2512,7 +2508,7 @@
       <!-- Header Section -->
       <div class="px-8 pt-8 pb-6 text-center border-b border-white/10">
 
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background/80 border border border-white/10 mb-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-md bg-background/80 border border border-white/10 mb-6">
           <span class="material-symbols-outlined text-primary text-3xl">
             mark_email_read
           </span>
@@ -2924,7 +2920,7 @@
       <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
 
         <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
         </span>
 
         <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -3013,7 +3009,7 @@
           <div
             id="notificationBadge"
             class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px]
-            px-1 rounded-full bg-red-500 text-white
+            px-1 rounded-md bg-red-500 text-white
             text-[10px] font-bold flex items-center justify-center">
             0
           </div>
@@ -3061,37 +3057,37 @@
 
   <button
   onclick="setActiveCategory(this); filterProducts('All')"
-  class="category-btn active-category flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn active-category flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
   ALL
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Food')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
   FOOD
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Drink')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
   DRINK
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Coffee')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
   COFFEE
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Snack')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
   SNACK
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Paket')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-full font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
   PAKET
 </button>
 
@@ -3377,7 +3373,7 @@
 
         <button
           onclick="closeRedeem()"
-          class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+          class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
           <span class="material-symbols-outlined">
             close
@@ -3587,7 +3583,7 @@
       <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
 
         <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
         </span>
 
         <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -3730,12 +3726,12 @@
 </div>
 <div class="flex items-center gap-4 border-r border-outline-variant/20 pr-6">
 
-  <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition-colors rounded-full active:scale-95 duration-200">
+  <button class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition-colors rounded-md active:scale-95 duration-200">
     <span class="material-symbols-outlined">notifications</span>
   </button>
 
   <button 
-    class="settingsMenu w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition-colors rounded-full active:scale-95 duration-200"
+    class="settingsMenu w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition-colors rounded-md active:scale-95 duration-200"
     onclick="navigate('settingsPage')"
   >
     <span class="material-symbols-outlined">settings</span>
@@ -3744,7 +3740,7 @@
   <!-- TAMBAH INI -->
   <button
     onclick="toggleBillingSidebar('table')"
-    class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition-colors rounded-full active:scale-95 duration-200"
+    class="w-10 h-10 flex items-center justify-center text-slate-400 hover:bg-white/5 transition-colors rounded-md active:scale-95 duration-200"
   >
     <span class="material-symbols-outlined">dock_to_right</span>
   </button>
@@ -3772,7 +3768,7 @@
 
     <!-- AVAILABLE -->
     <div class="px-4 py-2 rounded-md flex items-center gap-3">
-      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      <span class="w-2 h-2 rounded-md bg-emerald-500"></span>
       <span class="text-xs font-semibold">
         <span id="availableCount" class="text-emerald-500 text-lg">0</span>
         Available
@@ -3781,7 +3777,7 @@
 
     <!-- OCCUPIED -->
     <div class="px-4 py-2 rounded-md flex items-center gap-3">
-      <span class="w-2 h-2 rounded-full bg-primary-container"></span>
+      <span class="w-2 h-2 rounded-md bg-primary-container"></span>
       <span class="text-xs font-semibold">
         <span id="occupiedCount" class="text-primary-container text-lg">0</span>
         Occupied
@@ -3790,7 +3786,7 @@
 
     <!-- RESERVED -->
     <div class="px-4 py-2 rounded-md flex items-center gap-3">
-      <span class="w-2 h-2 rounded-full bg-white"></span>
+      <span class="w-2 h-2 rounded-md bg-white"></span>
       <span class="text-xs font-semibold">
         <span id="reservedCount" class="text-white text-lg">0</span>
         Reserved
@@ -3900,7 +3896,7 @@
 
       <button
         onclick="closeAddTableModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -4046,7 +4042,7 @@
       <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
 
         <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
         </span>
 
         <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
@@ -4104,7 +4100,7 @@
             <div
               id="notificationBadge"
               class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px]
-              px-1 rounded-full bg-red-500 text-white
+              px-1 rounded-md bg-red-500 text-white
               text-[10px] font-bold flex items-center justify-center">
               0
             </div>
@@ -4194,7 +4190,7 @@
 
     <div
       class="absolute -top-24 -right-24 w-72 h-72
-      bg-primary/10 blur-[120px] rounded-full">
+      bg-primary/10 blur-[120px] rounded-md">
     </div>
 
   </section>
@@ -4288,8 +4284,8 @@
         </div>
 
         <div class="flex -space-x-2">
-          <div class="w-6 h-6 rounded-full bg-white/10 border border-white/10"></div>
-          <div class="w-6 h-6 rounded-full bg-white/20 border border-white/10"></div>
+          <div class="w-6 h-6 rounded-md bg-white/10 border border-white/10"></div>
+          <div class="w-6 h-6 rounded-md bg-white/20 border border-white/10"></div>
         </div>
 
       </div>
@@ -4322,7 +4318,7 @@
               lg:justify-between
               gap-6">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+        <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
           <span class="material-symbols-outlined text-secondary">manage_accounts</span>
         </div>
         <h2 class="font-headline text-2xl font-bold tracking-tight">Member Management</h2>
@@ -4480,7 +4476,7 @@
     <!-- Tier 1 -->
     <div class="flex items-center gap-3 p-3 rounded-md bg-background/80 border border-white/10">
 
-      <div class="w-1.5 h-10 bg-slate-500/60 rounded-full"></div>
+      <div class="w-1.5 h-10 bg-slate-500/60 rounded-md"></div>
 
       <div>
         <p id="tier_label_1"
@@ -4500,7 +4496,7 @@
     <!-- Tier 2 -->
     <div class="flex items-center gap-3 p-3 rounded-md bg-background/80 border border-white/10">
 
-      <div class="w-1.5 h-10 bg-slate-300 rounded-full"></div>
+      <div class="w-1.5 h-10 bg-slate-300 rounded-md"></div>
 
       <div>
         <p id="tier_label_2"
@@ -4520,7 +4516,7 @@
     <!-- Tier 3 -->
     <div class="flex items-center gap-3 p-3 rounded-md bg-background/80 border border-white/10">
 
-      <div class="w-1.5 h-10 bg-amber-500 rounded-full"></div>
+      <div class="w-1.5 h-10 bg-amber-500 rounded-md"></div>
 
       <div>
         <p id="tier_label_3"
@@ -4540,7 +4536,7 @@
     <!-- Tier 4 -->
     <div class="flex items-center gap-3 p-3 rounded-md bg-background/80 border border-white/10">
 
-      <div class="w-1.5 h-10 bg-slate-400 rounded-full"></div>
+      <div class="w-1.5 h-10 bg-slate-400 rounded-md"></div>
 
       <div>
         <p id="tier_label_4"
@@ -4560,7 +4556,7 @@
     <!-- Tier 5 -->
     <div class="flex items-center gap-3 p-3 rounded-md bg-primary/5 border border-primary/10">
 
-      <div class="w-1.5 h-10 bg-primary rounded-full shadow-[0_0_10px_rgba(245,158,11,0.35)]"></div>
+      <div class="w-1.5 h-10 bg-primary rounded-md shadow-[0_0_10px_rgba(245,158,11,0.35)]"></div>
 
       <div>
         <p id="tier_label_5"
@@ -4632,7 +4628,7 @@
 
         <button
         onclick="closeWhatsAppModal()"
-        class="w-10 h-10 rounded-full hover:bg-white/5">
+        class="w-10 h-10 rounded-md hover:bg-white/5">
 
           <span class="material-symbols-outlined">
             close
@@ -4858,9 +4854,9 @@
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-background/80 border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-background/80 border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
-<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all scale-95 active:scale-90">
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
@@ -4884,7 +4880,7 @@
 
       <div
         class="absolute -top-24 -right-24 w-72 h-72
-        bg-primary/10 blur-[120px] rounded-full">
+        bg-primary/10 blur-[120px] rounded-md">
       </div>
 
       
@@ -5013,14 +5009,14 @@
                 mb-12 relative">
 <div class="px-8 py-10 flex items-center justify-between">
   <div class="flex items-center gap-4">
-    <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+    <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
       <span class="material-symbols-outlined text-secondary">inventory</span>
     </div>
     <h2 class="font-headline text-2xl font-bold tracking-tight">Ingredient Stock</h2>
   </div>
 <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
   
-  <button onclick="exportInventoryPDF()" class="bg-background px-5 py-2.5 rounded-full
+  <button onclick="exportInventoryPDF()" class="bg-background px-5 py-2.5 rounded-md
           text-xs font-bold text-primary h-[30px]
           border border-outline-variant/10
           hover:bg-white/5 transition-all
@@ -5100,7 +5096,7 @@
 
   <div class="px-8 py-10 flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
         <span class="material-symbols-outlined text-secondary">local_shipping</span>
       </div>
       <h2 class="font-headline text-2xl font-bold tracking-tight">Supplier Management</h2>
@@ -5154,7 +5150,7 @@
 
   <div class="px-8 py-10 flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
         <span class="material-symbols-outlined text-secondary">receipt_long</span>
       </div>
       <h2 class="font-headline text-2xl font-bold tracking-tight">Recipe Master</h2>
@@ -5163,7 +5159,7 @@
 
         <button
           onclick="exportRecipeReport()"
-          class="bg-background px-5 py-2.5 rounded-full
+          class="bg-background px-5 py-2.5 rounded-md
           text-xs font-bold text-primary h-[30px]
           border border-outline-variant/10
           hover:bg-white/5 transition-all
@@ -5241,7 +5237,7 @@
                 p-8 relative">
 
   <div class="flex items-center gap-4 pb-10">
-    <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+    <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
       <span class="material-symbols-outlined text-secondary">receipt_long</span>
     </div>
     <h2 class="font-headline text-2xl font-bold tracking-tight">Recipe Master</h2>
@@ -5341,9 +5337,9 @@
     </span>
 
     <div class="flex gap-1">
-      <span class="w-1.5 h-1.5 bg-primary-container rounded-full animate-pulse"></span>
-      <span class="w-1.5 h-1.5 bg-primary-container/30 rounded-full"></span>
-      <span class="w-1.5 h-1.5 bg-primary-container/30 rounded-full"></span>
+      <span class="w-1.5 h-1.5 bg-primary-container rounded-md animate-pulse"></span>
+      <span class="w-1.5 h-1.5 bg-primary-container/30 rounded-md"></span>
+      <span class="w-1.5 h-1.5 bg-primary-container/30 rounded-md"></span>
     </div>
 
   </div>
@@ -5367,7 +5363,7 @@
       Real-time ingredient deduction feed will be enabled after transaction sync activation.
     </p>
 
-    <div class="mt-6 px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
+    <div class="mt-6 px-4 py-2 rounded-md bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em]">
       Upcoming Feature
     </div>
 
@@ -5428,7 +5424,7 @@
 
       <button
         onclick="closeAddProductModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -5555,7 +5551,7 @@
           </h2>
 
           <div class="flex items-center gap-2 mt-1">
-            <span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#f59e0b]"></span>
+            <span class="w-2 h-2 rounded-md bg-primary shadow-[0_0_10px_#f59e0b]"></span>
             <span class="text-xs uppercase tracking-wider text-primary">
               Current Stock:
               <span id="modalStockText" class="text-on-surface-variant font-semibold"></span>
@@ -5567,7 +5563,7 @@
       </div>
 
       <button onclick="closeIngredientModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
         <span class="material-symbols-outlined">close</span>
       </button>
 
@@ -5681,7 +5677,7 @@
           Adjust Stock Level
         </h2>
 
-        <div class="bg-white/5 px-4 py-2 rounded-full flex items-center gap-2">
+        <div class="bg-white/5 px-4 py-2 rounded-md flex items-center gap-2">
           <span class="material-symbols-outlined text-primary text-sm">inventory</span>
           <span class="uppercase text-[10px] font-bold text-on-surface">
             CURRENT STOCK:
@@ -5891,7 +5887,7 @@
 
       <div class="flex items-center gap-4">
 
-        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+        <div class="w-14 h-14 rounded-md bg-primary/10 flex items-center justify-center">
           <span class="material-symbols-outlined text-primary text-3xl">history_edu</span>
         </div>
 
@@ -5909,7 +5905,7 @@
       </div>
 
       <button onclick="closeUsageLogModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
         <span class="material-symbols-outlined">close</span>
       </button>
 
@@ -6037,7 +6033,7 @@
       </div>
 
       <button onclick="closeEditSupplierModal()"
-        class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors">
+        class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-white/5 transition-colors">
         <span class="material-symbols-outlined text-on-surface-variant">close</span>
       </button>
 
@@ -6139,11 +6135,11 @@
         <input id="supplierStatusInput" type="checkbox" class="sr-only peer" checked />
 
         <label for="supplierStatusInput"
-          class="cursor-pointer w-14 h-7 bg-surface-container-high rounded-full block relative
+          class="cursor-pointer w-14 h-7 bg-surface-container-high rounded-md block relative
                  peer-checked:bg-primary-container
                  after:content-['']
                  after:absolute after:top-[4px] after:left-[4px]
-                 after:h-5 after:w-6 after:rounded-full
+                 after:h-5 after:w-6 after:rounded-md
                  after:bg-on-surface-variant
                  after:transition-all
                  peer-checked:after:translate-x-full
@@ -6249,7 +6245,7 @@
           <button
             type="button"
             onclick="removeRecipeImage()"
-            class="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center">
+            class="absolute top-2 right-2 w-7 h-7 rounded-md bg-black/60 text-white flex items-center justify-center">
 
             <span class="material-symbols-outlined text-sm">
               close
@@ -6360,7 +6356,7 @@
 
             <div class="flex items-center gap-4">
 
-              <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+              <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center text-primary">
                 <span class="material-symbols-outlined">insights</span>
               </div>
 
@@ -6500,7 +6496,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 
 
       <button onclick="closeIngredientStockAlert()"
-      class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+      class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -6686,7 +6682,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
   <div
     class="absolute -top-24 -right-24 w-72 h-72
-    bg-primary/10 blur-[120px] rounded-full">
+    bg-primary/10 blur-[120px] rounded-md">
   </div>
 
 </section>
@@ -6824,7 +6820,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
 </div>
 
-<div class="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full">
+<div class="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-md">
 <span class="material-symbols-outlined text-sm">trending_up</span>
 <span id="growthValue" class="text-xs font-bold">0% vs last period</span>
 </div>
@@ -6840,32 +6836,32 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 <div class="mt-3 grid grid-cols-2 lg:grid-cols-5 gap-4">
 
   <!-- Revenue -->
-  <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full">
+  <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-md">
     <span class="material-symbols-outlined text-sm">trending_up</span>
     <span id="revenueValue" class="text-xs font-bold">Revenue: IDR 0</span>
   </div>
 
   <!-- HPP -->
-  <div class="flex items-center gap-2 px-3 py-1 bg-red-500/10 text-red-400 rounded-full">
+  <div class="flex items-center gap-2 px-3 py-1 bg-red-500/10 text-red-400 rounded-md">
     <span class="material-symbols-outlined text-sm">shopping_cart</span>
     <span id="hppValue" class="text-xs font-bold">HPP: IDR 0</span>
   </div>
 
   <!-- Expenses -->
-  <div class="flex items-center gap-2 px-3 py-1 bg-amber-500/10 text-amber-400 rounded-full">
+  <div class="flex items-center gap-2 px-3 py-1 bg-amber-500/10 text-amber-400 rounded-md">
     <span class="material-symbols-outlined text-sm">settings</span>
     <span id="opsValue" class="text-xs font-bold">Expense: IDR 0</span>
   </div>
 
   <!-- Other Income -->
-  <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-full">
+  <div class="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 text-emerald-400 rounded-md">
     <span class="material-symbols-outlined text-sm">finance</span>
     <span id="otherincometValue" class="text-xs font-bold">Other Income: IDR 0</span>
   </div>
 
 
   <!-- Net Profit -->
-  <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-full">
+  <div class="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-md">
     <span class="material-symbols-outlined text-sm">finance</span>
     <span id="grossProfitValue" class="text-xs font-bold">Gross Profit: IDR 0</span>
   </div>
@@ -6873,7 +6869,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
 </div>
 <!-- Background accent -->
-<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-md blur-[100px] -mr-32 -mt-32"></div>
 </div>
 <!-- Payment Channel Donut Chart -->
 <div class="col-span-12 lg:col-span-4 p-8 bg-background rounded-md relative overflow-hidden
@@ -6931,7 +6927,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
   shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 <div class="p-8 flex justify-between items-center">
   <div class="flex items-center gap-4">
-    <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+    <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
     <span class="material-symbols-outlined text-secondary">inventory_2</span>
     </div>
     <h2 class="font-headline text-2xl font-bold tracking-tight">Material Stock Analytics</h2>
@@ -7094,9 +7090,9 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-background/80 border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-background/80 border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
-<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all scale-95 active:scale-90">
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
@@ -7144,7 +7140,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
   <div
     class="absolute -top-24 -right-24 w-72 h-72
-    bg-primary/10 blur-[120px] rounded-full">
+    bg-primary/10 blur-[120px] rounded-md">
   </div>
 
 </section>
@@ -7183,12 +7179,12 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
   ">
   <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
   <div class="flex items-center gap-4">
-  <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+  <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
   <span class="material-symbols-outlined text-secondary">business</span>
   </div>
   <h2 class="font-headline text-2xl font-bold tracking-tight">Business Outlets</h2>
   </div>
-  <button onclick="openAddBranchModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-all text-xs font-bold uppercase tracking-wider">
+  <button onclick="openAddBranchModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-all text-xs font-bold uppercase tracking-wider">
   <span class="material-symbols-outlined text-sm">add</span>
   Add New Outlet
   </button>
@@ -7243,7 +7239,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
     <div class="flex items-center gap-4">
 
-      <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+      <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
         <span class="material-symbols-outlined text-primary">
           group
         </span>
@@ -7265,7 +7261,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
     <button
       onclick="openAddUserModal()"
-      class="flex items-center gap-2 px-5 py-2.5 rounded-full
+      class="flex items-center gap-2 px-5 py-2.5 rounded-md
       bg-primary/10 text-primary
       hover:bg-primary hover:text-on-primary
       transition-all text-xs font-bold uppercase tracking-wider">
@@ -7351,7 +7347,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
       <div class="flex items-center gap-4">
 
-        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
 
           <span class="material-symbols-outlined text-primary">
             storefront
@@ -7392,7 +7388,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
         border border-white/10 rounded-md p-6 bg-background/50">
 
 
-          <div class="w-32 h-32 rounded-full overflow-hidden bg-white/5 mb-4">
+          <div class="w-32 h-32 rounded-md overflow-hidden bg-white/5 mb-4">
             <img
               id="businessLogoPreview"
               src=""
@@ -7493,7 +7489,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 <!-- Footer Copyright -->
 <footer class="mt-12 flex justify-between items-center text-slate-600 text-[8px] font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-white/10 pt-12 px-10 ">
 <div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></span>
 SOMA Kasir v2.4.0-Stable
 </div>
 <div class="flex gap-8 text-[8px] text-slate-500">
@@ -7552,7 +7548,7 @@ SOMA Kasir v2.4.0-Stable
 
       <button
         onclick="closeAddBranchModal()"
-        class="w-10 h-10 rounded-full hover:bg-white/5">
+        class="w-10 h-10 rounded-md hover:bg-white/5">
 
         <span class="material-symbols-outlined">
           close
@@ -7699,7 +7695,7 @@ SOMA Kasir v2.4.0-Stable
 
       <button
         onclick="closeEditBranchModal()"
-        class="w-10 h-10 rounded-full hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -7833,7 +7829,7 @@ SOMA Kasir v2.4.0-Stable
 
       <button
         onclick="closeAddUserModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -8005,7 +8001,7 @@ SOMA Kasir v2.4.0-Stable
 
       <button
         onclick="closeEditUserModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -8166,9 +8162,9 @@ SOMA Kasir v2.4.0-Stable
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-background border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
-<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all scale-95 active:scale-90">
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
@@ -8484,7 +8480,7 @@ SOMA Kasir v2.4.0-Stable
 
       <button
         onclick="closeDocumentationModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center
+        class="w-10 h-10 rounded-md flex items-center justify-center
         text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
@@ -8579,9 +8575,9 @@ SOMA Kasir v2.4.0-Stable
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-surface-container-lowest border-none rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-surface-container-lowest border-none rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
-<button class="p-2 text-slate-400 hover:bg-[#222a3d] rounded-full transition-all scale-95 active:scale-90">
+<button class="p-2 text-slate-400 hover:bg-[#222a3d] rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
@@ -8831,9 +8827,9 @@ SOMA Kasir v2.4.0-Stable
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-background border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
-<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all scale-95 active:scale-90">
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
@@ -9056,7 +9052,7 @@ SOMA Kasir v2.4.0-Stable
               </span>
             </div>
 
-            <div class="w-10 h-10 rounded-full flex items-center justify-center">
+            <div class="w-10 h-10 rounded-md flex items-center justify-center">
               <span
                 class="material-symbols-outlined text-primary"
                 style="font-variation-settings:'FILL' 1;">support_agent
@@ -9120,7 +9116,7 @@ SOMA Kasir v2.4.0-Stable
 
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-2">
-          <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+          <div class="w-10 h-10 rounded-md flex items-center justify-center shrink-0">
 
             <span
               class="material-symbols-outlined text-primary"
@@ -9148,7 +9144,7 @@ SOMA Kasir v2.4.0-Stable
 
       </div>
 
-      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 blur-2xl rounded-full"></div>
+      <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-primary/5 blur-2xl rounded-md"></div>
 
     </div>
 
@@ -9156,7 +9152,7 @@ SOMA Kasir v2.4.0-Stable
 
   </main>
 
-  <div class="fixed pointer-events-none bg-primary-container/10 rounded-full blur-[2px] -z-10" style="width: 2.39689px; height: 2.39689px; left: 5.30405vw; top: 13.5147vh; opacity: 0.117979;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-full blur-[2px] -z-10" style="width: 1.8197px; height: 1.8197px; left: 17.5577vw; top: 44.7061vh; opacity: 0.24032;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-full blur-[2px] -z-10" style="width: 2.96541px; height: 2.96541px; left: 31.3624vw; top: 95.0009vh; opacity: 0.215679;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-full blur-[2px] -z-10" style="width: 1.06305px; height: 1.06305px; left: 32.3485vw; top: 3.40306vh; opacity: 0.205332;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-full blur-[2px] -z-10" style="width: 1.54824px; height: 1.54824px; left: 48.4407vw; top: 79.9211vh; opacity: 0.284659;"></div>
+  <div class="fixed pointer-events-none bg-primary-container/10 rounded-md blur-[2px] -z-10" style="width: 2.39689px; height: 2.39689px; left: 5.30405vw; top: 13.5147vh; opacity: 0.117979;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-md blur-[2px] -z-10" style="width: 1.8197px; height: 1.8197px; left: 17.5577vw; top: 44.7061vh; opacity: 0.24032;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-md blur-[2px] -z-10" style="width: 2.96541px; height: 2.96541px; left: 31.3624vw; top: 95.0009vh; opacity: 0.215679;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-md blur-[2px] -z-10" style="width: 1.06305px; height: 1.06305px; left: 32.3485vw; top: 3.40306vh; opacity: 0.205332;"></div><div class="fixed pointer-events-none bg-primary-container/10 rounded-md blur-[2px] -z-10" style="width: 1.54824px; height: 1.54824px; left: 48.4407vw; top: 79.9211vh; opacity: 0.284659;"></div>
     <script>
 
         const card = document.getElementById("businessCard");
@@ -9297,9 +9293,9 @@ SOMA Kasir v2.4.0-Stable
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-background border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
-<button class="p-2 text-slate-400 hover:bg-white/5 rounded-full transition-all scale-95 active:scale-90">
+<button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 </div>
@@ -9330,7 +9326,7 @@ SOMA Kasir v2.4.0-Stable
 
       <div
         class="absolute -top-24 -right-24 w-72 h-72
-        bg-primary/10 blur-[120px] rounded-full">
+        bg-primary/10 blur-[120px] rounded-md">
       </div>
 
       
@@ -9434,8 +9430,8 @@ SOMA Kasir v2.4.0-Stable
 <h2 id="kpiTotalExpense" class="font-['Manrope'] text-4xl font-extrabold text-primary">IDR 0</h2>
 <span id="kpiBudgetTotal" class="text-on-surface-variant text-sm">/ IDR 0</span>
 </div>
-<div class="mt-6 w-full h-2 bg-white/5 rounded-full overflow-hidden">
-<div id="kpiBudgetBar" class="h-full bg-primary rounded-full" style="width:0%"></div>
+<div class="mt-6 w-full h-2 bg-white/5 rounded-md overflow-hidden">
+<div id="kpiBudgetBar" class="h-full bg-primary rounded-md" style="width:0%"></div>
 </div>
 </div>
 <div class="mt-4 flex justify-between items-center text-sm">
@@ -9455,9 +9451,9 @@ SOMA Kasir v2.4.0-Stable
 <h2 id="kpiRemainingPercent" class="font-['Manrope'] text-4xl font-extrabold text-tertiary">0%</h2>
 <span id="kpiBudgetMonthLabel" class="text-on-surface-variant text-sm">Left for Oct</span>
 </div>
-<div class="w-full h-2 bg-white/5 rounded-full overflow-hidden">
+<div class="w-full h-2 bg-white/5 rounded-md overflow-hidden">
   <div id="expenseBudgetBar"
-       class="h-full bg-tertiary rounded-full"
+       class="h-full bg-tertiary rounded-md"
        style="width:0%"></div>
 </div>
 </div>
@@ -9498,7 +9494,7 @@ SOMA Kasir v2.4.0-Stable
 <div class="px-8 py-6 space-y-6 border-b border-outline-variant/5">
   <div class="mb-6 flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
         <span class="material-symbols-outlined text-secondary">credit_card_off</span>
       </div>
       <h2 class="font-headline text-2xl font-bold tracking-tight">Expense Ledger</h2>
@@ -9604,7 +9600,7 @@ SOMA Kasir v2.4.0-Stable
 <div class="px-8 py-6 space-y-6 border-b border-outline-variant/5">
   <div class="mb-6 flex items-center justify-between">
     <div class="flex items-center gap-4">
-      <div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center">
+      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
         <span class="material-symbols-outlined text-secondary">account_balance_wallet</span>
       </div>
       <h2 class="font-headline text-2xl font-bold tracking-tight">Other Income Ledger</h2>
@@ -9767,7 +9763,7 @@ SOMA Kasir v2.4.0-Stable
             <div class="flex items-center gap-2 mt-1">
 
               <span id="receipt-status-dot"
-                class="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#f59e0b]">
+                class="w-2 h-2 rounded-md bg-primary shadow-[0_0_10px_#f59e0b]">
               </span>
 
               <span class="text-xs uppercase tracking-wider text-primary">
@@ -9790,7 +9786,7 @@ SOMA Kasir v2.4.0-Stable
 
         <button
           onclick="closeExpenseReceipt()"
-          class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+          class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
           <span class="material-symbols-outlined">
 
@@ -9983,7 +9979,7 @@ SOMA Kasir v2.4.0-Stable
 
             <div class="flex items-center gap-2 mt-1">
 
-              <span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#f59e0b]"></span>
+              <span class="w-2 h-2 rounded-md bg-primary shadow-[0_0_10px_#f59e0b]"></span>
 
               <span class="text-xs uppercase tracking-wider text-primary">
                 Available Actions
@@ -9997,7 +9993,7 @@ SOMA Kasir v2.4.0-Stable
 
         <button
           onclick="closeExpenseMenu()"
-          class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+          class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
           <span class="material-symbols-outlined">
             close
@@ -10135,7 +10131,7 @@ SOMA Kasir v2.4.0-Stable
 
       <button
         onclick="closeExpenseStatusModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
         <span class="material-symbols-outlined">
           close
@@ -10251,7 +10247,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
           </h2>
           <div class="flex items-center gap-2 mt-1">
 
-            <span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#f59e0b]"></span>
+            <span class="w-2 h-2 rounded-md bg-primary shadow-[0_0_10px_#f59e0b]"></span>
 
 
             <span class="text-xs uppercase tracking-wider text-primary">
@@ -10264,7 +10260,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
 
       <button
       onclick="closeExpenseAttachmentModal()"
-      class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+      class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
 
 
         <span class="material-symbols-outlined">
@@ -10433,7 +10429,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
 
             <div class="flex items-center gap-2 mt-1">
 
-              <span class="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_#f59e0b]"></span>
+              <span class="w-2 h-2 rounded-md bg-primary shadow-[0_0_10px_#f59e0b]"></span>
 
               <span class="text-xs uppercase tracking-wider text-primary">
                 Expense Document
@@ -10447,7 +10443,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
 
         <button
         onclick="closeExpenseViewAttachmentModal()"
-        class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-white/5">
+        class="w-10 h-10 rounded-md flex items-center justify-center hover:bg-white/5">
 
           <span class="material-symbols-outlined">
             close
@@ -10590,7 +10586,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
 
   <button
   onclick="closeExpenseAddAttachmentModal()"
-  class="w-10 h-10 rounded-full hover:bg-white/5 flex items-center justify-center">
+  class="w-10 h-10 rounded-md hover:bg-white/5 flex items-center justify-center">
 
   <span class="material-symbols-outlined">
   close
@@ -10706,7 +10702,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
 
   <button
   onclick="removeExpenseAttachment()"
-  class="w-9 h-9 rounded-full hover:bg-white/5 flex items-center justify-center">
+  class="w-9 h-9 rounded-md hover:bg-white/5 flex items-center justify-center">
 
   <span class="material-symbols-outlined text-error">
 
@@ -10797,7 +10793,7 @@ class="fixed inset-0 z-[70] hidden items-center justify-center p-6 bg-background
 <!-- Modal Header -->
 <div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/10">
 <div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<div class="w-10 h-10 rounded-md bg-primary-container/20 flex items-center justify-center text-primary">
 <span class="material-symbols-outlined">account_balance_wallet</span>
 </div>
 <div>
@@ -10884,7 +10880,7 @@ Rp 0
 
 <!-- Footer -->
 <div class="px-8 py-6 bg-background border-t border-white/10 flex items-center justify-end gap-4">
-<button onclick="saveExpenseBudget()" class="px-8 py-3 rounded-full font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
+<button onclick="saveExpenseBudget()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
 Cancel
 </button>
 <button id="btnSaveBudget" onclick="saveExpenseBudget()" class="px-10 py-3 bg-background bg-primary/10 border border-primary/5 rounded-md text-primary font-bold active:scale-95 hover:scale-105 transition-transform flex items-center gap-2">
@@ -10908,7 +10904,7 @@ Save Budget
 <!-- Modal Header -->
 <div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/10">
 <div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<div class="w-10 h-10 rounded-md bg-primary-container/20 flex items-center justify-center text-primary">
 <span class="material-symbols-outlined">receipt_long</span>
 </div>
 <div>
@@ -10980,7 +10976,7 @@ Save Budget
 <label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Payment Method</label>
 <div class="flex p-1 bg-background/80 border border-white/10 rounded-md max-w-md">
 <button id="expenseMethodCash"
-  onclick="selectExpenseMethod('Cash')" class="flex-1 py-2 text-sm font-semibold rounded-full bg-urface-container-highs text-primary shadow-sm">Cash</button>
+  onclick="selectExpenseMethod('Cash')" class="flex-1 py-2 text-sm font-semibold rounded-md bg-urface-container-highs text-primary shadow-sm">Cash</button>
 <button id="expenseMethodBank"
   onclick="selectExpenseMethod('Bank Transfer')" class="flex-1 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">Bank Transfer</button>
 <button id="expenseMethodQris"
@@ -11001,7 +10997,7 @@ Save Budget
 </div>
 <!-- Modal Footer (Actions) -->
 <div class="px-8 py-6 bg-background border-t border-white/10 flex items-center justify-end gap-4">
-<button class="px-8 py-3 rounded-full font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
+<button class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
           Cancel
         </button>
 <button id="btnSaveExpense" class="px-10 py-3 rounded-md amber-gradient text-on-primary font-bold shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-2">
@@ -11034,7 +11030,7 @@ Save Budget
 <!-- Modal Header -->
 <div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/10">
 <div class="flex items-center gap-3">
-<div class="w-10 h-10 rounded-full bg-primary-container/20 flex items-center justify-center text-primary">
+<div class="w-10 h-10 rounded-md bg-primary-container/20 flex items-center justify-center text-primary">
 <span class="material-symbols-outlined">receipt_long</span>
 </div>
 <div>
@@ -11133,7 +11129,7 @@ placeholder="Optional notes..."></textarea>
 </div>
 <!-- Modal Footer (Actions) -->
 <div class="px-8 py-6 bg-background flex items-center justify-end gap-4">
-<button onclick="closeAddNewOtherIncome()" class="px-8 py-3 rounded-full font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
+<button onclick="closeAddNewOtherIncome()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
           Cancel
         </button>
 <button onclick="submitOtherIncome()"
@@ -11202,7 +11198,7 @@ class="px-10 py-3 rounded-md amber-gradient text-on-primary font-bold shadow-lg 
   </div>
   <button
   onclick="closeOtherIncomeDetailModal()"
-  class="w-10 h-10 rounded-full hover:bg-white/5">
+  class="w-10 h-10 rounded-md hover:bg-white/5">
 
   <span class="material-symbols-outlined">
   close
@@ -11390,7 +11386,7 @@ Other Income
 
 <button
 onclick="closeOtherIncomeStatusModal()"
-class="w-10 h-10 rounded-full hover:bg-white/5">
+class="w-10 h-10 rounded-md hover:bg-white/5">
 
 <span class="material-symbols-outlined">
 close
@@ -11614,7 +11610,7 @@ Save
 
       <div
         class="absolute -top-24 -right-24 w-72 h-72
-        bg-primary/10 blur-[120px] rounded-full">
+        bg-primary/10 blur-[120px] rounded-md">
       </div>
 
       
@@ -11705,7 +11701,7 @@ Save
 <input id="point_ratio" class="w-full" type="range" min="1000" max="50000" step="500"/>
 </div>
 <div class="bg-background border border-white/10 rounded-md p-6 flex items-center gap-6">
-<div class="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+<div class="h-12 w-12 rounded-md bg-primary/10 flex items-center justify-center">
 <span class="material-symbols-outlined text-primary" data-icon="trending_up">trending_up</span>
 </div>
 <div>
@@ -11911,7 +11907,7 @@ Save
 <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
 
 <div class="col-span-3 flex items-center gap-3">
-<div class="h-2 w-2 rounded-full bg-background"></div>
+<div class="h-2 w-2 rounded-md bg-background"></div>
 
 <input
 id="tier_1_name"
@@ -11958,7 +11954,7 @@ DEFAULT
 
 <div class="col-span-3 flex items-center gap-3">
 
-<div class="h-2 w-2 rounded-full bg-background"></div>
+<div class="h-2 w-2 rounded-md bg-background"></div>
 
 <input
 id="tier_2_name"
@@ -12007,7 +12003,7 @@ edit
 
 <div class="col-span-3 flex items-center gap-3">
 
-<div class="h-2 w-2 rounded-full bg-background"></div>
+<div class="h-2 w-2 rounded-md bg-background"></div>
 
 <input
 id="tier_3_name"
@@ -12056,7 +12052,7 @@ edit
 
 <div class="col-span-3 flex items-center gap-3">
 
-<div class="h-2 w-2 rounded-full bg-background"></div>
+<div class="h-2 w-2 rounded-md bg-background"></div>
 
 <input
 id="tier_4_name"
@@ -12105,7 +12101,7 @@ edit
 
 <div class="col-span-3 flex items-center gap-3">
 
-<div class="h-2 w-2 rounded-full bg-background"></div>
+<div class="h-2 w-2 rounded-md bg-background"></div>
 
 <input
 id="tier_5_name"
@@ -12553,7 +12549,7 @@ edit
 
       <div
         class="absolute -top-24 -right-24 w-72 h-72
-        bg-primary/10 blur-[120px] rounded-full">
+        bg-primary/10 blur-[120px] rounded-md">
       </div>
 
       
@@ -12619,7 +12615,7 @@ edit
 <!-- VAT Section -->
 
 <div class="col-span-12 lg:col-span-8 bg-background rounded-md p-8 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-primary/10 transition-colors"></div>
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-md -mr-16 -mt-16 blur-3xl group-hover:bg-primary/10 transition-colors"></div>
 <div class="flex items-start justify-between relative z-10">
 <div class="flex gap-4">
 <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center text-[#f59e0b]">
@@ -12842,7 +12838,7 @@ edit
   <div class="relative w-full max-w-md">
     <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
     
-    <input class="w-full bg-background border border-white/10 rounded-full py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+    <input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
   </div>
 
 
@@ -12852,7 +12848,7 @@ edit
       class="w-10 h-10 rounded-md flex items-center justify-center text-slate-400 hover:text-on-surface hover:bg-white/5 transition-all">
       <span class="relative inline-flex">
         <span class="relative material-symbols-outlined">notifications</span>
-        <div id="cashFlowNotifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"></div>
+        <div id="cashFlowNotifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 px-1 rounded-md bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"></div>
       </span>
     </button>
 
@@ -12945,7 +12941,7 @@ edit
       w-72 h-72
       bg-primary/10
       blur-[120px]
-      rounded-full">
+      rounded-md">
     </div>
 
   </section>
@@ -13476,7 +13472,7 @@ edit
         class="flex items-center gap-2">
 
         <span
-          class="w-3 h-3 rounded-full
+          class="w-3 h-3 rounded-md
           bg-primary">
         </span>
 
@@ -13494,7 +13490,7 @@ edit
         class="flex items-center gap-2">
 
         <span
-          class="w-3 h-3 rounded-full
+          class="w-3 h-3 rounded-md
           bg-white/15">
         </span>
 
@@ -13562,7 +13558,7 @@ edit
             <span
               id="cf-sales-percent"
               class="px-2 py-1
-              rounded-full
+              rounded-md
               bg-primary/10
               text-primary
               text-xs font-semibold">
@@ -13576,14 +13572,14 @@ edit
           <div
             class="h-2.5 w-full
             bg-white/5
-            rounded-full
+            rounded-md
             overflow-hidden">
 
             <div
               id="cf-sales-bar"
               class="h-full
               bg-primary
-              rounded-full"
+              rounded-md"
               style="width:0%">
             </div>
 
@@ -13610,7 +13606,7 @@ edit
             <span
               id="cf-income-percent"
               class="px-2 py-1
-              rounded-full
+              rounded-md
               bg-primary/10
               text-primary
               text-xs font-semibold">
@@ -13624,14 +13620,14 @@ edit
           <div
             class="h-2.5 w-full
             bg-white/5
-            rounded-full
+            rounded-md
             overflow-hidden">
 
             <div
               id="cf-income-bar"
               class="h-full
               bg-primary
-              rounded-full"
+              rounded-md"
               style="width:0%">
             </div>
 
@@ -13697,7 +13693,7 @@ edit
             <span
               id="cf-expenses-percent"
               class="px-2 py-1
-              rounded-full
+              rounded-md
               bg-primary/10
               text-primary
               text-xs font-semibold">
@@ -13711,14 +13707,14 @@ edit
           <div
             class="h-2.5 w-full
             bg-white/5
-            rounded-full
+            rounded-md
             overflow-hidden">
 
             <div
               id="cf-expenses-bar"
               class="h-full
               bg-primary
-              rounded-full"
+              rounded-md"
               style="width:0%">
             </div>
 
@@ -13745,7 +13741,7 @@ edit
             <span
               id="cf-purchases-percent"
               class="px-2 py-1
-              rounded-full
+              rounded-md
               bg-primary/10
               text-primary
               text-xs font-semibold">
@@ -13759,14 +13755,14 @@ edit
           <div
             class="h-2.5 w-full
             bg-white/5
-            rounded-full
+            rounded-md
             overflow-hidden">
 
             <div
               id="cf-purchases-bar"
               class="h-full
               bg-primary
-              rounded-full"
+              rounded-md"
               style="width:0%">
             </div>
 
@@ -14083,7 +14079,7 @@ edit
   <button
     id="btnBackupChat"
     onclick="openBackupChat()"
-    class=" fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full bg-primary/10 border border-primary/10 text-primary shadow-[0_10px_30px_rgba(0,0,0,0.35)] flex items-center justify-center hover:scale-110 transition-all duration-300 group">
+    class=" fixed bottom-8 right-8 z-50 w-16 h-16 rounded-md bg-primary/10 border border-primary/10 text-primary shadow-[0_10px_30px_rgba(0,0,0,0.35)] flex items-center justify-center hover:scale-110 transition-all duration-300 group">
 
     <span
       class="material-symbols-outlined text-3xl">
@@ -15073,9 +15069,9 @@ edit
                 class="sr-only peer"
                 type="checkbox">
 
-              <div class="w-11 h-6 bg-background rounded-full peer peer-checked:bg-primary relative
+              <div class="w-11 h-6 bg-background rounded-md peer peer-checked:bg-primary relative
                           after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-                          after:h-5 after:w-5 after:bg-white after:rounded-full
+                          after:h-5 after:w-5 after:bg-white after:rounded-md
                           peer-checked:after:translate-x-full transition-all">
               </div>
 
@@ -15386,10 +15382,10 @@ edit
 <div class="px-10 pt-12 pb-8 flex flex-col items-center text-center">
 <!-- Avatar with Luminous Ring -->
 <div class="relative mb-6">
-<div class="absolute inset-0 bg-primary-container rounded-full blur-md opacity-20"></div>
+<div class="absolute inset-0 bg-primary-container rounded-md blur-md opacity-20"></div>
 <img
   id="memberPhoto"
-  class="w-32 h-32 rounded-full border-2 border-primary-container object-cover relative z-10"
+  class="w-32 h-32 rounded-md border-2 border-primary-container object-cover relative z-10"
 />
 <input
   type="file"
@@ -15400,7 +15396,7 @@ edit
 >
 <div
   id="memberTierBadge"
-  class="absolute bottom-1 right-1 bg-primary-container text-on-primary-container px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest z-20 shadow-lg"> RINDU
+  class="absolute bottom-1 right-1 bg-primary-container text-on-primary-container px-3 py-0.5 rounded-md text-[10px] font-bold tracking-widest z-20 shadow-lg"> RINDU
 </div>
 </div>
 <h1 id="memberName" class="font-headline text-3xl font-bold tracking-tight mb-1 text-on-surface">Aditya Wijaya</h1>
@@ -18319,7 +18315,7 @@ function renderGrossRevenue(data) {
     return `
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <span class="w-2 h-2 rounded-full"
+          <span class="w-2 h-2 rounded-md"
             style="background:${colors[index % colors.length]}"></span>
           <span class="text-sm font-medium">${item.category}</span>
         </div>
@@ -18425,7 +18421,7 @@ data.forEach(item => {
       </td>
 
       <td class="px-8 py-5">
-        <span class="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">
+        <span class="px-2.5 py-1 rounded-md bg-primary/10 text-primary text-[10px] font-bold uppercase">
           ${item.category || "-"}
         </span>
       </td>
@@ -19777,7 +19773,7 @@ function renderMembers(data = state.members) {
       </td>
       <td class="px-8 py-5">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full
+          <div class="w-8 h-8 rounded-md
                       bg-background
                       flex items-center justify-center
                       font-bold text-xs">
@@ -20992,7 +20988,7 @@ function openMemberProfile(memberId) {
   if (tierBadge) {
     const tier = member.Level_Current || "";
     tierBadge.innerText = tier.toUpperCase();
-    tierBadge.className = "absolute bottom-1 right-1 px-3 py-0.5 rounded-full text-[10px] font-bold tracking-widest z-20 shadow-lg";
+    tierBadge.className = "absolute bottom-1 right-1 px-3 py-0.5 rounded-md text-[10px] font-bold tracking-widest z-20 shadow-lg";
 	  
     const settings = window.loyaltySettings || {};
     const tier1 = String(settings.tier_1_name_value || "") .toLowerCase();
@@ -21265,7 +21261,7 @@ function renderTierTimeline(history, modal) {
         "></div>
         <div class="
           absolute left-0 top-1
-          w-8 h-8 rounded-full
+          w-8 h-8 rounded-md
           flex items-center justify-center
           z-10
           ${current
@@ -21503,7 +21499,7 @@ function renderTierProgression(history = []) {
       <div class="relative flex items-center justify-between pl-8">
 
         <div class="
-          absolute left-0 w-2 h-2 rounded-full
+          absolute left-0 w-2 h-2 rounded-md
           ${isCurrent
             ? "bg-primary shadow-[0_0_8px_rgba(245,158,11,0.6)]"
             : "bg-outline-variant"}
@@ -21538,7 +21534,7 @@ function renderTierProgression(history = []) {
               text-primary
               border border-primary/30
               px-2 py-0.5
-              rounded-full
+              rounded-md
             ">
               Current
             </span>
@@ -21596,7 +21592,7 @@ function loadNotifications() {
 
             <div
             class="
-            w-10 h-10 rounded-full
+            w-10 h-10 rounded-md
             bg-red-500/10
             flex items-center justify-center
             ">
@@ -21647,7 +21643,7 @@ function loadNotifications() {
             <div class="flex items-start gap-3">
 
               <div class="
-                w-10 h-10 rounded-full
+                w-10 h-10 rounded-md
                 overflow-hidden
                 bg-background/80
               ">
@@ -21700,7 +21696,7 @@ function loadNotifications() {
           >
             <div class="flex items-start gap-3">
               <div class="
-                w-10 h-10 rounded-full
+                w-10 h-10 rounded-md
                 overflow-hidden
                 bg-background/80
               ">
@@ -21865,7 +21861,7 @@ function renderTableGrid(data) {
             shadow-[0_2px_10px_rgba(0,0,0,0.15)]
             p-6 relative hover:bg-white/5 transition">
           <div class="flex justify-between mb-2">
-            <span class="px-2 py-1 rounded-full bg-background/90 border border-white/10 font-bold text-2xl">${tableNumber}</span>
+            <span class="px-2 py-1 rounded-md bg-background/90 border border-white/10 font-bold text-2xl">${tableNumber}</span>
             <span class="text-xs font-bold text-primary">Occupied</span>
           </div>
           <p>IDR ${t.total || 0}</p>
@@ -22578,8 +22574,8 @@ function renderSuppliers() {
         <td class="px-8 py-5">
           ${
             isActive
-            ? `<span class="px-3 py-1 bg-primary-container/20 text-primary text-[10px] font-black rounded-full uppercase">Active</span>`
-            : `<span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-black rounded-full uppercase">Inactive</span>`
+            ? `<span class="px-3 py-1 bg-primary-container/20 text-primary text-[10px] font-black rounded-md uppercase">Active</span>`
+            : `<span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-black rounded-md uppercase">Inactive</span>`
           }
         </td>
 
@@ -22920,7 +22916,7 @@ function renderRecipes() {
           <span class="text-xs font-bold">
             ${item.costPercent}%
           </span>
-          <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+          <div class="w-16 h-1 bg-white/5 rounded-md overflow-hidden">
             <div class="h-full 
               ${item.costPercent > 60 ? 'bg-red-500' :
                 item.costPercent >= 40 ? 'bg-yellow-400' :
@@ -23427,16 +23423,16 @@ function renderIngredients(data) {
         <td class="px-8 py-5 text-center">
           ${
             isCritical
-              ? `<span class="px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-black rounded-full uppercase">Critical</span>`
+              ? `<span class="px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-black rounded-md uppercase">Critical</span>`
               : isLow
-                ? `<span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-[10px] font-black rounded-full uppercase">Low</span>`
-                : `<span class="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-black rounded-full uppercase">Optimal</span>`
+                ? `<span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-[10px] font-black rounded-md uppercase">Low</span>`
+                : `<span class="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-black rounded-md uppercase">Optimal</span>`
           }
         </td>
 
         <!-- ACTION -->
         <td class="px-8 py-5 text-right flex items-center justify-end gap-1">
-          <button onclick='openIngredientModal(${JSON.stringify(itemWithBranch)})' class="p-2 hover:bg-white/5 rounded-full text-slate-500">
+          <button onclick='openIngredientModal(${JSON.stringify(itemWithBranch)})' class="p-2 hover:bg-white/5 rounded-md text-slate-500">
             <span class="material-symbols-outlined">more_vert</span>
           </button>
         </td>
@@ -23948,8 +23944,8 @@ function renderUsageLog(data) {
         </td>
 		
         <td class="py-5 px-6">
-          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 text-xs font-semibold ${badgeColor}">
-            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/5 text-xs font-semibold ${badgeColor}">
+            <span class="w-1.5 h-1.5 rounded-md bg-current"></span>
             ${badgeName}
           </span>
         </td>
@@ -26007,7 +26003,7 @@ function renderActiveMembers(data) {
     const row = document.createElement("div");
     row.className = "flex items-center gap-3 p-2 rounded-md bg-white/5 hover:bg-white/10 transition";
     row.innerHTML = `
-      <div class="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400">
+      <div class="w-8 h-8 rounded-md bg-emerald-500/20 flex items-center justify-center text-xs font-bold text-emerald-400">
         ${initials}
       </div>
 
@@ -26359,7 +26355,7 @@ function renderRawMaterialPage() {
 
         <td class="px-8 py-6">
           <span class="
-            px-3 py-1 rounded-full
+            px-3 py-1 rounded-md
             text-[10px]
             font-bold
             uppercase
@@ -26396,7 +26392,7 @@ function renderRawMaterialPage() {
         <td class="px-8 py-6 text-right">
           <button
             onclick="openIngredient('${item.id}')"
-            class="p-2 rounded-full bg-white/5 hover:bg-amber-500 hover:text-surface-dim transition-all"
+            class="p-2 rounded-md bg-white/5 hover:bg-amber-500 hover:text-surface-dim transition-all"
           >
             <span class="material-symbols-outlined text-sm">
               visibility
@@ -26480,7 +26476,7 @@ function renderRawMaterialPagination() {
       <button
         onclick="goToRawMaterialPage(${i})"
         class="
-          w-8 h-8 rounded-full
+          w-8 h-8 rounded-md
           text-xs font-bold
           transition-all
           ${
@@ -27138,7 +27134,7 @@ function renderBranchTable(){
               ${String(b.status).toUpperCase() === "ACTIVE" ? "checked" : ""}
               onchange="toggleBranchStatus('${b.branchId}', this.checked)">
 
-            <div class="w-10 h-5 bg-white/10 rounded-full
+            <div class="w-10 h-5 bg-white/10 rounded-md
               peer
               peer-checked:bg-primary
               after:content-['']
@@ -27146,7 +27142,7 @@ function renderBranchTable(){
               after:top-0.5
               after:left-[2px]
               after:bg-background
-              after:rounded-full
+              after:rounded-md
               after:h-4
               after:w-4
               after:transition-all
@@ -27159,7 +27155,7 @@ function renderBranchTable(){
           <div class="flex justify-end gap-2">
             <button
               onclick="openEditBranchModal('${b.branchId}')"
-              class="w-9 h-9 hover:bg-primary/10 transition rounded-full">
+              class="w-9 h-9 hover:bg-primary/10 transition rounded-md">
 
               <span class="material-symbols-outlined text-sm">
                 edit
@@ -27609,7 +27605,7 @@ function renderUsers() {
             ${canManage ? `
               <button
                 onclick="openEditUserModal('${user.id}')"
-                class="w-9 h-9 hover:bg-primary/10 transition rounded-full">
+                class="w-9 h-9 hover:bg-primary/10 transition rounded-md">
 
                 <span class="material-symbols-outlined text-sm">
                   edit
@@ -27618,7 +27614,7 @@ function renderUsers() {
 
               <button
                 onclick="deleteUser('${user.id}')"
-                class="w-9 h-9 hover:bg-red-500/10 transition rounded-full">
+                class="w-9 h-9 hover:bg-red-500/10 transition rounded-md">
 
                 <span class="material-symbols-outlined text-sm text-red-400">
                   delete
@@ -28709,7 +28705,7 @@ function renderExpenseTable(data) {
         </td>
 
         <td class="px-4 py-5">
-          <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-[9px] font-bold uppercase">
+          <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-md text-[9px] font-bold uppercase">
             ${item.category || "-"}
           </span>
         </td>
@@ -28724,7 +28720,7 @@ function renderExpenseTable(data) {
 
         <td class="px-4 py-5">
           <div class="flex items-center gap-1.5 ${statusColor}">
-            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+            <span class="w-1.5 h-1.5 rounded-md bg-current"></span>
 
             <span class="font-bold text-[9px] uppercase tracking-wide">
               ${item.status || "-"}
@@ -28781,7 +28777,7 @@ function showExpenseReceipt(index) {
     // Status
     const status = document.getElementById("receipt-status");
     status.textContent = expense.status || "-";
-    status.className = "px-4 py-1 rounded-full text-sm font-semibold";
+    status.className = "px-4 py-1 rounded-md text-sm font-semibold";
     switch ((expense.status || "").toLowerCase()) {
         case "paid":
             status.classList.add(
@@ -29428,7 +29424,7 @@ function renderOtherIncomeTable() {
         </td>
 
         <td class="px-4 py-5">
-          <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-full text-[9px] font-bold uppercase">
+          <span class="px-2 py-0.5 bg-primary/10 text-primary rounded-md text-[9px] font-bold uppercase">
             ${item.category}
           </span>
         </td>
@@ -29496,7 +29492,7 @@ function renderOtherIncomeStatus(status) {
     map[status] || map.Pending;
   return `
     <div class="flex items-center gap-1.5 text-${config.color}">
-      <span class="w-1.5 h-1.5 rounded-full bg-${config.color}"></span>
+      <span class="w-1.5 h-1.5 rounded-md bg-${config.color}"></span>
 
       <span class="font-bold text-[9px] uppercase tracking-wide">
         ${status}
@@ -29904,9 +29900,9 @@ function drawCategory(data) {
           ${Number(item.percent).toFixed(1)}%
         </span>
       </div>
-      <div class="h-2 w-full bg-white/5 rounded-full">
+      <div class="h-2 w-full bg-white/5 rounded-md">
         <div
-          class="h-full bg-primary rounded-full"
+          class="h-full bg-primary rounded-md"
           style="width:${item.percent}%">
         </div>
       </div>
@@ -30233,7 +30229,7 @@ function selectExpenseMethod(method) {
         "bg-white/5",
         "text-primary",
         "shadow-sm",
-        "rounded-full"
+        "rounded-md"
       );
   });
 
@@ -30250,7 +30246,7 @@ function selectExpenseMethod(method) {
       "bg-white/5",
       "text-primary",
       "shadow-sm",
-      "rounded-full"
+      "rounded-md"
     );
 }
 
@@ -31482,7 +31478,7 @@ function updateSeasonUI(res) {
   badge.innerText = status;
   // RESET CLASS TOTAL (IMPORTANT)
   badge.className =
-    "text-[10px] font-inter tracking-widest uppercase px-3 py-1 rounded-full";
+    "text-[10px] font-inter tracking-widest uppercase px-3 py-1 rounded-md";
   // APPLY STYLE
   switch (status) {
     case "OPEN":
@@ -35107,11 +35103,11 @@ async function startBackupProcess() {
 
     <div
       id="${progressId}-box"
-      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+      class="w-full bg-white/10 rounded-md h-2 overflow-hidden"
     >
       <div
         id="${progressId}"
-        class="h-full bg-primary rounded-full transition-all duration-500"
+        class="h-full bg-primary rounded-md transition-all duration-500"
         style="width:5%"
       ></div>
     </div>
@@ -35306,11 +35302,11 @@ dengan backup ini.`
 
     <div
       id="${progressId}-box"
-      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+      class="w-full bg-white/10 rounded-md h-2 overflow-hidden"
     >
       <div
         id="${progressId}"
-        class="h-full bg-primary rounded-full transition-all duration-500"
+        class="h-full bg-primary rounded-md transition-all duration-500"
         style="width:5%"
       ></div>
     </div>
@@ -35490,11 +35486,11 @@ File backup akan dihapus permanen.`
 
     <div
       id="${progressId}-box"
-      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+      class="w-full bg-white/10 rounded-md h-2 overflow-hidden"
     >
       <div
         id="${progressId}"
-        class="h-full bg-red-400 rounded-full transition-all duration-500"
+        class="h-full bg-red-400 rounded-md transition-all duration-500"
         style="width:5%"
       ></div>
     </div>
@@ -35697,11 +35693,11 @@ Lanjutkan?
 
     <div
       id="${progressId}-box"
-      class="w-full bg-white/10 rounded-full h-2 overflow-hidden"
+      class="w-full bg-white/10 rounded-md h-2 overflow-hidden"
     >
       <div
         id="${progressId}"
-        class="h-full bg-primary rounded-full transition-all duration-500"
+        class="h-full bg-primary rounded-md transition-all duration-500"
         style="width:5%"
       ></div>
     </div>
