@@ -52,7 +52,7 @@
                         ========================= */
                     
                         "background": "#0B0F14",
-                        "foreground": "#777777",
+                        "foreground": "#F5F5F5",
                     
                         "surface": "#0B0F14",
                         "surface-dim": "#0B0F14",
@@ -292,7 +292,7 @@
 	.main-icon-box {
 	  width: 48px;
 	  height: 48px;
-	  border-radius: 12px;
+	  border-radius: 50%;
 	  background: rgba(85, 85, 85, 0.10);
 	  border: 1px solid rgba(85, 85, 85, 0.20);
 	  display: flex;
@@ -1005,7 +1005,7 @@ class="text-xs font-semibold text-on-surface">
       </div>
   <div class="flex justify-between items-start">
 
-    <div class="main-icon-box>
+    <div class="main-icon-box">
                 
       <span class="material-symbols-outlined text-3xl"
             style="font-variation-settings:'FILL' 1;">
@@ -1309,79 +1309,111 @@ class="text-xs font-semibold text-on-surface">
 
 <template id="grossRevenuePage" >
   
-  <!-- Sidebar Navigation Shell -->
+<!-- ================= SIDEBAR ================= -->
 <aside
   id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-<div class="px-8 mb-12">
-<div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">SOMA Kasir</div>
-<div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">PREMIUM POS</div>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all" onclick="navigate('dashboardPage')">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-semibold text-sm">Dashboard</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="goToRecentTransactions()">
-<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
-<span class="font-semibold text-sm">Transactions</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('grossRevenuePage')">
-<span class="material-symbols-outlined">Payment</span>
-<span class="font-semibold text-sm">Gross Revenue</span>
-</a>
+  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-semibold text-sm">Logout</span>
-</a></nav>
-<div class="px-6 mt-auto">
-<div class="p-4 rounded-xl glass-panel
-border border-white/5
-bg-background -low/40
-backdrop-blur-xl
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<p class="text-xs text-slate-500 font-medium">SYSTEM STATUS</p>
-<div class="flex items-center gap-2 mt-2">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="text-xs text-on-surface font-semibold tracking-wide">SERVER ACTIVE</span>
-</div>
-</div>
-</div>
+  <!-- SIDEBAR CONTENT -->
+  <div class="sidebar-menu flex flex-col h-full">
+    <!-- MENU -->
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+      <!-- DASHBOARD -->
+      <a onclick="navigate('dashboardPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          home
+        </span>
+    
+        <span
+          class="sidebar-label">
+          Dashboard
+        </span>
+      </a>
+      <!-- RECENT TRANSAKSI -->
+      <a onclick="goToRecentTransactions()"">
+        <span class="material-symbols-outlined sidebar-icon">
+          receipt_long
+        </span>
+
+        <span class="sidebar-label">
+          Transactions
+        </span>
+      </a>
+
+      <!-- GROSS RAVENUE -->
+      <a class="active" onclick="navigate('grossRevenuePage')">
+         <span class="material-symbols-outlined sidebar-icon">
+          Payment
+        </span>
+
+        <span class="sidebar-label">
+          Gross Revenue
+        </span>
+      </a>
+
+      <!-- LOGOUT -->
+      <a onclick="logout()">
+        <span class="material-symbols-outlined sidebar-icon">
+          logout
+        </span>
+
+        <span class="sidebar-label">
+	        LOGOUT
+        </span>
+      </a>
+    </nav>
+
+
+    <!-- FOOTER -->
+    <div class="mt-auto p-2 pb-2">
+      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+
+        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        </span>
+
+        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <p class="text-[10px] text-slate-500">
+            SYSTEM STATUS
+          </p>
+
+          <span class="sidebar-label">
+            SERVER ACTIVE
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </aside>
 
 <div
   id="mainContent"
-  class="flex-1 ml-72 flex flex-col h-screen transition-all duration-300">
-
-<!-- Top App Bar -->
-<header
-  class="h-20 flex-shrink-0 z-40
-  bg-background -low/40
-  backdrop-blur-xl
-  border-b border-white/5
-  flex items-center px-8">
-
-  <div class="flex w-full items-center justify-between">
-
-    <!-- LEFT -->
-    <button
-      onclick="toggleSidebar()"
-      class="w-11 h-11 rounded-xl flex items-center justify-center
-      text-slate-400 hover:text-on-surface
-      hover:hover:bg-white/5 transition-all">
-
-      <span class="material-symbols-outlined">
-        menu
-      </span>
-
-    </button>
-
-  </div>
-
-</header>
+  class="flex-1 flex flex-col h-screen">
+	
+	<header
+	  class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
+	
+	  <div class="flex w-full items-center justify-between">
+	
+	    <!-- LEFT -->
+	    <button
+	      onclick="toggleSidebar()"
+	      class="w-11 h-11 rounded-xl flex items-center justify-center
+	      text-slate-400 hover:text-on-surface
+	      hover:hover:bg-white/5 transition-all">
+	
+	      <span class="material-symbols-outlined">
+	        menu
+	      </span>
+	
+	    </button>
+	
+	  </div>
+	
+	</header>
+	
 <!-- Main Content Area -->
-<main class="flex-1 overflow-auto custom-scrollbar pt-4 px-8 pb-12">
+<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <div class="flex flex-col gap-8">
 <!-- Welcome Header -->
 <section
@@ -1924,58 +1956,90 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
 <template id="recentTransactionsPage" >
 
-  <!-- Sidebar Navigation Shell -->
+<!-- ================= SIDEBAR ================= -->
 <aside
   id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-<div class="px-8 mb-12">
-<div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">SOMA Kasir</div>
-<div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">PREMIUM POS</div>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all" onclick="navigate('dashboardPage')">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-semibold text-sm">Dashboard</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="goToRecentTransactions()">
-<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
-<span class="font-semibold text-sm">Transactions</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('grossRevenuePage')">
-<span class="material-symbols-outlined">Payment</span>
-<span class="font-semibold text-sm">Gross Revenue</span>
-</a>
+  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-semibold text-sm">Logout</span>
-</a></nav>
-<div class="px-6 mt-auto">
-<div class="p-4 rounded-xl glass-panel
-border border-white/5
-bg-background -low/40
-backdrop-blur-xl
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<p class="text-xs text-slate-500 font-medium">SYSTEM STATUS</p>
-<div class="flex items-center gap-2 mt-2">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="text-xs text-on-surface font-semibold tracking-wide">SERVER ACTIVE</span>
-</div>
-</div>
-</div>
+  <!-- SIDEBAR CONTENT -->
+  <div class="sidebar-menu flex flex-col h-full">
+    <!-- MENU -->
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+      <!-- DASHBOARD -->
+      <a onclick="navigate('dashboardPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          home
+        </span>
+    
+        <span
+          class="sidebar-label">
+          Dashboard
+        </span>
+      </a>
+      <!-- RECENT TRANSAKSI -->
+      <a class="active" onclick="goToRecentTransactions()"">
+        <span class="material-symbols-outlined sidebar-icon">
+          receipt_long
+        </span>
+
+        <span class="sidebar-label">
+          Transactions
+        </span>
+      </a>
+
+      <!-- GROSS RAVENUE -->
+      <a onclick="navigate('grossRevenuePage')">
+         <span class="material-symbols-outlined sidebar-icon">
+          Payment
+        </span>
+
+        <span class="sidebar-label">
+          Gross Revenue
+        </span>
+      </a>
+
+      <!-- LOGOUT -->
+      <a onclick="logout()">
+        <span class="material-symbols-outlined sidebar-icon">
+          logout
+        </span>
+
+        <span class="sidebar-label">
+	        LOGOUT
+        </span>
+      </a>
+    </nav>
+
+
+    <!-- FOOTER -->
+    <div class="mt-auto p-2 pb-2">
+      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+
+        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        </span>
+
+        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <p class="text-[10px] text-slate-500">
+            SYSTEM STATUS
+          </p>
+
+          <span class="sidebar-label">
+            SERVER ACTIVE
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </aside>
-<!-- Main Canvas Wrapper -->
+
 <div
   id="mainContent"
-  class="flex-1 ml-72 flex flex-col h-screen transition-all duration-300">
+  class="flex-1 flex flex-col h-screen">
 <!-- Top Navigation Bar -->
 <div class="flex-1 flex flex-col overflow-hidden">
-<header
-  class="h-20 flex-shrink-0 z-40
-  bg-background -low/40
-  backdrop-blur-xl
-  border-b border-white/5
-  flex items-center px-8">
+	<header
+	  class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
 
   <div class="flex w-full items-center justify-between">
 
@@ -1996,7 +2060,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 
 </header>
 <!-- Scrollable Content Area -->
-<main class="flex-1 overflow-y-auto custom-scrollbar pt-4 px-8 pb-12">
+<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <section class="flex flex-col gap-8">
 <!-- Page Header & Stats -->
 
@@ -3152,62 +3216,106 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 
 <template id="posPage" >
 <!-- SideNavBar (Shared Component) -->
+<!-- ================= SIDEBAR ================= -->
 <aside
   id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-<div class="px-8 mb-12">
-<div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">SOMA Kasir</div>
-<div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">PREMIUM POS</div>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('dashboardPage')">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-semibold text-sm">Dashboard</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all" onclick="navigate('posPage')">
-<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
-<span class="font-semibold text-sm">POS</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('tablePage')">
-<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
-<span class="font-semibold text-sm">Table</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('memberPage')">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-semibold text-sm">Member</span>
-</a>
-<a 
-  class="settingsMenu flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all"
-  onclick="navigate('settingsPage')"
-  style="display:none"
->
+  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
-  <span class="material-symbols-outlined">
-    settings
-  </span>
+  <!-- SIDEBAR CONTENT -->
+  <div class="sidebar-menu flex flex-col h-full">
+    <!-- MENU -->
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+      <!-- DASHBOARD -->
+      <a class="active" onclick="navigate('dashboardPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          home
+        </span>
+    
+        <span
+          class="sidebar-label">
+          Dashboard
+        </span>
+      </a>
+      <!-- POS -->
+      <a onclick="navigate('posPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          shopping_cart
+        </span>
 
-  <span class="font-semibold text-sm">
-    Settings
-  </span>
+        <span class="sidebar-label">
+          POS
+        </span>
+      </a>
 
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-semibold text-sm">Logout</span>
-</a></nav>
-<div class="px-6 mt-auto">
-<div class="p-4 rounded-xl glass-panel
-border border-white/5
-bg-background -low/40
-backdrop-blur-xl
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<p class="text-xs text-slate-500 font-medium">SYSTEM STATUS</p>
-<div class="flex items-center gap-2 mt-2">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="text-xs text-on-surface font-semibold tracking-wide">SERVER ACTIVE</span>
-</div>
-</div>
-</div>
+      <!-- TABLE -->
+      <a onclick="navigate('tablePage')">
+         <span class="material-symbols-outlined sidebar-icon">
+          Table
+        </span>
+
+        <span class="sidebar-label">
+          Table
+        </span>
+      </a>
+
+      <!-- MEMBER -->
+      <a onclick="navigate('memberPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          group
+        </span>
+
+        <span class="sidebar-label">
+          Member
+        </span>
+      </a>
+
+      <!-- SETTINGS -->
+      <a onclick="navigate('settingsPage')"
+         style="display:none"
+		  	 class="settingsMenu">
+        <span class="material-symbols-outlined sidebar-icon">
+          settings
+        </span>
+
+        <span class="sidebar-label">
+          Settings
+        </span>
+      </a>
+
+      <!-- LOGOUT -->
+      <a onclick="logout()">
+        <span class="material-symbols-outlined sidebar-icon">
+          logout
+        </span>
+
+        <span class="sidebar-label">
+	        LOGOUT
+        </span>
+      </a>
+
+    </nav>
+
+
+    <!-- FOOTER -->
+    <div class="mt-auto p-2 pb-2">
+      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+
+        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        </span>
+
+        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <p class="text-[10px] text-slate-500">
+            SYSTEM STATUS
+          </p>
+
+          <span class="sidebar-label">
+            SERVER ACTIVE
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </aside>
 
 <div
@@ -3771,65 +3879,106 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 <!-- TABLES --> 
 
 <template id="tablePage" >
-<!-- TopNavBar -->
-
-<!-- SideNavBar -->
+<!-- ================= SIDEBAR ================= -->
 <aside
   id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-<div class="px-8 mb-12">
-<div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">SOMA Kasir</div>
-<div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">PREMIUM POS</div>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('dashboardPage')">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-semibold text-sm">Dashboard</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('posPage')">
-<span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
-<span class="font-semibold text-sm">POS</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all" onclick="navigate('tablePage')">
-<span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
-<span class="font-semibold text-sm">Table</span>
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('memberPage')">
-<span class="material-symbols-outlined" data-icon="group">group</span>
-<span class="font-semibold text-sm">Member</span>
-</a>
-<a 
-  class="settingsMenu flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all"
-  onclick="navigate('settingsPage')"
-  style="display:none"
->
+  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
-  <span class="material-symbols-outlined">
-    settings
-  </span>
+  <!-- SIDEBAR CONTENT -->
+  <div class="sidebar-menu flex flex-col h-full">
+    <!-- MENU -->
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+      <!-- DASHBOARD -->
+      <a class="active" onclick="navigate('dashboardPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          home
+        </span>
+    
+        <span
+          class="sidebar-label">
+          Dashboard
+        </span>
+      </a>
+      <!-- POS -->
+      <a onclick="navigate('posPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          shopping_cart
+        </span>
 
-  <span class="font-semibold text-sm">
-    Settings
-  </span>
+        <span class="sidebar-label">
+          POS
+        </span>
+      </a>
 
-</a>
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-semibold text-sm">Logout</span>
-</a></nav>
-<div class="px-6 mt-auto">
-<div class="p-4 rounded-xl glass-panel
-border border-white/5
-bg-background -low/40
-backdrop-blur-xl
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<p class="text-xs text-slate-500 font-medium">SYSTEM STATUS</p>
-<div class="flex items-center gap-2 mt-2">
-<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-<span class="text-xs text-on-surface font-semibold tracking-wide">SERVER ACTIVE</span>
-</div>
-</div>
-</div>
+      <!-- TABLE -->
+      <a onclick="navigate('tablePage')">
+         <span class="material-symbols-outlined sidebar-icon">
+          Table
+        </span>
+
+        <span class="sidebar-label">
+          Table
+        </span>
+      </a>
+
+      <!-- MEMBER -->
+      <a onclick="navigate('memberPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          group
+        </span>
+
+        <span class="sidebar-label">
+          Member
+        </span>
+      </a>
+
+      <!-- SETTINGS -->
+      <a onclick="navigate('settingsPage')"
+         style="display:none"
+		  	 class="settingsMenu">
+        <span class="material-symbols-outlined sidebar-icon">
+          settings
+        </span>
+
+        <span class="sidebar-label">
+          Settings
+        </span>
+      </a>
+
+      <!-- LOGOUT -->
+      <a onclick="logout()">
+        <span class="material-symbols-outlined sidebar-icon">
+          logout
+        </span>
+
+        <span class="sidebar-label">
+	        LOGOUT
+        </span>
+      </a>
+
+    </nav>
+
+
+    <!-- FOOTER -->
+    <div class="mt-auto p-2 pb-2">
+      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+
+        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        </span>
+
+        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <p class="text-[10px] text-slate-500">
+            SYSTEM STATUS
+          </p>
+
+          <span class="sidebar-label">
+            SERVER ACTIVE
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </aside>
 
 <!-- Sidebar Kanan: Billing Control -->
@@ -4189,63 +4338,109 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 
 <template id="memberPage" >
   
-  <aside
+<!-- ================= SIDEBAR ================= -->
+<aside
   id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-    <div class="px-8 mb-12">
-    <div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">SOMA Kasir</div>
-    <div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">PREMIUM POS</div>
-    </div>
-    <nav class="flex-1 space-y-1">
-    <a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('dashboardPage')">
-    <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-    <span class="font-semibold text-sm">Dashboard</span>
-    </a>
-    <a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('posPage')">
-    <span class="material-symbols-outlined" data-icon="point_of_sale">point_of_sale</span>
-    <span class="font-semibold text-sm">POS</span>
-    </a>
-    <a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('tablePage')">
-    <span class="material-symbols-outlined" data-icon="table_restaurant">table_restaurant</span>
-    <span class="font-semibold text-sm">Table</span>
-    </a>
-    <a class="flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all" onclick="navigate('memberPage')">
-    <span class="material-symbols-outlined" data-icon="group">group</span>
-    <span class="font-semibold text-sm">Member</span>
-    </a>
-    <a 
-      class="settingsMenu flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all"
-      onclick="navigate('settingsPage')"
-      style="display:none"
-    >
+  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
-      <span class="material-symbols-outlined">
-        settings
-      </span>
+  <!-- SIDEBAR CONTENT -->
+  <div class="sidebar-menu flex flex-col h-full">
+    <!-- MENU -->
+    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+      <!-- DASHBOARD -->
+      <a class="active" onclick="navigate('dashboardPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          home
+        </span>
+    
+        <span
+          class="sidebar-label">
+          Dashboard
+        </span>
+      </a>
+      <!-- POS -->
+      <a onclick="navigate('posPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          shopping_cart
+        </span>
 
-      <span class="font-semibold text-sm">
-        Settings
-      </span>
+        <span class="sidebar-label">
+          POS
+        </span>
+      </a>
 
-    </a>
-    <a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-    <span class="material-symbols-outlined" data-icon="logout">logout</span>
-    <span class="font-semibold text-sm">Logout</span>
-    </a></nav>
-      <div class="px-6 mt-auto">
-      <div class="p-4 rounded-xl glass-panel
-      border border-white/5
-      bg-background -low/40
-      backdrop-blur-xl
-      shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-        <p class="text-xs text-slate-500 font-medium">SYSTEM STATUS</p>
-        <div class="flex items-center gap-2 mt-2">
-          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-          <span class="text-xs text-on-surface font-semibold tracking-wide">SERVER ACTIVE</span>
+      <!-- TABLE -->
+      <a onclick="navigate('tablePage')">
+         <span class="material-symbols-outlined sidebar-icon">
+          Table
+        </span>
+
+        <span class="sidebar-label">
+          Table
+        </span>
+      </a>
+
+      <!-- MEMBER -->
+      <a onclick="navigate('memberPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          group
+        </span>
+
+        <span class="sidebar-label">
+          Member
+        </span>
+      </a>
+
+      <!-- SETTINGS -->
+      <a onclick="navigate('settingsPage')"
+         style="display:none"
+		  	 class="settingsMenu">
+        <span class="material-symbols-outlined sidebar-icon">
+          settings
+        </span>
+
+        <span class="sidebar-label">
+          Settings
+        </span>
+      </a>
+
+      <!-- LOGOUT -->
+      <a onclick="logout()">
+        <span class="material-symbols-outlined sidebar-icon">
+          logout
+        </span>
+
+        <span class="sidebar-label">
+	        LOGOUT
+        </span>
+      </a>
+
+    </nav>
+
+
+    <!-- FOOTER -->
+    <div class="mt-auto p-2 pb-2">
+      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+
+        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        </span>
+
+        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          <p class="text-[10px] text-slate-500">
+            SYSTEM STATUS
+          </p>
+
+          <span class="sidebar-label">
+            SERVER ACTIVE
+          </p>
         </div>
       </div>
     </div>
-  </aside>
+  </div>
+</aside>
+
+	
   <!-- Content Wrapper (Scrollable Main Content Area) -->
   <div id="mainContent"
     class="flex-1 ml-72 flex flex-col h-screen transition-all duration-300">
