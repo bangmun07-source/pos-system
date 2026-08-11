@@ -283,6 +283,9 @@
 	  justify-content: flex-start;
 	}
 	
+	.sidebar-closed {
+	    width: 4rem !important;
+	}
 	h1, h2, h3,
 	.font-headline,
 	.headline-font {
@@ -15731,21 +15734,23 @@ let sidebarOpen = true;
 
 function toggleSidebar() {
 
-  const sidebar =
-    document.getElementById("sidebar");
+    const sidebar = document.getElementById("sidebar");
 
-  sidebarOpen = !sidebarOpen;
+    if (!sidebar) return;
 
-  if (!sidebarOpen) {
+    sidebarOpen = !sidebarOpen;
 
-    sidebar.classList.add("-translate-x-full");
+    if (!sidebarOpen) {
 
-  } else {
+        sidebar.classList.add("sidebar-closed");
 
-    sidebar.classList.remove("-translate-x-full");
+    } else {
 
-  }
+        sidebar.classList.remove("sidebar-closed");
+
+    }
 }
+
 
 document.addEventListener("mousedown", function (e) {
 
@@ -15753,14 +15758,15 @@ document.addEventListener("mousedown", function (e) {
 
     if (!sidebar || !sidebarOpen) return;
 
-    // Klik di dalam sidebar
+    // Klik di dalam sidebar → jangan tutup
     if (sidebar.contains(e.target)) return;
 
-    // Klik tombol toggle
+    // Klik tombol/icon toggle → jangan tutup
     if (e.target.closest('[onclick="toggleSidebar()"]')) return;
 
-    // Klik di luar sidebar
+    // Klik di luar sidebar → kembali kecil
     toggleSidebar();
+
 });
 
 
