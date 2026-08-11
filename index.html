@@ -136,6 +136,7 @@
 	.sidebar-menu {
 	  width: 100%;
 	}
+
 	
 	/* MENU ITEM */
 	.sidebar-menu a {
@@ -193,26 +194,19 @@
 	  transition: opacity 150ms ease;
 	}
 	
-	
 	/* TEXT MUNCUL SAAT HOVER */
-	
 	#sidebar:hover .sidebar-label {
 	  opacity: 1;
 	}
 		
 	/* CLOSED */
-	
 	#sidebar:not(:hover) .sidebar-menu a {
-	  justify-content: center;
-	  padding-left: 0;
-	  padding-right: 0;
+	  justify-content: flex-start;
 	}
 	
 	/* OPEN / HOVER */
 	#sidebar:hover .sidebar-menu a {
-	  justify-content: flex-start;	
-	  padding-left: 6px;
-	  padding-right: 6px;
+	  justify-content: flex-start;
 	}
 	
     h1, h2, h3,
