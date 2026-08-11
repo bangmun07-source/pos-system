@@ -566,69 +566,54 @@
  <!-- DASHBOARD -->
 
 <template id="dashboardPage" >
-  
+
 <aside
   id="sidebar"
   class="
-    fixed
-    left-0
-    top-20
-    bottom-0
+    fixed left-0 top-20 bottom-0
     z-50
-
-    w-[80px]
-    hover:w-[288px]
-
-    bg-background
-    dark:bg-background
-
+    w-20 hover:w-72
+    bg-background dark:bg-background
+    border-r border-white/5
     shadow-2xl
-
-    flex
-    flex-col
-
-    transition-[width]
-    duration-300
-    ease-out
-
+    flex flex-col
+    transition-[width] duration-300 ease-out
     overflow-hidden
     group
   "
 >
 
   <!-- BRAND -->
-  <div
-    class="
-      h-20
-      flex
-      items-center
-      px-0
-      group-hover:px-6
+  <div class="h-20 flex items-center px-6 whitespace-nowrap">
 
-      whitespace-nowrap
-
-      transition-all
-      duration-300
-    "
-  >
-
+    <!-- Icon / Logo saat collapsed -->
     <div
       class="
-        opacity-0
-        group-hover:opacity-100
-        transition-opacity
-        duration-200
-        whitespace-nowrap
+        w-8 h-8 shrink-0
+        flex items-center justify-center
+        text-[#f59e0b]
+        font-black text-lg
       "
     >
+      E
+    </div>
 
+    <!-- Brand saat hover -->
+    <div
+      class="
+        ml-4
+        opacity-0 group-hover:opacity-100
+        transition-opacity duration-200
+        pointer-events-none
+      "
+    >
       <div
         class="
-          text-2xl
-          font-black
+          text-xl font-black
           text-[#f59e0b]
           tracking-widest
           font-headline
+          leading-none
         "
       >
         Elevate POS
@@ -636,8 +621,7 @@
 
       <div
         class="
-          text-[10px]
-          font-['Manrope']
+          text-[9px]
           font-bold
           tracking-[0.2em]
           text-[#dae2fd]/50
@@ -647,71 +631,48 @@
       >
         MANAGEMENT SYSTEM
       </div>
-
     </div>
 
   </div>
 
 
   <!-- MENU -->
-  <nav class="flex-1 space-y-1">
-
+  <nav class="flex-1 px-2 space-y-1 overflow-y-auto">
 
     <!-- DASHBOARD -->
     <a
+      onclick="navigate('dashboardPage')"
       class="
-        flex
-        items-center
-        justify-center
-        group-hover:justify-start
-
-        gap-4
-
-        px-0
-        group-hover:px-6
-
-        py-4
-
+        h-10
+        flex items-center
+        rounded-md
         text-[#f59e0b]
-
-        bg-gradient-to-r
-        from-[#f59e0b]/20
-        to-transparent
-
-        transition-all
-        duration-300
-
+        bg-[#f59e0b]/10
+        hover:bg-[#f59e0b]/15
+        transition-colors
+        cursor-pointer
         whitespace-nowrap
       "
-      onclick="navigate('dashboardPage')"
     >
 
+      <!-- ICON SLOT -->
       <span
         class="
-          material-symbols-outlined
-          shrink-0
-          w-6
-          h-6
-          flex
-          items-center
-          justify-center
+          w-16 shrink-0
+          flex items-center justify-center
         "
       >
-        dashboard
+        <span class="material-symbols-outlined text-[22px]">
+          dashboard
+        </span>
       </span>
 
+      <!-- TEXT -->
       <span
         class="
-          font-semibold
-          text-sm
-
-          opacity-0
-          group-hover:opacity-100
-
-          transition-opacity
-          duration-200
-
-          whitespace-nowrap
+          font-semibold text-sm
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
         "
       >
         Dashboard
@@ -722,58 +683,36 @@
 
     <!-- POS -->
     <a
+      onclick="navigate('posPage')"
       class="
-        flex
-        items-center
-        justify-center
-        group-hover:justify-start
-
-        gap-4
-
-        px-0
-        group-hover:px-6
-
-        py-4
-
+        h-10
+        flex items-center
+        rounded-md
         text-slate-400
-
         hover:text-slate-200
         hover:bg-white/5
-
-        transition-all
-        duration-300
-
+        transition-colors
+        cursor-pointer
         whitespace-nowrap
       "
-      onclick="navigate('posPage')"
     >
 
       <span
         class="
-          material-symbols-outlined
-          shrink-0
-          w-6
-          h-6
-          flex
-          items-center
-          justify-center
+          w-16 shrink-0
+          flex items-center justify-center
         "
       >
-        point_of_sale
+        <span class="material-symbols-outlined text-[22px]">
+          point_of_sale
+        </span>
       </span>
 
       <span
         class="
-          font-semibold
-          text-sm
-
-          opacity-0
-          group-hover:opacity-100
-
-          transition-opacity
-          duration-200
-
-          whitespace-nowrap
+          font-semibold text-sm
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
         "
       >
         POS
@@ -784,58 +723,36 @@
 
     <!-- TABLE -->
     <a
+      onclick="navigate('tablePage')"
       class="
-        flex
-        items-center
-        justify-center
-        group-hover:justify-start
-
-        gap-4
-
-        px-0
-        group-hover:px-6
-
-        py-4
-
+        h-10
+        flex items-center
+        rounded-md
         text-slate-400
-
         hover:text-slate-200
         hover:bg-white/5
-
-        transition-all
-        duration-300
-
+        transition-colors
+        cursor-pointer
         whitespace-nowrap
       "
-      onclick="navigate('tablePage')"
     >
 
       <span
         class="
-          material-symbols-outlined
-          shrink-0
-          w-6
-          h-6
-          flex
-          items-center
-          justify-center
+          w-16 shrink-0
+          flex items-center justify-center
         "
       >
-        table_restaurant
+        <span class="material-symbols-outlined text-[22px]">
+          table_restaurant
+        </span>
       </span>
 
       <span
         class="
-          font-semibold
-          text-sm
-
-          opacity-0
-          group-hover:opacity-100
-
-          transition-opacity
-          duration-200
-
-          whitespace-nowrap
+          font-semibold text-sm
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
         "
       >
         Table
@@ -846,58 +763,36 @@
 
     <!-- MEMBER -->
     <a
+      onclick="navigate('memberPage')"
       class="
-        flex
-        items-center
-        justify-center
-        group-hover:justify-start
-
-        gap-4
-
-        px-0
-        group-hover:px-6
-
-        py-4
-
+        h-10
+        flex items-center
+        rounded-md
         text-slate-400
-
         hover:text-slate-200
         hover:bg-white/5
-
-        transition-all
-        duration-300
-
+        transition-colors
+        cursor-pointer
         whitespace-nowrap
       "
-      onclick="navigate('memberPage')"
     >
 
       <span
         class="
-          material-symbols-outlined
-          shrink-0
-          w-6
-          h-6
-          flex
-          items-center
-          justify-center
+          w-16 shrink-0
+          flex items-center justify-center
         "
       >
-        group
+        <span class="material-symbols-outlined text-[22px]">
+          group
+        </span>
       </span>
 
       <span
         class="
-          font-semibold
-          text-sm
-
-          opacity-0
-          group-hover:opacity-100
-
-          transition-opacity
-          duration-200
-
-          whitespace-nowrap
+          font-semibold text-sm
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
         "
       >
         Member
@@ -910,27 +805,14 @@
     <a
       class="
         settingsMenu
-
-        flex
-        items-center
-        justify-center
-        group-hover:justify-start
-
-        gap-4
-
-        px-0
-        group-hover:px-6
-
-        py-4
-
+        h-10
+        flex items-center
+        rounded-md
         text-slate-400
-
         hover:text-slate-200
         hover:bg-white/5
-
-        transition-all
-        duration-300
-
+        transition-colors
+        cursor-pointer
         whitespace-nowrap
       "
       onclick="navigate('settingsPage')"
@@ -939,30 +821,20 @@
 
       <span
         class="
-          material-symbols-outlined
-          shrink-0
-          w-6
-          h-6
-          flex
-          items-center
-          justify-center
+          w-16 shrink-0
+          flex items-center justify-center
         "
       >
-        settings
+        <span class="material-symbols-outlined text-[22px]">
+          settings
+        </span>
       </span>
 
       <span
         class="
-          font-semibold
-          text-sm
-
-          opacity-0
-          group-hover:opacity-100
-
-          transition-opacity
-          duration-200
-
-          whitespace-nowrap
+          font-semibold text-sm
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
         "
       >
         Settings
@@ -973,59 +845,37 @@
 
     <!-- LOGOUT -->
     <a
+      onclick="logout()"
       class="
-        flex
-        items-center
-        justify-center
-        group-hover:justify-start
-
-        gap-4
-
-        px-0
-        group-hover:px-6
-
-        py-4
-        mt-4
-
+        h-10
+        flex items-center
+        rounded-md
         text-slate-400
-
         hover:text-red-400
         hover:bg-red-500/10
-
-        transition-all
-        duration-300
-
+        transition-colors
+        cursor-pointer
         whitespace-nowrap
+        mt-3
       "
-      onclick="logout()"
     >
 
       <span
         class="
-          material-symbols-outlined
-          shrink-0
-          w-6
-          h-6
-          flex
-          items-center
-          justify-center
+          w-16 shrink-0
+          flex items-center justify-center
         "
       >
-        logout
+        <span class="material-symbols-outlined text-[22px]">
+          logout
+        </span>
       </span>
 
       <span
         class="
-          font-semibold
-          text-sm
-
-          opacity-0
-          group-hover:opacity-100
-
-          transition-opacity
-          duration-200
-
-          whitespace-nowrap
+          font-semibold text-sm
+          opacity-0 group-hover:opacity-100
+          transition-opacity duration-200
         "
       >
         Logout
@@ -1039,70 +889,35 @@
   <!-- SYSTEM STATUS -->
   <div
     class="
-      px-0
-      group-hover:px-4
-
-      pb-6
-
-      transition-all
-      duration-300
-
-      overflow-hidden
+      p-2
+      opacity-0 group-hover:opacity-100
+      transition-opacity duration-200
+      whitespace-nowrap
     "
   >
 
     <div
       class="
         p-4
-
         rounded-xl
-
-        border
-        border-white/5
-
+        border border-white/5
         bg-background/40
-
         backdrop-blur-xl
-
-        shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-
-        whitespace-nowrap
-
-        opacity-0
-        group-hover:opacity-100
-
-        transition-opacity
-        duration-200
       "
     >
 
-      <p
-        class="
-          text-xs
-          text-slate-500
-          font-medium
-        "
-      >
+      <p class="text-xs text-slate-500 font-medium">
         SYSTEM STATUS
       </p>
 
-      <div
-        class="
-          flex
-          items-center
-          gap-2
-          mt-2
-        "
-      >
+      <div class="flex items-center gap-2 mt-2">
 
         <span
           class="
-            w-2
-            h-2
+            w-2 h-2
             rounded-full
             bg-primary
             animate-pulse
-            shrink-0
           "
         ></span>
 
@@ -1124,6 +939,8 @@
   </div>
 
 </aside>
+
+
 
 <div
   id="mainContent"
