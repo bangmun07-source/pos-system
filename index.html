@@ -729,8 +729,7 @@
 
  <!-- DASHBOARD -->
 
-<template id="dashboardPage" >
-	
+<template id="dashboardPage" >	
 	<!-- ================= SIDEBAR ================= -->
 	<aside
 	  id="sidebar"
@@ -1211,86 +1210,57 @@
   </div>
 </aside>
 
-<div
-  id="mainContent"
-  class="flex-1 flex flex-col h-screen">
-	
-	<header
-	  class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
-	
+<div id="mainContent" class="flex-1 flex flex-col h-screen">	
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
 	  <div class="flex w-full items-center justify-between">
-	
 	    <!-- LEFT -->
-	    <button
-	      onclick="toggleSidebar()"
-	      class="w-11 h-11 rounded-xl flex items-center justify-center
-	      text-slate-400 hover:text-on-surface
-	      hover:hover:bg-white/5 transition-all">
+	    <button onclick="toggleSidebar()"
+	      class="w-11 h-11 rounded-xl flex items-center justify-center text-slate-400 hover:text-on-surface hover:hover:bg-white/5 transition-all">
 	
 	      <span class="material-symbols-outlined">
 	        menu
 	      </span>
-	
 	    </button>
-	
-	  </div>
-	
+	  </div>	
 	</header>
 	
 <!-- Main Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <div class="flex flex-col gap-8">
-<!-- Welcome Header -->
-<section
-class="mb-10 mt-4 relative overflow-hidden
-rounded-xl glass-panel
-border border-white/5
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-">
-
-  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-      <img
-        src="https://lh3.googleusercontent.com/d/14FwZsJGl8GFlccDscIB4NSi7MXuR_Ej7"
-        class="w-full h-full object-cover"
-        style="object-position: right 15%;"
-        alt="">
-    </div>
-  
+	<!-- Welcome Header -->
+	<section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+	      <img
+	        src="https://lh3.googleusercontent.com/d/14FwZsJGl8GFlccDscIB4NSi7MXuR_Ej7"
+	        class="w-full h-full object-cover"
+	        style="object-position: right 15%;"
+	        alt="">
+	    </div>
   <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
-
   <div class="relative min-h-[260px] flex flex-col justify-center px-12">
-
     <div>
-
       <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
-      Revenue Analytics
+     	 Revenue Analytics
       </span>
-
+			
       <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
-      Gross Revenue
+     	 Gross Revenue
       </h2>
-
+			
       <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
-      Analyze sales performance, monitor revenue growth, and gain insights into your business income across selected periods.
+     	 Analyze sales performance, monitor revenue growth, and gain insights into your business income across selected periods.
       </p>
-
     </div>
-
   </div>
 
   <div
     class="absolute -top-24 -right-24 w-72 h-72
     bg-primary/10 blur-[120px] rounded-full">
   </div>
-
 </section>
 
 <!-- TOOLBAR -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4
-            p-6 glass-panel rounded-xl overflow-hidden
-            border border-white/5
-            shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-bacground rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
   <!-- START DATE -->
   <div class="flex flex-col gap-2 ">
     <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500">
@@ -1300,13 +1270,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
     <input
       id="startDate"
       type="date"
-      class="w-full h-12
-             bg-background/80
-             border border-white/5
-             rounded-xl
-             text-sm text-on-surface
-             focus:ring-1 focus:ring-primary
-             outline-none transition-all" />
+      class="w-full h-12 bg-bacground rounded-md overflow-hidden border border-white/10 text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
   </div>
 
   <!-- END DATE -->
@@ -1318,13 +1282,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
     <input
       id="endDate"
       type="date"
-      class="w-full h-12
-             bg-background/80
-             border border-white/5
-             rounded-xl
-             text-sm text-on-surface
-             focus:ring-1 focus:ring-primary
-             outline-none transition-all" />
+      class="w-full h-12 bg-bacground rounded-md overflow-hidden border border-white/10 text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
   </div>
 
   <!-- EXPORT -->
@@ -1335,11 +1293,7 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 
     <button
       id="btnExportGrossRevenuePDF"
-      class="h-12
-      rounded-xl bg-primary/10 border border-primary/10 text-primary font-semibold text-sm
-      flex items-center justify-center gap-2
-      active:scale-95
-      transition-all">
+      class="h-12 rounded-md bg-background border border-white/10 text-primary font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
 
       <span class="material-symbols-outlined text-lg">
         download
@@ -1357,45 +1311,27 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 
   <!-- Total Revenue -->
-  <div class="glass-panel rounded-xl overflow-hidden
-              border border-white/5
-              p-6 relative group
-              shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-      <div
-        class="absolute right-0 p-5
-        opacity-5
-        group-hover:opacity-20
-        transition-all
-        duration-700
-        group-hover:scale-90">
-
-        <span
-          class="material-symbols-outlined text-[200px] animate-float">
-          trending_up
-        </span>
+  <div class="bg-background rounded-md overflow-hidden border border-white/10 group shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative ">
+		<div class="absolute right-0 p-5 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-90">
+			<span class="material-symbols-outlined text-[200px] animate-float">
+				trending_up
+			</span>
 
       </div>
     <div class="flex justify-between items-start">
-
-      <div class="w-12 h-12 rounded-xl
-                  bg-primary/10
-                  border border-primary/10
-                  flex items-center justify-center text-primary">
-        <span class="material-symbols-outlined text-2xl"
-              style="font-variation-settings:'FILL' 1;">
+      <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
           payments
         </span>
       </div>
 
-      <span id="gr-revenue-growth"
-            class="text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-lg">
-        +0%
+      <span id="gr-revenue-growth" class="text-xs font-bold text-foreground">
       </span>
-
     </div>
 
     <div class="mt-8">
-      <p class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
         Total Gross Revenue
       </p>
 
@@ -1404,31 +1340,22 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
         IDR 0
       </h3>
     </div>
-
   </div>
 
   <!-- Total Discounts -->
-  <div class="glass-panel rounded-xl overflow-hidden
-              border border-white/5
-              p-6 relative
-              shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+  <div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
     <div class="flex justify-between items-start">
-
-      <div class="w-12 h-12 rounded-xl
-                  bg-tertiary/10
-                  border border-tertiary/10
-                  flex items-center justify-center text-tertiary">
+      <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
         <span class="material-symbols-outlined text-2xl">
           loyalty
         </span>
       </div>
-
     </div>
 
     <div class="mt-8">
-
-      <p class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
         Total Discounts
       </p>
 
@@ -1441,35 +1368,22 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
         <div id="discountBarFill"
              class="h-full bg-tertiary rounded-full"></div>
       </div>
-
     </div>
-
   </div>
 
   <!-- Total Tax -->
-  <div class="glass-panel rounded-xl overflow-hidden
-              border border-white/5
-              p-6 relative
-              shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+  <div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
     <div class="flex justify-between items-start">
-
-      <div class="w-12 h-12 rounded-xl
-                  bg-slate-500/10
-                  border border-slate-500/10
-                  flex items-center justify-center text-slate-300">
-
-        <span class="material-symbols-outlined text-2xl">
+			<div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
           account_balance
         </span>
-
       </div>
-
     </div>
-
+		
     <div class="mt-8">
-
-      <p class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
         Total Tax (11%)
       </p>
 
@@ -1477,39 +1391,22 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
           class="text-3xl font-extrabold text-on-surface mt-2">
         IDR 0
       </h3>
-
-      <p class="text-[11px] text-on-surface-variant mt-3 italic">
-        Automatically withheld for PPN
-      </p>
-
     </div>
-
   </div>
 
   <!-- Average Transaction -->
-  <div class="glass-panel rounded-xl overflow-hidden
-              border border-white/5
-              p-6 relative
-              shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
     <div class="flex justify-between items-start">
-
-      <div class="w-12 h-12 rounded-xl
-                  bg-amber-500/10
-                  border border-amber-500/10
-                  flex items-center justify-center text-amber-400">
-
-        <span class="material-symbols-outlined text-2xl">
+	    <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
           analytics
         </span>
-
       </div>
-
     </div>
 
     <div class="mt-8">
-
-      <p class="text-on-surface-variant text-xs uppercase tracking-widest font-bold">
+	    <p class="text-muted text-sm font-medium uppercase tracking-widest">
         Average Transaction
       </p>
 
@@ -1517,15 +1414,8 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
           class="text-3xl font-extrabold text-on-surface mt-2">
         IDR 0
       </h3>
-
-      <p class="text-[11px] text-primary mt-3 font-medium">
-        Highest in Lunch Shift
-      </p>
-
     </div>
-
   </div>
-
 </div>
 
 
