@@ -331,24 +331,17 @@
 
 
     .bg-background {
-
-      position: relative;
-      overflow: hidden;
-
-      background: rgba(255,255,255,0.035);
-
-      backdrop-filter: 
-      blur(25px)
-      saturate(150%);
-
-      -webkit-backdrop-filter: 
-      blur(25px)
-      saturate(150%);
-      
-
-      border: 1px solid rgba(255,255,255,0.08);
-
-    }
+		  position: relative;
+		  overflow: hidden;
+		  background: #0B0F14;
+		  backdrop-filter: 
+		  blur(25px)
+		  saturate(150%);
+		  -webkit-backdrop-filter: 
+		  blur(25px)
+		  saturate(150%);
+		  border: 1px solid rgba(255,255,255,0.08);
+		}
 
     .bg-background::before {
       content: "";
@@ -451,6 +444,7 @@
     #mainContent {
       height: 100vh;
       overflow: auto;
+			background-color: #0B0F14;
     }
 
     /* =========================
@@ -3699,7 +3693,7 @@
 
  <div id="mainContent" class="flex-1 flex flex-col h-screen">	
 <!-- Top Navigation Bar -->
-<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">>
+<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex justify-between items-center flex items-center px-8">
   
 <div class="flex items-center flex-1 max-w-xl">
 <div class="relative w-full group">
