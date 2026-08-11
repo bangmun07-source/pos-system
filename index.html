@@ -1354,7 +1354,7 @@
         IDR 0
       </h3>
 
-      <div class="mt-5 h-2 w-full rounded-md bg-surface-container-lowest/60 overflow-hidden">
+      <div class="mt-5 h-2 w-full rounded-md bg-white/5 overflow-hidden">
         <div id="discountBarFill"
              class="h-full bg-tertiary rounded-md"></div>
       </div>
@@ -2099,8 +2099,6 @@
     <button
       id="recentPrevBtn"
       class="p-2 rounded-lg
-             bg-background
-             hover:bg-surface-container-high
              transition-colors
              disabled:opacity-30">
 
@@ -2113,8 +2111,6 @@
     <button
       id="recentNextBtn"
       class="p-2 rounded-lg
-             bg-background
-             hover:bg-surface-container-high
              transition-colors
              disabled:opacity-30">
 
@@ -3042,8 +3038,7 @@
     <button
     onclick="toggleBillingSidebar('pos')"
     class="w-11 h-11 rounded-md flex items-center justify-center
-      text-slate-400 hover:text-on-surface
-      hover:bg-surface-container-high/40 transition-all">
+      text-slate-400 hover:text-on-surface transition-all">
     <span class="material-symbols-outlined">
       shopping_cart
     </span>
@@ -8575,7 +8570,7 @@ SOMA Kasir v2.4.0-Stable
 
 <div class="relative w-full max-w-md">
 <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-surface-container-lowest border-none rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+<input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
 </div>
 <button class="p-2 text-slate-400 hover:bg-[#222a3d] rounded-md transition-all scale-95 active:scale-90">
 <span class="material-symbols-outlined">notifications</span>
@@ -18845,14 +18840,14 @@ function selectPayment(method) {
         "ring-primary-container"
       );
       btn.classList.add(
-        "bg-surface-container-low",
-        "text-slate-400"
+        "bg-background",
+        "text-foreground"
       );
     });
     //  aktifkan tombol yang dipilih
     const activeBtn = document.getElementById("pay-" + method);
     if (activeBtn) {
-      activeBtn.classList.remove("bg-surface-container-low", "text-slate-400");
+      activeBtn.classList.remove("bg-background", "text-foreground");
       activeBtn.classList.add(
         "bg-primary-container",
         "text-on-primary-container",
