@@ -123,13 +123,98 @@
       user-select: none;
     }
 
-		.logo{
-			width: 50px;
-			height: 50px;
-			border-radius: 50%:
-			object-fit: cover;
-		}
+	.logo{
+		width: 50px;
+		height: 50px;
+		border-radius: 50%:
+		object-fit: cover;
+	}
 
+	/* =========================
+		   SIDEBAR MENU
+		========================= */
+	.sidebar-menu {
+	  width: 100%;
+	}
+	
+	/* MENU ITEM */
+	.sidebar-menu a {
+	  height: 32px;
+	  width: 100%;
+	  display: flex;
+	  align-items: center;
+	  gap: 8px;	
+	  padding: 0 6px	
+	  overflow: hidden;
+	  white-space: nowrap;	
+	  border-radius: 6px;	
+	  color: #94a3b8;	
+	  cursor: pointer;	
+	  transition:
+	    background-color 150ms ease,
+	    color 150ms ease;
+	}
+	
+	.sidebar-menu a:hover {
+	  background: rgba(255, 255, 255, 0.05);
+	  color: #e2e8f0;
+	}
+	
+	/* ICON */	
+	.sidebar-menu .sidebar-icon {
+	  width: 20px;
+	  height: 20px;
+	  min-width: 20px;	
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;	
+	  flex-shrink: 0;	
+	  color: #94a3b8;	
+	  font-size: 20px;	
+	  line-height: 1;	
+	  font-variation-settings:
+	    'FILL' 0,
+	    'wght' 300,
+	    'GRAD' 0,
+	    'opsz' 20;
+	}
+	
+	.sidebar-menu a:hover .sidebar-icon {
+	  color: #e2e8f0;
+	}
+	
+	/* TEXT */
+	.sidebar-menu .sidebar-label {
+	  font-size: 14px;	
+	  font-weight: 300;	
+	  line-height: 1;	
+	  white-space: nowrap;	
+	  opacity: 0;	
+	  transition: opacity 150ms ease;
+	}
+	
+	
+	/* TEXT MUNCUL SAAT HOVER */
+	
+	#sidebar:hover .sidebar-label {
+	  opacity: 1;
+	}
+		
+	/* CLOSED */
+	
+	#sidebar:not(:hover) .sidebar-menu a {
+	  justify-content: center;
+	  padding-left: 0;
+	  padding-right: 0;
+	}
+	
+	/* OPEN / HOVER */
+	#sidebar:hover .sidebar-menu a {
+	  justify-content: flex-start;	
+	  padding-left: 6px;
+	  padding-right: 6px;
+	}
+	
     h1, h2, h3,
     .font-headline,
     .headline-font {
@@ -573,110 +658,74 @@
   class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 
   <!-- SIDEBAR CONTENT -->
-  <div class="flex h-full w-full flex-col">
+  <div class="sidebar-menu">
     <!-- MENU -->
     <nav class="flex-1 overflow-y-auto overflow-x-hidden p-4">
       <!-- DASHBOARD -->
-      <a
-        onclick="navigate('dashboardPage')"
-        class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
-      
-        <span
-          class="material-symbols-outlined text-slate-200 shrink-0 w-8 h-8 flex items-center justify-center"
-					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
+      <a onclick="navigate('dashboardPage')">
+        <span class="material-symbols-outlined sidebar-icon">
           home
         </span>
     
         <span
-          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+          class="sidebar-label">
           DASHBOARD
         </span>
       </a>
       <!-- POS -->
-      <a
-        onclick="navigate('posPage')"
-        class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer" >
-
-        <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
-					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
-          point_of_sale
+      <a onclick="navigate('posPage')">
+        <span class="material-symbols-outlined sidebar-icon">
+          shopping_cart
         </span>
 
-        <span
-          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          shopping_cart
+        <span class="sidebar-label">
+          POS
         </span>
       </a>
 
       <!-- TABLE -->
-      <a
-        onclick="navigate('tablePage')"
-        class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
-
-        <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center " 
-					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
+      <a onclick="navigate('tablePage')">
+         <span class="material-symbols-outlined sidebar-icon">
           table
         </span>
 
-        <span
-          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <span class="sidebar-label">
           TABLE
         </span>
       </a>
 
       <!-- MEMBER -->
-      <a
-        onclick="navigate('memberPage')"
-        class=" flex h-10 w-full items-center gap-3 overflow-hidden rounded-md text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer">
-
-        <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
-					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
+      <a onclick="navigate('memberPage')">
+        <span class="material-symbols-outlined sidebar-icon">
           group
         </span>
 
-        <span
-          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <span class="sidebar-label">
           Member
         </span>
       </a>
 
       <!-- SETTINGS -->
-      <a
-        class="settingsMenu flex h-10 w-full items-center gap-3 overflow-hidden rounded-md text-slate-400 hover:bg-white/5 hover:text-slate-200 transition-colors cursor-pointer"
-        onclick="navigate('settingsPage')"
+      <a onclick="navigate('settingsPage')"
         style="display:none">
-
-        <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
-        	style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
+        <span class="material-symbols-outlined sidebar-icon">
           settings
         </span>
 
-        <span
-          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <span class="sidebar-label">
           SETTINGS
         </span>
       </a>
 
       <!-- LOGOUT -->
-      <a
-        onclick="logout()"
-        class="flex h-10 w-full items-center gap-3 overflow-hidden rounded-md mt-2 text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors cursor-pointer">
-
-        <span
-          class="material-symbols-outlined font-light shrink-0 w-8 h-8 flex items-center justify-center"
-					style="font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 0, 'opsz' 24;">
+      <a onclick="logout()">
+        <span class="material-symbols-outlined sidebar-icon">
           logout
         </span>
 
-        <span
-          class="whitespace-nowrap text-sm font-light opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <span class="sidebar-label">
 	        LOGOUT
         </span>
-
       </a>
 
     </nav>
@@ -696,7 +745,7 @@
             SYSTEM STATUS
           </p>
 
-          <p class="text-xs font-semibold text-on-surface">
+          <span class="sidebar-label">
             SERVER ACTIVE
           </p>
         </div>
