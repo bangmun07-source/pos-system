@@ -202,7 +202,6 @@
 	.sidebar-menu {
 	  width: 100%;
 	}
-
 	
 	/* MENU ITEM */
 	.sidebar-menu a {
@@ -332,12 +331,7 @@
 			transparent 4px
 		);
 	}
-@media (max-width: 768px) {
-  .bg-background {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-}
+	
 	#receiptMainWrapper .bg-background{
     background: 
         linear-gradient(
@@ -353,12 +347,12 @@
 		INPUT & FORM
 	========================= */
 	.input-glow:focus-within {
-		border-left: 2px solid #f59e0b;
+		border-left: 2px solid #F5F5F5;
 	}
 
 	.input-focus-glow:focus-within {
-		box-shadow: inset 2px 0 0 0 #f59e0b;
-		background-color: #222a3d;
+		box-shadow: inset 2px 0 0 0 #F5F5F5;
+		background-color: #101715;
 	}
 
 	/* remove number arrows */
@@ -473,46 +467,6 @@
     ========================= */
     .tonal-architecture {
       background-color: #131b2e;
-    }
-
-    /* =========================
-      EFFECTS / VISUAL
-    ========================= */
-    .brushed-obsidian {
-      background: 
-        radial-gradient(circle at 50% 0%, rgba(245, 158, 11, 0.05) 0%, transparent 70%),
-        radial-gradient(circle at 100% 100%, rgba(19, 27, 46, 1) 0%, rgba(6, 14, 32, 1) 100%);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .brushed-obsidian::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-image: repeating-linear-gradient(
-        0deg,
-        rgba(255,255,255,0.01) 0px,
-        rgba(255,255,255,0.01) 1px,
-        transparent 1px,
-        transparent 2px
-      );
-      pointer-events: none;
-      opacity: 0.5;
-    }
-
-    /* =========================
-      TEXT EFFECTS
-    ========================= */
-    .embossed-mark {
-      color: #f59e0b;
-      text-shadow: 
-        -1px -1px 1px rgba(0, 0, 0, 0.8),
-        1px 1px 1px rgba(255, 255, 255, 0.1);
-    }
-
-    .amber-text-glow {
-      text-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
     }
 
     /* =========================
