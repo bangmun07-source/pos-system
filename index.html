@@ -11777,36 +11777,24 @@ Save
 	</aside>
 
  <div id="mainContent" class="flex-1 flex flex-col h-screen">	
-	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8 overflow-visible">
 	  <div class="flex items-center gap-4">
-	    <button onclick="toggleSidebar()"
-	      class="w-11 h-11 rounded-md flex items-center justify-center hover:bg-white/5 text-muted transition-all">
-	      <span class="material-symbols-outlined">
-	        menu
-	      </span>
-	    </button>
-	    <p class="text-[20px] text-muted font-medium tracking-wider">
+	    <img src="logo.png"
+	      alt="Logo"
+	      class="w-10 h-10 object-contain">
+
+	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
 	      CASH FLOW
 	    </p>
-	  </div>
+ 		 </div>
+	
 	
 	  <!-- KANAN -->
 	  <div class="ml-auto flex items-center gap-3">
-	    <!-- SEARCH -->
-	    <div class="relative w-96">
-	      <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted text-lg">
-	        search
-	      </span>
-	
-	      <input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface"
-	        placeholder="Search settings..."
-	        type="text" />
-	    </div>
-	
 	    <!-- NOTIFICATION -->
 	    <div class="relative">
 	      <button onclick="toggleCashFlowNotification()"
-	        class="w-10 h-10 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition-all" >
+	        class="hidden absolute right-0 top-12 w-96 bg-background headline-font border border-white/10 shadow-2xl rounded-md overflow-hidden z-[100]"
 	        <span class="relative inline-flex">
 	          <span class="relative material-symbols-outlined">
 	            notifications
