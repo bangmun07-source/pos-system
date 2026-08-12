@@ -64,7 +64,7 @@
                     
                         "on-background": "#F5F5F5",
                         "on-surface": "#F5F5F5",
-                        "on-surface-variant": "#555555",
+                        "on-surface-variant": "#a1a1a1",
                     
                         /* =========================
                            MUTED / SECONDARY TEXT
@@ -545,7 +545,7 @@
           SOMMA
         </h2>
 
-        <p class="text-sm text-on-surface-variant mt-1">
+        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
           Premium Terminal Access
         </p>
 
@@ -1174,7 +1174,7 @@
     <input
       id="startDate"
       type="date"
-      class="w-full h-12 bg-background rounded-md overflow-hidden border border-white/10 text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
+      class="w-full h-12 bg-background rounded-md overflow-hidden border border-white/10 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
   </div>
 
   <!-- END DATE -->
@@ -1186,7 +1186,7 @@
     <input
       id="endDate"
       type="date"
-      class="w-full h-12 bg-background rounded-md overflow-hidden border border-white/10 text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
+      class="w-full h-12 bg-background rounded-md overflow-hidden border border-white/10 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
   </div>
 
   <!-- EXPORT -->
@@ -1589,7 +1589,7 @@
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <section class="flex flex-col gap-4">
 <!-- Page Header & Stats -->
-<section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+<section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 	<div class="absolute inset-0 bg-cover bg-center opacity-70"
 	  style="background-image:url('https://lh3.googleusercontent.com/d/1uPJEKlJ9Qb8eDMB8GWfBP88Z1edQLkh8');">
 	</div>
@@ -1624,7 +1624,7 @@
 
     <input type="date"
       id="startDate"
-     class="w-full h-12  bg-background border border-white/10 rounded-md text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
+     class="w-full h-12  bg-background border border-white/10 rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
   </div>
 
   <!-- END DATE -->
@@ -1635,7 +1635,7 @@
 
     <input type="date"
       id="endDate"
-      class="w-full h-12 bg-background border border-white/10 rounded-md text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
+      class="w-full h-12 bg-background border border-white/10 rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
   </div>
 
   <!-- STATUS -->
@@ -1646,7 +1646,7 @@
 
     <div class="relative">
       <select id="statusFilter"
-        class="w-full h-12 bg-background border border-white/10 rounded-md px-4 pr-10 text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
+        class="w-full h-12 bg-background border border-white/10 rounded-md px-4 pr-10 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
 	        <option value="ALL">All Statuses</option>
 	        <option value="PAID">Paid</option>
 	        <option value="REFUND">Refund</option>
@@ -2696,13 +2696,13 @@
           shadow-2xl overflow-hidden z-50">
 
           <div class="p-4 border-b border-white/10">
-            <h3 class="font-bold text-sm text-on-surface">
+            <h3 class="font-bold text-xs lg:text-sm text-on-surface">
             Notifications
             </h3>
           </div>
 
           <div id="notificationList" class="max-h-96 overflow-y-auto custom-scrollbar">
-            <div class="p-4 text-sm text-on-surface-variant">
+            <div class="p-4 text-xs lg:text-sm text-on-surface-variant">
               No Notifications Today
             </div>
           </div>
@@ -3090,7 +3090,7 @@
 
                   <span
                     id="redeemMemberId"
-                    class="text-sm text-on-surface-variant font-mono">
+                    class="text-xs lg:text-sm text-on-surface-variant font-mono">
                   </span>
 
                 </div>
@@ -3577,7 +3577,7 @@
     <!-- BODY -->
     <div class="p-6">
 
-      <label class="block text-sm text-on-surface-variant mb-2">
+      <label class="block text-xs lg:text-sm text-on-surface-variant mb-2">
         Table Name
       </label>
 
@@ -3779,13 +3779,13 @@
             shadow-2xl overflow-hidden z-50">
 
             <div class="p-4 border-b border-white/10">
-              <h3 class="font-bold text-sm text-on-surface">
+              <h3 class="font-bold text-xs lg:text-sm text-on-surface">
               Notifications
               </h3>
             </div>
 
             <div id="notificationList" class="max-h-96 overflow-y-auto custom-scrollbar">
-              <div class="p-4 text-sm text-on-surface-variant">
+              <div class="p-4 text-xs lg:text-sm text-on-surface-variant">
                 No Notifications Today
               </div>
             </div>
@@ -4003,7 +4003,7 @@
                   border border-white/10
                   rounded-md
                   pl-12 pr-6 py-2.5
-                  text-sm text-on-surface
+                  text-xs lg:text-sm text-on-surface
                   focus:ring-1 focus:ring-primary
                   transition-all"
             placeholder="Search members..."
@@ -4020,7 +4020,7 @@
                 border border-white/10
                 rounded-md
                 px-4 py-2.5
-                text-sm text-on-surface
+                text-xs lg:text-sm text-on-surface
                 focus:ring-1 focus:ring-primary
                 transition-all">
 
@@ -5140,7 +5140,7 @@
           </div>
 
           <div class="text-left">
-            <p class="text-sm text-on-surface font-medium">Adjust Stock Level</p>
+            <p class="text-xs lg:text-sm text-on-surface font-medium">Adjust Stock Level</p>
             <p class="text-xs text-on-surface-variant">Manual inventory corrections</p>
           </div>
 
@@ -5163,7 +5163,7 @@
           </div>
 
           <div class="text-left">
-            <p class="text-sm text-on-surface font-medium">View Stock Movement Log</p>
+            <p class="text-xs lg:text-sm text-on-surface font-medium">View Stock Movement Log</p>
             <p class="text-xs text-on-surface-variant">Historical usage tracking</p>
           </div>
 
@@ -5186,7 +5186,7 @@
           </div>
 
           <div class="text-left">
-            <p class="text-sm text-on-surface font-medium">Set Minimum Threshold</p>
+            <p class="text-xs lg:text-sm text-on-surface font-medium">Set Minimum Threshold</p>
             <p class="text-xs text-on-surface-variant">Restock alert configuration</p>
           </div>
 
@@ -5380,7 +5380,7 @@
             Espresso Roast - Arabica
           </h2>
 
-          <p class="text-sm text-on-surface-variant mt-1">
+          <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
             Current Stock:
             <span class="text-primary">4,500g</span>
           </p>
@@ -5454,7 +5454,7 @@
           </h1>
 
           <p id="usageLogItemName"
-            class="text-sm text-on-surface-variant font-medium">
+            class="text-xs lg:text-sm text-on-surface-variant font-medium">
             <span class="mx-2 text-primary/40">|</span> SKU: ER-ARB-001
           </p>
         </div>
@@ -5510,7 +5510,7 @@
           <span id="usageAvgDaily" class="text-3xl font-bold text-on-surface">
             4.2
           </span>
-          <span class="text-sm text-on-surface-variant">days</span>
+          <span class="text-xs lg:text-sm text-on-surface-variant">days</span>
         </div>
 
       </div>
@@ -5825,7 +5825,7 @@
             </span>
 
             <span
-              class="text-sm text-on-surface-variant text-center">
+              class="text-xs lg:text-sm text-on-surface-variant text-center">
               Click to upload image
             </span>
 
@@ -5921,7 +5921,7 @@
                 <h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
                   Margin Intelligence
                 </h4>
-                <p class="text-sm text-on-surface-variant">
+                <p class="text-xs lg:text-sm text-on-surface-variant">
                   Profit per unit sold
                 </p>
               </div>
@@ -5936,7 +5936,7 @@
               </div>
 
               <p id="recipeProfitValue"
-                class="text-sm text-on-surface-variant">
+                class="text-xs lg:text-sm text-on-surface-variant">
                 Rp 0
               </p>
 
@@ -6286,7 +6286,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		
 				<input type="date" id="analyticsStartDate"
 					onchange="onDateChange()"
-					class="w-full h-12 bg-background border border-white/10 rounded-md px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
+					class="w-full h-12 bg-background border border-white/10 rounded-md px-4 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
 			</div>		
 			<!-- END DATE -->
 			<div class="flex flex-col gap-1.5">
@@ -6296,7 +6296,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		
 				<input type="date" id="analyticsEndDate"
 					onchange="onDateChange()"
-					class="w-full h-12 bg-background border border-white/10 rounded-md px-4 text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
+					class="w-full h-12 bg-background border border-white/10 rounded-md px-4 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
 			</div>		
 			<!-- EXPORT -->
 			<div class="flex flex-col gap-1.5">
@@ -6804,7 +6804,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		          User Management
 		        </h2>
 		        
-		        <p class="text-sm text-on-surface-variant mt-1">
+		        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
 		          Manage system users, roles, passwords and outlet access.
 		        </p>
 		      </div>
@@ -6875,7 +6875,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		          Business Profile
 		        </h2>
 		
-		        <p class="text-sm text-on-surface-variant mt-1">
+		        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
 		          Manage business identity, logo, and digital receipt information.
 		        </p>
 		      </div>
@@ -6912,7 +6912,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		          <input
 		            id="businessCompanyName"
 		            type="text"
-		            class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
+		            class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-xs lg:text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
 		            placeholder="Nama usaha" >
 		        </div>
 		
@@ -6924,7 +6924,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		          <input
 		            id="businessInstagram"
 		            type="text"
-		            class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
+		            class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-xs lg:text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
 		            placeholder="@instagram">
 		        </div>
 		
@@ -6936,7 +6936,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		          <textarea
 		            id="businessReceiptFooter"
 		            rows="2"
-		            class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
+		            class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-xs lg:text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
 		            placeholder="Terima kasih sudah berkunjung" >
 		          </textarea>
 		        </div>
@@ -7510,7 +7510,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Dashboard
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Ringkasan performa bisnis, statistik penjualan,
 			      dan informasi penting secara real-time.
 			    </p>
@@ -7525,7 +7525,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      POS
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Panduan transaksi penjualan, pembayaran,
 			      diskon, dan proses checkout.
 			    </p>
@@ -7540,7 +7540,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Table
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Pengelolaan meja, status meja,
 			      dan alur pelayanan pelanggan.
 			    </p>
@@ -7555,7 +7555,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Member
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Manajemen pelanggan, data member,
 			      dan riwayat transaksi.
 			    </p>
@@ -7570,7 +7570,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Gross Revenue
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Analisis pendapatan kotor,
 			      laba, dan performa penjualan.
 			    </p>
@@ -7585,7 +7585,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Recent Transactions
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Melihat riwayat transaksi
 			      beserta detail pembayaran.
 			    </p>
@@ -7600,7 +7600,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Settings
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Pengaturan aplikasi, pengguna,
 			      outlet, dan konfigurasi sistem.
 			    </p>
@@ -7615,7 +7615,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Expenses
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Pencatatan pengeluaran operasional
 			      beserta kategorinya.
 			    </p>
@@ -7630,7 +7630,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Loyalty & Tiers
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Pengaturan poin, level member,
 			      dan program loyalitas pelanggan.
 			    </p>
@@ -7645,7 +7645,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 						Taxes & Fees
 					</h3>
 			
-					<p class="text-sm text-on-surface-variant mt-2">
+					<p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 						Konfigurasi pajak,
 						service charge, dan biaya tambahan.
 					</p>
@@ -7660,7 +7660,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 						Analytics
 					</h3>
 			
-					<p class="text-sm text-on-surface-variant mt-2">
+					<p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 						Visualisasi data bisnis,
 						laporan, dan analisis performa usaha.
 					</p>
@@ -7675,7 +7675,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			      Inventory
 			    </h3>
 			
-			    <p class="text-sm text-on-surface-variant mt-2">
+			    <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 			      Mengelola stok, bahan baku,
 			      produk, dan mutasi inventori.
 			    </p>
@@ -7690,7 +7690,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 				    Cash Flow
 				  </h3>
 				
-				  <p class="text-sm text-on-surface-variant mt-2">
+				  <p class="text-xs lg:text-sm text-on-surface-variant mt-2">
 				    Memantau arus kas, pemasukan,
 				    pengeluaran, dan saldo keuangan
 				    secara real-time.
@@ -8902,7 +8902,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 							<span class="material-symbols-outlined text-primary">auto_awesome</span>
 							<h4 class="font-['Manrope'] text-sm font-bold text-primary uppercase tracking-widest">Concierge AI Insights</h4>
 					</div>
-						<p class="text-sm text-on-surface leading-relaxed mb-4">
+						<p class="text-xs lg:text-sm text-on-surface leading-relaxed mb-4">
 							"Staff salaries are trending 5% higher than Q3. Consider optimizing weekend shifts based on reservation data. Utility costs are stable, but HVAC maintenance scheduled for Nov 12 may impact next month's surplus."
 						</p>
 					
@@ -9036,7 +9036,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
           </p>
 
           <div id="receipt-description"
-            class="rounded-lg bg-background-high p-4 text-sm text-on-surface">
+            class="rounded-lg bg-background-high p-4 text-xs lg:text-sm text-on-surface">
             -
           </div>
         </div>
@@ -9121,7 +9121,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
             </div>
 						
             <div class="text-left">
-              <p class="text-sm text-on-surface font-medium">
+              <p class="text-xs lg:text-sm text-on-surface font-medium">
                 Change Status
               </p>
 
@@ -9146,7 +9146,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
             </div>
 
             <div class="text-left">
-              <p class="text-sm text-on-surface font-medium">
+              <p class="text-xs lg:text-sm text-on-surface font-medium">
                 View Attachment
               </p>
 							
@@ -9323,7 +9323,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
             </span>
           </div>
           <div class="text-left">
-            <p class="text-sm text-on-surface font-medium">
+            <p class="text-xs lg:text-sm text-on-surface font-medium">
               View Attachment
             </p>
 						
@@ -9347,7 +9347,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
           	</div>
 						
           	<div class="text-left">
-	            <p class="text-sm text-on-surface font-medium">
+	            <p class="text-xs lg:text-sm text-on-surface font-medium">
 	              Add Attachment
 	            </p>
 	
@@ -9533,7 +9533,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			  	Click to Upload			
 			  </h3>
 
-			  <p class="mt-2 text-sm text-on-surface-variant">
+			  <p class="mt-2 text-xs lg:text-sm text-on-surface-variant">
 			  	PDF, JPG, PNG	
 			  </p>
 			
@@ -10096,7 +10096,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 
       <div
         id="otherIncomeDetailDescription"
-        class="rounded-lg bg-background-high p-4 text-sm text-on-surface">
+        class="rounded-lg bg-background-high p-4 text-xs lg:text-sm text-on-surface">
         -
       </div>
     </div>
@@ -10110,7 +10110,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 
       <div
         id="otherIncomeDetailNotes"
-        class="rounded-lg bg-background-high p-4 text-sm text-on-surface">
+        class="rounded-lg bg-background-high p-4 text-xs lg:text-sm text-on-surface">
         -
       </div>
     </div>
@@ -10629,7 +10629,7 @@ Save
 								</span>
 								Reward Products
 							</h3>
-							<p class="text-sm text-on-surface-variant mt-1">
+							<p class="text-xs lg:text-sm text-on-surface-variant mt-1">
 								Configure products that can be redeemed using loyalty points.
 							</p>
 						</div>
@@ -10846,17 +10846,17 @@ Save
 							<div class="grid grid-cols-2 gap-8">
 								<div>
 									<label class="block text-[10px] font-inter font-bold tracking-widest text-on-surface-variant uppercase mb-2">Cycle Start Date</label>
-									<input id="season_start" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-01-01"/>
+									<input id="season_start" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-01-01"/>
 								</div>
 								<div>
 									<label class="block text-[10px] font-inter font-bold tracking-widest text-on-surface-variant uppercase mb-2">Cycle End Date</label>
-									<input id="season_end" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-12-31"/>
+									<input id="season_end" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-12-31"/>
 								</div>
 							</div>
 							<!-- Season Actions -->
 							<div class="mt-8 pt-6 border-t border-outline-variant/10">			
 								<div class="flex items-center justify-between mb-4">
-									<h4 class="font-manrope font-bold text-sm text-on-surface">
+									<h4 class="font-manrope font-bold text-xs lg:text-sm text-on-surface">
 										Season Control Panel
 									</h4>
 									<span id="season_status_badge" class="text-[10px] font-inter tracking-widest uppercase px-3 py-1 bg-background border border-white/10 rounded-md">
@@ -11316,7 +11316,7 @@ Save
 								<h4 class="font-bold text-on-surface mb-3">
 									Receipt Printing Behavior
 								</h4>							
-								<ul class="space-y-3 text-sm text-on-surface-variant">									
+								<ul class="space-y-3 text-xs lg:text-sm text-on-surface-variant">									
 									<li>
 										• Customer copy will automatically display store information, transaction details, payment method and total amount.
 									</li>
@@ -11501,7 +11501,7 @@ Save
 	      <div id="cashFlowNotifDropdown"
 	        class="hidden absolute right-0 top-12 w-96 bg-background border border-white/10 shadow-2xl rounded-md overflow-hidden z-50">
 	        <div class="p-4 border-b border-white/10">
-	          <h3 class="font-bold text-sm text-on-surface">
+	          <h3 class="font-bold text-xs lg:text-sm text-on-surface">
 	            Cash Flow Notification
 	          </h3>
 	        </div>
@@ -11541,7 +11541,7 @@ Save
         </span>
       </h2>
 			
-      <p class="text-sm text-on-surface-variant max-w-xl">
+      <p class="text-xs lg:text-sm text-on-surface-variant max-w-xl">
        Track cash movement, monitor account balances, and maintain complete visibility into your business liquidity.
       </p>
     </div>
@@ -11558,7 +11558,7 @@ Save
 
       <input id="cf-start-date"
         type="date"
-        class="w-full h-12 bg-background border border-white/10 rounded-md text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
+        class="w-full h-12 bg-background border border-white/10 rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
     </div>
 
     <!-- END DATE -->
@@ -11569,7 +11569,7 @@ Save
 
       <input id="cf-end-date"
         type="date"
-        class="w-full h-12 bg-background border border-white/10 rounded-md text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
+        class="w-full h-12 bg-background border border-white/10 rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
     </div>
 
       <!-- BRANCH -->
@@ -11579,7 +11579,7 @@ Save
       </label>
       <div class="relative">
         <select  id="cf-branch"
-          class="w-full h-12 bg-background border border-white/10 rounded-md px-4 pr-10 text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
+          class="w-full h-12 bg-background border border-white/10 rounded-md px-4 pr-10 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
           <option value="ALL">All Branch</option>
         </select>
 				
@@ -11803,7 +11803,7 @@ Save
             Cash In vs Cash Out
           </h4>
 
-          <p class="text-sm text-on-surface-variant">
+          <p class="text-xs lg:text-sm text-on-surface-variant">
             Income and expenses during
             selected period
           </p>
@@ -11817,7 +11817,7 @@ Save
         <span class="w-3 h-3 rounded-md  bg-primary">
         </span>
 				
-        <span class="text-sm text-on-surface-variant">
+        <span class="text-xs lg:text-sm text-on-surface-variant">
           Cash In
         </span>
       </div>
@@ -11826,7 +11826,7 @@ Save
         <span class="w-3 h-3 rounded-md bg-white/15">
         </span>
 
-        <span class="text-sm text-on-surface-variant">
+        <span class="text-xs lg:text-sm text-on-surface-variant">
           Cash Out
         </span>
       </div>
@@ -12001,7 +12001,7 @@ Save
             Owner Equity
           </h4>
 
-          <p class="text-sm text-on-surface-variant">
+          <p class="text-xs lg:text-sm text-on-surface-variant">
             Capital investment & owner withdrawals
           </p>
         </div>
@@ -12339,7 +12339,7 @@ Save
 	            </h3>
 	
 	            <p id="ownerModalSubtitle"
-	              class="text-sm text-on-surface-variant">
+	              class="text-xs lg:text-sm text-on-surface-variant">
 	             	 Record owner capital transaction
 	            </p>
 	          </div>
@@ -13130,7 +13130,7 @@ Save
 				</div>
 			</div>
 				<h1 id="memberName" class="font-headline text-3xl font-bold tracking-tight mb-1 text-on-surface">Aditya Wijaya</h1>
-				<p id="memberId"class="font-label text-sm text-on-surface-variant tracking-[0.2em] font-medium uppercase opacity-60">#SL-2024-001</p>
+				<p id="memberId"class="font-label text-xs lg:text-sm text-on-surface-variant tracking-[0.2em] font-medium uppercase opacity-60">#SL-2024-001</p>
 		</div>
 			<!-- Metrics Section (Tonal Architecture) -->
 		<div class="px-10 pb-8 grid grid-cols-2 gap-4">
@@ -17705,7 +17705,7 @@ function openIngredientStockAlert(data = []) {
             <div>
 
               <p
-                class="font-bold text-sm text-on-surface">
+                class="font-bold text-xs lg:text-sm text-on-surface">
                 ${item.name || "-"}
               </p>
 
@@ -19203,7 +19203,7 @@ function renderTierProgression(history = []) {
   if (!history.length) {
 
     el.innerHTML = `
-      <p class="text-sm text-on-surface-variant">
+      <p class="text-xs lg:text-sm text-on-surface-variant">
         No tier history
       </p>
     `;
@@ -26680,14 +26680,14 @@ function viewExpenseAttachment() {
                     description
                 </span>
 
-                <span class="text-sm text-on-surface">
+                <span class="text-xs lg:text-sm text-on-surface">
                     Open Attachment
                 </span>
             </a>
             `;
         } else {
             file.innerHTML = `
-            <div class="p-4 rounded-lg bg-background-high text-sm text-on-surface-variant text-center">
+            <div class="p-4 rounded-lg bg-background-high text-xs lg:text-sm text-on-surface-variant text-center">
                 No attachment available
             </div>
             `;
@@ -31347,7 +31347,7 @@ function renderTransferHistory(data) {
   container.innerHTML = "";
   if (!data || data.length === 0) {
     container.innerHTML = `
-      <div class="text-sm text-on-surface-variant text-center py-4">
+      <div class="text-xs lg:text-sm text-on-surface-variant text-center py-4">
         No transfer history
       </div>
     `;
