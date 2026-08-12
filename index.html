@@ -2624,22 +2624,16 @@
 <div
   id="mainContent"
   class="flex-1 flex flex-col h-screen">
-<!-- Main Content Canvas -->
-
 <!-- Left: Menu Grid Section -->
-<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">	
+<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8">	
   <!-- LEFT -->
   <div class="flex items-center gap-4 flex-1">
-    <!-- HAMBURGER -->
-      <button
-      onclick="toggleSidebar()"
-      class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-foreground transition-all">
-
-      <span class="material-symbols-outlined">
-        menu
-      </span>
-    </button>
-
+	<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMMA%20LOGO%202%20white.png"
+	  class="w-10 h-10 object-contain">
+	<p class="text-xl text-muted font-medium headline-font tracking-wider">
+	  POS
+	</p>
+	
     <!-- SEARCH -->
     <div class="relative w-full max-w-xl">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">
@@ -3729,7 +3723,7 @@
 			</div>
 			<!-- NAMA -->
 			<p class="text-xl text-muted font-medium headline-font tracking-wider">
-				TABLE
+				MEMBERS
 			</p>
 		</div>
 
@@ -11294,12 +11288,12 @@ Save
 
  <div id="mainContent" class="flex-1 flex flex-col h-screen">	
 	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8 overflow-visible">
-	  <div class="flex items-center gap-4">
+	  <div class="flex items-center gap-3 flex-1">
 	    <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMMA%20LOGO%202%20white.png"
 	      class="w-10 h-10 object-contain">
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      CASH FLOW
-	    </p>
+		    <p class="text-xl text-muted font-medium headline-font tracking-wider">
+		      CASH FLOW
+		    </p>
  		</div>
 	
 	
@@ -11307,33 +11301,23 @@ Save
 	  <div class="ml-auto flex items-center gap-3">
 	    <!-- NOTIFICATION -->
 	    <div class="relative">
-	      <button onclick="toggleCashFlowNotification()"
-	        class="hidden absolute right-0 top-12 w-96 bg-background border border-white/10 shadow-2xl rounded-md overflow-hidden z-[100]">
-	        <span class="relative inline-flex">
-	          <span class="relative material-symbols-outlined">
-	            notifications
-	          </span>
-	          <div id="cashFlowNotifBadge"
-	            class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 px-1 rounded-md bg-red-500 text-white text-[10px] font-bold flex items-center justify-center"></div>
-	        </span>
-	      </button>
-	
-	      <div id="cashFlowNotifDropdown"
-	        class="hidden absolute right-0 top-12 w-96 bg-background border border-white/10 shadow-2xl rounded-md overflow-hidden z-50">
-	        <div class="p-4 border-b border-white/10">
-	          <h3 class="font-bold text-xs lg:text-sm text-on-surface">
-	            Cash Flow Notification
-	          </h3>
-	        </div>
-	
-	        <div id="cashFlowNotifList"
-	          class="max-h-96 overflow-y-auto custom-scrollbar" >
-	          <div class="p-4 text-sm text-muted">
-	            No notification
-	          </div>
-	        </div>
-	      </div>
-	    </div>
+		  <button onclick="toggleCashFlowNotification()" class="w-10 h-10 flex items-center justify-center rounded-md text-slate-400 hover:text-on-surface hover:bg-white/5 transition-all">
+		    <span class="relative inline-flex">
+		      <span class="material-symbols-outlined text-lg">notifications</span>
+		      <div id="cashFlowNotifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-md bg-red-500"></div>
+		    </span>
+		  </button>
+		
+		  <div id="cashFlowNotifDropdown" class="hidden absolute right-0 top-12 w-96 bg-background border border-white/10 shadow-2xl rounded-md overflow-hidden z-50">
+		    <div class="p-4 border-b border-white/10">
+		      <h3 class="font-bold text-xs lg:text-sm text-on-surface">Cash Flow Notification</h3>
+		    </div>
+		
+		    <div id="cashFlowNotifList" class="max-h-96 overflow-y-auto custom-scrollbar">
+		      <div class="p-4 text-sm text-muted">No notification</div>
+		    </div>
+		  </div>
+		</div>
 	  </div>
 	</header>
 
