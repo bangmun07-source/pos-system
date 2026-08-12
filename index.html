@@ -2642,20 +2642,18 @@
       <span class="material-symbols-outlined">
         menu
       </span>
-
     </button>
 
     <!-- SEARCH -->
     <div class="relative w-full max-w-xl">
-
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg pointer-events-none">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">
         search
       </span>
 
       <input
         id="searchInput"
-        class="w-full bg-background border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all placeholder:text-foreground"
-        placeholder="Search menu, categories, or tags..."
+        class="w-full bg-background border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
+        placeholder="Search menu..."
         type="text"
       />
 
@@ -2790,8 +2788,8 @@
 <div class="mb-2">
 <label class="text-muted text-xs font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
 <div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-primary-container text-sm" data-icon="table_restaurant">table_restaurant</span>
-<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-sm focus:ring-1 focus:white placeholder:text-muted font-bold" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" data-icon="table_restaurant">table_restaurant</span>
+<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
 </div>
 </div>
 
@@ -2806,21 +2804,17 @@
 <div class="grid grid-cols-6 gap-4 pb-2">
 <div class="col-span-6">
 <label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
-<div class="relative">
-  
+	<div class="relative">
   <!-- ICON -->
-  <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg pointer-events-none">
-    search
-  </span>
+	<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+		search
+	</span>
+	<input id="memberSearch" 
+		class="w-full bg-background border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-sm text-on-surface text-xs font-bold" 
+		autocomplete="off" 
+		placeholder="Search members..." 
+		type="text" />
 
-  <!-- INPUT -->
-  <input 
-    type="text"
-    id="memberSearch"
-    placeholder="Cari Member..."
-    autocomplete="off"
-    class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs font-bold"
-  />
 
   <input type="hidden" id="member-id">
 
