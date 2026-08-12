@@ -335,7 +335,12 @@
 			transparent 4px
 		);
 	}
-
+@media (max-width: 768px) {
+  .bg-background {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
 	#receiptMainWrapper .bg-background{
     background: 
         linear-gradient(
