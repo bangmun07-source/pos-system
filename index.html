@@ -8430,7 +8430,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
   		</section>
 			<div class="w-full space-y-12 pb-12">
 			<!-- Expanded KPI Bento Grid - Updated to be in the same row -->
-			<section class="grid grid-cols-12 gap-6">
+			<section class="grid grid-cols-12 gap-4">
 				<!-- Total vs Budget -->
 				<div class="col-span-12 lg:col-span-6 rounded-md bg-background border border-white/10 p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 					<div>
@@ -8571,7 +8571,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			<div class="custom-scrollbar overflow-x-auto">
 				<table class="w-full text-left border-collapse min-w-[900px]">
 					<thead>
-						<tr class="text-[11px] uppercase tracking-[0.1em] font-bold text-muted  border-b border-white/10">
+						<tr class="text-[11px] uppercase tracking-[0.1em] font-bold text-muted border-b border-white/10">
 							<th class="px-8 py-4">Date &amp; Ref#</th>
 							<th class="px-4 py-4">Description</th>
 							<th class="px-4 py-4">Category</th>
@@ -8712,8 +8712,8 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		</section>
 
 		<!-- Left Sidebar: Category & Vendors & AI -->
-		<section class="grid grid-cols-12 gap-6">
-			<div class="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-6">
+		<section class="grid grid-cols-12 gap-4">
+			<div class="col-span-12 grid grid-cols-1 lg:grid-cols-2 gap-4">
 		<!-- Category Breakdown with Trends -->
 				<div class="bg-background p-8 rounded-md space-y-8 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 					<div class="flex justify-between items-center">
@@ -11363,7 +11363,7 @@ Save
 		</div>
   </section>
   <!-- TOOLBAR -->
-  <div class="grid grid-cols-1 mb-10 md:grid-cols-4 gap-4 p-6 bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+  <div class="grid grid-cols-1 mb-4 md:grid-cols-4 gap-4 p-6 bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
     <!-- START DATE -->
     <div class="flex flex-col gap-2 ">
       <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted ">
@@ -11420,26 +11420,27 @@ Save
   </div>
 
   <!-- KPI -->
-  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
     <!-- Cash In -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
       <div class="flex justify-between">
-        <div class="w-12 h-12 rounded-md bg-emerald-500/10 border border-emerald-500/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-emerald-400">
+	       <div class="main-icon-box">		                
+						<span class="material-symbols-outlined text-3xl"
+									style="font-variation-settings:'FILL' 1;">
             south_west
           </span>
 
         </div>
         <span class="text-xs font-bold text-emerald-400">
-          MONEY IN
+           IN
         </span>
       </div>
       <div class="mt-8">
-        <p class="text-xs text-on-surface-variant uppercase tracking-widest">
+         <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
           Income
         </p>
         <h3 id="cf-cashin"
-          class="text-[18px] font-extrabold text-on-surface mt-1">
+          class="text-2xl font-bold text-foregroun mt-1">
           	IDR 0
         </h3>
       </div>
@@ -11447,25 +11448,26 @@ Save
     <!-- Cash Out -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
       <div class="flex justify-between">
-        <div class="w-12 h-12 rounded-md bg-red-500/10 border border-red-500/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-red-400">
+        <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
             north_east
           </span>
         </div>
 
         <span class="text-xs font-bold text-red-400">
-          MONEY OUT
+           OUT
         </span>
       </div>
 			
       <div class="mt-8">
 
-        <p class="text-xs text-on-surface-variant uppercase tracking-widest">
+         <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
           Expense
         </p>
 
         <h3 id="cf-cashout"
-          class="text-[18px] font-extrabold text-on-surface mt-1">
+          class="text-2xl font-bold text-foregroun mt-1">
         	  IDR 0
         </h3>
       </div>
@@ -11474,9 +11476,9 @@ Save
     <!-- Net Flow -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
       <div class="flex justify-between">
-        <div class="w-12 h-12 rounded-md bg-primary/10 border border-primary/10 flex items-center justify-center">
-
-          <span class="material-symbols-outlined text-primary">
+        <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
             monitoring
           </span>
         </div>
@@ -11484,12 +11486,12 @@ Save
 			
       <div class="mt-8">
 
-        <p class="text-xs text-on-surface-variant uppercase tracking-widest">
+        <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
           Net Flow
         </p>
 				
         <h3 id="cf-net"
-          class="text-[18px] font-extrabold text-on-surface mt-1">
+          class="text-2xl font-bold text-foregroun mt-1">
           IDR 0
         </h3>
       </div>
@@ -11498,19 +11500,20 @@ Save
     <!-- Balance -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
       <div class="flex justify-between">
-        <div class="w-12 h-12 rounded-md bg-primary/10 border border-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">
+        <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
             account_balance_wallet
           </span>
         </div>
       </div>
 
       <div class="mt-8">
-        <p class="text-xs text-on-surface-variant uppercase tracking-widest">
+         <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
           Balance
         </p>
 
-        <h3 id="cf-balance" class="text-[18px] font-extrabold text-on-surface mt-1">
+        <h3 id="cf-balance" class="text-2xl font-bold text-foregroun mt-1">
           IDR 0
         </h3>
       </div>
@@ -11518,12 +11521,13 @@ Save
   </section>
 
   <!-- BALANCE + TRANSFER -->
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
     <div class="lg:col-span-1 bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
       <!-- HEADER -->
       <div class="flex items-center gap-3 mb-8">
-        <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">
+        <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
             account_balance
           </span>
         </div>
@@ -11542,7 +11546,7 @@ Save
 
           <span
             id="cf-cash"
-            class="text-[14px] font-bold">
+            class="text-xs lg:text-sm font-bold">
             IDR 0
           </span>
 
@@ -11556,7 +11560,7 @@ Save
 
           <span
             id="cf-bank"
-            class="text-[14px] font-bold">
+            class="text-xs lg:text-sm font-bold">
             IDR 0
           </span>
         </div>
@@ -11568,7 +11572,7 @@ Save
             </span>
 
             <span id="cf-total"
-              class="text-[20px] font-black text-primary">
+              class="text-base lg:text-lg font-black text-primary">
               	IDR 0
             </span>
           </div>
@@ -11606,8 +11610,9 @@ Save
     <!-- Header -->
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">
+        <<div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
             bar_chart
           </span>
         </div>
@@ -11654,7 +11659,7 @@ Save
   </section>
 
   <!-- BREAKDOWN -->
-  <section class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+  <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
     <!-- CASH IN -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
       <h4 class="text-xl font-bold mb-8">
@@ -11800,12 +11805,13 @@ Save
     </div>
   </section>
   <!-- OWNER EQUITY -->
-  <section class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8 mb-10">
+  <section class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-4 mb-10">
     <!-- HEADER -->
     <div class="flex items-center justify-between mb-8">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">
+        <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
             account_balance
           </span>
         </div>
