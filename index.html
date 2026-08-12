@@ -307,142 +307,109 @@
 	.material-symbols-outlined {
 		vertical-align: middle;
 	}
+	
+	.bg-background {
+		position: relative;
+		overflow: hidden;
+		background: #101715;
+		backdrop-filter: 
+		blur(5px)
+		saturate(150%);
+		-webkit-backdrop-filter: 
+		blur(5px)
+		saturate(150%);
+		border: 1px solid rgba(255,255,255,0.08);
+	}
 
-    /* =========================
-      GLASS SYSTEM
-    ========================= */
-    .glass-modal,
-    .glass-effect,
-    .glass-overlay,
-    .bg-background {
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-    }
-
-    .glass-modal {
-      background: rgba(23, 31, 51, 0.8);
-    }
-
-    .glass-effect {
-      background: rgba(34, 42, 61, 0.8);
-    }
-
-    .glass-overlay {
-      background: rgba(11, 19, 38, 0.7);
-    }
-
-
-
-    .bg-background {
-		  position: relative;
-		  overflow: hidden;
-		  background: #101715;
-		  backdrop-filter: 
-		  blur(25px)
-		  saturate(150%);
-		  -webkit-backdrop-filter: 
-		  blur(25px)
-		  saturate(150%);
-		  border: 1px solid rgba(255,255,255,0.08);
-		}
-
-    .bg-background::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-
-      opacity: 0.02;
-
-      background-image: repeating-radial-gradient(
-        circle at 0 0,
-        rgba(255,255,255,0.12) 0,
-        rgba(255,255,255,0.12) 1px,
-        transparent 1px,
-        transparent 4px
-      );
-    }
-
+	.bg-background::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		opacity: 0.02;
+		background-image: repeating-radial-gradient(
+			circle at 0 0,
+			rgba(255,255,255,0.12) 0,
+			rgba(255,255,255,0.12) 1px,
+			transparent 1px,
+			transparent 4px
+		);
+	}
 
 	#receiptMainWrapper .bg-background{
-
     background: 
         linear-gradient(
             180deg,
             rgba(255,255,255,.05),
             rgba(255,255,255,.02)
         );
-
     border:1px solid rgba(255,255,255,.06);
+    box-shadow: 0 15px 40px rgba(0,0,0,.35);
+	}
 
-    box-shadow: 
-        0 15px 40px rgba(0,0,0,.35);
+	/* =========================
+		INPUT & FORM
+	========================= */
+	.input-glow:focus-within {
+		border-left: 2px solid #f59e0b;
+	}
 
-}
+	.input-focus-glow:focus-within {
+		box-shadow: inset 2px 0 0 0 #f59e0b;
+		background-color: #222a3d;
+	}
 
-    /* =========================
-      INPUT & FORM
-    ========================= */
-    .input-glow:focus-within {
-      border-left: 2px solid #f59e0b;
-    }
+	/* remove number arrows */
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
 
-    .input-focus-glow:focus-within {
-      box-shadow: inset 2px 0 0 0 #f59e0b;
-      background-color: #222a3d;
-    }
+	input[type=number] {
+		-moz-appearance: textfield;
+	}
 
-    /* remove number arrows */
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+	/* =========================
+		SCROLLBAR
+	========================= */
+	.custom-scrollbar::-webkit-scrollbar {
+		width: 4px;
+		height: 4px; 
+	}
 
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
+	.custom-scrollbar::-webkit-scrollbar-track {
+		background: #101715;
+	}
 
-    /* =========================
-      SCROLLBAR
-    ========================= */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 4px;
-      height: 4px; 
-    }
+	.custom-scrollbar::-webkit-scrollbar-thumb {
+		background: rgba(255, 255, 255, 0.05);
+		border-radius: 999px;
+	}
 
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #101715;
-    }
+	.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+		background: rgba(255, 255, 255, 0.10);
+	}
 
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 999px;
-    }
+	.scrollbar-hide::-webkit-scrollbar,
+	.no-scrollbar::-webkit-scrollbar {
+		display: none;
+	}
 
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.10);
-    }
-
-    .scrollbar-hide::-webkit-scrollbar,
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .custom-scrollbar {
-      -webkit-overflow-scrolling: touch;
-    }
+	.custom-scrollbar {
+		-webkit-overflow-scrolling: touch;
+	}
 
     /* =========================
       LAYOUT HELPERS
     ========================= */
-    html, body {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: auto;
-    }
+    html,body {
+		  width: 100%;
+		  height: 100%;
+		  margin: 0;
+		  padding: 0;
+		  overflow: hidden;
+		}
 
     #mainContent {
       height: 100vh;
