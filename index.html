@@ -602,7 +602,7 @@
 
       <div class="flex items-center gap-3">
 
-        <span class="material-symbols-outlined text-primary">
+        <span class="material-symbols-outlined sidebar-icon">
           lock
         </span>
 
@@ -680,7 +680,7 @@
         <!-- INFO BOX -->
         <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
 
-          <span class="material-symbols-outlined text-primary">
+          <span class="material-symbols-outlined sidebar-icon">
             verified_user
           </span>
 
@@ -865,9 +865,9 @@
 	      <div class="h-8 w-px bg-white/5"></div>
 	
 	      <!-- SETTINGS -->
-	      <button class="settingsMenu w-10 h-10 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition-all"
+	      <button class="settingsMenu w-10 h-10 rounded-md flex items-center justify-center transition-all"
 	        			onclick="navigate('settingsPage')">
-	        <span class="material-symbols-outlined">
+	        <span class="material-symbols-outlined sidebar-icon">
 	          settings
 	        </span>
 	      </button>
@@ -1017,7 +1017,7 @@
 	        <div class="flex items-center gap-4">
 		        <div class="main-icon-box">
 			        <span class="material-symbols-outlined text-3xl">receipt_long</span>
-			        </div>
+			      </div>
 			        <h4 class="text-xl font-bold ">
 			            Recent Transactions
 			        </h4>
@@ -1066,7 +1066,7 @@
 	    <div class="bg-background flex flex-col flex-1 rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative h-[420px]">
 	      <div class="flex items-center gap-3 mb-6">
 	        <span
-	          class="material-symbols-outlined text-primary"
+	          class="material-symbols-outlined main-icon-box"
 	          style="font-variation-settings:'FILL' 1;">
 	          warning
 	        </span>
@@ -1090,7 +1090,7 @@
 	    <div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative ">
 	      <div class="relative">
 	        <div class="flex items-center gap-3 mb-4 mt-5">
-	          <span class="material-symbols-outlined">speed</span>
+	          <span class="material-symbols-outlined main-icon-box">speed</span>
 	          
 	          <h4 class="font-bold text-on-surface2">
 	            Shift Performance
@@ -1207,16 +1207,16 @@
 </aside>
 
 <div id="mainContent" class="flex-1 flex flex-col h-screen">	
-	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
-	  <div class="flex w-full items-center justify-between">
-	    <!-- LEFT -->
-	    <button onclick="toggleSidebar()"
-	      class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:hover:bg-white/5 transition-all">
-	      <span class="material-symbols-outlined">
-	        dock_to_right
-	      </span>
-	    </button>
-	  </div>	
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8 overflow-visible">
+	  <div class="flex items-center gap-4">
+	    <img
+	      src="logo.png"
+	      alt="Logo"
+	      class="w-10 h-10 object-contain">
+	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
+	      GROSS REVENUE
+	    </p>
+	  </div>
 	</header>
 	
 <!-- Main Content Area -->
@@ -1282,8 +1282,7 @@
       Export
     </label>
 
-    <button
-      id="btnExportGrossRevenuePDF"
+    <button id="btnExportGrossRevenuePDF"
       class="h-12 rounded-md bg-background border border-white/10 text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
 
       <span class="material-symbols-outlined text-lg">
@@ -1658,201 +1657,106 @@
   </div>
 </aside>
 
-<div
-  id="mainContent"
-  class="flex-1 flex flex-col h-screen">
+<div id="mainContent" class="flex-1 flex flex-col h-screen">
 <!-- Top Navigation Bar -->
 <div class="flex-1 flex flex-col overflow-hidden">
-	<header
-	  class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">
-
-  <div class="flex w-full items-center justify-between">
-
-    <!-- LEFT -->
-    <button
-      onclick="toggleSidebar()"
-      class="w-11 h-11 rounded-md flex items-center justify-center
-      text-muted hover:text-on-surface
-      hover:hover:bg-white/5 transition-all">
-
-      <span class="material-symbols-outlined">
-        menu
-      </span>
-
-    </button>
-
-  </div>
-
-</header>
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8 overflow-visible">
+	  <div class="flex items-center gap-4">
+	    <img
+	      src="logo.png"
+	      alt="Logo"
+	      class="w-10 h-10 object-contain">
+	
+	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
+	     RECENT TRANSACTIONS
+	    </p>
+	  </div>
+	</header>
 <!-- Scrollable Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <section class="flex flex-col gap-8">
 <!-- Page Header & Stats -->
 
-<section class="mb-10 mt-4 relative overflow-hidden
-  rounded-md bg-background
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-  ">
-
-  <div class="absolute inset-0 bg-cover bg-center opacity-70"
-  style="background-image:url('https://lh3.googleusercontent.com/d/1uPJEKlJ9Qb8eDMB8GWfBP88Z1edQLkh8');">
-  </div>
+<section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+	<div class="absolute inset-0 bg-cover bg-center opacity-70"
+	  style="background-image:url('https://lh3.googleusercontent.com/d/1uPJEKlJ9Qb8eDMB8GWfBP88Z1edQLkh8');">
+	</div>
   <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
-
-  <div class="relative min-h-[260px] flex flex-col justify-center px-12">
+ 	<div class="relative min-h-[260px] flex flex-col justify-center px-12">
     <!-- LEFT -->
     <div>
-      <span
-        class="text-primary
-        text-[11px]
-        font-semibold
-        tracking-[0.25em]
-        uppercase">
+      <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
         Transaction Center
       </span>
-
+			
       <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
         Recent Transactions
       </h2>
 
-      <p
-        class="text-on-surface-variant
-        max-w-xl
-        text-lg
-        font-light
-        leading-relaxed">
-
+      <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
         View, search, and monitor recent transactions, payment status, customer activity, and order details across your business.
-
       </p>
-
     </div>
   </div>
-
 </section>
 
 <!-- Filters Bar -->
-<div
-  class="bg-background
-  rounded-md
-  border border-white/10
-  p-6
-  grid grid-cols-1 md:grid-cols-4 gap-4 items-end
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+<div class="bg-background rounded-md border border-white/10 p-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 
   <!-- START DATE -->
   <div class="flex flex-col gap-2">
-
-    <label
-      class="text-[11px] uppercase tracking-[0.25em]
-      text-muted  font-bold">
-
+    <label class="uppercase tracking-[0.25em]
+      text-muted text-base font-medium ">
       Start Date
-
     </label>
 
-    <input
-      type="date"
+    <input type="date"
       id="startDate"
-     class="w-full h-12
-             bg-background
-             border border-white/10
-             rounded-md
-             text-sm text-on-surface
-             focus:ring-1 focus:ring-primary
-             outline-none transition-all">
-
+     class="w-full h-12  bg-background border border-white/10 rounded-md text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
   </div>
 
   <!-- END DATE -->
   <div class="flex flex-col gap-2">
-
-    <label
-      class="text-[11px] uppercase tracking-[0.25em]
-      text-muted  font-bold">
-
+    <label class="uppercase tracking-[0.25em] text-muted text-base font-medium ">
       End Date
-
     </label>
 
-    <input
-      type="date"
+    <input type="date"
       id="endDate"
-      class="w-full h-12
-             bg-background
-             border border-white/10
-             rounded-md
-             text-sm text-on-surface
-             focus:ring-1 focus:ring-primary
-             outline-none transition-all" />
-
+      class="w-full h-12 bg-background border border-white/10 rounded-md text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
   </div>
 
   <!-- STATUS -->
   <div class="flex flex-col gap-2">
-
-    <label
-      class="text-[11px] uppercase tracking-[0.25em]
-      text-muted  font-bold">
-
+    <label class=" uppercase tracking-[0.25em] text-muted text-base font-medium ">
       Transaction Status
-
     </label>
 
     <div class="relative">
-
-      <select
-        id="statusFilter"
-        class="w-full h-12
-              bg-background
-              border border-white/10
-              rounded-md px-4 pr-10
-              text-sm text-on-surface
-              appearance-none
-              outline-none
-              focus:ring-1 focus:ring-primary
-              transition-all">
-
-        <option value="ALL">All Statuses</option>
-        <option value="PAID">Paid</option>
-        <option value="REFUND">Refund</option>
-
+      <select id="statusFilter"
+        class="w-full h-12 bg-background border border-white/10 rounded-md px-4 pr-10 text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
+	        <option value="ALL">All Statuses</option>
+	        <option value="PAID">Paid</option>
+	        <option value="REFUND">Refund</option>
       </select>
 
-      <span
-        class="material-symbols-outlined
-        absolute right-3 top-1/2 -translate-y-1/2
-        text-on-surface-variant
-        pointer-events-none">
-
+      <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
         expand_more
-
       </span>
-
     </div>
-
   </div>
 
   <!-- EXPORT -->
   <div class="flex flex-col gap-2">
 
     <label
-      class="text-[11px] uppercase tracking-[0.25em]
-      text-muted  font-bold">
-
+      class="uppercase tracking-[0.25em] text-muted text-base font-medium ">
       Export
-
     </label>
 
-    <button
-      id="exportBtn"
+    <button id="exportBtn"
       onclick="exportRecentTransactions()"
-      class="w-full h-12
-      rounded-md bg-primary/10 border border-primary/10 text-primary font-semibold text-sm
-      flex items-center justify-center gap-2
-      active:scale-95
-      transition-all">
+      class="h-12 rounded-md bg-background border border-white/10 text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
 
       <span class="material-symbols-outlined text-lg">
         download
@@ -1868,167 +1772,80 @@
 
 <!-- Contextual Quick Stats -->
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-
   <!-- Revenue -->
-  <div
-    class="bg-background rounded-md overflow-hidden
-    border border-white/10
-    p-6 relative group
-    shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-    <div
-        class="absolute right-0
-        opacity-5
-        group-hover:opacity-20
-        transition-all
-        duration-700
-        group-hover:scale-90">
-
-        <span
-          class="material-symbols-outlined text-[200px] animate-float">
-          attach_money
-        </span>
-
-      </div>
-
+  <div class="bg-background rounded-md overflow-hidden border border-white/10 p-6 relative group shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+    <div class="absolute right-0 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-90">
+			<span class="material-symbols-outlined text-[200px] animate-float">
+				attach_money
+			</span>
+    </div>
 
     <div class="flex justify-between items-start">
-
-      <div
-        class="w-12 h-12 rounded-md
-        bg-primary/10
-        flex items-center justify-center
-        text-primary
-        border border-primary/10">
-
-        <span class="material-symbols-outlined">
+      <div class="main-icon-box">		                
+				<span class="material-symbols-outlined text-3xl"
+							style="font-variation-settings:'FILL' 1;">
           payments
         </span>
-
       </div>
-
     </div>
 
     <div class="mt-8">
-
-      <p
-        class="text-on-surface-variant
-        text-xs font-medium
-        uppercase tracking-widest">
-
-        Total Revenue
-
+      <p class="text-muted text-sm font-medium uppercase tracking-widest">
+				Grand Total 
       </p>
 
-      <h4
-        id="totalRevenueValue"
-        class="text-3xl font-extrabold
-        mt-1 text-on-surface">
-
-        IDR 42.8M
-
+      <h4 id="totalRevenueValue"
+        class="text-lg font-extrabold mt-1 text-foreground">
+        IDR 0
       </h4>
-
     </div>
-
   </div>
 
   <!-- Guests -->
-  <div
-    class="bg-background rounded-md overflow-hidden
-    border border-white/10
-    p-6 relative
-    shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+  <div class="bg-background rounded-md overflow-hidden border border-white/10 p-6 relative shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
     <div class="flex justify-between items-start">
-
-      <div
-        class="w-12 h-12 rounded-md
-        bg-primary/10
-        flex items-center justify-center
-        text-primary
-        border border-primary/10">
-
-        <span class="material-symbols-outlined">
+      <div class="main-icon-box">		                
+				<span class="material-symbols-outlined text-3xl"
+							style="font-variation-settings:'FILL' 1;">
           group
         </span>
-
       </div>
-
     </div>
 
     <div class="mt-8">
-
-      <p
-        class="text-on-surface-variant
-        text-xs font-medium
-        uppercase tracking-widest">
-
+      <p class="text-muted text-sm font-medium uppercase tracking-widest">
         Active Guests
-
       </p>
 
-      <h4
-        id="activeGuestsValue"
-        class="text-3xl font-extrabold
-        mt-1 text-on-surface">
-
-        142
-
+      <h4 id="activeGuestsValue"
+        class="text-lg font-extrabold mt-1 text-foreground">
+        0
       </h4>
-
     </div>
-
   </div>
 
   <!-- Voided -->
-  <div
-    class="bg-background rounded-md overflow-hidden
-    border border-white/10
-    p-6 relative
-    shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+  <div class="bg-background rounded-md overflow-hidden border border-white/10 p-6 relative shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
     <div class="flex justify-between items-start">
-
-      <div
-        class="w-12 h-12 rounded-md
-        bg-primary/10
-        flex items-center justify-center
-        text-primary
-        border border-primary/10">
-
-        <span class="material-symbols-outlined">
+      <div class="main-icon-box">		                
+				<span class="material-symbols-outlined text-3xl"
+							style="font-variation-settings:'FILL' 1;">
           shopping_bag
         </span>
-
       </div>
-
     </div>
 
     <div class="mt-8">
-
-      <p
-        class="text-on-surface-variant
-        text-xs font-medium
-        uppercase tracking-widest">
-
+      <p class="text-muted text-sm font-medium uppercase tracking-widest">
         Items Sold
-
       </p>
 
-      <h4
-        id="itemsSoldValue"
-        class="text-3xl font-extrabold
-        mt-1 text-on-surface">
-
-        12
-
+      <h4 id="itemsSoldValue"
+        class="text-lg font-extrabold mt-1 text-foreground">
+        0
       </h4>
-
     </div>
-
   </div>
-
 </div>
 
 <!-- Transactions Table -->
@@ -2039,20 +1856,16 @@
   border border-white/10
   shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-8">
   <div class="flex items-center gap-4 py-8 px-6">
-    <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-    <span class="material-symbols-outlined text-secondary">receipt_long</span>
+    <div class="main-icon-box">
+			<span class="material-symbols-outlined text-3xl">receipt_long</span>
     </div>
-    <h2 class="font-headline text-2xl font-bold tracking-tight">Recent Transactions</h2>
+    <h2 class="font-headline text-xl font-bold tracking-tight">Recent Transactions</h2>
   </div>
   <!-- TABLE -->
   <div class="overflow-x-auto custom-scrollbar">
-
     <table class="w-full text-left border-collapse">
-
       <thead>
-
         <tr class="sticky top-0 text-muted text-base font-medium headline-font uppercase tracking-widest">
-
           <th class="px-6 py-4">Order ID</th>
           <th class="px-6 py-4">Date & Time</th>
           <th class="px-6 py-4">Table</th>
@@ -2060,13 +1873,10 @@
           <th class="px-6 py-4 text-right">Total Amount</th>
           <th class="px-6 py-4 text-center">Status</th>
           <th class="px-6 py-4 text-center">Actions</th>
-
         </tr>
-
       </thead>
 
-      <tbody
-        id="recentTransactionsList"
+      <tbody id="recentTransactionsList"
         class="divide-y divide-white/5">
         <tr>
           <td colspan="7" class="text-center text-muted ">
@@ -2074,62 +1884,34 @@
           </td>
         </tr>
       </tbody>
-
     </table>
-
   </div>
-
   <!-- PAGINATION -->
-<div
-  class="px-6 py-4 flex items-center justify-between
-         border-t border-white/10">
+<div class="px-6 py-4 flex items-center justify-between border-t border-white/10">
 
-  <p
-    id="recentTransactionInfo"
-    class="text-xs text-muted  font-medium">
-
+  <p id="recentTransactionInfo"
+   	class="text-muted text-base font-medium headline-font uppercase tracking-widest">
     Showing 1-10
-
   </p>
-
   <div class="flex items-center gap-2">
-
-    <button
-      id="recentPrevBtn"
-      class="p-2 rounded-lg
-             transition-colors
-             disabled:opacity-30">
-
+    <button id="recentPrevBtn"
+      class="p-2 rounded-lg transition-colors disabled:opacity-30">
       <span class="material-symbols-outlined">
         chevron_left
       </span>
-
     </button>
-
-    <button
-      id="recentNextBtn"
-      class="p-2 rounded-lg
-             transition-colors
-             disabled:opacity-30">
-
+    <button id="recentNextBtn" class="p-2 rounded-lg transition-colors disabled:opacity-30">
       <span class="material-symbols-outlined">
         chevron_right
       </span>
-
     </button>
-
   </div>
-
 </div>
-
 </div>
-
-
 </section>
 </main>
 </div>
 </div>
-
 </template>
 
 
@@ -11794,7 +11576,7 @@ Save
 	    <!-- NOTIFICATION -->
 	    <div class="relative">
 	      <button onclick="toggleCashFlowNotification()"
-	        class="hidden absolute right-0 top-12 w-96 bg-background headline-font border border-white/10 shadow-2xl rounded-md overflow-hidden z-[100]"
+	        class="hidden absolute right-0 top-12 w-96 bg-background border border-white/10 shadow-2xl rounded-md overflow-hidden z-[100]"
 	        <span class="relative inline-flex">
 	          <span class="relative material-symbols-outlined">
 	            notifications
