@@ -6961,122 +6961,167 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 <!-- SETTINGS -->
 
 <template id="settingsPage" >
+<!-- ================= SIDEBAR ================= -->
+	<aside
+	  id="sidebar"
+	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+	
+	  <!-- SIDEBAR CONTENT -->
+	  <div class="sidebar-menu flex flex-col h-full">
+	    <!-- MENU -->
+	    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+	      <!-- DASHBOARD -->
+	      <a class="active" onclick="navigate('dashboardPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          home
+	        </span>
+	    
+	        <span
+	          class="sidebar-label">
+	          Dashboard
+	        </span>
+	      </a>
 
-<aside
-  id="sidebar"
-  class="fixed left-0 top-0 h-full flex flex-col pt-24 pb-8 bg-background dark:bg-background w-72 z-40 transition-all duration-300">
-<div class="px-8 mb-12">
-<div class="text-2xl font-black text-[#f59e0b] tracking-widest font-headline">SOMA Kasir</div>
-<div class="text-[10px] font-['Manrope'] font-bold tracking-[0.2em] text-[#dae2fd]/50 uppercase mt-1">PREMIUM POS</div>
-</div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('dashboardPage')">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-semibold text-sm">Dashboard</span>
-</a>
-<a 
-  
-  class="settingsMenu flex items-center gap-4 px-6 py-4 bg-gradient-to-r from-[#f59e0b]/20 to-transparent text-[#f59e0b] border-l-4 border-[#f59e0b] transition-all"
-  onclick="navigate('settingsPage', { roles:['Owner','Admin'] })">
+        <!-- SETTINGS -->
+	      <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })
+	         style="display:none"
+			  	 class="settingsMenu">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          settings
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Settings
+	        </span>
+	      </a>
+	
+	      <!-- LOYALTY -->
+	      <a onclick="navigate('loyaltysettingPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          military_tech
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Loyalty &amp; Tiers
+	        </span>
+	      </a>
 
-  <span class="material-symbols-outlined">
-    settings
-  </span>
+	      <!-- TAX-->
+	      <a onclick="navigate('taxservicesettingPage')">
+	         <span class="material-symbols-outlined sidebar-icon">
+	          receipt_long
+	        </span>
+	
+	        <span class="sidebar-label">
+	           Taxes &amp; Fees
+	        </span>
+	      </a>
 
-  <span class="font-semibold text-sm">
-    Settings
-  </span>
+	      <!-- EXPENSES -->
+	      <a onclick="navigate('expensessettingPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          payments
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Expenses
+	        </span>
+	      </a>
+	    
+	      <!-- ANALYTICS -->
+	      <a onclick="navigate('analyticsPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          analytics
+	        </span>
+	
+	        <span class="sidebar-label">
+		        Analytics
+	        </span>
+	      </a>
+        
+        <!-- ANALYTICS -->
+	      <a onclick="navigate('inventoryPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          inventory_2
+	        </span>
+	
+	        <span class="sidebar-label">
+		        Inventory
+	        </span>
+	      </a>
 
-</a>
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          account_balance_wallet
+	        </span>
+	
+	        <span class="sidebar-label">
+		        Cash Flow
+	        </span>
+	      </a>
+	    </nav>
+	
+	
+	    <!-- FOOTER -->
+	    <div class="mt-auto p-2 pb-2">
+	      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+	
+	        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+	          <span class=" w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+	        </span>
+	
+	        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+	          <p class="text-[10px] text-slate-500">
+	            SYSTEM STATUS
+	          </p>
+	
+	          <span class="sidebar-label">
+	            SERVER ACTIVE
+	          </p>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</aside>
 
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('expensessettingPage')">
-<span class="material-symbols-outlined">payments</span>
-<span class="font-['Inter'] font-bold">Expenses</span>
-</a>
-
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('loyaltysettingPage')">
-<span class="material-symbols-outlined" data-icon="military_tech" style="font-variation-settings: 'FILL' 1;">military_tech</span>
-<span class="font-inter font-medium">Loyalty &amp; Tiers</span>
-</a>
-
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('taxservicesettingPage')">
-<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
-<span class="font-inter font-medium">Taxes &amp; Fees</span>
-</a>
-
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('analyticsPage')">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="font-semibold text-sm">Analytics</span>
-</a>
-
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('inventoryPage')">
-<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
-<span class="font-semibold text-sm">Inventory</span>
-</a>
-
-<a class="ownerOnly flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-slate-200 hover:bg-white/5 transition-all" onclick="navigate('cashFlowPage', { roles:['Owner'] })">
-<span class="material-symbols-outlined" data-icon="account_balance_wallet">account_balance_wallet</span>
-<span class="font-inter font-medium">Cash Flow</span>
-</a>
-</nav>
-<div class="px-3 mt-auto">
-<a class="flex items-center gap-4 px-6 py-4 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all mt-4" onclick="logout()">
-<span class="material-symbols-outlined" data-icon="logout">logout</span>
-<span class="font-semibold text-sm">Logout</span>
-</a>
-</div>
-</aside>
 <!-- Content Wrapper -->
-<div
-  id="mainContent"
-  class="flex-1 ml-72 flex flex-col h-screen transition-all duration-300">
-<header class="h-20 flex-shrink-0 z-40
-  bg-background-low/80 backdrop-blur-xl
-  border-b border-white/10
-  flex justify-between items-center px-12">
-<div class="flex items-center gap-4 flex-1 max-w-xl">
-
-  <button
-    onclick="toggleSidebar()"
-    class="w-11 h-11 rounded-md flex items-center justify-center hover:bg-white/5 text-slate-300 transition-all"
-  >
-    <span class="material-symbols-outlined">
-      menu
-    </span>
-  </button>
-
-  <div>
-    <p
-    id="appBrandName"
-    class="text-[20px] text-slate-500 font-medium tracking-wider">
-      SISTEM KASIR
-    </p>
-  </div>
-
-</div>
-
-<div class="flex items-center gap-3">
-
-<div class="relative w-full max-w-md">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
-<input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
-</div>
-<button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
-<span class="material-symbols-outlined">notifications</span>
-</button>
-</div>
-</header>
+<div id="mainContent" class="flex-1 flex flex-col h-screen">
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">	
+    <div class="flex items-center gap-4 flex-1 max-w-xl">
+    
+      <button onclick="toggleSidebar()"
+        class="w-11 h-11 rounded-md flex items-center justify-center hover:bg-white/5 text-slate-300 transition-all">
+        <span class="material-symbols-outlined">
+          menu
+        </span>
+      </button>
+    
+      <div>
+        <p id="appBrandName"
+           class="text-[20px] text-slate-500 font-medium tracking-wider">
+          SISTEM KASIR
+        </p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <div class="relative w-full max-w-md">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg">search</span>
+        <input class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-12 pr-4 text-sm focus:ring-1 focus:ring-primary/30 transition-all font-body text-on-surface" placeholder="Search settings..." type="text"/>
+      </div>
+      <button class="p-2 text-slate-400 hover:bg-white/5 rounded-md transition-all scale-95 active:scale-90">
+        <span class="material-symbols-outlined">notifications</span>
+      </button>
+    </div>
+  </header>
 
 
 <!-- Main Content Area -->
 <main class="flex-1 overflow-y-auto p-10 bg-background custom-scrollbar">
   
 <section
-class="mb-10 relative overflow-hidden
-rounded-md bg-background
-border border-white/10
-shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-">
+class="mb-10 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
 
   <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
     <img
@@ -7085,103 +7130,111 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
       style="object-position: right 60%;"
       alt="">
   </div>
+  
   <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
+    <div class="relative min-h-[260px] flex flex-col justify-center px-12">
+      <div>
+        <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
+          Administration Center
+        </span>
 
-  <div class="relative min-h-[260px] flex flex-col justify-center px-12">
-
-    <div>
-
-      <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
-      Administration Center
-      </span>
-
-      <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
-      System Settings
-      </h2>
-
-      <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
-      Centralize configuration and maintain complete control over your business operations.
-      </p>
-
+        <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
+          System Settings
+        </h2>
+        
+        <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
+          Centralize configuration and maintain complete control over your business operations.
+        </p>
     </div>
-
   </div>
-
+  
   <div
-    class="absolute -top-24 -right-24 w-72 h-72
-    bg-primary/10 blur-[120px] rounded-md">
+    class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-md">
   </div>
-
 </section>
 
 <!-- Global Outlet Selector -->
 <div class="mb-8 p-6 bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative overflow-hidden group">
-<div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-<span class="material-symbols-outlined text-9xl">hub</span>
-</div>
-<div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-<div class="flex-1">
-<div class="flex items-center gap-3 mb-2">
-<span class="material-symbols-outlined text-primary text-xl">account_tree</span>
-<h3 class="font-headline font-bold text-lg text-on-surface tracking-tight">Global Outlet Context</h3>
-</div>
-<p class="text-on-surface-variant text-sm max-w-xl leading-relaxed">
-        Switching the active outlet will instantly synchronize configuration, analytics, and transaction data across the <span class="text-primary font-bold">Dashboard, Inventory, and Analytics</span> modules for the selected branch.
-      </p>
-</div>
-<div class="flex-shrink-0 w-full md:w-80">
-<label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">Selected Active Branch</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-lg">store</span>
-<select id="globalBranchSelector" class="w-full bg-background border border-white/10 rounded-md py-4 pl-12 pr-10 text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer transition-all shadow-inner">
-</select>
-<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">unfold_more</span>
-</div>
-</div>
-</div>
+  <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+    <span class="material-symbols-outlined text-9xl">hub</span>
+  </div>
+      <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div class="flex-1">
+          <div class="flex items-center gap-3 mb-2">
+            <span class="material-symbols-outlined text-primary text-xl">
+              account_tree
+            </span>
+            
+            <h3 class="font-headline font-bold text-lg text-on-surface tracking-tight">
+              Global Outlet Context
+            </h3>
+          </div>
+          
+          <p class="text-on-surface-variant text-sm max-w-xl leading-relaxed">
+            Switching the active outlet will instantly synchronize configuration, analytics, and transaction data across the <span class="text-primary font-bold">Dashboard, Inventory, and Analytics</span> modules for the selected branch.
+          </p>
+      </div>
+        
+      <div class="flex-shrink-0 w-full md:w-80">
+        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 px-1">
+          Selected Active Branch
+        </label>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-primary text-lg">
+            store
+        </span>
+          <select id="globalBranchSelector" class="w-full bg-background border border-white/10 rounded-md py-4 pl-12 pr-10 text-sm font-bold text-on-surface focus:ring-2 focus:ring-primary/50 focus:border-primary appearance-none cursor-pointer transition-all shadow-inner">
+          </select>
+        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none">unfold_more</span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Bento Grid Layout -->
 <div class="grid grid-cols-12 gap-8">
 <!-- Business Outlets Section -->
-<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] 
-  ">
+<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)]  ">
   <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
-  <div class="flex items-center gap-4">
-  <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-  <span class="material-symbols-outlined text-secondary">business</span>
-  </div>
-  <h2 class="font-headline text-2xl font-bold tracking-tight">Business Outlets</h2>
-  </div>
-  <button onclick="openAddBranchModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-all text-xs font-bold uppercase tracking-wider">
-  <span class="material-symbols-outlined text-sm">add</span>
-  Add New Outlet
-  </button>
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
+        <span class="material-symbols-outlined text-secondary">
+          business
+        </span>
+      </div>
+        <h2 class="font-headline text-2xl font-bold tracking-tight">
+          Business Outlets
+        </h2>
+    </div>
+    
+    <button onclick="openAddBranchModal()" class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-all text-xs font-bold uppercase tracking-wider">
+      <span class="material-symbols-outlined text-sm">add</span>
+      Add New Outlet
+    </button>
   </div>
   <div class="overflow-x-auto">
-  <table class="w-full text-left">
-  <thead>
-  <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-outline-variant/5">
-  <th class="pb-4 px-4">Branch Name</th>
-  <th class="pb-4 px-4">Manager</th>
-  <th class="pb-4 px-4">Address</th>
-  <th class="pb-4 px-4 text-center">Status</th>
-  <th class="pb-4 px-4 text-right">Actions</th>
-  </tr>
-  </thead>
-  <tbody id="branchTableBody" class="divide-y divide-outline-variant/5">
-    <tr>
-      <td colspan="5" class="text-center text-slate-500">
-        Loading...
-      </td>
-    </tr>
-  </tbody>
-  </table>
+    <table class="w-full text-left">
+        <thead>
+            <tr class="text-muted text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant/5">
+            <th class="pb-4 px-4">Branch Name</th>
+            <th class="pb-4 px-4">Manager</th>
+            <th class="pb-4 px-4">Address</th>
+            <th class="pb-4 px-4 text-center">Status</th>
+            <th class="pb-4 px-4 text-right">Actions</th>
+            </tr>
+        </thead>
+      
+        <tbody id="branchTableBody" class="divide-y divide-outline-variant/5">
+          <tr>
+          <td colspan="5" class="text-center text-slate-500">
+            Loading...
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
   <!-- Pagination -->
-  <div class="px-6 py-4 flex items-center justify-between
-      border-t border-white/10">
-
+  <div class="px-6 py-4 flex items-center justify-between border-t border-white/10">
     <div class="text-xs text-slate-500">
       Showing
       <span id="branchShowingStart" class="text-on-surface font-semibold">1</span>
@@ -7196,18 +7249,13 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
       id="branchPagination"
       class="flex items-center gap-1">
     </div>
-
   </div>
 </section>
 
 <!-- User Management -->
-<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-  ">
-
+<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
   <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
-
     <div class="flex items-center gap-4">
-
       <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
         <span class="material-symbols-outlined text-primary">
           group
@@ -7215,75 +7263,46 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
       </div>
 
       <div>
-
         <h2 class="font-headline text-2xl font-bold tracking-tight">
           User Management
         </h2>
-
+        
         <p class="text-sm text-on-surface-variant mt-1">
           Manage system users, roles, passwords and outlet access.
         </p>
-
       </div>
-
     </div>
 
-    <button
-      onclick="openAddUserModal()"
-      class="flex items-center gap-2 px-5 py-2.5 rounded-md
-      bg-primary/10 text-primary
-      hover:bg-primary hover:text-on-primary
-      transition-all text-xs font-bold uppercase tracking-wider">
-
+    <button onclick="openAddUserModal()"
+      class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-primary/10 text-primary hover:bg-primary hover:text-on-primary transition-all text-xs font-bold uppercase tracking-wider">
       <span class="material-symbols-outlined text-sm">
         person_add
       </span>
-
       Add User
-
     </button>
-
   </div>
 
   <div class="overflow-x-auto custom-scrollbar">
-
     <table class="w-full text-left">
-
       <thead>
-
-        <tr class="text-[11px] font-bold text-slate-500 uppercase tracking-widest border-b border-outline-variant/5">
-
+        <tr class="text-muted text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant/5">
           <th class="px-5 py-4">Username</th>
-
           <th class="px-5 py-4">Role</th>
-
           <th class="px-5 py-4">Password</th>
-
           <th class="px-5 py-4">Outlet</th>
-
           <th class="px-5 py-4 text-right">Actions</th>
-
         </tr>
-
       </thead>
-
-      <tbody
-        id="userTableBody"
-        class="divide-y divide-outline-variant/5">
-
-          <tr>
-            <td colspan="5" class="text-center text-slate-500">
-              Loading...
-            </td>
-          </tr>
-
+      <tbody id="userTableBody" class="divide-y divide-outline-variant/5">
+        <tr>
+          <td colspan="5" class="text-center text-slate-500">
+            Loading...
+          </td>
+        </tr>
       </tbody>
-
     </table>
-
   </div>
-
-
+  
   <!-- Pagination -->
   <div class="px-6 py-4 flex items-center justify-between
       border-t border-white/10">
@@ -7308,101 +7327,61 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
 </div>
 
 <!-- BUSINESS PROFILE -->
-
-  <section
-  class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-8">
-
-    <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
-
-      <div class="flex items-center gap-4">
-
-        <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
-
-          <span class="material-symbols-outlined text-primary">
-            storefront
-          </span>
-
-        </div>
-
-        <div>
-
-          <h2 class="font-headline text-2xl font-bold tracking-tight">
-            Business Profile
-          </h2>
-
-          <p class="text-sm text-on-surface-variant mt-1">
-            Manage business identity, logo, and digital receipt information.
-          </p>
-
-        </div>
-
+<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-8">
+  <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-primary">
+          storefront
+        </span>
       </div>
+      <div>
+        <h2 class="font-headline text-2xl font-bold tracking-tight">
+          Business Profile
+        </h2>
 
+        <p class="text-sm text-on-surface-variant mt-1">
+          Manage business identity, logo, and digital receipt information.
+        </p>
+      </div>
     </div>
-
-
-    <div class="grid grid-cols-12 gap-8">
-
-
+  </div>
+  
+  <div class="grid grid-cols-12 gap-8">
       <!-- Logo -->
-
       <div class="col-span-12 md:col-span-4">
-
         <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-3">
           Business Logo
         </label>
 
-
-        <div class="flex flex-col items-center justify-center
-        border border-white/10 rounded-md p-6 bg-background/50">
-
-
+        <div class="flex flex-col items-center justify-center border border-white/10 rounded-md p-6 bg-background/50">
           <div class="w-32 h-32 rounded-md overflow-hidden bg-white/5 mb-4">
-            <img
-              id="businessLogoPreview"
-              src=""
+            <img src="" 
+              id="businessLogoPreview" 
               class="w-full h-full object-contain p-3">
           </div>
-
-
-          <input
-            type="file"
+          <input type="file"
             id="businessLogoInput"
             accept="image/*"
-            class="text-xs text-slate-400"
-          >
-
-
+            class="text-xs text-slate-400" >
         </div>
-
       </div>
 
-
-
       <!-- Form -->
-
       <div class="col-span-12 md:col-span-8 space-y-5">
-
-
         <div>
-
           <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
             Company Name
           </label>
-
+          
           <input
             id="businessCompanyName"
             type="text"
             class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
-            placeholder="Nama usaha"
-          >
-
+            placeholder="Nama usaha" >
         </div>
 
-
-
         <div>
-
           <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
             Instagram
           </label>
@@ -7411,16 +7390,10 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
             id="businessInstagram"
             type="text"
             class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
-            placeholder="@instagram"
-          >
-
+            placeholder="@instagram">
         </div>
 
-
-
-
         <div>
-
           <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
             Receipt Footer
           </label>
@@ -7429,48 +7402,37 @@ shadow-[0_2px_10px_rgba(0,0,0,0.15)]
             id="businessReceiptFooter"
             rows="2"
             class="w-full bg-background border border-white/10 rounded-md py-3 px-4 text-sm text-on-surface focus:ring-2 focus:ring-primary/50"
-            placeholder="Terima kasih sudah berkunjung"
-          ></textarea>
-
+            placeholder="Terima kasih sudah berkunjung" >
+          </textarea>
         </div>
 
 
         <div class="flex justify-end pt-4">
-
           <button
             id="btnSaveBusinessProfile"
             class="px-6 py-3 flex items-center gap-2 px-4 py-2 rounded-md bg-primary/10 border border-primary/10 text-primary font-semibold text-xs hover:text-on-surface transition-colors">
-
             Save Profile
-
           </button>
-
         </div>
-
-
       </div>
-
-
     </div>
-
-
   </section>
+  
 <!-- Footer Copyright -->
-<footer class="mt-12 flex justify-between items-center text-slate-600 text-[8px] font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-white/10 pt-12 px-10 ">
-<div class="flex items-center gap-2">
-<span class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></span>
-SOMA Kasir v2.4.0-Stable
-</div>
-<div class="flex gap-8 text-[8px] text-slate-500">
-<a class="hover:text-primary transition-colors" onclick="navigate('privacyPolicyPage')">Privacy Policy</a>
-<a class="hover:text-primary transition-colors" onclick="navigate('licenseAgreementPage')">License Agreement</a>
-<a class="hover:text-primary transition-colors" onclick="navigate('documentationPage')">Documentation</a>
-<a class="hover:text-primary transition-colors" onclick="navigate('businesscardPage')">Support Center</a>
-</div>
-</footer>
+  <footer class="mt-12 flex justify-between items-center text-slate-600 text-[8px] font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-white/10 pt-12 px-10 ">
+    <div class="flex items-center gap-2">
+      <span class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></span>
+      SOMA Kasir v2.4.0-Stable
+    </div>
+    <div class="flex gap-8 text-[8px] text-slate-500">
+      <a class="hover:text-primary transition-colors" onclick="navigate('privacyPolicyPage')">Privacy Policy</a>
+      <a class="hover:text-primary transition-colors" onclick="navigate('licenseAgreementPage')">License Agreement</a>
+      <a class="hover:text-primary transition-colors" onclick="navigate('documentationPage')">Documentation</a>
+      <a class="hover:text-primary transition-colors" onclick="navigate('businesscardPage')">Support Center</a>
+    </div>
+  </footer>
 </main>
 </div>
-
 </template>
 
 
