@@ -745,19 +745,21 @@
 	
 	<div id="mainContent"
 	  	 class="flex-1 flex flex-col h-screen">
-	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-8">	
+	<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center px-4 pr-8">	
 	  <div class="flex w-full items-center justify-between">	
-	    <!-- LEFT -->
-	    <button
-	      onclick="toggleSidebar()"
-	      class="w-11 h-11 rounded-md flex items-center justify-center
-	      text-muted hover:text-on-surface
-	      hover:hover:bg-white/5 transition-all">
-	
-	      <span class="material-symbols-outlined">
-	        dock_to_right
-	      </span>	
-	    </button>
+	   <div class="flex items-center gap-5 flex-1">
+			<!-- LOGO -->
+			<div class="w-11 h-11 flex items-center justify-center">
+				<img
+					src="logo.png"
+					alt="SOMA"
+					class="w-9 h-9 object-contain" >
+			</div>
+			<!-- NAMA -->
+			<p class="text-xl text-muted font-medium headline-font tracking-wider">
+				DASHBOARD
+			</p>
+		</div>
 	
 	    <!-- RIGHT -->
 	    <div class="flex items-center gap-4">
