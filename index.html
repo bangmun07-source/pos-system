@@ -1160,7 +1160,7 @@
     bg-primary/10 blur-[120px] rounded-md">
   </div>
 </section>
-
+<div class="flex flex-col gap-4">
 <!-- TOOLBAR -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-bacground rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
   <!-- START DATE -->
@@ -1481,6 +1481,7 @@
     </div>
   </div>
 </div>
+</div>
 </main>
 </div>
 </template>
@@ -1605,10 +1606,9 @@
     </div>
   </div>
 </section>
-
+<div class="flex flex-col gap-4">
 <!-- Filters Bar -->
 <div class="bg-background rounded-md border border-white/10 p-6 grid grid-cols-1 md:grid-cols-4 gap-4 items-end shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
   <!-- START DATE -->
   <div class="flex flex-col gap-2">
     <label class="uppercase tracking-[0.25em]
@@ -1812,6 +1812,7 @@
       </span>
     </button>
   </div>
+</div>
 </div>
 </div>
 </main>
@@ -4409,7 +4410,7 @@
 <!-- Main Content -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <!-- Header Section -->
-  <section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
 		<div class="absolute inset-0 bg-cover bg-center opacity-70"
 			style="background-image:url('https://lh3.googleusercontent.com/d/1R8n-WBDEeUUJTpfFc4w5m4khzhDY4v4s');">
 		</div>
@@ -4486,7 +4487,7 @@
   </section>
 	
 <!-- Dashboard Stats Bento Grid -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
 	<div id="totalMaterials" class="col-span-1 bg-background  p-6 rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative overflow-hidden group">
 		<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
 			<span class="material-symbols-outlined text-6xl">database</span>
@@ -4518,7 +4519,7 @@
 	</div>
 	
 <!-- Main Table Section -->
-	<div class="bg-background rounded-md overflow-hidden border border-white/10  shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-12 relative">
+	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-4 relative">
 		<div class="px-8 py-10 flex items-center justify-between">
 	  	<div class="flex items-center gap-4">
 	   		<div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
@@ -4585,7 +4586,7 @@
 
 
 <!-- Supplier Management Section -->
-	<div class="mb-12" id="Supplier-Management-Section">
+	<div class="mb-4" id="Supplier-Management-Section">
 		<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-12 relative">
   		<div class="px-8 py-10 flex items-center justify-between">
    			<div class="flex items-center gap-4">
@@ -4634,7 +4635,7 @@
 </div>
 
 <!-- Recipe Master Ledger Section -->
-<div class="mb-12" id="Recipe-Master-Ledger-Section">
+<div class="mb-4" id="Recipe-Master-Ledger-Section">
 	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-12 relative">
 	  <div class="px-8 py-10 flex items-center justify-between">
 	    <div class="flex items-center gap-4">
@@ -4699,7 +4700,7 @@
 
 
 <!-- Recipe Builder Section -->
-<div class="mt-12 grid grid-cols-3 gap-8 pb-12">
+<div class="mt-4 grid grid-cols-3 gap-4 pb-10">
 	<div class="col-span-2">
 		<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8 relative">
   		<div class="flex items-center gap-4 pb-10">
@@ -6073,9 +6074,8 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 
 		<!-- Main Content Canvas -->
 		<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-			<div class="w-full flex flex-col gap-8">
 				<!-- Scrollable Dashboard Content -->
-				<section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+				<section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
 					<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 							<img
 								src="https://lh3.googleusercontent.com/d/1A6iAplqifTz16AS_szzuX1AQcwXxDuqG"
@@ -6103,6 +6103,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 				<div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-md">
 			</div>
 		</section>
+		<div class="w-full flex flex-col gap-4">
 		<!-- TOOLBAR FULL EQUAL 3 COL -->
 		<div class="bg-background rounded-md border border-white/10 p-6 grid grid-cols-1 md:grid-cols-3 gap-3 items-end shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 			<!-- START DATE -->
@@ -7297,7 +7298,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 	</header>
 	 
 	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-		<div class="space-y-8 pt-10 px-8">
+		<div class="space-y-8 pt-10 px-4">
 		  <!-- BACK BUTTON -->
 		  <div>
 		    <button onclick="navigate('settingsPage')"
@@ -7662,7 +7663,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 	</header>
 	 
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-  <div class="space-y-8 pt-10 px-8">
+  <div class="space-y-8 pt-10 px-4">
       <!-- BACK BUTTON -->
     <div>
       <button onclick="navigate('settingsPage')"
@@ -7918,7 +7919,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		</header>
 	 
 		<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-		  <div class="space-y-8 pt-10 px-8">
+		  <div class="space-y-8 pt-10 px-4">
 		    <!-- BACK BUTTON -->
 		    <div>
 		      <button onclick="navigate('settingsPage')"
@@ -8345,9 +8346,8 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 	</header>
 <!-- Main Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-	<div class="w-full space-y-12 pb-12">
 		<!-- Hero Action Section -->
-	  <section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 	      <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 	        <img
 	          src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
@@ -8421,7 +8421,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
         	</div>
       	</div>
   		</section>
-		
+			<div class="w-full space-y-12 pb-12">
 			<!-- Expanded KPI Bento Grid - Updated to be in the same row -->
 			<section class="grid grid-cols-12 gap-6">
 				<!-- Total vs Budget -->
@@ -10264,8 +10264,8 @@ Save
 	</header>
 		<!-- Page Content Scroll Container -->
 	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-		<div class="w-full space-y-12 pb-12">
-		  <section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	
+		  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 				<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 					<img
 						src="https://lh3.googleusercontent.com/d/1f5oHrRZGzev5MbtMTx9WryUz9XLjXpw0"
@@ -10724,7 +10724,6 @@ Save
 				</div>
 			</div>
 		</section>
-	</div>
 </main>
 </div>
 </div>
@@ -10989,7 +10988,7 @@ Save
 <!-- Scrollable Main Content -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <div class="w-full space-y-12 pb-12">
-  <section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">    
+  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">    
       <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
         <img
           src="https://lh3.googleusercontent.com/d/1Ds197JwBnXEYg14mOCQbbPeFnf1MaILR"
@@ -11320,7 +11319,7 @@ Save
 
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
   <!-- HERO -->
-  <section class="mb-10 mt-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
     <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
         <img
           src="https://lh3.googleusercontent.com/d/1NIz-UQV4GLkPivFgVcsO3HZComH0xClp"
