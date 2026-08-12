@@ -3770,12 +3770,8 @@
           </button>
 
           <!-- DROPDOWN -->
-          <div
-            id="notificationDropdown"
-            class="hidden absolute right-0 top-12 w-80
-            bg-background rounded-md
-            border border-white/10
-            shadow-2xl overflow-hidden z-50">
+          <div id="notificationDropdown"
+            class="hidden absolute right-0 top-12 w-80 bg-background rounded-md border border-white/10 shadow-2xl overflow-hidden z-50">
 
             <div class="p-4 border-b border-white/10">
               <h3 class="font-bold text-xs lg:text-sm text-on-surface">
@@ -3788,7 +3784,6 @@
                 No Notifications Today
               </div>
             </div>
-
           </div>
 
         </div>
@@ -3796,11 +3791,8 @@
         <!-- ADD BUTTON -->
         <button
           onclick="openAddMemberModal()"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-md
-          bg-primary/10 border border-primary/10 text-primary font-bold
-          active:scale-95 transition">
-
-          <span class="material-symbols-outlined text-xl">person_add</span>
+          class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-background border border-white/10 text-on-surface font-medium headline-font active:scale-95 transition">
+          <span class="material-symbols-outlined text-lg">person_add</span>
           Add Member
 
         </button>
@@ -3812,52 +3804,6 @@
   </header>
   <!-- Main Content (Independently Scrollable) -->
   <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-
-  <!-- Hero Section -->
-  <section
-  class="mb-10 mt-4 relative overflow-hidden
-  rounded-md bg-background
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-  ">
-
-    <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-      <img
-        src="https://lh3.googleusercontent.com/d/1zp3DZRAH0cBCGox2eqW0YKGk4PvXVUlC"
-        class="w-full h-full object-cover"
-        style="object-position: right 20%;"
-        alt="">
-    </div>
-    <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
-
-    <div class="relative min-h-[260px] flex flex-col justify-center px-12">
-
-      <div>
-
-        <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
-        Customer Loyalty
-        </span>
-
-        <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
-        Member Management
-        </h2>
-
-        <p class="text-on-surface-variant max-w-xl text-lg font-light leading-relaxed">
-        Manage your member database, monitor loyalty points, membership levels, and customer activity to build long-term relationships.
-        </p>
-
-      </div>
-
-    </div>
-
-    <div
-      class="absolute -top-24 -right-24 w-72 h-72
-      bg-primary/10 blur-[120px] rounded-md">
-    </div>
-
-  </section>
-
-
   <!-- Bento Stats Grid -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
 
@@ -3956,14 +3902,14 @@
       <div class="flex flex-col sm:flex-row w-full md:w-auto gap-3">
 			  <div class="relative flex-1">
 					<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">search</span>
-					<input id="memberSearchInput" class="w-full bg-background/80 border border-white/10 rounded-xl pl-12 pr-6 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary transition-all" placeholder="Search members..." type="text" />
+					<input id="memberSearchInput" class="w-full bg-background/80 border border-white/10 rounded-md pl-12 pr-6 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary transition-all" placeholder="Search members..." type="text" />
 			  </div>
 			
-			  <select id="tierFilter" class="w-full sm:w-44 md:w-48 bg-background/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
+			  <select id="tierFilter" class="w-full sm:w-44 md:w-48 bg-background border border-white/10 font-semibold px-4 py-2.5 text-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
 					<option value="all">All Tier</option>
 			  </select>
 			
-			  <button id="memberExportPdfBtn" class="w-full sm:w-auto flex items-center justify-center whitespace-nowrap px-4 py-2 rounded-xl bg-primary/10 text-primary border border-primary/10 text-sm font-semibold gap-2 hover:bg-primary/20 transition-all">
+			  <button id="memberExportPdfBtn" class="w-full sm:w-auto flex items-center justify-center whitespace-nowrap px-4 py-2 rounded-md bg-background border border-white/10 text-on-surface font-semibold text-sm gap-2 hover:bg-primary/20 transition-all">
 					<span class="material-symbols-outlined text-lg">download</span>
 						Export
 			  </button>
