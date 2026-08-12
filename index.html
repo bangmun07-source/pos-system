@@ -3873,7 +3873,7 @@
         </div>
 
         <span id="member-growth"
-              class="text-xs font-medium text-emerald-400">
+              class="text-xs font-medium text-emerald-400 headline-font">
         </span>
       </div>
 
@@ -3923,8 +3923,8 @@
         </div>
 
         <div class="flex -space-x-2">
-          <div class="w-6 h-6 rounded-md bg-white/10 border border-white/10"></div>
-          <div class="w-6 h-6 rounded-md bg-white/20 border border-white/10"></div>
+          <div class="w-6 h-6 rounded-full bg-white/10 border border-white/10"></div>
+          <div class="w-6 h-6 rounded-full bg-white/20 border border-white/10"></div>
         </div>
       </div>
 
@@ -3959,7 +3959,7 @@
         <!-- SEARCH -->
         <div class="relative flex-1">
 
-          <span class="material-symbols-outlined text-white text-2xl"
+          <span class="material-symbols-outlined text-white text-2xl">
             search
           </span>
 
@@ -18184,7 +18184,7 @@ function loadMemberGrowth() {
   const growth = res.growth?.growth || 0;
   const sign = growth >= 0 ? "+" : "";
   el.innerText =
-    `${sign}${growth}% vs last month`;
+    `${sign}${growth}%`;
 }
 
 function applyFilters() {
