@@ -3860,129 +3860,96 @@
 
 
   <!-- Bento Stats Grid -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
 
     <!-- CARD 1 -->
-    <div class="bg-background rounded-md overflow-hidden
-                border border-white/10
-                p-6 relative
-                shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+    <div class="bg-background rounded-md overflow-hidden border border-white/10 p-6 relative shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
       <div class="flex justify-between items-start">
-
-        <div class="w-12 h-12 rounded-md
-                    bg-primary/10
-                    flex items-center justify-center text-primary
-                    border border-primary/10">
-          <span class="material-symbols-outlined text-3xl">groups</span>
+       <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	         style="font-variation-settings:'FILL' 1;">
+			  groups
+		  </span>
         </div>
 
         <span id="member-growth"
-              class="text-xs font-bold text-emerald-400">
-        
+              class="text-xs font-medium text-emerald-400">
         </span>
-
       </div>
 
       <div class="mt-8">
-        <p class="text-on-surface-variant text-xs font-medium uppercase tracking-widest">
+        <p <p class="text-muted text-base font-medium headline-font uppercase tracking-widest">
           Total Members
         </p>
 
         <h3 id="total-members"
             class="text-4xl font-extrabold mt-1 text-on-surface">
-      
         </h3>
       </div>
-
     </div>
 
     <!-- CARD 2 -->
-    <div class="bg-background rounded-md overflow-hidden
-                border border-white/10
-                p-6 relative
-                shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+    <div class="bg-background rounded-md overflow-hidden border border-white/10 p-6 relative shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
       <div class="flex justify-between items-start">
-
-        <div class="w-12 h-12 rounded-md
-                    bg-primary/10
-                    flex items-center justify-center text-primary
-                    border border-primary/10">
-          <span class="material-symbols-outlined text-3xl">bedtime</span>
+        <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+			  DIAMOND
+		  </span>
         </div>
-
-        <span class="text-[10px] font-black uppercase text-primary/80">
-          Tier
-        </span>
-
       </div>
 
       <div class="mt-8">
         <p id="top-tier-label"
-        class="text-on-surface-variant text-xs font-medium uppercase tracking-widest">
+        	<p class="text-muted text-base font-medium headline-font uppercase tracking-widest">
         Top Tier
       </p>
 
       <h3 id="total-top-tier"
-          class="text-4xl font-extrabold mt-1 text-on-surface">
-      
+          class="text-2xl font-bold text-foreground mt-2">
       </h3>
       </div>
     </div>
 
     <!-- CARD 3 -->
-    <div class="bg-background rounded-md overflow-hidden
-                border border-white/10
-                p-6 relative
-                shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
+    <div class="bg-background rounded-md overflow-hidden border border-white/10 p-6 relative shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
       <div class="flex justify-between items-start">
 
-        <div class="w-12 h-12 rounded-md
-                    bg-amber-500/10
-                    flex items-center justify-center text-amber-400
-                    border border-amber-500/10">
-          <span class="material-symbols-outlined text-3xl">monetization_on</span>
+        <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+			  monetization_on
+		  </span>
         </div>
 
         <div class="flex -space-x-2">
           <div class="w-6 h-6 rounded-md bg-white/10 border border-white/10"></div>
           <div class="w-6 h-6 rounded-md bg-white/20 border border-white/10"></div>
         </div>
-
       </div>
 
       <div class="mt-8">
-        <p class="text-on-surface-variant text-xs font-medium uppercase tracking-widest">
+        <p <p class="text-muted text-base font-medium headline-font uppercase tracking-widest">
           Points Issued
         </p>
 
         <h3 id="total-points"
-            class="text-4xl font-extrabold mt-1 text-on-surface">
-
+            class="text-2xl font-bold text-foreground mt-2">
         </h3>
       </div>
-
     </div>
-
   </div>
   <!-- Member Directory Table Container -->
-  <section class="bg-background rounded-md overflow-hidden
-                  border border-white/10
-                  shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-                  mb-12 relative">
+  <section class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-4 relative">
 
     <!-- HEADER -->
-    <div class="px-6 py-8
-              flex flex-col
-              lg:flex-row
-              lg:items-center
-              lg:justify-between
-              gap-6">
+    <div class="px-6 py-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-          <span class="material-symbols-outlined text-secondary">manage_accounts</span>
+        <div class="main-icon-box">
+	      <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+					manage_accounts
+				</span>
         </div>
         <h2 class="font-headline text-2xl font-bold tracking-tight">Member Management</h2>
       </div>
@@ -3998,52 +3965,22 @@
 
           <input
             id="memberSearchInput"
-            class="w-full
-                  bg-background
-                  border border-white/10
-                  rounded-md
-                  pl-12 pr-6 py-2.5
-                  text-xs lg:text-sm text-on-surface
-                  focus:ring-1 focus:ring-primary
-                  transition-all"
+            class="w-full bg-background border border-white/10 rounded-md pl-12 pr-6 py-2.5 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary transition-all"
             placeholder="Search members..."
-            type="text"
-          />
-
+            type="text" />
         </div>
 
         <!-- FILTER -->
         <select
           id="tierFilter"
-          class="w-full sm:w-44 md:w-48
-                bg-background
-                border border-white/10
-                rounded-md
-                px-4 py-2.5
-                text-xs lg:text-sm text-on-surface
-                focus:ring-1 focus:ring-primary
-                transition-all">
-
+          class="w-full bg-background border border-white/10 rounded-md pl-12 pr-6 py-2.5 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary transition-all">
         <option value="all">All Tier</option>
-
-
         </select>
 
         <!-- EXPORT -->
         <button
           id="btnExportMembersPDF"
-          class="w-full sm:w-auto
-                flex items-center justify-center
-                whitespace-nowrap
-                px-4 py-2
-                rounded-md
-                bg-primary/10
-                text-primary
-                border border-primary/10
-                text-sm font-semibold
-                flex items-center gap-2
-                hover:bg-primary/20
-                transition-all">
+          class="w-full bg-background border border-white/10 rounded-md pl-12 pr-6 py-2.5 text-xs lg:text-sm text-on-surface hover:bg-primary/20 transition-all">
 
           <span class="material-symbols-outlined text-lg">download</span>
           Export
