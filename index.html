@@ -3397,7 +3397,7 @@
 </header>
 
 <!-- Main Content Area -->
-<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 
 <!-- Header / Floor Status -->
 <header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -4522,8 +4522,9 @@
 	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-4 relative">
 		<div class="px-8 py-10 flex items-center justify-between">
 	  	<div class="flex items-center gap-4">
-	   		<div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-	      	<span class="material-symbols-outlined text-secondary">inventory</span>
+	   		<div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">inventory</span>
 				</div>
 	    		<h2 class="font-headline text-2xl font-bold tracking-tight">Ingredient Stock</h2>
 	  	</div>
@@ -4554,7 +4555,7 @@
 		<div class="custom-scrollbar overflow-x-auto">
 			<table class="w-full text-left border-collapse min-w-[900px]">
 				<thead>
-					<tr class="sticky top-0 border-b border-white/10 text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-wides">
+					<tr class="sticky top-0 border-b border-white/10 text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
 						<th class="px-8 py-4 font-bold">Ingredient</th>
 						<th class="px-8 py-4 font-bold">(IDR) VALUE</th>
 						<th class="px-8 py-4 font-bold">Current Qty</th>
@@ -4587,11 +4588,12 @@
 
 <!-- Supplier Management Section -->
 	<div class="mb-4" id="Supplier-Management-Section">
-		<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-12 relative">
+		<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative">
   		<div class="px-8 py-10 flex items-center justify-between">
    			<div class="flex items-center gap-4">
-      		<div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-        		<span class="material-symbols-outlined text-secondary">local_shipping</span>
+      		<div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">local_shipping</span>
       		</div>
       			<h2 class="font-headline text-2xl font-bold tracking-tight">Supplier Management</h2>
     		</div>
@@ -4605,7 +4607,7 @@
 		<div class="custom-scrollbar overflow-x-auto">
 			<table class="w-full text-left border-collapse min-w-[900px]">
 				<thead>
-					<tr class="sticky top-0 border-b border-white/10 text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-wides">
+					<tr class="sticky top-0 border-b border-white/10 text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
 						<th class="px-8 py-4 font-bold">SUPPLIER NAME</th>
 						<th class="px-8 py-4 font-bold">CATEGORY</th>
 						<th class="px-8 py-4 font-bold">CONTACT PERSON</th>
@@ -4636,11 +4638,12 @@
 
 <!-- Recipe Master Ledger Section -->
 <div class="mb-4" id="Recipe-Master-Ledger-Section">
-	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-12 relative">
+	<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative">
 	  <div class="px-8 py-10 flex items-center justify-between">
 	    <div class="flex items-center gap-4">
-	      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-	        <span class="material-symbols-outlined text-secondary">receipt_long</span>
+	      <div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">receipt_long</span>
 	      </div>
       		<h2 class="font-headline text-2xl font-bold tracking-tight">Recipe Master</h2>
 			</div>
@@ -4667,7 +4670,7 @@
 		<div class="custom-scrollbar overflow-x-auto">
 			<table class="w-full text-left border-collapse min-w-[900px]">
 				<thead>
-					<tr class="sticky top-0 border-b border-white/10 text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-wides">
+					<tr class="sticky top-0 border-b border-white/10 text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
 						<th class="px-8 py-5 font-bold">Product Name</th>
 						<th class="px-8 py-5 font-bold text-center">Ingredients</th>
 						<th class="px-8 py-5 font-bold">Est. Cost (IDR)</th>
@@ -4704,8 +4707,9 @@
 	<div class="col-span-2">
 		<div class="bg-background rounded-md overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8 relative">
   		<div class="flex items-center gap-4 pb-10">
-    		<div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-      		<span class="material-symbols-outlined text-secondary">receipt_long</span>
+    		<div class="main-icon-box">		                
+					<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">receipt_long</span>
    			</div>
     			<h2 class="font-headline text-2xl font-bold tracking-tight">Recipe Master</h2>
   			</div>
@@ -6182,7 +6186,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 					</div>			
 				</div>
 				<!-- Hero Stats: Bento Grid -->
-				<div class="grid grid-cols-12 gap-6">
+				<div class="grid grid-cols-12 gap-4">
 					<!-- Large Net Profit Card -->
 					<div class="col-span-12 lg:col-span-8 p-8 bg-background rounded-md relative overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 						<div class="relative z-10">
@@ -6485,7 +6489,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 
 		<!-- Main Content Area -->
 	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-		<section class="mb-10 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+		<section class="mb-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
 		  <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 		    <img
 		      src="https://lh3.googleusercontent.com/d/1CGqbJsxmJ7qvBPxHRHnznYPKkAE32rpR"
@@ -6517,7 +6521,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		</section>
 		
 		<!-- Global Outlet Selector -->
-		<div class="mb-8 p-6 bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative overflow-hidden group">
+		<div class="mb-4 p-6 bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative overflow-hidden group">
 		  <div class="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
 		    <span class="material-symbols-outlined text-9xl">hub</span>
 		  </div>
@@ -6555,13 +6559,14 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		</div>
 		
 		<!-- Bento Grid Layout -->
-		<div class="grid grid-cols-12 gap-8">
+		<div class="grid grid-cols-12 gap-4">
 		<!-- Business Outlets Section -->
 		<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)]  ">
 		  <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
 		    <div class="flex items-center gap-4">
-		      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-		        <span class="material-symbols-outlined text-secondary">
+		      <div class="main-icon-box">		                
+						<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
 		          business
 		        </span>
 		      </div>
@@ -6619,8 +6624,9 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
 		  <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
 		    <div class="flex items-center gap-4">
-		      <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
-		        <span class="material-symbols-outlined text-primary">
+		      <div class="main-icon-box">		                
+						<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
 		          group
 		        </span>
 		      </div>
@@ -6691,8 +6697,9 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		<section class="col-span-12 bg-background rounded-md border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-8">
 		  <div class="flex items-center justify-between mb-8 border-b border-outline-variant/10 pb-6">
 		    <div class="flex items-center gap-4">
-		      <div class="w-12 h-12 rounded-md bg-primary/10 flex items-center justify-center">
-		        <span class="material-symbols-outlined text-primary">
+		      <div class="main-icon-box">		                
+						<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
 		          storefront
 		        </span>
 		      </div>
@@ -6716,7 +6723,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		        </label>
 		
 		        <div class="flex flex-col items-center justify-center border border-white/10 rounded-md p-6 bg-background/50">
-		          <div class="w-32 h-32 rounded-md overflow-hidden bg-white/5 mb-4">
+		          <div class="w-32 h-32 rounded-full overflow-hidden bg-white/5 mb-4">
 		            <img src="" 
 		              id="businessLogoPreview" 
 		              class="w-full h-full object-contain p-3">
@@ -6780,7 +6787,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		  </section>
 		  
 		<!-- Footer Copyright -->
-		  <footer class="mt-12 flex justify-between items-center text-slate-600 text-[8px] font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-white/10 pt-12 px-10 ">
+		  <footer class="mt-12 flex justify-between items-center surface-variant text-xs font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-white/10 pt-12 px-10 ">
 		    <div class="flex items-center gap-2">
 		      <span class="w-2 h-2 rounded-md bg-emerald-500 animate-pulse"></span>
 		      SOMA Kasir v2.4.0-Stable
@@ -8469,7 +8476,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 							<span id="kpiRemainingAmount" class="text-on-surface font-bold">IDR 0</span>
 						</div>
 					</div>
-<!-- Largest Category -->
+				<!-- Largest Category -->
 					<div class="col-span-12 md:col-span-6 lg:col-span-3 rounded-md bg-background border border-white/10 p-8 relative overflow-hidden flex flex-col justify-between shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 						<div class="flex justify-between items-start">
 							<div>
@@ -8479,8 +8486,9 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 								</div>
 							</div>
 							
-							<div class="w-10 h-10 bg-primary/10 rounded-md flex items-center justify-center">
-								<span class="material-symbols-outlined text-primary text-2xl">groups</span>
+							<div class="main-icon-box">		                
+								<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">groups</span>
 							</div>
 						</div>
 					<div class="mt-4 flex justify-between items-center pt-4 border-t border-outline-variant/10">
@@ -8490,15 +8498,18 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 				</div>
 			</section>
 			<!-- Main Analytics & Ledger Section -->
-			<section class="grid grid-cols-12 gap-8 items-start">
+			<section class="grid grid-cols-12 gap-4 items-start">
 				<!-- Right Area: Expense Ledger -->
-				<div class="col-span-12 p-6 rounded-lg overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex flex-col">
+				<div class="col-span-12 p-6 rounded-md overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex flex-col">
 					<!-- Ledger Header with Filtering -->
 					<div class="px-8 py-6 space-y-6 border-b border-outline-variant/5">
 					  <div class="mb-6 flex items-center justify-between">
 					    <div class="flex items-center gap-4">
-					      <div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-					        <span class="material-symbols-outlined text-secondary">credit_card_off</span>
+					      <div class="main-icon-box">		                
+								<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
+									credit_card_off
+								</span>
 					      </div>
       						<h2 class="font-headline text-2xl font-bold tracking-tight">Expense Ledger</h2>
 								</div>
@@ -8604,8 +8615,11 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		<div class="px-8 py-6 space-y-6 border-b border-outline-variant/5">
 			<div class="mb-6 flex items-center justify-between">
 				<div class="flex items-center gap-4">
-					<div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-						<span class="material-symbols-outlined text-secondary">account_balance_wallet</span>
+					<div class="main-icon-box">		                
+						<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;">
+							account_balance_wallet
+						</span>
 					</div>
 					<h2 class="font-headline text-2xl font-bold tracking-tight">Other Income Ledger</h2>
 				</div>
@@ -8682,7 +8696,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 			</div>
 			<!-- Footer / Pagination -->
 			<div class="px-8 py-4 border-t border-white/10 flex items-center justify-between">
-				<span id="otherIncomeTableInfo" class="text-[8px] text-muted  font-bold uppercase tracking-widest">Showing 4 of 124 Ledger Entries</span>
+				<span id="otherIncomeTableInfo" class="text-[8px] text-muted font-bold uppercase tracking-widest">Showing 4 of 124 Ledger Entries</span>
 					<div id="otherIncomePagination" class="flex gap-2">
 						<button class="w-8 h-8 rounded-md flex items-center justify-center border border-outline-variant/20 hover:bg-surface-container-high transition-colors">
 							<span class="material-symbols-outlined text-sm">chevron_left</span>
@@ -8710,7 +8724,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 				</div>
 		
 				<!-- Concierge AI Insights Section -->
-				<div class="bg-gradient-to-br from-primary/10 to-transparent p-6 rounded-lg border border-primary/20 relative overflow-hidden">
+				<div class="bg-background p-6 rounded-md border border-shite/10 relative overflow-hidden">
 					<div class="absolute -right-4 -bottom-4 opacity-10">
 						<span class="material-symbols-outlined text-8xl">psychology</span>
 					</div>
