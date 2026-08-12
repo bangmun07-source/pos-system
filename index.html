@@ -10279,7 +10279,7 @@ Save
 		<!-- Page Content Scroll Container -->
 	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 	
-		  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+		  <section class="relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 				<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 					<img
 						src="https://lh3.googleusercontent.com/d/1f5oHrRZGzev5MbtMTx9WryUz9XLjXpw0"
@@ -10326,7 +10326,7 @@ Save
 		  </section>
 			
 			<section class="pt-4 px-4 pb-24">
-				<div class="grid grid-cols-12 gap-8 items-stretch">
+				<div class="grid grid-cols-12 gap-4 items-stretch">
 					<div class="col-span-12 lg:col-span-6">
 						<div class="bg-background rounded-md overflow-hidden border border-white/10 p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
 							<div class="relative z-10">
@@ -11532,7 +11532,7 @@ Save
           </span>
         </div>
 
-        <h4 class="text-xl font-bold">
+        <h4 class="font-headline text-xl font-bold tracking-tight">
           Account Balance
         </h4>
       </div>
@@ -11618,7 +11618,7 @@ Save
         </div>
 				
         <div>
-          <h4 class="text-xl font-bold">
+          <h4 class="font-headline text-xl font-bold tracking-tight">
             Cash In vs Cash Out
           </h4>
 
@@ -11662,7 +11662,7 @@ Save
   <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
     <!-- CASH IN -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
-      <h4 class="text-xl font-bold mb-8">
+      <h4 class="font-headline text-xl font-bold tracking-tight mb-8">
         Income Sources
       </h4>
       <div class="space-y-6">
@@ -11730,7 +11730,7 @@ Save
 
     <!-- CASH OUT -->
     <div class="bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
-      <h4 class="text-xl font-bold mb-8">
+      <h4 class="font-headline text-xl font-bold tracking-tight mb-8">
        Expense Categories
       </h4>
      	 <div class="space-y-6">
@@ -11817,7 +11817,7 @@ Save
         </div>
 				
         <div>
-          <h4 class="text-xl font-bold">
+          <h4 class="font-headline text-xl font-bold tracking-tight">
             Owner Equity
           </h4>
 
@@ -11831,7 +11831,7 @@ Save
     <!-- SUMMARY -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
       <!-- CAPITAL -->
-      <div class="rounded-md bg-primary/5 border border-primary/10 p-6">
+      <div class="rounded-md bg-background border border-primary/10 p-6">
         <div class="flex justify-between items-center">
           <div>
             <p class="text-xs uppercase tracking-[0.2em] text-muted ">
@@ -11839,19 +11839,19 @@ Save
             </p>
 
             <h3 id="owner-capital-total"
-              class="text-2xl font-black mt-2 text-emerald-400">
+              class="text-2xl font-medium headline-font mt-2 text-foreground">
               	IDR 0
             </h3>
           </div>
 
-          <span class="material-symbols-outlined text-4xl text-emerald-400">
+          <span class="material-symbols-outlined text-2xl text-emerald-400">
             trending_up
           </span>
         </div>
       </div>
 
       <!-- WITHDRAW -->
-      <div class="rounded-md bg-primary/5 border border-primary/10 p-6">
+      <div class="rounded-md bg-background border border-primary/10 p-6">
         <div class="flex justify-between items-center">
           <div>
             <p class="text-xs uppercase tracking-[0.2em] text-muted ">
@@ -11859,12 +11859,12 @@ Save
             </p>
 
             <h3 id="owner-withdraw-total"
-              class="text-2xl font-black mt-2 text-red-400">
+              class="text-2xl font-medium headline-font mt-2 text-foreground">
               IDR 0
             </h3>
           </div>
 
-          <span class="material-symbols-outlined text-4xl text-red-400">
+          <span class="material-symbols-outlined text-2xl text-red-400">
             trending_down
           </span>
         </div>
@@ -11893,11 +11893,13 @@ Save
     <!-- HISTORY -->
     <div class="border-t border-white/10 pt-6">
       <div class="flex items-center gap-2 mb-4">
-        <span class="material-symbols-outlined text-primary">
-          history
-        </span>
-
-        <h5 class="text-sm font-bold uppercase tracking-wider">
+				<div class="main-icon-box">	  
+					<span class="material-symbols-outlined text-3xl"
+						style="font-variation-settings:'FILL' 1;">
+					  history
+					</span>
+				</div>
+        <h5 class="font-headline text-sm font-bold tracking-tight uppercase tracking-wider">
           Owner Transaction History
         </h5>
       </div>
@@ -11916,9 +11918,10 @@ Save
     <!-- HEADER -->
     <div class="h-16 flex items-center justify-between px-5 py-3 border-b border-white/10 bg-background-low" >
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary">
-            smart_toy
+        <div class="main-icon-box">	  
+					<span class="material-symbols-outlined text-3xl"
+						style="font-variation-settings:'FILL' 1;">
+            chat_bubble
           </span>
         </div>
 
