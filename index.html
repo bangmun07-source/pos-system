@@ -23693,7 +23693,7 @@ function openSupplierModal() {
   document.body.appendChild(clone);
   loadBranchDropdown();
 }
-
+	
 async function saveMaterial() {
   const select = document.getElementById("material_branch");
   const data = {
@@ -23711,33 +23711,15 @@ async function saveMaterial() {
 		    error
 		  } = await supabaseClient.rpc(
 		    "save_material",
-		    {
-		      p_id:
-		        generateIngredientId(),
-		
-		      p_name:
-		        data.name || "",
-		
-		      p_value:
-		        0,
-		
-		      p_qty:
-		        0,
-		
-		      p_unit:
-		        data.unit || "",
-		
-		      p_min:
-		        Number(data.min) || 0,
-		
-		      p_cost:
-		        0,
-		
-		      p_branch_id:
-		        data.branchId || "",
-		
-		      p_outlet:
-		        data.branchName || ""
+		    {		
+		      p_name: data.name || "",		
+		      p_value: 0,		
+		      p_qty: 0,		
+		      p_unit: data.unit || "",		
+		      p_min: Number(data.min) || 0,
+				  p_cost: 0,		
+		      p_branch_id: data.branchId || "",
+		      p_outlet: data.branchName || ""
 		    }
 		  );
 		
