@@ -22675,7 +22675,13 @@ async function loadRecipeProducts() {
 
     const recipes =
       data || [];
-
+	console.log(
+	  "GET PRODUCTS FOR RECIPE:",
+	  {
+	    branchId,
+	    recipes
+	  }
+	);
 
     // ==============================
     // CACHE
