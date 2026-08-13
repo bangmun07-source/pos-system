@@ -23473,8 +23473,7 @@ catch (error) {
   }
 
   alert(message);
-}
-};
+}};
 	
 window.closeModal = function () {
   document.querySelectorAll(".fixed.inset-0")
@@ -23708,86 +23707,88 @@ async function saveMaterial() {
 
   try {
 
-  const {
-    data: res,
-    error
-  } = await supabaseClient.rpc(
-    "save_material",
-    {
-      p_id:
-        generateIngredientId(),
-
-      p_name:
-        data.name || "",
-
-      p_value:
-        0,
-
-      p_qty:
-        0,
-
-      p_unit:
-        data.unit || "",
-
-      p_min:
-        Number(data.min) || 0,
-
-      p_cost:
-        0,
-
-      p_branch_id:
-        data.branchId || "",
-
-      p_outlet:
-        data.branchName || ""
-    }
-  );
-
-  if (error) {
-    throw error;
-  }
-
-  if (
-    res &&
-    res.success === false
-  ) {
-    throw new Error(
-      res.message ||
-      "Gagal menyimpan material"
-    );
-  }
-
-  // CLEAR CACHE
-  state.inventoryData = null;
-  state.inventoryBranchId = null;
-
-  // RELOAD
-  closeAddMaterialModal();
-
-  await loadInventoryPage(
-    state.branchId
-  );
-
-  showToast(
-    "Material berhasil disimpan",
-    "success"
-  );
-
+		  const {
+		    data: res,
+		    error
+		  } = await supabaseClient.rpc(
+		    "save_material",
+		    {
+		      p_id:
+		        generateIngredientId(),
+		
+		      p_name:
+		        data.name || "",
+		
+		      p_value:
+		        0,
+		
+		      p_qty:
+		        0,
+		
+		      p_unit:
+		        data.unit || "",
+		
+		      p_min:
+		        Number(data.min) || 0,
+		
+		      p_cost:
+		        0,
+		
+		      p_branch_id:
+		        data.branchId || "",
+		
+		      p_outlet:
+		        data.branchName || ""
+		    }
+		  );
+		
+		  if (error) {
+		    throw error;
+		  }
+		
+		  if (
+		    res &&
+		    res.success === false
+		  ) {
+		    throw new Error(
+		      res.message ||
+		      "Gagal menyimpan material"
+		    );
+		  }
+		
+		  // CLEAR CACHE
+		  state.inventoryData = null;
+		  state.inventoryBranchId = null;
+		
+		  // RELOAD
+		  closeAddMaterialModal();
+		
+		  await loadInventoryPage(
+		    state.branchId
+		  );
+		
+		  showToast(
+		    "Material berhasil disimpan",
+		    "success"
+		  );
+		
+		}
+		catch (err) {
+		
+		  console.error(
+		    "Save Material:",
+		    err
+		  );
+		
+		  showToast(
+		    err?.message ||
+		    "Gagal menyimpan material",
+		    "error"
+		  );
+		}
 }
-catch (err) {
 
-  console.error(
-    "Save Material:",
-    err
-  );
-
-  showToast(
-    err?.message ||
-    "Gagal menyimpan material",
-    "error"
-  );
-}
-
+	
 async function saveSupplier() {
 
   const branchSelect =
