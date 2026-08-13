@@ -2655,7 +2655,7 @@
 
         <button
           onclick="toggleNotification()"
-          class="class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
+          class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
           <span class="material-symbols-outlined">notifications</span>
 
           <!-- BADGE -->
@@ -2763,17 +2763,17 @@
 <div class="flex justify-between items-center mb-6">
 <div class="flex flex-col">
 <h2 class="font-headline font-extrabold text-2xl">SOMMA POS</h2>
-<p class="text-xs text-muted  font-medium tracking-tight">Current Order</p>
+<p class="text-xs lg:text-sm text-muted  font-medium tracking-tight">Current Order</p>
 </div>
 </div>
 
 
 <!-- Table Input Field -->
 <div class="mb-2">
-<label class="text-muted text-xs font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
+<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" data-icon="table_restaurant">table_restaurant</span>
-<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
+<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
 </div>
 </div>
 
@@ -2790,11 +2790,11 @@
 <label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
 	<div class="relative">
   <!-- ICON -->
-	<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+	<span class="material-symbols-outlined ">
 		search
 	</span>
 	<input id="memberSearch" 
-		class="w-full bg-background border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-sm text-on-surface text-xs font-bold" 
+		class="w-full bg-background border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
 		autocomplete="off" 
 		placeholder="Search members..." 
 		type="text" />
@@ -3348,7 +3348,7 @@
 
  <div id="mainContent" class="flex-1 flex flex-col h-screen">	
 <!-- Top Navigation Bar -->
-<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex justify-between items-center flex items-center pl-4 pr-8">
+<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex justify-between items-center flex items-center pl-4 pr-4">
   
 	<div class="flex items-center gap-3 flex-1">
 		<!-- LOGO -->
@@ -3389,7 +3389,7 @@
 <!-- Main Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <!-- Header / Floor Status -->
-<header class="mb-10 flex flex-col md:flex-row md:items-end gap-6">
+<header class="mb-10 flex flex-col md:flex-row md:items-end gap-6 border border-white/10">
   <div class="flex flex-wrap items-center gap-4">
 
     <!-- AVAILABLE -->
