@@ -20614,7 +20614,7 @@ async function loadRecipes() {
       data,
       error
     } = await supabaseClient.rpc(
-      "get_recipe_list",
+      "get_recipes",
       {
         p_branch_id:
           branchId
