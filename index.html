@@ -28930,38 +28930,68 @@ function openAddNewOtherIncome() {
 
 async function submitOtherIncome() {
 
+  const now = new Date();
+
+  const id =
+    "OI-" +
+    now.getTime() +
+    "-" +
+    Math.floor(Math.random() * 10000);
+
+  const refId =
+    id;
+
   const data = {
+
+    id: id,
+
     date:
       document.getElementById(
         "otherIncomeDate"
       ).value,
+
+    refId: refId,
+
     description:
       document.getElementById(
         "otherIncomeDescription"
       ).value,
+
     category:
       document.getElementById(
         "otherIncomeCategory"
       ).value,
+
     method:
       document.getElementById(
         "otherIncomeMethod"
       ).value,
+
     amount:
       Number(
         document.getElementById(
           "otherIncomeAmount"
         ).value || 0
       ),
+
+    status:
+      "Paid",
+
     branchId:
       document.getElementById(
         "otherIncomeBranch"
       ).value,
+
     notes:
       document.getElementById(
         "otherIncomeNotes"
       ).value
   };
+
+  console.log(
+    "OTHER INCOME DATA:",
+    data
+  );
 
   try {
 
@@ -28978,27 +29008,19 @@ async function submitOtherIncome() {
       );
     }
 
-    // =========================
-    // CLOSE FORM
-    // =========================
     document
       .getElementById(
         "addNewOtherIncomeWrapper"
       )
       ?.remove();
 
-    // =========================
-    // CLEAR CACHE
-    // =========================
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
-	
-    // =========================
-    // RELOAD
-    // =========================
+
     await loadExpenseDashboard();
+
     showToast(
       "Other Income berhasil disimpan",
       "success"
@@ -29006,10 +29028,12 @@ async function submitOtherIncome() {
 
   }
   catch (err) {
+
     console.error(
       "Submit Other Income Error:",
       err
     );
+
     showToast(
       err?.message ||
       "Gagal menyimpan Other Income",
