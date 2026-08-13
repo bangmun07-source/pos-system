@@ -70,7 +70,7 @@
                            MUTED / SECONDARY TEXT
                            ========================= */
                     
-                        "muted": "#cccccc",
+                        "muted": "#787777",
                         "muted-foreground": "#555555",
                     
                         /* =========================
@@ -3710,7 +3710,7 @@ custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 	
   <!-- Content Wrapper (Scrollable Main Content Area) -->
 	<div id="mainContent" class="flex-1 flex flex-col h-screen">	
-		<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8">
+		<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8 overflow-visible">
 
     <div class="flex w-full items-center justify-between">
 		<div class="flex items-center gap-3 flex-1">
@@ -3734,8 +3734,7 @@ custom-scrollbar pt-4 pr-4 pb-10 pl-20">
           <button
             onclick="toggleNotification()"
             class="w-10 h-10 rounded-md flex items-center justify-center
-            text-muted hover:text-on-surface
-            hover:bg-white/5 transition-all">
+            text-on-surface-variant hover:text-on-surface transition-all">
 
             <span class="material-symbols-outlined">notifications</span>
 
@@ -3743,8 +3742,8 @@ custom-scrollbar pt-4 pr-4 pb-10 pl-20">
             <div
               id="notificationBadge"
               class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px]
-              px-1 rounded-md bg-red-500 text-white
-              text-[10px] font-bold flex items-center justify-center">
+              px-1 rounded-md bg-red-500 text-on-surface
+              text-sx font-bold flex items-center justify-center">
               0
             </div>
 
@@ -11311,9 +11310,9 @@ Save
 	  <div class="ml-auto flex items-center gap-3">
 	    <!-- NOTIFICATION -->
 	    <div class="relative">
-		  <button onclick="toggleCashFlowNotification()" class="w-10 h-10 flex items-center justify-center rounded-md text-slate-400 hover:text-on-surface hover:bg-white/5 transition-all">
+		  <button onclick="toggleCashFlowNotification()" class="w-10 h-10 flex items-center justify-center rounded-md on-surface-variant hover:text-on-surface transition-all">
 		    <span class="relative inline-flex">
-		      <span class="material-symbols-outlined text-lg">notifications</span>
+		      <span class="material-symbols-outlined">notifications</span>
 		      <div id="cashFlowNotifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-md bg-red-500"></div>
 		    </span>
 		  </button>
