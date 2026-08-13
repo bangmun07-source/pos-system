@@ -19983,7 +19983,12 @@ function renderInventoryPage(data) {
 
 	// RECIPES
 	state.recipes =
-    data.recipes || [];
+	  data.recipes || [];
+	
+	allRecipesData =
+	  data.recipes || [];
+	
+	renderRecipes();
 }
 
 async function loadIngredients(branchId) {
