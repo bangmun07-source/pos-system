@@ -23694,82 +23694,6 @@ function openSupplierModal() {
   loadBranchDropdown();
 }
 	
-async function saveMaterial() {
-  const select = document.getElementById("material_branch");
-  const data = {
-    branchId: select.value,
-    branchName: select.options[select.selectedIndex].text,
-    name: document.getElementById("material_name").value,
-    unit: document.getElementById("material_unit").value,
-    min: Number(document.getElementById("material_min").value || 0)
-  };
-
-  try {
-
-		  const {
-		    data: res,
-		    error
-		  } = await supabaseClient.rpc(
-		    "save_material",
-		    {		
-		      p_name: data.name || "",		
-		      p_value: 0,		
-		      p_qty: 0,		
-		      p_unit: data.unit || "",		
-		      p_min: Number(data.min) || 0,
-				  p_cost: 0,		
-		      p_branch_id: data.branchId || "",
-		      p_outlet: data.branchName || ""
-		    }
-		  );
-		
-		  if (error) {
-		    throw error;
-		  }
-		
-		  if (
-		    res &&
-		    res.success === false
-		  ) {
-		    throw new Error(
-		      res.message ||
-		      "Gagal menyimpan material"
-		    );
-		  }
-		
-		  // CLEAR CACHE
-		  state.inventoryData = null;
-		  state.inventoryBranchId = null;
-		
-		  // RELOAD
-		  closeAddMaterialModal();
-		
-		  await loadInventoryPage(
-		    state.branchId
-		  );
-		
-		  showToast(
-		    "Material berhasil disimpan",
-		    "success"
-		  );
-		
-		}
-		catch (err) {
-		
-		  console.error(
-		    "Save Material:",
-		    err
-		  );
-		
-		  showToast(
-		    err?.message ||
-		    "Gagal menyimpan material",
-		    "error"
-		  );
-		}
-}
-
-	
 async function saveSupplier() {
 
   const branchSelect =
@@ -24139,7 +24063,6 @@ async function saveMaterial() {
     );
 
   const data = {
-
     branchId:
       select.value,
 
@@ -24166,13 +24089,9 @@ async function saveMaterial() {
       )
   };
 
-
   try {
-
-    // ==============================
+	
     // SUPABASE RPC
-    // ==============================
-
     const {
       data: res,
       error
@@ -24180,101 +24099,61 @@ async function saveMaterial() {
       await supabaseClient.rpc(
         "save_material",
         {
-          p_id:
-            generateIngredientId(),
-
-          p_name:
-            data.name || "",
-
-          p_value:
-            0,
-
-          p_qty:
-            0,
-
-          p_unit:
-            data.unit || "",
-
-          p_min:
-            Number(data.min) || 0,
-
-          p_cost:
-            0,
-
-          p_branch_id:
-            data.branchId || "",
-
-          p_outlet:
-            data.branchName || ""
+          p_name: data.name || "",
+          p_value: 0,
+          p_qty: 0,
+          p_unit: data.unit || "",
+          p_min: Number(data.min) || 0,
+          p_cost: 0,
+          p_branch_id: data.branchId || "",
+          p_outlet: data.branchName || ""
         }
       );
-
 
     if (error) {
       throw error;
     }
 
-
-    // ==============================
     // SUCCESS CHECK
-    // ==============================
 
     if (
       res &&
       res.success === false
     ) {
-
       throw new Error(
         res.message ||
         "Gagal menyimpan material"
       );
-
     }
 
-
-    // ==============================
     // CLEAR CACHE
-    // ==============================
 
     closeAddMaterialModal();
-
     // product cache
     state.products = null;
     state.productBranchId = null;
-
     // recipe cache
     state.recipeData = null;
     state.recipeDataBranchId = null;
-
     state.recipeProductsData = null;
     state.recipeProductsBranchId = null;
-
     // inventory cache
     state.inventoryData = null;
     state.inventoryBranchId = null;
-
-
-    // ==============================
+ 
     // RELOAD
-    // ==============================
-
     await loadProducts();
-
     await loadRecipes();
-
     await loadInventoryPage(
       state.branchId
     );
-
 
     showToast(
       "Material berhasil disimpan",
       "success"
     );
-
   }
   catch (err) {
-
     console.error(
       "Save Material:",
       err
@@ -24285,7 +24164,6 @@ async function saveMaterial() {
       "Gagal menyimpan material",
       "error"
     );
-
   }
 }
 
