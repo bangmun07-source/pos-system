@@ -19982,9 +19982,8 @@ function renderInventoryPage(data) {
 	renderSuppliers();
 
 	// RECIPES
-	state.recipes = data.recipes || [];
-	allRecipesData = data.recipes || [];
-	renderRecipes();
+	state.recipes =
+    data.recipes || [];
 }
 
 async function loadIngredients(branchId) {
