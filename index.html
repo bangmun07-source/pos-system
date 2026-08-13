@@ -778,9 +778,9 @@
 	      <div class="h-8 w-px bg-white/5"></div>
 	
 	      <!-- SETTINGS -->
-	      <button class="settingsMenu w-10 h-10 rounded-md flex items-center justify-center transition-all"
+	      <button class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
 	        			onclick="navigate('settingsPage')">
-	        <span class="material-symbols-outlined sidebar-icon">
+	        <span class="material-symbols-outlined">
 	          settings
 	        </span>
 	      </button>
@@ -19138,15 +19138,22 @@ function loadNotifications() {
       const ingredients = res?.ingredientStock || [];
       window.ingredientStockData = ingredients;
     
-      if (!res?.success || members.length === 0) {
-        badge.classList.add("hidden");
-        list.innerHTML = `
-          <div class="p-4 text-sm text-muted">
-            No Notifications
-          </div>
-        `;
-        return;
-      }
+     if ( !res?.success ||
+				(
+				members.length === 0 &&
+				transactions.length === 0 &&
+				ingredients.length === 0
+				)
+				) {
+					badge.classList.add("hidden");
+					list.innerHTML = `
+					<div class="p-4 text-sm text-muted">
+						No Notifications
+					</div>
+					`;
+					return;
+				}
+	
       badge.classList.remove("hidden");
       badge.innerText = "";
       if (window.ingredientStockData.length > 0) {
