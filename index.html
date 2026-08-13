@@ -2623,7 +2623,7 @@
   id="mainContent"
   class="flex-1 flex flex-col h-screen">
 <!-- Left: Menu Grid Section -->
-<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8">	
+<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8 overflow-hidden">	
   <!-- LEFT -->
   <div class="flex items-center gap-4 flex-1">
 	<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMMA%20LOGO%202%20white.png"
@@ -2634,7 +2634,7 @@
 	
     <!-- SEARCH -->
     <div class="relative w-full max-w-xl">
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg pointer-events-none">
+      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
         search
       </span>
 
@@ -2644,10 +2644,7 @@
         placeholder="Search menu..."
         type="text"
       />
-
- 
     </div>
-
   </div>
 
   <!-- RIGHT -->
@@ -2658,9 +2655,8 @@
 
         <button
           onclick="toggleNotification()"
-          class="class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-foreground transition-all">
-
-          <span class="material-symbols-outlined text-muted">notifications</span>
+          class="class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
+          <span class="material-symbols-outlined">notifications</span>
 
           <!-- BADGE -->
           <div
@@ -2698,7 +2694,7 @@
       </div>
     <button
     onclick="toggleBillingSidebar('pos')"
-   	class="w-11 h-11 rounded-md flex items-center justify-center text-muted hover:text-foreground transition-all">
+   	class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
     <span class="material-symbols-outlined">
       shopping_cart
     </span>
@@ -11310,7 +11306,7 @@ Save
 	  <div class="ml-auto flex items-center gap-3">
 	    <!-- NOTIFICATION -->
 	    <div class="relative">
-		  <button onclick="toggleCashFlowNotification()" class="w-10 h-10 flex items-center justify-center rounded-md on-surface-variant hover:text-on-surface transition-all">
+		  <button onclick="toggleCashFlowNotification()" class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface-variant hover:text-on-surface transition-all">
 		    <span class="relative inline-flex">
 		      <span class="material-symbols-outlined">notifications</span>
 		      <div id="cashFlowNotifBadge" class="hidden absolute -top-1 -right-1 w-2.5 h-2.5 rounded-md bg-red-500"></div>
