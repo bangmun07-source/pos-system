@@ -3190,6 +3190,26 @@ async function deleteOtherIncomeRPC(id) {
 }
 
 async function saveOtherIncomeRPC(data = {}) {
+onsole.log(
+    "SAVE OTHER INCOME DATA:",
+    data
+  );
+
+  console.log(
+    "SAVE OTHER INCOME RPC PARAMS:",
+    {
+      p_id: data.id,
+      p_date: data.date,
+      p_ref_id: data.refId,
+      p_description: data.description,
+      p_category: data.category,
+      p_method: data.method,
+      p_amount: data.amount,
+      p_status: data.status,
+      p_branch_id: data.branchId,
+      p_notes: data.notes
+    }
+  );
 
   const {
     data: result,
@@ -3197,35 +3217,16 @@ async function saveOtherIncomeRPC(data = {}) {
   } = await supabaseClient.rpc(
     "save_other_income",
     {
-      p_id:
-        data.id,
-
-      p_date:
-        data.date,
-
-      p_ref_id:
-        data.refId,
-
-      p_description:
-        data.description,
-
-      p_category:
-        data.category,
-
-      p_method:
-        data.method,
-
-      p_amount:
-        data.amount,
-
-      p_status:
-        data.status,
-
-      p_branch_id:
-        data.branchId,
-
-      p_notes:
-        data.notes
+      p_id: data.id,
+      p_date: data.date,
+      p_ref_id: data.refId,
+      p_description: data.description,
+      p_category: data.category,
+      p_method: data.method,
+      p_amount: data.amount,
+      p_status: data.status,
+      p_branch_id: data.branchId,
+      p_notes: data.notes
     }
   );
 
