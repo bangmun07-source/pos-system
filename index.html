@@ -20961,7 +20961,7 @@ async function saveRecipeMaster() {
   try {
 
     // ==============================
-    // UPLOAD RECIPE IMAGE
+    // PRODUCT IMAGE
     // ==============================
 
     let imageUrl =
@@ -20970,15 +20970,15 @@ async function saveRecipeMaster() {
     if (imageBase64) {
 
       imageUrl =
-        await uploadRecipeImage(
+        await uploadProductImage(
           imageBase64,
-          payload.recipeId
+          payload.productId
         );
     }
 
 
     // ==============================
-    // UPDATE RECIPE
+    // UPDATE RECIPE MASTER
     // ==============================
 
     const {
@@ -21035,6 +21035,9 @@ async function saveRecipeMaster() {
     state.inventoryData = null;
     state.inventoryBranchId = null;
 
+    state.products = null;
+    state.productBranchId = null;
+
 
     // ==============================
     // RELOAD
@@ -21048,62 +21051,23 @@ async function saveRecipeMaster() {
 
 
     showToast(
-      "Recipe updated"
+      "Product updated"
     );
 
   }
   catch (err) {
 
     console.error(
-      "Update Recipe Error:",
+      "Update Product Error:",
       err
     );
 
     showToast(
       err?.message ||
-      "Failed update recipe",
+      "Failed update product",
       "error"
     );
   }
-}
-
-async function uploadRecipeImage(
-  base64,
-  recipeId
-) {
-
-  const response =
-    await fetch(
-      "/api/handle-recipe-image-upload",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          base64,
-          recipeId
-        })
-      }
-    );
-
-  const result =
-    await response.json();
-
-  if (
-    !response.ok ||
-    !result.success
-  ) {
-    throw new Error(
-      result.error ||
-      "Upload recipe image gagal"
-    );
-  }
-
-  return result.url;
 }
 
 function renderRecipePriceHistory(data) {
