@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
     const {
       base64,
-      recipeId
+      productId
     } = req.body || {};
 
     if (!base64) {
@@ -28,10 +28,10 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!recipeId) {
+    if (!productId) {
       return res.status(400).json({
         success: false,
-        error: "Recipe ID kosong"
+        error: "Product ID kosong"
       });
     }
 
@@ -40,10 +40,23 @@ export default async function handler(req, res) {
     // BASE64
     // =========================
 
+    const matches =
+      base64.match(
+        /^data:(.+);base64,(.+)$/
+      );
+
+    if (!matches) {
+      return res.status(400).json({
+        success: false,
+        error: "Format gambar tidak valid"
+      });
+    }
+
+    const mime =
+      matches[1];
+
     const base64Data =
-      base64.includes(",")
-        ? base64.split(",")[1]
-        : base64;
+      matches[2];
 
     const buffer =
       Buffer.from(
@@ -53,19 +66,19 @@ export default async function handler(req, res) {
 
 
     // =========================
-    // BUCKET
+    // EXTENSION
     // =========================
 
-    const bucket =
-      "Recipes_Digital";
+    const ext =
+      mime.split("/")[1] || "jpg";
 
 
     // =========================
-    // FILE
+    // PATH
     // =========================
 
-    const fileName =
-      `${recipeId}.jpg`;
+    const path =
+      `products/${productId}_${Date.now()}.${ext}`;
 
 
     // =========================
@@ -75,13 +88,12 @@ export default async function handler(req, res) {
     const {
       error: uploadError
     } = await supabase.storage
-      .from(bucket)
+      .from("product-images")
       .upload(
-        fileName,
+        path,
         buffer,
         {
-          contentType:
-            "image/jpeg",
+          contentType: mime,
           upsert: true
         }
       );
@@ -98,34 +110,11 @@ export default async function handler(req, res) {
     const {
       data: publicData
     } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(
-        fileName
-      );
+      .from("product-images")
+      .getPublicUrl(path);
 
     const url =
       publicData.publicUrl;
-
-
-    // =========================
-    // SAVE URL TO RECIPES
-    // =========================
-
-    const {
-      error: updateError
-    } = await supabase
-      .from("Recipes")
-      .update({
-        Image: url
-      })
-      .eq(
-        "ID",
-        recipeId
-      );
-
-    if (updateError) {
-      throw updateError;
-    }
 
 
     // =========================
@@ -141,7 +130,7 @@ export default async function handler(req, res) {
   catch (err) {
 
     console.error(
-      "HANDLE RECIPE IMAGE UPLOAD ERROR:",
+      "HANDLE PRODUCT IMAGE UPLOAD ERROR:",
       err
     );
 
@@ -149,7 +138,7 @@ export default async function handler(req, res) {
       success: false,
       error:
         err?.message ||
-        "Upload recipe image gagal"
+        "Upload product image gagal"
     });
 
   }
