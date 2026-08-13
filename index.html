@@ -23342,68 +23342,27 @@ window.saveStockIn = async function () {
     );
 
   try {
-
-  // ==============================
+	
   // TOTAL PRICE
-  // ==============================
+	const totalPrice =
+	  Number(price) || 0;
 
-  const totalPrice =
-    Number(qty) *
-    Number(price);
-
-
-// ==============================
-// DEBUG
-// ==============================
-
-console.log("STOCK IN DEBUG:", {
-  branchId,
-  paymentMethod,
-  qty: Number(qty),
-  price: Number(price),
-  totalPrice,
-  ingredient,
-  supplier,
-  outletName
-});
-
-
-  // ==============================
   // SUPABASE RPC
-  // ==============================
-
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "add_ingredient_purchase",
     {
-      p_date:
-        wibDate,
-
-      p_ingredient_name:
-        ingredient || "",
-
-      p_qty:
-        Number(qty) || 0,
-
-      p_total_price:
-        totalPrice || 0,
-
-      p_supplier:
-        supplier || "",
-
-      p_note:
-        note || "",
-
-      p_branch_id:
-        branchId,
-
-      p_outlet:
-        outletName || "",
-
-      p_payment_method:
-        paymentMethod || "CASH"
+      p_date: wibDate,
+      p_ingredient_name: ingredient || "",
+      p_qty: Number(qty) || 0,
+      p_total_price: totalPrice || 0,
+      p_supplier: supplier || "",
+      p_note: note || "",
+      p_branch_id: branchId,
+      p_outlet: outletName || "",
+      p_payment_method: paymentMethod || "CASH"
     }
   );
 
