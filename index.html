@@ -19817,64 +19817,73 @@ async function saveNewTable() {
 // ==================================	
 
 async function loadInventoryPage(branchId) {
+
   if (
     state.inventoryData &&
     state.inventoryBranchId === branchId
   ) {
+
     renderInventoryPage(
       state.inventoryData
     );
+
     return;
   }
 
   try {
 
+    console.log(
+      "CALL get_inventory_page:",
+      branchId
+    );
 
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_inventory_page",
-        {
-          p_branch_id: branchId
-        }
-      );
-
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_inventory_page",
+      {
+        p_branch_id: branchId
+      }
+    );
 
     if (error) {
       throw error;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const data = {
-      summary: {
-        totalSKU: 0,
-        totalValue: 0,
-        criticalStock: 0,
-        dailyDeduction: 0
-      },
-      ingredients: [],
-      suppliers: [],
-      recipes: []
-    };
-
+    // =========================
     // CACHE
-    state.inventoryData = data;
-    state.inventoryBranchId = branchId;
+    // =========================
 
+    state.inventoryData =
+      data || {
+        summary: {},
+        ingredients: [],
+        suppliers: [],
+        recipes: []
+      };
+
+    state.inventoryBranchId =
+      branchId;
+
+    // =========================
     // RENDER
-    renderInventoryPage(data);
+    // =========================
+
+    renderInventoryPage(
+      state.inventoryData
+    );
+
   }
-  catch(err) {
+  catch (err) {
+
     console.error(
       "Inventory Page Error:",
       err
     );
+
     showToast(
+      err?.message ||
       "Gagal load inventory",
       "error"
     );
@@ -19973,57 +19982,82 @@ function renderInventoryPage(data) {
 }
 
 async function loadIngredients(branchId) {
+
   if (!branchId) {
     return;
   }
-  const cacheKey = `ingredients_${branchId}`;
+
+  const cacheKey =
+    `ingredients_${branchId}`;
+
+  // =========================
   // CACHE
+  // =========================
 
   if (
     state.ingredients &&
     state.ingredientsCacheKey === cacheKey
   ) {
+
     renderIngredients(
       state.ingredients
     );
+
     return;
   }
 
   try {
 
+    console.log(
+      "CALL get_ingredients:",
+      branchId
+    );
 
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // SUPABASE RPC
+    // =========================
 
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "get_ingredients",
-        {
-          p_branch_id: branchId
-        }
-      );
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_ingredients",
+      {
+        p_branch_id: branchId
+      }
+    );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const data = [];
+    // =========================
     // CACHE
-    state.ingredients = data;
-    state.ingredientsCacheKey = cacheKey;
+    // =========================
 
+    state.ingredients =
+      data || [];
+
+    state.ingredientsCacheKey =
+      cacheKey;
+
+    // =========================
     // EMPTY CHECK
+    // =========================
+
     const tbody =
       document.getElementById(
         "ingredientsTable"
       );
-    if (!tbody) return;
-    if(data.length === 0){
+
+    if (!tbody) {
+      return;
+    }
+
+    if (
+      !state.ingredients.length
+    ) {
+
       tbody.innerHTML = `
         <tr>
           <td colspan="8"
@@ -20032,15 +20066,30 @@ async function loadIngredients(branchId) {
           </td>
         </tr>
       `;
+
       return;
     }
+
+    // =========================
     // RENDER
-    renderIngredients(data);
+    // =========================
+
+    renderIngredients(
+      state.ingredients
+    );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Ingredients Error:",
       err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat ingredients.",
+      "error"
     );
   }
 }
@@ -20053,50 +20102,81 @@ function openInventoryPage() {
 }
 
 async function loadSuppliers() {
+
   if (
     state.supplierData &&
     state.supplierBranchId === state.branchId
   ) {
-    allSupplierData = state.supplierData;
+
+    allSupplierData =
+      state.supplierData;
+
     renderSuppliers();
+
     return;
   }
 
   try {
 
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
+    const branchId =
+      state.branchId;
 
-    /*
+    if (!branchId) {
+      return;
+    }
+
+    console.log(
+      "CALL get_suppliers:",
+      branchId
+    );
+
+    // =========================
+    // SUPABASE RPC
+    // =========================
+
     const { data, error } =
-      await supabase
-      .from("Suppliers")
-      .select("*")
-      .eq(
-        "branchId",
-        state.branchId
+      await supabaseClient.rpc(
+        "get_suppliers",
+        {
+          p_branch_id: branchId
+        }
       );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const data = [];
+    // =========================
     // CACHE
-    allSupplierData = data || [];
-    state.supplierData = data || [];
-    state.supplierBranchId = state.branchId;
+    // =========================
+
+    allSupplierData =
+      data || [];
+
+    state.supplierData =
+      data || [];
+
+    state.supplierBranchId =
+      branchId;
+
+    // =========================
     // RENDER
+    // =========================
+
     renderSuppliers();
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Suppliers Error:",
       err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat supplier.",
+      "error"
     );
   }
 }
@@ -20206,108 +20286,92 @@ function openEditSupplierModal(supplierId) {
 
 }
 
-async function saveEditSupplier() {
-  if (!currentSupplierData) return;
-  const supplierName = document.getElementById("supplierNameInput");
-  const category = document.getElementById("supplierCategoryInput");
-  const contact = document.getElementById("supplierContactInput");
-  const phone = document.getElementById("supplierPhoneInput");
-  const notes = document.getElementById("supplierAddressInput");
-  const status = document.getElementById("supplierStatusInput");
-  if (
-    !supplierName ||
-    !category ||
-    !contact ||
-    !phone ||
-    !notes ||
-    !status
-  ) {
-    return;
-  }
-  const payload = {
-    supplierId: currentSupplierData.id,
-    branchId: currentSupplierData.branchId,
-    supplierName: supplierName.value,
-    category: category.value,
-    contactPerson: contact.value,
-    phone: phone.value,
-    notes: notes.value,
-    status: status.checked
-  };
+try {
 
-  try {
+  // ==============================
+  // UPDATE SUPPLIER
+  // ==============================
 
-    // ==================================
-    // SUPABASE UPDATE
-    // ==================================
-
-    /*
-    const { error } =
-      await supabase
-      .from("Suppliers")
-      .update({
-
-        supplierName:
-          payload.supplierName,
-
-        category:
-          payload.category,
-
-        contactPerson:
-          payload.contactPerson,
-
-        phone:
-          payload.phone,
-
-        notes:
-          payload.notes,
-
-        status:
-          payload.status
-
-      })
-      .eq(
-        "id",
-        payload.supplierId
-      )
-      .eq(
-        "branchId",
-        payload.branchId
-      );
-
-
-    if(error){
-      throw error;
+  const {
+    data: updateData,
+    error: updateError
+  } = await supabaseClient.rpc(
+    "update_supplier",
+    {
+      p_supplier_id: payload.supplierId,
+      p_branch_id: payload.branchId,
+      p_name: payload.supplierName,
+      p_category: payload.category,
+      p_contact: payload.contactPerson,
+      p_phone: payload.phone,
+      p_status: payload.status
+        ? "Active"
+        : "INACTIVE",
+      p_notes: payload.notes
     }
-    */
+  );
 
-    // TEMP SUCCESS VERCEL
-    showToast(
-      "Supplier updated"
-    );
-    closeEditSupplierModal();
-    // CLEAR CACHE
-    state.inventoryData = null;
-    state.inventoryBranchId = null;
-    state.supplierData = null;
-    state.supplierBranchId = null;
-    state.ingredientSelectData = null;
-    state.ingredientSelectBranchId = null;
-    // reload
-    loadInventoryPage(
-      state.branchId
-    );
+  if (updateError) {
+    throw updateError;
   }
-  catch(err){
-    console.error(
-      "Update Supplier Error:",
-      err
-    );
-    showToast(
-      "Failed update supplier",
-      "error"
-    );
+
+  // ==============================
+  // LOAD ULANG SUPPLIER
+  // ==============================
+
+  const {
+    data: suppliers,
+    error: suppliersError
+  } = await supabaseClient.rpc(
+    "get_suppliers",
+    {
+      p_branch_id: payload.branchId
+    }
+  );
+
+  if (suppliersError) {
+    throw suppliersError;
   }
+
+  // ==============================
+  // UPDATE CACHE
+  // ==============================
+
+  allSupplierData =
+    suppliers || [];
+
+  state.supplierData =
+    suppliers || [];
+
+  state.supplierBranchId =
+    payload.branchId;
+
+  // ==============================
+  // RENDER
+  // ==============================
+
+  renderSuppliers();
+
+  showToast(
+    "Supplier updated"
+  );
+
+  closeEditSupplierModal();
+
+}
+catch(err) {
+
+  console.error(
+    "Update Supplier Error:",
+    err
+  );
+
+  showToast(
+    err?.message ||
+    "Failed update supplier",
+    "error"
+  );
+
 }
 
 function closeEditSupplierModal() {
@@ -20387,65 +20451,101 @@ function changeSupplierPage(page) {
 }
 
 async function loadRecipes() {
-  const branchId = state.branchId;
-  if (!branchId) return;
 
+  const branchId =
+    state.branchId;
+
+  if (!branchId) {
+    return;
+  }
+
+  // ==============================
   // CACHE
+  // ==============================
+
   if (
     state.recipeData &&
     state.recipeDataBranchId === branchId
   ) {
-    state.recipes = state.recipeData;
-    allRecipesData = state.recipeData;
+
+    state.recipes =
+      state.recipeData;
+
+    allRecipesData =
+      state.recipeData;
+
     renderRecipes();
+
     return;
   }
 
   try {
 
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
 
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_recipe_list",
+      {
+        p_branch_id:
+          branchId
+      }
+    );
 
-    /*
-    const { data, error } =
-      await supabase
-      .from("Recipe_Items")
-      .select("*")
-      .eq(
-        "branchId",
-        branchId
-      );
-
-
-    if(error){
+    if (error) {
       throw error;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const recipes = [];
+    // ==============================
     // CACHE
-    state.recipes = recipes;
-    allRecipesData = recipes;
-    state.recipeData = recipes;
-    state.recipeDataBranchId = branchId;
+    // ==============================
+
+    state.recipes =
+      data || [];
+
+    allRecipesData =
+      data || [];
+
+    state.recipeData =
+      data || [];
+
+    state.recipeDataBranchId =
+      branchId;
+
+    // ==============================
     // RENDER
+    // ==============================
+
     const tbody =
       document.getElementById(
         "recipesTable"
       );
-    if (!tbody) return;
+
+    if (!tbody) {
+      return;
+    }
+
     renderRecipes();
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Recipes Error:",
       err
     );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat recipes.",
+      "error"
+    );
   }
-}	
+}
 
 function renderRecipes() {
   const tbody = document.getElementById("recipesTable");
@@ -20528,110 +20628,171 @@ let currentRecipeData = null;
 
 
 async function openRecipeModal(recipeId) {
+
   const item =
     allRecipesData.find(
-      x => String(x.id) === String(recipeId)
+      x =>
+        String(x.id) ===
+        String(recipeId)
     );
+
   if (!item) return;
-  currentRecipeData = item;
-  document .getElementById("recipeModalWrapper")?.remove();
-	
-  const tpl = document.getElementById("recipemasterledgerModal");
-  const wrapper = document.createElement("div");
-	
-  wrapper.id = "recipeModalWrapper";
-  wrapper.appendChild(tpl.content.cloneNode(true));
-  document.body.appendChild( wrapper );
+
+  currentRecipeData =
+    item;
+
+  document
+    .getElementById(
+      "recipeModalWrapper"
+    )
+    ?.remove();
+
+
+  const tpl =
+    document.getElementById(
+      "recipemasterledgerModal"
+    );
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.id =
+    "recipeModalWrapper";
+
+  wrapper.appendChild(
+    tpl.content.cloneNode(true)
+  );
+
+  document.body.appendChild(
+    wrapper
+  );
+
+
+  // ==============================
   // FILL DATA
-  document.getElementById("recipeTitle" )
-	.innerText = item.name;
-  document.getElementById("recipeNameInput")
-	.value = item.name;
-  document.getElementById("recipeSellingPrice")
-	.value = item.selling;
-  document.getElementById("recipeNetPrice")
-	.value = item.net;
+  // ==============================
+
+  document.getElementById(
+    "recipeTitle"
+  ).innerText =
+    item.name;
+
+  document.getElementById(
+    "recipeNameInput"
+  ).value =
+    item.name;
+
+  document.getElementById(
+    "recipeSellingPrice"
+  ).value =
+    item.selling;
+
+  document.getElementById(
+    "recipeNetPrice"
+  ).value =
+    item.net;
+
+
   const margin =
     item.net > 0
-      ? ((item.net - item.cost) / item.net) * 100
+      ? (
+          (item.net - item.cost) /
+          item.net
+        ) * 100
       : 0;
-	
+
+
   document.getElementById(
     "recipeMarginPercent"
   ).innerHTML =
     `${margin.toFixed(1)}
     <span class="text-xl ml-0.5">
-    %
+      %
     </span>`;
-	
+
+
   document.getElementById(
     "recipeProfitValue"
   ).innerText =
     "Rp " +
-    (item.net - item.cost)
-    .toLocaleString("id-ID");
+    (
+      item.net - item.cost
+    ).toLocaleString("id-ID");
+
+
+  // ==============================
   // PRICE HISTORY
+  // ==============================
+
   try {
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    const { data, error } =
-      await supabase
-      .from("Recipe_Price_History")
-      .select("*")
-      .eq(
-        "recipe_id",
-        item.id
-      )
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_recipe_price_history",
+      {
+        p_recipe_id:
+          item.id
+      }
+    );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
 
 
-    renderRecipePriceHistory(data || []);
-    */
-	  
-    // TEMP VERCEL
-    renderRecipePriceHistory([]);
+    renderRecipePriceHistory(
+      data || []
+    );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Recipe History Error:",
       err
     );
-    renderRecipePriceHistory([]);
+
+    renderRecipePriceHistory(
+      []
+    );
   }
 }
-
+	
 async function saveRecipeMaster() {
+
   if (!currentRecipeData) return;
+
   const file =
     document.getElementById(
       "recipeImageInput"
     )?.files?.[0];
-	
+
   let imageBase64 = null;
+
   if (file) {
-    const compressed = await compressImage(file);
+
+    const compressed =
+      await compressImage(file);
+
     imageBase64 =
       await fileToBase64(
         compressed
       );
   }
+
+
   const payload = {
-    recipeId: currentRecipeData.id,
-    productId: currentRecipeData.productId,
-    branchId: currentRecipeData.branchId,
+
+    recipeId:
+      currentRecipeData.id,
+
+    productId:
+      currentRecipeData.productId,
+
+    branchId:
+      currentRecipeData.branchId,
 
     productName:
       document.getElementById(
@@ -20641,115 +20802,143 @@ async function saveRecipeMaster() {
     sellingPrice:
       Number(
         document
-        .getElementById(
-          "recipeSellingPrice"
-        )
-        .value
-        .replace(
-          /[^0-9]/g,
-          ""
-        )
+          .getElementById(
+            "recipeSellingPrice"
+          )
+          .value
+          .replace(
+            /[^0-9]/g,
+            ""
+          )
       ),
 
     netPrice:
       Number(
         document
-        .getElementById(
-          "recipeNetPrice"
-        )
-        .value
-        .replace(
-          /[^0-9]/g,
-          ""
-        )
+          .getElementById(
+            "recipeNetPrice"
+          )
+          .value
+          .replace(
+            /[^0-9]/g,
+            ""
+          )
       ),
+
     updatedBy:
       state.user?.name ||
       state.user?.fullName ||
       state.user?.username ||
       "Unknown",
+
     imageBase64
+
   };
 
+
   try {
+
     // ==================================
-    // SUPABASE UPDATE (AKTIFKAN NANTI)
+    // IMAGE URL
     // ==================================
 
-    /*
-    let imageUrl = currentRecipeData.image;
+    let imageUrl =
+      currentRecipeData.image || "";
 
-
-    // upload image kalau ada
-    if(imageBase64){
+    if (imageBase64) {
 
       imageUrl =
         await uploadRecipeImage(
           imageBase64,
           payload.recipeId
         );
-
     }
 
 
+    // ==================================
+    // UPDATE RECIPE
+    // ==================================
 
-    const { error } =
-      await supabase
-      .from("Recipes")
-      .update({
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "update_recipe_master",
+      {
+        p_recipe_id:
+          payload.recipeId,
 
-        name:
-          payload.productName,
+        p_product_id:
+          payload.productId,
 
-        selling_price:
+        p_branch_id:
+          payload.branchId,
+
+        p_selling_price:
           payload.sellingPrice,
 
-        net_price:
+        p_net_price:
           payload.netPrice,
 
-        image:
-          imageUrl,
+        p_product_name:
+          payload.productName,
 
-        updated_by:
-          payload.updatedBy
+        p_updated_by:
+          payload.updatedBy,
 
-      })
-      .eq(
-        "id",
-        payload.recipeId
-      )
-      .eq(
-        "branchId",
-        payload.branchId
-      );
+        p_image_url:
+          imageUrl || ""
+      }
+    );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
-    */
-	  
-    // TEMP SUCCESS VERCEL
+
+
+    // ==================================
+    // CLOSE MODAL
+    // ==================================
+
     closeRecipeMasterModal();
 
+
+    // ==================================
     // CLEAR CACHE
+    // ==================================
+
     state.recipeData = null;
     state.recipeDataBranchId = null;
+
     state.inventoryData = null;
     state.inventoryBranchId = null;
-    loadInventoryPage(
+
+
+    // ==================================
+    // RELOAD
+    // ==================================
+
+    await loadInventoryPage(
       state.branchId
     );
+
+    await loadRecipes();
+
+
     showToast(
       "Recipe updated"
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Update Recipe Error:",
       err
     );
+
     showToast(
+      err?.message ||
       "Failed update recipe",
       "error"
     );
@@ -21148,74 +21337,123 @@ function openThresholdFromIngredient() {
 }
 
 async function submitAdjust() {
+
   const qty =
     Number(
-      document.getElementById("modalQty").value || 0
+      document.getElementById(
+        "modalQty"
+      ).value || 0
     );
-  const reason = document.getElementById("modalReason").value;
-  if (!currentAdjustItem) return;
+
+  const reason =
+    document.getElementById(
+      "modalReason"
+    ).value;
+
+  if (!currentAdjustItem) {
+    return;
+  }
+
+
   const payload = {
-    ingredientId: currentAdjustItem.id,
-    type: currentMode, qty, reason,
-    branchId: currentAdjustItem.branchId
+
+    ingredientId:
+      currentAdjustItem.id,
+
+    type:
+      currentMode,
+
+    qty:
+      qty,
+
+    reason:
+      reason,
+
+    branchId:
+      currentAdjustItem.branchId
 
   };
 
+
   try {
+
     // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
+    // SUPABASE RPC
     // ==================================
 
-    /*
-    
-    const { error } =
-      await supabase.rpc(
-        "adjust_ingredient_stock",
-        {
-          p_ingredient_id:
-            payload.ingredientId,
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "adjust_ingredient_stock",
+      {
+        p_ingredient_id:
+          payload.ingredientId,
 
-          p_type:
-            payload.type,
+        p_branch_id:
+          payload.branchId,
 
-          p_qty:
-            payload.qty,
+        p_type:
+          payload.type,
 
-          p_reason:
-            payload.reason,
+        p_qty:
+          payload.qty,
 
-          p_branch_id:
-            payload.branchId
-        }
-      );
+        p_reason:
+          payload.reason
+      }
+    );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
 
-    */
 
-	  
-    // TEMP SUCCESS VERCEL
+    // ==================================
     // CLEAR CACHE
+    // ==================================
+
     state.inventoryData = null;
     state.inventoryBranchId = null;
+
+    state.ingredients = null;
+    state.ingredientsCacheKey = null;
+
+
+    // ==================================
+    // CLOSE MODAL
+    // ==================================
+
     closeAdjustStockModal();
-    loadInventoryPage(
+
+
+    // ==================================
+    // RELOAD
+    // ==================================
+
+    await loadInventoryPage(
       state.branchId
     );
+
+    await loadIngredients(
+      state.branchId
+    );
+
+
     showToast(
       "Stock updated"
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Adjust Stock Error:",
       err
     );
+
     alert(
-      err.message ||
+      err?.message ||
       "Gagal update stock"
     );
   }
@@ -21247,71 +21485,106 @@ function openThresholdFromIngredient() {
 }
 
 async function submitThreshold() {
+
   const min =
     Number(
       document.getElementById(
         "thresholdValue"
       ).value || 0
     );
-  if (!currentThresholdItem) return;
+
+  if (!currentThresholdItem) {
+    return;
+  }
+
+
   const payload = {
-    ingredientId: currentThresholdItem.id,
-    branchId: currentThresholdItem.branchId, min
+
+    ingredientId:
+      currentThresholdItem.id,
+
+    branchId:
+      currentThresholdItem.branchId,
+
+    min:
+      min
+
   };
 
+
   try {
+
     // ==================================
-    // SUPABASE UPDATE (AKTIFKAN NANTI)
+    // SUPABASE RPC
     // ==================================
 
-    /*
-    
-    const { error } =
-      await supabase
-      .from("Ingredients")
-      .update({
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "update_ingredient_threshold",
+      {
+        p_ingredient_id:
+          payload.ingredientId,
 
-        min_stock:
+        p_branch_id:
+          payload.branchId,
+
+        p_min:
           payload.min
+      }
+    );
 
-      })
-      .eq(
-        "id",
-        payload.ingredientId
-      )
-      .eq(
-        "branchId",
-        payload.branchId
-      );
-
-
-    if(error){
+    if (error) {
       throw error;
     }
 
-    */
 
     // ==================================
-    // TEMP SUCCESS VERCEL
-    // ==================================
-	  
     // CLEAR CACHE
+    // ==================================
+
     state.inventoryData = null;
     state.inventoryBranchId = null;
+
+    state.ingredients = null;
+    state.ingredientsCacheKey = null;
+
+
+    // ==================================
+    // CLOSE MODAL
+    // ==================================
+
     closeThresholdModal();
-    loadInventoryPage(
+
+
+    // ==================================
+    // RELOAD
+    // ==================================
+
+    await loadInventoryPage(
       state.branchId
     );
+
+    await loadIngredients(
+      state.branchId
+    );
+
+
     showToast(
       "Threshold updated"
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Update Threshold Error:",
       err
     );
+
     showToast(
+      err?.message ||
       "Failed update threshold",
       "error"
     );
@@ -21325,8 +21598,12 @@ function closeThresholdModal() {
 }
 
 let currentUsageItem = null;
+
 async function openUsageLogFromIngredient() {
-  const item = window.currentIngredientItem;
+
+  const item =
+    window.currentIngredientItem;
+
   if (
     !item ||
     !item.id ||
@@ -21334,53 +21611,67 @@ async function openUsageLogFromIngredient() {
   ) {
     return;
   }
-  const tpl = document.getElementById("inventorydetailusageModal");
+
+
+  const tpl =
+    document.getElementById(
+      "inventorydetailusageModal"
+    );
+
   if (!tpl) {
     return;
   }
 
+
   document
-  .getElementById(
-    "inventoryUsageLogWrapper"
-  )
-  ?.remove();
-  const wrapper = document.createElement("div");
-  wrapper.id = "inventoryUsageLogWrapper";
-  wrapper.appendChild(tpl.content.cloneNode(true));
-  document.body.appendChild(wrapper);
+    .getElementById(
+      "inventoryUsageLogWrapper"
+    )
+    ?.remove();
+
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.id =
+    "inventoryUsageLogWrapper";
+
+  wrapper.appendChild(
+    tpl.content.cloneNode(true)
+  );
+
+  document.body.appendChild(
+    wrapper
+  );
+
 
   document.getElementById(
     "usageLogItemName"
   ).innerText =
     item.name || "-";
+
+
   try {
+
     // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
+    // SUPABASE RPC
     // ==================================
 
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Stock_Log")
-      .select("*")
-      .eq(
-        "ingredient_id",
-        item.id
-      )
-      .eq(
-        "branchId",
-        item.branchId
-      )
-      .order(
-        "created_at",
-        {
-          ascending:false
-        }
-      );
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_ingredient_usage_log",
+      {
+        p_ingredient_id:
+          item.id,
 
+        p_branch_id:
+          item.branchId
+      }
+    );
 
-    if(error){
+    if (error) {
       throw error;
     }
 
@@ -21388,26 +21679,32 @@ async function openUsageLogFromIngredient() {
     const usageData =
       data || [];
 
-    */
 
-    // TEMP DATA VERCEL
-    const usageData = [];
+    // ==================================
+    // RENDER
+    // ==================================
+
     renderUsageLog(
       usageData
     );
+
     renderUsageSummary(
       usageData,
       Number(
         item.qty || 0
       )
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Usage Log Error:",
       err
     );
+
     showToast(
+      err?.message ||
       "Gagal memuat data."
     );
   }
@@ -21696,200 +21993,214 @@ function showToast(msg, type = "success") {
 }	
 
 async function saveRecipe() {
+
   const productId =
     document.getElementById(
       "recipeProductSelect"
     ).value;
+
   if (!productId) {
+
     alert(
       "Pilih produk dulu"
     );
+
     return;
   }
+
+
   const ingredients = [];
+
   document
-  .querySelectorAll(
-    ".ingredient-row"
-  )
-  .forEach(row => {
-    const ingredientId =
-      row.querySelector(
-        ".ingredient-select"
-      ).value;
-    const qty =
-      row.querySelector(
-        ".ingredient-qty"
-      ).value;
-    const unit =
-      row.querySelector(
-        ".ingredient-unit"
-      ).value;
-    if (
-      ingredientId &&
-      qty
-    ) {
-      ingredients.push({
-        ingredientId,
-        qty:
-          Number(qty),
-        unit
-      });
-    }
-  });
+    .querySelectorAll(
+      ".ingredient-row"
+    )
+    .forEach(row => {
+
+      const ingredientId =
+        row.querySelector(
+          ".ingredient-select"
+        ).value;
+
+      const qty =
+        row.querySelector(
+          ".ingredient-qty"
+        ).value;
+
+      const unit =
+        row.querySelector(
+          ".ingredient-unit"
+        ).value;
+
+
+      if (
+        ingredientId &&
+        qty
+      ) {
+
+        ingredients.push({
+
+          ingredientId,
+
+          qty:
+            Number(qty),
+
+          unit
+
+        });
+
+      }
+
+    });
+
 
   if (!ingredients.length) {
+
     alert(
       "Tambahkan ingredient dulu"
     );
+
     return;
   }
+
+
   const payload = {
+
     productId,
+
     ingredients,
-    branchId: state.branchId
+
+    branchId:
+      state.branchId
+
   };
+
+
   try {
+
     // ==================================
-    // SUPABASE INSERT (AKTIFKAN NANTI)
+    // SUPABASE RPC
     // ==================================
 
-    /*
-    
-    const { data: recipe, error } =
-      await supabase
-      .from("Recipes")
-      .insert({
-
-        product_id:
-          payload.productId,
-
-        branchId:
-          payload.branchId
-
-      })
-      .select()
-      .single();
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "save_recipe",
+      {
+        p_payload:
+          payload
+      }
+    );
 
 
-
-    if(error){
+    if (error) {
       throw error;
     }
 
 
+    // ==================================
+    // CLEAR CACHE
+    // ==================================
 
-    const recipeItems =
-      payload.ingredients.map(item => ({
+    state.inventoryData = null;
+    state.inventoryBranchId = null;
 
-        recipe_id:
-          recipe.id,
+    state.recipeData = null;
+    state.recipeDataBranchId = null;
 
-        ingredient_id:
-          item.ingredientId,
-
-        qty:
-          item.qty,
-
-        unit:
-          item.unit,
-
-        branchId:
-          payload.branchId
-
-      }));
+    state.recipes = null;
 
 
+    // ==================================
+    // RELOAD
+    // ==================================
 
-    const { error:itemError } =
-      await supabase
-      .from("Recipe_Items")
-      .insert(
-        recipeItems
-      );
+    await loadInventoryPage(
+      state.branchId
+    );
+
+    await loadRecipes();
 
 
-    if(itemError){
-      throw itemError;
-    }
-
-    */
-
-    // TEMP SUCCESS VERCEL
     alert(
       "Recipe berhasil disimpan"
     );
-    // clear inventory cache
-    state.inventoryData = null;
-    state.inventoryBranchId = null;
-    loadInventoryPage(
-      state.branchId
-    );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Save Recipe Error:",
       err
     );
+
     alert(
-      err.message ||
+      err?.message ||
       "Gagal menyimpan recipe"
     );
   }
 }
 	
 async function loadIngredientsByBranch(branchId) {
+
   const modal =
     document.querySelector(
       ".stock-modal"
     );
+
   if (!modal) return;
+
+
   const select =
     modal.querySelector(
       "#ingredientName"
     );
+
   if (!select) return;
+
+
+  // ==============================
   // CACHE
+  // ==============================
+
   if (
     state.ingredientSelectData &&
-    state.ingredientSelectBranchId === branchId
+    state.ingredientSelectBranchId ===
+      branchId
   ) {
+
     renderIngredientOptions(
       select,
       state.ingredientSelectData
     );
+
     return;
   }
+
+
   select.innerHTML =
     `<option>Loading...</option>`;
-	
+
+
   try {
 
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
 
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_ingredients",
+      {
+        p_branch_id:
+          branchId
+      }
+    );
 
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Ingredients")
-      .select(
-        "id,name,qty,unit,branchId"
-      )
-      .eq(
-        "branchId",
-        branchId
-      )
-      .order(
-        "name",
-        {
-          ascending:true
-        }
-      );
-
-
-    if(error){
+    if (error) {
       throw error;
     }
 
@@ -21897,29 +22208,47 @@ async function loadIngredientsByBranch(branchId) {
     const ingredients =
       data || [];
 
-    */
 
-    // TEMP DATA VERCEL
-    const ingredients = [];
+    // ==============================
     // CACHE
-    state.ingredientSelectData =  ingredients;
-    state.ingredientSelectBranchId = branchId;
+    // ==============================
+
+    state.ingredientSelectData =
+      ingredients;
+
+    state.ingredientSelectBranchId =
+      branchId;
+
+
+    // ==============================
+    // RENDER
+    // ==============================
+
     renderIngredientOptions(
       select,
       ingredients
     );
-    const first = ingredients[0]?.name;
-    if(first){
+
+
+    const first =
+      ingredients[0]?.name;
+
+    if (first) {
+
       loadIngredientSummary(
         first
       );
+
     }
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Ingredients Error:",
       err
     );
+
     select.innerHTML =
       `<option>
         Failed load ingredients
@@ -21958,56 +22287,25 @@ function onSelectRecipeProduct(e) {
 }
 
 async function loadRecipeItems(recipeId) {
+
   if (!recipeId) return;
+
+
+  // ==============================
   // CACHE
+  // ==============================
+
   if (
     state.recipeItemsData &&
-    state.recipeItemsRecipeId === recipeId
+    state.recipeItemsRecipeId ===
+      recipeId
   ) {
-    currentIngredients = state.recipeItemsData.map(i => ({
-        ingredientId: i.ingredientId,
-        qty: i.qty,
-        unit: i.unit
-      }));
-    renderRecipeBuilder(
-      currentIngredients
-    );
-    return;
-  }
 
-  try {
-
-
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Recipe_Items")
-      .select(`
-        ingredient_id,
-        qty,
-        unit
-      `)
-      .eq(
-        "recipe_id",
-        recipeId
-      );
-
-
-    if(error){
-      throw error;
-    }
-
-
-    const items =
-      data.map(i => ({
+    currentIngredients =
+      state.recipeItemsData.map(i => ({
 
         ingredientId:
-          i.ingredient_id,
+          i.ingredientId,
 
         qty:
           i.qty,
@@ -22017,32 +22315,93 @@ async function loadRecipeItems(recipeId) {
 
       }));
 
-    */
 
-    // TEMP DATA VERCEL
-    const items = [];
-    // CACHE
-    state.recipeItemsData = items;
-    state.recipeItemsRecipeId = recipeId;
-    currentIngredients =
-      items.map(i => ({
-        ingredientId: i.ingredientId,
-        qty: i.qty,
-        unit: i.unit
-      }));
     renderRecipeBuilder(
       currentIngredients
     );
+
+    return;
   }
-  catch(err){
+
+
+  try {
+
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
+
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_recipe_items",
+      {
+        p_recipe_id:
+          recipeId
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+
+    const items =
+      data || [];
+
+
+    // ==============================
+    // CACHE
+    // ==============================
+
+    state.recipeItemsData =
+      items;
+
+    state.recipeItemsRecipeId =
+      recipeId;
+
+
+    // ==============================
+    // NORMALIZE
+    // ==============================
+
+    currentIngredients =
+      items.map(i => ({
+
+        ingredientId:
+          i.ingredientId,
+
+        qty:
+          i.qty,
+
+        unit:
+          i.unit
+
+      }));
+
+
+    // ==============================
+    // RENDER
+    // ==============================
+
+    renderRecipeBuilder(
+      currentIngredients
+    );
+
+  }
+  catch (err) {
+
     console.error(
       "Load Recipe Items Error:",
       err
     );
-    renderRecipeBuilder([]);
+
+    renderRecipeBuilder(
+      []
+    );
   }
 }
-
+	
 function renderRecipeBuilder(data = []) {
   const container = document.getElementById("ingredientContainer");
   if (!container) return;
@@ -22137,48 +22496,54 @@ function renderRecipeProducts(recipes) {
 }
 
 async function loadRecipeProducts() {
-  const branchId = state.branchId;
+
+  const branchId =
+    state.branchId;
+
   if (!branchId) return;
+
+
+  // ==============================
   // CACHE
+  // ==============================
+
   if (
     state.recipeProductsData &&
-    state.recipeProductsBranchId === branchId
+    state.recipeProductsBranchId ===
+      branchId
   ) {
+
     renderRecipeProducts(
       state.recipeProductsData
     );
+
     return;
   }
-	
+
+
   try {
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Produk")
-      .select(`
-        id,
-        name,
-        category,
-        selling_price
-      `)
-      .eq(
-        "branchId",
-        branchId
-      )
-      .order(
-        "name",
-        {
-          ascending:true
-        }
-      );
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
 
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_products",
+      {
+        p_branch_id:
+          branchId,
 
-    if(error){
+        p_role:
+          state.user?.role ||
+          state.user?.Role ||
+          ""
+      }
+    );
+
+    if (error) {
       throw error;
     }
 
@@ -22186,23 +22551,37 @@ async function loadRecipeProducts() {
     const recipes =
       data || [];
 
-    */
 
-    // TEMP DATA VERCEL
-    const recipes = [];
+    // ==============================
     // CACHE
-    state.recipeProductsData = recipes;
-    state.recipeProductsBranchId = branchId;
+    // ==============================
+
+    state.recipeProductsData =
+      recipes;
+
+    state.recipeProductsBranchId =
+      branchId;
+
+
+    // ==============================
+    // RENDER
+    // ==============================
+
     renderRecipeProducts(
       state.recipeProductsData
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Recipe Products Error:",
       err
     );
-    renderRecipeProducts([]);
+
+    renderRecipeProducts(
+      []
+    );
   }
 }
 
@@ -22252,176 +22631,237 @@ function removeIngredient(index) {
 }
 
 async function saveRecipeConfig() {
+
   if (!selectedRecipeId) return;
+
   try {
 
+    // ==============================
+    // PRODUCT ID
+    // ==============================
 
-    // ==================================
-    // SUPABASE UPDATE (AKTIFKAN NANTI)
-    // ==================================
+    const productId =
+      currentRecipeData?.productId ||
+      allRecipesData.find(
+        x =>
+          String(x.id) ===
+          String(selectedRecipeId)
+      )?.productId;
 
-    /*
-    
-    const { error: deleteError } =
-      await supabase
-      .from("Recipe_Items")
-      .delete()
-      .eq(
-        "recipe_id",
-        selectedRecipeId
+    if (!productId) {
+
+      throw new Error(
+        "Product ID recipe tidak ditemukan."
       );
 
-
-    if(deleteError){
-      throw deleteError;
     }
 
 
+    // ==============================
+    // PAYLOAD
+    // ==============================
 
-    const items =
-      currentIngredients.map(item => ({
+    const payload = {
 
-        recipe_id:
-          selectedRecipeId,
+      productId,
 
-        ingredient_id:
-          item.ingredientId,
+      ingredients:
+        currentIngredients.map(item => ({
 
-        qty:
-          Number(item.qty),
+          ingredientId:
+            item.ingredientId,
 
-        unit:
-          item.unit,
+          qty:
+            Number(item.qty) || 0,
 
-        branchId:
-          state.branchId
+          unit:
+            item.unit || ""
 
-      }));
+        })),
 
+      branchId:
+        state.branchId
 
-
-    const { error:itemError } =
-      await supabase
-      .from("Recipe_Items")
-      .insert(items);
-
+    };
 
 
-    if(itemError){
-      throw itemError;
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
+
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "save_recipe",
+      {
+        p_payload:
+          payload
+      }
+    );
+
+    if (error) {
+      throw error;
     }
 
-    */
 
-    // TEMP SUCCESS
+    // ==============================
+    // CLEAR CACHE
+    // ==============================
+
     state.inventoryData = null;
     state.inventoryBranchId = null;
+
     state.recipeData = null;
     state.recipeDataBranchId = null;
+
     state.recipeProductsData = null;
     state.recipeProductsBranchId = null;
+
+    state.recipeItemsData = null;
+    state.recipeItemsRecipeId = null;
+
+
+    // ==============================
+    // RELOAD
+    // ==============================
+
+    await loadInventoryPage(
+      state.branchId
+    );
+
+    await loadRecipes();
+
 
     alert(
       "Recipe updated!"
     );
-    loadInventoryPage(
-      state.branchId
-    );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Save Recipe Config:",
       err
     );
+
     alert(
-      err.message ||
+      err?.message ||
       "Gagal update recipe"
     );
   }
 }
 
 window.loadIngredientSummary = async function(name) {
+
   if (!name) return;
+
+
   const branchId =
     document.getElementById(
       "branchSelect"
     )?.value ||
     state.branchId;
 
+
+  if (!branchId) return;
+
+
   try {
 
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
 
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Ingredients")
-      .select(`
-        qty,
-        cost
-      `)
-      .eq(
-        "name",
-        name
-      )
-      .eq(
-        "branchId",
-        branchId
-      )
-      .single();
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_ingredient_summary",
+      {
+        p_ingredient_name:
+          name,
 
+        p_branch_id:
+          branchId
+      }
+    );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
 
 
+    // ==============================
+    // RESULT
+    // ==============================
 
-    const res = {
+    const res =
+      data || {};
 
-      totalCost:
-        data.cost || 0,
 
-      totalQty:
-        data.qty || 0
+    const totalCost =
+      Number(
+        res.totalCost ??
+        res.total_cost ??
+        0
+      );
 
-    };
 
-    */
+    const totalQty =
+      Number(
+        res.totalQty ??
+        res.total_qty ??
+        0
+      );
 
-    // TEMP
-    const res = {
-      totalCost: 0,
-      totalQty: 0
-    };
-    const costEl = document.getElementById("totalCostPreview");
-    const stockEl = document.getElementById("newStockPreview");
-    if(costEl){
+
+    // ==============================
+    // RENDER
+    // ==============================
+
+    const costEl =
+      document.getElementById(
+        "totalCostPreview"
+      );
+
+
+    const stockEl =
+      document.getElementById(
+        "newStockPreview"
+      );
+
+
+    if (costEl) {
+
       costEl.innerText =
         "Rp " +
-        Number(
-          res.totalCost || 0
-        )
-        .toLocaleString("id-ID");
+        totalCost.toLocaleString(
+          "id-ID"
+        );
+
     }
-    if(stockEl){
+
+
+    if (stockEl) {
+
       stockEl.innerText =
-        Number(
-          res.totalQty || 0
-        )
-        .toLocaleString("id-ID");
+        totalQty.toLocaleString(
+          "id-ID"
+        );
+
     }
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Ingredient Summary Error:",
       err
     );
+
   }
+
 };
 	
 window.openStockInModal = function () {
@@ -22468,137 +22908,183 @@ function renderSupplierOptions(select, data){
 }	
 
 window.loadStockInData = async function () {
-  const modal = document.querySelector(".stock-modal");
+
+  const modal =
+    document.querySelector(
+      ".stock-modal"
+    );
+
   if (!modal) return;
+
+
+  // ==============================
   // BRANCH + INGREDIENT
-  const branchId = state.branchId;
+  // ==============================
+
+  const branchId =
+    state.branchId;
+
   loadStockInIngredients(
     modal,
     branchId
   );
 
   loadBranchDropdown();
+
+
+  // ==============================
   // SUPPLIER
+  // ==============================
+
   const supplierSelect =
     modal.querySelector(
       "#supplierSelect"
     );
-  if (supplierSelect) {
-    // CACHE SUPPLIER
-    if (
-      state.supplierData &&
-      state.supplierBranchId === branchId
-    ) {
-      renderSupplierOptions(
-        supplierSelect,
-        state.supplierData
-      );
-    } else {
-      try {
-        // ==================================
-        // SUPABASE QUERY (AKTIFKAN NANTI)
-        // ==================================
 
-        /*
-        
-        const { data, error } =
-          await supabase
-          .from("Suppliers")
-          .select("*")
-          .eq(
-            "branchId",
-            branchId
-          )
-          .order(
-            "supplierName",
-            {
-              ascending:true
-            }
-          );
+  if (!supplierSelect) return;
 
 
-        if(error){
-          throw error;
-        }
+  // ==============================
+  // CACHE SUPPLIER
+  // ==============================
 
+  if (
+    state.supplierData &&
+    state.supplierBranchId ===
+      branchId
+  ) {
 
-        const suppliers =
-          data || [];
+    renderSupplierOptions(
+      supplierSelect,
+      state.supplierData
+    );
 
-        */
-
-        // TEMP VERCEL
-        const suppliers = [];
-        state.supplierData = suppliers;
-        state.supplierBranchId = branchId;
-        renderSupplierOptions(
-          supplierSelect,
-          suppliers
-        );
-      }
-      catch(err){
-        console.error(
-          "Load Supplier Error:",
-          err
-        );
-      }
-    }
+    return;
   }
+
+
+  try {
+
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
+
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_suppliers",
+      {
+        p_branch_id:
+          branchId
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+
+    const suppliers =
+      data || [];
+
+
+    // ==============================
+    // CACHE
+    // ==============================
+
+    state.supplierData =
+      suppliers;
+
+    state.supplierBranchId =
+      branchId;
+
+
+    // ==============================
+    // RENDER
+    // ==============================
+
+    renderSupplierOptions(
+      supplierSelect,
+      suppliers
+    );
+
+  }
+  catch (err) {
+
+    console.error(
+      "Load Supplier Error:",
+      err
+    );
+
+  }
+
 };
 
-async function loadStockInIngredients(modal, branchId) {
+async function loadStockInIngredients(
+  modal,
+  branchId
+) {
+
   if (!modal) return;
-  branchId = branchId || state.branchId;
-  const select = modal.querySelector("#ingredientName");
+
+
+  branchId =
+    branchId ||
+    state.branchId;
+
+  if (!branchId) return;
+
+
+  const select =
+    modal.querySelector(
+      "#ingredientName"
+    );
+
   if (!select) return;
 
+
+  // ==============================
   // CACHE
+  // ==============================
+
   if (
     state.stockInIngredients &&
-    state.stockInIngredientsBranchId === branchId
+    state.stockInIngredientsBranchId ===
+      branchId
   ) {
+
     renderStockInIngredientOptions(
       select,
       state.stockInIngredients
     );
+
     return;
   }
 
+
   select.innerHTML =
     `<option>Loading...</option>`;
-	
+
+
   try {
 
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
 
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Ingredients")
-      .select(`
-        id,
-        name,
-        qty,
-        unit,
-        cost,
-        min_stock
-      `)
-      .eq(
-        "branchId",
-        branchId
-      )
-      .order(
-        "name",
-        {
-          ascending:true
-        }
-      );
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_ingredients",
+      {
+        p_branch_id:
+          branchId
+      }
+    );
 
-
-    if(error){
+    if (error) {
       throw error;
     }
 
@@ -22606,37 +23092,60 @@ async function loadStockInIngredients(modal, branchId) {
     const ingredients =
       data || [];
 
-    */
 
-    // TEMP DATA VERCEL
-    const ingredients = [];
+    // ==============================
     // CACHE
-    state.stockInIngredients = ingredients;
-    state.stockInIngredientsBranchId = branchId;
+    // ==============================
+
+    state.stockInIngredients =
+      ingredients;
+
+    state.stockInIngredientsBranchId =
+      branchId;
+
+
+    // ==============================
+    // RENDER
+    // ==============================
+
     renderStockInIngredientOptions(
       select,
       ingredients
     );
-    // Load summary ingredient pertama
-    const first = ingredients[0]?.name;
-    if(first){
+
+
+    // ==============================
+    // LOAD SUMMARY
+    // ==============================
+
+    const first =
+      ingredients[0]?.name;
+
+    if (first) {
+
       loadIngredientSummary(
         first
       );
+
     }
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Stock In Ingredients Error:",
       err
     );
+
     select.innerHTML =
       `<option>
         Failed load ingredients
       </option>`;
-  }
-}
 
+  }
+
+}
+	
 window.stockModalEl = null;
 window.saveStockIn = async function () {
   const modal =
@@ -22708,101 +23217,138 @@ window.saveStockIn = async function () {
     );
 
   try {
-    // ==================================
-    // SUPABASE INSERT (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    
-    const totalPrice =
-      Number(qty) *
-      Number(price);
+  // ==============================
+  // TOTAL PRICE
+  // ==============================
 
+  const totalPrice =
+    Number(qty) *
+    Number(price);
 
 
-    const { error } =
-      await supabase
-      .from("Ingredient_Purchases")
-      .insert({
+  // ==============================
+  // SUPABASE RPC
+  // ==============================
 
-        Date:
-          wibDate,
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "add_ingredient_purchase",
+    {
+      p_date:
+        wibDate,
 
-        Ingredient:
-          ingredient,
+      p_ingredient_name:
+        ingredient || "",
 
-        Qty:
-          Number(qty),
+      p_qty:
+        Number(qty) || 0,
 
-        Total_Price:
-          totalPrice,
+      p_total_price:
+        totalPrice || 0,
 
-        Name_Supplier:
-          supplier,
+      p_supplier:
+        supplier || "",
 
-        Note:
-          note,
+      p_note:
+        note || "",
 
-        branchId:
-          branchId,
+      p_branch_id:
+        branchId,
 
-        Outlet:
-          outletName,
+      p_outlet:
+        outletName || "",
 
-        Payment_Method:
-          paymentMethod
-
-      });
-
-    if(error){
-      throw error;
+      p_payment_method:
+        paymentMethod || "CASH"
     }
-    // update stock ingredient
-    // update Account_Balance
-    // insert Stock_Log
-    */
+  );
 
-    // TEMP SUCCESS VERCEL
-    closeModal();
-    // clear cache
-    state.inventoryData = null;
-    state.inventoryBranchId = null;
-    state.stockInIngredients = null;
-    state.stockInIngredientsBranchId = null;
-    showToast(
-      "Purchase berhasil disimpan",
-      "success"
-    );
+  if (error) {
+    throw error;
   }
-  catch(error){
-    console.error(
-      "Stock In Error:",
-      error
-    );
-    let message = "Gagal menyimpan purchase";
-    const err = error.message || "";
-    if(
-      err.includes(
-        "Saldo Cash tidak mencukupi"
-      )
-    ){
-      message =
-        "Saldo Cash tidak mencukupi";
-    }
-    else if(
-      err.includes(
-        "Saldo Bank tidak mencukupi"
-      )
-    ){
-      message =
-        "Saldo Bank tidak mencukupi";
-    }
-    alert(
-      message
-    );
-  }
-};
 
+
+  // ==============================
+  // RPC RESULT
+  // ==============================
+
+  console.log(
+    "ADD INGREDIENT PURCHASE:",
+    data
+  );
+
+
+  // ==============================
+  // CLEAR CACHE
+  // ==============================
+
+  state.inventoryData = null;
+  state.inventoryBranchId = null;
+
+  state.stockInIngredients = null;
+  state.stockInIngredientsBranchId = null;
+
+  state.supplierData = null;
+  state.supplierBranchId = null;
+
+  state.recipeData = null;
+  state.recipeDataBranchId = null;
+
+
+  // ==============================
+  // CLOSE MODAL
+  // ==============================
+
+  closeModal();
+
+
+  showToast(
+    "Purchase berhasil disimpan",
+    "success"
+  );
+
+}
+catch (error) {
+
+  console.error(
+    "Stock In Error:",
+    error
+  );
+
+  let message =
+    "Gagal menyimpan purchase";
+
+  const err =
+    error?.message || "";
+
+
+  if (
+    err.includes(
+      "Saldo Cash tidak mencukupi"
+    )
+  ) {
+
+    message =
+      "Saldo Cash tidak mencukupi";
+
+  }
+  else if (
+    err.includes(
+      "Saldo Bank tidak mencukupi"
+    )
+  ) {
+
+    message =
+      "Saldo Bank tidak mencukupi";
+
+  }
+
+  alert(message);
+}
+	
 window.closeModal = function () {
   document.querySelectorAll(".fixed.inset-0")
     .forEach(el => el.remove());
@@ -22818,107 +23364,183 @@ document.addEventListener("change", function(e) {
 });
 
 async function loadBranchDropdown() {
+
   try {
-    // ==================================
-    // SUPABASE QUERY (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    
-    const { data, error } =
-      await supabase
-      .from("Branches")
-      .select(`
-        branchId,
-        branchName
-      `)
-      .order(
-        "branchName",
-        {
-          ascending:true
-        }
-      );
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
 
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_expense_branches"
+    );
 
-    if(error){
+    if (error) {
       throw error;
     }
 
 
+    // ==============================
+    // NORMALIZE DATA
+    // ==============================
+
     const branches =
       data || [];
 
-    */
 
-    // TEMP DATA VERCEL
-    const branches = [];
+    // ==============================
+    // SELECT ELEMENT
+    // ==============================
+
     const materialSelect =
       document.getElementById(
         "material_branch"
       );
+
     const supplierSelect =
       document.getElementById(
         "supplier_branch"
       );
+
     const stockBranchSelect =
       document.getElementById(
         "branchSelect"
       );
-    if(materialSelect)
+
+
+    // ==============================
+    // CLEAR OPTIONS
+    // ==============================
+
+    if (materialSelect) {
       materialSelect.innerHTML = "";
-    if(supplierSelect)
+    }
+
+    if (supplierSelect) {
       supplierSelect.innerHTML = "";
-    branches.forEach(b => {
-      // STOCK IN BRANCH
-      if(stockBranchSelect){
-        const opt3 =
+    }
+
+    if (stockBranchSelect) {
+      stockBranchSelect.innerHTML = "";
+    }
+
+
+    // ==============================
+    // RENDER BRANCH
+    // ==============================
+
+    branches.forEach(branch => {
+
+      // STOCK IN
+      if (stockBranchSelect) {
+
+        const option =
           document.createElement(
             "option"
           );
-        opt3.value = b.branchId;
-        opt3.textContent = b.branchName;
-        stockBranchSelect.appendChild(opt3);
+
+        option.value =
+          branch.id;
+
+        option.textContent =
+          branch.name;
+
+        stockBranchSelect.appendChild(
+          option
+        );
       }
+
+
       // MATERIAL
-      if(materialSelect){
-        const opt1 =
+      if (materialSelect) {
+
+        const option =
           document.createElement(
             "option"
           );
-        opt1.value = b.branchId;
-        opt1.textContent = b.branchName;
-        materialSelect.appendChild(opt1);
+
+        option.value =
+          branch.id;
+
+        option.textContent =
+          branch.name;
+
+        materialSelect.appendChild(
+          option
+        );
       }
+
+
       // SUPPLIER
-      if(supplierSelect){
-        const opt2 =
+      if (supplierSelect) {
+
+        const option =
           document.createElement(
             "option"
           );
-        opt2.value = b.branchId;
-        opt2.textContent =  b.branchName;
-        supplierSelect.appendChild(opt2);
+
+        option.value =
+          branch.id;
+
+        option.textContent =
+          branch.name;
+
+        supplierSelect.appendChild(
+          option
+        );
       }
+
     });
 
+
+    // ==============================
     // LOCK USER BRANCH
-    if(materialSelect){
-      materialSelect.value = state.branchId;
-      materialSelect.disabled = true;
+    // ==============================
+
+    if (materialSelect) {
+
+      materialSelect.value =
+        state.branchId;
+
+      materialSelect.disabled =
+        true;
     }
-    if(supplierSelect){
-      supplierSelect.value = state.branchId;
-      supplierSelect.disabled = true;
+
+
+    if (supplierSelect) {
+
+      supplierSelect.value =
+        state.branchId;
+
+      supplierSelect.disabled =
+        true;
     }
-    if(stockBranchSelect){
-      stockBranchSelect.value = state.branchId;
-      stockBranchSelect.disabled = true;
+
+
+    if (stockBranchSelect) {
+
+      stockBranchSelect.value =
+        state.branchId;
+
+      stockBranchSelect.disabled =
+        true;
     }
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Load Branch Error:",
       err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat branch.",
+      "error"
     );
   }
 }
@@ -22959,145 +23581,245 @@ async function saveMaterial() {
 
   try {
 
-    // ==============================
-    // SUPABASE RPC (AKTIFKAN)
-    // ==============================
+  const {
+    data: res,
+    error
+  } = await supabaseClient.rpc(
+    "save_material",
+    {
+      p_id:
+        generateIngredientId(),
 
-    /*
-    const { data: res, error } =
-      await supabase.rpc(
-        "add_material",
-        {
-          p_branch_id: data.branchId,
-          p_name: data.name,
-          p_unit: data.unit,
-          p_min: data.min
-        }
-      );
+      p_name:
+        data.name || "",
 
+      p_value:
+        0,
 
-    if(error){
-      throw error;
+      p_qty:
+        0,
+
+      p_unit:
+        data.unit || "",
+
+      p_min:
+        Number(data.min) || 0,
+
+      p_cost:
+        0,
+
+      p_branch_id:
+        data.branchId || "",
+
+      p_outlet:
+        data.branchName || ""
     }
-    */
+  );
 
-    // TEMP VERCEL
-    const res = {
-      success: true
-    };
+  if (error) {
+    throw error;
+  }
 
-    if(!res.success){
-      throw new Error(
-        "Gagal menyimpan material"
-      );
-    }
-    // CLEAR CACHE
-    state.inventoryData = null;
-    state.inventoryBranchId = null;
-
-    // RELOAD INVENTORY
-    closeAddMaterialModal();
-    loadInventoryPage(
-      state.branchId
-    );
-    showToast(
-      "Material berhasil disimpan",
-      "success"
+  if (
+    res &&
+    res.success === false
+  ) {
+    throw new Error(
+      res.message ||
+      "Gagal menyimpan material"
     );
   }
-  catch(err){
-    console.error(
-      "Save Material:",
-      err
-    );
-    showToast(
-      "Gagal menyimpan material",
-      "error"
-    );
-  }
+
+  // CLEAR CACHE
+  state.inventoryData = null;
+  state.inventoryBranchId = null;
+
+  // RELOAD
+  closeAddMaterialModal();
+
+  await loadInventoryPage(
+    state.branchId
+  );
+
+  showToast(
+    "Material berhasil disimpan",
+    "success"
+  );
+
+}
+catch (err) {
+
+  console.error(
+    "Save Material:",
+    err
+  );
+
+  showToast(
+    err?.message ||
+    "Gagal menyimpan material",
+    "error"
+  );
 }
 
 async function saveSupplier() {
-  const branchSelect = document.getElementById("supplier_branch");
+
+  const branchSelect =
+    document.getElementById(
+      "supplier_branch"
+    );
+
   const data = {
-    name: document.getElementById("supplier_name").value,
-    category: document.getElementById("supplier_category").value,
-    contact: document.getElementById("supplier_contact").value,
-    phone: document.getElementById("supplier_phone").value,
-    address: document.getElementById("supplier_address").value,
-    status: document.getElementById("supplier_status").checked
+
+    name:
+      document.getElementById(
+        "supplier_name"
+      ).value,
+
+    category:
+      document.getElementById(
+        "supplier_category"
+      ).value,
+
+    contact:
+      document.getElementById(
+        "supplier_contact"
+      ).value,
+
+    phone:
+      document.getElementById(
+        "supplier_phone"
+      ).value,
+
+    address:
+      document.getElementById(
+        "supplier_address"
+      ).value,
+
+    status:
+      document.getElementById(
+        "supplier_status"
+      ).checked
         ? "Active"
         : "Inactive",
-    branchId: branchSelect.value,
+
+    branchId:
+      branchSelect.value,
+
     outlet:
       branchSelect.options[
         branchSelect.selectedIndex
       ].text
   };
 
-  try {
-    // ==================================
-    // SUPABASE RPC (AKTIFKAN NANTI)
-    // ==================================
 
-    /*
-    const { data: res, error } =
-      await supabase.rpc(
-        "add_supplier",
+  try {
+
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
+
+    const {
+      data: res,
+      error
+    } =
+      await supabaseClient.rpc(
+        "save_supplier",
         {
-          p_branch_id: data.branchId,
-          p_name: data.name,
-          p_category: data.category,
-          p_contact: data.contact,
-          p_phone: data.phone,
-          p_address: data.address,
-          p_status: data.status
+          p_id:
+            generateSupplierId(),
+
+          p_name:
+            data.name || "",
+
+          p_category:
+            data.category || "",
+
+          p_contact:
+            data.contact || "",
+
+          p_phone:
+            Number(data.phone) || 0,
+
+          p_status:
+            data.status || "",
+
+          p_notes:
+            data.address || "",
+
+          p_branch_id:
+            data.branchId || "",
+
+          p_outlet:
+            data.outlet || ""
         }
       );
 
 
-    if(error){
+    if (error) {
       throw error;
     }
-    */
 
-    // TEMP DATA VERCEL
-    const res = {
-      success: true
-    };
-    if(!res.success){
+
+    // ==============================
+    // SUCCESS CHECK
+    // ==============================
+
+    if (
+      res &&
+      res.success === false
+    ) {
+
       throw new Error(
+        res.message ||
         "Gagal menyimpan supplier"
       );
+
     }
 
+
+    // ==============================
     // CLEAR CACHE
+    // ==============================
+
     closeSupplierModal();
-    // supplier cache
+
     state.supplierData = null;
     state.supplierBranchId = null;
-    // inventory cache karena supplier muncul di inventory
+
     state.inventoryData = null;
     state.inventoryBranchId = null;
-    // reload inventory
-    loadInventoryPage(
+
+
+    // ==============================
+    // RELOAD
+    // ==============================
+
+    await loadInventoryPage(
       state.branchId
     );
+
+
     showToast(
       "Supplier berhasil disimpan",
       "success"
     );
+
   }
-  catch(err){
+  catch (err) {
+
     console.error(
       "Save Supplier:",
       err
     );
+
     showToast(
+      err?.message ||
       "Gagal menyimpan supplier",
       "error"
     );
+
   }
+
 }
 
 function closeSupplierModal() {
@@ -23301,74 +24023,160 @@ function openAddProductModal() {
 }
 
 async function saveMaterial() {
-	const select = document.getElementById("material_branch");
-	const data = {
-	  branchId: select.value,
-	  branchName: select.options[select.selectedIndex].text,
-	  name: document.getElementById("material_name").value,
-	  unit: document.getElementById( "material_unit").value,
-	  min: Number( document.getElementById("material_min").value || 0)
-	};
-	
-	try {
-	// ==================================
-	// SUPABASE (AKTIFKAN NANTI)
-	// ==================================
-	
-	/*
-	const { data:res, error } =
-	  await supabase
-	    .from("Ingredients")
-	    .insert(data)
-	    .select();
-	
-	if(error){
-	  throw error;
-	}
-	*/
-	
-	// TEMP DATA VERCEL
-		const res = {
-		  success:true
-		};
-		// AFTER SUCCESS
-		if(!res.success){
-		  throw new Error(
-		    "Gagal menyimpan material"
-		  );
-		}
-		closeAddMaterialModal();
-		// clear product cache
-		state.products = null;
-		state.productBranchId = null;
-		// clear recipe cache
-		state.recipeData = null;
-		state.recipeDataBranchId = null;
-		state.recipeProductsData = null;
-		state.recipeProductsBranchId = null;
-		// clear inventory cache
-		// karena product + recipe tampil di inventory
-		state.inventoryData = null;
-		state.inventoryBranchId = null;
-		// reload data terbaru
-		loadProducts();
-		loadRecipes();
-		loadInventoryPage(
-		  state.branchId
-		);
-		showToast(
-		  "Material berhasil disimpan"
-		);
-	}
-	catch(err){
-	console.error(
-	  "Save Material:",
-	  err
-	);
-	showToast(
-	  "Gagal menyimpan material",
-	  "error"
-	);
+
+  const select =
+    document.getElementById(
+      "material_branch"
+    );
+
+  const data = {
+
+    branchId:
+      select.value,
+
+    branchName:
+      select.options[
+        select.selectedIndex
+      ].text,
+
+    name:
+      document.getElementById(
+        "material_name"
+      ).value,
+
+    unit:
+      document.getElementById(
+        "material_unit"
+      ).value,
+
+    min:
+      Number(
+        document.getElementById(
+          "material_min"
+        ).value || 0
+      )
+  };
+
+
+  try {
+
+    // ==============================
+    // SUPABASE RPC
+    // ==============================
+
+    const {
+      data: res,
+      error
+    } =
+      await supabaseClient.rpc(
+        "save_material",
+        {
+          p_id:
+            generateIngredientId(),
+
+          p_name:
+            data.name || "",
+
+          p_value:
+            0,
+
+          p_qty:
+            0,
+
+          p_unit:
+            data.unit || "",
+
+          p_min:
+            Number(data.min) || 0,
+
+          p_cost:
+            0,
+
+          p_branch_id:
+            data.branchId || "",
+
+          p_outlet:
+            data.branchName || ""
+        }
+      );
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    // ==============================
+    // SUCCESS CHECK
+    // ==============================
+
+    if (
+      res &&
+      res.success === false
+    ) {
+
+      throw new Error(
+        res.message ||
+        "Gagal menyimpan material"
+      );
+
+    }
+
+
+    // ==============================
+    // CLEAR CACHE
+    // ==============================
+
+    closeAddMaterialModal();
+
+    // product cache
+    state.products = null;
+    state.productBranchId = null;
+
+    // recipe cache
+    state.recipeData = null;
+    state.recipeDataBranchId = null;
+
+    state.recipeProductsData = null;
+    state.recipeProductsBranchId = null;
+
+    // inventory cache
+    state.inventoryData = null;
+    state.inventoryBranchId = null;
+
+
+    // ==============================
+    // RELOAD
+    // ==============================
+
+    await loadProducts();
+
+    await loadRecipes();
+
+    await loadInventoryPage(
+      state.branchId
+    );
+
+
+    showToast(
+      "Material berhasil disimpan",
+      "success"
+    );
+
+  }
+  catch (err) {
+
+    console.error(
+      "Save Material:",
+      err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal menyimpan material",
+      "error"
+    );
+
   }
 }
 
