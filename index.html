@@ -27458,7 +27458,7 @@ function viewExpenseAttachment() {
     if (!modal) {
         const template = document.getElementById("expenseAttachmentModalTemplate");
         document.body.appendChild(template.content.cloneNode(true));
-        modal = ocument.getElementById("expense-attachment-modal");
+        modal = document.getElementById("expense-attachment-modal");
     }
     const ref = document.getElementById("attachmentRef");
     if (ref) {
