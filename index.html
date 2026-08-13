@@ -20611,15 +20611,14 @@ async function loadRecipes() {
     // ==============================
 
     const {
-      data,
-      error
-    } = await supabaseClient.rpc(
-      "get_recipes",
-      {
-        p_branch_id:
-          branchId
-      }
-    );
+	  data,
+	  error
+	} = await supabaseClient.rpc(
+	  "get_recipe_list",
+	  {
+	    p_branch_id: branchId
+	  }
+	);
 
     if (error) {
       throw error;
