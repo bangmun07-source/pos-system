@@ -13953,11 +13953,18 @@ function initModule(pageId) {
     break;
 
     case "inventoryPage":
-      waitBranch(() => {
-        loadInventoryPage(state.branchId);
-        initIngredientExportDate();
-      });
-    break;
+	  waitBranch(async () => {
+	
+	    await loadInventoryPage(
+	      state.branchId
+	    );
+	
+	    await loadRecipeProducts();
+	
+	    initIngredientExportDate();
+	
+	  });
+	break;
 
     case "analyticsPage": {
       initAnalyticsDate();
