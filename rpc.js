@@ -1042,6 +1042,1157 @@ async function getRecipeMasterLedgerRPC(branchId) {
   return data;
 }
 
+async function getInventoryPageRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_inventory_page",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_inventory_page error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    summary: {},
+    ingredients: [],
+    suppliers: [],
+    recipes: []
+  };
+}
+
+async function getInventoryDashboardRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_inventory_dashboard",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_inventory_dashboard error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function getRecipesRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipes"
+  );
+
+  if (error) {
+    console.error(
+      "get_recipes error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getRecipeMasterLedgerRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipe_master_ledger",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_recipe_master_ledger error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getIngredientPurchasesRPC(branchId, startDate, endDate) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_ingredient_purchases",
+    {
+      p_branch_id: branchId,
+      p_start: startDate || null,
+      p_end: endDate || null
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_ingredient_purchases error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getInventorySummaryRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_inventory_summary",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_inventory_summary error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function getDailyIngredientUsageRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_daily_ingredient_usage",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_daily_ingredient_usage error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getLowIngredientStockRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_low_ingredient_stock",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_low_ingredient_stock error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getCriticalIngredientsRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_critical_ingredients",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_critical_ingredients error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getStockHistoryRPC(limit = 50, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_stock_history",
+    {
+      p_limit: limit,
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_stock_history error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getLiveDeductionFeed(limit = 20, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_live_deduction_feed",
+    {
+      p_limit: limit,
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_live_deduction_feed error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getIngredientSummaryRPC(ingredientName, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_ingredient_summary",
+    {
+      p_ingredient_name: ingredientName,
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_ingredient_summary error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {};
+}
+
+async function getIngredientUsageLogRPC( ingredientId, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_ingredient_usage_log",
+    {
+      p_ingredient_id: ingredientId,
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_ingredient_usage_log error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function saveRecipeRPC(payload) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "save_recipe",
+    {
+      p_payload: payload
+    }
+  );
+
+  if (error) {
+    console.error(
+      "save_recipe error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function saveMaterialRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_material",
+    {
+      p_id:
+        generateIngredientId(),
+
+      p_name:
+        data.name || "",
+
+      p_value:
+        Number(data.value) || 0,
+
+      p_qty:
+        Number(data.qty) || 0,
+
+      p_unit:
+        data.unit || "",
+
+      p_min:
+        Number(data.min) || 0,
+
+      p_cost:
+        Number(data.cost) || 0,
+
+      p_branch_id:
+        data.branchId || "",
+
+      p_outlet:
+        data.outlet || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "save_material error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function adjustIngredientStockRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "adjust_ingredient_stock",
+    {
+      p_ingredient_id:
+        String(
+          data.ingredientId || ""
+        ).trim(),
+
+      p_branch_id:
+        String(
+          data.branchId || ""
+        ).trim(),
+
+      p_type:
+        data.type || "",
+
+      p_qty:
+        Number(data.qty) || 0,
+
+      p_reason:
+        data.reason || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "adjust_ingredient_stock error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function updateIngredientThresholdRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_ingredient_threshold",
+    {
+      p_ingredient_id:
+        String(
+          data.ingredientId || ""
+        ).trim(),
+
+      p_branch_id:
+        String(
+          data.branchId || ""
+        ).trim(),
+
+      p_min:
+        Number(data.min) || 0
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_ingredient_threshold error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, note, branchId, outlet, paymentMethod = "CASH") {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "add_ingredient_purchase",
+    {
+      p_date:
+        date,
+
+      p_ingredient_name:
+        ingredientName,
+
+      p_qty:
+        Number(qty) || 0,
+
+      p_total_price:
+        Number(totalPrice) || 0,
+
+      p_supplier:
+        supplier || "",
+
+      p_note:
+        note || "",
+
+      p_branch_id:
+        branchId,
+
+      p_outlet:
+        outlet || "",
+
+      p_payment_method:
+        paymentMethod || "CASH"
+    }
+  );
+
+  if (error) {
+    console.error(
+      "add_ingredient_purchase error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
+async function saveIngredientPurchaseRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_ingredient_purchase",
+    {
+      p_date:
+        getWIBDateTime(),
+
+      p_ingredient:
+        data.ingredient,
+
+      p_qty:
+        Number(data.qty) || 0,
+
+      p_total_price:
+        Number(data.totalPrice) || 0,
+
+      p_supplier:
+        data.supplier || "",
+
+      p_note:
+        data.note || "",
+
+      p_branch_id:
+        data.branchId,
+
+      p_payment_method:
+        data.paymentMethod || "CASH"
+    }
+  );
+
+  if (error) {
+    console.error(
+      "save_ingredient_purchase error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function updateRecipeMasterRPC(data = {}) {
+
+  let imageUrl = "";
+
+  // ==========================
+  // Upload image jika ada
+  // ==========================
+
+  if (data.imageBase64) {
+
+    imageUrl =
+      await uploadProductImage(
+        data.imageBase64,
+        data.productId
+      );
+  }
+
+  // SUPABASE RPC
+  const {
+    data: result,
+    error
+  } =
+    await supabaseClient.rpc(
+      "update_recipe_master",
+      {
+        p_recipe_id:
+          data.recipeId,
+
+        p_product_id:
+          data.productId,
+
+        p_branch_id:
+          data.branchId,
+
+        p_selling_price:
+          Number(
+            data.sellingPrice
+          ) || 0,
+
+        p_net_price:
+          Number(
+            data.netPrice
+          ) || 0,
+
+        p_product_name:
+          data.productName || "",
+
+        p_updated_by:
+          data.updatedBy || "",
+
+        p_image_url:
+          imageUrl || ""
+      }
+    );
+
+  if (error) {
+    console.error(
+      "update_recipe_master error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function addNewProductRPC(data = {}) {
+
+  const {
+    data: result,
+    error
+  } =
+    await supabaseClient.rpc(
+      "add_new_product",
+      {
+        p_product_id:
+          generateProductId(),
+
+        p_name:
+          data.name || "",
+
+        p_category:
+          data.category || "",
+
+        p_price:
+          Number(data.price) || 0,
+
+        p_branch_id:
+          data.branchId || "",
+
+        p_outlet:
+          data.outlet || ""
+      }
+    );
+
+  if (error) {
+    console.error(
+      "add_new_product error:",
+      error
+    );
+    throw error;
+  }
+  return result;
+}
+
+async function recalcAllProductStockRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "recalc_all_product_stock",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "recalc_all_product_stock error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    success: false
+  };
+}
+
+async function logStockMovementRPC(data = {}) {
+
+  const totalCost =
+    (Number(data.qty) || 0) *
+    (Number(data.unitPrice) || 0);
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "log_stock_movement",
+    {
+      p_id:
+        crypto.randomUUID(),
+
+      p_timestamp:
+        getWIBDateTime(),
+
+      p_ingredient_id:
+        data.ingredientId,
+
+      p_action:
+        data.action,
+
+      p_qty_change:
+        Number(data.qty) || 0,
+
+      p_unit_price:
+        Number(data.unitPrice) || 0,
+
+      p_total_cost:
+        totalCost,
+
+      p_before:
+        Number(data.before) || 0,
+
+      p_after:
+        Number(data.after) || 0,
+
+      p_source:
+        data.source || "",
+
+      p_notes:
+        data.note || "",
+
+      p_branch_id:
+        data.branchId || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "log_stock_movement error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result;
+}
+
+async function deductIngredientStockRPC(
+  productId,
+  qtySold,
+  branchId
+) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "deduct_ingredient_stock",
+    {
+      p_product_id:
+        productId,
+
+      p_qty_sold:
+        Number(qtySold) || 0,
+
+      p_branch_id:
+        branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "deduct_ingredient_stock error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    success: false
+  };
+}
+
+async function getRecipeByProductRPC(productId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipe_by_product",
+    {
+      p_product_id:
+        productId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_recipe_by_product error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || null;
+}
+
+async function getRecipeItemsRPC(recipeId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipe_items",
+    {
+      p_recipe_id: recipeId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_recipe_items error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function validateIngredientStockRPC(cartItems, branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "validate_ingredient_stock",
+    {
+      p_cart_items: cartItems,
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "validate_ingredient_stock error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    valid: true,
+    missing: []
+  };
+}
+
+async function validateStockRPC(items) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "validate_stock",
+    {
+      p_items: items
+    }
+  );
+
+  if (error) {
+    console.error(
+      "validate_stock error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || {
+    valid: true
+  };
+}
+
+async function getRecipeListRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipe_list",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_recipe_list error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getProductsRPC(branchId, role) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_products",
+    {
+      p_branch_id: branchId,
+      p_role: role
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_products error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getIngredientsRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_ingredients",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_ingredients error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getSuppliersRPC(branchId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_suppliers",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_suppliers error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function updateSupplierRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "update_supplier",
+    {
+      p_supplier_id: data.supplierId,
+      p_branch_id: data.branchId,
+      p_name: data.supplierName,
+      p_category: data.category,
+      p_contact: data.contactPerson,
+      p_phone: data.phone,
+      p_status: data.status
+        ? "Active"
+        : "INACTIVE",
+      p_notes: data.notes
+    }
+  );
+
+  if (error) {
+    console.error(
+      "update_supplier error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result || {
+    success: false
+  };
+}
+
+async function saveSupplierRPC(data) {
+
+  const {
+    data: result,
+    error
+  } = await supabaseClient.rpc(
+    "save_supplier",
+    {
+      p_id: generateSupplierId(),
+
+      p_name:
+        data.name || "",
+
+      p_category:
+        data.category || "",
+
+      p_contact:
+        data.contact || "",
+
+      p_phone:
+        Number(data.phone) || 0,
+
+      p_status:
+        data.status || "",
+
+      p_notes:
+        data.address || "",
+
+      p_branch_id:
+        data.branchId || "",
+
+      p_outlet:
+        data.outlet || ""
+    }
+  );
+
+  if (error) {
+    console.error(
+      "save_supplier error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return result || {
+    success: false
+  };
+}
+
+async function getRecipePriceHistoryRPC(recipeId) {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_recipe_price_history",
+    {
+      p_recipe_id: recipeId
+    }
+  );
+
+  if (error) {
+    console.error(
+      "get_recipe_price_history error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function getInventoryRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_inventory",
+    {}
+  );
+
+  if (error) {
+    console.error(
+      "get_inventory error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || [];
+}
+
+async function generateIngredientIdRPC() {
+
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "generate_ingredient_id",
+    {}
+  );
+
+  if (error) {
+    console.error(
+      "generate_ingredient_id error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data || "ING001";
+}
+
+
+
+
+
+
 
 
 
