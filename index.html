@@ -449,18 +449,18 @@
     }
 
     .category-btn {
-      background: #101715;
-      color: #94a3b8;
-    }
-
-    .category-btn:hover {
-      color: black;
-    }
-
-    .active-category {
-      background: linear-gradient(135deg, #ffc174 0%, #f59e0b 100%);
-      color: black;
-    }
+	  background: #101715;
+	  color: #94a3b8;
+	}
+	
+	.category-btn:hover {
+	  color: #e0e0e0;
+	}
+	
+	.active-category {
+	  background: #787777;
+	  color: #e0e0e0;
+	}
 
     /* =========================
       THEME / BACKGROUND
@@ -2713,37 +2713,37 @@
 
   <button
   onclick="setActiveCategory(this); filterProducts('All')"
-  class="category-btn active-category flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn active-category flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs lg:text-sm whitespace-nowrap transition-all">
   ALL
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Food')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs lg:text-sm whitespace-nowrap transition-all">
   FOOD
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Drink')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs lg:text-sm whitespace-nowrap transition-all">
   DRINK
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Coffee')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs lg:text-sm whitespace-nowrap transition-all">
   COFFEE
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Snack')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs lg:text-sm whitespace-nowrap transition-all">
   SNACK
 </button>
 
 <button
   onclick="setActiveCategory(this); filterProducts('Paket')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-bold text-[6px] sm:text-xs md:text-xs whitespace-nowrap transition-all">
+  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold text-xs lg:text-sm whitespace-nowrap transition-all">
   PAKET
 </button>
 
@@ -2772,7 +2772,7 @@
 <div class="mb-2">
 <label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
 <div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg" data-icon="table_restaurant">table_restaurant</span>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" data-icon="table_restaurant">table_restaurant</span>
 <input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
 </div>
 </div>
@@ -2790,7 +2790,7 @@
 <label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
 	<div class="relative">
   <!-- ICON -->
-	<span class="material-symbols-outlined ">
+	<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2">
 		search
 	</span>
 	<input id="memberSearch" 
