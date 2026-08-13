@@ -23352,6 +23352,22 @@ window.saveStockIn = async function () {
     Number(price);
 
 
+// ==============================
+// DEBUG
+// ==============================
+
+console.log("STOCK IN DEBUG:", {
+  branchId,
+  paymentMethod,
+  qty: Number(qty),
+  price: Number(price),
+  totalPrice,
+  ingredient,
+  supplier,
+  outletName
+});
+
+
   // ==============================
   // SUPABASE RPC
   // ==============================
