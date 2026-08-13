@@ -23719,13 +23719,9 @@ async function saveSupplier() {
       ].text
   };
 
-
   try {
 
-    // ==============================
     // SUPABASE RPC
-    // ==============================
-
     const {
       data: res,
       error
@@ -23733,32 +23729,14 @@ async function saveSupplier() {
       await supabaseClient.rpc(
         "save_supplier",
         {
-          p_id:
-            generateSupplierId(),
-
-          p_name:
-            data.name || "",
-
-          p_category:
-            data.category || "",
-
-          p_contact:
-            data.contact || "",
-
-          p_phone:
-            Number(data.phone) || 0,
-
-          p_status:
-            data.status || "",
-
-          p_notes:
-            data.address || "",
-
-          p_branch_id:
-            data.branchId || "",
-
-          p_outlet:
-            data.outlet || ""
+          p_name: data.name || "",
+          p_category: data.category || "",
+          p_contact: data.contact || "",
+          p_phone: Number(data.phone) || 0,
+          p_status: data.status || "",
+          p_notes: data.address || "",
+          p_branch_id: data.branchId || "",
+          p_outlet: data.outlet || ""
         }
       );
 
