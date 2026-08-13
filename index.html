@@ -2623,7 +2623,7 @@
   id="mainContent"
   class="flex-1 flex flex-col h-screen">
 <!-- Left: Menu Grid Section -->
-<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8 overflow-hidden">	
+<header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex items-center pl-4 pr-8 overflow-visible">
   <!-- LEFT -->
   <div class="flex items-center gap-4 flex-1">
 	<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMMA%20LOGO%202%20white.png"
@@ -16475,19 +16475,19 @@ function renderProducts(products) {
       </div>
 
       <div class="p-3">
-        <h4 class="font-bold text-sm">${name}</h4>
+        <h4 class="font-bold text-foreground text-sm lg:text-lg">${name}</h4>
 
         <div class="flex justify-between items-center mt-1">
-          <span class="text-sm text-muted">
+          <span class="text-sm lg:text-lg text-muted">
             ${format(price)}
           </span>
 
-          <span class="text-xs px-2 py-1 rounded bg-primary-container text-black">
+          <span class="text-xs lg:text-sm px-2 py-1 border border-white/10 rounded-md bg-background text-foreground">
             ${category}
           </span>
         </div>
 
-        <p class="text-xs text-muted  mt-1">
+        <p class="text-xs lg:text-sm text-muted mt-1">
           Stock: ${stock}
         </p>
       </div>
