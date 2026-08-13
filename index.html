@@ -20895,6 +20895,10 @@ async function saveRecipeMaster() {
 
   if (!currentRecipeData) return;
 
+  // ==============================
+  // GET IMAGE PRODUK
+  // ==============================
+
   const file =
     document.getElementById(
       "recipeImageInput"
@@ -20912,6 +20916,11 @@ async function saveRecipeMaster() {
         compressed
       );
   }
+
+
+  // ==============================
+  // PAYLOAD
+  // ==============================
 
   const payload = {
 
@@ -20936,7 +20945,10 @@ async function saveRecipeMaster() {
             "recipeSellingPrice"
           )
           .value
-          .replace(/[^0-9]/g, "")
+          .replace(
+            /[^0-9]/g,
+            ""
+          )
       ),
 
     netPrice:
@@ -20946,7 +20958,10 @@ async function saveRecipeMaster() {
             "recipeNetPrice"
           )
           .value
-          .replace(/[^0-9]/g, "")
+          .replace(
+            /[^0-9]/g,
+            ""
+          )
       ),
 
     updatedBy:
@@ -20956,7 +20971,9 @@ async function saveRecipeMaster() {
       "Unknown",
 
     imageBase64
+
   };
+
 
   try {
 
@@ -21018,8 +21035,14 @@ async function saveRecipeMaster() {
     }
 
 
+    console.log(
+      "UPDATE RECIPE MASTER:",
+      data
+    );
+
+
     // ==============================
-    // CLOSE
+    // CLOSE MODAL
     // ==============================
 
     closeRecipeMasterModal();
@@ -21051,7 +21074,8 @@ async function saveRecipeMaster() {
 
 
     showToast(
-      "Product updated"
+      "Product updated",
+      "success"
     );
 
   }
@@ -21068,6 +21092,60 @@ async function saveRecipeMaster() {
       "error"
     );
   }
+}
+
+async function uploadProductImage(
+  base64,
+  productId
+) {
+
+  if (!base64) {
+    return null;
+  }
+
+  if (!productId) {
+    throw new Error(
+      "Product ID tidak ditemukan"
+    );
+  }
+
+
+  const response =
+    await fetch(
+      "/api/handle-product-image-upload",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          base64,
+          productId
+        })
+      }
+    );
+
+
+  const result =
+    await response.json();
+
+
+  if (
+    !response.ok ||
+    !result.success
+  ) {
+
+    throw new Error(
+      result.error ||
+      "Upload product image gagal"
+    );
+  }
+
+
+  return result.url;
 }
 
 function renderRecipePriceHistory(data) {
