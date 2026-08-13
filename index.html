@@ -3254,13 +3254,7 @@
 <!-- Sidebar Kanan: Billing Control -->
 <aside
   id="billingSidebar"
-  class="
-    fixed right-0 top-6 bottom-0 pointer-events-none w-0 bg-background translate-x-[120%] opacity-0
-    border border-white/10 flex flex-col
-    pt-24 pb-8 px-6
-    z-40 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-    transition-all duration-300
-  ">
+  class=" fixed right-0 top-6 bottom-0 pointer-events-none w-0 bg-background translate-x-[120%] opacity-0 border border-white/10 flex flex-col pt-24 pb-8 px-6 z-40 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ">
 <div class="flex items-center justify-between mb-8">
 <div>
 <h2 class="font-headline text-2xl font-bold">Card Table</h2>
@@ -3369,12 +3363,12 @@
 	</div>
 <div class="flex items-center gap-4 border-r border-outline-variant/20 pr-6">
 
-  <button class="w-10 h-10 flex items-center justify-center text-muted hover:bg-white/5 transition-colors rounded-md active:scale-95 duration-200">
+  <button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
     <span class="material-symbols-outlined">notifications</span>
   </button>
 
   <button 
-    class="settingsMenu w-10 h-10 flex items-center justify-center text-muted hover:bg-white/5 transition-colors rounded-md active:scale-95 duration-200"
+    class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
     onclick="navigate('settingsPage')"
   >
     <span class="material-symbols-outlined">settings</span>
@@ -3383,7 +3377,7 @@
   <!-- TAMBAH INI -->
   <button
     onclick="toggleBillingSidebar('table')"
-    class="w-10 h-10 flex items-center justify-center text-muted hover:bg-white/5 transition-colors rounded-md active:scale-95 duration-200"
+    class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
   >
     <span class="material-symbols-outlined">dock_to_right</span>
   </button>
@@ -3393,21 +3387,9 @@
 </header>
 
 <!-- Main Content Area -->
-custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-
+<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 <!-- Header / Floor Status -->
-<header class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
-
-  <div>
-    <h1 class="font-headline text-4xl font-extrabold tracking-tight text-on-surface mb-2">
-      Main Floor
-    </h1>
-
-    <p class="text-on-surface-variant font-medium">
-      Visual distribution of current restaurant floor
-    </p>
-  </div>
-
+<header class="mb-10 flex flex-col md:flex-row md:items-end gap-6">
   <div class="flex flex-wrap items-center gap-4">
 
     <!-- AVAILABLE -->
@@ -3440,11 +3422,7 @@ custom-scrollbar pt-4 pr-4 pb-10 pl-20">
      <!-- ADD TABLE -->
     <button
       onclick="openAddTableModal()"
-      class="h-11 px-5 rounded-md 
-      bg-primary/10 border border-primary/10 text-primary font-bold
-      text-primary font-semibold
-      flex items-center gap-2
-      active:scale-95 transition">
+      class="h-11 px-5 rounded-md bg-background border border-white/10 text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
 
       <span class="material-symbols-outlined text-xl">
         add
