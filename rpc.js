@@ -3190,7 +3190,7 @@ async function deleteOtherIncomeRPC(id) {
 }
 
 async function saveOtherIncomeRPC(data = {}) {
-onsole.log(
+console.log(
     "SAVE OTHER INCOME DATA:",
     data
   );
