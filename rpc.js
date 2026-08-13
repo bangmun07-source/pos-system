@@ -1512,7 +1512,16 @@ async function updateIngredientThresholdRPC(data = {}) {
 }
 
 async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, note, branchId, outlet, paymentMethod = "CASH") {
-
+console.log("ADD PURCHASE PARAMS:", {
+  branchId,
+  ingredientName,
+  qty,
+  totalPrice,
+  supplier,
+  note,
+  outlet,
+  paymentMethod
+});
   const {
     data,
     error
