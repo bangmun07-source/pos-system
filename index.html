@@ -24008,6 +24008,186 @@ function openAddProductModal() {
   openModal("addProductModal");
 }
 
+async function saveNewProduct() {
+
+  // =========================
+  // GET FORM
+  // =========================
+
+  const name =
+    document
+      .getElementById("newProductName")
+      ?.value
+      .trim();
+
+  const category =
+    document
+      .getElementById("newProductCategory")
+      ?.value;
+
+  const price =
+    Number(
+      document
+        .getElementById("newProductPrice")
+        ?.value || 0
+    );
+
+  const branchId =
+    state.branchId;
+
+  const branchSelect =
+    document.getElementById(
+      "newProductBranch"
+    );
+
+  const outlet =
+    branchSelect
+      ? branchSelect.options[
+          branchSelect.selectedIndex
+        ]?.text || ""
+      : state.branchName || "";
+
+
+  // =========================
+  // VALIDATION
+  // =========================
+
+  if (!name) {
+
+    alert(
+      "Product Name wajib diisi."
+    );
+
+    return;
+  }
+
+
+  if (!category) {
+
+    alert(
+      "Category wajib dipilih."
+    );
+
+    return;
+  }
+
+
+  if (price <= 0) {
+    alert(
+      "Selling Price tidak valid."
+    );
+    return;
+  }
+
+  if (!branchId) {
+    alert(
+      "Branch belum dipilih."
+    );
+    return;
+  }
+
+  try {
+
+    // DEBUG
+    console.log(
+      "SAVE NEW PRODUCT:",
+      {
+        name,
+        category,
+        price,
+        branchId,
+        outlet
+      }
+    );
+
+    // SUPABASE RPC
+    const {
+      data: res,
+      error
+    } =
+      await supabaseClient.rpc(
+        "add_new_product",
+        {
+          p_name: name,
+          p_category: category,
+          p_price: price,
+          p_branch_id: branchId,
+          p_outlet: outlet
+        }
+      );
+
+    // RPC ERROR
+    if (error) {
+      console.error(
+        "add_new_product error:",
+        error
+      );
+      throw error;
+    }
+
+    // DEBUG RESULT
+    console.log(
+      "ADD NEW PRODUCT RESULT:",
+      res
+    );
+
+    // SUCCESS CHECK
+    if (
+      !res ||
+      res.success === false
+    ) {
+
+      throw new Error(
+        res?.message ||
+        "Gagal menyimpan product."
+      );
+    }
+	
+    // CLOSE MODAL
+    closeAddProductModal();
+    // CLEAR PRODUCT CACHE
+    state.products = null;
+    state.productBranchId = null;
+    // CLEAR RECIPE CACHE
+    state.recipeData = null;
+    state.recipeDataBranchId = null;
+    state.recipeProductsData = null;
+    state.recipeProductsBranchId = null;
+    // CLEAR INVENTORY CACHE
+    state.inventoryData = null;
+    state.inventoryBranchId = null;
+
+    // RELOAD PRODUCT
+    await loadProducts();
+	
+    // RELOAD RECIPE
+    await loadRecipes();
+	
+    // RELOAD INVENTORY
+    await loadInventoryPage(
+      state.branchId
+    );
+
+    // SUCCESS TOAST
+    showToast(
+      "Product added successfully.",
+      "success"
+    );
+  }
+  catch (err) {
+    console.error(
+      "Save New Product:",
+      err
+    );
+
+    alert(
+      err?.message ||
+      "Gagal menyimpan product."
+    );
+  }
+}
+
+
 async function saveMaterial() {
 
   const select =
