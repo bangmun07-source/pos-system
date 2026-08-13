@@ -20913,7 +20913,6 @@ async function saveRecipeMaster() {
       );
   }
 
-
   const payload = {
 
     recipeId:
@@ -20937,10 +20936,7 @@ async function saveRecipeMaster() {
             "recipeSellingPrice"
           )
           .value
-          .replace(
-            /[^0-9]/g,
-            ""
-          )
+          .replace(/[^0-9]/g, "")
       ),
 
     netPrice:
@@ -20950,10 +20946,7 @@ async function saveRecipeMaster() {
             "recipeNetPrice"
           )
           .value
-          .replace(
-            /[^0-9]/g,
-            ""
-          )
+          .replace(/[^0-9]/g, "")
       ),
 
     updatedBy:
@@ -20963,15 +20956,13 @@ async function saveRecipeMaster() {
       "Unknown",
 
     imageBase64
-
   };
-
 
   try {
 
-    // ==================================
-    // IMAGE URL
-    // ==================================
+    // ==============================
+    // UPLOAD RECIPE IMAGE
+    // ==============================
 
     let imageUrl =
       currentRecipeData.image || "";
@@ -20986,9 +20977,9 @@ async function saveRecipeMaster() {
     }
 
 
-    // ==================================
+    // ==============================
     // UPDATE RECIPE
-    // ==================================
+    // ==============================
 
     const {
       data,
@@ -21027,16 +21018,16 @@ async function saveRecipeMaster() {
     }
 
 
-    // ==================================
-    // CLOSE MODAL
-    // ==================================
+    // ==============================
+    // CLOSE
+    // ==============================
 
     closeRecipeMasterModal();
 
 
-    // ==================================
+    // ==============================
     // CLEAR CACHE
-    // ==================================
+    // ==============================
 
     state.recipeData = null;
     state.recipeDataBranchId = null;
@@ -21045,9 +21036,9 @@ async function saveRecipeMaster() {
     state.inventoryBranchId = null;
 
 
-    // ==================================
+    // ==============================
     // RELOAD
-    // ==================================
+    // ==============================
 
     await loadInventoryPage(
       state.branchId
@@ -21074,6 +21065,45 @@ async function saveRecipeMaster() {
       "error"
     );
   }
+}
+
+async function uploadRecipeImage(
+  base64,
+  recipeId
+) {
+
+  const response =
+    await fetch(
+      "/api/handle-recipe-image-upload",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          base64,
+          recipeId
+        })
+      }
+    );
+
+  const result =
+    await response.json();
+
+  if (
+    !response.ok ||
+    !result.success
+  ) {
+    throw new Error(
+      result.error ||
+      "Upload recipe image gagal"
+    );
+  }
+
+  return result.url;
 }
 
 function renderRecipePriceHistory(data) {
