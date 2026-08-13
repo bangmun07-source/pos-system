@@ -22653,20 +22653,14 @@ async function loadRecipeProducts() {
     // ==============================
 
     const {
-      data,
-      error
-    } = await supabaseClient.rpc(
-      "get_products",
-      {
-        p_branch_id:
-          branchId,
-
-        p_role:
-          state.user?.role ||
-          state.user?.Role ||
-          ""
-      }
-    );
+	  data,
+	  error
+	} = await supabaseClient.rpc(
+	  "get_recipe_products",
+	  {
+		p_branch_id: branchId
+	  }
+	);
 
     if (error) {
       throw error;
