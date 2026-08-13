@@ -22646,13 +22646,8 @@ async function loadRecipeProducts() {
     const recipes =
       data || [];
 
-    console.log(
-      "GET RECIPE LIST:",
-      {
-        branchId,
-        recipes
-      }
-    );
+   console.log("GET RECIPE LIST RAW:", data);
+console.log("FIRST RECIPE:", data?.[0]);
 
     state.recipeProductsData =
       recipes;
