@@ -20258,121 +20258,247 @@ function renderSuppliers() {
 let currentSupplierData = null;
 
 function openEditSupplierModal(supplierId) {
-  const supplier = allSupplierData.find( x => String(x.id) === String(supplierId));
-  if (!supplier) {
-    return;
-  }
+
+  const supplier =
+    allSupplierData.find(
+      x => String(x.id) === String(supplierId)
+    );
+
+  if (!supplier) return;
 
   currentSupplierData = supplier;
+
   document
     .getElementById("editSupplierModalWrapper")
     ?.remove();
-  const tpl = document.getElementById("editsupplierModal");
-  if (!tpl) {
+
+  const tpl =
+    document.getElementById("editsupplierModal");
+
+  if (!tpl) return;
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.id =
+    "editSupplierModalWrapper";
+
+  wrapper.appendChild(
+    tpl.content.cloneNode(true)
+  );
+
+  document.body.appendChild(wrapper);
+
+  setTimeout(() => {
+
+    document.getElementById(
+      "supplierNameInput"
+    ).value = supplier.name || "";
+
+    document.getElementById(
+      "supplierCategoryInput"
+    ).value = supplier.category || "";
+
+    document.getElementById(
+      "supplierContactInput"
+    ).value = supplier.contact || "";
+
+    document.getElementById(
+      "supplierPhoneInput"
+    ).value = supplier.phone || "";
+
+    document.getElementById(
+      "supplierAddressInput"
+    ).value = supplier.notes || "";
+
+    document.getElementById(
+      "supplierStatusInput"
+    ).checked =
+      supplier.status === "Active";
+
+  }, 50);
+}
+
+async function saveEditSupplier() {
+
+  if (!currentSupplierData) return;
+
+  const supplierName =
+    document.getElementById(
+      "supplierNameInput"
+    );
+
+  const category =
+    document.getElementById(
+      "supplierCategoryInput"
+    );
+
+  const contact =
+    document.getElementById(
+      "supplierContactInput"
+    );
+
+  const phone =
+    document.getElementById(
+      "supplierPhoneInput"
+    );
+
+  const notes =
+    document.getElementById(
+      "supplierAddressInput"
+    );
+
+  const status =
+    document.getElementById(
+      "supplierStatusInput"
+    );
+
+  if (
+    !supplierName ||
+    !category ||
+    !contact ||
+    !phone ||
+    !notes ||
+    !status
+  ) {
     return;
   }
-  const wrapper = document.createElement("div");
-  wrapper.id = "editSupplierModalWrapper";
-  wrapper.appendChild(tpl.content.cloneNode(true));
-  document.body.appendChild(wrapper);
-  setTimeout(() => {
-    document.getElementById("supplierNameInput").value = supplier.name || "";
-    document.getElementById("supplierCategoryInput").value = supplier.category || "";
-    document.getElementById("supplierContactInput").value = supplier.contact || "";
-    document.getElementById("supplierPhoneInput").value = supplier.phone || "";
-    document.getElementById("supplierAddressInput").value = supplier.notes || "";
-    document.getElementById("supplierStatusInput").checked = supplier.status === "Active";
-  }, 50);
 
-}
+  const payload = {
 
-try {
+    supplierId:
+      currentSupplierData.id,
 
-  // ==============================
-  // UPDATE SUPPLIER
-  // ==============================
+    branchId:
+      currentSupplierData.branchId,
 
-  const {
-    data: updateData,
-    error: updateError
-  } = await supabaseClient.rpc(
-    "update_supplier",
-    {
-      p_supplier_id: payload.supplierId,
-      p_branch_id: payload.branchId,
-      p_name: payload.supplierName,
-      p_category: payload.category,
-      p_contact: payload.contactPerson,
-      p_phone: payload.phone,
-      p_status: payload.status
-        ? "Active"
-        : "INACTIVE",
-      p_notes: payload.notes
+    supplierName:
+      supplierName.value,
+
+    category:
+      category.value,
+
+    contactPerson:
+      contact.value,
+
+    phone:
+      phone.value,
+
+    notes:
+      notes.value,
+
+    status:
+      status.checked
+
+  };
+
+  try {
+
+    // ==============================
+    // UPDATE SUPPLIER
+    // ==============================
+
+    const {
+      data: updateData,
+      error: updateError
+    } =
+      await supabaseClient.rpc(
+        "update_supplier",
+        {
+          p_supplier_id:
+            payload.supplierId,
+
+          p_branch_id:
+            payload.branchId,
+
+          p_name:
+            payload.supplierName,
+
+          p_category:
+            payload.category,
+
+          p_contact:
+            payload.contactPerson,
+
+          p_phone:
+            payload.phone,
+
+          p_status:
+            payload.status
+              ? "Active"
+              : "INACTIVE",
+
+          p_notes:
+            payload.notes
+        }
+      );
+
+    if (updateError) {
+      throw updateError;
     }
-  );
 
-  if (updateError) {
-    throw updateError;
-  }
+    // ==============================
+    // LOAD ULANG SUPPLIER
+    // ==============================
 
-  // ==============================
-  // LOAD ULANG SUPPLIER
-  // ==============================
+    const {
+      data: suppliers,
+      error: suppliersError
+    } =
+      await supabaseClient.rpc(
+        "get_suppliers",
+        {
+          p_branch_id:
+            payload.branchId
+        }
+      );
 
-  const {
-    data: suppliers,
-    error: suppliersError
-  } = await supabaseClient.rpc(
-    "get_suppliers",
-    {
-      p_branch_id: payload.branchId
+    if (suppliersError) {
+      throw suppliersError;
     }
-  );
 
-  if (suppliersError) {
-    throw suppliersError;
+    // ==============================
+    // UPDATE CACHE
+    // ==============================
+
+    allSupplierData =
+      suppliers || [];
+
+    state.supplierData =
+      suppliers || [];
+
+    state.supplierBranchId =
+      payload.branchId;
+
+    // ==============================
+    // RENDER
+    // ==============================
+
+    renderSuppliers();
+
+    closeEditSupplierModal();
+
+    showToast(
+      "Supplier updated",
+      "success"
+    );
+
   }
+  catch (err) {
 
-  // ==============================
-  // UPDATE CACHE
-  // ==============================
+    console.error(
+      "Update Supplier Error:",
+      err
+    );
 
-  allSupplierData =
-    suppliers || [];
-
-  state.supplierData =
-    suppliers || [];
-
-  state.supplierBranchId =
-    payload.branchId;
-
-  // ==============================
-  // RENDER
-  // ==============================
-
-  renderSuppliers();
-
-  showToast(
-    "Supplier updated"
-  );
-
-  closeEditSupplierModal();
-
+    showToast(
+      err?.message ||
+      "Failed update supplier",
+      "error"
+    );
+  }
 }
-catch(err) {
-
-  console.error(
-    "Update Supplier Error:",
-    err
-  );
-
-  showToast(
-    err?.message ||
-    "Failed update supplier",
-    "error"
-  );
-
-}
+	
 
 function closeEditSupplierModal() {
   document
