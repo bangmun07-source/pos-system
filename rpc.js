@@ -3011,6 +3011,10 @@ async function getExpenseDashboardRPC(filter = {}) {
 
     throw error;
   }
+    console.log(
+    "RPC EXPENSE RESULT:",
+    data
+  );
 
   return data || {
     summary: {},
