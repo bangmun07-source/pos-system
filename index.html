@@ -22633,7 +22633,7 @@ async function loadRecipeProducts() {
       data,
       error
     } = await supabaseClient.rpc(
-      "get_recipe_products",
+      "get_recipe_list",
       {
         p_branch_id: branchId
       }
@@ -22647,7 +22647,7 @@ async function loadRecipeProducts() {
       data || [];
 
     console.log(
-      "GET PRODUCTS FOR RECIPE:",
+      "GET RECIPE LIST:",
       {
         branchId,
         recipes
@@ -22672,10 +22672,12 @@ async function loadRecipeProducts() {
       err
     );
 
+    state.recipeProductsData = [];
+
     renderRecipeProducts([]);
   }
 }
-
+	
 function updateLiveStockUI(deductionMap) {
   Object.keys(deductionMap).forEach(id => {
     const el = document.querySelector(`[data-stock-id="${id}"]`);
