@@ -20679,36 +20679,44 @@ async function loadRecipes() {
 }
 
 function renderRecipes() {
+
   const tbody = document.getElementById("recipesTable");
   if (!tbody) return;
+
   if (!allRecipesData || allRecipesData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-6 text-muted">
+        <td colspan="8" class="text-center py-6 text-slate-400">
           No recipes
         </td>
       </tr>
     `;
     return;
   }
+
   // PAGINATION
- const start = (recipeCurrentPage - 1) * recipeItemsPerPage;
- const end = start + recipeItemsPerPage;
+  const start = (recipeCurrentPage - 1) * recipeItemsPerPage;
+  const end = start + recipeItemsPerPage;
+
  const filteredData = allRecipesData.filter(item =>
   !state.branchId || item.branchId === state.branchId
   );
+
   const paginatedData = filteredData.slice(start, end);
+
   tbody.innerHTML = paginatedData.map((item, index) => {
+
     return `
     <tr class="
       ${index % 2 === 0 ? 'bg-background/10' : ''}
       hover:bg-white/5 transition-colors
     ">
+
       <td class="px-6 py-4 font-bold">
         ${item.productName || item.Product_Name || item.Nama_Produk || item.name || "-"}
       </td>
 
-      <td class="px-6 py-4 text-sm text-muted">
+      <td class="px-6 py-4 text-sm text-slate-400">
         ${item.ingredientsLabel || item.ingredients?.map(i => `${i.name} (${i.qty})`).join(", ")}
       </td>
 
@@ -20726,32 +20734,39 @@ function renderRecipes() {
 
       <td class="text-center">
         <div class="flex flex-col items-center gap-1">
+
           <span class="text-xs font-bold">
-            ${Number(item.costPercent || 0)}%
+            ${item.costPercent}%
           </span>
-          <div class="w-16 h-1 bg-white/5 rounded-md overflow-hidden">
+
+          <div class="w-16 h-1 bg-white/5 rounded-full overflow-hidden">
+
             <div class="h-full 
               ${item.costPercent > 60 ? 'bg-red-500' :
                 item.costPercent >= 40 ? 'bg-yellow-400' :
                 'bg-emerald-500'}"
               style="width:${item.costPercent}%">
             </div>
+
           </div>
+
         </div>
       </td>
 
       <td class="px-6 py-4 font-bold text-green-400">
-        Rp ${Number(item.profit || 0).toLocaleString("id-ID")}
+        Rp ${item.profit.toLocaleString("id-ID")}
       </td>
 
-      <td class="px-6 py-4 text-right text-[10px] text-muted ">
+      <td class="px-6 py-4 text-right text-[10px] text-slate-500">
         <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:bg-white/5 rounded-lg">
           <span class="material-symbols-outlined">edit</span>
         </button>
       </td>
+
     </tr>
     `;
   }).join("");
+
   renderRecipePagination();
 }
 
