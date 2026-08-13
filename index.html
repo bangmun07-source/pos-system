@@ -22627,59 +22627,32 @@ async function loadRecipeProducts() {
 
   if (!branchId) return;
 
-
-  // ==============================
-  // CACHE
-  // ==============================
-
-  if (
-    state.recipeProductsData &&
-    state.recipeProductsBranchId ===
-      branchId
-  ) {
-
-    renderRecipeProducts(
-      state.recipeProductsData
-    );
-
-    return;
-  }
-
-
   try {
 
-    // ==============================
-    // SUPABASE RPC
-    // ==============================
-
     const {
-	  data,
-	  error
-	} = await supabaseClient.rpc(
-	  "get_recipe_products",
-	  {
-		p_branch_id: branchId
-	  }
-	);
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_recipe_products",
+      {
+        p_branch_id: branchId
+      }
+    );
 
     if (error) {
       throw error;
     }
 
-
     const recipes =
       data || [];
-	console.log(
-	  "GET PRODUCTS FOR RECIPE:",
-	  {
-	    branchId,
-	    recipes
-	  }
-	);
 
-    // ==============================
-    // CACHE
-    // ==============================
+    console.log(
+      "GET PRODUCTS FOR RECIPE:",
+      {
+        branchId,
+        recipes
+      }
+    );
 
     state.recipeProductsData =
       recipes;
@@ -22687,13 +22660,8 @@ async function loadRecipeProducts() {
     state.recipeProductsBranchId =
       branchId;
 
-
-    // ==============================
-    // RENDER
-    // ==============================
-
     renderRecipeProducts(
-      state.recipeProductsData
+      recipes
     );
 
   }
@@ -22704,9 +22672,7 @@ async function loadRecipeProducts() {
       err
     );
 
-    renderRecipeProducts(
-      []
-    );
+    renderRecipeProducts([]);
   }
 }
 
