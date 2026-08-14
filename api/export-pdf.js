@@ -66,12 +66,13 @@ export default async function handler(req, res) {
         throw error;
       }
 
-      return res.status(200).json({
-        success: true,
-        rows: Array.isArray(data)
-          ? data.length
-          : 0
-      });
+return res.status(200).json({
+  success: true,
+  rows: Array.isArray(data)
+    ? data.length
+    : 0,
+  data: data
+});
     }
 
     // =====================================================
