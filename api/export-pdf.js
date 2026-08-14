@@ -30,16 +30,49 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     console.log("EXPORT TYPE:", type);
-    console.log("EXPORT BRANCH:", branchId);
+console.log("EXPORT BRANCH:", branchId);
 
-    return res.status(200).json({
-      success: true,
-      test: true,
-      type,
-      branchId
-    });
+// =====================================================
+// TEST MEMBER RPC
+// =====================================================
 
-  } catch (err) {
+if (type === "members") {
+
+  console.log(
+    ">>> MASUK MEMBER EXPORT <<<"
+  );
+
+  const {
+    data,
+    error
+  } = await supabase.rpc(
+    "get_members",
+    {
+      p_branch_id: branchId
+    }
+  );
+
+  console.log(
+    "GET MEMBERS DATA:",
+    data
+  );
+
+  console.log(
+    "GET MEMBERS ERROR:",
+    error
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return res.status(200).json({
+    success: true,
+    rows: Array.isArray(data)
+      ? data.length
+      : 0
+  });
+} catch (err) {
 
     console.error(
       "EXPORT TEST ERROR:",
