@@ -27755,14 +27755,237 @@ function removeExpenseAttachment() {
 
 }
 
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result);
+    };
+
+    reader.onerror = () => {
+      reject(
+        new Error("Gagal membaca file")
+      );
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 
 async function uploadExpenseAttachment() {
-  console.log("=== UPLOAD EXPENSE ATTACHMENT START ===");
+
+  const expense =
+    expenseData[selectedAttachmentExpenseIndex];
+
+  if (!expense) {
+    showToast(
+      "Expense tidak ditemukan",
+      "error"
+    );
+    return;
+  }
+
+  const input =
+    document.getElementById(
+      "expenseAttachmentInput"
+    );
+
+  const file =
+    input?.files?.[0];
+
+  if (!file) {
+    showToast(
+      "Pilih file terlebih dahulu",
+      "warning"
+    );
+    return;
+  }
+
+  console.log(
+    "START UPLOAD:",
+    file.name,
+    file.type,
+    file.size
+  );
+
+  try {
+
+    // =========================
+    // BASE64
+    // =========================
+
+    let base64;
+
+    if (
+      file.type ===
+      "application/pdf"
+    ) {
+
+      // PDF langsung
+      base64 =
+        await fileToBase64(file);
+
+    } else {
+
+      // JPG / PNG compress dulu
+      const compressed =
+        await compressImage(file);
+
+      base64 =
+        await fileToBase64(
+          compressed
+        );
+    }
+
+    console.log(
+      "BASE64 READY"
+    );
+
+
+    // =========================
+    // UPLOAD VIA VERCEL API
+    // =========================
+
+    const response =
+      await fetch(
+        "/api/handle-expense-attachment",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            base64,
+            branchId:
+              expense.branchId,
+            refId:
+              expense.refId
+          })
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    console.log(
+      "UPLOAD API RESULT:",
+      result
+    );
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+      throw new Error(
+        result.error ||
+        "Upload attachment gagal"
+      );
+    }
+
+
+    // =========================
+    // URL DARI API
+    // =========================
+
+    const url =
+      result.url;
+
+    if (!url) {
+      throw new Error(
+        "URL attachment tidak ditemukan"
+      );
+    }
+
+
+    // =========================
+    // UPDATE DATABASE
+    // =========================
+
+    await updateExpenseAttachmentRPC({
+
+      Ref_ID:
+        expense.refId,
+
+      Attachment_URL:
+        url
+
+    });
+
+
+    // =========================
+    // SUCCESS
+    // =========================
+
+    showToast(
+      "Attachment berhasil disimpan",
+      "success"
+    );
+
+
+    closeExpenseAddAttachmentModal();
+
+
+    // =========================
+    // CLEAR CACHE
+    // =========================
+
+    state.expenseDashboardData =
+      null;
+
+    state.expenseDashboardFilter =
+      null;
+
+
+    // =========================
+    // RELOAD
+    // =========================
+
+    await loadExpenseDashboard();
+
+  }
+
+  catch (err) {
+
+    console.error(
+      "Upload expense attachment:",
+      err
+    );
+
+    showToast(
+      err?.message ||
+      "Upload attachment gagal",
+      "error"
+    );
+
+  }
+
+}
+
+async function uploadExpenseAttachment() {
+
+  console.log(
+    "=== UPLOAD ATTACHMENT START ==="
+  );
+
   const expense =
     expenseData[
       selectedAttachmentExpenseIndex
     ];
-console.log("SELECTED EXPENSE:", expense);
+
+  console.log(
+    "SELECTED EXPENSE:",
+    expense
+  );
+
   if (!expense) {
 
     showToast(
@@ -27779,23 +28002,14 @@ console.log("SELECTED EXPENSE:", expense);
       "expenseAttachmentInput"
     );
 
-console.log(
-  "INPUT ELEMENT:",
-  input
-);
-
-console.log(
-  "INPUT FILES:",
-  input?.files
-);
-
-console.log(
-  "INPUT FILE COUNT:",
-  input?.files?.length
-);
   const file =
     input?.files?.[0];
-console.log("SELECTED FILE:", file);
+
+  console.log(
+    "SELECTED FILE:",
+    file
+  );
+
 
   if (!file) {
 
@@ -27810,24 +28024,75 @@ console.log("SELECTED FILE:", file);
 
   try {
 
-    // =========================
-    // COMPRESS IMAGE
-    // =========================
+    let base64;
 
-    const compressed =
-      await compressImage(
-        file
+
+    // =================================
+    // IMAGE
+    // =================================
+
+    if (
+      file.type === "image/jpeg" ||
+      file.type === "image/png" ||
+      file.type === "image/webp"
+    ) {
+
+      console.log(
+        "FILE TYPE: IMAGE"
       );
 
 
-    // =========================
-    // BASE64
-    // =========================
+      const compressed =
+        await compressImage(file);
 
-    const base64 =
-      await fileToBase64(
-        compressed
+
+      base64 =
+        await fileToBase64(
+          compressed
+        );
+
+    }
+
+
+    // =================================
+    // PDF
+    // =================================
+
+    else if (
+      file.type === "application/pdf"
+    ) {
+
+      console.log(
+        "FILE TYPE: PDF"
       );
+
+
+      // PDF JANGAN DI-COMPRESS
+      base64 =
+        await fileToBase64(
+          file
+        );
+
+    }
+
+
+    // =================================
+    // FORMAT LAIN
+    // =================================
+
+    else {
+
+      throw new Error(
+        "Format file tidak didukung. Gunakan PDF, JPG, atau PNG."
+      );
+
+    }
+
+
+    console.log(
+      "BASE64 LENGTH:",
+      base64?.length
+    );
 
 
     if (!base64) {
@@ -27838,10 +28103,15 @@ console.log("SELECTED FILE:", file);
 
     }
 
-console.log("CALLING EXPENSE ATTACHMENT API");
-    // =========================
-    // UPLOAD VIA VERCEL API
-    // =========================
+
+    // =================================
+    // UPLOAD KE VERCEL API
+    // =================================
+
+    console.log(
+      "CALL API:"
+    );
+
 
     const response =
       await fetch(
@@ -27873,12 +28143,20 @@ console.log("CALLING EXPENSE ATTACHMENT API");
       );
 
 
-    // =========================
-    // RESPONSE JSON
-    // =========================
+    console.log(
+      "API STATUS:",
+      response.status
+    );
+
 
     const result =
       await response.json();
+
+
+    console.log(
+      "API RESULT:",
+      result
+    );
 
 
     if (
@@ -27894,9 +28172,9 @@ console.log("CALLING EXPENSE ATTACHMENT API");
     }
 
 
-    // =========================
-    // URL
-    // =========================
+    // =================================
+    // URL HASIL UPLOAD
+    // =================================
 
     const url =
       result.url;
@@ -27912,14 +28190,14 @@ console.log("CALLING EXPENSE ATTACHMENT API");
 
 
     console.log(
-      "EXPENSE ATTACHMENT URL:",
+      "ATTACHMENT URL:",
       url
     );
 
 
-    // =========================
-    // SAVE URL TO DATABASE
-    // =========================
+    // =================================
+    // SIMPAN URL KE OPERATIONS
+    // =================================
 
     await updateExpenseAttachmentRPC({
 
@@ -27932,9 +28210,9 @@ console.log("CALLING EXPENSE ATTACHMENT API");
     });
 
 
-    // =========================
+    // =================================
     // SUCCESS
-    // =========================
+    // =================================
 
     showToast(
       "Attachment berhasil disimpan",
@@ -27942,16 +28220,12 @@ console.log("CALLING EXPENSE ATTACHMENT API");
     );
 
 
-    // =========================
-    // CLOSE MODAL
-    // =========================
-
     closeExpenseAddAttachmentModal();
 
 
-    // =========================
+    // =================================
     // CLEAR CACHE
-    // =========================
+    // =================================
 
     state.expenseDashboardData =
       null;
@@ -27960,14 +28234,19 @@ console.log("CALLING EXPENSE ATTACHMENT API");
       null;
 
 
-    // =========================
-    // RELOAD DATA
-    // =========================
+    // =================================
+    // RELOAD
+    // =================================
 
     await loadExpenseDashboard();
 
 
+    console.log(
+      "=== UPLOAD ATTACHMENT DONE ==="
+    );
+
   }
+
   catch (err) {
 
     console.error(
