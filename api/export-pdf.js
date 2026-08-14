@@ -4930,7 +4930,9 @@ else if (type === "cash-flow) {
     // =====================================================
     
     else if (type === "other-income") {
-    
+  console.log(
+    ">>> MASUK OTHER INCOME EXPORT <<<"
+  );
       if (!branchId) {
         return res.status(400).send(
           "branchId wajib diisi"
