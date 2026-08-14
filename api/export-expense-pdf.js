@@ -123,38 +123,33 @@ export default async function handler(req, res) {
     // =========================
 
     const filteredRows =
-      rows.filter(row => {
+  rows.filter(row => {
 
-        const matchBranch =
-          !branchId ||
-          branchId === "ALL" ||
-          normalize(row.branchId) ===
-            normalize(branchId);
+    const matchBranch =
+      normalize(row.branchId) ===
+      normalize(branchId);
 
+    const matchStatus =
+      !status ||
+      status === "ALL" ||
+      status === "All Status" ||
+      normalize(row.status) ===
+        normalize(status);
 
-        const matchStatus =
-          !status ||
-          status === "ALL" ||
-          status === "All Status" ||
-          normalize(row.status) ===
-            normalize(status);
+    const matchCategory =
+      !category ||
+      category === "ALL" ||
+      category === "All Categories" ||
+      normalize(row.category) ===
+        normalize(category);
 
+    return (
+      matchBranch &&
+      matchStatus &&
+      matchCategory
+    );
 
-        const matchCategory =
-          !category ||
-          category === "ALL" ||
-          category === "All Categories" ||
-          normalize(row.category) ===
-            normalize(category);
-
-
-        return (
-          matchBranch &&
-          matchStatus &&
-          matchCategory
-        );
-
-      });
+  });
 
 
     // =========================
