@@ -2539,65 +2539,59 @@ export default async function handler(req, res) {
     // =========================
 
     else if (type === "cash-flow") {
-      console.log(
-              ">>> MASUK CASH FLOW EXPORT <<<"
-            );
-        if (!branchId) {
-      
-          return res
-            .status(400)
-            .send("branchId wajib diisi");
-      
-        }
-           const {
-                start,
-                end,
-                branchId,
-                loginUserId
-              } = req.body || {};
-          
-              console.log(
-                "EXPORT CASH FLOW REQUEST:",
-                {
-                  loginUserId,
-                  branchId,
-                  start,
-                  end
-                }
-              );
-          
-              // VALIDATION
-              if (!loginUserId) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: "loginUserId wajib diisi"
-                  });
-              }
-          
-              if (!branchId) {
-                return res
-                  .status(400)
-                  .json({
-                    success: false,
-                    error: "branchId wajib diisi"
-                  });
-              }
-          
-              // GET CASH FLOW DATA
-              const {
-                data,
-                error
-              } = await supabase.rpc(
-                "get_cash_flow_page_data",
-                {
-                  p_login_user_id: loginUserId,
-                  p_branch_id: branchId,
-                  p_start: start || null,
-                  p_end: end || null
-                }
-              );
+
+          console.log(
+            ">>> MASUK CASH FLOW EXPORT <<<"
+          );
+        
+          console.log(
+            "EXPORT CASH FLOW REQUEST:",
+            {
+              loginUserId,
+              branchId,
+              start,
+              end
+            }
+          );
+        
+          // VALIDATION
+        
+          if (!loginUserId) {
+        
+            return res
+              .status(400)
+              .json({
+                success: false,
+                error: "loginUserId wajib diisi"
+              });
+        
+          }
+        
+          if (!branchId) {
+        
+            return res
+              .status(400)
+              .json({
+                success: false,
+                error: "branchId wajib diisi"
+              });
+        
+          }
+        
+          // GET CASH FLOW DATA
+        
+          const {
+            data,
+            error
+          } = await supabase.rpc(
+            "get_cash_flow_page_data",
+            {
+              p_login_user_id: loginUserId,
+              p_branch_id: branchId,
+              p_start: start || null,
+              p_end: end || null
+            }
+          );
           
               if (error) {
                 console.error(
