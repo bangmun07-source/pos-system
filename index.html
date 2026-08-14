@@ -30020,8 +30020,48 @@ document.addEventListener("click", function (e) {
 });
 
 async function exportOtherIncomePDF() {
+
   const f =
     getOtherIncomeFilters();
+
+  // =========================
+  // PAYLOAD
+  // =========================
+
+  const payload = {
+
+    type:
+      "other-income",
+
+    branchId:
+      state.branchId,
+
+    category:
+      f.category || "ALL",
+
+    status:
+      f.status || "ALL",
+
+    search:
+      f.keyword || "",
+
+    start:
+      f.startDate || null,
+
+    end:
+      f.endDate || null
+
+  };
+
+  console.log(
+    "EXPORT OTHER INCOME PAYLOAD:",
+    payload
+  );
+
+  // =========================
+  // OPEN WINDOW
+  // =========================
+
   const win =
     window.open(
       "",
@@ -30029,129 +30069,223 @@ async function exportOtherIncomePDF() {
     );
 
   if (!win) {
+
     alert(
       "Popup diblokir browser"
     );
+
     return;
   }
-  // ==================================
+
+  // =========================
   // LOADING
-  // ==================================
+  // =========================
 
   win.document.write(`
+    <!DOCTYPE html>
+
     <html>
-      <body style="
-        background:#0B0F14;
-        color:white;
-        font-family:Arial;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
+
+    <head>
+
+      <meta charset="UTF-8">
+
+      <title>
+        Other Income Report
+      </title>
+
+    </head>
+
+    <body style="
+      margin:0;
+      background:#0B0F14;
+      color:white;
+      font-family:Arial,sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+    ">
+
+      <div style="
+        text-align:center;
       ">
-        Generating Other Income Report...
-      </body>
+
+        <div style="
+          font-size:18px;
+          font-weight:bold;
+          margin-bottom:10px;
+        ">
+          Generating Other Income Report...
+        </div>
+
+        <div style="
+          font-size:13px;
+          opacity:.6;
+        ">
+          Please wait...
+        </div>
+
+      </div>
+
+    </body>
+
     </html>
   `);
 
   try {
-    // ==================================
-    // CALL VERCEL
-    // ==================================
+
+    // =========================
+    // REQUEST VERCEL API
+    // =========================
+
     const response =
       await fetch(
         "/api/export-pdf",
         {
-          method: "POST",
+
+          method:
+            "POST",
+
           headers: {
+
             "Content-Type":
               "application/json"
+
           },
 
-          body: JSON.stringify({
-			type: "other-income",
-            branchId: state.branchId,
-            category: f.category,
-            status: f.status,
-            search: f.keyword,
-            start: f.startDate,
-            end: f.endDate
+          body:
+            JSON.stringify(
+              payload
+            )
 
-          })
         }
       );
 
-    // ==================================
+    // =========================
     // CHECK RESPONSE
-    // ==================================
+    // =========================
+
     if (!response.ok) {
+
       const errorText =
         await response.text();
+
       throw new Error(
         errorText ||
         "Export Other Income gagal"
       );
+
     }
 
-    // ==================================
+    // =========================
     // GET HTML
-    // ==================================
+    // =========================
 
     const html =
       await response.text();
+
     if (!html) {
+
       throw new Error(
         "Response export kosong"
       );
+
     }
 
-    // ==================================
+    // =========================
     // SHOW REPORT
-    // ==================================
+    // =========================
 
     win.document.open();
+
     win.document.write(
       html
     );
+
     win.document.close();
+
   }
 
   catch (err) {
+
     console.error(
       "Export Other Income PDF:",
       err
     );
 
-    win.document.open();
-    win.document.write(`
-      <html>
-        <body style="
-          font-family:Arial;
-          padding:40px; ">
+    // =========================
+    // SHOW ERROR IN WINDOW
+    // =========================
 
-          <h2>
+    const errorMessage =
+      String(
+        err?.message ||
+        "Export PDF gagal"
+      );
+
+    win.document.open();
+
+    win.document.write(`
+      <!DOCTYPE html>
+
+      <html>
+
+      <head>
+
+        <meta charset="UTF-8">
+
+        <title>
+          Export Failed
+        </title>
+
+      </head>
+
+      <body style="
+        margin:0;
+        background:#0B0F14;
+        color:white;
+        font-family:Arial,sans-serif;
+        padding:40px;
+      ">
+
+        <div style="
+          max-width:900px;
+          margin:auto;
+          background:#151A21;
+          border:1px solid rgba(255,255,255,.1);
+          border-radius:14px;
+          padding:25px;
+        ">
+
+          <h2 style="
+            margin-top:0;
+          ">
             Export PDF Failed
           </h2>
 
-          <pre>
-						${String(
-						  err?.message ||
-						  "Export PDF gagal"
-						)}
-          </pre>
-        </body>
+          <pre style="
+            white-space:pre-wrap;
+            word-break:break-word;
+            color:#ffb4b4;
+          ">${errorMessage}</pre>
+
+        </div>
+
+      </body>
+
       </html>
     `);
 
     win.document.close();
+
     alert(
-      err?.message ||
-      "Export PDF gagal"
+      errorMessage
     );
+
   }
+
 }
-
-
 
     // ==================================
     // MEMBER & LOYALTY UPDATES
