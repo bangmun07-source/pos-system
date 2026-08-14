@@ -22,12 +22,16 @@ function escapeHtml(value) {
 }
 
 function normalize(value) {
-  return String(value || "")
+  return String(value ?? "")
     .trim()
     .toUpperCase();
 }
 
 export default async function handler(req, res) {
+
+  // ==========================================
+  // METHOD
+  // ==========================================
 
   if (req.method !== "POST") {
     return res
@@ -36,6 +40,10 @@ export default async function handler(req, res) {
   }
 
   try {
+
+    // ==========================================
+    // REQUEST
+    // ==========================================
 
     const {
       start,
@@ -46,9 +54,9 @@ export default async function handler(req, res) {
     } = req.body || {};
 
 
-    // =========================
+    // ==========================================
     // VALIDASI BRANCH
-    // =========================
+    // ==========================================
 
     if (!branchId) {
 
@@ -62,9 +70,41 @@ export default async function handler(req, res) {
     }
 
 
-    // =========================
-    // GET EXPENSE DATA
-    // =========================
+    // ==========================================
+    // NORMALIZE FILTER
+    // ==========================================
+
+    const normalizedStatus =
+      status === "All Status"
+        ? "ALL"
+        : status || "ALL";
+
+    const normalizedCategory =
+      category === "All Categories"
+        ? "ALL"
+        : category || "ALL";
+
+
+    console.log(
+      "=========================================="
+    );
+
+    console.log(
+      "EXPORT EXPENSE REQUEST"
+    );
+
+    console.log({
+      start: start || null,
+      end: end || null,
+      branchId,
+      status: normalizedStatus,
+      category: normalizedCategory
+    });
+
+
+    // ==========================================
+    // GET EXPENSE DASHBOARD
+    // ==========================================
 
     const {
       data,
@@ -72,18 +112,15 @@ export default async function handler(req, res) {
     } = await supabase.rpc(
       "get_expense_dashboard",
       {
+
         p_branch_id:
           branchId,
 
         p_status:
-          status === "All Status"
-            ? "ALL"
-            : status || "ALL",
+          normalizedStatus,
 
         p_category:
-          category === "All Categories"
-            ? "ALL"
-            : category || "ALL",
+          normalizedCategory,
 
         p_keyword:
           "",
@@ -93,12 +130,20 @@ export default async function handler(req, res) {
 
         p_end:
           end || null
+
       }
     );
 
 
     if (error) {
+
+      console.error(
+        "RPC get_expense_dashboard ERROR:",
+        error
+      );
+
       throw error;
+
     }
 
 
@@ -108,9 +153,9 @@ export default async function handler(req, res) {
     );
 
 
-    // =========================
-    // NORMALIZE
-    // =========================
+    // ==========================================
+    // NORMALIZE DATA
+    // ==========================================
 
     const rows =
       Array.isArray(data?.expenses)
@@ -118,56 +163,105 @@ export default async function handler(req, res) {
         : [];
 
 
-    // =========================
-    // FILTER
-    // =========================
-
-    const filteredRows =
-  rows.filter(row => {
-
-    const matchBranch =
-      normalize(row.branchId) ===
-      normalize(branchId);
-
-    const matchStatus =
-      !status ||
-      status === "ALL" ||
-      status === "All Status" ||
-      normalize(row.status) ===
-        normalize(status);
-
-    const matchCategory =
-      !category ||
-      category === "ALL" ||
-      category === "All Categories" ||
-      normalize(row.category) ===
-        normalize(category);
-
-    return (
-      matchBranch &&
-      matchStatus &&
-      matchCategory
+    console.log(
+      "EXPORT EXPENSE ROW COUNT:",
+      rows.length
     );
 
-  });
+
+    // ==========================================
+    // FILTER BRANCH / STATUS / CATEGORY
+    // ==========================================
+
+    const filteredRows =
+      rows.filter(row => {
+
+        const rowBranch =
+          row.branchId ??
+          row.branch_id ??
+          row.branchid ??
+          "";
+
+        const rowStatus =
+          row.status ??
+          row.Status ??
+          "";
+
+        const rowCategory =
+          row.category ??
+          row.Category ??
+          "";
 
 
-    // =========================
-    // PAID ROWS
-    // =========================
+        // --------------------------------------
+        // BRANCH
+        // --------------------------------------
 
-    const paidRows =
-      filteredRows.filter(row => {
+        const matchBranch =
+          normalize(rowBranch) ===
+          normalize(branchId);
 
-        return normalize(row.status) ===
-          "PAID";
+
+        // --------------------------------------
+        // STATUS
+        // --------------------------------------
+
+        const matchStatus =
+          normalizedStatus === "ALL" ||
+          normalizedStatus === "All Status" ||
+          normalize(rowStatus) ===
+            normalize(normalizedStatus);
+
+
+        // --------------------------------------
+        // CATEGORY
+        // --------------------------------------
+
+        const matchCategory =
+          normalizedCategory === "ALL" ||
+          normalizedCategory === "All Categories" ||
+          normalize(rowCategory) ===
+            normalize(normalizedCategory);
+
+
+        return (
+          matchBranch &&
+          matchStatus &&
+          matchCategory
+        );
 
       });
 
 
-    // =========================
+    console.log(
+      "FILTERED EXPENSE ROW COUNT:",
+      filteredRows.length
+    );
+
+
+    // ==========================================
+    // PAID ROWS
+    // ==========================================
+
+    const paidRows =
+      filteredRows.filter(row => {
+
+        const rowStatus =
+          row.status ??
+          row.Status ??
+          "";
+
+        return (
+          normalize(rowStatus) ===
+          "PAID"
+        );
+
+      });
+
+
+    // ==========================================
     // CATEGORY BREAKDOWN
-    // =========================
+    // ==========================================
 
     const categoryMap = {};
 
@@ -177,14 +271,15 @@ export default async function handler(req, res) {
     paidRows.forEach(row => {
 
       const categoryName =
-        row.category ||
-        row.Category ||
+        row.category ??
+        row.Category ??
         "Other";
+
 
       const amount =
         Number(
-          row.amount ||
-          row.Amount ||
+          row.amount ??
+          row.Amount ??
           0
         );
 
@@ -204,21 +299,25 @@ export default async function handler(req, res) {
     const categoryBreakdown =
       Object.entries(categoryMap)
         .map(
-          ([name, amount]) => ({
+          ([name, amount]) => {
 
-            name,
+            return {
 
-            amount,
+              name,
 
-            percent:
-              categoryTotal > 0
-                ? (
-                    amount /
-                    categoryTotal
-                  ) * 100
-                : 0
+              amount,
 
-          })
+              percent:
+                categoryTotal > 0
+                  ? (
+                      amount /
+                      categoryTotal
+                    ) * 100
+                  : 0
+
+            };
+
+          }
         )
         .sort(
           (a, b) =>
@@ -226,26 +325,31 @@ export default async function handler(req, res) {
         );
 
 
-    // =========================
+    // ==========================================
     // TOTAL EXPENDITURE
-    // =========================
+    // ==========================================
 
     const total =
       paidRows.reduce(
-        (sum, row) =>
-          sum +
-          Number(
-            row.amount ||
-            row.Amount ||
-            0
-          ),
+        (sum, row) => {
+
+          const amount =
+            Number(
+              row.amount ??
+              row.Amount ??
+              0
+            );
+
+          return sum + amount;
+
+        },
         0
       );
 
 
-    // =========================
+    // ==========================================
     // CATEGORY ROWS
-    // =========================
+    // ==========================================
 
     const categoryRows =
       categoryBreakdown.length
@@ -292,9 +396,9 @@ export default async function handler(req, res) {
           `;
 
 
-    // =========================
+    // ==========================================
     // LEDGER ROWS
-    // =========================
+    // ==========================================
 
     const ledgerRows =
       filteredRows.length
@@ -302,64 +406,92 @@ export default async function handler(req, res) {
         ? filteredRows
             .map(row => {
 
+              const date =
+                row.tanggal ??
+                row.date ??
+                "";
+
+              const refId =
+                row.refId ??
+                row.ref_id ??
+                "";
+
+              const description =
+                row.description ??
+                "";
+
+              const rowCategory =
+                row.category ??
+                row.Category ??
+                "";
+
+              const payment =
+                row.paymentMethod ??
+                row.payment_method ??
+                row.method ??
+                "";
+
+              const rowBranch =
+                row.branchId ??
+                row.branch_id ??
+                "";
+
+              const rowStatus =
+                row.status ??
+                row.Status ??
+                "";
+
+              const amount =
+                Number(
+                  row.amount ??
+                  row.Amount ??
+                  0
+                );
+
+
               return `
                 <tr>
 
                   <td>
+                    ${escapeHtml(date)}
+                  </td>
+
+                  <td>
+                    ${escapeHtml(refId)}
+                  </td>
+
+                  <td>
                     ${escapeHtml(
-                      row.tanggal ||
-                      row.date ||
-                      ""
+                      description
                     )}
                   </td>
 
                   <td>
                     ${escapeHtml(
-                      row.refId ||
-                      ""
+                      rowCategory
                     )}
                   </td>
 
                   <td>
                     ${escapeHtml(
-                      row.description ||
-                      ""
+                      payment
                     )}
                   </td>
 
                   <td>
                     ${escapeHtml(
-                      row.category ||
-                      ""
+                      rowBranch
                     )}
                   </td>
 
                   <td>
                     ${escapeHtml(
-                      row.paymentMethod ||
-                      row.method ||
-                      ""
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      row.branchId ||
-                      ""
-                    )}
-                  </td>
-
-                  <td>
-                    ${escapeHtml(
-                      row.status ||
-                      ""
+                      rowStatus
                     )}
                   </td>
 
                   <td class="right">
-                    Rp ${rupiah(
-                      row.amount
-                    )}
+                    Rp ${rupiah(amount)}
                   </td>
 
                 </tr>
@@ -382,17 +514,17 @@ export default async function handler(req, res) {
           `;
 
 
-    // =========================
+    // ==========================================
     // FILENAME
-    // =========================
+    // ==========================================
 
     const filename =
       `Expense Ledger Report - ${branchId} (${start || "-"} - ${end || "-"}).pdf`;
 
 
-    // =========================
+    // ==========================================
     // HTML REPORT
-    // =========================
+    // ==========================================
 
     const html = `
 <!DOCTYPE html>
@@ -417,8 +549,11 @@ export default async function handler(req, res) {
 
 html,
 body {
+
   margin: 0;
+
   padding: 0;
+
 }
 
 
@@ -437,6 +572,10 @@ body {
 
 }
 
+
+/* ==========================================
+   TOOLBAR
+========================================== */
 
 .export-toolbar {
 
@@ -490,6 +629,10 @@ body {
 }
 
 
+/* ==========================================
+   REPORT
+========================================== */
+
 .report {
 
   width: 100%;
@@ -515,6 +658,10 @@ body {
 
 }
 
+
+/* ==========================================
+   HEADER
+========================================== */
 
 .header {
 
@@ -561,6 +708,10 @@ body {
 }
 
 
+/* ==========================================
+   META
+========================================== */
+
 .meta {
 
   font-size:
@@ -574,6 +725,10 @@ body {
 
 }
 
+
+/* ==========================================
+   KPI
+========================================== */
 
 .kpi-grid {
 
@@ -644,6 +799,10 @@ body {
 }
 
 
+/* ==========================================
+   CARD
+========================================== */
+
 .card {
 
   border:
@@ -675,6 +834,10 @@ body {
 
 }
 
+
+/* ==========================================
+   TABLE
+========================================== */
 
 table {
 
@@ -744,6 +907,10 @@ td {
 }
 
 
+/* ==========================================
+   TOTAL
+========================================== */
+
 .total {
 
   margin-top:
@@ -760,6 +927,10 @@ td {
 
 }
 
+
+/* ==========================================
+   FOOTER
+========================================== */
 
 .footer {
 
@@ -778,6 +949,10 @@ td {
 }
 
 
+/* ==========================================
+   PAGE BREAK
+========================================== */
+
 .page-break {
 
   page-break-before:
@@ -785,6 +960,10 @@ td {
 
 }
 
+
+/* ==========================================
+   PRINT
+========================================== */
 
 @media print {
 
@@ -833,6 +1012,10 @@ td {
 <body>
 
 
+<!-- ==========================================
+     TOOLBAR
+========================================== -->
+
 <div class="export-toolbar">
 
   <div>
@@ -849,10 +1032,14 @@ td {
 </div>
 
 
+<!-- ==========================================
+     REPORT
+========================================== -->
+
 <div class="report">
 
 
-  <!-- LOGO -->
+  <!-- HEADER -->
 
   <div class="header">
 
@@ -880,25 +1067,25 @@ td {
 
   <div class="meta">
 
-    Periode:
+    <b>Periode:</b>
     ${escapeHtml(start || "-")}
     -
     ${escapeHtml(end || "-")}
 
     <br>
 
-    Branch:
+    <b>Branch:</b>
     ${escapeHtml(branchId)}
 
     <br>
 
-    Status:
-    ${escapeHtml(status)}
+    <b>Status:</b>
+    ${escapeHtml(normalizedStatus)}
 
     <br>
 
-    Category:
-    ${escapeHtml(category)}
+    <b>Category:</b>
+    ${escapeHtml(normalizedCategory)}
 
   </div>
 
@@ -937,7 +1124,7 @@ td {
   </div>
 
 
-  <!-- CATEGORY -->
+  <!-- CATEGORY BREAKDOWN -->
 
   <div class="card">
 
@@ -988,10 +1175,12 @@ td {
   </div>
 
 
-  <!-- LEDGER -->
+  <!-- PAGE BREAK -->
 
   <div class="page-break"></div>
 
+
+  <!-- EXPENSE LEDGER -->
 
   <div class="card">
 
@@ -1074,9 +1263,9 @@ td {
 `;
 
 
-    // =========================
+    // ==========================================
     // RETURN HTML
-    // =========================
+    // ==========================================
 
     res.setHeader(
       "Content-Type",
@@ -1090,12 +1279,27 @@ td {
   }
 
 
+  // ==========================================
+  // ERROR
+  // ==========================================
+
   catch (err) {
 
     console.error(
       "EXPORT EXPENSE ERROR:",
       err
     );
+
+    console.error(
+      "ERROR MESSAGE:",
+      err?.message
+    );
+
+    console.error(
+      "ERROR STACK:",
+      err?.stack
+    );
+
 
     return res
       .status(500)
