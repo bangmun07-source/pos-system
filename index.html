@@ -15654,23 +15654,18 @@ async function exportGrossRevenuePDF() {
     // =========================
 
     const response =
-      await fetch(
-        "/api/export-gross-revenue-pdf",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            branchId,
-            start,
-            end
-          })
-        }
-      );
+      await fetch("/api/export-pdf", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify({
+					type: "gross-revenue",
+					start,
+					end,
+					branchId
+				})
+			});
 
     // =========================
     // HTTP ERROR
@@ -35355,35 +35350,19 @@ async function exportCashFlowReport() {
     // =========================
 
     const response =
-      await fetch(
-        "/api/export-cash-flow-pdf",
-        {
-
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            loginUserId:
-              loginUserId,
-
-            branchId:
-              branch,
-
-            start:
-              startDate,
-
-            end:
-              endDate
-
-          })
-
-        }
-      );
+      await fetch("/api/export-pdf", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({
+				type: "cash-flow",
+          start,
+          end,
+          branchId,
+          loginUserId
+			})
+		});
 
     // =========================
     // HTTP ERROR
