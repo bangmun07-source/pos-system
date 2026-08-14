@@ -29416,20 +29416,21 @@ async function submitOtherIncome() {
 }
 
 document.addEventListener("click", function (e) {
+
   const btn =
     e.target.closest("#btnExportExpensePDF");
+
   if (!btn) return;
+
   exportExpensePDF();
+
 });
+
 
 async function exportExpensePDF() {
 
   const f =
     getExpenseFilters();
-
-  // =========================
-  // BRANCH LOGIN
-  // =========================
 
   const branchId =
     state?.branchId || "";
@@ -29444,8 +29445,9 @@ async function exportExpensePDF() {
     return;
   }
 
+
   // =========================
-  // OPEN WINDOW
+  // OPEN TAB
   // =========================
 
   const pdfWindow =
@@ -29464,87 +29466,93 @@ async function exportExpensePDF() {
     return;
   }
 
+
   // =========================
   // LOADING
   // =========================
 
   pdfWindow.document.write(`
 
+    <!DOCTYPE html>
+
     <html>
 
-      <head>
+    <head>
 
-        <title>
-          Generating Expense Report
-        </title>
+      <title>
+        Generating Expense Report...
+      </title>
 
-        <style>
+      <style>
 
-          body {
+        body {
 
-            margin: 0;
+          margin: 0;
 
-            background: #0B0F14;
+          height: 100vh;
 
-            color: white;
+          display: flex;
 
-            font-family: Arial, sans-serif;
+          align-items: center;
 
-            display: flex;
+          justify-content: center;
 
-            align-items: center;
+          background: #0B0F14;
 
-            justify-content: center;
+          color: white;
 
-            height: 100vh;
+          font-family: Arial, sans-serif;
 
-          }
+        }
 
-          .loading {
+        .loading {
 
-            text-align: center;
+          text-align: center;
 
-          }
+        }
 
-          .title {
+        .title {
 
-            font-size: 18px;
+          font-size: 18px;
 
-            font-weight: bold;
+          font-weight: bold;
 
-            margin-bottom: 8px;
-          }
+          margin-bottom: 8px;
 
-          .text {
+        }
 
-            font-size: 13px;
+        .text {
 
-            opacity: .7;
+          font-size: 13px;
 
-          }
+          opacity: .7;
 
-        </style>
+        }
 
-      </head>
+      </style>
 
-      <body>
-        <div class="loading">
+    </head>
 
-          <div class="title">
-            Expense Report
-          </div>
+    <body>
 
-          <div class="text">
-            Generating report...
-          </div>
+      <div class="loading">
 
+        <div class="title">
+          Expense Report
         </div>
 
-      </body>
+        <div class="text">
+          Generating report...
+        </div>
+
+      </div>
+
+    </body>
 
     </html>
 
   `);
+
 
   try {
 
@@ -29553,19 +29561,28 @@ async function exportExpensePDF() {
     // =========================
 
     console.log(
-      "EXPORT EXPENSE:",
+      "EXPORT EXPENSE REQUEST:",
       {
         branchId,
+
         start:
-          f?.startDate || "",
+          f?.startDate || null,
+
         end:
-          f?.endDate || "",
+          f?.endDate || null,
+
         status:
-          f?.status || "ALL",
+          f?.status === "All Status"
+            ? "ALL"
+            : f?.status || "ALL",
+
         category:
-          f?.category || "ALL"
+          f?.category === "All Categories"
+            ? "ALL"
+            : f?.category || "ALL"
       }
     );
+
 
     // =========================
     // CALL VERCEL API
@@ -29585,36 +29602,36 @@ async function exportExpensePDF() {
 
           },
 
-          body: JSON.stringify({
+          body:
+            JSON.stringify({
 
-            branchId:
-              branchId,
+              branchId:
+                branchId,
 
-            start:
-              f?.startDate || null,
+              start:
+                f?.startDate || null,
 
-            end:
-              f?.endDate || null,
+              end:
+                f?.endDate || null,
 
-            status:
-              f?.status ===
-              "All Status"
-                ? "ALL"
-                : f?.status || "ALL",
+              status:
+                f?.status === "All Status"
+                  ? "ALL"
+                  : f?.status || "ALL",
 
-            category:
-              f?.category ===
-              "All Categories"
-                ? "ALL"
-                : f?.category || "ALL"
+              category:
+                f?.category === "All Categories"
+                  ? "ALL"
+                  : f?.category || "ALL"
 
-          })
+            })
 
         }
       );
 
+
     // =========================
-    // HTTP ERROR
+    // CHECK RESPONSE
     // =========================
 
     if (!response.ok) {
@@ -29629,12 +29646,14 @@ async function exportExpensePDF() {
 
     }
 
+
     // =========================
     // GET HTML
     // =========================
 
     const html =
       await response.text();
+
 
     if (!html) {
 
@@ -29644,12 +29663,14 @@ async function exportExpensePDF() {
 
     }
 
+
     console.log(
       "EXPORT EXPENSE HTML RECEIVED"
     );
 
+
     // =========================
-    // RENDER REPORT
+    // RENDER
     // =========================
 
     pdfWindow.document.open();
@@ -29662,65 +29683,77 @@ async function exportExpensePDF() {
 
   }
 
+
   catch (err) {
 
     console.error(
-      "Export Expense:",
+      "Export Expense PDF:",
       err
     );
+
 
     // =========================
     // ERROR PAGE
     // =========================
 
     pdfWindow.document.open();
+
     pdfWindow.document.write(`
+
+      <!DOCTYPE html>
+
       <html>
-        <body style="
-          background:#0B0F14;
-          color:white;
-          font-family:Arial;
-          padding:40px;
+
+      <body style="
+        background:#0B0F14;
+        color:white;
+        font-family:Arial;
+        padding:40px;
+      ">
+
+        <h2>
+          Export Failed
+        </h2>
+
+        <p style="
+          color:#aaa;
         ">
+          Gagal membuat Expense Report.
+        </p>
 
-          <h2>
-            Export Failed
-          </h2>
-          <p style="
-            color:#aaa;
-          ">
-            Gagal membuat Expense Report.
-          </p>
-
-          <pre style="
-            white-space:pre-wrap;
-            background:#151A21;
-            padding:15px;
-            border-radius:10px;
-          ">${String(
-            err?.message ||
-            err
+        <pre style="
+          white-space:pre-wrap;
+          background:#151A21;
+          padding:15px;
+          border-radius:10px;
+        ">${String(
+          err?.message ||
+          err ||
+          "Unknown error"
+        )
+          .replace(
+            /&/g,
+            "&amp;"
           )
-            .replace(
-              /&/g,
-              "&amp;"
-            )
-            .replace(
-              /</g,
-              "&lt;"
-            )
-            .replace(
-              />/g,
-              "&gt;"
-            )}</pre>
+          .replace(
+            /</g,
+            "&lt;"
+          )
+          .replace(
+            />/g,
+            "&gt;"
+          )}</pre>
 
-        </body>
+      </body>
 
       </html>
 
     `);
+
     pdfWindow.document.close();
+
   }
+
 }
 
 function paginate(data) {
