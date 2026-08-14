@@ -5405,836 +5405,1254 @@ export default async function handler(req, res) {
       
       
       
-   // ==========================================
-  // ANALYTICS
-  // ==========================================
-  
-  else if (type === "analytics") {
-  
-    console.log(
-      ">>> MASUK ANALYTICS EXPORT <<<"
-    );
-  
-    console.log(
-      "ANALYTICS REQUEST:",
-      {
-        start,
-        end,
-        branchId
-      }
-    );
-  
-    // =========================
-    // VALIDATION
-    // =========================
-  
-    if (!branchId) {
-  
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "branchId wajib diisi"
-        });
-  
+// ==========================================
+// ANALYTICS
+// ==========================================
+
+else if (type === "analytics") {
+
+  console.log(
+    ">>> MASUK ANALYTICS EXPORT <<<"
+  );
+
+  console.log(
+    "ANALYTICS REQUEST:",
+    {
+      start,
+      end,
+      branchId
     }
-  
-    // =========================
-    // GET ANALYTICS DASHBOARD
-    // =========================
-  
-    const {
-      data,
+  );
+
+  // =========================
+  // VALIDATION
+  // =========================
+
+  if (!branchId) {
+
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: "branchId wajib diisi"
+      });
+
+  }
+
+  // =========================
+  // GET ANALYTICS DASHBOARD
+  // =========================
+
+  const {
+    data,
+    error
+  } = await supabase.rpc(
+    "get_analytics_dashboard",
+    {
+      p_branch_id: branchId,
+      p_start: start || null,
+      p_end: end || null
+    }
+  );
+
+  if (error) {
+
+    console.error(
+      "ANALYTICS RPC ERROR:",
       error
-    } = await supabase.rpc(
-      "get_analytics_dashboard",
-      {
-        p_branch_id: branchId,
-        p_start: start || null,
-        p_end: end || null
-      }
     );
-  
-    if (error) {
-  
-      console.error(
-        "ANALYTICS RPC ERROR:",
-        error
-      );
-  
-      throw error;
-  
+
+    throw error;
+
+  }
+
+  console.log(
+    "ANALYTICS RPC DATA:",
+    data
+  );
+
+  // =========================
+  // NORMALIZE
+  // =========================
+
+  const report =
+    data || {};
+
+  const analytics =
+    report.analytics || {};
+
+  const weekly =
+    Array.isArray(
+      analytics.weekly
+    )
+      ? analytics.weekly
+      : [];
+
+  const peakHours =
+    Array.isArray(
+      report.peakHours
+    )
+      ? report.peakHours
+      : [];
+
+  const topSelling =
+    Array.isArray(
+      report.topSelling
+    )
+      ? report.topSelling
+      : [];
+
+  const paymentDistribution =
+    Array.isArray(
+      report.paymentDistribution
+    )
+      ? report.paymentDistribution
+      : [];
+
+  const rawMaterials =
+    Array.isArray(
+      report.rawMaterials
+    )
+      ? report.rawMaterials
+      : [];
+
+  console.log(
+    "ANALYTICS NORMALIZED:",
+    {
+      analytics,
+      weeklyCount:
+        weekly.length,
+      peakHoursCount:
+        peakHours.length,
+      topSellingCount:
+        topSelling.length,
+      paymentDistributionCount:
+        paymentDistribution.length,
+      rawMaterialsCount:
+        rawMaterials.length
     }
-  
-    console.log(
-      "ANALYTICS RPC DATA:",
-      data
+  );
+
+  // =========================
+  // KPI
+  // =========================
+
+  const revenue =
+    Number(
+      analytics.revenue || 0
     );
-  
-    // =========================
-    // NORMALIZE
-    // =========================
-  
-    const report =
-      data || {};
-  
-    console.log(
-      "ANALYTICS REPORT:",
-      report
+
+  const hpp =
+    Number(
+      analytics.hpp || 0
     );
-  
-    console.log(
-      "ANALYTICS DATA KEYS:",
-      Object.keys(report)
+
+  const netProfit =
+    Number(
+      analytics.netProfit || 0
     );
-  
-    // =========================
-    // SAFE NORMALIZE
-    // =========================
-  
-    const summary =
-      report.summary || {};
-  
-    const weekly =
-      Array.isArray(report.weekly)
-        ? report.weekly
-        : [];
-  
-    const peakHours =
-      Array.isArray(report.peakHours)
-        ? report.peakHours
-        : [];
-  
-    const topProducts =
-      Array.isArray(report.topProducts)
-        ? report.topProducts
-        : [];
-  
-    // =========================
-    // DEBUG
-    // =========================
-  
-    console.log(
-      "ANALYTICS NORMALIZED:",
-      {
-        summary,
-        weeklyCount:
-          weekly.length,
-        peakHoursCount:
-          peakHours.length,
-        topProductsCount:
-          topProducts.length
+
+  const growth =
+    Number(
+      analytics.growth || 0
+    );
+
+  // =========================
+  // WEEKLY ROWS
+  // =========================
+
+  const weeklyRows =
+    weekly.length
+
+      ? weekly
+          .map(item => {
+
+            const day =
+              item.day ??
+              item.date ??
+              item.name ??
+              "-";
+
+            const amount =
+              Number(
+                item.revenue ??
+                item.total ??
+                item.amount ??
+                0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${escapeHtml(day)}
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
+
+              </tr>
+            `;
+
+          })
+          .join("")
+
+      : `
+          <tr>
+
+            <td
+              colspan="2"
+              class="empty"
+            >
+              No weekly data
+            </td>
+
+          </tr>
+        `;
+
+  // =========================
+  // PEAK HOURS
+  // =========================
+  //
+  // Struktur:
+  //
+  // peakHours = [
+  //   Array(24),
+  //   Array(24),
+  //   ...
+  // ]
+  //
+  // Kita flatten semua data
+  // menjadi satu daftar jam.
+  // =========================
+
+  const peakHourMap = {};
+
+  peakHours.forEach(day => {
+
+    if (!Array.isArray(day)) {
+      return;
+    }
+
+    day.forEach((value, hour) => {
+
+      const amount =
+        Number(value || 0);
+
+      if (!peakHourMap[hour]) {
+        peakHourMap[hour] = 0;
       }
-    );
-  
-    // =========================
-    // TEST ROWS
-    // =========================
-  
-    const weeklyRows =
-      weekly.length
-  
-        ? weekly
-            .map(item => {
-  
-              return `
-                <tr>
-  
-                  <td>
-                    ${escapeHtml(
-                      item.date ??
-                      item.day ??
-                      "-"
-                    )}
-                  </td>
-  
-                  <td class="right">
-                    ${rupiah(
-                      item.total ??
-                      item.revenue ??
-                      item.amount ??
-                      0
-                    )}
-                  </td>
-  
-                </tr>
-              `;
-  
-            })
-            .join("")
-  
-        : `
-            <tr>
-  
-              <td
-                colspan="2"
-                class="empty"
-              >
-                No weekly data
-              </td>
-  
-            </tr>
-          `;
-  
-  
-    const peakHourRows =
-      peakHours.length
-  
-        ? peakHours
-            .map(item => {
-  
-              return `
-                <tr>
-  
-                  <td>
-                    ${escapeHtml(
-                      item.hour ??
-                      item.time ??
-                      item.jam ??
-                      "-"
-                    )}
-                  </td>
-  
-                  <td class="right">
-                    ${rupiah(
-                      item.total ??
-                      item.revenue ??
-                      item.amount ??
-                      item.orders ??
-                      0
-                    )}
-                  </td>
-  
-                </tr>
-              `;
-  
-            })
-            .join("")
-  
-        : `
-            <tr>
-  
-              <td
-                colspan="2"
-                class="empty"
-              >
-                No peak hour data
-              </td>
-  
-            </tr>
-          `;
-  
-  
-    const productRows =
-      topProducts.length
-  
-        ? topProducts
-            .map(item => {
-  
-              return `
-                <tr>
-  
-                  <td>
-                    ${escapeHtml(
-                      item.name ??
-                      item.product ??
-                      item.productName ??
-                      "-"
-                    )}
-                  </td>
-  
-                  <td class="right">
-                    ${rupiah(
-                      item.revenue ??
-                      item.total ??
-                      item.amount ??
-                      0
-                    )}
-                  </td>
-  
-                </tr>
-              `;
-  
-            })
-            .join("")
-  
-        : `
-            <tr>
-  
-              <td
-                colspan="2"
-                class="empty"
-              >
-                No product data
-              </td>
-  
-            </tr>
-          `;
-  
-    // =========================
-    // TEST HTML
-    // =========================
-  
-    const html = `
-  
-  <!DOCTYPE html>
-  
-  <html>
-  
-  <head>
-  
-  <meta charset="UTF-8">
-  
-  <title>
-    Analytics Report
-  </title>
-  
-  <style>
-  
-  * {
-    box-sizing: border-box;
-  }
-  
-  html,
+
+      peakHourMap[hour] += amount;
+
+    });
+
+  });
+
+  const peakHourEntries =
+    Object.entries(
+      peakHourMap
+    )
+      .map(
+        ([hour, amount]) => ({
+          hour:
+            Number(hour),
+          amount:
+            Number(amount || 0)
+        })
+      )
+      .sort(
+        (a, b) =>
+          b.amount - a.amount
+      );
+
+  const peakHourRows =
+    peakHourEntries.length
+
+      ? peakHourEntries
+          .map(item => {
+
+            const hour =
+              String(
+                item.hour
+              ).padStart(
+                2,
+                "0"
+              );
+
+            const nextHour =
+              String(
+                (item.hour + 1) % 24
+              ).padStart(
+                2,
+                "0"
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${hour}:00 -
+                  ${nextHour}:00
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(
+                    item.amount
+                  )}
+                </td>
+
+              </tr>
+            `;
+
+          })
+          .join("")
+
+      : `
+          <tr>
+
+            <td
+              colspan="2"
+              class="empty"
+            >
+              No peak hour data
+            </td>
+
+          </tr>
+        `;
+
+  // =========================
+  // TOP SELLING ROWS
+  // =========================
+
+  const topSellingRows =
+    topSelling.length
+
+      ? topSelling
+          .map(item => {
+
+            const name =
+              item.name ??
+              item.product ??
+              item.productName ??
+              item.nama ??
+              "-";
+
+            const quantity =
+              Number(
+                item.quantity ??
+                item.qty ??
+                item.totalQty ??
+                item.total_quantity ??
+                0
+              );
+
+            const amount =
+              Number(
+                item.revenue ??
+                item.totalRevenue ??
+                item.total ??
+                item.amount ??
+                0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${escapeHtml(name)}
+                </td>
+
+                <td class="right">
+                  ${rupiah(quantity)}
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
+
+              </tr>
+            `;
+
+          })
+          .join("")
+
+      : `
+          <tr>
+
+            <td
+              colspan="3"
+              class="empty"
+            >
+              No top selling data
+            </td>
+
+          </tr>
+        `;
+
+  // =========================
+  // PAYMENT DISTRIBUTION
+  // =========================
+
+  const paymentRows =
+    paymentDistribution.length
+
+      ? paymentDistribution
+          .map(item => {
+
+            const name =
+              item.name ??
+              item.method ??
+              item.paymentMethod ??
+              item.payment_method ??
+              item.type ??
+              "-";
+
+            const amount =
+              Number(
+                item.amount ??
+                item.total ??
+                item.value ??
+                item.revenue ??
+                0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${escapeHtml(name)}
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
+
+              </tr>
+            `;
+
+          })
+          .join("")
+
+      : `
+          <tr>
+
+            <td
+              colspan="2"
+              class="empty"
+            >
+              No payment data
+            </td>
+
+          </tr>
+        `;
+
+  // =========================
+  // RAW MATERIALS
+  // =========================
+
+  const rawMaterialRows =
+    rawMaterials.length
+
+      ? rawMaterials
+          .map(item => {
+
+            const name =
+              item.name ??
+              item.ingredient ??
+              item.ingredientName ??
+              item.nama ??
+              "-";
+
+            const amount =
+              Number(
+                item.amount ??
+                item.total ??
+                item.cost ??
+                item.value ??
+                0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${escapeHtml(name)}
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
+
+              </tr>
+            `;
+
+          })
+          .join("")
+
+      : `
+          <tr>
+
+            <td
+              colspan="2"
+              class="empty"
+            >
+              No raw material data
+            </td>
+
+          </tr>
+        `;
+
+  // =========================
+  // FILENAME
+  // =========================
+
+  const filename =
+    `Analytics Report - ${branchId} (${start || "-"} - ${end || "-"}).pdf`;
+
+  // =========================
+  // HTML
+  // =========================
+
+  const html = `
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+  ${escapeHtml(filename)}
+</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+
+  background: #0B0F14;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  color: #333;
+
+  padding:
+    40px 20px;
+}
+
+.export-toolbar {
+
+  width: 100%;
+
+  max-width:
+    1100px;
+
+  margin:
+    0 auto 20px auto;
+
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  color: white;
+
+  font-size: 14px;
+}
+
+.export-toolbar button {
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
+  background:
+    rgba(255,255,255,.08);
+
+  color: white;
+
+  padding:
+    10px 16px;
+
+  border-radius:
+    10px;
+
+  cursor:
+    pointer;
+
+  font-weight:
+    bold;
+}
+
+.report {
+
+  width: 100%;
+
+  max-width:
+    1100px;
+
+  margin:
+    0 auto;
+
+  background:
+    white;
+
+  padding:
+    45px;
+
+  border-radius:
+    4px;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.45);
+}
+
+.header {
+
+  text-align:
+    center;
+
+  margin-bottom:
+    25px;
+}
+
+.logo {
+
+  width:
+    170px;
+
+  height:
+    auto;
+
+  max-height:
+    90px;
+
+  object-fit:
+    contain;
+
+  margin-bottom:
+    12px;
+}
+
+.title {
+
+  font-size:
+    24px;
+
+  font-weight:
+    bold;
+
+  margin-bottom:
+    8px;
+}
+
+.subtitle {
+
+  font-size:
+    12px;
+
+  color:
+    #777;
+
+  margin-bottom:
+    3px;
+}
+
+.kpi-grid {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap:
+    16px;
+
+  margin:
+    30px 0;
+}
+
+.kpi-card {
+
+  border:
+    1px solid
+    #e5e5e5;
+
+  border-radius:
+    14px;
+
+  padding:
+    22px;
+
+  background:
+    #fafafa;
+
+  text-align:
+    center;
+}
+
+.kpi-title {
+
+  font-size:
+    11px;
+
+  color:
+    #666;
+
+  font-weight:
+    bold;
+
+  margin-bottom:
+    12px;
+}
+
+.kpi-value {
+
+  font-size:
+    22px;
+
+  font-weight:
+    bold;
+
+  color:
+    #222;
+}
+
+.card {
+
+  border:
+    1px solid
+    #e5e5e5;
+
+  border-radius:
+    14px;
+
+  padding:
+    18px;
+
+  margin-top:
+    20px;
+
+  background:
+    #fff;
+}
+
+.card h3 {
+
+  margin:
+    0 0 12px 0;
+
+  font-size:
+    16px;
+}
+
+table {
+
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+
+  font-size:
+    11px;
+
+  margin-top:
+    10px;
+}
+
+th {
+
+  background:
+    #f5f5f5;
+
+  padding:
+    10px;
+
+  text-align:
+    left;
+
+  font-weight:
+    bold;
+}
+
+td {
+
+  padding:
+    10px;
+
+  border-bottom:
+    1px solid
+    #eee;
+}
+
+.right {
+
+  text-align:
+    right;
+}
+
+.empty {
+
+  text-align:
+    center;
+
+  color:
+    #777;
+
+  padding:
+    25px;
+}
+
+.page-break {
+
+  page-break-before:
+    always;
+}
+
+.footer {
+
+  margin-top:
+    40px;
+
+  text-align:
+    center;
+
+  font-size:
+    9px;
+
+  color:
+    #888;
+}
+
+@media print {
+
   body {
-    margin: 0;
-    padding: 0;
-  }
-  
-  body {
-  
-    background: #0B0F14;
-  
-    font-family:
-      Arial,
-      sans-serif;
-  
-    color: #333;
-  
-    padding:
-      40px 20px;
-  }
-  
-  .export-toolbar {
-  
-    width: 100%;
-  
-    max-width:
-      1100px;
-  
-    margin:
-      0 auto 20px auto;
-  
-    display:
-      flex;
-  
-    justify-content:
-      space-between;
-  
-    align-items:
-      center;
-  
-    color: white;
-  
-    font-size: 14px;
-  }
-  
-  .export-toolbar button {
-  
-    border:
-      1px solid
-      rgba(255,255,255,.15);
-  
-    background:
-      rgba(255,255,255,.08);
-  
-    color: white;
-  
-    padding:
-      10px 16px;
-  
-    border-radius:
-      10px;
-  
-    cursor:
-      pointer;
-  
-    font-weight:
-      bold;
-  }
-  
-  .report {
-  
-    width: 100%;
-  
-    max-width:
-      1100px;
-  
-    margin:
-      0 auto;
-  
+
     background:
       white;
-  
+
     padding:
-      45px;
-  
-    border-radius:
-      4px;
-  
+      0;
+  }
+
+  .export-toolbar {
+
+    display:
+      none;
+  }
+
+  .report {
+
+    max-width:
+      none;
+
     box-shadow:
-      0 20px 60px
-      rgba(0,0,0,.45);
-  }
-  
-  .header {
-  
-    text-align:
-      center;
-  
-    margin-bottom:
-      25px;
-  }
-  
-  .logo {
-  
-    width:
-      170px;
-  
-    height:
-      auto;
-  
-    max-height:
-      90px;
-  
-    object-fit:
-      contain;
-  
-    margin-bottom:
-      12px;
-  }
-  
-  .title {
-  
-    font-size:
-      24px;
-  
-    font-weight:
-      bold;
-  
-    margin-bottom:
-      8px;
-  }
-  
-  .subtitle {
-  
-    font-size:
-      12px;
-  
-    color:
-      #777;
-  
-    margin-bottom:
-      3px;
-  }
-  
-  .card {
-  
-    border:
-      1px solid
-      #e5e5e5;
-  
+      none;
+
     border-radius:
-      14px;
-  
-    padding:
-      18px;
-  
-    margin-top:
-      20px;
-  
-    background:
-      #fff;
-  }
-  
-  .card h3 {
-  
-    margin:
-      0 0 12px 0;
-  
-    font-size:
-      16px;
-  }
-  
-  table {
-  
-    width:
-      100%;
-  
-    border-collapse:
-      collapse;
-  
-    font-size:
-      11px;
-  
-    margin-top:
-      10px;
-  }
-  
-  th {
-  
-    background:
-      #f5f5f5;
-  
-    padding:
-      10px;
-  
-    text-align:
-      left;
-  
-    font-weight:
-      bold;
-  }
-  
-  td {
-  
-    padding:
-      10px;
-  
-    border-bottom:
-      1px solid
-      #eee;
-  }
-  
-  .right {
-  
-    text-align:
-      right;
-  }
-  
-  .empty {
-  
-    text-align:
-      center;
-  
-    color:
-      #777;
-  
+      0;
+
     padding:
       25px;
   }
-  
-  .footer {
-  
-    margin-top:
-      40px;
-  
-    text-align:
-      center;
-  
-    font-size:
-      9px;
-  
-    color:
-      #888;
-  }
-  
-  @media print {
-  
-    body {
-  
-      background:
-        white;
-  
-      padding:
-        0;
-    }
-  
-    .export-toolbar {
-  
-      display:
-        none;
-    }
-  
-    .report {
-  
-      max-width:
-        none;
-  
-      box-shadow:
-        none;
-  
-      border-radius:
-        0;
-  
-      padding:
-        25px;
-    }
-  
-  }
-  
-  </style>
-  
-  </head>
-  
-  <body>
-  
-  <div class="export-toolbar">
-  
-    <div>
-      📊 Analytics Report
-    </div>
-  
-    <button
-      onclick="window.print()"
-    >
-      Download / Print PDF
-    </button>
-  
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- TOOLBAR -->
+
+<div class="export-toolbar">
+
+  <div>
+    📊 Analytics Report
   </div>
-  
-  <div class="report">
-  
-    <div class="header">
-  
-      ${
-        logoSrc
-          ? `
-            <img
-              src="${logoSrc}"
-              class="logo"
-              alt="Sistem POS"
-            />
-          `
-          : ""
-      }
-  
-      <div class="title">
-        Analytics Report
-      </div>
-  
-      <div class="subtitle">
-        Periode:
-        ${escapeHtml(start || "-")}
-        -
-        ${escapeHtml(end || "-")}
-      </div>
-  
-      <div class="subtitle">
-        Branch:
-        ${escapeHtml(branchId)}
-      </div>
-  
+
+  <button
+    onclick="window.print()"
+  >
+    Download / Print PDF
+  </button>
+
+</div>
+
+
+<!-- REPORT -->
+
+<div class="report">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    ${
+      logoSrc
+        ? `
+          <img
+            src="${logoSrc}"
+            class="logo"
+            alt="Sistem POS"
+          />
+        `
+        : ""
+    }
+
+    <div class="title">
+      Analytics Report
     </div>
-  
-  
-    <!-- SUMMARY -->
-  
-    <div class="card">
-  
-      <h3>
-        Summary
-      </h3>
-  
-      <table>
-  
-        <tbody>
-  
-          <tr>
-  
-            <td>
-              Revenue
-            </td>
-  
-            <td class="right">
-              IDR ${rupiah(
-                summary.revenue ??
-                summary.totalRevenue ??
-                0
-              )}
-            </td>
-  
-          </tr>
-  
-          <tr>
-  
-            <td>
-              Orders
-            </td>
-  
-            <td class="right">
-              ${rupiah(
-                summary.orders ??
-                summary.totalOrders ??
-                0
-              )}
-            </td>
-  
-          </tr>
-  
-          <tr>
-  
-            <td>
-              AOV
-            </td>
-  
-            <td class="right">
-              IDR ${rupiah(
-                summary.aov ??
-                0
-              )}
-            </td>
-  
-          </tr>
-  
-        </tbody>
-  
-      </table>
-  
+
+    <div class="subtitle">
+
+      Periode:
+
+      ${escapeHtml(
+        start || "-"
+      )}
+
+      -
+
+      ${escapeHtml(
+        end || "-"
+      )}
+
     </div>
-  
-  
-    <!-- WEEKLY -->
-  
-    <div class="card">
-  
-      <h3>
-        Weekly Revenue
-      </h3>
-  
-      <table>
-  
-        <thead>
-  
-          <tr>
-  
-            <th>
-              Date
-            </th>
-  
-            <th class="right">
-              Revenue
-            </th>
-  
-          </tr>
-  
-        </thead>
-  
-        <tbody>
-  
-          ${weeklyRows}
-  
-        </tbody>
-  
-      </table>
-  
+
+    <div class="subtitle">
+
+      Branch:
+
+      ${escapeHtml(
+        branchId
+      )}
+
     </div>
-  
-  
-    <!-- PEAK HOURS -->
-  
-    <div class="card">
-  
-      <h3>
-        Peak Hours
-      </h3>
-  
-      <table>
-  
-        <thead>
-  
-          <tr>
-  
-            <th>
-              Hour
-            </th>
-  
-            <th class="right">
-              Value
-            </th>
-  
-          </tr>
-  
-        </thead>
-  
-        <tbody>
-  
-          ${peakHourRows}
-  
-        </tbody>
-  
-      </table>
-  
-    </div>
-  
-  
-    <!-- TOP PRODUCTS -->
-  
-    <div class="card">
-  
-      <h3>
-        Top Products
-      </h3>
-  
-      <table>
-  
-        <thead>
-  
-          <tr>
-  
-            <th>
-              Product
-            </th>
-  
-            <th class="right">
-              Revenue
-            </th>
-  
-          </tr>
-  
-        </thead>
-  
-        <tbody>
-  
-          ${productRows}
-  
-        </tbody>
-  
-      </table>
-  
-    </div>
-  
-  
-    <div class="footer">
-  
-      Generated by Sistem POS
-      •
-      ${new Date().toLocaleString("id-ID")}
-  
-    </div>
-  
+
   </div>
-  
-  </body>
-  
-  </html>
-  
-  `;
-  
-    // =========================
-    // RETURN HTML
-    // =========================
-  
-    res.setHeader(
-      "Content-Type",
-      "text/html; charset=utf-8"
-    );
-  
-    return res
-      .status(200)
-      .send(html);
-  
-  }
+
+
+  <!-- KPI -->
+
+  <div class="kpi-grid">
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        REVENUE
+      </div>
+
+      <div class="kpi-value">
+
+        IDR ${rupiah(
+          revenue
+        )}
+
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        HPP
+      </div>
+
+      <div class="kpi-value">
+
+        IDR ${rupiah(
+          hpp
+        )}
+
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        NET PROFIT
+      </div>
+
+      <div class="kpi-value">
+
+        IDR ${rupiah(
+          netProfit
+        )}
+
+      </div>
+
+    </div>
+
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        GROWTH
+      </div>
+
+      <div class="kpi-value">
+
+        ${growth.toFixed(2)}%
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <!-- WEEKLY -->
+
+  <div class="card">
+
+    <h3>
+      Weekly Revenue
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Day
+          </th>
+
+          <th class="right">
+            Revenue
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${weeklyRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- PAYMENT -->
+
+  <div class="card">
+
+    <h3>
+      Payment Distribution
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Payment Method
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${paymentRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- TOP SELLING -->
+
+  <div class="card">
+
+    <h3>
+      Top Selling Products
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Product
+          </th>
+
+          <th class="right">
+            Quantity
+          </th>
+
+          <th class="right">
+            Revenue
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${topSellingRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- PEAK HOURS -->
+
+  <div class="card page-break">
+
+    <h3>
+      Peak Hours
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Hour
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${peakHourRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- RAW MATERIAL -->
+
+  <div class="card">
+
+    <h3>
+      Raw Materials
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Material
+          </th>
+
+          <th class="right">
+            Amount
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${rawMaterialRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- FOOTER -->
+
+  <div class="footer">
+
+    Generated by Sistem POS
+    •
+    ${new Date().toLocaleString(
+      "id-ID"
+    )}
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+
+`;
+
+  // =========================
+  // RETURN HTML
+  // =========================
+
+  res.setHeader(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+
+  return res
+    .status(200)
+    .send(html);
+
+}
 
     
 
