@@ -27169,12 +27169,22 @@ document.addEventListener("input",function(e){
 
 async function saveExpenseBudget() {
 
+  const branchId =
+    state.branchId;
+
+  if (!branchId) {
+    showToast(
+      "Branch belum tersedia.",
+      "error"
+    );
+    return;
+  }
+
   const payload = {
 
     branchId:
-      document.getElementById(
-        "budgetBranch"
-      ).value,
+
+      branchId,
 
     Month:
       document.getElementById(
@@ -27190,6 +27200,7 @@ async function saveExpenseBudget() {
   };
 
   try {
+
     await saveExpenseBudgetRPC(
       payload
     );
@@ -27202,12 +27213,15 @@ async function saveExpenseBudget() {
 
     // LOAD ULANG
     await loadExpenseDashboard();
+
     showToast(
       "Budget berhasil disimpan."
     );
+
   }
 
   catch (err) {
+
     console.error(
       "Save Expense Budget:",
       err
@@ -27215,7 +27229,8 @@ async function saveExpenseBudget() {
 
     showToast(
       err?.message ||
-      "Gagal menyimpan budget."
+      "Gagal menyimpan budget.",
+      "error"
     );
   }
 }
