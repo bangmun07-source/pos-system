@@ -27757,12 +27757,12 @@ function removeExpenseAttachment() {
 
 
 async function uploadExpenseAttachment() {
-
+  console.log("=== UPLOAD EXPENSE ATTACHMENT START ===");
   const expense =
     expenseData[
       selectedAttachmentExpenseIndex
     ];
-
+console.log("SELECTED EXPENSE:", expense);
   if (!expense) {
 
     showToast(
@@ -27781,7 +27781,7 @@ async function uploadExpenseAttachment() {
 
   const file =
     input?.files?.[0];
-
+console.log("SELECTED FILE:", file);
 
   if (!file) {
 
@@ -27824,7 +27824,7 @@ async function uploadExpenseAttachment() {
 
     }
 
-
+console.log("CALLING EXPENSE ATTACHMENT API");
     // =========================
     // UPLOAD VIA VERCEL API
     // =========================
