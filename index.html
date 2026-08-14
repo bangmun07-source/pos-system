@@ -29422,107 +29422,311 @@ document.addEventListener("click", function (e) {
 });
 
 async function exportExpensePDF() {
+
   const f =
     getExpenseFilters();
+
+  // =========================
+  // BRANCH
+  // =========================
+
+  const branchId =
+    state.branchId;
+
+  if (!branchId) {
+
+    showToast(
+      "Branch login tidak ditemukan",
+      "error"
+    );
+
+    return;
+  }
+
+
+  // =========================
+  // OPEN WINDOW
+  // =========================
+
   const pdfWindow =
     window.open(
       "",
       "_blank"
     );
+
+
   if (!pdfWindow) {
-    alert(
-      "Popup diblokir browser"
+
+    showToast(
+      "Popup diblokir browser",
+      "error"
     );
+
     return;
   }
+
+
+  // =========================
   // LOADING
+  // =========================
+
   pdfWindow.document.write(`
+    <!DOCTYPE html>
+
     <html>
-      <body style="
-        background:#0B0F14;
-        color:white;
-        font-family:Arial;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
+
+    <head>
+
+      <title>
+        Expense Report
+      </title>
+
+    </head>
+
+    <body style="
+      background:#0B0F14;
+      color:white;
+      font-family:Arial,sans-serif;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      margin:0;
+    ">
+
+      <div style="
+        text-align:center;
       ">
-        Expense Report...
-      </body>
+
+        <div style="
+          font-size:18px;
+          font-weight:bold;
+          margin-bottom:8px;
+        ">
+          Expense Report
+        </div>
+
+        <div style="
+          font-size:13px;
+          opacity:.7;
+        ">
+          Preparing report...
+        </div>
+
+      </div>
+
+    </body>
+
     </html>
   `);
 
+
   try {
 
-    // ==================================
-    // SUPABASE / VERCEL
-    // AKTIFKAN NANTI
-    // ==================================
+    console.log(
+      "EXPORT EXPENSE REQUEST:",
+      {
+        start:
+          f.startDate || null,
 
-    /*
+        end:
+          f.endDate || null,
+
+        branchId,
+
+        status:
+          f.status || "ALL",
+
+        category:
+          f.category || "ALL"
+      }
+    );
+
+
+    // =========================
+    // CALL VERCEL API
+    // =========================
+
     const response =
-      await fetch("/api/export-expense-pdf", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          startDate: f.startDate,
-          endDate: f.endDate,
-          branch: f.branch,
-          status: f.status,
-          category: f.category
-        })
-      });
+      await fetch(
+        "/api/export-expense-pdf",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+
+              start:
+                f.startDate ||
+                null,
+
+              end:
+                f.endDate ||
+                null,
+
+              branchId:
+                branchId,
+
+              status:
+                f.status ===
+                "All Status"
+                  ? "ALL"
+                  : f.status ||
+                    "ALL",
+
+              category:
+                f.category ===
+                "All Categories"
+                  ? "ALL"
+                  : f.category ||
+                    "ALL"
+
+            })
+
+        }
+      );
+
+
+    // =========================
+    // CHECK RESPONSE
+    // =========================
 
     if (!response.ok) {
+
+      const errorText =
+        await response.text();
+
       throw new Error(
+        errorText ||
         "Gagal membuat Expense Report"
       );
+
     }
+
+
+    // =========================
+    // GET HTML
+    // =========================
 
     const html =
       await response.text();
-    */
 
-    // TEMP DATA VERCEL
-    const html = null;
+
     if (!html) {
+
       throw new Error(
-        "Export Expense PDF belum diaktifkan"
+        "Report kosong"
       );
+
     }
+
+
+    console.log(
+      "EXPORT EXPENSE SUCCESS"
+    );
+
+
+    // =========================
+    // RENDER REPORT
+    // =========================
+
     pdfWindow.document.open();
+
     pdfWindow.document.write(
       html
     );
+
     pdfWindow.document.close();
+
   }
+
+
   catch (err) {
+
     console.error(
       "Export Expense PDF:",
       err
     );
-    pdfWindow.document.open();
-    pdfWindow.document.write(`
-      <html>
+
+
+    // =========================
+    // SHOW ERROR
+    // =========================
+
+    try {
+
+      pdfWindow.document.open();
+
+      pdfWindow.document.write(`
+
+        <!DOCTYPE html>
+
+        <html>
+
+        <head>
+
+          <title>
+            Export Failed
+          </title>
+
+        </head>
+
         <body style="
-          font-family:Arial;
+          font-family:Arial,sans-serif;
           padding:40px;
         ">
+
           <h2>
             Export Failed
           </h2>
 
-          <pre>
-			${err.message}
-          </pre>
+          <pre style="
+            white-space:pre-wrap;
+            color:#b91c1c;
+          ">${String(
+            err?.message ||
+            "Export expense gagal"
+          )
+            .replace(
+              /&/g,
+              "&amp;"
+            )
+            .replace(
+              /</g,
+              "&lt;"
+            )
+            .replace(
+              />/g,
+              "&gt;"
+            )}</pre>
 
         </body>
-      </html>
-    `);
-    pdfWindow.document.close();
+
+        </html>
+
+      `);
+
+      pdfWindow.document.close();
+
+    }
+    catch (_) {}
+
+
+    showToast(
+      err?.message ||
+      "Export Expense PDF gagal",
+      "error"
+    );
+
   }
+
 }
 
 function paginate(data) {
