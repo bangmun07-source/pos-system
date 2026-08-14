@@ -1761,7 +1761,778 @@ td {
     }
 
 
+// ==========================================
+// RECENT TRANSACTIONS
+// ==========================================
 
+if (type === "recent-transactions") {
+
+  if (!branchId) {
+
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: "branchId wajib diisi"
+      });
+
+  }
+
+  // GET TRANSACTIONS
+  const {
+    data: transactions,
+    error: trxError
+  } = await supabase.rpc(
+    "get_recent_transactions_page",
+    {
+      p_branch_id: branchId,
+      p_start: start || null,
+      p_end: end || null,
+      p_status: status || "ALL",
+      p_table: "ALL"
+    }
+  );
+
+  if (trxError) {
+    throw trxError;
+  }
+
+  // GET SUMMARY
+  const {
+    data: summary,
+    error: summaryError
+  } = await supabase.rpc(
+    "get_recent_transaction_summary",
+    {
+      p_branch_id: branchId,
+      p_start: start || null,
+      p_end: end || null,
+      p_status: status || "ALL",
+      p_table: "ALL"
+    }
+  );
+
+  if (summaryError) {
+    throw summaryError;
+  }
+
+  const rows =
+    Array.isArray(transactions)
+      ? transactions
+      : [];
+
+  const reportSummary =
+    summary || {};
+
+  const paymentDistribution =
+    reportSummary.paymentDistribution || {};
+
+  const activeMembers =
+    Array.isArray(reportSummary.activeMembers)
+      ? reportSummary.activeMembers
+      : [];
+
+  // ========================================
+  // TRANSACTION ROWS
+  // ========================================
+
+  const transactionRows =
+    rows.length
+
+      ? rows.map(row => {
+
+          const items =
+            Array.isArray(row.items)
+              ? row.items
+              : [];
+
+          const itemsCount =
+            items.reduce(
+              (total, item) =>
+                total +
+                Number(item.qty || 0),
+              0
+            );
+
+          return `
+            <tr>
+
+              <td>
+                ${escapeHtml(row.id)}
+              </td>
+
+              <td>
+                ${escapeHtml(row.date)}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  row.member || "Guest"
+                )}
+              </td>
+
+              <td class="center">
+                ${escapeHtml(
+                  row.status || "-"
+                )}
+              </td>
+
+              <td class="center">
+                ${itemsCount}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(row.total)}
+              </td>
+
+            </tr>
+          `;
+
+        }).join("")
+
+      : `
+        <tr>
+          <td
+            colspan="6"
+            class="empty"
+          >
+            No transactions
+          </td>
+        </tr>
+      `;
+
+  // ========================================
+  // PAYMENT ROWS
+  // ========================================
+
+  const paymentRows =
+    Object.entries(paymentDistribution).length
+
+      ? Object.entries(paymentDistribution)
+          .map(([method, total]) => {
+
+            const amount =
+              Number(total || 0);
+
+            const revenue =
+              Number(
+                reportSummary.revenue || 0
+              );
+
+            const percent =
+              revenue > 0
+                ? (amount / revenue) * 100
+                : 0;
+
+            return `
+              <tr>
+
+                <td>
+                  ${escapeHtml(method)}
+                </td>
+
+                <td class="right">
+                  Rp ${rupiah(amount)}
+                </td>
+
+                <td class="right">
+                  ${percent.toFixed(1)}%
+                </td>
+
+              </tr>
+            `;
+
+          }).join("")
+
+      : `
+        <tr>
+          <td colspan="3" class="empty">
+            No payment data
+          </td>
+        </tr>
+      `;
+
+  // ========================================
+  // ACTIVE MEMBERS
+  // ========================================
+
+  const memberRows =
+    activeMembers.length
+
+      ? activeMembers.map(member => {
+
+          return `
+            <tr>
+
+              <td>
+                ${escapeHtml(member.name)}
+              </td>
+
+              <td class="center">
+                ${escapeHtml(member.level)}
+              </td>
+
+              <td class="right">
+                ${rupiah(member.point)} PTS
+              </td>
+
+            </tr>
+          `;
+
+        }).join("")
+
+      : `
+        <tr>
+          <td
+            colspan="3"
+            class="empty"
+          >
+            No active member
+          </td>
+        </tr>
+      `;
+
+  // ========================================
+  // HTML REPORT
+  // ========================================
+
+  const html = `
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+Recent Transactions Report
+</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #0B0F14;
+  font-family: Arial, sans-serif;
+  color: #333;
+  padding: 40px 20px;
+}
+
+.export-toolbar {
+
+  width: 100%;
+  max-width: 1100px;
+
+  margin: 0 auto 20px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  color: white;
+  font-size: 14px;
+
+}
+
+.export-toolbar button {
+
+  border:
+    1px solid
+    rgba(255,255,255,.15);
+
+  background:
+    rgba(255,255,255,.08);
+
+  color: white;
+
+  padding: 10px 16px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-weight: bold;
+
+}
+
+.report {
+
+  width: 100%;
+  max-width: 1100px;
+
+  margin: auto;
+
+  background: white;
+
+  padding: 45px;
+
+  border-radius: 4px;
+
+  box-shadow:
+    0 20px 60px
+    rgba(0,0,0,.45);
+
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.logo {
+
+  width: 170px;
+  height: auto;
+
+  max-height: 90px;
+
+  object-fit: contain;
+
+  margin-bottom: 12px;
+
+}
+
+.title {
+
+  font-size: 24px;
+
+  font-weight: bold;
+
+  margin-bottom: 8px;
+
+}
+
+.subtitle {
+
+  font-size: 12px;
+
+  color: #777;
+
+  margin-bottom: 3px;
+
+}
+
+.kpi-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, 1fr);
+
+  gap: 16px;
+
+  margin: 30px 0;
+
+}
+
+.kpi-card {
+
+  border:
+    1px solid #e5e5e5;
+
+  border-radius: 14px;
+
+  padding: 22px;
+
+  background: #fafafa;
+
+  text-align: center;
+
+}
+
+.kpi-title {
+
+  font-size: 11px;
+
+  color: #666;
+
+  font-weight: bold;
+
+  margin-bottom: 12px;
+
+}
+
+.kpi-value {
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+  color: #222;
+
+}
+
+.card {
+
+  border:
+    1px solid #e5e5e5;
+
+  border-radius: 14px;
+
+  padding: 18px;
+
+  margin-top: 20px;
+
+  background: white;
+
+}
+
+.card h3 {
+
+  margin-top: 0;
+
+  margin-bottom: 12px;
+
+  font-size: 16px;
+
+}
+
+table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  font-size: 11px;
+
+  margin-top: 10px;
+
+}
+
+th {
+
+  background: #f5f5f5;
+
+  padding: 10px;
+
+  text-align: left;
+
+  font-weight: bold;
+
+}
+
+td {
+
+  padding: 10px;
+
+  border-bottom:
+    1px solid #eee;
+
+}
+
+.right {
+  text-align: right;
+}
+
+.center {
+  text-align: center;
+}
+
+.empty {
+
+  text-align: center;
+
+  color: #777;
+
+  padding: 25px;
+
+}
+
+.footer {
+
+  margin-top: 40px;
+
+  text-align: center;
+
+  font-size: 9px;
+
+  color: #888;
+
+}
+
+.page-break {
+
+  page-break-before: always;
+
+}
+
+@media print {
+
+  body {
+
+    background: white;
+
+    padding: 0;
+
+  }
+
+  .export-toolbar {
+
+    display: none;
+
+  }
+
+  .report {
+
+    max-width: none;
+
+    box-shadow: none;
+
+    border-radius: 0;
+
+    padding: 25px;
+
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="export-toolbar">
+
+  <div>
+    📄 Recent Transactions Report
+  </div>
+
+  <button onclick="window.print()">
+    Download / Print PDF
+  </button>
+
+</div>
+
+<div class="report">
+
+  <div class="header">
+
+    ${
+      logoSrc
+        ? `
+          <img
+            src="${logoSrc}"
+            class="logo"
+            alt="Sistem POS"
+          />
+        `
+        : ""
+    }
+
+  </div>
+
+  <div class="title">
+    Recent Transactions Report
+  </div>
+
+  <div class="subtitle">
+    Periode:
+    ${escapeHtml(start || "-")}
+    -
+    ${escapeHtml(end || "-")}
+  </div>
+
+  <div class="subtitle">
+    Branch:
+    ${escapeHtml(branchId)}
+  </div>
+
+  <div class="subtitle">
+    Status:
+    ${escapeHtml(status)}
+  </div>
+
+  <div class="kpi-grid">
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        TOTAL REVENUE
+      </div>
+
+      <div class="kpi-value">
+        Rp ${rupiah(reportSummary.revenue)}
+      </div>
+
+    </div>
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        ACTIVE GUEST
+      </div>
+
+      <div class="kpi-value">
+        ${Number(
+          reportSummary.activeGuests || 0
+        )}
+      </div>
+
+    </div>
+
+    <div class="kpi-card">
+
+      <div class="kpi-title">
+        ITEMS SOLD
+      </div>
+
+      <div class="kpi-value">
+        ${Number(
+          reportSummary.itemsSold || 0
+        )}
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="card">
+
+    <h3>
+      Payment Distribution
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Payment
+          </th>
+
+          <th class="right">
+            Total
+          </th>
+
+          <th class="right">
+            Percentage
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${paymentRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div class="card">
+
+    <h3>
+      Active Members
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>
+            Name
+          </th>
+
+          <th class="center">
+            Tier
+          </th>
+
+          <th class="right">
+            Point
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${memberRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="card">
+
+    <h3>
+      Recent Transactions
+    </h3>
+
+    <table>
+
+      <thead>
+
+        <tr>
+
+          <th>ID</th>
+          <th>Date</th>
+          <th>Member</th>
+          <th class="center">Status</th>
+          <th class="center">Items</th>
+          <th class="right">Total</th>
+
+        </tr>
+
+      </thead>
+
+      <tbody>
+
+        ${transactionRows}
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+  <div class="footer">
+
+    Generated by Sistem POS
+    •
+    ${new Date().toLocaleString("id-ID")}
+
+  </div>
+
+</div>
+
+</body>
+
+</html>
+`;
+
+  res.setHeader(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+
+  return res
+    .status(200)
+    .send(html);
+
+}
 
 
 
