@@ -14,6 +14,10 @@ function rupiah(value) {
     .toLocaleString("id-ID");
 }
 
+function number(value) {
+  return Number(value || 0);
+}
+
 
 function escapeHtml(value) {
   return String(value ?? "")
