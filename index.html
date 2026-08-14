@@ -29426,10 +29426,6 @@ async function exportExpensePDF() {
   const f =
     getExpenseFilters();
 
-  // =========================
-  // BRANCH
-  // =========================
-
   const branchId =
     state.branchId;
 
@@ -29445,17 +29441,16 @@ async function exportExpensePDF() {
 
 
   // =========================
-  // OPEN WINDOW
+  // OPEN TAB
   // =========================
 
-  const pdfWindow =
+  const pdfTab =
     window.open(
       "",
       "_blank"
     );
 
-
-  if (!pdfWindow) {
+  if (!pdfTab) {
 
     showToast(
       "Popup diblokir browser",
@@ -29470,47 +29465,58 @@ async function exportExpensePDF() {
   // LOADING
   // =========================
 
-  pdfWindow.document.write(`
+  pdfTab.document.write(`
     <!DOCTYPE html>
 
     <html>
 
     <head>
-
       <title>
-        Expense Report
+        Generating Expense PDF...
       </title>
+
+      <style>
+
+        body {
+          margin: 0;
+          height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: #0B0F14;
+          color: white;
+          font-family: Arial, sans-serif;
+        }
+
+        .loading {
+          text-align: center;
+        }
+
+        .title {
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 8px;
+        }
+
+        .text {
+          font-size: 13px;
+          opacity: .65;
+        }
+
+      </style>
 
     </head>
 
-    <body style="
-      background:#0B0F14;
-      color:white;
-      font-family:Arial,sans-serif;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      height:100vh;
-      margin:0;
-    ">
+    <body>
 
-      <div style="
-        text-align:center;
-      ">
+      <div class="loading">
 
-        <div style="
-          font-size:18px;
-          font-weight:bold;
-          margin-bottom:8px;
-        ">
-          Expense Report
+        <div class="title">
+          Generating Expense Report...
         </div>
 
-        <div style="
-          font-size:13px;
-          opacity:.7;
-        ">
-          Preparing report...
+        <div class="text">
+          Please wait
         </div>
 
       </div>
@@ -29535,16 +29541,20 @@ async function exportExpensePDF() {
         branchId,
 
         status:
-          f.status || "ALL",
+          f.status === "All Status"
+            ? "ALL"
+            : f.status || "ALL",
 
         category:
-          f.category || "ALL"
+          f.category === "All Categories"
+            ? "ALL"
+            : f.category || "ALL"
       }
     );
 
 
     // =========================
-    // CALL VERCEL API
+    // CALL API
     // =========================
 
     const response =
@@ -29552,8 +29562,7 @@ async function exportExpensePDF() {
         "/api/export-expense-pdf",
         {
 
-          method:
-            "POST",
+          method: "POST",
 
           headers: {
             "Content-Type":
@@ -29590,60 +29599,53 @@ async function exportExpensePDF() {
 
             })
 
-        }
+          }
+
       );
 
 
     // =========================
-    // CHECK RESPONSE
+    // ERROR
     // =========================
 
     if (!response.ok) {
 
-      const errorText =
-        await response.text();
-
       throw new Error(
-        errorText ||
-        "Gagal membuat Expense Report"
+        await response.text()
       );
 
     }
 
 
     // =========================
-    // GET HTML
+    // API RETURN URL
     // =========================
 
-    const html =
+    const url =
       await response.text();
 
 
-    if (!html) {
+    if (!url) {
 
       throw new Error(
-        "Report kosong"
+        "URL PDF tidak ditemukan"
       );
 
     }
 
 
     console.log(
-      "EXPORT EXPENSE SUCCESS"
+      "EXPORT EXPENSE URL:",
+      url
     );
 
 
     // =========================
-    // RENDER REPORT
+    // OPEN PDF
     // =========================
 
-    pdfWindow.document.open();
-
-    pdfWindow.document.write(
-      html
-    );
-
-    pdfWindow.document.close();
+    pdfTab.location.href =
+      url;
 
   }
 
@@ -29656,30 +29658,12 @@ async function exportExpensePDF() {
     );
 
 
-    // =========================
-    // SHOW ERROR
-    // =========================
+    if (pdfTab) {
 
-    try {
+      pdfTab.document.body.innerHTML = `
 
-      pdfWindow.document.open();
-
-      pdfWindow.document.write(`
-
-        <!DOCTYPE html>
-
-        <html>
-
-        <head>
-
-          <title>
-            Export Failed
-          </title>
-
-        </head>
-
-        <body style="
-          font-family:Arial,sans-serif;
+        <div style="
+          font-family:Arial;
           padding:40px;
         ">
 
@@ -29707,16 +29691,11 @@ async function exportExpensePDF() {
               "&gt;"
             )}</pre>
 
-        </body>
+        </div>
 
-        </html>
-
-      `);
-
-      pdfWindow.document.close();
+      `;
 
     }
-    catch (_) {}
 
 
     showToast(
