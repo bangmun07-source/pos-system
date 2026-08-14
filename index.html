@@ -27456,7 +27456,13 @@ async function saveExpenseStatus() {
   }
 
   try {
-
+console.log("UPDATE EXPENSE STATUS:", {
+  expense,
+  refId: expense.refId,
+  statusLama: expense.status,
+  statusBaru: newStatus,
+  branchId: state.branchId
+});
     const res =
       await updateExpenseStatusRPC(
         expense.refId,
