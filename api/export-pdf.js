@@ -10,7 +10,8 @@ const logoSrc =
 
 
 function rupiah(value) {
-  return Number(value || 0).toLocaleString("id-ID");
+  return Number(value || 0)
+    .toLocaleString("id-ID");
 }
 
 
@@ -48,7 +49,8 @@ export default async function handler(req, res) {
       branchId,
       status = "ALL",
       category = "ALL",
-      tier = "ALL"
+      tier = "ALL",
+      search = ""
     } = req.body || {};
 
     console.log(
@@ -60,7 +62,8 @@ export default async function handler(req, res) {
         branchId,
         status,
         category,
-        tier
+        tier,
+        search
       }
     );
 
@@ -4926,23 +4929,14 @@ else if (type === "cash-flow) {
     // OTHER INCOME EXPORT
     // =====================================================
     
-    if (type === "other-income") {
-    
-      const {
-        branchId,
-        category,
-        status,
-        search,
-        start,
-        end
-      } = req.body || {};
+    else if (type === "other-income") {
     
       if (!branchId) {
         return res.status(400).send(
           "branchId wajib diisi"
         );
       }
-   
+    
       // ===================================================
       // GET DATA
       // ===================================================
