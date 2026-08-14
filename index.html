@@ -8568,7 +8568,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 					  <div class="col-span-3">
 					    <select id="expenseBranchFilter"
 					      class="w-full bg-background border border-white/10 rounded-md px-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary">
-					      <option value="ALL">All Branch</option>
+					      
 					    </select>
   					</div>
 					</div>
@@ -8671,7 +8671,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 				<div class="col-span-3">
 						<select id="otherIncomeBranchFilter"
 							class="w-full bg-background border border-white/10 rounded-md px-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary">
-							<option value="ALL">All Branch</option>
+							
 						</select>
 					</div>
 				</div>
@@ -26956,7 +26956,7 @@ async function loadBranchName() {
 
 function getExpenseFilters() {
   return {
-    branch: document.getElementById("expenseBranchFilter")?.value || "ALL",
+    branch: state.branchId,
     category: document.getElementById("expenseCategoryFilter")?.value || "All Categories",
     status: document.getElementById("expenseStatusFilter")?.value || "All Status",
     startDate: document.getElementById("expenseStartDate")?.value,
@@ -29051,7 +29051,7 @@ function loadExpenseBranches(
     select.value =
       state.branchId;
 
-    select.disabled = false;
+    select.disabled = true;
 
   }
 
