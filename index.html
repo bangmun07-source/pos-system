@@ -26966,38 +26966,101 @@ function getExpenseFilters() {
 }
 
 function initExpenseSettingPage() {
+
+  // Isi dropdown branch dulu
+  loadExpenseBranches(
+    "expenseBranchFilter"
+  );
+
+  // Baru load data dashboard
   loadExpenseDashboard();
+
+
   document
-    .getElementById("expenseSearchInput")
-    ?.addEventListener("input", filterExpenseTable);
+    .getElementById(
+      "expenseSearchInput"
+    )
+    ?.addEventListener(
+      "input",
+      filterExpenseTable
+    );
+
+
   document
-    .getElementById("expenseCategoryFilter")
-    ?.addEventListener("change", filterExpenseTable);
+    .getElementById(
+      "expenseCategoryFilter"
+    )
+    ?.addEventListener(
+      "change",
+      filterExpenseTable
+    );
+
+
   document
-    .getElementById("expenseStatusFilter")
-    ?.addEventListener("change", filterExpenseTable);
+    .getElementById(
+      "expenseStatusFilter"
+    )
+    ?.addEventListener(
+      "change",
+      filterExpenseTable
+    );
+
+
   document
-    .getElementById("expenseStartDate")
-    ?.addEventListener("change", filterExpenseTable);
+    .getElementById(
+      "expenseStartDate"
+    )
+    ?.addEventListener(
+      "change",
+      filterExpenseTable
+    );
+
+
   document
-    .getElementById("expenseEndDate")
-    ?.addEventListener("change", filterExpenseTable);
+    .getElementById(
+      "expenseEndDate"
+    )
+    ?.addEventListener(
+      "change",
+      filterExpenseTable
+    );
+
+
+  // =========================
+  // BRANCH CHANGE
+  // =========================
+
   document
-    .getElementById("expenseBranchFilter")
+    .getElementById(
+      "expenseBranchFilter"
+    )
     ?.addEventListener(
       "change",
       async () => {
+
         state.expenseDashboardData =
           null;
+
         state.expenseDashboardFilter =
           null;
+
         await loadExpenseDashboard();
+
       }
     );
+
+
   setTimeout(() => {
+
     document
-      .getElementById("btnNewExpense")
-      ?.addEventListener("click", openAddExpensePopup);
+      .getElementById(
+        "btnNewExpense"
+      )
+      ?.addEventListener(
+        "click",
+        openAddExpensePopup
+      );
+
   }, 50);
 }
 
@@ -28580,27 +28643,72 @@ function updateOtherIncomeTableInfo() {
     `Showing ${start} to ${end} of ${total} Ledger Entries`;
 }
 
-function loadOtherIncomeBranches(selectId = "otherIncomeBranchFilter") {
+function loadOtherIncomeBranches(
+  selectId = "otherIncomeBranchFilter"
+) {
+
   const select =
     document.getElementById(selectId);
+
   if (!select) return;
-  const branches =
-    state.expenseDashboardData?.branches || [];
+
   select.innerHTML = "";
-  if (selectId === "otherIncomeBranchFilter") {
-    select.innerHTML =
-      `<option value="ALL">All Branch</option>`;
-  } else {
-    select.innerHTML =
-      `<option value="">Select Branch</option>`;
+
+
+  // =========================
+  // FILTER BRANCH
+  // =========================
+
+  if (
+    selectId ===
+    "otherIncomeBranchFilter"
+  ) {
+
+    (expenseBranches || [])
+      .forEach(b => {
+
+        select.innerHTML += `
+          <option value="${b.id}">
+            ${b.name}
+          </option>
+        `;
+
+      });
+
+
+    // DEFAULT = BRANCH LOGIN
+    select.value =
+      state.branchId;
+
+    select.disabled = false;
+
   }
-  branches.forEach(b => {
-    select.innerHTML += `
-      <option value="${b.id}">
-        ${b.name}
-      </option>
-    `;
-  });
+
+
+  // =========================
+  // POPUP
+  // =========================
+
+  else {
+
+    (
+      state.expenseDashboardData
+        ?.branches || []
+    ).forEach(b => {
+
+      select.innerHTML += `
+        <option value="${b.id}">
+          ${b.name}
+        </option>
+      `;
+
+    });
+
+    select.value =
+      state.branchId;
+
+    select.disabled = true;
+  }
 }
 
 function initOtherIncomeEvents() {
@@ -28928,56 +29036,73 @@ function updateExpenseKPIs(data = [], budget = null) {
 }
 
 
-function loadOtherIncomeBranches(selectId = "otherIncomeBranchFilter") {
+function loadExpenseBranches(
+  selectId = "expenseBranchFilter"
+) {
+
   const select =
     document.getElementById(selectId);
-  if (!select) return;
-  const branches =
-    state.expenseDashboardData?.branches || [];
-  select.innerHTML = "";
-  if (selectId === "otherIncomeBranchFilter") {
-    select.innerHTML =
-      `<option value="ALL">All Branch</option>`;
-  }
-  branches.forEach(b => {
-    select.innerHTML += `
-      <option value="${b.id}">
-        ${b.name}
-      </option>
-    `;
-  });
-  // popup add income
-  if (selectId !== "otherIncomeBranchFilter") {
-    select.value = state.branchId;
-    select.disabled = true;
-  }
-}
 
-function loadExpenseBranches(selectId = "expenseBranchFilter") {
-  const select = document.getElementById(selectId);
   if (!select) return;
+
   select.innerHTML = "";
-  // Dropdown filter di halaman
-  if (selectId === "expenseBranchFilter") {
-    select.innerHTML = `<option value="ALL">All Branch</option>`;
-    (expenseBranches || []).forEach(b => {
-      select.innerHTML += `
-        <option value="${b.id}">
-          ${b.name}
-        </option>
-      `;
-    });
+
+
+  // =========================
+  // DROPDOWN FILTER HALAMAN
+  // =========================
+
+  if (
+    selectId ===
+    "expenseBranchFilter"
+  ) {
+
+    (expenseBranches || [])
+      .forEach(b => {
+
+        select.innerHTML += `
+          <option value="${b.id}">
+            ${b.name}
+          </option>
+        `;
+
+      });
+
+
+    // =========================
+    // DEFAULT = BRANCH LOGIN
+    // =========================
+
+    select.value =
+      state.branchId;
+
     select.disabled = false;
-  } else {
-    // Dropdown di popup Add New Expense
-    (state.expenseDashboardData?.branches || []).forEach(b => {
+
+  }
+
+
+  // =========================
+  // POPUP ADD NEW EXPENSE
+  // =========================
+
+  else {
+
+    (
+      state.expenseDashboardData
+        ?.branches || []
+    ).forEach(b => {
+
       select.innerHTML += `
         <option value="${b.id}">
           ${b.name}
         </option>
       `;
+
     });
-    select.value = state.branchId;
+
+    select.value =
+      state.branchId;
+
     select.disabled = true;
   }
 }
