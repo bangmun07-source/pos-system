@@ -5405,129 +5405,836 @@ export default async function handler(req, res) {
       
       
       
-      // ==========================================
-// ANALYTICS
-// ==========================================
-
-else if (type === "analytics") {
-
-  console.log(
-    ">>> MASUK ANALYTICS EXPORT <<<"
-  );
-
-  console.log(
-    "ANALYTICS REQUEST:",
-    {
-      start,
-      end,
-      branchId
-    }
-  );
-
-  // =========================
-  // VALIDATION
-  // =========================
-
-  if (!branchId) {
-
-    return res
-      .status(400)
-      .json({
-        success: false,
-        error: "branchId wajib diisi"
-      });
-
-  }
-
-  // =========================
-  // RPC
-  // =========================
-
-  const {
-    data,
-    error
-  } = await supabase.rpc(
-    "get_analytics_dashboard",
-    {
-      p_branch_id: branchId,
-      p_start: start || null,
-      p_end: end || null
-    }
-  );
-
-  if (error) {
-
-    console.error(
-      "ANALYTICS RPC ERROR:",
-      error
+   // ==========================================
+  // ANALYTICS
+  // ==========================================
+  
+  else if (type === "analytics") {
+  
+    console.log(
+      ">>> MASUK ANALYTICS EXPORT <<<"
     );
-
-    throw error;
-
+  
+    console.log(
+      "ANALYTICS REQUEST:",
+      {
+        start,
+        end,
+        branchId
+      }
+    );
+  
+    // =========================
+    // VALIDATION
+    // =========================
+  
+    if (!branchId) {
+  
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "branchId wajib diisi"
+        });
+  
+    }
+  
+    // =========================
+    // GET ANALYTICS DASHBOARD
+    // =========================
+  
+    const {
+      data,
+      error
+    } = await supabase.rpc(
+      "get_analytics_dashboard",
+      {
+        p_branch_id: branchId,
+        p_start: start || null,
+        p_end: end || null
+      }
+    );
+  
+    if (error) {
+  
+      console.error(
+        "ANALYTICS RPC ERROR:",
+        error
+      );
+  
+      throw error;
+  
+    }
+  
+    console.log(
+      "ANALYTICS RPC DATA:",
+      data
+    );
+  
+    // =========================
+    // NORMALIZE
+    // =========================
+  
+    const report =
+      data || {};
+  
+    console.log(
+      "ANALYTICS REPORT:",
+      report
+    );
+  
+    console.log(
+      "ANALYTICS DATA KEYS:",
+      Object.keys(report)
+    );
+  
+    // =========================
+    // SAFE NORMALIZE
+    // =========================
+  
+    const summary =
+      report.summary || {};
+  
+    const weekly =
+      Array.isArray(report.weekly)
+        ? report.weekly
+        : [];
+  
+    const peakHours =
+      Array.isArray(report.peakHours)
+        ? report.peakHours
+        : [];
+  
+    const topProducts =
+      Array.isArray(report.topProducts)
+        ? report.topProducts
+        : [];
+  
+    // =========================
+    // DEBUG
+    // =========================
+  
+    console.log(
+      "ANALYTICS NORMALIZED:",
+      {
+        summary,
+        weeklyCount:
+          weekly.length,
+        peakHoursCount:
+          peakHours.length,
+        topProductsCount:
+          topProducts.length
+      }
+    );
+  
+    // =========================
+    // TEST ROWS
+    // =========================
+  
+    const weeklyRows =
+      weekly.length
+  
+        ? weekly
+            .map(item => {
+  
+              return `
+                <tr>
+  
+                  <td>
+                    ${escapeHtml(
+                      item.date ??
+                      item.day ??
+                      "-"
+                    )}
+                  </td>
+  
+                  <td class="right">
+                    ${rupiah(
+                      item.total ??
+                      item.revenue ??
+                      item.amount ??
+                      0
+                    )}
+                  </td>
+  
+                </tr>
+              `;
+  
+            })
+            .join("")
+  
+        : `
+            <tr>
+  
+              <td
+                colspan="2"
+                class="empty"
+              >
+                No weekly data
+              </td>
+  
+            </tr>
+          `;
+  
+  
+    const peakHourRows =
+      peakHours.length
+  
+        ? peakHours
+            .map(item => {
+  
+              return `
+                <tr>
+  
+                  <td>
+                    ${escapeHtml(
+                      item.hour ??
+                      item.time ??
+                      item.jam ??
+                      "-"
+                    )}
+                  </td>
+  
+                  <td class="right">
+                    ${rupiah(
+                      item.total ??
+                      item.revenue ??
+                      item.amount ??
+                      item.orders ??
+                      0
+                    )}
+                  </td>
+  
+                </tr>
+              `;
+  
+            })
+            .join("")
+  
+        : `
+            <tr>
+  
+              <td
+                colspan="2"
+                class="empty"
+              >
+                No peak hour data
+              </td>
+  
+            </tr>
+          `;
+  
+  
+    const productRows =
+      topProducts.length
+  
+        ? topProducts
+            .map(item => {
+  
+              return `
+                <tr>
+  
+                  <td>
+                    ${escapeHtml(
+                      item.name ??
+                      item.product ??
+                      item.productName ??
+                      "-"
+                    )}
+                  </td>
+  
+                  <td class="right">
+                    ${rupiah(
+                      item.revenue ??
+                      item.total ??
+                      item.amount ??
+                      0
+                    )}
+                  </td>
+  
+                </tr>
+              `;
+  
+            })
+            .join("")
+  
+        : `
+            <tr>
+  
+              <td
+                colspan="2"
+                class="empty"
+              >
+                No product data
+              </td>
+  
+            </tr>
+          `;
+  
+    // =========================
+    // TEST HTML
+    // =========================
+  
+    const html = `
+  
+  <!DOCTYPE html>
+  
+  <html>
+  
+  <head>
+  
+  <meta charset="UTF-8">
+  
+  <title>
+    Analytics Report
+  </title>
+  
+  <style>
+  
+  * {
+    box-sizing: border-box;
   }
-
-  console.log(
-    "ANALYTICS RPC DATA:",
-    data
-  );
-
- // =========================
-// NORMALIZE
-// =========================
-
-const report = data || {};
-
-console.log(
-  "ANALYTICS REPORT:",
-  report
-);
-
-const summary =
-  report.summary || {};
-
-const weekly =
-  Array.isArray(report.weekly)
-    ? report.weekly
-    : [];
-
-const peakHours =
-  Array.isArray(report.peakHours)
-    ? report.peakHours
-    : [];
-
-const topProducts =
-  Array.isArray(report.topProducts)
-    ? report.topProducts
-    : [];
-
-console.log(
-  "ANALYTICS NORMALIZED:",
-  {
-    summary,
-    weeklyCount: weekly.length,
-    peakHoursCount: peakHours.length,
-    topProductsCount: topProducts.length
+  
+  html,
+  body {
+    margin: 0;
+    padding: 0;
   }
-);
-
-// =========================
-// TEST RESPONSE
-// =========================
-
-return res
-  .status(200)
-  .json({
-    success: true,
-    type: "analytics",
-    branchId,
-    summary,
-    weeklyCount: weekly.length,
-    peakHoursCount: peakHours.length,
-    topProductsCount: topProducts.length
-  });
-
-}
-
+  
+  body {
+  
+    background: #0B0F14;
+  
+    font-family:
+      Arial,
+      sans-serif;
+  
+    color: #333;
+  
+    padding:
+      40px 20px;
+  }
+  
+  .export-toolbar {
+  
+    width: 100%;
+  
+    max-width:
+      1100px;
+  
+    margin:
+      0 auto 20px auto;
+  
+    display:
+      flex;
+  
+    justify-content:
+      space-between;
+  
+    align-items:
+      center;
+  
+    color: white;
+  
+    font-size: 14px;
+  }
+  
+  .export-toolbar button {
+  
+    border:
+      1px solid
+      rgba(255,255,255,.15);
+  
+    background:
+      rgba(255,255,255,.08);
+  
+    color: white;
+  
+    padding:
+      10px 16px;
+  
+    border-radius:
+      10px;
+  
+    cursor:
+      pointer;
+  
+    font-weight:
+      bold;
+  }
+  
+  .report {
+  
+    width: 100%;
+  
+    max-width:
+      1100px;
+  
+    margin:
+      0 auto;
+  
+    background:
+      white;
+  
+    padding:
+      45px;
+  
+    border-radius:
+      4px;
+  
+    box-shadow:
+      0 20px 60px
+      rgba(0,0,0,.45);
+  }
+  
+  .header {
+  
+    text-align:
+      center;
+  
+    margin-bottom:
+      25px;
+  }
+  
+  .logo {
+  
+    width:
+      170px;
+  
+    height:
+      auto;
+  
+    max-height:
+      90px;
+  
+    object-fit:
+      contain;
+  
+    margin-bottom:
+      12px;
+  }
+  
+  .title {
+  
+    font-size:
+      24px;
+  
+    font-weight:
+      bold;
+  
+    margin-bottom:
+      8px;
+  }
+  
+  .subtitle {
+  
+    font-size:
+      12px;
+  
+    color:
+      #777;
+  
+    margin-bottom:
+      3px;
+  }
+  
+  .card {
+  
+    border:
+      1px solid
+      #e5e5e5;
+  
+    border-radius:
+      14px;
+  
+    padding:
+      18px;
+  
+    margin-top:
+      20px;
+  
+    background:
+      #fff;
+  }
+  
+  .card h3 {
+  
+    margin:
+      0 0 12px 0;
+  
+    font-size:
+      16px;
+  }
+  
+  table {
+  
+    width:
+      100%;
+  
+    border-collapse:
+      collapse;
+  
+    font-size:
+      11px;
+  
+    margin-top:
+      10px;
+  }
+  
+  th {
+  
+    background:
+      #f5f5f5;
+  
+    padding:
+      10px;
+  
+    text-align:
+      left;
+  
+    font-weight:
+      bold;
+  }
+  
+  td {
+  
+    padding:
+      10px;
+  
+    border-bottom:
+      1px solid
+      #eee;
+  }
+  
+  .right {
+  
+    text-align:
+      right;
+  }
+  
+  .empty {
+  
+    text-align:
+      center;
+  
+    color:
+      #777;
+  
+    padding:
+      25px;
+  }
+  
+  .footer {
+  
+    margin-top:
+      40px;
+  
+    text-align:
+      center;
+  
+    font-size:
+      9px;
+  
+    color:
+      #888;
+  }
+  
+  @media print {
+  
+    body {
+  
+      background:
+        white;
+  
+      padding:
+        0;
+    }
+  
+    .export-toolbar {
+  
+      display:
+        none;
+    }
+  
+    .report {
+  
+      max-width:
+        none;
+  
+      box-shadow:
+        none;
+  
+      border-radius:
+        0;
+  
+      padding:
+        25px;
+    }
+  
+  }
+  
+  </style>
+  
+  </head>
+  
+  <body>
+  
+  <div class="export-toolbar">
+  
+    <div>
+      📊 Analytics Report
+    </div>
+  
+    <button
+      onclick="window.print()"
+    >
+      Download / Print PDF
+    </button>
+  
+  </div>
+  
+  <div class="report">
+  
+    <div class="header">
+  
+      ${
+        logoSrc
+          ? `
+            <img
+              src="${logoSrc}"
+              class="logo"
+              alt="Sistem POS"
+            />
+          `
+          : ""
+      }
+  
+      <div class="title">
+        Analytics Report
+      </div>
+  
+      <div class="subtitle">
+        Periode:
+        ${escapeHtml(start || "-")}
+        -
+        ${escapeHtml(end || "-")}
+      </div>
+  
+      <div class="subtitle">
+        Branch:
+        ${escapeHtml(branchId)}
+      </div>
+  
+    </div>
+  
+  
+    <!-- SUMMARY -->
+  
+    <div class="card">
+  
+      <h3>
+        Summary
+      </h3>
+  
+      <table>
+  
+        <tbody>
+  
+          <tr>
+  
+            <td>
+              Revenue
+            </td>
+  
+            <td class="right">
+              IDR ${rupiah(
+                summary.revenue ??
+                summary.totalRevenue ??
+                0
+              )}
+            </td>
+  
+          </tr>
+  
+          <tr>
+  
+            <td>
+              Orders
+            </td>
+  
+            <td class="right">
+              ${rupiah(
+                summary.orders ??
+                summary.totalOrders ??
+                0
+              )}
+            </td>
+  
+          </tr>
+  
+          <tr>
+  
+            <td>
+              AOV
+            </td>
+  
+            <td class="right">
+              IDR ${rupiah(
+                summary.aov ??
+                0
+              )}
+            </td>
+  
+          </tr>
+  
+        </tbody>
+  
+      </table>
+  
+    </div>
+  
+  
+    <!-- WEEKLY -->
+  
+    <div class="card">
+  
+      <h3>
+        Weekly Revenue
+      </h3>
+  
+      <table>
+  
+        <thead>
+  
+          <tr>
+  
+            <th>
+              Date
+            </th>
+  
+            <th class="right">
+              Revenue
+            </th>
+  
+          </tr>
+  
+        </thead>
+  
+        <tbody>
+  
+          ${weeklyRows}
+  
+        </tbody>
+  
+      </table>
+  
+    </div>
+  
+  
+    <!-- PEAK HOURS -->
+  
+    <div class="card">
+  
+      <h3>
+        Peak Hours
+      </h3>
+  
+      <table>
+  
+        <thead>
+  
+          <tr>
+  
+            <th>
+              Hour
+            </th>
+  
+            <th class="right">
+              Value
+            </th>
+  
+          </tr>
+  
+        </thead>
+  
+        <tbody>
+  
+          ${peakHourRows}
+  
+        </tbody>
+  
+      </table>
+  
+    </div>
+  
+  
+    <!-- TOP PRODUCTS -->
+  
+    <div class="card">
+  
+      <h3>
+        Top Products
+      </h3>
+  
+      <table>
+  
+        <thead>
+  
+          <tr>
+  
+            <th>
+              Product
+            </th>
+  
+            <th class="right">
+              Revenue
+            </th>
+  
+          </tr>
+  
+        </thead>
+  
+        <tbody>
+  
+          ${productRows}
+  
+        </tbody>
+  
+      </table>
+  
+    </div>
+  
+  
+    <div class="footer">
+  
+      Generated by Sistem POS
+      •
+      ${new Date().toLocaleString("id-ID")}
+  
+    </div>
+  
+  </div>
+  
+  </body>
+  
+  </html>
+  
+  `;
+  
+    // =========================
+    // RETURN HTML
+    // =========================
+  
+    res.setHeader(
+      "Content-Type",
+      "text/html; charset=utf-8"
+    );
+  
+    return res
+      .status(200)
+      .send(html);
+  
+  }
 
     
 
