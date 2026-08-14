@@ -4930,19 +4930,26 @@ else if (type === "cash-flow) {
     // =====================================================
     
     else if (type === "other-income") {
-  console.log(
-    ">>> MASUK OTHER INCOME EXPORT <<<"
-  );
-      if (!branchId) {
-        return res.status(400).send(
-          "branchId wajib diisi"
-        );
-      }
+      console.log(
+        ">>> MASUK OTHER INCOME EXPORT <<<"
+      );
+          if (!branchId) {
+            return res.status(400).send(
+              "branchId wajib diisi"
+            );
+          }
     
       // ===================================================
       // GET DATA
       // ===================================================
-    
+    console.log(
+  "OTHER INCOME RPC REQUEST:",
+  {
+    branchId,
+    start,
+    end
+  }
+);
       const {
         data,
         error
@@ -4954,6 +4961,35 @@ else if (type === "cash-flow) {
           p_end: end || null
         }
       );
+
+      console.log(
+  "OTHER INCOME RPC DATA:",
+  data
+);
+
+console.log(
+  "OTHER INCOME RPC ERROR:",
+  error
+);
+
+if (error) {
+
+  console.error(
+    "OTHER INCOME RPC ERROR DETAIL:",
+    error
+  );
+
+  return res
+    .status(500)
+    .json({
+      success: false,
+      error:
+        error.message ||
+        "RPC get_expense_dashboard gagal",
+      details: error
+    });
+
+}
     
       if (error) {
         throw error;
