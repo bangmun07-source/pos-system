@@ -25550,32 +25550,18 @@ async function exportAnalyticsPDF() {
 
 
     const response =
-      await fetch(
-        "/api/export-analytics-pdf",
-        {
-
-          method:"POST",
-
-          headers:{
-
-            "Content-Type":
-              "application/json"
-
-          },
-
-          body:JSON.stringify({
-
-            branchId,
-
-            start,
-
-            end
-
-          })
-
-        }
-      );
-
+      await fetch("/api/export-pdf", {
+		  method: "POST",
+		  headers: {
+			"Content-Type": "application/json"
+		  },
+		  body: JSON.stringify({
+			type: "analytics",
+			start,
+			end,
+			branchId
+		  })
+		});
 
     // =========================
     // HTTP ERROR
