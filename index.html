@@ -29429,8 +29429,7 @@ document.addEventListener("click", function (e) {
 
 async function exportExpensePDF() {
 
-  const f =
-    getExpenseFilters();
+  const f = getExpenseFilters();
 
   const branchId =
     state?.branchId || "";
@@ -29445,9 +29444,8 @@ async function exportExpensePDF() {
     return;
   }
 
-
   // =========================
-  // OPEN TAB
+  // OPEN WINDOW
   // =========================
 
   const pdfWindow =
@@ -29466,7 +29464,6 @@ async function exportExpensePDF() {
     return;
   }
 
-
   // =========================
   // LOADING
   // =========================
@@ -29480,53 +29477,37 @@ async function exportExpensePDF() {
     <head>
 
       <title>
-        Generating Expense Report...
+        Generating Expense Report
       </title>
 
       <style>
 
         body {
-
           margin: 0;
-
-          height: 100vh;
-
-          display: flex;
-
-          align-items: center;
-
-          justify-content: center;
-
           background: #0B0F14;
-
           color: white;
-
           font-family: Arial, sans-serif;
 
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          height: 100vh;
         }
 
         .loading {
-
           text-align: center;
-
         }
 
         .title {
-
           font-size: 18px;
-
           font-weight: bold;
-
           margin-bottom: 8px;
-
         }
 
         .text {
-
           font-size: 13px;
-
           opacity: .7;
-
         }
 
       </style>
@@ -29553,44 +29534,49 @@ async function exportExpensePDF() {
 
   `);
 
-
   try {
 
     // =========================
     // DEBUG
     // =========================
 
-    console.log(
-      "EXPORT EXPENSE REQUEST:",
-      {
+    const payload = {
+
+      type: "expense",
+
+      branchId:
         branchId,
 
-        start:
-          f?.startDate || null,
+      start:
+        f?.startDate || null,
 
-        end:
-          f?.endDate || null,
+      end:
+        f?.endDate || null,
 
-        status:
-          f?.status === "All Status"
-            ? "ALL"
-            : f?.status || "ALL",
+      status:
+        f?.status === "All Status"
+          ? "ALL"
+          : f?.status || "ALL",
 
-        category:
-          f?.category === "All Categories"
-            ? "ALL"
-            : f?.category || "ALL"
-      }
+      category:
+        f?.category === "All Categories"
+          ? "ALL"
+          : f?.category || "ALL"
+
+    };
+
+    console.log(
+      "EXPORT EXPENSE PAYLOAD:",
+      payload
     );
 
-
     // =========================
-    // CALL VERCEL API
+    // CALL SINGLE EXPORT API
     // =========================
 
     const response =
       await fetch(
-        "/api/export-expense-pdf",
+        "/api/export-pdf",
         {
 
           method: "POST",
@@ -29603,35 +29589,13 @@ async function exportExpensePDF() {
           },
 
           body:
-            JSON.stringify({
-
-              branchId:
-                branchId,
-
-              start:
-                f?.startDate || null,
-
-              end:
-                f?.endDate || null,
-
-              status:
-                f?.status === "All Status"
-                  ? "ALL"
-                  : f?.status || "ALL",
-
-              category:
-                f?.category === "All Categories"
-                  ? "ALL"
-                  : f?.category || "ALL"
-
-            })
+            JSON.stringify(payload)
 
         }
       );
 
-
     // =========================
-    // CHECK RESPONSE
+    // HTTP ERROR
     // =========================
 
     if (!response.ok) {
@@ -29646,14 +29610,12 @@ async function exportExpensePDF() {
 
     }
 
-
     // =========================
-    // GET HTML
+    // GET HTML REPORT
     // =========================
 
     const html =
       await response.text();
-
 
     if (!html) {
 
@@ -29663,14 +29625,12 @@ async function exportExpensePDF() {
 
     }
 
-
     console.log(
       "EXPORT EXPENSE HTML RECEIVED"
     );
 
-
     // =========================
-    // RENDER
+    // RENDER REPORT
     // =========================
 
     pdfWindow.document.open();
@@ -29683,14 +29643,12 @@ async function exportExpensePDF() {
 
   }
 
-
   catch (err) {
 
     console.error(
-      "Export Expense PDF:",
+      "Export Expense:",
       err
     );
-
 
     // =========================
     // ERROR PAGE
@@ -29726,23 +29684,16 @@ async function exportExpensePDF() {
           background:#151A21;
           padding:15px;
           border-radius:10px;
+          color:#ff6b6b;
         ">${String(
           err?.message ||
           err ||
           "Unknown error"
         )
-          .replace(
-            /&/g,
-            "&amp;"
-          )
-          .replace(
-            /</g,
-            "&lt;"
-          )
-          .replace(
-            />/g,
-            "&gt;"
-          )}</pre>
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+        }</pre>
 
       </body>
 
