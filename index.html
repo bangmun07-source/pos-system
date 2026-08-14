@@ -27732,27 +27732,47 @@ function formatFileSize(bytes) {
 }
 
 function removeExpenseAttachment() {
-    const input = document.getElementById("expenseAttachmentInput");
-    if (input) {
-        input.value = "";
-    }
-    document.getElementById("expenseSelectedFile")
-    .classList
-    .add("hidden");
+
+  const input =
+    document.getElementById(
+      "expenseAttachmentInput"
+    );
+
+  if (input) {
+    input.value = "";
+  }
+
+  const selectedFile =
+    document.getElementById(
+      "expenseSelectedFile"
+    );
+
+  if (selectedFile) {
+    selectedFile.classList.add(
+      "hidden"
+    );
+  }
+
 }
+
 
 async function uploadExpenseAttachment() {
 
   const expense =
-    expenseData[selectedAttachmentExpenseIndex];
+    expenseData[
+      selectedAttachmentExpenseIndex
+    ];
 
   if (!expense) {
+
     showToast(
       "Expense tidak ditemukan",
       "error"
     );
+
     return;
   }
+
 
   const input =
     document.getElementById(
@@ -27762,29 +27782,47 @@ async function uploadExpenseAttachment() {
   const file =
     input?.files?.[0];
 
+
   if (!file) {
+
     showToast(
       "Pilih file terlebih dahulu",
       "warning"
     );
+
     return;
   }
 
+
   try {
 
-    showLoading();
-
     // =========================
-    // COMPRESS + BASE64
+    // COMPRESS IMAGE
     // =========================
 
     const compressed =
-      await compressImage(file);
+      await compressImage(
+        file
+      );
+
+
+    // =========================
+    // BASE64
+    // =========================
 
     const base64 =
       await fileToBase64(
         compressed
       );
+
+
+    if (!base64) {
+
+      throw new Error(
+        "Gagal membaca file"
+      );
+
+    }
 
 
     // =========================
@@ -27795,23 +27833,35 @@ async function uploadExpenseAttachment() {
       await fetch(
         "/api/handle-expense-attachment",
         {
-          method: "POST",
+
+          method:
+            "POST",
 
           headers: {
             "Content-Type":
               "application/json"
           },
 
-          body: JSON.stringify({
-            base64,
-            branchId:
-              expense.branchId,
-            refId:
-              expense.refId
-          })
+          body:
+            JSON.stringify({
+
+              base64,
+
+              branchId:
+                expense.branchId,
+
+              refId:
+                expense.refId
+
+            })
+
         }
       );
 
+
+    // =========================
+    // RESPONSE JSON
+    // =========================
 
     const result =
       await response.json();
@@ -27831,7 +27881,7 @@ async function uploadExpenseAttachment() {
 
 
     // =========================
-    // URL DARI API
+    // URL
     // =========================
 
     const url =
@@ -27839,22 +27889,32 @@ async function uploadExpenseAttachment() {
 
 
     if (!url) {
+
       throw new Error(
         "URL attachment tidak ditemukan"
       );
+
     }
 
 
+    console.log(
+      "EXPENSE ATTACHMENT URL:",
+      url
+    );
+
+
     // =========================
-    // UPDATE DATABASE
+    // SAVE URL TO DATABASE
     // =========================
 
     await updateExpenseAttachmentRPC({
+
       Ref_ID:
         expense.refId,
 
       Attachment_URL:
         url
+
     });
 
 
@@ -27867,6 +27927,10 @@ async function uploadExpenseAttachment() {
       "success"
     );
 
+
+    // =========================
+    // CLOSE MODAL
+    // =========================
 
     closeExpenseAddAttachmentModal();
 
@@ -27883,10 +27947,11 @@ async function uploadExpenseAttachment() {
 
 
     // =========================
-    // RELOAD
+    // RELOAD DATA
     // =========================
 
     await loadExpenseDashboard();
+
 
   }
   catch (err) {
@@ -27896,6 +27961,7 @@ async function uploadExpenseAttachment() {
       err
     );
 
+
     showToast(
       err?.message ||
       "Upload attachment gagal",
@@ -27903,11 +27969,7 @@ async function uploadExpenseAttachment() {
     );
 
   }
-  finally {
 
-    hideLoading();
-
-  }
 }
 
 function renderOtherIncome() {
