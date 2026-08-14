@@ -30069,7 +30069,7 @@ async function exportOtherIncomePDF() {
           },
 
           body: JSON.stringify({
-            type: "other-income",
+            branchId: state.branchId,
             branchId: f.branch,
             category: f.category,
             status: f.status,
