@@ -18142,64 +18142,161 @@ function initMemberExport() {
 
 async function exportMembersPDF() {
 
+  // =========================
+  // FILTER
+  // =========================
+
   const tier =
     document.getElementById("tierFilter")?.value || "ALL";
 
   const branchId =
-    state.branchId || "";
+    state?.branchId || "";
+
+  // =========================
+  // VALIDASI
+  // =========================
 
   if (!branchId) {
-    alert("Branch belum tersedia");
+
+    showToast(
+      "Branch login tidak ditemukan",
+      "error"
+    );
+
     return;
   }
 
-  // OPEN REPORT TAB
+  // =========================
+  // OPEN REPORT WINDOW
+  // =========================
+
   const pdfWindow =
-    window.open("", "_blank");
+    window.open(
+      "",
+      "_blank"
+    );
 
   if (!pdfWindow) {
-    alert("Popup diblokir browser");
+
+    showToast(
+      "Popup diblokir browser",
+      "error"
+    );
+
     return;
   }
 
+  // =========================
+  // LOADING PAGE
+  // =========================
+
   pdfWindow.document.write(`
+
     <!DOCTYPE html>
+
     <html>
+
     <head>
-      <title>Generating Member Report...</title>
+
+      <meta charset="UTF-8">
+
+      <title>
+        Generating Member Report...
+      </title>
 
       <style>
+
         body {
+
           margin: 0;
+
           height: 100vh;
+
           display: flex;
+
           align-items: center;
+
           justify-content: center;
-          background: #0B0F14;
-          color: white;
-          font-family: Arial, sans-serif;
+
+          background:
+            #0B0F14;
+
+          color:
+            white;
+
+          font-family:
+            Arial,
+            sans-serif;
+
         }
 
         .box {
-          text-align: center;
+
+          text-align:
+            center;
+
         }
 
         .loader {
-          width: 32px;
-          height: 32px;
-          border: 3px solid #ffffff33;
-          border-top-color: white;
-          border-radius: 50%;
-          animation: spin .8s linear infinite;
-          margin: 0 auto 20px;
+
+          width:
+            32px;
+
+          height:
+            32px;
+
+          border:
+            3px solid
+            rgba(255,255,255,.2);
+
+          border-top-color:
+            white;
+
+          border-radius:
+            50%;
+
+          animation:
+            spin .8s linear infinite;
+
+          margin:
+            0 auto 20px;
+
         }
 
         @keyframes spin {
+
           to {
-            transform: rotate(360deg);
+            transform:
+              rotate(360deg);
           }
+
         }
+
+        h2 {
+
+          margin:
+            0 0 8px;
+
+          font-size:
+            18px;
+
+        }
+
+        p {
+
+          margin:
+            0;
+
+          font-size:
+            13px;
+
+          opacity:
+            .65;
+
+        }
+
       </style>
+
     </head>
 
     <body>
@@ -18219,59 +18316,119 @@ async function exportMembersPDF() {
       </div>
 
     </body>
+
     </html>
+
   `);
+
+  // =========================
+  // PAYLOAD
+  // =========================
+
+  const payload = {
+
+    type:
+      "members",
+
+    tier:
+      tier,
+
+    branchId:
+      branchId
+
+  };
+
+  console.log(
+    "EXPORT MEMBER PAYLOAD:",
+    payload
+  );
+
+  // =========================
+  // REQUEST
+  // =========================
 
   try {
 
-    console.log(
-      "EXPORT MEMBERS:",
-      {
-        tier,
-        branchId
-      }
-    );
-
     const response =
-	  await fetch(
-	    "/api/export-pdf",
-	    {
-	      method: "POST",
-	
-	      headers: {
-	        "Content-Type":
-	          "application/json"
-	      },
-	
-	      body: JSON.stringify({
-	        type: "members",
-	        tier,
-	        branchId
-	      })
-	    }
-	  );
+      await fetch(
+        "/api/export-pdf",
+        {
+
+          method:
+            "POST",
+
+          headers: {
+
+            "Content-Type":
+              "application/json"
+
+          },
+
+          body:
+            JSON.stringify(
+              payload
+            )
+
+        }
+      );
+
+    // =========================
+    // RESPONSE TEXT
+    // =========================
 
     const text =
       await response.text();
 
     console.log(
-      "EXPORT MEMBER API STATUS:",
+      "EXPORT MEMBER STATUS:",
       response.status
     );
 
     console.log(
-      "EXPORT MEMBER API RESPONSE:",
+      "EXPORT MEMBER RESPONSE:",
       text
     );
 
+    // =========================
+    // HTTP ERROR
+    // =========================
+
     if (!response.ok) {
 
+      let errorMessage =
+        `Export member gagal (${response.status})`;
+
+      try {
+
+        const json =
+          JSON.parse(text);
+
+        errorMessage =
+          json?.error ||
+          json?.message ||
+          errorMessage;
+
+      }
+      catch (_) {
+
+        if (text) {
+
+          errorMessage =
+            text;
+
+        }
+
+      }
+
       throw new Error(
-        text ||
-        "Export member gagal"
+        errorMessage
       );
 
     }
+
+    // =========================
+    // EMPTY RESPONSE
+    // =========================
 
     if (
       !text ||
@@ -18279,12 +18436,19 @@ async function exportMembersPDF() {
     ) {
 
       throw new Error(
-        "Response API kosong."
+        "Server mengembalikan HTML kosong."
       );
 
     }
 
-    // WRITE REPORT
+    console.log(
+      "EXPORT MEMBER HTML RECEIVED"
+    );
+
+    // =========================
+    // RENDER REPORT
+    // =========================
+
     pdfWindow.document.open();
 
     pdfWindow.document.write(
@@ -18302,30 +18466,92 @@ async function exportMembersPDF() {
       err
     );
 
+    // =========================
+    // ERROR PAGE
+    // =========================
+
+    const message =
+      String(
+        err?.message ||
+        err ||
+        "Unknown error"
+      )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      );
+
     pdfWindow.document.open();
 
     pdfWindow.document.write(`
+
       <!DOCTYPE html>
 
       <html>
 
       <head>
 
+        <meta charset="UTF-8">
+
         <title>
-          Export Error
+          Export Member Error
         </title>
 
         <style>
 
           body {
-            font-family: Arial;
+
+            margin: 0;
+
             padding: 40px;
-            background: #0B0F14;
-            color: white;
+
+            background:
+              #0B0F14;
+
+            color:
+              white;
+
+            font-family:
+              Arial,
+              sans-serif;
+
           }
 
           .error {
-            color: #ff6b6b;
+
+            color:
+              #ff6b6b;
+
+          }
+
+          .message {
+
+            margin-top:
+              20px;
+
+            background:
+              #151A21;
+
+            padding:
+              15px;
+
+            border-radius:
+              10px;
+
+            white-space:
+              pre-wrap;
+
+            color:
+              #ff8080;
+
           }
 
         </style>
@@ -18339,17 +18565,25 @@ async function exportMembersPDF() {
         </h2>
 
         <p>
-          ${String(
-            err.message || err
-          )}
+          Gagal membuat Member Report.
         </p>
+
+        <div class="message">
+          ${message}
+        </div>
 
       </body>
 
       </html>
+
     `);
 
     pdfWindow.document.close();
+
+    showToast(
+      "Export Member gagal",
+      "error"
+    );
 
   }
 
