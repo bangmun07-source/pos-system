@@ -27115,23 +27115,24 @@ async function loadExpenseDashboard() {
 
   const filter =
     getExpenseFilters();
-
   filter.loginBranchId =
     state.branchId;
-
   const filterKey =
     JSON.stringify(filter);
-
 
   // =========================
   // CACHE HIT
   // =========================
-
   if (
     state.expenseDashboardData &&
     state.expenseDashboardFilter === filterKey
   ) {
-
+    loadExpenseBranches(
+      "expenseBranchFilter"
+    );
+    loadOtherIncomeBranches(
+      "otherIncomeBranchFilter"
+    );
     applyExpenseDashboard(
       state.expenseDashboardData
     );
@@ -27139,19 +27140,15 @@ async function loadExpenseDashboard() {
     return;
   }
 
-
   try {
-
     console.log(
       "SERVER CALL getExpenseDashboardRPC"
     );
-
 
     const data =
       await getExpenseDashboardRPC(
         filter
       );
-
 
     // =========================
     // CACHE
@@ -27165,27 +27162,32 @@ async function loadExpenseDashboard() {
 
 
     // =========================
+    // LOAD BRANCH FILTER
+    // =========================
+    loadExpenseBranches(
+      "expenseBranchFilter"
+    );
+    loadOtherIncomeBranches(
+      "otherIncomeBranchFilter"
+    );
+
+    // =========================
     // RENDER
     // =========================
-
     applyExpenseDashboard(
       data
     );
-
   }
   catch (err) {
-
     console.error(
       "Expense Dashboard Error:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal memuat data.",
       "error"
     );
-
   }
 }
 
@@ -28654,61 +28656,30 @@ function loadOtherIncomeBranches(
 
   select.innerHTML = "";
 
-
-  // =========================
-  // FILTER BRANCH
-  // =========================
-
-  if (
-    selectId ===
-    "otherIncomeBranchFilter"
-  ) {
-
-    (expenseBranches || [])
-      .forEach(b => {
-
-        select.innerHTML += `
-          <option value="${b.id}">
-            ${b.name}
-          </option>
-        `;
-
-      });
+  const branches =
+    state.expenseDashboardData
+      ?.branches || [];
 
 
-    // DEFAULT = BRANCH LOGIN
-    select.value =
-      state.branchId;
+  branches.forEach(b => {
 
-    select.disabled = false;
+    select.innerHTML += `
+      <option value="${b.id}">
+        ${b.name}
+      </option>
+    `;
 
-  }
+  });
 
 
   // =========================
-  // POPUP
+  // DEFAULT = BRANCH LOGIN
   // =========================
 
-  else {
+  select.value =
+    state.branchId;
 
-    (
-      state.expenseDashboardData
-        ?.branches || []
-    ).forEach(b => {
-
-      select.innerHTML += `
-        <option value="${b.id}">
-          ${b.name}
-        </option>
-      `;
-
-    });
-
-    select.value =
-      state.branchId;
-
-    select.disabled = true;
-  }
+  select.disabled = false;
 }
 
 function initOtherIncomeEvents() {
@@ -29057,16 +29028,20 @@ function loadExpenseBranches(
     "expenseBranchFilter"
   ) {
 
-    (expenseBranches || [])
-      .forEach(b => {
+    const branches =
+      state.expenseDashboardData
+        ?.branches || [];
 
-        select.innerHTML += `
-          <option value="${b.id}">
-            ${b.name}
-          </option>
-        `;
 
-      });
+    branches.forEach(b => {
+
+      select.innerHTML += `
+        <option value="${b.id}">
+          ${b.name}
+        </option>
+      `;
+
+    });
 
 
     // =========================
