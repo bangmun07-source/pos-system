@@ -69,6 +69,14 @@ export default async function handler(req, res) {
       }
     );
 
+console.log(
+  "=== EXPORT PDF FUNCTION RUNNING ==="
+);
+
+console.log(
+  "TYPE RECEIVED:",
+  type
+);
     // ==========================================
     // EXPENSE
     // ==========================================
@@ -1140,7 +1148,9 @@ td {
     // ==========================================
 
     else if (type === "members") {
-
+     console.log(
+        ">>> MASUK MEMBERS EXPORT <<<"
+      );
       if (!branchId) {
 
         return res
@@ -1771,7 +1781,9 @@ td {
 // ==========================================
 
 else if (type === "recent-transactions") {
-
+     console.log(
+        ">>> MASUK RECENT TRANSAKSI EXPORT <<<"
+      );
   if (!branchId) {
 
     return res
@@ -2545,7 +2557,9 @@ td {
 // ==========================================
 
 else if (type === "gross-revenue") {
-
+     console.log(
+        ">>> MASUK GROSS REVENUE EXPORT <<<"
+      );
   if (!branchId) {
 
     return res
@@ -2758,18 +2772,9 @@ else if (type === "analytics") {
       });
 
   }
-
-   const {
-      start,
-      end,
-      branchId
-    } = req.body || {};
-
-    if (!branchId) {
-      return res.status(400).send(
-        "branchId wajib diisi"
+  console.log(
+        ">>> MASUK ANALYTICS EXPORT <<<"
       );
-    }
 
     // =========================
     // GET ANALYTICS DASHBOARD
@@ -3865,7 +3870,9 @@ td{
 }
 
 else if (type === "cash-flow") {
-
+console.log(
+        ">>> MASUK CASH FLOW EXPORT <<<"
+      );
   if (!branchId) {
 
     return res
