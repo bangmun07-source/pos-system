@@ -5411,6 +5411,10 @@ export default async function handler(req, res) {
       
       else if (type === "analytics") {
       
+        console.log(
+          ">>> MASUK ANALYTICS EXPORT <<<"
+        );
+      
         if (!branchId) {
       
           return res
@@ -5421,54 +5425,49 @@ export default async function handler(req, res) {
             });
       
         }
-        console.log(
-              ">>> MASUK ANALYTICS EXPORT <<<"
-            );
       
-          // =========================
-          // GET ANALYTICS DASHBOARD
-          // =========================
+        // =========================
+        // GET ANALYTICS DASHBOARD
+        // =========================
       
-          const {
-            data,
+        const {
+          data,
+          error
+        } = await supabase.rpc(
+          "get_analytics_dashboard",
+          {
+            p_branch_id: branchId,
+            p_start: start || null,
+            p_end: end || null
+          }
+        );
+      
+        if (error) {
+      
+          console.error(
+            "ANALYTICS RPC ERROR:",
             error
-          } = await supabase.rpc(
-            "get_analytics_dashboard",
-            {
-              p_branch_id: branchId,
-              p_start: start || null,
-              p_end: end || null
-            }
           );
       
-          if (error) {
-            throw error;
-          }
+          throw error;
+        }
       
-          const analyticsData = data;
+        console.log(
+          "EXPORT ANALYTICS DATA:",
+          data
+        );
       
-          console.log(
-            "EXPORT ANALYTICS DATA:",
-            analyticsData
-          );
+        // =========================
+        // NORMALIZE
+        // =========================
       
-          console.log(
-            "EXPORT ACTIVE MEMBERS:",
-            analyticsData?.analytics?.activeMemberList
-          );
+        const report =
+          data || {};
       
-          if (!data) {
-            throw new Error(
-              "Data analytics kosong"
-            );
-          }
-      
-          // =========================
-          // NORMALIZE
-          // =========================
-      
-          const analytics =
-            data.analytics || {};
+        console.log(
+          "ANALYTICS REPORT:",
+          report
+        );
       
           const paymentDistribution =
             Array.isArray(data.paymentDistribution)
