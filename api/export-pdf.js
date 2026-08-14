@@ -50,7 +50,8 @@ export default async function handler(req, res) {
       status = "ALL",
       category = "ALL",
       tier = "ALL",
-      search = ""
+      search = "",
+      loginUserId
     } = req.body || {};
 
     console.log(
@@ -63,7 +64,8 @@ export default async function handler(req, res) {
         status,
         category,
         tier,
-        search
+        search,
+        loginUserId
       }
     );
 
