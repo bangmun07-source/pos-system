@@ -27441,7 +27441,12 @@ async function saveExpenseStatus() {
   const expense =
     expenseData[selectedExpenseIndex];
   if (!expense) return;
-
+console.log("SELECTED EXPENSE:", {
+    index: selectedExpenseIndex,
+    expense,
+    refId: expense?.refId,
+    status: expense?.status
+  });
   const newStatus =
     document.getElementById(
       "expenseNewStatus"
