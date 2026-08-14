@@ -35401,19 +35401,21 @@ async function exportCashFlowReport() {
     // =========================
 
     const response =
-      await fetch("/api/export-pdf", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json"
-			},
-			body: JSON.stringify({
-				type: "cash-flow",
-          start,
-          end,
-          branchId,
-          loginUserId
-			})
-		});
+	  await fetch("/api/export-pdf", {
+		method: "POST",
+	
+		headers: {
+		  "Content-Type": "application/json"
+		},
+	
+		body: JSON.stringify({
+		  type: "cash-flow",
+		  start: startDate,
+		  end: endDate,
+		  branchId: branch,
+		  loginUserId
+		})
+	  });
 
     // =========================
     // HTTP ERROR
