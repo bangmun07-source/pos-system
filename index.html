@@ -26984,7 +26984,16 @@ function initExpenseSettingPage() {
     ?.addEventListener("change", filterExpenseTable);
   document
     .getElementById("expenseBranchFilter")
-    ?.addEventListener("change", filterExpenseTable);
+    ?.addEventListener(
+      "change",
+      async () => {
+        state.expenseDashboardData =
+          null;
+        state.expenseDashboardFilter =
+          null;
+        await loadExpenseDashboard();
+      }
+    );
   setTimeout(() => {
     document
       .getElementById("btnNewExpense")
