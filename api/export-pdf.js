@@ -30,59 +30,82 @@ export default async function handler(req, res) {
     } = req.body || {};
 
     console.log("EXPORT TYPE:", type);
-console.log("EXPORT BRANCH:", branchId);
+    console.log("EXPORT BRANCH:", branchId);
 
-// =====================================================
-// TEST MEMBER RPC
-// =====================================================
+    // =====================================================
+    // TEST MEMBER RPC
+    // =====================================================
 
-if (type === "members") {
+    if (type === "members") {
 
-  console.log(
-    ">>> MASUK MEMBER EXPORT <<<"
-  );
+      console.log(
+        ">>> MASUK MEMBER EXPORT <<<"
+      );
 
-  const {
-    data,
-    error
-  } = await supabase.rpc(
-    "get_members",
-    {
-      p_branch_id: branchId
+      const {
+        data,
+        error
+      } = await supabase.rpc(
+        "get_members",
+        {
+          p_branch_id: branchId
+        }
+      );
+
+      console.log(
+        "GET MEMBERS DATA:",
+        data
+      );
+
+      console.log(
+        "GET MEMBERS ERROR:",
+        error
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      return res.status(200).json({
+        success: true,
+        rows: Array.isArray(data)
+          ? data.length
+          : 0
+      });
     }
-  );
 
-  console.log(
-    "GET MEMBERS DATA:",
-    data
-  );
+    // =====================================================
+    // UNKNOWN TYPE
+    // =====================================================
 
-  console.log(
-    "GET MEMBERS ERROR:",
-    error
-  );
+    return res.status(400).json({
+      success: false,
+      error:
+        `Export type tidak dikenal: ${type}`
+    });
 
-  if (error) {
-    throw error;
-  }
-
-  return res.status(200).json({
-    success: true,
-    rows: Array.isArray(data)
-      ? data.length
-      : 0
-  });
-} catch (err) {
+  } catch (err) {
 
     console.error(
       "EXPORT TEST ERROR:",
       err
     );
 
+    console.error(
+      "ERROR MESSAGE:",
+      err?.message
+    );
+
+    console.error(
+      "ERROR STACK:",
+      err?.stack
+    );
+
     return res.status(500).json({
       success: false,
-      error: err?.message || "Unknown error"
+      error:
+        err?.message ||
+        "Unknown error"
     });
-
   }
 }
