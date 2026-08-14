@@ -33,24 +33,13 @@ function normalize(value) {
 
 export default async function handler(req, res) {
 
-  // ==========================================
-  // METHOD
-  // ==========================================
-
   if (req.method !== "POST") {
-
     return res
       .status(405)
       .send("Method not allowed");
-
   }
 
-
   try {
-
-    // ==========================================
-    // REQUEST
-    // ==========================================
 
     const {
       type = "",
@@ -58,9 +47,9 @@ export default async function handler(req, res) {
       end,
       branchId,
       status = "ALL",
-      category = "ALL"
+      category = "ALL",
+      tier = "ALL"
     } = req.body || {};
-
 
     console.log(
       "EXPORT PDF REQUEST:",
@@ -70,10 +59,10 @@ export default async function handler(req, res) {
         end,
         branchId,
         status,
-        category
+        category,
+        tier
       }
     );
-
 
     // ==========================================
     // EXPENSE
