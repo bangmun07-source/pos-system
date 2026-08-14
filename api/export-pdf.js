@@ -5471,18 +5471,60 @@ else if (type === "analytics") {
     data
   );
 
-  // =========================
-  // TEST RESPONSE
-  // =========================
+ // =========================
+// NORMALIZE
+// =========================
 
-  return res
-    .status(200)
-    .json({
-      success: true,
-      type: "analytics",
-      branchId,
-      hasData: !!data
-    });
+const report = data || {};
+
+console.log(
+  "ANALYTICS REPORT:",
+  report
+);
+
+const summary =
+  report.summary || {};
+
+const weekly =
+  Array.isArray(report.weekly)
+    ? report.weekly
+    : [];
+
+const peakHours =
+  Array.isArray(report.peakHours)
+    ? report.peakHours
+    : [];
+
+const topProducts =
+  Array.isArray(report.topProducts)
+    ? report.topProducts
+    : [];
+
+console.log(
+  "ANALYTICS NORMALIZED:",
+  {
+    summary,
+    weeklyCount: weekly.length,
+    peakHoursCount: peakHours.length,
+    topProductsCount: topProducts.length
+  }
+);
+
+// =========================
+// TEST RESPONSE
+// =========================
+
+return res
+  .status(200)
+  .json({
+    success: true,
+    type: "analytics",
+    branchId,
+    summary,
+    weeklyCount: weekly.length,
+    peakHoursCount: peakHours.length,
+    topProductsCount: topProducts.length
+  });
 
 }
 
