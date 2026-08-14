@@ -3286,9 +3286,6 @@ async function addExpenseRPC(data = {}) {
 
       p_status:
         data.status,
-
-      p_ref_id:
-        data.refId
     }
   );
 
