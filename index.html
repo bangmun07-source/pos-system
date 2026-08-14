@@ -14806,26 +14806,28 @@ async function exportRecentTransactions() {
     // =========================
 
     const response =
-      await fetch(
-        "/api/export-recent-transactions",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-
-            start,
-            end,
-            status,
-            branchId
-
-          })
-        }
-      );
+	  await fetch(
+	    "/api/export-pdf",
+	    {
+	      method: "POST",
+	
+	      headers: {
+	        "Content-Type":
+	          "application/json"
+	      },
+	
+	      body: JSON.stringify({
+	
+	        type: "recent-transactions",
+	
+	        start,
+	        end,
+	        status,
+	        branchId
+	
+	      })
+	    }
+	  );
 
     // =========================
     // GET RESPONSE AS TEXT
