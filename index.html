@@ -27774,61 +27774,76 @@ async function uploadExpenseAttachment() {
 
     showLoading();
 
-    const ext =
-      file.name
-        .split(".")
-        .pop()
-        .toLowerCase() === "jpeg"
-        ? "jpg"
-        : file.name
-            .split(".")
-            .pop()
-            .toLowerCase();
+    // =========================
+    // COMPRESS + BASE64
+    // =========================
 
-    const path =
-      `${expense.branchId}/${expense.refId}/${expense.refId}_${Date.now()}.${ext}`;
+    const compressed =
+      await compressImage(file);
+
+    const base64 =
+      await fileToBase64(
+        compressed
+      );
 
 
     // =========================
-    // UPLOAD SUPABASE STORAGE
+    // UPLOAD VIA VERCEL API
     // =========================
 
-    const {
-      error: uploadError
-    } = await supabaseClient.storage
-      .from("Expense_Attachment")
-      .upload(
-        path,
-        file,
+    const response =
+      await fetch(
+        "/api/handle-expense-attachment",
         {
-          contentType: file.type,
-          upsert: false
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            base64,
+            branchId:
+              expense.branchId,
+            refId:
+              expense.refId
+          })
         }
       );
 
-    if (uploadError) {
-      throw uploadError;
+
+    const result =
+      await response.json();
+
+
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      throw new Error(
+        result.error ||
+        "Upload attachment gagal"
+      );
+
     }
 
-    // =========================
-    // PUBLIC URL
-    // =========================
 
-    const {
-      data: publicData
-    } =
-      supabaseClient.storage
-        .from("Expense_Attachment")
-        .getPublicUrl(path);
+    // =========================
+    // URL DARI API
+    // =========================
 
     const url =
-      publicData?.publicUrl;
+      result.url;
+
 
     if (!url) {
       throw new Error(
         "URL attachment tidak ditemukan"
       );
     }
+
 
     // =========================
     // UPDATE DATABASE
@@ -27842,14 +27857,35 @@ async function uploadExpenseAttachment() {
         url
     });
 
+
+    // =========================
+    // SUCCESS
+    // =========================
+
     showToast(
       "Attachment berhasil disimpan",
       "success"
     );
 
+
     closeExpenseAddAttachmentModal();
-    state.expenseDashboardData = null;
-    state.expenseDashboardFilter = null;
+
+
+    // =========================
+    // CLEAR CACHE
+    // =========================
+
+    state.expenseDashboardData =
+      null;
+
+    state.expenseDashboardFilter =
+      null;
+
+
+    // =========================
+    // RELOAD
+    // =========================
+
     await loadExpenseDashboard();
 
   }
@@ -27861,7 +27897,7 @@ async function uploadExpenseAttachment() {
     );
 
     showToast(
-      err.message ||
+      err?.message ||
       "Upload attachment gagal",
       "error"
     );
