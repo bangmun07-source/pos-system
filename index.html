@@ -28648,38 +28648,28 @@ function updateOtherIncomeTableInfo() {
 function loadOtherIncomeBranches(
   selectId = "otherIncomeBranchFilter"
 ) {
-
   const select =
     document.getElementById(selectId);
 
   if (!select) return;
-
   select.innerHTML = "";
-
   const branches =
     state.expenseDashboardData
       ?.branches || [];
 
-
   branches.forEach(b => {
-
     select.innerHTML += `
       <option value="${b.id}">
         ${b.name}
       </option>
     `;
-
   });
-
 
   // =========================
   // DEFAULT = BRANCH LOGIN
   // =========================
-
-  select.value =
-    state.branchId;
-
-  select.disabled = false;
+  select.value = state.branchId;
+  select.disabled = true;
 }
 
 function initOtherIncomeEvents() {
