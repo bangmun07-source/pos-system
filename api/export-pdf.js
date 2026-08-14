@@ -3864,7 +3864,7 @@ td{
 
 }
 
-else if (type === "cash-flow) {
+else if (type === "cash-flow") {
 
   if (!branchId) {
 
