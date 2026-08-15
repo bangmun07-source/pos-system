@@ -2982,6 +2982,26 @@ async function saveCategoryRPC( branchId, categoryKey, categoryName, discount, r
   return data;
 }
 
+async function getCategoriesRPC(branchId) {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "get_categories",
+    {
+      p_branch_id: branchId
+    }
+  );
+  if (error) {
+    console.error(
+      "get_categories error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
+
     // ===============================
     // EXPENSES & OTHER INCOME PAGE
     // ===============================
