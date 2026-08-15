@@ -30885,30 +30885,15 @@ async function loadCategorySettings() {
       return;
     }
 
-    const res =
+    const categories =
       await getCategoriesRPC(
         branchId
       );
 
     console.log(
       "CATEGORY RPC RESULT:",
-      res
+      categories
     );
-
-    if (
-      !res ||
-      res.success === false
-    ) {
-      throw new Error(
-        res?.message ||
-        "Gagal mengambil category"
-      );
-    }
-
-    const categories =
-      Array.isArray(res.data)
-        ? res.data
-        : [];
 
     // ==============================
     // RESET UI
