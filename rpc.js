@@ -3810,7 +3810,7 @@ async function deleteBackupHistoryRPC(data = {}) {
   return result;
 }
 
-async function clearDatabase() {
+async function clearDatabaseRPC() {
 
   const {
     data,
