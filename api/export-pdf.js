@@ -5440,7 +5440,7 @@ else if (type === "analytics") {
   }
 
   // =========================
-  // GET ANALYTICS DASHBOARD
+  // RPC
   // =========================
 
   const {
@@ -5471,33 +5471,12 @@ else if (type === "analytics") {
     data
   );
 
-  // =========================
+  // ==========================================
   // NORMALIZE
-  // =========================
+  // ==========================================
 
   const report =
     data || {};
-
-  /*
-    Struktur yang terlihat dari
-    dashboard:
-
-    {
-      analytics: {
-        revenue,
-        hpp,
-        netProfit,
-        growth,
-        weekly,
-        ...
-      },
-
-      paymentDistribution: [],
-      topSelling: [],
-      peakHours: [],
-      rawMaterials: []
-    }
-  */
 
   const analytics =
     report.analytics || {};
@@ -5554,9 +5533,9 @@ else if (type === "analytics") {
     }
   );
 
-  // =========================
+  // ==========================================
   // KPI
-  // =========================
+  // ==========================================
 
   const revenue =
     Number(
@@ -5578,242 +5557,23 @@ else if (type === "analytics") {
       analytics.growth || 0
     );
 
-  // =========================
+  // ==========================================
   // WEEKLY REVENUE
-  // =========================
+  // ==========================================
 
   const weeklyRows =
     weekly.length
 
-      ? weekly.map(item => {
-
-          /*
-            Support beberapa kemungkinan
-            bentuk data weekly.
-          */
-
-          const day =
-            item?.day ??
-            item?.date ??
-            item?.label ??
-            item?.Day ??
-            "-";
-
-          const amount =
-            Number(
-              item?.revenue ??
-              item?.total ??
-              item?.amount ??
-              item?.value ??
-              0
-            );
-
-          return `
-            <tr>
-
-              <td>
-                ${escapeHtml(day)}
-              </td>
-
-              <td class="right">
-                IDR ${rupiah(amount)}
-              </td>
-
-            </tr>
-          `;
-
-        }).join("")
-
-      : `
-        <tr>
-
-          <td
-            colspan="2"
-            class="empty"
-          >
-            No weekly revenue data
-          </td>
-
-        </tr>
-      `;
-
-  // =========================
-  // PAYMENT DISTRIBUTION
-  // =========================
-
-  const paymentRows =
-    paymentDistribution.length
-
-      ? paymentDistribution.map(item => {
-
-          const method =
-            item?.paymentMethod ??
-            item?.payment_method ??
-            item?.method ??
-            item?.name ??
-            item?.type ??
-            "-";
-
-          const amount =
-            Number(
-              item?.amount ??
-              item?.total ??
-              item?.value ??
-              0
-            );
-
-          return `
-            <tr>
-
-              <td>
-                ${escapeHtml(method)}
-              </td>
-
-              <td class="right">
-                IDR ${rupiah(amount)}
-              </td>
-
-            </tr>
-          `;
-
-        }).join("")
-
-      : `
-        <tr>
-
-          <td
-            colspan="2"
-            class="empty"
-          >
-            No payment data
-          </td>
-
-        </tr>
-      `;
-
-  // =========================
-  // TOP SELLING PRODUCTS
-  // =========================
-
-  const topProductRows =
-    topSelling.length
-
-      ? topSelling.map(item => {
-
-          const product =
-            item?.product ??
-            item?.productName ??
-            item?.product_name ??
-            item?.name ??
-            "-";
-
-          const quantity =
-            Number(
-              item?.quantity ??
-              item?.qty ??
-              item?.totalQuantity ??
-              0
-            );
-
-          const amount =
-            Number(
-              item?.revenue ??
-              item?.totalRevenue ??
-              item?.amount ??
-              item?.total ??
-              0
-            );
-
-          return `
-            <tr>
-
-              <td>
-                ${escapeHtml(product)}
-              </td>
-
-              <td class="right">
-                ${quantity}
-              </td>
-
-              <td class="right">
-                IDR ${rupiah(amount)}
-              </td>
-
-            </tr>
-          `;
-
-        }).join("")
-
-      : `
-        <tr>
-
-          <td
-            colspan="3"
-            class="empty"
-          >
-            No top selling products
-          </td>
-
-        </tr>
-      `;
-
-  // =========================
-  // PEAK HOURS
-  // =========================
-
-  /*
-    Dari dashboard:
-
-    peakHours: [
-      Array(24),
-      Array(24),
-      ...
-    ]
-
-    Jadi bisa berupa array 24 angka
-    atau object.
-
-    Kita flatten agar aman.
-  */
-
-  let normalizedPeakHours = [];
-
-  for (
-    const item of peakHours
-  ) {
-
-    if (
-      Array.isArray(item)
-    ) {
-
-      normalizedPeakHours =
-        normalizedPeakHours.concat(
-          item
-        );
-
-    }
-    else {
-
-      normalizedPeakHours.push(
-        item
-      );
-
-    }
-
-  }
-
-  const peakHourRows =
-    normalizedPeakHours.length
-
-      ? normalizedPeakHours.map(
+      ? weekly.map(
           (item, index) => {
 
-            let hour =
-              index;
+            let day =
+              `Week ${index + 1}`;
 
             let amount =
               0;
 
+            // Kalau weekly berupa angka
             if (
               typeof item ===
               "number"
@@ -5823,59 +5583,41 @@ else if (type === "analytics") {
                 Number(item);
 
             }
+
+            // Kalau weekly berupa object
             else if (
               item &&
               typeof item ===
               "object"
             ) {
 
-              hour =
-                item.hour ??
-                item.Hour ??
-                item.jam ??
-                item.hourIndex ??
-                index;
+              day =
+                item.day ??
+                item.date ??
+                item.label ??
+                item.Day ??
+                `Week ${index + 1}`;
 
               amount =
                 Number(
-                  item.amount ??
+                  item.revenue ??
                   item.total ??
+                  item.amount ??
                   item.value ??
-                  item.count ??
                   0
                 );
 
             }
 
-            const numericHour =
-              Number(hour);
-
-            const safeHour =
-              Number.isFinite(
-                numericHour
-              )
-                ? numericHour
-                : index % 24;
-
-            const nextHour =
-              (safeHour + 1) % 24;
-
-            const hourLabel =
-              `${String(
-                safeHour
-              ).padStart(2, "0")}:00 - ${String(
-                nextHour
-              ).padStart(2, "0")}:00`;
-
             return `
               <tr>
 
                 <td>
-                  ${hourLabel}
+                  ${escapeHtml(day)}
                 </td>
 
                 <td class="right">
-                  ${rupiah(amount)}
+                  IDR ${rupiah(amount)}
                 </td>
 
               </tr>
@@ -5891,52 +5633,340 @@ else if (type === "analytics") {
             colspan="2"
             class="empty"
           >
+            No weekly revenue data
+          </td>
+
+        </tr>
+      `;
+
+  // ==========================================
+  // PAYMENT DISTRIBUTION
+  // ==========================================
+
+  const paymentRows =
+    paymentDistribution.length
+
+      ? paymentDistribution.map(
+          item => {
+
+            const method =
+              item?.method ??
+              item?.paymentMethod ??
+              item?.payment_method ??
+              item?.name ??
+              item?.type ??
+              "-";
+
+            const amount =
+              Number(
+                item?.value ??
+                item?.amount ??
+                item?.total ??
+                item?.revenue ??
+                0
+              );
+
+            const percent =
+              Number(
+                item?.percent ??
+                item?.percentage ??
+                0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${escapeHtml(method)}
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
+
+                <td class="right">
+                  ${percent.toFixed(1)}%
+                </td>
+
+              </tr>
+            `;
+
+          }
+        ).join("")
+
+      : `
+        <tr>
+
+          <td
+            colspan="3"
+            class="empty"
+          >
+            No payment data
+          </td>
+
+        </tr>
+      `;
+
+  // ==========================================
+  // TOP SELLING PRODUCTS
+  // ==========================================
+
+  const topSellingRows =
+    topSelling.length
+
+      ? topSelling.map(
+          (item, index) => {
+
+            const product =
+              item?.name ??
+              item?.product ??
+              item?.productName ??
+              item?.product_name ??
+              "-";
+
+            const quantity =
+              Number(
+                item?.qty ??
+                item?.quantity ??
+                item?.totalQuantity ??
+                0
+              );
+
+            const amount =
+              Number(
+                item?.revenue ??
+                item?.totalRevenue ??
+                item?.amount ??
+                item?.total ??
+                0
+              );
+
+            return `
+              <tr>
+
+                <td>
+                  ${index + 1}
+                </td>
+
+                <td>
+                  ${escapeHtml(product)}
+                </td>
+
+                <td class="right">
+                  ${quantity.toLocaleString(
+                    "id-ID"
+                  )}
+                </td>
+
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
+
+              </tr>
+            `;
+
+          }
+        ).join("")
+
+      : `
+        <tr>
+
+          <td
+            colspan="4"
+            class="empty"
+          >
+            No top selling products
+          </td>
+
+        </tr>
+      `;
+
+  // ==========================================
+  // PEAK HOURS
+  // ==========================================
+
+  /*
+    IMPORTANT:
+
+    peakHours dari dashboard:
+
+    [
+      [24 jam],
+      [24 jam],
+      [24 jam],
+      ...
+    ]
+
+    Jadi JANGAN flatten.
+
+    Setiap array = 1 hari.
+    Setiap index = jam.
+  */
+
+  const peakHourRows = [];
+
+  const dayNames = [
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu"
+  ];
+
+  const startDateObj =
+    start
+      ? new Date(
+          `${start}T00:00:00`
+        )
+      : new Date();
+
+  peakHours.forEach(
+    (day, dayIndex) => {
+
+      if (
+        !Array.isArray(day)
+      ) {
+        return;
+      }
+
+      const currentDate =
+        new Date(startDateObj);
+
+      currentDate.setDate(
+        startDateObj.getDate() +
+        dayIndex
+      );
+
+      const dayName =
+        dayNames[
+          currentDate.getDay()
+        ];
+
+      const dateText =
+        currentDate.toLocaleDateString(
+          "id-ID"
+        );
+
+      day.forEach(
+        (count, hour) => {
+
+          const value =
+            Number(count || 0);
+
+          // Hanya tampilkan jam
+          // yang benar-benar punya transaksi
+          if (value <= 0) {
+            return;
+          }
+
+          const nextHour =
+            (hour + 1) % 24;
+
+          const hourLabel =
+            `${String(hour).padStart(
+              2,
+              "0"
+            )}:00 - ${String(nextHour).padStart(
+              2,
+              "0"
+            )}:00`;
+
+          peakHourRows.push(`
+            <tr>
+
+              <td>
+                ${escapeHtml(
+                  dateText
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  dayName
+                )}
+              </td>
+
+              <td>
+                ${hourLabel}
+              </td>
+
+              <td class="right">
+                ${value.toLocaleString(
+                  "id-ID"
+                )}
+              </td>
+
+            </tr>
+          `);
+
+        }
+      );
+
+    }
+  );
+
+  const peakRows =
+    peakHourRows.length
+
+      ? peakHourRows.join("")
+
+      : `
+        <tr>
+
+          <td
+            colspan="4"
+            class="empty"
+          >
             No peak hour data
           </td>
 
         </tr>
       `;
 
-  // =========================
+  // ==========================================
   // RAW MATERIALS
-  // =========================
+  // ==========================================
 
   const rawMaterialRows =
     rawMaterials.length
 
-      ? rawMaterials.map(item => {
+      ? rawMaterials.map(
+          item => {
 
-          const material =
-            item?.material ??
-            item?.ingredient ??
-            item?.name ??
-            item?.Ingredient ??
-            "-";
+            const material =
+              item?.name ??
+              item?.material ??
+              item?.ingredient ??
+              item?.Ingredient ??
+              "-";
 
-          const amount =
-            Number(
-              item?.amount ??
-              item?.total ??
-              item?.value ??
-              item?.cost ??
-              0
-            );
+            const amount =
+              Number(
+                item?.amount ??
+                item?.total ??
+                item?.value ??
+                item?.cost ??
+                0
+              );
 
-          return `
-            <tr>
+            return `
+              <tr>
 
-              <td>
-                ${escapeHtml(material)}
-              </td>
+                <td>
+                  ${escapeHtml(material)}
+                </td>
 
-              <td class="right">
-                IDR ${rupiah(amount)}
-              </td>
+                <td class="right">
+                  IDR ${rupiah(amount)}
+                </td>
 
-            </tr>
-          `;
+              </tr>
+            `;
 
-        }).join("")
+          }
+        ).join("")
 
       : `
         <tr>
@@ -5951,9 +5981,90 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // =========================
+  // ==========================================
+  // ACTIVE MEMBERS
+  // ==========================================
+
+  const activeMembers =
+    Array.isArray(
+      analytics.activeMemberList
+    )
+      ? analytics.activeMemberList
+      : [];
+
+  const memberRows =
+    activeMembers.length
+
+      ? activeMembers.map(
+          member => `
+            <tr>
+
+              <td>
+                ${escapeHtml(
+                  member.name
+                )}
+              </td>
+
+              <td>
+                ${escapeHtml(
+                  member.tier || "-"
+                )}
+              </td>
+
+              <td class="right">
+                ${Number(
+                  member.point || 0
+                ).toLocaleString(
+                  "id-ID"
+                )} PTS
+              </td>
+
+            </tr>
+          `
+        ).join("")
+
+      : `
+        <tr>
+
+          <td
+            colspan="3"
+            class="empty"
+          >
+            No active members
+          </td>
+
+        </tr>
+      `;
+
+  // ==========================================
+  // DEBUG SEBELUM HTML
+  // ==========================================
+
+  console.log(
+    "ANALYTICS EXPORT ROWS:",
+    {
+      revenue,
+      hpp,
+      netProfit,
+      growth,
+      weeklyRowsLength:
+        weeklyRows.length,
+      paymentRowsLength:
+        paymentRows.length,
+      topSellingRowsLength:
+        topSellingRows.length,
+      peakRowsLength:
+        peakRows.length,
+      rawMaterialRowsLength:
+        rawMaterialRows.length,
+      memberRowsLength:
+        memberRows.length
+    }
+  );
+
+  // ==========================================
   // HTML REPORT
-  // =========================
+  // ==========================================
 
   const html = `
 
@@ -6038,7 +6149,8 @@ else if (type === "analytics") {
 
           cursor: pointer;
 
-          font-weight: bold;
+          font-weight:
+            bold;
 
         }
 
@@ -6131,7 +6243,8 @@ else if (type === "analytics") {
           background:
             #fafafa;
 
-          text-align: center;
+          text-align:
+            center;
 
         }
 
@@ -6143,13 +6256,14 @@ else if (type === "analytics") {
 
           font-weight: bold;
 
-          margin-bottom: 12px;
+          margin-bottom:
+            12px;
 
         }
 
         .kpi-value {
 
-          font-size: 22px;
+          font-size: 20px;
 
           font-weight: bold;
 
@@ -6203,9 +6317,11 @@ else if (type === "analytics") {
 
           padding: 10px;
 
-          text-align: left;
+          text-align:
+            left;
 
-          font-weight: bold;
+          font-weight:
+            bold;
 
         }
 
@@ -6222,9 +6338,14 @@ else if (type === "analytics") {
           text-align: right;
         }
 
+        .center {
+          text-align: center;
+        }
+
         .empty {
 
-          text-align: center;
+          text-align:
+            center;
 
           color: #777;
 
@@ -6236,7 +6357,8 @@ else if (type === "analytics") {
 
           margin-top: 40px;
 
-          text-align: center;
+          text-align:
+            center;
 
           font-size: 9px;
 
@@ -6308,6 +6430,7 @@ else if (type === "analytics") {
 
       <div class="report">
 
+
         <!-- HEADER -->
 
         <div class="header">
@@ -6331,13 +6454,10 @@ else if (type === "analytics") {
           <div class="subtitle">
 
             Periode:
-
             ${escapeHtml(
               start || "-"
             )}
-
             -
-
             ${escapeHtml(
               end || "-"
             )}
@@ -6347,7 +6467,6 @@ else if (type === "analytics") {
           <div class="subtitle">
 
             Branch:
-
             ${escapeHtml(
               branchId
             )}
@@ -6361,6 +6480,7 @@ else if (type === "analytics") {
 
         <div class="kpi-grid">
 
+
           <div class="kpi-card">
 
             <div class="kpi-title">
@@ -6368,11 +6488,7 @@ else if (type === "analytics") {
             </div>
 
             <div class="kpi-value">
-
-              IDR ${rupiah(
-                revenue
-              )}
-
+              IDR ${rupiah(revenue)}
             </div>
 
           </div>
@@ -6385,11 +6501,7 @@ else if (type === "analytics") {
             </div>
 
             <div class="kpi-value">
-
-              IDR ${rupiah(
-                hpp
-              )}
-
+              IDR ${rupiah(hpp)}
             </div>
 
           </div>
@@ -6402,11 +6514,7 @@ else if (type === "analytics") {
             </div>
 
             <div class="kpi-value">
-
-              IDR ${rupiah(
-                netProfit
-              )}
-
+              IDR ${rupiah(netProfit)}
             </div>
 
           </div>
@@ -6419,17 +6527,16 @@ else if (type === "analytics") {
             </div>
 
             <div class="kpi-value">
-
               ${growth.toFixed(2)}%
-
             </div>
 
           </div>
 
+
         </div>
 
 
-        <!-- WEEKLY REVENUE -->
+        <!-- WEEKLY -->
 
         <div class="card">
 
@@ -6466,7 +6573,7 @@ else if (type === "analytics") {
         </div>
 
 
-        <!-- PAYMENT DISTRIBUTION -->
+        <!-- PAYMENT -->
 
         <div class="card">
 
@@ -6488,6 +6595,10 @@ else if (type === "analytics") {
                   Amount
                 </th>
 
+                <th class="right">
+                  Percentage
+                </th>
+
               </tr>
 
             </thead>
@@ -6503,7 +6614,7 @@ else if (type === "analytics") {
         </div>
 
 
-        <!-- TOP PRODUCTS -->
+        <!-- TOP SELLING -->
 
         <div class="card">
 
@@ -6516,6 +6627,10 @@ else if (type === "analytics") {
             <thead>
 
               <tr>
+
+                <th>
+                  #
+                </th>
 
                 <th>
                   Product
@@ -6535,7 +6650,7 @@ else if (type === "analytics") {
 
             <tbody>
 
-              ${topProductRows}
+              ${topSellingRows}
 
             </tbody>
 
@@ -6559,11 +6674,19 @@ else if (type === "analytics") {
               <tr>
 
                 <th>
+                  Date
+                </th>
+
+                <th>
+                  Day
+                </th>
+
+                <th>
                   Hour
                 </th>
 
                 <th class="right">
-                  Amount
+                  Transactions
                 </th>
 
               </tr>
@@ -6572,7 +6695,7 @@ else if (type === "analytics") {
 
             <tbody>
 
-              ${peakHourRows}
+              ${peakRows}
 
             </tbody>
 
@@ -6618,6 +6741,47 @@ else if (type === "analytics") {
         </div>
 
 
+        <!-- ACTIVE MEMBERS -->
+
+        <div class="card">
+
+          <h3>
+            Active Members
+          </h3>
+
+          <table>
+
+            <thead>
+
+              <tr>
+
+                <th>
+                  Member
+                </th>
+
+                <th>
+                  Tier
+                </th>
+
+                <th class="right">
+                  Points
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              ${memberRows}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+
         <!-- FOOTER -->
 
         <div class="footer">
@@ -6630,6 +6794,7 @@ else if (type === "analytics") {
 
         </div>
 
+
       </div>
 
     </body>
@@ -6637,15 +6802,6 @@ else if (type === "analytics") {
     </html>
 
   `;
-
-  // =========================
-  // RETURN HTML
-  // =========================
-
-  res.setHeader(
-    "Content-Type",
-    "text/html; charset=utf-8"
-  );
 
   return res
     .status(200)
