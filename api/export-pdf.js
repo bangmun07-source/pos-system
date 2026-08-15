@@ -5389,7 +5389,462 @@ else if (type === "analytics") {
     .send(html);
 }
 
+// ==========================================
+// INVENTORY
+// ==========================================
 
+else if (type === "inventory") {
+  if (!branchId) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: "Branch tidak ditemukan"
+      });
+  }
+
+  // ========================================
+  // INVENTORY DATA
+  // ========================================
+  const {
+    data,
+    error
+  } = await supabase.rpc(
+    "get_inventory_page",
+    {
+      p_branch_id: branchId
+    }
+  );
+  if (error) {
+    console.error(
+      "get_inventory_page error:",
+      error
+    );
+    throw error;
+  }
+  const inventoryData =
+    data || {
+      summary: {},
+      ingredients: [],
+      suppliers: [],
+      recipes: []
+    };
+
+  const rows =
+    Array.isArray(inventoryData.ingredients)
+      ? inventoryData.ingredients
+      : [];
+
+  // ========================================
+  // BRANCH NAME
+  // ========================================
+
+  const branchName =
+    await getBranchName(branchId);
+  
+  // ========================================
+  // TOTAL
+  // ========================================
+
+  const totalValue =
+    rows.reduce((sum, r) => {
+      const qty =
+        Number(r.qty) || 0;
+      const cost =
+        Number(r.costPerUnit) || 0;
+      return sum + (qty * cost);
+
+    }, 0);
+  const totalItems =
+    rows.length;
+  const lowStockCount =
+    rows.filter(r => {
+      const qty =
+        Number(r.qty) || 0;
+      const min =
+        Number(r.min) || 0;
+      return qty <= min;
+    }).length;
+
+  // ========================================
+  // INVENTORY ROWS
+  // ========================================
+
+  const inventoryRows =
+    rows.length
+      ? rows.map(r => {
+          const qty =
+            Number(r.qty) || 0;
+          const min =
+            Number(r.min) || 0;
+          const cost =
+            Number(r.costPerUnit) || 0;
+          const value =
+            qty * cost;
+          return `
+            <tr>
+              <td>
+                ${escapeHtml(r.id)}
+              </td>
+
+              <td>
+                ${escapeHtml(r.name)}
+              </td>
+
+              <td class="right">
+                ${qty}
+              </td>
+
+              <td>
+                ${escapeHtml(r.unit || "-")}
+              </td>
+
+              <td class="right">
+                ${min}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(cost)}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(value)}
+              </td>
+            </tr>
+          `;
+
+        }).join("")
+      : `
+          <tr>
+            <td
+              colspan="7"
+              class="empty"
+            >
+              No inventory data
+            </td>
+          </tr>
+        `;
+
+
+  // ========================================
+  // FILENAME
+  // ========================================
+
+  const today =
+    new Date()
+      .toLocaleDateString("id-ID");
+
+  const filename =
+    `Inventory Report - ${branchName} (${today}).pdf`;
+
+
+  // ========================================
+  // HTML REPORT
+  // ========================================
+
+const html = `
+  <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>
+          ${escapeHtml(filename)}
+        </title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #0B0F14;
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 40px 20px;
+          }
+
+          .export-toolbar {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+          }
+
+          .export-toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 45px;
+            border-radius: 4px;
+          }
+
+          .header {
+            text-align: center;
+            margin-bottom: 15px;
+          }
+
+          .logo {
+            width: 170px;
+            height: auto;
+            max-height: 90px;
+            object-fit: contain;
+            margin-bottom: 8px;
+          }
+
+          .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 8px;
+          }
+
+          .subtitle {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 3px;
+          }
+
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 30px 0;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 22px;
+            background: #fafafa;
+          }
+
+          .summary-label {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 12px;
+          }
+
+          .summary-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 20px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+          }
+
+          td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @media print {
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .export-toolbar {
+              display: none;
+            }
+
+            .report {
+              max-width: none;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 25px;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="export-toolbar">
+          <div>
+            Inventory Report
+          </div>
+
+          <button onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <div class="report">
+          <div class="header">
+            ${
+              logoSrc
+                ? `
+                  <img
+                    src="${logoSrc}"
+                    class="logo"
+                    alt="Sistem POS"
+                  />
+                `
+                : ""
+            }
+
+            <div class="title">
+              Ingredient Stock Report
+            </div>
+
+            <div class="subtitle">
+              <b>Branch:</b>
+              ${escapeHtml(branchName)}
+            </div>
+
+            <div class="subtitle">
+              <b>Generated:</b>
+              ${escapeHtml(
+                new Date()
+                  .toLocaleString("id-ID")
+              )}
+            </div>
+          </div>
+
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">
+                TOTAL ITEMS
+              </div>
+
+              <div class="summary-value">
+                ${totalItems.toLocaleString("id-ID")}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                LOW STOCK
+              </div>
+
+              <div class="summary-value">
+                ${lowStockCount.toLocaleString("id-ID")}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                INVENTORY VALUE
+              </div>
+              
+              <div class="summary-value">
+                Rp ${rupiah(totalValue)}
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>
+              Ingredient Stock Report
+            </h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Ingredient</th>
+                  <th class="right"> Qty </th>
+                  <th> Unit </th>
+                  <th class="right"> Min </th>
+                  <th class="right"> Cost </th>
+                  <th class="right"> Value </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${inventoryRows}
+              </tbody>
+            </table>
+          </div>
+          
+          <div class="footer">
+            Generated by SOMA POS System
+            Version 1.1-Build
+            •
+            ${new Date()
+              .toLocaleString("id-ID")}
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+
+
+  // ========================================
+  // RETURN
+  // ========================================
+
+  res.setHeader(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+
+  return res
+    .status(200)
+    .send(html);
+}
 
 
     
