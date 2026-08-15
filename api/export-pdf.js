@@ -2574,9 +2574,7 @@ export default async function handler(req, res) {
                       
                       <div class="subtitle">
                         Branch:
-                        ${escapeHtml(
-                          branchId || "ALL"
-                        )}
+                        ${escapeHtml( branchName || "ALL" )}
                       </div>
                     </div>
           
@@ -3491,17 +3489,17 @@ export default async function handler(req, res) {
                     Other Income Report     
                   </div>
                 
-                  <div class="subtitle">            
-                    Branch:
-                    ${escapeHtml(branchDisplay)}          
-                  </div>
-                
                   <div class="subtitle">          
                     Periode:
                     ${escapeHtml(startDate || "-")}
                     -
                     ${escapeHtml(endDate || "-")}         
                   </div>       
+
+                  <div class="subtitle">            
+                    Branch:
+                    ${escapeHtml(branchDisplay)}          
+                  </div>
                 </div>
           
                 <!-- CATEGORY BREAKDOWN -->          
@@ -3519,11 +3517,14 @@ export default async function handler(req, res) {
                     <span>
                       <b>Status:</b>
                        ${escapeHtml(statusDisplay)}           
-                    </span> 
+                    </span>             
+                  </div>
+
+                  <div>
                     <span>
                       <b>Search:</b>
                       ${escapeHtml(searchValue || "-")} 
-                    </span>                           
+                    </span>   
                   </div>
        
                   <table>          
@@ -4328,6 +4329,9 @@ else if (type === "analytics") {
     )
       ? report.rawMaterials
       : [];
+  
+  const branchName =
+    await getBranchName(branchId);
 
   // =========================
   // PROFIT SUMMARY
@@ -5107,9 +5111,7 @@ else if (type === "analytics") {
 
           <div class="subtitle">
             Branch:
-            ${escapeHtml(
-              branchId
-            )}
+            ${escapeHtml(branchName)}
           </div>
         </div>
 
