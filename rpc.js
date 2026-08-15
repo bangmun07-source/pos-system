@@ -2954,11 +2954,33 @@ async function toggleAutoSeasonRPC() {
 
     throw error;
   }
-
   return data;
 }
 
+async function saveCategoryRPC( branchId, categoryKey, categoryName, discount, reward ) {
+  const {
+    data,
+    error
+  } = await supabaseClient.rpc(
+    "save_category",
+    {
+      p_branch_id: branchId,
+      p_category_key: categoryKey,
+      p_category_name: categoryName,
+      p_discount: discount || 0,
+      p_reward: reward || 0
+    }
+  );
 
+  if (error) {
+    console.error(
+      "save_category error:",
+      error
+    );
+    throw error;
+  }
+  return data;
+}
 
     // ===============================
     // EXPENSES & OTHER INCOME PAGE
