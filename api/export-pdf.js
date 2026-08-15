@@ -5849,7 +5849,7 @@ const html = `
 
 
   else if (type === "ingredient-purchase") {
-
+    
   if (!branchId) {
     return res
       .status(400)
@@ -5859,11 +5859,9 @@ const html = `
       });
   }
 
-
   // ========================================
   // GET PURCHASE DATA
   // ========================================
-
   const {
     data,
     error
@@ -5877,42 +5875,32 @@ const html = `
   );
 
   if (error) {
-
     console.error(
       "get_ingredient_purchases error:",
       error
     );
-
     throw error;
   }
-
 
   const rows =
     Array.isArray(data)
       ? data
       : [];
 
-
   // ========================================
   // BRANCH NAME
   // ========================================
-
   const branchName =
     await getBranchName(branchId);
-
 
   // ========================================
   // TOTAL
   // ========================================
-
   const totalPurchases =
     rows.length;
-
-
   const totalSpending =
     rows.reduce(
       (sum, r) => {
-
         return sum +
           (
             Number(
@@ -5921,11 +5909,9 @@ const html = `
               0
             ) || 0
           );
-
       },
       0
     );
-
 
   const totalSuppliers =
     new Set(
@@ -5937,49 +5923,32 @@ const html = `
       )
     ).size;
 
-
   // ========================================
   // SUPPLIER BREAKDOWN
   // ========================================
-
   const supplierMap = {};
-
-
   rows.forEach(r => {
-
     const supplier =
       r.Name_Supplier ??
       r.name_supplier ??
       "-";
 
-
     if (!supplierMap[supplier]) {
-
       supplierMap[supplier] = {
-
         supplier,
-
         purchases: 0,
-
         spending: 0
-
       };
-
     }
 
-
     supplierMap[supplier].purchases++;
-
-
     supplierMap[supplier].spending +=
       Number(
         r.Total_Price ??
         r.total_price ??
         0
       ) || 0;
-
   });
-
 
   const supplierRows =
     Object.values(supplierMap)
@@ -5989,22 +5958,15 @@ const html = `
           a.spending
       );
 
-
   // ========================================
   // PAYMENT BREAKDOWN
   // ========================================
-
   const paymentMap = {};
-
-
   rows.forEach(r => {
-
     const payment =
       r.Payment_Method ??
       r.payment_method ??
       "-";
-
-
     paymentMap[payment] =
       (
         paymentMap[payment] ||
@@ -6017,9 +5979,7 @@ const html = `
           0
         ) || 0
       );
-
   });
-
 
   const paymentRows =
     Object.entries(paymentMap)
@@ -6030,60 +5990,49 @@ const html = `
         })
       );
 
-
   // ========================================
   // PURCHASE HISTORY
   // ========================================
-
   const purchaseRows =
     rows.length
       ? rows
           .map(r => {
-
             const date =
               r.Date ??
               r.date ??
               "";
-
             const ingredient =
               r.Ingredient ??
               r.ingredient ??
               "-";
-
             const qty =
               Number(
                 r.Qty ??
                 r.qty ??
                 0
               ) || 0;
-
             const totalPrice =
               Number(
                 r.Total_Price ??
                 r.total_price ??
                 0
               ) || 0;
-
             const supplier =
               r.Name_Supplier ??
               r.name_supplier ??
               "-";
-
             const payment =
               r.Payment_Method ??
               r.payment_method ??
               "-";
-
             const outlet =
               r.Outlet ??
               r.outlet ??
               "-";
-
             const note =
               r.Note ??
               r.note ??
               "-";
-
 
             const formattedDate =
               date
@@ -6093,92 +6042,59 @@ const html = `
                     )
                 : "-";
 
-
             return `
-
               <tr>
-
                 <td>
-                  ${escapeHtml(
-                    formattedDate
-                  )}
+                  ${escapeHtml( formattedDate )}
                 </td>
 
                 <td>
-                  ${escapeHtml(
-                    ingredient
-                  )}
+                  ${escapeHtml( ingredient )}
                 </td>
 
                 <td class="right">
-                  ${qty.toLocaleString(
-                    "id-ID"
-                  )}
+                  ${qty.toLocaleString( "id-ID" )}
                 </td>
 
                 <td class="right">
-                  Rp ${rupiah(
-                    totalPrice
-                  )}
+                  Rp ${rupiah( totalPrice )}
                 </td>
 
                 <td>
-                  ${escapeHtml(
-                    supplier
-                  )}
+                  ${escapeHtml( supplier )}
                 </td>
 
                 <td>
-                  ${escapeHtml(
-                    payment
-                  )}
+                  ${escapeHtml( payment )}
                 </td>
 
                 <td>
-                  ${escapeHtml(
-                    outlet
-                  )}
+                  ${escapeHtml( outlet )}
                 </td>
 
                 <td>
-                  ${escapeHtml(
-                    note
-                  )}
+                  ${escapeHtml( note )}
                 </td>
-
               </tr>
-
             `;
-
           })
           .join("")
       : `
-
           <tr>
-
-            <td
-              colspan="8"
-              class="empty"
-            >
+            <td colspan="8" class="empty" >
               No purchase data
             </td>
-
           </tr>
-
         `;
-
 
   // ========================================
   // PAYMENT HTML
   // ========================================
-
   const paymentHtml =
     paymentRows.length
       ? paymentRows
           .map(r => `
-
             <tr>
-
               <td>
                 ${escapeHtml(
                   r.payment
@@ -6190,38 +6106,26 @@ const html = `
                   r.total
                 )}
               </td>
-
             </tr>
-
           `)
           .join("")
       : `
-
           <tr>
-
-            <td
-              colspan="2"
-              class="empty"
-            >
+            <td colspan="2"
+              class="empty" >
               No payment data
             </td>
-
           </tr>
-
         `;
-
 
   // ========================================
   // SUPPLIER HTML
   // ========================================
-
   const supplierHtml =
     supplierRows.length
       ? supplierRows
           .map(r => `
-
             <tr>
-
               <td>
                 ${escapeHtml(
                   r.supplier
@@ -6239,34 +6143,22 @@ const html = `
                   r.spending
                 )}
               </td>
-
             </tr>
-
           `)
           .join("")
       : `
-
           <tr>
-
-            <td
-              colspan="3"
-              class="empty"
-            >
+            <td colspan="3" class="empty" >
               No supplier data
             </td>
-
           </tr>
-
         `;
-
 
   // ========================================
   // FILENAME
   // ========================================
-
   const filename =
     `Ingredient Purchase Report - ${branchName}.pdf`;
-
 
   // ========================================
   // HTML REPORT
@@ -6274,21 +6166,15 @@ const html = `
 
   const html = `
 
-    <!DOCTYPE html>
-
+  <!DOCTYPE html>
     <html>
-
       <head>
-
         <meta charset="UTF-8">
-
         <title>
           ${escapeHtml(filename)}
         </title>
 
-
         <style>
-
           * {
             box-sizing: border-box;
           }
@@ -6306,322 +6192,171 @@ const html = `
             padding: 40px 20px;
           }
 
-
           .export-toolbar {
-
             width: 100%;
-
             max-width: 1100px;
-
-            margin:
-              0 auto 20px auto;
-
+            margin: 0 auto 20px auto;
             display: flex;
-
-            justify-content:
-              space-between;
-
+            justify-content: space-between;
             align-items: center;
-
             color: white;
-
             font-size: 14px;
-
           }
-
 
           .export-toolbar button {
-
-            border:
-              1px solid
+            border: 1px solid
               rgba(255,255,255,.15);
-
-            background:
-              rgba(255,255,255,.08);
-
+            background: rgba(255,255,255,.08);
             color: white;
-
-            padding:
-              10px 16px;
-
+            padding: 10px 16px;
             border-radius: 10px;
-
             cursor: pointer;
-
             font-weight: bold;
-
           }
-
 
           .report {
-
             width: 100%;
-
             max-width: 1100px;
-
             margin: 0 auto;
-
             background: white;
-
             padding: 45px;
-
             border-radius: 4px;
-
           }
-
 
           .header {
-
             text-align: center;
-
             margin-bottom: 15px;
-
           }
-
 
           .logo {
-
             width: 170px;
-
             height: auto;
-
             max-height: 90px;
-
             object-fit: contain;
-
             margin-bottom: 8px;
-
           }
-
 
           .title {
-
             font-size: 24px;
-
             font-weight: bold;
-
             margin-bottom: 8px;
-
           }
-
 
           .subtitle {
-
             font-size: 12px;
-
             color: #777;
-
             margin-bottom: 3px;
-
           }
-
 
           .summary-grid {
-
             display: grid;
-
-            grid-template-columns:
-              repeat(3, 1fr);
-
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
-
             margin: 30px 0;
-
           }
-
 
           .summary-card {
-
-            border:
-              1px solid #e5e5e5;
-
+            border: 1px solid #e5e5e5;
             border-radius: 14px;
-
             padding: 22px;
-
             background: #fafafa;
-
           }
-
 
           .summary-label {
-
             font-size: 11px;
-
             color: #666;
-
             font-weight: bold;
-
             margin-bottom: 12px;
-
           }
-
 
           .summary-value {
-
             font-size: 22px;
-
             font-weight: bold;
-
             color: #222;
-
           }
-
 
           .card {
-
-            border:
-              1px solid #e5e5e5;
-
+            border: 1px solid #e5e5e5;
             border-radius: 14px;
-
             padding: 18px;
-
             margin-top: 20px;
-
             background: #fff;
-
           }
-
 
           .card h3 {
-
-            margin:
-              0 0 12px 0;
-
+            margin: 0 0 12px 0;
             font-size: 16px;
-
           }
-
 
           table {
-
             width: 100%;
-
-            border-collapse:
-              collapse;
-
+            border-collapse: collapse;
             font-size: 11px;
-
             margin-top: 10px;
-
           }
-
 
           th {
-
             background: #f5f5f5;
-
             padding: 10px;
-
             text-align: left;
-
             font-weight: bold;
-
           }
-
 
           td {
-
             padding: 10px;
-
-            border-bottom:
-              1px solid #eee;
-
+            border-bottom: 1px solid #eee;
           }
-
 
           .right {
-
             text-align: right;
-
           }
-
 
           .empty {
-
             text-align: center;
-
             color: #777;
-
             padding: 25px;
-
           }
-
 
           .footer {
-
             margin-top: 40px;
-
             text-align: center;
-
             font-size: 9px;
-
             color: #888;
-
           }
-
 
           @media print {
-
             body {
-
               background: white;
-
               padding: 0;
-
             }
-
 
             .export-toolbar {
-
               display: none;
-
             }
-
-
+            
             .report {
-
               max-width: none;
-
               box-shadow: none;
-
               border-radius: 0;
-
               padding: 25px;
-
             }
-
           }
-
         </style>
-
       </head>
 
-
       <body>
-
-
         <div class="export-toolbar">
-
           <div>
             Ingredient Purchase Report
           </div>
 
-          <button
-            onclick="window.print()"
-          >
+          <button onclick="window.print()" >
             Download / Print PDF
           </button>
-
         </div>
 
-
         <div class="report">
-
-
           <div class="header">
-
             ${
               logoSrc
                 ? `
@@ -6636,25 +6371,18 @@ const html = `
                 : ""
             }
 
-
             <div class="title">
               INGREDIENT PURCHASE REPORT
             </div>
 
-
             <div class="subtitle">
-
               <b>Branch:</b>
-
               ${escapeHtml(
                 branchName
               )}
-
             </div>
 
-
             <div class="subtitle">
-
               <b>Period:</b>
 
               ${escapeHtml(
@@ -6666,254 +6394,721 @@ const html = `
               ${escapeHtml(
                 end || "-"
               )}
-
             </div>
 
-
             <div class="subtitle">
-
               <b>Generated:</b>
-
               ${escapeHtml(
                 new Date()
                   .toLocaleString(
                     "id-ID"
                   )
               )}
-
             </div>
-
           </div>
 
 
           <!-- KPI -->
-
           <div class="summary-grid">
-
-
             <div class="summary-card">
-
               <div class="summary-label">
                 TOTAL PURCHASES
               </div>
 
               <div class="summary-value">
-
                 ${totalPurchases.toLocaleString(
                   "id-ID"
                 )}
-
               </div>
-
             </div>
 
 
             <div class="summary-card">
-
               <div class="summary-label">
                 TOTAL SPENDING
               </div>
-
+              
               <div class="summary-value">
-
                 Rp ${rupiah(
                   totalSpending
                 )}
-
               </div>
-
             </div>
 
-
             <div class="summary-card">
-
               <div class="summary-label">
                 TOTAL SUPPLIERS
               </div>
-
+              
               <div class="summary-value">
-
                 ${totalSuppliers.toLocaleString(
                   "id-ID"
                 )}
-
               </div>
-
             </div>
-
-
           </div>
 
-
           <!-- PAYMENT -->
-
           <div class="card">
-
             <h3>
               Payment Method Breakdown
             </h3>
-
-
+            
             <table>
-
               <thead>
-
                 <tr>
-
-                  <th>
-                    Payment Method
-                  </th>
-
-                  <th class="right">
-                    Total Spending
-                  </th>
-
+                  <th> Payment Method </th>
+                  <th class="right"> Total Spending </th>
                 </tr>
-
               </thead>
-
-
+              
               <tbody>
-
                 ${paymentHtml}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- SUPPLIER -->
-
           <div class="card">
-
             <h3>
               Supplier Breakdown
             </h3>
 
-
             <table>
-
               <thead>
-
                 <tr>
-
-                  <th>
-                    Supplier
-                  </th>
-
-                  <th class="right">
-                    Purchases
-                  </th>
-
-                  <th class="right">
-                    Total Spending
-                  </th>
-
+                  <th> Supplier </th>
+                  <th class="right"> Purchases </th>
+                  <th class="right"> Total Spending </th>
                 </tr>
-
               </thead>
 
-
               <tbody>
-
                 ${supplierHtml}
-
               </tbody>
-
             </table>
-
           </div>
 
 
           <!-- HISTORY -->
-
           <div
             class="card"
-            style="page-break-before: always;"
-          >
+            style="page-break-before: always;" >
 
             <h3>
               Purchase History
             </h3>
-
-
             <table>
 
               <thead>
-
                 <tr>
-
                   <th>Date</th>
-
                   <th>Ingredient</th>
-
-                  <th class="right">
-                    Qty
-                  </th>
-
-                  <th class="right">
-                    Total Price
-                  </th>
-
-                  <th>
-                    Supplier
-                  </th>
-
-                  <th>
-                    Payment
-                  </th>
-
-                  <th>
-                    Outlet
-                  </th>
-
-                  <th>
-                    Note
-                  </th>
-
+                  <th class="right"> Qty </th>
+                  <th class="right"> Total Price </th>
+                  <th> Supplier </th>
+                  <th> Payment </th>
+                  <th> Outlet </th>
+                  <th> Note </th>
                 </tr>
-
               </thead>
 
-
               <tbody>
-
                 ${purchaseRows}
-
               </tbody>
-
             </table>
-
           </div>
 
-
           <div class="footer">
-
             Generated by SOMA POS System
             Version 1.1-Build
             •
-
             ${new Date()
               .toLocaleString(
                 "id-ID"
               )}
-
           </div>
-
-
         </div>
-
       </body>
-
     </html>
-
   `;
 
 
   // ========================================
   // RETURN
+  // ========================================
+  res.setHeader(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+  return res
+    .status(200)
+    .send(html);
+}  
+
+
+// ==========================================
+// RECIPE
+// ==========================================
+else if (type === "recipe") {
+  if (!branchId) {
+    return res
+      .status(400)
+      .json({
+        success: false,
+        error: "branchId wajib diisi"
+      });
+  }
+
+  // ========================================
+  // GET RECIPE DATA
+  // ========================================
+  const {
+    data,
+    error
+  } = await supabase.rpc(
+    "get_recipes"
+  );
+
+  if (error) {
+    console.error(
+      "RPC get_recipes ERROR:",
+      error
+    );
+    throw error;
+  }
+  const recipes =
+    Array.isArray(data)
+      ? data
+      : [];
+  // ========================================
+  // FILTER BRANCH
+  // ========================================
+
+  const filtered =
+    recipes.filter(row => {
+      const rowBranch =
+        row.branchId ??
+        row.branch_id ??
+        row.branchid ??
+        "";
+      return (
+        normalize(rowBranch) ===
+        normalize(branchId)
+      );
+
+    });
+
+  // ========================================
+  // BRANCH NAME
+  // ========================================
+  const branchName =
+    await getBranchName(branchId);
+
+  // ========================================
+  // SUMMARY
+  // ========================================
+  const totalRecipes =
+    filtered.length;
+  const totalCost =
+    filtered.reduce(
+      (sum, row) =>
+        sum +
+        Number(
+          row.cost ??
+          row.Cost ??
+          0
+        ),
+      0
+    );
+  const totalProfit =
+    filtered.reduce(
+      (sum, row) =>
+        sum +
+        Number(
+          row.profit ??
+          row.Profit ??
+          0
+        ),
+      0
+    );
+  const avgCostPercent =
+    totalRecipes > 0
+      ? filtered.reduce(
+          (sum, row) =>
+            sum +
+            Number(
+              row.costPercent ??
+              row.cost_percent ??
+              row.Cost_Percent ??
+              0
+            ),
+          0
+        ) / totalRecipes
+      : 0;
+  // ========================================
+  // TABLE ROWS
+  // ========================================
+
+  const rows =
+    filtered
+      .map((item, i) => {
+        const productName =
+          item.productName ??
+          item.product_name ??
+          item.Product_Name ??
+          item.Nama_Produk ??
+          item.name ??
+          "-";
+
+        const ingredients =
+          Array.isArray(
+            item.ingredients
+          )
+            ? item.ingredients
+                .map(ing => {
+                  const name =
+                    ing.name ??
+                    ing.ingredientName ??
+                    "-";
+                  const qty =
+                    ing.qty ??
+                    0;
+                  const unit =
+                    ing.unit ??
+                    "";
+                  return `${name} (${qty}${unit})`;
+
+                })
+                .join(", ")
+
+            : (
+                item.ingredientsLabel ??
+                item.ingredients_label ??
+                "-"
+              );
+
+        const cost =
+          Number(
+            item.cost ??
+            item.Cost ??
+            0
+          );
+
+        const selling =
+          Number(
+            item.selling ??
+            item.Selling ??
+            item.sellingPrice ??
+            item.selling_price ??
+            0
+          );
+
+        const net =
+          Number(
+            item.net ??
+            item.Net ??
+            0
+          );
+
+        const costPercent =
+          Number(
+            item.costPercent ??
+            item.cost_percent ??
+            0
+          );
+
+        const profit =
+          Number(
+            item.profit ??
+            item.Profit ??
+            0
+          );
+
+        return `
+          <tr>
+            <td>
+              ${i + 1}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                productName
+              )}
+            </td>
+
+            <td>
+              ${escapeHtml(
+                ingredients
+              )}
+            </td>
+
+            <td class="right">
+              Rp ${rupiah(cost)}
+            </td>
+
+            <td class="right">
+              Rp ${rupiah(selling)}
+            </td>
+
+            <td class="right">
+              Rp ${rupiah(net)}
+            </td>
+
+            <td class="center">
+              ${costPercent}%
+            </td>
+
+            <td class="right">
+              Rp ${rupiah(profit)}
+            </td>
+          </tr>
+        `;
+      })
+      .join("");
+
+  // ========================================
+  // EMPTY
+  // ========================================
+
+  const recipeRows =
+    rows ||
+    `
+      <tr>
+        <td colspan="8"
+          style="
+            text-align:center;
+            padding:25px;
+            color:#777; " >
+          No recipe data
+        </td>
+      </tr>
+    `;
+
+  // ========================================
+  // FILENAME
+  // ========================================
+
+  const today =
+    new Date()
+      .toLocaleDateString(
+        "id-ID"
+      );
+
+  const filename =
+    `Recipe Master Ledger Report - ${branchName} (${today}).pdf`;
+
+  // ========================================
+  // HTML REPORT
+  // ========================================
+
+  const html = `
+<!DOCTYPE html>
+  <html>  
+    <head>    
+      <meta charset="UTF-8">
+      
+      <title>
+      ${escapeHtml(filename)}
+      </title>    
+        <style>       
+          * {
+            box-sizing:border-box;
+          }
+          
+          html,
+          body {
+            margin:0;
+            padding:0;
+          }
+          
+          body {
+            background:#0B0F14;
+            font-family:Arial,sans-serif;
+            color:#333;
+            padding:40px 20px;
+          }
+          
+          .export-toolbar {
+            width:100%;
+            max-width:1100px;
+            margin:0 auto 20px auto;
+          
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+          
+            color:white;
+            font-size:14px;
+          }
+          
+          .export-toolbar button {
+            border:1px solid
+              rgba(255,255,255,.15);        
+            background: rgba(255,255,255,.08);      
+            color:white;      
+            padding:10px 16px;       
+            border-radius:10px;       
+            cursor:pointer;       
+            font-weight:bold;
+          }
+          
+          .report {
+            width:100%;
+            max-width:1100px;       
+            margin:0 auto;      
+            background:white;      
+            padding:45px;       
+            border-radius:4px;       
+            box-shadow: 20px 60px
+              rgba(0,0,0,.45);
+          }
+          
+          .header {
+            text-align:center;
+            margin-bottom:15px;
+          }
+          
+          .logo {
+            width:170px;
+            height:auto;
+            max-height:90px;
+            object-fit:contain;
+            margin-bottom:8px;
+          }
+          
+          .title {
+            font-size:24px;
+            font-weight:bold;
+            margin-bottom:8px;
+          }
+          
+          .subtitle {
+            font-size:12px;
+            color:#777;
+            margin-bottom:3px;
+          }
+          
+          .summary-grid {
+            display:grid;
+            grid-template-columns: repeat(4,1fr);      
+            gap:16px;       
+            margin:30px 0;
+          }
+          
+          .summary-card {
+            border:1px solid #e5e5e5;        
+            border-radius:14px;        
+            padding:22px;        
+            background:#fafafa;        
+            text-align:center;
+          }
+          
+          .summary-label {
+            font-size:11px;
+            color:#666;        
+            font-weight:bold;        
+            margin-bottom:12px;
+          }
+          
+          .summary-value {
+            font-size:20px;
+            font-weight:bold;
+            color:#222;
+          }
+          
+          .card {
+            border:1px solid #e5e5e5;        
+            border-radius:14px;        
+            padding:18px;        
+            margin-top:20px;        
+            background:#fff;
+          }
+          
+          .card h3 {
+            margin:0 0 12px 0;
+            font-size:16px;
+          }
+          
+          table {
+            width:100%;        
+            border-collapse:collapse;        
+            font-size:10px;        
+            margin-top:10px;
+          }
+          
+          th {
+            background:#f5f5f5;        
+            padding:10px;        
+            text-align:left;        
+            font-weight:bold;
+          }
+          
+          td {
+            padding:10px;        
+            border-bottom: 1px solid #eee;        
+            vertical-align:top;        
+            word-break:break-word;
+          }
+          
+          .right {
+            text-align:right;
+          }
+          
+          .center {
+            text-align:center;
+          }
+          
+          .footer {
+            margin-top:40px;        
+            text-align:center;        
+            font-size:9px;        
+            color:#888;
+          }
+          
+          @media print {        
+            body {
+              background:white;
+              padding:0;
+            }
+          
+            .export-toolbar {
+              display:none;
+            }
+          
+            .report {
+              max-width:none;        
+              box-shadow:none;        
+              border-radius:0;        
+              padding:25px;
+            }       
+          }      
+        </style>      
+      </head>  
+      
+      <body>
+      
+      <div class="export-toolbar">      
+        <div>
+          ${escapeHtml(filename)}
+        </div>
+      
+        <button onclick="window.print()" >
+          Download / Print PDF
+        </button>      
+      </div>
+      
+      <div class="report">      
+        <div class="header">      
+          ${
+            logoSrc
+              ? `
+                <img
+                  src="${logoSrc}"
+                  class="logo"
+                  alt="Sistem POS"
+                />
+              `
+              : ""
+          }
+      
+          <div class="title">
+            Recipe Master Ledger Report
+          </div>
+      
+          <div class="subtitle">
+            <b>Branch:</b>
+            ${escapeHtml(branchName)}
+          </div>
+      
+          <div class="subtitle">
+            <b>Generated:</b>
+            ${new Date()
+              .toLocaleString("id-ID")}
+          </div>      
+        </div>
+      
+        <div class="summary-grid">      
+          <div class="summary-card">      
+            <div class="summary-label">
+              TOTAL RECIPES
+            </div>
+      
+            <div class="summary-value">
+              ${totalRecipes.toLocaleString("id-ID")}
+            </div>      
+          </div>
+      
+          <div class="summary-card">      
+            <div class="summary-label">
+              TOTAL COST
+            </div>
+      
+            <div class="summary-value">
+              Rp ${rupiah(totalCost)}
+            </div>      
+          </div>
+      
+          <div class="summary-card">      
+            <div class="summary-label">
+              TOTAL PROFIT
+            </div>
+      
+            <div class="summary-value">
+              Rp ${rupiah(totalProfit)}
+            </div>      
+          </div>
+      
+          <div class="summary-card">      
+            <div class="summary-label">
+              AVG COST %
+            </div>
+      
+            <div class="summary-value">
+              ${avgCostPercent.toFixed(0)}%
+            </div>      
+          </div>      
+        </div>
+      
+        <div class="card">      
+          <h3>
+            Recipe Master Ledger
+          </h3>
+      
+          <table>      
+            <thead>      
+              <tr>      
+                <th>No</th>      
+                <th> Product Name </th>      
+                <th> Ingredients </th>      
+                <th class="right"> Est Cost </th>      
+                <th class="right"> Selling Price </th>      
+                <th class="right"> Net Price </th>      
+                <th class="center"> Cost % </th>     
+                <th class="right"> Profit </th>      
+              </tr>      
+            </thead> 
+            
+            <tbody>   
+              ${recipeRows}     
+            </tbody>     
+          </table>      
+        </div>
+      
+        <div class="footer">      
+          Generated by Sistem POS      
+          •
+          ${new Date()
+            .toLocaleString("id-ID")}      
+        </div>      
+      </div>    
+    </body>
+  </html>
+`;
+
+  // ========================================
+  // RETURN HTML
   // ========================================
 
   res.setHeader(
@@ -6924,10 +7119,7 @@ const html = `
   return res
     .status(200)
     .send(html);
-}  
-
-
-
+}
 
 
 
