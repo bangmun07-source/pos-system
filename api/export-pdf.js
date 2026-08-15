@@ -62,7 +62,7 @@ export default async function handler(req, res) {
     console.log("EXPORT TYPE:", type);
     console.log("EXPORT BRANCH:", branchId);
 
-// ==========================================
+    // ==========================================
     // EXPENSE
     // ==========================================
 
@@ -1775,7 +1775,6 @@ export default async function handler(req, res) {
             success: false,
             error: "branchId wajib diisi"
           });
-    
       }
     
       // GET TRANSACTIONS
@@ -1815,7 +1814,6 @@ export default async function handler(req, res) {
       if (summaryError) {
         throw summaryError;
       }
-    
       const rows =
         Array.isArray(transactions)
           ? transactions
@@ -1856,7 +1854,6 @@ export default async function handler(req, res) {
     
               return `
                 <tr>
-    
                   <td>
                     ${escapeHtml(row.id)}
                   </td>
@@ -1884,18 +1881,13 @@ export default async function handler(req, res) {
                   <td class="right">
                     Rp ${rupiah(row.total)}
                   </td>
-    
                 </tr>
               `;
     
             }).join("")
-    
           : `
             <tr>
-              <td
-                colspan="6"
-                class="empty"
-              >
+              <td colspan="6" class="empty" >
                 No transactions
               </td>
             </tr>
@@ -1904,7 +1896,6 @@ export default async function handler(req, res) {
       // ========================================
       // PAYMENT ROWS
       // ========================================
-    
       const paymentRows =
         Object.entries(paymentDistribution).length
     
@@ -1925,8 +1916,7 @@ export default async function handler(req, res) {
                     : 0;
     
                 return `
-                  <tr>
-    
+                  <tr>  
                     <td>
                       ${escapeHtml(method)}
                     </td>
@@ -1937,11 +1927,9 @@ export default async function handler(req, res) {
     
                     <td class="right">
                       ${percent.toFixed(1)}%
-                    </td>
-    
+                    </td> 
                   </tr>
                 `;
-    
               }).join("")
     
           : `
@@ -1963,7 +1951,6 @@ export default async function handler(req, res) {
     
               return `
                 <tr>
-    
                   <td>
                     ${escapeHtml(member.name)}
                   </td>
@@ -1975,12 +1962,10 @@ export default async function handler(req, res) {
                   <td class="right">
                     ${rupiah(member.point)} PTS
                   </td>
-    
                 </tr>
               `;
     
             }).join("")
-    
           : `
             <tr>
               <td
@@ -1997,531 +1982,371 @@ export default async function handler(req, res) {
       // ========================================
     
       const html = `
-    <!DOCTYPE html>
-    
-    <html>
-    
-    <head>
-    
-    <meta charset="UTF-8">
-    
-    <title>
-    Recent Transactions Report
-    </title>
-    
-    <style>
-    
-    * {
-      box-sizing: border-box;
-    }
-    
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      background: #0B0F14;
-      font-family: Arial, sans-serif;
-      color: #333;
-      padding: 40px 20px;
-    }
-    
-    .export-toolbar {
-    
-      width: 100%;
-      max-width: 1100px;
-    
-      margin: 0 auto 20px;
-    
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    
-      color: white;
-      font-size: 14px;
-    
-    }
-    
-    .export-toolbar button {
-    
-      border:
-        1px solid
-        rgba(255,255,255,.15);
-    
-      background:
-        rgba(255,255,255,.08);
-    
-      color: white;
-    
-      padding: 10px 16px;
-    
-      border-radius: 10px;
-    
-      cursor: pointer;
-    
-      font-weight: bold;
-    
-    }
-    
-    .report {
-    
-      width: 100%;
-      max-width: 1100px;
-    
-      margin: auto;
-    
-      background: white;
-    
-      padding: 45px;
-    
-      border-radius: 4px;
-    
-      box-shadow:
-        0 20px 60px
-        rgba(0,0,0,.45);
-    
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    
-    .logo {
-    
-      width: 170px;
-      height: auto;
-    
-      max-height: 90px;
-    
-      object-fit: contain;
-    
-      margin-bottom: 12px;
-    
-    }
-    
-    .title {
-    
-      font-size: 24px;
-    
-      font-weight: bold;
-    
-      margin-bottom: 8px;
-    
-    }
-    
-    .subtitle {
-    
-      font-size: 12px;
-    
-      color: #777;
-    
-      margin-bottom: 3px;
-    
-    }
-    
-    .kpi-grid {
-    
-      display: grid;
-    
-      grid-template-columns:
-        repeat(3, 1fr);
-    
-      gap: 16px;
-    
-      margin: 30px 0;
-    
-    }
-    
-    .kpi-card {
-    
-      border:
-        1px solid #e5e5e5;
-    
-      border-radius: 14px;
-    
-      padding: 22px;
-    
-      background: #fafafa;
-    
-      text-align: center;
-    
-    }
-    
-    .kpi-title {
-    
-      font-size: 11px;
-    
-      color: #666;
-    
-      font-weight: bold;
-    
-      margin-bottom: 12px;
-    
-    }
-    
-    .kpi-value {
-    
-      font-size: 22px;
-    
-      font-weight: bold;
-    
-      color: #222;
-    
-    }
-    
-    .card {
-    
-      border:
-        1px solid #e5e5e5;
-    
-      border-radius: 14px;
-    
-      padding: 18px;
-    
-      margin-top: 20px;
-    
-      background: white;
-    
-    }
-    
-    .card h3 {
-    
-      margin-top: 0;
-    
-      margin-bottom: 12px;
-    
-      font-size: 16px;
-    
-    }
-    
-    table {
-    
-      width: 100%;
-    
-      border-collapse: collapse;
-    
-      font-size: 11px;
-    
-      margin-top: 10px;
-    
-    }
-    
-    th {
-    
-      background: #f5f5f5;
-    
-      padding: 10px;
-    
-      text-align: left;
-    
-      font-weight: bold;
-    
-    }
-    
-    td {
-    
-      padding: 10px;
-    
-      border-bottom:
-        1px solid #eee;
-    
-    }
-    
-    .right {
-      text-align: right;
-    }
-    
-    .center {
-      text-align: center;
-    }
-    
-    .empty {
-    
-      text-align: center;
-    
-      color: #777;
-    
-      padding: 25px;
-    
-    }
-    
-    .footer {
-    
-      margin-top: 40px;
-    
-      text-align: center;
-    
-      font-size: 9px;
-    
-      color: #888;
-    
-    }
-    
-    .page-break {
-    
-      page-break-before: always;
-    
-    }
-    
-    @media print {
-    
-      body {
-    
-        background: white;
-    
-        padding: 0;
-    
-      }
-    
-      .export-toolbar {
-    
-        display: none;
-    
-      }
-    
-      .report {
-    
-        max-width: none;
-    
-        box-shadow: none;
-    
-        border-radius: 0;
-    
-        padding: 25px;
-    
-      }
-    
-    }
-    
-    </style>
-    
-    </head>
-    
-    <body>
-    
-    <div class="export-toolbar">
-    
-      <div>
-        📄 Recent Transactions Report
-      </div>
-    
-      <button onclick="window.print()">
-        Download / Print PDF
-      </button>
-    
-    </div>
-    
-    <div class="report">
-    
-      <div class="header">
-    
-        ${
-          logoSrc
-            ? `
-              <img
-                src="${logoSrc}"
-                class="logo"
-                alt="Sistem POS"
-              />
-            `
-            : ""
-        }
-    
-      </div>
-    
-      <div class="title">
-        Recent Transactions Report
-      </div>
-    
-      <div class="subtitle">
-        Periode:
-        ${escapeHtml(start || "-")}
-        -
-        ${escapeHtml(end || "-")}
-      </div>
-    
-      <div class="subtitle">
-        Branch:
-        ${escapeHtml(branchId)}
-      </div>
-    
-      <div class="subtitle">
-        Status:
-        ${escapeHtml(status)}
-      </div>
-    
-      <div class="kpi-grid">
-    
-        <div class="kpi-card">
-    
-          <div class="kpi-title">
-            TOTAL REVENUE
-          </div>
-    
-          <div class="kpi-value">
-            Rp ${rupiah(reportSummary.revenue)}
-          </div>
-    
-        </div>
-    
-        <div class="kpi-card">
-    
-          <div class="kpi-title">
-            ACTIVE GUEST
-          </div>
-    
-          <div class="kpi-value">
-            ${Number(
-              reportSummary.activeGuests || 0
-            )}
-          </div>
-    
-        </div>
-    
-        <div class="kpi-card">
-    
-          <div class="kpi-title">
-            ITEMS SOLD
-          </div>
-    
-          <div class="kpi-value">
-            ${Number(
-              reportSummary.itemsSold || 0
-            )}
-          </div>
-    
-        </div>
-    
-      </div>
-    
-      <div class="card">
-    
-        <h3>
-          Payment Distribution
-        </h3>
-    
-        <table>
-    
-          <thead>
-    
-            <tr>
-    
-              <th>
-                Payment
-              </th>
-    
-              <th class="right">
-                Total
-              </th>
-    
-              <th class="right">
-                Percentage
-              </th>
-    
-            </tr>
-    
-          </thead>
-    
-          <tbody>
-    
-            ${paymentRows}
-    
-          </tbody>
-    
-        </table>
-    
-      </div>
-    
-      <div class="card">
-    
-        <h3>
-          Active Members
-        </h3>
-    
-        <table>
-    
-          <thead>
-    
-            <tr>
-    
-              <th>
-                Name
-              </th>
-    
-              <th class="center">
-                Tier
-              </th>
-    
-              <th class="right">
-                Point
-              </th>
-    
-            </tr>
-    
-          </thead>
-    
-          <tbody>
-    
-            ${memberRows}
-    
-          </tbody>
-    
-        </table>
-    
-      </div>
-    
-      <div class="page-break"></div>
-    
-      <div class="card">
-    
-        <h3>
-          Recent Transactions
-        </h3>
-    
-        <table>
-    
-          <thead>
-    
-            <tr>
-    
-              <th>ID</th>
-              <th>Date</th>
-              <th>Member</th>
-              <th class="center">Status</th>
-              <th class="center">Items</th>
-              <th class="right">Total</th>
-    
-            </tr>
-    
-          </thead>
-    
-          <tbody>
-    
-            ${transactionRows}
-    
-          </tbody>
-    
-        </table>
-    
-      </div>
-    
-      <div class="footer">
-    
-        Generated by Sistem POS
-        •
-        ${new Date().toLocaleString("id-ID")}
-    
-      </div>
-    
-    </div>
-    
-    </body>
-    
-    </html>
-    `;
+      <!DOCTYPE html>      
+        <html>   
+          <head>     
+            <meta charset="UTF-8">    
+              <title>
+                Recent Transactions Report
+              </title>
+          
+              <style>
+      
+                * {
+                  box-sizing: border-box;
+                }
+                
+                html,
+                body {
+                  margin: 0;
+                  padding: 0;
+                }
+                
+                body {
+                  background: #0B0F14;
+                  font-family: Arial, sans-serif;
+                  color: #333;
+                  padding: 40px 20px;
+                }
+                
+                .export-toolbar {
+                  width: 100%;
+                  max-width: 1100px;
+                  margin: 0 auto 20px;
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  color: white;
+                  font-size: 14px; 
+                }
+                
+                .export-toolbar button {    
+                  border: 1px solid
+                    rgba(255,255,255,.15);      
+                  background: rgba(255,255,255,.08);      
+                  color: white;    
+                  padding: 10px 16px;    
+                  border-radius: 10px;   
+                  cursor: pointer;   
+                  font-weight: bold;   
+                }
+                
+                .report { 
+                  width: 100%;
+                  max-width: 1100px;    
+                  margin: auto;   
+                  background: white;   
+                  padding: 45px;    
+                  border-radius: 4px;   
+                  box-shadow: 0 20px 60px rgba(0,0,0,.45);  
+                }
+      
+                .header {
+                  text-align: center;
+                  margin-bottom: 20px;
+                }
+                
+                .logo {      
+                  width: 170px;
+                  height: auto;    
+                  max-height: 90px;    
+                  object-fit: contain;   
+                  margin-bottom: 12px; 
+                }
+                
+                .title {      
+                  font-size: 24px;    
+                  font-weight: bold;      
+                  margin-bottom: 8px;    
+                }
+                
+                .subtitle {      
+                  font-size: 12px;     
+                  color: #777;    
+                  margin-bottom: 3px;    
+                }
+      
+                .kpi-grid {
+                  display: grid;   
+                  grid-template-columns: repeat(3, 1fr);     
+                  gap: 16px; 
+                  margin: 30px 0; 
+                }
+                
+                .kpi-card {     
+                  border: 1px solid #e5e5e5;      
+                  border-radius: 14px;      
+                  padding: 22px;      
+                  background: #fafafa;      
+                  text-align: center;      
+                }
+      
+                .kpi-title {    
+                  font-size: 11px;      
+                  color: #666;      
+                  font-weight: bold;     
+                  margin-bottom: 12px;     
+                }
+                
+                .kpi-value {      
+                  font-size: 22px;      
+                  font-weight: bold;      
+                  color: #222;      
+                }
+                
+                .card {      
+                  border: 1px solid #e5e5e5;      
+                  border-radius: 14px;      
+                  padding: 18px;      
+                  margin-top: 20px;      
+                  background: white;      
+                }
+      
+                .card h3 {      
+                  margin-top: 0;      
+                  margin-bottom: 12px;      
+                  font-size: 16px;      
+                }
+                
+                table {      
+                  width: 100%;      
+                  border-collapse: collapse;      
+                  font-size: 11px;      
+                  margin-top: 10px;      
+                }
+      
+                th {      
+                  background: #f5f5f5;     
+                  padding: 10px;    
+                  text-align: left;   
+                  font-weight: bold; 
+                }
+                
+                td {
+                  padding: 10px;      
+                  border-bottom: 1px solid #eee;      
+                }
+                
+                .right {
+                  text-align: right;
+                }
+                
+                .center {
+                  text-align: center;
+                }
+                
+                .empty {   
+                  text-align: center;     
+                  color: #777;    
+                  padding: 25px;    
+                }
+      
+                .footer {      
+                  margin-top: 40px;      
+                  text-align: center;      
+                  font-size: 9px;     
+                  color: #888;     
+                }
+                
+                .page-break {      
+                  page-break-before: always;     
+                }
+                
+                @media print {    
+                  body {   
+                    background: white;   
+                    padding: 0;  
+                  }
+      
+                  .export-toolbar {      
+                    display: none;     
+                  }
+                
+                  .report {      
+                    max-width: none;    
+                    box-shadow: none;    
+                    border-radius: 0;    
+                    padding: 25px;     
+                  }    
+                }
+                
+              </style>  
+            </head>
+      
+            <body>      
+              <div class="export-toolbar">
+                <div>
+                  📄 Recent Transactions Report
+                </div>
+              
+                <button onclick="window.print()">
+                  Download / Print PDF
+                </button>
+              </div>
+      
+              <div class="report">
+                <div class="header">
+              
+                  ${
+                    logoSrc
+                      ? `
+                        <img
+                          src="${logoSrc}"
+                          class="logo"
+                          alt="Sistem POS"
+                        />
+                      `
+                      : ""
+                  }
+        
+                <div class="title">
+                  Recent Transactions Report
+                </div>
+              
+                <div class="subtitle">
+                  Periode:
+                  ${escapeHtml(start || "-")}
+                  -
+                  ${escapeHtml(end || "-")}
+                </div>
+              
+                <div class="subtitle">
+                  Branch:
+                  ${escapeHtml(branchId)}
+                </div>
+              
+                <div class="subtitle">
+                  Status:
+                  ${escapeHtml(status)}
+                </div>
+              </div>
+              
+              <div class="kpi-grid">   
+                <div class="kpi-card"> 
+                  <div class="kpi-title">
+                    TOTAL REVENUE
+                  </div>
+            
+                  <div class="kpi-value">
+                    Rp ${rupiah(reportSummary.revenue)}
+                  </div>   
+                </div>
+            
+                <div class="kpi-card">   
+                  <div class="kpi-title">
+                    ACTIVE GUEST
+                  </div>
+            
+                  <div class="kpi-value">
+                    ${Number(
+                      reportSummary.activeGuests || 0
+                    )}
+                  </div>    
+                </div>
+            
+                <div class="kpi-card">  
+                  <div class="kpi-title">
+                    ITEMS SOLD
+                  </div>
+            
+                  <div class="kpi-value">
+                    ${Number(
+                      reportSummary.itemsSold || 0
+                    )}
+                  </div>  
+                </div>  
+              </div>
+            
+              <div class="card">    
+                <h3>
+                  Payment Distribution
+                </h3>
+            
+                <table>    
+                  <thead>    
+                    <tr>    
+                      <th>
+                        Payment
+                      </th>
+            
+                      <th class="right">
+                        Total
+                      </th>
+            
+                      <th class="right">
+                        Percentage
+                      </th>    
+                    </tr>    
+                  </thead>
+            
+                  <tbody>    
+                    ${paymentRows}    
+                  </tbody>    
+                </table>    
+              </div>
+            
+              <div class="card">    
+                <h3>
+                  Active Members
+                </h3>
+            
+                <table>    
+                  <thead>    
+                    <tr>   
+                      <th>
+                        Name
+                      </th>
+            
+                      <th class="center">
+                        Tier
+                      </th>
+            
+                      <th class="right">
+                        Point
+                      </th> 
+                    </tr>  
+                  </thead>
+            
+                  <tbody>    
+                    ${memberRows}    
+                  </tbody>    
+                </table>   
+              </div>
+            
+              <div class="page-break"></div>
+              
+              <div class="card">    
+                <h3>
+                  Recent Transactions
+                </h3>
+                
+                <table>    
+                  <thead>    
+                    <tr>    
+                      <th>ID</th>
+                      <th>Date</th>
+                      <th>Member</th>
+                      <th class="center">Status</th>
+                      <th class="center">Items</th>
+                      <th class="right">Total</th>    
+                    </tr>    
+                  </thead>
+                  
+                  <tbody>    
+                    ${transactionRows}    
+                  </tbody>    
+                </table>    
+              </div>
+            
+              <div class="footer">    
+                Generated by Sistem POS
+                •
+                ${new Date().toLocaleString("id-ID")}   
+              </div>    
+            </div>    
+          </body>  
+         </html>
+      `;
     
       res.setHeader(
         "Content-Type",
@@ -4732,11 +4557,8 @@ export default async function handler(req, res) {
         const html = `
       
           <!DOCTYPE html>
-      
             <html>
-      
             <head>
-      
               <meta charset="UTF-8">
       
               <title>
@@ -4756,333 +4578,192 @@ export default async function handler(req, res) {
                 }
       
                 body {
-      
                   background: #0B0F14;
-      
                   font-family:
                     Arial,
                     sans-serif;
-      
                   color: #333;
-      
-                  padding:
-                    40px 20px;
-      
+                  padding: 40px 20px;
                 }
       
-                .export-toolbar {
-      
-                  width: 100%;
-      
-                  max-width: 1100px;
-      
-                  margin:
-                    0 auto 20px auto;
-      
-                  display: flex;
-      
-                  justify-content:
-                    space-between;
-      
-                  align-items:
-                    center;
-      
-                  color: white;
-      
+                .export-toolbar {      
+                  width: 100%;      
+                  max-width: 1100px;    
+                  margin: 0 auto 20px auto;      
+                  display: flex;      
+                  justify-content: space-between;     
+                  align-items: center;    
+                  color: white;  
                   font-size: 14px;
-      
                 }
       
-                .export-toolbar button {
-      
-                  border:
-                    1px solid
+                .export-toolbar button {   
+                  border: 1px solid
                     rgba(255,255,255,.15);
-      
-                  background:
-                    rgba(255,255,255,.08);
-      
+                  background: rgba(255,255,255,.08);
                   color: white;
-      
-                  padding:
-                    10px 16px;
-      
-                  border-radius:
-                    10px;
-      
-                  cursor: pointer;
-      
-                  font-weight: bold;
-      
+                  padding: 10px 16px;      
+                  border-radius: 10px;      
+                  cursor: pointer;     
+                  font-weight: bold;    
                 }
       
-                .report {
-      
+                .report {      
                   width: 100%;
-      
-                  max-width: 1100px;
-      
-                  margin: 0 auto;
-      
-                  background: white;
-      
-                  padding: 45px;
-      
-                  border-radius: 4px;
-      
-                  box-shadow:
-                    0 20px 60px
+                  max-width: 1100px;      
+                  margin: 0 auto;      
+                  background: white;  
+                  padding: 45px;      
+                  border-radius: 4px;     
+                  box-shadow: 0 20px 60px
                     rgba(0,0,0,.45);
-      
                 }
       
-                .header {
-      
-                  text-align: center;
-      
-                  margin-bottom: 25px;
-      
+                .header {      
+                  text-align: center;   
+                  margin-bottom: 25px;     
                 }
       
-                .logo {
-      
-                  width: 170px;
-      
-                  height: auto;
-      
-                  max-height: 90px;
-      
-                  object-fit: contain;
-      
-                  margin-bottom: 12px;
-      
+                .logo {      
+                  width: 170px;    
+                  height: auto;   
+                  max-height: 90px;   
+                  object-fit: contain;    
+                  margin-bottom: 12px;      
                 }
       
                 .title {
-      
                   font-size: 24px;
-      
                   font-weight: bold;
-      
                   margin-bottom: 8px;
-      
                 }
       
                 .subtitle {
-      
                   font-size: 12px;
-      
                   color: #777;
-      
                   margin-bottom: 3px;
-      
                 }
       
                 .kpi-grid {
-      
                   display: grid;
-      
-                  grid-template-columns:
-                    repeat(3, 1fr);
-      
+                  grid-template-columns: repeat(3, 1fr);
                   gap: 16px;
-      
-                  margin:
-                    30px 0;
-      
+                  margin: 30px 0;
                 }
       
                 .kpi-card {
-      
-                  border:
-                    1px solid #e5e5e5;
-      
-                  border-radius:
-                    14px;
-      
+                  border: 1px solid #e5e5e5;
+                  border-radius: 14px;    
                   padding: 22px;
-      
-                  background:
-                    #fafafa;
-      
-                  text-align: center;
-      
+                  background: #fafafa;      
+                  text-align: center;     
                 }
       
-                .kpi-title {
-      
-                  font-size: 11px;
-      
-                  color: #666;
-      
-                  font-weight: bold;
-      
-                  margin-bottom: 12px;
-      
+                .kpi-title {      
+                  font-size: 11px;      
+                  color: #666;     
+                  font-weight: bold;     
+                  margin-bottom: 12px;      
                 }
       
-                .kpi-value {
-      
-                  font-size: 22px;
-      
-                  font-weight: bold;
-      
-                  color: #222;
-      
+                .kpi-value {      
+                  font-size: 22px;     
+                  font-weight: bold;   
+                  color: #222;  
                 }
       
-                .card {
-      
-                  border:
-                    1px solid #e5e5e5;
-      
-                  border-radius:
-                    14px;
-      
-                  padding: 18px;
-      
-                  margin-top: 20px;
-      
-                  background: #fff;
-      
+                .card {      
+                  border: 1px solid #e5e5e5;      
+                  border-radius: 14px;     
+                  padding: 18px;   
+                  margin-top: 20px;  
+                  background: #fff;    
                 }
       
-                .card h3 {
-      
-                  margin-top: 0;
-      
-                  margin-bottom: 12px;
-      
-                  font-size: 16px;
-      
+                .card h3 {      
+                  margin-top: 0;     
+                  margin-bottom: 12px;   
+                  font-size: 16px;      
                 }
       
-                table {
-      
-                  width: 100%;
-      
-                  border-collapse:
-                    collapse;
-      
-                  font-size: 11px;
-      
-                  margin-top: 10px;
-      
+                table {      
+                  width: 100%;      
+                  border-collapse: collapse;      
+                  font-size: 11px;      
+                  margin-top: 10px;     
                 }
       
                 th {
-      
                   background: #f5f5f5;
-      
-                  padding: 10px;
-      
-                  text-align: left;
-      
-                  font-weight: bold;
-      
+                  padding: 10px;    
+                  text-align: left;     
+                  font-weight: bold;   
                 }
       
-                td {
-      
-                  padding: 10px;
-      
-                  border-bottom:
-                    1px solid #eee;
-      
+                td {   
+                  padding: 10px;    
+                  border-bottom: 1px solid #eee;     
                 }
       
                 .right {
                   text-align: right;
                 }
       
-                .empty {
-      
-                  text-align: center;
-      
-                  color: #777;
-      
-                  padding: 25px;
-      
+                .empty {     
+                  text-align: center;   
+                  color: #777; 
+                  padding: 25px;   
                 }
       
-                .footer {
-      
-                  margin-top: 40px;
-      
-                  text-align: center;
-      
-                  font-size: 9px;
-      
-                  color: #888;
-      
+                .footer {      
+                  margin-top: 40px;      
+                  text-align: center;      
+                  font-size: 9px;     
+                  color: #888;    
                 }
       
-                .page-break {
-      
-                  page-break-before:
-                    always;
-      
+                .page-break {      
+                  page-break-before: always;     
                 }
       
-                @media print {
-      
-                  body {
-      
+                @media print {   
+                  body {     
                     background: white;
-      
                     padding: 0;
-      
                   }
       
-                  .export-toolbar {
-      
-                    display: none;
-      
+                  .export-toolbar {      
+                    display: none;    
                   }
       
-                  .report {
-      
-                    max-width: none;
-      
-                    box-shadow: none;
-      
-                    border-radius: 0;
-      
-                    padding: 25px;
-      
-                  }
-      
+                  .report {      
+                    max-width: none;     
+                    box-shadow: none;     
+                    border-radius: 0;      
+                    padding: 25px;     
+                  }      
                 }
-      
               </style>
-      
             </head>
-      
             <body>
       
               <!-- TOOLBAR -->
       
               <div class="export-toolbar">
-      
                 <div>
-                  📄 Gross Revenue Report
+                   Gross Revenue Report
                 </div>
       
                 <button
-                  onclick="window.print()"
-                >
+                  onclick="window.print()" >
                   Download / Print PDF
-                </button>
-      
+                </button>     
               </div>
-      
-      
-              <!-- REPORT -->
-      
-              <div class="report">
-      
-                <!-- HEADER -->
-      
+           
+              <!-- REPORT -->  
+              <div class="report"> 
+              
+                <!-- HEADER -->      
                 <div class="header">
       
                   ${
@@ -5118,16 +4799,11 @@ export default async function handler(req, res) {
                       branchId
                     )}
                   </div>
-      
                 </div>
       
-      
                 <!-- SUMMARY -->
-      
-                <div class="kpi-grid">
-      
-                  <div class="kpi-card">
-      
+                <div class="kpi-grid">      
+                  <div class="kpi-card">      
                     <div class="kpi-title">
                       GROSS REVENUE
                     </div>
@@ -5136,13 +4812,10 @@ export default async function handler(req, res) {
                       IDR ${rupiah(
                         summary.totalSubtotal
                       )}
-                    </div>
-      
+                    </div>      
                   </div>
       
-      
-                  <div class="kpi-card">
-      
+                  <div class="kpi-card">      
                     <div class="kpi-title">
                       NET REVENUE
                     </div>
@@ -5152,12 +4825,9 @@ export default async function handler(req, res) {
                         summary.totalNetRevenue
                       )}
                     </div>
-      
                   </div>
       
-      
                   <div class="kpi-card">
-      
                     <div class="kpi-title">
                       GRAND TOTAL
                     </div>
@@ -5166,25 +4836,18 @@ export default async function handler(req, res) {
                       IDR ${rupiah(
                         summary.totalRevenue
                       )}
-                    </div>
-      
+                    </div>    
                   </div>
-      
                 </div>
-      
-      
-                <!-- SUMMARY DETAIL -->
-      
-                <div class="card">
-      
+          
+                <!-- SUMMARY DETAIL -->      
+                <div class="card">      
                   <h3>
                     Revenue Summary
                   </h3>
       
-                  <table>
-      
-                    <tr>
-      
+                  <table>      
+                    <tr>      
                       <td>
                         Gross Revenue
                       </td>
@@ -5193,13 +4856,11 @@ export default async function handler(req, res) {
                         IDR ${rupiah(
                           summary.totalSubtotal
                         )}
-                      </td>
-      
+                      </td>      
                     </tr>
       
       
                     <tr>
-      
                       <td>
                         Total Discount
                       </td>
@@ -5209,12 +4870,9 @@ export default async function handler(req, res) {
                           summary.totalDiscount
                         )}
                       </td>
-      
                     </tr>
       
-      
                     <tr>
-      
                       <td>
                         Net Revenue
                       </td>
@@ -5224,12 +4882,9 @@ export default async function handler(req, res) {
                           summary.totalNetRevenue
                         )}
                       </td>
-      
                     </tr>
       
-      
                     <tr>
-      
                       <td>
                         Total Tax
                       </td>
@@ -5239,12 +4894,10 @@ export default async function handler(req, res) {
                           summary.totalTax
                         )}
                       </td>
-      
                     </tr>
       
       
                     <tr>
-      
                       <td>
                         Total Service
                       </td>
@@ -5254,12 +4907,10 @@ export default async function handler(req, res) {
                           summary.totalService
                         )}
                       </td>
-      
                     </tr>
       
       
                     <tr>
-      
                       <td>
                         Grand Total Payment
                       </td>
@@ -5269,12 +4920,10 @@ export default async function handler(req, res) {
                           summary.totalRevenue
                         )}
                       </td>
-      
                     </tr>
       
       
                     <tr>
-      
                       <td>
                         AOV
                       </td>
@@ -5286,28 +4935,20 @@ export default async function handler(req, res) {
                           )
                         )}
                       </td>
-      
                     </tr>
-      
                   </table>
-      
                 </div>
       
       
                 <!-- CATEGORY -->
-      
                 <div class="card">
-      
                   <h3>
                     Revenue by Category
                   </h3>
       
                   <table>
-      
                     <thead>
-      
                       <tr>
-      
                         <th>
                           Category
                         </th>
@@ -5315,36 +4956,24 @@ export default async function handler(req, res) {
                         <th class="right">
                           Revenue
                         </th>
-      
                       </tr>
-      
                     </thead>
       
                     <tbody>
-      
                       ${categoryRows}
-      
                     </tbody>
-      
                   </table>
-      
                 </div>
       
-      
                 <!-- TREND -->
-      
                 <div class="card page-break">
-      
                   <h3>
                     Revenue Trend
                   </h3>
       
                   <table>
-      
                     <thead>
-      
                       <tr>
-      
                         <th>
                           Date
                         </th>
@@ -5356,40 +4985,28 @@ export default async function handler(req, res) {
                         <th class="right">
                           Revenue
                         </th>
-      
                       </tr>
-      
                     </thead>
-      
+                    
                     <tbody>
-      
                       ${trendRows}
-      
                     </tbody>
-      
                   </table>
-      
                 </div>
       
       
                 <!-- FOOTER -->
       
                 <div class="footer">
-      
                   Generated by Sistem POS
                   •
                   ${new Date().toLocaleString(
                     "id-ID"
                   )}
-      
                 </div>
-      
               </div>
-      
             </body>
-      
             </html>
-      
         `;
       
         res.setHeader(
@@ -5456,20 +5073,12 @@ else if (type === "analytics") {
   );
 
   if (error) {
-
     console.error(
       "ANALYTICS RPC ERROR:",
       error
     );
-
     throw error;
-
   }
-
-  console.log(
-    "ANALYTICS RPC DATA:",
-    data
-  );
 
   // ==========================================
   // NORMALIZE
@@ -5515,23 +5124,6 @@ else if (type === "analytics") {
     )
       ? report.rawMaterials
       : [];
-
-  console.log(
-    "ANALYTICS NORMALIZED:",
-    {
-      analytics,
-      weeklyCount:
-        weekly.length,
-      paymentCount:
-        paymentDistribution.length,
-      topSellingCount:
-        topSelling.length,
-      peakHoursCount:
-        peakHours.length,
-      rawMaterialsCount:
-        rawMaterials.length
-    }
-  );
 
   // =========================
   // PROFIT SUMMARY
@@ -5622,7 +5214,6 @@ else if (type === "analytics") {
         IDR ${rupiah(operational)}
       </td>
     </tr>
-
    
     <tr>
       <td>
@@ -5676,13 +5267,10 @@ else if (type === "analytics") {
 
   const weeklyRows =
     weekly.length
-
       ? weekly.map(
           (item, index) => {
-
             let day =
               `Week ${index + 1}`;
-
             let amount =
               0;
 
@@ -5691,10 +5279,8 @@ else if (type === "analytics") {
               typeof item ===
               "number"
             ) {
-
               amount =
                 Number(item);
-
             }
 
             // Kalau weekly berupa object
@@ -5703,14 +5289,12 @@ else if (type === "analytics") {
               typeof item ===
               "object"
             ) {
-
               day =
                 item.day ??
                 item.date ??
                 item.label ??
                 item.Day ??
                 `Week ${index + 1}`;
-
               amount =
                 Number(
                   item.revenue ??
@@ -5719,12 +5303,10 @@ else if (type === "analytics") {
                   item.value ??
                   0
                 );
-
             }
 
             return `
               <tr>
-
                 <td>
                   ${escapeHtml(day)}
                 </td>
@@ -5732,23 +5314,19 @@ else if (type === "analytics") {
                 <td class="right">
                   IDR ${rupiah(amount)}
                 </td>
-
               </tr>
             `;
-
           }
         ).join("")
 
       : `
         <tr>
-
           <td
             colspan="2"
             class="empty"
           >
             No weekly revenue data
           </td>
-
         </tr>
       `;
 
@@ -5758,10 +5336,8 @@ else if (type === "analytics") {
 
   const paymentRows =
     paymentDistribution.length
-
       ? paymentDistribution.map(
           item => {
-
             const method =
               item?.method ??
               item?.paymentMethod ??
@@ -5769,7 +5345,6 @@ else if (type === "analytics") {
               item?.name ??
               item?.type ??
               "-";
-
             const amount =
               Number(
                 item?.value ??
@@ -5788,7 +5363,6 @@ else if (type === "analytics") {
 
             return `
               <tr>
-
                 <td>
                   ${escapeHtml(method)}
                 </td>
@@ -5800,23 +5374,19 @@ else if (type === "analytics") {
                 <td class="right">
                   ${percent.toFixed(1)}%
                 </td>
-
               </tr>
             `;
-
           }
         ).join("")
 
       : `
         <tr>
-
           <td
             colspan="3"
             class="empty"
           >
             No payment data
           </td>
-
         </tr>
       `;
 
@@ -5826,17 +5396,14 @@ else if (type === "analytics") {
 
   const topSellingRows =
     topSelling.length
-
       ? topSelling.map(
           (item, index) => {
-
             const product =
               item?.name ??
               item?.product ??
               item?.productName ??
               item?.product_name ??
               "-";
-
             const quantity =
               Number(
                 item?.qty ??
@@ -5856,7 +5423,6 @@ else if (type === "analytics") {
 
             return `
               <tr>
-
                 <td>
                   ${index + 1}
                 </td>
@@ -5874,23 +5440,19 @@ else if (type === "analytics") {
                 <td class="right">
                   IDR ${rupiah(amount)}
                 </td>
-
               </tr>
             `;
-
           }
         ).join("")
 
       : `
         <tr>
-
           <td
             colspan="4"
             class="empty"
           >
             No top selling products
           </td>
-
         </tr>
       `;
 
@@ -5898,9 +5460,7 @@ else if (type === "analytics") {
   // PEAK HOURS
   // ==========================================
 
-
   const peakHourRows = [];
-
   const dayNames = [
     "Minggu",
     "Senin",
@@ -5929,7 +5489,6 @@ else if (type === "analytics") {
 
       const currentDate =
         new Date(startDateObj);
-
       currentDate.setDate(
         startDateObj.getDate() +
         dayIndex
@@ -5947,10 +5506,8 @@ else if (type === "analytics") {
 
       day.forEach(
         (count, hour) => {
-
           const value =
             Number(count || 0);
-
           if (value <= 0) {
             return;
           }
@@ -5969,7 +5526,6 @@ else if (type === "analytics") {
 
           peakHourRows.push(`
             <tr>
-
               <td>
                 ${escapeHtml(
                   dateText
@@ -5991,31 +5547,21 @@ else if (type === "analytics") {
                   "id-ID"
                 )}
               </td>
-
             </tr>
           `);
-
         }
       );
-
     }
   );
 
   const peakRows =
     peakHourRows.length
-
       ? peakHourRows.join("")
-
       : `
         <tr>
-
-          <td
-            colspan="4"
-            class="empty"
-          >
+          <td colspan="4" class="empty" >
             No peak hour data
           </td>
-
         </tr>
       `;
 
@@ -6027,31 +5573,13 @@ else if (type === "analytics") {
     rawMaterials.length
 
       ? rawMaterials.map(item => {
-
-          const id =
-            item?.id ??
-            "-";
-
-          const name =
-            item?.name ??
-            "-";
-        
-          const status =
-            item?.status ??
-            "-";
-        
-          const unit =
-            item?.unit ??
-            "-";
-
-          const stock =
-            Number(
-              item?.stock || 0
-            );
-
+          const id = item?.id ?? "-";
+          const name = item?.name ?? "-";
+          const status = item?.status ?? "-";
+          const unit = item?.unit ?? "-";
+          const stock = Number( item?.stock || 0 );
           return `
             <tr>
-
               <td>
                 ${escapeHtml(id)}
               </td>
@@ -6071,22 +5599,15 @@ else if (type === "analytics") {
               <td class="right">
                 ${stock.toLocaleString("id-ID")}
               </td>
-
             </tr>
           `;
-
         }).join("")
 
       : `
         <tr>
-
-          <td
-            colspan="5"
-            class="empty"
-          >
+          <td colspan="5" class="empty" >
             No raw material data
           </td>
-
         </tr>
       `;
 
@@ -6103,11 +5624,9 @@ else if (type === "analytics") {
 
   const memberRows =
     activeMembers.length
-
       ? activeMembers.map(
           member => `
             <tr>
-
               <td>
                 ${escapeHtml(
                   member.name
@@ -6127,68 +5646,31 @@ else if (type === "analytics") {
                   "id-ID"
                 )} PTS
               </td>
-
             </tr>
           `
         ).join("")
 
       : `
         <tr>
-
-          <td
-            colspan="3"
-            class="empty"
-          >
+          <td colspan="3" class="empty">
             No active members
           </td>
-
         </tr>
       `;
-
-  // ==========================================
-  // DEBUG SEBELUM HTML
-  // ==========================================
-
-  console.log(
-    "ANALYTICS EXPORT ROWS:",
-    {
-      revenue,
-      hpp,
-      netProfit,
-      growth,
-      weeklyRowsLength:
-        weeklyRows.length,
-      paymentRowsLength:
-        paymentRows.length,
-      topSellingRowsLength:
-        topSellingRows.length,
-      peakRowsLength:
-        peakRows.length,
-      rawMaterialRowsLength:
-        rawMaterialRows.length,
-      memberRowsLength:
-        memberRows.length
-    }
-  );
 
   // ==========================================
   // HTML REPORT
   // ==========================================
 
   const html = `
-
     <!DOCTYPE html>
-
     <html>
-
     <head>
-
       <meta charset="UTF-8">
 
       <title>
         Analytics Report
       </title>
-
       <style>
 
         * {
@@ -6202,245 +5684,130 @@ else if (type === "analytics") {
         }
 
         body {
-
           background: #0B0F14;
-
           font-family:
             Arial,
             sans-serif;
-
           color: #333;
-
-          padding:
-            40px 20px;
-
+          padding: 40px 20px;
         }
 
         .export-toolbar {
-
           width: 100%;
-
           max-width: 1100px;
-
-          margin:
-            0 auto 20px auto;
-
+          margin: 0 auto 20px auto;
           display: flex;
-
-          justify-content:
-            space-between;
-
-          align-items:
-            center;
-
+          justify-content: space-between;
+          align-items: center;
           color: white;
-
           font-size: 14px;
-
         }
 
         .export-toolbar button {
-
-          border:
-            1px solid
+          border: 1px solid
             rgba(255,255,255,.15);
-
-          background:
-            rgba(255,255,255,.08);
-
+          background: rgba(255,255,255,.08);
           color: white;
-
-          padding:
-            10px 16px;
-
-          border-radius:
-            10px;
-
+          padding: 10px 16px;
+          border-radius: 10px;
           cursor: pointer;
-
-          font-weight:
-            bold;
-
+          font-weight: bold;
         }
 
         .report {
-
           width: 100%;
-
           max-width: 1100px;
-
           margin: 0 auto;
-
           background: white;
-
           padding: 45px;
-
           border-radius: 4px;
-
-          box-shadow:
-            0 20px 60px
-            rgba(0,0,0,.45);
-
+          box-shadow: 0 20px 60px rgba(0,0,0,.45);
         }
 
         .header {
-
           text-align: center;
-
           margin-bottom: 25px;
-
         }
 
         .logo {
-
           width: 170px;
-
           height: auto;
-
           max-height: 90px;
-
           object-fit: contain;
-
           margin-bottom: 12px;
-
         }
 
         .title {
-
           font-size: 24px;
-
           font-weight: bold;
-
           margin-bottom: 8px;
-
         }
 
         .subtitle {
-
           font-size: 12px;
-
           color: #777;
-
           margin-bottom: 3px;
-
         }
 
         .kpi-grid {
-
           display: grid;
-
-          grid-template-columns:
-            repeat(4, 1fr);
-
+          grid-template-columns: repeat(4, 1fr);
           gap: 16px;
-
-          margin:
-            30px 0;
-
+          margin: 30px 0;
         }
 
         .kpi-card {
-
-          border:
-            1px solid #e5e5e5;
-
-          border-radius:
-            14px;
-
+          border: 1px solid #e5e5e5;
+          border-radius: 14px;
           padding: 22px;
-
-          background:
-            #fafafa;
-
-          text-align:
-            center;
-
+          background: #fafafa;
+          text-align: center;
         }
 
         .kpi-title {
-
           font-size: 11px;
-
           color: #666;
-
           font-weight: bold;
-
-          margin-bottom:
-            12px;
-
+          margin-bottom: 12px;
         }
 
         .kpi-value {
-
           font-size: 20px;
-
           font-weight: bold;
-
           color: #222;
-
         }
 
         .card {
-
-          border:
-            1px solid #e5e5e5;
-
-          border-radius:
-            14px;
-
+          border: 1px solid #e5e5e5;
+          border-radius: 14px;
           padding: 18px;
-
           margin-top: 20px;
-
           background: #fff;
-
         }
 
         .card h3 {
-
           margin-top: 0;
-
           margin-bottom: 12px;
-
           font-size: 16px;
-
         }
 
         table {
-
           width: 100%;
-
-          border-collapse:
-            collapse;
-
+          border-collapse: collapse;
           font-size: 11px;
-
           margin-top: 10px;
-
         }
 
         th {
-
-          background:
-            #f5f5f5;
-
+          background: #f5f5f5;
           padding: 10px;
-
-          text-align:
-            left;
-
-          font-weight:
-            bold;
-
+          text-align: left;
+          font-weight: bold;
         }
 
         td {
-
           padding: 10px;
-
-          border-bottom:
-            1px solid #eee;
-
+          border-bottom: 1px solid #eee;
         }
 
         .right {
@@ -6452,96 +5819,60 @@ else if (type === "analytics") {
         }
 
         .empty {
-
-          text-align:
-            center;
-
+          text-align: center;
           color: #777;
-
           padding: 25px;
-
         }
 
         .footer {
-
           margin-top: 40px;
-
-          text-align:
-            center;
-
+          text-align: center;
           font-size: 9px;
-
           color: #888;
-
         }
 
         .page-break {
-
-          page-break-before:
-            always;
-
+          page-break-before: always;
         }
 
         @media print {
-
           body {
-
             background: white;
-
             padding: 0;
-
           }
 
           .export-toolbar {
-
             display: none;
-
           }
 
           .report {
-
             max-width: none;
-
             box-shadow: none;
-
             border-radius: 0;
-
             padding: 25px;
-
           }
-
         }
-
       </style>
-
     </head>
-
+    
     <body>
-
+    
       <!-- TOOLBAR -->
-
       <div class="export-toolbar">
-
         <div>
           📊 Analytics Report
         </div>
 
-        <button
-          onclick="window.print()"
-        >
+        <button onclick="window.print()" >
           Download / Print PDF
         </button>
-
       </div>
 
 
       <!-- REPORT -->
-
       <div class="report">
 
-
         <!-- HEADER -->
-
         <div class="header">
 
           ${
@@ -6559,9 +5890,7 @@ else if (type === "analytics") {
           <div class="title">
             Analytics Report
           </div>
-
           <div class="subtitle">
-
             Periode:
             ${escapeHtml(
               start || "-"
@@ -6570,28 +5899,19 @@ else if (type === "analytics") {
             ${escapeHtml(
               end || "-"
             )}
-
           </div>
 
           <div class="subtitle">
-
             Branch:
             ${escapeHtml(
               branchId
             )}
-
           </div>
-
         </div>
 
-
         <!-- KPI -->
-
         <div class="kpi-grid">
-
-
           <div class="kpi-card">
-
             <div class="kpi-title">
               REVENUE
             </div>
@@ -6599,12 +5919,10 @@ else if (type === "analytics") {
             <div class="kpi-value">
               IDR ${rupiah(revenue)}
             </div>
-
           </div>
 
 
           <div class="kpi-card">
-
             <div class="kpi-title">
               HPP
             </div>
@@ -6612,12 +5930,9 @@ else if (type === "analytics") {
             <div class="kpi-value">
               IDR ${rupiah(hpp)}
             </div>
-
           </div>
 
-
           <div class="kpi-card">
-
             <div class="kpi-title">
               NET PROFIT
             </div>
@@ -6625,12 +5940,10 @@ else if (type === "analytics") {
             <div class="kpi-value">
               IDR ${rupiah(netProfit)}
             </div>
-
           </div>
 
 
           <div class="kpi-card">
-
             <div class="kpi-title">
               GROWTH
             </div>
@@ -6638,25 +5951,18 @@ else if (type === "analytics") {
             <div class="kpi-value">
               ${growth.toFixed(2)}%
             </div>
-
           </div>
-
-
         </div>
 
         <!-- PROFIT SUMMARY  -->
-
         <div class="card">
-
           <h3>
             Profit Summary
           </h3>
 
           <table>
-
             <thead>
               <tr>
-
                 <th>
                   Description
                 </th>
@@ -6664,35 +5970,24 @@ else if (type === "analytics") {
                 <th class="right">
                   Amount
                 </th>
-
               </tr>
             </thead>
-
+            
             <tbody>
-
               ${profitSummaryRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- WEEKLY -->
-
         <div class="card">
-
           <h3>
             Weekly Revenue
           </h3>
 
           <table>
-
             <thead>
-
               <tr>
-
                 <th>
                   Day
                 </th>
@@ -6700,36 +5995,24 @@ else if (type === "analytics") {
                 <th class="right">
                   Revenue
                 </th>
-
               </tr>
-
             </thead>
 
             <tbody>
-
               ${weeklyRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- PAYMENT -->
-
         <div class="card">
-
           <h3>
             Payment Distribution
           </h3>
 
           <table>
-
             <thead>
-
               <tr>
-
                 <th>
                   Payment Method
                 </th>
@@ -6741,36 +6024,24 @@ else if (type === "analytics") {
                 <th class="right">
                   Percentage
                 </th>
-
               </tr>
-
             </thead>
-
+            
             <tbody>
-
               ${paymentRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- TOP SELLING -->
-
         <div class="card">
-
           <h3>
             Top Selling Products
           </h3>
 
           <table>
-
             <thead>
-
               <tr>
-
                 <th>
                   #
                 </th>
@@ -6786,36 +6057,24 @@ else if (type === "analytics") {
                 <th class="right">
                   Revenue
                 </th>
-
               </tr>
-
             </thead>
 
             <tbody>
-
               ${topSellingRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- PEAK HOURS -->
-
         <div class="card page-break">
-
           <h3>
             Peak Hours
           </h3>
-
+          
           <table>
-
             <thead>
-
               <tr>
-
                 <th>
                   Date
                 </th>
@@ -6831,36 +6090,24 @@ else if (type === "analytics") {
                 <th class="center">
                   Transactions
                 </th>
-
               </tr>
-
             </thead>
 
             <tbody>
-
               ${peakRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- RAW MATERIALS -->
-
         <div class="card">
-
           <h3>
             Raw Materials
           </h3>
 
           <table>
-
             <thead>
-
               <tr>
-
                 <th>
                   ID
                 </th>
@@ -6880,36 +6127,24 @@ else if (type === "analytics") {
                 <th class="right">
                   Stock
                 </th>
-
               </tr>
-
             </thead>
 
             <tbody>
-
               ${rawMaterialRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- ACTIVE MEMBERS -->
-
         <div class="card">
-
           <h3>
             Active Members
           </h3>
-
+          
           <table>
-
             <thead>
-
               <tr>
-
                 <th>
                   Member
                 </th>
@@ -6921,47 +6156,31 @@ else if (type === "analytics") {
                 <th class="right">
                   Points
                 </th>
-
               </tr>
-
             </thead>
-
+            
             <tbody>
-
               ${memberRows}
-
             </tbody>
-
           </table>
-
         </div>
 
-
         <!-- FOOTER -->
-
         <div class="footer">
-
           Generated by Sistem POS
           •
           ${new Date().toLocaleString(
             "id-ID"
           )}
-
         </div>
-
-
       </div>
-
     </body>
-
     </html>
-
   `;
 
   return res
     .status(200)
     .send(html);
-
 }
 
 
