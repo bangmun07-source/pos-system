@@ -6360,7 +6360,6 @@ const html = `
             ${
               logoSrc
                 ? `
-
                   <img
                     src="${logoSrc}"
                     class="logo"
@@ -6376,33 +6375,20 @@ const html = `
             </div>
 
             <div class="subtitle">
-              <b>Branch:</b>
-              ${escapeHtml(
-                branchName
-              )}
-            </div>
-
-            <div class="subtitle">
               <b>Period:</b>
-
               ${escapeHtml(
                 start || "-"
               )}
-
               -
-
               ${escapeHtml(
                 end || "-"
               )}
             </div>
 
             <div class="subtitle">
-              <b>Generated:</b>
+              <b>Branch:</b>
               ${escapeHtml(
-                new Date()
-                  .toLocaleString(
-                    "id-ID"
-                  )
+                branchName
               )}
             </div>
           </div>
@@ -7016,16 +7002,16 @@ else if (type === "recipe") {
           <div class="title">
             Recipe Master Ledger Report
           </div>
+          
+         <div class="subtitle">
+            <b>Generated:</b>
+            ${new Date()
+              .toLocaleString("id-ID")}
+          </div>
       
           <div class="subtitle">
             <b>Branch:</b>
             ${escapeHtml(branchName)}
-          </div>
-      
-          <div class="subtitle">
-            <b>Generated:</b>
-            ${new Date()
-              .toLocaleString("id-ID")}
           </div>      
         </div>
       
