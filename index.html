@@ -4861,12 +4861,7 @@
 
         <select id="newProductCategory"
           class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
-					<option value="">Select Category</option>
-					<option>Drink</option>
-					<option>Coffee</option>
-					<option>Snack</option>
-					<option>Food</option>
-					<option>Dessert</option>
+		<option value="">Select Category</option>
         </select>
       </div>
       <!-- Price -->
@@ -24708,25 +24703,93 @@ function switchTab(tab) {
 }
 
 function openModal(templateId) {
-  const old = document.getElementById(templateId);
-  if (old) old.remove();
-  const tpl = document.getElementById(templateId + "Template");
+  const old =
+    document.getElementById(templateId);
+  if (old) {
+    old.remove();
+  }
+  const tpl =
+    document.getElementById(
+      templateId + "Template"
+    );
   if (!tpl) return;
-  const modal = tpl.content.firstElementChild.cloneNode(true);
+  const modal =
+    tpl.content
+      .firstElementChild
+      .cloneNode(true);
   modal.id = templateId;
   document.body.appendChild(modal);
 }
-	
-function openAddProductModal() {
-  openModal("addProductModal");
+
+
+async function openAddProductModal() {
+  // BUKA MODAL
+  openModal(
+    "addProductModal"
+  );
+  // LOAD CATEGORY SESUAI BRANCH LOGIN
+  await loadProductCategories();
+}
+
+async function loadProductCategories() {
+  const select =
+    document.getElementById(
+      "newProductCategory"
+    );
+  if (!select) return;
+  const branchId =
+    state.branchId;
+  if (!branchId) {
+    console.warn(
+      "Category: branchId belum tersedia"
+    );
+    return;
+  }
+
+  try {
+    const categories =
+      await getCategoriesRPC(
+        branchId
+      );
+    console.log(
+      "PRODUCT CATEGORIES:",
+      categories
+    );
+    select.innerHTML =
+      `<option value="">
+        Select Category
+      </option>`;
+
+    categories.forEach(
+      category => {
+        const option =
+          document.createElement(
+            "option"
+          );
+        option.value =
+          category.category_name;
+        option.textContent =
+          category.category_name;
+        select.appendChild(
+          option
+        );
+      }
+    );
+  }
+  catch (err) {
+    console.error(
+      "Load Product Categories:",
+      err
+    );
+
+    select.innerHTML =
+      `<option value="">
+        Gagal memuat category
+      </option>`;
+  }
 }
 
 async function saveNewProduct() {
-
-  // =========================
-  // GET FORM
-  // =========================
-
   const name =
     document
       .getElementById("newProductName")
