@@ -200,10 +200,8 @@ export default async function handler(req, res) {
           );
         });
         
-        const branchName =
-          branchData?.branchName || branchId;
-
-      
+         const branchName =
+            await getBranchName(branchId);
       // ========================================
       // PAID
       // ========================================
@@ -1924,6 +1922,9 @@ export default async function handler(req, res) {
                 Array.isArray(data.ownerTransactions)
                   ? data.ownerTransactions
                   : [];
+      
+              const branchName =
+                  await getBranchName(branchId);
           
               // KPI
               const cashIn =
@@ -2900,14 +2901,7 @@ export default async function handler(req, res) {
             // ===================================================
             // GET DATA
             // ===================================================
-          console.log(
-        "OTHER INCOME RPC REQUEST:",
-        {
-          branchId,
-          start,
-          end
-        }
-      );
+
             const {
               data,
               error
@@ -2919,16 +2913,6 @@ export default async function handler(req, res) {
                 p_end: end || null
               }
             );
-      
-            console.log(
-        "OTHER INCOME RPC DATA:",
-        data
-      );
-      
-      console.log(
-        "OTHER INCOME RPC ERROR:",
-        error
-      );
       
       if (error) {
       
@@ -2976,6 +2960,9 @@ export default async function handler(req, res) {
             const rupiah = n =>
               Number(n || 0)
                 .toLocaleString("id-ID");
+
+           const branchName =
+              await getBranchName(branchId);
           
             // ===================================================
             // FILTER
@@ -3173,7 +3160,7 @@ export default async function handler(req, res) {
               !branchValue ||
               norm(branchValue) === "ALL"
                 ? "ALL"
-                : branchValue;
+                : await getBranchName(branchValue);
           
             const categoryDisplay =
               categoryValue &&
@@ -3907,7 +3894,8 @@ export default async function handler(req, res) {
           Array.isArray(report.trend)
             ? report.trend
             : [];
-      
+        const branchName =
+          await getBranchName(branchId);
         // =========================
         // CATEGORY ROWS
         // =========================
