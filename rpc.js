@@ -2999,7 +2999,7 @@ async function getCategoriesRPC(branchId) {
     );
     throw error;
   }
-  return data;
+  return data?.data || [];
 }
 
     // ===============================
