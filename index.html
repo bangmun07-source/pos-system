@@ -2697,45 +2697,9 @@
   class="relative w-full pl-8 mx-auto md:px-2 lg:px-2 flex flex-col transition-all duration-300">
 
 <!-- Category Chips -->
-<div class="relative pl-6 md:px-4 pt-4 pb-2 md:pt-6 md:pb-3 flex justify-between gap-2 md:gap-3 border-b border-white/10 overflow-x-auto custom-scrollbar">
-
-  <button
-  onclick="setActiveCategory(this); filterProducts('All')"
-  class="category-btn active-category flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all">
-  ALL
-</button>
-
-<button
-  onclick="setActiveCategory(this); filterProducts('Food')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font  text-xs lg:text-sm whitespace-nowrap transition-all">
-  FOOD
-</button>
-
-<button
-  onclick="setActiveCategory(this); filterProducts('Drink')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all">
-  DRINK
-</button>
-
-<button
-  onclick="setActiveCategory(this); filterProducts('Coffee')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all">
-  COFFEE
-</button>
-
-<button
-  onclick="setActiveCategory(this); filterProducts('Snack')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all">
-  SNACK
-</button>
-
-<button
-  onclick="setActiveCategory(this); filterProducts('Paket')"
-  class="category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all">
-  PAKET
-</button>
-
-
+<div
+  id="pos-category-list"
+  class="relative pl-6 md:px-4 pt-4 pb-2 md:pt-6 md:pb-3 flex justify-between gap-2 md:gap-3 border-b border-white/10 overflow-x-auto custom-scrollbar">
 </div>
 <!-- Product Grid -->
 <div class="relative flex-1 overflow-y-auto custom-scrollbar pl-2 pt-4 pb-10">
@@ -16992,6 +16956,74 @@ function filterProducts(category) {
     );
   }
   renderProducts(filtered); 
+}
+
+async function loadPOSCategories() {
+  try {
+    const categoryContainer =
+      document.getElementById(
+        "pos-category-list"
+      );
+    if (!categoryContainer) return;
+    categoryContainer.innerHTML = "";
+  
+    // ALL
+    const allButton =
+      document.createElement("button");
+    allButton.type = "button";
+    allButton.className =
+      "category-btn active-category flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all";
+    allButton.textContent = "ALL";
+    allButton.onclick = () => {
+      setActiveCategory(allButton);
+      filterProducts("All");
+
+    };
+    categoryContainer.appendChild(
+      allButton
+    );
+
+    // =========================
+    // DATABASE CATEGORIES
+    // =========================
+    const categories =
+      await getCategoriesRPC(
+        state.branchId
+      );
+    console.log(
+      "POS CATEGORIES:",
+      categories
+    );
+    categories.forEach(category => {
+      const button =
+        document.createElement(
+          "button"
+        );
+      button.type = "button";
+      button.className =
+        "category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all";
+      button.textContent =
+        (
+          category.category_name ||
+          category.category_key ||
+          ""
+        ).toUpperCase();
+      button.onclick = () => {
+        setActiveCategory(button);
+        filterProducts(
+          category.category_name
+        );
+      };
+      categoryContainer.appendChild(
+        button
+      );
+    });
+  } catch (error) {
+    console.error(
+      "Load POS Categories:",
+      error
+    );
+  }
 }
 
 
