@@ -30926,6 +30926,37 @@ async function saveLoyaltySettings() {
       parseNumber("reward_other")
   };
 
+ 
+  // CATEGORY
+  const categoryPayload = [];
+
+  for (let i = 1; i <= 5; i++) {
+
+    const name =
+      document
+        .getElementById(`category_${i}_name`)
+        ?.value
+        ?.trim() || "";
+
+    const discount =
+      parseNumber(`category_${i}_discount`);
+
+    const reward =
+      parseNumber(`category_${i}_reward`);
+
+    // Category kosong dilewati
+    if (!name) {
+      continue;
+    }
+
+    categoryPayload.push({
+      category_key: `category_${i}`,
+      category_name: name,
+      discount: discount,
+      reward: reward
+    });
+  }
+
   try {
 
     // SUPABASE RPC
@@ -30937,7 +30968,17 @@ async function saveLoyaltySettings() {
       "SAVE LOYALTY SETTINGS RESULT:",
       res
     );
-
+ 
+    // SAVE CATEGORIES
+    for (const category of categoryPayload) {
+      await saveCategoryRPC(
+        state.branchId,
+        category.category_key,
+        category.category_name,
+        category.discount,
+        category.reward
+      );
+    }
     // HANDLE RESPONSE
     if (
       res &&
