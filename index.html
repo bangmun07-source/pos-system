@@ -30682,7 +30682,7 @@ function initLoyaltyPage() {
   loadRewardProducts();
   initPointRatioListener();
   initSeasonControl();
-
+	loadCategorySettings();
   document.getElementById("saveSettingsBtn")
     ?.addEventListener(
       "click",
@@ -30729,6 +30729,143 @@ async function loadLoyaltySettings() {
       err?.message ||
       "Gagal memuat Loyalty Settings",
       "error"
+    );
+  }
+}
+
+async function loadCategorySettings() {
+
+  try {
+    const branchId = state.branchId;
+
+    if (!branchId) {
+      console.warn(
+        "loadCategorySettings: branchId tidak tersedia"
+      );
+      return;
+    }
+
+    const res =
+      await getCategoriesRPC(
+        branchId
+      );
+
+    if (
+      !res ||
+      res.success === false
+    ) {
+      throw new Error(
+        res?.message ||
+        "Gagal mengambil category"
+      );
+    }
+
+    const categories =
+      Array.isArray(res.data)
+        ? res.data
+        : [];
+
+
+    // RESET UI
+    for (let i = 1; i <= 5; i++) {
+      const name =
+        document.getElementById(
+          `category_${i}_name`
+        );
+
+      const discount =
+        document.getElementById(
+          `category_${i}_discount`
+        );
+
+      const reward =
+        document.getElementById(
+          `category_${i}_reward`
+        );
+
+      if (name) {
+        name.value = "";
+      }
+
+      if (discount) {
+        discount.value = 0;
+      }
+
+      if (reward) {
+        reward.value = 0;
+      }
+    }
+
+    // LOAD DATABASE
+    categories.forEach(category => {
+
+      const key =
+        String(
+          category.category_key || ""
+        );
+
+      const match =
+        key.match(
+          /^category_(\d+)$/
+        );
+
+      if (!match) {
+        return;
+      }
+
+      const index =
+        Number(match[1]);
+
+      if (
+        index < 1 ||
+        index > 5
+      ) {
+        return;
+      }
+
+      const name =
+        document.getElementById(
+          `category_${index}_name`
+        );
+
+      const discount =
+        document.getElementById(
+          `category_${index}_discount`
+        );
+
+      const reward =
+        document.getElementById(
+          `category_${index}_reward`
+        );
+
+      if (name) {
+        name.value =
+          category.category_name || "";
+      }
+
+      if (discount) {
+        discount.value =
+          Number(
+            category.discount || 0
+          );
+      }
+
+      if (reward) {
+        reward.value =
+          Number(
+            category.reward || 0
+          );
+      }
+    });
+    console.log(
+      "CATEGORY SETTINGS LOADED:",
+      categories
+    );
+  }
+  catch (err) {
+    console.error(
+      "Load Category Settings:",
+      err
     );
   }
 }
