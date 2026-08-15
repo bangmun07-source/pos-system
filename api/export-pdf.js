@@ -35,6 +35,35 @@ function normalize(value) {
     .toUpperCase();
 }
 
+// ==========================================
+// GET BRANCH NAME
+// ==========================================
+
+async function getBranchName(branchId) {
+  if (!branchId) {
+    return "";
+  }
+  const {
+    data,
+    error
+  } = await supabase
+    .from("Branches")
+    .select("branchName")
+    .eq("branchId", branchId)
+    .single();
+
+  if (error) {
+    console.error(
+      "getBranchName error:",
+      error
+    );
+    // Kalau gagal ambil nama,
+    // tetap gunakan branchId
+    return branchId;
+  }
+  return data?.branchName || branchId;
+}
+
 export default async function handler(req, res) {
 
   console.log("=== EXPORT PDF START ===");
@@ -170,7 +199,11 @@ export default async function handler(req, res) {
             matchCategory
           );
         });
+        
+        const branchName =
+          branchData?.branchName || branchId;
 
+      
       // ========================================
       // PAID
       // ========================================
@@ -388,7 +421,7 @@ export default async function handler(req, res) {
       // FILENAME
       // ========================================
 
-      const filename = `Expense Ledger Report - ${branchId} (${start || "-"} - ${end || "-"}).pdf`;
+      const filename = `Expense Ledger Report - ${branchName} (${start || "-"} - ${end || "-"}).pdf`;
 
       // ========================================
       // HTML REPORT
@@ -472,7 +505,13 @@ export default async function handler(req, res) {
                     font-weight: bold;          
                     margin-bottom: 8px;         
                   }
-          
+       
+                  .subtitle {              
+                    font-size: 12px;             
+                    color: #777;            
+                    margin-bottom: 3px;            
+                  }
+                
                   .meta {          
                     font-size: 12px;          
                     color: #777;          
@@ -590,7 +629,7 @@ export default async function handler(req, res) {
               <body>          
                 <div class="export-toolbar">          
                   <div>
-                    📄 Expense Ledger Report
+                    Expense Ledger Report
                   </div>
                 
                   <button onclick="window.print()">
@@ -625,7 +664,7 @@ export default async function handler(req, res) {
 
                     <div class="subtitle">
                       <b>Branch:</b>
-                      ${escapeHtml(branchId)}
+                      ${escapeHtml(branchName)}
                     </div>
                   </div>
                     
@@ -805,6 +844,7 @@ export default async function handler(req, res) {
         );
 
       }
+
 
       // ========================================
       // SUMMARY
@@ -1064,7 +1104,7 @@ export default async function handler(req, res) {
           <body>            
             <div class="export-toolbar">          
               <div>
-                📄 Member Directory Report
+                 Member Directory Report
               </div>
             
               <button onclick="window.print()">
@@ -1084,8 +1124,10 @@ export default async function handler(req, res) {
                 </div>
               
                 <div class="subtitle">
-                  Branch:
-                  ${escapeHtml(branchId)}
+                  Periode:
+                  ${escapeHtml(start || "-")}
+                  -
+                  ${escapeHtml(end || "-")}
                 </div>
               
                 <div class="subtitle">
@@ -1240,6 +1282,8 @@ export default async function handler(req, res) {
         Array.isArray(reportSummary.activeMembers)
           ? reportSummary.activeMembers
           : [];
+      const branchName =
+        await getBranchName(branchId);
     
       // ========================================
       // TRANSACTION ROWS
@@ -1587,7 +1631,7 @@ export default async function handler(req, res) {
             <body>      
               <div class="export-toolbar">
                 <div>
-                  📄 Recent Transactions Report
+                  Recent Transactions Report
                 </div>
               
                 <button onclick="window.print()">
@@ -1623,7 +1667,7 @@ export default async function handler(req, res) {
               
                 <div class="subtitle">
                   Branch:
-                  ${escapeHtml(branchId)}
+                  ${escapeHtml(branchName)}
                 </div>
               
                 <div class="subtitle">
@@ -3962,7 +4006,7 @@ export default async function handler(req, res) {
         // =========================
       
         const filename =
-          `Gross Revenue Report - ${branchId} (${start || "-"} - ${end || "-"}).pdf`;
+          `Gross Revenue Report - ${branchName} (${start || "-"} - ${end || "-"}).pdf`;
       
         const html = `
       
