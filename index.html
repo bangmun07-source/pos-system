@@ -30869,7 +30869,14 @@ async function loadLoyaltySettings() {
 async function loadCategorySettings() {
 
   try {
-    const branchId = state.branchId;
+
+    const branchId =
+      state.branchId;
+
+    console.log(
+      "LOAD CATEGORY SETTINGS:",
+      branchId
+    );
 
     if (!branchId) {
       console.warn(
@@ -30882,6 +30889,11 @@ async function loadCategorySettings() {
       await getCategoriesRPC(
         branchId
       );
+
+    console.log(
+      "CATEGORY RPC RESULT:",
+      res
+    );
 
     if (
       !res ||
@@ -30898,9 +30910,12 @@ async function loadCategorySettings() {
         ? res.data
         : [];
 
-
+    // ==============================
     // RESET UI
+    // ==============================
+
     for (let i = 1; i <= 5; i++) {
+
       const name =
         document.getElementById(
           `category_${i}_name`
@@ -30929,77 +30944,85 @@ async function loadCategorySettings() {
       }
     }
 
-    // LOAD DATABASE
-    categories.forEach(category => {
+    // ==============================
+    // LOAD DATABASE → UI
+    // ==============================
 
-      const key =
-        String(
-          category.category_key || ""
-        );
+    categories.forEach(
+      category => {
 
-      const match =
-        key.match(
-          /^category_(\d+)$/
-        );
-
-      if (!match) {
-        return;
-      }
-
-      const index =
-        Number(match[1]);
-
-      if (
-        index < 1 ||
-        index > 5
-      ) {
-        return;
-      }
-
-      const name =
-        document.getElementById(
-          `category_${index}_name`
-        );
-
-      const discount =
-        document.getElementById(
-          `category_${index}_discount`
-        );
-
-      const reward =
-        document.getElementById(
-          `category_${index}_reward`
-        );
-
-      if (name) {
-        name.value =
-          category.category_name || "";
-      }
-
-      if (discount) {
-        discount.value =
-          Number(
-            category.discount || 0
+        const key =
+          String(
+            category.category_key || ""
           );
-      }
 
-      if (reward) {
-        reward.value =
-          Number(
-            category.reward || 0
+        const match =
+          key.match(
+            /^category_(\d+)$/
           );
+
+        if (!match) return;
+
+        const index =
+          Number(match[1]);
+
+        if (
+          index < 1 ||
+          index > 5
+        ) {
+          return;
+        }
+
+        const name =
+          document.getElementById(
+            `category_${index}_name`
+          );
+
+        const discount =
+          document.getElementById(
+            `category_${index}_discount`
+          );
+
+        const reward =
+          document.getElementById(
+            `category_${index}_reward`
+          );
+
+        if (name) {
+          name.value =
+            category.category_name || "";
+        }
+
+        if (discount) {
+          discount.value =
+            Number(
+              category.discount ?? 0
+            );
+        }
+
+        if (reward) {
+          reward.value =
+            Number(
+              category.reward ?? 0
+            );
+        }
+
       }
-    });
+    );
+
     console.log(
       "CATEGORY SETTINGS LOADED:",
       categories
     );
+
   }
   catch (err) {
+
     console.error(
       "Load Category Settings:",
       err
     );
+
   }
 }
 
