@@ -31917,58 +31917,65 @@ function onRewardProductChange() {
 }	
 
 async function loadRewardProductsForModal() {
+
   const branchId =
     document.getElementById(
       "rewardBranch"
     )?.value ||
     state.branchId;
+
+  const role =
+    state.user?.role?.toLowerCase() || "";
+
   try {
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
+    // =========================
+    // LOAD PRODUCTS FROM RPC
+    // =========================
 
-    /*
-    const { data: products, error } =
-      await supabase
-        .from("Products")
-        .select("*")
-        .eq(
-          "branchId",
-          branchId
-        );
+    const products =
+      await getProductsRPC(
+        branchId,
+        role
+      );
 
-    if(error){
-      throw error;
-    }
-    */
+    console.log(
+      "REWARD PRODUCTS:",
+      products
+    );
 
-    // TEMP DATA VERCEL
-    const products = [];
     const select =
       document.getElementById(
         "rewardProduct"
       );
+
     if (!select) return;
+
     select.innerHTML =
       `
       <option value="">
         Pilih Produk
       </option>
       `;
+
     products.forEach(p => {
+
       select.innerHTML +=
-      `
+        `
         <option
           value="${p.ID_Produk}"
           data-category="${p.Kategori}">
           ${p.Nama_Produk}
         </option>
-      `;
+        `;
+
     });
+
     onRewardProductChange();
+
   }
-  catch(err) {
+  catch (err) {
+
     console.error(
       "Load Reward Products Modal:",
       err
@@ -31994,74 +32001,78 @@ async function saveRewardProduct() {
   const product =
     document
       .getElementById("rewardProduct")
-      .selectedOptions[0];
-  if (!product) {
+      ?.selectedOptions[0];
+
+  if (!product || !product.value) {
     alert(
       "Pilih produk terlebih dahulu."
     );
     return;
   }
+  const branchId =
+    document.getElementById(
+      "rewardBranch"
+    )?.value ||
+    state.branchId;
+
   const payload = {
-    ID_Reward:
-      "R" + Date.now(),
-    Branch_ID:
-      document.getElementById(
-        "rewardBranch"
-      ).value,
-    Produk_ID:
-      product.value,
-    Nama_Reward:
-      product.text,
-    Point_Dibutuhkan:
-      30,
-    Status:
-      "active",
-    Max_Redeem:
-      0,
-    Category:
-      product.dataset.category
+    ID_Reward: "R" + Date.now(),
+    Branch_ID: branchId,
+    Produk_ID: product.value,
+    Nama_Reward: product.text,
+    Point_Dibutuhkan: 30,
+    Status: "active",
+    Max_Redeem: 0,
+    Category: product.dataset.category || null
   };
 
   try {
 
+    // ================================
+    // SAVE VIA SUPABASE RPC
+    // ================================
+    const result =
+      await saveRewardProductRPC(
+        payload
+      );
+    console.log(
+      "SAVE REWARD RESULT:",
+      result
+    );
 
-    // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
-    /*
-    const { data, error } =
-      await supabase
-        .from("REWARD")
-        .insert(payload)
-        .select();
-
-    if(error){
-      throw error;
-    }
-    */
-
-    // TEMP DATA VERCEL
-    const res = {
-      success:true
-    };
-    if(!res.success){
+    // ================================
+    // VALIDATE RESULT
+    // ================================
+    if (
+      result &&
+      result.success === false
+    ) {
       throw new Error(
+        result.message ||
         "Gagal menyimpan reward."
       );
     }
-    // FLOW LAMA TETAP
+
+    // ================================
+    // CLOSE MODAL
+    // ================================
     closeAddRewardModal();
-    // clear reward cache
-    state.rewardProducts = null;
-    state.rewardProductsBranchId = null;
-    // reload
-    loadRewardProducts();
+    // ================================
+    // CLEAR CACHE
+    // ================================
+    state.rewardProducts =
+      null;
+    state.rewardProductsBranchId =
+      null;
+    // ================================
+    // RELOAD REWARD
+    // ================================
+    await loadRewardProducts();
     showToast(
       "Reward berhasil ditambahkan."
     );
   }
-  catch(err) {
+  catch (err) {
     console.error(
       "Save Reward Product:",
       err
