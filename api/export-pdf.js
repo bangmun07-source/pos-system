@@ -5865,7 +5865,7 @@ else if (type === "analytics") {
                   ${escapeHtml(product)}
                 </td>
 
-                <td class="right">
+                <td class="center">
                   ${quantity.toLocaleString(
                     "id-ID"
                   )}
@@ -5898,23 +5898,6 @@ else if (type === "analytics") {
   // PEAK HOURS
   // ==========================================
 
-  /*
-    IMPORTANT:
-
-    peakHours dari dashboard:
-
-    [
-      [24 jam],
-      [24 jam],
-      [24 jam],
-      ...
-    ]
-
-    Jadi JANGAN flatten.
-
-    Setiap array = 1 hari.
-    Setiap index = jam.
-  */
 
   const peakHourRows = [];
 
@@ -5968,8 +5951,6 @@ else if (type === "analytics") {
           const value =
             Number(count || 0);
 
-          // Hanya tampilkan jam
-          // yang benar-benar punya transaksi
           if (value <= 0) {
             return;
           }
@@ -6001,7 +5982,7 @@ else if (type === "analytics") {
                 )}
               </td>
 
-              <td>
+              <td class="center">
                 ${hourLabel}
               </td>
 
