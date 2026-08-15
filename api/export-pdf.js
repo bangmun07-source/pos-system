@@ -3303,518 +3303,286 @@ export default async function handler(req, res) {
             // ===================================================
             // HTML REPORT
             // ===================================================
-          
-            const html = `
-          
-          <!DOCTYPE html>
-          
-          <html>
-          
-          <head>
-          
-          <meta charset="UTF-8">
-          
-          <title>
-          Other Income Report
-          </title>
-          
-          <style>
-          
-          *{
-            box-sizing:border-box;
-          }
-          
-          body{
-          
-            margin:0;
-          
-            padding:40px 20px;
-          
-            background:#0B0F14;
-          
-            font-family:
-              Arial,
-              sans-serif;
-          
-            color:#333;
-          
-          }
-          
-          .export-toolbar{
-          
-            width:100%;
-          
-            max-width:1100px;
-          
-            margin:
-              0 auto 20px;
-          
-            display:flex;
-          
-            justify-content:
-              space-between;
-          
-            align-items:center;
-          
-            color:white;
-          
-            font-size:14px;
-          
-          }
-          
-          .export-toolbar button{
-          
-            border:
-              1px solid
-              rgba(
-                255,
-                255,
-                255,
-                .15
-              );
-          
-            background:
-              rgba(
-                255,
-                255,
-                255,
-                .08
-              );
-          
-            color:white;
-          
-            padding:
-              10px 16px;
-          
-            border-radius:10px;
-          
-            cursor:pointer;
-          
-            font-weight:bold;
-          
-          }
-          
-          .report{
-          
-            width:100%;
-          
-            max-width:1100px;
-          
-            margin:0 auto;
-          
-            background:white;
-          
-            padding:45px;
-          
-            border-radius:4px;
-          
-            box-shadow:
-              0 20px 60px
-              rgba(
-                0,
-                0,
-                0,
-                .45
-              );
-          
-          }
-          
-          .header{
-          
-            text-align:center;
-          
-            margin-bottom:20px;
-          
-          }
-          
-          .logo{
-          
-            width:170px;
-          
-            height:auto;
-          
-            max-height:90px;
-          
-            object-fit:contain;
-          
-          }
-          
-          .title{
-          
-            font-size:24px;
-          
-            font-weight:bold;
-          
-            margin-bottom:8px;
-          
-          }
-          
-          .subtitle{
-          
-            font-size:12px;
-          
-            color:#777;
-          
-            margin-bottom:4px;
-          
-          }
-          
-          .card{
-          
-            border:
-              1px solid
-              #e5e5e5;
-          
-            border-radius:14px;
-          
-            padding:18px;
-          
-            margin-top:20px;
-          
-            background:#fff;
-          
-          }
-          
-          .card h3{
-          
-            margin-top:0;
-          
-            margin-bottom:12px;
-          
-            font-size:16px;
-          
-          }
-          
-          .meta{
-          
-            font-size:12px;
-          
-            color:#777;
-          
-            margin-bottom:12px;
-          
-            line-height:1.6;
-          
-          }
-          
-          table{
-          
-            width:100%;
-          
-            border-collapse:
-              collapse;
-          
-            font-size:11px;
-          
-            margin-top:10px;
-          
-          }
-          
-          th{
-          
-            background:#f5f5f5;
-          
-            padding:10px;
-          
-            text-align:left;
-          
-            font-weight:bold;
-          
-          }
-          
-          td{
-          
-            padding:10px;
-          
-            border-bottom:
-              1px solid
-              #eee;
-          
-          }
-          
-          .right{
-          
-            text-align:right;
-          
-          }
-          
-          .empty{
-          
-            text-align:center;
-          
-            color:#777;
-          
-            padding:25px;
-          
-          }
-          
-          .footer{
-          
-            margin-top:40px;
-          
-            text-align:center;
-          
-            font-size:9px;
-          
-            color:#888;
-          
-          }
-          
-          @media print{
-          
-            body{
-          
-              background:white;
-          
-              padding:0;
-          
-            }
-          
-            .export-toolbar{
-          
-              display:none;
-          
-            }
-          
-            .report{
-          
-              max-width:none;
-          
-              box-shadow:none;
-          
-              border-radius:0;
-          
-              padding:25px;
-          
-            }
-          
-          }
-          
-          </style>
-          
-          </head>
-          
-          <body>
-          
-          <div class="export-toolbar">
-          
-            <div>
-              📊 Other Income Report
-            </div>
-          
-            <button
-              onclick="window.print()"
-            >
-              Download / Print PDF
-            </button>
-          
-          </div>
-          
-          <div class="report">
-          
-            <!-- HEADER -->
-          
-            <div class="header">
-          
-              ${
-                logoSrc
-                  ? `
-          
-                    <img
-                      src="${logoSrc}"
-                      class="logo"
-                      alt="Sistem POS"
-                    />
-          
-                  `
-                  : ""
+  const html = `          
+    <!DOCTYPE html>
+      
+      <html>   
+        <head>         
+          <meta charset="UTF-8">         
+            <title>
+                Other Income Report
+            </title>
+          
+            <style>          
+              *{
+                box-sizing:border-box;
+              }
+              
+              body{          
+                margin:0;          
+                padding:40px 20px;          
+                background:#0B0F14;          
+                font-family: Arial, sans-serif;          
+                color:#333;          
+              }
+              
+              .export-toolbar{          
+                width:100%;          
+                max-width:1100px;          
+                margin: 0 auto 20px;          
+                display:flex;          
+                justify-content: space-between;          
+                align-items:center;          
+                color:white;          
+                font-size:14px;          
+              }
+              
+              .export-toolbar button{          
+                border: 1px solid
+                  rgba( 255, 255, 255, .15 );       
+                background: rgba( 255, 255, 255, .08 );          
+                color:white;          
+                padding: 10px 16px;          
+                border-radius:10px;          
+                cursor:pointer;          
+                font-weight:bold;          
               }
           
-            </div>
+              .report{         
+                width:100%;          
+                max-width:1100px;          
+                margin:0 auto;          
+                background:white;          
+                padding:45px;          
+                border-radius:4px;          
+                box-shadow: 0 20px 60px
+                  rgba( 0, 0, 0, .45 );          
+              }
           
-            <div class="title">
+              .header{          
+                text-align:center;          
+                margin-bottom:20px;          
+              }
           
-              Other Income Report
+              .logo{          
+                width:170px;          
+                height:auto;          
+                max-height:90px;          
+                object-fit:contain;          
+              }
           
-            </div>
+              .title{          
+                font-size:24px;          
+                font-weight:bold;          
+                margin-bottom:8px;          
+              }
           
-            <div class="subtitle">
+              .subtitle{          
+                font-size:12px;          
+                color:#777;          
+                margin-bottom:4px;          
+              }
           
-              Branch:
-              ${escapeHtml(branchDisplay)}
+              .card{          
+                border: 1px solid #e5e5e5;          
+                border-radius:14px;          
+                padding:18px;          
+                margin-top:20px;          
+                background:#fff;         
+              }
+              
+              .card h3{          
+                margin-top:0;          
+                margin-bottom:12px;          
+                font-size:16px;          
+              }
+              
+              .meta{          
+                font-size:12px;          
+                color:#777;          
+                margin-bottom:12px;          
+                line-height:1.6;          
+              }
           
-            </div>
+              table{          
+                width:100%;          
+                border-collapse: collapse;          
+                font-size:11px;          
+                margin-top:10px;          
+              }
+              
+              th{          
+                background:#f5f5f5;          
+                padding:10px;          
+                text-align:left;          
+                font-weight:bold;          
+              }
+              
+              td{          
+                padding:10px;          
+                border-bottom: 1px solid #eee;          
+              }
           
-            <div class="subtitle">
+              .right{          
+                text-align:right;          
+              }
+              
+              .empty{          
+                text-align:center;          
+                color:#777;          
+                padding:25px;          
+              }
           
-              Periode:
-              ${escapeHtml(startDate || "-")}
-              -
-              ${escapeHtml(endDate || "-")}
+              .footer{          
+                margin-top:40px;          
+                text-align:center;          
+                font-size:9px;          
+                color:#888;          
+              }
           
-            </div>
+              @media print{        
+                body{          
+                  background:white;          
+                  padding:0;          
+                }
+                  
+                .export-toolbar{          
+                  display:none;          
+                }
           
+                .report{          
+                  max-width:none;          
+                  box-shadow:none;          
+                  border-radius:0;          
+                  padding:25px;          
+                }          
+              }          
+            </style>          
+          </head>
           
-            <!-- CATEGORY BREAKDOWN -->
+            <body>
           
-            <div class="card">
-          
-              <h3>
-          
-                Category Breakdown
-          
-              </h3>
-          
-              <div class="meta">
-          
-                Branch:
-                ${escapeHtml(branchDisplay)}
-          
-                <br>
-          
-                Category:
-                ${escapeHtml(categoryDisplay)}
-          
-                <br>
-          
-                Status:
-                ${escapeHtml(statusDisplay)}
-          
-                <br>
-          
-                Search:
-                ${escapeHtml(searchValue || "-")}
-          
+              <div class="export-toolbar">          
+                <div>
+                  📊 Other Income Report
+                </div>
+              
+                <button onclick="window.print()" >
+                  Download / Print PDF
+                </button>          
               </div>
           
-              <table>
+              <div class="report">       
+                <!-- HEADER -->          
+                <div class="header">          
+                  ${
+                    logoSrc
+                      ? `         
+                        <img
+                          src="${logoSrc}"
+                          class="logo"
+                          alt="Sistem POS"
+                        />          
+                      `
+                      : ""
+                  }
+    
+                  <div class="title">      
+                    Other Income Report     
+                  </div>
+                
+                  <div class="subtitle">            
+                    Branch:
+                    ${escapeHtml(branchDisplay)}          
+                  </div>
+                
+                  <div class="subtitle">          
+                    Periode:
+                    ${escapeHtml(startDate || "-")}
+                    -
+                    ${escapeHtml(endDate || "-")}         
+                  </div>       
+                </div>
           
-                <thead>
+                <!-- CATEGORY BREAKDOWN -->          
+                <div class="card">          
+                  <h3>          
+                    Category Breakdown          
+                  </h3>
+              
+                  <div class="meta flex items-center gap-4"> 
+                    <span>
+                      <b>Category:</b>
+                      ${escapeHtml(categoryDisplay)}          
+                    </span>  
+                    <span>|</span>
+                    <span>
+                      <b>Status:</b>
+                       ${escapeHtml(statusDisplay)}           
+                    </span> 
+                    <span>
+                      <b>Search:</b>
+                      ${escapeHtml(searchValue || "-")} 
+                    </span>                           
+                  </div>
+       
+                  <table>          
+                    <thead>          
+                      <tr>          
+                        <th> Category </th>          
+                        <th class="right"> Percent </th>          
+                        <th class="right"> Amount </th>        
+                      </tr>          
+                    </thead>
           
-                  <tr>
+                    <tbody>          
+                      ${categoryRows}          
+                    </tbody>         
+                  </table>  
+              
+                  <div style=" margin-top:15px; text-align:right; font-weight:bold; " >          
+                    TOTAL OTHER INCOME:          
+                    Rp ${rupiah(totalIncome)}          
+                  </div>          
+                </div>
           
-                    <th>
-                      Category
-                    </th>
+                <!-- LEDGER -->
+              
+                <div class="card page-break">          
+                  <h3>          
+                    Other Income Ledger Report          
+                  </h3>
           
-                    <th class="right">
-                      Percent
-                    </th>
+                  <table>          
+                    <thead>          
+                      <tr>          
+                        <th> Date </th>          
+                        <th> Ref ID </th>          
+                        <th> Description </th>          
+                        <th> Category </th>          
+                        <th> Method </th>          
+                        <th class="right"> Amount </th>          
+                        <th> Status </th>          
+                        <th> Branch </th>          
+                      </tr>          
+                    </thead>
           
-                    <th class="right">
-                      Amount
-                    </th>
+                    <tbody>          
+                      ${ledgerRows}          
+                    </tbody>          
+                  </table>          
+                </div>
+              
           
-                  </tr>
-          
-                </thead>
-          
-                <tbody>
-          
-                  ${categoryRows}
-          
-                </tbody>
-          
-              </table>
-          
-              <div
-                style="
-                  margin-top:15px;
-                  text-align:right;
-                  font-weight:bold;
-                "
-              >
-          
-                TOTAL OTHER INCOME:
-          
-                Rp ${rupiah(totalIncome)}
-          
-              </div>
-          
-            </div>
-          
-          
-            <!-- LEDGER -->
-          
-            <div class="card page-break">
-          
-              <h3>
-          
-                Other Income Ledger Report
-          
-              </h3>
-          
-              <table>
-          
-                <thead>
-          
-                  <tr>
-          
-                    <th>
-                      Date
-                    </th>
-          
-                    <th>
-                      Ref ID
-                    </th>
-          
-                    <th>
-                      Description
-                    </th>
-          
-                    <th>
-                      Category
-                    </th>
-          
-                    <th>
-                      Method
-                    </th>
-          
-                    <th class="right">
-                      Amount
-                    </th>
-          
-                    <th>
-                      Status
-                    </th>
-          
-                    <th>
-                      Branch
-                    </th>
-          
-                  </tr>
-          
-                </thead>
-          
-                <tbody>
-          
-                  ${ledgerRows}
-          
-                </tbody>
-          
-              </table>
-          
-            </div>
-          
-          
-            <!-- FOOTER -->
-          
-            <div class="footer">
-          
-              Generated by Sistem POS
-          
-              •
-          
-              ${new Date().toLocaleString("id-ID")}
-          
-            </div>
-          
-          </div>
-          
-          </body>
-          
-          </html>
-          
+                <!-- FOOTER -->          
+                <div class="footer">          
+                  Generated by Sistem POS          
+                  •          
+                  ${new Date().toLocaleString("id-ID")}          
+                </div>          
+              </div>          
+            </body>          
+          </html>          
           `;
           
             // ===================================================
@@ -4226,20 +3994,14 @@ export default async function handler(req, res) {
       
                   <div class="subtitle">
                     Periode:
-                    ${escapeHtml(
-                      start || "-"
-                    )}
+                    ${escapeHtml( start || "-" )}
                     -
-                    ${escapeHtml(
-                      end || "-"
-                    )}
+                    ${escapeHtml( end || "-" )}
                   </div>
       
                   <div class="subtitle">
                     Branch:
-                    ${escapeHtml(
-                      branchId
-                    )}
+                    ${escapeHtml( branchName )}
                   </div>
                 </div>
       
