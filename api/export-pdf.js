@@ -6083,7 +6083,7 @@ else if (type === "analytics") {
                 ${escapeHtml(status)}
               </td>
 
-              <td>
+              <td class="center">
                 ${escapeHtml(unit)}
               </td>
 
@@ -6798,7 +6798,7 @@ else if (type === "analytics") {
                   Product
                 </th>
 
-                <th class="right">
+                <th class="center">
                   Quantity
                 </th>
 
@@ -6843,11 +6843,11 @@ else if (type === "analytics") {
                   Day
                 </th>
 
-                <th>
+                <th class="center">
                   Hour
                 </th>
 
-                <th class="right">
+                <th class="center">
                   Transactions
                 </th>
 
@@ -6889,15 +6889,15 @@ else if (type === "analytics") {
                 </th>
 
                 <th>
+                  Status
+                </th>
+
+                <th class="center">
                   Unit
                 </th>
 
                 <th class="right">
                   Stock
-                </th>
-
-                <th>
-                  Status
                 </th>
 
               </tr>
