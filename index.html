@@ -16875,7 +16875,7 @@ async function loadProducts(callback) {
 	if (!branchId) {
 	  return;
 	}
-	
+	await loadPOSCategories();
 	if (
 	  state.products &&
 	  state.productsBranchId === branchId &&
