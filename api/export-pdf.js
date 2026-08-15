@@ -5533,31 +5533,6 @@ else if (type === "analytics") {
     }
   );
 
-  // ==========================================
-  // KPI
-  // ==========================================
-
-  const revenue =
-    Number(
-      analytics.revenue || 0
-    );
-
-  const hpp =
-    Number(
-      analytics.hpp || 0
-    );
-
-  const netProfit =
-    Number(
-      analytics.netProfit || 0
-    );
-
-  const growth =
-    Number(
-      analytics.growth || 0
-    );
-
-
   // =========================
   // PROFIT SUMMARY
   // =========================
