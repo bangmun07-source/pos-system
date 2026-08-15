@@ -10498,7 +10498,7 @@ Save
 				</div>
 			</div>			
 
-		```html
+
 <!-- Product Categories -->
 <div class="col-span-12">
   <div class="bg-background border border-white/10 p-4 rounded-md h-full shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
@@ -24764,13 +24764,10 @@ async function openAddProductModal() {
 }
 
 async function loadProductCategories() {
-  const select =
-    document.getElementById(
-      "newProductCategory"
-    );
-  if (!select) return;
+
   const branchId =
     state.branchId;
+
   if (!branchId) {
     console.warn(
       "Category: branchId belum tersedia"
@@ -24779,32 +24776,81 @@ async function loadProductCategories() {
   }
 
   try {
+
     const categories =
       await getCategoriesRPC(
         branchId
       );
+
     console.log(
       "PRODUCT CATEGORIES:",
       categories
     );
-    select.innerHTML =
-      `<option value="">
-        Select Category
-      </option>`;
 
+    // PRODUCT CATEGORY SELECT
+    const select =
+      document.getElementById(
+        "newProductCategory"
+      );
+
+    if (select) {
+      select.innerHTML =
+        `<option value="">
+          Select Category
+        </option>`;
+
+      categories.forEach(
+        category => {
+          const option =
+            document.createElement(
+              "option"
+            );
+          option.value =
+            category.category_name;
+          option.textContent =
+            category.category_name;
+          select.appendChild(
+            option
+          );
+        }
+      );
+    }
+	
+    // CATEGORY SETTINGS UI
     categories.forEach(
       category => {
-        const option =
-          document.createElement(
-            "option"
+        const key =
+          category.category_key;
+
+        const nameInput =
+          document.getElementById(
+            `${key}_name`
           );
-        option.value =
-          category.category_name;
-        option.textContent =
-          category.category_name;
-        select.appendChild(
-          option
-        );
+
+        const discountInput =
+          document.getElementById(
+            `${key}_discount`
+          );
+
+        const rewardInput =
+          document.getElementById(
+            `${key}_reward`
+          );
+
+        if (nameInput) {
+          nameInput.value =
+            category.category_name || "";
+        }
+
+        if (discountInput) {
+          discountInput.value =
+            category.discount ?? 0;
+        }
+
+        if (rewardInput) {
+          rewardInput.value =
+            category.reward ?? 0;
+        }
       }
     );
   }
@@ -24814,10 +24860,12 @@ async function loadProductCategories() {
       err
     );
 
-    select.innerHTML =
-      `<option value="">
-        Gagal memuat category
-      </option>`;
+    if (select) {
+      select.innerHTML =
+        `<option value="">
+          Gagal memuat category
+        </option>`;
+    }
   }
 }
 
@@ -24855,30 +24903,20 @@ async function saveNewProduct() {
         ]?.text || ""
       : state.branchName || "";
 
-
-  // =========================
   // VALIDATION
-  // =========================
-
   if (!name) {
-
     alert(
       "Product Name wajib diisi."
     );
-
     return;
   }
 
-
   if (!category) {
-
     alert(
       "Category wajib dipilih."
     );
-
     return;
   }
-
 
   if (price <= 0) {
     alert(
