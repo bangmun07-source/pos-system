@@ -5557,6 +5557,143 @@ else if (type === "analytics") {
       analytics.growth || 0
     );
 
+
+  // =========================
+  // PROFIT SUMMARY
+  // =========================
+
+  const revenue =
+    Number(
+      analytics.revenue || 0
+    );
+
+  const hpp =
+    Number(
+      analytics.hpp || 0
+    );
+
+  const grossProfit =
+    Number(
+      analytics.grossProfit || 0
+    );
+
+  const operational =
+    Number(
+      analytics.operational || 0
+    );
+
+  const otherIncome =
+    Number(
+      analytics.otherIncome || 0
+    );
+
+  const netProfitBeforeOtherIncome =
+    Number(
+      analytics.netProfitBeforeOtherIncome || 0
+    );
+
+  const netProfit =
+    Number(
+      analytics.netProfit || 0
+    );
+
+  const growth =
+    Number(
+      analytics.growth || 0
+    );
+
+  // =========================
+  // PROFIT SUMMARY ROWS
+  // =========================
+
+  const profitSummaryRows = `
+
+    <tr>
+      <td>
+        Revenue
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(revenue)}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        HPP
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(hpp)}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Gross Profit
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(grossProfit)}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Operational
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(operational)}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Other Income
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(otherIncome)}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Net Profit Before Other Income
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(
+          netProfitBeforeOtherIncome
+        )}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Net Profit
+      </td>
+
+      <td class="right">
+        <strong>
+          IDR ${rupiah(netProfit)}
+        </strong>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Growth
+      </td>
+
+      <td class="right">
+        ${growth.toFixed(2)}%
+      </td>
+    </tr>
+
+  `;
+
   // ==========================================
   // WEEKLY REVENUE
   // ==========================================
@@ -5925,54 +6062,69 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ==========================================
-  // RAW MATERIALS
-  // ==========================================
+  // =========================
+  // RAW MATERIAL ROWS
+  // =========================
 
   const rawMaterialRows =
     rawMaterials.length
 
-      ? rawMaterials.map(
-          item => {
+      ? rawMaterials.map(item => {
 
-            const material =
-              item?.name ??
-              item?.material ??
-              item?.ingredient ??
-              item?.Ingredient ??
-              "-";
+          const id =
+            item?.id ??
+            "-";
 
-            const amount =
-              Number(
-                item?.amount ??
-                item?.total ??
-                item?.value ??
-                item?.cost ??
-                0
-              );
+          const name =
+            item?.name ??
+            "-";
 
-            return `
-              <tr>
+          const unit =
+            item?.unit ??
+            "-";
 
-                <td>
-                  ${escapeHtml(material)}
-                </td>
+          const stock =
+            Number(
+              item?.stock || 0
+            );
 
-                <td class="right">
-                  IDR ${rupiah(amount)}
-                </td>
+          const status =
+            item?.status ??
+            "-";
 
-              </tr>
-            `;
+          return `
+            <tr>
 
-          }
-        ).join("")
+              <td>
+                ${escapeHtml(id)}
+              </td>
+
+              <td>
+                ${escapeHtml(name)}
+              </td>
+
+              <td>
+                ${escapeHtml(unit)}
+              </td>
+
+              <td class="right">
+                ${stock.toLocaleString("id-ID")}
+              </td>
+
+              <td>
+                ${escapeHtml(status)}
+              </td>
+
+            </tr>
+          `;
+
+        }).join("")
 
       : `
         <tr>
 
           <td
-            colspan="2"
+            colspan="5"
             class="empty"
           >
             No raw material data
@@ -6535,6 +6687,40 @@ else if (type === "analytics") {
 
         </div>
 
+        <!-- PROFIT SUMMARY  -->
+
+        <div class="card">
+
+          <h3>
+            Profit Summary
+          </h3>
+
+          <table>
+
+            <thead>
+              <tr>
+
+                <th>
+                  Description
+                </th>
+
+                <th class="right">
+                  Amount
+                </th>
+
+              </tr>
+            </thead>
+
+            <tbody>
+
+              ${profitSummaryRows}
+
+            </tbody>
+
+          </table>
+
+        </div>
+
 
         <!-- WEEKLY -->
 
@@ -6719,11 +6905,23 @@ else if (type === "analytics") {
               <tr>
 
                 <th>
+                  ID
+                </th>
+
+                <th>
                   Material
                 </th>
 
+                <th>
+                  Unit
+                </th>
+
                 <th class="right">
-                  Amount
+                  Stock
+                </th>
+
+                <th>
+                  Status
                 </th>
 
               </tr>
@@ -6808,6 +7006,7 @@ else if (type === "analytics") {
     .send(html);
 
 }
+
 
 
 
