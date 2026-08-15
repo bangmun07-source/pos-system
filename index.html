@@ -24109,9 +24109,9 @@ function getBranchId() {
   return state.branchId || localStorage.getItem("branchId");
 }
 
-async function exportInventoryPDF(){
+async function exportInventoryPDF() {
   const branchId = getBranchId();
-  if(!branchId){
+  if (!branchId) {
     alert(
       "Branch tidak ditemukan"
     );
@@ -24122,71 +24122,121 @@ async function exportInventoryPDF(){
       "",
       "_blank"
     );
-  if(!pdfWindow){
+
+  if (!pdfWindow) {
     alert(
       "Popup diblokir browser"
     );
     return;
   }
+	
+  // ==================================
+  // LOADING
+  // ==================================
+
+  pdfWindow.document.write(`
+    <html>
+      <body style="
+        background:#0B0F14;
+        color:white;
+        font-family:Arial;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+      ">
+        Generating Inventory Report...
+      </body>
+    </html>
+  `);
+
   try {
+	  
     // ==================================
-    // SUPABASE (AKTIFKAN NANTI)
+    // CALL VERCEL
     // ==================================
 
-    /*
-    const { data, error } =
-      await supabase.rpc(
-        "export_inventory_pdf",
+    const response =
+      await fetch(
+        "/api/export-pdf",
         {
-          p_branch_id: branchId
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            type: "inventory",
+            branchId: branchId
+          })
         }
       );
 
+    // ==================================
+    // CHECK RESPONSE
+    // ==================================
 
-    if(error){
-      throw error;
+    if (!response.ok) {
+      const errorText =
+        await response.text();
+      throw new Error(
+        errorText ||
+        "Export Inventory gagal"
+      );
     }
 
+    // ==================================
+    // GET HTML
+    // ==================================
+    const html = await response.text();
 
-    const html = data.html;
-    */
-	  
-    // TEMP DATA VERCEL
-    const html = `
-      <html>
-        <body style="font-family:Arial;padding:40px">
-          <h2>
-            Inventory Report
-          </h2>
-          <p>
-            Export masih dalam tahap migrasi.
-          </p>
-        </body>
-      </html>
-    `;
+    if (!html) {
+      throw new Error(
+        "Response export kosong"
+      );
+    }
+
+    // ==================================
+    // SHOW REPORT
+    // ==================================
     pdfWindow.document.open();
-    pdfWindow.document.write(html);
+    pdfWindow.document.write(
+      html
+    );
     pdfWindow.document.close();
   }
-  catch(err){
+
+  catch (err) {
     console.error(
       "Export Inventory PDF:",
       err
     );
+	
     pdfWindow.document.open();
     pdfWindow.document.write(`
+	
       <html>
-        <body style="font-family:Arial;padding:40px">
-          <h3>
+        <body style=" font-family:Arial; padding:40px;">
+          <h2>
             Export PDF Failed
-          </h3>
+          </h2>
+
           <pre>
-          	${err.message}
+			${String(
+			  err?.message ||
+			  "Export PDF gagal"
+			)}
           </pre>
         </body>
       </html>
     `);
+
     pdfWindow.document.close();
+    alert(
+      err?.message ||
+      "Export PDF gagal"
+    );
   }
 }
 
