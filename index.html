@@ -34491,7 +34491,11 @@ function handleAnalyticsCommand(message){
 async function getChatAnalytics(start, end, branchId, callback) {
 
   try {
-
+console.log("CHAT ANALYTICS PARAMS:", {
+  start,
+  end,
+  branchId
+});
     const {
       data,
       error
@@ -34503,7 +34507,7 @@ async function getChatAnalytics(start, end, branchId, callback) {
 		p_end: end || null
       }
     );
-
+console.log("CHAT ANALYTICS DATA:", data);
 
     if (error) {
       throw error;
