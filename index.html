@@ -21446,54 +21446,128 @@ function closeRecipeMasterModal() {
 }
 
 async function exportRecipeReport() {
-  const pdfWindow =
-    window.open(
-      "",
-      "_blank"
-    );
 
-  if (!pdfWindow) {
-    alert(
-      "Popup diblokir browser."
-    );
+  const branchId = getBranchId();
+  if (!branchId) {
+    alert("Branch tidak ditemukan");
     return;
   }
+  const pdfWindow =
+    window.open("", "_blank");
+	
+  if (!pdfWindow) {
+    alert("Popup diblokir browser.");
+    return;
+  }
+
+  // ==================================
+  // LOADING
+  // ==================================
+
+  pdfWindow.document.write(`
+    <html>
+      <body style="
+        background:#0B0F14;
+        color:white;
+        font-family:Arial;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        height:100vh;
+      ">
+        Generating Recipe Report...
+      </body>
+    </html>
+  `);
+
   try {
 
-    // VERCEL API
-    const response = await fetch(`/api/export-recipe-report?branchId=${state.branchId}`);
+    // ==================================
+    // CALL VERCEL API
+    // ==================================
+    const response =
+      await fetch(
+        "/api/export-pdf",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            type: "recipe",
+            branchId
+          })
+        }
+      );
+
+    // ==================================
+    // CHECK RESPONSE
+    // ==================================
     if (!response.ok) {
+      const errorText =
+        await response.text();
       throw new Error(
-        "Gagal export report"
+        errorText ||
+        "Gagal export Recipe Report"
       );
     }
-    const html = await response.text();
+
+    // ==================================
+    // GET HTML
+    // ==================================
+    const html =
+      await response.text();
+    if (!html) {
+      throw new Error(
+        "Response export kosong"
+      );
+    }
+
+    // ==================================
+    // SHOW REPORT
+    // ==================================
     pdfWindow.document.open();
     pdfWindow.document.write(
       html
     );
     pdfWindow.document.close();
+
   }
-  catch(err){
+  catch (err) {
     console.error(
       "Export Recipe Report:",
       err
     );
+
     pdfWindow.document.open();
     pdfWindow.document.write(`
       <html>
-        <body style="font-family:Arial;padding:40px;">
+        <body style="
+          font-family:Arial;
+          padding:40px;
+        ">
+
           <h3>
-            Export Failed
+            Export PDF Failed
           </h3>
 
           <pre>
-            ${err.message}
+			${String(
+			  err?.message ||
+			  "Export PDF gagal"
+			)}
           </pre>
         </body>
       </html>
     `);
+
     pdfWindow.document.close();
+    alert(
+      err?.message ||
+      "Export Recipe Report gagal"
+    );
   }
 }
 
