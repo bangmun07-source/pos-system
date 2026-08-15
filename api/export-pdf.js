@@ -5557,15 +5557,15 @@ else if (type === "analytics") {
       analytics.operational || 0
     );
 
-  const otherIncome =
-    Number(
-      analytics.otherIncome || 0
-    );
-
   const netProfitBeforeOtherIncome =
     Number(
       analytics.netProfitBeforeOtherIncome || 0
     );
+
+  const otherIncome =
+  Number(
+    analytics.otherIncome || 0
+  );
 
   const netProfit =
     Number(
@@ -5623,16 +5623,7 @@ else if (type === "analytics") {
       </td>
     </tr>
 
-    <tr>
-      <td>
-        Other Income
-      </td>
-
-      <td class="right">
-        IDR ${rupiah(otherIncome)}
-      </td>
-    </tr>
-
+   
     <tr>
       <td>
         Net Profit Before Other Income
@@ -5642,6 +5633,16 @@ else if (type === "analytics") {
         IDR ${rupiah(
           netProfitBeforeOtherIncome
         )}
+      </td>
+    </tr>
+
+     <tr>
+      <td>
+        Other Income
+      </td>
+
+      <td class="right">
+        IDR ${rupiah(otherIncome)}
       </td>
     </tr>
 
@@ -6004,7 +6005,7 @@ else if (type === "analytics") {
                 ${hourLabel}
               </td>
 
-              <td class="right">
+              <td class="center">
                 ${value.toLocaleString(
                   "id-ID"
                 )}
@@ -6053,7 +6054,11 @@ else if (type === "analytics") {
           const name =
             item?.name ??
             "-";
-
+        
+          const status =
+            item?.status ??
+            "-";
+        
           const unit =
             item?.unit ??
             "-";
@@ -6062,10 +6067,6 @@ else if (type === "analytics") {
             Number(
               item?.stock || 0
             );
-
-          const status =
-            item?.status ??
-            "-";
 
           return `
             <tr>
@@ -6079,15 +6080,15 @@ else if (type === "analytics") {
               </td>
 
               <td>
+                ${escapeHtml(status)}
+              </td>
+
+              <td>
                 ${escapeHtml(unit)}
               </td>
 
               <td class="right">
                 ${stock.toLocaleString("id-ID")}
-              </td>
-
-              <td>
-                ${escapeHtml(status)}
               </td>
 
             </tr>
