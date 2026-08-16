@@ -16990,6 +16990,7 @@ async function loadPOSCategories() {
       await getCategoriesRPC(
         state.branchId
       );
+	  state.categories = categories || [];
     console.log(
       "POS CATEGORIES:",
       categories
