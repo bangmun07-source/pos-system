@@ -17268,73 +17268,97 @@ function calculateTotal() {
     state.currentMember !== "";
 
   // ==========================================
-  // MEMBER DISCOUNT
+  // DISCOUNT PER ITEM
   // ==========================================
 
-  const memberDiscount =
+  let categoryDiscountAmount = 0;
+
+  state.cart.forEach(item => {
+	  
+    // Produk redeem tidak mendapatkan discount
+    if (item.isRedeem) return;
+    const product =
+      state.products.find(
+        p =>
+          String(p.ID_Produk) ===
+          String(item.id)
+      );
+    if (!product) return;
+    const categoryName =
+      product.Kategori ||
+      product.Category ||
+      item.category ||
+      "";
+    const categoryDiscount =
+      getCategoryDiscount(categoryName);
+    const itemSubtotal =
+      Number(item.price || 0) *
+      Number(item.qty || 0);
+    categoryDiscountAmount +=
+      itemSubtotal *
+      categoryDiscount /
+      100;
+  });
+
+  // MEMBER DISCOUNT
+  const memberDiscountRate =
     isMember
       ? Number(state.settings?.discount || 0)
       : 0;
 
-  // ==========================================
-  // CATEGORY DISCOUNT
-  // ==========================================
+  const memberDiscountAmount =
+    subtotal *
+    memberDiscountRate /
+    100;
 
-  const categoryDiscount =
-    getCartCategoryDiscount();
-
-  // ==========================================
-  // DISCOUNT TERBESAR
-  // ==========================================
-
-  const discountRate =
+  // PILIH DISCOUNT TERBESAR
+  const discount =
     Math.max(
-      memberDiscount,
-      categoryDiscount
+      memberDiscountAmount,
+      categoryDiscountAmount
     );
 
+  // Persentase untuk tampilan
+  const discountRate =
+    subtotal > 0
+      ? (discount / subtotal) * 100
+      : 0;
+
+  // DEBUG
   console.log(
     "DISCOUNT:",
     {
       isMember,
-      memberDiscount,
-      categoryDiscount,
-      finalDiscount: discountRate
+      memberDiscountRate,
+      memberDiscountAmount,
+      categoryDiscountAmount,
+      finalDiscount: discount,
+      finalDiscountRate: discountRate
     }
   );
 
-  // ==========================================
   // CALCULATE
-  // ==========================================
-
-  const discount =
-    subtotal * discountRate / 100;
-
   const base =
     subtotal - discount;
-
   const tax =
     base *
     Number(state.settings?.tax || 0) /
     100;
-
   const service =
     base *
     Number(state.settings?.service || 0) /
     100;
-
   const total =
     base + tax + service;
-
   return {
     subtotal,
-	discountRate,
+    discountRate,
     discount,
     tax,
     service,
     total
   };
-}	
+}
 
 
 function clearCart() {
