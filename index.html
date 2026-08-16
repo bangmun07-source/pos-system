@@ -504,140 +504,114 @@
 <!-- ROOT -->
 <div id="app"></div>
 
-
 <!-- LOGIN -->
-
+	
 <template id="loginPage" >
+	<!-- BACKGROUND -->
+	<div class="fixed_enter">
+	  <div class="absolute inset-0 bg-background"></div>
+	  <div class="absolute inset-0 bg-background"></div>
+	</div>
+	<!-- Main Content Canvas -->
+	<main class="relative z-10 min-h-screen flex items-center justify-center px-6 py-10">
+	  <div class="bg-background rounded-md overflow-hidden w-full max-w-lg">
+	    <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+	      <div class="flex items-center gap-3">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          lock
+	        </span>
+	
+	        <div>
+	          <h1 class="text-lg font-bold text-on-surface">
+	            Secure Login
+	          </h1>
+				
+	          <p class="text-xs font-headline uppercase tracking-widest text-foreground">
+	            POS SYSTEM
+	          </p>
+	        </div>
+	      </div>
+	    </div>
+	
+	    <!-- CONTENT -->
+	    <div class="p-6 space-y-6">
+	      <!-- BRAND -->
+	      <div class="text-center">
+	        <h2 class="text-3xl font-extrabold text-primary">
+	          SOMMA
+	        </h2>
+	
+	        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
+	          Premium Terminal Access
+	        </p>
+	      </div>
+	
+	      <!-- FORM -->
+	      <form
+	        onsubmit="event.preventDefault(); handleLogin();"
+	        class="space-y-5">
+	
+	        <!-- USERNAME -->
+	        <div>
+	          <label
+	            class="text-xs uppercase tracking-widest text-on-surface-variant">
+	            Staff ID
+	          </label>
+	
+	          <input
+	            id="username"
+	            type="text"
+	            autocomplete="username"
+	            placeholder="Enter Staff ID"
+	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"/>
+	        </div>
+	
+	        <!-- PASSWORD -->
+	        <div>
+	          <label
+	            class="text-xs uppercase tracking-widest text-on-surface-variant">
+	            Access PIN
+	          </label>
+	
+	          <input
+	            id="password"
+	            type="password"
+	            autocomplete="current-password"
+	            placeholder="••••••"
+	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"/>
+	        </div>
+	
+	        <!-- INFO BOX -->
+	        <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
+	          <span class="material-symbols-outlined sidebar-icon">
+	            verified_user
+	          </span>
+	
+	          <p class="text-xs text-on-surface-variant">
+	            Authorized personnel only. All login activities are recorded and monitored.
+	          </p>
+	        </div>
 
-<!-- BACKGROUND -->
-<div class="fixed_enter">
-
-  <div class="absolute inset-0 bg-background"></div>
-
-  <div class="absolute inset-0 bg-background"></div>
-
-</div>
-<!-- Main Content Canvas -->
-<main class="relative z-10 min-h-screen flex items-center justify-center px-6 py-10">
-<!-- LOGIN PANEL -->
-  <div class="bg-background rounded-md overflow-hidden w-full max-w-lg">
-
-    <!-- HEADER -->
-    <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
-
-      <div class="flex items-center gap-3">
-
-        <span class="material-symbols-outlined sidebar-icon">
-          lock
-        </span>
-
-        <div>
-
-          <h1 class="text-lg font-bold text-on-surface">
-            Secure Login
-          </h1>
-
-          <p class="text-[10px] uppercase tracking-widest text-on-surface-variant">
-            SOMMA POS SYSTEM
-          </p>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- CONTENT -->
-    <div class="p-6 space-y-6">
-
-      <!-- BRAND -->
-      <div class="text-center">
-
-        <h2 class="text-3xl font-extrabold text-primary">
-          SOMMA
-        </h2>
-
-        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
-          Premium Terminal Access
-        </p>
-
-      </div>
-
-      <!-- FORM -->
-      <form
-        onsubmit="event.preventDefault(); handleLogin();"
-        class="space-y-5">
-
-        <!-- USERNAME -->
-        <div>
-
-          <label
-            class="text-[10px] uppercase tracking-widest text-on-surface-variant">
-            Staff ID
-          </label>
-
-          <input
-            id="username"
-            type="text"
-            autocomplete="username"
-            placeholder="Enter Staff ID"
-            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"/>
-
-        </div>
-
-        <!-- PASSWORD -->
-        <div>
-
-          <label
-            class="text-[10px] uppercase tracking-widest text-on-surface-variant">
-            Access PIN
-          </label>
-
-          <input
-            id="password"
-            type="password"
-            autocomplete="current-password"
-            placeholder="••••••"
-            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"/>
-
-        </div>
-
-        <!-- INFO BOX -->
-        <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
-
-          <span class="material-symbols-outlined sidebar-icon">
-            verified_user
-          </span>
-
-          <p class="text-xs text-on-surface-variant">
-            Authorized personnel only. All login activities are recorded and monitored.
-          </p>
-
-        </div>
-
-        <!-- BUTTON -->
-        <button type="submit"
-          class="btn-background border border-white/10 hover:bg-white/20 hover:text-white w-full py-4 rounded-md font-semibold text-white">
-          Authorize Access
-        </button>
-      </form>
-    </div>
-
-    <!-- FOOTER -->
-    <div class="px-6 py-5 flex items-center justify-between bg-background border-t border-white/10">
-
-      <span class="text-[10px] uppercase tracking-widest text-on-surface-variant">
-        SOMMA POS v1.1
-      </span>
-
-      <span class="text-[10px] uppercase tracking-widest text-primary">
-        Secure Node Online
-      </span>
-
-    </div>
-
-  </div>
-</main>
+	        <!-- BUTTON -->
+	        <button type="submit"
+	          class="bottom-theme foreground font-headline w-full py-4 font-semibold">
+	          Authorize Access
+	        </button>
+	      </form>
+	    </div>
+	
+	    <!-- FOOTER -->
+	    <div class="px-6 py-5 flex items-center justify-between bg-background border-t border-white/10">
+	      <span class="text-xs uppercase tracking-widest text-on-surface-variant">
+	        SOMMA POS v1.1
+	      </span>
+	
+	      <span class="text-xs font-headline uppercase tracking-widest text-foreground">
+	        Secure Node Online
+	      </span>
+	    </div>
+	  </div>	
+	</main>
 </template>
 
 
@@ -939,7 +913,7 @@
 		        </div>
 	
 		        <button
-		          class="text-primary text-xs font-bold tracking-wider hover:opacity-80 transition"
+		          class="text-foreground text-xs font-bold tracking-wider hover:text-muted transition"
 		          onclick="goToRecentTransactions()">
 		          VIEW ALL
 		        </button>
@@ -996,8 +970,8 @@
 	        class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
 	      </div>
 	
-	      <button class="w-full mt-6 py-4 bottom-theme text-xs font-semibold tracking-[0.15em] transition-all uppercase">
-	        Stock Product
+	      <button class="w-full mt-6 py-4 bottom-theme text-xs font-headline font-semibold tracking-[0.15em] transition-all uppercase">
+	        Stock Product 
 	      </button>
 	    </div>
 	
@@ -1192,7 +1166,7 @@
     </label>
 
     <button id="btnExportGrossRevenuePDF"
-      class="h-12 rounded-md bg-background border border-white/10 text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
+      class="h-12 bottom-theme foreground font-headline tracking-[0.15em] text-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-all uppercase">
 
       <span class="material-symbols-outlined text-lg">
         download
@@ -1662,7 +1636,7 @@
 
     <button id="exportBtn"
       onclick="exportRecentTransactions()"
-      class="h-12 rounded-md bg-background border border-white/10 text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
+      class="h-12 bottom-theme text-foreground font-semibold font-headline tracking-[0.15em] text-sm flex items-center justify-center gap-2 transition-all uppercase">
 
       <span class="material-symbols-outlined text-lg">
         download
@@ -1820,695 +1794,537 @@
 </div>
 </template>
 
-
-
 <!-- POPPUP RECENTTRANSACTIONS -->
 
 <template id="transactionModalTemplate">
+	<div id="transactionModalOverlay"
+	  class="fixed inset-0 z-[9999] flex items-center justify-center p-6">
+	  <!-- BACKDROP -->
+	  <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
+	  	<div class="relative w-full max-w-[450px]">
+	    	<div class="bg-background rounded-md border border-white/10 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+		      <!-- HEADER -->
+		      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+		        <div class="flex items-center gap-3">
+		          <span class="material-symbols-outlined text-primary">
+		            receipt_long 
+		          </span>
+	
+		          <div>
+		            <h1 class="text-lg font-bold font-semibold text-foreground">
+		              Transaction Actions
+		            </h1>
+		
+		            <div class="flex items-center gap-2 mt-1">
+		              <span id="modalTransactionId"
+		                class="text-xs uppercase tracking-widest text-on-surface-variant">
+		                Order #SOM-9021
+		              </span>
+		
+		              <span class="text-on-surface-variant opacity-30">
+		                •
+		              </span>
+		
+		              <span id="modalTransactionTotal"
+		                class="text-xs font-semibold text-on-surface-variant">
+		                IDR 28.450.000
+		              </span>
+		            </div>
+		          </div>
+		        </div>
+	
+					<button onclick="closeTransactionModal()"
+						class="text-on-surface-variant hover:text-on-surface">
+						✕
+					</button>
+				</div>
 
-<div id="transactionModalOverlay"
-  class="fixed inset-0 z-[9999] flex items-center justify-center p-6">
-
-  <!-- BACKDROP -->
-  <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
-
-  <div class="relative w-full max-w-[350px]">
-
-    <div class="bg-background
-    rounded-md
-    border border-white/10 
-    overflow-hidden 
-    shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-      <!-- HEADER -->
-      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
-
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-primary">
-            receipt_long
-          </span>
-
-          <div>
-            <h1 class="text-lg font-bold text-on-surface">
-              Transaction Actions
-            </h1>
-
-            <div class="flex items-center gap-2 mt-1">
-
-              <span id="modalTransactionId"
-                class="text-[10px] uppercase tracking-widest text-primary font-bold">
-                Order #SOM-9021
-              </span>
-
-              <span class="text-on-surface-variant opacity-30">
-                •
-              </span>
-
-              <span id="modalTransactionTotal"
-                class="text-xs text-on-surface-variant">
-                IDR 28.450.000
-              </span>
-
-            </div>
-          </div>
-        </div>
-
-        <button onclick="closeTransactionModal()"
-          class="text-on-surface-variant hover:text-on-surface">
-          ✕
-        </button>
-
-      </div>
-
-      <!-- CONTENT -->
-      <div class="p-4 space-y-2">
-
-        <!-- VIEW DETAIL -->
-        <button
-          onclick="openViewTransactionModal(currentTransaction)"
-          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition-all">
-
-          <div class="flex items-center gap-4">
-
-            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-              <span class="material-symbols-outlined text-primary">
-                visibility
-              </span>
-            </div>
-
-            <span class="font-medium text-on-surface">
-              View Full Details
-            </span>
-
-          </div>
- 
-          <span class="material-symbols-outlined text-on-surface-variant">
-            chevron_right
-          </span>
-
-        </button>
-
-        <!-- SEND RECEIPT -->
-        <button
-          onclick="openSendDigitalReceipt(currentTransaction)"
-          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition-all">
-
-          <div class="flex items-center gap-4">
-
-            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
-              <span class="material-symbols-outlined text-primary">
-                send
-              </span>
-            </div>
-
-            <span class="font-medium text-on-surface">
-              Send via WhatsApp/Email
-            </span>
-
-          </div>
-
-          <span class="material-symbols-outlined text-on-surface-variant">
-            chevron_right
-          </span>
-
-        </button>
-
-        <!-- INFO BOX -->
-        <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3 mt-4">
-
-          <span class="material-symbols-outlined text-primary">
-            info
-          </span>
-
-          <p class="text-xs text-on-surface-variant">
-            Manage transaction actions such as viewing details,
-            sending receipts, or processing refunds.
-          </p>
-
-        </div>
-
-      </div>
-
-      <!-- FOOTER -->
-      <div class="px-6 py-5 flex justify-end gap-3 border border-white/10">
-
-        <button
-          onclick="closeTransactionModal()"
-          class="text-on-surface-variant hover:text-on-surface">
-          Cancel
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
+	      <!-- CONTENT -->
+	      <div class="p-4 space-y-2">
+	        <!-- VIEW DETAIL -->
+	        <button
+	          onclick="openViewTransactionModal(currentTransaction)"
+	          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition-all">
+	          <div class="flex items-center gap-4">
+	            <div class="main-icon-box">
+					      <span class="material-symbols-outlined text-3xl"
+					            style="font-variation-settings:'FILL' 1;">
+	                visibility
+	              </span>
+	            </div>
+	
+	            <span class="font-medium text-on-surface">
+	              View Full Details
+	            </span>
+	          </div>
+	 
+	          <span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">
+	            chevron_right
+	          </span>
+	        </button>
+	
+	        <!-- SEND RECEIPT -->
+	        <button
+	          onclick="openSendDigitalReceipt(currentTransaction)"
+	          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition-all">
+	
+	          <div class="flex items-center gap-4">
+							<div class="main-icon-box">
+								<span class="material-symbols-outlined text-3xl"
+											style="font-variation-settings:'FILL' 1;">
+	                	send
+	              </span>
+	            </div>
+	
+	            <span class="font-medium text-on-surface">
+	              Send via WhatsApp/Email
+	            </span>
+	          </div>
+	
+	          <span class="material-symbols-outlined text-on-surface-variant">
+	            chevron_right
+	          </span>
+	        </button>
+	
+	        <!-- INFO BOX -->
+	        <div class="p-4 rounded-md bg-white/5 border border-white/10 flex gap-3 mt-4">
+	          <span class="material-symbols-outlined text-foreground">
+	            info
+	          </span>
+	
+	          <p class="text-xs text-on-surface-variant">
+	            Manage transaction actions such as viewing details,
+	            sending receipts, or processing refunds.
+	          </p>
+	        </div>
+	      </div>
+	
+	      <!-- FOOTER -->
+	      <div class="px-6 py-5 flex justify-end gap-3 border border-white/10">
+	        <button
+	          onclick="closeTransactionModal()"
+	          class="text-on-surface-variant hover:text-on-surface">
+	          Cancel
+	        </button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 
 <!-- POPPUP DETAILTRANSACTIONS -->
 
 <template id="viewtransactionModalTemplate">
+	<!-- Modal Backdrop -->
+	<div class="fixed inset-0 z-[9999] flex items-center justify-center p-6 view-transaction-overlay">
+	  <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
+		  <!-- Transaction Details Modal -->
+		  <div class="relative w-full max-w-xl">
+		    <div class="bg-background rounded-md border border-white/10 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+		      <!-- Header Section -->
+		      <header class="px-6 py-5 border-b border-white/10">
+		        <div class="flex justify-between items-center">
+		          <div>
+		            <h1 class="text-lg font-bold text-on-surface">
+		              Order Details
+		            </h1>
 
-<!-- Modal Backdrop -->
-<div class="fixed inset-0 z-[9999] flex items-center justify-center p-6 view-transaction-overlay">
+		            <p id="viewtrxid"
+		              class="text-foregroundy font-semibold mt-1 text-xs uppercase tracking-widest">
+		              #SOM-8821
+		            </p>
+		          </div>
+		
+		          <div class="flex items-center gap-2 text-on-surface-variant">
+		            <span class="material-symbols-outlined text-sm">
+		              check_circle
+		            </span>
+		
+		            <span class="text-[10px] uppercase tracking-widest font-bold">
+		              Paid
+		            </span>
+		          </div>
+		        </div>
+		      </header>
 
-  <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
+		      <!-- Metadata Row -->
+		      <section class="px-6 py-5">
+		        <div class="grid grid-cols-4 gap-4 p-4 rounded-md bg-background/50 border border-white/10">
+		          <div>
+		            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
+		              Date
+		            </span>
+								
+		            <div id="viewtrxdate" class="text-xs font-medium mt-1"></div>
+		          </div>
+		
+		          <div>
+		            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
+		              Time
+		            </span>
+		
+		            <div id="viewtrxtime" class="text-xs font-medium mt-1"></div>
+		          </div>
+		
+		          <div>
+		            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
+		              Table
+		            </span>
+		
+		            <div id="viewtrxtable" class="text-xs font-bold text-primary mt-1"></div>
+		          </div>
+		
+		          <div>
+		            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
+		              Cashier
+		            </span>
+		
+		            <div id="viewtrxcashier" class="text-xs font-medium mt-1"></div>
+		          </div>
+		        </div>
+		      </section>
 
-  <!-- Transaction Details Modal -->
-  <div class="relative w-full max-w-xl">
-
-    <div class="bg-background
-    rounded-md
-    border border-white/10 
-    overflow-hidden 
-    shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-      <!-- Header Section -->
-      <header class="px-6 py-5 border-b border-white/10">
-
-        <div class="flex justify-between items-center">
-
-          <div>
-            <h1 class="text-lg font-bold text-on-surface">
-              Order Details
-            </h1>
-
-            <p id="viewtrxid"
-              class="text-primary font-bold mt-1 text-xs uppercase tracking-widest">
-              #SOM-8821
-            </p>
-          </div>
-
-          <div class="flex items-center gap-2 text-on-surface-variant">
-
-            <span class="material-symbols-outlined text-sm">
-              check_circle
-            </span>
-
-            <span class="text-[10px] uppercase tracking-widest font-bold">
-              Paid
-            </span>
-
-          </div>
-
-        </div>
-
-      </header>
-
-      <!-- Metadata Row -->
-      <section class="px-6 py-5">
-
-        <div class="grid grid-cols-4 gap-4 p-4 rounded-md bg-background/50 border border-white/10">
-
-          <div>
-            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
-              Date
-            </span>
-
-            <div id="viewtrxdate" class="text-xs font-medium mt-1"></div>
-          </div>
-
-          <div>
-            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
-              Time
-            </span>
-
-            <div id="viewtrxtime" class="text-xs font-medium mt-1"></div>
-          </div>
-
-          <div>
-            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
-              Table
-            </span>
-
-            <div id="viewtrxtable" class="text-xs font-bold text-primary mt-1"></div>
-          </div>
-
-          <div>
-            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
-              Cashier
-            </span>
-
-            <div id="viewtrxcashier" class="text-xs font-medium mt-1"></div>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- Itemized List -->
-      <section class="px-6 space-y-4 mb-6 overflow-y-auto max-h-[320px]">
-
-        <div class="grid grid-cols-12 text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
-
-          <div class="col-span-8">
-            Item
-          </div>
-
-          <div class="col-span-1 text-center">
-            Qty
-          </div>
-
-          <div class="col-span-3 text-right">
-            Price
-          </div>
-
-        </div>
-
-        <div id="viewtrxitems" class="space-y-4"></div>
-
-      </section>
-
-      <!-- Financial Summary -->
-      <section class="px-6">
-
-        <div class="p-4 rounded-md bg-background/50 border border border-white/10 space-y-3">
-
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-on-surface-variant">
-              Subtotal
-            </span>
-            <span id="viewtrxsubtotal">
-              IDR 2.430.000
-            </span>
-          </div>
-
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-on-surface-variant">
-              Discount
-            </span>
-            <span id="viewtrxdiscount" class="text-primary">
-              - IDR 243.000
-            </span>
-          </div>
-
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-on-surface-variant">
-              Service Charge
-            </span>
-            <span id="viewtrxservice">
-              IDR 109.350
-            </span>
-          </div>
-
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-on-surface-variant">
-              Tax
-            </span>
-            <span id="viewtrxtax">
-              IDR 229.635
-            </span>
-          </div>
-
-        </div>
-
-      </section>
-
-      <!-- FOOTER -->
-      <div class="px-6 py-5 mt-6 flex justify-between items-center bg-background">
-
-        <div>
-
-          <div class="text-[9px] uppercase tracking-widest text-on-surface-variant mb-1">
-            Amount
-          </div>
-
-          <div id="viewtrxtotal"
-            class="text-2xl font-bold text-on-surface">
-            IDR 2.525.985
-          </div>
-
-        </div>
-
-        <button
-          onclick="closeViewTransactionModal()"
-          class="text-on-surface-variant hover:text-on-surface">
-        
-          Cancel
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
+		      <!-- Itemized List -->
+		      <section class="px-6 space-y-4 mb-6 overflow-y-auto max-h-[320px]">
+		        <div class="grid grid-cols-12 text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
+		          <div class="col-span-8">
+		            Item
+		          </div>
+		
+		          <div class="col-span-1 text-center">
+		            Qty
+		          </div>
+		
+		          <div class="col-span-3 text-right">
+		            Price
+		          </div>
+		        </div>
+		
+		        <div id="viewtrxitems" class="space-y-4"></div>
+		      </section>
+		
+		      <!-- Financial Summary -->
+		      <section class="px-6">
+		        <div class="p-4 rounded-md bg-background/50 border border border-white/10 space-y-3">
+		          <div class="flex justify-between items-center text-sm">
+		            <span class="text-on-surface-variant">
+		              Subtotal
+		            </span>
+		            <span id="viewtrxsubtotal">
+		              IDR 2.430.000
+		            </span>
+		          </div>
+		
+		          <div class="flex justify-between items-center text-sm">
+		            <span class="text-on-surface-variant">
+		              Discount
+		            </span>
+		            <span id="viewtrxdiscount" class="text-primary">
+		              - IDR 243.000
+		            </span>
+		          </div>
+		
+		          <div class="flex justify-between items-center text-sm">
+		            <span class="text-on-surface-variant">
+		              Service Charge
+		            </span>
+		            <span id="viewtrxservice">
+		              IDR 109.350
+		            </span>
+		          </div>
+		
+		          <div class="flex justify-between items-center text-sm">
+		            <span class="text-on-surface-variant">
+		              Tax
+		            </span>
+		            <span id="viewtrxtax">
+		              IDR 229.635
+		            </span>
+		          </div>
+		        </div>
+		      </section>
+		
+		      <!-- FOOTER -->
+		      <div class="px-6 py-5 mt-6 flex justify-between items-center bg-background">
+		        <div>
+		          <div class="text-[9px] uppercase tracking-widest text-on-surface-variant mb-1">
+		            Amount
+		          </div>
+		
+		          <div id="viewtrxtotal"
+		            class="text-2xl font-bold text-on-surface">
+		            IDR 2.525.985
+		          </div>
+		        </div>
+		
+		        <button
+		          onclick="closeViewTransactionModal()"
+		          class="text-on-surface-variant hover:text-on-surface">
+		          Cancel
+		        </button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
 </template>
 
 
 <!-- POPPUP SEND DIGITAL RECEIPT -->
 
 <template id="senddigitalReceipt">
+	<!-- Modal Backdrop -->
+<div id="sendDigitalReceiptModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-6">	
+	<div class="absolute inset-0 bg-background backdrop-blur-md"></div>	
+	  <!-- Centered Glassmorphism Modal -->
+	  <div class="relative w-full max-w-lg">	
+	    <div class="bg-background rounded-md border border-white/10 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	      <button
+	        id="closeReceiptModal"
+	        class="absolute top-5 right-5 text-on-surface-variant hover:text-on-surface z-10">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
 
-<!-- Modal Backdrop -->
-<div id="sendDigitalReceiptModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-6">
-
-  <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
-
-  <!-- Centered Glassmorphism Modal -->
-  <div class="relative w-full max-w-lg">
-
-    <div class="bg-background
-    rounded-md
-    border border-white/10 
-    overflow-hidden 
-    shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-      <button
-        id="closeReceiptModal"
-        class="absolute top-5 right-5 text-on-surface-variant hover:text-on-surface z-10"
-      >
-        <span class="material-symbols-outlined">close</span>
-      </button>
-
-      <!-- Header Section -->
-      <div class="px-8 pt-8 pb-6 text-center border-b border-white/10">
-
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-md bg-background border border border-white/10 mb-6">
-          <span class="material-symbols-outlined text-primary text-3xl">
-            mark_email_read
-          </span>
-        </div>
-
-        <h1 class="font-headline text-2xl font-extrabold text-on-surface tracking-tight mb-2">
-          Send Digital Receipt
-        </h1>
-
-        <p class="font-body text-on-surface-variant text-sm">
-          Choose the preferred delivery method for the guest.
-        </p>
-
-      </div>
-
-      <!-- Transaction Summary Bento-Style -->
-      <div class="px-8 py-6">
-
-        <div class="bg-background border rounded-md p-6 border border-white/10 flex justify-between items-center">
-
-          <div>
-            <p class="font-label text-[10px] uppercase tracking-[0.20em] text-on-surface-variant font-bold mb-1">
-              Transaction ID
-            </p>
-
-            <p id="receiptTransactionId"
-              style="width:150px"
-              class="font-headline text-xs font-bold text-on-surface">
-              #SL-9842-X
-            </p>
-          </div>
-
-          <div class="text-right">
-            <p class="font-label text-[10px] uppercase tracking-[0.20em] text-on-surface-variant font-bold mb-1">
-              Amount
-            </p>
-
-            <p id="receiptTransactionTotal"
-              class="font-headline text-2xl font-extrabold text-primary tracking-tighter">
-              Rp 1.240.000
-            </p>
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- Tabbed Selector -->
-      <div class="px-8">
-
-        <div class="bg-background border p-1.5 rounded-md flex gap-1 mb-8 border border-white/10">
-
-          <button class="flex-1 flex items-center justify-center gap-2 py-3 rounded-md bg-primary text-black font-bold text-sm">
-
-            <span class="material-symbols-outlined text-sm"
-              style="font-variation-settings:'FILL' 1;">
-              chat
-            </span>
-
-            WhatsApp
-
-          </button>
-
-          <button class="flex-1 flex items-center justify-center gap-2 py-3 rounded-x1 text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all">
-
-            <span class="material-symbols-outlined text-sm">
-              mail
-            </span>
-
-            Email Address
-
-          </button>
-
-        </div>
-
-        <!-- Form Content -->
-        <div class="space-y-6">
-
-          <div class="space-y-2">
-
-            <label class="text-[10px] uppercase text-on-surface-variant">
-              Recipient Phone Number
-            </label>
-
-            <div class="relative group">
-
-              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
-                <span class="material-symbols-outlined text-lg">call</span>
-              </div>
-
-              <div class="absolute inset-y-0 left-12 flex items-center pointer-events-none border-r border-white/10 pr-3 my-3">
-                <span class="text-sm font-medium text-on-surface">
-                  +62
-                </span>
-              </div>
-
-              <input
-                id="receiptWhatsappInput"
-                type="tel"
-                placeholder="812 3456 7890"
-                class="w-full bg-background p-4 pl-24 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"
-              >
-
-            </div>
-
-          </div>
-
-          <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
-
-            <span class="material-symbols-outlined text-primary">
-              info
-            </span>
-
-            <p class="text-xs text-on-surface-variant">
-              Receipt will be delivered instantly through WhatsApp after verification.
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- Footer Actions -->
-      <div class="px-8 py-5 mt-6 flex justify-end gap-3 bg-background border border border-white/10">
-
-        <button
-          class="text-on-surface-variant hover:text-on-surface"
-        >
-          Print Physical Copy
-        </button>
-
-        <button
-          onclick="sendReceiptWhatsapp()"
-          class="btn-gradient px-6 py-3 rounded-md font-bold text-black flex items-center gap-2"
-        >
-          Dispatch Receipt
-          <span class="material-symbols-outlined">
-            send
-          </span>
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
+	      <!-- Header Section -->
+	      <div class="px-8 pt-8 pb-6 text-center border-b border-white/10">	
+	        <div class="inline-flex items-center justify-center main-icon-box mb-6">
+	          <span class="material-symbols-outlined text-3xl"
+	            	style="font-variation-settings:'FILL' 1;">
+	            mark_email_read
+	          </span>
+	        </div>
+	
+	        <h1 class="font-headline text-2xl font-extrabold text-on-surface tracking-tight mb-2">
+	          Send Digital Receipt
+	        </h1>
+	
+	        <p class="font-body text-on-surface-variant text-sm">
+	          Choose the preferred delivery method for the guest.
+	        </p>	
+	      </div>
+	
+	      <!-- Transaction Summary Bento-Style -->
+	      <div class="px-8 py-6">	
+	        <div class="bg-background border rounded-md p-6 border border-white/10 flex justify-between items-center">	
+	          <div>
+	            <p class="font-label text-[10px] uppercase tracking-[0.20em] text-on-surface-variant font-bold mb-1">
+	              Transaction ID
+	            </p>
+	
+	            <p id="receiptTransactionId"
+	              style="width:150px"
+	              class="font-headline text-xs font-bold text-on-surface">
+	              #SL-9842-X
+	            </p>
+	          </div>
+	
+	          <div class="text-right">
+	            <p class="font-label text-[10px] uppercase tracking-[0.20em] text-on-surface-variant font-bold mb-1">
+	              Amount
+	            </p>
+	
+	            <p id="receiptTransactionTotal"
+	              class="font-headline text-2xl font-extrabold text-primary tracking-tighter">
+	              Rp 1.240.000
+	            </p>
+	          </div>
+	        </div>
+	      </div>
+	
+	      <!-- Tabbed Selector -->
+	      <div class="px-8">
+	        <div class="bg-background border p-1.5 rounded-md flex gap-1 mb-8 border border-white/10">	
+	          <button class="flex-1 flex items-center justify-center gap-2 py-3 bottom-theme text-foreground font-semibold font-headline tracking-[0.15em] text-sm">	
+	            <span class="material-symbols-outlined text-sm"
+	              style="font-variation-settings:'FILL' 1;">
+	              chat
+	            </span>
+	            WhatsApp
+	          </button>
+	
+	          <button class="flex-1 flex items-center justify-center gap-2 py-3 rounded-x1 text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all">
+	            <span class="material-symbols-outlined text-sm">
+	              mail
+	            </span>
+	            Email Address
+	          </button>
+	        </div>
+	
+	        <!-- Form Content -->
+	        <div class="space-y-6">
+	          <div class="space-y-2">
+	            <label class="text-[10px] uppercase text-on-surface-variant">
+	              Recipient Phone Number
+	            </label>
+	
+	            <div class="relative group">
+	              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
+	                <span class="material-symbols-outlined text-lg">call</span>
+	              </div>
+	
+	              <div class="absolute inset-y-0 left-12 flex items-center pointer-events-none border-r border-white/10 pr-3 my-3">
+	                <span class="text-sm font-medium text-on-surface">
+	                  +62
+	                </span>
+	              </div>
+	
+	              <input
+	                id="receiptWhatsappInput"
+	                type="tel"
+	                placeholder="812 3456 7890"
+	                class="w-full bg-transparent border border-white/10 rounded-md t p-4 pl-24 rounded-md text-on-surface focus:ring-1 focus:ring-primary">	
+	            </div>	
+	          </div>
+	
+	          <div class="p-4 rounded-md bg-white/5 border border-white/10 flex gap-3">	
+	            <span class="material-symbols-outlined text-on-surface">
+	              info
+	            </span>
+		
+	            <p class="text-xs text-on-surface-variant">
+	              Receipt will be delivered instantly through WhatsApp after verification.
+	            </p>	
+	          </div>	
+	        </div>
+	      </div>
+				
+	      <!-- Footer Actions -->
+	      <div class="px-8 py-5 mt-6 flex justify-end gap-3 bg-background border border border-white/10">
+	        <button
+	          onclick="sendReceiptWhatsapp()"
+	          class="px-6 py-3 bottom-theme font-semibold font-headline flex items-center gap-2">
+	          Dispatch Receipt
+	          <span class="material-symbols-outlined">
+	            send
+	          </span>
+	        </button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 
 <!-- DIGITAL RECEIPT -->
 
 <template id="receiptTemplate">
+	
+	<main id="receiptMainWrapper" class="pt-32 pb-40 px-4 md:px-0 flex justify-center items-start min-h-screen">
+		<article id="receiptCanvas" class="w-full max-w-xl bg-background rounded-md overflow-hidden relative shadow-[0_-20px_40px_rgba(6,14,32,0.6)]">		
+			<div id="receiptTextureLayer" class="absolute inset-0 receipt-texture pointer-events-none opacity-40"></div>
+				<div id="receiptContentWrapper" class="relative p-8 md:p-12">
+					<header id="receiptHeroSection" class="relative -mx-8 md:-mx-12 -mt-8 md:-mt-12 mb-12 overflow-hidden rounded-t-lg">
+					    <div class="absolute inset-0">
+					        <img
+					            id="receiptHeroImage"
+					            src="https://lh3.googleusercontent.com/d/1bBSgAdzEtECl6nTxYmdgs7oPxK1s3Z6y"
+					            class="w-full h-[250px] object-cover"
+					            alt="SOMA Logo">
+					
+					        <div
+					            id="receiptHeroOverlay"
+					            class="absolute inset-x-0 top-0 -bottom-1 bg-gradient-to-b from-background/40 via-background/90 to-background">
+					        </div>
+					    </div>
+					
+					    <div id="receiptHeroContent"
+					      class="relative z-10 min-h-[240px] flex flex-col items-center justify-center text-center px-8">
+					          <!-- LOGO -->
+					          <div id="receiptHeroIconWrapper" class="mb-5 flex justify-center">
+					
+					              <img
+					              id="receiptLogo"
+					              src=""
+					              class="h-16 w-auto object-contain"
+					              alt="Business Logo">
+					          </div>
+					        
+					          <h1 id="receiptTitle"
+					          class="font-display font-extrabold text-3xl tracking-tight text-on-surface mb-3 drop-shadow-lg">
+					          </h1>
+					
+					          <p class="font-label text-xs uppercase tracking-[0.2em] text-primary font-bold drop-shadow-md">
+					              Digital Receipt
+					          </p>
+					      </div>
+					</header>
+					
+					<!-- Order Meta Bento Grid -->
+					<section id="receiptMetaSection" class="grid grid-cols-2 gap-4 mb-12">
+						<div class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Order ID</p>
+							<p id="receiptId" class="font-display font-light text-xs text-primary"></p>
+						</div>
 
-
-<main id="receiptMainWrapper" class="pt-32 pb-40 px-4 md:px-0 flex justify-center items-start min-h-screen">
-<!-- Digital Receipt Canvas -->
-<article id="receiptCanvas" class="w-full max-w-xl bg-background rounded-md overflow-hidden relative shadow-[0_-20px_40px_rgba(6,14,32,0.6)]">
-<!-- Subtle Receipt Texture -->
-
-<div id="receiptTextureLayer" class="absolute inset-0 receipt-texture pointer-events-none opacity-40"></div>
-<!-- Content Container -->
-<div id="receiptContentWrapper" class="relative p-8 md:p-12">
-<!-- Receipt Header -->
-<header id="receiptHeroSection"
-    class="relative -mx-8 md:-mx-12 -mt-8 md:-mt-12 mb-12 overflow-hidden rounded-t-lg">
-
-    <!-- Background Wrapper -->
-    <div class="absolute inset-0">
-
-        <img
-            id="receiptHeroImage"
-            src="https://lh3.googleusercontent.com/d/1bBSgAdzEtECl6nTxYmdgs7oPxK1s3Z6y"
-            class="w-full h-[250px] object-cover"
-            alt="SOMA Logo">
-
-        <div
-            id="receiptHeroOverlay"
-            class="absolute inset-x-0 top-0 -bottom-1 bg-gradient-to-b from-background/40 via-background/90 to-background">
-        </div>
-
-    </div>
-
-    <!-- Content -->
-    <div
-      id="receiptHeroContent"
-      class="relative z-10 min-h-[240px] flex flex-col items-center justify-center text-center px-8">
-
-
-          <!-- LOGO -->
-          <div id="receiptHeroIconWrapper" class="mb-5 flex justify-center">
-
-              <img
-              id="receiptLogo"
-              src=""
-              class="h-16 w-auto object-contain"
-              alt="Business Logo">
-
-          </div>
-
-
-          <!-- BRAND NAME -->
-          <h1
-          id="receiptTitle"
-          class="font-display font-extrabold text-3xl tracking-tight text-on-surface mb-3 drop-shadow-lg">
-          </h1>
-
-
-          <!-- TAGLINE -->
-          <p
-          class="font-label text-xs uppercase tracking-[0.2em] text-primary font-bold drop-shadow-md">
-              Digital Receipt
-          </p>
-
-
-      </div>
-
-</header>
-<!-- Order Meta Bento Grid -->
-<section id="receiptMetaSection" class="grid grid-cols-2 gap-4 mb-12">
-<div class="p-5 relative overflow-hidden
-  rounded-md bg-background
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
-<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Order ID</p>
-<p id="receiptId" class="font-display font-light text-xs text-primary"></p>
-</div>
-
-<div id="receiptDateCard" class="p-5 relative overflow-hidden
-  rounded-md bg-background
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Date</p>
-<p id="receiptDate" class="font-display font-bold text-lg"></p>
-</div>
-<div id="receiptTableCard" class="p-5 relative overflow-hidden
-  rounded-md bg-background
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)] col-span-2 flex justify-between items-center">
-<div>
-<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Service Location</p>
-<p id="receiptTable" class="font-display font-bold text-lg">Table</p>
-</div>
-<span id="receiptTableIcon" class="material-symbols-outlined text-on-surface-variant opacity-50">restaurant</span>
-</div>
-</section>
-<!-- Items Table -->
-<section id="receiptItemsSection" class="mb-12">
-<div class="flex justify-between items-end mb-6">
-<h2 id="receiptItemsTitle" class="font-display font-bold text-xl">Order Summary</h2>
-<div class="h-px bg-outline-variant/20 flex-grow mx-4 mb-2"></div>
-</div>
-<div id="receiptItemsContainer" class="space-y-6">
-</div>
-</section>
-<!-- Financial Breakdown -->
-<section id="receiptFinancialSection" class="p-8 relative overflow-hidden
-  rounded-md bg-background
-  border border-white/10
-  shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-<div id="receiptFinancialBreakdown" class="space-y-4 mb-8">
-<div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">Subtotal</span>
-<span id="receiptSubtotal" class="font-semibold"></span>
-</div>
-<div class="flex justify-between text-sm text-primary">
-<span class="font-medium italic">Discount</span>
-<span id="receiptDiscount" class="font-semibold"></span>
-</div>
-<div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">VAT </span>
-<span id="receiptTax" class="font-semibold"></span>
-</div>
-<div class="flex justify-between text-sm">
-<span class="text-on-surface-variant">Service </span>
-<span id="receiptService" class="font-semibold"></span>
-</div>
-</div>
-<div id="receiptGrandTotalWrapper" class="pt-6 border-t border-outline-variant/30 flex justify-between items-center">
-<p class="font-label text-sm uppercase tracking-widest font-bold text-primary">Amount</p>
-<p id="receiptTotal" class="font-display font-extrabold text-3xl text-primary tracking-tight"></p>
-</div>
-</section>
-<!-- Footer / Loyalty -->
-<footer id="receiptFooterSection" class="text-center"><div class="space-y-6">
-<p
- id="receiptFooterText"
- class="font-display font-medium text-lg text-on-surface italic">
-</p>
-<div id="receiptOutletInfo" class="flex flex-col items-center gap-3 pt-6 border-t border-outline-variant/10">
-
-  <div class="flex items-center gap-2 text-on-surface-variant">
-    <span id="receiptPhone"
-      class="font-label text-xs tracking-widest font-semibold">
-    </span>
-  </div>
-
-
-  <p
-    id="receiptInstagram"
-    class="font-label text-xs tracking-wide text-on-surface-variant">
-  </p>
-
-
-  <div id="receiptAddressWrapper" class="flex items-center gap-2 text-on-surface-variant">
-
-    <address id="receiptAddress"
-      class="font-label text-xs tracking-wide not-italic uppercase">
-    </address>
-
-  </div>
-
-</div>
-</div></footer>
-</div>
-</article>
+						<div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+							<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Date</p>
+							<p id="receiptDate" class="font-display font-bold text-lg"></p>
+						</div>
+						
+						<div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] col-span-2 flex justify-between items-center">
+							<div>
+								<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Service Location</p>
+								<p id="receiptTable" class="font-display font-bold text-lg">Table</p>
+							</div>
+						<span id="receiptTableIcon" class="material-symbols-outlined text-on-surface-variant opacity-50">restaurant</span>
+					</div>
+				</section>
+					
+				<!-- Items Table -->
+				<section id="receiptItemsSection" class="mb-12">
+					<div class="flex justify-between items-end mb-6">
+						<h2 id="receiptItemsTitle" class="font-display font-bold text-xl">Order Summary</h2>
+						<div class="h-px bg-outline-variant/20 flex-grow mx-4 mb-2"></div>
+					</div>
+					<div id="receiptItemsContainer" class="space-y-6">
+				</div>
+			</section>
+					
+			<!-- Financial Breakdown -->
+			<section id="receiptFinancialSection" class="p-8 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+				<div id="receiptFinancialBreakdown" class="space-y-4 mb-8">
+					<div class="flex justify-between text-sm">
+						<span class="text-on-surface-variant">Subtotal</span>
+						<span id="receiptSubtotal" class="font-semibold"></span>
+					</div>
+				<div class="flex justify-between text-sm text-primary">
+					<span class="font-medium italic">Discount</span>
+					<span id="receiptDiscount" class="font-semibold"></span>
+				</div>
+				<div class="flex justify-between text-sm">
+					<span class="text-on-surface-variant">VAT </span>
+					<span id="receiptTax" class="font-semibold"></span>
+				</div>
+				<div class="flex justify-between text-sm">
+					<span class="text-on-surface-variant">Service </span>
+					<span id="receiptService" class="font-semibold"></span>
+				</div>
+			</div>
+			<div id="receiptGrandTotalWrapper" class="pt-6 border-t border-outline-variant/30 flex justify-between items-center">
+				<p class="font-label text-sm uppercase tracking-widest font-bold text-primary">Amount</p>
+				<p id="receiptTotal" class="font-display font-extrabold text-3xl text-primary tracking-tight"></p>
+			</div>
+		</section>
+	
+		<footer id="receiptFooterSection" class="text-center"><div class="space-y-6">
+			<p id="receiptFooterText" class="font-display font-medium text-lg text-on-surface italic"> </p>
+					<div id="receiptOutletInfo" class="flex flex-col items-center gap-3 pt-6 border-t border-outline-variant/10">
+						<div class="flex items-center gap-2 text-on-surface-variant">
+							<span id="receiptPhone" class="font-label text-xs tracking-widest font-semibold">
+							</span>
+						</div>
+						
+				  	<p id="receiptInstagram" class="font-label text-xs tracking-wide text-on-surface-variant"> </p>
+			
+					  <div id="receiptAddressWrapper" class="flex items-center gap-2 text-on-surface-variant">
+					    <address id="receiptAddress" class="font-label text-xs tracking-wide not-italic uppercase">
+					    </address>
+					  </div>
+					</div>
+				</div>
+			</footer>
+		</div>
+	</article>
 </main>
 </template>
 
@@ -2593,14 +2409,12 @@
 	        LOGOUT
         </span>
       </a>
-
     </nav>
 
 
     <!-- FOOTER -->
     <div class="mt-auto p-2 pb-2">
       <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
-
         <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
           <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
         </span>
@@ -2638,45 +2452,30 @@
         search
       </span>
 
-      <input
-        id="searchInput"
+      <input id="searchInput"
         class="w-full bg-background border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
         placeholder="Search menu..."
-        type="text"
-      />
+        type="text"/>
     </div>
   </div>
 
   <!-- RIGHT -->
   <div class="flex items-center gap-4 ml-8">
-
-    <!-- NOTIFICATION -->
     <div class="relative">
-
-        <button
-          onclick="toggleNotification()"
+        <button onclick="toggleNotification()"
           class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
           <span class="material-symbols-outlined">notifications</span>
 
           <!-- BADGE -->
-          <div
-            id="notificationBadge"
-            class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px]
-            px-1 rounded-md bg-red-500 text-white
-            text-[10px] font-bold flex items-center justify-center">
+          <div id="notificationBadge"
+            class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px] px-1 rounded-md bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
             0
           </div>
-
         </button>
 
         <!-- DROPDOWN -->
-        <div
-          id="notificationDropdown"
-          class="hidden absolute right-0 top-12 w-80
-          bg-background rounded-md 
-          border border-white/10
-          shadow-2xl overflow-hidden z-50">
-
+        <div id="notificationDropdown"
+          class="hidden absolute right-0 top-12 w-80 bg-background rounded-md border border-white/10 shadow-2xl overflow-hidden z-50">
           <div class="p-4 border-b border-white/10">
             <h3 class="font-bold text-xs lg:text-sm text-on-surface">
             Notifications
@@ -2688,271 +2487,217 @@
               No Notifications Today
             </div>
           </div>
-
         </div>
-
       </div>
-    <button
-    onclick="toggleBillingSidebar('pos')"
-   	class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
-    <span class="material-symbols-outlined">
-      shopping_cart
-    </span>
-  </button>
-
+    <button onclick="toggleBillingSidebar('pos')"
+   		class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
+	    <span class="material-symbols-outlined">
+	      shopping_cart
+	    </span>
+ 		</button>
   </div>
-
 </header>
 <main class="flex-1 overflow-y-auto flex h-screen overflow-hidden relative pl-14 ">
-<section
-  id="productSection"
-  class="relative w-full pl-8 mx-auto md:px-2 lg:px-2 flex flex-col transition-all duration-300">
+	<section id="productSection" class="relative w-full pl-8 mx-auto md:px-2 lg:px-2 flex flex-col transition-all duration-300">
+		<!-- Category Chips -->
+		<div id="pos-category-list"
+		  class="relative pl-6 md:px-4 pt-4 pb-2 md:pt-6 md:pb-3 flex justify-between gap-2 md:gap-3 border-b border-white/10 overflow-x-auto custom-scrollbar">
+		</div>
+	<!-- Product Grid -->
+		<div class="relative flex-1 overflow-y-auto custom-scrollbar pl-2 pt-4 pb-10">
+			<div id="product-list" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-3">
+			</div>
+		</div>
+	</section>
+	
+	<!-- Right: Active Order Cart Section -->
+	<section id="billingSidebar" class="w-[520px] bg-background flex flex-col border-l border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative duration-300">
+		<div class="p-8 pb-4">
+			<div class="flex justify-between items-center mb-6">
+				<div class="flex flex-col">
+					<h2 class="font-headline font-extrabold text-2xl">SOMMA POS</h2>
+					<p class="text-xs lg:text-sm text-muted  font-medium tracking-tight">Current Order</p>
+				</div>
+			</div>
 
-<!-- Category Chips -->
-<div
-  id="pos-category-list"
-  class="relative pl-6 md:px-4 pt-4 pb-2 md:pt-6 md:pb-3 flex justify-between gap-2 md:gap-3 border-b border-white/10 overflow-x-auto custom-scrollbar">
-</div>
-<!-- Product Grid -->
-<div class="relative flex-1 overflow-y-auto custom-scrollbar pl-2 pt-4 pb-10">
-<div id="product-list" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-3">
-</div>
+			<!-- Table Input Field -->
+			<div class="mb-2">
+				<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
+				<div class="relative">
+					<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" data-icon="table_restaurant">table_restaurant</span>
+					<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
+				</div>
+			</div>
+		</div>
+		<!-- Cart Items -->
+		<div id="cart-items" class="flex-1 overflow-y-auto px-8 custom-scrollbar space-y-6 py-4"></div>
+			<!-- Financial Controls & Summary Section -->
+			<div class="bg-background border border-white/10 p-5 space-y-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+				<!-- Financial Modifiers -->
+				<div class="grid grid-cols-6 gap-4 pb-2">
+					<div class="col-span-6">
+						<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
+						<div class="relative">
+					  <!-- ICON -->
+							<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2">
+								search
+							</span>
+							
+							<input id="memberSearch" 
+								class="w-full bg-background border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
+								autocomplete="off" 
+								placeholder="Search members..." 
+								type="text" />
 
-</div>
+  						<input type="hidden" id="member-id">
+						  <!-- RESULT DROPDOWN -->
+						 <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-lg bg-background border border-white/10 z-50 custom-scrollbar" style="display:none;"></div>
+					</div>
+					<button onclick="openRedeem()" 
+					  	class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-white/10 tracking-wide transition-all">
+					  <span class="material-symbols-outlined text-sm">redeem</span>
+					  <span class="text-sm">REDEEM</span>
+					</button>
+				</div>
+			</div>
+		</div>
 
-</section>
-<!-- Right: Active Order Cart Section -->
-<section id="billingSidebar" class="w-[520px] bg-background flex flex-col border-l border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative duration-300">
-<div class="p-8 pb-4">
-<div class="flex justify-between items-center mb-6">
-<div class="flex flex-col">
-<h2 class="font-headline font-extrabold text-2xl">SOMMA POS</h2>
-<p class="text-xs lg:text-sm text-muted  font-medium tracking-tight">Current Order</p>
-</div>
-</div>
+		<!-- Summary -->
+		<div id="pos-cart-summary" class="space-y-2.5 pt-2 border-t border-outline-variant/10"> </div>
+			<div class="h-[1px] bg-outline-variant/10"></div>
+				<!-- Payment Method Selector -->
+				<div class="pb-2">
+					<label class="text-[10px] text-muted  font-bold uppercase tracking-wider m-3 block">Payment</label>	
+						<div class="grid grid-cols-3 m-3 gap-2">
+							<button id="pay-Cash" onclick="selectPayment('Cash')"
+							   class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground">
+							  <span class="material-symbols-outlined text-2xl">payments</span>
+							</button>
+	
+							<button id="pay-QRIS" onclick="selectPayment('QRIS')"
+							  class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground">
+							  <span class="material-symbols-outlined text-2xl">qr_code_2</span>
+							</button>
+	
+							<button id="pay-Bank" onclick="selectPayment('Bank')"
+								class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground">
+							  <span class="material-symbols-outlined text-2xl">account_balance</span>
+							</button>
+						</div>
+					</div>
+					
+					<button id="btnCheckout" onclick="checkout()" class="mt-3 h-10 w-full py-2.5 flex items-center justify-center gap-2 text-foreground bottom-theme font-headline font-bold text-xl tracking-wide hover:text-on-surface-variant transition-all">
+						<span>BUY</span>
+						<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+					</button>
+				</section>
+			</main>
+		</div>
 
-
-<!-- Table Input Field -->
-<div class="mb-2">
-<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
-<div class="relative">
-<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" data-icon="table_restaurant">table_restaurant</span>
-<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
-</div>
-</div>
-
-</div>
-<!-- Cart Items -->
-<div id="cart-items" class="flex-1 overflow-y-auto px-8 custom-scrollbar space-y-6 py-4">
-</div>
-<!-- Financial Controls & Summary Section -->
-<div class="bg-background border border-white/10 p-5 space-y-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-<!-- Financial Modifiers -->
-<div class="grid grid-cols-6 gap-4 pb-2">
-<div class="col-span-6">
-<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
-	<div class="relative">
-  <!-- ICON -->
-	<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2">
-		search
-	</span>
-	<input id="memberSearch" 
-		class="w-full bg-background border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
-		autocomplete="off" 
-		placeholder="Search members..." 
-		type="text" />
-
-
-  <input type="hidden" id="member-id">
-
-  <!-- RESULT DROPDOWN -->
- <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-lg bg-background border border-white/10 z-50 custom-scrollbar" style="display:none;"></div>
-
-</div>
-<button 
-  onclick="openRedeem()" 
-  class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-white/10 tracking-wide transition-all">
-  <span class="material-symbols-outlined text-sm">redeem</span>
-  <span class="text-sm">REDEEM</span>
-</button>
-</div>
-</div>
-</div>
-
-<!-- Summary -->
-<div id="pos-cart-summary" class="space-y-2.5 pt-2 border-t border-outline-variant/10">
-</div>
-<div class="h-[1px] bg-outline-variant/10"></div>
-<!-- Payment Method Selector -->
-<div class="pb-2">
-<label class="text-[10px] text-muted  font-bold uppercase tracking-wider m-3 block">Payment</label>
-
-<div class="grid grid-cols-3 m-3 gap-2">
-
-<button id="pay-Cash" 
-   class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground"
-  onclick="selectPayment('Cash')">
-  <span class="material-symbols-outlined text-2xl">payments</span>
-</button>
-
-<button id="pay-QRIS" 
-  class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground"
-  onclick="selectPayment('QRIS')">
-  <span class="material-symbols-outlined text-2xl">qr_code_2</span>
-</button>
-
-<button id="pay-Bank" 
-	class="h-8 rounded-md bg-background text-muted border border-white/10 flex items-center justify-center transition-all hover:text-foreground"
-  onclick="selectPayment('Bank')">
-  <span class="material-symbols-outlined text-2xl">account_balance</span>
-</button>
-
-</div>
-</div>
-<button id="btnCheckout" onclick="checkout()" class="mt-3 h-10 w-full py-2.5 flex items-center justify-center gap-2 text-foreground border-t border-white/10  font-headline font-bold text-lg tracking-wide hover:text-on-surface-variant transition-all">
-<span>BUY</span>
-<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
-</button>
-
-</section>
-</main>
-</div>
-
-	<script>
-	 
-	  document.addEventListener(
-		  "input",
-		  async function(e) {
-		
-		    if (
-		      e.target.id === "memberSearch"
-		    ) {
-		
-		      const keyword =
-		        e.target.value
-		          .toLowerCase();
-		
-		      if (!keyword) {
-		
-		        document.getElementById(
-		          "memberResult"
-		        ).style.display = "none";
-		
-		        return;
-		      }
-		
-		      try {
-		
-		        const data =
-		          await searchMembersRPC(
-		            keyword,
-		            state.branchId
-		          );
-		
-		        console.log(
-		          "MEMBER SEARCH:",
-		          keyword
-		        );
-		
-		        console.log(
-		          "BRANCH:",
-		          state.branchId
-		        );
-		
-		        console.log(
-		          "RESULT:",
-		          data
-		        );
-		
-		        showMemberResult(
-		          data
-		        );
-		
-		      } catch (err) {
-		
-		        console.error(
-		          "Search Member:",
-		          err
-		        );
-		      }
-		    }
-		  }
-		);
-		
-		
-		// ================================
-		// TAMPILKAN HASIL MEMBER
-		// ================================
-		
-		function showMemberResult(data) {
-		
-		  const box =
-		    document.getElementById(
-		      "memberResult"
-		    );
-		
-		  if (!box) return;
-		
-		  box.innerHTML = "";
-		
-		  if (
-		    !data ||
-		    data.length === 0
-		  ) {
-		
-		    box.style.display =
-		      "none";
-		
-		    return;
-		  }
-		
-		  data.forEach(m => {
-		
-		    const div =
-		      document.createElement(
-		        "div"
-		      );
-		
-		    div.style.padding =
-		      "10px";
-		
-		    div.style.cursor =
-		      "pointer";
-		
-		    div.innerHTML =
-		      `<b>${m.nama}</b>
-		       <br>
-		       <small>${m.level}</small>`;
-		
-		    div.onclick = async () => {
-			  await selectMember(m);
-			};
-		
-		    box.appendChild(div);
-		
-		  });
-		  box.style.display =
-		    "block";
-		}
-  </script>
+		<script>
+		  document.addEventListener(
+			  "input",
+			  async function(e) {
+			    if (
+			      e.target.id === "memberSearch"
+			    ) {
+			      const keyword =
+			        e.target.value
+			          .toLowerCase();
+			
+			      if (!keyword) {
+			        document.getElementById(
+			          "memberResult"
+			        ).style.display = "none";
+			        return;
+			      }
+			
+			      try {
+			        const data =
+			          await searchMembersRPC(
+			            keyword,
+			            state.branchId
+			          );
+			
+			        console.log(
+			          "MEMBER SEARCH:",
+			          keyword
+			        );
+			
+			        console.log(
+			          "BRANCH:",
+			          state.branchId
+			        );
+			
+			        console.log(
+			          "RESULT:",
+			          data
+			        );
+			
+			        showMemberResult(
+			          data
+			        );
+			      } catch (err) {
+			        console.error(
+			          "Search Member:",
+			          err
+			        );
+			      }
+			    }
+			  }
+			);
+			
+			// ================================
+			// TAMPILKAN HASIL MEMBER
+			// ================================
+			function showMemberResult(data) {
+			  const box =
+			    document.getElementById(
+			      "memberResult"
+			    );
+			
+			  if (!box) return;
+			  box.innerHTML = "";
+			
+			  if (
+			    !data ||
+			    data.length === 0
+			  ) {
+			    box.style.display = "none";
+			    return;
+			  }
+			  data.forEach(m => {
+			    const div =
+			      document.createElement(
+			        "div"
+			      );
+			
+			    div.style.padding = "10px";
+			    div.style.cursor = "pointer";
+			    div.innerHTML =
+			      `<b>${m.nama}</b>
+			       <br>
+			       <small>${m.level}</small>`;
+			
+			    div.onclick = async () => {
+					  await selectMember(m);
+					};
+			    box.appendChild(div);
+			  });
+			  box.style.display = "block";
+			}
+	  </script>
 </template>
 
 
 <!-- REDEEM POINT -->
 
 <template id="redeempointModal">
-
   <div class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-background backdrop-blur-md">
-
-    <div
-      class="w-full max-w-4xl h-[680px] bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
-
+    <div class="w-full max-w-4xl h-[680px] bg-background rounded-md border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
       <!-- HEADER -->
       <div class="p-6 border-b border-white/10 flex items-center justify-between">
-
         <div class="flex items-center gap-4">
-
           <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
             <span class="material-symbols-outlined text-primary text-2xl">
               card_giftcard
@@ -2960,345 +2705,246 @@
           </div>
 
           <div>
-            <h2 class="text-xl font-headline font-bold text-on-surface">
-              Redeem Reward Points
-            </h2>
-
-            <p class="text-xs uppercase tracking-wider text-primary">
-              Loyalty Program
-            </p>
+            <h2 class="text-xl font-headline font-bold text-on-surface"> Redeem Reward Points </h2>
+            <p class="text-xs uppercase tracking-wider text-primary"> Loyalty Program </p>
           </div>
-
         </div>
 
-        <button
-          onclick="closeRedeem()"
+        <button onclick="closeRedeem()"
           class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
-
           <span class="material-symbols-outlined">
             close
           </span>
-
         </button>
-
       </div>
-
+			
       <!-- BODY -->
       <div class="h-[calc(680px-81px)] overflow-y-auto custom-scrollbar p-6 space-y-6">
-
         <!-- MEMBER INFO -->
         <section class="bg-background border border-white/10 rounded-md p-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
           <div class="flex items-center justify-between">
-
             <div class="flex items-center gap-4">
-
               <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
-
                 <span class="material-symbols-outlined text-primary">
                   person
                 </span>
-
               </div>
-
+							
               <div>
-
-                <h3
-                  id="redeemMemberName"
-                  class="text-lg font-headline font-bold text-on-surface">
-                </h3>
-
+                <h3 id="redeemMemberName" class="text-lg font-headline font-bold text-on-surface"> </h3>
+								
                 <div class="flex items-center gap-2 mt-1">
-
-                  <span class="text-xs uppercase tracking-wider text-primary">
-                    Member ID
-                  </span>
-
-                  <span
-                    id="redeemMemberId"
-                    class="text-xs lg:text-sm text-on-surface-variant font-mono">
-                  </span>
-
+                  <span class="text-xs uppercase tracking-wider text-primary"> Member ID </span>
+                  <span id="redeemMemberId" class="text-xs lg:text-sm text-on-surface-variant font-mono"></span>
                 </div>
-
               </div>
-
             </div>
 
             <div class="text-right">
-
-              <p class="text-xs uppercase tracking-widest text-on-surface-variant mb-1">
-                Current Balance
-              </p>
-
+              <p class="text-xs uppercase tracking-widest text-on-surface-variant mb-1"> Current Balance </p>
+							
               <div class="flex items-center justify-end gap-2">
-
-                <span class="material-symbols-outlined text-primary">
-                  stars
-                </span>
-
-                <span
-                  id="redeemPoint"
-                  class="text-2xl font-headline font-bold text-on-surface">
-                </span>
-
-                <span class="text-primary font-semibold">
-                  PTS
-                </span>
-
+                <span class="material-symbols-outlined text-primary"> stars </span>
+                <span id="redeemPoint" class="text-2xl font-headline font-bold text-on-surface"> </span>
+                <span class="text-primary font-semibold"> PTS </span>
               </div>
-
             </div>
-
           </div>
-
         </section>
 
         <!-- TITLE -->
         <section>
-
           <div class="flex items-center justify-between mb-4">
-
             <div>
-
-              <h3 class="text-lg font-semibold text-on-surface">
-                Available Rewards
-              </h3>
-
-              <p class="text-xs text-on-surface-variant">
-                Exchange your loyalty points for exclusive rewards
-              </p>
-
+              <h3 class="text-lg font-semibold text-on-surface"> Available Rewards </h3>
+              <p class="text-xs text-on-surface-variant"> Exchange your loyalty points for exclusive rewards </p>
             </div>
 
-            <span class="text-xs text-primary uppercase tracking-wider">
-              Reward Catalog
-            </span>
-
+            <span class="text-xs text-primary uppercase tracking-wider"> Reward Catalog </span>
           </div>
-
           <!-- REWARD GRID -->
-          <div
-            id="rewardContainer"
-            class="grid grid-cols-2 lg:grid-cols-3 gap-4">
-
+          <div id="rewardContainer" class="grid grid-cols-2 lg:grid-cols-3 gap-4">
           </div>
-
         </section>
-
       </div>
-
     </div>
-
   </div>
-
 </template>
 
 
 <!-- TABLES --> 
 
 <template id="tablePage" >
-<!-- ================= SIDEBAR ================= -->
-<aside
-  id="sidebar"
-  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+	<!-- ================= SIDEBAR ================= -->
+	<aside
+	  id="sidebar"
+	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+	
+	  <!-- SIDEBAR CONTENT -->
+	  <div class="sidebar-menu flex flex-col h-full">
+	    <!-- MENU -->
+	    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
+	      <!-- DASHBOARD -->
+	      <a onclick="navigate('dashboardPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          home
+	        </span>
+	    
+	        <span
+	          class="sidebar-label">
+	          Dashboard
+	        </span>
+	      </a>
+	      <!-- POS -->
+	      <a onclick="navigate('posPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          shopping_cart
+	        </span>
+	
+	        <span class="sidebar-label">
+	          POS
+	        </span>
+	      </a>
+	
+	      <!-- TABLE -->
+	      <a class="active" onclick="navigate('tablePage')">
+	         <span class="material-symbols-outlined sidebar-icon">
+	          Table
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Table
+	        </span>
+	      </a>
+	
+	      <!-- MEMBER -->
+	      <a onclick="navigate('memberPage')">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          group
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Member
+	        </span>
+	      </a>
+	
+	      <!-- SETTINGS -->
+	      <a onclick="navigate('settingsPage')"
+	         style="display:none"
+			  	 class="settingsMenu">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          settings
+	        </span>
+	
+	        <span class="sidebar-label">
+	          Settings
+	        </span>
+	      </a>
+	
+	      <!-- LOGOUT -->
+	      <a onclick="logout()">
+	        <span class="material-symbols-outlined sidebar-icon">
+	          logout
+	        </span>
+	
+	        <span class="sidebar-label">
+		        LOGOUT
+	        </span>
+	      </a>
+	    </nav>
 
-  <!-- SIDEBAR CONTENT -->
-  <div class="sidebar-menu flex flex-col h-full">
-    <!-- MENU -->
-    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
-      <!-- DASHBOARD -->
-      <a onclick="navigate('dashboardPage')">
-        <span class="material-symbols-outlined sidebar-icon">
-          home
-        </span>
-    
-        <span
-          class="sidebar-label">
-          Dashboard
-        </span>
-      </a>
-      <!-- POS -->
-      <a onclick="navigate('posPage')">
-        <span class="material-symbols-outlined sidebar-icon">
-          shopping_cart
-        </span>
+	    <!-- FOOTER -->
+	    <div class="mt-auto p-2 pb-2">
+	      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
+	        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
+	          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
+	        </span>
+	
+	        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+	          <p class="text-[10px] text-muted ">
+	            SYSTEM STATUS
+	          </p>
+	
+	          <span class="sidebar-label">
+	            SERVER ACTIVE
+	          </span>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</aside>
 
-        <span class="sidebar-label">
-          POS
-        </span>
-      </a>
+	<!-- Sidebar Kanan: Billing Control -->
+	<aside id="billingSidebar"
+	  class=" fixed right-0 top-6 bottom-0 pointer-events-none w-0 bg-background translate-x-[120%] opacity-0 border border-white/10 flex flex-col pt-24 pb-8 px-6 z-40 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ">
+		<div class="flex items-center justify-between mb-8">
+			<div>
+				<h2 class="font-headline text-2xl font-bold">Card Table</h2>
+				<p id="billing-table-info" class="text-on-surface-variant text-sm font-semibold">
+				  No Table Selected
+				</p>
+			</div>
+			<div class="bg-background-high p-3 rounded-2xl">
+				<span class="material-symbols-outlined text-foreground">Table</span>
+			</div>
+		</div>
+	  <!-- Billing Mode -->
+	  <div id="billingActions" class="flex flex-col flex-1 min-h-0">
+	    <!-- Tabel Cart -->
+	    <div
+	      id="table-cart-items"
+	      class="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-4 pr-2">
+	    </div>
+	
+	    <!-- Summary -->
+	    <div
+	      id="table-cart-summary"
+	      class="pt-6 mt-6 border-t border-outline-variant/10 space-y-6">
+	    </div>
+	
+	    <div class="space-y-3 mt-6">	
+	      <button onclick="openReserveModalFromSidebar()"
+	        class="w-full py-4 bottom-theme font-headline tracking-[0.15em] text-md font-bold">
+	        Reserve
+	      </button>
 
-      <!-- TABLE -->
-      <a class="active" onclick="navigate('tablePage')">
-         <span class="material-symbols-outlined sidebar-icon">
-          Table
-        </span>
-
-        <span class="sidebar-label">
-          Table
-        </span>
-      </a>
-
-      <!-- MEMBER -->
-      <a onclick="navigate('memberPage')">
-        <span class="material-symbols-outlined sidebar-icon">
-          group
-        </span>
-
-        <span class="sidebar-label">
-          Member
-        </span>
-      </a>
-
-      <!-- SETTINGS -->
-      <a onclick="navigate('settingsPage')"
-         style="display:none"
-		  	 class="settingsMenu">
-        <span class="material-symbols-outlined sidebar-icon">
-          settings
-        </span>
-
-        <span class="sidebar-label">
-          Settings
-        </span>
-      </a>
-
-      <!-- LOGOUT -->
-      <a onclick="logout()">
-        <span class="material-symbols-outlined sidebar-icon">
-          logout
-        </span>
-
-        <span class="sidebar-label">
-	        LOGOUT
-        </span>
-      </a>
-
-    </nav>
-
-
-    <!-- FOOTER -->
-    <div class="mt-auto p-2 pb-2">
-      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-white/10">
-
-        <span class=" shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class=" w-2 h-2 rounded-md bg-primary animate-pulse"></span>
-        </span>
-
-        <div class=" whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <p class="text-[10px] text-muted ">
-            SYSTEM STATUS
-          </p>
-
-          <span class="sidebar-label">
-            SERVER ACTIVE
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</aside>
-
-<!-- Sidebar Kanan: Billing Control -->
-<aside
-  id="billingSidebar"
-  class=" fixed right-0 top-6 bottom-0 pointer-events-none w-0 bg-background translate-x-[120%] opacity-0 border border-white/10 flex flex-col pt-24 pb-8 px-6 z-40 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ">
-<div class="flex items-center justify-between mb-8">
-<div>
-<h2 class="font-headline text-2xl font-bold">Card Table</h2>
-<p id="billing-table-info" class="text-primary-container text-sm font-semibold">
-  No Table Selected
-</p>
-</div>
-<div class="bg-background-high p-3 rounded-2xl">
-<span class="material-symbols-outlined text-primary-container">Table</span>
-</div>
-</div>
-  <!-- Billing Mode -->
-  <div id="billingActions" class="flex flex-col flex-1 min-h-0">
-
-    <!-- Tabel Cart -->
-    <div
-      id="table-cart-items"
-      class="flex-1 min-h-0 overflow-y-auto custom-scrollbar space-y-4 pr-2">
-    </div>
-
-    <!-- Summary -->
-    <div
-      id="table-cart-summary"
-      class="pt-6 mt-6 border-t border-outline-variant/10 space-y-6">
-    </div>
-
-    <div class="space-y-3 mt-6">
-
-      <button
-        onclick="openReserveModalFromSidebar()"
-        class="w-full py-4 rounded-md bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold">
-
-        Reserve
-
-      </button>
-
-      <button
-        onclick="clearSelectedTable()"
-        class="w-full py-2 rounded-md bg-red-500/10 border border-red-500/20 text-red-400">
-
-        Clear Table
-
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- Reserve Form -->
-  <div id="reserveForm" class="hidden flex flex-col flex-1">
-
-    <h3 class="text-lg font-bold mb-4">
-      Reserve Table
-    </h3>
-
-    <input
-      id="reserveName"
-      type="text"
-      placeholder="Nama Reservasi"
-      class="mb-3 p-3 rounded-md bg-background border border-white/10">
-
-    <textarea
-      id="reserveNote"
-      placeholder="Catatan"
-      class="mb-4 p-3 rounded-md bg-background border border-white/10"></textarea>
-
-    <div class="mt-auto space-y-3">
-
-      <button
-        onclick="saveReserve()"
-        class="w-full py-3 rounded-md bg-gradient-to-r from-primary to-primary-container text-on-primary font-bold">
-
-        Save
-
-      </button>
-
-      <button
-        onclick="cancelReserve()"
-        class="w-full py-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400">
-
-        Cancel
-
-      </button>
-
-    </div>
-
-  </div>
-
-</aside>
+	      <button onclick="clearSelectedTable()"
+	        class="w-full py-2 rounded-md bg-red-500/10 border border-red-500/20 text-red-400">
+	        Clear Table
+	      </button>
+	    </div>
+	  </div>
+	
+	  <!-- Reserve Form -->
+	  <div id="reserveForm" class="hidden flex flex-col flex-1">
+	    <h3 class="text-lg font-bold mb-4">
+	      Reserve Table
+	    </h3>
+	
+	    <input id="reserveName"
+	      type="text"
+	      placeholder="Nama Reservasi"
+	      class="mb-3 p-3 rounded-md bg-background border border-white/10">
+	
+	    <textarea id="reserveNote"
+	      placeholder="Catatan"
+	      class="mb-4 p-3 rounded-md bg-background border border-white/10"></textarea>
+	
+	    <div class="mt-auto space-y-3">
+	      <button onclick="saveReserve()" class="w-full py-3 bottom-theme text-foreground font-headline tracking-[0.15em] transition-all uppercase font-bold">
+	       	 Save
+	      </button>
+		
+	      <button onclick="cancelReserve()" class="w-full py-3 rounded-md bg-red-500/10 border border-red-500/20 text-red-400 font-headline tracking-[0.15em] transition-all uppercase">
+	        Cancel
+	      </button>
+	    </div>
+	  </div>
+	</aside>
 
  <div id="mainContent" class="flex-1 flex flex-col h-screen">	
 <!-- Top Navigation Bar -->
 <header class="h-20 flex-shrink-0 z-40 bg-background border-b border-white/10 flex justify-between items-center flex items-center pl-4 pr-4">
-  
 	<div class="flex items-center gap-3 flex-1">
 		<!-- LOGO -->
 		<div class="w-11 h-11 flex items-center justify-center">
@@ -3310,136 +2956,105 @@
 			TABLE
 		</p>
 	</div>
-<div class="flex items-center gap-4 border-r border-outline-variant/20 ">
-  <button 
-    class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
-    onclick="navigate('settingsPage')"
-  >
-    <span class="material-symbols-outlined">settings</span>
-  </button>
-
-  <!-- TAMBAH INI -->
-  <button
-    onclick="toggleBillingSidebar('table')"
-    class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
-  >
-    <span class="material-symbols-outlined">dock_to_right</span>
-  </button>
-
-</div>
-
+	
+	<div class="flex items-center gap-4 border-r border-outline-variant/20 ">
+	  <button  class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
+	    onclick="navigate('settingsPage')" >
+	    <span class="material-symbols-outlined">settings</span>
+	  </button>
+	
+	  <!-- TAMBAH INI -->
+	  <button onclick="toggleBillingSidebar('table')"
+	    class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+	    <span class="material-symbols-outlined">dock_to_right</span>
+	  </button>	
+	</div>
 </header>
 
 <!-- Main Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-<!-- Header / Floor Status -->
-<header class="mb-4 flex flex-col md:flex-row md:items-end gap-6 p-4 border border-white/10">
-  <div class="flex flex-wrap items-center gap-4">
+	<!-- Header / Floor Status -->
+	<header class="mb-4 flex flex-col md:flex-row md:items-end gap-6 p-4 border border-white/10">
+	  <div class="flex flex-wrap items-center gap-4">
+	    <!-- AVAILABLE -->
+	    <div class="px-4 py-2 rounded-md flex items-center gap-3">
+	      <span class="w-2 h-2 rounded-md bg-emerald-500"></span>
+	      <span class="text-xs font-semibold">
+	        <span id="availableCount" class="text-emerald-500 text-lg">0</span>
+	        Available
+	      </span>
+	    </div>
 
-    <!-- AVAILABLE -->
-    <div class="px-4 py-2 rounded-md flex items-center gap-3">
-      <span class="w-2 h-2 rounded-md bg-emerald-500"></span>
-      <span class="text-xs font-semibold">
-        <span id="availableCount" class="text-emerald-500 text-lg">0</span>
-        Available
-      </span>
-    </div>
+	    <!-- OCCUPIED -->
+	    <div class="px-4 py-2 rounded-md flex items-center gap-3">
+	      <span class="w-2 h-2 rounded-md bg-primary-container"></span>
+	      <span class="text-xs font-semibold">
+	        <span id="occupiedCount" class="text-primary-container text-lg">0</span>
+	        Occupied
+	      </span>
+	    </div>
 
-    <!-- OCCUPIED -->
-    <div class="px-4 py-2 rounded-md flex items-center gap-3">
-      <span class="w-2 h-2 rounded-md bg-primary-container"></span>
-      <span class="text-xs font-semibold">
-        <span id="occupiedCount" class="text-primary-container text-lg">0</span>
-        Occupied
-      </span>
-    </div>
-
-    <!-- RESERVED -->
-    <div class="px-4 py-2 rounded-md flex items-center gap-3">
-      <span class="w-2 h-2 rounded-md bg-white"></span>
-      <span class="text-xs font-semibold">
-        <span id="reservedCount" class="text-white text-lg">0</span>
-        Reserved
-      </span>
-    </div>
-
-     <!-- ADD TABLE -->
-    <button
-      onclick="openAddTableModal()"
-      class="h-11 px-5 rounded-md bg-background border border-white/10 text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-primary/20 transition-all uppercase">
-
-      <span class="material-symbols-outlined text-xl">
-        add
-      </span>
-
-      Add New Table
-
-    </button>
-
-  </div>
-
-</header>
-
-
+	    <!-- RESERVED -->
+	    <div class="px-4 py-2 rounded-md flex items-center gap-3">
+	      <span class="w-2 h-2 rounded-md bg-white"></span>
+	      <span class="text-xs font-semibold">
+	        <span id="reservedCount" class="text-white text-lg">0</span>
+	        Reserved
+	      </span>
+	    </div>
+	     <!-- ADD TABLE -->
+	    <button onclick="openAddTableModal()"
+	      class="h-11 px-5 bottom-theme text-foreground font-semibold text-sm flex items-center justify-center gap-2 tracking-[0.15em] transition-all uppercase">
+	      <span class="material-symbols-outlined text-xl">
+	        add
+	      </span>
+	      Add New Table
+	    </button>
+	  </div>
+	</header>
 <!-- Table Grid (Bento Style Layout) -->
-<div id="table-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-  
-</div>
-
-
+	<div id="table-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> </div>
 </main>
-
+	 
 <div id="reserve-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
-
   <div class="bg-[#0b1326] p-6 rounded-2xl w-80 space-y-4">
-
     <h3 class="text-lg font-bold">Reserve Table</h3>
+	    <input id="reserve-name" placeholder="Guest Name"
+	      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
+		    <input id="reserve-pax" placeholder="Pax"
+		      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
+			    <input id="reserve-time" type="time"
+			      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
 
-    <input id="reserve-name" placeholder="Guest Name"
-      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
+					<div class="flex gap-2 pt-2">
+						<button onclick="submitReserve()"
+							class="flex-1 py-3bottom-theme font-bold">
+							Save
+						</button>
 
-    <input id="reserve-pax" placeholder="Pax"
-      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
-
-    <input id="reserve-time" type="time"
-      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
-
-    <div class="flex gap-2 pt-2">
-      <button onclick="submitReserve()"
-        class="flex-1 py-3 bg-primary rounded-md text-white font-bold">
-        Save
-      </button>
-
-      <button onclick="closeReserveModal()"
-        class="flex-1 py-3 bg-background-high rounded-md">
-        Cancel
-      </button>
-    </div>
-
-  </div>
-</div>
-</div>
+						<button onclick="closeReserveModal()"
+							class="flex-1 py-3 bg-background-high rounded-md">
+							Cancel
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
 </template>
 
 
 <!-- ADD TABLE MODAL -->
 
 <template id="addTableModalTemplate">
-
 <div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background backdrop-blur-md">
-
   <!-- Overlay -->
   <div class="absolute inset-0" onclick="closeAddTableModal()"></div>
-
   <!-- Modal -->
   <div onclick="event.stopPropagation()"
     class="relative w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
-
     <!-- HEADER -->
     <div class="p-6 border-b border-white/10 flex items-center justify-between">
-
       <div class="flex items-center gap-4">
-
         <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
           <span class="material-symbols-outlined text-primary text-2xl">
             table_restaurant
@@ -3447,7 +3062,6 @@
         </div>
 
         <div>
-
           <h2 class="text-xl font-headline font-bold text-on-surface">
             Add New Table
           </h2>
@@ -3455,40 +3069,31 @@
           <p class="text-xs text-on-surface-variant mt-1">
             Tambahkan meja baru ke sistem.
           </p>
-
         </div>
-
       </div>
 
-      <button
-        onclick="closeAddTableModal()"
+      <button onclick="closeAddTableModal()"
         class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
-
         <span class="material-symbols-outlined">
           close
         </span>
-
       </button>
-
     </div>
 
     <!-- BODY -->
     <div class="p-6">
-
       <label class="block text-xs lg:text-sm text-on-surface-variant mb-2">
         Table Name
       </label>
 
-      <input
-        id="newTableName"
+      <input id="newTableName"
         type="text"
         placeholder="Contoh : 15"
         class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 text-on-surface placeholder:text-on-surface-variant outline-none focus:border-primary transition">
 
-    <p class="mt-3 text-xs text-on-surface-variant leading-6">
-      Masukkan nomor meja, kemudian klik <strong>Add Table</strong>. Meja baru akan otomatis muncul pada halaman <strong>Table</strong>.
-    </p>
-
+		    <p class="mt-3 text-xs text-on-surface-variant leading-6">
+		      Masukkan nomor meja, kemudian klik <strong>Add Table</strong>. Meja baru akan otomatis muncul pada halaman <strong>Table</strong>.
+		    </p>
     </div>
 
     <!-- FOOTER -->
