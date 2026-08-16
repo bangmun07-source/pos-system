@@ -17598,20 +17598,26 @@ function resetPOSMember() {
   }
 }
 
-function selectMember(member) {
-  document.getElementById("memberSearch").value = member.nama;
-  document.getElementById("member-id").value = member.id;
-
+async function selectMember(member) {
+  document.getElementById("memberSearch").value =
+    member.nama;
+  document.getElementById("member-id").value =
+    member.id;
   state.selectedMember = member;
   state.currentMember = member.id;
- 	state.currentMemberData = member;
-  document.getElementById("memberResult").style.display = "none";
-
-  // INI WAJIB (BIAR DISKON LANGSUNG UPDATE)
-  const subtotal = state.cart.reduce(
-    (sum, item) => sum + (item.price * item.qty),
-    0
+  state.currentMemberData =
+    await checkMemberRPC(member.id);
+  console.log(
+    "FULL MEMBER DATA:",
+    state.currentMemberData
   );
+  document.getElementById("memberResult").style.display = "none";
+  const subtotal =
+    state.cart.reduce(
+      (sum, item) =>
+        sum + (item.price * item.qty),
+      0
+    );
   updateSummary(subtotal);
 }
 
