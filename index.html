@@ -26580,7 +26580,10 @@ function reloadCurrentPage() {
 function applySettingsPage(data) {
   // update state/cache
   state.settings = data.settings || {};
-  state.businessProfile = data.businessProfile || {};
+ if (data.businessProfile) {
+	  state.businessProfile =
+	    data.businessProfile;
+	}
   // update branch
   window.branchData = data.branches || [];
   allBranches = data.branches || [];
@@ -26618,9 +26621,7 @@ async function loadSettingsPage() {
       state.settingsPageData
     );
 
-    // BUSINESS PROFILE
     initBusinessProfile();
-    await loadBusinessProfile();
 
     return;
   }
@@ -27773,51 +27774,42 @@ function applyBusinessProfile(data){
 
 async function loadBusinessProfile() {
 
-  if (state.businessProfile) {
-    setTimeout(() => {
-      applyBusinessProfile(
-        state.businessProfile
-      );
-
-    }, 50);
-    return;
-  }
-
   try {
-	
-    // SUPABASE RPC
+
     const data =
       await getBusinessProfileRPC();
+
     console.log(
       "BUSINESS PROFILE:",
       data
     );
 
-    // CACHE / STATE
     state.businessProfile =
-	  data || {
-		company_name: "",
-		instagram: "",
-		receipt_footer: "",
-		logo_url: ""
-	  };
+      data || {
+        company_name: "",
+        instagram: "",
+        receipt_footer: "",
+        logo_url: ""
+      };
 
-    // APPLY UI
     applyBusinessProfile(
       state.businessProfile
     );
-  }
 
+  }
   catch (err) {
+
     console.error(
       "Business Profile Error:",
       err
     );
+
     showToast(
       err?.message ||
       "Gagal memuat Business Profile",
       "error"
     );
+
   }
 }
 
