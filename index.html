@@ -17280,42 +17280,67 @@ function calculateTotal() {
     state.currentMember !== "";
 
   // ==========================================
-  // DISCOUNT PER ITEM
+  // GLOBAL DISCOUNT
+  // ==========================================
+
+  const globalDiscountRate =
+    Number(
+      state.settings?.discount || 0
+    );
+
+  const globalDiscountAmount =
+    subtotal *
+    globalDiscountRate /
+    100;
+
+  // ==========================================
+  // CATEGORY DISCOUNT PER ITEM
   // ==========================================
 
   let categoryDiscountAmount = 0;
 
   state.cart.forEach(item => {
-	  
+
     // Produk redeem tidak mendapatkan discount
     if (item.isRedeem) return;
+
     const product =
       state.products.find(
         p =>
           String(p.ID_Produk) ===
           String(item.id)
       );
+
     if (!product) return;
+
     const categoryName =
       product.Kategori ||
       product.Category ||
       item.category ||
       "";
+
     const categoryDiscount =
       getCategoryDiscount(categoryName);
+
     const itemSubtotal =
       Number(item.price || 0) *
       Number(item.qty || 0);
+
     categoryDiscountAmount +=
       itemSubtotal *
       categoryDiscount /
       100;
   });
 
+  // ==========================================
   // MEMBER DISCOUNT
+  // ==========================================
+
   const memberDiscountRate =
     isMember
-      ? Number(state.settings?.discount || 0)
+      ? Number(
+          state.loyaltySettings?.member_discount || 0
+        )
       : 0;
 
   const memberDiscountAmount =
@@ -17323,59 +17348,104 @@ function calculateTotal() {
     memberDiscountRate /
     100;
 
+  // ==========================================
   // PILIH DISCOUNT TERBESAR
-	const discount =
-	  Math.max(
-	    memberDiscountAmount,
-	    categoryDiscountAmount
-	  );
-	
-	// RATE YANG DITAMPILKAN DI SUMMARY
-	let displayDiscountRate = 0;
-	
-	if (
-	  memberDiscountAmount >= categoryDiscountAmount &&
-	  memberDiscountAmount > 0
-	) {
-	  displayDiscountRate =
-	    memberDiscountRate;
-	}
+  // ==========================================
 
+  const discount =
+    Math.max(
+      globalDiscountAmount,
+      memberDiscountAmount,
+      categoryDiscountAmount
+    );
+
+  // ==========================================
+  // RATE UNTUK SUMMARY
+  // ==========================================
+
+  let displayDiscountRate = 0;
+
+  if (
+    discount === globalDiscountAmount &&
+    globalDiscountAmount > 0
+  ) {
+    displayDiscountRate =
+      globalDiscountRate;
+  }
+
+  if (
+    discount === memberDiscountAmount &&
+    memberDiscountAmount > 0
+  ) {
+    displayDiscountRate =
+      memberDiscountRate;
+  }
+
+  // Category discount adalah nominal per-item,
+  // jadi jangan tampilkan persentase gabungan
+  // di summary.
+
+  // ==========================================
   // DEBUG
+  // ==========================================
+
   console.log(
     "DISCOUNT:",
     {
       isMember,
+
+      globalDiscountRate,
+      globalDiscountAmount,
+
       memberDiscountRate,
       memberDiscountAmount,
+
       categoryDiscountAmount,
-      finalDiscount: discount
+
+      finalDiscount:
+        discount,
+
+      finalDiscountRate:
+        displayDiscountRate
     }
   );
 
+  // ==========================================
   // CALCULATE
+  // ==========================================
+
   const base =
     subtotal - discount;
+
   const tax =
     base *
-    Number(state.settings?.tax || 0) /
+    Number(
+      state.settings?.tax || 0
+    ) /
     100;
+
   const service =
     base *
-    Number(state.settings?.service || 0) /
+    Number(
+      state.settings?.service || 0
+    ) /
     100;
+
   const total =
-    base + tax + service;
+    base +
+    tax +
+    service;
+
   return {
     subtotal,
     discount,
-	discountRate: displayDiscountRate,
+    discountRate:
+      displayDiscountRate,
     tax,
     service,
     total
   };
 }
-
 
 function clearCart() {
   state.cart = [];
