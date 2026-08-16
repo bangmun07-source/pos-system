@@ -17353,6 +17353,49 @@ function calculateTotal() {
     memberDiscountRate /
     100;
 
+
+	// ==========================================
+	// BIRTHDAY DISCOUNT
+	// ==========================================
+	
+	const birthdayDiscountRate =
+		isMember
+			? Number(
+					state.loyaltySettings?.birthday_discount || 0
+				)
+			: 0;
+	
+	let birthdayDiscountAmount = 0;
+	
+	
+	if (
+		isMember &&
+		state.currentMemberData?.tgl_lahir
+	) {
+	
+		const today =
+			new Date();
+	
+		const birth =
+			new Date(
+				state.currentMemberData.tgl_lahir
+			);
+	
+	
+		if (
+			today.getMonth() === birth.getMonth() &&
+			today.getDate() === birth.getDate()
+		) {
+	
+			birthdayDiscountAmount =
+				subtotal *
+				birthdayDiscountRate /
+				100;
+	
+		}
+	}
+
+
   // ==========================================
   // PILIH DISCOUNT TERBESAR
   // ==========================================
@@ -17366,47 +17409,6 @@ function calculateTotal() {
 			
     );
 
-		// ==========================================
-		// BIRTHDAY DISCOUNT
-		// ==========================================
-		
-		const birthdayDiscountRate =
-		  isMember
-		    ? Number(
-		        state.loyaltySettings?.birthday_discount || 0
-		      )
-		    : 0;
-		
-		let birthdayDiscountAmount = 0;
-		
-		
-		if (
-		  isMember &&
-		  state.currentMemberData?.tgl_lahir
-		) {
-		
-		  const today =
-		    new Date();
-		
-		  const birth =
-		    new Date(
-		      state.currentMemberData.tgl_lahir
-		    );
-		
-		
-		  if (
-		    today.getMonth() === birth.getMonth() &&
-		    today.getDate() === birth.getDate()
-		  ) {
-		
-		    birthdayDiscountAmount =
-		      subtotal *
-		      birthdayDiscountRate /
-		      100;
-		
-		  }
-		}
-	
   // ==========================================
   // RATE UNTUK SUMMARY
   // ==========================================
@@ -17422,12 +17424,20 @@ function calculateTotal() {
   }
 
   if (
-    discount === memberDiscountAmount &&
-    memberDiscountAmount > 0
-  ) {
-    displayDiscountRate =
-      memberDiscountRate;
-  }
+	  discount === memberDiscountAmount &&
+	  memberDiscountAmount > 0
+	) {
+	  displayDiscountRate =
+	    memberDiscountRate;
+	}
+	
+	if (
+	  discount === birthdayDiscountAmount &&
+	  birthdayDiscountAmount > 0
+	) {
+	  displayDiscountRate =
+	    birthdayDiscountRate;
+	}
 
   // Category discount adalah nominal per-item,
   // jadi jangan tampilkan persentase gabungan
