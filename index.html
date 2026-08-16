@@ -27804,24 +27804,97 @@ async function loadBusinessProfile() {
     );
   }
 }
+	
+function initBusinessLogoPreview() {
 
-function initBusinessLogoPreview(){
-  const input = document.getElementById("businessLogoInput");
-  const preview = document.getElementById("businessLogoPreview");
+  const input =
+    document.getElementById(
+      "businessLogoInput"
+    );
+
+  const preview =
+    document.getElementById(
+      "businessLogoPreview"
+    );
+
   if (!input || !preview) return;
-  input.onchange = function(e){
-    const file = e.target.files[0];
+  input.onchange = function (e) {
+    const file =
+      e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      preview.src = ev.target.result;
-    };
+    const reader =
+      new FileReader();
+    reader.onload =
+      function (ev) {
+        preview.src =
+          ev.target.result;
+      };
     reader.readAsDataURL(file);
   };
 }
 
-async function saveBusinessProfile() {
 
+async function uploadBusinessLogo(base64) {
+
+  if (!base64) {
+    return null;
+  }
+
+  const response =
+    await fetch(
+      "/api/handle-business-logo-upload",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+        body: JSON.stringify({
+          base64
+        })
+      }
+    );
+
+  const result =
+    await response.json();
+  console.log(
+    "BUSINESS LOGO UPLOAD RESULT:",
+    result
+  );
+
+  if (
+    !response.ok ||
+    !result.success
+  ) {
+    throw new Error(
+      result.error ||
+      "Gagal upload business logo"
+    );
+  }
+  return result.logo_url;
+}
+
+function fileToBase64(file) {
+  return new Promise(
+    (resolve, reject) => {
+      const reader =
+        new FileReader();
+      reader.onload =
+        () => resolve(
+          reader.result
+        );
+      reader.onerror =
+        () => reject(
+          new Error(
+            "Gagal membaca file logo"
+          )
+        );
+      reader.readAsDataURL(file);
+    }
+  );
+}
+
+async function saveBusinessProfile() {
   const companyName =
     document.getElementById(
       "businessCompanyName"
@@ -27838,88 +27911,119 @@ async function saveBusinessProfile() {
     document.getElementById(
       "businessLogoPreview"
     );
+  const logoInput =
+    document.getElementById(
+      "businessLogoInput"
+    );
 
+  // VALIDATE ELEMENT
   if (
     !companyName ||
     !instagram ||
     !receiptFooter ||
     !logoPreview
   ) {
+    console.error(
+      "Business Profile element tidak ditemukan"
+    );
     return;
   }
 
+  // DATA AWAL
   const data = {
     company_name:
-      companyName.value,
+      companyName.value.trim(),
     instagram:
-      instagram.value,
+      instagram.value.trim(),
     receipt_footer:
-      receiptFooter.value,
+      receiptFooter.value.trim(),
     logo_url:
       logoPreview.src || ""
   };
-  const logoInput =
-    document.getElementById(
-      "businessLogoInput"
+
+  try {
+
+    // CEK LOGO BARU
+    const file =
+      logoInput?.files?.[0];
+
+    if (file) {
+      console.log(
+        "UPLOAD BUSINESS LOGO:",
+        file.name,
+        file.type,
+        file.size
+      );
+
+      // FILE → BASE64
+      const base64 =
+        await fileToBase64(
+          file
+        );
+
+      // UPLOAD KE API
+      const logoUrl =
+        await uploadBusinessLogo(
+          base64
+        );
+
+      if (!logoUrl) {
+        throw new Error(
+          "URL logo tidak diterima dari API"
+        );
+      }
+
+      // UPDATE DATA
+      data.logo_url =
+        logoUrl;
+
+      console.log(
+        "BUSINESS LOGO URL:",
+        logoUrl
+      );
+    }
+
+    // SAVE PROFILE VIA RPC
+    const result =
+      await saveBusinessProfileRPC(
+        data
+      );
+
+    console.log(
+      "SAVE BUSINESS PROFILE RESULT:",
+      result
     );
-  const file =
-    logoInput?.files?.[0];
 
+    // CHECK RPC RESULT
+    if (
+      result &&
+      result.success === false
+    ) {
 
-  // AFTER SAVE
-  function afterSave() {
+      throw new Error(
+        result.message ||
+        "Gagal menyimpan profile"
+      );
+
+    }
+
+    // CLEAR STATE
     state.businessProfile =
       null;
+
+    // SUCCESS
     showToast(
       "Business Profile berhasil disimpan",
       "success"
     );
-    setTimeout(() => {
-      loadBusinessProfile();
-    }, 100);
-  }
 
-  try {
-
-    // ADA LOGO BARU
-    if (file) {
-      const reader =
-        new FileReader();
-      reader.onload =
-        async function (e) {
-	
-          try {
-            const base64 =
-              e.target.result;
-            // Upload logo ke Supabase Storage
-            const logoUrl =
-              await uploadBusinessLogo(
-                base64
-              );
-            data.logo_url =
-              logoUrl;
-            // Simpan profile
-            await saveProfile();
-          }
-          catch (err) {
-            console.error(
-              "Upload Business Logo:",
-              err
-            );
-            showToast(
-              err?.message ||
-              "Gagal upload logo",
-              "error"
-            );
-          }
-        };
-      reader.readAsDataURL(file);
-    }
-
-    // TIDAK ADA LOGO BARU
-    else {
-      await saveProfile();
-    }
+    // RELOAD PROFILE
+    setTimeout(
+      () => {
+        loadBusinessProfile();
+      },
+      100
+    );
   }
   catch (err) {
     console.error(
@@ -27932,33 +28036,9 @@ async function saveBusinessProfile() {
       "error"
     );
   }
-
-  // SAVE PROFILE VIA RPC
-  async function saveProfile() {
-    const result =
-      await saveBusinessProfileRPC(
-        data
-      );
-    console.log(
-      "SAVE BUSINESS PROFILE RESULT:",
-      result
-    );
-
-    if (
-      result &&
-      result.success === false
-    ) {
-      throw new Error(
-        result.message ||
-        "Gagal menyimpan profile"
-      );
-    }
-    afterSave();
-  }
 }
 	
 async function loadBranchName() {
-
   // LOAD FROM STATE
   if (state.branchInfo) {
     const el =
@@ -27975,7 +28055,6 @@ async function loadBranchName() {
     }
     return;
   }
-
   // VALIDATE BRANCH
   if (!state.branchId) {
     const el =
@@ -27990,7 +28069,6 @@ async function loadBranchName() {
   }
 
   try {
-
     // SUPABASE RPC
     const data =
       await getBranchInfoRPC(
