@@ -6730,6 +6730,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 		        <div class="flex justify-end pt-4">
 		          <button
 		            id="btnSaveBusinessProfile"
+					onclick="saveBusinessProfile()"
 		            class="px-6 py-3 flex items-center gap-2 px-4 py-2 rounded-md bg-primary/10 border border-primary/10 text-primary font-semibold text-xs hover:text-on-surface transition-colors">
 		            Save Profile
 		          </button>
@@ -26607,11 +26608,19 @@ function applySettingsPage(data) {
 
 async function loadSettingsPage() {
 
+  // =========================
+  // CACHE
+  // =========================
+
   if (state.settingsPageData) {
 
     applySettingsPage(
       state.settingsPageData
     );
+
+    // BUSINESS PROFILE
+    initBusinessProfile();
+    await loadBusinessProfile();
 
     return;
   }
@@ -26657,6 +26666,14 @@ async function loadSettingsPage() {
       state.settingsPageData
     );
 
+    // =========================
+    // BUSINESS PROFILE
+    // =========================
+
+    initBusinessProfile();
+
+    await loadBusinessProfile();
+
   }
   catch (err) {
 
@@ -26672,7 +26689,7 @@ async function loadSettingsPage() {
     );
   }
 }
-
+	
 async function reloadSettingsPage() {
 
   traceCall(
@@ -27778,13 +27795,12 @@ async function loadBusinessProfile() {
 
     // CACHE / STATE
     state.businessProfile =
-      data || {
-        businessName: "",
-        phone: "",
-        email: "",
-        address: "",
-        logo: ""
-      };
+	  data || {
+		company_name: "",
+		instagram: "",
+		receipt_footer: "",
+		logo_url: ""
+	  };
 
     // APPLY UI
     applyBusinessProfile(
@@ -27803,6 +27819,36 @@ async function loadBusinessProfile() {
       "error"
     );
   }
+}
+
+function initBusinessProfile() {
+
+  console.log(
+    "🔥 INIT BUSINESS PROFILE"
+  );
+
+  const saveButton =
+    document.getElementById(
+      "btnSaveBusinessProfile"
+    );
+
+  console.log(
+    "SAVE BUTTON:",
+    saveButton
+  );
+
+  if (!saveButton) {
+    console.warn(
+      "btnSaveBusinessProfile tidak ditemukan"
+    );
+    return;
+  }
+
+  saveButton.onclick =
+    saveBusinessProfile;
+
+  initBusinessLogoPreview();
+
 }
 	
 function initBusinessLogoPreview() {
