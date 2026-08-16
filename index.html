@@ -10303,375 +10303,438 @@ Save
 				</div>
 				
       <!-- MEMBER BENEFITS -->
-<div class="col-span-12 lg:col-span-6">
-  <div class="bg-background border border-white/10 p-4 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
-    <h3 class="font-manrope text-lg font-bold flex items-center gap-2 mb-6">
-      <span class="material-symbols-outlined text-primary">
-        loyalty
-      </span>
-      Member Benefits
-    </h3>
-
-    <div class="grid grid-cols-1 gap-4">
-      <!-- MEMBER DISCOUNT -->
-      <div class="bg-white/5 border border-white/10 rounded-md p-4">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-primary">
-              percent
-            </span>
-          </div>
-
-          <div>
-            <h4 class="font-manrope font-bold text-sm">
-              Member Discount
-            </h4>
-
-            <p class="text-xs text-on-surface-variant">
-              Discount khusus untuk member.
-            </p>
-          </div>
-        </div>
-
-        <div class="relative">
-          <input
-            id="memberDiscountInput"
-            class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-            type="number"
-            min="0"
-            max="100"
-            value="0"
-          />
-
-          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-            %
-          </span>
-        </div>
-      </div>
-
-
-      <!-- BIRTHDAY DISCOUNT -->
-      <div class="bg-white/5 border border-white/10 rounded-md p-4">
-        <div class="flex items-center gap-3 mb-4">
-          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
-            <span class="material-symbols-outlined text-primary">
-              cake
-            </span>
-          </div>
-
-          <div>
-            <h4 class="font-manrope font-bold text-sm">
-              Birthday Discount
-            </h4>
-
-            <p class="text-xs text-on-surface-variant">
-              Discount khusus saat ulang tahun member.
-            </p>
-          </div>
-        </div>
-
-        <div class="relative">
-          <input
-            id="birthdayDiscountInput"
-            class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-            type="number"
-            min="0"
-            max="100"
-            value="0"
-          />
-
-          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-            %
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Product Categories -->
-<div class="col-span-12">
-  <div class="bg-background border border-white/10 p-4 rounded-md h-full shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-    <!-- HEADER -->
-    <div class="flex justify-between items-center mb-8">
-      <h3 class="font-manrope text-lg font-bold flex items-center gap-2">
-        <span
-          class="material-symbols-outlined text-primary"
-          data-icon="category"
-          style="font-variation-settings: 'FILL' 1;"
-        >
-          category
-        </span>
-        Product Categories
-      </h3>
-
-      <span class="text-[10px] font-inter tracking-widest text-on-surface-variant uppercase bg-background border border-white/10 px-3 py-1 rounded-md">
-        Category Discount & Reward
-      </span>
-    </div>
-
-
-    <div class="space-y-3">
+		<div class="col-span-12 lg:col-span-6">
+		  <div class="bg-background border border-white/10 p-4 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
+		    <h3 class="font-manrope text-lg font-bold flex items-center gap-2 mb-6">
+		      <span class="material-symbols-outlined text-primary">
+		        loyalty
+		      </span>
+		      Member Benefits
+		    </h3>
 		
-      <!-- CATEGORY 1 -->
-      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
-        <div class="col-span-3 flex items-center gap-3">
-          <div class="h-2 w-2 rounded-md bg-background"></div>
-          <input
-            id="category_1_name"
-            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-            type="text"
-            placeholder="Category 1"
-          />
-        </div>
-
-        <div class="col-span-5">
-          <div class="relative">
-            <input
-              id="category_1_discount"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              max="100"
-              value="0"
-            />
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              %
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2">
-          <div class="relative">
-            <input
-              id="category_1_reward"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              value="0"
-            />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              PTS
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2 text-right">
-          <span class="material-symbols-outlined text-sm">
-            edit
-          </span>
-        </div>
-      </div>
-
-
-      <!-- CATEGORY 2 -->
-      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
-        <div class="col-span-3 flex items-center gap-3">
-          <div class="h-2 w-2 rounded-md bg-background"></div>
-          <input
-            id="category_2_name"
-            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-            type="text"
-            placeholder="Category 2"
-          />
-        </div>
-		  
-        <div class="col-span-5">
-          <div class="relative">
-            <input
-              id="category_2_discount"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              max="100"
-              value="0"
-            />
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              %
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2">
-          <div class="relative">
-            <input
-              id="category_2_reward"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              value="0"
-            />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              PTS
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2 text-right">
-          <span class="material-symbols-outlined text-sm">
-            edit
-          </span>
-        </div>
-      </div>
-
-      <!-- CATEGORY 3 -->
-      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
-        <div class="col-span-3 flex items-center gap-3">
-          <div class="h-2 w-2 rounded-md bg-background"></div>
-          <input
-            id="category_3_name"
-            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-            type="text"
-            placeholder="Category 3"
-          />
-        </div>
-		  
-        <div class="col-span-5">
-          <div class="relative">
-            <input
-              id="category_3_discount"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              max="100"
-              value="0"
-            />
-
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              %
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2">
-          <div class="relative">
-            <input
-              id="category_3_reward"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              value="0"
-            />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              PTS
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2 text-right">
-          <span class="material-symbols-outlined text-sm">
-            edit
-          </span>
-        </div>
-      </div>
-
-      <!-- CATEGORY 4 -->
-      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
-        <div class="col-span-3 flex items-center gap-3">
-          <div class="h-2 w-2 rounded-md bg-background"></div>
-          <input
-            id="category_4_name"
-            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-            type="text"
-            placeholder="Category 4"
-          />
-        </div>
-
-        <div class="col-span-5">
-          <div class="relative">
-            <input
-              id="category_4_discount"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              max="100"
-              value="0"
-            />
-
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              %
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2">
-          <div class="relative">
-            <input
-              id="category_4_reward"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              value="0"
-            />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              PTS
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2 text-right">
-          <span class="material-symbols-outlined text-sm">
-            edit
-          </span>
-        </div>
-      </div>
-
-      <!-- CATEGORY 5 -->
-      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
-        <div class="col-span-3 flex items-center gap-3">
-          <div class="h-2 w-2 rounded-md bg-background"></div>
-          <input
-            id="category_5_name"
-            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-            type="text"
-            placeholder="Category 5"
-          />
-        </div>
-
-        <div class="col-span-5">
-          <div class="relative">
-            <input
-              id="category_5_discount"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              max="100"
-              value="0"
-            />
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              %
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2">
-          <div class="relative">
-            <input
-              id="category_5_reward"
-              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
-              type="number"
-              min="0"
-              value="0"
-            />
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
-              PTS
-            </span>
-          </div>
-        </div>
-
-        <div class="col-span-2 text-right">
-          <span class="material-symbols-outlined text-sm">
-            edit
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
+		    <div class="grid grid-cols-1 gap-4">
+		      <!-- MEMBER DISCOUNT -->
+		      <div class="bg-white/5 border border-white/10 rounded-md p-4">
+		        <div class="flex items-center gap-3 mb-4">
+		          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+		            <span class="material-symbols-outlined text-primary">
+		              percent
+		            </span>
+		          </div>
 		
+		          <div>
+		            <h4 class="font-manrope font-bold text-sm">
+		              Member Discount
+		            </h4>
+		
+		            <p class="text-xs text-on-surface-variant">
+		              Discount khusus untuk member.
+		            </p>
+		          </div>
+		        </div>
+		
+		        <div class="relative">
+		          <input
+		            id="memberDiscountInput"
+		            class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		            type="number"
+		            min="0"
+		            max="100"
+		            value="0"
+		          />
+		
+		          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		            %
+		          </span>
+		        </div>
+		      </div>
+		
+		
+		      <!-- BIRTHDAY DISCOUNT -->
+		      <div class="bg-white/5 border border-white/10 rounded-md p-4">
+		        <div class="flex items-center gap-3 mb-4">
+		          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+		            <span class="material-symbols-outlined text-primary">
+		              cake
+		            </span>
+		          </div>
+		
+		          <div>
+		            <h4 class="font-manrope font-bold text-sm">
+		              Birthday Discount
+		            </h4>
+		
+		            <p class="text-xs text-on-surface-variant">
+		              Discount khusus saat ulang tahun member.
+		            </p>
+		          </div>
+		        </div>
+		
+		        <div class="relative">
+		          <input
+		            id="birthdayDiscountInput"
+		            class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		            type="number"
+		            min="0"
+		            max="100"
+		            value="0"
+		          />
+		
+		          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		            %
+		          </span>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Reward Products Table -->
+			<div class="col-span-12">
+				<div class="bg-background border border-white/10 p-4 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+					<!-- Header -->
+					<div class="flex items-center justify-between mb-6">
+						<div>
+							<h3 class="font-manrope text-lg font-bold flex items-center gap-2">
+								<span class="material-symbols-outlined text-primary">
+									redeem
+								</span>
+								Reward Products
+							</h3>
+							<p class="text-xs lg:text-sm text-on-surface-variant mt-1">
+								Configure products that can be redeemed using loyalty points.
+							</p>
+						</div>
+			
+						<button onclick="openAddRewardModal()"
+							class="flex items-center gap-2 px-4 py-2 rounded-md bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all">
+								<span class="material-symbols-outlined text-sm">add</span>
+								<span class="font-inter font-semibold text-sm">
+									Add Reward
+								</span>
+						</button>
+					</div>
+	
+					<!-- Table -->
+					<div class="overflow-x-auto">
+						<table class="w-full">
+							<thead>
+								<tr class="border-b border-white/10 text-left text-[11px] uppercase tracking-widest text-muted ">
+									<th class="py-4 px-4">Nama Produk</th>
+									<th class="py-4 px-4">Category</th>
+									<th class="py-4 px-4 text-center">Point Reward</th>
+									<th class="py-4 px-4 text-right">Action</th>
+								</tr>
+							</thead>
+			
+							<tbody id="rewardTableBody">
+							</tbody>
+						</table>
+						<!-- Pagination -->
+						<div class="mt-6 pt-6 border-t border-white/10 flex justify-end">
+							<div class="flex items-center gap-2">			
+								<button id="rewardPrevBtn"
+									onclick="changeRewardPage(-1)"
+									class="w-10 h-10 rounded-md hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-all">
+									<span class="material-symbols-outlined text-sm">
+										chevron_left
+									</span>
+								</button>
+			
+								<button id="rewardNextBtn"
+									onclick="changeRewardPage(1)"
+									class="w-10 h-10 rounded-md hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-all">
+									<span class="material-symbols-outlined text-sm">
+										chevron_right
+									</span>
+								</button>		
+							</div>
+						</div>
+					</div>			
+				</div>
+			</div>	
+		
+		<!-- Product Categories -->
+		<div class="col-span-12">
+		  <div class="bg-background border border-white/10 p-4 rounded-md h-full shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+		
+		    <!-- HEADER -->
+		    <div class="flex justify-between items-center mb-8">
+		      <h3 class="font-manrope text-lg font-bold flex items-center gap-2">
+		        <span
+		          class="material-symbols-outlined text-primary"
+		          data-icon="category"
+		          style="font-variation-settings: 'FILL' 1;"
+		        >
+		          category
+		        </span>
+		        Product Categories
+		      </h3>
+		
+		      <span class="text-[10px] font-inter tracking-widest text-on-surface-variant uppercase bg-background border border-white/10 px-3 py-1 rounded-md">
+		        Category Discount & Reward
+		      </span>
+		    </div>
+		
+		
+		    <div class="space-y-3">
+				
+		      <!-- CATEGORY 1 -->
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		        <div class="col-span-3 flex items-center gap-3">
+		          <div class="h-2 w-2 rounded-md bg-background"></div>
+		          <input
+		            id="category_1_name"
+		            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+		            type="text"
+		            placeholder="Category 1"
+		          />
+		        </div>
+		
+		        <div class="col-span-5">
+		          <div class="relative">
+		            <input
+		              id="category_1_discount"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              max="100"
+		              value="0"
+		            />
+		            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              %
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2">
+		          <div class="relative">
+		            <input
+		              id="category_1_reward"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              value="0"
+		            />
+		            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              PTS
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2 text-right">
+		          <span class="material-symbols-outlined text-sm">
+		            edit
+		          </span>
+		        </div>
+		      </div>
+		
+		
+		      <!-- CATEGORY 2 -->
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		        <div class="col-span-3 flex items-center gap-3">
+		          <div class="h-2 w-2 rounded-md bg-background"></div>
+		          <input
+		            id="category_2_name"
+		            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+		            type="text"
+		            placeholder="Category 2"
+		          />
+		        </div>
+				  
+		        <div class="col-span-5">
+		          <div class="relative">
+		            <input
+		              id="category_2_discount"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              max="100"
+		              value="0"
+		            />
+		            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              %
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2">
+		          <div class="relative">
+		            <input
+		              id="category_2_reward"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              value="0"
+		            />
+		            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              PTS
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2 text-right">
+		          <span class="material-symbols-outlined text-sm">
+		            edit
+		          </span>
+		        </div>
+		      </div>
+		
+		      <!-- CATEGORY 3 -->
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		        <div class="col-span-3 flex items-center gap-3">
+		          <div class="h-2 w-2 rounded-md bg-background"></div>
+		          <input
+		            id="category_3_name"
+		            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+		            type="text"
+		            placeholder="Category 3"
+		          />
+		        </div>
+				  
+		        <div class="col-span-5">
+		          <div class="relative">
+		            <input
+		              id="category_3_discount"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              max="100"
+		              value="0"
+		            />
+		
+		            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              %
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2">
+		          <div class="relative">
+		            <input
+		              id="category_3_reward"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              value="0"
+		            />
+		            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              PTS
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2 text-right">
+		          <span class="material-symbols-outlined text-sm">
+		            edit
+		          </span>
+		        </div>
+		      </div>
+		
+		      <!-- CATEGORY 4 -->
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		        <div class="col-span-3 flex items-center gap-3">
+		          <div class="h-2 w-2 rounded-md bg-background"></div>
+		          <input
+		            id="category_4_name"
+		            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+		            type="text"
+		            placeholder="Category 4"
+		          />
+		        </div>
+		
+		        <div class="col-span-5">
+		          <div class="relative">
+		            <input
+		              id="category_4_discount"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              max="100"
+		              value="0"
+		            />
+		
+		            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              %
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2">
+		          <div class="relative">
+		            <input
+		              id="category_4_reward"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              value="0"
+		            />
+		            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              PTS
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2 text-right">
+		          <span class="material-symbols-outlined text-sm">
+		            edit
+		          </span>
+		        </div>
+		      </div>
+		
+		      <!-- CATEGORY 5 -->
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		        <div class="col-span-3 flex items-center gap-3">
+		          <div class="h-2 w-2 rounded-md bg-background"></div>
+		          <input
+		            id="category_5_name"
+		            class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+		            type="text"
+		            placeholder="Category 5"
+		          />
+		        </div>
+		
+		        <div class="col-span-5">
+		          <div class="relative">
+		            <input
+		              id="category_5_discount"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              max="100"
+		              value="0"
+		            />
+		            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              %
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2">
+		          <div class="relative">
+		            <input
+		              id="category_5_reward"
+		              class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+		              type="number"
+		              min="0"
+		              value="0"
+		            />
+		            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+		              PTS
+		            </span>
+		          </div>
+		        </div>
+		
+		        <div class="col-span-2 text-right">
+		          <span class="material-symbols-outlined text-sm">
+		            edit
+		          </span>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+					
 			<!-- Membership Tiers Column -->
 			<div class="col-span-12">
 				<div class="bg-background border border-white/10 p-4 rounded-md h-full shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
