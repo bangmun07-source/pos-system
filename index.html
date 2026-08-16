@@ -17179,9 +17179,13 @@ function updateSummary(subtotal, member = null) {
 // ==========================================
 
 function getCategoryDiscount(categoryName) {
+
   if (!categoryName) return 0;
+
   const category =
     (state.categories || []).find(c =>
+      String(c.branch_id) ===
+      String(state.branchId) &&
       String(c.category_name || "")
         .trim()
         .toLowerCase() ===
@@ -17189,7 +17193,20 @@ function getCategoryDiscount(categoryName) {
         .trim()
         .toLowerCase()
     );
-  return Number(category?.discount || 0);
+
+  console.log(
+    "CATEGORY LOOKUP:",
+    {
+      branch: state.branchId,
+      categoryName,
+      found: category,
+      discount: category?.discount
+    }
+  );
+
+  return Number(
+    category?.discount || 0
+  );
 }
 
 
