@@ -17780,6 +17780,60 @@ async function getMemberDetailPage(memberId, branchId) {
   }
 }
 
+async function uploadMemberImage(
+  base64,
+  memberId
+) {
+
+  if (!base64) {
+    return null;
+  }
+
+  if (!memberId) {
+    throw new Error(
+      "Member ID kosong"
+    );
+  }
+
+  const response =
+    await fetch(
+      "/api/handle-member-image-upload",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+          base64,
+          memberId
+        })
+      }
+    );
+
+  const result =
+    await response.json();
+
+  console.log(
+    "MEMBER IMAGE UPLOAD RESULT:",
+    result
+  );
+
+  if (
+    !response.ok ||
+    !result.success
+  ) {
+    throw new Error(
+      result.error ||
+      "Gagal upload member image"
+    );
+  }
+
+  return result.url;
+}
+
 async function loadMembers(callback) {
 
   const el =
@@ -19777,64 +19831,143 @@ function enableEditMember() {
 }
 
 async function saveMemberEdit() {
-	
+
   const modal =
     document.querySelector(
       "[data-member-modal]"
     );
+
   if (!modal || !editingMember) {
     return;
   }
+
+
+  // =========================
+  // PAYLOAD
+  // =========================
+
   const payload = {
+
     ...editingMember,
+
     Nama:
       document.querySelector(
         "#edit-memberName"
       ).value,
+
     WA:
       document.querySelector(
         "#edit-whatsapp"
       ).value,
+
     Address:
       document.querySelector(
         "#edit-address"
       ).value,
+
     Tgl_Lahir:
       document.querySelector(
         "#edit-birthday"
       ).value,
+
     Join_Date:
       document.querySelector(
         "#edit-joinDate"
       ).value,
+
     PhotoBase64:
       memberPhotoBase64,
+
     branchId:
       state.branchId
+
   };
 
+
   try {
+
+    // =========================
+    // UPLOAD FOTO BARU
+    // =========================
+
+    if (
+      payload.PhotoBase64 &&
+      payload.ID_Member
+    ) {
+
+      console.log(
+        "📸 UPLOAD MEMBER IMAGE:",
+        payload.ID_Member
+      );
+
+
+      const photoUrl =
+        await uploadMemberImage(
+          payload.PhotoBase64,
+          payload.ID_Member
+        );
+
+
+      if (!photoUrl) {
+        throw new Error(
+          "URL foto member tidak diterima"
+        );
+      }
+
+
+      // SIMPAN URL KE PHOTO
+
+      payload.Photo =
+        photoUrl;
+
+
+      console.log(
+        "📸 MEMBER PHOTO URL:",
+        photoUrl
+      );
+
+    }
+
+
+    // =========================
+    // JANGAN KIRIM BASE64 KE RPC
+    // =========================
+
+    delete payload.PhotoBase64;
+
+
+    // =========================
+    // UPDATE MEMBER
+    // =========================
 
     console.log(
       "UPDATE MEMBER PAYLOAD:",
       payload
     );
 
+
     const res =
       await updateMemberRPC(
         payload
       );
+
 
     console.log(
       "UPDATE MEMBER RESULT:",
       res
     );
 
+
+    // =========================
+    // VALIDATE RESPONSE
+    // =========================
+
     if (!res) {
       throw new Error(
         "Backend mengembalikan data kosong"
       );
     }
+
 
     if (res.success === false) {
       throw new Error(
@@ -19843,27 +19976,50 @@ async function saveMemberEdit() {
       );
     }
 
+
+    // =========================
+    // SUCCESS
+    // =========================
+
     showToast(
       "Member berhasil diperbarui ✔",
       "success"
     );
 
-    // Clear cache member
-    state.memberPageData = null;
-    state.members = null;
+
+    // =========================
+    // CLEAR CACHE
+    // =========================
+
+    state.memberPageData =
+      null;
+
+    state.members =
+      null;
+
+
+    // =========================
+    // CLOSE + RELOAD
+    // =========================
+
     closeMemberProfile();
+
     await loadMembers();
 
-  } catch (err) {
+  }
+  catch (err) {
+
     console.error(
       "Update Member:",
       err
     );
+
     showToast(
       err.message ||
       "Gagal update member",
       "error"
     );
+
   }
 }
 
