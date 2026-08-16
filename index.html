@@ -4414,7 +4414,6 @@
 				</div>
 			</div>
 		</div>
-		<div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-md"></div>
 	</section>
 
 	
@@ -8325,13 +8324,13 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
             <!-- START -->
             <div class="flex flex-col px-3">
               <div class="relative flex items-center">
-                <span class="material-symbols-outlined text-primary text-lg absolute left-0">
+                <span class="material-symbols-outlined text-foreground text-sm lg:text-md absolute left-0">
                   calendar_today
                 </span>
                 <input id="expenseStartDate"
                   type="date"
                   value="2024-10-01"
-                  class="bg-transparent border-none p-0 pl-7 text-xs font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
+                  class="bg-transparent border-none p-0 pl-7 text-sm lg:text-md font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
               </div>
             </div>
 
@@ -8339,7 +8338,7 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
             <!-- END -->
 						<div class="flex flex-col px-3">
 							<div class="relative flex items-center">
-								<span class="material-symbols-outlined text-primary text-lg absolute left-0">
+								<span class="material-symbols-outlined text-foreground text-sm lg:text-md absolute left-0">
 									calendar_month
 								</span>
 
@@ -8347,14 +8346,14 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 									id="expenseEndDate"
 									type="date"
 									value="2024-10-31"
-									class="bg-transparent border-none p-0 pl-7 text-xs font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
+									class="bg-transparent border-none p-0 pl-7 text-sm lg:text-md font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
 							</div>
 						</div>
 					</div>
 					<!-- ADD BUDGET -->
 					<button onclick="openBudgetModal()" 
-						class="bg-background border border-white/10 rounded-md h-[30px] px-4 shrink-0 text-xs flex items-center justify-center gap-2 text-primary font-semibold">
-						<span class="text-xs material-symbols-outlined">
+						class="bg-background border border-white/10 rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">
+						<span class="text-sm lg:text-md material-symbols-outlined">
 							account_balance_wallet
 						</span>
 						<span class="hidden sm:inline">Add Budget</span>
@@ -8362,84 +8361,9 @@ class="fixed inset-0 z-[9999] hidden flex items-center justify-center p-6 bg-bac
 				</div>
 			</div>
 		</div>
-		<div class="absolute -top-24 -right-24 w-72 h-72 bg-primary/10 blur-[120px] rounded-md"></div>
 	</section>
 	
-	  <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-	      <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-	        <img
-	          src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
-	          class="w-full h-full object-cover"
-	          style="object-position: right 30%;"
-	          alt="">
-	      </div>
-	      <div class="absolute inset-0 bg-gradient-to-r from-background via-background/60 to-background/40"></div>
-	
-	      <div
-	        class="absolute -top-24 -right-24 w-72 h-72
-	        bg-primary/10 blur-[120px] rounded-md">
-	      </div>
-			
-	      <div class="relative min-h-[260px] flex flex-col justify-center px-12">
-	        <!-- TITLE -->
-	        <div>
-	          <span class="text-primary text-[11px] font-semibold tracking-[0.25em] uppercase">
-	            Financial Operations
-	          </span>
-	     
-	          <h2 class="lg:text-5xl md:text-3xl font-black text-on-surface mt-2 mb-4 leading-tight tracking-tight">
-	            Expenses & Other Income
-	          </h2>
-	
-	          <p class="text-on-surface-variant/80 font-body mt-1">
-	            Monitor operational expenses and additional income with complete financial visibility.
-	          </p>
-	        </div>
-        <!-- FILTER -->
-        <div class="flex flex-row items-center gap-3 mt-8 flex-wrap">
-          <!-- DATE -->
-          <div class="bg-background border border-white/10 rounded-md h-[30px] inline-flex items-center gap-3 px-2">
-            <!-- START -->
-            <div class="flex flex-col px-3">
-              <div class="relative flex items-center">
-                <span class="material-symbols-outlined text-primary text-lg absolute left-0">
-                  calendar_today
-                </span>
-                <input id="expenseStartDate"
-                  type="date"
-                  value="2024-10-01"
-                  class="bg-transparent border-none p-0 pl-7 text-xs font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
-              </div>
-            </div>
-
-            <div class="hidden sm:block h-8 w-px bg-outline-variant/20"></div>
-            <!-- END -->
-	            <div class="flex flex-col px-3">
-	              <div class="relative flex items-center">
-	                <span class="material-symbols-outlined text-primary text-lg absolute left-0">
-	                  calendar_month
-	                </span>
-	
-	                <input
-	                  id="expenseEndDate"
-	                  type="date"
-	                  value="2024-10-31"
-	                  class="bg-transparent border-none p-0 pl-7 text-xs font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
-	              </div>
-	            </div>
-          	</div>
-	          <!-- ADD BUDGET -->
-	          <button onclick="openBudgetModal()" 
-	            class="bg-background border border-white/10 rounded-md h-[30px] px-4 shrink-0 text-xs flex items-center justify-center gap-2 text-primary font-semibold">
-	            <span class="text-xs material-symbols-outlined">
-	              account_balance_wallet
-	            </span>
-	            <span class="hidden sm:inline">Add Budget</span>
-	          </button>
-        	</div>
-      	</div>
-  		</section>
-			<div class="w-full space-y-4 pb-12">
+		<div class="w-full space-y-4 pb-12">
 			<!-- Expanded KPI Bento Grid - Updated to be in the same row -->
 			<section class="grid grid-cols-12 gap-4">
 				<!-- Total vs Budget -->
