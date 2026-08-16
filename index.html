@@ -10352,92 +10352,95 @@ Save
 					</div>
 				</div>
 					
-			<!-- Loyalty Discount Config -->
-			<div class="col-span-12 lg:col-span-6">
-				<div class="bg-background rounded-md overflow-hidden border border-white/10 p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
-					<h3 class="font-manrope text-lg font-bold mb-6 flex items-center gap-2">
-						<span
-							class="material-symbols-outlined text-tertiary"
-							data-icon="local_offer">
-							local_offer
-						</span>
-						Discount
-					</h3>
-			
-					<div class="space-y-4">
-						<!-- MEMBER DISCOUNT -->
-						<div class="bg-background border border-white/10 p-4 rounded-md flex items-center justify-between">
-							<div class="flex items-center gap-4">
-								<div class="bg-primary/10 p-2 rounded-md">
-									<span
-										class="material-symbols-outlined text-primary"
-										data-icon="card_membership">
-										card_membership
-									</span>
-								</div>
-			
-								<div>
-									<span class="font-inter font-medium text-sm">
-										Member Discount
-									</span>
-									<p class="text-xs text-on-surface-variant mt-1">
-										Discount khusus member
-									</p>
-								</div>
-							</div>
-			
-							<div class="flex items-center gap-3">
-								<input
-									id="discount"
-									class="w-16 bg-white/5 border-none rounded-md text-sm font-inter text-right focus:ring-1 focus:ring-primary"
-									type="number"
-									min="0"
-									max="100"
-									value="0" />
-								<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">
-									%
-								</span>
-							</div>
-						</div>
-			
-						<!-- BIRTHDAY DISCOUNT -->
-						<div class="bg-background border border-white/10 p-4 rounded-md flex items-center justify-between">
-							<div class="flex items-center gap-4">
-								<div class="bg-primary/10 p-2 rounded-md">
-									<span
-										class="material-symbols-outlined text-primary"
-										data-icon="cake">
-										cake
-									</span>
-								</div>
-			
-								<div>
-									<span class="font-inter font-medium text-sm">
-										Birthday Discount
-									</span>
-			
-									<p class="text-xs text-on-surface-variant mt-1">
-										Discount khusus ulang tahun member
-									</p>
-								</div>
-							</div>
-			
-							<div class="flex items-center gap-3">
-								<input
-									id="birthday_discount"
-									class="w-16 bg-white/5 border-none rounded-md text-sm font-inter text-right focus:ring-1 focus:ring-primary"
-									type="number"
-									min="0"
-									max="100"
-									value="0"/>
-			
-								<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">
-									%
-								</span>
-							</div>
-						</div>
-					</div>
-				</div>
+<!-- MEMBER BENEFITS -->
+<div class="col-span-12">
+  <div class="bg-background border border-white/10 p-4 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+
+    <h3 class="font-manrope text-lg font-bold flex items-center gap-2 mb-6">
+      <span class="material-symbols-outlined text-primary">
+        loyalty
+      </span>
+      Member Benefits
+    </h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- MEMBER DISCOUNT -->
+      <div class="bg-white/5 border border-white/10 rounded-md p-4">
+
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary">
+              percent
+            </span>
+          </div>
+
+          <div>
+            <h4 class="font-manrope font-bold text-sm">
+              Member Discount
+            </h4>
+
+            <p class="text-xs text-on-surface-variant">
+              Discount khusus untuk member.
+            </p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <input
+            id="memberDiscountInput"
+            class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+            type="number"
+            min="0"
+            max="100"
+            value="0"
+          />
+
+          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+            %
+          </span>
+        </div>
+
+      </div>
+
+
+      <!-- BIRTHDAY DISCOUNT -->
+      <div class="bg-white/5 border border-white/10 rounded-md p-4">
+
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary">
+              cake
+            </span>
+          </div>
+
+          <div>
+            <h4 class="font-manrope font-bold text-sm">
+              Birthday Discount
+            </h4>
+
+            <p class="text-xs text-on-surface-variant">
+              Discount khusus saat ulang tahun member.
+            </p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <input
+            id="birthdayDiscountInput"
+            class="w-full bg-background border border-white/10 rounded-md py-3 pr-12 pl-4 text-sm font-manrope font-bold"
+            type="number"
+            min="0"
+            max="100"
+            value="0"
+			          />
+			          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-on-surface-variant">
+			            %
+			          </span>
+			        </div>
+			      </div>
+			    </div>
+			  </div>
 			</div>
 	
 			<!-- Reward Products Table -->
@@ -31195,10 +31198,15 @@ function applyLoyaltySettings(s) {
       .toLocaleString("id-ID");
   }
   setInputValue("point_amount", s.point_reward);
-  setInputValue("reward_drink",s.reward_drink);
-  setInputValue("reward_snack",s.reward_snack);
-  setInputValue("reward_coffee",s.reward_coffee);
-  setInputValue("reward_other",s.reward_other);
+	setInputValue(
+	  "memberDiscountInput",
+	  s.member_discount
+	);
+
+setInputValue(
+	  "birthdayDiscountInput",
+	  s.birthday_discount
+	);
 }
 
 async function loadLoyaltySettings() {
@@ -31322,6 +31330,14 @@ async function saveLoyaltySettings() {
       parseNumber("point_ratio"),
     point_reward:
       parseNumber("point_amount"),
+						
+    // MEMBER DISCOUNT
+    member_discount:
+      parseNumber("memberDiscountInput"),
+
+    // BIRTHDAY DISCOUNT
+    birthday_discount:
+      parseNumber("birthdayDiscountInput"),
 
     // REWARD
     reward_drink:
