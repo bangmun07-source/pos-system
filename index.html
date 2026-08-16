@@ -17205,7 +17205,10 @@ function getCartCategoryDiscount() {
           String(p.ID_Produk) ===
           String(item.id)
       );
-
+    console.log("CATEGORY CHECK:", {
+      item,
+      product
+    });
     if (!product) return;
     const categoryName =
       product.Kategori ||
@@ -17216,12 +17219,22 @@ function getCartCategoryDiscount() {
       getCategoryDiscount(
         categoryName
       );
+	     console.log("CATEGORY DISCOUNT CHECK:", {
+      productId: product.ID_Produk,
+      categoryName,
+      discount
+    });
     maxDiscount =
       Math.max(
         maxDiscount,
         discount
       );
   });
+	console.log(
+    "FINAL CATEGORY DISCOUNT:",
+    maxDiscount
+  );
+
   return maxDiscount;
 }
 
