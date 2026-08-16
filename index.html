@@ -2913,24 +2913,9 @@
 		       <br>
 		       <small>${m.level}</small>`;
 		
-		    div.onclick = () => {
-		
-		      setValue(
-		        "memberSearch",
-		        m.nama
-		      );
-		
-		      setValue(
-		        "member-id",
-		        m.id
-		      );
-		
-		      state.currentMember =
-		        m.id;
-		
-		      box.style.display =
-		        "none";
-		    };
+		    div.onclick = async () => {
+			  await selectMember(m);
+			};
 		
 		    box.appendChild(div);
 		
