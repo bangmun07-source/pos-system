@@ -17354,7 +17354,6 @@ function calculateTotal() {
 	  subtotal * discountRate / 100;
 	const base =
 	  subtotal - discount;
-  const base = subtotal - discount;
   const tax = base * (state.settings?.tax || 0) / 100;
   const service = base * (state.settings?.service || 0) / 100;
   return {
