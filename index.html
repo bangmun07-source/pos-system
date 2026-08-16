@@ -17174,6 +17174,59 @@ function updateSummary(subtotal, member = null) {
   `;
 }
 
+// ==========================================
+// CATEGORY DISCOUNT
+// ==========================================
+
+function getCategoryDiscount(categoryName) {
+  if (!categoryName) return 0;
+  const category =
+    (state.categories || []).find(c =>
+      String(c.category_name || "")
+        .trim()
+        .toLowerCase() ===
+      String(categoryName || "")
+        .trim()
+        .toLowerCase()
+    );
+  return Number(category?.discount || 0);
+}
+
+
+function getCartCategoryDiscount() {
+  let maxDiscount = 0;
+  state.cart.forEach(item => {
+
+    // Redeem tidak mendapatkan discount
+    if (item.isRedeem) return;
+    const product =
+      state.products.find(
+        p =>
+          String(p.ID_Produk) ===
+          String(item.id)
+      );
+
+    if (!product) return;
+    const categoryName =
+      product.Kategori ||
+      product.Category ||
+      item.category ||
+      "";
+    const discount =
+      getCategoryDiscount(
+        categoryName
+      );
+    maxDiscount =
+      Math.max(
+        maxDiscount,
+        discount
+      );
+  });
+  return maxDiscount;
+}
+
+	
+
 function calculateTotal() {
   const subtotal = state.cart.reduce(
     (sum, item) => sum + (item.price * item.qty),
@@ -17227,11 +17280,80 @@ function calculateTotal() {
     "service loyalty:",
     state.loyaltySettings?.service
   );
-  const isMember = state.currentMember && state.currentMember !== "";
-  const discountRate = isMember
-    ? (state.settings?.discount || 0)
-    : 0;
-  const discount = subtotal * discountRate / 100;
+	const isMember =
+	  state.currentMember &&
+	  state.currentMember !== "";
+	// ==========================================
+	// DISCOUNT
+	// ==========================================
+	let discountRate = 0;
+	if (isMember) {
+	  // MEMBER DISCOUNT LAMA
+	  const memberDiscount =
+	    Number(state.settings?.discount || 0);
+	  // CATEGORY DISCOUNT
+	  let categoryDiscount = 0;
+	  state.cart.forEach(item => {
+	    // Produk redeem tidak ikut discount
+	    if (item.isRedeem) return;
+	    const product =
+	      state.products.find(
+	        p =>
+	          String(p.ID_Produk) ===
+	          String(item.id)
+	      );
+	
+	    if (!product) return;
+	    const categoryName =
+	      product.Kategori ||
+	      product.Category ||
+	      item.category ||
+	      "";
+	    const category =
+	      (state.categories || []).find(c =>
+	        String(c.category_name || "")
+	          .trim()
+	          .toLowerCase() ===
+	        String(categoryName)
+	          .trim()
+	          .toLowerCase()
+	      );
+	    const categoryRate =
+	      Number(category?.discount || 0);
+	    // Ambil category discount terbesar
+	    categoryDiscount =
+	      Math.max(
+	        categoryDiscount,
+	        categoryRate
+	      );
+	  });
+	
+	  // Ambil discount terbesar
+	  discountRate =
+	    Math.max(
+	      memberDiscount,
+	      categoryDiscount
+	    );
+	  console.log(
+	    "MEMBER DISCOUNT:",
+	    memberDiscount
+	  );
+	  console.log(
+	    "CATEGORY DISCOUNT:",
+	    categoryDiscount
+	  );
+	  console.log(
+	    "FINAL DISCOUNT:",
+	    discountRate
+	  );
+	} else {
+	  // GLOBAL DISCOUNT BELUM DIBUAT
+	  discountRate = 0;
+	}
+	const discount =
+	  subtotal * discountRate / 100;
+	const base =
+	  subtotal - discount;
   const base = subtotal - discount;
   const tax = base * (state.settings?.tax || 0) / 100;
   const service = base * (state.settings?.service || 0) / 100;
