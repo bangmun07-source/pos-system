@@ -27895,26 +27895,41 @@ function fileToBase64(file) {
 }
 
 async function saveBusinessProfile() {
+
+  console.log("🔥 SAVE BUSINESS PROFILE CLICKED");
+
   const companyName =
     document.getElementById(
       "businessCompanyName"
     );
+
   const instagram =
     document.getElementById(
       "businessInstagram"
     );
+
   const receiptFooter =
     document.getElementById(
       "businessReceiptFooter"
     );
+
   const logoPreview =
     document.getElementById(
       "businessLogoPreview"
     );
+
   const logoInput =
     document.getElementById(
       "businessLogoInput"
     );
+
+  console.log("ELEMENTS:", {
+    companyName,
+    instagram,
+    receiptFooter,
+    logoPreview,
+    logoInput
+  });
 
   // VALIDATE ELEMENT
   if (
