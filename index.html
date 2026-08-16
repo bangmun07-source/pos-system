@@ -31779,7 +31779,10 @@ async function saveLoyaltySettings() {
     alert(
       "Loyalty settings saved!"
     );
-
+	state.rewardProducts = 
+		null;
+	state.rewardProductsBranchId = 
+		null;
     // CLEAR STATE
     state.loyaltySettings =
       null;
@@ -31788,7 +31791,6 @@ async function saveLoyaltySettings() {
     state.memberPageData =
       null;
     // Settings page juga perlu
-    // mengambil data terbaru
     state.settingsPageData =
       null;
 
