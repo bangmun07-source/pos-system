@@ -31764,6 +31764,7 @@ async function saveLoyaltySettings() {
         category.reward
       );
     }
+	
     // HANDLE RESPONSE
     if (
       res &&
@@ -31793,7 +31794,7 @@ async function saveLoyaltySettings() {
     // Settings page juga perlu
     state.settingsPageData =
       null;
-
+	await loadRewardProducts();
     // RELOAD
     await loadLoyaltySettings();
   }
