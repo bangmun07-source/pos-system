@@ -14192,6 +14192,7 @@ function initModule(pageId) {
         fetchSettings(() => {
           renderCart();
         });
+		loadLoyaltySettings();
         preloadRecipeMap();
         loadRecipes(state.branchId);
       });
