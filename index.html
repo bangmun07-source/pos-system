@@ -16499,7 +16499,8 @@ async function checkout() {
 	
 	    const member =
 	      await checkMemberRPC(memberId);
-	
+			state.currentMemberData =
+					member;
 	    console.log(
 	      "CHECK MEMBER RESULT:",
 	      member
@@ -16520,8 +16521,11 @@ async function checkout() {
 	      return;
 	    }
 	
-	    payload.memberId =
-	      member.id;
+		payload.memberId =
+		      member.id;
+		
+		payload.memberData =
+		      member;
 	
 	    console.log(
 	      "FINAL MEMBER ID:",
@@ -17357,9 +17361,52 @@ function calculateTotal() {
     Math.max(
       globalDiscountAmount,
       memberDiscountAmount,
+			birthdayDiscountAmount,
       categoryDiscountAmount
+			
     );
 
+		// ==========================================
+		// BIRTHDAY DISCOUNT
+		// ==========================================
+		
+		const birthdayDiscountRate =
+		  isMember
+		    ? Number(
+		        state.loyaltySettings?.birthday_discount || 0
+		      )
+		    : 0;
+		
+		let birthdayDiscountAmount = 0;
+		
+		
+		if (
+		  isMember &&
+		  state.currentMemberData?.tgl_lahir
+		) {
+		
+		  const today =
+		    new Date();
+		
+		  const birth =
+		    new Date(
+		      state.currentMemberData.tgl_lahir
+		    );
+		
+		
+		  if (
+		    today.getMonth() === birth.getMonth() &&
+		    today.getDate() === birth.getDate()
+		  ) {
+		
+		    birthdayDiscountAmount =
+		      subtotal *
+		      birthdayDiscountRate /
+		      100;
+		
+		  }
+		}
+	
   // ==========================================
   // RATE UNTUK SUMMARY
   // ==========================================
@@ -17397,7 +17444,8 @@ function calculateTotal() {
 
       globalDiscountRate,
       globalDiscountAmount,
-
+			birthdayDiscountRate,
+    	birthdayDiscountAmount,
       memberDiscountRate,
       memberDiscountAmount,
 
