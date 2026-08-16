@@ -17129,48 +17129,46 @@ async function removeItemById(id) {
 }
 
 function updateSummary(subtotal, member = null) {
-  const el = document.getElementById("pos-cart-summary");
+  const el =
+    document.getElementById("pos-cart-summary");
+
   if (!el) return;
-  const taxRate = state.settings?.tax || 0;
-  const serviceRate = state.settings?.service || 0;
-  const isMember = state.currentMember && state.currentMember !== "";
-  const discountRate = isMember
-    ? (state.settings?.discount || 0)
-    : 0;
-  const discount = isMember
-    ? subtotal * discountRate / 100
-    : 0;
-  const base = subtotal - discount;
-  const tax = base * taxRate / 100;
-  const service = base * serviceRate / 100;
-  const total = base + tax + service;
+
+  // Gunakan satu sumber perhitungan
+  const calc = calculateTotal();
+
+  const taxRate =
+    Number(state.settings?.tax || 0);
+
+  const serviceRate =
+    Number(state.settings?.service || 0);
 
   el.innerHTML = `
     <div class="flex justify-between m-3 text-sm">
       <span>Subtotal</span>
-      <span>${format(subtotal)}</span>
+      <span>${format(calc.subtotal)}</span>
     </div>
 
     <div class="flex justify-between m-3 text-sm">
       <span>Tax (${taxRate}%)</span>
-      <span>${format(tax)}</span>
+      <span>${format(calc.tax)}</span>
     </div>
 
     <div class="flex justify-between m-3 text-sm">
       <span>Service (${serviceRate}%)</span>
-      <span>${format(service)}</span>
+      <span>${format(calc.service)}</span>
     </div>
 
     <div class="flex justify-between m-3 text-sm text-tertiary">
-      <span>Discount (${discountRate}%)</span>
-      <span>- ${format(discount)}</span>
+      <span>Discount (${calc.discountRate}%)</span>
+      <span>- ${format(calc.discount)}</span>
     </div>
 
     <div class="h-[1px] my-2"></div>
 
     <div class="flex justify-between m-3 font-bold text-lg">
       <span>Total</span>
-      <span>${format(total)}</span>
+      <span>${format(calc.total)}</span>
     </div>
   `;
 }
