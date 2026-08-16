@@ -17159,10 +17159,12 @@ function updateSummary(subtotal, member = null) {
       <span>${format(calc.service)}</span>
     </div>
 
-    <div class="flex justify-between m-3 text-sm text-tertiary">
-      <span>Discount</span>
-      <span>- ${format(calc.discount)}</span>
-    </div>
+	 <div class="flex justify-between m-3 text-sm text-tertiary">
+	  <span>
+	    Discount${calc.discountRate > 0 ? ` (${calc.discountRate}%)` : ""}
+	  </span>
+	  <span>- ${format(calc.discount)}</span>
+	</div>
 
     <div class="h-[1px] my-2"></div>
 
@@ -17312,11 +17314,22 @@ function calculateTotal() {
     100;
 
   // PILIH DISCOUNT TERBESAR
-  const discount =
-    Math.max(
-      memberDiscountAmount,
-      categoryDiscountAmount
-    );
+	const discount =
+	  Math.max(
+	    memberDiscountAmount,
+	    categoryDiscountAmount
+	  );
+	
+	// RATE YANG DITAMPILKAN DI SUMMARY
+	let displayDiscountRate = 0;
+	
+	if (
+	  memberDiscountAmount >= categoryDiscountAmount &&
+	  memberDiscountAmount > 0
+	) {
+	  displayDiscountRate =
+	    memberDiscountRate;
+	}
 
   // DEBUG
   console.log(
@@ -17346,6 +17359,7 @@ function calculateTotal() {
   return {
     subtotal,
     discount,
+	discountRate: displayDiscountRate,
     tax,
     service,
     total
