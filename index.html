@@ -17318,12 +17318,6 @@ function calculateTotal() {
       categoryDiscountAmount
     );
 
-  // Persentase untuk tampilan
-  const discountRate =
-    subtotal > 0
-      ? (discount / subtotal) * 100
-      : 0;
-
   // DEBUG
   console.log(
     "DISCOUNT:",
@@ -17332,8 +17326,7 @@ function calculateTotal() {
       memberDiscountRate,
       memberDiscountAmount,
       categoryDiscountAmount,
-      finalDiscount: discount,
-      finalDiscountRate: discountRate
+      finalDiscount: discount
     }
   );
 
@@ -17352,7 +17345,6 @@ function calculateTotal() {
     base + tax + service;
   return {
     subtotal,
-    discountRate,
     discount,
     tax,
     service,
