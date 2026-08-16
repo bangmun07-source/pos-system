@@ -27941,43 +27941,39 @@ function fileToBase64(file) {
 }
 
 async function saveBusinessProfile() {
-
-  console.log("🔥 SAVE BUSINESS PROFILE CLICKED");
-
   const companyName =
     document.getElementById(
       "businessCompanyName"
     );
-
   const instagram =
     document.getElementById(
       "businessInstagram"
     );
-
   const receiptFooter =
     document.getElementById(
       "businessReceiptFooter"
     );
-
   const logoPreview =
     document.getElementById(
       "businessLogoPreview"
     );
-
   const logoInput =
     document.getElementById(
       "businessLogoInput"
     );
 
-  console.log("ELEMENTS:", {
-    companyName,
-    instagram,
-    receiptFooter,
-    logoPreview,
-    logoInput
-  });
+  console.log(
+    "ELEMENTS:",
+    {
+      companyName,
+      instagram,
+      receiptFooter,
+      logoPreview,
+      logoInput
+    }
+  );
 
-  // VALIDATE ELEMENT
+  // VALIDATE
   if (
     !companyName ||
     !instagram ||
@@ -28022,7 +28018,7 @@ async function saveBusinessProfile() {
           file
         );
 
-      // UPLOAD KE API
+      // UPLOAD API
       const logoUrl =
         await uploadBusinessLogo(
           base64
@@ -28043,7 +28039,7 @@ async function saveBusinessProfile() {
         logoUrl
       );
     }
-
+	
     // SAVE PROFILE VIA RPC
     const result =
       await saveBusinessProfileRPC(
@@ -28054,8 +28050,8 @@ async function saveBusinessProfile() {
       "SAVE BUSINESS PROFILE RESULT:",
       result
     );
-
-    // CHECK RPC RESULT
+	
+    // CHECK RPC
     if (
       result &&
       result.success === false
@@ -28065,25 +28061,35 @@ async function saveBusinessProfile() {
         result.message ||
         "Gagal menyimpan profile"
       );
-
     }
 
-    // CLEAR STATE
-    state.businessProfile =
-      null;
+    // UPDATE STATE
+    state.businessProfile = {
+      ...(state.businessProfile || {}),
+      company_name:
+        data.company_name,
+      instagram:
+        data.instagram,
+      receipt_footer:
+        data.receipt_footer,
+      logo_url:
+        data.logo_url
+    };
+
+    // UPDATE UI
+    applyBusinessProfile(
+      state.businessProfile
+    );
+
+    // CLEAR FILE INPUT
+    if (logoInput) {
+      logoInput.value = "";
+    }
 
     // SUCCESS
     showToast(
       "Business Profile berhasil disimpan",
       "success"
-    );
-
-    // RELOAD PROFILE
-    setTimeout(
-      () => {
-        loadBusinessProfile();
-      },
-      100
     );
   }
   catch (err) {
