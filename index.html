@@ -10352,80 +10352,87 @@ Save
 					</div>
 				</div>
 					
-				<!-- redeem System Config -->
-				<div class="col-span-12 lg:col-span-6">
-					<div class="bg-background rounded-md overflow-hidden border border-white/10 p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
-						<h3 class="font-manrope text-lg font-bold mb-6 flex items-center gap-2">
-							<span class="material-symbols-outlined text-tertiary" data-icon="redeem">redeem</span>
-								Redem Point
-						</h3>
-						
-						<div class="space-y-4">
-							<div class="bg-background border border-white/10 p-4 rounded-md flex items-center justify-between">
-								<div class="flex items-center gap-4">
-									<div class="bg-primary/10 p-2 rounded-md">
-										<span class="material-symbols-outlined text-primary" data-icon="coffee">coffee</span>
-									</div>
-									<span class="font-inter font-medium text-sm">Drink</span>
-								</div>
-								
-								<div class="flex items-center gap-3">
-									<input id="reward_drink" class="w-16 bg-white/5 border-none rounded-md text-sm font-inter text-right focus:ring-1 focus:ring-primary" type="number" value="0"/>
-									<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">Points</span>
-								</div>
-							</div>
-							<div class="bg-background border border-white/10 p-4 rounded-md flex items-center justify-between">
-								<div class="flex items-center gap-4">
-									<div class="bg-primary/10 p-2 rounded-md">
-										<span class="material-symbols-outlined text-primary" data-icon="shopping_bag">shopping_bag</span>
-									</div>
-										<span class="font-inter font-medium text-sm">Snack</span>
-								</div>
-							<div class="flex items-center gap-3">
-								<input id="reward_snack" class="w-16 bg-white/5 border-none rounded-md text-sm font-inter text-right focus:ring-1 focus:ring-primary" type="number" value="0"/>
-								<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">Points</span>
-							</div>
-						</div>
-							
+			<!-- Loyalty Discount Config -->
+			<div class="col-span-12 lg:col-span-6">
+				<div class="bg-background rounded-md overflow-hidden border border-white/10 p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
+					<h3 class="font-manrope text-lg font-bold mb-6 flex items-center gap-2">
+						<span
+							class="material-symbols-outlined text-tertiary"
+							data-icon="local_offer">
+							local_offer
+						</span>
+						Discount
+					</h3>
+			
+					<div class="space-y-4">
+						<!-- MEMBER DISCOUNT -->
 						<div class="bg-background border border-white/10 p-4 rounded-md flex items-center justify-between">
 							<div class="flex items-center gap-4">
 								<div class="bg-primary/10 p-2 rounded-md">
-									<span class="material-symbols-outlined text-primary" data-icon="local_cafe">
-										local_cafe
+									<span
+										class="material-symbols-outlined text-primary"
+										data-icon="card_membership">
+										card_membership
 									</span>
 								</div>
-								<span class="font-inter font-medium text-sm">Coffee</span>
+			
+								<div>
+									<span class="font-inter font-medium text-sm">
+										Member Discount
+									</span>
+									<p class="text-xs text-on-surface-variant mt-1">
+										Discount khusus member
+									</p>
+								</div>
 							</div>
 			
 							<div class="flex items-center gap-3">
-								<input id="reward_coffee"
+								<input
+									id="discount"
 									class="w-16 bg-white/5 border-none rounded-md text-sm font-inter text-right focus:ring-1 focus:ring-primary"
 									type="number"
+									min="0"
+									max="100"
 									value="0" />
 								<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">
-									Points
+									%
 								</span>
 							</div>
 						</div>
-							
+			
+						<!-- BIRTHDAY DISCOUNT -->
 						<div class="bg-background border border-white/10 p-4 rounded-md flex items-center justify-between">
 							<div class="flex items-center gap-4">
 								<div class="bg-primary/10 p-2 rounded-md">
-									<span class="material-symbols-outlined text-primary" data-icon="category">
-										category
+									<span
+										class="material-symbols-outlined text-primary"
+										data-icon="cake">
+										cake
 									</span>
 								</div>
-								<span class="font-inter font-medium text-sm">Other</span>
+			
+								<div>
+									<span class="font-inter font-medium text-sm">
+										Birthday Discount
+									</span>
+			
+									<p class="text-xs text-on-surface-variant mt-1">
+										Discount khusus ulang tahun member
+									</p>
+								</div>
 							</div>
-						
+			
 							<div class="flex items-center gap-3">
 								<input
-									id="reward_other"
+									id="birthday_discount"
 									class="w-16 bg-white/5 border-none rounded-md text-sm font-inter text-right focus:ring-1 focus:ring-primary"
 									type="number"
-									value="0" />
-									<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">
-									Points
+									min="0"
+									max="100"
+									value="0"/>
+			
+								<span class="text-xs font-inter text-on-surface-variant uppercase tracking-widest">
+									%
 								</span>
 							</div>
 						</div>
