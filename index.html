@@ -303,6 +303,18 @@
 	  color: #F5F5F5;
 	}
 
+	.bottom-theme {
+	  background: #101715;
+	  color: #e0e0e0;
+	  border: 1px solid rgba(255, 255, 255, 0.10);
+	  border-radius: 0.375rem;
+	  transition: background-color 0.2s ease;
+	}
+	
+	.bottom-theme:hover {
+	  background: rgba(255, 255, 255, 0.10);
+	}
+
 	.material-symbols-outlined {
 		vertical-align: middle;
 	}
@@ -984,8 +996,8 @@
 	        class="flex-1 overflow-y-auto custom-scrollbar space-y-4 pr-2">
 	      </div>
 	
-	      <button class="w-full mt-6 py-4 rounded-md bg-background border border-white/10 text-white text-xs font-bold tracking-[0.15em] hover:bg-white/10 transition-all uppercase">
-	        Open Inventory Manager
+	      <button class="w-full mt-6 py-4 bottom-theme text-xs font-semibold tracking-[0.15em] transition-all uppercase">
+	        Stock Product
 	      </button>
 	    </div>
 	
