@@ -1775,12 +1775,12 @@
   </p>
   <div class="flex items-center gap-2">
     <button id="recentPrevBtn"
-      class="p-2 rounded-lg transition-colors disabled:opacity-30">
+      class="p-2 rounded-md transition-colors disabled:opacity-30">
       <span class="material-symbols-outlined">
         chevron_left
       </span>
     </button>
-    <button id="recentNextBtn" class="p-2 rounded-lg transition-colors disabled:opacity-30">
+    <button id="recentNextBtn" class="p-2 rounded-md transition-colors disabled:opacity-30">
       <span class="material-symbols-outlined">
         chevron_right
       </span>
@@ -2551,7 +2551,7 @@
 
   						<input type="hidden" id="member-id">
 						  <!-- RESULT DROPDOWN -->
-						 <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-lg bg-background border border-white/10 z-50 custom-scrollbar" style="display:none;"></div>
+						 <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-md bg-background border border-white/10 z-50 custom-scrollbar" style="display:none;"></div>
 					</div>
 					<button onclick="openRedeem()" 
 					  	class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-white/10 tracking-wide transition-all">
@@ -2698,7 +2698,7 @@
       <!-- HEADER -->
       <div class="p-6 border-b border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+          <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
             <span class="material-symbols-outlined text-primary text-2xl">
               card_giftcard
             </span>
@@ -2724,7 +2724,7 @@
         <section class="bg-background border border-white/10 rounded-md p-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-              <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+              <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
                 <span class="material-symbols-outlined text-primary">
                   person
                 </span>
@@ -3055,7 +3055,7 @@
     <!-- HEADER -->
     <div class="p-6 border-b border-white/10 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+        <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
           <span class="material-symbols-outlined text-primary text-2xl">
             table_restaurant
           </span>
@@ -3089,7 +3089,7 @@
       <input id="newTableName"
         type="text"
         placeholder="Contoh : 15"
-        class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 text-on-surface placeholder:text-on-surface-variant outline-none focus:border-primary transition">
+        class="w-full h-11 px-4 rounded-md bg-background border border-white/10 text-on-surface placeholder:text-on-surface-variant outline-none focus:border-primary transition">
 
 		    <p class="mt-3 text-xs text-on-surface-variant leading-6">
 		      Masukkan nomor meja, kemudian klik <strong>Add Table</strong>. Meja baru akan otomatis muncul pada halaman <strong>Table</strong>.
@@ -3101,7 +3101,7 @@
 
       <button
         onclick="closeAddTableModal()"
-        class="flex-1 h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+        class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
 
         Cancel
 
@@ -3109,7 +3109,7 @@
 
       <button
         onclick="saveNewTable()"
-        class="flex-1 h-11 rounded-lg bg-primary text-on-primary hover:opacity-90 transition active:scale-95">
+        class="flex-1 h-11 rounded-md bg-primary text-on-primary hover:opacity-90 transition active:scale-95">
 
         Add Table
 
@@ -3481,7 +3481,7 @@
       <div class="flex items-center gap-2">
 
         <button id="memberPrevBtn"
-                class="p-2 rounded-lg
+                class="p-2 rounded-md
                       text-muted
                       hover:bg-background-high
                       transition-colors
@@ -3490,7 +3490,7 @@
         </button>
 
         <button id="memberNextBtn"
-                class="p-2 rounded-lg
+                class="p-2 rounded-md
                       text-muted 
                       hover:bg-background-high
                       transition-colors">
@@ -3647,7 +3647,7 @@
 
         <div class="flex items-center gap-4">
 
-          <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+          <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
 
             <span class="material-symbols-outlined text-primary text-2xl">
               chat
@@ -3707,7 +3707,7 @@
           id="waRecipient"
           type="text"
           readonly
-          class="w-full h-11 rounded-lg bg-background px-4
+          class="w-full h-11 rounded-md bg-background px-4
           text-on-surface border border-white/10">
 
         </div>
@@ -3784,7 +3784,7 @@
 
         onclick="closeWhatsAppModal()"
 
-        class="px-5 h-11 rounded-lg bg-background-high">
+        class="px-5 h-11 rounded-md bg-background-high">
 
           Cancel
 
@@ -4500,7 +4500,7 @@
     <div class="p-2 space-y-1">
       <!-- 1 -->
       <button onclick="openAdjustFromIngredient()"
-        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background transition group">
+        class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
         <div class="flex items-center gap-4">
          <div class="w-10 h-10 flex items-center justify-center text-on-surface">
 		      <span class="main-icon-box material-symbols-outlined text-lg"
@@ -4520,7 +4520,7 @@
 
       <!-- 2 -->
       <button onclick="openUsageLogFromIngredient()"
-        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background transition group">
+        class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 flex items-center justify-center text-on-surface">
 			      <span class="main-icon-box material-symbols-outlined text-lg"
@@ -4540,7 +4540,7 @@
 
       <!-- 3 -->
       <button onclick="openThresholdFromIngredient()"
-        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background transition group">
+        class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 flex items-center justify-center text-on-surface">
 			      <span class="main-icon-box material-symbols-outlined text-lg"
@@ -6118,10 +6118,10 @@
 				SOMA Kasir v2.4.0-Stable
 			</div>
 			<div class="flex gap-8 text-[8px] text-muted ">
-				<a class="hover:text-primary transition-colors" onclick="navigate('privacyPolicyPage')">Privacy Policy</a>
-				<a class="hover:text-primary transition-colors" onclick="navigate('licenseAgreementPage')">License Agreement</a>
-				<a class="hover:text-primary transition-colors" onclick="navigate('documentationPage')">Documentation</a>
-				<a class="hover:text-primary transition-colors" onclick="navigate('businesscardPage')">Support Center</a>
+				<a class="hover:text-on-surface transition-colors" onclick="navigate('privacyPolicyPage')">Privacy Policy</a>
+				<a class="hover:text-on-surface transition-colors" onclick="navigate('licenseAgreementPage')">License Agreement</a>
+				<a class="hover:text-on-surface transition-colors" onclick="navigate('documentationPage')">Documentation</a>
+				<a class="hover:text-on-surface transition-colors" onclick="navigate('businesscardPage')">Support Center</a>
 			</div>
 		</footer>
 	</main>
@@ -6142,8 +6142,9 @@
     <!-- Header -->
     <div class="p-6 border-b border-white/10 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary text-2xl">
+        <div class="main-icon-box">
+		      <span class="main-icon-box material-symbols-outlined text-2xl"
+		            style="font-variation-settings:'FILL' 1;">
             business
           </span>
         </div>
@@ -6160,7 +6161,7 @@
       </div>
 
       <button onclick="closeAddBranchModal()"
-        class="w-10 h-10 rounded-md hover:bg-white/5">
+        class="w-10 h-10 rounded-md text-on-surface-variant hover:text-on-surface">
         <span class="material-symbols-outlined">
           close
         </span>
@@ -6175,7 +6176,7 @@
         <input id="newBranchName"
           type="text"
           placeholder="Your Brand"
-          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10">
+          class="w-full h-11 px-4 rounded-md bg-background border border-white/10">
       </div>
 
       <div>
@@ -6185,7 +6186,7 @@
         <input id="newBranchManager"
           type="text"
           placeholder="Nama Manager"
-          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10">
+          class="w-full h-11 px-4 rounded-md bg-background border border-white/10">
       </div>
 
       <div>
@@ -6196,7 +6197,7 @@
         <input id="newBranchPhone"
           type="text"
           placeholder="08xxxxxxxxxx"
-          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10">
+          class="w-full h-11 px-4 rounded-md bg-background border border-white/10">
       </div>
 
       <div>
@@ -6207,7 +6208,7 @@
         <textarea id="newBranchAddress"
           rows="3"
           placeholder="Alamat Outlet"
-          class="w-full px-4 py-3 rounded-lg bg-background border border-white/10"></textarea>
+          class="w-full px-4 py-3 rounded-md bg-background border border-white/10"></textarea>
       </div>
 	      <p class="text-xs text-on-surface-variant">
 	        Branch ID dan Status akan dibuat otomatis setelah outlet disimpan.
@@ -6217,12 +6218,12 @@
     <!-- Footer -->
     <div class="p-4 border-t border-white/10 flex gap-3">
       <button onclick="closeAddBranchModal()"
-        class="flex-1 h-11 rounded-lg bg-background hover:bg-white/5">
+        class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface">
         Cancel
       </button>
 
       <button onclick="saveNewBranch()"
-        class="flex-1 h-11 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold">
+        class="flex-1 h-11 rounded-md bottom-theme uppercase tracking-widest text-on-surface tracking-[0.20em] font-semibold">
         Save Outlet
       </button>
     </div>
@@ -6245,8 +6246,9 @@
 	    <!-- HEADER -->
 	    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	      <div class="flex items-center gap-4">
-	        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
-	          <span class="material-symbols-outlined text-primary text-2xl">
+	        <div class="main-icon-box">
+			      <span class="main-icon-box material-symbols-outlined text-2xl"
+			            style="font-variation-settings:'FILL' 1;">
 	            business
 	          </span>
 	        </div>
@@ -6263,8 +6265,8 @@
 	      </div>
 	
 	      <button onclick="closeEditBranchModal()"
-	        class="w-10 h-10 rounded-md hover:bg-white/5 transition">
-	        <span class="material-symbols-outlined">
+	        class="w-10 h-10 rounded-md text-on-surface-variant hover:text-on-surface transition">
+	        <span class="material-symbols-outlined text-on-surface-variant">
 	          close
 	        </span>
 	      </button>
@@ -6280,7 +6282,7 @@
 					
 	        <input id="editBranchName"
 	          type="text"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	      </div>
 	
 	      <div>
@@ -6290,7 +6292,7 @@
 	
 	        <input id="editBranchManager"
 	          type="text"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	      </div>
 	
 	      <div>
@@ -6300,7 +6302,7 @@
 	
 	        <textarea id="editBranchAddress"
 	          rows="3"
-	          class="w-full px-4 py-3 rounded-lg bg-background border border-white/10 outline-none focus:border-primary"></textarea>
+	          class="w-full px-4 py-3 rounded-md bg-background border border-white/10 outline-none focus:border-primary"></textarea>
 	      </div>
 	
 	      <p class="text-xs text-on-surface-variant">
@@ -6310,12 +6312,12 @@
 	    <!-- FOOTER -->
 	    <div class="p-4 border-t border-white/10 flex gap-3">
 	      <button onclick="closeEditBranchModal()"
-	        class="flex-1 h-11 rounded-lg bg-background hover:bg-white/5 transition">
+	        class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface transition">
 	        Cancel
 	      </button>
 	
 	      <button onclick="saveEditBranch()"
-	        class="flex-1 h-11 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold active:scale-95 transition">
+	        class="flex-1 h-11 rounded-md bottom-theme uppercase tracking-widest font-bold tracking-[0.20em] text-on-surface">
 	        	Save Changes
 	      </button>
 	    </div>
@@ -6338,8 +6340,9 @@
 	    <!-- HEADER -->
 	    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	      <div class="flex items-center gap-4">
-	        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
-	          <span class="material-symbols-outlined text-primary text-2xl">
+	        <div class="main-icon-box">
+			      <span class="main-icon-box material-symbols-outlined text-2xl"
+			            style="font-variation-settings:'FILL' 1;">
 	            person_add
 	          </span>
 	        </div>
@@ -6356,7 +6359,7 @@
 	      </div>
 				
 	      <button onclick="closeAddUserModal()"
-	        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+	        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
 	        <span class="material-symbols-outlined">
 	          close
 	        </span>
@@ -6372,7 +6375,7 @@
 	        </label>
 
 	        <select id="newUserBranch"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	
 	          <option value="">
 	            Select Outlet
@@ -6389,7 +6392,7 @@
 	          type="text"
 	          autocomplete="username"
 	          placeholder="Masukkan username"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	      </div>
 	      <!-- Password -->
 	      <div>
@@ -6401,7 +6404,7 @@
 	          type="password"
 	          autocomplete="new-password"
 	          placeholder="Masukkan password"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	      </div>
 	      <!-- Role -->
 	      <div>
@@ -6410,7 +6413,7 @@
 	        </label>
 	
 	        <select id="newUserRole"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	          <option value="">
 	            Select Role
 	          </option>
@@ -6431,12 +6434,12 @@
     <!-- FOOTER -->
 	    <div class="p-4 border-t border-white/10 flex gap-3">
 	      <button onclick="closeAddUserModal()"
-	        class="flex-1 h-11 rounded-lg bg-background hover:bg-white/5 transition">
+	        class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface transition">
 	        Cancel
 	      </button>
 	      <button type="submit"
 	        onclick="saveNewUser()"
-	        class="flex-1 h-11 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold active:scale-95 transition">
+	        class="flex-1 h-11 rounded-md bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold active:scale-95 transition">
 	        	Save User
 	      </button>
 	    </div>
@@ -6459,7 +6462,7 @@
 	    <!-- HEADER -->
 	    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	      <div class="flex items-center gap-4">
-	        <div class="w-12 h-12 rounded-lg bg-background flex items-center justify-center">
+	        <div class="w-12 h-12 rounded-md bg-background flex items-center justify-center">
 	          <span class="material-symbols-outlined text-primary text-2xl">
 	            manage_accounts
 	          </span>
@@ -6477,7 +6480,7 @@
 	      </div>
 
 	      <button onclick="closeEditUserModal()"
-	        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
+	        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
 	        <span class="material-symbols-outlined">
 	          close
 	        </span>
@@ -6496,7 +6499,7 @@
 					<input id="editUsername"
 						autocomplete="username"
 						type="text"
-						class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+						class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 				</div>
       <!-- Password -->
 	      <div>
@@ -6508,7 +6511,7 @@
 	          type="password"
 	          autocomplete="new-password"
 	          placeholder="Leave blank to keep current password"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 outline-none focus:border-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 outline-none focus:border-primary">
 	      </div>
 	      <!-- Role -->
 	      <div>
@@ -6519,7 +6522,7 @@
 	        <input id="editRole"
 	          type="text"
 	          readonly
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 text-on-surface-variant cursor-not-allowed">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 text-on-surface-variant cursor-not-allowed">
 	      </div>
 	      <!-- Outlet -->
 	      <div>
@@ -6530,7 +6533,7 @@
 	        <input id="editOutlet"
 	          type="text"
 	          readonly
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 text-on-surface-variant cursor-not-allowed">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 text-on-surface-variant cursor-not-allowed">
 	      </div>
 				<p class="text-xs text-on-surface-variant leading-6">
 					Hanya Username dan Password yang dapat diubah. Role dan Outlet mengikuti konfigurasi sistem.
@@ -6539,12 +6542,12 @@
 	    <!-- FOOTER -->
 	    <div class="p-4 border-t border-white/10 flex gap-3">
 	      <button onclick="closeEditUserModal()"
-	        class="flex-1 h-11 rounded-lg bg-background hover:bg-white/5 transition">
+	        class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface transition">
 	        	Cancel
 	      </button>
 	
 	      <button onclick="saveEditUser()"
-	        class="flex-1 h-11 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold active:scale-95 transition">
+	        class="flex-1 h-11 rounded-md bottom-theme uppercase tracking-widest tracking-[0.20em] text-on-surface-variant font-semibold active:scale-95 transition">
 	        	Save Changes
 	      </button>
 	    </div>
@@ -6569,7 +6572,7 @@
 	        </span>
 	    
 	        <span class="sidebar-label">
-	          Documentation<
+	          Documentation
 	        </span>
 	      </a>
 	      <!-- POS -->
@@ -6634,7 +6637,7 @@
 		  <!-- BACK BUTTON -->
 		  <div>
 		    <button onclick="navigate('settingsPage')"
-		      class="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors">
+		      class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors">
 		      <span class="material-symbols-outlined">
 		        arrow_back
 		      </span>
@@ -6657,8 +6660,9 @@
  	<!-- Cards -->
 		<section class="grid grid-cols-12 gap-6">
 			  <!-- Dashboard -->
-			  <div onclick="openDocumentation('dashboard')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('dashboard')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      dashboard
 			    </span>
 			
@@ -6672,8 +6676,9 @@
 			    </p>
 			  </div>
 			  <!-- POS -->
-			  <div onclick="openDocumentation('pos')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('pos')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      point_of_sale
 			    </span>
 			
@@ -6687,8 +6692,9 @@
 			    </p>
 			  </div>
 			  <!-- Table -->
-			  <div onclick="openDocumentation('table')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('table')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      table_restaurant
 			    </span>
 			
@@ -6702,8 +6708,9 @@
 			    </p>
 			  </div>
 			  <!-- Member -->
-			  <div onclick="openDocumentation('member')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('member')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      groups
 			    </span>
 			
@@ -6717,8 +6724,9 @@
 			    </p>
 			  </div>
 			  <!-- Gross Revenue -->
-			  <div onclick="openDocumentation('grossrevenue')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('grossrevenue')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			  	<span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      monitoring
 			    </span>
 			
@@ -6732,9 +6740,10 @@
 			    </p>
 			  </div>
 			  <!-- Recent Transactions -->
-			  <div onclick="openDocumentation('recenttransactions')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
-			      receipt_long
+			  <div onclick="openDocumentation('recenttransactions')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+				 <span class="material-symbols-outlined text-on-surface text-4xl"
+						style="font-variation-settings:'FILL' 1;"> 
+						receipt_long
 			    </span>
 			
 			    <h3 class="font-bold text-lg mt-4">
@@ -6747,8 +6756,9 @@
 			    </p>
 			  </div>
 			 <!-- Settings -->
-			  <div onclick="openDocumentation('settings')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('settings')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      settings
 			    </span>
 			
@@ -6762,8 +6772,9 @@
 			    </p>
 			  </div>
 			  <!-- Expenses -->
-			  <div onclick="openDocumentation('expenses')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('expenses')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      payments
 			    </span>
 			
@@ -6777,8 +6788,9 @@
 			    </p>
 			  </div>
 			  <!-- Loyalty -->
-			  <div onclick="openDocumentation('loyalty')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('loyalty')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      workspace_premium
 			    </span>
 			
@@ -6792,8 +6804,9 @@
 			    </p>
 			  </div>
 				<!-- Taxes -->
-				<div onclick="openDocumentation('taxes')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-					<span class="material-symbols-outlined text-primary text-4xl">
+				<div onclick="openDocumentation('taxes')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+					<span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 						account_balance
 					</span>
 			
@@ -6807,8 +6820,9 @@
 					</p>
 				</div>
 				<!-- Analytics -->
-				<div onclick="openDocumentation('analytics')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-					<span class="material-symbols-outlined text-primary text-4xl">
+				<div onclick="openDocumentation('analytics')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+					<span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 						analytics
 					</span>
 			
@@ -6822,8 +6836,9 @@
 					</p>
 				</div>
 			   <!-- Inventory -->
-			  <div onclick="openDocumentation('inventory')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-			    <span class="material-symbols-outlined text-primary text-4xl">
+			  <div onclick="openDocumentation('inventory')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+			    <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 			      inventory_2
 			    </span>
 			
@@ -6837,8 +6852,9 @@
 			    </p>
 			  </div>
 				<!-- Cash Flow -->
-				<div onclick="openDocumentation('cashflow')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-primary/40 transition-all">
-				  <span class="material-symbols-outlined text-primary text-4xl">
+				<div onclick="openDocumentation('cashflow')" class="col-span-12 md:col-span-6 lg:col-span-4 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 cursor-pointer hover:border-white/40 transition-all">
+				  <span class="material-symbols-outlined text-on-surface text-4xl"
+							style="font-variation-settings:'FILL' 1;">
 				    account_balance_wallet
 				  </span>
 				
@@ -6874,7 +6890,7 @@
 	    <!-- HEADER -->
 	    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	      <div class="flex items-center gap-4">
-	        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+	        <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
 	          <span id="docIcon"
 	            class="material-symbols-outlined text-primary text-2xl">
 	            description
@@ -6909,7 +6925,7 @@
 	    <!-- FOOTER -->
 	    <div class="p-4 border-t border-white/10">
 	      <button onclick="closeDocumentationModal()"
-	        class="w-full h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+	        class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
 	        Tutup Dokumentasi
 	      </button>
 	    </div>
@@ -7923,14 +7939,14 @@
 		<div class="px-8 py-4 border-t border-t border-white/10 flex items-center justify-between">
 			<span id="expenseTableInfo" class="text-[8px] text-muted  font-bold uppercase tracking-widest">Showing 4 of 124 Ledger Entries</span>
 		<div id="pagination" class="flex gap-2">
-			<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-outline-variant/20 hover:bg-white/5 transition-colors">
+			<button class="w-8 h-8 rounded-md flex items-center justify-center border border-outline-variant/20 hover:bg-white/5 transition-colors">
 				<span class="material-symbols-outlined text-sm">chevron_left</span>
 			</button>
 			
-			<button class="w-8 h-8 rounded-lg flex items-center justify-center bg-primary/10 text-on-primary font-bold text-xs">1</button>
-			<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-outline-variant/20 hover:bg-white/5 transition-colors text-xs">2</button>
+			<button class="w-8 h-8 rounded-md flex items-center justify-center bg-primary/10 text-on-primary font-bold text-xs">1</button>
+			<button class="w-8 h-8 rounded-md flex items-center justify-center border border-outline-variant/20 hover:bg-white/5 transition-colors text-xs">2</button>
 			
-			<button class="w-8 h-8 rounded-lg flex items-center justify-center border border-outline-variant/20 hover:bg-white/5 transition-colors">
+			<button class="w-8 h-8 rounded-md flex items-center justify-center border border-outline-variant/20 hover:bg-white/5 transition-colors">
 				<span class="material-symbols-outlined text-sm">chevron_right</span>
 			</button>
 			</div>
@@ -8084,7 +8100,7 @@
       <!-- HEADER -->
       <div class="p-6 border-b border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+          <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
             <span class="material-symbols-outlined text-primary text-2xl">
               receipt_long
             </span>
@@ -8194,12 +8210,12 @@
           </p>
 
           <div id="receipt-description"
-            class="rounded-lg bg-background-high p-4 text-xs lg:text-sm text-on-surface">
+            class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
             -
           </div>
         </div>
 				
-        <div class="rounded-lg bg-background-high p-5 flex items-center justify-between">
+        <div class="rounded-md bg-background-high p-5 flex items-center justify-between">
           <div>
             <p class="text-xs uppercase text-on-surface-variant">
               Total Expense
@@ -8219,7 +8235,7 @@
       <!-- FOOTER -->
       <div class="p-4 border-t border-white/10">
         <button onclick="closeExpenseReceipt()"
-          class="w-full h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
           Close
         </button>
       </div>
@@ -8238,7 +8254,7 @@
       <!-- HEADER -->
       <div class="p-6 border-b border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+          <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
             <span class="material-symbols-outlined text-primary text-2xl">
               more_horiz
             </span>
@@ -8270,9 +8286,9 @@
       <div class="p-2 space-y-1">
         <!-- Change Status -->
         <button onclick="openExpenseStatusModal()"
-          class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
+          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
+            <div class="w-10 h-10 rounded-md bg-background-high flex items-center justify-center text-primary">
               <span class="material-symbols-outlined">
                 published_with_changes
               </span>
@@ -8295,9 +8311,9 @@
 
         <!-- Attachment -->
         <button onclick="viewExpenseAttachment()"
-          class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
+          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
           <div class="flex items-center gap-4">
-            <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
+            <div class="w-10 h-10 rounded-md bg-background-high flex items-center justify-center text-primary">
               <span class="material-symbols-outlined">
                 attach_file
               </span>
@@ -8323,7 +8339,7 @@
       <!-- FOOTER -->
       <div class="p-4">
         <button onclick="closeExpenseMenu()"
-          class="w-full h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
           Close Menu
         </button>
       </div>
@@ -8342,7 +8358,7 @@
 		    <!-- HEADER -->
 		    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 		      <div class="flex items-center gap-4">
-		        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+		        <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
 		          <span class="material-symbols-outlined text-primary text-2xl">
 		            published_with_changes
 		          </span>
@@ -8374,7 +8390,7 @@
 		        </label>
 		
 		        <div id="expenseStatusRef"
-		          class="h-11 px-4 rounded-lg bg-background-high flex items-center text-on-surface">
+		          class="h-11 px-4 rounded-md bg-background-high flex items-center text-on-surface">
 		          -
 		        </div>
 		      </div>
@@ -8384,7 +8400,7 @@
 	        </label>
 					
 	        <div id="expenseCurrentStatus"
-	          class="h-11 px-4 rounded-lg bg-background-high flex items-center text-on-surface">
+	          class="h-11 px-4 rounded-md bg-background-high flex items-center text-on-surface">
 	          -
 	        </div>
 	      </div>
@@ -8395,7 +8411,7 @@
 	        </label>
 	
 	        <select id="expenseNewStatus"
-	          class="w-full h-11 px-4 rounded-lg bg-background border border-white/10 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
+	          class="w-full h-11 px-4 rounded-md bg-background border border-white/10 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
 		          <option value="Paid">Paid</option>
 		          <option value="Pending">Pending</option>
 		          <option value="Void">Void</option>
@@ -8406,12 +8422,12 @@
 	    <!-- FOOTER -->
 	    <div class="p-4 border-t border-white/10 flex gap-3">
 	      <button onclick="closeExpenseStatusModal()"
-	        class="flex-1 h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition">
+	        class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition">
 	        	Cancel
 	      </button>
 				
 	      <button onclick="saveExpenseStatus()"
-	        class="flex-1 h-11 rounded-lg bg-primary text-white hover:opacity-90 transition">
+	        class="flex-1 h-11 rounded-md bg-primary text-white hover:opacity-90 transition">
 	        	Save Changes
 	      </button>
 	    </div>
@@ -8430,7 +8446,7 @@
     <!-- HEADER -->
 	    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	      <div class="flex items-center gap-4">
-	        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+	        <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
 	          <span class="material-symbols-outlined text-primary text-2xl">
 	            attach_file
 	          </span>
@@ -8473,9 +8489,9 @@
 
       <!-- VIEW ATTACHMENT -->
       <button onclick="openExpenseAttachmentFile()"
-      class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
+      class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
         <div class="flex items-center gap-4">
-          <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
+          <div class="w-10 h-10 rounded-md bg-background-high flex items-center justify-center text-primary">
             <span class="material-symbols-outlined">
               visibility
             </span>
@@ -8496,9 +8512,9 @@
       </button>
       <!-- ADD ATTACHMENT -->
       <button onclick="openExpenseAddAttachmentModal()"
-      	class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
+      	class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
         	<div class="flex items-center gap-4">
-	          <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
+	          <div class="w-10 h-10 rounded-md bg-background-high flex items-center justify-center text-primary">
 	            <span class="material-symbols-outlined">
 	              upload_file
 	            </span>
@@ -8525,7 +8541,7 @@
 	
 	    <div class="p-4">
 	      <button onclick="closeExpenseAttachmentModal()"
-	      class="w-full h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+	      class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
 	        Close Menu
 	      </button>
 	    </div>
@@ -8544,7 +8560,7 @@
       <!-- HEADER -->
       <div class="p-6 border-b border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+          <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
             <span class="material-symbols-outlined text-primary text-2xl">
               description
             </span>
@@ -8620,7 +8636,7 @@
           Download
         </button>
         <button onclick="closeExpenseViewAttachmentModal()"
-        	class="flex-1 h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition">
+        	class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition">
           Close
         </button>
       </div>
@@ -8639,7 +8655,7 @@
   <!-- HEADER -->
   <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	  <div class="flex items-center gap-4">
-		  <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">		
+		  <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">		
 			  <span class="material-symbols-outlined text-primary text-2xl">
 			  upload_file
 			  </span>
@@ -8758,7 +8774,7 @@
 				<!-- FOOTER -->
 			<div class="p-4 border-t border-white/10 flex gap-3">
 				<button onclick="closeExpenseAddAttachmentModal()"
-					class="flex-1 h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition">
+					class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition">
 					 Cancel
 				</button>
 
@@ -8842,7 +8858,7 @@
 		</div>
 	</div>
 	<!-- Preview -->
-	<div class="p-5 bg-background/50 rounded-lg border border-white/10">
+	<div class="p-5 bg-background/50 rounded-md border border-white/10">
 		<div class="flex items-center justify-between">
 			<div>
 				<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
@@ -8969,7 +8985,7 @@
 						</div>
 					</div>
 					<!-- Amount Input (Highlight Section) -->
-					<div class="p-6 bg-background/50 rounded-lg border border-white/10">
+					<div class="p-6 bg-background/50 rounded-md border border-white/10">
 						<div class="flex items-center justify-between">
 							<label class="block font-label text-sm font-semibold text-amber-500 uppercase tracking-widest">Amount (IDR)</label>
 							<span class="text-[10px] text-on-surface-variant/50">CURRENCY CODE: IDR</span>
@@ -9156,7 +9172,7 @@
   <div class="flex items-center gap-4">
 
 
-  <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
+  <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
 
   <span class="material-symbols-outlined text-primary text-2xl">
   receipt_long
@@ -9254,7 +9270,7 @@
 
       <div
         id="otherIncomeDetailDescription"
-        class="rounded-lg bg-background-high p-4 text-xs lg:text-sm text-on-surface">
+        class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
         -
       </div>
     </div>
@@ -9268,7 +9284,7 @@
 
       <div
         id="otherIncomeDetailNotes"
-        class="rounded-lg bg-background-high p-4 text-xs lg:text-sm text-on-surface">
+        class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
         -
       </div>
     </div>
@@ -9276,7 +9292,7 @@
     <!-- AMOUNT -->
 
     <div
-      class="rounded-lg bg-background-high p-5 flex items-center justify-between">
+      class="rounded-md bg-background-high p-5 flex items-center justify-between">
 
       <div>
         <p class="text-xs uppercase text-on-surface-variant">
@@ -9320,7 +9336,7 @@
 
   <button
   onclick="closeOtherIncomeDetailModal()"
-  class="w-full h-11 rounded-lg bg-background-high text-on-surface">
+  class="w-full h-11 rounded-md bg-background-high text-on-surface">
 
   Close
 
@@ -9406,7 +9422,7 @@ Status
 
 <select
 id="editOtherIncomeStatus"
-class="mt-2 w-full bg-background border border-white/10 rounded-lg px-4 py-3 text-sm">
+class="mt-2 w-full bg-background border border-white/10 rounded-md px-4 py-3 text-sm">
 
 <option value="Paid">
 Paid
@@ -9438,7 +9454,7 @@ Cancelled
 
 <button
 onclick="closeOtherIncomeStatusModal()"
-class="flex-1 h-11 rounded-lg bg-background-high">
+class="flex-1 h-11 rounded-md bg-background-high">
 
 Cancel
 
@@ -11602,7 +11618,7 @@ Save
       smart_toy
     </span>
     <!-- Tooltip -->
-    <span class=" absolute right-20 whitespace-nowrap px-4 py-2 rounded-lg bg-background border border-primary/10 text-xs text-on-surface opacity-0 group-hover:opacity-100 transition-all pointer-events-none ">
+    <span class=" absolute right-20 whitespace-nowrap px-4 py-2 rounded-md bg-background border border-primary/10 text-xs text-on-surface opacity-0 group-hover:opacity-100 transition-all pointer-events-none ">
       Sistem POS Assistant
     </span>
   </button>
@@ -12656,7 +12672,7 @@ Save
 						</div>
 					</div>
 					<!-- Tabbed Content -->
-					<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all duration-200 group mb-3 cursor-pointer">
+					<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-all duration-200 group mb-3 cursor-pointer">
 						<span class="material-symbols-outlined text-primary text-sm">download</span>
 						<span class="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant group-hover:text-primary transition-colors">Save as Image</span>
 					</div>
@@ -15576,7 +15592,7 @@ data.forEach(item => {
     <tr class="hover:bg-white/5 transition-colors">
       <td class="px-8 py-5">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-surface-container overflow-hidden">
+          <div class="w-10 h-10 rounded-md bg-surface-container overflow-hidden">
             <img src="${img}" class="w-full h-full object-cover"/>
           </div>
           <div>
@@ -16986,7 +17002,7 @@ function showRedeemPopup(data) {
               <div class="flex gap-3">
                   <div class="
                       w-11 h-11
-                      rounded-lg
+                      rounded-md
                       bg-background-high
                       flex items-center justify-center
                       text-primary
@@ -17015,7 +17031,7 @@ function showRedeemPopup(data) {
                   mt-4
                   w-full
                   h-11
-                  rounded-lg
+                  rounded-md
                   transition
                   active:scale-95
 
@@ -17518,7 +17534,7 @@ function openIngredientStockAlert(data = []) {
           <div class="flex items-start gap-3">
 
             <div
-              class="w-9 h-9 rounded-lg
+              class="w-9 h-9 rounded-md
               bg-primary/10
               flex items-center
               justify-center
@@ -20530,7 +20546,7 @@ function renderSuppliers() {
 
         <td class="px-8 py-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center text-primary font-bold">
+            <div class="w-10 h-10 rounded-md bg-white/5 flex items-center justify-center text-primary font-bold">
               ${initials}
             </div>
             <span class="font-bold text-sm">${item.name}</span>
@@ -20834,7 +20850,7 @@ function renderSupplierPagination() {
         onclick="changeSupplierPage(${supplierCurrentPage - 1})"
         ${supplierCurrentPage === 1 ? "disabled" : ""}
         class="
-          p-2 rounded-lg
+          p-2 rounded-md
           ${supplierCurrentPage === 1
             ? "text-slate-600 cursor-not-allowed"
             : "text-muted hover:text-muted"}
@@ -20851,7 +20867,7 @@ function renderSupplierPagination() {
       <button
         onclick="changeSupplierPage(${i})"
         class="
-          w-8 h-8 rounded-lg text-xs font-bold transition-colors
+          w-8 h-8 rounded-md text-xs font-bold transition-colors
           ${supplierCurrentPage === i
             ? "text-white"
             : "text-muted hover:bg-white/5"}
@@ -20867,7 +20883,7 @@ function renderSupplierPagination() {
         onclick="changeSupplierPage(${supplierCurrentPage + 1})"
         ${supplierCurrentPage === totalPages ? "disabled" : ""}
         class="
-          p-2 rounded-lg
+          p-2 rounded-md
           ${supplierCurrentPage === totalPages
             ? "text-slate-600 cursor-not-allowed"
             : "text-muted hover:text-muted"}
@@ -21068,7 +21084,7 @@ function renderRecipes() {
       </td>
 
       <td class="px-6 py-4 text-right text-[10px] text-slate-500">
-        <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:bg-white/5 rounded-lg">
+        <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:bg-white/5 rounded-md">
           <span class="material-symbols-outlined">edit</span>
         </button>
       </td>
@@ -21760,7 +21776,7 @@ function renderIngredients(data) {
         <!-- INGREDIENT -->
         <td class="px-8 py-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center text-primary">
+            <div class="w-10 h-10 rounded-md bg-white/10 flex items-center justify-center text-primary">
               <span class="material-symbols-outlined">${icon}</span>
             </div>
             <span class="font-bold text-sm">${item.name}</span>
@@ -22466,7 +22482,7 @@ function renderInventoryPagination() {
         onclick="changeInventoryPage(${inventoryCurrentPage - 1})"
         ${inventoryCurrentPage === 1 ? "disabled" : ""}
         class="
-          p-2 rounded-lg
+          p-2 rounded-md
           ${inventoryCurrentPage === 1
             ? "text-slate-600 cursor-not-allowed"
             : "text-muted hover:text-muted"}
@@ -22484,7 +22500,7 @@ function renderInventoryPagination() {
       <button
         onclick="changeInventoryPage(${i})"
         class="
-          w-8 h-8 rounded-lg text-xs font-bold transition-colors
+          w-8 h-8 rounded-md text-xs font-bold transition-colors
           ${inventoryCurrentPage === i
             ? "text-white"
             : "text-muted hover:bg-white/5"}
@@ -22500,7 +22516,7 @@ function renderInventoryPagination() {
         onclick="changeInventoryPage(${inventoryCurrentPage + 1})"
         ${inventoryCurrentPage === totalPages ? "disabled" : ""}
         class="
-          p-2 rounded-lg
+          p-2 rounded-md
           ${inventoryCurrentPage === totalPages
             ? "text-slate-600 cursor-not-allowed"
             : "text-muted hover:text-muted"}
@@ -26370,7 +26386,7 @@ function renderBranchPagination() {
     html += `
       <button
         onclick="changeBranchPage(${i})"
-        class="w-7 h-7 rounded-lg transition text-xs font-bold
+        class="w-7 h-7 rounded-md transition text-xs font-bold
         ${
           i === branchCurrentPage
             ? 'text-white'
@@ -26825,7 +26841,7 @@ function renderUserPagination() {
     html += `
       <button
         onclick="changeUserPage(${i})"
-        class="w-8 h-8 rounded-lg transition text-xs font-bold
+        class="w-8 h-8 rounded-md transition text-xs font-bold
         ${
           i === userCurrentPage
             ? 'text-white'
@@ -28345,7 +28361,7 @@ function viewExpenseAttachment() {
             file.innerHTML = `
             <a href="${expense.Attachment_URL}"
             target="_blank"
-            class="flex items-center gap-3 p-4 rounded-lg bg-background-high hover:bg-white/10 transition">
+            class="flex items-center gap-3 p-4 rounded-md bg-background-high hover:bg-white/10 transition">
 
                 <span class="material-symbols-outlined text-primary">
                     description
@@ -28358,7 +28374,7 @@ function viewExpenseAttachment() {
             `;
         } else {
             file.innerHTML = `
-            <div class="p-4 rounded-lg bg-background-high text-xs lg:text-sm text-on-surface-variant text-center">
+            <div class="p-4 rounded-md bg-background-high text-xs lg:text-sm text-on-surface-variant text-center">
                 No attachment available
             </div>
             `;
@@ -29097,7 +29113,7 @@ function renderOtherIncomePagination() {
   wrapper.innerHTML += `
     <button
       onclick="changeOtherIncomePage(-1)"
-      class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+      class="w-8 h-8 rounded-md flex items-center justify-center transition-colors">
 
       <span class="material-symbols-outlined text-sm">
         chevron_left
@@ -29112,7 +29128,7 @@ function renderOtherIncomePagination() {
       <button
         onclick="goToOtherIncomePage(${i})"
         class="
-          w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold
+          w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold
           ${i === otherIncomeCurrentPage
             ? "bg-primary text-black"
             : "bg-white/5 hover:bg-primary/10"}
@@ -29128,7 +29144,7 @@ function renderOtherIncomePagination() {
   wrapper.innerHTML += `
     <button
       onclick="changeOtherIncomePage(1)"
-      class="w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+      class="w-8 h-8 rounded-md flex items-center justify-center transition-colors">
 
       <span class="material-symbols-outlined text-sm">
         chevron_right
@@ -30445,7 +30461,7 @@ function renderPagination(data) {
   let html = "";
   // ⬅ LEFT
  html += `
-  <button class="chevron-left w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+  <button class="chevron-left w-8 h-8 rounded-md flex items-center justify-center transition-colors">
     <span class="material-symbols-outlined text-sm">chevron_left</span>
   </button>
 `;
@@ -30454,7 +30470,7 @@ function renderPagination(data) {
     const isActive = i === currentPage;
     html += `
       <button data-page="${i}"
-        class="page-btn w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-colors
+        class="page-btn w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold transition-colors
         ${isActive
           ? "bg-primary text-black"
           : "bg-white/5 hover:bg-primary/10"}">
@@ -30464,7 +30480,7 @@ function renderPagination(data) {
   }
   // ➡ RIGHT
  html += `
-  <button class="chevron-right w-8 h-8 rounded-lg flex items-center justify-center transition-colors">
+  <button class="chevron-right w-8 h-8 rounded-md flex items-center justify-center transition-colors">
     <span class="material-symbols-outlined text-sm">chevron_right</span>
   </button>
 `;
