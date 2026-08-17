@@ -5290,7 +5290,7 @@
 			  </a>
 		
 			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })""
+			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
 				 style="display:none"
 					 class="settingsMenu">
 					<span class="material-symbols-outlined sidebar-icon">
@@ -7578,7 +7578,7 @@
 			  </a>
 		
 			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })""
+			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
 				 style="display:none"
 					 class="settingsMenu">
 					<span class="material-symbols-outlined sidebar-icon">
@@ -9355,129 +9355,63 @@
 <!-- POPPUP EDIT OTHER INCOME -->
 
 <template id="editOtherIncomeStatusTemplate">
+	<div id="edit-other-income-status-modal"
+		class="fixed inset-0 z-[90] hidden items-center justify-center p-6 bg-background backdrop-blur-md">
+		<div onclick="event.stopPropagation()"
+			class="w-full max-w-sm bg-background rounded-md overflow-hidden animate-in fade-in zoom-in duration-300">
+			<!-- HEADER -->
+				<div class="p-6 border-b border-white/10 flex items-center justify-between">				
+					<div>
+						<h2 class="text-xl font-bold text-on-surface">
+							Change Status
+						</h2>
+						
+						<p class="text-xs text-on-surface uppercase tracking-wider">
+							Other Income
+						</p>
+					</div>
+	
+					<button onclick="closeOtherIncomeStatusModal()"
+						class="w-10 h-10 rounded-md text-on-surface-variant hover:text-on-surface">
+						<span class="material-symbols-outlined">
+							close
+						</span>
+					</button>
+				</div>
 
-<div 
-id="edit-other-income-status-modal"
-class="fixed inset-0 z-[90] hidden items-center justify-center p-6 bg-background backdrop-blur-md">
-
-
-<div 
-onclick="event.stopPropagation()"
-class="w-full max-w-sm bg-background rounded-md overflow-hidden animate-in fade-in zoom-in duration-300">
-
-
-<!-- HEADER -->
-
-<div class="p-6 border-b border-white/10 flex items-center justify-between">
-
-<div>
-
-<h2 class="text-xl font-bold text-on-surface">
-Change Status
-</h2>
-
-<p class="text-xs text-on-surface uppercase tracking-wider">
-Other Income
-</p>
-
-</div>
-
-
-<button
-onclick="closeOtherIncomeStatusModal()"
-class="w-10 h-10 rounded-md hover:bg-white/5">
-
-<span class="material-symbols-outlined">
-close
-</span>
-
-</button>
-
-</div>
-
-<!-- BODY -->
-
-<div class="p-6 space-y-5">
-
-
-<div>
-
-<p class="text-xs text-on-surface-variant">
-Reference ID
-</p>
-
-<p id="editOtherIncomeRef"
-class="font-bold text-on-surface">
--
-</p>
-
-</div>
-
-<div>
-
-<label class="text-xs text-on-surface-variant">
-Status
-</label>
-
-
-<select
-id="editOtherIncomeStatus"
-class="mt-2 w-full bg-background border border-white/10 rounded-md px-4 py-3 text-sm">
-
-<option value="Paid">
-Paid
-</option>
-
-<option value="Pending">
-Pending
-</option>
-
-<option value="Void">
-Void
-</option>
-
-<option value="Cancelled">
-Cancelled
-</option>
-
-</select>
-
-
-</div>
-
-</div>
-
-<!-- FOOTER -->
-
-<div class="p-4 border-t border-white/10 flex gap-3">
-
-
-<button
-onclick="closeOtherIncomeStatusModal()"
-class="flex-1 h-11 rounded-md bg-background-high">
-
-Cancel
-
-</button>
-
-
-<button
-onclick="saveOtherIncomeStatus()"
-class="flex-1 h-11 bg-background bottom-theme border border-primary/5 rounded-md  font-bold text-on-surface">
-
-Save
-
-</button>
-
-
-</div>
-
-
-</div>
-
-
-</div>
-
+				<!-- BODY -->
+					<div class="p-6 space-y-5">
+						<div>
+							<p class="text-xs text-on-surface-variant"> Reference ID </p>
+							<p id="editOtherIncomeRef" class="font-bold text-on-surface"> </p>
+						</div>
+					<div>
+		
+					<label class="text-xs text-on-surface-variant"> Status </label>
+	
+					<select id="editOtherIncomeStatus"
+						class="mt-2 w-full bg-background border border-white/10 rounded-md px-4 py-3 text-sm">
+						<option value="Paid"> Paid </option>
+						<option value="Pending"> Pending </option>
+						<option value="Void"> Void </option>
+						<option value="Cancelled"> Cancelled </option>
+					</select>
+				</div>
+			</div>
+		<!-- FOOTER -->
+			<div class="p-4 border-t border-white/10 flex gap-3">
+				<button onclick="closeOtherIncomeStatusModal()"
+					class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface ">
+					Cancel
+				</button>
+			
+				<button onclick="saveOtherIncomeStatus()"
+					class="flex-1 h-11 bg-background bottom-theme border border-primary/5 rounded-md font-bold text-on-surface">
+					Save
+				</button>
+			</div>
+		</div>
+	</div>
 </template>
 
 
@@ -9491,7 +9425,6 @@ Save
 	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-white/10 shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
 	  <!-- SIDEBAR CONTENT -->
 	  <div class="sidebar-menu flex flex-col h-full">
-		<!-- MENU -->
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 			  <!-- DASHBOARD -->
 			  <a onclick="navigate('dashboardPage')">
@@ -9506,7 +9439,7 @@ Save
 			  </a>
 		
 			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })""
+			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
 				 style="display:none"
 					 class="settingsMenu">
 					<span class="material-symbols-outlined sidebar-icon">
@@ -9676,7 +9609,8 @@ Save
 						<div class="bg-background rounded-md overflow-hidden border border-white/10 p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
 							<div class="relative z-10">
 								<h3 class="font-manrope text-lg font-bold mb-6 flex items-center gap-2">
-									<span class="material-symbols-outlined text-on-surface" data-icon="generating_tokens">generating_tokens</span>
+									<span class="main-icon-box material-symbols-outlined text-2xl"
+	            				style="font-variation-settings:'FILL' 1;" data-icon="generating_tokens">generating_tokens</span>
 										Point Earning Ratio
 								</h3>
 								
@@ -9714,17 +9648,18 @@ Save
 		<div class="col-span-12 lg:col-span-6">
 		  <div class="bg-background border border-white/10 p-4 rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] h-full">
 		    <h3 class="font-manrope text-lg font-bold flex items-center gap-2 mb-6">
-		      <span class="material-symbols-outlined text-on-surface">
+		      <span class="main-icon-box material-symbols-outlined text-2xl"
+	            style="font-variation-settings:'FILL' 1;">
 		        loyalty
 		      </span>
 		      Member Benefits
 		    </h3>
-		
+
 		    <div class="grid grid-cols-1 gap-4">
 		      <!-- MEMBER DISCOUNT -->
-		      <div class="bg-white/5 border border-white/10 rounded-md p-4">
+		      <div class="p-4">
 		        <div class="flex items-center gap-3 mb-4">
-		          <div class="w-10 h-10 rounded-md bottom-theme flex items-center justify-center shrink-0">
+		          <div class="w-10 h-10 rounded-md flex items-center justify-center shrink-0">
 		            <span class="material-symbols-outlined text-on-surface">
 		              percent
 		            </span>
@@ -9759,9 +9694,9 @@ Save
 		
 		
 		      <!-- BIRTHDAY DISCOUNT -->
-		      <div class="bg-white/5 border border-white/10 rounded-md p-4">
+		      <div class="p-4">
 		        <div class="flex items-center gap-3 mb-4">
-		          <div class="w-10 h-10 rounded-md bottom-theme flex items-center justify-center shrink-0">
+		          <div class="w-10 h-10 rounded-md flex items-center justify-center shrink-0">
 		            <span class="material-symbols-outlined text-on-surface">
 		              cake
 		            </span>
@@ -9804,7 +9739,8 @@ Save
 					<div class="flex items-center justify-between mb-6">
 						<div>
 							<h3 class="font-manrope text-lg font-bold flex items-center gap-2">
-								<span class="material-symbols-outlined text-on-surface">
+								<span class="main-icon-box material-symbols-outlined text-2xl"
+	            			style="font-variation-settings:'FILL' 1;">
 									redeem
 								</span>
 								Reward Products
@@ -9815,14 +9751,14 @@ Save
 						</div>
 			
 						<button onclick="openAddRewardModal()"
-							class="flex items-center gap-2 px-4 py-2 rounded-md bottom-theme text-on-surface border border-primary/20 hover:bg-primary/20 transition-all">
+							class="flex items-center gap-2 px-4 py-2 rounded-md bottom-theme bottom-theme transition-all">
 								<span class="material-symbols-outlined text-sm">add</span>
 								<span class="font-inter font-semibold text-sm">
 									Add Reward
 								</span>
 						</button>
 					</div>
-	
+
 					<!-- Table -->
 					<div class="overflow-x-auto">
 						<table class="w-full">
@@ -9869,17 +9805,15 @@ Save
 		    <!-- HEADER -->
 		    <div class="flex justify-between items-center mb-8">
 		      <h3 class="font-manrope text-lg font-bold flex items-center gap-2">
-		        <span
-		          class="material-symbols-outlined text-on-surface"
-		          data-icon="category"
-		          style="font-variation-settings: 'FILL' 1;"
-		        >
+						<span class="main-icon-box material-symbols-outlined text-2xl"
+								style="font-variation-settings:'FILL' 1;"
+			          data-icon="category">
 		          category
 		        </span>
 		        Product Categories
 		      </h3>
 		
-		      <span class="text-[10px] font-inter tracking-widest text-on-surface-variant uppercase bg-background border border-white/10 px-3 py-1 rounded-md">
+		      <span class="text-xs font-inter tracking-widest text-on-surface-variant uppercase px-3 py-1 rounded-md">
 		        Category Discount & Reward
 		      </span>
 		    </div>
@@ -9888,7 +9822,7 @@ Save
 		    <div class="space-y-3">
 				
 		      <!-- CATEGORY 1 -->
-		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">
 		        <div class="col-span-3 flex items-center gap-3">
 		          <div class="h-2 w-2 rounded-md bg-background"></div>
 		          <input
@@ -9930,7 +9864,7 @@ Save
 		          </div>
 		        </div>
 		
-		        <div class="col-span-2 text-right">
+		        <div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 		          <span class="material-symbols-outlined text-sm">
 		            edit
 		          </span>
@@ -9939,7 +9873,7 @@ Save
 		
 		
 		      <!-- CATEGORY 2 -->
-		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">
 		        <div class="col-span-3 flex items-center gap-3">
 		          <div class="h-2 w-2 rounded-md bg-background"></div>
 		          <input
@@ -9981,7 +9915,7 @@ Save
 		          </div>
 		        </div>
 		
-		        <div class="col-span-2 text-right">
+		        <div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 		          <span class="material-symbols-outlined text-sm">
 		            edit
 		          </span>
@@ -9989,7 +9923,7 @@ Save
 		      </div>
 		
 		      <!-- CATEGORY 3 -->
-		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">
 		        <div class="col-span-3 flex items-center gap-3">
 		          <div class="h-2 w-2 rounded-md bg-background"></div>
 		          <input
@@ -10032,7 +9966,7 @@ Save
 		          </div>
 		        </div>
 		
-		        <div class="col-span-2 text-right">
+		        <div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 		          <span class="material-symbols-outlined text-sm">
 		            edit
 		          </span>
@@ -10040,7 +9974,7 @@ Save
 		      </div>
 		
 		      <!-- CATEGORY 4 -->
-		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">
 		        <div class="col-span-3 flex items-center gap-3">
 		          <div class="h-2 w-2 rounded-md bg-background"></div>
 		          <input
@@ -10083,7 +10017,7 @@ Save
 		          </div>
 		        </div>
 		
-		        <div class="col-span-2 text-right">
+		        <div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 		          <span class="material-symbols-outlined text-sm">
 		            edit
 		          </span>
@@ -10091,7 +10025,7 @@ Save
 		      </div>
 		
 		      <!-- CATEGORY 5 -->
-		      <div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">
+		      <div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">
 		        <div class="col-span-3 flex items-center gap-3">
 		          <div class="h-2 w-2 rounded-md bg-background"></div>
 		          <input
@@ -10132,8 +10066,8 @@ Save
 		            </span>
 		          </div>
 		        </div>
-		
-		        <div class="col-span-2 text-right">
+
+		        <div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 		          <span class="material-symbols-outlined text-sm">
 		            edit
 		          </span>
@@ -10148,7 +10082,8 @@ Save
 				<div class="bg-background border border-white/10 p-4 rounded-md h-full shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 					<div class="flex justify-between items-center mb-8">
 						<h3 class="font-manrope text-lg font-bold flex items-center gap-2">
-							<span class="material-symbols-outlined text-on-surface" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+							<span class="main-icon-box material-symbols-outlined text-3xl"
+							  	style="font-variation-settings:'FILL' 1;" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
 								Membership Tier Thresholds
 						</h3>
 						<span class="text-[10px] font-inter tracking-widest text-on-surface-variant uppercase bg-background border border-white/10 px-3 py-1 rounded-md">Annual Spending in IDR</span>
@@ -10156,7 +10091,7 @@ Save
 					
 					<div class="space-y-3">
 						<!-- Tier 1 -->
-						<div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">					
+						<div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">					
 							<div class="col-span-3 flex items-center gap-3">
 								<div class="h-2 w-2 rounded-md bg-background"></div>
 					
@@ -10187,193 +10122,194 @@ Save
 							</div>			
 						</div>
 						
-			<!-- Tier 2 -->
-			<div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">			
-				<div class="col-span-3 flex items-center gap-3">			
-					<div class="h-2 w-2 rounded-md bg-background"></div>			
-						<input id="tier_2_name"
-						class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-						type="text"
-						value="Explorer" />			
-					</div>			
-					<div class="col-span-7">			
-						<div class="relative">			
-							<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
-								IDR
-							</span>			
-							<input id="tier_2"
-							class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
-							type="number"
-							value="800000" />
-						</div>		
-					</div>
-							
-					<div class="col-span-2 text-right">
-						<span class="material-symbols-outlined text-sm">
-							edit
-						</span>
-					</div>			
-				</div>
-				<!-- Tier 3 -->
-				<div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">			
-					<div class="col-span-3 flex items-center gap-3">			
-						<div class="h-2 w-2 rounded-md bg-background"></div>			
-						<input id="tier_3_name"
-							class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-							type="text"
-							value="Premium" />			
-						</div>	
-					
-						<div class="col-span-7">			
-							<div class="relative">			
-								<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
-									IDR
-								</span>			
-								<input id="tier_3"
-									class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
-									type="number"
-									value="2500000" />								
-							</div>			
-						</div>			
-						<div class="col-span-2 text-right">
-							<span class="material-symbols-outlined text-sm">
-								edit
-							</span>
-						</div>						
-					</div>			
-					<!-- Tier 4 -->
-					<div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">			
-						<div class="col-span-3 flex items-center gap-3">			
-							<div class="h-2 w-2 rounded-md bg-background"></div>			
-								<input id="tier_4_name"
-								class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
-								type="text"
-								value="Elite"/>			
-							</div>
-			
-							<div class="col-span-7">			
-								<div class="relative">			
-									<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
-										IDR
-									</span>							
-									<input id="tier_4"
-									class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
-									type="number"
-									value="4500000" />
-								</div>	
-							</div>
-			
-							<div class="col-span-2 text-right">
-								<span class="material-symbols-outlined text-sm">
-									edit
-								</span>
-							</div>						
-						</div>
-						<!-- Tier 5 -->
-						<div class="grid grid-cols-12 items-center gap-4 p-4 bg-white/5 rounded-md">					
-							<div class="col-span-3 flex items-center gap-3">						
-								<div class="h-2 w-2 rounded-md bg-background"></div>								
-									<input id="tier_5_name"
+						<!-- Tier 2 -->
+						<div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">			
+							<div class="col-span-3 flex items-center gap-3">			
+								<div class="h-2 w-2 rounded-md bg-background"></div>			
+									<input id="tier_2_name"
 									class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
 									type="text"
-									value="Diamond" />									
-								</div>
-																
-								<div class="col-span-7">								
-									<div class="relative">									
+									value="Explorer" />			
+								</div>			
+								<div class="col-span-7">			
+									<div class="relative">			
 										<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
-										IDR
-										</span>
-										
-										<input id="tier_5"
+											IDR
+										</span>			
+										<input id="tier_2"
 										class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
 										type="number"
-										value="10000000" />										
-									</div>								
-								</div>	
-							
+										value="800000" />
+									</div>		
+								</div>
+										
 								<div class="col-span-2 text-right">
 									<span class="material-symbols-outlined text-sm">
-									edit
+										edit
 									</span>
-								</div>							
-							</div>													
-						</div>
-						<!-- Season Reset Date Config -->
-						<div class="mt-12 pt-8 border-t border-outline-variant/10">
-							<h3 class="font-manrope text-lg font-bold mb-6 flex items-center gap-2">
-								<span class="material-symbols-outlined text-on-surface" data-icon="calendar_today">calendar_today</span>
-									Season Cycle Configuration
-							</h3>
-							<div class="grid grid-cols-2 gap-8">
-								<div>
-									<label class="block text-[10px] font-inter font-bold tracking-widest text-on-surface-variant uppercase mb-2">Cycle Start Date</label>
-									<input id="season_start" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-01-01"/>
-								</div>
-								<div>
-									<label class="block text-[10px] font-inter font-bold tracking-widest text-on-surface-variant uppercase mb-2">Cycle End Date</label>
-									<input id="season_end" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-12-31"/>
-								</div>
+								</div>			
 							</div>
-							<!-- Season Actions -->
-							<div class="mt-8 pt-6 border-t border-outline-variant/10">			
-								<div class="flex items-center justify-between mb-4">
-									<h4 class="font-manrope font-bold text-xs lg:text-sm text-on-surface">
-										Season Control Panel
-									</h4>
-									<span id="season_status_badge" class="text-[10px] font-inter tracking-widest uppercase px-3 py-1 bg-background border border-white/10 rounded-md">
-										UNKNOWN
-									</span>
-								</div>
-			
-								<div class="grid grid-cols-3 gap-4">			
-									<!-- OPEN SEASON -->
-									<button id="btn_open_season"
-										class="group bg-background border border-white/10 rounded-md hover:bg-green-500/10 px-4 py-4 transition-all">			
-										<div class="flex items-center justify-center gap-2">
-											<span class="material-symbols-outlined text-green-400 text-sm">play_arrow</span>
-											<span class="text-xs font-inter font-bold tracking-widest">
-												OPEN SEASON
-											</span>
+							<!-- Tier 3 -->
+							<div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">			
+								<div class="col-span-3 flex items-center gap-3">			
+									<div class="h-2 w-2 rounded-md bg-background"></div>			
+									<input id="tier_3_name"
+										class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+										type="text"
+										value="Premium" />			
+									</div>	
+								
+									<div class="col-span-7">			
+										<div class="relative">			
+											<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
+												IDR
+											</span>			
+											<input id="tier_3"
+												class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
+												type="number"
+												value="2500000" />								
 										</div>			
-									</button>			
-									<!-- CLOSE SEASON -->
-									<button id="btn_close_season"
-										class="group bg-background border border-white/10 rounded-md hover:bg-red-500/10 border px-4 py-4 transition-all">
+									</div>			
+									<div class="col-span-2 text-right">
+										<span class="material-symbols-outlined text-sm">
+											edit
+										</span>
+									</div>						
+								</div>			
+								<!-- Tier 4 -->
+								<div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">			
+									<div class="col-span-3 flex items-center gap-3">			
+										<div class="h-2 w-2 rounded-md bg-background"></div>			
+											<input id="tier_4_name"
+											class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+											type="text"
+											value="Elite"/>			
+										</div>
+						
+										<div class="col-span-7">			
+											<div class="relative">			
+												<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
+													IDR
+												</span>							
+												<input id="tier_4"
+												class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
+												type="number"
+												value="4500000" />
+											</div>	
+										</div>
+						
+										<div class="col-span-2 text-right">
+											<span class="material-symbols-outlined text-sm">
+												edit
+											</span>
+										</div>						
+									</div>
+									<!-- Tier 5 -->
+									<div class="grid grid-cols-12 items-center gap-4 p-4 rounded-md">					
+										<div class="col-span-3 flex items-center gap-3">						
+											<div class="h-2 w-2 rounded-md bg-background"></div>								
+												<input id="tier_5_name"
+												class="text-sm font-inter font-bold w-full bg-background border border-white/10 rounded-md focus:ring-0"
+												type="text"
+												value="Diamond" />									
+											</div>
+																			
+											<div class="col-span-7">								
+												<div class="relative">									
+													<span class="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-bold">
+													IDR
+													</span>
+													
+													<input id="tier_5"
+													class="w-full bg-background border border-white/10 rounded-md py-3 pl-12 text-sm font-bold"
+													type="number"
+													value="10000000" />										
+												</div>								
+											</div>	
+										
+											<div class="col-span-2 text-right">
+												<span class="material-symbols-outlined text-sm">
+												edit
+												</span>
+											</div>							
+										</div>													
+									</div>
+									<!-- Season Reset Date Config -->
+									<div class="mt-12 pt-8 border-t border-outline-variant/10">
+										<h3 class="font-manrope text-lg font-bold mb-6 flex items-center gap-2">
+											<span class="main-icon-box material-symbols-outlined text-3xl"
+							            style="font-variation-settings:'FILL' 1;" data-icon="calendar_today">calendar_today</span>
+												Season Cycle Configuration
+										</h3>
+										<div class="grid grid-cols-2 gap-8">
+											<div>
+												<label class="block text-[10px] font-inter font-bold tracking-widest text-on-surface-variant uppercase mb-2">Cycle Start Date</label>
+												<input id="season_start" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-01-01"/>
+											</div>
+											<div>
+												<label class="block text-[10px] font-inter font-bold tracking-widest text-on-surface-variant uppercase mb-2">Cycle End Date</label>
+												<input id="season_end" class="w-full bg-background border border-white/10 rounded-md py-3 px-4 font-inter text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary" type="date" value="2024-12-31"/>
+											</div>
+										</div>
+										<!-- Season Actions -->
+										<div class="mt-8 pt-6 border-t border-outline-variant/10">			
+											<div class="flex items-center justify-between mb-4">
+												<h4 class="font-manrope font-bold text-xs lg:text-sm text-on-surface">
+													Season Control Panel
+												</h4>
+												<span id="season_status_badge" class="text-[10px] font-inter tracking-widest uppercase px-3 py-1 bg-background border border-white/10 rounded-md">
+													UNKNOWN
+												</span>
+											</div>
+						
+											<div class="grid grid-cols-3 gap-4">			
+												<!-- OPEN SEASON -->
+												<button id="btn_open_season"
+													class="group bg-background border border-white/10 rounded-md hover:bg-green-500/10 px-4 py-4 transition-all">			
+													<div class="flex items-center justify-center gap-2">
+														<span class="material-symbols-outlined text-green-400 text-sm">play_arrow</span>
+														<span class="text-xs font-inter font-bold tracking-widest">
+															OPEN SEASON
+														</span>
+													</div>			
+												</button>			
+												<!-- CLOSE SEASON -->
+												<button id="btn_close_season"
+													class="group bg-background border border-white/10 rounded-md hover:bg-red-500/10 border px-4 py-4 transition-all">
+										
+													<div class="flex items-center justify-center gap-2">
+														<span class="material-symbols-outlined text-red-400 text-sm">stop</span>
+														<span class="text-xs font-inter font-bold tracking-widest">
+															CLOSE SEASON
+														</span>
+													</div>	
+												</button>
 							
-										<div class="flex items-center justify-center gap-2">
-											<span class="material-symbols-outlined text-red-400 text-sm">stop</span>
-											<span class="text-xs font-inter font-bold tracking-widest">
-												CLOSE SEASON
-											</span>
-										</div>	
-									</button>
-				
-									<!-- AUTO SEASON -->
-									<button id="btn_auto_season"
-										class="group bg-background border border-white/10 rounded-md hover:bottom-theme px-4 py-4 transition-all">
-										<div class="flex items-center justify-center gap-2">
-											<span class="material-symbols-outlined text-on-surface text-sm">schedule</span>
-											<span class="text-xs font-inter font-bold tracking-widest">
-												AUTO SEASON
-											</span>
-										</div>							
-									</button>			
+												<!-- AUTO SEASON -->
+												<button id="btn_auto_season"
+													class="group bg-background border border-white/10 rounded-md hover:bottom-theme px-4 py-4 transition-all">
+													<div class="flex items-center justify-center gap-2">
+														<span class="material-symbols-outlined text-on-surface text-sm">schedule</span>
+														<span class="text-xs font-inter font-bold tracking-widest">
+															AUTO SEASON
+														</span>
+													</div>							
+												</button>			
+											</div>
+										</div>
+						
+										<div class="mt-6 flex items-center gap-4 bg-white/5 p-4 rounded-md border border-white/10">
+											<span class="material-symbols-outlined text-on-surface" data-icon="info">info</span>
+											<p class="text-xs text-on-surface-variant leading-relaxed">All tier progress will be archived and customer status will reset to Bronze on the cycle end date unless manually overridden.</p>
+										</div>
+									</div>
 								</div>
 							</div>
-			
-							<div class="mt-6 flex items-center gap-4 bottom-theme p-4 rounded-md border border-white/10">
-								<span class="material-symbols-outlined text-on-surface" data-icon="info">info</span>
-								<p class="text-xs text-on-surface-variant leading-relaxed">All tier progress will be archived and customer status will reset to Bronze on the cycle end date unless manually overridden.</p>
-							</div>
 						</div>
-					</div>
-				</div>
+					</section>
+				</main>
 			</div>
-		</section>
-</main>
-</div>
-</div>
+		</div>
 </template>
 
 
@@ -10385,8 +10321,8 @@ Save
       <!-- Header -->
       <div class="px-8 py-6 flex items-center justify-between border-b border-white/10">
         <div class="flex items-center gap-4">
-          <div class="w-12 h-12 rounded-2xl bottom-theme flex items-center justify-center">
-            <span class="material-symbols-outlined text-on-surface text-2xl">
+					<span class="main-icon-box material-symbols-outlined text-3xl"
+							style="font-variation-settings:'FILL' 1;">
               redeem
             </span>
           </div>
@@ -10403,7 +10339,7 @@ Save
         </div>
 
         <button onclick="closeAddRewardModal()"
-          class="w-10 h-10 rounded-md hover:bg-white/5 flex items-center justify-center text-muted">
+          class="w-10 h-10 rounded-md hover:text-on-surfaceflex items-center justify-center text-on-surface-variant">
           <span class="material-symbols-outlined">
             close
           </span>
@@ -10435,12 +10371,12 @@ Save
 
         <!-- Product -->
         <div class="space-y-2">
-          <label class="text-sm font-semibold uppercase tracking-wider text-muted ">
+          <label class="text-sm font-semibold uppercase tracking-wider text-on-surface-variant ">
             Product
           </label>
 
           <div class="relative">
-            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-muted ">
+            <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant ">
               inventory_2
             </span>
 
@@ -10477,12 +10413,12 @@ Save
       <!-- Footer -->
       <div class="px-8 py-6 border-t border-white/10 flex justify-end gap-3">
         <button onclick="closeAddRewardModal()"
-          class="px-8 py-3 rounded-md border border-white/10 text-muted hover:bg-white/5">
+          class="px-8 py-3 rounded-md text-on-surface-variant hover:text-on-surface">
           	Cancel
         </button>
 
         <button onclick="saveRewardProduct()"
-          class="px-10 py-3 rounded-md bg-background text-foreground font-bold shadow-lg hover:opacity-90 flex items-center gap-2">
+          class="px-10 py-3 rounded-md bottom-theme uppercase tracking-widest font-bold tracking-[0.20em] flex items-center gap-2">
          	 Save Reward
           <span class="material-symbols-outlined">
             arrow_forward
@@ -10518,7 +10454,7 @@ Save
 			  </a>
 		
 			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })""
+			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
 				 style="display:none"
 					 class="settingsMenu">
 					<span class="material-symbols-outlined sidebar-icon">
@@ -10690,8 +10626,11 @@ Save
 			<div class="absolute top-0 right-0 w-32 h-32 bottom-theme rounded-md -mr-16 -mt-16 blur-3xl group-hover:bottom-theme transition-colors"></div>
 				<div class="flex items-start justify-between relative z-10">
 					<div class="flex gap-4">
-						<div class="w-12 h-12 rounded-md bottom-theme flex items-center justify-center text-[#f59e0b]">
-							<span class="material-symbols-outlined text-2xl" data-icon="account_balance">account_balance</span>
+						<div class="main-icon-box">
+			      	<span class="main-icon-box material-symbols-outlined text-3xl"
+			          style="font-variation-settings:'FILL' 1;" data-icon="account_balance">
+							account_balance
+						</span>
 						</div>
 						<div>
 							<h3 class="font-headline font-bold text-xl text-on-surface">VAT (Tax)</h3>
@@ -10752,57 +10691,58 @@ Save
 							<div class="col-span-12 md:col-span-6 bg-background rounded-md p-4 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 								<div class="flex items-start justify-between mb-8">
 									<div class="flex gap-4">
-										<div class="w-12 h-12 rounded-md bottom-theme flex items-center justify-center text-on-surface-container">
-											<span class="material-symbols-outlined text-2xl" data-icon="percent">percent</span>
-										</div>
-										<div>
-											<h3 class="font-headline font-bold text-xl text-on-surface">Discount</h3>
-											<p class="text-on-surface-variant text-sm mt-1">Global store-wide internal discount.</p>
-										</div>
+							      <span class="main-icon-box material-symbols-outlined text-3xl"
+							            style="font-variation-settings:'FILL' 1;" data-icon="percent">
+											percent
+										</span>
+									</div>
+									<div>
+										<h3 class="font-headline font-bold text-xl text-on-surface">Discount</h3>
+										<p class="text-on-surface-variant text-sm mt-1">Global store-wide internal discount.</p>
 									</div>
 								</div>
-								<div class="p-6 rounded-md group focus-within:border-primary-container/20 transition-all">
-									<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Discount Cap</label>
-										<div class="relative group">
-											<input id="discountInput" class="w-full h-16 bg-background rounded-md border border-white/10 text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
-											<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
-										</div>
-									</div>
-								</div>
-								<!-- Preview Area (Glassmorphism) -->
-								<div class="col-span-12 bg-background rounded-md p-4 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-								  <h3 class="font-headline font-bold text-xl text-on-surface mb-6 flex items-center gap-3">
-								    <span class="material-symbols-outlined">info</span>
-								    Receipt Information
-								  </h3>
-								
-							<div class="bg-background p-6 border border-white/10 rounded-md">
-								<h4 class="font-bold text-on-surface mb-3">
-									Receipt Printing Behavior
-								</h4>							
-								<ul class="space-y-3 text-xs lg:text-sm text-on-surface-variant">									
-									<li>
-										• Customer copy will automatically display store information, transaction details, payment method and total amount.
-									</li>
-						
-									<li>
-										• Tax and service charge are calculated according to the configuration above.
-									</li>
-						
-									<li>
-										• Footer message will appear at the bottom of every receipt.
-									</li>
-						
-									<li>
-										• QRIS, Cash and Card transactions use the same receipt layout.
-									</li>
-						
-									<li>
-										• Changes are applied immediately after saving settings.
-									</li>									
-								</ul>								
 							</div>
-
+							<div class="p-6 rounded-md group focus-within:border-primary-container/20 transition-all">
+								<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Discount Cap</label>
+									<div class="relative group">
+										<input id="discountInput" class="w-full h-16 bg-background rounded-md border border-white/10 text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
+										<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
+									</div>
+								</div>
+							</div>
+							<!-- Preview Area (Glassmorphism) -->
+							<div class="col-span-12 bg-background rounded-md p-4 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+								<h3 class="font-headline font-bold text-xl text-on-surface mb-6 flex items-center gap-3">
+									<span class="material-symbols-outlined">info</span>
+									Receipt Information
+								</h3>
+							
+						<div class="bg-background p-6 border border-white/10 rounded-md">
+							<h4 class="font-bold text-on-surface mb-3">
+								Receipt Printing Behavior
+							</h4>							
+							<ul class="space-y-3 text-xs lg:text-sm text-on-surface-variant">									
+								<li>
+									• Customer copy will automatically display store information, transaction details, payment method and total amount.
+								</li>
+					
+								<li>
+									• Tax and service charge are calculated according to the configuration above.
+								</li>
+					
+								<li>
+									• Footer message will appear at the bottom of every receipt.
+								</li>
+					
+								<li>
+									• QRIS, Cash and Card transactions use the same receipt layout.
+								</li>
+					
+								<li>
+									• Changes are applied immediately after saving settings.
+								</li>									
+							</ul>								
+						</div>
 					</div>
 				</div>
 			</div>
@@ -10835,7 +10775,7 @@ Save
 			  </a>
 		
 			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })""
+			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
 				 style="display:none"
 					 class="settingsMenu">
 					<span class="material-symbols-outlined sidebar-icon">
