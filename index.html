@@ -12324,7 +12324,7 @@ Save
 			                checked
 			                class="sr-only peer"
 			                type="checkbox">
-			              <div class="w-11 h-6 bg-background rounded-md peer peer-checked:bg-primary relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:bg-white after:rounded-md peer-checked:after:translate-x-full transition-all">
+			              <div class="w-11 h-6 bg-background rounded-md peer peer-checked:bg-white relative after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:h-5 after:w-5 after:bg-background after:rounded-md peer-checked:after:translate-x-full transition-all">
 		              </div>
 		            </label>
 		          </div>
@@ -12548,7 +12548,7 @@ Save
         </button>
 
         <button onclick="submitMember()"
-          class="btn-gradient px-6 py-3 rounded-md font-bold text-black flex items-center gap-2">
+          class="px-6 py-3 bottom-theme uppercase tracking-widest font-bold tracking-[0.20em] flex items-center gap-2">
           	Register Member
           <span class="material-symbols-outlined">
             arrow_forward
@@ -12610,7 +12610,7 @@ Save
 				<div class="flex-1 px-10">
 				<!-- Navigation -->
 					<div class="flex gap-8 border-b border-outline-variant/15 mb-6">
-				<button data-tab="personal" class="pb-3 border-b-2 border-primary text-on-surface font-semibold text-sm tracking-wide">Personal Info</button>
+				<button data-tab="personal" class="pb-3 border-b-2 border-white text-on-surface font-semibold text-sm tracking-wide">Personal Info</button>
 				<button data-tab="tier" class="pb-3 text-on-surface-variant hover:text-on-surface transition-colors font-medium text-sm tracking-wide">Tier History</button></div>
 			</div>
 				<!-- TAB PERSONAL -->
@@ -12644,20 +12644,18 @@ Save
 				</div>
 				<!-- Action Buttons -->
 				<div class="p-10 pt-0 flex gap-4 mt-auto">
-					<button onclick="enableEditMember()" class="flex-1 btn-gradient h-12 rounded-md flex items-center justify-center text-on-primary font-semibold tracking-wide transition-transform hover:scale-[1.02] active:scale-95 shadow-lg">
+					<button onclick="enableEditMember()" class="flex-1 bottom-theme font-bold h-12 rounded-md flex items-center justify-center">
 						<span class="material-symbols-outlined mr-2 text-xl" style="font-variation-settings: 'FILL' 1;">edit_note</span>
 							Edit Profile
 					</button>
 					<button onclick="document.getElementById('memberPhotoInput').click()"
-						class="flex-1 bg-transparent border border-outline-variant/30 h-12 rounded-md flex items-center justify-center text-on-surface font-semibold tracking-wide hover:bg-surface-container-highest transition-all duration-200">
+						class="flex-1 bottom-theme font-bold h-12 rounded-md flex items-center justify-center text-on-surface transition-all duration-200">
 						<span class="material-symbols-outlined mr-2 text-xl">
 							add_a_photo
 						</span>
 						Upload Photo
 					</button>
 				</div>
-				<!-- Bottom Aesthetic Gradient Stripe -->
-				<div class="h-1.5 w-full bg-gradient-to-r from-primary via-primary-container to-secondary opacity-80"></div>
 			</div>
 		</div>
 		
@@ -12671,13 +12669,6 @@ Save
 						<div class="pb-6"></div>
 						</div>
 					</div>
-					<!-- Tabbed Content -->
-					<div class="flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-primary/20 bottom-theme hover:bottom-theme transition-all duration-200 group mb-3 cursor-pointer">
-						<span class="material-symbols-outlined text-on-surface text-sm">download</span>
-						<span class="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant group-hover:text-on-surface transition-colors">Save as Image</span>
-					</div>
-					<!-- Bottom Aesthetic Gradient Stripe -->
-					<div class="h-1.5 w-full bg-gradient-to-r from-primary via-primary-container to-secondary opacity-80"></div>
 				</div>
 			</div>
 		</div>
