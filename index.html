@@ -1987,7 +1987,7 @@
 
 		      <!-- Itemized List -->
 		      <section class="px-6 space-y-4 mb-6 overflow-y-auto max-h-[320px]">
-		        <div class="grid grid-cols-12 text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
+		        <div class="grid grid-cols-12 text-xs uppercase tracking-widest font-bold text-on-surface-variant">
 		          <div class="col-span-8">
 		            Item
 		          </div>
@@ -4460,20 +4460,16 @@
 <!-- POPPUP INGREDIENT INVENTORY -->
 
 <template id="ingredientinventoryModal">
-
 <div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background backdrop-blur-md">
-
   <div onclick="event.stopPropagation()"
     class="w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
 
     <!-- HEADER -->
     <div class="p-6 border-b border-white/10 flex items-center justify-between">
-
       <div class="flex items-center gap-4">
-
-        <div class="w-12 h-12 rounded-lg bg-background-high flex items-center justify-center">
-          <span id="modalItemIcon"
-            class="material-symbols-outlined text-primary text-2xl">
+        <div class="main-icon-box">
+		      <span class="main-icon-box material-symbols-outlined text-2xl"
+		            style="font-variation-settings:'FILL' 1;">
             inventory_2
           </span>
         </div>
@@ -4485,127 +4481,103 @@
           </h2>
 
           <div class="flex items-center gap-2 mt-1">
-            <span class="w-2 h-2 rounded-md bg-primary shadow-[0_0_10px_#f59e0b]"></span>
-            <span class="text-xs uppercase tracking-wider text-primary">
+            <span class="w-2 h-2 rounded-md bg-on-surface shadow-[0_0_10px_#f59e0b]"></span>
+            <span class="text-xs uppercase tracking-wider text-on-surface-variant">
               Current Stock:
               <span id="modalStockText" class="text-on-surface-variant font-semibold"></span>
             </span>
           </div>
-
         </div>
-
       </div>
 
       <button onclick="closeIngredientModal()"
         class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
         <span class="material-symbols-outlined">close</span>
       </button>
-
     </div>
 
     <!-- ACTION LIST -->
     <div class="p-2 space-y-1">
-
       <!-- 1 -->
       <button onclick="openAdjustFromIngredient()"
-        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
-
+        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background transition group">
         <div class="flex items-center gap-4">
-
-          <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
-            <span class="material-symbols-outlined">edit</span>
+         <div class="main-icon-box">
+		      <span class="main-icon-box material-symbols-outlined text-lg"
+		            style="font-variation-settings:'FILL' 1;">edit</span>
           </div>
 
           <div class="text-left">
             <p class="text-xs lg:text-sm text-on-surface font-medium">Adjust Stock Level</p>
             <p class="text-xs text-on-surface-variant">Manual inventory corrections</p>
           </div>
-
         </div>
 
-        <span class="material-symbols-outlined text-outline/50 group-hover:text-primary">
+        <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
           chevron_right
         </span>
-
       </button>
 
       <!-- 2 -->
       <button onclick="openUsageLogFromIngredient()"
-        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
-
+        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background transition group">
         <div class="flex items-center gap-4">
-
-          <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
-            <span class="material-symbols-outlined">history_edu</span>
+          <div class="main-icon-box">
+			      <span class="main-icon-box material-symbols-outlined text-lg"
+			            style="font-variation-settings:'FILL' 1;">history_edu</span>
           </div>
 
           <div class="text-left">
             <p class="text-xs lg:text-sm text-on-surface font-medium">View Stock Movement Log</p>
             <p class="text-xs text-on-surface-variant">Historical usage tracking</p>
           </div>
-
         </div>
 
-        <span class="material-symbols-outlined text-outline/50 group-hover:text-primary">
+        <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
           chevron_right
         </span>
-
       </button>
 
       <!-- 3 -->
       <button onclick="openThresholdFromIngredient()"
-        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background-high transition group">
-
+        class="w-full flex items-center justify-between p-4 rounded-lg hover:bg-background transition group">
         <div class="flex items-center gap-4">
-
-          <div class="w-10 h-10 rounded-lg bg-background-high flex items-center justify-center text-primary">
-            <span class="material-symbols-outlined">low_priority</span>
+          <div class="main-icon-box">
+			      <span class="main-icon-box material-symbols-outlined text-lg"
+			            style="font-variation-settings:'FILL' 1;">low_priority</span>
           </div>
 
           <div class="text-left">
             <p class="text-xs lg:text-sm text-on-surface font-medium">Set Minimum Threshold</p>
             <p class="text-xs text-on-surface-variant">Restock alert configuration</p>
           </div>
-
         </div>
-
-        <span class="material-symbols-outlined text-outline/50 group-hover:text-primary">
+				
+        <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
           chevron_right
         </span>
-
       </button>
-
     </div>
-
     <!-- FOOTER -->
     <div class="p-4">
-
       <button onclick="closeIngredientModal()"
-        class="w-full h-11 rounded-lg bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+        class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
         Close Menu
       </button>
-
     </div>
-
   </div>
-
 </div>
-
 </template>
 
 
 <!-- POPUP ADJUST STOCK INVENTORY -->
 
 <template id="inventoryModal">
-
 <div class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-background backdrop-blur-md">
-
   <div class="bg-background w-full max-w-xl rounded-md overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
     <!-- HEADER -->
     <div class="p-8 pb-4">
       <div class="flex justify-between items-start mb-6">
-
         <h2 id="adjustItemName"
             class="font-headline text-2xl font-extrabold text-on-surface">
           Adjust Stock Level
@@ -4615,16 +4587,14 @@
           <span class="material-symbols-outlined text-primary text-sm">inventory</span>
           <span class="uppercase text-[10px] font-bold text-on-surface">
             CURRENT STOCK:
-            <span id="adjustCurrentStock" class="text-primary"></span>
+            <span id="adjustCurrentStock" class="text-on-surface-variant"></span>
           </span>
         </div>
-
       </div>
     </div>
 
     <!-- CONTENT -->
     <div class="px-8 py-6 space-y-8">
-
       <!-- TYPE -->
       <div>
         <label class="text-[10px] uppercase tracking-widest text-on-surface-variant">
@@ -4632,7 +4602,6 @@
         </label>
 
         <div class="mt-2 flex p-1 rounded-md bg-background border border-white/10">
-
           <button id="btnAdd"
             class="flex-1 py-2 rounded-md text-xs font-bold btn-inactive">
             Add (+)
@@ -4647,13 +4616,11 @@
             class="flex-1 py-2 rounded-md text-xs font-bold btn-inactive">
             Set New (=)
           </button>
-
         </div>
       </div>
 
       <!-- INPUT + RESULT -->
       <div class="grid grid-cols-2 gap-6">
-
         <div>
           <label class="text-[10px] uppercase tracking-widest text-on-surface-variant">
             Adjustment Quantity
@@ -4671,18 +4638,13 @@
           </label>
 
           <div class="mt-2 h-full bg-background rounded-md flex items-center justify-between px-4 border border-white/10">
-
             <span class="material-symbols-outlined text-primary">trending_up</span>
-
             <p id="projectedStock" class="text-primary font-bold text-xl">
               450
             </p>
-
           </div>
         </div>
-
       </div>
-
       <!-- REASON -->
       <div>
         <label class="text-[10px] uppercase tracking-widest text-on-surface-variant">
@@ -4693,14 +4655,11 @@
           rows="2"
           class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary/30"
           placeholder="e.g., Waste, Recount, Spillage..."></textarea>
-
       </div>
-
     </div>
 
     <!-- ACTION -->
     <div class="p-8 flex gap-4 bg-background border border-white/10">
-
       <button onclick="closeAdjustStockModal()"
         class="flex-1 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-white/5">
         Cancel
@@ -4710,119 +4669,97 @@
         class="flex-[2] py-3 rounded-md btn-gradient font-bold text-black">
         Confirm Adjustment
       </button>
-
     </div>
-
   </div>
-
 </div>
-
 </template>
 
 
 <!-- POPUP MIN THRESHOLD INVENTORY -->
 
 <template id="inventorythersholdModal">
-
 <div class="fixed inset-0 z-[9999] flex items-center justify-center p-6">
-
   <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
+	  <div class="relative w-full max-w-[540px]">
+	    <div class="bg-background rounded-md overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 
-  <div class="relative w-full max-w-[540px]">
-
-    <div class="bg-background rounded-md overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-      <!-- HEADER -->
-      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
-
-        <div class="flex items-center gap-3">
-          <span class="material-symbols-outlined text-primary">inventory_2</span>
-          <h1 class="text-lg font-bold text-on-surface">
-            Minimum Threshold
-          </h1>
-        </div>
-
-        <button onclick="closeThresholdModal()"
-          class="text-on-surface-variant hover:text-on-surface">
-          ✕
-        </button>
-
-      </div>
-
-      <!-- CONTENT -->
-      <div class="p-6 space-y-6">
-
-        <div>
-          <h2 id="thresholdItemName" class="text-xl font-bold text-on-surface">
-            Espresso Roast - Arabica
-          </h2>
-
-          <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
-            Current Stock:
-            <span class="text-primary">4,500g</span>
-          </p>
-        </div>
-
-        <div>
-          <label class="text-[10px] uppercase text-on-surface-variant">
-            Threshold (Grams)
-          </label>
-
-          <input id="thresholdValue"
-            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"
-            type="text"
-            value="500">
-
-        </div>
-
-        <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
-          <span class="material-symbols-outlined text-primary">info</span>
-          <p class="text-xs text-on-surface-variant">
-            Restock alerts trigger automatically when stock falls below this level.
-          </p>
-        </div>
-
-      </div>
-
-      <!-- FOOTER -->
-      <div class="px-6 py-5 flex justify-end gap-3 bg-background">
-
-        <button onclick="closeThresholdModal()"
-          class="text-on-surface-variant hover:text-on-surface">
-          Cancel
-        </button>
-
-        <button onclick="submitThreshold()"
-          class="btn-gradient px-6 py-3 rounded-md font-bold text-black">
-          Update Threshold
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</div>
-
+	      <!-- HEADER -->
+	      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+	        <div class="flex items-center gap-3">
+	          <span <span class="main-icon-box material-symbols-outlined text-3xl"
+		            style="font-variation-settings:'FILL' 1;">inventory_2</span>
+	          <h1 class="text-lg font-bold text-on-surface">
+	            Minimum Threshold
+	          </h1>
+	        </div>
+	
+	        <button onclick="closeThresholdModal()"
+	          class="text-on-surface-variant hover:text-on-surface">
+	          ✕
+	        </button>
+	      </div>
+	
+	      <!-- CONTENT -->
+	      <div class="p-6 space-y-6">
+	        <div>
+	          <h2 id="thresholdItemName" class="text-xl font-bold text-on-surface">
+	            Espresso Roast - Arabica
+	          </h2>
+	
+	          <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
+	            Current Stock:
+	            <span class="text-primary">4,500g</span>
+	          </p>
+	        </div>
+	
+	        <div>
+	          <label class="text-[10px] uppercase text-on-surface-variant">
+	            Threshold (Grams)
+	          </label>
+	
+	          <input id="thresholdValue"
+	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"
+	            type="text"
+	            value="500">
+	        </div>
+	
+	        <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
+	          <span class="material-symbols-outlined text-on-surface-variant">info</span>
+	          <p class="text-xs text-on-surface-variant">
+	            Restock alerts trigger automatically when stock falls below this level.
+	          </p>
+	        </div>
+	      </div>
+	
+	      <!-- FOOTER -->
+	      <div class="px-6 py-5 flex justify-end gap-3 bg-background">
+	        <button onclick="closeThresholdModal()"
+	          class="text-on-surface-variant hover:text-on-surface">
+	          Cancel
+	        </button>
+	
+	        <button onclick="submitThreshold()"
+	          bottom-theme uppercase tracking-widest font-bold text-on-surface-variant tracking-[0.20em]">
+	          Update Threshold
+	        </button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 
 <!-- POPUP DETAIL USAGE INVENTORY -->
 
 <template id="inventorydetailusageModal">
-
 <div class="fixed inset-0 bg-background z-[100] flex items-center justify-center p-4 md:p-8 backdrop-blur-md">
-
   <main class="w-full max-w-5xl bg-background rounded-md shadow-2xl flex flex-col max-h-[90vh] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
     <!-- HEADER -->
     <header class="p-8 pb-4 flex items-center justify-between">
-
       <div class="flex items-center gap-4">
-
-        <div class="w-14 h-14 rounded-md bg-primary/10 flex items-center justify-center">
-          <span class="material-symbols-outlined text-primary text-3xl">history_edu</span>
+        <div class="main-icon-box">
+	      	<span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">history_edu</span>
         </div>
 
         <div>
@@ -4835,37 +4772,30 @@
             <span class="mx-2 text-primary/40">|</span> SKU: ER-ARB-001
           </p>
         </div>
-
       </div>
 
       <button onclick="closeUsageLogModal()"
         class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
         <span class="material-symbols-outlined">close</span>
       </button>
-
     </header>
 
     <!-- SUMMARY -->
     <div class="px-8 grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-
       <!-- 1 -->
       <div class="bg-background p-6 rounded-md border border-white/10 relative overflow-hidden">
-
         <span class="text-xs uppercase tracking-wider text-on-surface-variant">
           Total QTY
         </span>
 
         <div class="mt-2 flex items-end gap-2">
-          <span id="usageCurrentStock" class="text-4xl font-bold text-primary">
+          <span id="usageCurrentStock" class="text-4xl font-bold text-on-surface">
             12.4
           </span>
         </div>
-
       </div>
-
       <!-- 2 -->
       <div class="bg-background p-6 rounded-md border border-white/10 relative overflow-hidden">
-
         <span class="text-xs uppercase tracking-wider text-on-surface-variant">
           Average Daily Deduction
         </span>
@@ -4873,12 +4803,9 @@
         <div class="mt-2 text-3xl font-bold text-on-surface">
           <span id="usageTotalOut">1,770</span>
         </div>
-
       </div>
-
       <!-- 3 -->
       <div class="bg-background p-6 rounded-md border border-white/10 relative overflow-hidden">
-
         <span class="text-xs uppercase tracking-wider text-on-surface-variant">
           Remaining Supply
         </span>
@@ -4889,20 +4816,14 @@
           </span>
           <span class="text-xs lg:text-sm text-on-surface-variant">days</span>
         </div>
-
       </div>
-
     </div>
 
     <!-- TABLE -->
     <div class="flex-1 px-8 overflow-y-auto custom-scrollbar">
-
       <div class="bg-background/50 rounded-md overflow-hidden border border-white/10">
-
         <table class="w-full text-left">
-
           <thead class="sticky top-0 bg-background">
-
             <tr>
               <th class="p-5 text-xs uppercase text-on-surface-variant">Timestamp</th>
               <th class="p-5 text-xs uppercase text-on-surface-variant">Type</th>
@@ -4910,52 +4831,34 @@
               <th class="p-5 text-xs uppercase text-on-surface-variant text-right">Qty</th>
               <th class="p-5 text-xs uppercase text-on-surface-variant text-right">Stock</th>
             </tr>
-
           </thead>
 
           <tbody id="usageLogTableBody"
             class="divide-y divide-white/5 text-on-surface">
           </tbody>
-
         </table>
-
       </div>
-
     </div>
 
     <!-- FOOTER -->
     <footer class="p-10 flex justify-between items-center bg-background border border-white/10 relative overflow-hidden">
-
       <button onclick="closeUsageLogModal()"
         class="px-6 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition">
         Close Log
       </button>
-
-      <button
-        class="px-6 py-3 rounded-md btn-gradient text-black font-bold shadow-lg">
-        Export PDF
-      </button>
-
     </footer>
-
   </main>
-
 </div>
-
 </template>
 
 
 <!-- POPUP EDIT SUPPLIER -->
 
 <template id="editsupplierModal">
-
 <div class="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-background backdrop-blur-md">
-
   <div class="bg-background w-full max-w-lg rounded-md shadow-2xl overflow-hidden border border-white/10 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
     <!-- HEADER -->
     <div class="px-8 py-6 flex justify-between items-center border-b border-white/10">
-
       <div>
         <h2 class="font-headline font-bold text-2xl tracking-tight text-on-surface">
           Edit Supplier Information
@@ -4970,12 +4873,10 @@
         class="w-10 h-10 flex items-center justify-center rounded-md hover:bg-white/5 transition-colors">
         <span class="material-symbols-outlined text-on-surface-variant">close</span>
       </button>
-
     </div>
 
     <!-- BODY -->
     <div class="p-8 space-y-6">
-
       <!-- Supplier Name -->
       <div class="space-y-2">
         <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-1">
@@ -4989,7 +4890,6 @@
 
       <!-- Category + Contact -->
       <div class="grid grid-cols-2 gap-4">
-
         <div class="space-y-2">
           <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-1">
             Category
@@ -4997,15 +4897,13 @@
 
           <div class="relative">
             <select id="supplierCategoryInput"
-              class="w-full bg-background p-3.5 rounded-md text-on-surface border border-outline-variant/10 appearance-none focus:ring-1 focus:ring-primary-container outline-none cursor-pointer">
-
+              class="w-full bg-background p-3.5 rounded-md text-on-surface border border-white/10 appearance-none focus:ring-1 focus:ring-primary-container outline-none cursor-pointer">
               <option>Coffee & Beans</option>
               <option>Dairy & Creams</option>
               <option>Meats & Poultry</option>
               <option>Grains & Spices</option>
               <option>Packaging</option>
               <option>Other</option>
-
             </select>
 
             <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
@@ -5020,10 +4918,9 @@
           </label>
 
           <input id="supplierContactInput"
-            class="w-full bg-background p-3.5 rounded-md text-on-surface border border-outline-variant/10 focus:ring-1 focus:ring-primary-container outline-none"
+            class="w-full bg-background p-3.5 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary-container outline-none"
             type="text" value="-">
         </div>
-
       </div>
 
       <!-- Phone -->
@@ -5033,7 +4930,6 @@
         </label>
 
         <div class="flex rounded-md overflow-hidden border border-white/10">
-
           <div class="bg-background px-4 py-3.5 text-on-surface-variant font-medium">
             +62
           </div>
@@ -5041,7 +4937,6 @@
           <input id="supplierPhoneInput"
             class="flex-1 bg-background px-4 py-3.5 text-on-surface focus:ring-1 focus:ring-primary-container outline-none transition-all"
             type="tel" value="-">
-
         </div>
       </div>
 
@@ -5058,7 +4953,6 @@
 
       <!-- STATUS -->
       <div class="flex items-center justify-between p-4 bg-background rounded-md border border-white/10">
-
         <div>
           <p class="font-bold text-on-surface">Supplier Status</p>
           <p class="text-xs text-on-surface-variant">
@@ -5079,30 +4973,23 @@
                  peer-checked:after:translate-x-full
                  peer-checked:after:bg-on-primary">
         </label>
-
       </div>
-
     </div>
 
     <!-- FOOTER -->
     <div class="px-6 py-5 flex justify-end gap-3 bg-background border-t border-white/10">
-
       <button onclick="closeEditSupplierModal()"
         class="px-6 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
         Cancel
       </button>
 
       <button onclick="saveeditSupplier()"
-        class="px-8 py-3 rounded-md btn-gradient text-black font-bold hover:brightness-110 active:scale-95 transition-all">
+        class="px-8 py-3 bottom-theme uppercase tracking-widest font-bold text-on-surface-variant tracking-[0.20em]">
         Save Changes
       </button>
-
     </div>
-
   </div>
-
 </div>
-
 </template>
 
 
