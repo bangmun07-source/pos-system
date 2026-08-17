@@ -10691,63 +10691,66 @@
 							<div class="col-span-12 md:col-span-6 bg-background rounded-md p-4 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 								<div class="flex items-start justify-between mb-8">
 									<div class="flex gap-4">
-							      <span class="main-icon-box material-symbols-outlined text-3xl"
-							            style="font-variation-settings:'FILL' 1;" data-icon="percent">
-											percent
-										</span>
-									</div>
-									<div>
-										<h3 class="font-headline font-bold text-xl text-on-surface">Discount</h3>
-										<p class="text-on-surface-variant text-sm mt-1">Global store-wide internal discount.</p>
-									</div>
-								</div>
-							</div>
-							<div class="p-6 rounded-md group focus-within:border-primary-container/20 transition-all">
-								<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Discount Cap</label>
-									<div class="relative group">
-										<input id="discountInput" class="w-full h-16 bg-background rounded-md border border-white/10 text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
-										<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
+										<div class="main-icon-box">
+								      <span class="main-icon-box material-symbols-outlined text-3xl"
+								            style="font-variation-settings:'FILL' 1;" data-icon="percent">
+												percent
+											</span>
+										</div>
+									
+										<div>
+											<h3 class="font-headline font-bold text-xl text-on-surface">Discount</h3>
+											<p class="text-on-surface-variant text-sm mt-1">Global store-wide internal discount.</p>
+										</div>
 									</div>
 								</div>
+		
+								<div class="p-6 rounded-md group focus-within:border-primary-container/20 transition-all">
+									<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Discount Cap</label>
+										<div class="relative group">
+											<input id="discountInput" class="w-full h-16 bg-background rounded-md border border-white/10 text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
+											<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
+										</div>
+									</div>
+								</div>
+								<!-- Preview Area (Glassmorphism) -->
+								<div class="col-span-12 bg-background rounded-md p-4 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+									<h3 class="font-headline font-bold text-xl text-on-surface mb-6 flex items-center gap-3">
+										<span class="material-symbols-outlined">info</span>
+										Receipt Information
+									</h3>
+									
+							<div class="bg-background p-6 border border-white/10 rounded-md">
+								<h4 class="font-bold text-on-surface mb-3">
+									Receipt Printing Behavior
+								</h4>							
+								<ul class="space-y-3 text-xs lg:text-sm text-on-surface-variant">									
+									<li>
+										• Customer copy will automatically display store information, transaction details, payment method and total amount.
+									</li>
+						
+									<li>
+										• Tax and service charge are calculated according to the configuration above.
+									</li>
+						
+									<li>
+										• Footer message will appear at the bottom of every receipt.
+									</li>
+						
+									<li>
+										• QRIS, Cash and Card transactions use the same receipt layout.
+									</li>
+						
+									<li>
+										• Changes are applied immediately after saving settings.
+									</li>									
+								</ul>								
 							</div>
-							<!-- Preview Area (Glassmorphism) -->
-							<div class="col-span-12 bg-background rounded-md p-4 border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-								<h3 class="font-headline font-bold text-xl text-on-surface mb-6 flex items-center gap-3">
-									<span class="material-symbols-outlined">info</span>
-									Receipt Information
-								</h3>
-							
-						<div class="bg-background p-6 border border-white/10 rounded-md">
-							<h4 class="font-bold text-on-surface mb-3">
-								Receipt Printing Behavior
-							</h4>							
-							<ul class="space-y-3 text-xs lg:text-sm text-on-surface-variant">									
-								<li>
-									• Customer copy will automatically display store information, transaction details, payment method and total amount.
-								</li>
-					
-								<li>
-									• Tax and service charge are calculated according to the configuration above.
-								</li>
-					
-								<li>
-									• Footer message will appear at the bottom of every receipt.
-								</li>
-					
-								<li>
-									• QRIS, Cash and Card transactions use the same receipt layout.
-								</li>
-					
-								<li>
-									• Changes are applied immediately after saving settings.
-								</li>									
-							</ul>								
 						</div>
 					</div>
 				</div>
-			</div>
-		</main>
-	</div>
+			</main>
+		</div>
 </template>
 
 
