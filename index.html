@@ -2214,24 +2214,10 @@
 			<div id="receiptTextureLayer" class="absolute inset-0 receipt-texture pointer-events-none opacity-40"></div>
 				<div id="receiptContentWrapper" class="relative p-8 md:p-12">
 					<header id="receiptHeroSection" class="relative -mx-8 md:-mx-12 -mt-8 md:-mt-12 mb-12 overflow-hidden rounded-t-lg">
-					    <div class="absolute inset-0">
-					        <img
-					            id="receiptHeroImage"
-					            src="https://lh3.googleusercontent.com/d/1bBSgAdzEtECl6nTxYmdgs7oPxK1s3Z6y"
-					            class="w-full h-[250px] object-cover"
-					            alt="SOMA Logo">
-					
-					        <div
-					            id="receiptHeroOverlay"
-					            class="absolute inset-x-0 top-0 -bottom-1 bg-gradient-to-b from-background/40 via-background/90 to-background">
-					        </div>
-					    </div>
-					
 					    <div id="receiptHeroContent"
 					      class="relative z-10 min-h-[240px] flex flex-col items-center justify-center text-center px-8">
 					          <!-- LOGO -->
 					          <div id="receiptHeroIconWrapper" class="mb-5 flex justify-center">
-					
 					              <img
 					              id="receiptLogo"
 					              src=""
@@ -2240,10 +2226,10 @@
 					          </div>
 					        
 					          <h1 id="receiptTitle"
-					          class="font-display font-extrabold text-3xl tracking-tight text-on-surface mb-3 drop-shadow-lg">
+					          class="font-display font-bold text-3xl tracking-tight text-on-surface mb-3 drop-shadow-lg">
 					          </h1>
 					
-					          <p class="font-label text-xs uppercase tracking-[0.2em] text-on-surface font-bold drop-shadow-md">
+					          <p class="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant font-semibold drop-shadow-md">
 					              Digital Receipt
 					          </p>
 					      </div>
@@ -2251,17 +2237,17 @@
 					
 					<!-- Order Meta Bento Grid -->
 					<section id="receiptMetaSection" class="grid grid-cols-2 gap-4 mb-12">
-						<div class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+						<div class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10">
 							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Order ID</p>
 							<p id="receiptId" class="font-display font-light text-xs text-on-surface"></p>
 						</div>
 
-						<div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+						<div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10">
 							<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Date</p>
 							<p id="receiptDate" class="font-display font-bold text-lg"></p>
 						</div>
 						
-						<div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] col-span-2 flex justify-between items-center">
+						<div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 col-span-2 flex justify-between items-center">
 							<div>
 								<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Service Location</p>
 								<p id="receiptTable" class="font-display font-bold text-lg">Table</p>
@@ -2274,14 +2260,14 @@
 				<section id="receiptItemsSection" class="mb-12">
 					<div class="flex justify-between items-end mb-6">
 						<h2 id="receiptItemsTitle" class="font-display font-bold text-xl">Order Summary</h2>
-						<div class="h-px bg-outline-variant/20 flex-grow mx-4 mb-2"></div>
+						<div class="h-px bg-white/10 flex-grow mx-4 mb-2"></div>
 					</div>
 					<div id="receiptItemsContainer" class="space-y-6">
 				</div>
 			</section>
 					
 			<!-- Financial Breakdown -->
-			<section id="receiptFinancialSection" class="p-8 relative overflow-hidden rounded-md bg-background border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+			<section id="receiptFinancialSection" class="p-8 relative overflow-hidden rounded-md bg-background border border-white/10">
 				<div id="receiptFinancialBreakdown" class="space-y-4 mb-8">
 					<div class="flex justify-between text-sm">
 						<span class="text-on-surface-variant">Subtotal</span>
@@ -2300,32 +2286,33 @@
 					<span id="receiptService" class="font-semibold"></span>
 				</div>
 			</div>
-			<div id="receiptGrandTotalWrapper" class="pt-6 border-t border-outline-variant/30 flex justify-between items-center">
+			<div id="receiptGrandTotalWrapper" class="pt-6 border-t border-white/10 flex justify-between items-center">
 				<p class="font-label text-sm uppercase tracking-widest font-bold text-on-surface">Amount</p>
 				<p id="receiptTotal" class="font-display font-extrabold text-3xl text-on-surface tracking-tight"></p>
 			</div>
 		</section>
 	
-		<footer id="receiptFooterSection" class="text-center"><div class="space-y-6">
-			<p id="receiptFooterText" class="font-display font-medium text-lg text-on-surface italic"> </p>
-					<div id="receiptOutletInfo" class="flex flex-col items-center gap-3 pt-6 border-t border-outline-variant/10">
-						<div class="flex items-center gap-2 text-on-surface-variant">
-							<span id="receiptPhone" class="font-label text-xs tracking-widest font-semibold">
-							</span>
+		<footer id="receiptFooterSection" class="text-center">
+			<div class="space-y-6">
+				<p id="receiptFooterText" class="font-display font-medium text-lg text-on-surface italic px-8"> </p>
+						<div id="receiptOutletInfo" class="flex flex-col items-center gap-3 pt-6 border-t border-outline-variant/10">
+							<div class="flex items-center gap-2 text-on-surface-variant">
+								<span id="receiptPhone" class="font-label text-xs tracking-widest font-semibold">
+								</span>
+							</div>
+							
+					  	<p id="receiptInstagram" class="font-label text-xs tracking-wide text-on-surface-variant"> </p>
+				
+						  <div id="receiptAddressWrapper" class="flex items-center gap-2 text-on-surface-variant">
+						    <address id="receiptAddress" class="font-label text-xs tracking-wide not-italic uppercase">
+						    </address>
+						  </div>
 						</div>
-						
-				  	<p id="receiptInstagram" class="font-label text-xs tracking-wide text-on-surface-variant"> </p>
-			
-					  <div id="receiptAddressWrapper" class="flex items-center gap-2 text-on-surface-variant">
-					    <address id="receiptAddress" class="font-label text-xs tracking-wide not-italic uppercase">
-					    </address>
-					  </div>
 					</div>
-				</div>
-			</footer>
-		</div>
-	</article>
-</main>
+				</footer>
+			</div>
+		</article>
+	</main>
 </template>
 
 
