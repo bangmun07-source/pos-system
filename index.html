@@ -108,7 +108,7 @@
                            TERTIARY
                            ========================= */
                     
-                        "tertiary": "#00344A",
+                        "tertiary": "#2c9cf2",
                         "tertiary-container": "#1ABDFF",
                     
                         "on-tertiary": "#00344A",
@@ -8421,12 +8421,12 @@
 	    <!-- FOOTER -->
 	    <div class="p-4 border-t border-white/10 flex gap-3">
 	      <button onclick="closeExpenseStatusModal()"
-	        class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition">
+	        class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface transition">
 	        	Cancel
 	      </button>
 				
 	      <button onclick="saveExpenseStatus()"
-	        class="flex-1 h-11 rounded-md bg-primary text-white hover:opacity-90 transition">
+	        class="flex-1 h-11 rounded-md bottom-theme font-headline font-semibold uppercase tracking-[0.20em] text-on-surface transition">
 	        	Save Changes
 	      </button>
 	    </div>
@@ -8540,7 +8540,7 @@
 	
 	    <div class="p-4">
 	      <button onclick="closeExpenseAttachmentModal()"
-	      class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+	      class="w-full h-11 rounded-md bg-background-high text-on-surface-variant hover:text-on-surface transition active:scale-95">
 	        Close Menu
 	      </button>
 	    </div>
@@ -8635,7 +8635,7 @@
           Download
         </button>
         <button onclick="closeExpenseViewAttachmentModal()"
-        	class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition">
+        	class="flex-1 h-11 rounded-md bg-background-high text-on-surface-variant hover:text-on-surface transition">
           Close
         </button>
       </div>
@@ -8672,7 +8672,7 @@
 		</div>
 		
 		  <button onclick="closeExpenseAddAttachmentModal()"
-		  	class="w-10 h-10 rounded-md hover:bg-white/5 flex items-center justify-center">
+		  	class="w-10 h-10 rounded-md text-on-surface-variant hover:text-on-surface flex items-center justify-center">
 			  <span class="material-symbols-outlined">
 			  	close
 			  </span>
@@ -8773,7 +8773,7 @@
 				<!-- FOOTER -->
 			<div class="p-4 border-t border-white/10 flex gap-3">
 				<button onclick="closeExpenseAddAttachmentModal()"
-					class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition">
+					class="flex-1 h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface transition">
 					 Cancel
 				</button>
 
@@ -8797,8 +8797,11 @@
 				<!-- Modal Header -->
 				<div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/10">
 					<div class="flex items-center gap-3">
-						<div class="w-10 h-10 rounded-md bg-primary-container/20 flex items-center justify-center text-on-surface">
-							<span class="material-symbols-outlined">account_balance_wallet</span>
+						<div class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface">
+							<span class="material-symbols-outlined"
+								style="font-variation-settings:'FILL' 1;">
+									account_balance_wallet
+							</span>
 						</div>
 						
 						<div>
@@ -8881,7 +8884,7 @@
 
 	<!-- Footer -->
 				<div class="px-8 py-6 bg-background border-t border-white/10 flex items-center justify-end gap-4">
-					<button onclick="saveExpenseBudget()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
+					<button onclick="saveExpenseBudget()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface transition-all">
 						Cancel
 					</button>
 					<button id="btnSaveBudget" onclick="saveExpenseBudget()" class="px-10 py-3 bg-background bottom-theme border border-primary/5 rounded-md text-on-surface font-bold active:scale-95 hover:scale-105 transition-transform flex items-center gap-2">
@@ -10148,7 +10151,7 @@
 									</div>		
 								</div>
 										
-								<div class="col-span-2 text-right">
+								<div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 									<span class="material-symbols-outlined text-sm">
 										edit
 									</span>
@@ -10175,7 +10178,7 @@
 												value="2500000" />								
 										</div>			
 									</div>			
-									<div class="col-span-2 text-right">
+									<div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 										<span class="material-symbols-outlined text-sm">
 											edit
 										</span>
@@ -10203,7 +10206,7 @@
 											</div>	
 										</div>
 						
-										<div class="col-span-2 text-right">
+										<div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 											<span class="material-symbols-outlined text-sm">
 												edit
 											</span>
@@ -10232,7 +10235,7 @@
 												</div>								
 											</div>	
 										
-											<div class="col-span-2 text-right">
+											<div class="col-span-2 text-right text-on-surface-variant hover:text-on-surface">
 												<span class="material-symbols-outlined text-sm">
 												edit
 												</span>
@@ -25523,7 +25526,7 @@ function renderRawMaterialPage() {
 
         <td class="px-8 py-6 text-right text-on-surface-variant">
           <button
-            onclick="openIngredient('${item.id}')"
+            onclick="navigate('inventoryPage')"
             class="p-2 hover:text-on-surface transition-all"
           >
             <span class="material-symbols-outlined text-sm">
@@ -26276,7 +26279,7 @@ function renderBranchTable(){
               after:absolute
               after:top-0.5
               after:left-[2px]
-              after:bg-white
+              after:bg-background
               after:rounded-md
               after:h-4
               after:w-4
@@ -29018,7 +29021,7 @@ function renderOtherIncomeTable() {
 function renderOtherIncomeStatus(status) {
   const map = {
     Paid: {
-      color: "primary"
+      color: "white"
     },
     Pending: {
       color: "primary"
