@@ -108,7 +108,7 @@
                            TERTIARY
                            ========================= */
                     
-                        "tertiary": "#8FD5FF",
+                        "tertiary": "#00344A",
                         "tertiary-container": "#1ABDFF",
                     
                         "on-tertiary": "#00344A",
@@ -143,7 +143,7 @@
                            ERROR
                            ========================= */
                     
-                        "error": "#FFB4AB",
+                        "error": "#7a0d00",
                         "error-container": "#93000A",
                         "on-error": "#690005",
                         "on-error-container": "#FFDAD6",
@@ -26269,18 +26269,19 @@ function renderBranchTable(){
               ${String(b.status).toUpperCase() === "ACTIVE" ? "checked" : ""}
               onchange="toggleBranchStatus('${b.branchId}', this.checked)">
 
-            <div class="w-10 h-5 bg-white/10 rounded-md
+            <div class="w-10 h-5 bg-background border border-white/10 rounded-md
               peer
-              peer-checked:bg-primary
+              peer-checked:bg-white
               after:content-['']
               after:absolute
               after:top-0.5
               after:left-[2px]
-              after:bg-background
+              after:bg-white
               after:rounded-md
               after:h-4
               after:w-4
               after:transition-all
+							peer-checked:bg-background
               peer-checked:after:translate-x-full">
             </div>
           </label>
