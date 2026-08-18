@@ -2242,29 +2242,42 @@
 					
 					<!-- Order Meta Bento Grid -->
 					<section id="receiptMetaSection" class="grid grid-cols-2 gap-4 mb-10">
-						<div class="p-5 relative overflow-hidden rounded-md border border-white/10 col-span-2">
-							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Order ID</p>
+				    <!-- Order ID -->
+				    <div class="p-5 relative overflow-hidden rounded-md border border-white/10 col-span-2">
+							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+									Order ID
+							</p>
 							<p id="receiptId" class="font-display font-light text-xs text-on-surface"></p>
-						</div>
-
-						<div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md border border-white/10">
-							<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Date</p>
+				    </div>
+				
+				    <!-- Date -->
+				    <div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md border border-white/10">
+							<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+									Date
+							</p>
 							<p id="receiptDate" class="font-display font-bold text-xs"></p>
-						</div>
-						
-						<div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md border border-white/10 col-span-2 flex justify-between items-center">
+				    </div>
+				
+				    <!-- Table -->
+				    <div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md border border-white/10 flex justify-between items-center">
 							<div>
-								<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Table</p>
+								<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+										Table
+								</p>
 								<p id="receiptTable" class="font-display font-bold text-lg"></p>
 							</div>
-						<span id="receiptTableIcon" class="material-symbols-outlined text-on-surface-variant opacity-50">restaurant</span>
-					</div>
+				
+							<span id="receiptTableIcon"
+										class="material-symbols-outlined text-on-surface-variant opacity-50">
+									restaurant
+							</span>
+				    </div>
 				</section>
 					
 				<!-- Items Table -->
 				<section id="receiptItemsSection" class="mb-12">
 					<div class="flex justify-between items-end mb-6">
-						<h2 id="receiptItemsTitle" class="font-display font-bold text-xl">Order Summary</h2>
+						<h2 id="receiptItemsTitle" class="font-display font-bold font-headline uppercase tracking-[0.20em] text-xl">Order Summary</h2>
 						<div class="h-px bg-white/10 flex-grow mx-4 mb-2"></div>
 					</div>
 					<div id="receiptItemsContainer" class="space-y-6">
@@ -2276,24 +2289,24 @@
 				<div id="receiptFinancialBreakdown" class="space-y-4 mb-8">
 					<div class="flex justify-between text-sm">
 						<span class="text-on-surface-variant">Subtotal</span>
-						<span id="receiptSubtotal" class="font-semibold"></span>
+						<span id="receiptSubtotal" class="font-medium"></span>
 					</div>
 				<div class="flex justify-between text-sm text-on-surface">
 					<span class="font-medium italic">Discount</span>
-					<span id="receiptDiscount" class="font-semibold"></span>
+					<span id="receiptDiscount" class="font-medium"></span>
 				</div>
 				<div class="flex justify-between text-sm">
 					<span class="text-on-surface-variant">VAT </span>
-					<span id="receiptTax" class="font-semibold"></span>
+					<span id="receiptTax" class="font-medium"></span>
 				</div>
 				<div class="flex justify-between text-sm">
 					<span class="text-on-surface-variant">Service </span>
-					<span id="receiptService" class="font-semibold"></span>
+					<span id="receiptService" class="font-medium"></span>
 				</div>
 			</div>
 			<div id="receiptGrandTotalWrapper" class="pt-6 border-t border-white/10 flex justify-between items-center">
-				<p class="font-label text-sm uppercase tracking-widest font-bold text-on-surface">Amount</p>
-				<p id="receiptTotal" class="font-display font-extrabold text-3xl text-on-surface tracking-tight"></p>
+				<p class="font-label text-sm uppercase tracking-[0.20em] font-headline font-semibold text-on-surface">Amount</p>
+				<p id="receiptTotal" class="font-display font-bold font-headline text-xl text-on-surface tracking-tight"></p>
 			</div>
 		</section>
 	
@@ -2445,7 +2458,7 @@
       </span>
 
       <input id="searchInput"
-        class="w-full bg-background border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
+        class="w-full bg-transparent border border-white/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
         placeholder="Search menu..."
         type="text"/>
     </div>
@@ -2517,7 +2530,7 @@
 				<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
 				<div class="relative">
 					<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2" data-icon="table_restaurant">table_restaurant</span>
-					<input id="table-input" class="w-full bg-background border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
+					<input id="table-input" class="w-full bg-transparent border border-white/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
 				</div>
 			</div>
 		</div>
@@ -2536,7 +2549,7 @@
 							</span>
 							
 							<input id="memberSearch" 
-								class="w-full bg-background border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
+								class="w-full bg-transparent border border-white/10 rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
 								autocomplete="off" 
 								placeholder="Search members..." 
 								type="text" />
@@ -5610,8 +5623,10 @@
 							<section class="bg-background rounded-md relative overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 								<div class="p-8 flex justify-between items-center">
 									<div class="flex items-center gap-4">
-										<div class="w-12 h-12 rounded-md bg-secondary-container/30 flex items-center justify-center">
-											<span class="material-symbols-outlined text-secondary">inventory_2</span>
+										<div class="main-icon-box">
+								      <span class="main-icon-box material-symbols-outlined text-3xl">
+												inventory_2
+											</span>
 										</div>
 											<h2 class="font-headline text-2xl font-bold tracking-tight">Material Stock Analytics</h2>
 									</div>
@@ -7863,7 +7878,7 @@
 					<div class="grid grid-cols-12 gap-4">
 						<div class="col-span-4 relative">
 							<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
-							<input id="expenseSearchInput" class="w-full bg-background border border-white/10 rounded-md pl-10 pr-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Search by Vendor or Ref#..." type="text"/>
+							<input id="expenseSearchInput" class="w-full bg-transparent border border-white/10 rounded-md pl-10 pr-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Search by Vendor or Ref#..." type="text"/>
 						</div>
 
 						<div class="col-span-3">
@@ -7973,7 +7988,7 @@
 			<div class="grid grid-cols-12 gap-4">
 				<div class="col-span-4 relative">
 					<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
-					<input id="otherIncomeSearchInput" class="w-full bg-background border border-white/10 rounded-md pl-10 pr-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Search by Vendor or Ref#..." type="text"/>
+					<input id="otherIncomeSearchInput" class="w-full bg-transparent border border-white/10 rounded-md pl-10 pr-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary" placeholder="Search by Vendor or Ref#..." type="text"/>
 				</div>
 				
 				<div class="col-span-3">
