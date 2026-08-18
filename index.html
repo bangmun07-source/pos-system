@@ -497,30 +497,21 @@
 
 <template id="loginPage" >
 
-<!-- BACKGROUND -->
 <div class="fixed_enter">
-
   <div class="absolute inset-0 bg-background"></div>
-
   <div class="absolute inset-0 bg-background"></div>
-
 </div>
 <!-- Main Content Canvas -->
 <main class="relative z-10 min-h-screen flex items-center justify-center px-6 py-10">
-<!-- LOGIN PANEL -->
   <div class="bg-background rounded-md overflow-hidden w-full max-w-lg">
-
-    <!-- HEADER -->
     <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
-
       <div class="flex items-center gap-3">
-
-        <span class="material-symbols-outlined sidebar-icon">
-          lock
+        <span class="material-symbols-outlined sidebar-icon"
+					style="font-variation-settings:'FILL' 1;">
+          	lock
         </span>
 
         <div>
-
           <h1 class="text-lg font-bold text-on-surface">
             Secure Login
           </h1>
@@ -528,37 +519,28 @@
           <p class="text-[10px] uppercase tracking-widest text-on-surface-variant">
             SOMMA POS SYSTEM
           </p>
-
         </div>
-
       </div>
-
     </div>
 
     <!-- CONTENT -->
     <div class="p-6 space-y-6">
-
-      <!-- BRAND -->
       <div class="text-center">
-
-        <h2 class="text-3xl font-extrabold text-primary">
+        <h2 class="text-3xl uppercase tracking-widest font-headline font-bold tracking-[0.20em] text-foreground">
           SOMMA
         </h2>
 
-        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
-          Premium Terminal Access
+        <p class="text-xs lg:text-sm text-on-surface-variant mt-1 uppercase tracking-[0.20em]">
+          One system. Every business.
         </p>
-
       </div>
 
-      <!-- FORM -->
+
       <form
         onsubmit="event.preventDefault(); handleLogin();"
         class="space-y-5">
 
-        <!-- USERNAME -->
         <div>
-
           <label
             class="text-[10px] uppercase tracking-widest text-on-surface-variant">
             Staff ID
@@ -570,12 +552,9 @@
             autocomplete="username"
             placeholder="Enter Staff ID"
             class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"/>
-
         </div>
 
-        <!-- PASSWORD -->
         <div>
-
           <label
             class="text-[10px] uppercase tracking-widest text-on-surface-variant">
             Access PIN
@@ -587,12 +566,10 @@
             autocomplete="current-password"
             placeholder="••••••"
             class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary"/>
-
         </div>
 
-        <!-- INFO BOX -->
-        <div class="p-4 rounded-md bg-primary/5 border border-primary/10 flex gap-3">
 
+        <div class="p-4 rounded-md bg-white/5 border border-white/10 flex gap-3">
           <span class="material-symbols-outlined sidebar-icon">
             verified_user
           </span>
@@ -600,25 +577,18 @@
           <p class="text-xs text-on-surface-variant">
             Authorized personnel only. All login activities are recorded and monitored.
           </p>
-
         </div>
 
         <!-- BUTTON -->
-        <button
-          type="submit"
+        <button type="submit"
           class="btn-gradient w-full py-4 rounded-md font-bold text-black">
-
           Authorize Access
-
         </button>
-
       </form>
-
     </div>
 
     <!-- FOOTER -->
     <div class="px-6 py-5 flex items-center justify-between bg-background border-t border-white/10">
-
       <span class="text-[10px] uppercase tracking-widest text-on-surface-variant">
         SOMMA POS v1.1
       </span>
@@ -626,15 +596,12 @@
       <span class="text-[10px] uppercase tracking-widest text-primary">
         Secure Node Online
       </span>
-
     </div>
-
   </div>
 </main>
 <!-- Visual Polish: Decorative Ambient Glows -->
 <div class="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary-container/5 rounded-md blur-[120px] pointer-events-none"></div>
 <div class="fixed bottom-[-10%] left-[-10%] w-[400px] h-[400px] bg-tertiary-container/5 rounded-md blur-[100px] pointer-events-none"></div>
-
 </template>
 
 
