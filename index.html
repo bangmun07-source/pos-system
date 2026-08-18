@@ -8905,8 +8905,11 @@
 			<!-- Modal Header -->
 		<div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/10">
 			<div class="flex items-center gap-3">
-				<div class="w-10 h-10 rounded-md bg-primary-container/20 flex items-center justify-center text-on-surface">
-					<span class="material-symbols-outlined">receipt_long</span>
+				<div class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface">
+					<span class="material-symbols-outlined"
+						style="font-variation-settings:'FILL' 1;">
+							receipt_long
+					</span>
 				</div>
 				
 				<div>
@@ -8986,21 +8989,21 @@
 					<!-- Amount Input (Highlight Section) -->
 					<div class="p-6 bg-background/50 rounded-md border border-white/10">
 						<div class="flex items-center justify-between">
-							<label class="block font-label text-sm font-semibold text-amber-500 uppercase tracking-widest">Amount (IDR)</label>
-							<span class="text-[10px] text-on-surface-variant/50">CURRENCY CODE: IDR</span>
+							<label class="block font-label text-sm font-semibold font-headline text-on-surface uppercase tracking-widest">Amount (IDR)</label>
+							<span class="text-xs text-on-surface-variant">CURRENCY CODE: IDR</span>
 						</div>
 						<div class="mt-2 flex items-baseline">
-							<span class="font-display text-2xl font-bold text-amber-500/50 mr-2">Rp</span>
-							<input id="expenseAmount" class="w-full bg-transparent border-none p-0 text-4xl font-display font-extrabold text-on-surface focus:ring-0 placeholder:text-surface-container-highest" type="text" value="0"/>
+							<span class="font-display text-2xl font-bold text-on-surface mr-2">Rp</span>
+							<input id="expenseAmount" class="w-full bg-transparent border-none p-0 text-4xl font-display font-extrabold text-on-surface focus:ring-0 placeholder:10000000" type="text" value=""/>
 						</div>
 					</div>
 				</div>
 				<!-- Modal Footer (Actions) -->
 				<div class="px-8 py-6 bg-background border-t border-white/10 flex items-center justify-end gap-4">
-					<button class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
+					<button class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface transition-all">
 						 Cancel
 					</button>
-					<button id="btnSaveExpense" class="px-10 py-3 rounded-md amber-gradient text-on-primary font-bold shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-2">
+					<button id="btnSaveExpense" class="px-10 py-3 rounded-md bottom-theme uppercase font-headline font-bold tracking-[0.20em] text-on-surface transition-all flex items-center gap-2">
 					  Confirm Expense
 					  <span class="material-symbols-outlined text-xl">arrow_forward</span>
 					</button>
@@ -9028,8 +9031,11 @@
 		<div class="bg-background w-full max-w-2xl rounded-md shadow-2xl overflow-hidden border border-white/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 			<div class="px-8 py-6 flex items-center justify-between border-b border-outline-variant/10">
 				<div class="flex items-center gap-3">
-					<div class="w-10 h-10 rounded-md bg-primary-container/20 flex items-center justify-center text-on-surface">
-						<span class="material-symbols-outlined">receipt_long</span>
+					<div class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface">
+						<span class="material-symbols-outlined"
+							style="font-variation-settings:'FILL' 1;">
+								receipt_long
+						</span>
 					</div>
 					
 					<div>
@@ -9104,8 +9110,8 @@
 				<!-- Amount Input (Highlight Section) -->
 				<div class="p-6 bg-background/20 rounded-md border border-white/10">
 					<div class="flex items-center justify-between">
-						<label class="block font-label text-sm font-semibold text-amber-500 uppercase tracking-widest">Amount (IDR)</label>
-						<span class="text-[10px] text-on-surface-variant/50">CURRENCY CODE: IDR</span>
+						<label class="block font-label text-sm font-semibold text-on-surface font-headline uppercase tracking-widest">Amount (IDR)</label>
+						<span class="text-sm text-on-surface-variant">CURRENCY CODE: IDR</span>
 						</div>
 
 						<div class="space-y-2">
@@ -9114,25 +9120,25 @@
 							</label>
 							
 							<div class="mt-2 flex items-baseline">
-								<span class="font-display text-2xl font-bold text-amber-500/50 mr-2">Rp</span>
-								<input id="otherIncomeAmount" class="w-full bg-background border border-white/10 rounded-md p-0 text-4xl font-display font-extrabold text-on-surface focus:ring-0 placeholder:text-surface-container-highest" type="text" value="0"/>
+								<span class="font-display text-2xl font-semibold text-on-surface mr-2">Rp</span>
+								<input id="otherIncomeAmount" class="w-full bg-background border border-white/10 rounded-md p-0 text-4xl font-display font-extrabold text-on-surface focus:ring-0 placeholder:10000000" type="text" value=""/>
 							</div>
 
 							<textarea id="otherIncomeNotes"
-								class="w-full bg-background border border-white/10 rounded-md px-4 py-3 min-h-[100px]"
+								class="w-full bg-background border border-white/10 rounded-md px-4 py-3 min-h-[100px] text-on-surface-variant"
 								placeholder="Optional notes..."></textarea>
 						</div>
 					</div>
 				</div>
 				<!-- Modal Footer (Actions) -->
 				<div class="px-8 py-6 bg-background flex items-center justify-end gap-4">
-					<button onclick="closeAddNewOtherIncome()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all">
+					<button onclick="closeAddNewOtherIncome()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface transition-all">
 						Cancel
 					</button>
 				
 					<button onclick="submitOtherIncome()"
-						class="px-10 py-3 rounded-md amber-gradient text-on-primary font-bold shadow-lg hover:shadow-amber-500/20 active:scale-95 transition-all flex items-center gap-2">
-							Confirm Expense
+						class="px-10 py-3 rounded-md bottom-theme uppercase font-headline font-bold tracking-[0.20em] text-on-surface transition-all flex items-center gap-2">
+							Confirm Income
 						<span class="material-symbols-outlined text-xl">arrow_forward</span>
 					</button>
 				</div>
@@ -20509,8 +20515,8 @@ function renderSuppliers() {
         <td class="px-8 py-5">
           ${
             isActive
-            ? `<span class="px-3 py-1 bg-white/20 text-on-surface text-[10px] font-black rounded-md uppercase">Active</span>`
-            : `<span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-black rounded-md uppercase">Inactive</span>`
+            ? `<span class="px-3 py-1 bg-white/20 text-on-surface text-[10px] border border-white/10 font-headline font-semibold rounded-md uppercase">Active</span>`
+            : `<span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-headline font-semibold rounded-md uppercase">Inactive</span>`
           }
         </td>
 
@@ -25502,7 +25508,7 @@ function renderRawMaterialPage() {
           </span>
         </td>
 
-        <td class="px-8 py-6 text-right font-headline font-bold text-amber-500">
+        <td class="px-8 py-6 text-right font-headline font-bold text-on-surface">
           ${formatNumber(item.stockValue)}
         </td>
 
@@ -25515,10 +25521,10 @@ function renderRawMaterialPage() {
           }
         </td>
 
-        <td class="px-8 py-6 text-right">
+        <td class="px-8 py-6 text-right text-on-surface-variant">
           <button
             onclick="openIngredient('${item.id}')"
-            class="p-2 rounded-md bg-white/5 hover:bg-amber-500 hover:text-surface-dim transition-all"
+            class="p-2 hover:text-on-surface transition-all"
           >
             <span class="material-symbols-outlined text-sm">
               visibility
@@ -25607,8 +25613,8 @@ function renderRawMaterialPagination() {
           transition-all
           ${
             i === rawMaterialPage
-              ? "bg-amber-500 text-black"
-              : "bg-white/5 text-muted hover:text-white"
+              ? "text-on-surface"
+              : "text-on-surface-variant hover:text-on-surface"
           }
         ">
         ${i}
@@ -25659,17 +25665,17 @@ function renderTopSellingItems(items){
     container.innerHTML += `
       <div class="flex items-center gap-4">
 
-        <div class="w-12 h-12 rounded-md bg-surface-container-high flex items-center justify-center">
+        <div class="w-12 h-12 flex items-center justify-center">
           <span class="material-symbols-outlined">restaurant</span>
         </div>
 
         <div class="flex-1">
-          <h4 class="text-sm font-bold">${item.name}</h4>
-          <p class="text-xs text-muted ">${item.qty} Sold</p>
+          <h4 class="text-sm text-on-surface uppercase font-headline font-bold tracking-[0.20em]">${item.name}</h4>
+          <p class="text-xs text-on-surface-variant">${item.qty} Sold</p>
         </div>
 
         <div class="text-right">
-          <p class="text-sm font-bold text-amber-500">
+          <p class="text-sm font-bold text-on-surface">
             Rp ${formatNumber(item.revenue)}
           </p>
         </div>
@@ -28042,7 +28048,7 @@ function renderExpenseTable(data) {
         </td>
 
         <td class="px-4 py-5">
-          <span class="px-2 py-0.5 bottom-theme text-on-surface rounded-md text-[9px] font-bold uppercase">
+          <span class="px-2 py-0.5 text-xs text-on-surface uppercase font-headline font-bold tracking-[0.20em]">
             ${item.category || "-"}
           </span>
         </td>
@@ -28124,14 +28130,14 @@ function showExpenseReceipt(index) {
             break;
         case "pending":
             status.classList.add(
-                "bg-yellow-500/20",
+                "bg-yellow-500",
                 "text-yellow-400"
             );
             break;
 
         case "void":
             status.classList.add(
-                "bg-red-500/20",
+                "bg-red-500",
                 "text-red-400"
             );
             break;
@@ -28213,13 +28219,6 @@ console.log("SELECTED EXPENSE:", {
   }
 
   try {
-console.log("UPDATE EXPENSE STATUS:", {
-  expense,
-  refId: expense.refId,
-  statusLama: expense.status,
-  statusBaru: newStatus,
-  branchId: state.branchId
-});
     const res =
       await updateExpenseStatusRPC(
         expense.refId,
@@ -28387,7 +28386,7 @@ function openExpenseAttachmentFile() {
               <a
               href="${expense.Attachment_URL}"
               target="_blank"
-              class="inline-flex items-center justify-center gap-2 px-6 h-11 bg-background bottom-theme border border-primary/5 rounded-md  font-bold text-on-surface">
+              class="inline-flex items-center justify-center gap-2 px-6 h-11 bg-background bottom-theme border border-white/5 rounded-md  font-bold text-on-surface">
 
                   <span class="material-symbols-outlined">
                       open_in_new
@@ -28967,7 +28966,7 @@ function renderOtherIncomeTable() {
         </td>
 
         <td class="px-4 py-5">
-          <span class="px-2 py-0.5 bottom-theme text-on-surface rounded-md text-[9px] font-bold uppercase">
+          <span class="px-2 py-0.5 text-on-surface rounded-md text-xs uppercase tracking-widest font-headline font-bold tracking-[0.20em]">
             ${item.category}
           </span>
         </td>
@@ -29021,7 +29020,7 @@ function renderOtherIncomeStatus(status) {
       color: "primary"
     },
     Pending: {
-      color: "secondary"
+      color: "primary"
     },
     Void: {
       color: "error"
@@ -29071,8 +29070,8 @@ function renderOtherIncomePagination() {
         class="
           w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold
           ${i === otherIncomeCurrentPage
-            ? "bg-primary text-black"
-            : "bg-white/5 hover:bottom-theme"}
+            ? "text-on-surface"
+            : "text-on-surface-variant hover:text-on-surface"}
         ">
 
         ${i}
@@ -30413,8 +30412,8 @@ function renderPagination(data) {
       <button data-page="${i}"
         class="page-btn w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold transition-colors
         ${isActive
-          ? "bg-primary text-black"
-          : "bg-white/5 hover:bottom-theme"}">
+          ? "text-on-surface"
+          : "text-on-surface-variant hover:text-on-surface"}">
         ${i}
       </button>
     `;
