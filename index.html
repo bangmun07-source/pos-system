@@ -167,10 +167,10 @@
                         "xl": "3rem",
                         "full": "9999px"
                     },
-										"fontFamily": {
-											"headline": ["Montserrat"],
-											"body": ["Poppins"],
-											"label": ["Poppins"]
+									"fontFamily": {
+										"headline": ["Montserrat"],
+										"body": ["Poppins"],
+										"label": ["Poppins"]
                     }
                 },
             },
@@ -327,6 +327,10 @@
 		backdrop-filter: none;
 		-webkit-backdrop-filter: none;
 		border: 1px solid rgba(255,255,255,0.08);
+	}
+
+	.bg-recipe {
+		background:#101715
 	}
 
 	.bg-background::before {
@@ -2209,8 +2213,8 @@
 
 <template id="receiptTemplate">
 	
-	<main id="receiptMainWrapper" class="pt-32 pb-40 px-4 md:px-0 flex justify-center items-start min-h-screen">
-		<article id="receiptCanvas" class="w-full max-w-xl bg-background rounded-md overflow-hidden relative shadow-[0_-20px_40px_rgba(6,14,32,0.6)]">		
+	<main id="receiptMainWrapper" class="pt-20 pb-20 px-4 md:px-0 flex justify-center items-start min-h-screen">
+		<article id="receiptCanvas" class="w-full max-w-xl bg-recipe rounded-md overflow-hidden relative">		
 			<div id="receiptTextureLayer" class="absolute inset-0 receipt-texture pointer-events-none opacity-40"></div>
 				<div id="receiptContentWrapper" class="relative p-8 md:p-12">
 					<header id="receiptHeroSection" class="relative -mx-8 md:-mx-12 -mt-8 md:-mt-12 mb-12 overflow-hidden rounded-t-lg">
@@ -2226,10 +2230,10 @@
 					          </div>
 					        
 					          <h1 id="receiptTitle"
-					          class="font-display font-bold text-3xl tracking-tight text-on-surface mb-3 drop-shadow-lg">
+					          class="font-display font-bold text-2xl tracking-tight text-on-surface mb-3 drop-shadow-lg">
 					          </h1>
 					
-					          <p class="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant font-semibold drop-shadow-md">
+					          <p class="font-label text-xs uppercase tracking-[0.2em] font-headline text-on-surface-variant font-semibold drop-shadow-md">
 					              Digital Receipt
 					          </p>
 					      </div>
@@ -2237,17 +2241,17 @@
 					
 					<!-- Order Meta Bento Grid -->
 					<section id="receiptMetaSection" class="grid grid-cols-2 gap-4 mb-12">
-						<div class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10">
+						<div class="p-5 relative overflow-hidden rounded-md border border-white/10">
 							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Order ID</p>
 							<p id="receiptId" class="font-display font-light text-xs text-on-surface"></p>
 						</div>
 
-						<div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10">
+						<div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md border border-white/10">
 							<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Date</p>
-							<p id="receiptDate" class="font-display font-bold text-lg"></p>
+							<p id="receiptDate" class="font-display font-bold text-xs"></p>
 						</div>
 						
-						<div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md bg-background border border-white/10 col-span-2 flex justify-between items-center">
+						<div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md border border-white/10 col-span-2 flex justify-between items-center">
 							<div>
 								<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">Service Location</p>
 								<p id="receiptTable" class="font-display font-bold text-lg">Table</p>
@@ -2267,7 +2271,7 @@
 			</section>
 					
 			<!-- Financial Breakdown -->
-			<section id="receiptFinancialSection" class="p-8 relative overflow-hidden rounded-md bg-background border border-white/10">
+			<section id="receiptFinancialSection" class="p-8 relative overflow-hidden rounded-md border border-white/10">
 				<div id="receiptFinancialBreakdown" class="space-y-4 mb-8">
 					<div class="flex justify-between text-sm">
 						<span class="text-on-surface-variant">Subtotal</span>
