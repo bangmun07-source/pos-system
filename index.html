@@ -1815,7 +1815,7 @@
 		          </span>
 	
 		          <div>
-		            <h1 class="text-lg font-bold font-semibold text-foreground">
+		            <h1 class="text-md lg:text:lg font-headline font-bold uppercase tracking-[0.20em] text-foreground">
 		              Transaction Actions
 		            </h1>
 		
@@ -1857,7 +1857,7 @@
 	              </span>
 	            </div>
 	
-	            <span class="font-medium text-on-surface">
+	            <span class="font-medium text-sm lg:text:md text-on-surface">
 	              View Full Details
 	            </span>
 	          </div>
@@ -1880,7 +1880,7 @@
 	              </span>
 	            </div>
 	
-	            <span class="font-medium text-on-surface">
+	            <span class="font-medium text-sm lg:text:md text-on-surface">
 	              Send via WhatsApp/Email
 	            </span>
 	          </div>
@@ -2146,11 +2146,11 @@
 	            WhatsApp
 	          </button>
 	
-	          <button class="flex-1 flex items-center justify-center gap-2 py-3 rounded-x1 text-on-surface-variant hover:text-on-surface font-medium text-sm transition-all">
+	          <button class="flex-1 flex items-center justify-center gap-2 py-3 rounded-x1 text-on-surface-variant font-medium text-sm transition-all">
 	            <span class="material-symbols-outlined text-sm">
-	              mail
-	            </span>
-	            Email Address
+							    favorite
+							</span>
+							Thank You
 	          </button>
 	        </div>
 	
@@ -2544,7 +2544,7 @@
 						<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1 block">Member ID</label>
 						<div class="relative">
 					  <!-- ICON -->
-							<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2">
+							<span class="material-symbols-outlined absolute text-on-surface-variant text-lg left-3 top-1/2 -translate-y-1/2">
 								search
 							</span>
 							
@@ -4671,7 +4671,7 @@
       </button>
 
       <button onclick="submitAdjust()"
-        class="flex-[2] py-3 rounded-md btn-gradient font-bold text-black">
+        class="flex-[2] py-3 rounded-md bottom-theme font-headline font-bold uppercase tracking-[0.20em] text-foreground">
         Confirm Adjustment
       </button>
     </div>
@@ -4728,7 +4728,7 @@
 	            value="500">
 	        </div>
 	
-	        <div class="p-4 rounded-md bottom-theme border border-white/10 flex gap-3">
+	        <div class="p-4 rounded-md bg-white/5 border border-white/10 flex gap-3">
 	          <span class="material-symbols-outlined text-on-surface-variant">info</span>
 	          <p class="text-xs text-on-surface-variant">
 	            Restock alerts trigger automatically when stock falls below this level.
@@ -4744,7 +4744,7 @@
 	        </button>
 	
 	        <button onclick="submitThreshold()"
-	          bottom-theme uppercase tracking-widest font-bold text-on-surface-variant tracking-[0.20em]">
+	          class="py-3 rounded-md bottom-theme font-headline font-bold uppercase tracking-[0.20em] text-foreground border border-white/10">
 	          Update Threshold
 	        </button>
 	      </div>
@@ -5016,7 +5016,7 @@
       </div>
 
       <h1 id="recipeTitle"
-        class="text-2xl md:text-3xl font-headline font-extrabold text-on-surface uppercase tracking-[0.20em]">
+        class="text-xk md:text-3xl font-headline font-semibold text-on-surface uppercase tracking-[0.10em]">
         #PRD-4021 - Signature Wagyu Ribs
       </h1>
     </header>
@@ -5024,7 +5024,7 @@
     <!-- TAB -->
     <div class="px-8 flex gap-8 border-b border-white/10">
       <button id="tab-overview"
-        class="pb-4 text-sm font-semibold border-b-2 border-primary text-on-surface"
+        class="pb-4 text-sm font-semibold border-b-2 border-white text-on-surface"
         onclick="switchTab('overview')">
         Overview
       </button>
@@ -24451,16 +24451,16 @@ function switchTab(tab) {
   const overviewContent = document.getElementById('content-overview');
   const historyContent = document.getElementById('content-history');
   if (tab === 'overview') {
-      overviewBtn.classList.add('border-primary', 'text-on-surface');
+      overviewBtn.classList.add('border-white', 'text-on-surface');
       overviewBtn.classList.remove('border-transparent', 'text-on-surface/50');
-      historyBtn.classList.remove('border-primary', 'text-on-surface');
+      historyBtn.classList.remove('border-white', 'text-on-surface');
       historyBtn.classList.add('border-transparent', 'text-on-surface/50');
       overviewContent.classList.remove('hidden');
       historyContent.classList.add('hidden');
   } else {
-      historyBtn.classList.add('border-primary', 'text-on-surface');
+      historyBtn.classList.add('border-white', 'text-on-surface');
       historyBtn.classList.remove('border-transparent', 'text-on-surface/50');
-      overviewBtn.classList.remove('border-primary', 'text-on-surface');
+      overviewBtn.classList.remove('border-white', 'text-on-surface');
       overviewBtn.classList.add('border-transparent', 'text-on-surface/50');
       historyContent.classList.remove('hidden');
       overviewContent.classList.add('hidden');
