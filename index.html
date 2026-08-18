@@ -11829,7 +11829,7 @@
 	      <!-- HEADER -->
 	      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
 	        <div class="flex items-center gap-3">
-	          <div class="w-10 h-10 rounded-md bottom-theme flex items-center justify-center">
+	          <div class="w-10 h-10 rounded-md flex items-center justify-center">
 	            <span class="material-symbols-outlined text-on-surface"
 	              style="font-variation-settings:'FILL' 1;">
 	              add_shopping_cart
@@ -11911,7 +11911,7 @@
 	          </div>
 	        </div>
 	        <!-- SUMMARY -->
-	        <div class="p-4 rounded-md bottom-theme border border-white/10">
+	        <div class="p-4 rounded-md bg-white/5 border border-white/10">
 	          <div class="flex justify-between items-center">
 	            <div>
 	              <p class="text-xs text-on-surface-variant">
@@ -11990,7 +11990,7 @@
 	        </button>
 	
 	        <button onclick="saveStockIn()"
-	          class="btn-gradient px-6 py-3 rounded-md font-bold text-black">
+	          class="bottom-theme uppercase tracking-widest font-bold tracking-[0.20em] text-on-surface px-6 py-3 rounded-md">
 	          Confirm Stock In
 	        </button>
 	      </div>
@@ -12047,10 +12047,6 @@
 	            </span>
 	            <select id="material_branch"
 	              class="w-full bg-background p-4 pl-12 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary">
-	              <option>Pusat</option>
-	              <option>Outlet 1</option>
-	              <option>Outlet 2</option>
-	              <option>Outlet 3</option>
 	            </select>
 	          </div>
 	        </div>
@@ -12101,7 +12097,7 @@
        	 	</div>
 
 	        <!-- INFO BOX -->
-	        <div class="p-4 rounded-md bottom-theme border border-white/10 flex gap-3">
+	        <div class="p-4 rounded-md bg-white/5 border border-white/10 flex gap-3">
 	          <span class="material-symbols-outlined text-on-surface">
 	            info
 	          </span>
@@ -12120,7 +12116,7 @@
 	        </button>
 	
 	        <button onclick="saveMaterial()"
-	          class="btn-gradient px-6 py-3 rounded-md font-bold text-black">
+	          class="bottom-theme uppercase tracking-widest font-bold tracking-[0.20em] text-on-surface px-6 py-3 rounded-md">
 	          Register Material
 	        </button>
 	      </div>
@@ -12269,13 +12265,16 @@
 			                checked
 			                class="sr-only peer"
 			                type="checkbox">
-			              <div class="w-11 h-6 bg-background rounded-md relative border border-white/10 
+
+			              <div class="cursor-pointer w-11 h-6 bg-background rounded-md relative border border-white/10 
 											peer peer-checked:bg-white
 											after:content-[''] 
 											after:absolute after:top-[2px] after:left-[2px] 
 											after:h-5 after:w-5 after:rounded-md
 											after:bg-white 
-											peer-checked:after:translate-x-full transition-all">
+											after:transition-all
+			                peer-checked:after:translate-x-full
+			                peer-checked:after:bg-background">
 		              </div>
 		            </label>
 		          </div>
@@ -20510,14 +20509,14 @@ function renderSuppliers() {
         <td class="px-8 py-5">
           ${
             isActive
-            ? `<span class="px-3 py-1 bg-primary-container/20 text-on-surface text-[10px] font-black rounded-md uppercase">Active</span>`
+            ? `<span class="px-3 py-1 bg-white/20 text-on-surface text-[10px] font-black rounded-md uppercase">Active</span>`
             : `<span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-black rounded-md uppercase">Inactive</span>`
           }
         </td>
 
         <td class="px-8 py-5 text-right flex items-center justify-end gap-1">
-          <button onclick="openEditSupplierModal('${item.id}')" class="p-2 hover:bg-white/5 rounded-md text-muted ">
-            <span class="material-symbols-outlined">edit_square</span>
+          <button onclick="openEditSupplierModal('${item.id}')" class="p-2 hover:text-on-surface rounded-md text-on-surface-variant ">
+            <span class="material-symbols-outlined">edit</span>
           </button>
         </td>
 
@@ -20593,7 +20592,7 @@ function openEditSupplierModal(supplierId) {
   }, 50);
 }
 
-async function saveEditSupplier() {
+async function saveeditSupplier() {
 
   if (!currentSupplierData) return;
 
