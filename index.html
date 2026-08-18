@@ -11538,15 +11538,25 @@
     <!-- CHAT BODY -->
     <div id="backupChatMessages"
       class="flex-1 p-5 overflow-y-auto space-y-4 custom-scrollbar ">
-      <div class="max-w-[80%] rounded-md bg-background border border-white/10 p-5 text-sm lg:text-base">
-        Halo...
-        <br>
-        Saya dapat membantu backup data Sistem POS.
-        <br><br>
-        Ketik:
-        <br>
-        <b>backup full data</b>
-      </div>
+     	<div class="max-w-[80%] rounded-md bg-background border border-white/10 p-5 text-sm lg:text-base">
+			  Halo 👋
+			  <br><br>
+			  Saya siap membantu mengelola data dan informasi Sistem POS.
+			  <br><br>
+			  Kamu bisa meminta saya untuk:
+			  <br>
+			  • Backup data
+			  <br>
+			  • Restore & Hapus backup
+			  <br>
+			  • Cek database
+			  <br>
+			  • Hapus struk digital
+			  <br>
+			  • Melihat analytics
+			  <br><br>
+			  Cukup ketik perintah yang kamu butuhkan.
+			</div>
     </div>
 
     <!-- INPUT -->
@@ -11569,7 +11579,7 @@
     onclick="openBackupChat()"
     class=" fixed bottom-8 right-8 z-50 w-16 h-16 rounded-md bottom-theme border border-white/10 text-on-surface shadow-[0_10px_30px_rgba(0,0,0,0.35)] flex items-center justify-center hover:scale-110 transition-all duration-300 group">
     <span class="material-symbols-outlined text-3xl">
-      smart_toy
+      chat
     </span>
     <!-- Tooltip -->
     <span class=" absolute right-20 whitespace-nowrap px-4 py-2 rounded-md bg-background border border-white/10 text-xs text-on-surface opacity-0 group-hover:opacity-100 transition-all pointer-events-none ">
@@ -34596,8 +34606,6 @@ function extractAnalyticsRange(text){
   return null;
 }
 
-
-
 // MATCH INTENT
 function matchIntent(cmd, keywords){
   return keywords.some(keyword =>
@@ -34819,7 +34827,7 @@ function handleAnalyticsCommand(message){
         addBackupChatMessage(
         "bot",
         `
-        🏆 Produk Terlaris
+        Produk Terlaris
         ${item.name}
         Terjual:
         ${item.qty} pcs
@@ -34862,7 +34870,7 @@ function handleAnalyticsCommand(message){
       if(!peak || peak.total === 0){
         addBackupChatMessage(
           "bot",
-          "⚠️ Belum ada data jam ramai."
+          "Belum ada data jam ramai."
         );
         return;
       }
@@ -34913,7 +34921,7 @@ function handleAnalyticsCommand(message){
 		  
         addBackupChatMessage(
           "bot",
-          "⚠️ Belum ada data pembayaran."
+          "Belum ada data pembayaran."
         );
         return;
       }
@@ -34921,7 +34929,7 @@ function handleAnalyticsCommand(message){
       addBackupChatMessage(
         "bot",
         `
-        💳 Pembayaran Terbanyak
+        Pembayaran Terbanyak
           ${pay.method}
         Total:
           Rp ${Number(pay.value || 0)
@@ -34946,7 +34954,7 @@ function handleAnalyticsCommand(message){
         addBackupChatMessage(
           "bot",
           `
-          ✅ Stok Aman
+          Stok Aman
           Semua bahan masih dalam batas aman.
           `
         );
@@ -34996,8 +35004,7 @@ function clearDigitalReceiptsConfirm(){
     Yakin ingin menghapus semua struk digital?
     <br><br>
     <div class="flex justify-center">
-      <button
-        onclick="clearDigitalReceipts()"
+      <button onclick="startClearDigitalReceipts()"
         class="px-4 py-2 rounded-md bottom-theme border border-white/10 text-on-surface text-xs">
         HAPUS SEMUA
       </button>
@@ -35006,12 +35013,82 @@ function clearDigitalReceiptsConfirm(){
   );
 }
 
-async function clearDigitalReceipts(){
+async function startClearDigitalReceipts(){
+  const progressId =
+    "digitalReceiptClearProgress-" +
+    Date.now();
+  addBackupChatMessage(
+    "bot",
+    `
+    <b>Clear Digital Receipts</b>
+    <br><br>
+    <div class="w-full">
+      <div
+        class="w-full h-2 rounded-md bg-white/10 overflow-hidden">
+        <div
+          id="${progressId}"
+          class="h-full bg-white transition-all duration-500"
+          style="width:0%">
+        </div>
+      </div>
+
+      <div
+        id="${progressId}-text"
+        class="mt-2 text-xs opacity-60">
+        Mempersiapkan...
+      </div>
+    </div>
+    `
+  );
+
+  let progress = 0;
+  const interval =
+    setInterval(() => {
+      progress +=
+        Math.floor(
+          Math.random() * 10
+        ) + 5;
+      if(progress >= 90){
+        progress = 90;
+      }
+      const bar =
+        document.getElementById(
+          progressId
+        );
+      const text =
+        document.getElementById(
+          progressId + "-text"
+        );
+      if(bar){
+        bar.style.width =
+          progress + "%";
+      }
+      if(text){
+        if(progress < 20){
+          text.innerHTML =
+            "Mengecek digital receipt...";
+        }
+        else if(progress < 40){
+          text.innerHTML =
+            "Mencari file struk digital...";
+        }
+        else if(progress < 65){
+          text.innerHTML =
+            "Menghapus file dari Storage...";
+        }
+        else if(progress < 85){
+          text.innerHTML =
+            "Membersihkan receipt URL...";
+        }
+        else{
+
+          text.innerHTML =
+            "Menyelesaikan proses...";
+        }
+      }
+    }, 800);
+
   try {
-    addBackupChatMessage(
-      "bot",
-      "⏳ Sedang menghapus semua struk digital..."
-    );
     const response =
       await fetch(
         "/api/clear-digital-receipts",
@@ -35023,37 +35100,70 @@ async function clearDigitalReceipts(){
           }
         }
       );
+
     const result =
       await response.json();
-    if (
+    if(
       !response.ok ||
       !result.success
-    ) {
+    ){
       throw new Error(
         result.error ||
         "Gagal menghapus struk digital"
       );
     }
-    addBackupChatMessage(
-      "bot",
-      `
-      ✅ <b>Struk Digital Dibersihkan</b>
-      <br><br>
-      ${result.deleted || 0}
-      struk digital berhasil dihapus.
-      <br><br>
-      Data transaksi tetap aman.
-      `
-    );
-  } catch (error) {
+    clearInterval(interval);
+
+    // FINISH 100%
+    const bar =
+      document.getElementById(
+        progressId
+      );
+    const text =
+      document.getElementById(
+        progressId + "-text"
+      );
+    if(bar){
+      bar.style.width = "100%";
+    }
+    if(text){
+      text.innerHTML =
+        "Selesai.";
+    }
+
+    // HASIL
+    setTimeout(() => {
+      addBackupChatMessage(
+        "bot",
+        `
+        <b>Struk Digital Berhasil Dihapus</b>
+        <br><br>
+        ${result.deleted || 0}
+        struk digital berhasil dihapus.
+        <br><br>
+        Data transaksi tetap aman.
+        `
+      );
+    }, 500);
+  }
+  catch(error){
+    clearInterval(interval);
     console.error(
       "Clear digital receipts error:",
       error
     );
+    const text =
+      document.getElementById(
+        progressId + "-text"
+      );
+    if(text){
+      text.innerHTML =
+        "Gagal.";
+    }
     addBackupChatMessage(
       "bot",
       `
-      ❌ <b>Gagal Menghapus</b>
+      ❌ <b>Gagal Menghapus Struk Digital</b>
       <br><br>
       ${error.message}
       `
