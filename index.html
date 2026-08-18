@@ -34639,6 +34639,11 @@ function handleBackupCommand(message){
     loadBackupList();
     return;
   }
+	// CLEAR DIGITAL RECEIPTS
+	if(matchIntent(cmd, intents.CLEAR_DIGITAL_RECEIPTS)){
+	  clearDigitalReceiptsConfirm();
+	  return;
+	}
   // CLEAR DATABASE
   if(matchIntent(cmd, intents.CLEAR_DATABASE)){
     clearDatabaseConfirm();
@@ -34966,14 +34971,90 @@ function handleAnalyticsCommand(message){
   }
 }
 
-async function getChatAnalytics(start, end, branchId, callback) {
+function clearDigitalReceiptsConfirm(){
+  addBackupChatMessage(
+    "bot",
+    `
+    <b>Hapus Semua Struk Digital</b>
+    <br><br>
+    Semua file struk digital yang tersimpan
+    di Storage akan dihapus.
+    <br><br>
+    Data transaksi <b>tidak akan dihapus</b>.
+    <br><br>
+    Struk lama tetap dapat dibuat ulang
+    dari data transaksi.
+    <br><br>
+    Yakin ingin menghapus semua struk digital?
+    <br><br>
+    <div class="flex justify-center">
+      <button
+        onclick="clearDigitalReceipts()"
+        class="px-4 py-2 rounded-md bottom-theme border border-white/10 text-on-surface text-xs">
+        HAPUS SEMUA
+      </button>
+    </div>
+    `
+  );
+}
 
+async function clearDigitalReceipts(){
   try {
-console.log("CHAT ANALYTICS PARAMS:", {
-  start,
-  end,
-  branchId
-});
+    addBackupChatMessage(
+      "bot",
+      "⏳ Sedang menghapus semua struk digital..."
+    );
+    const response =
+      await fetch(
+        "/api/clear-digital-receipts",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          }
+        }
+      );
+    const result =
+      await response.json();
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+      throw new Error(
+        result.error ||
+        "Gagal menghapus struk digital"
+      );
+    }
+    addBackupChatMessage(
+      "bot",
+      `
+      ✅ <b>Struk Digital Dibersihkan</b>
+      <br><br>
+      ${result.deleted || 0}
+      struk digital berhasil dihapus.
+      <br><br>
+      Data transaksi tetap aman.
+      `
+    );
+  } catch (error) {
+    console.error(
+      "Clear digital receipts error:",
+      error
+    );
+    addBackupChatMessage(
+      "bot",
+      `
+      ❌ <b>Gagal Menghapus</b>
+      <br><br>
+      ${error.message}
+      `
+    );
+  }
+}
+	
+async function getChatAnalytics(start, end, branchId, callback) {
+  try {
     const {
       data,
       error
@@ -34985,24 +35066,13 @@ console.log("CHAT ANALYTICS PARAMS:", {
 		p_end: end || null
       }
     );
-console.log("CHAT ANALYTICS DATA:", data);
 
     if (error) {
       throw error;
     }
-
-
     callback(data || {});
-
-
   }
   catch (err) {
-
-    console.error(
-      "Chat Analytics:",
-      err
-    );
-
     addBackupChatMessage(
       "bot",
       `
@@ -35016,21 +35086,16 @@ console.log("CHAT ANALYTICS DATA:", data);
 
 async function loadBackupList(){
   try {
-
-
-    // ==================================
     // SUPABASE (AKTIFKAN NANTI)
-    // ==================================
-
     const {
-	  data,
-	  error
-	} = await supabaseClient
-	  .from("Backup_History")
-	  .select("*")
-	  .order("created_at", {
-	    ascending: false
-	  });
+		  data,
+		  error
+		} = await supabaseClient
+		  .from("Backup_History")
+		  .select("*")
+		  .order("created_at", {
+		    ascending: false
+		  });
 	
 	if (error) {
 	  throw error;
@@ -35168,31 +35233,23 @@ async function startBackupProcess() {
   );
 
   let progress = 5;
-
   const interval = setInterval(() => {
-
     progress +=
       Math.floor(Math.random() * 10) + 5;
-
     if (progress >= 90) {
       progress = 90;
     }
-
     const bar =
       document.getElementById(progressId);
-
     const text =
       document.getElementById(
         progressId + "-text"
       );
-
     if (bar) {
       bar.style.width =
         progress + "%";
     }
-
     if (text) {
-
       if (progress < 20) {
         text.innerHTML =
           "Mengambil data Transaksi...";
@@ -35213,11 +35270,8 @@ async function startBackupProcess() {
         text.innerHTML =
           "Menyusun file backup JSON...";
       }
-
     }
-
   }, 800);
-
 
   try {
 
