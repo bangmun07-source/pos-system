@@ -45,6 +45,7 @@ export default async function handler(req, res) {
     // =========================
 
     let supabase;
+    let targetSupabaseUrl = null;
 
     // MASTER
     if (!tenantSlug) {
@@ -53,8 +54,11 @@ export default async function handler(req, res) {
         "RECEIPT → MASTER"
       );
 
-      supabase =
-        centralSupabase;
+    supabase =
+      centralSupabase;
+    
+    targetSupabaseUrl =
+      process.env.SUPABASE_URL;
     }
 
     // CUSTOMER
@@ -101,17 +105,24 @@ export default async function handler(req, res) {
       }
 
       // Buat client Customer
-      supabase =
-        createClient(
-          config.supabase_url,
-          config.supabase_anon_key
-        );
-
-      console.log(
-        "CUSTOMER SUPABASE:",
-        config.supabase_url
+     supabase =
+      createClient(
+        config.supabase_url,
+        config.supabase_anon_key
       );
-    }
+    
+    targetSupabaseUrl =
+      config.supabase_url;
+    
+    console.log(
+      "CUSTOMER SUPABASE:",
+      config.supabase_url
+    );
+    
+    console.log(
+      "TENANT:",
+      tenantSlug
+    );
 
     // =========================
     // BASE64
@@ -180,7 +191,15 @@ export default async function handler(req, res) {
     // =========================
     // SAVE receipt_url
     // =========================
-
+    console.log(
+      "RECEIPT DATABASE TARGET:",
+      targetSupabaseUrl
+    );
+    
+    console.log(
+      "RECEIPT TRX ID:",
+      trxId
+    );
     const {
       error: updateError
     } =
