@@ -2401,11 +2401,18 @@ async function getSettingsPageDataRPC() {
 }
 
 async function getBranchOptionsRPC(data) {
+ const client =
+    getActiveSupabase();
 
+  if (!client) {
+    throw new Error(
+      "Supabase client belum siap"
+    );
+  }
   const {
     data: result,
     error
-  } = await supabaseClient.rpc(
+  } = await client.rpc(
     "get_branch_options",
     {
       p_login_user_id:
