@@ -14861,7 +14861,8 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
             },
             body:JSON.stringify({
               base64:image,
-              trxId:trx.id
+              trxId:trx.id,
+							tenantSlug: state.tenantSlug
             })
           }
         );
