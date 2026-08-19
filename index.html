@@ -27434,38 +27434,107 @@ async function uploadBusinessLogo(base64) {
     return null;
   }
 
-  const response =
-    await fetch(
-      "/api/handle-business-logo-upload",
+  const client =
+    getActiveSupabase();
+
+  if (!client) {
+    throw new Error(
+      "Supabase client belum siap"
+    );
+  }
+
+  // =========================
+  // PARSE BASE64
+  // =========================
+
+  const matches =
+    base64.match(
+      /^data:(.+);base64,(.+)$/
+    );
+
+  if (!matches) {
+    throw new Error(
+      "Format gambar tidak valid"
+    );
+  }
+
+  const mime =
+    matches[1];
+
+  const base64Data =
+    matches[2];
+
+  const buffer =
+    Uint8Array.from(
+      atob(base64Data),
+      c => c.charCodeAt(0)
+    );
+
+  // =========================
+  // EXTENSION
+  // =========================
+
+  const ext =
+    mime.split("/")[1] || "jpg";
+
+  // =========================
+  // PATH
+  // =========================
+
+  const path =
+    `business/logo_${Date.now()}.${ext}`;
+
+  // =========================
+  // UPLOAD
+  // =========================
+
+  const {
+    error: uploadError
+  } = await client.storage
+    .from("Logo_Digital_Recipes")
+    .upload(
+      path,
+      buffer,
       {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-        body: JSON.stringify({
-          base64
-        })
+        contentType: mime,
+        upsert: true
       }
     );
 
-  const result =
-    await response.json();
-  console.log(
-    "BUSINESS LOGO UPLOAD RESULT:",
-    result
-  );
+  if (uploadError) {
+    console.error(
+      "BUSINESS LOGO STORAGE ERROR:",
+      uploadError
+    );
 
-  if (
-    !response.ok ||
-    !result.success
-  ) {
+    throw uploadError;
+  }
+
+  // =========================
+  // PUBLIC URL
+  // =========================
+
+  const {
+    data: publicData
+  } = client.storage
+    .from("Logo_Digital_Recipes")
+    .getPublicUrl(path);
+
+  const logoUrl =
+    publicData?.publicUrl;
+
+  if (!logoUrl) {
     throw new Error(
-      result.error ||
-      "Gagal upload business logo"
+      "Public URL logo tidak ditemukan"
     );
   }
-  return result.logo_url;
+
+  console.log(
+    "BUSINESS LOGO URL:",
+    logoUrl
+  );
+
+  return logoUrl;
 }
 
 function fileToBase64(file) {
