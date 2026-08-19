@@ -85,9 +85,10 @@ export default async function handler(req, res) {
       category = "ALL",
       tier = "ALL",
       search = "",
-      loginUserId
+      loginUserId,
+      tenantSlug
     } = req.body || {};
-
+    console.log("EXPORT TENANT:", tenantSlug);
     console.log("EXPORT TYPE:", type);
     console.log("EXPORT BRANCH:", branchId);
 
