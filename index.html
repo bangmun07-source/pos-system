@@ -13075,85 +13075,105 @@ function setText(id, value) {
 
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
 
-      
-      const params =
-      new URLSearchParams(
-        window.location.search
+  // TENANT
+  state.tenantSlug =
+    params.get("tenant") || null;
+  console.log(
+    "TENANT SLUG:",
+    state.tenantSlug
+  );
+
+  // CONNECT TENANT
+  if (state.tenantSlug) {
+	  
+    try {
+      await connectTenant(
+        state.tenantSlug
       );
-      
-      
-      const page =
-      params.get("page") ||
-      window.__ACTIVE_PAGE ||
-      null;
-      
-      
-      
-      function bootApp(targetPage = "dashboardPage") {
-        const ok =
-          restoreSession();
-      
-        if (!ok) {
-          navigate("loginPage");
-          return;
-        }
-      
-        const role =
-          state.user?.role?.toLowerCase();
-      
-      
-        // BRANCH CONTEXT
-        if (role === "owner") {
-          // owner pilih branch nanti
-          state.branchId =
-            localStorage.getItem(
-              "pos_branchId"
-            ) || "";
-          
-        } else {
-      
-          // admin / kasir
-          state.branchId =
-            state.user?.branchId ||
-            localStorage.getItem(
-              "pos_branchId"
-            ) ||
-            "";
-      
-        }
-      
-      
-        console.log(
-          "ROLE:",
-          role,
-          "BRANCH:",
-          state.branchId
-        );
-        
-      // loadIngredientStockAlertTemplate();
-      // loadWhatsAppModal();
-      
-        window.__ACTIVE_PAGE =
-          targetPage;
-        navigate(targetPage);
-      
-      }
-      
-      // ROUTING
-      if(page){
-      
-        window.__ACTIVE_PAGE =
-          page;
-        bootApp(page);
-      
-      } else {
-      
-        bootApp(
-          "dashboardPage"
-        );
-      }
+      console.log(
+        "TENANT READY:",
+        state.tenantSlug
+      );
+    } catch (error) {
+      console.error(
+        "TENANT CONNECTION FAILED:",
+        error
+      );
+      alert(
+        "Gagal menghubungkan database tenant"
+      );
+      return;
+    }
+  }
+
+  // PAGE
+  const page =
+    params.get("page") ||
+    window.__ACTIVE_PAGE ||
+    null;
+
+  // BOOT APP
+  async function bootApp(
+    targetPage = "dashboardPage"
+  ) {
+    const ok =
+      restoreSession();
+    if (!ok) {
+      navigate(
+        "loginPage"
+      );
+      return;
+    }
+    const role =
+      state.user?.role?.toLowerCase();
+	  
+    // BRANCH CONTEXT
+    if (role === "owner") {
+      state.branchId =
+        localStorage.getItem(
+          "pos_branchId"
+        ) || "";
+    } else {
+      state.branchId =
+        state.user?.branchId ||
+        localStorage.getItem(
+          "pos_branchId"
+        ) ||
+        "";
+    }
+    console.log(
+      "ROLE:",
+      role,
+      "BRANCH:",
+      state.branchId,
+      "TENANT:",
+      state.tenantSlug
+    );
+    window.__ACTIVE_PAGE =
+      targetPage;
+    navigate(
+      targetPage
+    );
+  }
+	
+  // ROUTING
+  if (page) {
+    window.__ACTIVE_PAGE =
+      page;
+    await bootApp(
+      page
+    );
+  } else {
+    await bootApp(
+      "dashboardPage"
+    );
+  }
 });
 
 function bootApp(targetPage = "dashboardPage") {
