@@ -14867,8 +14867,37 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
           }
         );
       })
-      .then(res => res.json())
-      .then(result => {
+      .then(async res => {
+
+			  const text =
+			    await res.text();
+			
+			  console.log(
+			    "RECEIPT API STATUS:",
+			    res.status
+			  );
+			
+			  console.log(
+			    "RECEIPT API RAW:",
+			    text
+			  );
+			
+			  let result;
+			
+			  try {
+			    result =
+			      JSON.parse(text);
+			  }
+			  catch (e) {
+			    throw new Error(
+			      text ||
+			      `Receipt API error ${res.status}`
+			    );
+			  }
+			
+			  return result;
+			})
+			.then(result => {
       
         console.log(
           "RECEIPT API RESULT:",
