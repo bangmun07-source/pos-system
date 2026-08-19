@@ -27500,7 +27500,10 @@ async function uploadBusinessLogo(base64) {
         upsert: true
       }
     );
-
+	console.log(
+	  "SUPABASE SESSION:",
+	  await client.auth.getSession()
+	);
   if (uploadError) {
     console.error(
       "BUSINESS LOGO STORAGE ERROR:",
