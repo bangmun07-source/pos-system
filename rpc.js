@@ -3499,11 +3499,19 @@ async function getCashFlowPageDataRPC(filter = {}) {
 
 
 async function getAccountBalanceRPC(branchId) {
+  const client =
+    getActiveSupabase();
+
+  if (!client) {
+    throw new Error(
+      "Supabase client belum siap"
+    );
+  }
 
   const {
     data,
     error
-  } = await supabaseClient.rpc(
+  } = await client.rpc(
     "get_account_balance",
     {
       p_branch_id:
