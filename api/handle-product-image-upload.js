@@ -1,9 +1,10 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const centralSupabase =
+  createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
 export default async function handler(req, res) {
 
@@ -18,8 +19,13 @@ export default async function handler(req, res) {
 
     const {
       base64,
-      productId
+      productId,
+      tenantSlug
     } = req.body || {};
+
+    // =========================
+    // VALIDATE
+    // =========================
 
     if (!base64) {
       return res.status(400).json({
@@ -35,6 +41,76 @@ export default async function handler(req, res) {
       });
     }
 
+    // =========================
+    // PILIH DATABASE
+    // =========================
+
+    let supabase;
+
+    // MASTER
+    if (!tenantSlug) {
+
+      console.log(
+        "PRODUCT IMAGE → MASTER"
+      );
+
+      supabase =
+        centralSupabase;
+    }
+
+    // CUSTOMER
+    else {
+
+      console.log(
+        "PRODUCT IMAGE → CUSTOMER:",
+        tenantSlug
+      );
+
+      const {
+        data: tenantResult,
+        error: tenantError
+      } =
+        await centralSupabase.rpc(
+          "get_tenant_config",
+          {
+            p_slug: tenantSlug
+          }
+        );
+
+      if (tenantError) {
+        throw tenantError;
+      }
+
+      if (
+        !tenantResult?.success ||
+        !tenantResult?.data
+      ) {
+        throw new Error(
+          tenantResult?.message ||
+          "Tenant tidak ditemukan"
+        );
+      }
+
+      const config =
+        tenantResult.data;
+
+      if (!config.is_active) {
+        throw new Error(
+          "Tenant tidak aktif"
+        );
+      }
+
+      supabase =
+        createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
+
+      console.log(
+        "CUSTOMER SUPABASE:",
+        config.supabase_url
+      );
+    }
 
     // =========================
     // BASE64
@@ -48,7 +124,8 @@ export default async function handler(req, res) {
     if (!matches) {
       return res.status(400).json({
         success: false,
-        error: "Format gambar tidak valid"
+        error:
+          "Format gambar tidak valid"
       });
     }
 
@@ -64,14 +141,13 @@ export default async function handler(req, res) {
         "base64"
       );
 
-
     // =========================
     // EXTENSION
     // =========================
 
     const ext =
-      mime.split("/")[1] || "jpg";
-
+      mime.split("/")[1] ||
+      "jpg";
 
     // =========================
     // PATH
@@ -80,28 +156,27 @@ export default async function handler(req, res) {
     const path =
       `products/${productId}_${Date.now()}.${ext}`;
 
-
     // =========================
     // UPLOAD
     // =========================
 
     const {
       error: uploadError
-    } = await supabase.storage
-      .from("product-images")
-      .upload(
-        path,
-        buffer,
-        {
-          contentType: mime,
-          upsert: true
-        }
-      );
+    } =
+      await supabase.storage
+        .from("product-images")
+        .upload(
+          path,
+          buffer,
+          {
+            contentType: mime,
+            upsert: true
+          }
+        );
 
     if (uploadError) {
       throw uploadError;
     }
-
 
     // =========================
     // PUBLIC URL
@@ -109,13 +184,18 @@ export default async function handler(req, res) {
 
     const {
       data: publicData
-    } = supabase.storage
-      .from("product-images")
-      .getPublicUrl(path);
+    } =
+      supabase.storage
+        .from("product-images")
+        .getPublicUrl(path);
 
     const url =
       publicData.publicUrl;
 
+    console.log(
+      "PRODUCT IMAGE UPLOAD SUCCESS:",
+      url
+    );
 
     // =========================
     // RESPONSE
@@ -140,7 +220,5 @@ export default async function handler(req, res) {
         err?.message ||
         "Upload product image gagal"
     });
-
   }
-
 }
