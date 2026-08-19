@@ -10,6 +10,7 @@ const centralSupabase = createClient(
 
 // Client tenant akan dibuat setelah tenant ditemukan
 let supabase = null;
+let logoSrc = "";
 
 function rupiah(value) {
   return Number(value || 0)
@@ -269,9 +270,12 @@ console.log(
             matchCategory
           );
         });
-        
-         const branchName =
-            await getBranchName(branchId);
+      
+       const branchName =
+          await getBranchName(
+            supabase,
+            branchId
+          );
       // ========================================
       // PAID
       // ========================================
@@ -1997,7 +2001,10 @@ console.log(
                   : [];
       
               const branchName =
-                  await getBranchName(branchId);
+                await getBranchName(
+                  supabase,
+                  branchId
+                );
           
               // KPI
               const cashIn =
@@ -3033,7 +3040,10 @@ console.log(
                 .toLocaleString("id-ID");
 
            const branchName =
-              await getBranchName(branchId);
+              await getBranchName(
+                supabase,
+                branchId
+              );
           
             // ===================================================
             // FILTER
@@ -3736,8 +3746,12 @@ console.log(
           Array.isArray(report.trend)
             ? report.trend
             : [];
+        
         const branchName =
-          await getBranchName(branchId);
+          await getBranchName(
+            supabase,
+            branchId
+          );
         // =========================
         // CATEGORY ROWS
         // =========================
@@ -4404,7 +4418,10 @@ else if (type === "analytics") {
       : [];
   
   const branchName =
-    await getBranchName(branchId);
+    await getBranchName(
+      supabase,
+      branchId
+    );
 
   // =========================
   // PROFIT SUMMARY
@@ -5475,10 +5492,8 @@ else if (type === "inventory") {
         error: "Branch tidak ditemukan"
       });
   }
-
-  // ========================================
+  
   // INVENTORY DATA
-  // ========================================
   const {
     data,
     error
@@ -5508,17 +5523,16 @@ else if (type === "inventory") {
       ? inventoryData.ingredients
       : [];
 
-  // ========================================
+
   // BRANCH NAME
-  // ========================================
+ const branchName =
+    await getBranchName(
+      supabase,
+      branchId
+    );
+    
 
-  const branchName =
-    await getBranchName(branchId);
-  
-  // ========================================
   // TOTAL
-  // ========================================
-
   const totalValue =
     rows.reduce((sum, r) => {
       const qty =
@@ -5539,10 +5553,8 @@ else if (type === "inventory") {
       return qty <= min;
     }).length;
 
-  // ========================================
-  // INVENTORY ROWS
-  // ========================================
 
+  // INVENTORY ROWS
   const inventoryRows =
     rows.length
       ? rows.map(r => {
@@ -5599,10 +5611,7 @@ else if (type === "inventory") {
         `;
 
 
-  // ========================================
   // FILENAME
-  // ========================================
-
   const today =
     new Date()
       .toLocaleDateString("id-ID");
@@ -5610,11 +5619,7 @@ else if (type === "inventory") {
   const filename =
     `Inventory Report - ${branchName} (${today}).pdf`;
 
-
-  // ========================================
   // HTML REPORT
-  // ========================================
-
 const html = `
   <!DOCTYPE html>
     <html>
@@ -5932,9 +5937,7 @@ const html = `
       });
   }
 
-  // ========================================
   // GET PURCHASE DATA
-  // ========================================
   const {
     data,
     error
@@ -5960,15 +5963,15 @@ const html = `
       ? data
       : [];
 
-  // ========================================
-  // BRANCH NAME
-  // ========================================
-  const branchName =
-    await getBranchName(branchId);
 
-  // ========================================
+  // BRANCH NAME
+  const branchName =
+    await getBranchName(
+      supabase,
+      branchId
+    );
+
   // TOTAL
-  // ========================================
   const totalPurchases =
     rows.length;
   const totalSpending =
@@ -5996,9 +5999,8 @@ const html = `
       )
     ).size;
 
-  // ========================================
+
   // SUPPLIER BREAKDOWN
-  // ========================================
   const supplierMap = {};
   rows.forEach(r => {
     const supplier =
@@ -6031,9 +6033,7 @@ const html = `
           a.spending
       );
 
-  // ========================================
   // PAYMENT BREAKDOWN
-  // ========================================
   const paymentMap = {};
   rows.forEach(r => {
     const payment =
@@ -6063,9 +6063,7 @@ const html = `
         })
       );
 
-  // ========================================
   // PURCHASE HISTORY
-  // ========================================
   const purchaseRows =
     rows.length
       ? rows
@@ -6160,9 +6158,7 @@ const html = `
           </tr>
         `;
 
-  // ========================================
   // PAYMENT HTML
-  // ========================================
   const paymentHtml =
     paymentRows.length
       ? paymentRows
@@ -6191,9 +6187,7 @@ const html = `
           </tr>
         `;
 
-  // ========================================
   // SUPPLIER HTML
-  // ========================================
   const supplierHtml =
     supplierRows.length
       ? supplierRows
@@ -6227,16 +6221,11 @@ const html = `
           </tr>
         `;
 
-  // ========================================
   // FILENAME
-  // ========================================
   const filename =
     `Ingredient Purchase Report - ${branchName}.pdf`;
 
-  // ========================================
   // HTML REPORT
-  // ========================================
-
   const html = `
 
   <!DOCTYPE html>
@@ -6620,9 +6609,7 @@ else if (type === "recipe") {
       });
   }
 
-  // ========================================
   // GET RECIPE DATA
-  // ========================================
   const {
     data,
     error
@@ -6641,10 +6628,8 @@ else if (type === "recipe") {
     Array.isArray(data)
       ? data
       : [];
-  // ========================================
-  // FILTER BRANCH
-  // ========================================
 
+  // FILTER BRANCH
   const filtered =
     recipes.filter(row => {
       const rowBranch =
@@ -6656,18 +6641,16 @@ else if (type === "recipe") {
         normalize(rowBranch) ===
         normalize(branchId)
       );
-
     });
 
-  // ========================================
   // BRANCH NAME
-  // ========================================
   const branchName =
-    await getBranchName(branchId);
-
-  // ========================================
+    await getBranchName(
+      supabase,
+      branchId
+    );
+  
   // SUMMARY
-  // ========================================
   const totalRecipes =
     filtered.length;
   const totalCost =
@@ -6706,10 +6689,8 @@ else if (type === "recipe") {
           0
         ) / totalRecipes
       : 0;
-  // ========================================
-  // TABLE ROWS
-  // ========================================
 
+  // TABLE ROWS
   const rows =
     filtered
       .map((item, i) => {
@@ -6827,10 +6808,7 @@ else if (type === "recipe") {
       })
       .join("");
 
-  // ========================================
   // EMPTY
-  // ========================================
-
   const recipeRows =
     rows ||
     `
@@ -6845,10 +6823,7 @@ else if (type === "recipe") {
       </tr>
     `;
 
-  // ========================================
   // FILENAME
-  // ========================================
-
   const today =
     new Date()
       .toLocaleDateString(
@@ -6858,10 +6833,7 @@ else if (type === "recipe") {
   const filename =
     `Recipe Master Ledger Report - ${branchName} (${today}).pdf`;
 
-  // ========================================
   // HTML REPORT
-  // ========================================
-
   const html = `
 <!DOCTYPE html>
   <html>  
@@ -7179,16 +7151,6 @@ else if (type === "recipe") {
     .status(200)
     .send(html);
 }
-
-
-
-
-
-
-
-
-
-
 
 
     
