@@ -23,7 +23,11 @@ const centralSupabase =
 
 let supabaseClient = null;
 
-
+function getActiveSupabase() {
+  return state.tenantSlug
+    ? supabaseClient
+    : centralSupabase;
+}
 // =====================================================
 // CONNECT TENANT
 // =====================================================
