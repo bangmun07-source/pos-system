@@ -1355,7 +1355,7 @@ console.log(
           : [];
       const branchName =
         await getBranchName(
-          tenantSupabase,
+          supabase,
           branchId
         );
     
