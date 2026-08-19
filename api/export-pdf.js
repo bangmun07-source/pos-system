@@ -1,9 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
+// =====================================================
+// CENTRAL SUPABASE
+// =====================================================
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
+const centralSupabase = createClient(
+  process.env.CENTRAL_SUPABASE_URL,
+  process.env.CENTRAL_SUPABASE_ANON_KEY
 );
+
+// Client tenant akan dibuat setelah tenant ditemukan
+let supabase = null;
+
 
 const logoSrc =
   `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
@@ -92,6 +99,74 @@ export default async function handler(req, res) {
     console.log("EXPORT TYPE:", type);
     console.log("EXPORT BRANCH:", branchId);
 
+    
+// ==========================================
+// CONNECT TENANT
+// ==========================================
+
+if (!tenantSlug) {
+  return res.status(400).json({
+    success: false,
+    error: "tenantSlug wajib diisi"
+  });
+}
+
+const {
+  data: tenantResult,
+  error: tenantError
+} = await centralSupabase.rpc(
+  "get_tenant_config",
+  {
+    p_slug: tenantSlug
+  }
+);
+
+if (tenantError) {
+  console.error(
+    "get_tenant_config ERROR:",
+    tenantError
+  );
+
+  throw tenantError;
+}
+
+if (!tenantResult?.success) {
+  return res.status(404).json({
+    success: false,
+    error:
+      tenantResult?.message ||
+      "Tenant tidak ditemukan"
+  });
+}
+
+const tenantConfig =
+  tenantResult.data;
+
+if (!tenantConfig?.is_active) {
+  return res.status(403).json({
+    success: false,
+    error: "Tenant tidak aktif"
+  });
+}
+
+// ==========================================
+// CREATE CUSTOMER SUPABASE CLIENT
+// ==========================================
+
+supabase = createClient(
+  tenantConfig.supabase_url,
+  tenantConfig.supabase_anon_key
+);
+
+console.log(
+  "EXPORT CONNECTED TENANT:",
+  tenantConfig.tenant_name
+);
+
+console.log(
+  "EXPORT TENANT ID:",
+  tenantConfig.tenant_id
+);
     
     // ==========================================
     // EXPENSE
