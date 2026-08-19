@@ -12701,7 +12701,14 @@ let isProcessing = false;
 let memberSearchValue = "";
 let selectedTier = "ALL";
 
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
 
+state.tenantSlug =
+  params.get("tenant");
+	
 function isLoggedIn() {
   return state.user && state.branchId;
 }
