@@ -2702,11 +2702,12 @@ async function saveBusinessProfileRPC(data) {
 }
 
 async function getBranchInfoRPC(branchId) {
-
+  const client =
+    getActiveSupabase();
   const {
     data,
     error
-  } = await supabaseClient.rpc(
+  } = await client.rpc(
     "get_branch_info",
     {
       p_branch_id:
