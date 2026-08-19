@@ -1,12 +1,29 @@
 const { createClient } =
   require("@supabase/supabase-js");
 
-const centralSupabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const centralSupabase =
+  createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 
 module.exports = async function handler(req, res) {
+
+  console.log(
+    "=== HANDLE RECEIPT START ==="
+  );
+
+  console.log(
+    "METHOD:",
+    req.method
+  );
+
+  console.log(
+    "BODY:",
+    req.body
+      ? Object.keys(req.body)
+      : null
+  );
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -23,9 +40,15 @@ module.exports = async function handler(req, res) {
       tenantSlug
     } = req.body || {};
 
-    // =========================
-    // VALIDATE
-    // =========================
+    console.log(
+      "TRX:",
+      trxId
+    );
+
+    console.log(
+      "TENANT:",
+      tenantSlug
+    );
 
     if (!base64) {
       return res.status(400).json({
@@ -41,36 +64,18 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // =========================
-    // PILIH DATABASE
-    // =========================
-
     let supabase;
-    let targetSupabaseUrl = null;
 
-    // MASTER
-    if (!tenantSlug) {
-
-      console.log(
-        "RECEIPT → MASTER"
-      );
-
-    supabase =
-      centralSupabase;
-    
-    targetSupabaseUrl =
-      process.env.SUPABASE_URL;
-    }
-
+    // =====================================
     // CUSTOMER
-    else {
+    // =====================================
+
+    if (tenantSlug) {
 
       console.log(
-        "RECEIPT → CUSTOMER:",
-        tenantSlug
+        "RECEIPT → CUSTOMER"
       );
 
-      // Ambil konfigurasi tenant
       const {
         data: tenantResult,
         error: tenantError
@@ -85,6 +90,11 @@ module.exports = async function handler(req, res) {
       if (tenantError) {
         throw tenantError;
       }
+
+      console.log(
+        "TENANT CONFIG:",
+        tenantResult
+      );
 
       if (
         !tenantResult?.success ||
@@ -105,29 +115,35 @@ module.exports = async function handler(req, res) {
         );
       }
 
-      // Buat client Customer
-     supabase =
-      createClient(
-        config.supabase_url,
-        config.supabase_anon_key
-      );
-    
-    targetSupabaseUrl =
-      config.supabase_url;
-    
-    console.log(
-      "CUSTOMER SUPABASE:",
-      config.supabase_url
-    );
-    
-    console.log(
-      "TENANT:",
-      tenantSlug
-    );
+      supabase =
+        createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
 
-    // =========================
+      console.log(
+        "CUSTOMER URL:",
+        config.supabase_url
+      );
+    }
+
+    // =====================================
+    // MASTER
+    // =====================================
+
+    else {
+
+      console.log(
+        "RECEIPT → MASTER"
+      );
+
+      supabase =
+        centralSupabase;
+    }
+
+    // =====================================
     // BASE64
-    // =========================
+    // =====================================
 
     const base64Data =
       base64.includes(",")
@@ -140,9 +156,14 @@ module.exports = async function handler(req, res) {
         "base64"
       );
 
-    // =========================
-    // FILE
-    // =========================
+    console.log(
+      "BUFFER SIZE:",
+      buffer.length
+    );
+
+    // =====================================
+    // STORAGE
+    // =====================================
 
     const bucket =
       "Recipes_Digital";
@@ -150,9 +171,11 @@ module.exports = async function handler(req, res) {
     const fileName =
       `${trxId}.jpg`;
 
-    // =========================
-    // UPLOAD STORAGE
-    // =========================
+    console.log(
+      "UPLOAD:",
+      bucket,
+      fileName
+    );
 
     const {
       error: uploadError
@@ -173,9 +196,13 @@ module.exports = async function handler(req, res) {
       throw uploadError;
     }
 
-    // =========================
-    // PUBLIC URL
-    // =========================
+    console.log(
+      "STORAGE UPLOAD SUCCESS"
+    );
+
+    // =====================================
+    // URL
+    // =====================================
 
     const {
       data: publicData
@@ -189,18 +216,15 @@ module.exports = async function handler(req, res) {
     const url =
       publicData.publicUrl;
 
-    // =========================
-    // SAVE receipt_url
-    // =========================
     console.log(
-      "RECEIPT DATABASE TARGET:",
-      targetSupabaseUrl
+      "PUBLIC URL:",
+      url
     );
-    
-    console.log(
-      "RECEIPT TRX ID:",
-      trxId
-    );
+
+    // =====================================
+    // UPDATE TRANSAKSI
+    // =====================================
+
     const {
       error: updateError
     } =
@@ -218,13 +242,8 @@ module.exports = async function handler(req, res) {
       throw updateError;
     }
 
-    // =========================
-    // RESPONSE
-    // =========================
-
     console.log(
-      "RECEIPT UPLOAD SUCCESS:",
-      url
+      "TRANSAKSI UPDATE SUCCESS"
     );
 
     return res.status(200).json({
@@ -233,11 +252,10 @@ module.exports = async function handler(req, res) {
     });
 
   }
-
   catch (err) {
 
     console.error(
-      "HANDLE RECEIPT UPLOAD ERROR:",
+      "HANDLE RECEIPT ERROR:",
       err
     );
 
@@ -247,7 +265,5 @@ module.exports = async function handler(req, res) {
         err?.message ||
         "Upload receipt gagal"
     });
-
   }
-
-}
+};
