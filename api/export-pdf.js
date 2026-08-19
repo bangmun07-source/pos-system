@@ -11,11 +11,6 @@ const centralSupabase = createClient(
 // Client tenant akan dibuat setelah tenant ditemukan
 let supabase = null;
 
-
-const logoSrc =
-  `${tenantConfig.supabase_url}/storage/v1/object/public/Logo/SOMA.png`;
-
-
 function rupiah(value) {
   return Number(value || 0)
     .toLocaleString("id-ID");
@@ -24,7 +19,6 @@ function rupiah(value) {
 function number(value) {
   return Number(value || 0);
 }
-
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -154,6 +148,9 @@ supabase = createClient(
   tenantConfig.supabase_url,
   tenantConfig.supabase_anon_key
 );
+
+const logoSrc =
+  `${tenantConfig.supabase_url}/storage/v1/object/public/Logo/SOMA.png`;
 
 console.log(
   "EXPORT CONNECTED TENANT:",
