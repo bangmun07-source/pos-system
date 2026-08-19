@@ -46,28 +46,25 @@ function normalize(value) {
 // GET BRANCH NAME
 // ==========================================
 
-async function getBranchName(branchId) {
+async function getBranchName(supabaseClient, branchId) {
   if (!branchId) {
     return "";
   }
+
   const {
     data,
     error
-  } = await supabase
+  } = await supabaseClient
     .from("Branches")
     .select("branchName")
     .eq("branchId", branchId)
     .single();
 
   if (error) {
-    console.error(
-      "getBranchName error:",
-      error
-    );
-    // Kalau gagal ambil nama,
-    // tetap gunakan branchId
+    console.error("getBranchName error:", error);
     return branchId;
   }
+
   return data?.branchName || branchId;
 }
 
@@ -1357,7 +1354,10 @@ console.log(
           ? reportSummary.activeMembers
           : [];
       const branchName =
-        await getBranchName(branchId);
+        await getBranchName(
+          tenantSupabase,
+          branchId
+        );
     
       // ========================================
       // TRANSACTION ROWS
