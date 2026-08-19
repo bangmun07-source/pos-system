@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
+const centralSupabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
@@ -18,8 +18,13 @@ export default async function handler(req, res) {
 
     const {
       base64,
-      trxId
+      trxId,
+      tenantSlug
     } = req.body || {};
+
+    // =========================
+    // VALIDATE
+    // =========================
 
     if (!base64) {
       return res.status(400).json({
@@ -36,6 +41,79 @@ export default async function handler(req, res) {
     }
 
     // =========================
+    // PILIH DATABASE
+    // =========================
+
+    let supabase;
+
+    // MASTER
+    if (!tenantSlug) {
+
+      console.log(
+        "RECEIPT → MASTER"
+      );
+
+      supabase =
+        centralSupabase;
+    }
+
+    // CUSTOMER
+    else {
+
+      console.log(
+        "RECEIPT → CUSTOMER:",
+        tenantSlug
+      );
+
+      // Ambil konfigurasi tenant
+      const {
+        data: tenantResult,
+        error: tenantError
+      } =
+        await centralSupabase.rpc(
+          "get_tenant_config",
+          {
+            p_slug: tenantSlug
+          }
+        );
+
+      if (tenantError) {
+        throw tenantError;
+      }
+
+      if (
+        !tenantResult?.success ||
+        !tenantResult?.data
+      ) {
+        throw new Error(
+          tenantResult?.message ||
+          "Tenant tidak ditemukan"
+        );
+      }
+
+      const config =
+        tenantResult.data;
+
+      if (!config.is_active) {
+        throw new Error(
+          "Tenant tidak aktif"
+        );
+      }
+
+      // Buat client Customer
+      supabase =
+        createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
+
+      console.log(
+        "CUSTOMER SUPABASE:",
+        config.supabase_url
+      );
+    }
+
+    // =========================
     // BASE64
     // =========================
 
@@ -45,7 +123,10 @@ export default async function handler(req, res) {
         : base64;
 
     const buffer =
-      Buffer.from(base64Data, "base64");
+      Buffer.from(
+        base64Data,
+        "base64"
+      );
 
     // =========================
     // FILE
@@ -58,21 +139,23 @@ export default async function handler(req, res) {
       `${trxId}.jpg`;
 
     // =========================
-    // UPLOAD SUPABASE STORAGE
+    // UPLOAD STORAGE
     // =========================
 
     const {
       error: uploadError
-    } = await supabase.storage
-      .from(bucket)
-      .upload(
-        fileName,
-        buffer,
-        {
-          contentType: "image/jpeg",
-          upsert: true
-        }
-      );
+    } =
+      await supabase.storage
+        .from(bucket)
+        .upload(
+          fileName,
+          buffer,
+          {
+            contentType:
+              "image/jpeg",
+            upsert: true
+          }
+        );
 
     if (uploadError) {
       throw uploadError;
@@ -84,9 +167,12 @@ export default async function handler(req, res) {
 
     const {
       data: publicData
-    } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(fileName);
+    } =
+      supabase.storage
+        .from(bucket)
+        .getPublicUrl(
+          fileName
+        );
 
     const url =
       publicData.publicUrl;
@@ -97,15 +183,16 @@ export default async function handler(req, res) {
 
     const {
       error: updateError
-    } = await supabase
-      .from("Transaksi")
-      .update({
-        receipt_url: url
-      })
-      .eq(
-        "ID_Transaksi",
-        trxId
-      );
+    } =
+      await supabase
+        .from("Transaksi")
+        .update({
+          receipt_url: url
+        })
+        .eq(
+          "ID_Transaksi",
+          trxId
+        );
 
     if (updateError) {
       throw updateError;
@@ -115,12 +202,18 @@ export default async function handler(req, res) {
     // RESPONSE
     // =========================
 
+    console.log(
+      "RECEIPT UPLOAD SUCCESS:",
+      url
+    );
+
     return res.status(200).json({
       success: true,
       url
     });
 
   }
+
   catch (err) {
 
     console.error(
