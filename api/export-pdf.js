@@ -13,7 +13,7 @@ let supabase = null;
 
 
 const logoSrc =
-  `${process.env.SUPABASE_URL}/storage/v1/object/public/Logo/SOMA.png`;
+  `${tenantConfig.supabase_url}/storage/v1/object/public/Logo/SOMA.png`;
 
 
 function rupiah(value) {
