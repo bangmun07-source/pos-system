@@ -12660,12 +12660,9 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-client.js"></script>
 <script>
-  connectTenant("customer-test")
+  connectTenant(state.tenantSlug)
     .then(config => {
-      console.log(
-        "TENANT READY:",
-        config
-      );
+      console.log("TENANT READY:", config);
     })
     .catch(error => {
       console.error(
