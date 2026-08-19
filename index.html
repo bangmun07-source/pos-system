@@ -21563,7 +21563,8 @@ async function uploadProductImage(
 
         body: JSON.stringify({
           base64,
-          productId
+          productId,
+					tenantSlug: state.tenantSlug
         })
       }
     );
