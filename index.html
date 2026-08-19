@@ -14869,14 +14869,43 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
       })
       .then(res => res.json())
       .then(result => {
-        const url = result.url;
-        let wa = String(phone || "")
-          .replace(/\D/g,"");
+      
+        console.log(
+          "RECEIPT API RESULT:",
+          result
+        );
+      
+        if (
+          !result.success ||
+          !result.url
+        ) {
+          throw new Error(
+            result.error ||
+            "Receipt URL tidak diterima"
+          );
+        }
+      
+        const url =
+          result.url;
+      
+        console.log(
+          "RECEIPT URL:",
+          url
+        );
+      
+        let wa =
+          String(phone || "")
+            .replace(/\D/g,"");
+      
         if (wa.startsWith("0")) {
-          wa = "62" + wa.slice(1);
-        } 
+          wa =
+            "62" +
+            wa.slice(1);
+        }
         else if (!wa.startsWith("62")) {
-          wa = "62" + wa;
+          wa =
+            "62" +
+            wa;
         }
         let finalMessage;
         if(customMessage){
