@@ -91,9 +91,9 @@ async function uploadBusinessLogo(base64) {
     // LOGIN PAGE
     // ===============================
 
-async function loginUserRPC(username,password){
+async function loginUserRPC(client,username,password){
   const {data,error} =
-    await supabaseClient.rpc(
+    await client.rpc(
       "login_user",
       {
         p_username: username,
