@@ -14093,7 +14093,8 @@ async function initExportButton() {
               end,
               status,
               branchId:
-                state.branchId
+              state.branchId,
+							tenantSlug: state.tenantSlug
             })
           }
         );
@@ -14412,7 +14413,7 @@ async function exportRecentTransactions() {
 	        end,
 	        status,
 	        branchId,
-					tenantSlug: "customer-test"
+					tenantSlug: state.tenantSlug
 	      })
 	    }
 	  );
@@ -15251,7 +15252,8 @@ async function exportGrossRevenuePDF() {
 					type: "gross-revenue",
 					start,
 					end,
-					branchId
+					branchId,
+					tenantSlug: state.tenantSlug
 				})
 			});
 
@@ -18279,13 +18281,9 @@ async function exportMembersPDF() {
         <p>
           Please wait
         </p>
-
       </div>
-
     </body>
-
     </html>
-
   `);
 
   // =========================
@@ -18296,13 +18294,12 @@ async function exportMembersPDF() {
 
     type:
       "members",
-
     tier:
       tier,
-
     branchId:
-      branchId
-
+      branchId,
+		tenantSlug: 
+			state.tenantSlug
   };
 
   console.log(
@@ -18320,22 +18317,17 @@ async function exportMembersPDF() {
       await fetch(
         "/api/export-pdf",
         {
-
           method:
             "POST",
-
           headers: {
-
             "Content-Type":
               "application/json"
-
           },
 
           body:
             JSON.stringify(
               payload
             )
-
         }
       );
 
@@ -21569,7 +21561,8 @@ async function exportRecipeReport() {
 
           body: JSON.stringify({
             type: "recipe",
-            branchId
+            branchId,
+						tenantSlug: state.tenantSlug
           })
         }
       );
@@ -24314,7 +24307,8 @@ async function exportInventoryPDF() {
 
           body: JSON.stringify({
             type: "inventory",
-            branchId: branchId
+            branchId: branchId,
+						tenantSlug: state.tenantSlug
           })
         }
       );
@@ -24989,7 +24983,8 @@ async function exportIngredientPurchases() {
             type: "ingredient-purchase",
             branchId: branchId,
             start: startDate,
-            end: endDate
+            end: endDate,
+						tenantSlug: state.tenantSlug
           })
         }
       );
@@ -25919,7 +25914,8 @@ async function exportAnalyticsPDF() {
 			type: "analytics",
 			start,
 			end,
-			branchId
+			branchId,
+			tenantSlug: state.tenantSlug
 		  })
 		});
 
@@ -30274,8 +30270,10 @@ async function exportExpensePDF() {
       category:
         f?.category === "All Categories"
           ? "ALL"
-          : f?.category || "ALL"
+          : f?.category || "ALL",
 
+			tenantSlug: 
+				state.tenantSlug
     };
 
     console.log(
@@ -30291,16 +30289,11 @@ async function exportExpensePDF() {
       await fetch(
         "/api/export-pdf",
         {
-
           method: "POST",
-
           headers: {
-
             "Content-Type":
               "application/json"
-
           },
-
           body:
             JSON.stringify(payload)
 
@@ -30553,41 +30546,30 @@ async function exportOtherIncomePDF() {
       await fetch(
         "/api/export-pdf",
         {
-
           method: "POST",
-
           headers: {
-
             "Content-Type":
               "application/json"
-
           },
 
           body: JSON.stringify({
-
             type:
               "other-income",
-
             branchId:
               state.branchId,
-
             category:
               f.category,
-
             status:
               f.status,
-
             search:
               f.keyword,
-
             start:
               f.startDate,
-
             end:
-              f.endDate
-
+              f.endDate,
+						tenantSlug: 
+							state.tenantSlug
           })
-
         }
       );
 
@@ -36288,7 +36270,8 @@ async function exportCashFlowReport() {
 		  start: startDate,
 		  end: endDate,
 		  branchId: branch,
-		  loginUserId
+		  loginUserId,
+			tenantSlug: state.tenantSlug
 		})
 	  });
 
