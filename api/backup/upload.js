@@ -12,19 +12,21 @@ export default async function handler(req, res) {
 
     const {
       fileName,
-      jsonData
+      jsonData,
+      tenantSlug
     } = req.body || {};
 
-    if (!fileName || !jsonData) {
+    if (!tenantSlug) {
       return res.status(400).json({
-        error: "Data backup tidak lengkap"
+        error: "Tenant slug kosong"
       });
     }
 
-    const supabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const centralSupabase =
+      createClient(
+        process.env.SUPABASE_URL,
+        process.env.SUPABASE_SERVICE_ROLE_KEY
+      );
 
     const now = new Date();
 
@@ -53,6 +55,47 @@ export default async function handler(req, res) {
       );
 
     const {
+      data: tenantResult,
+      error: tenantError
+    } =
+      await centralSupabase.rpc(
+        "get_tenant_config",
+        {
+          p_slug: tenantSlug
+        }
+      );
+    
+    if (tenantError) {
+      throw tenantError;
+    }
+    
+    if (
+      !tenantResult?.success ||
+      !tenantResult?.data
+    ) {
+      throw new Error(
+        tenantResult?.message ||
+        "Tenant tidak ditemukan"
+      );
+    }
+    
+    const config =
+      tenantResult.data;
+    
+    if (!config.is_active) {
+      throw new Error(
+        "Tenant tidak aktif"
+      );
+    }
+    
+    // CUSTOMER SUPABASE
+    const supabase =
+      createClient(
+        config.supabase_url,
+        config.supabase_anon_key
+      );
+    
+    const {
       error
     } = await supabase
       .storage
@@ -66,7 +109,7 @@ export default async function handler(req, res) {
           upsert: false
         }
       );
-
+    
     if (error) {
       throw error;
     }
