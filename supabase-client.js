@@ -112,6 +112,46 @@ async function connectTenant(slug) {
   
     throw branchError;
   }
+
+  // ============================================
+  // SYNC BRANCH COUNT KE MASTER
+  // ============================================
+  
+  const syncResponse =
+    await fetch(
+      "/api/sync-tenant-branch-count",
+      {
+        method: "POST",
+  
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+  
+        body: JSON.stringify({
+          tenant_id:
+            config.tenant_id
+        })
+      }
+    );
+  
+  const syncResult =
+    await syncResponse.json();
+  
+  if (!syncResponse.ok) {
+  
+    console.error(
+      "Branch count sync failed:",
+      syncResult
+    );
+  
+  } else {
+  
+    console.log(
+      "Master branch_count updated:",
+      syncResult.branch_count
+    );
+  }
   
   
   // ============================================
