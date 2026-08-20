@@ -4010,7 +4010,8 @@ async function downloadDatabaseBackup(filePath) {
   
           body: JSON.stringify({
             fileName,
-            jsonData
+            jsonData,
+            tenantSlug: state.tenantSlug
           })
         }
       );
@@ -4034,11 +4035,8 @@ async function downloadDatabaseBackup(filePath) {
   
   
   async function createFullBackup() {
-
-  // =========================
-  // 1. CREATE BACKUP VIA RPC
-  // =========================
-
+    
+  //  CREATE BACKUP VIA RPC
   const {
     data: backup,
     error
