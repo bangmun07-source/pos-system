@@ -35213,16 +35213,19 @@ async function startClearDigitalReceipts(){
 
   try {
     const response =
-      await fetch(
-        "/api/clear-digital-receipts",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          }
-        }
-      );
+	  await fetch(
+		"/api/clear-digital-receipts",
+		{
+		  method: "POST",
+		  headers: {
+			"Content-Type":
+			  "application/json"
+		  },
+		  body: JSON.stringify({
+			tenantSlug: state.tenantSlug
+		  })
+		}
+	  );
 
     const result =
       await response.json();
