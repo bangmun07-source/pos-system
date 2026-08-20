@@ -48,65 +48,86 @@ export default async function handler(req, res) {
       });
     }
 
-    if (!tenantSlug) {
-      return res.status(400).json({
-        success: false,
-        error: "Tenant slug kosong"
-      });
+    // =========================
+    // PILIH DATABASE
+    // =========================
+    
+    let supabase;
+    
+    const isMaster =
+      !tenantSlug ||
+      tenantSlug === "master";
+    
+    // =========================
+    // MASTER
+    // =========================
+    
+    if (isMaster) {
+    
+      console.log(
+        "EXPENSE ATTACHMENT → MASTER"
+      );
+    
+      supabase =
+        centralSupabase;
     }
-
+    
     // =========================
-    // GET TENANT CONFIG
+    // CUSTOMER
     // =========================
-
-    const {
-      data: tenantResult,
-      error: tenantError
-    } = await centralSupabase.rpc(
-      "get_tenant_config",
-      {
-        p_slug: tenantSlug
+    
+    else {
+    
+      console.log(
+        "EXPENSE ATTACHMENT → CUSTOMER:",
+        tenantSlug
+      );
+    
+      const {
+        data: tenantResult,
+        error: tenantError
+      } =
+        await centralSupabase.rpc(
+          "get_tenant_config",
+          {
+            p_slug: tenantSlug
+          }
+        );
+    
+      if (tenantError) {
+        throw tenantError;
       }
-    );
-
-    if (tenantError) {
-      throw tenantError;
-    }
-
-    if (
-      !tenantResult?.success ||
-      !tenantResult?.data
-    ) {
-      throw new Error(
-        tenantResult?.message ||
-        "Tenant tidak ditemukan"
+    
+      if (
+        !tenantResult?.success ||
+        !tenantResult?.data
+      ) {
+        throw new Error(
+          tenantResult?.message ||
+          "Tenant tidak ditemukan"
+        );
+      }
+    
+      const config =
+        tenantResult.data;
+    
+      if (!config.is_active) {
+        throw new Error(
+          "Tenant tidak aktif"
+        );
+      }
+    
+      supabase =
+        createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
+    
+      console.log(
+        "CUSTOMER SUPABASE:",
+        config.supabase_url
       );
     }
-
-    const config =
-      tenantResult.data;
-
-    if (!config.is_active) {
-      throw new Error(
-        "Tenant tidak aktif"
-      );
-    }
-
-    // =========================
-    // CUSTOMER SUPABASE
-    // =========================
-
-    const supabase =
-      createClient(
-        config.supabase_url,
-        config.supabase_anon_key
-      );
-
-    console.log(
-      "EXPENSE ATTACHMENT → CUSTOMER:",
-      tenantSlug,
-      config.supabase_url
-    );
 
     // =========================
     // BASE64
