@@ -44,28 +44,38 @@ export default async function handler(req, res) {
     // =========================
     // PILIH DATABASE
     // =========================
-
+    
     let supabase;
-
+    
+    const isMaster =
+      !tenantSlug ||
+      tenantSlug === "master";
+    
+    // =========================
     // MASTER
-    if (!tenantSlug) {
-
+    // =========================
+    
+    if (isMaster) {
+    
       console.log(
         "PRODUCT IMAGE → MASTER"
       );
-
+    
       supabase =
         centralSupabase;
     }
-
+    
+    // =========================
     // CUSTOMER
+    // =========================
+    
     else {
-
+    
       console.log(
         "PRODUCT IMAGE → CUSTOMER:",
         tenantSlug
       );
-
+    
       const {
         data: tenantResult,
         error: tenantError
@@ -76,11 +86,11 @@ export default async function handler(req, res) {
             p_slug: tenantSlug
           }
         );
-
+    
       if (tenantError) {
         throw tenantError;
       }
-
+    
       if (
         !tenantResult?.success ||
         !tenantResult?.data
@@ -90,22 +100,22 @@ export default async function handler(req, res) {
           "Tenant tidak ditemukan"
         );
       }
-
+    
       const config =
         tenantResult.data;
-
+    
       if (!config.is_active) {
         throw new Error(
           "Tenant tidak aktif"
         );
       }
-
+    
       supabase =
         createClient(
           config.supabase_url,
           config.supabase_anon_key
         );
-
+    
       console.log(
         "CUSTOMER SUPABASE:",
         config.supabase_url
