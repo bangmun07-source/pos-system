@@ -81,29 +81,65 @@ async function connectTenant(slug) {
   // ============================================
   // BUAT CLIENT CUSTOMER
   // ============================================
-
+  
   supabaseClient =
     supabase.createClient(
       config.supabase_url,
       config.supabase_anon_key
     );
-
-
+  
+  
+  // ============================================
+  // BACA JUMLAH BRANCH AKTUAL
+  // ============================================
+  
+  const {
+    count: branchCount,
+    error: branchError
+  } = await supabaseClient
+    .from("Branches")
+    .select("*", {
+      count: "exact",
+      head: true
+    });
+  
+  if (branchError) {
+  
+    console.error(
+      "Branches count error:",
+      branchError
+    );
+  
+    throw branchError;
+  }
+  
+  
+  // ============================================
+  // LOG
+  // ============================================
+  
   console.log(
     "Tenant connected:",
     config.tenant_name
   );
-
+  
   console.log(
     "Tenant ID:",
     config.tenant_id
   );
-
+  
   console.log(
     "Branch count:",
-    config.branch_count
+    branchCount
   );
-
-
-  return config;
+  
+  
+  // ============================================
+  // RETURN CONFIG
+  // ============================================
+  
+  return {
+    ...config,
+    branch_count: branchCount
+  };
 }
