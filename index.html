@@ -28773,138 +28773,95 @@ function fileToBase64(file) {
 }
 
 async function uploadExpenseAttachment() {
-
   console.log(
     "=== UPLOAD ATTACHMENT START ==="
   );
-
   const expense =
     expenseData[
       selectedAttachmentExpenseIndex
     ];
-
   console.log(
     "SELECTED EXPENSE:",
     expense
   );
 
   if (!expense) {
-
     showToast(
       "Expense tidak ditemukan",
       "error"
     );
-
     return;
   }
-
 
   const input =
     document.getElementById(
       "expenseAttachmentInput"
     );
-
   const file =
     input?.files?.[0];
-
   console.log(
     "SELECTED FILE:",
     file
   );
 
-
   if (!file) {
-
     showToast(
       "Pilih file terlebih dahulu",
       "warning"
     );
-
     return;
   }
 
-
   try {
-
     let base64;
-
-
-    // =================================
     // IMAGE
-    // =================================
-
     if (
       file.type === "image/jpeg" ||
       file.type === "image/png" ||
       file.type === "image/webp"
     ) {
-
       console.log(
         "FILE TYPE: IMAGE"
       );
 
-
       const compressed =
         await compressImage(file);
-
-
       base64 =
         await fileToBase64(
           compressed
         );
-
     }
 
-
-    // =================================
     // PDF
-    // =================================
-
-    else if (
-      file.type === "application/pdf"
-    ) {
-
+    else if ( file.type === "application/pdf" ) {
       console.log(
         "FILE TYPE: PDF"
       );
-
-
+	
       // PDF JANGAN DI-COMPRESS
       base64 =
         await fileToBase64(
           file
         );
-
     }
 
-
-    // =================================
     // FORMAT LAIN
-    // =================================
-
     else {
-
       throw new Error(
         "Format file tidak didukung. Gunakan PDF, JPG, atau PNG."
       );
-
     }
-
 
     console.log(
       "BASE64 LENGTH:",
       base64?.length
     );
 
-
     if (!base64) {
-
       throw new Error(
         "Gagal membaca file"
       );
-
     }
-
 
     // =================================
     // UPLOAD KE VERCEL API
@@ -28914,15 +28871,12 @@ async function uploadExpenseAttachment() {
       "CALL API:"
     );
 
-
     const response =
       await fetch(
         "/api/handle-expense-attachment",
         {
-
           method:
             "POST",
-
           headers: {
             "Content-Type":
               "application/json"
@@ -28930,36 +28884,26 @@ async function uploadExpenseAttachment() {
 
           body:
             JSON.stringify({
-
               base64,
-
-              branchId:
-                expense.branchId,
-
-              refId:
-                expense.refId
-
+              branchId: expense.branchId,
+              refId: expense.refId,
+							tenantSlug: state.tenantSlug
             })
-
         }
       );
-
 
     console.log(
       "API STATUS:",
       response.status
     );
 
-
     const result =
       await response.json();
-
 
     console.log(
       "API RESULT:",
       result
     );
-
 
     if (
       !response.ok ||
@@ -28970,101 +28914,61 @@ async function uploadExpenseAttachment() {
         result.error ||
         "Upload attachment gagal"
       );
-
     }
 
-
-    // =================================
     // URL HASIL UPLOAD
-    // =================================
-
     const url =
       result.url;
 
-
     if (!url) {
-
       throw new Error(
         "URL attachment tidak ditemukan"
       );
-
     }
-
 
     console.log(
       "ATTACHMENT URL:",
       url
     );
-
-
-    // =================================
+	
     // SIMPAN URL KE OPERATIONS
-    // =================================
-
     await updateExpenseAttachmentRPC({
-
       Ref_ID:
         expense.refId,
-
       Attachment_URL:
         url
-
     });
 
-
-    // =================================
     // SUCCESS
-    // =================================
-
     showToast(
       "Attachment berhasil disimpan",
       "success"
     );
 
-
     closeExpenseAddAttachmentModal();
 
-
-    // =================================
     // CLEAR CACHE
-    // =================================
+    state.expenseDashboardData = null;
+    state.expenseDashboardFilter = null;
 
-    state.expenseDashboardData =
-      null;
-
-    state.expenseDashboardFilter =
-      null;
-
-
-    // =================================
     // RELOAD
-    // =================================
-
     await loadExpenseDashboard();
-
-
     console.log(
       "=== UPLOAD ATTACHMENT DONE ==="
     );
-
   }
 
   catch (err) {
-
     console.error(
       "Upload expense attachment:",
       err
     );
-
-
     showToast(
       err?.message ||
       "Upload attachment gagal",
       "error"
     );
-
   }
-
 }
 
 function renderOtherIncome() {
