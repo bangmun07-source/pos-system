@@ -151,7 +151,7 @@ supabase = createClient(
 );
 
 const logoSrc =
-  `${tenantConfig.supabase_url}/storage/v1/object/public/Logo/SOMA.png`;
+  `${tenantConfig.supabase_url}/storage/v1/object/public/Logo/LOGOEXPORT.png`;
 
 console.log(
   "EXPORT CONNECTED TENANT:",
@@ -177,10 +177,7 @@ console.log(
           });
       }
 
-      // ========================================
       // NORMALIZE FILTER
-      // ========================================
-
       const normalizedStatus =
         status === "All Status"
           ? "ALL"
@@ -191,10 +188,7 @@ console.log(
           ? "ALL"
           : category || "ALL";
 
-      // ========================================
       // RPC
-      // ========================================
-
       const {
         data,
         error
@@ -210,7 +204,6 @@ console.log(
         }
       );
 
-
       if (error) {
         console.error(
           "RPC get_expense_dashboard ERROR:",
@@ -219,19 +212,13 @@ console.log(
         throw error;
       }
 
-      // ========================================
       // DATA
-      // ========================================
-
       const rows =
         Array.isArray(data?.expenses)
           ? data.expenses
           : [];
 
-      // ========================================
       // FILTER
-      // ========================================
-
       const filteredRows =
         rows.filter(row => {
           const rowBranch =
@@ -276,10 +263,8 @@ console.log(
             supabase,
             branchId
           );
-      // ========================================
+  
       // PAID
-      // ========================================
-
       const paidRows =
         filteredRows.filter(row => {
           const rowStatus =
@@ -293,10 +278,7 @@ console.log(
           );
         });
 
-      // ========================================
       // CATEGORY
-      // ========================================
-
       const categoryMap = {};
       let categoryTotal = 0;
       paidRows.forEach(row => {
@@ -342,10 +324,7 @@ console.log(
               b.amount - a.amount
           );
 
-      // ========================================
       // TOTAL
-      // ========================================
-
       const total =
         paidRows.reduce(
           (sum, row) => {
@@ -360,10 +339,7 @@ console.log(
           0
         );
 
-      // ========================================
       // CATEGORY HTML
-      // ========================================
-
       const categoryRows =
         categoryBreakdown.length
           ? categoryBreakdown
@@ -394,10 +370,7 @@ console.log(
               </tr>
             `;
       
-      // ========================================
       // LEDGER HTML
-      // ========================================
-
       const ledgerRows =
         filteredRows.length
           ? filteredRows
@@ -488,17 +461,11 @@ console.log(
                 </td>
               </tr>
             `;
-
-      // ========================================
+      
       // FILENAME
-      // ========================================
-
       const filename = `Expense Ledger Report - ${branchName} (${start || "-"} - ${end || "-"}).pdf`;
 
-      // ========================================
       // HTML REPORT
-      // ========================================
-
       const html = `
         <!DOCTYPE html>
           <html> 
@@ -836,11 +803,8 @@ console.log(
             </body>          
           </html>
           `;
-      
-      // ========================================
-      // RETURN
-      // ========================================
 
+      // RETURN
       res.setHeader(
         "Content-Type",
         "text/html; charset=utf-8"
@@ -850,13 +814,11 @@ console.log(
         .send(html);
     }
 
-
-    // ==========================================
+    // ================================
     // MEMBERS
-    // ==========================================
-
+    // ================================
+      
     else if (type === "members") {
-
       if (!branchId) {
         return res
           .status(400)
@@ -866,10 +828,7 @@ console.log(
           });
       }
 
-      // ========================================
       // GET SEMUA MEMBER
-      // ========================================
-
       const {
         data: members,
         error
@@ -884,10 +843,7 @@ console.log(
         throw error;
       }
 
-      // ========================================
       // NORMALIZE
-      // ========================================
-
       let rows =
         Array.isArray(members)
           ? members.map(m => ({
@@ -900,10 +856,7 @@ console.log(
             }))
           : [];
 
-      // ========================================
       // FILTER TIER
-      // ========================================
-
       if (
         tier &&
         tier.toUpperCase() !== "ALL"
@@ -914,14 +867,9 @@ console.log(
             .toUpperCase() ===
           tier.toUpperCase()
         );
-
       }
 
-
-      // ========================================
       // SUMMARY
-      // ========================================
-
       const totalMembers =
         rows.length;
       
@@ -958,10 +906,7 @@ console.log(
           0
         );
 
-      // ========================================
       // MEMBER ROWS
-      // ========================================
-
       const memberRows =
         rows.length
           ? rows
@@ -1001,10 +946,7 @@ console.log(
               </tr>
             `;
 
-      // ========================================
       // HTML MEMBER REPORT
-      // ========================================
-
       const html = `
         <!DOCTYPE html>        
           <html>             
@@ -1196,13 +1138,6 @@ console.log(
                 </div>
               
                 <div class="subtitle">
-                  Periode:
-                  ${escapeHtml(start || "-")}
-                  -
-                  ${escapeHtml(end || "-")}
-                </div>
-              
-                <div class="subtitle">
                   Tier:
                   ${escapeHtml(tier)}
                 </div>
@@ -1359,11 +1294,8 @@ console.log(
           supabase,
           branchId
         );
-    
-      // ========================================
+ 
       // TRANSACTION ROWS
-      // ========================================
-    
       const transactionRows =
         rows.length
     
@@ -1423,9 +1355,7 @@ console.log(
             </tr>
           `;
     
-      // ========================================
       // PAYMENT ROWS
-      // ========================================
       const paymentRows =
         Object.entries(paymentDistribution).length
     
@@ -1469,11 +1399,8 @@ console.log(
               </td>
             </tr>
           `;
-    
-      // ========================================
+
       // ACTIVE MEMBERS
-      // ========================================
-    
       const memberRows =
         activeMembers.length
     
@@ -1507,10 +1434,7 @@ console.log(
             </tr>
           `;
     
-      // ========================================
       // HTML REPORT
-      // ========================================
-    
       const html = `
       <!DOCTYPE html>      
         <html>   
@@ -1890,9 +1814,6 @@ console.log(
     }
 
 
-
-
-
     // =========================
     // CASH FLOW
     // =========================
@@ -1913,31 +1834,25 @@ console.log(
           );
         
           // VALIDATION
-        
           if (!loginUserId) {
-        
             return res
               .status(400)
               .json({
                 success: false,
                 error: "loginUserId wajib diisi"
               });
-        
           }
         
           if (!branchId) {
-        
             return res
               .status(400)
               .json({
                 success: false,
                 error: "branchId wajib diisi"
               });
-        
           }
         
           // GET CASH FLOW DATA
-        
           const {
             data,
             error
@@ -1956,7 +1871,6 @@ console.log(
                   "CASH FLOW RPC ERROR:",
                   error
                 );
-          
                 throw error;
               }
           
@@ -2115,7 +2029,6 @@ console.log(
           
                         return `
                           <tr>
-          
                             <td>
                               ${escapeHtml(
                                 item.name ??
@@ -2132,23 +2045,18 @@ console.log(
                             <td class="right">
                               ${percent.toFixed(1)}%
                             </td>
-          
                           </tr>
                         `;
-          
                       })
                       .join("")
-          
                   : `
                     <tr>
-          
                       <td
                         colspan="3"
                         class="empty"
                       >
                         No income data
                       </td>
-          
                     </tr>
                   `;
           
@@ -2172,7 +2080,6 @@ console.log(
                         item.value
                       )
                     );
-          
                   },
                   0
                 );
@@ -2197,7 +2104,6 @@ console.log(
           
                         return `
                           <tr>
-          
                             <td>
                               ${escapeHtml(
                                 item.name ??
@@ -2213,23 +2119,19 @@ console.log(
                             <td class="right">
                               ${percent.toFixed(1)}%
                             </td>
-          
                           </tr>
                         `;
-          
                       })
                       .join("")
           
                   : `
                     <tr>
-          
                       <td
                         colspan="3"
                         class="empty"
                       >
                         No expense data
                       </td>
-          
                     </tr>
                   `;
           
@@ -2239,10 +2141,8 @@ console.log(
           
                   ? history
                       .map(item => {
-          
                         return `
                           <tr>
-          
                             <td>
                               ${escapeHtml(
                                 item.date ??
@@ -2276,36 +2176,29 @@ console.log(
                                 0
                               )}
                             </td>
-          
                           </tr>
                         `;
-          
                       })
                       .join("")
           
                   : `
                     <tr>
-          
                       <td
                         colspan="4"
                         class="empty"
                       >
                         No cash flow data
                       </td>
-          
                     </tr>
                   `;
           
               // FUND TRANSFERS
              const transferRows =
               transfers.length
-            
                 ? transfers
                     .map(item => {
-            
                       return `
                         <tr>
-            
                           <td>
                             ${escapeHtml(
                               item.Date ??
@@ -2334,23 +2227,19 @@ console.log(
                               0
                             )}
                           </td>
-            
                         </tr>
                       `;
-            
                     })
                     .join("")
             
                 : `
                   <tr>
-            
                     <td
                       colspan="4"
                       class="empty"
                     >
                       No fund transfers
                     </td>
-            
                   </tr>
                 `;
               
@@ -2363,7 +2252,6 @@ console.log(
           
                         return `
                           <tr>
-          
                             <td>
                               ${escapeHtml(
                                 item.date ??
@@ -2396,29 +2284,24 @@ console.log(
                                 0
                               )}
                             </td>
-          
                           </tr>
                         `;
-          
                       })
                       .join("")
           
                   : `
                     <tr>
-          
                       <td
                         colspan="4"
                         class="empty"
                       >
                         No owner transactions
                       </td>
-          
                     </tr>
                   `;
           
               // HTML REPORT
               const html = `
-          
                 <!DOCTYPE html>
           
                 <html>
@@ -2975,11 +2858,8 @@ console.log(
                     "branchId wajib diisi"
                   );
                 }
-          
-            // ===================================================
+        
             // GET DATA
-            // ===================================================
-
             const {
               data,
               error
@@ -2992,24 +2872,22 @@ console.log(
               }
             );
       
-      if (error) {
-      
-        console.error(
-          "OTHER INCOME RPC ERROR DETAIL:",
-          error
-        );
-      
-        return res
-          .status(500)
-          .json({
-            success: false,
-            error:
-              error.message ||
-              "RPC get_expense_dashboard gagal",
-            details: error
-          });
-      
-      }
+            if (error) {
+              console.error(
+                "OTHER INCOME RPC ERROR DETAIL:",
+                error
+              );
+            
+              return res
+                .status(500)
+                .json({
+                  success: false,
+                  error:
+                    error.message ||
+                    "RPC get_expense_dashboard gagal",
+                  details: error
+                });
+            }
           
             if (error) {
               throw error;
@@ -3021,10 +2899,7 @@ console.log(
               );
             }
           
-            // ===================================================
             // NORMALIZE
-            // ===================================================
-          
             const rows =
               Array.isArray(data.otherIncome)
                 ? data.otherIncome
@@ -3045,10 +2920,7 @@ console.log(
                 branchId
               );
           
-            // ===================================================
             // FILTER
-            // ===================================================
-          
             const branchValue =
               String(branchId || "").trim();
           
@@ -3083,10 +2955,7 @@ console.log(
                   JSON.stringify(r)
                     .toUpperCase();
           
-                // -------------------------------
-                // BRANCH
-                // -------------------------------
-          
+                // BRANCH        
                 if (
                   branchValue &&
                   norm(branchValue) !== "ALL" &&
@@ -3095,10 +2964,7 @@ console.log(
                   return false;
                 }
           
-                // -------------------------------
                 // CATEGORY
-                // -------------------------------
-          
                 if (
                   categoryValue &&
                   norm(categoryValue) !== "ALL" &&
@@ -3108,11 +2974,8 @@ console.log(
                 ) {
                   return false;
                 }
-          
-                // -------------------------------
-                // STATUS
-                // -------------------------------
-          
+        
+                // STATUS         
                 if (
                   statusValue &&
                   norm(statusValue) !== "ALL" &&
@@ -3122,11 +2985,8 @@ console.log(
                 ) {
                   return false;
                 }
-          
-                // -------------------------------
-                // SEARCH
-                // -------------------------------
-          
+
+                // SEARCH          
                 if (
                   searchValue &&
                   !keyword.includes(
@@ -3136,10 +2996,7 @@ console.log(
                   return false;
                 }
           
-                // -------------------------------
                 // DATE RANGE
-                // -------------------------------
-          
                 const rowDate =
                   r.date
                     ? new Date(
@@ -3183,14 +3040,10 @@ console.log(
           
               });
           
-            // ===================================================
-            // CATEGORY BREAKDOWN
-            // ===================================================
-          
+
+            // CATEGORY BREAKDOWN 
             const categoryMap = {};
-          
             let totalIncome = 0;
-          
             filteredRows.forEach(r => {
           
               const cat =
@@ -3233,10 +3086,7 @@ console.log(
                     b.amount - a.amount
                 );
           
-            // ===================================================
-            // DISPLAY FILTER
-            // ===================================================
-          
+            // DISPLAY FILTER      
             const branchDisplay =
               !branchValue ||
               norm(branchValue) === "ALL"
@@ -3259,10 +3109,7 @@ console.log(
                 ? statusValue
                 : "ALL";
           
-            // ===================================================
-            // CATEGORY ROWS
-            // ===================================================
-          
+            // CATEGORY ROWS          
             const categoryRows =
               categoryBreakdown.length
           
@@ -3303,10 +3150,7 @@ console.log(
           
                 `;
           
-            // ===================================================
-            // LEDGER ROWS
-            // ===================================================
-          
+            // LEDGER ROWS    
             const ledgerRows =
               filteredRows.length
           
@@ -3376,313 +3220,305 @@ console.log(
                     >
                       No Data Found
                     </td>
-          
                   </tr>
-          
                 `;
           
-            // ===================================================
             // HTML REPORT
-            // ===================================================
-  const html = `          
-    <!DOCTYPE html>
-      
-      <html>   
-        <head>         
-          <meta charset="UTF-8">         
-            <title>
-                Other Income Report
-            </title>
-          
-            <style>          
-              *{
-                box-sizing:border-box;
-              }
+          const html = `          
+            <!DOCTYPE html>
               
-              body{          
-                margin:0;          
-                padding:40px 20px;          
-                background:#0B0F14;          
-                font-family: Arial, sans-serif;          
-                color:#333;          
-              }
-              
-              .export-toolbar{          
-                width:100%;          
-                max-width:1100px;          
-                margin: 0 auto 20px;          
-                display:flex;          
-                justify-content: space-between;          
-                align-items:center;          
-                color:white;          
-                font-size:14px;          
-              }
-              
-              .export-toolbar button{          
-                border: 1px solid
-                  rgba( 255, 255, 255, .15 );       
-                background: rgba( 255, 255, 255, .08 );          
-                color:white;          
-                padding: 10px 16px;          
-                border-radius:10px;          
-                cursor:pointer;          
-                font-weight:bold;          
-              }
-          
-              .report{         
-                width:100%;          
-                max-width:1100px;          
-                margin:0 auto;          
-                background:white;          
-                padding:45px;          
-                border-radius:4px;          
-                box-shadow: 0 20px 60px
-                  rgba( 0, 0, 0, .45 );          
-              }
-          
-              .header{          
-                text-align:center;          
-                margin-bottom:20px;          
-              }
-          
-              .logo{          
-                width:170px;          
-                height:auto;          
-                max-height:90px;          
-                object-fit:contain;          
-              }
-          
-              .title{          
-                font-size:24px;          
-                font-weight:bold;          
-                margin-bottom:8px;          
-              }
-          
-              .subtitle{          
-                font-size:12px;          
-                color:#777;          
-                margin-bottom:4px;          
-              }
-          
-              .card{          
-                border: 1px solid #e5e5e5;          
-                border-radius:14px;          
-                padding:18px;          
-                margin-top:20px;          
-                background:#fff;         
-              }
-              
-              .card h3{          
-                margin-top:0;          
-                margin-bottom:12px;          
-                font-size:16px;          
-              }
-              
-              .meta{          
-                font-size:12px;          
-                color:#777;          
-                margin-bottom:12px;          
-                line-height:1.6;          
-              }
-          
-              table{          
-                width:100%;          
-                border-collapse: collapse;          
-                font-size:11px;          
-                margin-top:10px;          
-              }
-              
-              th{          
-                background:#f5f5f5;          
-                padding:10px;          
-                text-align:left;          
-                font-weight:bold;          
-              }
-              
-              td{          
-                padding:10px;          
-                border-bottom: 1px solid #eee;          
-              }
-          
-              .right{          
-                text-align:right;          
-              }
-              
-              .empty{          
-                text-align:center;          
-                color:#777;          
-                padding:25px;          
-              }
-          
-              .footer{          
-                margin-top:40px;          
-                text-align:center;          
-                font-size:9px;          
-                color:#888;          
-              }
-          
-              @media print{        
-                body{          
-                  background:white;          
-                  padding:0;          
-                }
+              <html>   
+                <head>         
+                  <meta charset="UTF-8">         
+                    <title>
+                        Other Income Report
+                    </title>
                   
-                .export-toolbar{          
-                  display:none;          
-                }
+                    <style>          
+                      *{
+                        box-sizing:border-box;
+                      }
+                      
+                      body{          
+                        margin:0;          
+                        padding:40px 20px;          
+                        background:#0B0F14;          
+                        font-family: Arial, sans-serif;          
+                        color:#333;          
+                      }
+                      
+                      .export-toolbar{          
+                        width:100%;          
+                        max-width:1100px;          
+                        margin: 0 auto 20px;          
+                        display:flex;          
+                        justify-content: space-between;          
+                        align-items:center;          
+                        color:white;          
+                        font-size:14px;          
+                      }
+                      
+                      .export-toolbar button{          
+                        border: 1px solid
+                          rgba( 255, 255, 255, .15 );       
+                        background: rgba( 255, 255, 255, .08 );          
+                        color:white;          
+                        padding: 10px 16px;          
+                        border-radius:10px;          
+                        cursor:pointer;          
+                        font-weight:bold;          
+                      }
+                  
+                      .report{         
+                        width:100%;          
+                        max-width:1100px;          
+                        margin:0 auto;          
+                        background:white;          
+                        padding:45px;          
+                        border-radius:4px;          
+                        box-shadow: 0 20px 60px
+                          rgba( 0, 0, 0, .45 );          
+                      }
+                  
+                      .header{          
+                        text-align:center;          
+                        margin-bottom:20px;          
+                      }
+                  
+                      .logo{          
+                        width:170px;          
+                        height:auto;          
+                        max-height:90px;          
+                        object-fit:contain;          
+                      }
+                  
+                      .title{          
+                        font-size:24px;          
+                        font-weight:bold;          
+                        margin-bottom:8px;          
+                      }
+                  
+                      .subtitle{          
+                        font-size:12px;          
+                        color:#777;          
+                        margin-bottom:4px;          
+                      }
+                  
+                      .card{          
+                        border: 1px solid #e5e5e5;          
+                        border-radius:14px;          
+                        padding:18px;          
+                        margin-top:20px;          
+                        background:#fff;         
+                      }
+                      
+                      .card h3{          
+                        margin-top:0;          
+                        margin-bottom:12px;          
+                        font-size:16px;          
+                      }
+                      
+                      .meta{          
+                        font-size:12px;          
+                        color:#777;          
+                        margin-bottom:12px;          
+                        line-height:1.6;          
+                      }
+                  
+                      table{          
+                        width:100%;          
+                        border-collapse: collapse;          
+                        font-size:11px;          
+                        margin-top:10px;          
+                      }
+                      
+                      th{          
+                        background:#f5f5f5;          
+                        padding:10px;          
+                        text-align:left;          
+                        font-weight:bold;          
+                      }
+                      
+                      td{          
+                        padding:10px;          
+                        border-bottom: 1px solid #eee;          
+                      }
+                  
+                      .right{          
+                        text-align:right;          
+                      }
+                      
+                      .empty{          
+                        text-align:center;          
+                        color:#777;          
+                        padding:25px;          
+                      }
+                  
+                      .footer{          
+                        margin-top:40px;          
+                        text-align:center;          
+                        font-size:9px;          
+                        color:#888;          
+                      }
+                  
+                      @media print{        
+                        body{          
+                          background:white;          
+                          padding:0;          
+                        }
+                          
+                        .export-toolbar{          
+                          display:none;          
+                        }
+                  
+                        .report{          
+                          max-width:none;          
+                          box-shadow:none;          
+                          border-radius:0;          
+                          padding:25px;          
+                        }          
+                      }          
+                    </style>          
+                  </head>
+                  
+                    <body>
+                  
+                      <div class="export-toolbar">          
+                        <div>
+                          📊 Other Income Report
+                        </div>
+                      
+                        <button onclick="window.print()" >
+                          Download / Print PDF
+                        </button>          
+                      </div>
+                  
+                      <div class="report">       
+                        <!-- HEADER -->          
+                        <div class="header">          
+                          ${
+                            logoSrc
+                              ? `         
+                                <img
+                                  src="${logoSrc}"
+                                  class="logo"
+                                  alt="Sistem POS"
+                                />          
+                              `
+                              : ""
+                          }
+            
+                          <div class="title">      
+                            Other Income Report     
+                          </div>
+                        
+                          <div class="subtitle">          
+                            Periode:
+                            ${escapeHtml(startDate || "-")}
+                            -
+                            ${escapeHtml(endDate || "-")}         
+                          </div>       
+        
+                          <div class="subtitle">            
+                            Branch:
+                            ${escapeHtml(branchDisplay)}          
+                          </div>
+                        </div>
+                  
+                        <!-- CATEGORY BREAKDOWN -->          
+                        <div class="card">          
+                          <h3>          
+                            Category Breakdown          
+                          </h3>
+                      
+                          <div class="meta flex items-center gap-4"> 
+                            <span>
+                              <b>Category:</b>
+                              ${escapeHtml(categoryDisplay)}          
+                            </span>  
+                            <span>|</span>
+                            <span>
+                              <b>Status:</b>
+                               ${escapeHtml(statusDisplay)}           
+                            </span>             
+                          </div>
+        
+                          <div>
+                            <span>
+                              <b>Search:</b>
+                              ${escapeHtml(searchValue || "-")} 
+                            </span>   
+                          </div>
+               
+                          <table>          
+                            <thead>          
+                              <tr>          
+                                <th> Category </th>          
+                                <th class="right"> Percent </th>          
+                                <th class="right"> Amount </th>        
+                              </tr>          
+                            </thead>
+                  
+                            <tbody>          
+                              ${categoryRows}          
+                            </tbody>         
+                          </table>  
+                      
+                          <div style=" margin-top:15px; text-align:right; font-weight:bold; " >          
+                            TOTAL OTHER INCOME:          
+                            Rp ${rupiah(totalIncome)}          
+                          </div>          
+                        </div>
+                  
+                        <!-- LEDGER -->
+                      
+                        <div class="card page-break">          
+                          <h3>          
+                            Other Income Ledger Report          
+                          </h3>
+                  
+                          <table>          
+                            <thead>          
+                              <tr>          
+                                <th> Date </th>          
+                                <th> Ref ID </th>          
+                                <th> Description </th>          
+                                <th> Category </th>          
+                                <th> Method </th>          
+                                <th class="right"> Amount </th>          
+                                <th> Status </th>          
+                                <th> Branch </th>          
+                              </tr>          
+                            </thead>
+                  
+                            <tbody>          
+                              ${ledgerRows}          
+                            </tbody>          
+                          </table>          
+                        </div>
+                      
+                  
+                        <!-- FOOTER -->          
+                        <div class="footer">          
+                          Generated by Sistem POS          
+                          •          
+                          ${new Date().toLocaleString("id-ID")}          
+                        </div>          
+                      </div>          
+                    </body>          
+                  </html>          
+                  `;
           
-                .report{          
-                  max-width:none;          
-                  box-shadow:none;          
-                  border-radius:0;          
-                  padding:25px;          
-                }          
-              }          
-            </style>          
-          </head>
-          
-            <body>
-          
-              <div class="export-toolbar">          
-                <div>
-                  📊 Other Income Report
-                </div>
-              
-                <button onclick="window.print()" >
-                  Download / Print PDF
-                </button>          
-              </div>
-          
-              <div class="report">       
-                <!-- HEADER -->          
-                <div class="header">          
-                  ${
-                    logoSrc
-                      ? `         
-                        <img
-                          src="${logoSrc}"
-                          class="logo"
-                          alt="Sistem POS"
-                        />          
-                      `
-                      : ""
-                  }
-    
-                  <div class="title">      
-                    Other Income Report     
-                  </div>
-                
-                  <div class="subtitle">          
-                    Periode:
-                    ${escapeHtml(startDate || "-")}
-                    -
-                    ${escapeHtml(endDate || "-")}         
-                  </div>       
-
-                  <div class="subtitle">            
-                    Branch:
-                    ${escapeHtml(branchDisplay)}          
-                  </div>
-                </div>
-          
-                <!-- CATEGORY BREAKDOWN -->          
-                <div class="card">          
-                  <h3>          
-                    Category Breakdown          
-                  </h3>
-              
-                  <div class="meta flex items-center gap-4"> 
-                    <span>
-                      <b>Category:</b>
-                      ${escapeHtml(categoryDisplay)}          
-                    </span>  
-                    <span>|</span>
-                    <span>
-                      <b>Status:</b>
-                       ${escapeHtml(statusDisplay)}           
-                    </span>             
-                  </div>
-
-                  <div>
-                    <span>
-                      <b>Search:</b>
-                      ${escapeHtml(searchValue || "-")} 
-                    </span>   
-                  </div>
-       
-                  <table>          
-                    <thead>          
-                      <tr>          
-                        <th> Category </th>          
-                        <th class="right"> Percent </th>          
-                        <th class="right"> Amount </th>        
-                      </tr>          
-                    </thead>
-          
-                    <tbody>          
-                      ${categoryRows}          
-                    </tbody>         
-                  </table>  
-              
-                  <div style=" margin-top:15px; text-align:right; font-weight:bold; " >          
-                    TOTAL OTHER INCOME:          
-                    Rp ${rupiah(totalIncome)}          
-                  </div>          
-                </div>
-          
-                <!-- LEDGER -->
-              
-                <div class="card page-break">          
-                  <h3>          
-                    Other Income Ledger Report          
-                  </h3>
-          
-                  <table>          
-                    <thead>          
-                      <tr>          
-                        <th> Date </th>          
-                        <th> Ref ID </th>          
-                        <th> Description </th>          
-                        <th> Category </th>          
-                        <th> Method </th>          
-                        <th class="right"> Amount </th>          
-                        <th> Status </th>          
-                        <th> Branch </th>          
-                      </tr>          
-                    </thead>
-          
-                    <tbody>          
-                      ${ledgerRows}          
-                    </tbody>          
-                  </table>          
-                </div>
-              
-          
-                <!-- FOOTER -->          
-                <div class="footer">          
-                  Generated by Sistem POS          
-                  •          
-                  ${new Date().toLocaleString("id-ID")}          
-                </div>          
-              </div>          
-            </body>          
-          </html>          
-          `;
-          
-            // ===================================================
-            // RETURN HTML
-            // ===================================================
-    
-      res.setHeader(
-        "Content-Type",
-        "text/html; charset=utf-8"
-      );
-    
-      return res
-        .status(200)
-        .send(html);
-    
-    }
+            // RETURN HTML  
+          res.setHeader(
+            "Content-Type",
+            "text/html; charset=utf-8"
+          );
+        
+          return res
+            .status(200)
+            .send(html);    
+        }
 
 
 
@@ -3700,12 +3536,9 @@ console.log(
           return res
             .status(400)
             .send("branchId wajib diisi");
-        }
-      
-        // =========================
-        // GET GROSS REVENUE
-        // =========================
-      
+        }      
+
+        // GET GROSS REVENUE      
         const {
           data,
           error
@@ -3726,11 +3559,8 @@ console.log(
           "EXPORT GROSS REVENUE:",
           data
         );
-      
-        // =========================
-        // NORMALIZE
-        // =========================
-      
+
+        // NORMALIZE     
         const report =
           data || {};
       
@@ -3752,10 +3582,8 @@ console.log(
             supabase,
             branchId
           );
-        // =========================
-        // CATEGORY ROWS
-        // =========================
-      
+
+        // CATEGORY ROWS      
         const categoryRows =
           category.length
       
@@ -3786,10 +3614,7 @@ console.log(
               </tr>
             `;
       
-        // =========================
-        // TREND ROWS
-        // =========================
-      
+        // TREND ROWS      
         const trendRows =
           trend.length
       
@@ -3845,10 +3670,7 @@ console.log(
               </tr>
             `;
       
-        // =========================
-        // HTML REPORT
-        // =========================
-      
+        // HTML REPORT      
         const filename =
           `Gross Revenue Report - ${branchName} (${start || "-"} - ${end || "-"}).pdf`;
       
@@ -4333,9 +4155,7 @@ else if (type === "analytics") {
     }
   );
 
-  // =========================
   // VALIDATION
-  // =========================
 
   if (!branchId) {
 
@@ -4345,13 +4165,9 @@ else if (type === "analytics") {
         success: false,
         error: "branchId wajib diisi"
       });
-
   }
 
-  // =========================
   // RPC
-  // =========================
-
   const {
     data,
     error
@@ -4372,10 +4188,7 @@ else if (type === "analytics") {
     throw error;
   }
 
-  // ==========================================
   // NORMALIZE
-  // ==========================================
-
   const report =
     data || {};
 
@@ -4423,10 +4236,7 @@ else if (type === "analytics") {
       branchId
     );
 
-  // =========================
   // PROFIT SUMMARY
-  // =========================
-
   const revenue =
     Number(
       analytics.revenue || 0
@@ -4467,10 +4277,7 @@ else if (type === "analytics") {
       analytics.growth || 0
     );
 
-  // =========================
   // PROFIT SUMMARY ROWS
-  // =========================
-
   const profitSummaryRows = `
 
     <tr>
@@ -4556,13 +4363,9 @@ else if (type === "analytics") {
         ${growth.toFixed(2)}%
       </td>
     </tr>
-
   `;
 
-  // ==========================================
   // WEEKLY REVENUE
-  // ==========================================
-
   const weeklyRows =
     weekly.length
       ? weekly.map(
@@ -4628,10 +4431,7 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ==========================================
   // PAYMENT DISTRIBUTION
-  // ==========================================
-
   const paymentRows =
     paymentDistribution.length
       ? paymentDistribution.map(
@@ -4688,10 +4488,7 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ==========================================
   // TOP SELLING PRODUCTS
-  // ==========================================
-
   const topSellingRows =
     topSelling.length
       ? topSelling.map(
@@ -4754,10 +4551,7 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ==========================================
   // PEAK HOURS
-  // ==========================================
-
   const peakHourRows = [];
   const dayNames = [
     "Minggu",
@@ -4863,10 +4657,7 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // =========================
   // RAW MATERIAL ROWS
-  // =========================
-
   const rawMaterialRows =
     rawMaterials.length
 
@@ -4909,10 +4700,7 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ==========================================
   // ACTIVE MEMBERS
-  // ==========================================
-
   const activeMembers =
     Array.isArray(
       analytics.activeMemberList
@@ -4956,10 +4744,7 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ==========================================
   // HTML REPORT
-  // ==========================================
-
   const html = `
     <!DOCTYPE html>
     <html>
@@ -5909,12 +5694,8 @@ const html = `
       </body>
     </html>
   `;
-
-
-  // ========================================
+  
   // RETURN
-  // ========================================
-
   res.setHeader(
     "Content-Type",
     "text/html; charset=utf-8"
@@ -5925,6 +5706,10 @@ const html = `
     .send(html);
 }
 
+
+  // ----------------------------------
+  // IGREDIENT PURCHASE
+  // ----------------------------------
 
   else if (type === "ingredient-purchase") {
     
@@ -6582,10 +6367,7 @@ const html = `
     </html>
   `;
 
-
-  // ========================================
   // RETURN
-  // ========================================
   res.setHeader(
     "Content-Type",
     "text/html; charset=utf-8"
@@ -6599,6 +6381,8 @@ const html = `
 // ==========================================
 // RECIPE
 // ==========================================
+
+    
 else if (type === "recipe") {
   if (!branchId) {
     return res
@@ -7138,10 +6922,7 @@ else if (type === "recipe") {
   </html>
 `;
 
-  // ========================================
   // RETURN HTML
-  // ========================================
-
   res.setHeader(
     "Content-Type",
     "text/html; charset=utf-8"
