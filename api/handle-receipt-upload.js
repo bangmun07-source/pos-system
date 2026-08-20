@@ -69,13 +69,17 @@ module.exports = async function handler(req, res) {
     // =====================================
     // CUSTOMER
     // =====================================
-
-    if (tenantSlug) {
-
+    
+    const isMaster =
+      !tenantSlug ||
+      tenantSlug === "master";
+    
+    if (!isMaster) {
+    
       console.log(
         "RECEIPT → CUSTOMER"
       );
-
+    
       const {
         data: tenantResult,
         error: tenantError
@@ -86,16 +90,16 @@ module.exports = async function handler(req, res) {
             p_slug: tenantSlug
           }
         );
-
+    
       if (tenantError) {
         throw tenantError;
       }
-
+    
       console.log(
         "TENANT CONFIG:",
         tenantResult
       );
-
+    
       if (
         !tenantResult?.success ||
         !tenantResult?.data
@@ -105,38 +109,38 @@ module.exports = async function handler(req, res) {
           "Tenant tidak ditemukan"
         );
       }
-
+    
       const config =
         tenantResult.data;
-
+    
       if (!config.is_active) {
         throw new Error(
           "Tenant tidak aktif"
         );
       }
-
+    
       supabase =
         createClient(
           config.supabase_url,
           config.supabase_anon_key
         );
-
+    
       console.log(
         "CUSTOMER URL:",
         config.supabase_url
       );
     }
-
+    
     // =====================================
     // MASTER
     // =====================================
-
+    
     else {
-
+    
       console.log(
         "RECEIPT → MASTER"
       );
-
+    
       supabase =
         centralSupabase;
     }
