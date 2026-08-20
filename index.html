@@ -17276,7 +17276,8 @@ async function uploadMemberImage(
 
         body: JSON.stringify({
           base64,
-          memberId
+          memberId,
+					tenantSlug: state.tenantSlug
         })
       }
     );
