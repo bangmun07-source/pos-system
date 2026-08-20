@@ -13202,13 +13202,65 @@ function bootApp(targetPage = "dashboardPage") {
 }
 
 function restoreSession() {
-  const user = localStorage.getItem("pos_user");
-  const branchId = localStorage.getItem("pos_branchId");
-    if (!user) return false;
-  
-  state.user = JSON.parse(user);
-  state.branchId = branchId;
-  
+  const user =
+    localStorage.getItem(
+      "pos_user"
+    );
+  const branchId =
+    localStorage.getItem(
+      "pos_branchId"
+    );
+
+  const loginTenant =
+    localStorage.getItem(
+      "pos_login_tenant"
+    );
+
+  // Tidak ada session
+  if (!user) {
+    return false;
+  }
+
+  // Tenant saat ini
+  const currentTenant =
+    state.tenantSlug || "master";
+
+  // Tenant berbeda
+  if (
+    loginTenant !== currentTenant
+  ) {
+
+    console.log(
+      "TENANT BERUBAH:",
+      loginTenant,
+      "→",
+      currentTenant
+    );
+
+    // Hapus session login
+    localStorage.removeItem(
+      "pos_user"
+    );
+
+    localStorage.removeItem(
+      "pos_branchId"
+    );
+
+    localStorage.removeItem(
+      "pos_login_tenant"
+    );
+
+    state.user = null;
+    state.branchId = "";
+    return false;
+  }
+
+  // Session masih untuk tenant yang sama
+  state.user =
+    JSON.parse(user);
+
+  state.branchId =
+    branchId;
   return true;
 }
 
