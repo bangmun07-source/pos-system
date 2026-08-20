@@ -62,6 +62,18 @@ export default async function handler(req, res) {
     const config =
       tenantResult.data;
 
+    console.log(
+      "RESTORE DEBUG:",
+      {
+        tenantSlug,
+        filePath,
+        supabaseUrl:
+          config.supabase_url,
+        hasAnonKey:
+          !!config.supabase_anon_key
+      }
+    );
+
     if (!config.is_active) {
       throw new Error(
         "Tenant tidak aktif"
@@ -90,7 +102,18 @@ export default async function handler(req, res) {
         .storage
         .from("database_backup")
         .download(filePath);
-
+    
+    console.log(
+      "RESTORE DOWNLOAD:",
+      {
+        filePath,
+        hasFile: !!file,
+        error:
+          downloadError?.message ||
+          null
+      }
+    );
+    
     if (downloadError) {
       throw downloadError;
     }
