@@ -4216,24 +4216,21 @@ async function restoreBackupById(
   );
 }
 
-
-async function deleteDatabaseBackup(
-  filePath
-) {
+async function deleteDatabaseBackup(filePath) {
 
   const response =
     await fetch(
       "/api/backup/delete",
       {
         method: "POST",
-
         headers: {
           "Content-Type":
             "application/json"
         },
 
         body: JSON.stringify({
-          filePath
+          filePath,
+          tenantSlug: state.tenantSlug
         })
       }
     );
@@ -4242,19 +4239,16 @@ async function deleteDatabaseBackup(
     await response.json();
 
   if (!response.ok) {
-
     throw new Error(
       result.error ||
       "Gagal menghapus file backup"
     );
   }
-
   return result;
 }
 
-
 async function deleteBackupById(backupId) {
-
+  
   const {
     data: history,
     error
@@ -4275,11 +4269,9 @@ async function deleteBackupById(backupId) {
   }
 
   if (history.file_path) {
-
     await deleteDatabaseBackup(
       history.file_path
     );
-
   }
 
   const {
