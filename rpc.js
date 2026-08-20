@@ -4145,7 +4145,8 @@ async function restoreDatabaseBackupByPath(
         },
 
         body: JSON.stringify({
-          filePath
+          filePath,
+          tenantSlug: state.tenantSlug
         })
       }
     );
