@@ -4235,13 +4235,33 @@ async function deleteDatabaseBackup(filePath) {
       }
     );
 
-  const result =
-    await response.json();
-
+  const responseText =
+    await response.text();
+  
   console.log(
-    "DELETE STORAGE RESULT:",
-    result
+    "DELETE STORAGE STATUS:",
+    response.status
   );
+  
+  console.log(
+    "DELETE STORAGE RESPONSE:",
+    responseText
+  );
+  
+  let result = {};
+  
+  try {
+    result =
+      responseText
+        ? JSON.parse(responseText)
+        : {};
+  }
+  catch (e) {
+    console.error(
+      "DELETE STORAGE JSON ERROR:",
+      e
+    );
+  }
 
   if (!response.ok) {
     throw new Error(
