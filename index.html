@@ -11614,7 +11614,7 @@
 		          </span>
 		
 		          <div>
-		            <p class="text-[10px] uppercase tracking-widest text-on-surface font-bold">
+		            <p class="text-xs uppercase tracking-widest text-on-surface font-bold">
 		              Cash Management
 		            </p>
 		
@@ -11732,7 +11732,7 @@
 	        </button>
 	
 	        <button onclick="saveTransfer()"
-	          class="btn-gradient px-6 py-3 rounded-md font-bold text-black">
+	          class="bottom-theme uppercase tracking-widest text-on-surface tracking-[0.20em] font-semibold border border-white/10 px-6 py-3 rounded-md">
 	          Transfer Funds
 	        </button>
       	</div>
@@ -11835,7 +11835,7 @@
 
         <button id="saveOwnerBtn"
           onclick="saveOwnerTransaction()"
-          class="flex-1 h-12 rounded-md bg-primary text-background font-bold hover:opacity-90">
+          class="flex-1 h-12 rounded-md bottom-theme uppercase tracking-widest text-on-surface tracking-[0.20em] font-semibold border border-white/10">
           Save
         </button>
       </div>
@@ -13869,7 +13869,7 @@ function renderLowStock(items) {
   }
 
   el.innerHTML = items.map(i => `
-    <div class="flex justify-between text-sm py-1 border-b border-slate-400">
+    <div class="flex justify-between text-sm py-1 border-b border-white/10">
       <span>${i.nama}</span>
       <span class="text-red-400 font-bold">${i.stok}</span>
     </div>
@@ -13909,7 +13909,7 @@ function renderShiftPerformance(shift) {
   el.innerHTML = `
     <div class="flex flex-col gap-3">
 
-      <div class="flex items-center justify-between py-3 border-b border-slate-400">
+      <div class="flex items-center justify-between py-3 border-b border-white/10>
         <div>
           <p class="text-sm text-on-surface font-medium font-bold">MORNING</p>
           <p class="text-xs text-muted ">${shift.pagi?.orders || 0} orders</p>
@@ -16088,6 +16088,9 @@ async function sendTransaction(payload){
       state.inventoryFilter = null;
       // state.products = null;
       state.cart = [];
+			state.products = null;
+			state.productsBranchId = null;
+			state.productsRole = null;
       state.currentMember = null;
       state.selectedMember = null;
       state.currentMemberPoint = 0;
@@ -34018,7 +34021,7 @@ function renderOwnerHistory(rows) {
       const isCapital =
         row.Type === "CAPITAL";
       return `
-        <div class="flex items-center justify-between p-4 px-4 rounded-md border border-white/10 bg-background/40">
+        <div class="flex items-center justify-between p-4 px-4 rounded-md border border-white/10 bg-background">
           <div class=px-4>
             <div class="font-semibold text-sm">
               ${isCapital ? "Add Capital" : "Withdraw"}
