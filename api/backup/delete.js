@@ -84,6 +84,7 @@ export default async function handler(req, res) {
 
     // DELETE
     const {
+      data: deletedFiles,
       error
     } =
       await supabase
@@ -92,9 +93,28 @@ export default async function handler(req, res) {
         .remove([
           filePath
         ]);
-
+    
+    console.log(
+      "DELETE BACKUP CUSTOMER:",
+      {
+        tenantSlug,
+        filePath,
+        deletedFiles,
+        error
+      }
+    );
+    
     if (error) {
       throw error;
+    }
+    
+    if (
+      !deletedFiles ||
+      deletedFiles.length === 0
+    ) {
+      throw new Error(
+        "File backup tidak ditemukan atau gagal dihapus dari Storage tenant"
+      );
     }
 
     return res.status(200).json({
