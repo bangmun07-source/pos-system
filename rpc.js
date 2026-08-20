@@ -4248,7 +4248,10 @@ async function deleteDatabaseBackup(filePath) {
 }
 
 async function deleteBackupById(backupId) {
-  
+   console.log(
+    "DELETE BACKUP ID:",
+    backupId
+  );
   const {
     data: history,
     error
@@ -4257,6 +4260,12 @@ async function deleteBackupById(backupId) {
     .select("backup_id,file_path")
     .eq("backup_id", backupId)
     .single();
+  
+   console.log(
+    "BACKUP HISTORY:",
+    history,
+    error
+  );
 
   if (error) {
     throw error;
