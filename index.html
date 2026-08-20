@@ -12620,10 +12620,16 @@
 				</div>
 				<!-- Action Buttons -->
 				<div class="p-10 pt-0 flex gap-4 mt-auto">
-					<button onclick="enableEditMember()" class="flex-1 bottom-theme font-bold h-12 rounded-md flex items-center justify-center">
-						<span class="material-symbols-outlined mr-2 text-xl" style="font-variation-settings: 'FILL' 1;">edit_note</span>
-							Edit Profile
+					<button id="memberEditBtn"
+					    onclick="enableEditMember()"
+					    class="flex-1 bottom-theme h-12 rounded-md flex items-center justify-center font-semibold tracking-wide transition-transform hover:scale-[1.02] active:scale-95">
+					    <span class="material-symbols-outlined mr-2 text-xl"
+					        style="font-variation-settings: 'FILL' 1;">
+					        edit_note
+					    </span>
+					    Edit Profile
 					</button>
+					
 					<button onclick="document.getElementById('memberPhotoInput').click()"
 						class="flex-1 bottom-theme font-bold h-12 rounded-md flex items-center justify-center text-on-surface transition-all duration-200">
 						<span class="material-symbols-outlined mr-2 text-xl">
@@ -19275,15 +19281,23 @@ function enableEditMember() {
   makeInput("birthday", editingMember.Tgl_Lahir);
   makeInput("joinDate", editingMember.Join_Date);
   // ubah tombol jadi SAVE
-  const btn = document.querySelector(".btn-gradient");
-  if (btn) {
-    btn.innerHTML = "Save Changes";
-    btn.onclick = saveMemberEdit;
-  }
+	const btn =
+	  document.querySelector("#memberEditBtn");
+
+	if (btn) {
+	  btn.innerHTML = `
+	    <span
+	      class="material-symbols-outlined mr-2 text-xl"
+	      style="font-variation-settings: 'FILL' 1;">
+	      save
+	    </span>
+	    Save Changes
+	  `;
+	  btn.onclick = saveMemberEdit;
+	}
 }
 
 async function saveMemberEdit() {
-
   const modal =
     document.querySelector(
       "[data-member-modal]"
