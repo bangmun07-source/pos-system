@@ -4238,6 +4238,11 @@ async function deleteDatabaseBackup(filePath) {
   const result =
     await response.json();
 
+  console.log(
+    "DELETE STORAGE RESULT:",
+    result
+  );
+
   if (!response.ok) {
     throw new Error(
       result.error ||
