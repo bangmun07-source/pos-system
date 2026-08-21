@@ -13450,11 +13450,27 @@ async function handleLogin() {
       return;
     }
 
-    const user =
-      result.user;
-
-    state.user =
-      user;
+	const user = {
+	  ...result.user,
+	
+	  id:
+	    result.user.id ||
+	    result.user.ID_User,
+	
+	  username:
+	    result.user.username ||
+	    result.user.Username,
+	
+	  role:
+	    result.user.role ||
+	    result.user.Role,
+	
+	  branchId:
+	    result.user.branchId
+	};
+	
+	state.user =
+	  user;
 
     state.branchId =
       user.branchId || "";
