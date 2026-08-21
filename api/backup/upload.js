@@ -17,6 +17,11 @@ export default async function handler(req, res) {
       tenantSlug
     } = req.body || {};
 
+
+    // =====================================================
+    // VALIDASI INPUT
+    // =====================================================
+
     if (!tenantSlug) {
       return res.status(400).json({
         success: false,
@@ -24,10 +29,17 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!fileName) {
+      return res.status(400).json({
+        success: false,
+        error: "Nama file backup kosong"
+      });
+    }
 
-    // ==========================================
-    // AMBIL SESSION
-    // ==========================================
+
+    // =====================================================
+    // SESSION
+    // =====================================================
 
     const sessionId =
       req.headers["x-session-id"];
@@ -40,9 +52,9 @@ export default async function handler(req, res) {
     }
 
 
-    // ==========================================
+    // =====================================================
     // MASTER SUPABASE
-    // ==========================================
+    // =====================================================
 
     const centralSupabase =
       createClient(
@@ -51,99 +63,146 @@ export default async function handler(req, res) {
       );
 
 
-    // ==========================================
-    // AMBIL TENANT
-    // ==========================================
+    // =====================================================
+    // TENTUKAN DATABASE TARGET
+    // =====================================================
 
-    const {
-      data: tenantResult,
-      error: tenantError
-    } =
-      await centralSupabase.rpc(
-        "get_tenant_config",
-        {
-          p_slug: tenantSlug
-        }
+    let targetSupabase;
+
+
+    // =====================================================
+    // MASTER
+    // =====================================================
+
+    if (tenantSlug === "master") {
+
+      console.log(
+        "BACKUP → MASTER DATABASE"
       );
 
-    if (tenantError) {
-      throw tenantError;
-    }
+      targetSupabase =
+        centralSupabase;
 
-    if (
-      !tenantResult?.success ||
-      !tenantResult?.data
-    ) {
-      return res.status(401).json({
-        success: false,
-        error: "Tenant tidak ditemukan"
-      });
-    }
-
-    const config =
-      tenantResult.data;
-
-
-    // ==========================================
-    // CEK TENANT
-    // ==========================================
-
-    if (!config.is_active) {
-      return res.status(403).json({
-        success: false,
-        error: "Tenant tidak aktif"
-      });
     }
 
 
-    // ==========================================
-    // AMBIL SERVICE ROLE CUSTOMER
-    // ==========================================
+    // =====================================================
+    // CUSTOMER
+    // =====================================================
 
-    const {
-      data: credential,
-      error: credentialError
-    } =
-      await centralSupabase
-        .from("tenant_credentials")
-        .select("service_role_key")
-        .eq(
-          "tenant_id",
-          config.tenant_id
-        )
-        .single();
+    else {
 
-    if (credentialError) {
-      throw credentialError;
-    }
-
-    if (!credential?.service_role_key) {
-      throw new Error(
-        "Service Role Customer tidak ditemukan"
-      );
-    }
-
-
-    // ==========================================
-    // CUSTOMER SUPABASE
-    // ==========================================
-
-    const customerSupabase =
-      createClient(
-        config.supabase_url,
-        credential.service_role_key
+      console.log(
+        "BACKUP → CUSTOMER:",
+        tenantSlug
       );
 
 
-    // ==========================================
+      // ==========================================
+      // GET TENANT CONFIG
+      // ==========================================
+
+      const {
+        data: tenantResult,
+        error: tenantError
+      } =
+        await centralSupabase.rpc(
+          "get_tenant_config",
+          {
+            p_slug: tenantSlug
+          }
+        );
+
+      if (tenantError) {
+        throw tenantError;
+      }
+
+
+      if (
+        !tenantResult?.success ||
+        !tenantResult?.data
+      ) {
+
+        return res.status(401).json({
+          success: false,
+          error: "Tenant tidak ditemukan"
+        });
+
+      }
+
+
+      const config =
+        tenantResult.data;
+
+
+      // ==========================================
+      // TENANT ACTIVE
+      // ==========================================
+
+      if (!config.is_active) {
+
+        return res.status(403).json({
+          success: false,
+          error: "Tenant tidak aktif"
+        });
+
+      }
+
+
+      // ==========================================
+      // CUSTOMER SERVICE ROLE
+      // ==========================================
+
+      const {
+        data: credential,
+        error: credentialError
+      } =
+        await centralSupabase
+          .from("tenant_credentials")
+          .select("service_role_key")
+          .eq(
+            "tenant_id",
+            config.tenant_id
+          )
+          .maybeSingle();
+
+
+      if (credentialError) {
+        throw credentialError;
+      }
+
+
+      if (!credential?.service_role_key) {
+
+        throw new Error(
+          "Service Role Customer tidak ditemukan"
+        );
+
+      }
+
+
+      // ==========================================
+      // CUSTOMER CLIENT
+      // ==========================================
+
+      targetSupabase =
+        createClient(
+          config.supabase_url,
+          credential.service_role_key
+        );
+
+    }
+
+
+    // =====================================================
     // VALIDASI SESSION
-    // ==========================================
+    // =====================================================
 
     const {
       data: session,
       error: sessionError
     } =
-      await customerSupabase
+      await targetSupabase
         .from("auth_sessions")
         .select(
           "session_id, user_id, expires_at"
@@ -154,28 +213,32 @@ export default async function handler(req, res) {
         )
         .maybeSingle();
 
+
     if (sessionError) {
       throw sessionError;
     }
 
+
     if (!session) {
+
       return res.status(401).json({
         success: false,
         error: "Session tidak valid"
       });
+
     }
 
 
-    // ==========================================
-    // CEK SESSION EXPIRED
-    // ==========================================
+    // =====================================================
+    // CEK EXPIRED
+    // =====================================================
 
     if (
       new Date(session.expires_at)
       <= new Date()
     ) {
 
-      await customerSupabase
+      await targetSupabase
         .from("auth_sessions")
         .delete()
         .eq(
@@ -187,18 +250,19 @@ export default async function handler(req, res) {
         success: false,
         error: "Session sudah expired"
       });
+
     }
 
 
-    // ==========================================
+    // =====================================================
     // AMBIL USER
-    // ==========================================
+    // =====================================================
 
     const {
       data: user,
       error: userError
     } =
-      await customerSupabase
+      await targetSupabase
         .from("Users")
         .select(
           "ID_User, Username, Role, branchId"
@@ -209,23 +273,29 @@ export default async function handler(req, res) {
         )
         .maybeSingle();
 
+
     if (userError) {
       throw userError;
     }
 
+
     if (!user) {
+
       return res.status(401).json({
         success: false,
         error: "User tidak ditemukan"
       });
+
     }
 
 
-    // ==========================================
+    // =====================================================
     // OWNER ONLY
-    // ==========================================
+    // =====================================================
 
-    if (user.Role !== "Owner") {
+    if (
+      user.Role?.toLowerCase() !== "owner"
+    ) {
 
       return res.status(403).json({
         success: false,
@@ -235,21 +305,9 @@ export default async function handler(req, res) {
     }
 
 
-    // ==========================================
-    // VALIDASI FILE
-    // ==========================================
-
-    if (!fileName) {
-      return res.status(400).json({
-        success: false,
-        error: "Nama file backup kosong"
-      });
-    }
-
-
-    // ==========================================
+    // =====================================================
     // BUAT PATH
-    // ==========================================
+    // =====================================================
 
     const now =
       new Date();
@@ -266,9 +324,9 @@ export default async function handler(req, res) {
       `${year}/${month}/${fileName}`;
 
 
-    // ==========================================
+    // =====================================================
     // JSON → BUFFER
-    // ==========================================
+    // =====================================================
 
     const jsonString =
       JSON.stringify(
@@ -284,14 +342,14 @@ export default async function handler(req, res) {
       );
 
 
-    // ==========================================
-    // UPLOAD BACKUP
-    // ==========================================
+    // =====================================================
+    // UPLOAD STORAGE
+    // =====================================================
 
     const {
       error: uploadError
     } =
-      await customerSupabase
+      await targetSupabase
         .storage
         .from("database_backup")
         .upload(
@@ -306,14 +364,15 @@ export default async function handler(req, res) {
           }
         );
 
+
     if (uploadError) {
       throw uploadError;
     }
 
 
-    // ==========================================
+    // =====================================================
     // RESPONSE
-    // ==========================================
+    // =====================================================
 
     return res.status(200).json({
 
@@ -323,7 +382,13 @@ export default async function handler(req, res) {
         path,
 
       size:
-        buffer.length
+        buffer.length,
+
+      tenant:
+        tenantSlug,
+
+      user:
+        user.Username
 
     });
 
