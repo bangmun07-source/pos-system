@@ -13316,22 +13316,37 @@ function navigate(pageId, params = {}) {
 	    state.user?.Role || "-";
 	}
 
-  // SETTINGS MENU
-  // Owner + Admin
-  document.querySelectorAll(".settingsMenu").forEach(menu => {
-    menu.style.display =
-      (role === "owner" || role === "admin")
-        ? "flex"
-        : "none";
-  });
-
-  // OWNER ONLY MENU
-  document.querySelectorAll(".ownerOnly").forEach(menu => {
-    menu.style.display =
-      (role === "owner")
-        ? "flex"
-        : "none";
-  });
+  // =========================
+	// SETTINGS MENU
+	// Owner + Admin
+	// =========================
+	const userRole =
+	  (
+	    state.user?.Role ||
+	    state.user?.role ||
+	    ""
+	  ).toLowerCase();
+	
+	document.querySelectorAll(".settingsMenu").forEach(menu => {
+	  menu.style.display =
+	    (
+	      userRole === "owner" ||
+	      userRole === "admin"
+	    )
+	      ? "flex"
+	      : "none";
+	});
+	
+	// =========================
+	// OWNER ONLY MENU
+	// =========================
+	
+	document.querySelectorAll(".ownerOnly").forEach(menu => {
+	  menu.style.display =
+	    userRole === "owner"
+	      ? "flex"
+	      : "none";
+	});
 
   currentPage = pageId;
 
