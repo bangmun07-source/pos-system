@@ -69,18 +69,40 @@ export default async function handler(req, res) {
       );
     }
 
+    // ==========================================
+    // AMBIL SERVICE ROLE CUSTOMER
+    // ==========================================
+    
+    const {
+      data: credential,
+      error: credentialError
+    } =
+      await centralSupabase
+        .from("tenant_credentials")
+        .select("service_role_key")
+        .eq("tenant_id", config.tenant_id)
+        .single();
+    
+    if (credentialError) {
+      throw credentialError;
+    }
+    
+    if (!credential?.service_role_key) {
+      throw new Error(
+        "Service Role Customer tidak ditemukan"
+      );
+    }
+    
+    
+    // ==========================================
     // CUSTOMER SUPABASE
+    // ==========================================
+    
     const supabase =
       createClient(
         config.supabase_url,
-        config.supabase_anon_key
+        credential.service_role_key
       );
-
-    console.log(
-      "DELETE BACKUP → CUSTOMER:",
-      tenantSlug,
-      filePath
-    );
 
     // DELETE
     const {
