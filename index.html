@@ -4379,7 +4379,7 @@
 	    <!-- HEADER -->
 	    <div class="p-6 border-b border-white/10 flex items-center justify-between">
 	      <div class="flex items-center gap-4">
-	        <<div class="main-icon-box">
+	        <div class="main-icon-box">
 			      <span class="main-icon-box material-symbols-outlined text-2xl"
 			            style="font-variation-settings:'FILL' 1;">
 	            inventory_2
@@ -4472,8 +4472,8 @@
     <!-- HEADER -->
     <div class="p-6 border-b border-white/10 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="main-icon-box">
-		      <span class="main-icon-box material-symbols-outlined text-2xl"
+        <div class="relative">
+		      <span class="text-on-surface material-symbols-outlined text-2xl"
 		            style="font-variation-settings:'FILL' 1;">
             inventory_2
           </span>
@@ -4508,7 +4508,7 @@
         class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
         <div class="flex items-center gap-4">
          <div class="w-10 h-10 flex items-center justify-center text-on-surface">
-		      <span class="main-icon-box material-symbols-outlined text-lg"
+		      <span class="material-symbols-outlined text-lg"
 		            style="font-variation-settings:'FILL' 1;">edit</span>
           </div>
 
@@ -4528,7 +4528,7 @@
         class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 flex items-center justify-center text-on-surface">
-			      <span class="main-icon-box material-symbols-outlined text-lg"
+			      <span class="material-symbols-outlined text-lg"
 			            style="font-variation-settings:'FILL' 1;">history_edu</span>
           </div>
 
@@ -4548,7 +4548,7 @@
         class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
         <div class="flex items-center gap-4">
           <div class="w-10 h-10 flex items-center justify-center text-on-surface">
-			      <span class="main-icon-box material-symbols-outlined text-lg"
+			      <span class="material-symbols-outlined text-lg"
 			            style="font-variation-settings:'FILL' 1;">low_priority</span>
           </div>
 
@@ -4896,26 +4896,15 @@
       <!-- Category + Contact -->
       <div class="grid grid-cols-2 gap-4">
         <div class="space-y-2">
-          <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-1">
-            Category
-          </label>
-
-          <div class="relative">
-            <select id="supplierCategoryInput"
-              class="w-full bg-background p-3.5 rounded-md text-on-surface border border-white/10 appearance-none focus:ring-1 focus:ring-primary-container outline-none cursor-pointer">
-              <option>Coffee & Beans</option>
-              <option>Dairy & Creams</option>
-              <option>Meats & Poultry</option>
-              <option>Grains & Spices</option>
-              <option>Packaging</option>
-              <option>Other</option>
-            </select>
-
-            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              expand_more
-            </span>
-          </div>
-        </div>
+		  <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-1">
+		    Category
+		  </label>
+		
+		  <input id="supplierCategoryInput"
+		    class="w-full bg-background p-3.5 rounded-md text-on-surface border border-white/10 focus:ring-1 focus:ring-primary-container outline-none transition-all"
+		    type="text"
+		    placeholder="Enter supplier category...">
+		</div>
 
         <div class="space-y-2">
           <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wider px-1">
@@ -12220,21 +12209,16 @@
 		                type="text">
 		            </div>
 		            <!-- Category -->
-		            <div>
-		              <label class="text-[10px] uppercase text-on-surface-variant">
-		                Category
-		              </label>
-		
-		              <select id="supplier_category"
-		                class="mt-2 w-full bg-background border border-white/10 rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary">
-		                <option>Coffee & Beans</option>
-		                <option>Dairy & Creams</option>
-		                <option>Meats & Poultry</option>
-		                <option>Grains & Spices</option>
-		                <option>Packaging</option>
-		                <option>Other</option>
-		              </select>
-		            </div>
+					<div>
+					  <label class="text-[10px] uppercase text-on-surface-variant">
+					    Category
+					  </label>
+					
+					  <input id="supplier_category"
+					    type="text"
+					    placeholder="Enter supplier category..."
+					    class="mt-2 w-full bg-background border border-white/10 rounded-md p-4 text-on-surface focus:ring-1 focus:ring-primary outline-none">
+					</div>
 
 		            <!-- Contact -->
 		            <div>
