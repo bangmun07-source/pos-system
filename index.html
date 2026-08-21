@@ -13407,80 +13407,81 @@ async function handleLogin() {
     let result;
 
     // ==========================================
-    // MASTER LOGIN
-    // ==========================================
-
-    if (
-      !state.tenantSlug ||
-      state.tenantSlug === "master"
-    ) {
-
-      console.log(
-        "LOGIN → MASTER"
-      );
-
-			result =
-			  await loginUserRPC(
-			    centralSupabase,
-			    username,
-			    password
-			  );
-			
-			console.log(
-			  "MASTER LOGIN RESULT:",
-			  result
-			);
-
-    // ==========================================
-    // CUSTOMER LOGIN
-    // ==========================================
-
-    else {
-
-      console.log(
-        "LOGIN → CUSTOMER:",
-        state.tenantSlug
-      );
-
-      const response =
-        await fetch(
-          "/api/auth/login",
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-              tenantSlug:
-                state.tenantSlug,
-
-              username:
-                username,
-
-              password:
-                password
-            })
-          }
-        );
-
-      result =
-        await response.json();
-
-      console.log(
-        "CUSTOMER AUTH RESULT:",
-        result
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          result.error ||
-          "Login gagal"
-        );
-      }
-    }
+	// MASTER LOGIN
+	// ==========================================
+	
+	if (
+	  !state.tenantSlug ||
+	  state.tenantSlug === "master"
+	) {
+	
+	  console.log(
+	    "LOGIN → MASTER"
+	  );
+	
+	  result =
+	    await loginUserRPC(
+	      centralSupabase,
+	      username,
+	      password
+	    );
+	
+	  console.log(
+	    "MASTER LOGIN RESULT:",
+	    result
+	  );
+	}
+	
+	// ==========================================
+	// CUSTOMER LOGIN
+	// ==========================================
+	
+	else {
+	
+	  console.log(
+	    "LOGIN → CUSTOMER:",
+	    state.tenantSlug
+	  );
+	
+	  const response =
+	    await fetch(
+	      "/api/auth/login",
+	      {
+	        method: "POST",
+	
+	        headers: {
+	          "Content-Type":
+	            "application/json"
+	        },
+	
+	        body: JSON.stringify({
+	          tenantSlug:
+	            state.tenantSlug,
+	
+	          username:
+	            username,
+	
+	          password:
+	            password
+	        })
+	      }
+	    );
+	
+	  result =
+	    await response.json();
+	
+	  console.log(
+	    "CUSTOMER AUTH RESULT:",
+	    result
+	  );
+	
+	  if (!response.ok) {
+	    throw new Error(
+	      result.error ||
+	      "Login gagal"
+	    );
+	  }
+	}
 
     // ==========================================
     // LOGIN RESULT
