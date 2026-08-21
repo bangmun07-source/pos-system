@@ -4226,38 +4226,54 @@ async function restoreBackupById(
 
 async function deleteDatabaseBackup(filePath) {
 
+  const sessionId =
+    localStorage.getItem(
+      "pos_session_id"
+    );
+
+  if (!sessionId) {
+    throw new Error(
+      "Session login tidak ditemukan"
+    );
+  }
+
   const response =
     await fetch(
       "/api/backup/delete",
       {
         method: "POST",
+
         headers: {
           "Content-Type":
-            "application/json"
+            "application/json",
+
+          "x-session-id":
+            sessionId
         },
 
         body: JSON.stringify({
           filePath,
-          tenantSlug: state.tenantSlug
+          tenantSlug:
+            state.tenantSlug
         })
       }
     );
 
   const responseText =
     await response.text();
-  
+
   console.log(
     "DELETE STORAGE STATUS:",
     response.status
   );
-  
+
   console.log(
     "DELETE STORAGE RESPONSE:",
     responseText
   );
-  
+
   let result = {};
-  
+
   try {
     result =
       responseText
@@ -4277,6 +4293,7 @@ async function deleteDatabaseBackup(filePath) {
       "Gagal menghapus file backup"
     );
   }
+
   return result;
 }
 
