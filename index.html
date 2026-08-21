@@ -13378,28 +13378,47 @@ async function handleLogin() {
     // ==========================================
     // CUSTOMER LOGIN
     // ==========================================
-
     else {
-
-      console.log(
-        "LOGIN → CUSTOMER:",
-        state.tenantSlug
-      );
-      await connectTenant(
-        state.tenantSlug
-      );
-      console.log(
-        "TENANT READY:",
-        state.tenantSlug
-      );
-
-      result =
-        await loginUserRPC(
-          supabaseClient,
-          username,
-          password
-        );
-    }
+		  console.log(
+			"LOGIN → CUSTOMER:",
+			state.tenantSlug
+		  );
+		  const response =
+			await fetch(
+			  "/api/auth/login",
+			  {
+				method: "POST",
+				headers: {
+				  "Content-Type":
+					"application/json"
+				},
+		
+				body: JSON.stringify({
+				  tenantSlug:
+					state.tenantSlug,
+				  username:
+					username,
+				  password:
+					password
+				})
+			  }
+			);
+		
+		  result =
+			await response.json();
+		
+		  console.log(
+			"CUSTOMER AUTH RESULT:",
+			result
+		  );
+		
+		  if (!response.ok) {
+			throw new Error(
+			  result.error ||
+			  "Login gagal"
+			);
+		  }
+		}
 
     // ==========================================
     // LOGIN RESULT
