@@ -13435,10 +13435,40 @@ async function handleLogin() {
       user;
     state.branchId =
       user.branchId || "";
-    localStorage.setItem(
-      "pos_user",
-      JSON.stringify(user)
-    );
+	localStorage.setItem(
+	  "pos_user",
+	  JSON.stringify(user)
+	);
+	
+	// ==========================================
+	// SIMPAN SESSION CUSTOMER
+	// ==========================================
+	
+	console.log(
+	  "SESSION ID:",
+	  result.session_id
+	);
+	
+	if (result.session_id) {
+	
+	  localStorage.setItem(
+		"pos_session_id",
+		result.session_id
+	  );
+	
+	  console.log(
+		"SESSION DISIMPAN:",
+		localStorage.getItem(
+		  "pos_session_id"
+		)
+	  );
+	
+	} else {
+	
+	  console.error(
+		"SESSION ID TIDAK ADA DARI API LOGIN"
+	  );
+	}
 
     if (state.branchId) {
       localStorage.setItem(
@@ -13466,17 +13496,22 @@ async function handleLogin() {
 	
 function logout() {
   localStorage.removeItem("pos_user");
-  localStorage.removeItem("pos_branchId");
+  localStorage.removeItem(
+    "pos_branchId"
+  );
+  localStorage.removeItem(
+    "pos_session_id"
+  );
+
   state.user = null;
   state.branchId = null;
   state.cart = [];
   state.products = [];
-  
   navigate(
     "loginPage"
   );
 }
-
+	
 function initApp() {
   const params = new URLSearchParams(window.location.search);
   const page = params.get("page");
