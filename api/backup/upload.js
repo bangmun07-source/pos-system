@@ -4,6 +4,7 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({
+      success: false,
       error: "Method not allowed"
     });
   }
@@ -18,9 +19,30 @@ export default async function handler(req, res) {
 
     if (!tenantSlug) {
       return res.status(400).json({
+        success: false,
         error: "Tenant slug kosong"
       });
     }
+
+
+    // ==========================================
+    // AMBIL SESSION
+    // ==========================================
+
+    const sessionId =
+      req.headers["x-session-id"];
+
+    if (!sessionId) {
+      return res.status(401).json({
+        success: false,
+        error: "Session tidak ditemukan"
+      });
+    }
+
+
+    // ==========================================
+    // MASTER SUPABASE
+    // ==========================================
 
     const centralSupabase =
       createClient(
@@ -28,7 +50,209 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-    const now = new Date();
+
+    // ==========================================
+    // AMBIL TENANT
+    // ==========================================
+
+    const {
+      data: tenantResult,
+      error: tenantError
+    } =
+      await centralSupabase.rpc(
+        "get_tenant_config",
+        {
+          p_slug: tenantSlug
+        }
+      );
+
+    if (tenantError) {
+      throw tenantError;
+    }
+
+    if (
+      !tenantResult?.success ||
+      !tenantResult?.data
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: "Tenant tidak ditemukan"
+      });
+    }
+
+    const config =
+      tenantResult.data;
+
+
+    // ==========================================
+    // CEK TENANT
+    // ==========================================
+
+    if (!config.is_active) {
+      return res.status(403).json({
+        success: false,
+        error: "Tenant tidak aktif"
+      });
+    }
+
+
+    // ==========================================
+    // AMBIL SERVICE ROLE CUSTOMER
+    // ==========================================
+
+    const {
+      data: credential,
+      error: credentialError
+    } =
+      await centralSupabase
+        .from("tenant_credentials")
+        .select("service_role_key")
+        .eq(
+          "tenant_id",
+          config.tenant_id
+        )
+        .single();
+
+    if (credentialError) {
+      throw credentialError;
+    }
+
+    if (!credential?.service_role_key) {
+      throw new Error(
+        "Service Role Customer tidak ditemukan"
+      );
+    }
+
+
+    // ==========================================
+    // CUSTOMER SUPABASE
+    // ==========================================
+
+    const customerSupabase =
+      createClient(
+        config.supabase_url,
+        credential.service_role_key
+      );
+
+
+    // ==========================================
+    // VALIDASI SESSION
+    // ==========================================
+
+    const {
+      data: session,
+      error: sessionError
+    } =
+      await customerSupabase
+        .from("auth_sessions")
+        .select(
+          "session_id, user_id, expires_at"
+        )
+        .eq(
+          "session_id",
+          sessionId
+        )
+        .maybeSingle();
+
+    if (sessionError) {
+      throw sessionError;
+    }
+
+    if (!session) {
+      return res.status(401).json({
+        success: false,
+        error: "Session tidak valid"
+      });
+    }
+
+
+    // ==========================================
+    // CEK SESSION EXPIRED
+    // ==========================================
+
+    if (
+      new Date(session.expires_at)
+      <= new Date()
+    ) {
+
+      await customerSupabase
+        .from("auth_sessions")
+        .delete()
+        .eq(
+          "session_id",
+          sessionId
+        );
+
+      return res.status(401).json({
+        success: false,
+        error: "Session sudah expired"
+      });
+    }
+
+
+    // ==========================================
+    // AMBIL USER
+    // ==========================================
+
+    const {
+      data: user,
+      error: userError
+    } =
+      await customerSupabase
+        .from("Users")
+        .select(
+          "ID_User, Username, Role, branchId"
+        )
+        .eq(
+          "ID_User",
+          session.user_id
+        )
+        .maybeSingle();
+
+    if (userError) {
+      throw userError;
+    }
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "User tidak ditemukan"
+      });
+    }
+
+
+    // ==========================================
+    // OWNER ONLY
+    // ==========================================
+
+    if (user.Role !== "Owner") {
+
+      return res.status(403).json({
+        success: false,
+        error: "Akses hanya untuk Owner"
+      });
+
+    }
+
+
+    // ==========================================
+    // VALIDASI FILE
+    // ==========================================
+
+    if (!fileName) {
+      return res.status(400).json({
+        success: false,
+        error: "Nama file backup kosong"
+      });
+    }
+
+
+    // ==========================================
+    // BUAT PATH
+    // ==========================================
+
+    const now =
+      new Date();
 
     const year =
       now.getFullYear();
@@ -40,6 +264,11 @@ export default async function handler(req, res) {
 
     const path =
       `${year}/${month}/${fileName}`;
+
+
+    // ==========================================
+    // JSON → BUFFER
+    // ==========================================
 
     const jsonString =
       JSON.stringify(
@@ -54,101 +283,52 @@ export default async function handler(req, res) {
         "utf8"
       );
 
+
+    // ==========================================
+    // UPLOAD BACKUP
+    // ==========================================
+
     const {
-      data: tenantResult,
-      error: tenantError
+      error: uploadError
     } =
-      await centralSupabase.rpc(
-        "get_tenant_config",
-        {
-          p_slug: tenantSlug
-        }
-      );
-    
-    if (tenantError) {
-      throw tenantError;
+      await customerSupabase
+        .storage
+        .from("database_backup")
+        .upload(
+          path,
+          buffer,
+          {
+            contentType:
+              "application/json",
+
+            upsert:
+              false
+          }
+        );
+
+    if (uploadError) {
+      throw uploadError;
     }
-    
-    if (
-      !tenantResult?.success ||
-      !tenantResult?.data
-    ) {
-      throw new Error(
-        tenantResult?.message ||
-        "Tenant tidak ditemukan"
-      );
-    }
-    
-    const config =
-      tenantResult.data;
-    
-    if (!config.is_active) {
-      throw new Error(
-        "Tenant tidak aktif"
-      );
-    }
-    
+
+
     // ==========================================
-    // AMBIL SERVICE ROLE CUSTOMER
+    // RESPONSE
     // ==========================================
-    
-    const {
-      data: credential,
-      error: credentialError
-    } =
-      await centralSupabase
-        .from("tenant_credentials")
-        .select("service_role_key")
-        .eq("tenant_id", config.tenant_id)
-        .single();
-    
-    if (credentialError) {
-      throw credentialError;
-    }
-    
-    if (!credential?.service_role_key) {
-      throw new Error(
-        "Service Role Customer tidak ditemukan"
-      );
-    }
-    
-    
-    // ==========================================
-    // CUSTOMER SUPABASE
-    // ==========================================
-    
-    const supabase =
-      createClient(
-        config.supabase_url,
-        credential.service_role_key
-      );
-    
-    const {
-      error
-    } = await supabase
-      .storage
-      .from("database_backup")
-      .upload(
-        path,
-        buffer,
-        {
-          contentType:
-            "application/json",
-          upsert: false
-        }
-      );
-    
-    if (error) {
-      throw error;
-    }
 
     return res.status(200).json({
+
       success: true,
-      path: path,
-      size: buffer.length
+
+      path:
+        path,
+
+      size:
+        buffer.length
+
     });
 
-  } catch (error) {
+  }
+  catch (error) {
 
     console.error(
       "Upload backup error:",
@@ -156,9 +336,13 @@ export default async function handler(req, res) {
     );
 
     return res.status(500).json({
+
+      success: false,
+
       error:
         error.message ||
         "Upload backup gagal"
+
     });
 
   }
