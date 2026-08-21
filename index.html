@@ -13331,12 +13331,16 @@ function navigate(pageId, params = {}) {
 
 	if (headerUsername) {
 	  headerUsername.textContent =
-	    state.user?.Username || "-";
+	    state.user?.Username ||
+	    state.user?.username ||
+	    "-";
 	}
 	
 	if (headerRole) {
 	  headerRole.textContent =
-	    state.user?.Role || "-";
+	    state.user?.Role ||
+	    state.user?.role ||
+	    "-";
 	}
 
   // =========================
