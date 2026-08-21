@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req, res) {
@@ -16,12 +17,10 @@ export default async function handler(req, res) {
       tenantSlug
     } = req.body || {};
 
-    if (!filePath) {
-      return res.status(400).json({
-        success: false,
-        error: "File path tidak ditemukan"
-      });
-    }
+
+    // =====================================================
+    // VALIDASI INPUT
+    // =====================================================
 
     if (!tenantSlug) {
       return res.status(400).json({
@@ -30,10 +29,17 @@ export default async function handler(req, res) {
       });
     }
 
+    if (!filePath) {
+      return res.status(400).json({
+        success: false,
+        error: "File backup tidak ditemukan"
+      });
+    }
 
-    // ==========================================
-    // VALIDASI SESSION
-    // ==========================================
+
+    // =====================================================
+    // SESSION
+    // =====================================================
 
     const sessionId =
       req.headers["x-session-id"];
@@ -46,9 +52,9 @@ export default async function handler(req, res) {
     }
 
 
-    // ==========================================
+    // =====================================================
     // MASTER SUPABASE
-    // ==========================================
+    // =====================================================
 
     const centralSupabase =
       createClient(
@@ -57,196 +63,335 @@ export default async function handler(req, res) {
       );
 
 
-    // ==========================================
-    // GET TENANT CONFIG
-    // ==========================================
+    // =====================================================
+    // TENTUKAN DATABASE TARGET
+    // =====================================================
 
-    const {
-      data: tenantResult,
-      error: tenantError
-    } =
-      await centralSupabase.rpc(
-        "get_tenant_config",
-        {
-          p_slug: tenantSlug
-        }
+    let targetSupabase;
+
+
+    // =====================================================
+    // MASTER
+    // =====================================================
+
+    if (tenantSlug === "master") {
+
+      console.log(
+        "DELETE → MASTER DATABASE"
       );
 
-    if (tenantError) {
-      throw tenantError;
-    }
+      targetSupabase =
+        centralSupabase;
 
-    if (
-      !tenantResult?.success ||
-      !tenantResult?.data
-    ) {
-      throw new Error(
-        tenantResult?.message ||
-        "Tenant tidak ditemukan"
-      );
-    }
-
-    const config =
-      tenantResult.data;
-
-    if (!config.is_active) {
-      return res.status(403).json({
-        success: false,
-        error: "Tenant tidak aktif"
-      });
     }
 
 
-    // ==========================================
-    // AMBIL SERVICE ROLE CUSTOMER
-    // ==========================================
+    // =====================================================
+    // CUSTOMER
+    // =====================================================
 
-    const {
-      data: credential,
-      error: credentialError
-    } =
-      await centralSupabase
-        .from("tenant_credentials")
-        .select("service_role_key")
-        .eq("tenant_id", config.tenant_id)
-        .single();
+    else {
 
-    if (credentialError) {
-      throw credentialError;
-    }
-
-    if (!credential?.service_role_key) {
-      throw new Error(
-        "Service Role Customer tidak ditemukan"
-      );
-    }
-
-
-    // ==========================================
-    // CUSTOMER SUPABASE
-    // ==========================================
-
-    const supabase =
-      createClient(
-        config.supabase_url,
-        credential.service_role_key
+      console.log(
+        "DELETE → CUSTOMER:",
+        tenantSlug
       );
 
 
-    // ==========================================
-    // VALIDASI SESSION + ROLE
-    // ==========================================
+      // ==========================================
+      // GET TENANT CONFIG
+      // ==========================================
+
+      const {
+        data: tenantResult,
+        error: tenantError
+      } =
+        await centralSupabase.rpc(
+          "get_tenant_config",
+          {
+            p_slug: tenantSlug
+          }
+        );
+
+      if (tenantError) {
+        throw tenantError;
+      }
+
+
+      if (
+        !tenantResult?.success ||
+        !tenantResult?.data
+      ) {
+
+        return res.status(401).json({
+          success: false,
+          error: "Tenant tidak ditemukan"
+        });
+
+      }
+
+
+      const config =
+        tenantResult.data;
+
+
+      // ==========================================
+      // TENANT ACTIVE
+      // ==========================================
+
+      if (!config.is_active) {
+
+        return res.status(403).json({
+          success: false,
+          error: "Tenant tidak aktif"
+        });
+
+      }
+
+
+      // ==========================================
+      // CUSTOMER SERVICE ROLE
+      // ==========================================
+
+      const {
+        data: credential,
+        error: credentialError
+      } =
+        await centralSupabase
+          .from("tenant_credentials")
+          .select("service_role_key")
+          .eq(
+            "tenant_id",
+            config.tenant_id
+          )
+          .maybeSingle();
+
+
+      if (credentialError) {
+        throw credentialError;
+      }
+
+
+      if (!credential?.service_role_key) {
+
+        throw new Error(
+          "Service Role Customer tidak ditemukan"
+        );
+
+      }
+
+
+      // ==========================================
+      // CUSTOMER CLIENT
+      // ==========================================
+
+      targetSupabase =
+        createClient(
+          config.supabase_url,
+          credential.service_role_key
+        );
+
+    }
+
+
+    // =====================================================
+    // VALIDASI SESSION
+    // =====================================================
 
     const {
       data: session,
       error: sessionError
     } =
-      await supabase
+      await targetSupabase
         .from("auth_sessions")
-        .select(`
-          session_id,
-          user_id,
-          expires_at,
-          Users (
-            ID_User,
-            Username,
-            Role,
-            branchId
-          )
-        `)
+        .select(
+          "session_id, user_id, expires_at"
+        )
         .eq(
           "session_id",
           sessionId
         )
-        .single();
+        .maybeSingle();
 
-    if (sessionError || !session) {
+
+    if (sessionError) {
+      throw sessionError;
+    }
+
+
+    if (!session) {
+
       return res.status(401).json({
         success: false,
         error: "Session tidak valid"
       });
+
     }
+
+
+    // =====================================================
+    // CEK EXPIRED
+    // =====================================================
 
     if (
       new Date(session.expires_at)
       <= new Date()
     ) {
+
+      await targetSupabase
+        .from("auth_sessions")
+        .delete()
+        .eq(
+          "session_id",
+          sessionId
+        );
+
       return res.status(401).json({
         success: false,
         error: "Session sudah expired"
       });
+
     }
 
-    const user =
-      session.Users;
+
+    // =====================================================
+    // AMBIL USER
+    // =====================================================
+
+    const {
+      data: user,
+      error: userError
+    } =
+      await targetSupabase
+        .from("Users")
+        .select(
+          "ID_User, Username, Role, branchId"
+        )
+        .eq(
+          "ID_User",
+          session.user_id
+        )
+        .maybeSingle();
+
+
+    if (userError) {
+      throw userError;
+    }
+
+
+    if (!user) {
+
+      return res.status(401).json({
+        success: false,
+        error: "User tidak ditemukan"
+      });
+
+    }
+
+
+    // =====================================================
+    // OWNER ONLY
+    // =====================================================
 
     if (
-      !user ||
       user.Role?.toLowerCase() !== "owner"
     ) {
+
       return res.status(403).json({
         success: false,
         error: "Akses hanya untuk Owner"
       });
+
     }
 
 
-    // ==========================================
-    // DELETE BACKUP
-    // ==========================================
+    // =====================================================
+    // DELETE STORAGE
+    // =====================================================
 
     const {
       data: deletedFiles,
-      error
+      error: deleteError
     } =
-      await supabase
+      await targetSupabase
         .storage
         .from("database_backup")
         .remove([
           filePath
         ]);
 
+
     console.log(
-      "DELETE BACKUP CUSTOMER:",
+      "DELETE BACKUP:",
       {
         tenantSlug,
         filePath,
         deletedFiles,
-        error
+        error:
+          deleteError?.message ||
+          null
       }
     );
 
-    if (error) {
-      throw error;
+
+    if (deleteError) {
+      throw deleteError;
     }
+
+
+    // =====================================================
+    // VALIDASI HASIL
+    // =====================================================
 
     if (
       !deletedFiles ||
       deletedFiles.length === 0
     ) {
+
       throw new Error(
-        "File backup tidak ditemukan atau gagal dihapus dari Storage tenant"
+        "File backup tidak ditemukan atau gagal dihapus"
       );
+
     }
 
+
+    // =====================================================
+    // RESPONSE
+    // =====================================================
+
     return res.status(200).json({
+
       success: true,
-      file_path: filePath
+
+      path:
+        filePath,
+
+      tenant:
+        tenantSlug,
+
+      user:
+        user.Username
+
     });
 
   }
   catch (error) {
 
     console.error(
-      "Delete backup storage error:",
+      "Delete backup error:",
       error
     );
 
     return res.status(500).json({
+
       success: false,
+
       error:
         error.message ||
         "Gagal menghapus file backup"
+
     });
+
   }
 }
+
