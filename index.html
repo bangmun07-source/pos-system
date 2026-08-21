@@ -13436,12 +13436,30 @@ async function handleLogin() {
       );
       return;
     }
-    const user =
-      result.user;
-    state.user =
-      user;
-    state.branchId =
-      user.branchId || "";
+    const rawUser =
+	  result.user;
+	
+	const user = {
+	  ...rawUser,
+	
+	  id:
+		rawUser.ID_User,
+	
+	  username:
+		rawUser.Username,
+	
+	  role:
+		rawUser.Role,
+	
+	  branchId:
+		rawUser.branchId
+	};
+	
+	state.user =
+	  user;
+	
+	state.branchId =
+	  user.branchId || "";
 	localStorage.setItem(
 	  "pos_user",
 	  JSON.stringify(user)
