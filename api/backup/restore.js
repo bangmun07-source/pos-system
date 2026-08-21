@@ -16,6 +16,11 @@ export default async function handler(req, res) {
       tenantSlug
     } = req.body || {};
 
+
+    // ==========================================
+    // VALIDASI INPUT
+    // ==========================================
+
     if (!filePath) {
       return res.status(400).json({
         success: false,
@@ -32,7 +37,7 @@ export default async function handler(req, res) {
 
 
     // ==========================================
-    // VALIDASI SESSION
+    // SESSION
     // ==========================================
 
     const sessionId =
@@ -57,85 +62,141 @@ export default async function handler(req, res) {
       );
 
 
-    // ==========================================
-    // GET TENANT CONFIG
-    // ==========================================
+    // =====================================================
+    // TENTUKAN DATABASE TARGET
+    // =====================================================
 
-    const {
-      data: tenantResult,
-      error: tenantError
-    } =
-      await centralSupabase.rpc(
-        "get_tenant_config",
-        {
-          p_slug: tenantSlug
-        }
+    let supabase;
+
+
+    // =====================================================
+    // MASTER
+    // =====================================================
+
+    if (tenantSlug === "master") {
+
+      console.log(
+        "RESTORE → MASTER"
       );
 
-    if (tenantError) {
-      throw tenantError;
-    }
+      supabase =
+        centralSupabase;
 
-    if (
-      !tenantResult?.success ||
-      !tenantResult?.data
-    ) {
-      throw new Error(
-        tenantResult?.message ||
-        "Tenant tidak ditemukan"
-      );
-    }
-
-    const config =
-      tenantResult.data;
-
-    if (!config.is_active) {
-      return res.status(403).json({
-        success: false,
-        error: "Tenant tidak aktif"
-      });
     }
 
 
-    // ==========================================
-    // AMBIL SERVICE ROLE CUSTOMER
-    // ==========================================
+    // =====================================================
+    // CUSTOMER
+    // =====================================================
 
-    const {
-      data: credential,
-      error: credentialError
-    } =
-      await centralSupabase
-        .from("tenant_credentials")
-        .select("service_role_key")
-        .eq("tenant_id", config.tenant_id)
-        .single();
+    else {
 
-    if (credentialError) {
-      throw credentialError;
-    }
-
-    if (!credential?.service_role_key) {
-      throw new Error(
-        "Service Role Customer tidak ditemukan"
-      );
-    }
-
-
-    // ==========================================
-    // CUSTOMER SUPABASE
-    // ==========================================
-
-    const supabase =
-      createClient(
-        config.supabase_url,
-        credential.service_role_key
+      console.log(
+        "RESTORE → CUSTOMER:",
+        tenantSlug
       );
 
 
-    // ==========================================
+      // ==========================================
+      // GET TENANT CONFIG
+      // ==========================================
+
+      const {
+        data: tenantResult,
+        error: tenantError
+      } =
+        await centralSupabase.rpc(
+          "get_tenant_config",
+          {
+            p_slug: tenantSlug
+          }
+        );
+
+
+      if (tenantError) {
+        throw tenantError;
+      }
+
+
+      if (
+        !tenantResult?.success ||
+        !tenantResult?.data
+      ) {
+
+        throw new Error(
+          tenantResult?.message ||
+          "Tenant tidak ditemukan"
+        );
+      }
+
+
+      const config =
+        tenantResult.data;
+
+
+      // ==========================================
+      // CEK TENANT
+      // ==========================================
+
+      if (!config.is_active) {
+
+        return res.status(403).json({
+          success: false,
+          error: "Tenant tidak aktif"
+        });
+      }
+
+
+      // ==========================================
+      // SERVICE ROLE CUSTOMER
+      // ==========================================
+
+      const {
+        data: credential,
+        error: credentialError
+      } =
+        await centralSupabase
+          .from("tenant_credentials")
+          .select(
+            "service_role_key"
+          )
+          .eq(
+            "tenant_id",
+            config.tenant_id
+          )
+          .single();
+
+
+      if (credentialError) {
+        throw credentialError;
+      }
+
+
+      if (
+        !credential?.service_role_key
+      ) {
+
+        throw new Error(
+          "Service Role Customer tidak ditemukan"
+        );
+      }
+
+
+      // ==========================================
+      // CUSTOMER SUPABASE
+      // ==========================================
+
+      supabase =
+        createClient(
+          config.supabase_url,
+          credential.service_role_key
+        );
+    }
+
+
+    // =====================================================
     // VALIDASI SESSION + ROLE
-    // ==========================================
+    // =====================================================
 
     const {
       data: session,
@@ -158,32 +219,70 @@ export default async function handler(req, res) {
           "session_id",
           sessionId
         )
-        .single();
+        .maybeSingle();
 
-    if (sessionError || !session) {
+
+    if (sessionError) {
+
+      console.error(
+        "RESTORE SESSION ERROR:",
+        sessionError
+      );
+
+      throw sessionError;
+    }
+
+
+    if (!session) {
+
       return res.status(401).json({
         success: false,
         error: "Session tidak valid"
       });
     }
 
+
+    // =====================================================
+    // CEK EXPIRED
+    // =====================================================
+
     if (
       new Date(session.expires_at)
       <= new Date()
     ) {
+
+      await supabase
+        .from("auth_sessions")
+        .delete()
+        .eq(
+          "session_id",
+          sessionId
+        );
+
       return res.status(401).json({
         success: false,
         error: "Session sudah expired"
       });
     }
 
+
+    // =====================================================
+    // USER
+    // =====================================================
+
     const user =
       session.Users;
+
+
+    // =====================================================
+    // OWNER ONLY
+    // =====================================================
 
     if (
       !user ||
       user.Role?.toLowerCase() !== "owner"
     ) {
+
       return res.status(403).json({
         success: false,
         error: "Akses hanya untuk Owner"
@@ -191,9 +290,9 @@ export default async function handler(req, res) {
     }
 
 
-    // ==========================================
-    // DOWNLOAD DARI STORAGE
-    // ==========================================
+    // =====================================================
+    // DOWNLOAD BACKUP
+    // =====================================================
 
     const {
       data: file,
@@ -202,11 +301,15 @@ export default async function handler(req, res) {
       await supabase
         .storage
         .from("database_backup")
-        .download(filePath);
+        .download(
+          filePath
+        );
+
 
     console.log(
       "RESTORE DOWNLOAD:",
       {
+        tenantSlug,
         filePath,
         hasFile: !!file,
         error:
@@ -215,9 +318,11 @@ export default async function handler(req, res) {
       }
     );
 
+
     if (downloadError) {
       throw downloadError;
     }
+
 
     if (!file) {
       throw new Error(
@@ -226,9 +331,9 @@ export default async function handler(req, res) {
     }
 
 
-    // ==========================================
+    // =====================================================
     // PARSE JSON
-    // ==========================================
+    // =====================================================
 
     const text =
       await file.text();
@@ -237,9 +342,9 @@ export default async function handler(req, res) {
       JSON.parse(text);
 
 
-    // ==========================================
+    // =====================================================
     // RESTORE DATABASE
-    // ==========================================
+    // =====================================================
 
     const {
       data: result,
@@ -248,24 +353,30 @@ export default async function handler(req, res) {
       await supabase.rpc(
         "restore_database_backup",
         {
-          p_backup: backup,
+          p_backup:
+            backup,
+
           p_restored_by:
             user.ID_User
         }
       );
+
 
     if (restoreError) {
       throw restoreError;
     }
 
 
-    // ==========================================
+    // =====================================================
     // RESPONSE
-    // ==========================================
+    // =====================================================
 
     return res.status(200).json({
+
       success: true,
+
       result
+
     });
 
   }
@@ -277,10 +388,13 @@ export default async function handler(req, res) {
     );
 
     return res.status(500).json({
+
       success: false,
+
       error:
         error.message ||
         "Restore backup gagal"
+
     });
   }
 }
