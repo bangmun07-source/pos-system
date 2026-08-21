@@ -13266,8 +13266,8 @@ function restoreSession() {
 
 function navigate(pageId, params = {}) {
 
-  const role =
-    state.user?.role?.toLowerCase() || "";
+	 const role =
+	  state.user?.Role?.toLowerCase() || "";
 	
     if (params.roles) {
 
@@ -13306,8 +13306,15 @@ function navigate(pageId, params = {}) {
   const headerUsername = document.getElementById("headerUsername");
   const headerRole = document.getElementById("headerRole");
 
-  if (headerUsername) {headerUsername.textContent = state.user?.username || "-";}
-  if (headerRole) {headerRole.textContent = state.user?.role || "-";}
+	if (headerUsername) {
+	  headerUsername.textContent =
+	    state.user?.Username || "-";
+	}
+	
+	if (headerRole) {
+	  headerRole.textContent =
+	    state.user?.Role || "-";
+	}
 
   // SETTINGS MENU
   // Owner + Admin
