@@ -13266,28 +13266,51 @@ function restoreSession() {
 
 function navigate(pageId, params = {}) {
 
-	 const role =
-	  state.user?.Role?.toLowerCase() || "";
-	
-    if (params.roles) {
+  const role =
+    (
+      state.user?.Role ||
+      state.user?.role ||
+      ""
+    ).toLowerCase();
 
-      const allowedRoles = params.roles.map(r => r.toLowerCase());
+  console.log(
+    "NAVIGATE:",
+    pageId,
+    "ROLE:",
+    role
+  );
 
-      if (!allowedRoles.includes(role)) {
-        alert("You do not have permission to access this page.");
-        return;
-      }
+  if (params.roles) {
+
+    const allowedRoles =
+      params.roles.map(
+        r => r.toLowerCase()
+      );
+
+    if (
+      !allowedRoles.includes(role)
+    ) {
+      alert(
+        "You do not have permission to access this page."
+      );
+      return;
     }
-
+  }
   // OWNER ONLY PAGE
   const ownerPages = [
     "cashFlowPage"
   ];
 
-  if (ownerPages.includes(pageId) && role !== "owner") {
-    showToast("Access denied");
+  if (
+    ownerPages.includes(pageId) &&
+    role !== "owner"
+  ) {
+    showToast(
+      "Access denied"
+    );
     return;
   }
+
   const template = document.getElementById(pageId);
   const app = document.getElementById("app");
 
