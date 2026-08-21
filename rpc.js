@@ -3960,6 +3960,33 @@ async function restoreDatabaseBackupRPC(data = {}) {
   return result;
 }
 
+async function downloadDatabaseBackup(filePath) {
+
+  const bucket =
+    "database_backup";
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .storage
+      .from(bucket)
+      .download(filePath);
+
+  if (error) {
+
+    console.error(
+      "Download backup error:",
+      error
+    );
+
+    throw error;
+  }
+
+  return data;
+}
+
 async function uploadDatabaseBackup(
   fileName,
   jsonData
@@ -4013,53 +4040,6 @@ async function uploadDatabaseBackup(
   };
 }
 
-
-  // =========================
-  // BACKUP VIA RPC
-  // =========================
-  
-  async function uploadDatabaseBackup(
-    fileName,
-    jsonData
-  ) {
-  
-    const response =
-      await fetch(
-        "/api/backup/upload",
-        {
-          method: "POST",
-  
-          headers: {
-            "Content-Type":
-              "application/json"
-            
-          },
-  
-          body: JSON.stringify({
-            fileName,
-            jsonData,
-            tenantSlug: state.tenantSlug
-          })
-        }
-      );
-  
-    const result =
-      await response.json();
-  
-    if (!response.ok) {
-  
-      throw new Error(
-        result.error ||
-        "Upload backup gagal"
-      );
-    }
-  
-    return {
-      path: result.path,
-      size: result.size
-    };
-  }
-  
   
   async function createFullBackup() {
     
