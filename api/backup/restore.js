@@ -1,3 +1,4 @@
+
 import { createClient } from "@supabase/supabase-js";
 
 export default async function handler(req, res) {
@@ -17,9 +18,9 @@ export default async function handler(req, res) {
     } = req.body || {};
 
 
-    // ==========================================
+    // =====================================================
     // VALIDASI INPUT
-    // ==========================================
+    // =====================================================
 
     if (!filePath) {
       return res.status(400).json({
@@ -36,24 +37,9 @@ export default async function handler(req, res) {
     }
 
 
-    // ==========================================
-    // SESSION
-    // ==========================================
-
-    const sessionId =
-      req.headers["x-session-id"];
-
-    if (!sessionId) {
-      return res.status(401).json({
-        success: false,
-        error: "Session tidak ditemukan"
-      });
-    }
-
-
-    // ==========================================
+    // =====================================================
     // MASTER SUPABASE
-    // ==========================================
+    // =====================================================
 
     const centralSupabase =
       createClient(
@@ -112,23 +98,19 @@ export default async function handler(req, res) {
           }
         );
 
-
       if (tenantError) {
         throw tenantError;
       }
-
 
       if (
         !tenantResult?.success ||
         !tenantResult?.data
       ) {
-
         throw new Error(
           tenantResult?.message ||
           "Tenant tidak ditemukan"
         );
       }
-
 
       const config =
         tenantResult.data;
@@ -139,7 +121,6 @@ export default async function handler(req, res) {
       // ==========================================
 
       if (!config.is_active) {
-
         return res.status(403).json({
           success: false,
           error: "Tenant tidak aktif"
@@ -157,25 +138,18 @@ export default async function handler(req, res) {
       } =
         await centralSupabase
           .from("tenant_credentials")
-          .select(
-            "service_role_key"
-          )
+          .select("service_role_key")
           .eq(
             "tenant_id",
             config.tenant_id
           )
-          .single();
-
+          .maybeSingle();
 
       if (credentialError) {
         throw credentialError;
       }
 
-
-      if (
-        !credential?.service_role_key
-      ) {
-
+      if (!credential?.service_role_key) {
         throw new Error(
           "Service Role Customer tidak ditemukan"
         );
@@ -183,7 +157,7 @@ export default async function handler(req, res) {
 
 
       // ==========================================
-      // CUSTOMER SUPABASE
+      // CUSTOMER CLIENT
       // ==========================================
 
       supabase =
@@ -195,83 +169,133 @@ export default async function handler(req, res) {
 
 
     // =====================================================
-    // VALIDASI SESSION + ROLE
+    // TENTUKAN USER
     // =====================================================
 
-    const {
-      data: session,
-      error: sessionError
-    } =
-      await supabase
-        .from("auth_sessions")
-        .select(`
-          session_id,
-          user_id,
-          expires_at,
-          Users (
-            ID_User,
-            Username,
-            Role,
-            branchId
+    let user;
+
+
+    // =====================================================
+    // MASTER USER
+    // =====================================================
+
+    if (tenantSlug === "master") {
+
+      user = {
+        ID_User: "0",
+        Username: "owner",
+        Role: "Owner",
+        branchId: "ALL"
+      };
+
+    }
+
+
+    // =====================================================
+    // CUSTOMER SESSION
+    // =====================================================
+
+    else {
+
+      const sessionId =
+        req.headers["x-session-id"];
+
+      if (!sessionId) {
+        return res.status(401).json({
+          success: false,
+          error: "Session tidak ditemukan"
+        });
+      }
+
+
+      const {
+        data: session,
+        error: sessionError
+      } =
+        await supabase
+          .from("auth_sessions")
+          .select(`
+            session_id,
+            user_id,
+            expires_at
+          `)
+          .eq(
+            "session_id",
+            sessionId
           )
-        `)
-        .eq(
-          "session_id",
-          sessionId
-        )
-        .maybeSingle();
+          .maybeSingle();
 
 
-    if (sessionError) {
+      if (sessionError) {
+        throw sessionError;
+      }
 
-      console.error(
-        "RESTORE SESSION ERROR:",
-        sessionError
-      );
+      if (!session) {
+        return res.status(401).json({
+          success: false,
+          error: "Session tidak valid"
+        });
+      }
 
-      throw sessionError;
+
+      // ==========================================
+      // CEK EXPIRED
+      // ==========================================
+
+      if (
+        new Date(session.expires_at)
+        <= new Date()
+      ) {
+
+        await supabase
+          .from("auth_sessions")
+          .delete()
+          .eq(
+            "session_id",
+            sessionId
+          );
+
+        return res.status(401).json({
+          success: false,
+          error: "Session sudah expired"
+        });
+      }
+
+
+      // ==========================================
+      // AMBIL USER
+      // ==========================================
+
+      const {
+        data: customerUser,
+        error: userError
+      } =
+        await supabase
+          .from("Users")
+          .select(
+            "ID_User, Username, Role, branchId"
+          )
+          .eq(
+            "ID_User",
+            session.user_id
+          )
+          .maybeSingle();
+
+
+      if (userError) {
+        throw userError;
+      }
+
+      if (!customerUser) {
+        return res.status(401).json({
+          success: false,
+          error: "User tidak ditemukan"
+        });
+      }
+
+      user =
+        customerUser;
     }
-
-
-    if (!session) {
-
-      return res.status(401).json({
-        success: false,
-        error: "Session tidak valid"
-      });
-    }
-
-
-    // =====================================================
-    // CEK EXPIRED
-    // =====================================================
-
-    if (
-      new Date(session.expires_at)
-      <= new Date()
-    ) {
-
-      await supabase
-        .from("auth_sessions")
-        .delete()
-        .eq(
-          "session_id",
-          sessionId
-        );
-
-      return res.status(401).json({
-        success: false,
-        error: "Session sudah expired"
-      });
-    }
-
-
-    // =====================================================
-    // USER
-    // =====================================================
-
-    const user =
-      session.Users;
 
 
     // =====================================================
@@ -279,7 +303,6 @@ export default async function handler(req, res) {
     // =====================================================
 
     if (
-      !user ||
       user.Role?.toLowerCase() !== "owner"
     ) {
 
@@ -287,6 +310,7 @@ export default async function handler(req, res) {
         success: false,
         error: "Akses hanya untuk Owner"
       });
+
     }
 
 
@@ -322,7 +346,6 @@ export default async function handler(req, res) {
     if (downloadError) {
       throw downloadError;
     }
-
 
     if (!file) {
       throw new Error(
@@ -375,7 +398,13 @@ export default async function handler(req, res) {
 
       success: true,
 
-      result
+      result,
+
+      tenant:
+        tenantSlug,
+
+      user:
+        user.Username
 
     });
 
@@ -398,3 +427,4 @@ export default async function handler(req, res) {
     });
   }
 }
+
