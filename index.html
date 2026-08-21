@@ -7416,7 +7416,7 @@
 	  <div>
 	    <button
 	      onclick="navigate('settingsPage')"
-	      class="flex items-center gap-2 text-slate-600 hover:text-on-surface transition-colors mb-6">
+	      class="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors mb-6">
 	
 	      <span class="material-symbols-outlined">
 	        close
@@ -21127,8 +21127,8 @@ function renderSupplierPagination() {
         class="
           p-2 rounded-md
           ${supplierCurrentPage === 1
-            ? "text-slate-600 cursor-not-allowed"
-            : "text-muted hover:text-muted"}
+            ? "text-on-surface-variant cursor-not-allowed"
+            : "text-on-surface-variant hover:text-on-surface"}
         "
       >
         <span class="material-symbols-outlined text-lg">
@@ -21144,8 +21144,8 @@ function renderSupplierPagination() {
         class="
           w-8 h-8 rounded-md text-xs font-bold transition-colors
           ${supplierCurrentPage === i
-            ? "text-white"
-            : "text-muted hover:bg-white/5"}
+            ? "text-on-surface"
+            : "text-on-surface-variant hover:bg-white/5"}
         "
       >
         ${i}
@@ -21160,7 +21160,7 @@ function renderSupplierPagination() {
         class="
           p-2 rounded-md
           ${supplierCurrentPage === totalPages
-            ? "text-slate-600 cursor-not-allowed"
+            ? "text-on-surface-variant cursor-not-allowed"
             : "text-muted hover:text-muted"}
         "
       >
@@ -21951,7 +21951,7 @@ function renderRecipePagination() {
       class="
         p-2 rounded-md transition-colors
         ${recipeCurrentPage === 1
-          ? 'text-slate-600 cursor-not-allowed'
+          ? 'text-on-surface-variant cursor-not-allowed'
           : 'text-muted hover:text-muted'}
       "
     >
@@ -21987,7 +21987,7 @@ function renderRecipePagination() {
       class="
         p-2 rounded-md transition-colors
         ${recipeCurrentPage === totalPages
-          ? 'text-slate-600 cursor-not-allowed'
+          ? 'text-on-surface-variant cursor-not-allowed'
           : 'text-muted hover:text-muted'}
       "
     >
@@ -22761,7 +22761,7 @@ function renderInventoryPagination() {
         class="
           p-2 rounded-md
           ${inventoryCurrentPage === 1
-            ? "text-slate-600 cursor-not-allowed"
+            ? "text-on-surface-variant cursor-not-allowed"
             : "text-muted hover:text-muted"}
         "
       >
@@ -22795,7 +22795,7 @@ function renderInventoryPagination() {
         class="
           p-2 rounded-md
           ${inventoryCurrentPage === totalPages
-            ? "text-slate-600 cursor-not-allowed"
+            ? "text-on-surface-variant cursor-not-allowed"
             : "text-muted hover:text-muted"}
         "
       >
