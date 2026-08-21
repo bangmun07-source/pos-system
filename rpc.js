@@ -4140,6 +4140,17 @@ async function restoreDatabaseBackupByPath(
   filePath
 ) {
 
+  const sessionId =
+    localStorage.getItem(
+      "pos_session_id"
+    );
+
+  if (!sessionId) {
+    throw new Error(
+      "Session login tidak ditemukan"
+    );
+  }
+
   const response =
     await fetch(
       "/api/backup/restore",
@@ -4148,12 +4159,16 @@ async function restoreDatabaseBackupByPath(
 
         headers: {
           "Content-Type":
-            "application/json"
+            "application/json",
+
+          "x-session-id":
+            sessionId
         },
 
         body: JSON.stringify({
           filePath,
-          tenantSlug: state.tenantSlug
+          tenantSlug:
+            state.tenantSlug
         })
       }
     );
