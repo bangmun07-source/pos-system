@@ -93,42 +93,52 @@ export default async function handler(req, res) {
 
 
       // ==========================================
-      // SERVICE ROLE CUSTOMER
+      // TENANT SUPABASE
       // ==========================================
-
-      const {
-        data: credential,
-        error: credentialError
-      } =
-        await centralSupabase
-          .from("tenant_credentials")
-          .select("service_role_key")
-          .eq(
-            "tenant_id",
-            config.tenant_id
-          )
-          .single();
-
-      if (credentialError) {
-        throw credentialError;
+      
+      let tenantSupabase;
+      
+      if (tenantSlug === "master") {
+      
+        // MASTER
+        tenantSupabase =
+          createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_ROLE_KEY
+          );
+      
+      } else {
+      
+        // CUSTOMER
+        const {
+          data: credential,
+          error: credentialError
+        } =
+          await centralSupabase
+            .from("tenant_credentials")
+            .select("service_role_key")
+            .eq(
+              "tenant_id",
+              config.tenant_id
+            )
+            .single();
+      
+        if (credentialError) {
+          throw credentialError;
+        }
+      
+        if (!credential?.service_role_key) {
+          throw new Error(
+            "Service Role Customer tidak ditemukan"
+          );
+        }
+      
+        tenantSupabase =
+          createClient(
+            config.supabase_url,
+            credential.service_role_key
+          );
       }
-
-      if (!credential?.service_role_key) {
-        throw new Error(
-          "Service Role Customer tidak ditemukan"
-        );
-      }
-
-
-      // ==========================================
-      // CUSTOMER SUPABASE
-      // ==========================================
-
-      const customerSupabase =
-        createClient(
-          config.supabase_url,
-          credential.service_role_key
-        );
 
 
       // ==========================================
