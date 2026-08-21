@@ -13368,7 +13368,10 @@ async function handleLogin() {
     // MASTER LOGIN
     // ==========================================
 
-    if (!state.tenantSlug) {
+    if (
+      !state.tenantSlug ||
+      state.tenantSlug === "master"
+    ) {
 
       console.log(
         "LOGIN → MASTER"
@@ -13385,115 +13388,96 @@ async function handleLogin() {
     // ==========================================
     // CUSTOMER LOGIN
     // ==========================================
+
     else {
-		  console.log(
-			"LOGIN → CUSTOMER:",
-			state.tenantSlug
-		  );
-		  const response =
-			await fetch(
-			  "/api/auth/login",
-			  {
-				method: "POST",
-				headers: {
-				  "Content-Type":
-					"application/json"
-				},
-		
-				body: JSON.stringify({
-				  tenantSlug:
-					state.tenantSlug,
-				  username:
-					username,
-				  password:
-					password
-				})
-			  }
-			);
-		
-		  result =
-			await response.json();
-		
-		  console.log(
-			"CUSTOMER AUTH RESULT:",
-			result
-		  );
-		
-		  if (!response.ok) {
-			throw new Error(
-			  result.error ||
-			  "Login gagal"
-			);
-		  }
-		}
+
+      console.log(
+        "LOGIN → CUSTOMER:",
+        state.tenantSlug
+      );
+
+      const response =
+        await fetch(
+          "/api/auth/login",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              tenantSlug:
+                state.tenantSlug,
+
+              username:
+                username,
+
+              password:
+                password
+            })
+          }
+        );
+
+      result =
+        await response.json();
+
+      console.log(
+        "CUSTOMER AUTH RESULT:",
+        result
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          result.error ||
+          "Login gagal"
+        );
+      }
+    }
 
     // ==========================================
     // LOGIN RESULT
     // ==========================================
-    if (!result || !result.success) {
+
+    if (
+      !result ||
+      !result.success
+    ) {
       alert(
         "Username atau password salah"
       );
       return;
     }
-    const rawUser =
-	  result.user;
-	
-	const user = {
-	  ...rawUser,
-	
-	  id:
-		rawUser.ID_User,
-	
-	  username:
-		rawUser.Username,
-	
-	  role:
-		rawUser.Role,
-	
-	  branchId:
-		rawUser.branchId
-	};
-	
-	state.user =
-	  user;
-	
-	state.branchId =
-	  user.branchId || "";
-	localStorage.setItem(
-	  "pos_user",
-	  JSON.stringify(user)
-	);
-	
-	// ==========================================
-	// SIMPAN SESSION CUSTOMER
-	// ==========================================
-	
-	console.log(
-	  "SESSION ID:",
-	  result.session_id
-	);
-	
-	if (result.session_id) {
-	
-	  localStorage.setItem(
-		"pos_session_id",
-		result.session_id
-	  );
-	
-	  console.log(
-		"SESSION DISIMPAN:",
-		localStorage.getItem(
-		  "pos_session_id"
-		)
-	  );
-	
-	} else {
-	
-	  console.error(
-		"SESSION ID TIDAK ADA DARI API LOGIN"
-	  );
-	}
+
+    const user =
+      result.user;
+
+    state.user =
+      user;
+
+    state.branchId =
+      user.branchId || "";
+
+    localStorage.setItem(
+      "pos_user",
+      JSON.stringify(user)
+    );
+
+    // ==========================================
+    // SESSION CUSTOMER
+    // ==========================================
+
+    if (
+      state.tenantSlug &&
+      state.tenantSlug !== "master" &&
+      result.session_id
+    ) {
+      localStorage.setItem(
+        "pos_session_id",
+        result.session_id
+      );
+    }
 
     if (state.branchId) {
       localStorage.setItem(
@@ -13507,6 +13491,7 @@ async function handleLogin() {
     );
 
   } catch (err) {
+
     console.error(
       "Login error:",
       err
