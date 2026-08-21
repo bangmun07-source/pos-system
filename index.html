@@ -13511,42 +13511,37 @@ async function handleLogin() {
 	    result.user.branchId
 	};
 	
-	state.user =
-	  user;
+	state.user = user;
 
-    state.branchId =
-      user.branchId || "";
-
-    localStorage.setItem(
-      "pos_user",
-      JSON.stringify(user)
-    );
-
-    // ==========================================
-    // SESSION CUSTOMER
-    // ==========================================
-
-    if (
-      state.tenantSlug &&
-      state.tenantSlug !== "master" &&
-      result.session_id
-    ) {
-      localStorage.setItem(
-        "pos_session_id",
-        result.session_id
-      );
-    }
-
-    if (state.branchId) {
-      localStorage.setItem(
-        "pos_branchId",
-        state.branchId
-      );
-    }
-
-    navigate(
-      "dashboardPage"
-    );
+	state.branchId =
+	  user.branchId || "";
+	
+	localStorage.setItem(
+	  "pos_user",
+	  JSON.stringify(user)
+	);
+	
+	// ==========================================
+	// SESSION
+	// ==========================================
+	
+	if (result.session_id) {
+	  localStorage.setItem(
+	    "pos_session_id",
+	    result.session_id
+	  );
+	}
+	
+	if (state.branchId) {
+	  localStorage.setItem(
+	    "pos_branchId",
+	    state.branchId
+	  );
+	}
+	
+	navigate(
+	  "dashboardPage"
+	);
 
   } catch (err) {
 
