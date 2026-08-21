@@ -97,10 +97,9 @@ export default async function handler(req, res) {
       // ==========================================
       
       let tenantSupabase;
-      
+
       if (tenantSlug === "master") {
       
-        // MASTER
         tenantSupabase =
           createClient(
             process.env.SUPABASE_URL,
@@ -109,7 +108,6 @@ export default async function handler(req, res) {
       
       } else {
       
-        // CUSTOMER
         const {
           data: credential,
           error: credentialError
@@ -149,7 +147,7 @@ export default async function handler(req, res) {
         data: user,
         error: userError
       } =
-        await customerSupabase
+        await tenantSupabase
           .from("Users")
           .select(
             "ID_User, Username, Password, Role, branchId"
@@ -200,7 +198,7 @@ export default async function handler(req, res) {
         data: session,
         error: sessionError
       } =
-        await customerSupabase
+        await tenantSupabase
           .from("auth_sessions")
           .insert({
             user_id:
@@ -357,7 +355,7 @@ export default async function handler(req, res) {
       // CUSTOMER SUPABASE
       // ==========================================
 
-      const customerSupabase =
+      const tenantSupabase =
         createClient(
           config.supabase_url,
           credential.service_role_key
@@ -372,7 +370,7 @@ export default async function handler(req, res) {
         data: session,
         error: sessionError
       } =
-        await customerSupabase
+        await tenantSupabase
           .from("auth_sessions")
           .select(
             "session_id, user_id, expires_at"
@@ -404,7 +402,7 @@ export default async function handler(req, res) {
         <= new Date()
       ) {
 
-        await customerSupabase
+        await tenantSupabase
           .from("auth_sessions")
           .delete()
           .eq(
@@ -427,7 +425,7 @@ export default async function handler(req, res) {
         data: user,
         error: userError
       } =
-        await customerSupabase
+        await tenantSupabase
           .from("Users")
           .select(
             "ID_User, Username, Role, branchId"
