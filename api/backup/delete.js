@@ -4,6 +4,7 @@ export default async function handler(req, res) {
 
   if (req.method !== "POST") {
     return res.status(405).json({
+      success: false,
       error: "Method not allowed"
     });
   }
@@ -17,24 +18,49 @@ export default async function handler(req, res) {
 
     if (!filePath) {
       return res.status(400).json({
+        success: false,
         error: "File path tidak ditemukan"
       });
     }
 
     if (!tenantSlug) {
       return res.status(400).json({
+        success: false,
         error: "Tenant slug kosong"
       });
     }
 
+
+    // ==========================================
+    // VALIDASI SESSION
+    // ==========================================
+
+    const sessionId =
+      req.headers["x-session-id"];
+
+    if (!sessionId) {
+      return res.status(401).json({
+        success: false,
+        error: "Session tidak ditemukan"
+      });
+    }
+
+
+    // ==========================================
     // MASTER SUPABASE
+    // ==========================================
+
     const centralSupabase =
       createClient(
         process.env.SUPABASE_URL,
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
+
+    // ==========================================
     // GET TENANT CONFIG
+    // ==========================================
+
     const {
       data: tenantResult,
       error: tenantError
@@ -64,15 +90,17 @@ export default async function handler(req, res) {
       tenantResult.data;
 
     if (!config.is_active) {
-      throw new Error(
-        "Tenant tidak aktif"
-      );
+      return res.status(403).json({
+        success: false,
+        error: "Tenant tidak aktif"
+      });
     }
+
 
     // ==========================================
     // AMBIL SERVICE ROLE CUSTOMER
     // ==========================================
-    
+
     const {
       data: credential,
       error: credentialError
@@ -82,29 +110,91 @@ export default async function handler(req, res) {
         .select("service_role_key")
         .eq("tenant_id", config.tenant_id)
         .single();
-    
+
     if (credentialError) {
       throw credentialError;
     }
-    
+
     if (!credential?.service_role_key) {
       throw new Error(
         "Service Role Customer tidak ditemukan"
       );
     }
-    
-    
+
+
     // ==========================================
     // CUSTOMER SUPABASE
     // ==========================================
-    
+
     const supabase =
       createClient(
         config.supabase_url,
         credential.service_role_key
       );
 
-    // DELETE
+
+    // ==========================================
+    // VALIDASI SESSION + ROLE
+    // ==========================================
+
+    const {
+      data: session,
+      error: sessionError
+    } =
+      await supabase
+        .from("auth_sessions")
+        .select(`
+          session_id,
+          user_id,
+          expires_at,
+          Users (
+            ID_User,
+            Username,
+            Role,
+            branchId
+          )
+        `)
+        .eq(
+          "session_id",
+          sessionId
+        )
+        .single();
+
+    if (sessionError || !session) {
+      return res.status(401).json({
+        success: false,
+        error: "Session tidak valid"
+      });
+    }
+
+    if (
+      new Date(session.expires_at)
+      <= new Date()
+    ) {
+      return res.status(401).json({
+        success: false,
+        error: "Session sudah expired"
+      });
+    }
+
+    const user =
+      session.Users;
+
+    if (
+      !user ||
+      user.Role?.toLowerCase() !== "owner"
+    ) {
+      return res.status(403).json({
+        success: false,
+        error: "Akses hanya untuk Owner"
+      });
+    }
+
+
+    // ==========================================
+    // DELETE BACKUP
+    // ==========================================
+
     const {
       data: deletedFiles,
       error
@@ -115,7 +205,7 @@ export default async function handler(req, res) {
         .remove([
           filePath
         ]);
-    
+
     console.log(
       "DELETE BACKUP CUSTOMER:",
       {
@@ -125,11 +215,11 @@ export default async function handler(req, res) {
         error
       }
     );
-    
+
     if (error) {
       throw error;
     }
-    
+
     if (
       !deletedFiles ||
       deletedFiles.length === 0
@@ -153,6 +243,7 @@ export default async function handler(req, res) {
     );
 
     return res.status(500).json({
+      success: false,
       error:
         error.message ||
         "Gagal menghapus file backup"
