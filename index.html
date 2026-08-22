@@ -285,8 +285,32 @@
 	  border: 1px solid var(--outline-variant);
 	}
 
-	.bg-recipe {
-		background:#101715
+	/* RECEIPT LIGHT */
+	.receipt-canvas {
+	  background: #ffffff;
+	  color: #101715;
+	}
+	
+	.receipt-canvas .text-on-surface {
+	  color: #101715;
+	}
+	
+	.receipt-canvas .text-on-surface-variant {
+	  color: #666666;
+	}
+	
+	/* RECEIPT DARK */
+	.dark .receipt-canvas {
+	  background: #101715;
+	  color: #F5F5F5;
+	}
+	
+	.dark .receipt-canvas .text-on-surface {
+	  color: #F5F5F5;
+	}
+	
+	.dark .receipt-canvas .text-on-surface-variant {
+	  color: #787777;
 	}
 
 	.bg-background::before {
@@ -2174,7 +2198,7 @@
 <template id="receiptTemplate">
 	
 	<main id="receiptMainWrapper" class="pt-20 pb-20 px-4 md:px-0 flex justify-center items-start min-h-screen">
-		<article id="receiptCanvas" class="w-full max-w-xl bg-background rounded-md overflow-hidden relative">
+		<article id="receiptCanvas" class="receipt-canvas w-full max-w-xl bg-background rounded-md overflow-hidden relative">
 				<div id="receiptContentWrapper" class="relative p-8 md:p-12">
 					<header id="receiptHeroSection" class="relative -mx-8 md:-mx-12 -mt-8 md:-mt-4 mb-4 overflow-hidden rounded-t-lg">
 						<div id="receiptHeroContent"
@@ -14767,7 +14791,16 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   wrapper.style.position = "absolute";
   wrapper.style.left = "-9999px";
   wrapper.appendChild(tpl.content.cloneNode(true));
-  document.body.appendChild(wrapper);
+	document.body.appendChild(wrapper);
+	
+	// Terapkan tema ke receipt
+	const isDark =
+	  document.documentElement.classList.contains("dark");
+	
+	if (isDark) {
+	  wrapper.classList.add("dark");
+	}
+	
   const n = (v) => Number(v || 0);
   const subtotal = n(trx.subtotal);
   const total = n(trx.total);
