@@ -14280,11 +14280,7 @@ function paginateRecentTransactions(data) {
 
 function renderRecentPagination(totalData) {
   const totalPages = Math.max( 1, Math.ceil(totalData / recentItemsPerPage) );
-
-  // =========================
   // INFO
-  // =========================
-
   const from =
     totalData === 0
       ? 0
@@ -14387,10 +14383,6 @@ async function loadRecentTransactionSummary() {
     );
   }
   catch(err) {
-    console.error(
-      "Summary error:",
-      err
-    );
   }
 }
 
@@ -14414,13 +14406,11 @@ function renderRecentTransactionSummary(data) {
 }
 
 async function exportRecentTransactions() {
-
+	
   const start =
     document.getElementById("startDate")?.value || "";
-
   const end =
     document.getElementById("endDate")?.value || "";
-
   const status =
     document.getElementById("statusFilter")?.value || "ALL";
 
@@ -14431,16 +14421,12 @@ async function exportRecentTransactions() {
 
   const branchId =
     state.branchId || "";
-
   if (!branchId) {
     alert("Branch belum tersedia");
     return;
   }
 
-  // =========================
   // OPEN PDF / REPORT TAB
-  // =========================
-
   const pdfWindow =
     window.open("", "_blank");
 
@@ -14451,17 +14437,13 @@ async function exportRecentTransactions() {
 
   pdfWindow.document.write(`
     <!DOCTYPE html>
-
     <html>
-
       <head>
-
         <title>
           Generating Report...
         </title>
 
         <style>
-
           body {
             margin: 0;
             height: 100vh;
@@ -14492,17 +14474,12 @@ async function exportRecentTransactions() {
               transform: rotate(360deg);
             }
           }
-
         </style>
-
       </head>
 
       <body>
-
         <div class="box">
-
           <div class="loader"></div>
-
           <h2>
             Generating Report...
           </h2>
@@ -14510,35 +14487,26 @@ async function exportRecentTransactions() {
           <p>
             Please wait
           </p>
-
         </div>
-
       </body>
-
     </html>
   `);
 
   try {
 
-    // =========================
     // CALL VERCEL API
-    // =========================
-
     const response =
 	  await fetch(
 	    "/api/export-pdf",
 	    {
 	      method: "POST",
-	
 	      headers: {
 	        "Content-Type":
 	          "application/json"
 	      },
 	
 	      body: JSON.stringify({
-	
 	        type: "recent-transactions",
-	
 	        start,
 	        end,
 	        status,
@@ -14548,40 +14516,19 @@ async function exportRecentTransactions() {
 	    }
 	  );
 
-    // =========================
     // GET RESPONSE AS TEXT
-    // =========================
-
     const text =
       await response.text();
 
-    console.log(
-      "EXPORT API STATUS:",
-      response.status
-    );
-
-    console.log(
-      "EXPORT API RESPONSE:",
-      text
-    );
-
-    // =========================
     // SERVER ERROR
-    // =========================
-
     if (!response.ok) {
-
       throw new Error(
         text ||
         "Export gagal"
       );
-
     }
 
-    // =========================
     // VALIDATE HTML
-    // =========================
-
     if (
       !text ||
       !text.trim()
@@ -14590,48 +14537,29 @@ async function exportRecentTransactions() {
       throw new Error(
         "Response API kosong."
       );
-
     }
-
-    // =========================
+		
     // WRITE REPORT
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(
       text
     );
-
     pdfWindow.document.close();
-
   }
 
   catch (err) {
 
-    console.error(
-      "Export Recent Transactions:",
-      err
-    );
-
     if (pdfWindow) {
-
       pdfWindow.document.open();
-
       pdfWindow.document.write(`
-
         <!DOCTYPE html>
-
         <html>
-
           <head>
-
             <title>
               Export Error
             </title>
 
             <style>
-
               body {
                 font-family: Arial;
                 padding: 40px;
@@ -14642,13 +14570,10 @@ async function exportRecentTransactions() {
               .error {
                 color: #ff6b6b;
               }
-
             </style>
-
           </head>
 
           <body>
-
             <h2 class="error">
               Export Error
             </h2>
@@ -14656,19 +14581,12 @@ async function exportRecentTransactions() {
             <p>
               ${String(err.message || err)}
             </p>
-
           </body>
-
         </html>
-
       `);
-
       pdfWindow.document.close();
-
     }
-
   }
-
 }
 
 
@@ -14932,19 +14850,8 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
         );
       })
       .then(async res => {
-
 			  const text =
 			    await res.text();
-			
-			  console.log(
-			    "RECEIPT API STATUS:",
-			    res.status
-			  );
-			
-			  console.log(
-			    "RECEIPT API RAW:",
-			    text
-			  );
 			
 			  let result;
 			
@@ -14963,11 +14870,6 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 			})
 			.then(result => {
       
-        console.log(
-          "RECEIPT API RESULT:",
-          result
-        );
-      
         if (
           !result.success ||
           !result.url
@@ -14980,12 +14882,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
       
         const url =
           result.url;
-      
-        console.log(
-          "RECEIPT URL:",
-          url
-        );
-      
+				
         let wa =
           String(phone || "")
             .replace(/\D/g,"");
@@ -15025,13 +14922,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
         );
         wrapper.remove();
       })
-      .catch(err => {
-        console.error(
-          "Receipt upload error:",
-          err
-        );
-    
-      });
+      .catch(err => { });
   },100);
 }
 
@@ -15056,21 +14947,21 @@ function renderReceipt(data) {
   wrapper.querySelector("#receiptService").textContent = data.service;
   wrapper.querySelector("#receiptDiscount").textContent = data.discount;
   const canvas = wrapper.querySelector("#receiptCanvas");
+	const isDark =
+    document.documentElement.classList.contains("dark");
+
+  const receiptBackground =
+    isDark ? "#0B0F14" : "#F5F5F5";
   html2canvas(canvas, {
     scale: 1,
     useCORS: true,
-    backgroundColor: "#0B0F14"
+    backgroundColor: receiptBackground
   }).then(canvas => {
     const image =
       canvas.toDataURL(
         "image/jpeg",
         0.65
       );
-    console.log(
-      "Receipt size:",
-      Math.round(image.length / 1024),
-      "KB"
-    );
     wrapper.remove();
   });
 }
@@ -15110,19 +15001,11 @@ async function fetchSettings(callback) {
     // Ambil bagian settings saja
     state.settings =
       data.settings || {};
-
-    console.log(
-      "SETTINGS:",
-      state.settings
-    );
+		
     if (callback) {
       callback();
     }
   } catch (err) {
-    console.error(
-      "Fetch settings error:",
-      err
-    );
     alert(
       "Gagal mengambil settings"
     );
