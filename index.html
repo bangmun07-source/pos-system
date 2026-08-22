@@ -476,7 +476,7 @@
 	<!-- Main Content Canvas -->
 	<main class="relative z-10 min-h-screen flex items-center justify-center px-6 py-10">
 	  <div class="bg-background rounded-md overflow-hidden w-full max-w-lg">
-	    <div class="flex items-center justify-between px-6 py-5 border border-outline-variant/10">
+	    <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant">
 	      <div class="flex items-center gap-3">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          lock
@@ -524,7 +524,7 @@
 	            type="text"
 	            autocomplete="username"
 	            placeholder="Enter Staff ID"
-	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant/10 focus:ring-1 focus:ring-primary"/>
+	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant focus:ring-1 focus:ring-primary"/>
 	        </div>
 	
 	        <!-- PASSWORD -->
@@ -539,7 +539,7 @@
 	            type="password"
 	            autocomplete="current-password"
 	            placeholder="••••••"
-	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant/10 focus:ring-1 focus:ring-primary"/>
+	            class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant focus:ring-1 focus:ring-primary"/>
 	        </div>
 	
 	        <!-- INFO BOX -->
@@ -883,7 +883,7 @@
 	      <div class="overflow-x-auto custom-scrollbar flex-1">
 	        <table class="w-full text-left border-separate border-spacing-y-4">
 	          <thead>
-	            <tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border border-outline-variant/10">
+	            <tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border border-outline-variant">
 	              <th class="pb-3 pt-3 pl-6">Order ID</th>
 	              <th class="pb-3 pt-3 text-center ">Table</th>
 	              <th class="pb-3 pt-3 text-center">Total</th>
@@ -902,7 +902,7 @@
 	      </div>
 	
 	      <!-- FOOTER PAGINATION -->
-	      <div class="px-8 py-4 border-t border-outline-variant/10 text-center">
+	      <div class="px-8 py-4 border-t border-outline-variant text-center">
 	        <p class="text-[8px] text-muted   uppercase tracking-widest font-medium">
 	          Showing the 20 most recent transactions
 	        </p>
@@ -1095,7 +1095,7 @@
 	
 <div class="flex flex-col gap-4">
 <!-- TOOLBAR -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-bacground rounded-md overflow-hidden border border-outline-variant/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-bacground rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
   <!-- START DATE -->
   <div class="flex flex-col gap-2 ">
     <label class="text-muted text-sm lg:text-base font-medium uppercase tracking-[0.25em]">
@@ -1105,7 +1105,7 @@
     <input
       id="startDate"
       type="date"
-      class="w-full h-12 bg-background rounded-md overflow-hidden border border-outline-variant/10 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
+      class="w-full h-12 bg-background rounded-md overflow-hidden border border-outline-variant text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
   </div>
 
   <!-- END DATE -->
@@ -1117,7 +1117,7 @@
     <input
       id="endDate"
       type="date"
-      class="w-full h-12 bg-background rounded-md overflow-hidden border border-outline-variant/10 text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
+      class="w-full h-12 bg-background rounded-md overflow-hidden border border-outline-variant text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-white/20 outline-none transition-all" />
   </div>
 
   <!-- EXPORT -->
@@ -1356,7 +1356,7 @@
   <div class="overflow-x-auto custom-scrollbar">
     <table class="w-full text-left border-collapse">
       <thead>
-        <tr class="sticky top-0 border border-outline-variant/10 uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+        <tr class="sticky top-0 border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
           <th class="px-8 py-5">
             Item Name
           </th>
@@ -1379,7 +1379,7 @@
         </tr>
       </thead>
 
-      <tbody id="topRevenueTable" class="divide-y divide-white/5">
+      <tbody id="topRevenueTable" class="divide-y divide-outline-variant">
 				<tr>
 					<td colspan="5" class="text-center text-muted ">
 						Loading...
@@ -1390,7 +1390,7 @@
   </div>
 
 <!-- FOOTER -->
-  <div class="px-8 py-4 border-t border-outline-variant/10 flex items-center justify-between">
+  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
     <p id="topRevenueInfo"
       class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
       Showing 1–10 of 50 Products
@@ -1553,7 +1553,7 @@
 
     <input type="date"
       id="startDate"
-     class="w-full h-12  bg-background border border-outline-variant/10 rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
+     class="w-full h-12  bg-background border border-outline-variant rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all">
   </div>
 
   <!-- END DATE -->
@@ -1564,7 +1564,7 @@
 
     <input type="date"
       id="endDate"
-      class="w-full h-12 bg-background border border-outline-variant/10 rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
+      class="w-full h-12 bg-background border border-outline-variant rounded-md text-xs lg:text-sm text-on-surface focus:ring-1 focus:ring-primary outline-none transition-all" />
   </div>
 
   <!-- STATUS -->
@@ -1706,7 +1706,7 @@
   <div class="overflow-x-auto custom-scrollbar">
     <table class="w-full text-left border-collapse">
       <thead>
-        <tr class="sticky top-0 text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+        <tr class="sticky top-0 border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
           <th class="px-6 py-4">Order ID</th>
           <th class="px-6 py-4">Date & Time</th>
           <th class="px-6 py-4">Table</th>
@@ -1718,7 +1718,7 @@
       </thead>
 
       <tbody id="recentTransactionsList"
-        class="divide-y divide-white/5">
+        class="divide-y divide-outline-variant">
         <tr>
           <td colspan="7" class="text-center text-muted ">
             Loading...
@@ -1728,7 +1728,7 @@
     </table>
   </div>
   <!-- PAGINATION -->
-<div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant/10">
+<div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
 
   <p id="recentTransactionInfo"
    	class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
@@ -1763,7 +1763,7 @@
 	  <!-- BACKDROP -->
 	  <div class="absolute inset-0 bg-background backdrop-blur-md"></div>
 	  	<div class="relative w-full max-w-[450px]">
-	    	<div class="bg-background rounded-md border border-outline-variant/10 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	    	<div class="bg-background rounded-md border-b border-outline-variant overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 		      <!-- HEADER -->
 		      <div class="flex items-center justify-between px-6 py-5 border border-outline-variant/10">
 		        <div class="flex items-center gap-3">
@@ -1848,7 +1848,7 @@
 	        </button>
 	
 	        <!-- INFO BOX -->
-	        <div class="p-4 rounded-md bg-white/5 border border-outline-variant/10 flex gap-3 mt-4">
+	        <div class="p-4 rounded-md bg-white/5 border border-outline-variant flex gap-3 mt-4">
 	          <span class="material-symbols-outlined text-foreground">
 	            info
 	          </span>
@@ -1861,7 +1861,7 @@
 	      </div>
 	
 	      <!-- FOOTER -->
-	      <div class="px-6 py-5 flex justify-end gap-3 border border-outline-variant/10">
+	      <div class="px-6 py-5 flex justify-end gap-3 border border-outline-variant">
 	        <button
 	          onclick="closeTransactionModal()"
 	          class="text-on-surface-variant hover:text-on-surface">
@@ -1884,7 +1884,7 @@
 		  <div class="relative w-full max-w-xl">
 		    <div class="bg-background rounded-md border border-outline-variant/10 overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 		      <!-- Header Section -->
-		      <header class="px-6 py-5 border border-outline-variant/10">
+		      <header class="px-6 py-5 border border-outline-variant">
 		        <div class="flex justify-between items-center">
 		          <div>
 		            <h1 class="text-lg font-bold text-on-surface">
@@ -1911,7 +1911,7 @@
 
 		      <!-- Metadata Row -->
 		      <section class="px-6 py-5">
-		        <div class="grid grid-cols-4 gap-4 p-4 rounded-md bg-background/50 border border-outline-variant/10">
+		        <div class="grid grid-cols-4 gap-4 p-4 rounded-md bg-background border border-outline-variant">
 		          <div>
 		            <span class="text-[9px] uppercase tracking-widest text-on-surface-variant">
 		              Date
@@ -1967,7 +1967,7 @@
 		
 		      <!-- Financial Summary -->
 		      <section class="px-6">
-		        <div class="p-4 rounded-md bg-background/50 border border border-outline-variant/10 space-y-3">
+		        <div class="p-4 rounded-md bg-background border border border-outline-variant space-y-3">
 		          <div class="flex justify-between items-center text-sm">
 		            <span class="text-on-surface-variant">
 		              Subtotal
@@ -2415,7 +2415,7 @@
       </span>
 
       <input id="searchInput"
-        class="w-full bg-transparent border border-outline-variant/10 rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
+        class="w-full bg-transparent border border-outline-variant rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
         placeholder="Search menu..."
         type="text"/>
     </div>
@@ -2438,7 +2438,7 @@
         <!-- DROPDOWN -->
         <div id="notificationDropdown"
           class="hidden absolute right-0 top-12 w-80 bg-background rounded-md shadow-2xl overflow-hidden z-50">
-          <div class="p-4 border border-outline-variant/10">
+          <div class="p-4 border-b border-outline-variant">
             <h3 class="font-bold text-xs lg:text-sm text-on-surface">
             Notifications
             </h3>
@@ -2487,14 +2487,14 @@
 				<label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-1.5 block">Assign Table</label>
 				<div class="relative">
 					<span class="material-symbols-outlined absolute text-on-surface-variant left-3 top-1/2 -translate-y-1/2 text-lg" data-icon="table_restaurant">table_restaurant</span>
-					<input id="table-input" class="w-full bg-transparent border border-outline-variant/10 rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
+					<input id="table-input" class="w-full bg-transparent border border-outline-variant rounded-md py-2.5 pl-10 pr-3 text-xs lg:text-sm focus:ring-1 focus:white" placeholder="No table" oninput="setTable(this.value)" type="text" inputmode="numeric">
 				</div>
 			</div>
 		</div>
 		<!-- Cart Items -->
 		<div id="cart-items" class="flex-1 overflow-y-auto px-8 custom-scrollbar space-y-6 py-4"></div>
 			<!-- Financial Controls & Summary Section -->
-			<div class="bg-background border border-outline-variant/10 p-5 space-y-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+			<div class="bg-background border border-outline-variant p-5 space-y-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 				<!-- Financial Modifiers -->
 				<div class="grid grid-cols-6 gap-4 pb-2">
 					<div class="col-span-6">
@@ -2506,17 +2506,17 @@
 							</span>
 							
 							<input id="memberSearch" 
-								class="w-full bg-transparent border border-outline-variant/10 rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
+								class="w-full bg-transparent border border-outline-variant rounded-md pl-10 pr-6 py-2.5 text-on-surface text-xs lg:text-sm" 
 								autocomplete="off" 
 								placeholder="Search members..." 
 								type="text" />
 
   						<input type="hidden" id="member-id">
 						  <!-- RESULT DROPDOWN -->
-						 <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-md bg-background border border-outline-variant/10 z-50 custom-scrollbar" style="display:none;"></div>
+						 <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-md bg-background border border-outline-variant z-50 custom-scrollbar" style="display:none;"></div>
 					</div>
 					<button onclick="openRedeem()" 
-					  	class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-outline-variant/10 tracking-wide transition-all">
+					  	class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-outline-variant tracking-wide transition-all">
 					  <span class="material-symbols-outlined text-sm">redeem</span>
 					  <span class="text-sm">REDEEM</span>
 					</button>
@@ -2525,8 +2525,8 @@
 		</div>
 
 		<!-- Summary -->
-		<div id="pos-cart-summary" class="space-y-2.5 pt-2 border-t border-outline-variant/10"> </div>
-			<div class="h-[1px] bg-outline-variant/10"></div>
+		<div id="pos-cart-summary" class="space-y-2.5 pt-2 border-t border-outline-variant"> </div>
+			<div class="h-[1px] bg-outline-variant"></div>
 				<!-- Payment Method Selector -->
 				<div class="pb-2">
 					<label class="text-[10px] text-muted  font-bold uppercase tracking-wider m-3 block">Payment</label>	
@@ -2658,7 +2658,7 @@
   <div class="fixed inset-0 z-50 flex items-center justify-center p-6 bg-background backdrop-blur-md">
     <div class="w-full max-w-4xl h-[680px] bg-background rounded-md border border-outline-variant/10 shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
       <!-- HEADER -->
-      <div class="p-6 border border-outline-variant/10 flex items-center justify-between">
+      <div class="p-6 border-b border-outline-variant flex items-center justify-between">
         <div class="flex items-center gap-4">
           <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
             <span class="material-symbols-outlined text-on-surface text-2xl">
@@ -2861,7 +2861,7 @@
 	    <!-- Summary -->
 	    <div
 	      id="table-cart-summary"
-	      class="pt-6 mt-6 border-t border-outline-variant/10 space-y-6">
+	      class="pt-6 mt-6 border-t border-outline-variant space-y-6">
 	    </div>
 	
 	    <div class="space-y-3 mt-6">	
@@ -2936,7 +2936,7 @@
 <!-- Main Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 	<!-- Header / Floor Status -->
-	<header class="mb-4 flex flex-col md:flex-row md:items-end gap-6 p-4 border border-outline-variant/10">
+	<header class="mb-4 flex flex-col md:flex-row md:items-end gap-6 p-4 border border-outline-variant">
 	  <div class="flex flex-wrap items-center gap-4">
 	    <!-- AVAILABLE -->
 	    <div class="px-4 py-2 rounded-md flex items-center gap-3">
@@ -2982,11 +2982,11 @@
   <div class="bg-[#0b1326] p-6 rounded-2xl w-80 space-y-4">
     <h3 class="text-lg font-bold">Reserve Table</h3>
 	    <input id="reserve-name" placeholder="Guest Name"
-	      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
+	      class="w-full p-3 rounded-md bg-background border border-outline-variant">
 		    <input id="reserve-pax" placeholder="Pax"
-		      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
+		      class="w-full p-3 rounded-md bg-background border border-outline-variant">
 			    <input id="reserve-time" type="time"
-			      class="w-full p-3 rounded-md bg-background border border-outline-variant/10">
+			      class="w-full p-3 rounded-md bg-background border border-outline-variant">
 
 					<div class="flex gap-2 pt-2">
 						<button onclick="submitReserve()"
@@ -3015,7 +3015,7 @@
   <div onclick="event.stopPropagation()"
     class="relative w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
     <!-- HEADER -->
-    <div class="p-6 border border-outline-variant/10 flex items-center justify-between">
+    <div class="p-6 border border-outline-variant flex items-center justify-between">
       <div class="flex items-center gap-4">
         <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
           <span class="material-symbols-outlined text-on-surface text-2xl">
@@ -3051,7 +3051,7 @@
       <input id="newTableName"
         type="text"
         placeholder="Contoh : 15"
-        class="w-full h-11 px-4 rounded-md bg-background border border-outline-variant/10 text-on-surface placeholder:text-on-surface-variant outline-none focus:border-primary transition">
+        class="w-full h-11 px-4 rounded-md bg-background border border-outline-variant text-on-surface placeholder:text-on-surface-variant outline-none focus:border-primary transition">
 
 		    <p class="mt-3 text-xs text-on-surface-variant leading-6">
 		      Masukkan nomor meja, kemudian klik <strong>Add Table</strong>. Meja baru akan otomatis muncul pada halaman <strong>Table</strong>.
@@ -3059,30 +3059,21 @@
     </div>
 
     <!-- FOOTER -->
-    <div class="p-4 border-t border-outline-variant/10 flex gap-3">
-
+    <div class="p-4 border-t border-outline-variant flex gap-3">
       <button
         onclick="closeAddTableModal()"
         class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
-
         Cancel
-
       </button>
 
       <button
         onclick="saveNewTable()"
         class="flex-1 h-11 rounded-md bg-primary text-on-primary hover:opacity-90 transition active:scale-95">
-
         Add Table
-
       </button>
-
     </div>
-
   </div>
-
 </div>
-
 </template>
 
 
@@ -3406,10 +3397,7 @@
       <table class="w-full text-left border-collapse">
 
         <thead>
-          <tr class="sticky top-0 border border-outline-variant/10
-                    text-[11px]
-                    text-muted 
-                    uppercase tracking-widest">
+          <tr class="sticky top-0 border border-outline-variant text-[11px] text-muted uppercase tracking-widest">
 
             <th class="px-6 py-4">Member ID</th>
             <th class="px-6 py-4">Name</th>
@@ -3435,7 +3423,7 @@
 
     <!-- FOOTER PAGINATION -->
     <div class="px-6 py-4 flex items-center justify-between
-                border-t border-outline-variant/10">
+                border-t border-outline-variant">
       <p class="text-xs text-muted  font-medium">
         Showing members
       </p>
@@ -3595,182 +3583,106 @@
 <!-- MEMBER MESSAGE -->
 
 <template id="whatsAppMessageModalTemplate">
-
   <div id="whatsapp-message-modal"
-  class="fixed inset-0 z-[80] hidden items-center justify-center p-6 bg-background backdrop-blur-md">
-
-    <div
-    onclick="event.stopPropagation()"
-    class="w-full max-w-2xl bg-background rounded-md overflow-hidden animate-in fade-in zoom-in duration-300">
+  	class="fixed inset-0 z-[80] hidden items-center justify-center p-6 bg-background backdrop-blur-md">
+    <div onclick="event.stopPropagation()"
+   		class="w-full max-w-2xl bg-background rounded-md overflow-hidden animate-in fade-in zoom-in duration-300">
 
       <!-- HEADER -->
-
-      <div class="p-6 border border-outline-variant/10 flex items-center justify-between">
-
+      <div class="p-6 border-b border-outline-variant flex items-center justify-between">
         <div class="flex items-center gap-4">
-
           <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
-
             <span class="material-symbols-outlined text-on-surface text-2xl">
               chat
             </span>
-
           </div>
-
           <div>
 
-            <h2
-            id="waModalTitle"
+            <h2 id="waModalTitle"
             class="text-xl font-bold text-on-surface">
-
               WhatsApp Message
-
             </h2>
-
+						
             <p class="text-xs text-on-surface uppercase tracking-wider">
-
               Preview & Edit Message
-
             </p>
-
           </div>
-
         </div>
 
-        <button
-        onclick="closeWhatsAppModal()"
-        class="w-10 h-10 rounded-md hover:bg-white/5">
-
+        <button onclick="closeWhatsAppModal()"
+        	class="w-10 h-10 rounded-md hover:bg-white/5">
           <span class="material-symbols-outlined">
             close
           </span>
-
         </button>
-
       </div>
 
-
       <!-- BODY -->
-
       <div class="p-6 space-y-5">
-
-        <!-- Recipient -->
-
         <div>
-
-          <label
-          class="block text-xs text-on-surface-variant mb-2">
-
-            Recipient
-
+          <label class="block text-xs text-on-surface-variant mb-2">
+            WhatsApp
           </label>
 
-          <input
-          id="waRecipient"
+          <input id="waRecipient"
           type="text"
           readonly
           class="w-full h-11 rounded-md bg-background px-4
-          text-on-surface border border-outline-variant/10">
-
+          text-on-surface border border-outline-variant">
         </div>
 
-
         <!-- Message -->
-
         <div>
-
           <div class="flex items-center justify-between mb-2">
-
-            <label
-            class="text-xs text-on-surface-variant">
-
+            <label class="text-xs text-on-surface-variant">
               Message
-
             </label>
 
             <div class="flex items-center gap-2">
-
-              <button
-              onclick="resetWhatsAppMessage()"
+              <button onclick="resetWhatsAppMessage()"
               class="text-xs text-on-surface hover:underline">
-
                 Reset
-
               </button>
 
-              <button
-              onclick="copyWhatsAppMessage()"
+              <button onclick="copyWhatsAppMessage()"
               class="text-xs text-on-surface hover:underline">
-
                 Copy
-
               </button>
-
             </div>
-
           </div>
 
           <div class="rounded-md border border-outline-variant/10 bg-background overflow-hidden">
-            <textarea
-              id="waMessage"
+            <textarea id="waMessage"
               rows="14"
               oninput="updateWhatsAppCounter()"
               class="w-full p-4 text-sm resize-none text-on-surface custom-scrollbar bg-transparent border-0 outline-none">
             </textarea>
           </div>
-
         </div>
-
-
+				
         <!-- Counter -->
-
         <div class="flex justify-end">
-
-          <span
-          id="waCounter"
+          <span id="waCounter"
           class="text-xs text-on-surface-variant">
-
-
           </span>
-
         </div>
-
       </div>
-
 
       <!-- FOOTER -->
-
-      <div class="p-6 border-t border-outline-variant/10 flex justify-end gap-3">
-
-        <button
-
-        onclick="closeWhatsAppModal()"
-
+      <div class="p-6 border-t border-outline-variant flex justify-end gap-3">
+        <button onclick="closeWhatsAppModal()"
         class="px-5 h-11 rounded-md bg-background-high">
-
-          Cancel
-
+        	 Cancel
         </button>
-
-
-        <button
-
-        id="waSendButton"
-
+				
+        <button id="waSendButton"
         class="px-6 h-11 rounded-md bottom-theme border border-outline-variant/10 text-on-surface font-bold">
-
           Send WhatsApp
-
         </button>
-
       </div>
-
     </div>
-
   </div>
-
 </template>
-
 
 <!-- INVENTORY --> 
 
@@ -14022,7 +13934,7 @@ function renderLowStock(items) {
   }
 
   el.innerHTML = items.map(i => `
-    <div class="flex justify-between text-sm py-1 border border-outline-variant/10">
+    <div class="flex justify-between text-sm py-1 border-b border-outline-variant">
       <span>${i.nama}</span>
       <span class="text-red-400 font-bold">${i.stok}</span>
     </div>
@@ -14062,7 +13974,7 @@ function renderShiftPerformance(shift) {
   el.innerHTML = `
     <div class="flex flex-col gap-3">
 
-      <div class="flex items-center justify-between py-3 border border-outline-variant/10>
+      <div class="flex items-center justify-between py-3 border-b border-outline-variant">
         <div>
           <p class="text-sm text-on-surface font-medium font-bold">MORNING</p>
           <p class="text-xs text-muted ">${shift.pagi?.orders || 0} orders</p>
@@ -14070,7 +13982,7 @@ function renderShiftPerformance(shift) {
         <p class="font-bold">${format(shift.pagi?.revenue)}</p>
       </div>
 
-      <div class="flex items-center justify-between py-3 border-b border-slate-400">
+      <div class="flex items-center justify-between py-3 border-b border-outline-variant">
         <div>
           <p class="text-sm text-on-surface font-medium font-bold">AFTERNOON</p>
           <p class="text-xs text-muted ">${shift.siang?.orders || 0} orders</p>
@@ -14078,7 +13990,7 @@ function renderShiftPerformance(shift) {
         <p class="font-bold">${format(shift.siang?.revenue)}</p>
       </div>
 
-      <div class="flex items-center justify-between py-3 border-b border-slate-400">
+      <div class="flex items-center justify-between py-3 border-b border-outline-variant">
         <div>
           <p class="text-sm text-on-surface font-medium font-bold">EVENING</p>
           <p class="text-xs text-muted ">${shift.malam?.orders || 0} orders</p>
@@ -20259,7 +20171,7 @@ function renderBilling(data) {
     container.innerHTML += `
       <div class="flex justify-between items-center bg-background p-4 rounded-2xl">
         <div class="flex items-center gap-4">
-          <div class="w-10 h-10 bg-primary-container/10 flex items-center justify-center rounded-md text-on-surface-container font-bold text-sm">
+          <div class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface-container font-bold text-sm">
             ${item.qty}x
           </div>
           <div>
@@ -20290,7 +20202,7 @@ function renderBilling(data) {
       </div>
       <div class="flex justify-between pt-4">
         <span class="font-bold">Total</span>
-        <span class="font-bold text-on-surface-container">${formatRupiah(data.total)}</span>
+        <span class="font-bold text-on-surface">${formatRupiah(data.total)}</span>
       </div>
     </div>
   `;
