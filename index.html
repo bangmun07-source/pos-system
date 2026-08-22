@@ -5673,20 +5673,13 @@
 	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
 	      SETTINGS
 	    </p>
-  	<div class="flex-1"></div>
+ 
 			<button onclick="toggleTheme()"
-			    class="w-10 h-10 rounded-full flex items-center justify-center
-			           bg-surface-container-high hover:bg-surface-container-highest">
-			
-			    <span id="themeIcon">dark_mode</span>
-			
+			    class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+			    <span id="themeIcon" class="material-symbols-outlined">
+						dark_mode
+					</span>
 			</button>
-	    <!-- LOGOUT -->
-	    <button
-	      onclick="logout()"
-	      class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
-	      <span class="material-symbols-outlined">logout</span>
-	    </button>
 	  </div>
 	</header>
 
