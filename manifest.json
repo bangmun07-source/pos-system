@@ -1,26 +1,26 @@
 {
   "id": "/",
-  "name": "SOMMA Pos",
-  "short_name": "SOMMA Pos",
+  "name": "MUNO",
+  "short_name": "MUNO",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0B0F14",
   "theme_color": "#0B0F14",
   "icons": [
     {
-      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMA%202.png",
+      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMA%202.png",
+      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/LOGO%20WHITE%20%20512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-    "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/SOMA%202.png",
+    "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/LOGO%20WHITE%20%20512.png",
     "sizes": "512x512",
     "type": "image/png",
     "purpose": "maskable"
