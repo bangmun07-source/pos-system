@@ -47,120 +47,38 @@
             theme: {
                 extend: {
                     "colors": {
-                        /* =========================
-                           MAIN
-                        ========================= */
-                    
-                        "background": "#101715",
-                        "foreground": "#e0e0e0",
-                    
-                        "surface": "#101715",
-                        "surface-dim": "#101715",
-                        "surface-variant": "#151515",
-                    
-                        /* =========================
-                           TEXT
-                        ========================= */
-                    
-                        "on-background": "#F5F5F5",
-                        "on-surface": "#F5F5F5",
-                        "on-surface-variant": "#787777",
-                    
-                        /* =========================
-                           MUTED / SECONDARY TEXT
-                           ========================= */
-                    
-                        "muted": "#787777",
-                        "muted-foreground": "#555555",
-                    
-                        /* =========================
-                           PRIMARY
-                           ========================= */
-                    
-                        "primary": "#FFC174",
-                        "primary-container": "#F59E0B",
-                    
-                        "on-primary": "#101715",
-                        "on-primary-container": "#0B0F14",
-                    
-                        "primary-fixed": "#FFDBA8",
-                        "primary-fixed-dim": "#FFB95F",
-                    
-                        "inverse-primary": "#855300",
-                    
-                        /* =========================
-                           SECONDARY
-                           ========================= */
-                    
-                        "secondary": "#F0BD82",
-                        "secondary-container": "#62400F",
-                    
-                        "on-secondary": "#101715",
-                        "on-secondary-container": "#F0BD82",
-                    
-                        "secondary-fixed": "#FFDBA8",
-                        "secondary-fixed-dim": "#F0BD82",
-                    
-                        "on-secondary-fixed": "#2A1700",
-                        "on-secondary-fixed-variant": "#62400F",
-                    
-                        /* =========================
-                           TERTIARY
-                           ========================= */
-                    
-                        "tertiary": "#65d4fc",
-                        "tertiary-container": "#1ABDFF",
-                    
-                        "on-tertiary": "#00344A",
-                        "on-tertiary-container": "#004966",
-                    
-                        "tertiary-fixed": "#C5E7FF",
-                        "tertiary-fixed-dim": "#7FD0FF",
-                    
-                        "on-tertiary-fixed": "#001E2D",
-                        "on-tertiary-fixed-variant": "#004C6A",
-                    
-                        /* =========================
-                           SURFACE CONTAINERS
-                           ========================= */
-                    
-                        "surface-container-lowest": "#060E20",
-                        "surface-container-low": "#101419",
-                        "surface-container": "#15191E",
-                        "surface-container-high": "#1C2025",
-                        "surface-container-highest": "#24292F",
-                    
-                        "surface-bright": "#2A3036",
-                    
-                        /* =========================
-                           BORDER / OUTLINE
-                           ========================= */
-                    
-                        "outline": "#555555",
-                        "outline-variant": "#333333",
-                    
-                        /* =========================
-                           ERROR
-                           ========================= */
-                    
-                        "error": "#ff6161",
-                        "error-container": "#93000A",
-                        "on-error": "#690005",
-                        "on-error-container": "#FFDAD6",
-                    
-                        /* =========================
-                           INVERSE
-                           ========================= */
-                    
-                        "inverse-surface": "#F5F5F5",
-                        "inverse-on-surface": "#101715",
-                    
-                        /* =========================
-                           EFFECT
-                           ========================= */
-                    
-                        "surface-tint": "#FFC174"
-                    },
+											"background": "var(--background)",
+											"foreground": "var(--foreground)",
+									
+											"surface": "var(--surface)",
+											"surface-dim": "var(--surface-dim)",
+											"surface-variant": "var(--surface-variant)",
+									
+											"on-background": "var(--on-background)",
+											"on-surface": "var(--on-surface)",
+											"on-surface-variant": "var(--on-surface-variant)",
+									
+											"muted": "var(--muted)",
+											"muted-foreground": "var(--muted-foreground)",
+									
+											/* YANG LAIN TETAP */
+											"primary": "#FFC174",
+											"primary-container": "#F59E0B",
+									
+											"on-primary": "#101715",
+											"on-primary-container": "#0B0F14",
+									
+											"secondary": "#F0BD82",
+											"secondary-container": "#62400F",
+									
+											"tertiary": "#65d4fc",
+									
+											"outline": "var(--outline)",
+											"outline-variant": "var(--outline-variant)",
+									
+											"error": "#ff6161",
+											"error-container": "#93000A"
+									},
                     "borderRadius": {
                         "DEFAULT": "1rem",
                         "lg": "2rem",
@@ -180,6 +98,46 @@
     /* =========================
       TYPOGRAPHY
     ========================= */
+	:root {
+	    --background: #f5f5f5;
+	    --foreground: #101715;
+	
+	    --surface: #ffffff;
+	    --surface-dim: #eeeeee;
+	    --surface-variant: #e5e5e5;
+	
+	    --on-background: #101715;
+	    --on-surface: #101715;
+	    --on-surface-variant: #666666;
+	
+	    --muted: #666666;
+	    --muted-foreground: #888888;
+	
+	    --outline: #d0d0d0;
+	    --outline-variant: #e0e0e0;
+	}
+	
+	.dark {
+	    --background: #101715;
+	    --foreground: #e0e0e0;
+	
+	    --surface: #101715;
+	    --surface-dim: #101715;
+	    --surface-variant: #151515;
+	
+	    --on-background: #F5F5F5;
+	    --on-surface: #F5F5F5;
+	    --on-surface-variant: #787777;
+	
+	    --muted: #787777;
+	    --muted-foreground: #555555;
+	
+	    --outline: #555555;
+	    --outline-variant: #333333;
+	}
+
+
+	
    body {
 	  font-family: 'Poppins', sans-serif !important;
 	  background-color: #101715;
@@ -466,7 +424,7 @@
 
     .category-btn {
 	  background: #101715;
-	  color: #94a3b8;
+	  color: #e0e0e0;
 	}
 	
 	.category-btn:hover {
@@ -5804,6 +5762,14 @@
 	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
 	      SETTINGS
 	    </p>
+  	<div class="flex-1"></div>
+			<button onclick="toggleTheme()"
+			    class="w-10 h-10 rounded-full flex items-center justify-center
+			           bg-surface-container-high hover:bg-surface-container-highest">
+			
+			    <span id="themeIcon">dark_mode</span>
+			
+			</button>
 	    <!-- LOGOUT -->
 	    <button
 	      onclick="logout()"
@@ -12791,17 +12757,11 @@ let rewardData = [];
 let rewardPage = 1;
 const rewardLimit = 5;
 
-      const api = {
-
+const api = {
   products: async (cb) => {
-
-
     const user =
       state.user;
-
-
     let branchFilter = "";
-
 
     // ==========================
     // ACCESS RULE
@@ -12815,7 +12775,6 @@ const rewardLimit = 5;
       branchFilter =
         state.branchId || "ALL";
 
-
     } else {
 
       // admin & kasir tetap branch sendiri
@@ -12823,8 +12782,6 @@ const rewardLimit = 5;
         user.branchId;
 
     }
-
-
 
     // ==================================
     // SUPABASE QUERY (OFF DULU)
@@ -12856,14 +12813,11 @@ const rewardLimit = 5;
 
     */
 
-
-
     // ==================================
     // TEMP DATA VERCEL
     // ==================================
 
     const products = [
-
       {
         id:"P001",
         name:"Es Kopi Susu",
@@ -12871,7 +12825,6 @@ const rewardLimit = 5;
           branchFilter,
         price:10000
       },
-
       {
         id:"P002",
         name:"Matcha Latte",
@@ -12879,21 +12832,51 @@ const rewardLimit = 5;
           branchFilter,
         price:12000
       }
-
     ];
-
-
 
     cb(
       products
     );
-
-
   }
-
 };
 
+function applyTheme() {
+  const theme = localStorage.getItem("theme") || "dark";
 
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+
+  html.classList.toggle("dark");
+
+  const isDark = html.classList.contains("dark");
+
+  localStorage.setItem(
+    "theme",
+    isDark ? "dark" : "light"
+  );
+
+  updateThemeIcon();
+}
+
+function updateThemeIcon() {
+  const icon = document.getElementById("themeIcon");
+
+  if (!icon) return;
+
+  const isDark =
+    document.documentElement.classList.contains("dark");
+
+  icon.textContent =
+    isDark ? "light_mode" : "dark_mode";
+}
+	
 let sidebarOpen = false;
 
 function toggleSidebar() {
@@ -13064,8 +13047,11 @@ function setText(id, value) {
   }
 
 }
+	
+applyTheme();
 
 document.addEventListener("DOMContentLoaded", async () => {
+
   const params =
     new URLSearchParams(
       window.location.search
@@ -13074,6 +13060,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // TENANT
   state.tenantSlug =
     params.get("tenant") || null;
+
   console.log(
     "TENANT SLUG:",
     state.tenantSlug
@@ -13081,23 +13068,29 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // CONNECT TENANT
   if (state.tenantSlug) {
-	  
+
     try {
+
       await connectTenant(
         state.tenantSlug
       );
+
       console.log(
         "TENANT READY:",
         state.tenantSlug
       );
+
     } catch (error) {
+
       console.error(
         "TENANT CONNECTION FAILED:",
         error
       );
+
       alert(
         "Gagal menghubungkan database tenant"
       );
+
       return;
     }
   }
@@ -13112,24 +13105,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function bootApp(
     targetPage = "dashboardPage"
   ) {
+
     const ok =
       restoreSession();
+
     if (!ok) {
-      navigate(
-        "loginPage"
-      );
+      navigate("loginPage");
       return;
     }
+
     const role =
       state.user?.role?.toLowerCase();
-	  
+
     // BRANCH CONTEXT
     if (role === "owner") {
+
       state.branchId =
         localStorage.getItem(
           "pos_branchId"
         ) || "";
+
     } else {
+
       state.branchId =
         state.user?.branchId ||
         localStorage.getItem(
@@ -13137,33 +13134,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         ) ||
         "";
     }
-    console.log(
-      "ROLE:",
-      role,
-      "BRANCH:",
-      state.branchId,
-      "TENANT:",
-      state.tenantSlug
-    );
+
     window.__ACTIVE_PAGE =
       targetPage;
-    navigate(
-      targetPage
-    );
+
+    navigate(targetPage);
+
+    // Tunggu template masuk ke DOM
+    setTimeout(() => {
+      updateThemeIcon();
+    }, 0);
   }
-	
+
   // ROUTING
   if (page) {
+
     window.__ACTIVE_PAGE =
       page;
-    await bootApp(
-      page
-    );
+
+    await bootApp(page);
+
   } else {
+
     await bootApp(
       "dashboardPage"
     );
   }
+
 });
 
 function bootApp(targetPage = "dashboardPage") {
