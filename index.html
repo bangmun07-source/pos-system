@@ -447,7 +447,15 @@
     .active-tab-indicator {
       view-transition-name: active-tab;
     }
-    
+
+	.theme-logo {
+	  filter: brightness(0);
+	}
+	
+	.dark .theme-logo {
+	  filter: brightness(0) invert(1);
+	}
+	    
 </style>
 </head>
 
@@ -2177,7 +2185,7 @@
 								<img
 									id="receiptLogo"
 									src=""
-									class="h-16 w-auto object-contain"
+									class="h-16 w-auto object-contain theme-logo"
 									alt="Business Logo">
 							</div>
 					
