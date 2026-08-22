@@ -14823,11 +14823,17 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   // RENDER + SEND
   const canvas = wrapper.querySelector("#receiptCanvas");
     setTimeout(() => {
-      html2canvas(canvas, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#0B0F14"
-      })
+      const isDark =
+			  document.documentElement.classList.contains("dark");
+			
+			const receiptBackground =
+			  isDark ? "#101715" : "#f5f5f5";
+			
+			html2canvas(canvas, {
+			  scale: 1,
+			  useCORS: true,
+			  backgroundColor: receiptBackground
+			})
       .then(receiptCanvas => {
         const image =
           receiptCanvas.toDataURL(
