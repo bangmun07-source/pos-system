@@ -2542,7 +2542,7 @@
 						 <div id="memberResult" class="absolute left-0 mt-1 w-full max-h-48 overflow-auto rounded-md bg-background border border-outline-variant z-50 custom-scrollbar" style="display:none;"></div>
 					</div>
 					<button onclick="openRedeem()" 
-					  	class="mt-3 w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-outline-variant tracking-wide transition-all">
+					  	class="mt-3 w-full py-2.5 bottom-theme rounded-md flex items-center justify-center gap-2 text-foreground font-headline font-semibold border border-outline-variant tracking-wide transition-all">
 					  <span class="material-symbols-outlined text-sm">redeem</span>
 					  <span class="text-sm">REDEEM</span>
 					</button>
@@ -3094,7 +3094,7 @@
 
       <button
         onclick="saveNewTable()"
-        class="flex-1 h-11 rounded-md bg-primary text-on-primary hover:opacity-90 transition active:scale-95">
+        class="flex-1 h-11 rounded-md bottom-theme text-on-surface transition">
         Add Table
       </button>
     </div>
@@ -4639,8 +4639,8 @@
 	        </button>
 	
 	        <button onclick="submitThreshold()"
-	          class="py-3 rounded-md bottom-theme font-headline font-bold uppercase tracking-[0.20em] text-foreground border border-outline-variant">
-	          Update Threshold
+	          class="py-3 px-3 rounded-md bottom-theme font-headline font-bold uppercase tracking-[0.20em] text-foreground border border-outline-variant">
+	          Update 
 	        </button>
 	      </div>
 	    </div>
@@ -7755,7 +7755,7 @@
 								</div>
 							
       			<div class="flex gap-2">
-							<button id="btnExportExpensePDF" class="flex items-center gap-2 px-4 py-2 bg-background rounded-md border border-outline-variant text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors">
+							<button id="btnExportExpensePDF" class="flex items-center gap-2 px-4 py-2 bottom-theme rounded-md border border-outline-variant text-xs font-bold text-on-surface-variant transition-colors">
 								<span class="material-symbols-outlined text-sm">download</span> Export
 	            </button>
 							
@@ -7865,7 +7865,7 @@
 				</div>
 				
 				<div class="flex gap-2">
-					<button id="btnExportOtherIncomePDF" class="flex items-center gap-2 px-4 py-2 bg-background border border-outline-variant rounded-md text-xs font-bold text-on-surface-variant hover:text-on-surface transition-colors">
+					<button id="btnExportOtherIncomePDF" class="flex items-center gap-2 px-4 py-2 bottom-theme border border-outline-variant rounded-md text-xs font-bold text-on-surface-variant transition-colors">
 						<span class="material-symbols-outlined text-sm">download</span> 
 						Export
 					</button>
@@ -9498,7 +9498,7 @@
 							class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">
 								Discard Changes
 						</button>
-						<!-- EXPORT -->
+			
 						<button
 							id="saveSettingsBtn"
 							class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">
@@ -10515,7 +10515,7 @@
 								class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">
 								Discard Changes
 						</button>
-					<!-- EXPORT -->
+				
 						<button onclick="saveTaxSettings()"
 							class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">
 							<span class="hidden sm:inline">Deploy Settings</span>
@@ -10890,7 +10890,7 @@
         </span>
       </div>
     </div>
-    <!-- EXPORT -->
+ 
     <div class="flex flex-col gap-2">
       <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted ">
         Export
@@ -17136,7 +17136,7 @@ function showRedeemPopup(data) {
               class="
                   mt-4
                   w-full
-                  h-11
+                  h-10
                   rounded-md
                   transition
                   active:scale-95
@@ -17144,9 +17144,8 @@ function showRedeemPopup(data) {
                   ${
                       canRedeem
                       ? `
-                      bg-primary
-                      text-background
-                      hover:brightness-110
+                      bottom-theme
+                      text-on-surface
                       `
                       : `
                       bg-background-high
