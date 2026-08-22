@@ -413,24 +413,24 @@
     }
 
     .btn-active {
-      background-color: #f59e0b !important;
-      color: #0b1326 !important;
-      border-color: #f59e0b !important;
-    }
-
-    .btn-active span {
-      color: #0b1326 !important;
-    }
-
-    .btn-inactive {
-      background-color: transparent !important;
-      border: 1px solid rgba(255, 255, 255, 0.1) !important;
-      color: #dae2fd !important;
-    }
-
-    .btn-inactive:hover {
-      background-color: rgba(255, 255, 255, 0.05) !important;
-    }
+		  background-color: var(--foreground) !important;
+		  color: var(--background) !important;
+		  border-color: var(--foreground) !important;
+		}
+		
+		.btn-active span {
+		  color: var(--background) !important;
+		}
+		
+		.btn-inactive {
+		  background-color: transparent !important;
+		  border: 1px solid var(--outline-variant) !important;
+		  color: var(--on-surface-variant) !important;
+		}
+		
+		.btn-inactive:hover {
+		  background-color: var(--surface-variant) !important;
+		}
 
     /* =========================
       COMPONENTS
@@ -570,7 +570,7 @@
 	        </div>
 	
 	        <!-- INFO BOX -->
-	        <div class="p-4 rounded-md bottom-theme border border-outline-variant flex gap-3">
+	        <div class="p-4 rounded-md border border-outline-variant flex gap-3">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            verified_user
 	          </span>
@@ -3979,7 +3979,7 @@
 			
 			<div class="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
 			  <button onclick="exportInventoryPDF()" 
-					class="bg-background px-5 py-2.5 rounded-md text-xs font-bold text-on-surface h-[30px] border border-outline-variant hover:bg-outline-variant transition-all flex items-center gap-2">
+					class="bg-background px-5 py-2.5 bottom-theme rounded-md text-xs font-bold text-on-surface h-[30px] border border-outline-variant transition-all flex items-center gap-2">
 					<span class="material-symbols-outlined text-sm lg:text-base">
 						file_download
 					</span>
@@ -3987,7 +3987,7 @@
 			  </button>
 			
 			  <button  onclick="openStockInModal()" 
-					class="rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs hover:text-on-surface px-5 py-2.5 h-[30px] flex items-center gap-2 active:scale-95 transition">
+					class="rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs px-5 py-2.5 h-[30px] flex items-center gap-2 active:scale-95 transition">
 			    <span class="material-symbols-outlined text-sm lg:text-base sm:text-lg">move_to_inbox</span>
 			    	Stock In
 			  </button>
@@ -4098,7 +4098,7 @@
 			
       <div class="flex gap-2">
         <button onclick="exportRecipeReport()"
-          class="bg-background px-5 py-2.5 rounded-md text-xs font-bold text-on-surface h-[30px] border border-outline-variant hover:bg-outline-variant transition-all flex items-center gap-2">
+          class="bg-background px-5 py-2.5 bottom-theme rounded-md text-xs font-bold text-on-surface h-[30px] border border-outline-variant transition-all flex items-center gap-2">
           <span class="material-symbols-outlined text-sm lg:text-base">
             file_download
           </span>
@@ -4381,7 +4381,7 @@
           </h2>
 
           <div class="flex items-center gap-2 mt-1">
-            <span class="w-2 h-2 rounded-md bg-on-surface shadow-[0_0_10px_#f59e0b]"></span>
+            <span class="w-2 h-2 rounded-md bg-on-surface"></span>
             <span class="text-xs uppercase tracking-wider text-on-surface-variant">
               Current Stock:
               <span id="modalStockText" class="text-on-surface-variant font-semibold"></span>
@@ -5092,7 +5092,7 @@
     <!-- FOOTER -->
     <footer class="px-8 py-6 flex gap-4 bg-background border-t border-outline-variant">
       <button onclick="closeRecipeMasterModal()"
-        class="flex-1 py-3 rounded-md border border-outline-variant/20 text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-all">
+        class="flex-1 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-all">
         Discard Changes
       </button>
 
@@ -5374,7 +5374,7 @@
 		
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 			<!-- Active Members KPI -->
-			<div class="bg-background p-6 rounded-md border border-outline-variant group relative overflow-hidden">
+			<div class="bg-background p-6 rounded-md border border-outline-variant group relative overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 					<div class="absolute right-6 p-5 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-110">
 						<span class="material-symbols-outlined text-[150px] animate-float">
 							workspace_premium
@@ -5393,7 +5393,7 @@
 						</p>
 					</div>
 					<!-- Active Members List -->
-					<div class="bg-background p-6 rounded-md border border-outline-variant flex flex-col">
+					<div class="bg-background p-6 rounded-md border border-outline-variant flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 						<p class="text-xs uppercase tracking-widest text-muted  mb-3">
 							Active Members List
 						</p>				
@@ -5401,7 +5401,7 @@
 						<div id="activeMemberList"
 								 class="space-y-2 overflow-y-auto max-h-40 pr-2 custom-scrollbar">		
 							<!-- sample item -->
-							<div class="flex items-center gap-3 p-2 rounded-md bg-outline-variant hover:bg-outline-variant/10 transition">
+							<div class="flex items-center gap-3 p-2 rounded-md hover:bg-outline-variant/10 transition">
 								<div class="w-8 h-8 rounded-md bg-outline-variant/10 border border-white/5 flex items-center justify-center text-xs font-bold text-on-surface">
 									GM
 								</div>
@@ -5415,56 +5415,54 @@
 				</div>
 				<!-- Hero Stats: Bento Grid -->
 				<div class="grid grid-cols-12 gap-4">
-					<!-- Large Net Profit Card -->
-					<div class="col-span-12 lg:col-span-8 p-8 bg-background rounded-md relative overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-						<div class="relative z-10">
-							<div class="flex justify-between items-start mb-6">
-								<div>
-									<h3 class="text-xs font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1">Net Profit</h3>
-									<p id="netProfitValue" class="font-headline text-5xl font-extrabold text-on-surface tracking-tight">IDR 0</p>
+						<!-- Large Net Profit Card -->
+						<div class="col-span-12 lg:col-span-8 p-8 bg-background rounded-md relative overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+							<div class="relative z-10">
+								<div class="flex justify-between items-start mb-6">
+									<div>
+										<h3 class="text-xs font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-1">Net Profit</h3>
+										<p id="netProfitValue" class="font-headline text-5xl font-extrabold text-on-surface tracking-tight">IDR 0</p>
+									</div>
+			
+									<div class="flex items-center gap-2 px-3 py-1 bottom-theme text-on-surface rounded-md">
+										<span class="material-symbols-outlined text-sm">trending_up</span>
+										<span id="growthValue" class="text-xs font-bold">0% vs last period</span>
+									</div>
 								</div>
-		
-								<div class="flex items-center gap-2 px-3 py-1 bottom-theme text-on-surface rounded-md">
+								<!-- Visual representation of trend graph -->
+								<div id="weeklyChart" class="h-48 w-full mt-8 flex items-end gap-1">
+								</div>
+								<div class="flex justify-between mt-4 text-[10px] text-muted  uppercase tracking-widest font-bold">
+									<span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span>
+								</div>
+							</div>	
+							<div class="mt-3 grid grid-cols-2 lg:grid-cols-5 gap-4">		
+								<!-- Revenue -->
+								<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
 									<span class="material-symbols-outlined text-sm">trending_up</span>
-									<span id="growthValue" class="text-xs font-bold">0% vs last period</span>
+									<span id="revenueValue" class="text-xs font-bold">Revenue: IDR 0</span>
+								</div>					
+								<!-- HPP -->
+								<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
+									<span class="material-symbols-outlined text-sm">shopping_cart</span>
+									<span id="hppValue" class="text-xs font-bold">HPP: IDR 0</span>
+								</div>			
+								<!-- Net Profit -->
+								<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
+									<span class="material-symbols-outlined text-sm">finance</span>
+									<span id="grossProfitValue" class="text-xs font-bold">Gross Profit: IDR 0</span>
 								</div>
+								<!-- Expenses -->
+								<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
+									<span class="material-symbols-outlined text-sm">settings</span>
+									<span id="opsValue" class="text-xs font-bold">Expense: IDR 0</span>
+								</div>					
+								<!-- Other Income -->
+								<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
+									<span class="material-symbols-outlined text-sm">finance</span>
+									<span id="otherincometValue" class="text-xs font-bold">Other Income: IDR 0</span>
+								</div>					
 							</div>
-							<!-- Visual representation of trend graph -->
-							<div id="weeklyChart" class="h-48 w-full mt-8 flex items-end gap-1">
-							</div>
-							<div class="flex justify-between mt-4 text-[10px] text-muted  uppercase tracking-widest font-bold">
-								<span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span>
-							</div>
-						</div>	
-						<div class="mt-3 grid grid-cols-2 lg:grid-cols-5 gap-4">		
-							<!-- Revenue -->
-							<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
-								<span class="material-symbols-outlined text-sm">trending_up</span>
-								<span id="revenueValue" class="text-xs font-bold">Revenue: IDR 0</span>
-							</div>					
-							<!-- HPP -->
-							<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
-								<span class="material-symbols-outlined text-sm">shopping_cart</span>
-								<span id="hppValue" class="text-xs font-bold">HPP: IDR 0</span>
-							</div>			
-							<!-- Net Profit -->
-							<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
-								<span class="material-symbols-outlined text-sm">finance</span>
-								<span id="grossProfitValue" class="text-xs font-bold">Gross Profit: IDR 0</span>
-							</div>
-							<!-- Expenses -->
-							<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
-								<span class="material-symbols-outlined text-sm">settings</span>
-								<span id="opsValue" class="text-xs font-bold">Expense: IDR 0</span>
-							</div>					
-							<!-- Other Income -->
-							<div class="flex items-center gap-2 px-3 py-1 bg-outline-variant/10 text-on-surface border border-outline-variant rounded-md">
-								<span class="material-symbols-outlined text-sm">finance</span>
-								<span id="otherincometValue" class="text-xs font-bold">Other Income: IDR 0</span>
-							</div>					
-						</div>
-						<!-- Background accent -->
-						<div class="absolute top-0 right-0 w-64 h-64 bottom-theme rounded-md blur-[100px] -mr-32 -mt-32"></div>
 						</div>
 						<!-- Payment Channel Donut Chart -->
 						<div class="col-span-12 lg:col-span-4 p-8 bg-background rounded-md relative overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex flex-col justify-between h-full">
@@ -12161,7 +12159,7 @@
 									class="mt-2 w-full bg-background border border-outline-variant rounded-md p-4 text-on-surface resize-none focus:ring-1 focus:ring-primary"></textarea>
 							</div>
 		          <!-- STATUS BOX -->
-		          <div class="p-4 rounded-md bottom-theme border border-outline-variant flex justify-between items-center">
+		          <div class="p-4 rounded-md border border-outline-variant flex justify-between items-center">
 		            <div>
 		              <p class="font-medium text-on-surface">
 		                Active Status
@@ -12178,16 +12176,23 @@
 			                class="sr-only peer"
 			                type="checkbox">
 
-			              <div class="cursor-pointer w-11 h-6 bg-background rounded-md relative border border-outline-variant 
-											peer peer-checked:bg-outline-variant
-											after:content-[''] 
-											after:absolute after:top-[2px] after:left-[2px] 
-											after:h-5 after:w-5 after:rounded-md
-											after:bg-outline-variant 
-											after:transition-all
-			                peer-checked:after:translate-x-full
-			                peer-checked:after:bg-background">
-		              </div>
+			              <div class="cursor-pointer w-11 h-6
+										  bg-on-surface-variant
+										  rounded-md relative
+										  border border-outline-variant
+										  peer
+										  peer-checked:bg-foreground
+										  after:content-['']
+										  after:absolute
+										  after:top-[2px]
+										  after:left-[2px]
+										  after:h-5
+										  after:w-5
+										  after:rounded-md
+										  after:bg-background
+										  after:transition-all
+										  peer-checked:after:translate-x-full">
+									</div>
 		            </label>
 		          </div>
 		        </form>
