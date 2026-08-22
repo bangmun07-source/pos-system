@@ -4015,7 +4015,7 @@
 					</tr>
 				</thead>
 				
-				<tbody id="ingredientsTable" class="divide-y divide-outline-variant/10">
+				<tbody id="ingredientsTable" class="divide-y divide-outline-variant">
 			    <tr>
 			      <td colspan="8" class="text-center text-muted ">
 			        Loading...
@@ -4065,7 +4065,7 @@
 					</tr>
 				</thead>
 				
-				<tbody id="suppliersTable" class="divide-y divide-outline-variant/10">
+				<tbody id="suppliersTable" class="divide-y divide-outline-variant">
 			    <tr>
 			      <td colspan="6" class="text-center text-muted ">
 			        Loading...
@@ -4130,7 +4130,7 @@
 					</tr>
 				</thead>
 				
-				<tbody id="recipesTable" class="divide-y divide-outline-variant/10">
+				<tbody id="recipesTable" class="divide-y divide-outline-variant">
 			    <tr>
 			      <td colspan="8" class="text-center text-muted ">
 			        Loading...
@@ -4721,7 +4721,7 @@
 
     <!-- TABLE -->
     <div class="flex-1 px-8 overflow-y-auto custom-scrollbar">
-      <div class="bg-background/50 rounded-md overflow-hidden border border-outline-variant">
+      <div class="bg-background rounded-md overflow-hidden border-b border-outline-variant">
         <table class="w-full text-left">
           <thead class="sticky top-0 bg-background">
             <tr>
@@ -5062,7 +5062,7 @@
 
       <!-- HISTORY -->
       <section id="content-history" class="hidden">
-        <div class="rounded-md overflow-hidden border border-outline-variant bg-background/50">
+        <div class="rounded-md overflow-hidden border border-outline-variant bg-background">
           <div class="max-h-[350px] overflow-y-auto custom-scrollbar">
             <table class="w-full text-left">
               <thead class="bg-background border border-outline-variant">
@@ -5075,7 +5075,7 @@
               </thead>
 
               <tbody id="recipePriceHistoryTable"
-                class="divide-y divide-outline-variant/10">
+                class="divide-y divide-outline-variant">
               </tbody>
             </table>
           </div>
@@ -5937,7 +5937,7 @@
 					Business Logo
 				</label>
 
-				<div class="flex flex-col items-center justify-center border border-outline-variant rounded-md p-6 bg-background/50">
+				<div class="flex flex-col items-center justify-center border border-outline-variant rounded-md p-6 bg-background">
 					<div class="w-32 h-32 rounded-full overflow-hidden bg-outline-variant mb-4 border border-outline-variant">
 						<img src="" 
 							id="businessLogoPreview" 
@@ -8752,7 +8752,7 @@
 		</div>
 	</div>
 	<!-- Preview -->
-	<div class="p-5 bg-background/50 rounded-md border border-outline-variant">
+	<div class="p-5 bg-background rounded-md border border-outline-variant">
 		<div class="flex items-center justify-between">
 			<div>
 				<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
@@ -8882,7 +8882,7 @@
 						</div>
 					</div>
 					<!-- Amount Input (Highlight Section) -->
-					<div class="p-6 bg-background/50 rounded-md border border-outline-variant">
+					<div class="p-6 bg-background rounded-md border border-outline-variant">
 						<div class="flex items-center justify-between">
 							<label class="block font-label text-sm font-semibold font-headline text-on-surface uppercase tracking-widest">Amount (IDR)</label>
 							<span class="text-xs text-on-surface-variant">CURRENCY CODE: IDR</span>
@@ -26426,21 +26426,20 @@ function renderBranchTable(){
               ${String(b.status).toUpperCase() === "ACTIVE" ? "checked" : ""}
               onchange="toggleBranchStatus('${b.branchId}', this.checked)">
 
-            <div class="w-10 h-5 bg-background border border-outline-variant rounded-md
-              peer
-              peer-checked:bg-outline-variant
-              after:content-['']
-              after:absolute
-              after:top-0.5
-              after:left-[2px]
-              after:bg-background
-              after:rounded-md
-              after:h-4
-              after:w-4
-              after:transition-all
-							peer-checked:bg-background
-              peer-checked:after:translate-x-full">
-            </div>
+            <div class="w-10 h-5 bg-on-surface-variant border border-outline-variant rounded-md
+						  peer
+						  peer-checked:bg-foreground
+						  after:content-['']
+						  after:absolute
+						  after:top-0.5
+						  after:left-[2px]
+						  after:bg-background
+						  after:rounded-md
+						  after:h-4
+						  after:w-4
+						  after:transition-all
+						  peer-checked:after:translate-x-full">
+						</div>
           </label>
         </td>
 
