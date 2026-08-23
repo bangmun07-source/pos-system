@@ -711,48 +711,42 @@
 	<div id="mainContent"
 	  	 class="flex-1 flex flex-col h-screen">
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-4 pr-8">	
-	  <div class="flex w-full items-center justify-between">	
-	   <div class="flex items-center gap-5 flex-1">
-		    <div class="flex items-center gap-5">
-		        <img 
-		            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-		            class="w-11 h-11 object-contain" >
-		        <span class="h-7 w-px bg-white/20"></span>
+		<div class="flex w-full items-center justify-between">	
+			<div class="flex items-center gap-5 flex-1">
+				<div class="flex items-center gap-5">
+					<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+						class="w-11 h-11 object-contain" >
+					
+						<span class="h-7 w-px bg-white/20"></span>
 		
-		        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
-		            MUNO
-		        </p>
+						<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+								MUNO
+						</p>
+					</div>
+				</div>
+	
+		    <div class="flex items-center gap-4">
+		      <div class="flex items-center gap-3">
+		        <div class="hidden sm:block text-right">
+		          <p id="appBrandName" class="text-sm font-bold text-muted leading-none">	          
+		          </p>
+		
+		          <p class="text-[10px] text-muted ont-semibold tracking-[0.2em] uppercase mt-1">
+		             <span id="headerUsername"></span>
+		          </p>	
+		        </div>
+		      </div>	     
+		
+		      <div class="h-8 w-px bg-outline-variant"></div>
+		      <button class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
+		        			onclick="navigate('settingsPage')">
+		        <span class="material-symbols-outlined">
+		          settings
+		        </span>
+		      </button>
 		    </div>
-		</div>
-	
-	    <!-- RIGHT -->
-	    <div class="flex items-center gap-4">
-	      <!-- BRAND -->
-	      <div class="flex items-center gap-3">
-	        <div class="hidden sm:block text-right">
-	
-	          <p id="appBrandName" class="text-sm font-bold text-muted leading-none">	          
-	          </p>
-	
-	          <p class="text-[10px] text-muted ont-semibold tracking-[0.2em] uppercase mt-1">
-	             <span id="headerUsername"></span>
-	          </p>	
-	        </div>
-	      </div>	     
-	
-	      <!-- DIVIDER -->
-	      <div class="h-8 w-px bg-outline-variant"></div>
-	
-	      <!-- SETTINGS -->
-	      <button class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
-	        			onclick="navigate('settingsPage')">
-	        <span class="material-symbols-outlined">
-	          settings
-	        </span>
-	      </button>
-	    </div>
-	  </div>
-	</header>
+		  </div>
+		</header>
 		
 	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
 		
@@ -1086,13 +1080,16 @@
 
 <div id="mainContent" class="flex-1 flex flex-col h-screen">	
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
-	  <div class="flex items-center gap-4">
-	    <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	      class="w-10 h-10 object-contain">
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      GROSS REVENUE
-	    </p>
-	  </div>
+		<div class="flex items-center gap-4">
+			<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+		      class="w-11 h-11 object-contain" >
+		
+		  <span class="h-7 w-px bg-white/20"></span>
+		
+			<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+					MUNO
+			</p>
+		</div>
 	</header>
 	
 <!-- Main Content Area -->
@@ -1535,16 +1532,17 @@
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
 	  <div class="flex items-center gap-4">
 	    <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	      class="w-10 h-10 object-contain">
-	
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	     RECENT TRANSACTIONS
+	      class="w-11 h-11 object-contain" >
+			
+			<span class="h-7 w-px bg-white/20"></span>
+			
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	     	MUNO
 	    </p>
 	  </div>
 	</header>
 <!-- Scrollable Content Area -->
 <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-<!-- Page Header & Stats -->
 <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
 			<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 				<img
@@ -2427,65 +2425,67 @@
   class="flex-1 flex flex-col h-screen">
 <!-- Left: Menu Grid Section -->
 <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
-  <!-- LEFT -->
   <div class="flex items-center gap-4 flex-1">
-	<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	  class="w-10 h-10 object-contain">
-	<p class="text-xl text-muted font-medium headline-font tracking-wider">
-	  POS
-	</p>
+		<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+		  class="w-11 h-11 object-contain" >
+			
+			<span class="h-7 w-px bg-white/20"></span>
+			
+			<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+			  MUNO
+			</p>
+		
+	    <!-- SEARCH -->
+	    <div class="relative w-full max-w-xl">
+	      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
+	        search
+	      </span>
 	
-    <!-- SEARCH -->
-    <div class="relative w-full max-w-xl">
-      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
-        search
-      </span>
-
-      <input id="searchInput"
-        class="w-full bg-transparent border border-outline-variant rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
-        placeholder="Search menu..."
-        type="text"/>
-    </div>
-  </div>
-
-  <!-- RIGHT -->
-  <div class="flex items-center gap-4 ml-8">
-    <div class="relative">
-        <button onclick="toggleNotification()"
-          class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
-          <span class="material-symbols-outlined">notifications</span>
-
-          <!-- BADGE -->
-          <div id="notificationBadge"
-            class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px] px-1 rounded-md bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-            0
-          </div>
-        </button>
-
-        <!-- DROPDOWN -->
-        <div id="notificationDropdown"
-          class="hidden absolute right-0 top-12 w-80 bg-background rounded-md shadow-2xl overflow-hidden z-50">
-          <div class="p-4 border-b border-outline-variant">
-            <h3 class="font-bold text-xs lg:text-sm text-on-surface">
-            Notifications
-            </h3>
-          </div>
-
-          <div id="notificationList" class="max-h-96 overflow-y-auto custom-scrollbar">
-            <div class="p-4 text-xs lg:text-sm text-on-surface-variant">
-              No Notifications Today
-            </div>
-          </div>
-        </div>
-      </div>
-    <button onclick="toggleBillingSidebar('pos')"
-   		class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
-	    <span class="material-symbols-outlined">
-	      shopping_cart
-	    </span>
- 		</button>
-  </div>
-</header>
+	      <input id="searchInput"
+	        class="w-full bg-transparent border border-outline-variant rounded-md pl-12 pr-4 py-3 text-sm focus:ring-2 focus:ring-primary-container transition-all"
+	        placeholder="Search menu..."
+	        type="text"/>
+	    </div>
+	  </div>
+	
+	  <!-- RIGHT -->
+	  <div class="flex items-center gap-4 ml-8">
+	    <div class="relative">
+	        <button onclick="toggleNotification()"
+	          class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
+	          <span class="material-symbols-outlined">notifications</span>
+	
+	          <!-- BADGE -->
+	          <div id="notificationBadge"
+	            class="hidden absolute -top-0 -right-1 min-w-[10px] h-[10px] px-1 rounded-md bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+	            0
+	          </div>
+	        </button>
+	
+	        <!-- DROPDOWN -->
+	        <div id="notificationDropdown"
+	          class="hidden absolute right-0 top-12 w-80 bg-background rounded-md shadow-2xl overflow-hidden z-50">
+	          <div class="p-4 border-b border-outline-variant">
+	            <h3 class="font-bold text-xs lg:text-sm text-on-surface">
+	            Notifications
+	            </h3>
+	          </div>
+	
+	          <div id="notificationList" class="max-h-96 overflow-y-auto custom-scrollbar">
+	            <div class="p-4 text-xs lg:text-sm text-on-surface-variant">
+	              No Notifications Today
+	            </div>
+	          </div>
+	        </div>
+	      </div>
+	    <button onclick="toggleBillingSidebar('pos')"
+	   		class="w-11 h-11 rounded-md flex items-center justify-center text-on-surface-variant hover:text-foreground transition-all">
+		    <span class="material-symbols-outlined">
+		      shopping_cart
+		    </span>
+	 		</button>
+	  </div>
+	</header>
 <main class="flex-1 overflow-y-auto flex h-screen overflow-hidden relative pl-14 ">
 	<section id="productSection" class="relative w-full pl-8 mx-auto md:px-2 lg:px-2 flex flex-col transition-all duration-300">
 		<!-- Category Chips -->
@@ -2935,18 +2935,19 @@
 <!-- Top Navigation Bar -->
 <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex justify-between items-center flex items-center pl-4 pr-4">
 	<div class="flex items-center gap-3 flex-1">
-		<!-- LOGO -->
 		<div class="w-11 h-11 flex items-center justify-center">
 			<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-				class="w-9 h-9 object-contain" >
+				class="w-11 h-11 object-contain" >
 		</div>
-		<!-- NAMA -->
-		<p class="text-xl text-muted font-medium headline-font tracking-wider">
-			TABLE
+
+		<span class="h-7 w-px bg-white/20"></span>
+
+		<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+			MUNO
 		</p>
 	</div>
 	
-	<div class="flex items-center gap-4 border-r border-outline-variant/20 ">
+	<div class="flex items-center gap-4">
 	  <button  class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
 	    onclick="navigate('settingsPage')" >
 	    <span class="material-symbols-outlined">settings</span>
@@ -3217,11 +3218,13 @@
 			<!-- LOGO -->
 			<div class="w-11 h-11 flex items-center justify-center">
 				<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-					class="w-9 h-9 object-contain" >
+					class="w-11 h-11 object-contain" >
 			</div>
-			<!-- NAMA -->
-			<p class="text-xl text-muted font-medium headline-font tracking-wider">
-				MEMBERS
+
+			<span class="h-7 w-px bg-white/20"></span>
+
+			<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+				MUNO
 			</p>
 		</div>
 
@@ -3842,12 +3845,13 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	        class="w-9 h-9 object-contain">
+	        class="w-11 h-11 object-contain" >
 	    </div>
-	
-	    <!-- NAMA -->
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      INVENTORY
+			
+			<span class="h-7 w-px bg-white/20"></span>
+	  
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	      MUNO
 	    </p>
 	
 	    <!-- LOGOUT -->
@@ -5293,12 +5297,13 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	        class="w-9 h-9 object-contain">
+	        class="w-11 h-11 object-contain" >
 	    </div>
 	
-	    <!-- NAMA -->
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      ANALYTICS
+	    <span class="h-7 w-px bg-white/20"></span>
+			
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	      MUNO
 	    </p>
 	
 	    <!-- LOGOUT -->
@@ -5698,11 +5703,13 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	        class="w-9 h-9 object-contain">
+	        class="w-11 h-11 object-contain" >
 	    </div>
-	    <!-- NAMA -->
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      SETTINGS
+			
+			<span class="h-7 w-px bg-white/20"></span>
+			
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	      MUNO
 	    </p>
  
 			<button onclick="toggleTheme()"
@@ -6519,11 +6526,14 @@
 			<!-- LOGO -->
 			<div class="w-11 h-11 flex items-center justify-center">
 				<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-					class="w-9 h-9 object-contain" >
+					class="w-11 h-11 object-contain" >
 			</div>
+
+			<span class="h-7 w-px bg-white/20"></span>
+			
 			<!-- NAMA -->
-			<p class="text-xl text-muted font-medium headline-font tracking-wider">
-				DOCUMENTATION
+			<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+				MUNO
 			</p>
 		</div>
 	</header>
@@ -6897,11 +6907,13 @@
 			<!-- LOGO -->
 			<div class="w-11 h-11 flex items-center justify-center">
 				<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-					class="w-9 h-9 object-contain" >
+					class="w-11 h-11 object-contain" >
 			</div>
-			<!-- NAMA -->
-			<p class="text-xl text-muted font-medium headline-font tracking-wider">
-				PRIVACY POLICY
+
+			<span class="h-7 w-px bg-white/20"></span>
+			
+			<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+				MUNO
 			</p>
 		</div>
 	</header>
@@ -7153,11 +7165,13 @@
 				<!-- LOGO -->
 				<div class="w-11 h-11 flex items-center justify-center">
 					<img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-						class="w-9 h-9 object-contain" >
+						class="w-11 h-11 object-contain" >
 				</div>
-				<!-- NAMA -->
-				<p class="text-xl text-muted font-medium headline-font tracking-wider">
-					LICENSE AGREEMENT
+
+				<span class="h-7 w-px bg-white/20"></span>
+				
+				<p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+					MUNO
 				</p>
 			</div>
 		</header>
@@ -7581,12 +7595,13 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	        class="w-9 h-9 object-contain">
+	        class="w-11 h-11 object-contain" >
 	    </div>
+
+			<span class="h-7 w-px bg-white/20"></span>
 	
-	    <!-- NAMA -->
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      EXPENSES & OTHER INCOME
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	      MUNO
 	    </p>
 	
 	    <!-- LOGOUT -->
@@ -9446,19 +9461,17 @@
 <div id="mainContent" class="flex-1 flex flex-col h-screen">
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8">
 	  <div class="flex items-center gap-3 flex-1">
-	
-	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	        class="w-9 h-9 object-contain">
+	        class="w-11 h-11 object-contain" >
 	    </div>
-	
-	    <!-- NAMA -->
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      LOYALTY MEMBERS
+
+			<span class="h-7 w-px bg-white/20"></span>
+	   
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	      MUNO
 	    </p>
 	
-	    <!-- LOGOUT -->
 	    <button
 	      onclick="logout()"
 	      class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
@@ -9469,7 +9482,6 @@
 	</header>
 		<!-- Page Content Scroll Container -->
 	<main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-		<!-- Hero Action Section -->
 		<section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
 			<div class="absolute inset-0 flex items-center justify-center overflow-hidden">
 				<img
@@ -10462,16 +10474,15 @@
 <div id="mainContent" class="flex-1 flex flex-col h-screen">
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8">
 	  <div class="flex items-center gap-3 flex-1">
-	
-	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	        class="w-9 h-9 object-contain">
+	        class="w-11 h-11 object-contain" >
 	    </div>
-	
-	    <!-- NAMA -->
-	    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-	      TAXES & FEES
+			
+			<span class="h-7 w-px bg-white/20"></span>
+
+	    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+	      MUNO
 	    </p>
 	
 	    <!-- LOGOUT -->
@@ -10789,9 +10800,12 @@
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
 	  <div class="flex items-center gap-3 flex-1">
 	    <img src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
-	      class="w-10 h-10 object-contain">
-		    <p class="text-xl text-muted font-medium headline-font tracking-wider">
-		      CASH FLOW
+	      class="w-11 h-11 object-contain" >
+
+				<span class="h-7 w-px bg-white/20"></span>			
+			
+		    <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+		      MUNO
 		    </p>
  		</div>
 	
