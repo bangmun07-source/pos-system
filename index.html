@@ -715,7 +715,7 @@
 			<div class="flex items-center gap-5 flex-1">
 				<div class="flex items-center gap-5">
 					<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 			
@@ -1084,7 +1084,7 @@
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
 		<div class="flex items-center gap-5">
 			<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 		
@@ -1536,7 +1536,7 @@
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
 	  <div class="flex items-center gap-5">
 	    <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 			
@@ -2203,7 +2203,8 @@
 <template id="receiptTemplate">
 	
 	<main id="receiptMainWrapper" class="pt-20 pb-20 px-4 md:px-0 flex justify-center items-start min-h-screen">
-		<article id="receiptCanvas" class="receipt-canvas w-full max-w-xl bg-background rounded-md overflow-hidden relative">
+		<article id="receiptCanvas" class="receipt-canvas w-full max-w-xl rounded-md overflow-hidden relative"
+			style="background:#101715; color:#F5F5F5;">
 				<div id="receiptContentWrapper" class="relative p-8 md:p-12">
 					<header id="receiptHeroSection" class="relative -mx-8 md:-mx-12 -mt-8 md:-mt-4 mb-4 overflow-hidden rounded-t-lg">
 						<div id="receiptHeroContent"
@@ -2219,10 +2220,10 @@
 							</div>
 					
 							<h1 id="receiptTitle"
-								class="font-display font-bold text-2xl tracking-tight text-on-surface mb-2 drop-shadow-lg">
+								class="font-display font-bold text-2xl tracking-tight text-[#e0e0e0] mb-2 drop-shadow-lg">
 							</h1>
 					
-							<p class="font-label text-xs uppercase tracking-[0.2em] font-headline text-on-surface-variant font-semibold drop-shadow-md">
+							<p class="font-label text-xs uppercase tracking-[0.2em] font-headline text-[#787777] font-semibold drop-shadow-md">
 								Digital Receipt
 							</p>
 						</div>
@@ -2232,15 +2233,15 @@
 					<section id="receiptMetaSection" class="grid grid-cols-2 gap-4 mb-10">
 				    <!-- Order ID -->
 				    <div class="p-5 relative overflow-hidden rounded-md border border-outline-variant col-span-2">
-							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+							<p id="receiptOrderCard" class="text-[10px] uppercase tracking-widest text-[#787777] font-bold mb-1">
 									Order ID
 							</p>
-							<p id="receiptId" class="font-display font-light text-xs text-on-surface"></p>
+							<p id="receiptId" class="font-display font-light text-xs text-[#e0e0e0]"></p>
 				    </div>
 				
 				    <!-- Date -->
 				    <div id="receiptDateCard" class="p-5 relative overflow-hidden rounded-md border border-outline-variant">
-							<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+							<p class="text-[10px] uppercase tracking-widest text-[#787777] font-bold mb-1">
 									Date
 							</p>
 							<p id="receiptDate" class="font-display font-bold text-xs"></p>
@@ -2249,14 +2250,14 @@
 				    <!-- Table -->
 				    <div id="receiptTableCard" class="p-5 relative overflow-hidden rounded-md border border-outline-variant flex justify-between items-center">
 							<div>
-								<p class="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+								<p class="text-[10px] uppercase tracking-widest text-[#787777] font-bold mb-1">
 										Table
 								</p>
 								<p id="receiptTable" class="font-display font-bold text-lg"></p>
 							</div>
 				
 							<span id="receiptTableIcon"
-										class="material-symbols-outlined text-on-surface-variant opacity-50">
+										class="material-symbols-outlined text-[#787777] opacity-50">
 									restaurant
 							</span>
 				    </div>
@@ -2276,40 +2277,40 @@
 			<section id="receiptFinancialSection" class="p-8 relative overflow-hidden rounded-md border border-outline-variant">
 				<div id="receiptFinancialBreakdown" class="space-y-4 mb-8">
 					<div class="flex justify-between text-sm">
-						<span class="text-on-surface-variant">Subtotal</span>
+						<span class="text-[#787777]">Subtotal</span>
 						<span id="receiptSubtotal" class="font-medium"></span>
 					</div>
-				<div class="flex justify-between text-sm text-on-surface">
+				<div class="flex justify-between text-sm text-[#e0e0e0]]">
 					<span class="font-medium italic">Discount</span>
 					<span id="receiptDiscount" class="font-medium"></span>
 				</div>
 				<div class="flex justify-between text-sm">
-					<span class="text-on-surface-variant">VAT </span>
+					<span class="text-[#787777]">VAT </span>
 					<span id="receiptTax" class="font-medium"></span>
 				</div>
 				<div class="flex justify-between text-sm">
-					<span class="text-on-surface-variant">Service </span>
+					<span class="text-[#787777]">Service </span>
 					<span id="receiptService" class="font-medium"></span>
 				</div>
 			</div>
 			<div id="receiptGrandTotalWrapper" class="pt-6 border-t border-outline-variant flex justify-between items-center">
-				<p class="font-label text-sm uppercase tracking-[0.20em] font-headline font-semibold text-on-surface">Amount</p>
-				<p id="receiptTotal" class="font-display font-bold font-headline text-xl text-on-surface tracking-tight"></p>
+				<p class="font-label text-sm uppercase tracking-[0.20em] font-headline font-semibold text-[#e0e0e0]">Amount</p>
+				<p id="receiptTotal" class="font-display font-bold font-headline text-xl text-[#e0e0e0] tracking-tight"></p>
 			</div>
 		</section>
 	
 		<footer id="receiptFooterSection" class="text-center pt-4">
 			<div class="space-y-6">
-				<p id="receiptFooterText" class="font-display font-medium text-lg text-on-surface italic px-8"> </p>
+				<p id="receiptFooterText" class="font-display font-medium text-lg text-[#e0e0e0] italic px-8"> </p>
 						<div id="receiptOutletInfo" class="flex flex-col items-center gap-3 pt-4">
-							<div class="flex items-center gap-2 text-on-surface-variant">
+							<div class="flex items-center gap-2 text-[#e0e0e0]-variant">
 								<span id="receiptPhone" class="font-label text-xs tracking-widest font-semibold">
 								</span>
 							</div>
 							
-					  	<p id="receiptInstagram" class="font-label text-xs tracking-wide text-on-surface-variant"> </p>
+					  	<p id="receiptInstagram" class="font-label text-xs tracking-wide text-[#787777]"> </p>
 				
-						  <div id="receiptAddressWrapper" class="flex items-center gap-2 text-on-surface-variant">
+						  <div id="receiptAddressWrapper" class="flex items-center gap-2 text-[#787777]">
 						    <address id="receiptAddress" class="font-label text-xs tracking-wide not-italic uppercase">
 						    </address>
 						  </div>
@@ -2433,7 +2434,7 @@
 <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
   <div class="flex items-center gap-5 flex-1">
 		<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 			
@@ -2945,7 +2946,7 @@
 	<div class="flex items-center gap-5 flex-1">
 		<div class="w-11 h-11 flex items-center justify-center">
 			<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 		</div>
@@ -3228,7 +3229,7 @@
 			<!-- LOGO -->
 			<div class="w-11 h-11 flex items-center justify-center">
 				<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 			</div>
@@ -3855,7 +3856,7 @@
 	  <div class="flex items-center gap-5 flex-1">
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 	    </div>
@@ -5309,7 +5310,7 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 	    </div>
@@ -5717,7 +5718,7 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 	    </div>
@@ -6542,7 +6543,7 @@
 			<!-- LOGO -->
 			<div class="w-11 h-11 flex items-center justify-center">
 				<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 			</div>
@@ -6925,7 +6926,7 @@
 			<!-- LOGO -->
 			<div class="w-11 h-11 flex items-center justify-center">
 				<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 			</div>
@@ -7185,7 +7186,7 @@
 				<!-- LOGO -->
 				<div class="w-11 h-11 flex items-center justify-center">
 					<img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 				</div>
@@ -7617,7 +7618,7 @@
 	    <!-- LOGO -->
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 	    </div>
@@ -9487,7 +9488,7 @@
 	  <div class="flex items-center gap-5 flex-1">
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 	    </div>
@@ -10502,7 +10503,7 @@
 	  <div class="flex items-center gap-5 flex-1">
 	    <div class="w-11 h-11 flex items-center justify-center">
 	      <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 	    </div>
@@ -10828,7 +10829,7 @@
 	<header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center pl-4 pr-8 overflow-visible">
 	  <div class="flex items-center gap-5 flex-1">
 	    <img id="munoLogo"
-						src="URL_LOGO_HITAM"
+						src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
 						alt="MUNO"
 						class="w-15 h-15 object-contain" >
 
@@ -13148,6 +13149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Tunggu template masuk ke DOM
     setTimeout(() => {
       updateThemeIcon();
+			updateMunoLogo();
     }, 0);
   }
 
@@ -14934,16 +14936,12 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   // RENDER + SEND
   const canvas = wrapper.querySelector("#receiptCanvas");
     setTimeout(() => {
-      const isDark =
-			  document.documentElement.classList.contains("dark");
-			
-			const receiptBackground =
-			  isDark ? "#101715" : "#f5f5f5";
+      const receiptBackground = "#101715";
 			
 			html2canvas(canvas, {
 			  scale: 1,
 			  useCORS: true,
-			  backgroundColor: receiptBackground
+			  backgroundColor: "#101715"
 			})
       .then(receiptCanvas => {
         const image =
@@ -15064,15 +15062,11 @@ function renderReceipt(data) {
   wrapper.querySelector("#receiptService").textContent = data.service;
   wrapper.querySelector("#receiptDiscount").textContent = data.discount;
   const canvas = wrapper.querySelector("#receiptCanvas");
-	const isDark =
-    document.documentElement.classList.contains("dark");
-
-  const receiptBackground =
-    isDark ? "#0B0F14" : "#F5F5F5";
+	const receiptBackground = "#101715";
   html2canvas(canvas, {
     scale: 1,
     useCORS: true,
-    backgroundColor: receiptBackground
+    backgroundColor: "#101715"
   }).then(canvas => {
     const image =
       canvas.toDataURL(
