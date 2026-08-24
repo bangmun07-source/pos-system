@@ -2628,21 +2628,6 @@
 			            state.branchId
 			          );
 			
-			        console.log(
-			          "MEMBER SEARCH:",
-			          keyword
-			        );
-			
-			        console.log(
-			          "BRANCH:",
-			          state.branchId
-			        );
-			
-			        console.log(
-			          "RESULT:",
-			          data
-			        );
-			
 			        showMemberResult(
 			          data
 			        );
@@ -13070,11 +13055,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   state.tenantSlug =
     params.get("tenant") || null;
 
-  console.log(
-    "TENANT SLUG:",
-    state.tenantSlug
-  );
-
   // CONNECT TENANT
   if (state.tenantSlug) {
 
@@ -13083,23 +13063,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       await connectTenant(
         state.tenantSlug
       );
-
-      console.log(
-        "TENANT READY:",
-        state.tenantSlug
-      );
-
+		
     } catch (error) {
-
-      console.error(
-        "TENANT CONNECTION FAILED:",
-        error
-      );
-
       alert(
         "Gagal menghubungkan database tenant"
       );
-
       return;
     }
   }
@@ -13221,13 +13189,6 @@ function restoreSession() {
     loginTenant !== currentTenant
   ) {
 
-    console.log(
-      "TENANT BERUBAH:",
-      loginTenant,
-      "→",
-      currentTenant
-    );
-
     // Hapus session login
     localStorage.removeItem(
       "pos_user"
@@ -13264,15 +13225,7 @@ function navigate(pageId, params = {}) {
       ""
     ).toLowerCase();
 
-  console.log(
-    "NAVIGATE:",
-    pageId,
-    "ROLE:",
-    role
-  );
-
   if (params.roles) {
-
     const allowedRoles =
       params.roles.map(
         r => r.toLowerCase()
@@ -13406,22 +13359,13 @@ async function handleLogin() {
 	  !state.tenantSlug ||
 	  state.tenantSlug === "master"
 	) {
-	
-	  console.log(
-	    "LOGIN → MASTER"
-	  );
-	
+
 	  result =
 	    await loginUserRPC(
 	      centralSupabase,
 	      username,
 	      password
 	    );
-	
-	  console.log(
-	    "MASTER LOGIN RESULT:",
-	    result
-	  );
 	}
 	
 	// ==========================================
@@ -13429,12 +13373,7 @@ async function handleLogin() {
 	// ==========================================
 	
 	else {
-	
-	  console.log(
-	    "LOGIN → CUSTOMER:",
-	    state.tenantSlug
-	  );
-	
+
 	  const response =
 	    await fetch(
 	      "/api/auth/login",
@@ -13462,11 +13401,6 @@ async function handleLogin() {
 	  result =
 	    await response.json();
 	
-	  console.log(
-	    "CUSTOMER AUTH RESULT:",
-	    result
-	  );
-	
 	  if (!response.ok) {
 	    throw new Error(
 	      result.error ||
@@ -13475,10 +13409,7 @@ async function handleLogin() {
 	  }
 	}
 
-    // ==========================================
     // LOGIN RESULT
-    // ==========================================
-
     if (
       !result ||
       !result.success
@@ -13518,10 +13449,8 @@ async function handleLogin() {
 	  JSON.stringify(user)
 	);
 	
-	// ==========================================
+
 	// SESSION
-	// ==========================================
-	
 	if (result.session_id) {
 	  localStorage.setItem(
 	    "pos_session_id",
@@ -13606,13 +13535,6 @@ function initApp() {
       ) ||
       "";
   }
-
-  console.log(
-    "ROLE:",
-    role,
-    "BRANCH:",
-    state.branchId
-  );
 
   if(page) {
     window.__ACTIVE_PAGE =
@@ -13920,10 +13842,7 @@ async function loadDashboard() {
       await getDashboardDataRPC(
         branchId
       );
-    console.log(
-      "DASHBOARD RPC RESULT:",
-      dashboardData
-    );
+
     state.dashboardData =
       dashboardData || {};
     state.dashboardFilter =
@@ -14250,10 +14169,7 @@ async function loadRecentTransactionsPage() {
         status,
         table
       );
-    console.log(
-      "RECENT TRANSACTIONS RPC:",
-      transactions
-    );
+
     recentData =
       transactions || [];
     state.recentTransactionsData =
@@ -14478,10 +14394,6 @@ async function loadRecentTransactionSummary() {
         table
       );
 
-    console.log(
-      "RECENT SUMMARY RPC:",
-      summary
-    );
     state.recentSummaryData =
       summary || {};
     state.recentSummaryFilter =
@@ -15415,20 +15327,8 @@ async function exportGrossRevenuePDF() {
   `);
 
   try {
-
-    console.log(
-      "EXPORT GROSS REVENUE:",
-      {
-        branchId,
-        start,
-        end
-      }
-    );
-
-    // =========================
+	  
     // CALL VERCEL API
-    // =========================
-
     const response =
       await fetch("/api/export-pdf", {
 				method: "POST",
@@ -15459,30 +15359,18 @@ async function exportGrossRevenuePDF() {
       );
     }
 
-    // =========================
     // GET HTML REPORT
-    // =========================
-
     const html =
       await response.text();
 
     if (!html) {
-
       throw new Error(
         "Server mengembalikan HTML kosong"
       );
     }
 
-    console.log(
-      "EXPORT GROSS REVENUE HTML RECEIVED"
-    );
-
-    // =========================
     // RENDER REPORT
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(
       html
     );
@@ -15491,16 +15379,7 @@ async function exportGrossRevenuePDF() {
 
   }
   catch (err) {
-
-    console.error(
-      "Export Gross Revenue:",
-      err
-    );
-
-    // =========================
     // ERROR PAGE
-    // =========================
-
     pdfWindow.document.open();
 
     pdfWindow.document.write(`
@@ -16021,14 +15900,6 @@ async function checkout() {
 	      await checkMemberRPC(memberId);
 			state.currentMemberData =
 					member;
-	    console.log(
-	      "CHECK MEMBER RESULT:",
-	      member
-	    );
-		console.log(
-		  "CURRENT MEMBER DATA:",
-		  state.currentMemberData
-		);
 	    if (!member) {
 	
 	      alert(
@@ -16049,16 +15920,6 @@ async function checkout() {
 		
 		payload.memberData =
 		      member;
-	
-	    console.log(
-	      "FINAL MEMBER ID:",
-	      payload.memberId
-	    );
-	
-	    console.log(
-	      "FINAL PAYLOAD:",
-	      payload
-	    );
 	
 	    // LANJUT HITUNG HPP + KIRIM TRANSAKSI
 	    await hitungHPPDanKirim(payload);
@@ -16105,19 +15966,8 @@ async function sendTransaction(payload){
     if(btn){
       btn.disabled = true;
     }
-    // TEMP DATA SUPABASE
-  	console.log(
-	  "SEND TRANSACTION PAYLOAD:",
-	  JSON.stringify(payload, null, 2)
-	);
-	
 	const res =
 	  await checkoutTransaction(payload);
-	
-	console.log(
-	  "CHECKOUT TRANSACTION RESULT:",
-	  res
-	);
     isProcessing = false;
     if(btn){
       btn.disabled = false;
@@ -16407,11 +16257,7 @@ async function loadProducts(callback) {
 	  state.user?.role?.toLowerCase() || "";
 	const branchId =
 	  state.branchId;
-		
-	console.log("LOAD PRODUCTS RUN");
-	console.log("BRANCH:", branchId);
-	console.log("ROLE:", role);
-	
+
 	if (!branchId) {
 	  return;
 	}
@@ -16436,11 +16282,7 @@ async function loadProducts(callback) {
 	      branchId,
 	      role
 	    );
-	
-	  console.log(
-	    "PRODUCT RPC RESULT:",
-	    products
-	  );
+
 	  state.products =
 	    products || [];
 	  state.productsBranchId =
@@ -16531,10 +16373,7 @@ async function loadPOSCategories() {
         state.branchId
       );
 	  state.categories = categories || [];
-    console.log(
-      "POS CATEGORIES:",
-      categories
-    );
+
     categories.forEach(category => {
       const button =
         document.createElement(
@@ -16735,16 +16574,6 @@ function getCategoryDiscount(categoryName) {
         .toLowerCase()
     );
 
-  console.log(
-    "CATEGORY LOOKUP:",
-    {
-      branch: state.branchId,
-      categoryName,
-      found: category,
-      discount: category?.discount
-    }
-  );
-
   return Number(
     category?.discount || 0
   );
@@ -16763,10 +16592,7 @@ function getCartCategoryDiscount() {
           String(p.ID_Produk) ===
           String(item.id)
       );
-    console.log("CATEGORY CHECK:", {
-      item,
-      product
-    });
+	
     if (!product) return;
     const categoryName =
       product.Kategori ||
@@ -16777,22 +16603,12 @@ function getCartCategoryDiscount() {
       getCategoryDiscount(
         categoryName
       );
-	     console.log("CATEGORY DISCOUNT CHECK:", {
-      productId: product.ID_Produk,
-      categoryName,
-      discount
-    });
     maxDiscount =
       Math.max(
         maxDiscount,
         discount
       );
   });
-	console.log(
-    "FINAL CATEGORY DISCOUNT:",
-    maxDiscount
-  );
-
   return maxDiscount;
 }
 
@@ -16964,40 +16780,7 @@ function calculateTotal() {
 	    birthdayDiscountRate;
 	}
 
-  // Category discount adalah nominal per-item,
-  // jadi jangan tampilkan persentase gabungan
-  // di summary.
-
-  // ==========================================
-  // DEBUG
-  // ==========================================
-
-  console.log(
-    "DISCOUNT:",
-    {
-      isMember,
-
-      globalDiscountRate,
-      globalDiscountAmount,
-			birthdayDiscountRate,
-    	birthdayDiscountAmount,
-      memberDiscountRate,
-      memberDiscountAmount,
-
-      categoryDiscountAmount,
-
-      finalDiscount:
-        discount,
-
-      finalDiscountRate:
-        displayDiscountRate
-    }
-  );
-
-  // ==========================================
   // CALCULATE
-  // ==========================================
-
   const base =
     subtotal - discount;
 
@@ -17128,11 +16911,7 @@ async function selectMember(member) {
   state.selectedMember = member;
   state.currentMember = member.id;
   state.currentMemberData =
-    await checkMemberRPC(member.id);
-  console.log(
-    "FULL MEMBER DATA:",
-    state.currentMemberData
-  );
+  await checkMemberRPC(member.id);
   document.getElementById("memberResult").style.display = "none";
   const subtotal =
     state.cart.reduce(
@@ -17351,12 +17130,6 @@ async function uploadMemberImage(
 
   const result =
     await response.json();
-
-  console.log(
-    "MEMBER IMAGE UPLOAD RESULT:",
-    result
-  );
-
   if (
     !response.ok ||
     !result.success
@@ -17413,15 +17186,7 @@ async function loadMembers(callback) {
       await getMemberPageDataRPC(
         state.branchId
       );
-	  console.log(
-  "MEMBER PAGE DATA:",
-  res
-);
 
-console.log(
-  "TOTAL MEMBERS:",
-  res?.members?.length
-);
     state.memberPageData =
       res;
     state.members =
@@ -17921,10 +17686,7 @@ function openWhatsAppComposer({phone, title, message, type = null, trxId}) {
   // OPEN MODAL
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-  console.log(
-    "WHATSAPP MODAL OPENED"
-  );
-
+	
   // COUNTER
   updateWhatsAppCounter();
 
@@ -18485,12 +18247,8 @@ async function exportMembersPDF() {
     </html>
   `);
 
-  // =========================
   // PAYLOAD
-  // =========================
-
   const payload = {
-
     type:
       "members",
     tier:
@@ -18501,17 +18259,8 @@ async function exportMembersPDF() {
 			state.tenantSlug
   };
 
-  console.log(
-    "EXPORT MEMBER PAYLOAD:",
-    payload
-  );
-
-  // =========================
   // REQUEST
-  // =========================
-
   try {
-
     const response =
       await fetch(
         "/api/export-pdf",
@@ -18530,27 +18279,12 @@ async function exportMembersPDF() {
         }
       );
 
-    // =========================
+ 
     // RESPONSE TEXT
-    // =========================
-
     const text =
       await response.text();
 
-    console.log(
-      "EXPORT MEMBER STATUS:",
-      response.status
-    );
-
-    console.log(
-      "EXPORT MEMBER RESPONSE:",
-      text
-    );
-
-    // =========================
     // HTTP ERROR
-    // =========================
-
     if (!response.ok) {
 
       let errorMessage =
@@ -18592,33 +18326,20 @@ async function exportMembersPDF() {
       !text ||
       !text.trim()
     ) {
-
       throw new Error(
         "Server mengembalikan HTML kosong."
       );
-
     }
 
-    console.log(
-      "EXPORT MEMBER HTML RECEIVED"
-    );
-
-    // =========================
     // RENDER REPORT
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(
       text
     );
-
     pdfWindow.document.close();
-
   }
 
   catch (err) {
-
     console.error(
       "Export Member PDF:",
       err
@@ -18816,11 +18537,6 @@ async function submitMember() {
     // SUPABASE RPC
     const result =
       await addMemberRPC(payload);
-    console.log(
-      "ADD MEMBER RESULT:",
-      result
-    );
-
     if (!result) {
       throw new Error(
         "Backend mengembalikan data kosong"
@@ -19408,32 +19124,19 @@ async function saveMemberEdit() {
       document.querySelector(
         "#edit-joinDate"
       ).value,
-
     PhotoBase64:
       memberPhotoBase64,
-
     branchId:
       state.branchId
 
   };
-
-
+	
   try {
-
-    // =========================
     // UPLOAD FOTO BARU
-    // =========================
-
     if (
       payload.PhotoBase64 &&
       payload.ID_Member
     ) {
-
-      console.log(
-        "📸 UPLOAD MEMBER IMAGE:",
-        payload.ID_Member
-      );
-
 
       const photoUrl =
         await uploadMemberImage(
@@ -19448,54 +19151,21 @@ async function saveMemberEdit() {
         );
       }
 
-
       // SIMPAN URL KE PHOTO
-
       payload.Photo =
         photoUrl;
-
-
-      console.log(
-        "📸 MEMBER PHOTO URL:",
-        photoUrl
-      );
-
     }
-
-
-    // =========================
+	
     // JANGAN KIRIM BASE64 KE RPC
-    // =========================
-
     delete payload.PhotoBase64;
 
-
-    // =========================
     // UPDATE MEMBER
-    // =========================
-
-    console.log(
-      "UPDATE MEMBER PAYLOAD:",
-      payload
-    );
-
-
     const res =
       await updateMemberRPC(
         payload
       );
 
-
-    console.log(
-      "UPDATE MEMBER RESULT:",
-      res
-    );
-
-
-    // =========================
     // VALIDATE RESPONSE
-    // =========================
-
     if (!res) {
       throw new Error(
         "Backend mengembalikan data kosong"
@@ -19837,16 +19507,11 @@ async function previewMemberPhoto(e) {
     	// TABLES
     	// ==================================
 
-function traceCall(name) {
-  console.log("SERVER CALL:", name);
-}
-
 async function loadTables() {
 
   if (!state.branchId) {
     return;
   }
-
   // LOAD FROM CACHE
   if (
     state.tableData &&
@@ -19865,10 +19530,7 @@ async function loadTables() {
       await getTableDataRPC(
         state.branchId
       );
-    console.log(
-      "TABLE DATA:",
-      res
-    );
+		
     state.tableData =
       res || [];
     state.tableDataBranchId =
@@ -19906,10 +19568,7 @@ async function loadBilling(mejaId) {
       await getLatestTransactionByTableRPC(
         mejaId
       );
-    console.log(
-      "BILLING DATA:",
-      res
-    );
+
     renderBilling(
       res || null
     );
@@ -20076,11 +19735,6 @@ async function saveReserve() {
         note
       );
 
-    console.log(
-      "RESERVE TABLE RESULT:",
-      res
-    );
-
     if (res) {
       state.tableData = null;
       cancelReserve();
@@ -20117,11 +19771,7 @@ async function clearSelectedTable() {
       await clearTableStatusRPC(
         selectedTableId
       );
-    console.log(
-      "CLEAR TABLE RESULT:",
-      res
-    );
-
+		
     if (res) {
       // Clear cache
       state.tableData = null;
@@ -20291,10 +19941,6 @@ async function saveNewTable() {
         tableName,
         state.branchId
       );
-    console.log(
-      "ADD TABLE RESULT:",
-      res
-    );
 
     if (res) {
       closeAddTableModal();
@@ -20335,17 +19981,11 @@ async function loadInventoryPage(branchId) {
     renderInventoryPage(
       state.inventoryData
     );
-
     return;
   }
 
   try {
-
-    console.log(
-      "CALL get_inventory_page:",
-      branchId
-    );
-
+		
     const {
       data,
       error
@@ -20515,21 +20155,11 @@ async function loadIngredients(branchId) {
     renderIngredients(
       state.ingredients
     );
-
     return;
   }
 
   try {
-
-    console.log(
-      "CALL get_ingredients:",
-      branchId
-    );
-
-    // =========================
     // SUPABASE RPC
-    // =========================
-
     const {
       data,
       error
@@ -20615,22 +20245,17 @@ function openInventoryPage() {
 }
 
 async function loadSuppliers() {
-
   if (
     state.supplierData &&
     state.supplierBranchId === state.branchId
   ) {
-
     allSupplierData =
       state.supplierData;
-
     renderSuppliers();
-
     return;
   }
 
   try {
-
     const branchId =
       state.branchId;
 
@@ -20638,15 +20263,7 @@ async function loadSuppliers() {
       return;
     }
 
-    console.log(
-      "CALL get_suppliers:",
-      branchId
-    );
-
-    // =========================
     // SUPABASE RPC
-    // =========================
-
     const { data, error } =
       await supabaseClient.rpc(
         "get_suppliers",
@@ -21416,45 +21033,30 @@ async function openRecipeModal(recipeId) {
 async function saveRecipeMaster() {
 
   if (!currentRecipeData) return;
-
-  // ==============================
   // GET IMAGE PRODUK
-  // ==============================
-
   const file =
     document.getElementById(
       "recipeImageInput"
     )?.files?.[0];
 
   let imageBase64 = null;
-
   if (file) {
-
     const compressed =
       await compressImage(file);
-
     imageBase64 =
       await fileToBase64(
         compressed
       );
   }
 
-
-  // ==============================
   // PAYLOAD
-  // ==============================
-
   const payload = {
-
     recipeId:
       currentRecipeData.id,
-
     productId:
       currentRecipeData.productId,
-
     branchId:
       currentRecipeData.branchId,
-
     productName:
       document.getElementById(
         "recipeNameInput"
@@ -21491,23 +21093,14 @@ async function saveRecipeMaster() {
       state.user?.fullName ||
       state.user?.username ||
       "Unknown",
-
     imageBase64
-
   };
 
-
   try {
-
-    // ==============================
     // PRODUCT IMAGE
-    // ==============================
-
     let imageUrl =
       currentRecipeData.image || "";
-
     if (imageBase64) {
-
       imageUrl =
         await uploadProductImage(
           imageBase64,
@@ -21515,11 +21108,7 @@ async function saveRecipeMaster() {
         );
     }
 
-
-    // ==============================
     // UPDATE RECIPE MASTER
-    // ==============================
-
     const {
       data,
       error
@@ -21528,25 +21117,18 @@ async function saveRecipeMaster() {
       {
         p_recipe_id:
           payload.recipeId,
-
         p_product_id:
           payload.productId,
-
         p_branch_id:
           payload.branchId,
-
         p_selling_price:
           payload.sellingPrice,
-
         p_net_price:
           payload.netPrice,
-
         p_product_name:
           payload.productName,
-
         p_updated_by:
           payload.updatedBy,
-
         p_image_url:
           imageUrl || ""
       }
@@ -21556,27 +21138,13 @@ async function saveRecipeMaster() {
       throw error;
     }
 
-
-    console.log(
-      "UPDATE RECIPE MASTER:",
-      data
-    );
-
-
-    // ==============================
     // CLOSE MODAL
-    // ==============================
-
     closeRecipeMasterModal();
 
-
-    // ==============================
     // CLEAR CACHE
-    // ==============================
-
     state.recipeData = null;
     state.recipeDataBranchId = null;
-
+		
     state.inventoryData = null;
     state.inventoryBranchId = null;
 
@@ -23318,33 +22886,22 @@ async function loadRecipeProducts() {
     if (error) {
       throw error;
     }
-
     const recipes =
       data || [];
-
-   console.log("GET RECIPE LIST RAW:", data);
-console.log("FIRST RECIPE:", data?.[0]);
-
     state.recipeProductsData =
       recipes;
-
     state.recipeProductsBranchId =
       branchId;
-
     renderRecipeProducts(
       recipes
     );
-
   }
   catch (err) {
-
     console.error(
       "Load Recipe Products Error:",
       err
     );
-
     state.recipeProductsData = [];
-
     renderRecipeProducts([]);
   }
 }
@@ -24009,21 +23566,7 @@ window.saveStockIn = async function () {
     throw error;
   }
 
-
-  // ==============================
-  // RPC RESULT
-  // ==============================
-
-  console.log(
-    "ADD INGREDIENT PURCHASE:",
-    data
-  );
-
-
-  // ==============================
   // CLEAR CACHE
-  // ==============================
-
   state.inventoryData = null;
   state.inventoryBranchId = null;
 
@@ -24732,11 +24275,6 @@ async function loadProductCategories() {
         branchId
       );
 
-    console.log(
-      "PRODUCT CATEGORIES:",
-      categories
-    );
-
     // PRODUCT CATEGORY SELECT
     const select =
       document.getElementById(
@@ -24883,19 +24421,6 @@ async function saveNewProduct() {
   }
 
   try {
-
-    // DEBUG
-    console.log(
-      "SAVE NEW PRODUCT:",
-      {
-        name,
-        category,
-        price,
-        branchId,
-        outlet
-      }
-    );
-
     // SUPABASE RPC
     const {
       data: res,
@@ -24920,13 +24445,6 @@ async function saveNewProduct() {
       );
       throw error;
     }
-
-    // DEBUG RESULT
-    console.log(
-      "ADD NEW PRODUCT RESULT:",
-      res
-    );
-
     // SUCCESS CHECK
     if (
       !res ||
@@ -25440,28 +24958,18 @@ async function loadAnalyticsPage() {
         endDate
       });
 
-
-    // ==========================
     // CACHE
-    // ==========================
-
     if (
       state.analyticsData &&
       state.analyticsFilter === cacheKey
     ) {
-
       renderAnalyticsPageData(
         state.analyticsData
       );
-
       return;
     }
 
-
-    // ==========================
     // SUPABASE RPC
-    // ==========================
-
     const res =
       await getAnalyticsDashboardRPC(
         state.branchId,
@@ -25469,27 +24977,14 @@ async function loadAnalyticsPage() {
         endDate
       );
 
-    console.log(
-      "ANALYTICS DASHBOARD:",
-      res
-    );
-	  
-
-    // ==========================
     // VALIDASI
-    // ==========================
-
     if (!res) {
       throw new Error(
         "Data analytics tidak ditemukan"
       );
     }
 
-
-    // ==========================
     // CACHE
-    // ==========================
-
     state.analyticsData =
       res;
 
@@ -25941,7 +25436,6 @@ document.addEventListener(
 
 
 async function exportAnalyticsPDF() {
-
   const start =
     document.getElementById(
       "analyticsStartDate"
@@ -25955,163 +25449,93 @@ async function exportAnalyticsPDF() {
   const branchId =
     state.branchId;
 
-
-  // =========================
   // VALIDASI
-  // =========================
-
   if (!start || !end) {
-
     alert(
       "Pilih tanggal dulu"
     );
-
     return;
-
   }
-
-
+	
   if (!branchId) {
-
     alert(
       "Branch tidak valid"
     );
-
     return;
-
   }
 
-
-  // =========================
   // OPEN TAB
-  // =========================
-
   const pdfTab =
     window.open(
       "",
       "_blank"
     );
 
-
   if (!pdfTab) {
-
     alert(
       "Popup diblokir browser"
     );
-
     return;
-
   }
 
-
-  // =========================
   // LOADING PAGE
-  // =========================
-
   pdfTab.document.write(`
     <!DOCTYPE html>
-
     <html>
-
     <head>
-
       <title>
         Analytics Report
       </title>
-
+			
       <style>
 
         body {
-
           background:#0B0F14;
-
           color:white;
-
           font-family:Arial;
-
           display:flex;
-
           align-items:center;
-
           justify-content:center;
-
           height:100vh;
-
           margin:0;
-
         }
 
         .loading {
-
           text-align:center;
-
         }
 
         .title {
-
           font-size:18px;
-
           font-weight:bold;
-
           margin-bottom:8px;
-
         }
 
         .subtitle {
-
           font-size:13px;
-
           opacity:.7;
-
         }
-
       </style>
-
     </head>
 
-
     <body>
-
       <div class="loading">
-
         <div class="title">
-
           Analytics Report
-
         </div>
-
+				
         <div class="subtitle">
 
           Generating PDF...
-
         </div>
-
       </div>
-
     </body>
-
     </html>
   `);
 
   pdfTab.document.close();
 
-
-  // =========================
   // CALL VERCEL API
-  // =========================
-
   try {
-
-    console.log(
-      "EXPORT ANALYTICS:",
-      {
-        branchId,
-        start,
-        end
-      }
-    );
-
-
     const response =
       await fetch("/api/export-pdf", {
 		  method: "POST",
@@ -26140,37 +25564,19 @@ async function exportAnalyticsPDF() {
         errorText ||
         `Export gagal (${response.status})`
       );
-
     }
 
-
-    // =========================
     // API RETURN
-    // =========================
-
     const result =
       await response.text();
 
-
-    console.log(
-      "EXPORT ANALYTICS RESULT:",
-      result
-    );
-
-
     if (!result) {
-
       throw new Error(
         "Server tidak mengembalikan hasil PDF"
       );
-
     }
 
-
-    // =========================
     // JIKA API RETURN URL
-    // =========================
-
     if (
       result.startsWith("http://") ||
       result.startsWith("https://") ||
@@ -26179,47 +25585,27 @@ async function exportAnalyticsPDF() {
 
       pdfTab.location.href =
         result;
-
       return;
-
     }
 
-
-    // =========================
     // JIKA API RETURN HTML
-    // =========================
-
     pdfTab.document.open();
-
     pdfTab.document.write(
       result
     );
-
     pdfTab.document.close();
-
   }
 
-
-  // =========================
   // ERROR
-  // =========================
-
   catch(err) {
-
     console.error(
       "Export Analytics:",
       err
     );
-
-
     pdfTab.document.open();
-
     pdfTab.document.write(`
-
       <!DOCTYPE html>
-
       <html>
-
       <body style="
         background:#0B0F14;
         color:white;
@@ -26322,23 +25708,11 @@ async function loadSettingsPage() {
   }
 
   try {
-
-    // =========================
     // SUPABASE RPC
-    // =========================
-
     const data =
       await getSettingsPageDataRPC();
 
-    console.log(
-      "SETTINGS PAGE DATA:",
-      data
-    );
-
-    // =========================
     // NORMALIZE RESPONSE
-    // =========================
-
     const result =
       data || {
         settings: {},
@@ -26388,19 +25762,10 @@ async function loadSettingsPage() {
 	
 async function reloadSettingsPage() {
 
-  traceCall(
-    "reloadSettingsPage"
-  );
-
   try {
-
     // SUPABASE RPC
     const data =
       await getSettingsPageDataRPC();
-    console.log(
-      "SETTINGS PAGE DATA:",
-      data
-    );
 
     // UPDATE STATE
     state.settingsPageData =
@@ -26665,11 +26030,6 @@ async function saveNewBranch() {
       await addNewBranchRPC(
         data
       );
-    console.log(
-      "ADD BRANCH RESULT:",
-      res
-    );
-
 
     // HANDLE RESPONSE
     if (!res?.success) {
@@ -26714,10 +26074,6 @@ async function toggleBranchStatus(branchId, status) {
         branchId,
         status
       );
-    console.log(
-      "UPDATE BRANCH STATUS:",
-      res
-    );
 
     // HANDLE RESPONSE
     if (
@@ -26818,10 +26174,6 @@ async function saveEditBranch() {
       await updateBranchRPC(
         data
       );
-    console.log(
-      "UPDATE BRANCH RESULT:",
-      res
-    );
 
     // HANDLE RESPONSE
     if (
@@ -26910,10 +26262,6 @@ async function saveTaxSettings() {
       );
       throw error;
     }
-    console.log(
-      "SAVE SETTINGS RESULT:",
-      result
-    );
 
     // CLEAR STATE
     state.settingsPageData = null;
@@ -27109,10 +26457,6 @@ async function saveEditUser() {
       await updateUserRPC(
         data
       );
-    console.log(
-      "UPDATE USER RESULT:",
-      res
-    );
 
     // HANDLE RESPONSE
     if (
@@ -27159,9 +26503,7 @@ function closeEditUserModal(){
 }
 	
 async function loadBranchOptions() {
- console.log(
-    "🔥 LOAD BRANCH OPTIONS DIPANGGIL"
-  );
+
   try {
 
     // SUPABASE RPC
@@ -27170,12 +26512,7 @@ async function loadBranchOptions() {
         loginUserId:
           state.user.id
       });
-    console.log(
-      "BRANCH OPTIONS:",
-      data
-    );
 
-  
     // SELECT ELEMENT
     const select =
       document.getElementById(
@@ -27338,11 +26675,6 @@ async function saveNewUser() {
       await addNewUserRPC(
         data
       );
-    console.log(
-      "ADD USER RESULT:",
-      res
-    );
-
     // HANDLE RESPONSE
     if (
       res &&
@@ -27406,11 +26738,7 @@ async function deleteUser(id) {
         login_user_id:
           state.user.id
       });
-    console.log(
-      "DELETE USER RESULT:",
-      res
-    );
-	
+
     // HANDLE RESPONSE
     if (
       res &&
@@ -27476,11 +26804,6 @@ async function loadBusinessProfile() {
     const data =
       await getBusinessProfileRPC();
 
-    console.log(
-      "BUSINESS PROFILE:",
-      data
-    );
-
     state.businessProfile =
       data || {
         company_name: "",
@@ -27512,19 +26835,10 @@ async function loadBusinessProfile() {
 
 function initBusinessProfile() {
 
-  console.log(
-    "🔥 INIT BUSINESS PROFILE"
-  );
-
   const saveButton =
     document.getElementById(
       "btnSaveBusinessProfile"
     );
-
-  console.log(
-    "SAVE BUTTON:",
-    saveButton
-  );
 
   if (!saveButton) {
     console.warn(
@@ -27641,10 +26955,7 @@ async function uploadBusinessLogo(base64) {
         upsert: true
       }
     );
-	console.log(
-	  "SUPABASE SESSION:",
-	  await client.auth.getSession()
-	);
+
   if (uploadError) {
     console.error(
       "BUSINESS LOGO STORAGE ERROR:",
@@ -27672,11 +26983,6 @@ async function uploadBusinessLogo(base64) {
       "Public URL logo tidak ditemukan"
     );
   }
-
-  console.log(
-    "BUSINESS LOGO URL:",
-    logoUrl
-  );
 
   return logoUrl;
 }
@@ -27723,17 +27029,6 @@ async function saveBusinessProfile() {
       "businessLogoInput"
     );
 
-  console.log(
-    "ELEMENTS:",
-    {
-      companyName,
-      instagram,
-      receiptFooter,
-      logoPreview,
-      logoInput
-    }
-  );
-
   // VALIDATE
   if (
     !companyName ||
@@ -27766,13 +27061,7 @@ async function saveBusinessProfile() {
       logoInput?.files?.[0];
 
     if (file) {
-      console.log(
-        "UPLOAD BUSINESS LOGO:",
-        file.name,
-        file.type,
-        file.size
-      );
-
+   
       // FILE → BASE64
       const base64 =
         await fileToBase64(
@@ -27784,21 +27073,14 @@ async function saveBusinessProfile() {
         await uploadBusinessLogo(
           base64
         );
-
       if (!logoUrl) {
         throw new Error(
           "URL logo tidak diterima dari API"
         );
       }
-
       // UPDATE DATA
       data.logo_url =
         logoUrl;
-
-      console.log(
-        "BUSINESS LOGO URL:",
-        logoUrl
-      );
     }
 	
     // SAVE PROFILE VIA RPC
@@ -27807,11 +27089,7 @@ async function saveBusinessProfile() {
         data
       );
 
-    console.log(
-      "SAVE BUSINESS PROFILE RESULT:",
-      result
-    );
-	
+
     // CHECK RPC
     if (
       result &&
@@ -27902,11 +27180,7 @@ async function loadBranchName() {
       await getBranchInfoRPC(
         state.branchId
       );
-    console.log(
-      "BRANCH INFO:",
-      data
-    );
-
+  
     // SAVE STATE
     state.branchInfo =
       data || {
@@ -28138,39 +27412,26 @@ async function loadExpenseDashboard() {
   }
 
   try {
-    console.log(
-      "SERVER CALL getExpenseDashboardRPC"
-    );
-
     const data =
       await getExpenseDashboardRPC(
         filter
       );
 
-    // =========================
     // CACHE
-    // =========================
-
     state.expenseDashboardData =
       data;
-
     state.expenseDashboardFilter =
       filterKey;
-
-
-    // =========================
+		
     // LOAD BRANCH FILTER
-    // =========================
     loadExpenseBranches(
       "expenseBranchFilter"
     );
     loadOtherIncomeBranches(
       "otherIncomeBranchFilter"
     );
-
-    // =========================
+		
     // RENDER
-    // =========================
     applyExpenseDashboard(
       data
     );
@@ -28512,12 +27773,6 @@ async function saveExpenseStatus() {
   const expense =
     expenseData[selectedExpenseIndex];
   if (!expense) return;
-console.log("SELECTED EXPENSE:", {
-    index: selectedExpenseIndex,
-    expense,
-    refId: expense?.refId,
-    status: expense?.status
-  });
   const newStatus =
     document.getElementById(
       "expenseNewStatus"
@@ -28839,18 +28094,11 @@ function fileToBase64(file) {
 }
 
 async function uploadExpenseAttachment() {
-  console.log(
-    "=== UPLOAD ATTACHMENT START ==="
-  );
   const expense =
     expenseData[
       selectedAttachmentExpenseIndex
     ];
-  console.log(
-    "SELECTED EXPENSE:",
-    expense
-  );
-
+	
   if (!expense) {
     showToast(
       "Expense tidak ditemukan",
@@ -28865,10 +28113,6 @@ async function uploadExpenseAttachment() {
     );
   const file =
     input?.files?.[0];
-  console.log(
-    "SELECTED FILE:",
-    file
-  );
 
   if (!file) {
     showToast(
@@ -28886,10 +28130,7 @@ async function uploadExpenseAttachment() {
       file.type === "image/png" ||
       file.type === "image/webp"
     ) {
-      console.log(
-        "FILE TYPE: IMAGE"
-      );
-
+  
       const compressed =
         await compressImage(file);
       base64 =
@@ -28900,10 +28141,6 @@ async function uploadExpenseAttachment() {
 
     // PDF
     else if ( file.type === "application/pdf" ) {
-      console.log(
-        "FILE TYPE: PDF"
-      );
-	
       // PDF JANGAN DI-COMPRESS
       base64 =
         await fileToBase64(
@@ -28918,25 +28155,13 @@ async function uploadExpenseAttachment() {
       );
     }
 
-    console.log(
-      "BASE64 LENGTH:",
-      base64?.length
-    );
-
     if (!base64) {
       throw new Error(
         "Gagal membaca file"
       );
     }
 
-    // =================================
     // UPLOAD KE VERCEL API
-    // =================================
-
-    console.log(
-      "CALL API:"
-    );
-
     const response =
       await fetch(
         "/api/handle-expense-attachment",
@@ -28958,18 +28183,8 @@ async function uploadExpenseAttachment() {
         }
       );
 
-    console.log(
-      "API STATUS:",
-      response.status
-    );
-
     const result =
       await response.json();
-
-    console.log(
-      "API RESULT:",
-      result
-    );
 
     if (
       !response.ok ||
@@ -28991,11 +28206,6 @@ async function uploadExpenseAttachment() {
         "URL attachment tidak ditemukan"
       );
     }
-
-    console.log(
-      "ATTACHMENT URL:",
-      url
-    );
 	
     // SIMPAN URL KE OPERATIONS
     await updateExpenseAttachmentRPC({
@@ -29019,11 +28229,7 @@ async function uploadExpenseAttachment() {
 
     // RELOAD
     await loadExpenseDashboard();
-    console.log(
-      "=== UPLOAD ATTACHMENT DONE ==="
-    );
-  }
-
+		
   catch (err) {
     console.error(
       "Upload expense attachment:",
@@ -30255,11 +29461,6 @@ async function submitOtherIncome() {
       ).value
   };
 
-  console.log(
-    "OTHER INCOME DATA:",
-    data
-  );
-
   try {
 
     const res =
@@ -30460,16 +29661,8 @@ async function exportExpensePDF() {
 			tenantSlug: 
 				state.tenantSlug
     };
-
-    console.log(
-      "EXPORT EXPENSE PAYLOAD:",
-      payload
-    );
-
-    // =========================
+		
     // CALL SINGLE EXPORT API
-    // =========================
-
     const response =
       await fetch(
         "/api/export-pdf",
@@ -30481,14 +29674,10 @@ async function exportExpensePDF() {
           },
           body:
             JSON.stringify(payload)
-
         }
       );
 
-    // =========================
     // HTTP ERROR
-    // =========================
-
     if (!response.ok) {
 
       const errorText =
@@ -30498,44 +29687,27 @@ async function exportExpensePDF() {
         errorText ||
         `Export gagal (${response.status})`
       );
-
     }
-
-    // =========================
+		
     // GET HTML REPORT
-    // =========================
-
     const html =
       await response.text();
 
     if (!html) {
-
       throw new Error(
         "Server mengembalikan HTML kosong"
       );
-
     }
 
-    console.log(
-      "EXPORT EXPENSE HTML RECEIVED"
-    );
-
-    // =========================
     // RENDER REPORT
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(
       html
     );
-
     pdfWindow.document.close();
-
   }
 
   catch (err) {
-
     console.error(
       "Export Expense:",
       err
@@ -30880,15 +30052,9 @@ async function loadLoyaltySettings() {
   }
 
   try {
-
     // SUPABASE RPC
     const s =
       await getSettingsRPC();
-    console.log(
-      "LOYALTY SETTINGS:",
-      s
-    );
-
     // CACHE / STATE
     state.loyaltySettings =
       s || {};
@@ -30914,14 +30080,8 @@ async function loadLoyaltySettings() {
 async function loadCategorySettings() {
 
   try {
-
     const branchId =
       state.branchId;
-
-    console.log(
-      "LOAD CATEGORY SETTINGS:",
-      branchId
-    );
 
     if (!branchId) {
       console.warn(
@@ -30935,17 +30095,8 @@ async function loadCategorySettings() {
         branchId
       );
 
-    console.log(
-      "CATEGORY RPC RESULT:",
-      categories
-    );
-
-    // ==============================
     // RESET UI
-    // ==============================
-
     for (let i = 1; i <= 5; i++) {
-
       const name =
         document.getElementById(
           `category_${i}_name`
@@ -31036,23 +30187,14 @@ async function loadCategorySettings() {
               category.reward ?? 0
             );
         }
-
       }
     );
-
-    console.log(
-      "CATEGORY SETTINGS LOADED:",
-      categories
-    );
-
   }
   catch (err) {
-
     console.error(
       "Load Category Settings:",
       err
     );
-
   }
 }
 
@@ -31136,11 +30278,7 @@ async function loadLoyaltySettings() {
     // SUPABASE RPC
     const s =
       await getSettingsRPC();
-    console.log(
-      "LOYALTY SETTINGS:",
-      s
-    );
-
+		
     // SAVE STATE
     state.loyaltySettings =
       s || {};
@@ -31300,10 +30438,6 @@ async function saveLoyaltySettings() {
       await saveSettingsRPC(
         payload
       );
-    console.log(
-      "SAVE LOYALTY SETTINGS RESULT:",
-      res
-    );
  
     // SAVE CATEGORIES
     for (const category of categoryPayload) {
@@ -31432,11 +30566,6 @@ async function loadSeasonStatus() {
     // SUPABASE RPC
     const data =
       await getSeasonConfigRPC();
-    console.log(
-      "SEASON CONFIG:",
-      data
-    );
-
     // CACHE
     state.seasonStatus =
       data || {};
@@ -31509,10 +30638,6 @@ async function openSeason() {
         startDate,
         endDate
       );
-    console.log(
-      "OPEN SEASON RESULT:",
-      res
-    );
 	
     // CHECK RESPONSE
     if (
@@ -31550,13 +30675,8 @@ async function openSeason() {
 }
 
 async function closeSeason() {
-
   try {
-
-    // ================================
     // KONFIRMASI
-    // ================================
-
     const confirmed =
       confirm(
         "Tutup season sekarang?\n\n" +
@@ -31568,24 +30688,11 @@ async function closeSeason() {
       return;
     }
 
-
-    // ================================
     // SUPABASE RPC
-    // ================================
-
     const res =
       await closeSeasonRPC();
-
-    console.log(
-      "CLOSE SEASON RESULT:",
-      res
-    );
-
-
-    // ================================
+   
     // CHECK RESULT
-    // ================================
-
     if (
       res &&
       res.success === false
@@ -31653,11 +30760,6 @@ async function toggleAutoSeason() {
 
     const res =
       await toggleAutoSeasonRPC();
-
-    console.log(
-      "TOGGLE AUTO SEASON:",
-      res
-    );
 
     if (!res?.success) {
       throw new Error(
@@ -31769,16 +30871,8 @@ async function loadRewardProducts() {
       await getRewardProductsRPC(
         branchId
       );
-
-    console.log(
-      "REWARD PRODUCTS:",
-      res
-    );
-
-    // =========================
+		
     // AMBIL ARRAY REWARDS
-    // =========================
-
     const data =
       Array.isArray(res)
         ? res
@@ -31915,7 +31009,6 @@ function updateRewardPagination() {
 }
 	
 async function deleteReward(id) {
-
   if (
     !confirm(
       "Hapus reward ini?"
@@ -31925,18 +31018,10 @@ async function deleteReward(id) {
   }
 
   try {
-
-    // =========================
+		
     // SUPABASE RPC
-    // =========================
-
     const res =
       await deleteRewardRPC(id);
-
-    console.log(
-      "DELETE REWARD:",
-      res
-    );
 
     if (!res?.success) {
       throw new Error(
@@ -31945,10 +31030,7 @@ async function deleteReward(id) {
       );
     }
 
-    // =========================
     // CLEAR CACHE
-    // =========================
-
     state.rewardProducts = null;
     state.rewardProductsBranchId = null;
 	rewardData = [];  
@@ -32037,20 +31119,12 @@ async function loadRewardProductsForModal() {
 
   try {
 
-    // =========================
     // LOAD PRODUCTS FROM RPC
-    // =========================
-
     const products =
       await getProductsRPC(
         branchId,
         role
       );
-
-    console.log(
-      "REWARD PRODUCTS:",
-      products
-    );
 
     const select =
       document.getElementById(
@@ -32143,14 +31217,8 @@ async function saveRewardProduct() {
       await saveRewardProductRPC(
         payload
       );
-    console.log(
-      "SAVE REWARD RESULT:",
-      result
-    );
 
-    // ================================
     // VALIDATE RESULT
-    // ================================
     if (
       result &&
       result.success === false
@@ -33410,9 +32478,7 @@ function initCashFlowPage(){
 }
 
 async function loadCashFlowPage() {
-
   const filter = {
-
     loginUserId:
       state.user.id,
 
@@ -33431,71 +32497,39 @@ async function loadCashFlowPage() {
       document.getElementById(
         "cf-end-date"
       )?.value || ""
-
   };
-console.log(
-    "CF FILTER:",
-    filter
-  );
-
-  console.log(
-    "CF BRANCH VALUE:",
-    document.getElementById(
-      "cf-branch"
-    )?.value
-  );
+	
   const cacheKey =
     JSON.stringify(filter);
 
-
-  // =========================
   // CACHE HIT
-  // =========================
-
   if (
     state.cashFlowData &&
     state.cashFlowFilter === cacheKey
   ) {
-
     renderAccountBalance(
       state.cashFlowData.account
     );
-
     renderCashFlowSummary(
       state.cashFlowData.summary
     );
-
     renderCashFlowChart(
       state.cashFlowData.chart
     );
-
     renderTransferHistory(
       state.cashFlowData.transfers || []
     );
-
     renderOwnerSummary(
       state.cashFlowData.ownerSummary
     );
-
     renderOwnerHistory(
       state.cashFlowData.ownerTransactions || []
     );
-
     return;
   }
 
-
   try {
-
-    console.log(
-      "SERVER CALL get_cash_flow_page_data"
-    );
-
-
-    // =========================
     // SUPABASE RPC
-    // =========================
-
     const {
       data,
       error
@@ -34489,8 +33523,7 @@ function sendBackupChat(){
     input.value.trim();
 
   if(!message) return;
-  console.log("User:", message);
-  input.value = "";
+		input.value = "";
 }
 
 function sendBackupChat(){
@@ -35102,7 +34135,6 @@ function handleAnalyticsCommand(message){
 
   // PAYMENT
   if(matchIntent(cmd,analyticsIntents.PAYMENT)){
-    console.log("MASUK PAYMENT INTENT");
     getChatAnalytics(startDate, endDate, branchId,
     data=>{
       const pay = data.paymentDistribution?.[0];
@@ -36279,67 +35311,33 @@ async function exportCashFlowReport() {
     state?.branchId ||
     "ALL";
 
-  // =========================
   // LOGIN USER
-  // =========================
-
   const loginUserId =
     state?.user?.id || "";
 
-  // =========================
   // VALIDASI
-  // =========================
-
   if (!startDate || !endDate) {
-
     alert(
       "Pilih tanggal dulu"
     );
-
     return;
   }
 
   if (!branch) {
-
     alert(
       "Branch tidak valid"
     );
-
     return;
   }
 
   if (!loginUserId) {
-
-    console.error(
-      "LOGIN USER ID KOSONG:",
-      state?.user
-    );
-
     alert(
       "User login tidak ditemukan."
     );
-
     return;
   }
 
-  // =========================
-  // DEBUG
-  // =========================
-
-  console.log(
-    "EXPORT CASH FLOW:",
-    {
-      loginUserId,
-      branch,
-      startDate,
-      endDate
-    }
-  );
-
-  // =========================
   // OPEN WINDOW
-  // =========================
-
   const pdfWindow =
     window.open(
       "",
@@ -36347,82 +35345,51 @@ async function exportCashFlowReport() {
     );
 
   if (!pdfWindow) {
-
     alert(
       "Popup diblokir browser."
     );
-
     return;
   }
 
-  // =========================
   // LOADING
-  // =========================
-
   pdfWindow.document.write(`
-
     <html>
-
       <head>
-
         <title>
           Generating Cash Flow Report
         </title>
-
+				
         <style>
-
           body {
-
             margin: 0;
-
             background: #0B0F14;
-
             color: white;
-
             font-family: Arial, sans-serif;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             height: 100vh;
-
           }
 
           .loading {
-
             text-align: center;
-
           }
 
           .title {
-
             font-size: 18px;
-
             font-weight: bold;
-
             margin-bottom: 8px;
-
           }
 
           .text {
-
             font-size: 13px;
-
             opacity: .7;
-
           }
-
         </style>
-
       </head>
 
       <body>
-
         <div class="loading">
-
           <div class="title">
             Cash Flow Report
           </div>
@@ -36430,21 +35397,13 @@ async function exportCashFlowReport() {
           <div class="text">
             Generating PDF...
           </div>
-
         </div>
-
       </body>
-
     </html>
-
   `);
 
   try {
-
-    // =========================
     // CALL VERCEL API
-    // =========================
-
     const response =
 	  await fetch("/api/export-pdf", {
 		method: "POST",
@@ -36462,11 +35421,8 @@ async function exportCashFlowReport() {
 			tenantSlug: state.tenantSlug
 		})
 	  });
-
-    // =========================
+		
     // HTTP ERROR
-    // =========================
-
     if (!response.ok) {
 
       const errorText =
@@ -36476,59 +35432,37 @@ async function exportCashFlowReport() {
         errorText ||
         `Export gagal (${response.status})`
       );
-
     }
-
-    // =========================
+	
     // GET HTML REPORT
-    // =========================
-
     const html =
       await response.text();
 
     if (!html) {
-
       throw new Error(
         "Server mengembalikan HTML kosong"
       );
-
     }
 
-    console.log(
-      "EXPORT CASH FLOW HTML RECEIVED"
-    );
-
-    // =========================
     // RENDER REPORT
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(
       html
     );
-
     pdfWindow.document.close();
-
   }
 
   catch (err) {
-
     console.error(
       "Export Cash Flow:",
       err
     );
-
-    // =========================
+		
     // ERROR PAGE
-    // =========================
 
     pdfWindow.document.open();
-
     pdfWindow.document.write(`
-
       <html>
-
         <body style="
           background:#0B0F14;
           color:white;
