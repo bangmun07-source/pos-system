@@ -118,12 +118,6 @@ export default async function handler(req, res) {
 
   }
   catch (err) {
-
-    console.error(
-      "HANDLE BUSINESS LOGO UPLOAD ERROR:",
-      err
-    );
-
     return res.status(500).json({
       success: false,
       error:
