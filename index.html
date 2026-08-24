@@ -15112,11 +15112,6 @@ async function loadGrossRevenuePage() {
 	  renderTopRevenueTable();
 	}
 	catch (err) {
-	  console.error(
-	    "Load Gross Revenue error:",
-	    err
-	  );
-	
 	  showToast(
 	    "Gagal memuat Gross Revenue",
 	    "error"
@@ -15196,10 +15191,6 @@ async function applyDateFilter() {
     renderTopRevenueTable();
   }
   catch (err) {
-    console.error(
-      "Gross Revenue:",
-      err
-    );
     showToast(
       "Gagal memuat Gross Revenue",
       "error"
@@ -28230,11 +28221,7 @@ async function uploadExpenseAttachment() {
     // RELOAD
     await loadExpenseDashboard();
 		
-  catch (err) {
-    console.error(
-      "Upload expense attachment:",
-      err
-    );
+  }catch (err) {
     showToast(
       err?.message ||
       "Upload attachment gagal",
