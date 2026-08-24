@@ -56,11 +56,6 @@ export default async function handler(req, res) {
     // =========================
     
     if (isMaster) {
-    
-      console.log(
-        "PRODUCT IMAGE → MASTER"
-      );
-    
       supabase =
         centralSupabase;
     }
@@ -70,12 +65,6 @@ export default async function handler(req, res) {
     // =========================
     
     else {
-    
-      console.log(
-        "PRODUCT IMAGE → CUSTOMER:",
-        tenantSlug
-      );
-    
       const {
         data: tenantResult,
         error: tenantError
@@ -115,11 +104,6 @@ export default async function handler(req, res) {
           config.supabase_url,
           config.supabase_anon_key
         );
-    
-      console.log(
-        "CUSTOMER SUPABASE:",
-        config.supabase_url
-      );
     }
 
     // =========================
@@ -202,11 +186,6 @@ export default async function handler(req, res) {
     const url =
       publicData.publicUrl;
 
-    console.log(
-      "PRODUCT IMAGE UPLOAD SUCCESS:",
-      url
-    );
-
     // =========================
     // RESPONSE
     // =========================
@@ -218,12 +197,6 @@ export default async function handler(req, res) {
 
   }
   catch (err) {
-
-    console.error(
-      "HANDLE PRODUCT IMAGE UPLOAD ERROR:",
-      err
-    );
-
     return res.status(500).json({
       success: false,
       error:
