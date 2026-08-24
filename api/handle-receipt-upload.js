@@ -9,22 +9,6 @@ const centralSupabase =
 
 module.exports = async function handler(req, res) {
 
-  console.log(
-    "=== HANDLE RECEIPT START ==="
-  );
-
-  console.log(
-    "METHOD:",
-    req.method
-  );
-
-  console.log(
-    "BODY:",
-    req.body
-      ? Object.keys(req.body)
-      : null
-  );
-
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -39,16 +23,6 @@ module.exports = async function handler(req, res) {
       trxId,
       tenantSlug
     } = req.body || {};
-
-    console.log(
-      "TRX:",
-      trxId
-    );
-
-    console.log(
-      "TENANT:",
-      tenantSlug
-    );
 
     if (!base64) {
       return res.status(400).json({
@@ -75,11 +49,7 @@ module.exports = async function handler(req, res) {
       tenantSlug === "master";
     
     if (!isMaster) {
-    
-      console.log(
-        "RECEIPT → CUSTOMER"
-      );
-    
+  
       const {
         data: tenantResult,
         error: tenantError
@@ -94,11 +64,6 @@ module.exports = async function handler(req, res) {
       if (tenantError) {
         throw tenantError;
       }
-    
-      console.log(
-        "TENANT CONFIG:",
-        tenantResult
-      );
     
       if (
         !tenantResult?.success ||
@@ -124,11 +89,6 @@ module.exports = async function handler(req, res) {
           config.supabase_url,
           config.supabase_anon_key
         );
-    
-      console.log(
-        "CUSTOMER URL:",
-        config.supabase_url
-      );
     }
     
     // =====================================
@@ -136,11 +96,6 @@ module.exports = async function handler(req, res) {
     // =====================================
     
     else {
-    
-      console.log(
-        "RECEIPT → MASTER"
-      );
-    
       supabase =
         centralSupabase;
     }
@@ -160,11 +115,6 @@ module.exports = async function handler(req, res) {
         "base64"
       );
 
-    console.log(
-      "BUFFER SIZE:",
-      buffer.length
-    );
-
     // =====================================
     // STORAGE
     // =====================================
@@ -174,12 +124,6 @@ module.exports = async function handler(req, res) {
 
     const fileName =
       `${trxId}.jpg`;
-
-    console.log(
-      "UPLOAD:",
-      bucket,
-      fileName
-    );
 
     const {
       error: uploadError
@@ -200,10 +144,6 @@ module.exports = async function handler(req, res) {
       throw uploadError;
     }
 
-    console.log(
-      "STORAGE UPLOAD SUCCESS"
-    );
-
     // =====================================
     // URL
     // =====================================
@@ -219,11 +159,6 @@ module.exports = async function handler(req, res) {
 
     const url =
       publicData.publicUrl;
-
-    console.log(
-      "PUBLIC URL:",
-      url
-    );
 
     // =====================================
     // UPDATE TRANSAKSI
@@ -246,10 +181,6 @@ module.exports = async function handler(req, res) {
       throw updateError;
     }
 
-    console.log(
-      "TRANSAKSI UPDATE SUCCESS"
-    );
-
     return res.status(200).json({
       success: true,
       url
@@ -257,11 +188,6 @@ module.exports = async function handler(req, res) {
 
   }
   catch (err) {
-
-    console.error(
-      "HANDLE RECEIPT ERROR:",
-      err
-    );
 
     return res.status(500).json({
       success: false,
