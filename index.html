@@ -13051,26 +13051,49 @@ document.addEventListener("DOMContentLoaded", async () => {
       window.location.search
     );
 
-  // TENANT
-  state.tenantSlug =
-    params.get("tenant") || null;
+	// TENANT
 
-  // CONNECT TENANT
-  if (state.tenantSlug) {
-
-    try {
-
-      await connectTenant(
-        state.tenantSlug
-      );
-		
-    } catch (error) {
-      alert(
-        "Gagal menghubungkan database tenant"
-      );
-      return;
-    }
-  }
+	const urlTenant =
+	  params.get("tenant");
+	
+	if (urlTenant) {
+	  state.tenantSlug =
+	    urlTenant.trim();
+	  localStorage.setItem(
+	    "pos_tenantSlug",
+	    state.tenantSlug
+	  );
+	
+	} else {
+	  state.tenantSlug =
+	    localStorage.getItem(
+	      "pos_tenantSlug"
+	    ) || null;
+	}
+	
+	// CONNECT TENANT
+	if (state.tenantSlug) {
+	
+	  try {
+	
+	    await connectTenant(
+	      state.tenantSlug
+	    );
+	
+	  } catch (error) {
+	
+	    console.error(
+	      "CONNECT TENANT ERROR:",
+	      error
+	    );
+	
+	    alert(
+	      "Gagal menghubungkan database tenant"
+	    );
+	
+	    return;
+	  }
+	}
 
   // PAGE
   const page =
