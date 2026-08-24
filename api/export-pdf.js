@@ -540,8 +540,8 @@ console.log(
                   }
           
                   .title {         
-                    font-size: 24px;          
-                    font-weight: bold;          
+                    font-size: 20px;          
+                    font-weight: semibold;          
                     margin-bottom: 8px;         
                   }
        
@@ -1004,16 +1004,18 @@ console.log(
                   margin-bottom: 20px;             
                 }
                 
-                .logo {            
-                  width: 170px;             
-                  max-height: 90px;              
-                  object-fit: contain;             
+                .logo {        
+                  width: 170px;          
+                  height: auto;          
+                  max-height: 90px;          
+                  object-fit: contain;          
+                  margin-bottom: 8px;        
                 }
-                
-                .title {              
-                  font-size: 24px;              
-                  font-weight: bold;             
-                  margin-bottom: 8px;             
+        
+                .title {         
+                  font-size: 20px;          
+                  font-weight: semibold;          
+                  margin-bottom: 8px;         
                 }
                 
                 .subtitle {              
@@ -1500,18 +1502,18 @@ console.log(
                   margin-bottom: 20px;
                 }
                 
-                .logo {      
-                  width: 170px;
-                  height: auto;    
-                  max-height: 90px;    
-                  object-fit: contain;   
-                  margin-bottom: 12px; 
+                .logo {        
+                  width: 170px;          
+                  height: auto;          
+                  max-height: 90px;          
+                  object-fit: contain;          
+                  margin-bottom: 8px;        
                 }
-                
-                .title {      
-                  font-size: 24px;    
-                  font-weight: bold;      
-                  margin-bottom: 8px;    
+        
+                .title {         
+                  font-size: 20px;          
+                  font-weight: semibold;          
+                  margin-bottom: 8px;         
                 }
                 
                 .subtitle {      
@@ -2367,18 +2369,18 @@ console.log(
                       margin-bottom: 25px;
                     }
           
-                    .logo {
-                      width: 170px;
-                      height: auto;
-                      max-height: 90px;
-                      object-fit: contain;
-                      margin-bottom: 12px;
+                    .logo {        
+                      width: 170px;          
+                      height: auto;          
+                      max-height: 90px;          
+                      object-fit: contain;          
+                      margin-bottom: 8px;        
                     }
-          
-                    .title {
-                      font-size: 24px;
-                      font-weight: bold;
-                      margin-bottom: 8px;
+            
+                    .title {         
+                      font-size: 20px;          
+                      font-weight: semibold;          
+                      margin-bottom: 8px;         
                     }
           
                     .subtitle {
@@ -3285,17 +3287,18 @@ console.log(
                         margin-bottom:20px;          
                       }
                   
-                      .logo{          
-                        width:170px;          
-                        height:auto;          
-                        max-height:90px;          
-                        object-fit:contain;          
+                      .logo {        
+                        width: 170px;          
+                        height: auto;          
+                        max-height: 90px;          
+                        object-fit: contain;          
+                        margin-bottom: 8px;        
                       }
-                  
-                      .title{          
-                        font-size:24px;          
-                        font-weight:bold;          
-                        margin-bottom:8px;          
+              
+                      .title {         
+                        font-size: 20px;          
+                        font-weight: semibold;          
+                        margin-bottom: 8px;         
                       }
                   
                       .subtitle{          
@@ -3744,18 +3747,18 @@ console.log(
                   margin-bottom: 25px;     
                 }
       
-                .logo {      
-                  width: 170px;    
-                  height: auto;   
-                  max-height: 90px;   
-                  object-fit: contain;    
-                  margin-bottom: 12px;      
+                .logo {        
+                  width: 170px;          
+                  height: auto;          
+                  max-height: 90px;          
+                  object-fit: contain;          
+                  margin-bottom: 8px;        
                 }
-      
-                .title {
-                  font-size: 24px;
-                  font-weight: bold;
-                  margin-bottom: 8px;
+        
+                .title {         
+                  font-size: 20px;          
+                  font-weight: semibold;          
+                  margin-bottom: 8px;         
                 }
       
                 .subtitle {
@@ -4812,18 +4815,18 @@ else if (type === "analytics") {
           margin-bottom: 25px;
         }
 
-        .logo {
-          width: 170px;
-          height: auto;
-          max-height: 90px;
-          object-fit: contain;
-          margin-bottom: 12px;
+        .logo {        
+          width: 170px;          
+          height: auto;          
+          max-height: 90px;          
+          object-fit: contain;          
+          margin-bottom: 8px;        
         }
 
-        .title {
-          font-size: 24px;
-          font-weight: bold;
-          margin-bottom: 8px;
+        .title {         
+          font-size: 20px;          
+          font-weight: semibold;          
+          margin-bottom: 8px;         
         }
 
         .subtitle {
@@ -5467,18 +5470,18 @@ const html = `
             margin-bottom: 15px;
           }
 
-          .logo {
-            width: 170px;
-            height: auto;
-            max-height: 90px;
-            object-fit: contain;
-            margin-bottom: 8px;
+          .logo {        
+            width: 170px;          
+            height: auto;          
+            max-height: 90px;          
+            object-fit: contain;          
+            margin-bottom: 8px;        
           }
-
-          .title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 8px;
+  
+          .title {         
+            font-size: 20px;          
+            font-weight: semibold;          
+            margin-bottom: 8px;         
           }
 
           .subtitle {
@@ -6075,18 +6078,18 @@ const html = `
             margin-bottom: 15px;
           }
 
-          .logo {
-            width: 170px;
-            height: auto;
-            max-height: 90px;
-            object-fit: contain;
-            margin-bottom: 8px;
+          .logo {        
+            width: 170px;          
+            height: auto;          
+            max-height: 90px;          
+            object-fit: contain;          
+            margin-bottom: 8px;        
           }
-
-          .title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 8px;
+  
+          .title {         
+            font-size: 20px;          
+            font-weight: semibold;          
+            margin-bottom: 8px;         
           }
 
           .subtitle {
@@ -6685,18 +6688,18 @@ else if (type === "recipe") {
             margin-bottom:15px;
           }
           
-          .logo {
-            width:170px;
-            height:auto;
-            max-height:90px;
-            object-fit:contain;
-            margin-bottom:8px;
+          .logo {        
+            width: 170px;          
+            height: auto;          
+            max-height: 90px;          
+            object-fit: contain;          
+            margin-bottom: 8px;        
           }
-          
-          .title {
-            font-size:24px;
-            font-weight:bold;
-            margin-bottom:8px;
+  
+          .title {         
+            font-size: 20px;          
+            font-weight: semibold;          
+            margin-bottom: 8px;         
           }
           
           .subtitle {
