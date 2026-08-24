@@ -69,10 +69,6 @@ export default async function handler(req, res) {
         config.supabase_url,
         config.supabase_anon_key
       );
-    console.log(
-      "CLEAR DIGITAL RECEIPTS → CUSTOMER:",
-      tenantSlug
-    );
 
     // LIST SEMUA STRUK
     const {
@@ -147,10 +143,6 @@ export default async function handler(req, res) {
     });
   }
   catch (error) {
-    console.error(
-      "Clear digital receipts error:",
-      error
-    );
 
     return res.status(500).json({
       success: false,
