@@ -36,7 +36,6 @@ export default async function handler(req, res) {
       });
     }
 
-
     // =====================================================
     // MASTER SUPABASE
     // =====================================================
@@ -47,45 +46,26 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-
     // =====================================================
     // TENTUKAN DATABASE TARGET
     // =====================================================
 
     let supabase;
 
-
     // =====================================================
     // MASTER
     // =====================================================
 
     if (tenantSlug === "master") {
-
-      console.log(
-        "RESTORE → MASTER"
-      );
-
       supabase =
         centralSupabase;
-
     }
-
 
     // =====================================================
     // CUSTOMER
     // =====================================================
 
     else {
-
-      console.log(
-        "RESTORE → CUSTOMER:",
-        tenantSlug
-      );
-
-
-      // ==========================================
-      // GET TENANT CONFIG
-      // ==========================================
 
       const {
         data: tenantResult,
@@ -329,20 +309,6 @@ export default async function handler(req, res) {
           filePath
         );
 
-
-    console.log(
-      "RESTORE DOWNLOAD:",
-      {
-        tenantSlug,
-        filePath,
-        hasFile: !!file,
-        error:
-          downloadError?.message ||
-          null
-      }
-    );
-
-
     if (downloadError) {
       throw downloadError;
     }
@@ -384,46 +350,30 @@ export default async function handler(req, res) {
         }
       );
 
-
     if (restoreError) {
       throw restoreError;
     }
-
 
     // =====================================================
     // RESPONSE
     // =====================================================
 
     return res.status(200).json({
-
       success: true,
-
       result,
-
       tenant:
         tenantSlug,
-
       user:
         user.Username
-
     });
-
   }
   catch (error) {
 
-    console.error(
-      "Restore backup error:",
-      error
-    );
-
     return res.status(500).json({
-
       success: false,
-
       error:
         error.message ||
         "Restore backup gagal"
-
     });
   }
 }
