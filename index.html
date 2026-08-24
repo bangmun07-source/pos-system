@@ -15817,14 +15817,36 @@ async function checkout() {
   if (!state.user) return alert("User belum login");
   if (state.cart.length === 0) return alert("Keranjang kosong");
   if (!state.paymentMethod) return alert("Pilih pembayaran");
-	// CEK STATUS TABLE DI SINI
-	const tableData = await getTableStatus(table);
-	if (tableData?.status === "occupied") {
-	  alert(`Table ${table} sedang digunakan. Silakan clear table terlebih dahulu.`);
-	  return;
-	}
-	if (tableData?.status === "reserved") {
-	  alert(`Table ${table} sedang direservasi.`);
+
+	// CEK STATUS TABLE
+	try {
+	  const tableData =
+	    await getTableStatus(table);
+	
+	  if (tableData?.status === "occupied") {
+	    alert(
+	      `Table ${table} sedang digunakan. Silakan clear table terlebih dahulu.`
+	    );
+	    return;
+	  }
+	
+	  if (tableData?.status === "reserved") {
+	    alert(
+	      `Table ${table} sedang direservasi.`
+	    );
+	    return;
+	  }
+	
+	} catch (error) {
+	  console.error(
+	    "CHECK TABLE STATUS ERROR:",
+	    error
+	  );
+	
+	  alert(
+	    "Gagal memeriksa status table."
+	  );
+	
 	  return;
 	}
   isProcessing = true; //  kunci mulai
