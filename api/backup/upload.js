@@ -10,13 +10,11 @@ export default async function handler(req, res) {
   }
 
   try {
-
     const {
       fileName,
       jsonData,
       tenantSlug
     } = req.body || {};
-
 
     // =====================================================
     // VALIDASI INPUT
@@ -36,7 +34,6 @@ export default async function handler(req, res) {
       });
     }
 
-
     // =====================================================
     // SESSION
     // =====================================================
@@ -51,7 +48,6 @@ export default async function handler(req, res) {
       });
     }
 
-
     // =====================================================
     // MASTER SUPABASE
     // =====================================================
@@ -62,46 +58,27 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-
     // =====================================================
     // TENTUKAN DATABASE TARGET
     // =====================================================
 
     let targetSupabase;
 
-
     // =====================================================
     // MASTER
     // =====================================================
 
     if (tenantSlug === "master") {
-
-      console.log(
-        "BACKUP → MASTER DATABASE"
-      );
-
       targetSupabase =
         centralSupabase;
-
     }
-
 
     // =====================================================
     // CUSTOMER
     // =====================================================
 
     else {
-
-      console.log(
-        "BACKUP → CUSTOMER:",
-        tenantSlug
-      );
-
-
-      // ==========================================
-      // GET TENANT CONFIG
-      // ==========================================
-
+      
       const {
         data: tenantResult,
         error: tenantError
@@ -117,23 +94,18 @@ export default async function handler(req, res) {
         throw tenantError;
       }
 
-
       if (
         !tenantResult?.success ||
         !tenantResult?.data
       ) {
-
         return res.status(401).json({
           success: false,
           error: "Tenant tidak ditemukan"
         });
-
       }
-
 
       const config =
         tenantResult.data;
-
 
       // ==========================================
       // TENANT ACTIVE
@@ -145,9 +117,7 @@ export default async function handler(req, res) {
           success: false,
           error: "Tenant tidak aktif"
         });
-
       }
-
 
       // ==========================================
       // CUSTOMER SERVICE ROLE
@@ -166,20 +136,16 @@ export default async function handler(req, res) {
           )
           .maybeSingle();
 
-
       if (credentialError) {
         throw credentialError;
       }
 
 
       if (!credential?.service_role_key) {
-
         throw new Error(
           "Service Role Customer tidak ditemukan"
         );
-
       }
-
 
       // ==========================================
       // CUSTOMER CLIENT
@@ -190,9 +156,7 @@ export default async function handler(req, res) {
           config.supabase_url,
           credential.service_role_key
         );
-
     }
-
 
     // =====================================================
     // VALIDASI SESSION
@@ -213,21 +177,16 @@ export default async function handler(req, res) {
         )
         .maybeSingle();
 
-
     if (sessionError) {
       throw sessionError;
     }
 
-
     if (!session) {
-
       return res.status(401).json({
         success: false,
         error: "Session tidak valid"
       });
-
     }
-
 
     // =====================================================
     // CEK EXPIRED
@@ -250,9 +209,7 @@ export default async function handler(req, res) {
         success: false,
         error: "Session sudah expired"
       });
-
     }
-
 
     // =====================================================
     // AMBIL USER
@@ -273,21 +230,16 @@ export default async function handler(req, res) {
         )
         .maybeSingle();
 
-
     if (userError) {
       throw userError;
     }
 
-
     if (!user) {
-
       return res.status(401).json({
         success: false,
         error: "User tidak ditemukan"
       });
-
     }
-
 
     // =====================================================
     // OWNER ONLY
@@ -301,9 +253,7 @@ export default async function handler(req, res) {
         success: false,
         error: "Akses hanya untuk Owner"
       });
-
     }
-
 
     // =====================================================
     // BUAT PATH
@@ -323,7 +273,6 @@ export default async function handler(req, res) {
     const path =
       `${year}/${month}/${fileName}`;
 
-
     // =====================================================
     // JSON → BUFFER
     // =====================================================
@@ -340,7 +289,6 @@ export default async function handler(req, res) {
         jsonString,
         "utf8"
       );
-
 
     // =====================================================
     // UPLOAD STORAGE
@@ -364,51 +312,33 @@ export default async function handler(req, res) {
           }
         );
 
-
     if (uploadError) {
       throw uploadError;
     }
-
 
     // =====================================================
     // RESPONSE
     // =====================================================
 
     return res.status(200).json({
-
       success: true,
-
       path:
         path,
-
       size:
         buffer.length,
-
       tenant:
         tenantSlug,
-
       user:
         user.Username
-
     });
-
   }
   catch (error) {
 
-    console.error(
-      "Upload backup error:",
-      error
-    );
-
     return res.status(500).json({
-
       success: false,
-
       error:
         error.message ||
         "Upload backup gagal"
-
     });
-
   }
 }
