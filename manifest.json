@@ -8,8 +8,8 @@
   "theme_color": "#101715",
   "icons": [
     {
-      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20192.png",
-      "sizes": "192x192",
+      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20FULL%20512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
