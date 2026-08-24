@@ -541,7 +541,7 @@ console.log(
           
                   .title {         
                     font-size: 20px;          
-                    font-weight: semibold;          
+                    font-weight: bold;          
                     margin-bottom: 8px;         
                   }
        
@@ -1014,7 +1014,7 @@ console.log(
         
                 .title {         
                   font-size: 20px;          
-                  font-weight: semibold;          
+                  font-weight: bold;          
                   margin-bottom: 8px;         
                 }
                 
@@ -1512,7 +1512,7 @@ console.log(
         
                 .title {         
                   font-size: 20px;          
-                  font-weight: semibold;          
+                  font-weight: bold;          
                   margin-bottom: 8px;         
                 }
                 
@@ -2379,7 +2379,7 @@ console.log(
             
                     .title {         
                       font-size: 20px;          
-                      font-weight: semibold;          
+                      font-weight: bold;          
                       margin-bottom: 8px;         
                     }
           
@@ -3297,7 +3297,7 @@ console.log(
               
                       .title {         
                         font-size: 20px;          
-                        font-weight: semibold;          
+                        font-weight: bold;          
                         margin-bottom: 8px;         
                       }
                   
@@ -3757,7 +3757,7 @@ console.log(
         
                 .title {         
                   font-size: 20px;          
-                  font-weight: semibold;          
+                  font-weight: bold;          
                   margin-bottom: 8px;         
                 }
       
@@ -4825,7 +4825,7 @@ else if (type === "analytics") {
 
         .title {         
           font-size: 20px;          
-          font-weight: semibold;          
+          font-weight: bold;          
           margin-bottom: 8px;         
         }
 
@@ -5480,7 +5480,7 @@ const html = `
   
           .title {         
             font-size: 20px;          
-            font-weight: semibold;          
+            font-weight: bold;          
             margin-bottom: 8px;         
           }
 
@@ -6088,7 +6088,7 @@ const html = `
   
           .title {         
             font-size: 20px;          
-            font-weight: semibold;          
+            font-weight: bold;          
             margin-bottom: 8px;         
           }
 
@@ -6221,7 +6221,7 @@ const html = `
             }
 
             <div class="title">
-              INGREDIENT PURCHASE REPORT
+              Ingredient Purchase Report
             </div>
 
             <div class="subtitle">
@@ -6698,7 +6698,7 @@ else if (type === "recipe") {
   
           .title {         
             font-size: 20px;          
-            font-weight: semibold;          
+            font-weight: bold;          
             margin-bottom: 8px;         
           }
           
