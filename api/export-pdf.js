@@ -64,9 +64,6 @@ async function getBranchName(supabaseClient, branchId) {
 }
 
 export default async function handler(req, res) {
-
-  console.log("=== EXPORT PDF START ===");
-
   if (req.method !== "POST") {
     return res
       .status(405)
@@ -87,15 +84,8 @@ export default async function handler(req, res) {
       loginUserId,
       tenantSlug
     } = req.body || {};
-    console.log("EXPORT TENANT:", tenantSlug);
-    console.log("EXPORT TYPE:", type);
-    console.log("EXPORT BRANCH:", branchId);
-
     
-// ==========================================
 // CONNECT TENANT
-// ==========================================
-
 if (!tenantSlug) {
   return res.status(400).json({
     success: false,
@@ -152,16 +142,6 @@ supabase = createClient(
 
 const logoSrc =
   `${tenantConfig.supabase_url}/storage/v1/object/public/Logo/LOGOEXPORT.png`;
-
-console.log(
-  "EXPORT CONNECTED TENANT:",
-  tenantConfig.tenant_name
-);
-
-console.log(
-  "EXPORT TENANT ID:",
-  tenantConfig.tenant_id
-);
     
     // ==========================================
     // EXPENSE
@@ -1226,9 +1206,7 @@ console.log(
     // ==========================================
     
     else if (type === "recent-transactions") {
-         console.log(
-            ">>> MASUK RECENT TRANSAKSI EXPORT <<<"
-          );
+      
       if (!branchId) {
     
         return res
@@ -1821,20 +1799,6 @@ console.log(
     // =========================
 
     else if (type === "cash-flow") {
-          console.log(
-            ">>> MASUK CASH FLOW EXPORT <<<"
-          );
-        
-          console.log(
-            "EXPORT CASH FLOW REQUEST:",
-            {
-              loginUserId,
-              branchId,
-              start,
-              end
-            }
-          );
-        
           // VALIDATION
           if (!loginUserId) {
             return res
@@ -1888,11 +1852,6 @@ console.log(
                   "Gagal mengambil data Cash Flow"
                 );
               }
-          
-              console.log(
-                "EXPORT CASH FLOW DATA:",
-                data
-              );
           
               // NORMALIZE
               const account =
@@ -2852,14 +2811,11 @@ console.log(
       // ===================================================
 
       else if (type === "other-income") {
-            console.log(
-              ">>> MASUK OTHER INCOME EXPORT <<<"
-            );
-                if (!branchId) {
-                  return res.status(400).send(
-                    "branchId wajib diisi"
-                  );
-                }
+            if (!branchId) {
+              return res.status(400).send(
+                "branchId wajib diisi"
+              );
+            }
         
             // GET DATA
             const {
@@ -3530,11 +3486,6 @@ console.log(
       // ==========================================
       
       else if (type === "gross-revenue") {
-      
-        console.log(
-          ">>> MASUK GROSS REVENUE EXPORT <<<"
-        );
-      
         if (!branchId) {
           return res
             .status(400)
@@ -3557,11 +3508,6 @@ console.log(
         if (error) {
           throw error;
         }
-      
-        console.log(
-          "EXPORT GROSS REVENUE:",
-          data
-        );
 
         // NORMALIZE     
         const report =
@@ -4144,22 +4090,7 @@ console.log(
 // ==========================================
 
 else if (type === "analytics") {
-
-  console.log(
-    ">>> MASUK ANALYTICS EXPORT <<<"
-  );
-
-  console.log(
-    "ANALYTICS REQUEST:",
-    {
-      start,
-      end,
-      branchId
-    }
-  );
-
   // VALIDATION
-
   if (!branchId) {
 
     return res
