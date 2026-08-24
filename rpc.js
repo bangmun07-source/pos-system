@@ -830,7 +830,7 @@ async function getLatestTransactionByTableRPC(mejaId) {
   return data;
 }
 
-async function reserveTableRPC( mejaId, name, note ) {
+async function reserveTableRPC(mejaId, name, note) {
 
   const {
     data,
@@ -838,6 +838,7 @@ async function reserveTableRPC( mejaId, name, note ) {
   } = await supabaseClient.rpc(
     "reserve_table",
     {
+      p_branch_id: state.branchId,
       p_meja_id: mejaId,
       p_name: name,
       p_note: note || ""
@@ -846,6 +847,14 @@ async function reserveTableRPC( mejaId, name, note ) {
 
   if (error) {
     throw error;
+  }
+
+  if (!data?.success) {
+    alert(
+      data?.message ||
+      "Gagal melakukan reservasi"
+    );
+    return data;
   }
   return data;
 }
