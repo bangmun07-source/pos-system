@@ -56,7 +56,6 @@ async function getBranchName(supabaseClient, branchId) {
     .single();
 
   if (error) {
-    console.error("getBranchName error:", error);
     return branchId;
   }
 
@@ -104,11 +103,6 @@ const {
 );
 
 if (tenantError) {
-  console.error(
-    "get_tenant_config ERROR:",
-    tenantError
-  );
-
   throw tenantError;
 }
 
@@ -185,10 +179,6 @@ const logoSrc =
       );
 
       if (error) {
-        console.error(
-          "RPC get_expense_dashboard ERROR:",
-          error
-        );
         throw error;
       }
 
@@ -1833,10 +1823,6 @@ const logoSrc =
           );
           
               if (error) {
-                console.error(
-                  "CASH FLOW RPC ERROR:",
-                  error
-                );
                 throw error;
               }
           
@@ -2831,11 +2817,6 @@ const logoSrc =
             );
       
             if (error) {
-              console.error(
-                "OTHER INCOME RPC ERROR DETAIL:",
-                error
-              );
-            
               return res
                 .status(500)
                 .json({
@@ -4115,10 +4096,6 @@ else if (type === "analytics") {
   );
 
   if (error) {
-    console.error(
-      "ANALYTICS RPC ERROR:",
-      error
-    );
     throw error;
   }
 
@@ -5223,10 +5200,6 @@ else if (type === "inventory") {
     }
   );
   if (error) {
-    console.error(
-      "get_inventory_page error:",
-      error
-    );
     throw error;
   }
   const inventoryData =
@@ -5670,10 +5643,6 @@ const html = `
   );
 
   if (error) {
-    console.error(
-      "get_ingredient_purchases error:",
-      error
-    );
     throw error;
   }
 
@@ -6336,10 +6305,6 @@ else if (type === "recipe") {
   );
 
   if (error) {
-    console.error(
-      "RPC get_recipes ERROR:",
-      error
-    );
     throw error;
   }
   const recipes =
@@ -6881,22 +6846,6 @@ else if (type === "recipe") {
     });
 
   } catch (err) {
-
-    console.error(
-      "EXPORT TEST ERROR:",
-      err
-    );
-
-    console.error(
-      "ERROR MESSAGE:",
-      err?.message
-    );
-
-    console.error(
-      "ERROR STACK:",
-      err?.stack
-    );
-
     return res.status(500).json({
       success: false,
       error:
