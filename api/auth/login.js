@@ -14,7 +14,6 @@ export default async function handler(req, res) {
         process.env.SUPABASE_SERVICE_ROLE_KEY
       );
 
-
     // =====================================================
     // POST = LOGIN
     // =====================================================
@@ -26,7 +25,6 @@ export default async function handler(req, res) {
         username,
         password
       } = req.body || {};
-
 
       // ==========================================
       // VALIDASI INPUT
@@ -45,7 +43,6 @@ export default async function handler(req, res) {
           error: "Username dan password wajib diisi"
         });
       }
-
 
       // ==========================================
       // AMBIL CONFIG TENANT
@@ -79,7 +76,6 @@ export default async function handler(req, res) {
       const config =
         tenantResult.data;
 
-
       // ==========================================
       // CEK TENANT AKTIF
       // ==========================================
@@ -90,7 +86,6 @@ export default async function handler(req, res) {
           error: "Tenant tidak aktif"
         });
       }
-
 
       // ==========================================
       // TENANT SUPABASE
@@ -138,7 +133,6 @@ export default async function handler(req, res) {
           );
       }
 
-
       // ==========================================
       // CEK USER
       // ==========================================
@@ -162,14 +156,12 @@ export default async function handler(req, res) {
         throw userError;
       }
 
-
       if (!user) {
         return res.status(401).json({
           success: false,
           error: "Username atau password salah"
         });
       }
-
 
       // ==========================================
       // CEK PASSWORD
@@ -182,7 +174,6 @@ export default async function handler(req, res) {
         });
       }
 
-
       // ==========================================
       // BUAT SESSION
       // ==========================================
@@ -192,7 +183,6 @@ export default async function handler(req, res) {
           Date.now() +
           24 * 60 * 60 * 1000
         ).toISOString();
-
 
       const {
         data: session,
@@ -216,52 +206,38 @@ export default async function handler(req, res) {
         throw sessionError;
       }
 
-
       // ==========================================
       // RESPONSE LOGIN
       // ==========================================
 
       return res.status(200).json({
-
         success: true,
-
         session_id:
           session.session_id,
-
         expires_at:
           session.expires_at,
-
         user: {
-
           ID_User:
             user.ID_User,
-
           Username:
             user.Username,
-
           Role:
             user.Role,
-
           branchId:
             user.branchId
         }
-
       });
     }
-
 
     // =====================================================
     // GET = VALIDASI SESSION
     // =====================================================
 
     if (req.method === "GET") {
-
       const sessionId =
         req.headers["x-session-id"];
-
       const tenantSlug =
         req.headers["x-tenant-slug"];
-
 
       // ==========================================
       // VALIDASI HEADER
@@ -280,7 +256,6 @@ export default async function handler(req, res) {
           error: "Tenant slug kosong"
         });
       }
-
 
       // ==========================================
       // AMBIL TENANT
@@ -314,14 +289,12 @@ export default async function handler(req, res) {
       const config =
         tenantResult.data;
 
-
       if (!config.is_active) {
         return res.status(403).json({
           success: false,
           error: "Tenant tidak aktif"
         });
       }
-
 
       // ==========================================
       // SERVICE ROLE CUSTOMER
@@ -350,7 +323,6 @@ export default async function handler(req, res) {
         );
       }
 
-
       // ==========================================
       // CUSTOMER SUPABASE
       // ==========================================
@@ -360,7 +332,6 @@ export default async function handler(req, res) {
           config.supabase_url,
           credential.service_role_key
         );
-
 
       // ==========================================
       // CEK SESSION
@@ -392,7 +363,6 @@ export default async function handler(req, res) {
         });
       }
 
-
       // ==========================================
       // CEK EXPIRED
       // ==========================================
@@ -415,7 +385,6 @@ export default async function handler(req, res) {
           error: "Session sudah expired"
         });
       }
-
 
       // ==========================================
       // AMBIL USER
@@ -447,36 +416,26 @@ export default async function handler(req, res) {
         });
       }
 
-
       // ==========================================
       // RESPONSE SESSION
       // ==========================================
 
       return res.status(200).json({
-
         success: true,
-
         user: {
-
           ID_User:
             user.ID_User,
-
           Username:
             user.Username,
-
           Role:
             user.Role,
-
           branchId:
             user.branchId
         },
-
         expires_at:
           session.expires_at
-
       });
     }
-
 
     // =====================================================
     // METHOD LAIN
@@ -489,12 +448,6 @@ export default async function handler(req, res) {
 
   }
   catch (error) {
-
-    console.error(
-      "AUTH ERROR:",
-      error
-    );
-
     return res.status(500).json({
       success: false,
       error:
