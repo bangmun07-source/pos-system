@@ -13502,10 +13502,46 @@ function logout() {
 }
 	
 function initApp() {
-  const params = new URLSearchParams(window.location.search);
-  const page = params.get("page");
-  const user = localStorage.getItem("pos_user");
-      
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const page =
+    params.get("page");
+
+  // ==========================
+  // TENANT CONTEXT
+  // ==========================
+  const urlTenant =
+    params.get("tenant");
+
+  if (urlTenant) {
+
+    state.tenantSlug =
+      urlTenant.trim();
+
+    localStorage.setItem(
+      "pos_tenantSlug",
+      state.tenantSlug
+    );
+
+  } else {
+
+    state.tenantSlug =
+      localStorage.getItem(
+        "pos_tenantSlug"
+      ) || "";
+  }
+
+  // ==========================
+  // USER
+  // ==========================
+  const user =
+    localStorage.getItem(
+      "pos_user"
+    );
+
   if (!user) {
     navigate(
       "loginPage"
@@ -13513,21 +13549,28 @@ function initApp() {
     return;
   }
 
-  state.user = JSON.parse(user);
-  const role = state.user?.role?.toLowerCase();
+  state.user =
+    JSON.parse(user);
+
+  const role =
+    (
+      state.user?.role ||
+      state.user?.Role ||
+      ""
+    ).toLowerCase();
 
   // ==========================
   // BRANCH CONTEXT
   // ==========================
-  if(role === "owner") {
-    // owner ambil branch terakhir yang dipilih
+  if (role === "owner") {
+
     state.branchId =
       localStorage.getItem(
         "pos_branchId"
       ) || "";
-        
+
   } else {
-    // admin / kasir
+
     state.branchId =
       state.user?.branchId ||
       localStorage.getItem(
@@ -13536,10 +13579,16 @@ function initApp() {
       "";
   }
 
-  if(page) {
+  // ==========================
+  // PAGE
+  // ==========================
+  if (page) {
+
     window.__ACTIVE_PAGE =
       page;
+
     navigate(page);
+
     return;
   }
 
