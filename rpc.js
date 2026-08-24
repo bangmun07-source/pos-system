@@ -887,6 +887,32 @@ async function addNewTableRPC(tableName, branchId) {
   return data;
 }
 
+async function getTableStatus(table) {
+  const { data, error } =
+    await supabase.rpc(
+      "get_table_data",
+      {
+        p_branch_id: state.branchId
+      }
+    );
+
+  if (error) {
+    throw error;
+  }
+
+  const tables = Array.isArray(data)
+    ? data
+    : [];
+
+  const tableData = tables.find(
+    t =>
+      String(t.name || "").trim().toLowerCase() ===
+      String(table || "").trim().toLowerCase()
+  );
+
+  return tableData || null;
+}
+
     // ===============================
     // INGREDIENT PAGE
     // ===============================
