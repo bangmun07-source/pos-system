@@ -66,10 +66,6 @@ async function uploadBusinessLogo(base64) {
       );
 
   if (error) {
-    console.error(
-      "Upload Business Logo Error:",
-      error
-    );
     throw error;
   }
 
@@ -233,10 +229,6 @@ async function getReceiptDataRPC(trxId) {
       }
     );
   if (error) {
-    console.error(
-      "get_receipt_data error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -250,10 +242,6 @@ async function getSettingsPageDataRPC() {
     "get_settings_page_data"
   );
   if (error) {
-    console.error(
-      "get_settings_page_data error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -305,10 +293,6 @@ async function getGrossRevenueDataRPC(branchId, startDate, endDate) {
         topRevenue || []
     };
   } catch (err) {
-    console.error(
-      "getGrossRevenueDataRPC error:",
-      err
-    );
     throw err;
   }
 }
@@ -326,10 +310,6 @@ async function getGrossRevenueByDateRPC(start, end, branchId) {
     }
   );
   if (error) {
-    console.error(
-      "get_gross_revenue_by_date error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -349,10 +329,6 @@ async function getTopRevenueProductsRPC(start, end, branchId,limit = 10) {
     }
   );
   if (error) {
-    console.error(
-      "get_top_revenue_products error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -371,10 +347,6 @@ async function checkoutTransaction(payload){
       }
     );
   if(error){
-    console.error(
-      "checkout_transaction error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -406,10 +378,6 @@ async function getProductsRPC(branchId, role){
       }
     );
   if(error){
-    console.error(
-      "get_products error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -425,10 +393,6 @@ async function getRewardsRPC(memberId, branchId) {
       }
     );
   if(error){
-    console.error(
-      "get_rewards error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -442,10 +406,6 @@ async function getOrdersRPC() {
     "get_orders"
   );
   if (error) {
-    console.error(
-      "get_orders error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -465,11 +425,6 @@ async function removeItemFromCartRPC(transId, productId) {
   );
 
   if (error) {
-    console.error(
-      "remove_item_from_cart error:",
-      error
-    );
-
     throw error;
   }
   return data;
@@ -490,10 +445,6 @@ async function checkMemberRPC(memberId) {
     }
   );
   if (error) {
-    console.error(
-      "check_member error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -509,11 +460,6 @@ async function getMemberPageDataRPC(branchId) {
   ).then(({ data, error }) => {
 
     if (error) {
-      console.error(
-        "get_member_page_data error:",
-        error
-      );
-
       throw error;
     }
 
@@ -538,10 +484,6 @@ async function getTransactionNotificationsRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_transaction_notifications error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -561,10 +503,6 @@ async function getMemberDetailPageRPC(memberId, branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_member_detail_page error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -583,10 +521,6 @@ async function getMembersRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_members error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -606,17 +540,9 @@ async function searchMembersRPC(keyword) {
   );
 
   if (error) {
-    console.error(
-      "search_members error:",
-      error
-    );
     throw error;
   }
 
-  console.log(
-    "SEARCH RPC:",
-    data
-  );
   return data || [];
 }
 
@@ -656,10 +582,6 @@ async function addMemberRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "add_member error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -709,10 +631,6 @@ async function updateMemberRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "update_member error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -733,10 +651,6 @@ async function getMemberTierHistoryRPC(memberId) {
   );
 
   if (error) {
-    console.error(
-      "get_member_tier_history error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -759,10 +673,6 @@ async function getRewardsRPC(memberId, branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_rewards error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -783,10 +693,6 @@ async function getMemberDashboardRPC(memberId) {
   );
 
   if (error) {
-    console.error(
-      "get_member_dashboard error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -828,16 +734,8 @@ async function addMemberRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "add_member error:",
-      error
-    );
     throw error;
   }
-  console.log(
-    "ADD MEMBER RPC:",
-    result
-  );
   return result;
 }
 
@@ -887,16 +785,8 @@ async function updateMemberRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "update_member error:",
-      error
-    );
     throw error;
   }
-  console.log(
-    "UPDATE MEMBER RPC:",
-    result
-  );
   return result;
 }
 
@@ -917,10 +807,6 @@ async function getTableDataRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_table_data error:",
-      error
-    );
     throw error;
   }
   return data || [];
@@ -939,10 +825,6 @@ async function getLatestTransactionByTableRPC(mejaId) {
   );
 
   if (error) {
-    console.error(
-      "get_latest_transaction_by_table error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -963,10 +845,6 @@ async function reserveTableRPC( mejaId, name, note ) {
   );
 
   if (error) {
-    console.error(
-      "reserve_table error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -985,10 +863,6 @@ async function clearTableStatusRPC(mejaId) {
   );
 
   if (error) {
-    console.error(
-      "clear_table_status error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -1008,10 +882,6 @@ async function addNewTableRPC(tableName, branchId) {
   );
 
   if (error) {
-    console.error(
-      "add_new_table error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -1033,10 +903,6 @@ async function getRecipeMasterLedgerRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_recipe_master_ledger error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -1055,11 +921,6 @@ async function getInventoryPageRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_inventory_page error:",
-      error
-    );
-
     throw error;
   }
 
@@ -1084,11 +945,6 @@ async function getInventoryDashboardRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_inventory_dashboard error:",
-      error
-    );
-
     throw error;
   }
 
@@ -1105,14 +961,8 @@ async function getRecipesRPC() {
   );
 
   if (error) {
-    console.error(
-      "get_recipes error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1129,14 +979,8 @@ async function getRecipeMasterLedgerRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_recipe_master_ledger error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1155,14 +999,8 @@ async function getIngredientPurchasesRPC(branchId, startDate, endDate) {
   );
 
   if (error) {
-    console.error(
-      "get_ingredient_purchases error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1179,14 +1017,8 @@ async function getInventorySummaryRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_inventory_summary error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {};
 }
 
@@ -1203,14 +1035,8 @@ async function getDailyIngredientUsageRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_daily_ingredient_usage error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1227,14 +1053,8 @@ async function getLowIngredientStockRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_low_ingredient_stock error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1251,14 +1071,8 @@ async function getCriticalIngredientsRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_critical_ingredients error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1276,14 +1090,8 @@ async function getStockHistoryRPC(limit = 50, branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_stock_history error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1301,14 +1109,8 @@ async function getLiveDeductionFeed(limit = 20, branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_live_deduction_feed error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1326,14 +1128,8 @@ async function getIngredientSummaryRPC(ingredientName, branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_ingredient_summary error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {};
 }
 
@@ -1351,14 +1147,8 @@ async function getIngredientUsageLogRPC( ingredientId, branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_ingredient_usage_log error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1375,14 +1165,8 @@ async function saveRecipeRPC(payload) {
   );
 
   if (error) {
-    console.error(
-      "save_recipe error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -1424,14 +1208,8 @@ async function saveMaterialRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "save_material error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -1465,14 +1243,8 @@ async function adjustIngredientStockRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "adjust_ingredient_stock error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -1500,28 +1272,12 @@ async function updateIngredientThresholdRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "update_ingredient_threshold error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
 async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, note, branchId, outlet, paymentMethod = "CASH") {
-console.log("ADD PURCHASE PARAMS:", {
-  branchId,
-  ingredientName,
-  qty,
-  totalPrice,
-  supplier,
-  note,
-  outlet,
-  paymentMethod
-});
   const {
     data,
     error
@@ -1558,14 +1314,8 @@ console.log("ADD PURCHASE PARAMS:", {
   );
 
   if (error) {
-    console.error(
-      "add_ingredient_purchase error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -1604,14 +1354,8 @@ async function saveIngredientPurchaseRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "save_ingredient_purchase error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -1671,10 +1415,6 @@ async function updateRecipeMasterRPC(data = {}) {
     );
 
   if (error) {
-    console.error(
-      "update_recipe_master error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -1710,10 +1450,6 @@ async function addNewProductRPC(data = {}) {
     );
 
   if (error) {
-    console.error(
-      "add_new_product error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -1732,14 +1468,8 @@ async function recalcAllProductStockRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "recalc_all_product_stock error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {
     success: false
   };
@@ -1796,14 +1526,8 @@ async function logStockMovementRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "log_stock_movement error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -1831,14 +1555,8 @@ async function deductIngredientStockRPC(
   );
 
   if (error) {
-    console.error(
-      "deduct_ingredient_stock error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {
     success: false
   };
@@ -1858,14 +1576,8 @@ async function getRecipeByProductRPC(productId) {
   );
 
   if (error) {
-    console.error(
-      "get_recipe_by_product error:",
-      error
-    );
-
     throw error;
   }
-
   return data || null;
 }
 
@@ -1882,14 +1594,8 @@ async function getRecipeItemsRPC(recipeId) {
   );
 
   if (error) {
-    console.error(
-      "get_recipe_items error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1907,14 +1613,8 @@ async function validateIngredientStockRPC(cartItems, branchId) {
   );
 
   if (error) {
-    console.error(
-      "validate_ingredient_stock error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {
     valid: true,
     missing: []
@@ -1934,14 +1634,8 @@ async function validateStockRPC(items) {
   );
 
   if (error) {
-    console.error(
-      "validate_stock error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {
     valid: true
   };
@@ -1960,14 +1654,8 @@ async function getRecipeListRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_recipe_list error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -1985,14 +1673,8 @@ async function getProductsRPC(branchId, role) {
   );
 
   if (error) {
-    console.error(
-      "get_products error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -2009,14 +1691,8 @@ async function getIngredientsRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_ingredients error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -2033,14 +1709,8 @@ async function getSuppliersRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_suppliers error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -2066,14 +1736,8 @@ async function updateSupplierRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "update_supplier error:",
-      error
-    );
-
     throw error;
   }
-
   return result || {
     success: false
   };
@@ -2116,14 +1780,8 @@ async function saveSupplierRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "save_supplier error:",
-      error
-    );
-
     throw error;
   }
-
   return result || {
     success: false
   };
@@ -2142,14 +1800,8 @@ async function getRecipePriceHistoryRPC(recipeId) {
   );
 
   if (error) {
-    console.error(
-      "get_recipe_price_history error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -2164,11 +1816,6 @@ async function getInventoryRPC() {
   );
 
   if (error) {
-    console.error(
-      "get_inventory error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2186,11 +1833,6 @@ async function generateIngredientIdRPC() {
   );
 
   if (error) {
-    console.error(
-      "generate_ingredient_id error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2224,12 +1866,6 @@ async function getAnalyticsDashboardRPC(branchId, startDate, endDate) {
   );
 
   if (error) {
-
-    console.error(
-      "get_analytics_dashboard error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2251,12 +1887,6 @@ async function getAnalyticsRPC(branchId, startDate, endDate) {
   );
 
   if (error) {
-
-    console.error(
-      "get_analytics error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2279,15 +1909,8 @@ async function getPaymentDistributionRPC(branchId, startDate, endDate) {
   );
 
   if (error) {
-
-    console.error(
-      "get_payment_distribution error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2307,15 +1930,8 @@ async function getPeakHoursRPC(branchId, startDate, endDate ) {
   );
 
   if (error) {
-
-    console.error(
-      "get_peak_hours error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2334,15 +1950,8 @@ async function getTopSellingItemsRPC(branchId, startDate, endDate) {
   );
 
   if (error) {
-
-    console.error(
-      "get_top_selling_items error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2362,15 +1971,8 @@ async function getRawMaterialAnalysisRPC(branchId, startDate, endDate) {
   );
 
   if (error) {
-
-    console.error(
-      "get_raw_material_analysis error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2387,16 +1989,8 @@ async function getSettingsPageDataRPC() {
   );
 
   if (error) {
-    console.error(
-      "get_settings_page_data error:",
-      error
-    );
     throw error;
   }
-  console.log(
-    "RAW SETTINGS RPC:",
-    data
-  );
   return data;
 }
 
@@ -2421,10 +2015,6 @@ async function getBranchOptionsRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "get_branch_options error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -2445,10 +2035,6 @@ async function addNewBranchRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "add_new_branch error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -2468,10 +2054,6 @@ async function updateBranchStatusRPC(branchId, active) {
   );
 
   if (error) {
-    console.error(
-      "update_branch_status error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -2497,10 +2079,6 @@ async function updateBranchRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "update_branch error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -2516,10 +2094,6 @@ async function getUsersRPC() {
   );
 
   if (error) {
-    console.error(
-      "get_users error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -2547,10 +2121,6 @@ async function addNewUserRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "add_new_user error:",
-      error
-    );
     throw error;
   }
   // CLEAR SETTINGS STATE
@@ -2578,13 +2148,8 @@ async function updateUserRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "update_user error:",
-      error
-    );
     throw error;
   }
-
   // CLEAR STATE
   state.settingsPageData = null;
   return result;
@@ -2606,13 +2171,8 @@ async function deleteUserRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "delete_user error:",
-      error
-    );
     throw error;
   }
-
   // CLEAR STATE
   state.settingsPageData = null;
   return result;
@@ -2648,15 +2208,8 @@ async function saveSettingsRPC(payload) {
   );
 
   if (error) {
-
-    console.error(
-      "save_settings error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2670,10 +2223,6 @@ async function getBusinessProfileRPC() {
   );
 
   if (error) {
-    console.error(
-      "get_business_profile error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -2699,10 +2248,6 @@ async function saveBusinessProfileRPC(data) {
   );
 
   if (error) {
-    console.error(
-      "save_business_profile error:",
-      error
-    );
     throw error;
   }
   return result;
@@ -2723,10 +2268,6 @@ async function getBranchInfoRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_branch_info error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -2750,12 +2291,6 @@ async function getRewardProductsRPC(branchId) {
   );
 
   if (error) {
-
-    console.error(
-      "get_reward_products error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2775,12 +2310,6 @@ async function deleteRewardRPC(id) {
   );
 
   if (error) {
-
-    console.error(
-      "delete_reward error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2826,12 +2355,6 @@ async function saveRewardProductRPC(data) {
   );
 
   if (error) {
-
-    console.error(
-      "save_reward_product error:",
-      error
-    );
-
     throw error;
   }
 
@@ -2848,15 +2371,8 @@ async function getSeasonConfigRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "get_season_config error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2878,15 +2394,8 @@ async function setSeasonConfigRPC(
   );
 
   if (error) {
-
-    console.error(
-      "set_season_config error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2908,15 +2417,8 @@ async function openSeasonRPC(
   );
 
   if (error) {
-
-    console.error(
-      "open_season error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2931,15 +2433,8 @@ async function closeSeasonRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "close_season error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -2954,12 +2449,6 @@ async function toggleAutoSeasonRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "toggle_auto_season error:",
-      error
-    );
-
     throw error;
   }
   return data;
@@ -2981,10 +2470,6 @@ async function saveCategoryRPC( branchId, categoryKey, categoryName, discount, r
   );
 
   if (error) {
-    console.error(
-      "save_category error:",
-      error
-    );
     throw error;
   }
   return data;
@@ -3001,10 +2486,6 @@ async function getCategoriesRPC(branchId) {
     }
   );
   if (error) {
-    console.error(
-      "get_categories error:",
-      error
-    );
     throw error;
   }
   return data?.data || [];
@@ -3026,11 +2507,6 @@ async function getExpenseDashboardRPC(filter = {}) {
     branchId =
       filter.loginBranchId || "ALL";
   }
-
-  console.log(
-    "RPC EXPENSE BRANCH:",
-    branchId
-  );
 
   const {
     data,
@@ -3062,19 +2538,8 @@ async function getExpenseDashboardRPC(filter = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "get_expense_dashboard error:",
-      error
-    );
-
     throw error;
   }
-    console.log(
-    "RPC EXPENSE RESULT:",
-    data
-  );
-
   return data || {
     summary: {},
     expenses: [],
@@ -3092,15 +2557,8 @@ async function getExpenseBranchesRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "get_expense_branches error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -3124,15 +2582,8 @@ async function saveExpenseBudgetRPC(data) {
   );
 
   if (error) {
-
-    console.error(
-      "save_expense_budget error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -3150,15 +2601,8 @@ async function updateExpenseStatusRPC(refId, status) {
   );
 
   if (error) {
-
-    console.error(
-      "update_expense_status error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {
     success: false
   };
@@ -3181,15 +2625,8 @@ async function updateExpenseAttachmentRPC(data = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "update_expense_attachment error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -3211,15 +2648,8 @@ async function updateOtherIncomeStatusRPC(
   );
 
   if (error) {
-
-    console.error(
-      "update_other_income_status error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -3236,39 +2666,12 @@ async function deleteOtherIncomeRPC(id) {
   );
 
   if (error) {
-
-    console.error(
-      "delete_other_income error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
 async function saveOtherIncomeRPC(data = {}) {
-console.log(
-    "SAVE OTHER INCOME DATA:",
-    data
-  );
-
-  console.log(
-    "SAVE OTHER INCOME RPC PARAMS:",
-    {
-      p_id: data.id,
-      p_date: data.date,
-      p_ref_id: data.refId,
-      p_description: data.description,
-      p_category: data.category,
-      p_method: data.method,
-      p_amount: data.amount,
-      p_status: data.status,
-      p_branch_id: data.branchId,
-      p_notes: data.notes
-    }
-  );
 
   const {
     data: result,
@@ -3290,15 +2693,8 @@ console.log(
   );
 
   if (error) {
-
-    console.error(
-      "save_other_income error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -3340,24 +2736,12 @@ async function addExpenseRPC(data = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "add_expense error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
 async function getExpenseBudgetRPC(branchId) {
-
-  console.log(
-    "GET EXPENSE BUDGET BRANCH:",
-    branchId
-  );
 
   const {
     data,
@@ -3371,15 +2755,8 @@ async function getExpenseBudgetRPC(branchId) {
   );
 
   if (error) {
-
-    console.error(
-      "get_expense_budget error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {};
 }
 
@@ -3419,16 +2796,8 @@ async function getCategoryBreakdownRPC(f = {}) {
 
 
   if (error) {
-
-    console.error(
-      "get_category_breakdown error:",
-      error
-    );
-
     throw error;
   }
-
-
   return data || [];
 }
 
@@ -3446,15 +2815,8 @@ async function getOtherIncomeRPC(branchId) {
   );
 
   if (error) {
-
-    console.error(
-      "get_other_income error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -3487,13 +2849,8 @@ async function getCashFlowPageDataRPC(filter = {}) {
   );
 
   if (error) {
-    console.error(
-      "get_cash_flow_page_data error:",
-      error
-    );
     throw error;
   }
-
   return data || {};
 }
 
@@ -3520,13 +2877,8 @@ async function getAccountBalanceRPC(branchId) {
   );
 
   if (error) {
-    console.error(
-      "get_account_balance error:",
-      error
-    );
     throw error;
   }
-
   return data || {};
 }
 
@@ -3551,13 +2903,8 @@ async function getCashFlowSummaryRPC(filter = {}) {
   );
 
   if (error) {
-    console.error(
-      "get_cash_flow_summary error:",
-      error
-    );
     throw error;
   }
-
   return data || {};
 }
 
@@ -3582,13 +2929,8 @@ async function getCashFlowChartRPC(filter = {}) {
   );
 
   if (error) {
-    console.error(
-      "get_cash_flow_chart error:",
-      error
-    );
     throw error;
   }
-
   return data || [];
 }
 
@@ -3612,13 +2954,8 @@ async function getFundTransfersRPC(filter = {}) {
   );
 
   if (error) {
-    console.error(
-      "get_fund_transfers error:",
-      error
-    );
     throw error;
   }
-
   return data || [];
 }
 
@@ -3651,13 +2988,8 @@ async function transferFundsRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "transfer_funds error:",
-      error
-    );
     throw error;
   }
-
   return result;
 }
 
@@ -3681,13 +3013,8 @@ async function getCashFlowReportDataRPC(filter = {}) {
   );
 
   if (error) {
-    console.error(
-      "get_cash_flow_report_data error:",
-      error
-    );
     throw error;
   }
-
   return data || {};
 }
 
@@ -3720,13 +3047,8 @@ async function addOwnerTransactionRPC(data = {}) {
   );
 
   if (error) {
-    console.error(
-      "add_owner_transaction error:",
-      error
-    );
     throw error;
   }
-
   return result;
 }
 
@@ -3750,15 +3072,8 @@ async function getOwnerTransactionsRPC(filter = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "get_owner_transactions error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -3782,15 +3097,8 @@ async function getOwnerSummaryRPC(filter = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "get_owner_summary error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {};
 }
 
@@ -3810,15 +3118,8 @@ async function getYesterdayDashboardSummaryRPC(
   );
 
   if (error) {
-
-    console.error(
-      "get_yesterday_dashboard_summary error:",
-      error
-    );
-
     throw error;
   }
-
   return data || {};
 }
 
@@ -3833,15 +3134,8 @@ async function createDatabaseBackupRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "create_database_backup error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -3856,15 +3150,8 @@ async function deleteBackupHistoryRPC(data = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "delete_backup_history error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -3879,15 +3166,8 @@ async function clearDatabaseRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "clear_database error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -3902,15 +3182,8 @@ async function getBackupHistoryRPC() {
   );
 
   if (error) {
-
-    console.error(
-      "get_backup_history error:",
-      error
-    );
-
     throw error;
   }
-
   return data || [];
 }
 
@@ -3925,15 +3198,8 @@ async function updateBackupFileInfoRPC(data = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "update_backup_file_info error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -3948,15 +3214,8 @@ async function restoreDatabaseBackupRPC(data = {}) {
   );
 
   if (error) {
-
-    console.error(
-      "restore_database_backup error:",
-      error
-    );
-
     throw error;
   }
-
   return result;
 }
 
@@ -3975,15 +3234,8 @@ async function downloadDatabaseBackup(filePath) {
       .download(filePath);
 
   if (error) {
-
-    console.error(
-      "Download backup error:",
-      error
-    );
-
     throw error;
   }
-
   return data;
 }
 
@@ -4277,16 +3529,6 @@ async function deleteDatabaseBackup(filePath) {
   const responseText =
     await response.text();
 
-  console.log(
-    "DELETE STORAGE STATUS:",
-    response.status
-  );
-
-  console.log(
-    "DELETE STORAGE RESPONSE:",
-    responseText
-  );
-
   let result = {};
 
   try {
@@ -4296,10 +3538,7 @@ async function deleteDatabaseBackup(filePath) {
         : {};
   }
   catch (e) {
-    console.error(
-      "DELETE STORAGE JSON ERROR:",
-      e
-    );
+    throw e;
   }
 
   if (!response.ok) {
@@ -4313,10 +3552,6 @@ async function deleteDatabaseBackup(filePath) {
 }
 
 async function deleteBackupById(backupId) {
-   console.log(
-    "DELETE BACKUP ID:",
-    backupId
-  );
   const {
     data: history,
     error
@@ -4325,12 +3560,6 @@ async function deleteBackupById(backupId) {
     .select("backup_id,file_path")
     .eq("backup_id", backupId)
     .single();
-  
-   console.log(
-    "BACKUP HISTORY:",
-    history,
-    error
-  );
 
   if (error) {
     throw error;
