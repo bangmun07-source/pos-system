@@ -51,11 +51,6 @@ export default async function handler(req, res) {
     // =========================
     
     if (isMaster) {
-    
-      console.log(
-        "MEMBER IMAGE → MASTER"
-      );
-    
       supabase =
         centralSupabase;
     }
@@ -65,12 +60,6 @@ export default async function handler(req, res) {
     // =========================
     
     else {
-    
-      console.log(
-        "MEMBER IMAGE → CUSTOMER:",
-        tenantSlug
-      );
-    
       const {
         data: tenantResult,
         error: tenantError
@@ -110,11 +99,6 @@ export default async function handler(req, res) {
           config.supabase_url,
           config.supabase_anon_key
         );
-    
-      console.log(
-        "CUSTOMER SUPABASE:",
-        config.supabase_url
-      );
     }
 
     // =========================
@@ -155,16 +139,6 @@ export default async function handler(req, res) {
     const path =
       `members/${memberId}_${Date.now()}.${ext}`;
 
-    console.log(
-      "UPLOAD MEMBER IMAGE:",
-      {
-        memberId,
-        mime,
-        path,
-        size: buffer.length
-      }
-    );
-
     // =========================
     // UPLOAD
     // =========================
@@ -201,11 +175,6 @@ export default async function handler(req, res) {
     const url =
       publicData.publicUrl;
 
-    console.log(
-      "MEMBER IMAGE URL:",
-      url
-    );
-
     return res.status(200).json({
       success: true,
       url
@@ -213,11 +182,6 @@ export default async function handler(req, res) {
 
   }
   catch (err) {
-
-    console.error(
-      "HANDLE MEMBER IMAGE UPLOAD ERROR:",
-      err
-    );
 
     return res.status(500).json({
       success: false,
