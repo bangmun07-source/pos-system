@@ -33,12 +33,6 @@ function getActiveSupabase() {
 // =====================================================
 
 async function connectTenant(slug) {
-
-  console.log(
-    "Connecting tenant:",
-    slug
-  );
-
   const {
     data,
     error
@@ -50,17 +44,10 @@ async function connectTenant(slug) {
   );
 
   if (error) {
-
-    console.error(
-      "get_tenant_config error:",
-      error
-    );
-
     throw error;
   }
 
   if (!data?.success) {
-
     throw new Error(
       data?.message ||
       "Tenant tidak ditemukan"
@@ -71,7 +58,6 @@ async function connectTenant(slug) {
     data.data;
 
   if (!config.is_active) {
-
     throw new Error(
       "Tenant tidak aktif"
     );
@@ -104,12 +90,6 @@ async function connectTenant(slug) {
     });
   
   if (branchError) {
-  
-    console.error(
-      "Branches count error:",
-      branchError
-    );
-  
     throw branchError;
   }
 
@@ -137,42 +117,6 @@ async function connectTenant(slug) {
   
   const syncResult =
     await syncResponse.json();
-  
-  if (!syncResponse.ok) {
-  
-    console.error(
-      "Branch count sync failed:",
-      syncResult
-    );
-  
-  } else {
-  
-    console.log(
-      "Master branch_count updated:",
-      syncResult.branch_count
-    );
-  }
-  
-  
-  // ============================================
-  // LOG
-  // ============================================
-  
-  console.log(
-    "Tenant connected:",
-    config.tenant_name
-  );
-  
-  console.log(
-    "Tenant ID:",
-    config.tenant_id
-  );
-  
-  console.log(
-    "Branch count:",
-    branchCount
-  );
-  
   
   // ============================================
   // RETURN CONFIG
