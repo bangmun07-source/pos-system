@@ -33,8 +33,7 @@ export default async function handler(req, res) {
         message: "tenant_id wajib diisi"
       });
     }
-
-
+    
     // ==========================================
     // 1. AMBIL CONFIG TENANT DARI MASTER
     // ==========================================
@@ -49,11 +48,9 @@ export default async function handler(req, res) {
       )
       .eq("tenant_id", tenant_id)
       .single();
-
     if (tenantError) {
       throw tenantError;
     }
-
 
     // ==========================================
     // 2. CONNECT KE DATABASE CUSTOMER
@@ -64,7 +61,6 @@ export default async function handler(req, res) {
         tenant.supabase_url,
         tenant.supabase_anon_key
       );
-
 
     // ==========================================
     // 3. HITUNG BRANCH AKTUAL
@@ -84,7 +80,6 @@ export default async function handler(req, res) {
       throw branchError;
     }
 
-
     // ==========================================
     // 4. UPDATE MASTER
     // ==========================================
@@ -102,46 +97,27 @@ export default async function handler(req, res) {
         "tenant_id, tenant_name, branch_count"
       )
       .single();
-
     if (updateError) {
       throw updateError;
     }
-
-
+    
     // ==========================================
     // 5. RESPONSE
     // ==========================================
 
     return res.status(200).json({
-
       success: true,
-
       tenant_id,
-
-      branch_count:
-        branchCount,
-
-      data:
-        updatedTenant
-
+      branch_count: branchCount,
+      data: updatedTenant
     });
 
   } catch (error) {
-
-    console.error(
-      "SYNC BRANCH COUNT ERROR:",
-      error
-    );
-
     return res.status(500).json({
-
       success: false,
-
       message:
         error.message ||
         "Gagal sync branch count"
-
     });
-
   }
 }
