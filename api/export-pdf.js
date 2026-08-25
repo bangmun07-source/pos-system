@@ -3257,6 +3257,34 @@ const logoSrc =
                         margin-bottom:12px;          
                         font-size:16px;          
                       }
+
+                      .kpi-grid {
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 16px;
+                        margin: 25px 0;
+                      }
+                      
+                      .kpi-card {
+                        border: 1px solid #e5e5e5;
+                        border-radius: 14px;
+                        padding: 22px;
+                        background: #fafafa;
+                        text-align: center;
+                      }
+                      
+                      .kpi-title {
+                        font-size: 11px;
+                        color: #666;
+                        font-weight: bold;
+                        margin-bottom: 12px;
+                      }
+                      
+                      .kpi-value {
+                        font-size: 22px;
+                        font-weight: bold;
+                        color: #222;
+                      }
                       
                       .meta{          
                         font-size:12px;          
@@ -3347,6 +3375,8 @@ const logoSrc =
                               `
                               : ""
                           }
+
+                          
             
                           <div class="title">      
                             Other Income Report     
@@ -3361,7 +3391,30 @@ const logoSrc =
         
                           <div class="subtitle">            
                             Branch:
-                            ${escapeHtml(branchDisplay)}          
+                            ${escapeHtml(branchName || "-")}         
+                          </div>
+                        </div>
+
+                        <!-- KPI -->
+                        <div class="kpi-grid">
+                          <div class="kpi-card">
+                            <div class="kpi-title">
+                              TOTAL OTHER INCOME
+                            </div>
+                        
+                            <div class="kpi-value">
+                              Rp ${rupiah(totalIncome)}
+                            </div>
+                          </div>
+
+                          <div class="kpi-card">
+                            <div class="kpi-title">
+                              TOTAL INCOME RECORDS
+                            </div>
+                        
+                            <div class="kpi-value">
+                              ${filteredRows.length}
+                            </div>
                           </div>
                         </div>
                   
