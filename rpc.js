@@ -315,7 +315,7 @@ async function getGrossRevenueByDateRPC(start, end, branchId) {
   return data;
 }
 
-async function getTopRevenueProductsRPC(start, end, branchId,limit = 10) {
+async function getTopRevenueProductsRPC(start, end, branchId,limit = 10, offset = 0,isExport = false) {
   const {
     data,
     error
@@ -325,7 +325,9 @@ async function getTopRevenueProductsRPC(start, end, branchId,limit = 10) {
       p_branch_id: branchId,
       p_start: start || null,
       p_end: end || null,
-      p_limit: limit
+      p_limit: limit,
+      p_offset: offset,
+      p_export: isExport
     }
   );
   if (error) {
