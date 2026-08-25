@@ -22725,18 +22725,37 @@ function renderIngredientOptions(select, data) {
 
 function onSelectRecipeProduct(e) {
   const value = e?.target?.value || e;
+
   if (!value) {
+    selectedRecipeId = null;
+    selectedRecipeName = "";
+    sellingPrice = 0;
+    currentIngredients = [];
+    renderRecipeBuilder([]);
     return;
   }
+
   selectedRecipeId = value;
-  const recipe = state.recipes?.find(r =>
-    String(r.ID).trim().toUpperCase() === String(value).trim().toUpperCase()
+
+  const recipe = state.recipeProductsData?.find(r =>
+    String(r.Recipe_ID || "").trim().toUpperCase() ===
+    String(value).trim().toUpperCase()
   );
+
   if (!recipe) {
+    console.error("Recipe tidak ditemukan:", value);
+
+    selectedRecipeName = "";
+    sellingPrice = 0;
+    currentIngredients = [];
+    renderRecipeBuilder([]);
+
     return;
   }
+
   selectedRecipeName = recipe.Product_Name;
   sellingPrice = recipe.Selling_Price;
+
   loadRecipeItems(value);
 }
 
