@@ -479,12 +479,65 @@
 	.dark .theme-logo {
 	  filter: brightness(0) invert(1);
 	}
+
+	.app-splash {
+	  position: fixed;
+	  inset: 0;
+	  z-index: 999999;
+	  display: flex;
+	  align-items: center;
+	  justify-content: center;
+	  background: #101715;
+	  animation: splashFadeOut 0.5s ease 1.2s forwards;
+	}
+	
+	.app-splash-logo {
+	  width: 110px;
+	  height: 110px;
+	  object-fit: contain;
+	  animation: splashLogo 1s ease-out forwards;
+	}
+	
+	@keyframes splashLogo {
+	  0% {
+	    opacity: 0;
+	    transform: scale(0.75);
+	  }
+	
+	  50% {
+	    opacity: 1;
+	    transform: scale(1.05);
+	  }
+	
+	  100% {
+	    opacity: 1;
+	    transform: scale(1);
+	  }
+	}
+	
+	@keyframes splashFadeOut {
+	  to {
+	    opacity: 0;
+	    visibility: hidden;
+	    pointer-events: none;
+	  }
+	}
 	    
 </style>
 </head>
 
 
 <body class="bg-background text-on-surface selection:bg-primary-container selection:text-on-primary-container min-h-screen overflow-hidden">
+
+<!-- SPLASH / OPENING ANIMATION -->
+<div id="appSplash" class="app-splash">
+  <img
+    src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+    alt="MUNO"
+    class="app-splash-logo"
+  >
+</div>
+	
 <!-- Toast global -->
 <div id="toast-container"
      class="fixed top-5 left-1/2 -translate-x-1/2 z-[99999] flex flex-col items-center pointer-events-none">
