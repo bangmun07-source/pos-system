@@ -3500,7 +3500,9 @@ const logoSrc =
             p_branch_id: branchId,
             p_start: start || null,
             p_end: end || null,
-            p_limit: 10
+            p_limit: 10,
+            p_offset: 0,
+            p_export: true
           }
         );
         
