@@ -3490,6 +3490,29 @@ const logoSrc =
           throw error;
         }
 
+        // GET TOP PRODUCTS
+        const {
+          data: topProductData,
+          error: topProductError
+        } = await supabase.rpc(
+          "get_top_revenue_products",
+          {
+            p_branch_id: branchId,
+            p_start: start || null,
+            p_end: end || null,
+            p_limit: 10
+          }
+        );
+        
+        if (topProductError) {
+          throw topProductError;
+        }
+        
+        const topProducts =
+          Array.isArray(topProductData)
+            ? topProductData
+            : [];
+
         // NORMALIZE     
         const report =
           data || {};
@@ -3543,7 +3566,53 @@ const logoSrc =
                 </td>
               </tr>
             `;
-      
+
+        const topProductRows =
+          topProducts.length
+        
+            ? topProducts.map((item, index) => `
+                <tr>
+                  <td>
+                    ${index + 1}
+                  </td>
+        
+                  <td>
+                    ${escapeHtml(
+                      item.name || "-"
+                    )}
+                  </td>
+        
+                  <td>
+                    ${escapeHtml(
+                      item.category || "-"
+                    )}
+                  </td>
+        
+                  <td class="right">
+                    ${rupiah(
+                      item.units || 0
+                    )}
+                  </td>
+        
+                  <td class="right">
+                    IDR ${rupiah(
+                      item.revenue || 0
+                    )}
+                  </td>
+                </tr>
+              `).join("")
+        
+            : `
+              <tr>
+                <td
+                  colspan="5"
+                  class="empty"
+                >
+                  No product data
+                </td>
+              </tr>
+            `;
+        
         // TREND ROWS      
         const trendRows =
           trend.length
@@ -3981,8 +4050,7 @@ const logoSrc =
                       </td>
                     </tr>
                   </table>
-                </div>
-      
+                </div>      
       
                 <!-- CATEGORY -->
                 <div class="card">
@@ -4007,6 +4075,43 @@ const logoSrc =
                       ${categoryRows}
                     </tbody>
                   </table>
+                </div>
+
+                <!-- TOP PRODUCTS -->
+                <div class="card">
+                  <h3>
+                    Top Products
+                  </h3>    
+                  
+                  <table>         
+                    <thead>
+                      <tr>                
+                        <th>
+                          #
+                        </th>
+                
+                        <th>
+                          Product
+                        </th>
+                
+                        <th>
+                          Category
+                        </th>
+                
+                        <th class="right">
+                          Units
+                        </th>
+                
+                        <th class="right">
+                          Revenue
+                        </th>                
+                      </tr>
+                    </thead>
+                
+                    <tbody>
+                      ${topProductRows}
+                    </tbody>               
+                  </table>             
                 </div>
       
                 <!-- TREND -->
