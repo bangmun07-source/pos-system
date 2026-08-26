@@ -3,12 +3,18 @@
   "name": "MUNO",
   "short_name": "MUNO",
   "start_url": "/",
-  "display": "browser",
+  "display": "standalone",
   "background_color": "#101715",
   "theme_color": "#101715",
   "icons": [
     {
       "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20FULL%20512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
