@@ -13720,7 +13720,7 @@ function initModule(pageId) {
         fetchSettings(() => {
           renderCart();
         });
-		loadLoyaltySettings();
+				loadLoyaltySettings();
         preloadRecipeMap();
         loadRecipes(state.branchId);
       });
@@ -13749,15 +13749,11 @@ function initModule(pageId) {
 
     case "inventoryPage":
 	  waitBranch(async () => {
-	
 	    await loadInventoryPage(
 	      state.branchId
 	    );
-	
 	    await loadRecipeProducts();
-	
 	    initIngredientExportDate();
-	
 	  });
 	break;
 
@@ -17876,8 +17872,8 @@ function createMemberInfoMessage({name,memberId,level,point}) {
 
     Terima kasih telah menjadi member kami.
 
-    Silakan tunjukkan Nama/Member ID Anda setiap transaksi untuk mendapatkan point dan menikmati 
-    berbagai reward member.
+    Silakan tunjukkan Nama/Member ID Anda setiap transaksi untuk mendapatkan 
+	point dan menikmati berbagai reward member.
 
     Sampai jumpa kembali.
   `;  
@@ -19345,186 +19341,200 @@ function renderTierProgression(history = []) {
   }).join("");
 }
 
-function loadNotifications() {
+async function loadNotifications() {
 
-      const res = state.memberPageData;
-      if (!res) return;
+  let res = state.memberPageData;
+  if (!res) {
+    try {
+      res = await getMemberPageDataRPC(
+        state.branchId
+      );
+      state.memberPageData = res;
 
-      const badge = document.getElementById("notificationBadge");
-      const list = document.getElementById("notificationList");
-    
-      if (!badge || !list) return;
-      list.innerHTML = "";
-    
-      const members = res?.birthday || [];
-      const transactions = res?.transaction || [];
-      const ingredients = res?.ingredientStock || [];
-      window.ingredientStockData = ingredients;
-    
-     if ( !res?.success ||
-				(
-				members.length === 0 &&
-				transactions.length === 0 &&
-				ingredients.length === 0
-				)
-				) {
-					badge.classList.add("hidden");
-					list.innerHTML = `
-					<div class="p-4 text-sm text-muted">
-						No Notifications
+    } catch (err) {
+      console.error(
+        "Notification Load Error:",
+        err
+      );
+      return;
+    }
+  }
+
+	const badge = document.getElementById("notificationBadge");
+	const list = document.getElementById("notificationList");
+
+	if (!badge || !list) return;
+	list.innerHTML = "";
+
+	const members = res?.birthday || [];
+	const transactions = res?.transaction || [];
+	const ingredients = res?.ingredientStock || [];
+	window.ingredientStockData = ingredients;
+
+ 	if ( !res?.success ||
+		(
+		members.length === 0 &&
+		transactions.length === 0 &&
+		ingredients.length === 0
+		)
+		) {
+			badge.classList.add("hidden");
+			list.innerHTML = `
+			<div class="p-4 text-sm text-muted">
+				No Notifications
+			</div>
+			`;
+			return;
+		}
+
+	badge.classList.remove("hidden");
+	badge.innerText = "";
+	if (window.ingredientStockData.length > 0) {
+		list.innerHTML += `
+		<div
+ 
+		onclick="handleNotification(this)"
+		data-type="ingredient"
+		class="
+		p-4 border-b border-outline-variant
+		hover:bg-outline-variant
+		cursor-pointer
+		transition-all
+		"
+		data-type="ingredient"
+		>
+			<div class="flex items-start gap-3">
+
+				<div
+				class="
+				w-10 h-10 rounded-md
+				bg-red-500/10
+				flex items-center justify-center
+				">
+
+					<span
+					class="material-symbols-outlined text-red-500">
+						warning
+					</span>
+
+				</div>
+
+				<div class="flex-1">
+
+					<p class="font-semibold text-sm">
+						⚠️ Ingredient Low Stock
+					</p>
+
+
+					<p class="text-xs text-on-surface-variant mt-1">
+						${ingredients.length}
+						ingredient perlu restock
+
+						• Klik untuk melihat detail
+					</p>
+					
+				</div>
+			</div>
+		</div>
+
+		`;
+	}
+
+	members.forEach(member => {
+		list.innerHTML += `
+
+		 <div
+				class="
+					p-4 border-b border-outline-variant
+					hover:bg-outline-variant
+					cursor-pointer
+					transition-all
+				"
+				onclick="handleBirthday(this)"
+				data-phone="${member.phone || ''}"
+				data-name="${member.name || ''}"
+			>
+
+				<div class="flex items-start gap-3">
+
+					<div class="
+						w-10 h-10 rounded-md
+						overflow-hidden
+						bg-background
+					">
+
+					<img
+						src="${member.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name)}"
+						class="w-full h-full object-cover"
+					/>
+
+				</div>
+
+					<div class="flex-1">
+					
+						<p class="font-semibold text-sm">
+							${
+								member.daysLeft === 0
+									? `🎂 ${member.name} berulang tahun hari ini`
+									: `🎂 ${member.name} ulang tahun ${member.daysLeft} hari lagi`
+							}
+						</p>
+
+						<p class="text-xs text-on-surface-variant mt-1">
+							Klik untuk mengirim ucapan WhatsApp
+						</p>
+						
 					</div>
-					`;
-					return;
-				}
-	
-      badge.classList.remove("hidden");
-      badge.innerText = "";
-      if (window.ingredientStockData.length > 0) {
-        list.innerHTML += `
-        <div
-     
-        onclick="handleNotification(this)"
-        data-type="ingredient"
-        class="
-        p-4 border-b border-outline-variant
-        hover:bg-outline-variant/10
-        cursor-pointer
-        transition-all
-        "
-        data-type="ingredient"
-        >
-          <div class="flex items-start gap-3">
+				</div>
+			</div>
 
-            <div
-            class="
-            w-10 h-10 rounded-md
-            bg-red-500/10
-            flex items-center justify-center
-            ">
+		`;
+	});
 
-              <span
-              class="material-symbols-outlined text-red-500">
-                warning
-              </span>
+	transactions.forEach(trx => {
+		list.innerHTML += `
 
-            </div>
+			<div
+				class="
+					p-4 border-b border-outline-variant
+					hover:bg-outline-variant
+					cursor-pointer
+					transition-all
+				"
+				onclick="handleTransaction(this)"
+				data-phone="${trx.phone || ''}"
+				data-name="${trx.name || ''}"
+				data-total="${trx.total || 0}"
+				data-point="${trx.point || 0}"
+				data-invoice="${trx.invoice || ''}"
+				data-trxid="${trx.id || trx.invoice || ''}"
+			>
+				<div class="flex items-start gap-3">
+					<div class="
+						w-10 h-10 rounded-md
+						overflow-hidden
+						bg-background
+					">
+					<img
+						src="${trx.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(trx.name)}"
+						class="w-full h-full object-cover"
+					/>
+				</div>
+				
+				<div class="flex-1">
+					<p class="font-semibold text-sm">
+						💰 ${trx.name} baru melakukan transaksi
+					</p>
 
-            <div class="flex-1">
+					<p class="text-xs text-on-surface-variant mt-1">
+						Rp ${Number(trx.total || 0).toLocaleString("id-ID")}
+						• Klik untuk mengirim ucapan terima kasih
+					</p>
 
-              <p class="font-semibold text-sm">
-                ⚠️ Ingredient Low Stock
-              </p>
-
-
-              <p class="text-xs text-on-surface-variant mt-1">
-                ${ingredients.length}
-                ingredient perlu restock
-
-                • Klik untuk melihat detail
-              </p>
-              
-            </div>
-          </div>
-        </div>
-
-        `;
-      }
-
-      members.forEach(member => {
-        list.innerHTML += `
-
-         <div
-            class="
-              p-4 border-b border-outline-variant
-              hover:bg-outline-variant/10
-              cursor-pointer
-              transition-all
-            "
-            onclick="handleBirthday(this)"
-            data-phone="${member.phone || ''}"
-            data-name="${member.name || ''}"
-          >
-
-            <div class="flex items-start gap-3">
-
-              <div class="
-                w-10 h-10 rounded-md
-                overflow-hidden
-                bg-background
-              ">
-
-              <img
-                src="${member.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name)}"
-                class="w-full h-full object-cover"
-              />
-
-            </div>
-
-              <div class="flex-1">
-              
-                <p class="font-semibold text-sm">
-                  ${
-                    member.daysLeft === 0
-                      ? `🎂 ${member.name} berulang tahun hari ini`
-                      : `🎂 ${member.name} ulang tahun ${member.daysLeft} hari lagi`
-                  }
-                </p>
-
-                <p class="text-xs text-on-surface-variant mt-1">
-                  Klik untuk mengirim ucapan WhatsApp
-                </p>
-                
-              </div>
-            </div>
-          </div>
-
-        `;
-      });
-
-      transactions.forEach(trx => {
-        list.innerHTML += `
-
-          <div
-            class="
-              p-4 border-b border-outline-variant/5
-              hover:bg-outline-variant/10
-              cursor-pointer
-              transition-all
-            "
-            onclick="handleTransaction(this)"
-            data-phone="${trx.phone || ''}"
-            data-name="${trx.name || ''}"
-            data-total="${trx.total || 0}"
-            data-point="${trx.point || 0}"
-            data-invoice="${trx.invoice || ''}"
-            data-trxid="${trx.id || trx.invoice || ''}"
-          >
-            <div class="flex items-start gap-3">
-              <div class="
-                w-10 h-10 rounded-md
-                overflow-hidden
-                bg-background
-              ">
-              <img
-                src="${trx.photo || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(trx.name)}"
-                class="w-full h-full object-cover"
-              />
-            </div>
-            
-            <div class="flex-1">
-              <p class="font-semibold text-sm">
-                💰 ${trx.name} baru melakukan transaksi
-              </p>
-
-              <p class="text-xs text-on-surface-variant mt-1">
-                Rp ${Number(trx.total || 0).toLocaleString("id-ID")}
-                • Klik untuk mengirim ucapan terima kasih
-              </p>
-
-            </div>
-          </div>
-        `;
-      });
+				</div>
+			</div>
+		`;
+	});
 }
 
 function toggleNotification() {
@@ -19546,6 +19556,8 @@ async function previewMemberPhoto(e) {
   memberPhotoBase64 = await fileToBase64(compressed);
   document.getElementById("memberPhoto" ).src = memberPhotoBase64;
 }
+
+	
 
     	// ==================================
     	// TABLES
