@@ -11938,7 +11938,7 @@
 	          </div>
 	        </div>
 	        <!-- META -->
-	        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+	        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 	          <!-- Supplier -->
 	          <div>
 	            <label class="text-[10px] uppercase text-on-surface-variant">
@@ -11961,6 +11961,20 @@
 	              <option value="BANK">Bank Transfer</option>
 	            </select>
 	          </div>
+						<!-- Payment Status -->
+						<div>
+						  <label class="text-[10px] uppercase text-on-surface-variant">
+						    Payment Status
+						  </label>
+						
+						  <select id="purchasePaymentStatus"
+						    class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant">
+						
+						    <option value="PAID">Paid</option>
+						    <option value="PENDING">Pending</option>
+						
+						  </select>
+						</div>
 	          <!-- Arrival Date -->
 	          <div>
 	            <label class="text-[10px] uppercase text-on-surface-variant">
@@ -23348,15 +23362,20 @@ function renderStockInIngredientOptions(select, data){
   });
 }
 
-function renderSupplierOptions(select, data){
+function renderSupplierOptions(select, data) {
   select.innerHTML = "";
-  data.forEach(item=>{
-    const opt = document.createElement("option");
-    opt.value = item.name;
-    opt.textContent = item.name;
+  data.forEach(item => {
+    const opt =
+      document.createElement("option");
+    opt.value =
+      item.name;
+    opt.textContent =
+      item.name;
+    opt.dataset.id =
+      item.id;
     select.appendChild(opt);
   });
-}	
+}
 
 window.loadStockInData = async function () {
 
@@ -23366,12 +23385,8 @@ window.loadStockInData = async function () {
     );
 
   if (!modal) return;
-
-
-  // ==============================
+	
   // BRANCH + INGREDIENT
-  // ==============================
-
   const branchId =
     state.branchId;
 
@@ -23382,23 +23397,15 @@ window.loadStockInData = async function () {
 
   loadBranchDropdown();
 
-
-  // ==============================
   // SUPPLIER
-  // ==============================
-
   const supplierSelect =
     modal.querySelector(
       "#supplierSelect"
     );
 
   if (!supplierSelect) return;
-
-
-  // ==============================
+	
   // CACHE SUPPLIER
-  // ==============================
-
   if (
     state.supplierData &&
     state.supplierBranchId ===
@@ -23409,17 +23416,12 @@ window.loadStockInData = async function () {
       supplierSelect,
       state.supplierData
     );
-
     return;
   }
 
-
   try {
-
-    // ==============================
+	
     // SUPABASE RPC
-    // ==============================
-
     const {
       data,
       error
@@ -23435,41 +23437,27 @@ window.loadStockInData = async function () {
       throw error;
     }
 
-
     const suppliers =
       data || [];
 
-
-    // ==============================
     // CACHE
-    // ==============================
-
     state.supplierData =
       suppliers;
-
     state.supplierBranchId =
       branchId;
-
-
-    // ==============================
+	
     // RENDER
-    // ==============================
-
     renderSupplierOptions(
       supplierSelect,
       suppliers
     );
-
   }
   catch (err) {
-
     console.error(
       "Load Supplier Error:",
       err
     );
-
   }
-
 };
 
 async function loadStockInIngredients(
@@ -23604,61 +23592,96 @@ window.saveStockIn = async function () {
       ".stock-modal"
     );
   if (!modal) return;
+
   const ingredient =
     modal.querySelector(
       "#ingredientName"
     )?.value;
+
   const qty =
     modal.querySelector(
       "#stockQty"
     )?.value;
+
   const price =
     modal.querySelector(
       "#purchasePrice"
     )?.value;
-  const supplier =
+
+  // SUPPLIER
+  const supplierSelect =
     modal.querySelector(
       "#supplierSelect"
-    )?.value;
+    );
+  const supplier =
+    supplierSelect?.value || "";
+  const supplierId =
+    supplierSelect
+      ?.options[
+        supplierSelect.selectedIndex
+      ]
+      ?.dataset.id || null;
+
   const note =
     modal.querySelector(
       "textarea"
     )?.value;
-  const branchSelect =
-    modal.querySelector(
-      "#branchSelect"
-    );
+
+  // PAYMENT
   const paymentMethod =
     modal.querySelector(
       "#purchasePaymentMethod"
     )?.value ||
     "CASH";
-  const branchId = state.branchId;
+
+  const status =
+    modal.querySelector(
+      "#purchasePaymentStatus"
+    )?.value ||
+    "PAID";
+
+  const branchSelect =
+    modal.querySelector(
+      "#branchSelect"
+    );
+
+  const branchId =
+    state.branchId;
+
   const outletName =
     branchSelect
       ? branchSelect.options[
           branchSelect.selectedIndex
         ]?.text || ""
       : "";
+
   if (!branchId) {
     alert(
       "Branch belum dipilih!"
     );
     return;
   }
+	
   const wibDate =
     new Intl.DateTimeFormat(
       "sv-SE",
       {
         timeZone:
           "Asia/Jakarta",
-        year:"numeric",
-        month:"2-digit",
-        day:"2-digit",
-        hour:"2-digit",
-        minute:"2-digit",
-        second:"2-digit",
-        hour12:false
+        year:
+          "numeric",
+        month:
+          "2-digit",
+        day:
+          "2-digit",
+        hour:
+          "2-digit",
+        minute:
+          "2-digit",
+        second:
+          "2-digit",
+        hour12:
+          false
       }
     )
     .format(new Date())
@@ -23668,98 +23691,95 @@ window.saveStockIn = async function () {
     );
 
   try {
+
+    // TOTAL PRICE
+    const totalPrice =
+      Number(price) || 0;
 	
-  // TOTAL PRICE
-	const totalPrice =
-	  Number(price) || 0;
+    // SUPABASE RPC
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "add_ingredient_purchase",
+      {
+        p_date:
+          wibDate,
+        p_ingredient_name:
+          ingredient || "",
+        p_qty:
+          Number(qty) || 0,
+        p_total_price:
+          totalPrice,
+        p_supplier:
+          supplier || "",
+        p_supplier_id:
+          supplierId,
+        p_note:
+          note || "",
+        p_branch_id:
+          branchId,
+        p_outlet:
+          outletName || "",
+        p_payment_method:
+          paymentMethod || "CASH",
+        p_status:
+          status || "PAID"
+      }
+    );
 
-  // SUPABASE RPC
-  const {
-    data,
-    error
-  } = await supabaseClient.rpc(
-    "add_ingredient_purchase",
-    {
-      p_date: wibDate,
-      p_ingredient_name: ingredient || "",
-      p_qty: Number(qty) || 0,
-      p_total_price: totalPrice || 0,
-      p_supplier: supplier || "",
-      p_note: note || "",
-      p_branch_id: branchId,
-      p_outlet: outletName || "",
-      p_payment_method: paymentMethod || "CASH"
+    if (error) {
+      throw error;
     }
-  );
 
-  if (error) {
-    throw error;
+    // CLEAR CACHE
+    state.inventoryData = null;
+    state.inventoryBranchId = null;
+    state.stockInIngredients = null;
+    state.stockInIngredientsBranchId = null;
+    state.supplierData = null;
+    state.supplierBranchId = null;
+    state.recipeData = null;
+    state.recipeDataBranchId = null;
+
+    // CLOSE MODAL
+    closeModal();
+    showToast(
+      "Purchase berhasil disimpan",
+      "success"
+    );
+
+  } catch (error) {
+    console.error(
+      "Stock In Error:",
+      error
+    );
+    let message =
+      "Gagal menyimpan purchase";
+    const err =
+      error?.message || "";
+
+    if (
+      err.includes(
+        "Saldo Cash tidak mencukupi"
+      )
+    ) {
+      message =
+        "Saldo Cash tidak mencukupi";
+    }
+
+    else if (
+      err.includes(
+        "Saldo Bank tidak mencukupi"
+      )
+    ) {
+
+      message =
+        "Saldo Bank tidak mencukupi";
+    }
+    alert(message);
   }
-
-  // CLEAR CACHE
-  state.inventoryData = null;
-  state.inventoryBranchId = null;
-
-  state.stockInIngredients = null;
-  state.stockInIngredientsBranchId = null;
-
-  state.supplierData = null;
-  state.supplierBranchId = null;
-
-  state.recipeData = null;
-  state.recipeDataBranchId = null;
-
-
-  // ==============================
-  // CLOSE MODAL
-  // ==============================
-
-  closeModal();
-
-
-  showToast(
-    "Purchase berhasil disimpan",
-    "success"
-  );
-
-}
-catch (error) {
-
-  console.error(
-    "Stock In Error:",
-    error
-  );
-
-  let message =
-    "Gagal menyimpan purchase";
-
-  const err =
-    error?.message || "";
-
-
-  if (
-    err.includes(
-      "Saldo Cash tidak mencukupi"
-    )
-  ) {
-
-    message =
-      "Saldo Cash tidak mencukupi";
-
-  }
-  else if (
-    err.includes(
-      "Saldo Bank tidak mencukupi"
-    )
-  ) {
-
-    message =
-      "Saldo Bank tidak mencukupi";
-
-  }
-
-  alert(message);
-}};
+};
 	
 window.closeModal = function () {
   document.querySelectorAll(".fixed.inset-0")
