@@ -3,7 +3,7 @@
   "name": "MUNO",
   "short_name": "MUNO",
   "start_url": "/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#101715",
   "theme_color": "#101715",
   "icons": [
