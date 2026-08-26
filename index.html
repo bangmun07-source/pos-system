@@ -13098,121 +13098,99 @@ applyTheme();
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
+  const params = new URLSearchParams(window.location.search);
 
-	// TENANT
+  // ==========================================================
+  // 1. CEK PERUBAHAN TENANT (Wajib Login Ulang Jika Tenant Berubah)
+  // ==========================================================
+  const urlTenant = params.get("tenant") ? params.get("tenant").trim() : null;
+  const savedTenant = localStorage.getItem("pos_tenantSlug");
 
-	const urlTenant =
-	  params.get("tenant");
-	
-	if (urlTenant) {
-	  state.tenantSlug =
-	    urlTenant.trim();
-	  localStorage.setItem(
-	    "pos_tenantSlug",
-	    state.tenantSlug
-	  );
-	
-	} else {
-	  state.tenantSlug =
-	    localStorage.getItem(
-	      "pos_tenantSlug"
-	    ) || null;
-	}
-	
-	// CONNECT TENANT
-	if (state.tenantSlug) {
-	  try {
-	    await connectTenant(state.tenantSlug);
-	  } catch (error) {
-	    console.warn("Mode Offline: Gagal terhubung ke server tenant, mencoba memuat dari cache lokal...", error);
-	    
-	    // Cek apakah ada cache config tenant sebelumnya di localStorage
-	    const cachedConfig = localStorage.getItem("pos_cached_tenant_config");
-	    if (cachedConfig) {
-	      const config = JSON.parse(cachedConfig);
-	      // Inisialisasi ulang client Supabase menggunakan data cache
-	      supabaseClient = supabase.createClient(
-	        config.supabase_url,
-	        config.supabase_anon_key
-	      );
-	      console.log("Berhasil memuat tenant dari cache offline!");
-	    } else {
-	      // Jika belum pernah online sama sekali dan cache kosong
-	      alert("Anda sedang offline dan belum ada data tenant tersimpan di perangkat ini.");
-	      return;
-	    }
-	  }
-	}
+  // Jika di URL ada tenant DAN berbeda dengan yang tersimpan di localStorage sebelumnya
+  if (urlTenant && savedTenant && urlTenant !== savedTenant) {
+    console.warn("Tenant berubah dari '" + savedTenant + "' ke '" + urlTenant + "'. Menghapus sesi lama.");
+    
+    // Hapus sesi user agar harus login ulang dengan akun tenant baru
+    localStorage.removeItem("pos_user");
+    localStorage.removeItem("pos_session_id");
+    localStorage.removeItem("pos_branchId");
+    localStorage.removeItem("pos_cached_tenant_config");
+  }
 
-  // PAGE
-  const page =
-    params.get("page") ||
-    window.__ACTIVE_PAGE ||
-    null;
+  // Set tenant slug aktif
+  if (urlTenant) {
+    state.tenantSlug = urlTenant;
+    localStorage.setItem("pos_tenantSlug", state.tenantSlug);
+  } else {
+    state.tenantSlug = savedTenant || null;
+  }
+  
+  // ==========================================================
+  // 2. CONNECT TENANT (Dengan Fallback Offline yang Aman)
+  // ==========================================================
+  if (state.tenantSlug) {
+    try {
+      const tenantConfig = await connectTenant(state.tenantSlug);
+      // Simpan config terbaru ke cache lokal agar awet saat offline
+      if (tenantConfig) {
+        localStorage.setItem("pos_cached_tenant_config", JSON.stringify(tenantConfig));
+      }
+    } catch (error) {
+      console.warn("Mode Offline: Gagal terhubung ke server tenant, memuat dari cache lokal...", error);
+      
+      const cachedConfig = localStorage.getItem("pos_cached_tenant_config");
+      if (cachedConfig) {
+        const config = JSON.parse(cachedConfig);
+        supabaseClient = supabase.createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
+        console.log("Berhasil memuat tenant dari cache offline!");
+      } else {
+        alert("Anda sedang offline dan belum ada data tenant tersimpan di perangkat ini.");
+        return;
+      }
+    }
+  }
 
-  // BOOT APP
-  async function bootApp(
-    targetPage = "dashboardPage"
-  ) {
+  // ==========================================================
+  // 3. PAGE & BOOT APP
+  // ==========================================================
+  const page = params.get("page") || window.__ACTIVE_PAGE || null;
 
-    const ok =
-      restoreSession();
+  async function bootApp(targetPage = "dashboardPage") {
+    const ok = restoreSession();
 
     if (!ok) {
       navigate("loginPage");
       return;
     }
 
-    const role =
-      state.user?.role?.toLowerCase();
+    const role = state.user?.role?.toLowerCase();
 
     // BRANCH CONTEXT
     if (role === "owner") {
-
-      state.branchId =
-        localStorage.getItem(
-          "pos_branchId"
-        ) || "";
-
+      state.branchId = localStorage.getItem("pos_branchId") || "";
     } else {
-
-      state.branchId =
-        state.user?.branchId ||
-        localStorage.getItem(
-          "pos_branchId"
-        ) ||
-        "";
+      state.branchId = state.user?.branchId || localStorage.getItem("pos_branchId") || "";
     }
 
-    window.__ACTIVE_PAGE =
-      targetPage;
-
+    window.__ACTIVE_PAGE = targetPage;
     navigate(targetPage);
 
     // Tunggu template masuk ke DOM
     setTimeout(() => {
       updateThemeIcon();
-			updateMunoLogo();
+      updateMunoLogo();
     }, 0);
   }
 
   // ROUTING
   if (page) {
-
-    window.__ACTIVE_PAGE =
-      page;
-
+    window.__ACTIVE_PAGE = page;
     await bootApp(page);
-
   } else {
-
-    await bootApp(
-      "dashboardPage"
-    );
+    await bootApp("dashboardPage");
   }
 
 });
