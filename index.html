@@ -20384,136 +20384,151 @@ async function loadSuppliers() {
 }
 
 function renderSuppliers() {
-  const tbody = document.getElementById("suppliersTable");
-  if (!tbody) return;
+  const tbody =
+    document.getElementById(
+      "suppliersTable"
+    );
 
-  if (!allSupplierData || allSupplierData.length === 0) {
+  if (!tbody) return;
+  if (
+    !allSupplierData ||
+    allSupplierData.length === 0
+  ) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-6 text-muted">
+        <td colspan="8"
+          class="text-center py-6 text-muted">
           No suppliers
         </td>
       </tr>
     `;
-
     renderSupplierPagination();
     return;
   }
 
   const start =
-    (supplierCurrentPage - 1) * supplierItemsPerPage;
-
+    (supplierCurrentPage - 1) *
+    supplierItemsPerPage;
   const end =
     start + supplierItemsPerPage;
-
   const paginatedData =
-    allSupplierData.slice(start, end);
+    allSupplierData.slice(
+      start,
+      end
+    );
 
   tbody.innerHTML =
-    paginatedData.map((item, index) => {
+    paginatedData.map(
+      (item, index) => {
+        const initials =
+          (item.name || "")
+            .split(" ")
+            .map(w => w[0])
+            .join("")
+            .substring(0, 2)
+            .toUpperCase();
 
-      const initials =
-        item.name
-          .split(" ")
-          .map(w => w[0])
-          .join("")
-          .substring(0, 2)
-          .toUpperCase();
+        const isActive =
+          item.status === "Active";
 
-      const isActive =
-        item.status === "Active";
+        // FINANCIAL DATA
+        const totalSpend =
+          Number(
+            item.total_spend
+          ) || 0;
 
-      return `
-        <tr class="${
-          index % 2 === 0
-            ? "bg-background/10"
-            : ""
-        } hover:bg-outline-variant transition-colors group">
+        const totalDebt =
+          Number(
+            item.total_debt
+          ) || 0;
 
-          <!-- SUPPLIER NAME -->
-          <td class="px-8 py-5">
-            <div class="flex items-center gap-3">
+        return `
+          <tr class="${
+            index % 2 === 0
+              ? "bg-background/10"
+              : ""
+          } hover:bg-outline-variant transition-colors group">
 
-              <div class="w-10 h-10 rounded-md bg-outline-variant flex items-center justify-center text-on-surface font-bold">
-                ${initials}
+            <!-- SUPPLIER NAME -->
+            <td class="px-8 py-5">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-md bg-outline-variant flex items-center justify-center text-on-surface font-bold">
+                  ${initials}
+                </div>
+
+                <span class="font-bold text-sm">
+                  ${item.name || "-"}
+                </span>
               </div>
+            </td>
 
-              <span class="font-bold text-sm">
-                ${item.name}
-              </span>
+            <!-- CATEGORY -->
+            <td class="px-8 py-5 text-sm text-muted">
+              ${item.category || "-"}
+            </td>
 
-            </div>
-          </td>
+            <!-- CONTACT -->
+            <td class="px-8 py-5 text-sm font-medium">
+              ${item.contact || "-"}
+            </td>
 
-          <!-- CATEGORY -->
-          <td class="px-8 py-5 text-sm text-muted">
-            ${item.category}
-          </td>
+            <!-- PHONE -->
+            <td class="px-8 py-5 text-sm text-muted">
+              ${item.phone || "-"}
+            </td>
 
-          <!-- CONTACT -->
-          <td class="px-8 py-5 text-sm font-medium">
-            ${item.contact}
-          </td>
+            <!-- TOTAL SPEND -->
+            <td class="px-8 py-5 text-sm font-semibold">
+              Rp ${totalSpend.toLocaleString("id-ID")}
+            </td>
 
-          <!-- PHONE -->
-          <td class="px-8 py-5 text-sm text-muted">
-            ${item.phone}
-          </td>
+            <!-- HUTANG -->
+            <td class="px-8 py-5 text-sm font-semibold ${
+              totalDebt > 0
+                ? "text-error"
+                : "text-muted"
+            }">
+              Rp ${totalDebt.toLocaleString("id-ID")}
+            </td>
 
-          <!-- TOTAL SPEND -->
-          <td class="px-8 py-5 text-sm font-semibold">
-            Rp 0
-          </td>
+            <!-- STATUS -->
+            <td class="px-8 py-5">
+              ${
+                isActive
+                ? `
+                  <span class="px-3 py-1 bg-outline-variant/20 text-on-surface text-[10px] border border-outline-variant font-headline font-semibold rounded-md uppercase" >
+                    Active
+                  </span>
+                `
+                : `
+                  <span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-headline font-semibold rounded-md uppercase" >
+                    Inactive
+                  </span>
+                `
+              }
+            </td>
 
-          <!-- HUTANG -->
-          <td class="px-8 py-5 text-sm font-semibold text-error">
-            Rp 0
-          </td>
+            <!-- ACTIONS -->
+            <td class="px-8 py-5 text-right">
+              <div class="flex items-center justify-end gap-1" >
+                <button onclick="openEditSupplierModal('${item.id}')"
+                  class="p-2 hover:text-on-surface rounded-md text-on-surface-variant" >
 
-          <!-- STATUS -->
-          <td class="px-8 py-5">
-            ${
-              isActive
-              ? `
-                <span class="px-3 py-1 bg-outline-variant/20 text-on-surface text-[10px] border border-outline-variant font-headline font-semibold rounded-md uppercase">
-                  Active
-                </span>
-              `
-              : `
-                <span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-headline font-semibold rounded-md uppercase">
-                  Inactive
-                </span>
-              `
-            }
-          </td>
-
-          <!-- ACTIONS -->
-          <td class="px-8 py-5 text-right">
-            <div class="flex items-center justify-end gap-1">
-
-              <button
-                onclick="openEditSupplierModal('${item.id}')"
-                class="p-2 hover:text-on-surface rounded-md text-on-surface-variant"
-              >
-                <span class="material-symbols-outlined">
-                  edit
-                </span>
-              </button>
-
-            </div>
-          </td>
-
-        </tr>
-      `;
-
-    }).join("");
-
+                  <span class="material-symbols-outlined">
+                    edit
+                  </span>
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    ).join("");
   renderSupplierPagination();
 }
+	
 let currentSupplierData = null;
-
 function openEditSupplierModal(supplierId) {
-
   const supplier =
     allSupplierData.find(
       x => String(x.id) === String(supplierId)
