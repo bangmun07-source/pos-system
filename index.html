@@ -13125,25 +13125,26 @@ document.addEventListener("DOMContentLoaded", async () => {
 	
 	// CONNECT TENANT
 	if (state.tenantSlug) {
-	
 	  try {
-	
-	    await connectTenant(
-	      state.tenantSlug
-	    );
-	
+	    await connectTenant(state.tenantSlug);
 	  } catch (error) {
-	
-	    console.error(
-	      "CONNECT TENANT ERROR:",
-	      error
-	    );
-	
-	    alert(
-	      "Gagal menghubungkan database tenant"
-	    );
-	
-	    return;
+	    console.warn("Mode Offline: Gagal terhubung ke server tenant, mencoba memuat dari cache lokal...", error);
+	    
+	    // Cek apakah ada cache config tenant sebelumnya di localStorage
+	    const cachedConfig = localStorage.getItem("pos_cached_tenant_config");
+	    if (cachedConfig) {
+	      const config = JSON.parse(cachedConfig);
+	      // Inisialisasi ulang client Supabase menggunakan data cache
+	      supabaseClient = supabase.createClient(
+	        config.supabase_url,
+	        config.supabase_anon_key
+	      );
+	      console.log("Berhasil memuat tenant dari cache offline!");
+	    } else {
+	      // Jika belum pernah online sama sekali dan cache kosong
+	      alert("Anda sedang offline dan belum ada data tenant tersimpan di perangkat ini.");
+	      return;
+	    }
 	  }
 	}
 
