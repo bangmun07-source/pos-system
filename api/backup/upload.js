@@ -256,6 +256,33 @@ export default async function handler(req, res) {
     }
 
     // =====================================================
+    // BATAS BACKUP 1X PER HARI
+    // =====================================================
+    
+    const { data: usage, error: usageError } =
+      await centralSupabase
+        .from("maintenance_usage")
+        .select("tenant_id, operation, usage_date")
+        .eq("tenant_id", tenantSlug === "master"
+          ? "MASTER_TENANT_ID"
+          : config.tenant_id
+        )
+        .eq("operation", "backup")
+        .eq("usage_date", new Date().toISOString().slice(0, 10))
+        .maybeSingle();
+    
+    if (usageError) {
+      throw usageError;
+    }
+    
+    if (usage) {
+      return res.status(429).json({
+        success: false,
+        error: "Backup hari ini sudah digunakan. Silakan coba lagi besok."
+      });
+    }
+
+    // =====================================================
     // BUAT PATH
     // =====================================================
 
