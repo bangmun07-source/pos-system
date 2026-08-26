@@ -50,15 +50,26 @@ async function connectTenant(slug) {
     // Simpan config ke localStorage sebagai cadangan offline
     localStorage.setItem("pos_cached_tenant_config", JSON.stringify(config));
 
-    // 2. Buat Client Customer
-    if (
+    // 2. CONNECT DATABASE TENANT
+    if (slug === "master") {
+      // Master sudah punya client sendiri
+      supabaseClient =
+        centralSupabase;
+    
+      connectedTenantUrl =
+        CENTRAL_SUPABASE_URL;
+    
+    } else if (
       !supabaseClient ||
       connectedTenantUrl !== config.supabase_url
     ) {
-      supabaseClient = supabase.createClient(
-        config.supabase_url,
-        config.supabase_anon_key
-      );
+    
+      // Customer → buat client customer
+      supabaseClient =
+        supabase.createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
     
       connectedTenantUrl =
         config.supabase_url;
@@ -97,14 +108,22 @@ async function connectTenant(slug) {
     if (cachedConfig) {
       const config = JSON.parse(cachedConfig);
       // Inisialisasi ulang client pakai data cache
-      if (
+      if (config.supabase_url === CENTRAL_SUPABASE_URL) {
+        supabaseClient =
+          centralSupabase;
+        connectedTenantUrl =
+          CENTRAL_SUPABASE_URL;
+      
+      } else if (
         !supabaseClient ||
         connectedTenantUrl !== config.supabase_url
       ) {
-        supabaseClient = supabase.createClient(
-          config.supabase_url,
-          config.supabase_anon_key
-        );
+      
+        supabaseClient =
+          supabase.createClient(
+            config.supabase_url,
+            config.supabase_anon_key
+          );
       
         connectedTenantUrl =
           config.supabase_url;
