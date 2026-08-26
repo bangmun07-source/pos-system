@@ -4125,13 +4125,15 @@
 						<th class="px-8 py-4 font-bold">CONTACT PERSON</th>
 						<th class="px-8 py-4 font-bold">PHONE NUMBER</th>
 						<th class="px-8 py-4 font-bold">STATUS</th>
+						<th class="px-8 py-4 font-bold">HUTANG</th>
+				    <th class="px-8 py-4 font-bold">STATUS</th>
 						<th class="px-8 py-4 font-bold text-right">ACTIONS</th>
 					</tr>
 				</thead>
 				
 				<tbody id="suppliersTable" class="divide-y divide-outline-variant">
 			    <tr>
-			      <td colspan="6" class="text-center text-muted ">
+			      <td colspan="8" class="text-center text-muted ">
 			        Loading...
 			      </td>
 			    </tr>
@@ -20370,77 +20372,130 @@ async function loadSuppliers() {
 function renderSuppliers() {
   const tbody = document.getElementById("suppliersTable");
   if (!tbody) return;
+
   if (!allSupplierData || allSupplierData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" class="text-center py-6 text-muted">
+        <td colspan="8" class="text-center py-6 text-muted">
           No suppliers
         </td>
       </tr>
     `;
+
     renderSupplierPagination();
     return;
   }
-  const start = (supplierCurrentPage - 1) * supplierItemsPerPage;
-  const end = start + supplierItemsPerPage;
-  const paginatedData = allSupplierData.slice(start, end);
-  tbody.innerHTML = paginatedData.map((item, index) => {
 
-    const initials = item.name
-      .split(" ")
-      .map(w => w[0])
-      .join("")
-      .substring(0, 2)
-      .toUpperCase();
+  const start =
+    (supplierCurrentPage - 1) * supplierItemsPerPage;
 
-    const isActive = item.status === "Active";
+  const end =
+    start + supplierItemsPerPage;
 
-    return `
-      <tr class="${index % 2 === 0 ? "bg-background/10" : ""} hover:bg-outline-variant transition-colors group">
+  const paginatedData =
+    allSupplierData.slice(start, end);
 
-        <td class="px-8 py-5">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-md bg-outline-variant flex items-center justify-center text-on-surface font-bold">
-              ${initials}
+  tbody.innerHTML =
+    paginatedData.map((item, index) => {
+
+      const initials =
+        item.name
+          .split(" ")
+          .map(w => w[0])
+          .join("")
+          .substring(0, 2)
+          .toUpperCase();
+
+      const isActive =
+        item.status === "Active";
+
+      return `
+        <tr class="${
+          index % 2 === 0
+            ? "bg-background/10"
+            : ""
+        } hover:bg-outline-variant transition-colors group">
+
+          <!-- SUPPLIER NAME -->
+          <td class="px-8 py-5">
+            <div class="flex items-center gap-3">
+
+              <div class="w-10 h-10 rounded-md bg-outline-variant flex items-center justify-center text-on-surface font-bold">
+                ${initials}
+              </div>
+
+              <span class="font-bold text-sm">
+                ${item.name}
+              </span>
+
             </div>
-            <span class="font-bold text-sm">${item.name}</span>
-          </div>
-        </td>
+          </td>
 
-        <td class="px-8 py-5 text-sm text-muted">
-          ${item.category}
-        </td>
+          <!-- CATEGORY -->
+          <td class="px-8 py-5 text-sm text-muted">
+            ${item.category}
+          </td>
 
-        <td class="px-8 py-5 text-sm font-medium">
-          ${item.contact}
-        </td>
+          <!-- CONTACT -->
+          <td class="px-8 py-5 text-sm font-medium">
+            ${item.contact}
+          </td>
 
-        <td class="px-8 py-5 text-sm text-muted">
-          ${item.phone}
-        </td>
+          <!-- PHONE -->
+          <td class="px-8 py-5 text-sm text-muted">
+            ${item.phone}
+          </td>
 
-        <td class="px-8 py-5">
-          ${
-            isActive
-            ? `<span class="px-3 py-1 bg-outline-variant/20 text-on-surface text-[10px] border border-outline-variant font-headline font-semibold rounded-md uppercase">Active</span>`
-            : `<span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-headline font-semibold rounded-md uppercase">Inactive</span>`
-          }
-        </td>
+          <!-- TOTAL SPEND -->
+          <td class="px-8 py-5 text-sm font-semibold">
+            Rp 0
+          </td>
 
-        <td class="px-8 py-5 text-right flex items-center justify-end gap-1">
-          <button onclick="openEditSupplierModal('${item.id}')" class="p-2 hover:text-on-surface rounded-md text-on-surface-variant ">
-            <span class="material-symbols-outlined">edit</span>
-          </button>
-        </td>
+          <!-- HUTANG -->
+          <td class="px-8 py-5 text-sm font-semibold text-error">
+            Rp 0
+          </td>
 
-      </tr>
-    `;
+          <!-- STATUS -->
+          <td class="px-8 py-5">
+            ${
+              isActive
+              ? `
+                <span class="px-3 py-1 bg-outline-variant/20 text-on-surface text-[10px] border border-outline-variant font-headline font-semibold rounded-md uppercase">
+                  Active
+                </span>
+              `
+              : `
+                <span class="px-3 py-1 bg-error-container/20 text-error text-[10px] font-headline font-semibold rounded-md uppercase">
+                  Inactive
+                </span>
+              `
+            }
+          </td>
 
-  }).join("");
+          <!-- ACTIONS -->
+          <td class="px-8 py-5 text-right">
+            <div class="flex items-center justify-end gap-1">
+
+              <button
+                onclick="openEditSupplierModal('${item.id}')"
+                class="p-2 hover:text-on-surface rounded-md text-on-surface-variant"
+              >
+                <span class="material-symbols-outlined">
+                  edit
+                </span>
+              </button>
+
+            </div>
+          </td>
+
+        </tr>
+      `;
+
+    }).join("");
 
   renderSupplierPagination();
 }
-
 let currentSupplierData = null;
 
 function openEditSupplierModal(supplierId) {
