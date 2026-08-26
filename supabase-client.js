@@ -22,6 +22,7 @@ const centralSupabase =
 // =====================================================
 
 let supabaseClient = null;
+let connectedTenantUrl = null;
 
 function getActiveSupabase() {
   return state.tenantSlug
@@ -50,10 +51,18 @@ async function connectTenant(slug) {
     localStorage.setItem("pos_cached_tenant_config", JSON.stringify(config));
 
     // 2. Buat Client Customer
-    supabaseClient = supabase.createClient(
-      config.supabase_url,
-      config.supabase_anon_key
-    );
+    if (
+      !supabaseClient ||
+      connectedTenantUrl !== config.supabase_url
+    ) {
+      supabaseClient = supabase.createClient(
+        config.supabase_url,
+        config.supabase_anon_key
+      );
+    
+      connectedTenantUrl =
+        config.supabase_url;
+    }
 
     // 3. Coba baca branch & sync (Bungkus try/catch terpisah agar kalau offline tidak bikin blank)
     try {
@@ -88,10 +97,18 @@ async function connectTenant(slug) {
     if (cachedConfig) {
       const config = JSON.parse(cachedConfig);
       // Inisialisasi ulang client pakai data cache
-      supabaseClient = supabase.createClient(
-        config.supabase_url,
-        config.supabase_anon_key
-      );
+      if (
+        !supabaseClient ||
+        connectedTenantUrl !== config.supabase_url
+      ) {
+        supabaseClient = supabase.createClient(
+          config.supabase_url,
+          config.supabase_anon_key
+        );
+      
+        connectedTenantUrl =
+          config.supabase_url;
+      }
       console.log("Berhasil memuat tenant dari cache offline!");
       return config;
     }
