@@ -33,97 +33,70 @@ function getActiveSupabase() {
 // =====================================================
 
 async function connectTenant(slug) {
-  const {
-    data,
-    error
-  } = await centralSupabase.rpc(
-    "get_tenant_config",
-    {
-      p_slug: slug
-    }
-  );
-
-  if (error) {
-    throw error;
-  }
-
-  if (!data?.success) {
-    throw new Error(
-      data?.message ||
-      "Tenant tidak ditemukan"
+  try {
+    // 1. Coba ambil config dari Central Supabase via RPC
+    const { data, error } = await centralSupabase.rpc(
+      "get_tenant_config",
+      { p_slug: slug }
     );
-  }
 
-  const config =
-    data.data;
+    if (error) throw error;
+    if (!data?.success) throw new Error(data?.message || "Tenant tidak ditemukan");
 
-  if (!config.is_active) {
-    throw new Error(
-      "Tenant tidak aktif"
-    );
-  }
+    const config = data.data;
+    if (!config.is_active) throw new Error("Tenant tidak aktif");
 
+    // Simpan config ke localStorage sebagai cadangan offline
+    localStorage.setItem("pos_cached_tenant_config", JSON.stringify(config));
 
-  // ============================================
-  // BUAT CLIENT CUSTOMER
-  // ============================================
-  
-  supabaseClient =
-    supabase.createClient(
+    // 2. Buat Client Customer
+    supabaseClient = supabase.createClient(
       config.supabase_url,
       config.supabase_anon_key
     );
-  
-  
-  // ============================================
-  // BACA JUMLAH BRANCH AKTUAL
-  // ============================================
-  
-  const {
-    count: branchCount,
-    error: branchError
-  } = await supabaseClient
-    .from("Branches")
-    .select("*", {
-      count: "exact",
-      head: true
-    });
-  
-  if (branchError) {
-    throw branchError;
-  }
 
-  // ============================================
-  // SYNC BRANCH COUNT KE MASTER
-  // ============================================
-  
-  const syncResponse =
-    await fetch(
-      "/api/sync-tenant-branch-count",
-      {
+    // 3. Coba baca branch & sync (Bungkus try/catch terpisah agar kalau offline tidak bikin blank)
+    try {
+      const { count: branchCount } = await supabaseClient
+        .from("Branches")
+        .select("*", { count: "exact", head: true });
+
+      // Kirim sync ke Vercel di background (tidak perlu di-await mati-matian kalau offline)
+      fetch("/api/sync-tenant-branch-count", {
         method: "POST",
-  
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-  
-        body: JSON.stringify({
-          tenant_id:
-            config.tenant_id
-        })
-      }
-    );
-  
-  const syncResult =
-    await syncResponse.json();
-  
-  // ============================================
-  // RETURN CONFIG
-  // ============================================
-  
-  return {
-    ...config,
-    branch_count: branchCount
-  };
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant_id: config.tenant_id })
+      }).catch(() => {}); // Abaikan error sync jika offline
+
+      return {
+        ...config,
+        branch_count: branchCount || 0
+      };
+
+    } catch (dbError) {
+      console.warn("Gagal konek ke DB tenant (mungkin offline), pakai mode offline:", dbError);
+      return config;
+    }
+
+  } catch (err) {
+    console.warn("Gagal ambil config tenant online, cek cache...", err);
+    
+    // ==========================================
+    // FALLBACK OFFLINE (AMBIL DARI LOCALSTORAGE)
+    // ==========================================
+    const cachedConfig = localStorage.getItem("pos_cached_tenant_config");
+    if (cachedConfig) {
+      const config = JSON.parse(cachedConfig);
+      // Inisialisasi ulang client pakai data cache
+      supabaseClient = supabase.createClient(
+        config.supabase_url,
+        config.supabase_anon_key
+      );
+      console.log("Berhasil memuat tenant dari cache offline!");
+      return config;
+    }
+
+    // Kalau di cache juga benar-benar kosong, baru lempar error
+    throw new Error("Tidak ada koneksi internet dan data offline tidak ditemukan.");
+  }
 }
