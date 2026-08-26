@@ -369,11 +369,35 @@ export default async function handler(req, res) {
   }
   catch (error) {
 
+    const message =
+      error.message ||
+      "Restore backup gagal";
+  
+    // ==========================================
+    // BATAS RESTORE HARIAN
+    // ==========================================
+  
+    if (
+      message.includes(
+        "Restore sudah dilakukan hari ini"
+      )
+    ) {
+  
+      return res.status(429).json({
+        success: false,
+        error: message,
+        limit: "daily_restore"
+      });
+  
+    }
+  
+    // ==========================================
+    // ERROR LAIN
+    // ==========================================
+  
     return res.status(500).json({
       success: false,
-      error:
-        error.message ||
-        "Restore backup gagal"
+      error: message
     });
   }
 }
