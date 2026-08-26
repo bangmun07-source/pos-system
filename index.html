@@ -13215,58 +13215,37 @@ function bootApp(targetPage = "dashboardPage") {
 }
 
 function restoreSession() {
-  const user =
-    localStorage.getItem(
-      "pos_user"
-    );
-  const branchId =
-    localStorage.getItem(
-      "pos_branchId"
-    );
-
-  const loginTenant =
-    localStorage.getItem(
-      "pos_login_tenant"
-    );
+  const user = localStorage.getItem("pos_user");
+  const branchId = localStorage.getItem("pos_branchId");
+  const loginTenant = localStorage.getItem("pos_login_tenant");
 
   // Tidak ada session
   if (!user) {
     return false;
   }
 
-  // Tenant saat ini
-  const currentTenant =
-    state.tenantSlug || "master";
+  const currentTenant = state.tenantSlug || "master";
 
-  // Tenant berbeda
-  if (
-    loginTenant !== currentTenant
-  ) {
-
-    // Hapus session login
-    localStorage.removeItem(
-      "pos_user"
-    );
-
-    localStorage.removeItem(
-      "pos_branchId"
-    );
-
-    localStorage.removeItem(
-      "pos_login_tenant"
-    );
+  // JIKA POS_LOGIN_TENANT BELUM ADA (Kasus login lama), 
+  // simpan otomatis tenant saat ini agar tidak mental saat refresh
+  if (!loginTenant) {
+    localStorage.setItem("pos_login_tenant", currentTenant);
+  } 
+  // JIKA SUDAH ADA TAPI BEDA TENANT, BARU HAPUS SESI
+  else if (loginTenant !== currentTenant) {
+    localStorage.removeItem("pos_user");
+    localStorage.removeItem("pos_branchId");
+    localStorage.removeItem("pos_login_tenant");
+    localStorage.removeItem("pos_session_id");
 
     state.user = null;
     state.branchId = "";
     return false;
   }
 
-  // Session masih untuk tenant yang sama
-  state.user =
-    JSON.parse(user);
-
-  state.branchId =
-    branchId;
+  // Session valid untuk tenant yang sama
+  state.user = JSON.parse(user);
+  state.branchId = branchId;
   return true;
 }
 
@@ -13493,7 +13472,7 @@ async function handleLogin() {
     if (state.branchId) {
       localStorage.setItem("pos_branchId", state.branchId);
     }
-
+	localStorage.setItem("pos_login_tenant", state.tenantSlug || "master");
     navigate("dashboardPage");
 
   } catch (err) {
