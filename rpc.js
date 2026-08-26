@@ -1308,7 +1308,7 @@ async function updateIngredientThresholdRPC(data = {}) {
   return result;
 }
 
-async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, note, branchId, outlet, paymentMethod = "CASH") {
+async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, supplierId, note, branchId, outlet, paymentMethod = "CASH", status = "PAID") {
   const {
     data,
     error
@@ -1329,6 +1329,9 @@ async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, n
 
       p_supplier:
         supplier || "",
+      
+       p_supplier_id:
+        supplierId || null,
 
       p_note:
         note || "",
@@ -1340,7 +1343,10 @@ async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, n
         outlet || "",
 
       p_payment_method:
-        paymentMethod || "CASH"
+        paymentMethod || "CASH",
+
+      p_status:
+        status || "PAID"
     }
   );
 
