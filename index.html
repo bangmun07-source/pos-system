@@ -21407,6 +21407,9 @@ window.confirmPurchaseStatus = async function () {
     closePurchaseStatus();
     closePurchaseAction();
     renderPurchasePage();
+	state.supplierData = null;
+	state.supplierBranchId = null;
+	await loadSuppliers();
     showToast(
       "Status purchase berhasil diubah",
       "success"
@@ -21450,7 +21453,6 @@ async function loadSuppliers() {
     if (!branchId) {
       return;
     }
-
     // SUPABASE RPC
     const { data, error } =
       await supabaseClient.rpc(
@@ -21464,28 +21466,18 @@ async function loadSuppliers() {
       throw error;
     }
 
-    // =========================
     // CACHE
-    // =========================
-
     allSupplierData =
       data || [];
-
     state.supplierData =
       data || [];
-
     state.supplierBranchId =
       branchId;
 
-    // =========================
     // RENDER
-    // =========================
-
     renderSuppliers();
-
   }
   catch (err) {
-
     console.error(
       "Load Suppliers Error:",
       err
