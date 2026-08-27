@@ -13863,6 +13863,7 @@ function initModule(pageId) {
 	      state.branchId
 	    );
 	    initIngredientExportDate();
+		initPurchaseFilters();
 	  });
 	break;
 
@@ -20300,23 +20301,17 @@ function renderInventoryPage(data) {
 }
 
 async function loadIngredients(branchId) {
-
   if (!branchId) {
     return;
   }
-
   const cacheKey =
     `ingredients_${branchId}`;
 
-  // =========================
   // CACHE
-  // =========================
-
   if (
     state.ingredients &&
     state.ingredientsCacheKey === cacheKey
   ) {
-
     renderIngredients(
       state.ingredients
     );
@@ -20334,25 +20329,18 @@ async function loadIngredients(branchId) {
         p_branch_id: branchId
       }
     );
-
     if (error) {
       throw error;
     }
 
-    // =========================
     // CACHE
-    // =========================
-
     state.ingredients =
       data || [];
 
     state.ingredientsCacheKey =
       cacheKey;
 
-    // =========================
     // EMPTY CHECK
-    // =========================
-
     const tbody =
       document.getElementById(
         "ingredientsTable"
@@ -20365,7 +20353,6 @@ async function loadIngredients(branchId) {
     if (
       !state.ingredients.length
     ) {
-
       tbody.innerHTML = `
         <tr>
           <td colspan="8"
@@ -20374,32 +20361,47 @@ async function loadIngredients(branchId) {
           </td>
         </tr>
       `;
-
       return;
     }
-
-    // =========================
     // RENDER
-    // =========================
-
     renderIngredients(
       state.ingredients
     );
-
   }
   catch (err) {
-
     console.error(
       "Load Ingredients Error:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal memuat ingredients.",
       "error"
     );
   }
+}
+
+function initPurchaseFilters() {
+  const search =
+    document.getElementById(
+      "purchaseSearch"
+    );
+  const status =
+    document.getElementById(
+      "purchaseStatusFilter"
+    );
+  search?.addEventListener(
+    "input",
+    () => {
+      applyPurchaseFilters();
+    }
+  );
+  status?.addEventListener(
+    "change",
+    () => {
+      applyPurchaseFilters();
+    }
+  );
 }
 
 async function loadIngredientPurchases(branchId) {
@@ -20432,9 +20434,9 @@ async function loadIngredientPurchases(branchId) {
       throw error;
     }
     // RPC mengembalikan JSONB
-    const purchases = Array.isArray(data)
-      ? data
-      : [];
+    purchaseData = Array.isArray(data) ? data : [];
+	purchaseCurrentPage = 1;
+    applyPurchaseFilters();
     renderIngredientPurchases(purchases);
   } catch (error) {
     console.error(
@@ -20452,6 +20454,47 @@ async function loadIngredientPurchases(branchId) {
   }
 }
 
+function applyPurchaseFilters() {
+  const searchInput =
+    document.getElementById("purchaseSearch");
+
+  const statusSelect =
+    document.getElementById("purchaseStatusFilter");
+
+  const search = (
+    searchInput?.value || ""
+  ).trim().toLowerCase();
+
+  const status =
+    statusSelect?.value || "ALL";
+	
+  purchaseFilteredData = purchaseData.filter(purchase => {
+    const matchesSearch =
+      !search ||
+      String(purchase.ID || "")
+        .toLowerCase()
+        .includes(search) ||
+
+      String(purchase.Name_Supplier || "")
+        .toLowerCase()
+        .includes(search) ||
+
+      String(purchase.Ingredient || "")
+        .toLowerCase()
+        .includes(search);
+
+    const purchaseStatus =
+      String(purchase.Status || "")
+        .toUpperCase();
+    const matchesStatus =
+      status === "ALL" ||
+      purchaseStatus === status;
+    return matchesSearch && matchesStatus;
+  });
+  purchaseCurrentPage = 1;
+  renderPurchasePage();
+}
+	
 function renderIngredientPurchases(purchases) {
   const tbody = document.getElementById("ingredientPurchaseTable");
   if (!tbody) return;
@@ -20518,7 +20561,131 @@ function renderIngredientPurchases(purchases) {
     `;
   }).join("");
 }
+	
+function renderPurchasePage() {
+  const totalItems =
+    purchaseFilteredData.length;
 
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(totalItems / purchasePageSize)
+    );
+
+  if (purchaseCurrentPage > totalPages) {
+    purchaseCurrentPage = totalPages;
+  }
+  const start =
+    (purchaseCurrentPage - 1)
+    * purchasePageSize;
+
+  const end =
+    start + purchasePageSize;
+
+  const pageData =
+    purchaseFilteredData.slice(
+      start,
+      end
+    );
+
+  renderIngredientPurchases(pageData);
+  renderPurchasePagination(
+    totalPages
+  );
+
+  const showing =
+    document.getElementById(
+      "purchaseShowing"
+    );
+
+  if (showing) {
+    showing.textContent =
+      pageData.length;
+  }
+}
+
+function renderPurchasePagination(totalPages) {
+
+  const container =
+    document.getElementById(
+      "ingredientPurchasePagination"
+    );
+
+  if (!container) return;
+
+
+  if (totalPages <= 1) {
+    container.innerHTML = "";
+    return;
+  }
+
+
+  let html = `
+    <div class="flex items-center gap-1">
+  `;
+
+
+  // Previous
+  html += `
+    <button
+      onclick="changePurchasePage(${purchaseCurrentPage - 1})"
+      ${purchaseCurrentPage === 1 ? "disabled" : ""}
+      class="px-3 py-1 rounded-md border border-outline-variant text-xs disabled:opacity-40">
+      ‹
+    </button>
+  `;
+
+  for (
+    let i = 1;
+    i <= totalPages;
+    i++
+  ) {
+    html += `
+      <button
+        onclick="changePurchasePage(${i})"
+        class="px-3 py-1 rounded-md border border-outline-variant text-xs ${
+          i === purchaseCurrentPage
+            ? "bg-surface-container-high font-bold"
+            : ""
+        }">
+        ${i}
+      </button>
+    `;
+  }
+
+  // Next
+  html += `
+    <button
+      onclick="changePurchasePage(${purchaseCurrentPage + 1})"
+      ${purchaseCurrentPage === totalPages ? "disabled" : ""}
+      class="px-3 py-1 rounded-md border border-outline-variant text-xs disabled:opacity-40">
+      ›
+    </button>
+  `;
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function changePurchasePage(page) {
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        purchaseFilteredData.length
+        / purchasePageSize
+      )
+    );
+
+  if (
+    page < 1 ||
+    page > totalPages
+  ) {
+    return;
+  }
+  purchaseCurrentPage = page;
+  renderPurchasePage();
+}
+	
 function renderPurchaseStatus(status) {
   let className = "bg-surface-container-high text-muted";
   if (status === "PAID") {
