@@ -23791,23 +23791,19 @@ function renderSupplierOptions(select, data) {
 }
 
 window.loadStockInData = async function () {
-
   const modal =
     document.querySelector(
       ".stock-modal"
     );
-
   if (!modal) return;
 	
   // BRANCH + INGREDIENT
   const branchId =
     state.branchId;
-
   loadStockInIngredients(
     modal,
     branchId
   );
-
   loadBranchDropdown();
 
   // SUPPLIER
@@ -23815,7 +23811,6 @@ window.loadStockInData = async function () {
     modal.querySelector(
       "#supplierSelect"
     );
-
   if (!supplierSelect) return;
 	
   // CACHE SUPPLIER
@@ -23824,16 +23819,14 @@ window.loadStockInData = async function () {
     state.supplierBranchId ===
       branchId
   ) {
-
     renderSupplierOptions(
       supplierSelect,
       state.supplierData
     );
     return;
   }
-
-  try {
 	
+  try {
     // SUPABASE RPC
     const {
       data,
@@ -23845,11 +23838,9 @@ window.loadStockInData = async function () {
           branchId
       }
     );
-
     if (error) {
       throw error;
     }
-
     const suppliers =
       data || [];
 
@@ -23873,58 +23864,38 @@ window.loadStockInData = async function () {
   }
 };
 
-async function loadStockInIngredients(
-  modal,
-  branchId
-) {
-
+async function loadStockInIngredients( modal, branchId ) {
   if (!modal) return;
-
-
+	
   branchId =
     branchId ||
     state.branchId;
-
   if (!branchId) return;
-
 
   const select =
     modal.querySelector(
       "#ingredientName"
     );
-
   if (!select) return;
 
-
-  // ==============================
   // CACHE
-  // ==============================
-
   if (
     state.stockInIngredients &&
     state.stockInIngredientsBranchId ===
       branchId
   ) {
-
     renderStockInIngredientOptions(
       select,
       state.stockInIngredients
     );
-
     return;
   }
-
 
   select.innerHTML =
     `<option>Loading...</option>`;
 
-
   try {
-
-    // ==============================
     // SUPABASE RPC
-    // ==============================
-
     const {
       data,
       error
@@ -23940,62 +23911,41 @@ async function loadStockInIngredients(
       throw error;
     }
 
-
     const ingredients =
       data || [];
 
-
-    // ==============================
     // CACHE
-    // ==============================
-
     state.stockInIngredients =
       ingredients;
 
     state.stockInIngredientsBranchId =
       branchId;
 
-
-    // ==============================
     // RENDER
-    // ==============================
-
     renderStockInIngredientOptions(
       select,
       ingredients
     );
 
-
-    // ==============================
     // LOAD SUMMARY
-    // ==============================
-
     const first =
       ingredients[0]?.name;
-
     if (first) {
-
       loadIngredientSummary(
         first
       );
-
     }
-
   }
   catch (err) {
-
     console.error(
       "Load Stock In Ingredients Error:",
       err
     );
-
     select.innerHTML =
       `<option>
         Failed load ingredients
       </option>`;
-
   }
-
 }
 	
 window.stockModalEl = null;
@@ -25064,9 +25014,7 @@ async function saveNewProduct() {
   }
 }
 
-
 async function saveMaterial() {
-
   const select =
     document.getElementById(
       "material_branch"
@@ -25100,7 +25048,6 @@ async function saveMaterial() {
   };
 
   try {
-	
     // SUPABASE RPC
     const {
       data: res,
@@ -25125,7 +25072,6 @@ async function saveMaterial() {
     }
 
     // SUCCESS CHECK
-
     if (
       res &&
       res.success === false
@@ -25135,23 +25081,19 @@ async function saveMaterial() {
         "Gagal menyimpan material"
       );
     }
-
+	
     // CLEAR CACHE
-
     closeAddMaterialModal();
-    // product cache
     state.products = null;
     state.productBranchId = null;
-    // recipe cache
     state.recipeData = null;
     state.recipeDataBranchId = null;
     state.recipeProductsData = null;
     state.recipeProductsBranchId = null;
-    // inventory cache
     state.inventoryData = null;
     state.inventoryBranchId = null;
- 
-    // RELOAD
+		state.stockInIngredients = null;
+		state.stockInIngredientsBranchId = null;
     await loadProducts();
     await loadRecipes();
     await loadInventoryPage(
