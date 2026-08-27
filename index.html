@@ -413,7 +413,7 @@
     }
 
     .btn-active {
-		  background-color: var(--surface-variant) !important;
+		  background-color: var(--outline-variant) !important;
 		  color: var(--foreground) !important;
 		  border-color: var(--outline-variant) !important;
 		}
@@ -429,7 +429,7 @@
 		}
 		
 		.btn-inactive:hover {
-		  background-color: var(--surface-variant) !important;
+		  background-color: var(--outline-variant) !important;
 		}
 
     /* =========================
@@ -4122,7 +4122,7 @@
 								
 				  <!-- EXPORT -->
 				  <button onclick="exportIngredientPurchases()"
-				    class="bottom-theme text-foreground flex items-center justify-center gap-2 tracking-[0.15em] transition-all uppercase px-4 shrink-0 text-sm lg:text-md">			
+				    class="h-[30px] bottom-theme text-foreground flex items-center justify-center gap-2 tracking-[0.15em] transition-all uppercase px-4 shrink-0 text-sm lg:text-md">			
 				    <span class="text-sm lg:text-md material-symbols-outlined">
 				      download
 				    </span>
@@ -4240,7 +4240,7 @@
 					<span class="material-symbols-outlined text-3xl"
 								style="font-variation-settings:'FILL' 1;">receipt_long</span>
 	      </div>
-      		<h2 class="font-headline text-2xl font-bold tracking-tight">Recipe Master</h2>
+      		<h2 class="font-headline text-2xl font-bold tracking-tight">Material Composition</h2>
 			</div>
 			
       <div class="flex gap-2">
@@ -4306,7 +4306,7 @@
 					<span class="material-symbols-outlined text-3xl"
 								style="font-variation-settings:'FILL' 1;">receipt_long</span>
    			</div>
-    			<h2 class="font-headline text-2xl font-bold tracking-tight">Recipe Master</h2>
+    			<h2 class="font-headline text-2xl font-bold tracking-tight">Material Composition</h2>
   			</div>
 
 			<div class="space-y-8">
@@ -4321,7 +4321,7 @@
 			    <select id="recipeProductSelect"
 			      onchange="onSelectRecipeProduct(event)"
 			      class=" w-full appearance-none bg-background text-on-surface text-sm border border-outline-variant rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary transition-all">
-			      <option value="">Select a product to configure recipe...</option>
+			      <option value="">Select a product to configure the material composition....</option>
 			    </select>
 						
 					<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface pointer-events-none group-focus-within:text-on-surface transition-colors">
@@ -4708,7 +4708,7 @@
     <!-- ACTION -->
     <div class="p-8 flex gap-4 bg-background border border-outline-variant">
       <button onclick="closeAdjustStockModal()"
-        class="flex-1 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-outline-variant">
+        class="flex-1 py-3 rounded-md text-on-surface-variant hover:text-on-surface">
         Cancel
       </button>
 
@@ -20569,11 +20569,8 @@ async function loadInventoryPage(branchId) {
     if (error) {
       throw error;
     }
-
-    // =========================
+		
     // CACHE
-    // =========================
-
     state.inventoryData =
       data || {
         summary: {},
@@ -20585,10 +20582,7 @@ async function loadInventoryPage(branchId) {
     state.inventoryBranchId =
       branchId;
 
-    // =========================
     // RENDER
-    // =========================
-
     renderInventoryPage(
       state.inventoryData
     );
@@ -20924,7 +20918,7 @@ function renderIngredientPurchases(purchases) {
     ).toUpperCase();
 
     return `
-      <tr class="hover:bg-surface-container-low transition">
+      <tr class="hover:bg-outline-variant transition">
         <td class="px-8 py-4 text-sm font-semibold">
           ${escapeHtml(purchase.ID || "-")}
         </td>
@@ -20959,9 +20953,9 @@ function renderIngredientPurchases(purchases) {
 
         <td class="px-8 py-4 text-right">
           <button onclick="openPurchaseAction('${escapeHtml(purchase.ID)}')"
-            class="p-2 rounded-md hover:bg-surface-container-high transition">
+            class="p-2 rounded-md hover:text-on-surface transition">
 
-            <span class="material-symbols-outlined text-lg">
+            <span class="material-symbols-outlined text-lg text-on-surface-variant">
               more_vert
             </span>
           </button>
@@ -21628,7 +21622,7 @@ function renderSuppliers() {
                 <button onclick="openEditSupplierModal('${item.id}')"
                   class="p-2 hover:text-on-surface rounded-md text-on-surface-variant" >
 
-                  <span class="material-symbols-outlined">
+                  <span class="material-symbols-outlined text-sm">
                     edit
                   </span>
                 </button>
@@ -22136,8 +22130,8 @@ function renderRecipes() {
       </td>
 
       <td class="px-6 py-4 text-right text-[10px] text-on-surface-variant">
-        <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:bg-outline-variant rounded-md">
-          <span class="material-symbols-outlined">edit</span>
+        <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:text-on-surface">
+          <span class="material-symbols-outlined text-sm">edit</span>
         </button>
       </td>
 
@@ -22781,7 +22775,7 @@ function renderIngredients(data) {
         <!-- INGREDIENT -->
         <td class="px-8 py-5">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-md bg-outline-variant/10 flex items-center justify-center text-on-surface">
+            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
               <span class="material-symbols-outlined">${icon}</span>
             </div>
             <span class="font-bold text-sm">${item.name}</span>
@@ -22826,7 +22820,7 @@ function renderIngredients(data) {
 
         <!-- ACTION -->
         <td class="px-8 py-5 text-right flex items-center justify-end gap-1">
-          <button onclick='openIngredientModal(${JSON.stringify(itemWithBranch)})' class="p-2 hover:bg-outline-variant rounded-md text-muted ">
+          <button onclick='openIngredientModal(${JSON.stringify(itemWithBranch)})' class="p-2 hover:text-on-surface text-on-surface-variant">
             <span class="material-symbols-outlined">more_vert</span>
           </button>
         </td>
