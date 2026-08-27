@@ -21353,11 +21353,76 @@ window.closePurchaseStatus = function () {
   document.body.style.overflow = "";
 };
 
-window.confirmPurchaseStatus = function () {
-  console.log(
-    "Selected status:",
-    window.selectedPurchaseStatus
-  );
+window.confirmPurchaseStatus = async function () {
+  const purchase =
+    window.currentPurchaseAction;
+  const status =
+    window.selectedPurchaseStatus;
+
+  if (!purchase) {
+    showToast(
+      "Purchase tidak ditemukan",
+      "error"
+    );
+    return;
+  }
+
+  if (!status) {
+    showToast(
+      "Pilih status terlebih dahulu",
+      "error"
+    );
+    return;
+  }
+
+  try {
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "update_ingredient_purchase_status",
+      {
+        p_purchase_id:
+          purchase.ID,
+        p_status:
+          status,
+        p_updated_by:
+          "SYSTEM"
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    if (
+      data &&
+      data.success === false
+    ) {
+      throw new Error(
+        "Gagal mengubah status purchase"
+      );
+    }
+    purchase.Status = status;
+    closePurchaseStatus();
+    closePurchaseAction();
+    renderPurchasePage();
+    showToast(
+      "Status purchase berhasil diubah",
+      "success"
+    );
+  }
+  catch (err) {
+    console.error(
+      "Update Purchase Status:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal mengubah status purchase",
+      "error"
+    );
+  }
 };
 	
 function openInventoryPage() {
