@@ -1,6 +1,5 @@
-const CACHE_NAME = "MUNO-v1";
+const CACHE_NAME = "MUNO-v2";
 
-// Aset statis utama yang ingin disimpan ke cache lokal
 const ASSETS_TO_CACHE = [
   "/",
   "/index.html"
@@ -8,13 +7,15 @@ const ASSETS_TO_CACHE = [
 
 
 // =====================================================
-// 1. INSTALL & CACHE ASET UTAMA
+// 1. INSTALL
 // =====================================================
 self.addEventListener("install", (event) => {
+
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        return cache.addAll(ASSETS_TO_CACHE);
+      })
   );
 
   self.skipWaiting();
@@ -22,19 +23,30 @@ self.addEventListener("install", (event) => {
 
 
 // =====================================================
-// 2. ACTIVATE & BERSIHKAN CACHE LAMA
+// 2. ACTIVATE
 // =====================================================
 self.addEventListener("activate", (event) => {
+
   event.waitUntil(
+
     caches.keys().then((cacheNames) => {
+
       return Promise.all(
+
         cacheNames.map((cache) => {
+
           if (cache !== CACHE_NAME) {
             return caches.delete(cache);
           }
+
+          return null;
+
         })
+
       );
+
     })
+
   );
 
   self.clients.claim();
@@ -45,31 +57,46 @@ self.addEventListener("activate", (event) => {
 // 3. FETCH
 // =====================================================
 self.addEventListener("fetch", (event) => {
-  const url = new URL(event.request.url);
 
-  // Jangan tangani request selain GET
-  if (event.request.method !== "GET") {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  // Hanya GET
+  if (request.method !== "GET") {
     return;
   }
 
-  // Jangan tangani request ke Supabase
+  // Supabase → langsung network
   if (url.hostname.includes("supabase.co")) {
     return;
   }
 
-  // Jangan tangani endpoint API Vercel
+  // Vercel API → langsung network
   if (url.pathname.startsWith("/api/")) {
     return;
   }
 
+
   // ===================================================
-  // NAVIGASI HALAMAN
+  // NAVIGATION
+  // NETWORK FIRST
   // ===================================================
-  if (event.request.mode === "navigate") {
+  if (request.mode === "navigate") {
 
     event.respondWith(
-      fetch(event.request)
-        .catch(() => caches.match("/index.html"))
+
+      fetch(request)
+        .then((response) => {
+
+          return response;
+
+        })
+        .catch(() => {
+
+          return caches.match("/index.html");
+
+        })
+
     );
 
     return;
@@ -77,19 +104,40 @@ self.addEventListener("fetch", (event) => {
 
 
   // ===================================================
-  // ASET STATIS
+  // JS / CSS / ASSET
+  // NETWORK FIRST
   // ===================================================
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
 
-        // Kalau ada di cache → gunakan
-        if (cachedResponse) {
-          return cachedResponse;
+    fetch(request)
+
+      .then((response) => {
+
+        // Simpan response terbaru
+        if (response &&
+            response.status === 200 &&
+            response.type === "basic") {
+
+          const responseClone =
+            response.clone();
+
+          caches.open(CACHE_NAME)
+            .then((cache) => {
+              cache.put(request, responseClone);
+            });
+
         }
 
-        // Kalau belum ada → ambil dari network
-        return fetch(event.request);
+        return response;
+
       })
+
+      .catch(() => {
+
+        return caches.match(request);
+
+      })
+
   );
+
 });
