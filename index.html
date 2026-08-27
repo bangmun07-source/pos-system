@@ -4205,8 +4205,8 @@
 						<th class="px-8 py-4 font-bold">CATEGORY</th>
 						<th class="px-8 py-4 font-bold">CONTACT PERSON</th>
 						<th class="px-8 py-4 font-bold">PHONE NUMBER</th>
-						<th class="px-8 py-4 font-bold">STATUS</th>
-						<th class="px-8 py-4 font-bold">HUTANG</th>
+						<th class="px-8 py-4 font-bold">TOTAL SPEND</th>
+						<th class="px-8 py-4 font-bold">BALANCE DUE</th>
 				    <th class="px-8 py-4 font-bold">STATUS</th>
 						<th class="px-8 py-4 font-bold text-right">ACTIONS</th>
 					</tr>
@@ -14264,7 +14264,8 @@ function initModule(pageId) {
 	    );
 	    await loadRecipeProducts();
 	    initIngredientExportDate();
-	break;
+	  });
+	  break;
 
     case "analyticsPage": {
       initAnalyticsDate();
