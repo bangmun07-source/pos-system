@@ -20438,17 +20438,18 @@ async function loadIngredientPurchases(branchId) {
     if (error) {
       throw error;
     }
-    // RPC mengembalikan JSONB
-    purchaseData = Array.isArray(data) ? data : [];
-	purchaseCurrentPage = 1;
+	
+    purchaseData = Array.isArray(data)
+      ? data
+      : [];
+    purchaseCurrentPage = 1;
     applyPurchaseFilters();
-    renderIngredientPurchases(purchases);
+		
   } catch (error) {
     console.error(
       "Load Ingredient Purchases Error:",
       error
     );
-
     tbody.innerHTML = `
       <tr>
         <td colspan="9" class="text-center text-error py-6">
