@@ -1,4 +1,4 @@
-const CACHE_NAME = "MUNO-v2";
+const CACHE_NAME = "MUNO-v3";
 
 const ASSETS_TO_CACHE = [
   "/",
