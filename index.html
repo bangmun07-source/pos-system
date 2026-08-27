@@ -3943,57 +3943,7 @@
 	
 			<h2 class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
 				Inventory Management
-			</h2>
-	
-			<div class="flex items-center gap-4">
-				<div class="flex flex-row items-center gap-3 flex-wrap">
-				<!-- DATE -->
-				<div class="bg-background border border-outline-variant rounded-md h-[30px] inline-flex items-center gap-3 px-2">
-
-					<!-- START -->
-					<div class="flex flex-col px-3">
-						<div class="relative flex items-center">
-							<span class="material-symbols-outlined text-foreground text-sm lg:text-md absolute left-0">
-								calendar_today
-							</span>
-
-							<input class="bg-transparent border-none p-0 pl-7 text-sm lg:text-md font-semibold text-on-surface focus:ring-0 cursor-pointer w-32"
-								id="ingredientExportStart"
-								type="date"
-								value="2024-10-01" />
-						</div>
-					</div>
-
-					<div class="hidden sm:block h-8 w-px bg-outline-variant/20"></div>
-						<!-- END -->
-						<div class="flex flex-col px-3">
-							<div class="relative flex items-center">
-								<span class="material-symbols-outlined text-foreground text-sm lg:text-md absolute left-0">
-									calendar_month
-								</span>
-
-								<input
-									id="ingredientExportEnd"
-									type="date"
-									value="2024-10-31"
-									class="bg-transparent border-none p-0 pl-7 text-sm lg:text-md font-semibold text-on-surface focus:ring-0 cursor-pointer w-32" />
-							</div>
-						</div>
-					</div>
-
-					<!-- EXPORT -->
-					<button onclick="exportIngredientPurchases()"
-						class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">
-						<span class="text-sm lg:text-md material-symbols-outlined">
-							download
-						</span>
-
-						<span class="hidden sm:inline">
-							Export
-						</span>
-					</button>
-				</div>
-			</div>
+			</h2>	
 		</div>
 	</section>
 
@@ -13900,6 +13850,9 @@ function initModule(pageId) {
 	      state.branchId
 	    );
 	    await loadRecipeProducts();
+			await loadIngredientPurchases(
+	      state.branchId
+	    );
 	    initIngredientExportDate();
 	  });
 	break;
@@ -20438,6 +20391,141 @@ async function loadIngredients(branchId) {
       "error"
     );
   }
+}
+
+async function loadIngredientPurchases(branchId) {
+  const tbody = document.getElementById(
+    "ingredientPurchaseTable"
+  );
+  if (!tbody) return;
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="9" class="text-center text-muted py-6">
+        Loading...
+      </td>
+    </tr>
+  `;
+
+  try {
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_ingredient_purchases",
+      {
+        p_branch_id: branchId,
+        p_start: null,
+        p_end: null
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+    // RPC mengembalikan JSONB
+    const purchases = Array.isArray(data)
+      ? data
+      : [];
+    renderIngredientPurchases(purchases);
+  } catch (error) {
+    console.error(
+      "Load Ingredient Purchases Error:",
+      error
+    );
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="text-center text-error py-6">
+          Failed to load purchase data
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function renderIngredientPurchases(purchases) {
+  const tbody = document.getElementById("ingredientPurchaseTable");
+  if (!tbody) return;
+  if (!purchases.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="text-center text-muted py-6">
+          No purchase data
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = purchases.map(purchase => {
+    const status = String(
+      purchase.Status || ""
+    ).toUpperCase();
+
+    return `
+      <tr class="hover:bg-surface-container-low transition">
+        <td class="px-8 py-4 text-sm font-semibold">
+          ${escapeHtml(purchase.ID || "-")}
+        </td>
+
+        <td class="px-8 py-4 text-sm">
+          ${escapeHtml(purchase.Date || "-")}
+        </td>
+
+        <td class="px-8 py-4 text-sm">
+          ${escapeHtml(purchase.Name_Supplier || "-")}
+        </td>
+
+        <td class="px-8 py-4 text-sm">
+          ${escapeHtml(purchase.Ingredient || "-")}
+        </td>
+
+        <td class="px-8 py-4 text-sm">
+          ${Number(purchase.Qty || 0).toLocaleString("id-ID")}
+        </td>
+
+        <td class="px-8 py-4 text-sm font-semibold">
+          Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")}
+        </td>
+
+        <td class="px-8 py-4 text-sm">
+          ${escapeHtml(purchase.Payment_Method || "-")}
+        </td>
+
+        <td class="px-8 py-4 text-sm">
+          ${renderPurchaseStatus(status)}
+        </td>
+
+        <td class="px-8 py-4 text-right">
+          <button onclick="openPurchaseAction('${escapeHtml(purchase.ID)}')"
+            class="p-2 rounded-md hover:bg-surface-container-high transition">
+
+            <span class="material-symbols-outlined text-lg">
+              more_vert
+            </span>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderPurchaseStatus(status) {
+  let className = "bg-surface-container-high text-muted";
+  if (status === "PAID") {
+    className = "bg-success-container/20 text-success";
+  }
+  if (status === "PENDING") {
+    className = "bg-warning-container/20 text-warning";
+  }
+  if (status === "CANCELLED") {
+    className = "bg-error-container/20 text-error";
+  }
+  return `
+    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${className}">
+      ${status || "UNKNOWN"}
+    </span>
+  `;
 }
 
 function openInventoryPage() {
