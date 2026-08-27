@@ -87,14 +87,15 @@ self.addEventListener("fetch", (event) => {
 
         })
         .catch(() => {
-
-          // Fallback kalau offline total
           if (event.request.mode === "navigate") {
             return caches.match("/index.html");
           }
-
+        
+          return new Response("Network error", {
+            status: 503,
+            statusText: "Service Unavailable"
+          });
         });
-
     })
   );
 });
