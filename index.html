@@ -5140,6 +5140,165 @@
 </template>
 
 
+<!-- POPUP CHANGE PURCHASE STATUS -->
+
+<template id="purchaseStatusModal">
+  <div class="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-background backdrop-blur-md">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
+
+      <!-- HEADER -->
+      <div class="p-6 border border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="material-symbols-outlined text-2xl text-on-surface"
+            style="font-variation-settings:'FILL' 1;">
+            sync
+          </span>
+					
+          <div>
+            <h2 class="text-xl font-headline font-bold text-on-surface">
+              Change Purchase Status
+            </h2>
+
+            <p class="text-xs text-on-surface-variant mt-1">
+              Update purchase status
+            </p>
+          </div>
+        </div>
+
+        <button onclick="closePurchaseStatus()"
+          class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <!-- CURRENT STATUS -->
+      <div class="px-6 py-4 border-b border-outline-variant">
+        <p class="text-xs uppercase tracking-wider text-on-surface-variant">
+          Current Status
+        </p>
+
+        <p id="purchaseCurrentStatus"
+          class="text-sm font-bold text-on-surface mt-1">
+          -
+        </p>
+      </div>
+
+      <!-- STATUS OPTIONS -->
+      <div class="p-4">
+        <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant px-2 mb-2">
+          Select New Status
+        </p>
+
+        <!-- PAID -->
+        <button type="button"
+          onclick="selectPurchaseStatus('PAID')"
+          data-status="PAID"
+          class="purchase-status-option w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
+              <span class="material-symbols-outlined text-lg"
+                style="font-variation-settings:'FILL' 1;">
+                payments
+              </span>
+            </div>
+						
+            <div class="text-left">
+              <p class="text-sm font-medium text-on-surface">
+                Paid
+              </p>
+
+              <p class="text-xs text-on-surface-variant">
+                Purchase has been fully paid
+              </p>
+            </div>
+          </div>
+					
+          <span class="purchase-status-check material-symbols-outlined opacity-0">
+            check
+          </span>
+        </button>
+
+        <!-- PENDING -->
+        <button type="button"
+          onclick="selectPurchaseStatus('PENDING')"
+          data-status="PENDING"
+          class="purchase-status-option w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
+
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
+              <span class="material-symbols-outlined text-lg"
+                style="font-variation-settings:'FILL' 1;">
+                schedule
+              </span>
+            </div>
+
+            <div class="text-left">
+              <p class="text-sm font-medium text-on-surface">
+                Pending
+              </p>
+
+              <p class="text-xs text-on-surface-variant">
+                Payment is still pending
+              </p>
+            </div>
+          </div>
+
+          <span class="purchase-status-check material-symbols-outlined opacity-0">
+            check
+          </span>
+        </button>
+
+        <!-- CANCELLED -->
+        <button type="button"
+          onclick="selectPurchaseStatus('CANCELLED')"
+          data-status="CANCELLED"
+          class="purchase-status-option w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
+              <span class="material-symbols-outlined text-lg"
+                style="font-variation-settings:'FILL' 1;">
+                cancel
+              </span>
+            </div>
+
+            <div class="text-left">
+              <p class="text-sm font-medium text-on-surface">
+                Cancelled
+              </p>
+
+              <p class="text-xs text-on-surface-variant">
+                Purchase is cancelled
+              </p>
+            </div>
+          </div>
+
+          <span class="purchase-status-check material-symbols-outlined opacity-0">
+            check
+          </span>
+        </button>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="p-4 flex gap-2">
+        <button onclick="closePurchaseStatus()"
+          class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          Cancel
+        </button>
+
+        <button onclick="confirmPurchaseStatus()"
+          class="flex-1 h-11 rounded-md bg-on-surface text-background font-semibold hover:opacity-90 transition active:scale-95">
+          Update Status
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+
 <!-- POPUP EDIT SUPPLIER -->
 
 <template id="editsupplierModal">
@@ -21086,6 +21245,121 @@ window.closePurchaseNote = function () {
   document.body.style.overflow = "";
 };
 
+
+window.openPurchaseStatusAction = function () {
+  const purchase =
+    window.currentPurchaseAction;
+
+  if (!purchase) {
+    console.error("Purchase tidak ditemukan");
+    return;
+  }
+
+  const template =
+    document.getElementById(
+      "purchaseStatusModal"
+    );
+
+  if (!template) {
+    console.error(
+      "Template purchaseStatusModal tidak ditemukan"
+    );
+    return;
+  }
+
+  document
+    .querySelectorAll(".purchase-status-modal")
+    .forEach(el => el.remove());
+  const clone =
+    template.content.cloneNode(true);
+  const wrapper =
+    document.createElement("div");
+  wrapper.className =
+    "purchase-status-modal";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  window.purchaseStatusModalEl =
+    wrapper;
+  window.selectedPurchaseStatus =
+    purchase.Status || "PAID";
+  document.body.style.overflow =
+    "hidden";
+
+  // Current status
+  const current =
+    wrapper.querySelector(
+      "#purchaseCurrentStatus"
+    );
+
+  if (current) {
+    current.textContent =
+      purchase.Status || "-";
+  }
+  // Tandai status aktif
+  selectPurchaseStatus(
+    purchase.Status || "PAID"
+  );
+};
+
+window.selectPurchaseStatus = function (status) {
+  window.selectedPurchaseStatus =
+    status;
+  const modal =
+    window.purchaseStatusModalEl;
+
+  if (!modal) return;
+  modal
+    .querySelectorAll(
+      ".purchase-status-option"
+    )
+    .forEach(button => {
+      const isSelected =
+        button.dataset.status === status;
+      const check =
+        button.querySelector(
+          ".purchase-status-check"
+        );
+
+      if (isSelected) {
+        button.classList.add(
+          "bg-background-high"
+        );
+
+        if (check) {
+          check.classList.remove(
+            "opacity-0"
+          );
+        }
+      } else {
+        button.classList.remove(
+          "bg-background-high"
+        );
+
+        if (check) {
+          check.classList.add(
+            "opacity-0"
+          );
+        }
+      }
+    });
+};
+
+window.closePurchaseStatus = function () {
+  if (window.purchaseStatusModalEl) {
+    window.purchaseStatusModalEl.remove();
+    window.purchaseStatusModalEl =
+      null;
+  }
+  document.body.style.overflow = "";
+};
+
+window.confirmPurchaseStatus = function () {
+  console.log(
+    "Selected status:",
+    window.selectedPurchaseStatus
+  );
+};
+	
 function openInventoryPage() {
   if (!state.branchId) {
     return;
