@@ -20409,10 +20409,8 @@ function initPurchaseFilters() {
   );
 }
 
-async function loadIngredientPurchases(branchId) {
-  const tbody = document.getElementById(
-    "ingredientPurchaseTable"
-  );
+async function loadIngredientPurchases(branchId, start = null, end = null) {
+  const tbody = document.getElementById("ingredientPurchaseTable");
   if (!tbody) return;
   tbody.innerHTML = `
     <tr>
@@ -20430,21 +20428,20 @@ async function loadIngredientPurchases(branchId) {
       "get_ingredient_purchases",
       {
         p_branch_id: branchId,
-        p_start: null,
-        p_end: null
+        p_start: start,
+        p_end: end
       }
     );
 
     if (error) {
       throw error;
     }
-	
     purchaseData = Array.isArray(data)
       ? data
       : [];
     purchaseCurrentPage = 1;
     applyPurchaseFilters();
-		
+
   } catch (error) {
     console.error(
       "Load Ingredient Purchases Error:",
@@ -25202,6 +25199,15 @@ function initIngredientExportDate() {
   const format = (d) => d.toISOString().split("T")[0];
   start.value = format(weekAgo);
   end.value = format(today);
+  const applyDateFilter = () => {
+    loadIngredientPurchases(
+      state.branchId,
+      start.value,
+      end.value
+    );
+  };
+  start.onchange = applyDateFilter;
+  end.onchange = applyDateFilter;
 }
 
 async function exportIngredientPurchases() {
