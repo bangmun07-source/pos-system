@@ -20651,32 +20651,42 @@ function renderInventoryPage(data) {
 			</span>`;
 	}
 
-	// INGREDIENTS
-	state.ingredients = data.ingredients || [];
+	  // INGREDIENTS
+	  state.ingredients =
+	    data.ingredients || [];
 	
-	const tbody =
-		document.getElementById(
-		 "ingredientsTable"
-	);
-	if(tbody){
-		if(
-			state.ingredients.length === 0
-		){
-		
-		tbody.innerHTML = `
-			<tr>
-				<td colspan="8"
-					class="text-center py-6 text-muted">
-					No data
-				</td>
-			</tr>
-			`;
-		}else{
-		renderIngredients(
-				state.ingredients
-			);
-		}
-	}
+	  const tbody =
+	    document.getElementById(
+	      "ingredientsTable"
+	    );
+	
+	  if (tbody) {
+	    if (
+	      state.ingredients.length === 0
+	    ) {
+	      tbody.innerHTML = `
+	        <tr>
+	          <td colspan="8"
+	              class="text-center py-6 text-muted">
+	            No data
+	          </td>
+	        </tr>
+	      `;
+	
+	    } else {
+	      renderIngredients(
+	        state.ingredients
+	      );
+	    }
+	  }
+	
+	  // PURCHASES
+	  purchaseData =
+	    data.purchases || [];
+	  purchaseFilteredData =
+	    [...purchaseData];
+	  purchaseCurrentPage = 1;
+	  applyPurchaseFilters();
 
 	// SUPPLIERS
 	allSupplierData = data.suppliers || [];
