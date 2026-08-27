@@ -14281,6 +14281,12 @@ function initModule(pageId) {
       initLoyaltyPage();
     break;
 
+		case "taxservicesettingPage":
+		  waitBranch(async () => {
+		    await loadTaxSettings();
+		  });
+	  break;
+
     case "expensessettingPage":{
         const startEl = document.getElementById("expenseStartDate");
         const endEl = document.getElementById("expenseEndDate");
@@ -26831,27 +26837,18 @@ function applySettingsPage(data) {
 }
 
 async function loadSettingsPage() {
-
-  // =========================
   // CACHE
-  // =========================
-
   if (state.settingsPageData) {
-
     applySettingsPage(
       state.settingsPageData
     );
-
     initBusinessProfile();
-
     return;
   }
 
   try {
     // SUPABASE RPC
-    const data =
-      await getSettingsPageDataRPC();
-
+    const data = await getSettingsPageDataRPC();
     // NORMALIZE RESPONSE
     const result =
       data || {
@@ -26860,38 +26857,21 @@ async function loadSettingsPage() {
         branch: {},
         users: []
       };
-
-    // =========================
+		
     // CACHE
-    // =========================
-
     state.settingsPageData =
       result;
-
-    // =========================
-    // APPLY UI
-    // =========================
-
     applySettingsPage(
       state.settingsPageData
     );
-
-    // =========================
-    // BUSINESS PROFILE
-    // =========================
-
     initBusinessProfile();
-
     await loadBusinessProfile();
-
   }
   catch (err) {
-
     console.error(
       "Settings Page:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal memuat Settings.",
@@ -27179,13 +27159,8 @@ async function saveNewBranch() {
       );
       return;
     }
-
     closeAddBranchModal();
-	
-    // CLEAR STATE
     state.settingsPageData = null;
-	
-    // RELOAD SETTINGS
     await reloadSettingsPage();
     showToast(
       "Outlet berhasil ditambahkan."
@@ -27205,9 +27180,7 @@ async function saveNewBranch() {
 }
 
 async function toggleBranchStatus(branchId, status) {
-
   try {
-
     // SUPABASE RPC
     const res =
       await updateBranchStatusRPC(
@@ -27326,14 +27299,8 @@ async function saveEditBranch() {
       );
       return;
     }
-
-    // CLOSE MODAL
     closeEditBranchModal();
-	  
-    // CLEAR STATE
     state.settingsPageData = null;
-
-    // RELOAD SETTINGS
     await reloadSettingsPage();
     showToast(
       "Outlet berhasil diperbarui."
@@ -27610,13 +27577,8 @@ async function saveEditUser() {
       return;
     }
 	
-    // CLOSE MODAL
     closeEditUserModal();
-	  
-    // CLEAR STATE
     state.settingsPageData = null;
-	
-    // RELOAD SETTINGS
     await reloadSettingsPage();
     showToast(
       "User berhasil diperbarui."
@@ -27826,14 +27788,8 @@ async function saveNewUser() {
       );
       return;
     }
-
-    // CLOSE MODAL
     closeAddUserModal();
-	
-    // CLEAR STATE
     state.settingsPageData = null;
-
-    // RELOAD SETTINGS
     await reloadSettingsPage();
     showToast(
       "User berhasil ditambahkan."
@@ -27890,9 +27846,7 @@ async function deleteUser(id) {
       );
       return;
     }
-
     // CLEAR STATE
-	
     state.settingsPageData = null;
     // RELOAD SETTINGS
     await reloadSettingsPage();
@@ -27958,23 +27912,19 @@ async function loadBusinessProfile() {
 
   }
   catch (err) {
-
     console.error(
       "Business Profile Error:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal memuat Business Profile",
       "error"
     );
-
   }
 }
 
 function initBusinessProfile() {
-
   const saveButton =
     document.getElementById(
       "btnSaveBusinessProfile"
@@ -27986,16 +27936,11 @@ function initBusinessProfile() {
     );
     return;
   }
-
-  saveButton.onclick =
-    saveBusinessProfile;
-
+  saveButton.onclick = saveBusinessProfile;
   initBusinessLogoPreview();
-
 }
 	
 function initBusinessLogoPreview() {
-
   const input =
     document.getElementById(
       "businessLogoInput"
@@ -28024,11 +27969,9 @@ function initBusinessLogoPreview() {
 
 
 async function uploadBusinessLogo(base64) {
-
   if (!base64) {
     return null;
   }
-
   const client =
     getActiveSupabase();
 
@@ -28038,10 +27981,7 @@ async function uploadBusinessLogo(base64) {
     );
   }
 
-  // =========================
   // PARSE BASE64
-  // =========================
-
   const matches =
     base64.match(
       /^data:(.+);base64,(.+)$/
@@ -28053,36 +27993,21 @@ async function uploadBusinessLogo(base64) {
     );
   }
 
-  const mime =
-    matches[1];
-
-  const base64Data =
-    matches[2];
-
+  const mime = matches[1];
+  const base64Data = matches[2];
   const buffer =
     Uint8Array.from(
       atob(base64Data),
       c => c.charCodeAt(0)
     );
-
-  // =========================
   // EXTENSION
-  // =========================
-
-  const ext =
-    mime.split("/")[1] || "jpg";
-
-  // =========================
+  const ext = mime.split("/")[1] || "jpg";
+	
   // PATH
-  // =========================
-
   const path =
     `business/logo_${Date.now()}.${ext}`;
-
-  // =========================
+	
   // UPLOAD
-  // =========================
-
   const {
     error: uploadError
   } = await client.storage
@@ -28101,14 +28026,10 @@ async function uploadBusinessLogo(base64) {
       "BUSINESS LOGO STORAGE ERROR:",
       uploadError
     );
-
     throw uploadError;
   }
-
-  // =========================
+	
   // PUBLIC URL
-  // =========================
-
   const {
     data: publicData
   } = client.storage
@@ -28123,7 +28044,6 @@ async function uploadBusinessLogo(base64) {
       "Public URL logo tidak ditemukan"
     );
   }
-
   return logoUrl;
 }
 
@@ -28228,7 +28148,6 @@ async function saveBusinessProfile() {
       await saveBusinessProfileRPC(
         data
       );
-
 
     // CHECK RPC
     if (
@@ -28359,6 +28278,57 @@ async function loadBranchName() {
   }
 }
 
+	
+	// ==================================
+	// TAX
+	// ==================================
+
+async function loadTaxSettings() {
+  try {
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_settings"
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    const settings = data || {};
+    const taxInput =
+      document.getElementById("taxInput");
+    const serviceInput =
+      document.getElementById("serviceInput");
+    const discountInput =
+      document.getElementById("discountInput");
+
+    if (taxInput) {
+      taxInput.value =
+        settings.tax ?? 0;
+    }
+    if (serviceInput) {
+      serviceInput.value =
+        settings.service ?? 0;
+    }
+    if (discountInput) {
+      discountInput.value =
+        settings.discount ?? 0;
+    }
+  }
+  catch (err) {
+    console.error(
+      "Load Tax Settings Error:",
+      err
+    );
+    showToast(
+      err?.message ||
+      "Gagal memuat tax settings",
+      "error"
+    );
+  }
+}
 	
 	// ==================================
 	// EXPENSES 
@@ -28654,10 +28624,7 @@ async function saveExpenseBudget() {
 
   const payload = {
 
-    branchId:
-
-      branchId,
-
+    branchId: branchId,
     Month:
       document.getElementById(
         "budgetMonth"
@@ -28678,14 +28645,9 @@ async function saveExpenseBudget() {
     );
 
     closeBudgetModal();
-
-    // CLEAR CACHE
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
-
-    // LOAD ULANG
     await loadExpenseDashboard();
-
     showToast(
       "Budget berhasil disimpan."
     );
@@ -28693,12 +28655,10 @@ async function saveExpenseBudget() {
   }
 
   catch (err) {
-
     console.error(
       "Save Expense Budget:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal menyimpan budget.",
@@ -30241,14 +30201,9 @@ function loadExpenseBranches(
     document.getElementById(selectId);
 
   if (!select) return;
-
   select.innerHTML = "";
 
-
-  // =========================
   // DROPDOWN FILTER HALAMAN
-  // =========================
-
   if (
     selectId ===
     "expenseBranchFilter"
@@ -30258,34 +30213,20 @@ function loadExpenseBranches(
       state.expenseDashboardData
         ?.branches || [];
 
-
     branches.forEach(b => {
-
       select.innerHTML += `
         <option value="${b.id}">
           ${b.name}
         </option>
       `;
-
     });
 
-
-    // =========================
     // DEFAULT = BRANCH LOGIN
-    // =========================
-
-    select.value =
-      state.branchId;
-
+    select.value = state.branchId;
     select.disabled = true;
-
   }
 
-
-  // =========================
   // POPUP ADD NEW EXPENSE
-  // =========================
-
   else {
 
     (
@@ -30298,12 +30239,9 @@ function loadExpenseBranches(
           ${b.name}
         </option>
       `;
-
     });
 
-    select.value =
-      state.branchId;
-
+    select.value = state.branchId;
     select.disabled = true;
   }
 }
@@ -30381,7 +30319,6 @@ function closeAddExpensePopup() {
 }
 	
 async function saveExpense() {
-
   const branchSelect =
     document.getElementById(
       "expenseBranchSelect"
@@ -30395,11 +30332,8 @@ async function saveExpense() {
     return;
   }
 
-
   const data = {
-
-    branchId:
-      branchSelect.value,
+    branchId: branchSelect.value,
     tanggal:
       document.getElementById(
         "expenseDate"
@@ -30437,18 +30371,13 @@ async function saveExpense() {
       "Paid"
   };
 
-
   try {
-
-    // =========================
+		
     // SUPABASE RPC
-    // =========================
     const res =
       await addExpenseRPC(data);
 
-    // =========================
     // CHECK RESPONSE
-    // =========================
     if (
       res &&
       res.success === false
@@ -30459,20 +30388,12 @@ async function saveExpense() {
       );
     }
 
-    // =========================
     // CLEAR CACHE
-    // =========================
     state.cashFlowData = null;
     state.cashFlowFilter = null;
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
-
-
-    // =========================
-    // RELOAD
-    // =========================
     await loadExpenseDashboard();
-
     showToast(
       "Expense berhasil disimpan",
       "success"
@@ -30480,7 +30401,6 @@ async function saveExpense() {
 
   }
   catch (error) {
-
     console.error(
       "Save Expense Error:",
       error
@@ -30489,7 +30409,6 @@ async function saveExpense() {
     const errText =
       error?.message ||
       JSON.stringify(error);
-
 
     let message =
       "Gagal menyimpan expense";
@@ -30509,17 +30428,14 @@ async function saveExpense() {
       message =
         "Saldo Bank tidak mencukupi";
     }
-
     else if (errText) {
       message =
         errText;
     }
-
     showToast(
       message,
       "error"
     );
-
   }
 }
 
@@ -30540,7 +30456,6 @@ function openAddNewOtherIncome() {
 async function submitOtherIncome() {
 
   const now = new Date();
-
   const id =
     "OI-" +
     now.getTime() +
@@ -30549,18 +30464,16 @@ async function submitOtherIncome() {
 
   const refId =
     id;
-
+	
   const data = {
-
     id: id,
-
+		
     date:
       document.getElementById(
         "otherIncomeDate"
       ).value,
-
     refId: refId,
-
+		
     description:
       document.getElementById(
         "otherIncomeDescription"
@@ -30598,7 +30511,6 @@ async function submitOtherIncome() {
   };
 
   try {
-
     const res =
       await saveOtherIncomeRPC(data);
 
@@ -30611,7 +30523,6 @@ async function submitOtherIncome() {
         "Gagal menyimpan Other Income"
       );
     }
-
     document
       .getElementById(
         "addNewOtherIncomeWrapper"
@@ -30622,22 +30533,17 @@ async function submitOtherIncome() {
     state.expenseDashboardFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
-
     await loadExpenseDashboard();
-
     showToast(
       "Other Income berhasil disimpan",
       "success"
     );
-
   }
   catch (err) {
-
     console.error(
       "Submit Other Income Error:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal menyimpan Other Income",
@@ -30647,38 +30553,25 @@ async function submitOtherIncome() {
 }
 
 document.addEventListener("click", function (e) {
-
-  const btn =
-    e.target.closest("#btnExportExpensePDF");
-
+  const btn = e.target.closest("#btnExportExpensePDF");
   if (!btn) return;
-
   exportExpensePDF();
-
 });
 
 
 async function exportExpensePDF() {
-
   const f = getExpenseFilters();
-
-  const branchId =
-    state?.branchId || "";
+  const branchId = state?.branchId || "";
 
   if (!branchId) {
-
     showToast(
       "Branch login tidak ditemukan",
       "error"
     );
-
     return;
   }
 
-  // =========================
   // OPEN WINDOW
-  // =========================
-
   const pdfWindow =
     window.open(
       "",
@@ -30686,33 +30579,24 @@ async function exportExpensePDF() {
     );
 
   if (!pdfWindow) {
-
     showToast(
       "Popup diblokir browser",
       "error"
     );
-
     return;
   }
-
-  // =========================
+	
   // LOADING
-  // =========================
-
   pdfWindow.document.write(`
 
     <!DOCTYPE html>
-
     <html>
-
     <head>
-
       <title>
         Generating Expense Report
       </title>
 
       <style>
-
         body {
           margin: 0;
           background: #0B0F14;
@@ -30742,13 +30626,10 @@ async function exportExpensePDF() {
         }
 
       </style>
-
     </head>
-
+		
     <body>
-
       <div class="loading">
-
         <div class="title">
           Expense Report
         </div>
@@ -30756,44 +30637,29 @@ async function exportExpensePDF() {
         <div class="text">
           Generating report...
         </div>
-
       </div>
-
     </body>
-
     </html>
 
   `);
 
   try {
-
-    // =========================
-    // DEBUG
-    // =========================
-
     const payload = {
-
       type: "expense",
-
       branchId:
         branchId,
-
       start:
         f?.startDate || null,
-
       end:
         f?.endDate || null,
-
       status:
         f?.status === "All Status"
           ? "ALL"
           : f?.status || "ALL",
-
       category:
         f?.category === "All Categories"
           ? "ALL"
           : f?.category || "ALL",
-
 			tenantSlug: 
 				state.tenantSlug
     };
@@ -30818,7 +30684,6 @@ async function exportExpensePDF() {
 
       const errorText =
         await response.text();
-
       throw new Error(
         errorText ||
         `Export gagal (${response.status})`
@@ -30828,7 +30693,6 @@ async function exportExpensePDF() {
     // GET HTML REPORT
     const html =
       await response.text();
-
     if (!html) {
       throw new Error(
         "Server mengembalikan HTML kosong"
@@ -30849,18 +30713,12 @@ async function exportExpensePDF() {
       err
     );
 
-    // =========================
     // ERROR PAGE
-    // =========================
-
     pdfWindow.document.open();
-
     pdfWindow.document.write(`
 
       <!DOCTYPE html>
-
       <html>
-
       <body style="
         background:#0B0F14;
         color:white;
@@ -30893,17 +30751,12 @@ async function exportExpensePDF() {
           .replace(/</g, "&lt;")
           .replace(/>/g, "&gt;")
         }</pre>
-
       </body>
-
       </html>
-
     `);
 
     pdfWindow.document.close();
-
   }
-
 }
 
 function paginate(data) {
@@ -30984,33 +30837,24 @@ document.addEventListener("click", function (e) {
 });
 
 async function exportOtherIncomePDF() {
-
   const f =
     getOtherIncomeFilters();
-
   const win =
     window.open(
       "",
       "_blank"
     );
-
   if (!win) {
-
     alert(
       "Popup diblokir browser"
     );
-
     return;
   }
 
-  // ==================================
   // LOADING
-  // ==================================
-
   win.document.write(`
 
     <html>
-
       <body style="
         background:#0B0F14;
         color:white;
@@ -31020,21 +30864,13 @@ async function exportOtherIncomePDF() {
         justify-content:center;
         height:100vh;
       ">
-
         Generating Other Income Report...
-
       </body>
-
     </html>
-
   `);
 
   try {
-
-    // ==================================
     // CALL VERCEL
-    // ==================================
-
     const response =
       await fetch(
         "/api/export-pdf",
@@ -31065,96 +30901,66 @@ async function exportOtherIncomePDF() {
           })
         }
       );
-
-    // ==================================
+		
     // CHECK RESPONSE
-    // ==================================
-
     if (!response.ok) {
-
       const errorText =
         await response.text();
-
       throw new Error(
         errorText ||
         "Export Other Income gagal"
       );
-
     }
 
-    // ==================================
     // GET HTML
-    // ==================================
-
     const html =
       await response.text();
-
     if (!html) {
-
       throw new Error(
         "Response export kosong"
       );
-
     }
 
-    // ==================================
     // SHOW REPORT
-    // ==================================
-
     win.document.open();
-
     win.document.write(
       html
     );
-
     win.document.close();
-
   }
 
   catch (err) {
-
     console.error(
       "Export Other Income PDF:",
       err
     );
-
     win.document.open();
-
     win.document.write(`
-
       <html>
-
         <body style="
           font-family:Arial;
           padding:40px;
         ">
-
           <h2>
             Export PDF Failed
           </h2>
 
           <pre>
-			${String(
-			  err?.message ||
-			  "Export PDF gagal"
-			)}
+						${String(
+						  err?.message ||
+						  "Export PDF gagal"
+						)}
           </pre>
-
         </body>
-
       </html>
-
     `);
 
     win.document.close();
-
     alert(
       err?.message ||
       "Export PDF gagal"
     );
-
   }
-
 }
 
 	
@@ -31247,24 +31053,18 @@ async function loadCategorySettings() {
         document.getElementById(
           `category_${i}_reward`
         );
-
       if (name) {
         name.value = "";
       }
-
       if (discount) {
         discount.value = 0;
       }
-
       if (reward) {
         reward.value = 0;
       }
     }
-
-    // ==============================
+		
     // LOAD DATABASE → UI
-    // ==============================
-
     categories.forEach(
       category => {
 
@@ -31470,7 +31270,6 @@ function setInputValue(id, value) {
 }
 
 async function saveLoyaltySettings() {
-
   const payload = {
     // THRESHOLD TIER
     tier_1:
@@ -31536,12 +31335,9 @@ async function saveLoyaltySettings() {
       parseNumber("reward_other")
   };
 
- 
   // CATEGORY
   const categoryPayload = [];
-
   for (let i = 1; i <= 5; i++) {
-
     const name =
       document
         .getElementById(`category_${i}_name`)
@@ -31558,7 +31354,6 @@ async function saveLoyaltySettings() {
     if (!name) {
       continue;
     }
-
     categoryPayload.push({
       category_key: `category_${i}`,
       category_name: name,
@@ -31568,7 +31363,6 @@ async function saveLoyaltySettings() {
   }
 
   try {
-
     // SUPABASE RPC
     const res =
       await saveSettingsRPC(
@@ -31632,7 +31426,6 @@ async function saveLoyaltySettings() {
 }
 
 function validateSettings(p) {
-
   if (
     Number(p.tier_1) >=
     Number(p.tier_2)
@@ -31676,7 +31469,6 @@ function parseNumber(id) {
 }
 
 async function loadSeasonStatus() {
-
   const badge =
     document.getElementById(
       "season_status_badge"
@@ -31698,14 +31490,11 @@ async function loadSeasonStatus() {
   }
 
   try {
-	
     // SUPABASE RPC
     const data =
       await getSeasonConfigRPC();
-    // CACHE
     state.seasonStatus =
       data || {};
-    // RENDER
     updateSeasonUI(
       state.seasonStatus
     );
@@ -31739,7 +31528,6 @@ function refreshSeasonStatus(){
 }	
 
 async function openSeason() {
-
   const startDate =
     document.getElementById(
       "season_start"
@@ -31767,14 +31555,12 @@ async function openSeason() {
   }
 
   try {
-
     // SUPABASE RPC
     const res =
       await openSeasonRPC(
         startDate,
         endDate
       );
-	
     // CHECK RESPONSE
     if (
       res &&
@@ -31785,10 +31571,8 @@ async function openSeason() {
         "Gagal membuka season"
       );
     }
-
     // CLEAR CACHE STATE
     state.seasonStatus = null;
-
     // LOAD ULANG STATUS
     await loadSeasonStatus();
     showToast(
@@ -31823,7 +31607,6 @@ async function closeSeason() {
     if (!confirmed) {
       return;
     }
-
     // SUPABASE RPC
     const res =
       await closeSeasonRPC();
@@ -31833,37 +31616,18 @@ async function closeSeason() {
       res &&
       res.success === false
     ) {
-
       throw new Error(
         res.message ||
         "Gagal menutup season"
       );
-
     }
-
-
-    // ================================
+		
     // CLEAR STATE
-    // ================================
-
-    state.seasonStatus =
-      null;
-
-    state.memberPageData =
-      null;
-
-
-    // ================================
-    // LOAD ULANG SEASON
-    // ================================
-
+    state.seasonStatus = null;
+    state.memberPageData = null;
     await loadSeasonStatus();
 
-
-    // ================================
     // NOTIFICATION
-    // ================================
-
     showToast(
       `Season berhasil ditutup. ${
         res?.members_processed || 0
@@ -31874,26 +31638,21 @@ async function closeSeason() {
   }
 
   catch (err) {
-
     console.error(
       "Close Season:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal menutup season",
       "error"
     );
-
   }
-
 }
 
 async function toggleAutoSeason() {
 
   try {
-
     const res =
       await toggleAutoSeasonRPC();
 
@@ -31906,18 +31665,14 @@ async function toggleAutoSeason() {
 
     // Refresh status season
     state.seasonStatus = null;
-
     await refreshSeasonStatus();
-
     showToast(
       res.message ||
       "Auto Season berhasil diubah",
       "success"
     );
-
   }
   catch (err) {
-
     console.error(
       "Toggle Auto Season:",
       err
@@ -31928,9 +31683,7 @@ async function toggleAutoSeason() {
       "Gagal mengubah auto season",
       "error"
     );
-
   }
-
 }
 
 function updateSeasonUI(res) {
@@ -31991,13 +31744,9 @@ async function loadRewardProducts() {
     state.rewardProductsBranchId === branchId
   ) {
 
-    rewardData =
-      state.rewardProducts;
-
+    rewardData = state.rewardProducts;
     rewardPage = 1;
-
     renderRewardProductsTable();
-
     return;
   }
 
@@ -32017,28 +31766,17 @@ async function loadRewardProducts() {
           : [];
 
     // CACHE
-    state.rewardProducts =
-      data;
-
-    state.rewardProductsBranchId =
-      branchId;
-
-    // RENDER
-    rewardData =
-      state.rewardProducts;
-
+    state.rewardProducts = data;
+    state.rewardProductsBranchId = branchId;
+    rewardData = state.rewardProducts;
     rewardPage = 1;
-
     renderRewardProductsTable();
-
   }
   catch (err) {
-
     console.error(
       "Load Reward Products:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal memuat reward.",
@@ -32069,7 +31807,6 @@ function renderRewardProductsTable() {
         </td>
       </tr>
     `;
-
     updateRewardPagination();
     return;
   }
@@ -32169,27 +31906,20 @@ async function deleteReward(id) {
     // CLEAR CACHE
     state.rewardProducts = null;
     state.rewardProductsBranchId = null;
-	rewardData = [];  
+		rewardData = [];  
 
-    // =========================
     // RELOAD
-    // =========================
-
     await loadRewardProducts();
-
     showToast(
       "Reward berhasil dihapus.",
       "success"
     );
-
   }
   catch (err) {
-
     console.error(
       "Delete Reward:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal menghapus reward",
@@ -32266,9 +31996,7 @@ async function loadRewardProductsForModal() {
       document.getElementById(
         "rewardProduct"
       );
-
     if (!select) return;
-
     select.innerHTML =
       `
       <option value="">
@@ -32277,7 +32005,6 @@ async function loadRewardProductsForModal() {
       `;
 
     products.forEach(p => {
-
       select.innerHTML +=
         `
         <option
@@ -32286,14 +32013,10 @@ async function loadRewardProductsForModal() {
           ${p.Nama_Produk}
         </option>
         `;
-
     });
-
     onRewardProductChange();
-
   }
   catch (err) {
-
     console.error(
       "Load Reward Products Modal:",
       err
@@ -32346,9 +32069,7 @@ async function saveRewardProduct() {
 
   try {
 
-    // ================================
     // SAVE VIA SUPABASE RPC
-    // ================================
     const result =
       await saveRewardProductRPC(
         payload
@@ -32364,21 +32085,13 @@ async function saveRewardProduct() {
         "Gagal menyimpan reward."
       );
     }
-
-    // ================================
-    // CLOSE MODAL
-    // ================================
     closeAddRewardModal();
-    // ================================
+
     // CLEAR CACHE
-    // ================================
     state.rewardProducts =
       null;
     state.rewardProductsBranchId =
       null;
-    // ================================
-    // RELOAD REWARD
-    // ================================
     await loadRewardProducts();
     showToast(
       "Reward berhasil ditambahkan."
@@ -32395,7 +32108,6 @@ async function saveRewardProduct() {
     );
   }
 }
-
 
 // ===========================
 // DOCUMENTATION DATA
@@ -36634,10 +36346,37 @@ async function exportCashFlowReport() {
 </script>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .catch(() => {});
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      const registration =
+        await navigator.serviceWorker.register("/sw.js");
+      await registration.update();
+      navigator.serviceWorker.addEventListener(
+        "controllerchange",
+        () => {
+
+          if (
+            sessionStorage.getItem(
+              "swReloaded"
+            )
+          ) {
+            return;
+          }
+          sessionStorage.setItem(
+            "swReloaded",
+            "1"
+          );
+          window.location.reload();
+        }
+      );
+    }
+    catch (error) {
+      console.error(
+        "Service Worker Error:",
+        error
+      );
+    }
   });
 }
 </script>
