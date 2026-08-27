@@ -14263,12 +14263,7 @@ function initModule(pageId) {
 	      state.branchId
 	    );
 	    await loadRecipeProducts();
-			await loadIngredientPurchases(
-	      state.branchId
-	    );
 	    initIngredientExportDate();
-		initPurchaseFilters();
-	  });
 	break;
 
     case "analyticsPage": {
@@ -20953,9 +20948,8 @@ function renderIngredientPurchases(purchases) {
 
         <td class="px-8 py-4 text-right">
           <button onclick="openPurchaseAction('${escapeHtml(purchase.ID)}')"
-            class="p-2 rounded-md hover:text-on-surface transition">
-
-            <span class="material-symbols-outlined text-lg text-on-surface-variant">
+            class="p-2 rounded-md text-on-surface-variant hover:text-on-surface transition">
+            <span class="material-symbols-outlined text-lg">
               more_vert
             </span>
           </button>
@@ -22385,32 +22379,19 @@ async function saveRecipeMaster() {
     if (error) {
       throw error;
     }
-
-    // CLOSE MODAL
     closeRecipeMasterModal();
-
-    // CLEAR CACHE
     state.recipeData = null;
     state.recipeDataBranchId = null;
-		
     state.inventoryData = null;
     state.inventoryBranchId = null;
-
     state.products = null;
     state.productBranchId = null;
-
-
-    // ==============================
+		
     // RELOAD
-    // ==============================
-
     await loadInventoryPage(
       state.branchId
     );
-
     await loadRecipes();
-
-
     showToast(
       "Product updated",
       "success"
@@ -22821,7 +22802,7 @@ function renderIngredients(data) {
         <!-- ACTION -->
         <td class="px-8 py-5 text-right flex items-center justify-end gap-1">
           <button onclick='openIngredientModal(${JSON.stringify(itemWithBranch)})' class="p-2 hover:text-on-surface text-on-surface-variant">
-            <span class="material-symbols-outlined">more_vert</span>
+            <span class="material-symbols-outlined text-sm">more_vert</span>
           </button>
         </td>
 
@@ -22954,7 +22935,6 @@ function openThresholdFromIngredient() {
 }
 
 async function submitAdjust() {
-
   const qty =
     Number(
       document.getElementById(
@@ -22971,53 +22951,28 @@ async function submitAdjust() {
     return;
   }
 
-
   const payload = {
-
-    ingredientId:
-      currentAdjustItem.id,
-
-    type:
-      currentMode,
-
-    qty:
-      qty,
-
-    reason:
-      reason,
-
-    branchId:
-      currentAdjustItem.branchId
-
+    ingredientId: currentAdjustItem.id,
+    type: currentMode,
+    qty: qty,
+    reason: reason,
+    branchId: currentAdjustItem.branchId
   };
-
 
   try {
 
-    // ==================================
     // SUPABASE RPC
-    // ==================================
-
     const {
       data,
       error
     } = await supabaseClient.rpc(
       "adjust_ingredient_stock",
       {
-        p_ingredient_id:
-          payload.ingredientId,
-
-        p_branch_id:
-          payload.branchId,
-
-        p_type:
-          payload.type,
-
-        p_qty:
-          payload.qty,
-
-        p_reason:
-          payload.reason
+        p_ingredient_id: payload.ingredientId,
+        p_branch_id: payload.branchId,
+        p_type: payload.type,
+        p_qty: payload.qty,
+        p_reason: payload.reason
       }
     );
 
@@ -23025,29 +22980,14 @@ async function submitAdjust() {
       throw error;
     }
 
-
-    // ==================================
     // CLEAR CACHE
-    // ==================================
-
     state.inventoryData = null;
     state.inventoryBranchId = null;
-
     state.ingredients = null;
     state.ingredientsCacheKey = null;
-
-
-    // ==================================
-    // CLOSE MODAL
-    // ==================================
-
     closeAdjustStockModal();
-
-
-    // ==================================
+	
     // RELOAD
-    // ==================================
-
     await loadInventoryPage(
       state.branchId
     );
@@ -23055,15 +22995,11 @@ async function submitAdjust() {
     await loadIngredients(
       state.branchId
     );
-
-
     showToast(
       "Stock updated"
     );
-
   }
   catch (err) {
-
     console.error(
       "Adjust Stock Error:",
       err
