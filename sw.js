@@ -47,55 +47,49 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
 
-  // Jangan cache request selain GET
+  // Jangan tangani request selain GET
   if (event.request.method !== "GET") {
     return;
   }
 
-  // Jangan cache request ke Supabase
+  // Jangan tangani request ke Supabase
   if (url.hostname.includes("supabase.co")) {
     return;
   }
 
-  // Jangan cache endpoint API Vercel
+  // Jangan tangani endpoint API Vercel
   if (url.pathname.startsWith("/api/")) {
     return;
   }
 
+  // ===================================================
+  // NAVIGASI HALAMAN
+  // ===================================================
+  if (event.request.mode === "navigate") {
+
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match("/index.html"))
+    );
+
+    return;
+  }
+
+
+  // ===================================================
+  // ASET STATIS
+  // ===================================================
   event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
+    caches.match(event.request)
+      .then((cachedResponse) => {
 
-      // Kalau tersedia di cache → gunakan cache
-      if (cachedResponse) {
-        return cachedResponse;
-      }
+        // Kalau ada di cache → gunakan
+        if (cachedResponse) {
+          return cachedResponse;
+        }
 
-      // Kalau belum ada → ambil dari network
-      return fetch(event.request)
-        .then((networkResponse) => {
-
-          // Simpan response ke cache
-          return caches.open(CACHE_NAME).then((cache) => {
-
-            cache.put(
-              event.request,
-              networkResponse.clone()
-            );
-
-            return networkResponse;
-          });
-
-        })
-        .catch(() => {
-          if (event.request.mode === "navigate") {
-            return caches.match("/index.html");
-          }
-        
-          return new Response("Network error", {
-            status: 503,
-            statusText: "Service Unavailable"
-          });
-        });
-    })
+        // Kalau belum ada → ambil dari network
+        return fetch(event.request);
+      })
   );
 });
