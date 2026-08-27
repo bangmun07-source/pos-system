@@ -4969,7 +4969,7 @@
 
       <!-- FOOTER -->
       <div class="p-4">
-        <button onclick="closePurchaseAction()"
+        <button onclick="	<!-- POPUP INGREDIENT PURCHASE -->()"
           class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
           Close Menu
         </button>
@@ -4978,6 +4978,64 @@
   </div>
 </template>
 
+
+	<!-- POPUP INGREDIENT PURCHASE NOTE -->
+	
+<template id="purchaseNoteModal">
+  <div class="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-background backdrop-blur-md">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
+
+      <!-- HEADER -->
+      <div class="p-6 border border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span
+            class="material-symbols-outlined text-2xl text-on-surface"
+            style="font-variation-settings:'FILL' 1;">
+            notes
+          </span>
+
+          <div>
+            <h2 class="text-xl font-headline font-bold text-on-surface">
+              Purchase Note
+            </h2>
+
+            <p class="text-xs text-on-surface-variant mt-1">
+              Additional purchase information
+            </p>
+          </div>
+        </div>
+		  
+        <button onclick="closePurchaseNote()"
+          class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
+
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <!-- NOTE -->
+      <div class="p-6">
+        <div class="min-h-[120px] p-4 rounded-md border border-outline-variant bg-background-high">
+          <p id="purchaseNoteText"
+            class="text-sm text-on-surface whitespace-pre-wrap break-words">
+            -
+          </p>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="p-4">
+        <button onclick="closePurchaseNote()"
+          class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+	
 
 <!-- POPUP DETAIL USAGE INVENTORY -->
 
@@ -20894,7 +20952,9 @@ window.openPurchaseAction = function (purchaseId) {
     console.error("Purchase tidak ditemukan:", purchaseId);
     return;
   }
-
+	
+	window.currentPurchaseAction = purchase;
+	
   const template =
     document.getElementById(
       "ingredientPurchaseActionModal"
@@ -20981,6 +21041,47 @@ window.closePurchaseAction = function () {
     window.purchaseActionModalEl.remove();
     window.purchaseActionModalEl =
       null;
+  }
+  document.body.style.overflow = "";
+};
+
+window.viewPurchaseNote = function () {
+  const purchase = window.currentPurchaseAction;
+  if (!purchase) {
+    console.error("Purchase tidak ditemukan");
+    return;
+  }
+  const template =
+    document.getElementById("purchaseNoteModal");
+  if (!template) {
+    console.error("Template purchaseNoteModal tidak ditemukan");
+    return;
+  }
+  document
+    .querySelectorAll(".purchase-note-modal")
+    .forEach(el => el.remove());
+  const clone =
+    template.content.cloneNode(true);
+  const wrapper =
+    document.createElement("div");
+  wrapper.className =
+    "purchase-note-modal";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  window.purchaseNoteModalEl = wrapper;
+  document.body.style.overflow = "hidden";
+  const note =
+    wrapper.querySelector("#purchaseNoteText");
+  if (note) {
+    note.textContent =
+      purchase.Note || "Tidak ada catatan.";
+  }
+};
+
+window.closePurchaseNote = function () {
+  if (window.purchaseNoteModalEl) {
+    window.purchaseNoteModalEl.remove();
+    window.purchaseNoteModalEl = null;
   }
   document.body.style.overflow = "";
 };
