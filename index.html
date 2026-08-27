@@ -4077,7 +4077,7 @@
 				    <input id="purchaseSearch"
 				      type="text"
 				      placeholder="Search purchase..."
-				      class="h-[30px] w-full sm:w-[200px] pl-9 pr-3 rounded-md border border-outline-variant bg-background text-on-surface text-xs outline-none focus:ring-1 focus:ring-outline-variant">
+				      class="h-[30px] w-full sm:w-[200px] pl-9 pr-3 rounded-md border border-outline-variant bg-transparent text-on-surface text-xs outline-none focus:ring-1 focus:ring-outline-variant">
 				  </div>
 	
 				  <!-- STATUS -->
@@ -4122,7 +4122,7 @@
 								
 				  <!-- EXPORT -->
 				  <button onclick="exportIngredientPurchases()"
-				    class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">			
+				    class="bottom-theme text-foreground flex items-center justify-center gap-2 tracking-[0.15em] transition-all uppercase px-4 shrink-0 text-sm lg:text-md">			
 				    <span class="text-sm lg:text-md material-symbols-outlined">
 				      download
 				    </span>
@@ -4934,7 +4934,7 @@
             </div>
           </div>
 
-          <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
+          <span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">
             chevron_right
           </span>
         </button>
@@ -4961,7 +4961,7 @@
             </div>
           </div>
 
-          <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
+          <span class="material-symbols-outlined text-on-surface-variant hover:text-on-surface">
             chevron_right
           </span>
         </button>
@@ -4969,8 +4969,8 @@
 
       <!-- FOOTER -->
       <div class="p-4">
-        <button onclick="	<!-- POPUP INGREDIENT PURCHASE -->()"
-          class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+        <button onclick="closePurchaseAction()"
+          class="w-full h-11 rounded-md bg-background text-on-surface-variant hover:text-on-surface transition">
           Close Menu
         </button>
       </div>
@@ -5008,7 +5008,6 @@
 		  
         <button onclick="closePurchaseNote()"
           class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
-
           <span class="material-symbols-outlined">
             close
           </span>
@@ -5028,7 +5027,7 @@
       <!-- FOOTER -->
       <div class="p-4">
         <button onclick="closePurchaseNote()"
-          class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          class="w-full h-11 rounded-md text-on-surface-variant hover:text-on-surface transition">
           Close
         </button>
       </div>
@@ -5063,7 +5062,7 @@
       </div>
 
       <button onclick="closeUsageLogModal()"
-        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition">
+        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
         <span class="material-symbols-outlined">close</span>
       </button>
     </header>
@@ -5131,7 +5130,7 @@
     <!-- FOOTER -->
     <footer class="p-10 flex justify-between items-center bg-background border border-outline-variant relative overflow-hidden">
       <button onclick="closeUsageLogModal()"
-        class="px-6 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition">
+        class="px-6 py-3 rounded-md text-on-surface-variant hover:text-on-surface transition">
         Close Log
       </button>
     </footer>
@@ -5284,12 +5283,12 @@
       <!-- FOOTER -->
       <div class="p-4 flex gap-2">
         <button onclick="closePurchaseStatus()"
-          class="flex-1 h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          class="flex-1 h-11 rounded-md text-on-surface-variant hover:text-on-surface transition">
           Cancel
         </button>
 
         <button onclick="confirmPurchaseStatus()"
-          class="flex-1 h-11 rounded-md bg-on-surface text-background font-semibold hover:opacity-90 transition active:scale-95">
+          class="flex-1 h-11 bottom-theme text-foreground font-semibold text-sm flex items-center justify-center gap-2 tracking-[0.15em] transition-all uppercase">
           Update Status
         </button>
       </div>
@@ -20811,6 +20810,13 @@ function initPurchaseFilters() {
 
 async function loadIngredientPurchases(branchId, start = null, end = null) {
   const tbody = document.getElementById("ingredientPurchaseTable");
+	if (!branchId) {
+			purchaseData = [];
+			purchaseFilteredData = [];
+			purchaseCurrentPage = 1;
+			renderPurchasePage();
+		return;
+  }
   if (!tbody) return;
   tbody.innerHTML = `
     <tr>
@@ -23102,39 +23108,27 @@ function openThresholdFromIngredient() {
 }
 
 async function submitThreshold() {
-
   const min =
     Number(
       document.getElementById(
         "thresholdValue"
       ).value || 0
     );
-
   if (!currentThresholdItem) {
     return;
   }
 
-
   const payload = {
-
     ingredientId:
       currentThresholdItem.id,
-
     branchId:
       currentThresholdItem.branchId,
-
     min:
       min
-
   };
 
-
   try {
-
-    // ==================================
     // SUPABASE RPC
-    // ==================================
-
     const {
       data,
       error
@@ -23156,29 +23150,13 @@ async function submitThreshold() {
       throw error;
     }
 
-
-    // ==================================
     // CLEAR CACHE
-    // ==================================
-
     state.inventoryData = null;
     state.inventoryBranchId = null;
 
     state.ingredients = null;
     state.ingredientsCacheKey = null;
-
-
-    // ==================================
-    // CLOSE MODAL
-    // ==================================
-
     closeThresholdModal();
-
-
-    // ==================================
-    // RELOAD
-    // ==================================
-
     await loadInventoryPage(
       state.branchId
     );
@@ -23187,14 +23165,11 @@ async function submitThreshold() {
       state.branchId
     );
 
-
     showToast(
       "Threshold updated"
     );
-
   }
   catch (err) {
-
     console.error(
       "Update Threshold Error:",
       err
@@ -23339,7 +23314,7 @@ function renderUsageSummary(data, currentStock) {
     return;
   }
   if (!data.length) {
-    currentStockEl.innerText = urrentStock;
+    currentStockEl.innerText = currentStock;
     totalOutEl.innerText = 0;
     avgDailyEl.innerText = 0;
     return;
