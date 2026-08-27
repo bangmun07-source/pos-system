@@ -4097,6 +4097,137 @@
 		</div>
 	</div>
 
+	<!-- Ingredient Purchase Section -->
+	<div class="mb-4" id="Ingredient-Purchase-Section">
+	  <div class="bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative">
+	    <!-- Header -->
+	    <div class="px-8 py-10 flex items-center justify-between">
+	      <div class="flex items-center gap-4">
+	        <div class="main-icon-box">
+	          <span
+	            class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+	            shopping_cart
+	          </span>
+	        </div>
+					
+	        <h2 class="font-headline text-2xl font-bold tracking-tight">
+	          Ingredient Purchase
+	        </h2>
+	      </div>
+	
+	      <!-- FILTER + DATE + EXPORT -->
+				<div class="flex flex-row items-center gap-2 sm:gap-4 flex-wrap justify-end w-full sm:w-auto">		
+				  <!-- SEARCH -->
+				  <div class="relative">
+				    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">
+				      search
+				    </span>
+				
+				    <input id="purchaseSearch"
+				      type="text"
+				      placeholder="Search purchase..."
+				      class="h-[30px] w-full sm:w-[200px] pl-9 pr-3 rounded-md border border-outline-variant bg-background text-on-surface text-xs outline-none focus:ring-1 focus:ring-outline-variant">
+				  </div>
+	
+				  <!-- STATUS -->
+				  <select id="purchaseStatusFilter"
+				    class="h-[30px] rounded-md border border-outline-variant bg-background text-on-surface text-xs px-3 outline-none">
+				    <option value="ALL">All Status</option>
+				    <option value="PENDING">Pending</option>
+				    <option value="PAID">Paid</option>
+				    <option value="CANCELLED">Cancelled</option>				
+				  </select>
+				
+				  <!-- DATE RANGE -->
+				  <div class="bg-background border border-outline-variant rounded-md h-[30px] inline-flex items-center gap-3 px-2">	
+				    <div class="flex flex-col px-3">				
+				      <div class="relative flex items-center">			
+				        <span class="material-symbols-outlined text-foreground text-sm lg:text-md absolute left-0">
+				          calendar_today
+				        </span>
+				
+				        <input class="bg-transparent border-none p-0 pl-7 text-sm lg:text-md font-semibold text-on-surface focus:ring-0 cursor-pointer w-32"
+				          id="ingredientExportStart"
+				          type="date"
+				          value="2024-10-01" />
+				      </div>				
+				    </div>
+				
+				    <div class="hidden sm:block h-8 w-px bg-outline-variant/20"></div>			
+				    <!-- END -->
+				    <div class="flex flex-col px-3">				
+				      <div class="relative flex items-center">				
+				        <span class="material-symbols-outlined text-foreground text-sm lg:text-md absolute left-0">
+				          calendar_month
+				        </span>
+				
+				        <input id="ingredientExportEnd"
+				          type="date"
+				          value="2024-10-31"
+				          class="bg-transparent border-none p-0 pl-7 text-sm lg:text-md font-semibold text-on-surface focus:ring-0 cursor-pointer w-32"/>				
+				      </div>			
+				    </div>			
+				  </div>
+								
+				  <!-- EXPORT -->
+				  <button onclick="exportIngredientPurchases()"
+				    class="bg-background border border-outline-variant rounded-md h-[30px] px-4 shrink-0 text-sm lg:text-md flex items-center justify-center gap-2 text-foreground font-semibold">			
+				    <span class="text-sm lg:text-md material-symbols-outlined">
+				      download
+				    </span>
+				
+				    <span class="hidden sm:inline">
+				      Export
+				    </span>				
+				  </button>				
+				</div>
+	    </div>
+			
+	    <!-- Table -->
+	    <div class="custom-scrollbar overflow-x-auto">
+	      <table class="w-full text-left border-collapse min-w-[1100px]">
+	        <thead>
+	          <tr class="sticky top-0 border border-outline-variant text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
+	            <th class="px-8 py-4 font-bold">PURCHASE ID</th>
+	            <th class="px-8 py-4 font-bold">DATE</th>
+	            <th class="px-8 py-4 font-bold">SUPPLIER</th>
+	            <th class="px-8 py-4 font-bold">INGREDIENT</th>
+	            <th class="px-8 py-4 font-bold">QTY</th>
+	            <th class="px-8 py-4 font-bold">TOTAL</th>
+	            <th class="px-8 py-4 font-bold">PAYMENT</th>
+	            <th class="px-8 py-4 font-bold">STATUS</th>
+	            <th class="px-8 py-4 font-bold text-right">ACTIONS</th>
+	          </tr>
+	        </thead>
+	
+	        <tbody id="ingredientPurchaseTable"
+	          class="divide-y divide-outline-variant">
+	          <tr>
+	            <td colspan="9"
+	              class="text-center text-muted py-6">
+	              Loading...
+	            </td>
+	          </tr>
+	        </tbody>
+	      </table>
+	    </div>
+	
+	    <!-- Pagination -->
+	    <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
+	      <div class="text-xs text-muted">
+	        Showing
+	        <span
+	          id="purchaseShowing"
+	          class="text-on-surface font-semibold">
+	          10
+	        </span>
+	      </div>
+				
+	      <div id="ingredientPurchasePagination"></div>
+	    </div>
+	  </div>
+	</div>
 
 <!-- Supplier Management Section -->
 	<div class="mb-4" id="Supplier-Management-Section">
