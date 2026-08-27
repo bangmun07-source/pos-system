@@ -4796,6 +4796,189 @@
 </template>
 
 
+	<!-- POPUP INGREDIENT PURCHASE -->
+
+<template id="ingredientPurchaseActionModal">
+  <div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background backdrop-blur-md">
+    <div onclick="event.stopPropagation()"
+      class="w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
+      <!-- HEADER -->
+      <div class="p-6 border border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="relative">
+            <span
+              class="text-on-surface material-symbols-outlined text-2xl"
+              style="font-variation-settings:'FILL' 1;">
+              receipt_long
+            </span>
+          </div>
+
+          <div>
+            <h2 id="purchaseModalIngredient"
+              class="text-xl font-headline font-bold text-on-surface">
+              Ingredient
+            </h2>
+
+            <div class="flex items-center gap-2 mt-1">
+              <span class="w-2 h-2 rounded-md bg-on-surface"></span>
+              <span class="text-xs uppercase tracking-wider text-on-surface-variant">
+                Purchase:
+                <span
+                  id="purchaseModalId"
+                  class="text-on-surface-variant font-semibold">
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="closePurchaseAction()"
+          class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <!-- PURCHASE INFO -->
+      <div class="px-6 py-4 border-b border-outline-variant">
+        <div class="grid grid-cols-2 gap-y-3 text-sm">
+          <div>
+            <p class="text-xs text-on-surface-variant">
+              Date
+            </p>
+
+            <p id="purchaseModalDate"
+              class="font-semibold text-on-surface">
+              -
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs text-on-surface-variant">
+              Supplier
+            </p>
+
+            <p id="purchaseModalSupplier"
+              class="font-semibold text-on-surface">
+              -
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs text-on-surface-variant">
+              Quantity
+            </p>
+
+            <p id="purchaseModalQty"
+              class="font-semibold text-on-surface">
+              -
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs text-on-surface-variant">
+              Total Price
+            </p>
+
+            <p id="purchaseModalTotal"
+              class="font-semibold text-on-surface">
+              -
+            </p>
+          </div>
+
+          <div>
+            <p class="text-xs text-on-surface-variant">
+              Payment
+            </p>
+
+            <p id="purchaseModalPayment"
+              class="font-semibold text-on-surface">
+              -
+            </p>
+          </div>
+					
+          <div>
+            <p class="text-xs text-on-surface-variant">
+              Status
+            </p>
+
+            <p id="purchaseModalStatus"
+              class="font-semibold text-on-surface">
+              -
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION LIST -->
+      <div class="p-2 space-y-1">
+        <button onclick="openPurchaseStatusAction()"
+          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
+              <span class="material-symbols-outlined text-lg"
+                style="font-variation-settings:'FILL' 1;">
+                sync
+              </span>
+            </div>
+
+            <div class="text-left">
+              <p class="text-xs lg:text-sm text-on-surface font-medium">
+                Change Purchase Status
+              </p>
+
+              <p class="text-xs text-on-surface-variant">
+                Update payment or purchase status
+              </p>
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
+            chevron_right
+          </span>
+        </button>
+
+        <!-- VIEW NOTE -->
+        <button onclick="viewPurchaseNote()"
+          class="w-full flex items-center justify-between p-4 rounded-md hover:bg-background transition group">
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
+              <span class="material-symbols-outlined text-lg"
+                style="font-variation-settings:'FILL' 1;">
+                notes
+              </span>
+            </div>
+
+            <div class="text-left">
+              <p class="text-xs lg:text-sm text-on-surface font-medium">
+                View Purchase Note
+              </p>
+
+              <p class="text-xs text-on-surface-variant">
+                View additional purchase information
+              </p>
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined text-outline/50 group-hover:text-on-surface">
+            chevron_right
+          </span>
+        </button>
+      </div>
+
+      <!-- FOOTER -->
+      <div class="p-4">
+        <button onclick="closePurchaseAction()"
+          class="w-full h-11 rounded-md bg-background-high text-on-surface hover:bg-background transition active:scale-95">
+          Close Menu
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+
 <!-- POPUP DETAIL USAGE INVENTORY -->
 
 <template id="inventorydetailusageModal">
@@ -20608,32 +20791,27 @@ function renderPurchasePage() {
 }
 
 function renderPurchasePagination(totalPages) {
-
   const container =
     document.getElementById(
       "ingredientPurchasePagination"
     );
 
   if (!container) return;
-
-
   if (totalPages <= 1) {
     container.innerHTML = "";
     return;
   }
 
-
   let html = `
     <div class="flex items-center gap-1">
   `;
-
 
   // Previous
   html += `
     <button
       onclick="changePurchasePage(${purchaseCurrentPage - 1})"
       ${purchaseCurrentPage === 1 ? "disabled" : ""}
-      class="px-3 py-1 rounded-md border border-outline-variant text-xs disabled:opacity-40">
+      class="px-3 py-1 text-xs disabled:opacity-40">
       ‹
     </button>
   `;
@@ -20646,7 +20824,7 @@ function renderPurchasePagination(totalPages) {
     html += `
       <button
         onclick="changePurchasePage(${i})"
-        class="px-3 py-1 rounded-md border border-outline-variant text-xs ${
+        class="px-3 py-1 text-xs ${
           i === purchaseCurrentPage
             ? "bg-surface-container-high font-bold"
             : ""
@@ -20706,6 +20884,106 @@ function renderPurchaseStatus(status) {
     </span>
   `;
 }
+
+window.openPurchaseAction = function (purchaseId) {
+  const purchase = purchaseData.find(
+    item => String(item.ID) === String(purchaseId)
+  );
+
+  if (!purchase) {
+    console.error("Purchase tidak ditemukan:", purchaseId);
+    return;
+  }
+
+  const template =
+    document.getElementById(
+      "ingredientPurchaseActionModal"
+    );
+
+  if (!template) {
+    console.error(
+      "Template ingredientPurchaseActionModal tidak ditemukan"
+    );
+    return;
+  }
+
+  // Hapus popup lama
+  document
+    .querySelectorAll(".purchase-action-modal")
+    .forEach(el => el.remove());
+
+  // Clone template
+  const clone =
+    template.content.cloneNode(true);
+  const wrapper =
+    document.createElement("div");
+  wrapper.className =
+    "purchase-action-modal";
+  wrapper.appendChild(clone);
+  document.body.appendChild(wrapper);
+  window.purchaseActionModalEl =
+    wrapper;
+  document.body.style.overflow =
+    "hidden";
+
+  // ISI DATA
+  const setText = (id, value) => {
+    const el =
+      wrapper.querySelector("#" + id);
+    if (el) {
+      el.textContent =
+        value ?? "-";
+    }
+  };
+
+  setText(
+    "purchaseModalIngredient",
+    purchase.Ingredient
+  );
+  setText(
+    "purchaseModalId",
+    purchase.ID
+  );
+  setText(
+    "purchaseModalDate",
+    purchase.Date
+  );
+  setText(
+    "purchaseModalSupplier",
+    purchase.Name_Supplier
+  );
+  setText(
+    "purchaseModalQty",
+    purchase.Qty
+  );
+  setText(
+    "purchaseModalTotal",
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    }).format(
+      Number(purchase.Total_Price || 0)
+    )
+  );
+  setText(
+    "purchaseModalPayment",
+    purchase.Payment_Method
+  );
+  setText(
+    "purchaseModalStatus",
+    purchase.Status
+  );
+};
+
+window.closePurchaseAction = function () {
+  if (window.purchaseActionModalEl) {
+    window.purchaseActionModalEl.remove();
+    window.purchaseActionModalEl =
+      null;
+  }
+  document.body.style.overflow = "";
+};
 
 function openInventoryPage() {
   if (!state.branchId) {
