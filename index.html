@@ -16576,9 +16576,6 @@ async function sendTransaction(payload){
       state.inventoryFilter = null;
       // state.products = null;
       state.cart = [];
-			state.products = null;
-			state.productsBranchId = null;
-			state.productsRole = null;
       state.currentMember = null;
       state.selectedMember = null;
       state.currentMemberPoint = 0;
@@ -16778,6 +16775,7 @@ function addToCartFromFilter(id) {
 }
 
 function addToCartById(id, isRedeem = false, rewardId = null) {
+	const products = state.products || [];
   const product = state.products.find(p => p.ID_Produk === id);
   if (!product) return;
   addToCart(product, isRedeem, rewardId);
