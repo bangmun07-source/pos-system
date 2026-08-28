@@ -20882,8 +20882,10 @@ function applyPurchaseFilters() {
     searchInput?.value || ""
   ).trim().toLowerCase();
 
-  const status =
-    statusSelect?.value || "ALL";
+	const status =
+	  String(statusSelect?.value || "ALL")
+		.trim()
+		.toUpperCase();
 	
   purchaseFilteredData = purchaseData.filter(purchase => {
     const matchesSearch =
