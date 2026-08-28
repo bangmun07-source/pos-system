@@ -21421,6 +21421,8 @@ window.confirmPurchaseStatus = async function () {
     renderPurchasePage();
 	state.supplierData = null;
 	state.supplierBranchId = null;
+	state.ingredients = null;
+	state.ingredientsCacheKey = null;
 	state.cashFlowData = null;
     state.cashFlowFilter = null;
 	await loadSuppliers();
