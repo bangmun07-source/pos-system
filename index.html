@@ -28347,7 +28347,6 @@ async function loadTaxSettings() {
 	// EXPENSES 
 	// ==================================
 
-
 function getExpenseFilters() {
   return {
     branch: state.branchId,
@@ -28360,16 +28359,12 @@ function getExpenseFilters() {
 }
 
 function initExpenseSettingPage() {
-
   // Isi dropdown branch dulu
   loadExpenseBranches(
     "expenseBranchFilter"
   );
-
   // Baru load data dashboard
   loadExpenseDashboard();
-
-
   document
     .getElementById(
       "expenseSearchInput"
@@ -28378,7 +28373,6 @@ function initExpenseSettingPage() {
       "input",
       filterExpenseTable
     );
-
 
   document
     .getElementById(
@@ -28399,7 +28393,6 @@ function initExpenseSettingPage() {
       filterExpenseTable
     );
 
-
   document
     .getElementById(
       "expenseStartDate"
@@ -28409,7 +28402,6 @@ function initExpenseSettingPage() {
       filterExpenseTable
     );
 
-
   document
     .getElementById(
       "expenseEndDate"
@@ -28418,11 +28410,6 @@ function initExpenseSettingPage() {
       "change",
       filterExpenseTable
     );
-
-
-  // =========================
-  // BRANCH CHANGE
-  // =========================
 
   document
     .getElementById(
@@ -28437,15 +28424,11 @@ function initExpenseSettingPage() {
 
         state.expenseDashboardFilter =
           null;
-
         await loadExpenseDashboard();
-
       }
     );
 
-
   setTimeout(() => {
-
     document
       .getElementById(
         "btnNewExpense"
@@ -28514,9 +28497,7 @@ async function loadExpenseDashboard() {
   const filterKey =
     JSON.stringify(filter);
 
-  // =========================
   // CACHE HIT
-  // =========================
   if (
     state.expenseDashboardData &&
     state.expenseDashboardFilter === filterKey
@@ -29991,69 +29972,122 @@ function drawCategory(data) {
 
 function filterExpenseTable() {
   const f = getExpenseFilters();
-  const filtered = allExpenseData.filter(item => {
-    const keyword =
-      String(f.keyword || "")
-        .trim()
-        .toLowerCase();
-    const itemBranch =
-      String(item.branchId || "")
-        .trim()
-        .toUpperCase();
-    const filterBranch =
-      String(f.branch || "")
+  const filtered =
+    allExpenseData.filter(item => {
+
+      // BRANCH
+      const itemBranch =
+        String(
+          item.branchId || ""
+        )
         .trim()
         .toUpperCase();
-    const matchBranch =
-      filterBranch === "ALL" ||
-      itemBranch === filterBranch;
-    const text =
-      `${item.description || ""}
-       ${item.category || ""}
-       ${item.refId || ""}`
+
+      const filterBranch =
+        String(
+          f.branch || ""
+        )
+        .trim()
+        .toUpperCase();
+
+      const matchBranch =
+        filterBranch === "ALL" ||
+        !filterBranch ||
+        itemBranch === filterBranch;
+
+      // SEARCH
+      const keyword =
+        String(
+          f.keyword || ""
+        )
+        .trim()
         .toLowerCase();
-    const matchSearch =
-      text.includes(keyword);
-    const matchCategory =
-      f.category === "All Categories" ||
-      item.category === f.category;
-    const matchStatus =
-      f.status === "All Status" ||
-      item.status === f.status;
-    const itemDate =
-      item.tanggal
-        ? new Date(item.tanggal)
-        : null;
-    const matchStart =
-      !f.startDate ||
-      (
-        itemDate &&
-        itemDate >= new Date(f.startDate)
+
+      const text =
+        `${item.description || ""}
+         ${item.category || ""}
+         ${item.refId || ""}`
+        .toLowerCase();
+
+      const matchSearch =
+        !keyword ||
+        text.includes(keyword);
+
+      // CATEGORY
+      const matchCategory =
+        f.category === "All Categories" ||
+        String(
+          item.category || ""
+        ).trim() ===
+        String(
+          f.category || ""
+        ).trim();
+
+      // STATUS
+      const matchStatus =
+        f.status === "All Status" ||
+        String(
+          item.status || ""
+        )
+        .trim()
+        .toUpperCase() ===
+        String(
+          f.status || ""
+        )
+        .trim()
+        .toUpperCase();
+
+      // DATE
+      const itemDate =
+        item.tanggal
+          ? new Date(item.tanggal)
+          : null;
+
+      const matchStart =
+        !f.startDate ||
+        (
+          itemDate &&
+          !isNaN(itemDate) &&
+          itemDate >=
+            new Date(
+              `${f.startDate}T00:00:00`
+            )
+        );
+
+      const matchEnd =
+        !f.endDate ||
+        (
+          itemDate &&
+          !isNaN(itemDate) &&
+          itemDate <=
+            new Date(
+              `${f.endDate}T23:59:59.999`
+            )
+        );
+
+      return (
+        matchBranch &&
+        matchSearch &&
+        matchCategory &&
+        matchStatus &&
+        matchStart &&
+        matchEnd
       );
-    const matchEnd =
-      !f.endDate ||
-      (
-        itemDate &&
-        itemDate <= new Date(f.endDate)
-      );
-    return (
-      matchBranch &&
-      matchSearch &&
-      matchCategory &&
-      matchStatus &&
-      matchStart &&
-      matchEnd
-    );
-  });
+    });
+
   currentPage = 1;
-  window.currentFilteredData = filtered;
+  window.currentFilteredData =
+    filtered;
+
   paginate(filtered);
-  updateExpenseKPIs(filtered);
+  updateExpenseKPIs(
+    filtered
+  );
   setTimeout(() => {
     renderCategoryBreakdown();
   }, 50);
 }
-
+	
 function updateExpenseKPIs(data = [], budget = null) {
   if (budget === null) {
     budget = expenseBudget || 0;
