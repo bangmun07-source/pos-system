@@ -20795,32 +20795,29 @@ async function loadIngredients(branchId) {
 
 function initPurchaseFilters() {
   const search =
-    document.getElementById("purchaseSearch");
+    document.getElementById(
+      "purchaseSearch"
+    );
+
   const status =
-    document.getElementById("purchaseStatusFilter");
-
-  // Hindari listener terpasang berkali-kali
-  if (search && !search.dataset.filterInitialized) {
-    search.addEventListener(
-      "input",
-      () => {
-        applyPurchaseFilters();
-      }
+    document.getElementById(
+      "purchaseStatusFilter"
     );
-    search.dataset.filterInitialized = "true";
-  }
 
-  if (status && !status.dataset.filterInitialized) {
-    status.addEventListener(
-      "change",
-      () => {
-        applyPurchaseFilters();
-      }
-    );
-    status.dataset.filterInitialized = "true";
-  }
+  search?.addEventListener(
+    "input",
+    () => {
+      applyPurchaseFilters();
+    }
+  );
+
+  status?.addEventListener(
+    "change",
+    () => {
+      applyPurchaseFilters();
+    }
+  );
 }
-
 async function loadIngredientPurchases(branchId, start = null, end = null) {
   const tbody = document.getElementById("ingredientPurchaseTable");
 	if (!branchId) {
