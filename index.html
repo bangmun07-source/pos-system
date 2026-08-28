@@ -16576,6 +16576,10 @@ async function sendTransaction(payload){
       state.inventoryFilter = null;
       // state.products = null;
       state.cart = [];
+			state.products = null;
+			state.productsBranchId = null;
+			state.productsRole = null;
+			await loadProducts();
       state.currentMember = null;
       state.selectedMember = null;
       state.currentMemberPoint = 0;
