@@ -20795,25 +20795,30 @@ async function loadIngredients(branchId) {
 
 function initPurchaseFilters() {
   const search =
-    document.getElementById(
-      "purchaseSearch"
-    );
+    document.getElementById("purchaseSearch");
   const status =
-    document.getElementById(
-      "purchaseStatusFilter"
+    document.getElementById("purchaseStatusFilter");
+
+  // Hindari listener terpasang berkali-kali
+  if (search && !search.dataset.filterInitialized) {
+    search.addEventListener(
+      "input",
+      () => {
+        applyPurchaseFilters();
+      }
     );
-  search?.addEventListener(
-    "input",
-    () => {
-      applyPurchaseFilters();
-    }
-  );
-  status?.addEventListener(
-    "change",
-    () => {
-      applyPurchaseFilters();
-    }
-  );
+    search.dataset.filterInitialized = "true";
+  }
+
+  if (status && !status.dataset.filterInitialized) {
+    status.addEventListener(
+      "change",
+      () => {
+        applyPurchaseFilters();
+      }
+    );
+    status.dataset.filterInitialized = "true";
+  }
 }
 
 async function loadIngredientPurchases(branchId, start = null, end = null) {
@@ -20825,6 +20830,9 @@ async function loadIngredientPurchases(branchId, start = null, end = null) {
 			renderPurchasePage();
 		return;
   }
+	
+	initPurchaseFilters();
+	
   if (!tbody) return;
   tbody.innerHTML = `
     <tr>
