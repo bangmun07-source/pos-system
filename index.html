@@ -28470,6 +28470,10 @@ function closeBudgetModal(){
 
 function applyExpenseDashboard(data){
   allExpenseData = data.expenses || [];
+	console.log("=== EXPENSE DEBUG ===");
+  console.log("ALL EXPENSE DATA:", allExpenseData);
+  console.log("FIRST EXPENSE:", allExpenseData[0]);
+	
   allOtherIncome = data.otherIncome || [];
   expenseBranches = data.branches || [];
   state.expenseBranches = expenseBranches;
@@ -29971,7 +29975,10 @@ function drawCategory(data) {
 
 
 function filterExpenseTable() {
+	console.log("FILTER EXPENSE DIPANGGIL");
   const f = getExpenseFilters();
+	console.log("FILTER VALUE:", f);
+  console.log("DATA:", allExpenseData);
   const filtered =
     allExpenseData.filter(item => {
 
