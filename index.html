@@ -21422,6 +21422,8 @@ window.confirmPurchaseStatus = async function () {
     renderPurchasePage();
 	state.supplierData = null;
 	state.supplierBranchId = null;
+	state.cashFlowData = null;
+    state.cashFlowFilter = null;
 	await loadSuppliers();
     showToast(
       "Status purchase berhasil diubah",
@@ -33402,41 +33404,24 @@ async function loadCashFlowPage() {
       throw error;
     }
 
-
-    // =========================
     // ACCESS CHECK
-    // =========================
-
     if (
       data &&
       data.success === false
     ) {
-
       showToast(
         data.message ||
         "Access denied.",
         "error"
       );
-
       return;
     }
 
-
-    // =========================
     // CACHE
-    // =========================
-
     state.cashFlowData =
       data || {};
-
     state.cashFlowFilter =
       cacheKey;
-
-
-    // =========================
-    // RENDER
-    // =========================
-
     renderAccountBalance(
       data?.account
     );
@@ -33463,12 +33448,10 @@ async function loadCashFlowPage() {
 
   }
   catch (err) {
-
     console.error(
       "Cash Flow:",
       err
     );
-
     showToast(
       err?.message ||
       "Gagal memuat Cash Flow.",
@@ -33576,12 +33559,10 @@ async function loadAccountBalance() {
         "Data account balance tidak ditemukan."
       );
     }
-
     renderAccountBalance(data);
 
   }
   catch (err) {
-
     console.error(
       "Load Account Balance:",
       err
@@ -33837,24 +33818,15 @@ async function saveTransfer() {
       "Jumlah transfer harus diisi",
       "warning"
     );
-
     return;
   }
-
-
+	
   try {
-
-    // =========================
     // SUPABASE RPC
-    // =========================
-
     const res =
       await transferFundsRPC(data);
 
-
-    // =========================
     // RESPONSE
-    // =========================
 
     if (
       res &&
@@ -33874,27 +33846,14 @@ async function saveTransfer() {
       "success"
     );
 
-
-    // =========================
     // CLEAR CACHE
-    // =========================
-
     state.cashFlowData = null;
     state.cashFlowFilter = null;
-
-
     closeTransferModal();
-
-
-    // =========================
     // RELOAD
-    // =========================
-
     await loadCashFlowPage();
-
   }
   catch (err) {
-
     console.error(
       "Transfer Funds:",
       err
