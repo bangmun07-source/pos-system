@@ -5820,22 +5820,32 @@ const html = `
     );
 
   // TOTAL
-  const totalPurchases =
-    rows.length;
   const totalSpending =
-    rows.reduce(
-      (sum, r) => {
-        return sum +
-          (
-            Number(
-              r.Total_Price ??
-              r.total_price ??
-              0
-            ) || 0
-          );
-      },
-      0
-    );
+  rows.reduce(
+    (sum, r) => {
+
+      const status =
+        String(
+          r.Status ??
+          r.status ??
+          ""
+        ).toUpperCase();
+
+      const totalPrice =
+        Number(
+          r.Total_Price ??
+          r.total_price ??
+          0
+        ) || 0;
+
+      // Hanya PAID yang dihitung sebagai spending
+      if (status === "PAID") {
+        return sum + totalPrice;
+      }
+      return sum;
+    },
+    0
+  );
 
   const totalSuppliers =
     new Set(
@@ -5850,29 +5860,53 @@ const html = `
 
   // SUPPLIER BREAKDOWN
   const supplierMap = {};
+  
   rows.forEach(r => {
+  
     const supplier =
       r.Name_Supplier ??
       r.name_supplier ??
       "-";
-
+  
     if (!supplierMap[supplier]) {
       supplierMap[supplier] = {
         supplier,
         purchases: 0,
-        spending: 0
+        spending: 0,
+        balanceDue: 0
       };
     }
-
+  
     supplierMap[supplier].purchases++;
-    supplierMap[supplier].spending +=
+  
+    const totalPrice =
       Number(
         r.Total_Price ??
         r.total_price ??
         0
       ) || 0;
+  
+    const status =
+      String(
+        r.Status ??
+        r.status ??
+        ""
+      ).toUpperCase();
+  
+    // PAID = pengeluaran
+    if (status === "PAID") {
+      supplierMap[supplier].spending +=
+        totalPrice;
+    }
+  
+    // PENDING = hutang supplier
+    else if (status === "PENDING") {
+      supplierMap[supplier].balanceDue +=
+        totalPrice;
+    }
+    // CANCEL = tidak dihitung
   });
-
+  
   const supplierRows =
     Object.values(supplierMap)
       .sort(
@@ -5936,18 +5970,34 @@ const html = `
                 r.total_price ??
                 0
               ) || 0;
+            
             const supplier =
               r.Name_Supplier ??
               r.name_supplier ??
               "-";
+            
             const payment =
               r.Payment_Method ??
               r.payment_method ??
               "-";
+            
+            const status =
+              String(
+                r.Status ??
+                r.status ??
+                ""
+              ).toUpperCase() || "-";
+            
+            const balanceDue =
+              status === "PENDING"
+                ? totalPrice
+                : 0;
+            
             const outlet =
               r.Outlet ??
               r.outlet ??
               "-";
+            
             const note =
               r.Note ??
               r.note ??
@@ -5988,6 +6038,14 @@ const html = `
                 </td>
 
                 <td>
+                  ${escapeHtml(status)}
+                </td>
+                
+                <td class="right">
+                  Rp ${rupiah(balanceDue)}
+                </td>
+
+                <td>
                   ${escapeHtml( outlet )}
                 </td>
 
@@ -6000,7 +6058,7 @@ const html = `
           .join("")
       : `
           <tr>
-            <td colspan="8" class="empty" >
+            <td colspan="10" class="empty" >
               No purchase data
             </td>
           </tr>
@@ -6056,6 +6114,12 @@ const html = `
               <td class="right">
                 Rp ${rupiah(
                   r.spending
+                )}
+              </td>
+
+              <td class="right">
+                Rp ${rupiah(
+                  r.balanceDue
                 )}
               </td>
             </tr>
@@ -6275,7 +6339,6 @@ const html = `
                     class="logo"
                     alt="Sistem POS"
                   />
-
                 `
                 : ""
             }
@@ -6364,7 +6427,6 @@ const html = `
             </table>
           </div>
 
-
           <!-- SUPPLIER -->
           <div class="card">
             <h3>
@@ -6377,6 +6439,7 @@ const html = `
                   <th> Supplier </th>
                   <th class="right"> Purchases </th>
                   <th class="right"> Total Spending </th>
+                  <th class="right"> Balance Due </th>
                 </tr>
               </thead>
 
@@ -6399,14 +6462,17 @@ const html = `
 
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Ingredient</th>
-                  <th class="right"> Qty </th>
-                  <th class="right"> Total Price </th>
-                  <th> Supplier </th>
-                  <th> Payment </th>
-                  <th> Outlet </th>
-                  <th> Note </th>
+                  <tr>
+                    <th>Date</th>
+                    <th>Ingredient</th>
+                    <th class="right"> Qty </th>
+                    <th class="right"> Total Price </th>
+                    <th> Supplier </th>
+                    <th> Payment </th>
+                    <th> Status </th>
+                    <th class="right"> Balance Due </th>
+                    <th> Outlet </th>
+                    <th> Note </th>
                 </tr>
               </thead>
 
