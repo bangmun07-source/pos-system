@@ -31629,7 +31629,7 @@ document.addEventListener("keydown", function(e){
 });
 
 function addBackupChatMessage(type, text){
-  const container = ocument.getElementById("backupChatMessages");
+  const container = document.getElementById("backupChatMessages");
   const div = document.createElement("div");
   if(type === "user"){
     div.className = ` ml-auto max-w-[80%] border border-outline-variant rounded-md bg-background p-5 text-sm lg:text-base text-lift `;
