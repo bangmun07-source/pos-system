@@ -5811,7 +5811,6 @@ const html = `
       ? data
       : [];
 
-
   // BRANCH NAME
   const branchName =
     await getBranchName(
@@ -5820,33 +5819,37 @@ const html = `
     );
 
   // TOTAL
+  const totalPurchases =
+    rows.length;
+  
   const totalSpending =
-  rows.reduce(
-    (sum, r) => {
-
-      const status =
-        String(
-          r.Status ??
-          r.status ??
-          ""
-        ).toUpperCase();
-
-      const totalPrice =
-        Number(
-          r.Total_Price ??
-          r.total_price ??
-          0
-        ) || 0;
-
-      // Hanya PAID yang dihitung sebagai spending
-      if (status === "PAID") {
-        return sum + totalPrice;
-      }
-      return sum;
-    },
-    0
-  );
-
+    rows.reduce(
+      (sum, r) => {
+  
+        const status =
+          String(
+            r.Status ??
+            r.status ??
+            ""
+          ).toUpperCase();
+  
+        const totalPrice =
+          Number(
+            r.Total_Price ??
+            r.total_price ??
+            0
+          ) || 0;
+  
+        // Hanya PAID yang dihitung sebagai spending
+        if (status === "PAID") {
+          return sum + totalPrice;
+        }
+  
+        return sum;
+      },
+      0
+    );
+  
   const totalSuppliers =
     new Set(
       rows.map(
@@ -5856,7 +5859,6 @@ const html = `
           "-"
       )
     ).size;
-
 
   // SUPPLIER BREAKDOWN
   const supplierMap = {};
