@@ -27558,34 +27558,53 @@ function closeAddNewOtherIncome() {
     ?.remove();
 }
 
-function renderCategoryBreakdown() {
+function renderCategoryBreakdown(data = allExpenseData) {
   const map = {};
-  allExpenseData.forEach(item => {
-    const status = item.status || item.Status;
-    if (status !== "Paid") return;
+
+  data.forEach(item => {
+    const status =
+      item.status ||
+      item.Status;
+
+    if (
+      String(status)
+        .trim()
+        .toUpperCase() !== "PAID"
+    ) return;
+
     const amount = Number(
-      item.amount || item.Amount || 0
+      item.amount ||
+      item.Amount ||
+      0
     );
+
     const category =
       item.category ||
       item.Category ||
       "Other";
+
     map[category] =
       (map[category] || 0) + amount;
   });
+
   const total =
     Object.values(map)
-    .reduce((a,b)=>a+b,0);
-  const data = Object.keys(map).map(cat => {
-    return {
+      .reduce(
+        (a, b) => a + b,
+        0
+      );
+
+  const result =
+    Object.keys(map).map(cat => ({
       name: cat,
       amount: map[cat],
-      percent: total > 0
-        ? (map[cat] / total) * 100
-        : 0
-    };
-  });
-  drawCategory(data);
+      percent:
+        total > 0
+          ? (map[cat] / total) * 100
+          : 0
+    }));
+
+  drawCategory(result);
 }
 
 function drawCategory(data) {
@@ -27732,7 +27751,7 @@ function filterExpenseTable() {
   paginate(filtered);
   updateExpenseKPIs(filtered);
   setTimeout(() => {
-    renderCategoryBreakdown();
+    renderCategoryBreakdown(filtered);
   }, 50);
 }
 	
