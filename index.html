@@ -27899,55 +27899,22 @@ function updateExpenseKPIs(data = [], budget = null) {
 }
 
 
-function loadExpenseBranches(
-  selectId = "expenseBranchFilter"
-) {
-
+function loadExpenseBranches(selectId = "expenseBranchFilter") {
   const select =
     document.getElementById(selectId);
-
   if (!select) return;
+  const branches = state.expenseDashboardData?.branches || [];
   select.innerHTML = "";
-
-  // DROPDOWN FILTER HALAMAN
-  if (
-    selectId ===
-    "expenseBranchFilter"
-  ) {
-
-    const branches =
-      state.expenseDashboardData
-        ?.branches || [];
-
-    branches.forEach(b => {
-      select.innerHTML += `
-        <option value="${b.id}">
-          ${b.name}
-        </option>
-      `;
-    });
-
-    // DEFAULT = BRANCH LOGIN
-    select.value = state.branchId;
-    select.disabled = true;
-  }
-
-  // POPUP ADD NEW EXPENSE
-  else {
-    (
-      state.expenseDashboardData
-        ?.branches || []
-    ).forEach(b => {
-
-      select.innerHTML += `
-        <option value="${b.id}">
-          ${b.name}
-        </option>
-      `;
-    });
-    select.value = state.branchId;
-    select.disabled = true;
-  }
+  branches.forEach(b => {
+    select.innerHTML += `
+      <option value="${b.id}">
+        ${b.name}
+      </option>
+    `;
+  });
+  // DEFAULT = BRANCH LOGIN
+  select.value = state.branchId;
+  select.disabled = true;
 }
 
 let selectedExpenseMethod = "Cash";
