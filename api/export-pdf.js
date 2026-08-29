@@ -220,11 +220,34 @@ const logoSrc =
             normalizedCategory === "ALL" ||
             normalize(rowCategory) ===
               normalize(normalizedCategory);
-
+          
+          const rowDate =
+            row.tanggal ??
+            row.date ??
+            "";
+          
+          const matchStart =
+            !start ||
+            (
+              rowDate &&
+              new Date(rowDate) >=
+                new Date(`${start}T00:00:00`)
+            );
+          
+          const matchEnd =
+            !end ||
+            (
+              rowDate &&
+              new Date(rowDate) <=
+                new Date(`${end}T23:59:59.999`)
+            );
+          
           return (
             matchBranch &&
             matchStatus &&
-            matchCategory
+            matchCategory &&
+            matchStart &&
+            matchEnd
           );
         });
       
