@@ -13063,23 +13063,23 @@
 					<div class="grid grid-cols-2 gap-y-6 gap-x-8 mb-8">
 						<div class="space-y-1">
 							<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Join Date</p>
-							<p id="joinDate" class="bg-background text-sm font-medium"></p>
+							<p id="joinDate" class="text-sm font-medium"></p>
 						</div>
 						<div class="space-y-1">
 							<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Birthday</p>
-							<p id="birthday" class="bg-background text-sm font-medium"></p>
+							<p id="birthday" class="text-sm font-medium"></p>
 						</div>
 						<div class="space-y-1">
 							<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">WhatsApp</p>
-							<p id="whatsapp" class="bg-background text-sm font-medium"></p>
+							<p id="whatsapp" class="text-sm font-medium"></p>
 						</div>
 						<div class="space-y-1">
-							<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold opacity-50">Address</p>
-							<p id="address" class="bg-background text-sm font-medium"></p>
+							<p class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Address</p>
+							<p id="address" class="text-sm font-medium"></p>
 						</div>
 					</div>
 					<div class="mt-4 mb-10">
-						<h3 class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold opacity-50 mb-6">Tier Progression</h3>
+						<h3 class="font-label text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-6">Tier Progression</h3>
 						<div id="tierProgression"
 							class="relative space-y-8 max-h-[150px] overflow-y-auto pr-2 custom-scrollbar before:absolute before:inset-0 before:ml-1 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-primary/50 before:via-outline-variant/20 before:to-transparent">
 					</div>
@@ -18720,7 +18720,7 @@ function enableEditMember() {
     const el = modal.querySelector(`#${id}`);
     if (!el) return;
     el.innerHTML = `
-      <input class="w-full bg-surface-container p-2 rounded"
+      <input class="w-full bg-background p-2 rounded-md"
         value="${value || ""}" id="edit-${id}">
     `;
   };
