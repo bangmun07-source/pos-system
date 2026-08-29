@@ -26329,7 +26329,6 @@ async function loadExpenseDashboard() {
 }
 
 async function loadBudgetBranches() {
-
   try {
     const data = await getExpenseBranchesRPC();
     const select = document.getElementById("budgetBranch");
@@ -26337,16 +26336,59 @@ async function loadBudgetBranches() {
     if (!select) return;
 
     select.innerHTML = "";
-    data.forEach(b => {
-      select.innerHTML += `
-        <option value="${b.id}">
-          ${b.name}
-        </option>
-      `;
-    });
-  }
 
-  catch (err) {
+    const role = state.user?.role;
+    const userBranchId = state.user?.branchId || state.branchId;
+
+    // =========================
+    // USER TERIKAT KE BRANCH
+    // =========================
+    if (userBranchId) {
+      const userBranch = data.find(
+        b => String(b.id) === String(userBranchId)
+      );
+
+      if (userBranch) {
+        select.innerHTML = `
+          <option value="${userBranch.id}">
+            ${userBranch.name}
+          </option>
+        `;
+
+        select.value = userBranch.id;
+
+        // Jika user punya branch tertentu,
+        // jangan biarkan memilih branch lain
+        if (role === "Cashier" || role === "Manager") {
+          select.disabled = true;
+        }
+      }
+    }
+	
+    // OWNER / ADMIN
+    else {
+      data.forEach(b => {
+        select.innerHTML += `
+          <option value="${b.id}">
+            ${b.name}
+          </option>
+        `;
+      });
+
+      if (data.length === 1) {
+        select.value = data[0].id;
+      }
+    }
+
+    // Update preview setelah branch otomatis dipilih
+    const month = document.getElementById("budgetMonth");
+    const preview = document.getElementById("budgetPreviewText");
+
+    if (month && preview && select.value) {
+      preview.innerText = `${select.options[select.selectedIndex].text} • ${month.value}`;
+    }
+
+  } catch (err) {
     showToast(
       "Terjadi kesalahan.",
       "error"
