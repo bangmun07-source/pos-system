@@ -22344,7 +22344,6 @@ function onSelectRecipeProduct(e) {
   );
 
   if (!recipe) {
-    console.error("Recipe tidak ditemukan:", value);
     selectedRecipeName = "";
     sellingPrice = 0;
     currentIngredients = [];
@@ -28645,9 +28644,6 @@ async function loadCategorySettings() {
     const branchId = state.branchId;
 
     if (!branchId) {
-      console.warn(
-        "loadCategorySettings: branchId tidak tersedia"
-      );
       return;
     }
 
@@ -32434,10 +32430,6 @@ async function startClearDigitalReceipts(){
   }
   catch(error){
     clearInterval(interval);
-    console.error(
-      "Clear digital receipts error:",
-      error
-    );
     const text =
       document.getElementById(
         progressId + "-text"
