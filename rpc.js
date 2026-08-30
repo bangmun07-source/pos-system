@@ -107,16 +107,23 @@ async function loginUserRPC(client,username,password){
     // ===============================
 
 async function getDashboardDataRPC(branchId) {
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
   const { data, error } =
     await supabaseClient.rpc(
       "get_dashboard_data",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+        p_session_id: sessionId
       }
     );
+
   if (error) {
     throw error;
   }
+
   return data || {};
 }
 
