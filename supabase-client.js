@@ -35,58 +35,98 @@ function getActiveSupabase() {
 
 async function connectTenant(slug) {
   try {
-    // 1. Coba ambil config dari Central Supabase via RPC
+
+    // =====================================================
+    // TENANT ISOLATION
+    // =====================================================
+
+    const loginTenant = localStorage.getItem("pos_login_tenant");
+    const currentSession = localStorage.getItem("pos_session_id");
+
+    // Kalau sudah login, hanya boleh masuk tenant yang sama
+    if (currentSession && loginTenant && loginTenant !== slug) {
+      throw new Error(
+        `Tenant mismatch: login=${loginTenant}, target=${slug}`
+      );
+    }
+
+    // =====================================================
+    // 1. AMBIL CONFIG DARI CENTRAL
+    // =====================================================
+
     const { data, error } = await centralSupabase.rpc(
       "get_tenant_config",
       { p_slug: slug }
     );
 
     if (error) throw error;
-    if (!data?.success) throw new Error(data?.message || "Tenant tidak ditemukan");
+
+    if (!data?.success) {
+      throw new Error(
+        data?.message || "Tenant tidak ditemukan"
+      );
+    }
 
     const config = data.data;
-    if (!config.is_active) throw new Error("Tenant tidak aktif");
 
-    // Simpan config ke localStorage sebagai cadangan offline
-    localStorage.setItem("pos_cached_tenant_config", JSON.stringify(config));
+    if (!config.is_active) {
+      throw new Error("Tenant tidak aktif");
+    }
 
+    // =====================================================
     // 2. CONNECT DATABASE TENANT
+    // =====================================================
+
+    localStorage.setItem(
+      "pos_cached_tenant_config",
+      JSON.stringify(config)
+    );
+
     if (slug === "master") {
-      // Master sudah punya client sendiri
-      supabaseClient =
-        centralSupabase;
-    
+
+      supabaseClient = centralSupabase;
+
       connectedTenantUrl =
         CENTRAL_SUPABASE_URL;
-    
+
     } else if (
       !supabaseClient ||
       connectedTenantUrl !== config.supabase_url
     ) {
-    
-      // Customer → buat client customer
+
       supabaseClient =
         supabase.createClient(
           config.supabase_url,
           config.supabase_anon_key
         );
-    
+
       connectedTenantUrl =
         config.supabase_url;
     }
 
-    // 3. Coba baca branch & sync (Bungkus try/catch terpisah agar kalau offline tidak bikin blank)
-    try {
-      const { count: branchCount } = await supabaseClient
-        .from("Branches")
-        .select("*", { count: "exact", head: true });
+    // =====================================================
+    // 3. BRANCH SYNC
+    // =====================================================
 
-      // Kirim sync ke Vercel di background (tidak perlu di-await mati-matian kalau offline)
+    try {
+
+      const { count: branchCount } =
+        await supabaseClient
+          .from("Branches")
+          .select("*", {
+            count: "exact",
+            head: true
+          });
+
       fetch("/api/sync-tenant-branch-count", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tenant_id: config.tenant_id })
-      }).catch(() => {}); // Abaikan error sync jika offline
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          tenant_id: config.tenant_id
+        })
+      }).catch(() => {});
 
       return {
         ...config,
@@ -94,45 +134,76 @@ async function connectTenant(slug) {
       };
 
     } catch (dbError) {
-      console.warn("Gagal konek ke DB tenant (mungkin offline), pakai mode offline:", dbError);
+
+      console.warn(
+        "Gagal konek DB tenant:",
+        dbError
+      );
+
       return config;
     }
 
   } catch (err) {
-    console.warn("Gagal ambil config tenant online, cek cache...", err);
-    
+
+    // Tenant mismatch JANGAN masuk fallback cache
+    if (
+      err?.message?.startsWith("Tenant mismatch")
+    ) {
+      console.error(err);
+      throw err;
+    }
+
+    console.warn(
+      "Gagal ambil config tenant online, cek cache...",
+      err
+    );
+
     // ==========================================
-    // FALLBACK OFFLINE (AMBIL DARI LOCALSTORAGE)
+    // FALLBACK OFFLINE
     // ==========================================
-    const cachedConfig = localStorage.getItem("pos_cached_tenant_config");
+
+    const cachedConfig =
+      localStorage.getItem(
+        "pos_cached_tenant_config"
+      );
+
     if (cachedConfig) {
-      const config = JSON.parse(cachedConfig);
-      // Inisialisasi ulang client pakai data cache
-      if (config.supabase_url === CENTRAL_SUPABASE_URL) {
+
+      const config =
+        JSON.parse(cachedConfig);
+
+      if (
+        config.supabase_url ===
+        CENTRAL_SUPABASE_URL
+      ) {
+
         supabaseClient =
           centralSupabase;
+
         connectedTenantUrl =
           CENTRAL_SUPABASE_URL;
-      
+
       } else if (
         !supabaseClient ||
-        connectedTenantUrl !== config.supabase_url
+        connectedTenantUrl !==
+          config.supabase_url
       ) {
-      
+
         supabaseClient =
           supabase.createClient(
             config.supabase_url,
             config.supabase_anon_key
           );
-      
+
         connectedTenantUrl =
           config.supabase_url;
       }
-      console.log("Berhasil memuat tenant dari cache offline!");
+
       return config;
     }
 
-    // Kalau di cache juga benar-benar kosong, baru lempar error
-    throw new Error("Tidak ada koneksi internet dan data offline tidak ditemukan.");
+    throw new Error(
+      "Tidak ada koneksi internet dan data offline tidak ditemukan."
+    );
   }
 }
