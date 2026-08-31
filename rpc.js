@@ -876,11 +876,10 @@ async function reserveTableRPC(mejaId, name, note) {
   } = await supabaseClient.rpc(
     "reserve_table",
     {
-      p_branch_id: state.branchId,
+      p_session_id: sessionId,
       p_meja_id: mejaId,
       p_name: name,
-      p_note: note || "",
-      p_session_id: sessionId
+      p_note: note || ""
     }
   );
   if (error) {
