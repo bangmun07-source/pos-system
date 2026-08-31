@@ -396,6 +396,9 @@ async function getTopRevenueProductsRPC(start, end, branchId,limit = 10, offset 
 async function checkoutTransaction(payload) {
   const sessionId =
     localStorage.getItem("pos_session_id");
+    console.log("=== CHECKOUT DEBUG ===");
+  console.log("SESSION:", sessionId);
+  console.log("PAYLOAD:", payload);
   const { data, error } =
     await supabaseClient.rpc(
       "checkout_transaction",
@@ -404,6 +407,12 @@ async function checkoutTransaction(payload) {
         p_session_id: sessionId
       }
     );
+
+   console.log("RPC DATA:", data);
+  console.log("RPC ERROR:", error);
+  console.log("RPC ERROR JSON:",
+    JSON.stringify(error, null, 2)
+  );
   if (error) {
     throw error;
   }
