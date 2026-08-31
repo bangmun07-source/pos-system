@@ -20850,7 +20850,8 @@ async function loadRecipes() {
   }
 
   try {
-
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     // SUPABASE RPC
 	const {
 	  data,
@@ -20858,7 +20859,8 @@ async function loadRecipes() {
 	} = await supabaseClient.rpc(
 	  "get_recipes",
 	  {
-	    p_branch_id: branchId
+	    p_branch_id: branchId,
+        p_session_id: sessionId
 	  }
 	);
 
