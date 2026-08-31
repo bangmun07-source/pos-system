@@ -19562,7 +19562,8 @@ async function loadInventoryPage(branchId) {
     } = await supabaseClient.rpc(
       "get_inventory_page",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+				p_session_id: sessionId
       }
     );
 
@@ -19720,7 +19721,8 @@ async function loadIngredients(branchId) {
     } = await supabaseClient.rpc(
       "get_ingredients",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+				p_session_id: sessionId
       }
     );
     if (error) {
@@ -19818,6 +19820,7 @@ async function loadIngredientPurchases(branchId, start = null, end = null) {
     } = await supabaseClient.rpc(
       "get_ingredient_purchases",
       {
+				p_session_id: sessionId,
         p_branch_id: branchId,
         p_start: start,
         p_end: end
@@ -20357,12 +20360,11 @@ window.confirmPurchaseStatus = async function () {
     } = await supabaseClient.rpc(
       "update_ingredient_purchase_status",
       {
-        p_purchase_id:
-          purchase.ID,
-        p_status:
-          status,
-        p_updated_by:
-          "SYSTEM"
+        p_purchase_id: purchase.ID,
+				p_session_id: sessionId,
+        p_status: status,
+        p_updated_by: "SYSTEM"
+				
       }
     );
 
@@ -20433,7 +20435,8 @@ async function loadSuppliers() {
       await supabaseClient.rpc(
         "get_suppliers",
         {
-          p_branch_id: branchId
+          p_branch_id: branchId,
+					p_session_id: sessionId
         }
       );
 
@@ -20725,7 +20728,8 @@ async function saveeditSupplier() {
           p_status: payload.status
               ? "Active"
               : "INACTIVE",
-          p_notes: payload.notes
+          p_notes: payload.notes,
+					p_session_id: sessionId
         }
       );
 
@@ -20741,8 +20745,8 @@ async function saveeditSupplier() {
       await supabaseClient.rpc(
         "get_suppliers",
         {
-          p_branch_id:
-            payload.branchId
+          p_branch_id: payload.branchId,
+					p_session_id: sessionId
         }
       );
 
@@ -20861,7 +20865,7 @@ async function loadRecipes() {
 	  "get_recipes",
 	  {
 	    p_branch_id: branchId,
-        p_session_id: sessionId
+      p_session_id: sessionId
 	  }
 	);
 
@@ -21054,8 +21058,8 @@ async function openRecipeModal(recipeId) {
     } = await supabaseClient.rpc(
       "get_recipe_price_history",
       {
-        p_recipe_id:
-          item.id
+        p_recipe_id: item.id,
+				p_session_id: sessionId
       }
     );
 
@@ -21162,6 +21166,7 @@ async function saveRecipeMaster() {
         p_recipe_id: payload.recipeId,
         p_product_id: payload.productId,
         p_branch_id: payload.branchId,
+				p_session_id: sessionId,
         p_selling_price: payload.sellingPrice,
         p_net_price: payload.netPrice,
         p_product_name: payload.productName,
@@ -21709,6 +21714,7 @@ async function submitAdjust() {
         p_branch_id: payload.branchId,
         p_type: payload.type,
         p_qty: payload.qty,
+				p_session_id: sessionId,
         p_reason: payload.reason
       }
     );
@@ -21787,7 +21793,8 @@ async function submitThreshold() {
       {
         p_ingredient_id: payload.ingredientId,
         p_branch_id: payload.branchId,
-        p_min: payload.min
+        p_min: payload.min,
+				p_session_id: sessionId
       }
     );
 
@@ -21866,7 +21873,8 @@ async function openUsageLogFromIngredient() {
       "get_ingredient_usage_log",
       {
         p_ingredient_id: item.id,
-        p_branch_id: item.branchId
+        p_branch_id: item.branchId,
+				p_session_id: sessionId
       }
     );
 
@@ -22228,7 +22236,8 @@ async function saveRecipe() {
     } = await supabaseClient.rpc(
       "save_recipe",
       {
-        p_payload: payload
+        p_payload: payload,
+				p_session_id: sessionId
       }
     );
 
@@ -22290,7 +22299,8 @@ async function loadIngredientsByBranch(branchId) {
     } = await supabaseClient.rpc(
       "get_ingredients",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+				p_session_id: sessionId
       }
     );
 
@@ -22385,7 +22395,8 @@ async function loadRecipeItems(recipeId) {
     } = await supabaseClient.rpc(
       "get_recipe_items",
       {
-        p_recipe_id: recipeId
+        p_recipe_id: recipeId,
+				p_session_id: sessionId
       }
     );
 
@@ -22514,6 +22525,7 @@ async function loadRecipeProducts() {
     } = await supabaseClient.rpc(
       "get_recipe_list",
       {
+				p_session_id: sessionId,
         p_branch_id: branchId
       }
     );
@@ -22614,7 +22626,8 @@ async function saveRecipeConfig() {
     } = await supabaseClient.rpc(
       "save_recipe",
       {
-        p_payload: payload
+        p_payload: payload,
+				p_session_id: sessionId
       }
     );
 
@@ -22667,7 +22680,8 @@ window.loadIngredientSummary = async function(name) {
       "get_ingredient_summary",
       {
         p_ingredient_name: name,
-        p_branch_id: branchId
+        p_branch_id: branchId,
+				p_session_id: sessionId
       }
     );
 
@@ -22803,7 +22817,8 @@ window.loadStockInData = async function () {
     } = await supabaseClient.rpc(
       "get_suppliers",
       {
-        p_branch_id:branchId
+        p_branch_id:branchId,
+				p_session_id: sessionId
       }
     );
     if (error) {
@@ -22855,7 +22870,8 @@ async function loadStockInIngredients( modal, branchId ) {
     } = await supabaseClient.rpc(
       "get_ingredients",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+				p_session_id: sessionId
       }
     );
 
@@ -22995,6 +23011,7 @@ window.saveStockIn = async function () {
     } = await supabaseClient.rpc(
       "add_ingredient_purchase",
       {
+				p_session_id: sessionId,
         p_date: wibDate,
         p_ingredient_name: ingredient || "",
         p_qty: Number(qty) || 0,
@@ -23076,7 +23093,10 @@ async function loadBranchDropdown() {
       data,
       error
     } = await supabaseClient.rpc(
-      "get_expense_branches"
+      "get_expense_branches",
+			{
+				p_session_id: sessionId
+			}
     );
 
     if (error) {
@@ -23250,7 +23270,8 @@ async function saveSupplier() {
           p_status: data.status || "",
           p_notes: data.address || "",
           p_branch_id: data.branchId || "",
-          p_outlet: data.outlet || ""
+          p_outlet: data.outlet || "",
+					p_session_id: sessionId
         }
       );
 
@@ -23679,7 +23700,8 @@ async function saveNewProduct() {
           p_category: category,
           p_price: price,
           p_branch_id: branchId,
-          p_outlet: outlet
+          p_outlet: outlet,
+					p_session_id: sessionId
         }
       );
 
@@ -23767,7 +23789,8 @@ async function saveMaterial() {
           p_min: Number(data.min) || 0,
           p_cost: 0,
           p_branch_id: data.branchId || "",
-          p_outlet: data.branchName || ""
+          p_outlet: data.branchName || "",
+					p_session_id: sessionId
         }
       );
 
@@ -25288,7 +25311,8 @@ async function saveTaxSettings() {
     } = await supabaseClient.rpc(
       "save_settings",
       {
-        p_settings: data
+        p_settings: data,
+				p_session_id: sessionId
       }
     );
 
@@ -30856,6 +30880,7 @@ async function loadCashFlowPage() {
         "get_cash_flow_page_data",
         {
           p_login_user_id: Number(filter.loginUserId),
+					p_session_id: sessionId,
           p_branch_id:  filter.branchId || "ALL",
           p_start: filter.startDate ||null,
           p_end: filter.endDate || null
@@ -30910,7 +30935,10 @@ async function loadCashFlowBranchOptions() {
       data,
       error
     } = await supabaseClient.rpc(
-      "get_expense_branches"
+      "get_expense_branches",
+			{
+				p_session_id: sessionId
+			}
     );
 
     if (error) {
@@ -31335,6 +31363,7 @@ async function addOwnerTransaction(data) {
     "add_owner_transaction",
     {
       p_branch_id: data.branchId,
+			p_session_id: sessionId,
       p_type: data.type,
       p_account: data.account,
       p_amount: Number(data.amount),
@@ -31493,6 +31522,7 @@ async function loadCashFlowNotification() {
     } = await supabaseClient.rpc(
       "get_yesterday_dashboard_summary",
       {
+				p_session_id: sessionId,
         p_branch_id: branchId
       }
     );
@@ -32445,7 +32475,8 @@ async function getChatAnalytics(start, end, branchId, callback) {
       {
 				p_branch_id: branchId,
 				p_start: start || null,
-				p_end: end || null
+				p_end: end || null,
+				p_session_id: sessionId
       }
     );
 
