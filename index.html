@@ -26124,17 +26124,22 @@ async function loadBranchName() {
 
 async function loadTaxSettings() {
   try {
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
     const {
       data,
       error
     } = await supabaseClient.rpc(
-      "get_settings"
+      "get_settings",
+      {
+        p_session_id: sessionId
+      }
     );
 
     if (error) {
       throw error;
     }
-
     const settings = data || {};
     const taxInput = document.getElementById("taxInput");
     const serviceInput = document.getElementById("serviceInput");
