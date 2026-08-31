@@ -15990,6 +15990,7 @@ async function sendTransaction(payload){
     const btn = document.getElementById("btnCheckout");
     	if(btn){btn.disabled = true;}
 		const res = await checkoutTransaction(payload);
+	  console.log("CHECKOUT RES:", res);
 	    isProcessing = false;
 	    if(btn){
 	      btn.disabled = false;
