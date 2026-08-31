@@ -1036,6 +1036,7 @@ async function getRecipesRPC() {
   } = await supabaseClient.rpc(
     "get_recipes",
     {
+      p_branch_id: branchId,
       p_session_id: sessionId
     }
   );
