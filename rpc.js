@@ -2303,13 +2303,15 @@ async function getBranchInfoRPC(branchId) {
     // ===============================
 
 async function getRewardProductsRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_reward_products",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId || null
     }
   );
@@ -2317,19 +2319,20 @@ async function getRewardProductsRPC(branchId) {
   if (error) {
     throw error;
   }
-
   return data || [];
 }
 
 async function deleteRewardRPC(id) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "delete_reward",
     {
-      p_id_reward: id
+      p_id_reward: id,
+      p_session_id: sessionId
     }
   );
 
@@ -2341,57 +2344,43 @@ async function deleteRewardRPC(id) {
 }
 
 async function saveRewardProductRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "save_reward_product",
     {
-      p_id_reward:
-        data.ID_Reward,
-
-      p_nama_reward:
-        data.Nama_Reward,
-
-      p_point_dibutuhkan:
-        Number(
-          data.Point_Dibutuhkan || 0
-        ),
-
-      p_produk_id:
-        data.Produk_ID || null,
-
-      p_status:
-        data.Status || "active",
-
-      p_branch_id:
-        data.Branch_ID || null,
-
-      p_max_redeem:
-        Number(
-          data.Max_Redeem || 0
-        ),
-
-      p_category:
-        data.Category || null
+      p_id_reward: data.ID_Reward,
+      p_nama_reward: data.Nama_Reward,
+      p_point_dibutuhkan: Number( data.Point_Dibutuhkan || 0 ),
+      p_produk_id: data.Produk_ID || null,
+      p_status: data.Status || "active",
+      p_branch_id: data.Branch_ID || null,
+      p_max_redeem: Number( data.Max_Redeem || 0 ),
+      p_category: data.Category || null,
+      p_session_id: sessionId
     }
   );
 
   if (error) {
     throw error;
   }
-
   return result;
 }
 
 async function getSeasonConfigRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_season_config"
+    "get_season_config",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2401,11 +2390,9 @@ async function getSeasonConfigRPC() {
 }
 
 
-async function setSeasonConfigRPC(
-  key,
-  value
-) {
-
+async function setSeasonConfigRPC(key, value) {
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
@@ -2413,7 +2400,8 @@ async function setSeasonConfigRPC(
     "set_season_config",
     {
       p_key: key,
-      p_value: String(value)
+      p_value: String(value),
+      p_session_id: sessionId
     }
   );
 
@@ -2424,11 +2412,9 @@ async function setSeasonConfigRPC(
 }
 
 
-async function openSeasonRPC(
-  startDate,
-  endDate
-) {
-
+async function openSeasonRPC(startDate, endDate) {
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
@@ -2436,7 +2422,8 @@ async function openSeasonRPC(
     "open_season",
     {
       p_start_date: startDate,
-      p_end_date: endDate
+      p_end_date: endDate,
+      p_session_id: sessionId
     }
   );
 
@@ -2448,12 +2435,16 @@ async function openSeasonRPC(
 
 
 async function closeSeasonRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "close_season"
+    "close_season",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2464,12 +2455,16 @@ async function closeSeasonRPC() {
 
 
 async function toggleAutoSeasonRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "toggle_auto_season"
+    "toggle_auto_season",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2479,6 +2474,8 @@ async function toggleAutoSeasonRPC() {
 }
 
 async function saveCategoryRPC( branchId, categoryKey, categoryName, discount, reward ) {
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
@@ -2486,6 +2483,7 @@ async function saveCategoryRPC( branchId, categoryKey, categoryName, discount, r
     "save_category",
     {
       p_branch_id: branchId,
+      p_session_id: sessionId,
       p_category_key: categoryKey,
       p_category_name: categoryName,
       p_discount: discount || 0,
@@ -2500,13 +2498,16 @@ async function saveCategoryRPC( branchId, categoryKey, categoryName, discount, r
 }
 
 async function getCategoriesRPC(branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");  
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_categories",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
   if (error) {
@@ -2520,7 +2521,8 @@ async function getCategoriesRPC(branchId) {
     // ===============================
 
 async function getExpenseDashboardRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   let branchId =
     filter.branch;
 
@@ -2538,26 +2540,17 @@ async function getExpenseDashboardRPC(filter = {}) {
   } = await supabaseClient.rpc(
     "get_expense_dashboard",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId,
-
-      p_status:
-        filter.status === "All Status"
+      p_status: filter.status === "All Status"
           ? "ALL"
           : filter.status || "ALL",
-
-      p_category:
-        filter.category === "All Categories"
+      p_category: filter.category === "All Categories"
           ? "ALL"
           : filter.category || "ALL",
-
-      p_keyword:
-        filter.keyword || "",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_keyword: filter.keyword || "",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -2572,12 +2565,16 @@ async function getExpenseDashboardRPC(filter = {}) {
 }
 
 async function getExpenseBranchesRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_expense_branches"
+    "get_expense_branches",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2587,21 +2584,18 @@ async function getExpenseBranchesRPC() {
 }
 
 async function saveExpenseBudgetRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "save_expense_budget",
     {
-      p_branch_id:
-        String(data.branchId),
-
-      p_month:
-        String(data.Month),
-
-      p_budget:
-        Number(data.Budget)
+      p_branch_id: String(data.branchId),
+      p_month: String(data.Month),
+      p_budget: Number(data.Budget),
+      p_session_id: sessionId
     }
   );
 
@@ -2612,7 +2606,8 @@ async function saveExpenseBudgetRPC(data) {
 }
 
 async function updateExpenseStatusRPC(refId, status) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -2620,7 +2615,8 @@ async function updateExpenseStatusRPC(refId, status) {
     "update_expense_status",
     {
       p_ref_id: refId,
-      p_status: status
+      p_status: status,
+      p_session_id: sessionId
     }
   );
 
@@ -2633,18 +2629,17 @@ async function updateExpenseStatusRPC(refId, status) {
 }
 
 async function updateExpenseAttachmentRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_expense_attachment",
     {
-      p_ref_id:
-        data.Ref_ID,
-
-      p_url:
-        data.Attachment_URL
+      p_ref_id: data.Ref_ID,
+      p_url: data.Attachment_URL,
+      p_session_id: sessionId
     }
   );
 
@@ -2654,11 +2649,9 @@ async function updateExpenseAttachmentRPC(data = {}) {
   return result;
 }
 
-async function updateOtherIncomeStatusRPC(
-  refId,
-  status
-) {
-
+async function updateOtherIncomeStatusRPC(refId, status) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -2666,8 +2659,8 @@ async function updateOtherIncomeStatusRPC(
     "update_other_income_status",
     {
       p_refid: refId,
-
-      p_status: status
+      p_status: status,
+      p_session_id: sessionId
     }
   );
 
@@ -2678,14 +2671,16 @@ async function updateOtherIncomeStatusRPC(
 }
 
 async function deleteOtherIncomeRPC(id) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "delete_other_income",
     {
-      p_id: String(id)
+      p_id: String(id),
+      p_session_id: sessionId
     }
   );
 
@@ -2696,7 +2691,8 @@ async function deleteOtherIncomeRPC(id) {
 }
 
 async function saveOtherIncomeRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
@@ -2712,7 +2708,8 @@ async function saveOtherIncomeRPC(data = {}) {
       p_amount: data.amount,
       p_status: data.status,
       p_branch_id: data.branchId,
-      p_notes: data.notes
+      p_notes: data.notes,
+      p_session_id: sessionId
     }
   );
 
@@ -2723,39 +2720,24 @@ async function saveOtherIncomeRPC(data = {}) {
 }
 
 async function addExpenseRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "add_expense",
     {
-      p_branch_id:
-        data.branchId,
-
-      p_tanggal:
-        data.tanggal,
-
-      p_category:
-        data.category,
-
-      p_description:
-        data.description,
-
-      p_amount:
-        data.amount,
-
-      p_method:
-        data.method,
-
-      p_created_by:
-        data.createdBy,
-
-      p_type:
-        data.type,
-
-      p_status:
-        data.status,
+      p_branch_id: data.branchId,
+      p_session_id: sessionId,
+      p_tanggal: data.tanggal,
+      p_category: data.category,
+      p_description: data.description,
+      p_amount: data.amount,
+      p_method: data.method,
+      p_created_by: data.createdBy,
+      p_type: data.type,
+      p_status: data.status,
     }
   );
 
@@ -2766,15 +2748,16 @@ async function addExpenseRPC(data = {}) {
 }
 
 async function getExpenseBudgetRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_expense_budget",
     {
-      p_branch_id:
-        branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -2785,18 +2768,17 @@ async function getExpenseBudgetRPC(branchId) {
 }
 
 async function getCategoryBreakdownRPC(f = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const status =
     f.status === "All Status"
       ? "ALL"
       : f.status;
 
-
   const category =
     f.category === "All Categories"
       ? "ALL"
       : f.category;
-
 
   const {
     data,
@@ -2804,20 +2786,13 @@ async function getCategoryBreakdownRPC(f = {}) {
   } = await supabaseClient.rpc(
     "get_category_breakdown",
     {
-      p_branch_id:
-        f.branch || "ALL",
-
-      p_status:
-        status,
-
-      p_category:
-        category,
-
-      p_keyword:
-        f.keyword || ""
+      p_session_id: sessionId,
+      p_branch_id: f.branch || "ALL",
+      p_status: status,
+      p_category: category,
+      p_keyword: f.keyword || ""
     }
   );
-
 
   if (error) {
     throw error;
@@ -2826,15 +2801,16 @@ async function getCategoryBreakdownRPC(f = {}) {
 }
 
 async function getOtherIncomeRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_other_income",
     {
-      p_branch_id:
-        branchId || null
+      p_session_id: sessionId,
+      p_branch_id: branchId || null
     }
   );
 
@@ -2845,30 +2821,24 @@ async function getOtherIncomeRPC(branchId) {
 }
 
 
-
     // ===============================
     // CASH FLOW PAGE
     // ===============================
 
 async function getCashFlowPageDataRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_cash_flow_page_data",
     {
-      p_login_user_id:
-        Number(filter.loginUserId),
-
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_login_user_id: Number(filter.loginUserId),
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -2880,6 +2850,8 @@ async function getCashFlowPageDataRPC(filter = {}) {
 
 
 async function getAccountBalanceRPC(branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");  
   const client =
     getActiveSupabase();
 
@@ -2895,8 +2867,8 @@ async function getAccountBalanceRPC(branchId) {
   } = await client.rpc(
     "get_account_balance",
     {
-      p_branch_id:
-        branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -2908,21 +2880,18 @@ async function getAccountBalanceRPC(branchId) {
 
 
 async function getCashFlowSummaryRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_cash_flow_summary",
     {
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -2934,21 +2903,18 @@ async function getCashFlowSummaryRPC(filter = {}) {
 
 
 async function getCashFlowChartRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_cash_flow_chart",
     {
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -2959,21 +2925,18 @@ async function getCashFlowChartRPC(filter = {}) {
 }
 
 async function getFundTransfersRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_fund_transfers",
     {
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -2984,30 +2947,21 @@ async function getFundTransfersRPC(filter = {}) {
 }
 
 async function transferFundsRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "transfer_funds",
     {
-      p_branch_id:
-        data.branchId,
-
-      p_from_account:
-        data.fromAccount,
-
-      p_to_account:
-        data.toAccount,
-
-      p_amount:
-        Number(data.amount),
-
-      p_note:
-        data.note || "",
-
-      p_created_by:
-        data.createdBy || "Admin"
+      p_branch_id: data.branchId,
+      p_session_id: sessionId,
+      p_from_account: data.fromAccount,
+      p_to_account: data.toAccount,
+      p_amount: Number(data.amount),
+      p_note: data.note || "",
+      p_created_by: data.createdBy || "Admin"
     }
   );
 
@@ -3018,21 +2972,18 @@ async function transferFundsRPC(data = {}) {
 }
 
 async function getCashFlowReportDataRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_cash_flow_report_data",
     {
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -3043,30 +2994,21 @@ async function getCashFlowReportDataRPC(filter = {}) {
 }
 
 async function addOwnerTransactionRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "add_owner_transaction",
     {
-      p_branch_id:
-        data.branchId,
-
-      p_type:
-        data.type,
-
-      p_account:
-        data.account,
-
-      p_amount:
-        Number(data.amount),
-
-      p_note:
-        data.note || "",
-
-      p_created_by:
-        data.createdBy || ""
+      p_branch_id: data.branchId,
+      p_session_id: sessionId,
+      p_type: data.type,
+      p_account: data.account,
+      p_amount: Number(data.amount),
+      p_note: data.note || "",
+      p_created_by: data.createdBy || ""
     }
   );
 
@@ -3077,21 +3019,18 @@ async function addOwnerTransactionRPC(data = {}) {
 }
 
 async function getOwnerTransactionsRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_owner_transactions",
     {
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -3102,21 +3041,18 @@ async function getOwnerTransactionsRPC(filter = {}) {
 }
 
 async function getOwnerSummaryRPC(filter = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_owner_summary",
     {
-      p_branch_id:
-        filter.branchId || "ALL",
-
-      p_start:
-        filter.startDate || null,
-
-      p_end:
-        filter.endDate || null
+      p_session_id: sessionId,
+      p_branch_id: filter.branchId || "ALL",
+      p_start: filter.startDate || null,
+      p_end: filter.endDate || null
     }
   );
 
@@ -3126,18 +3062,17 @@ async function getOwnerSummaryRPC(filter = {}) {
   return data || {};
 }
 
-async function getYesterdayDashboardSummaryRPC(
-  branchId
-) {
-
+async function getYesterdayDashboardSummaryRPC(branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_yesterday_dashboard_summary",
     {
-      p_branch_id:
-        branchId || "ALL"
+      p_session_id: sessionId,
+      p_branch_id: branchId || "ALL"
     }
   );
 
@@ -3148,13 +3083,16 @@ async function getYesterdayDashboardSummaryRPC(
 }
 
 async function createDatabaseBackupRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "create_database_backup",
-    {}
+    {
+      p_session_id: sessionId,
+    }
   );
 
   if (error) {
@@ -3164,13 +3102,17 @@ async function createDatabaseBackupRPC() {
 }
 
 async function deleteBackupHistoryRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "delete_backup_history",
-    data
+    {
+      ...data,
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -3180,13 +3122,16 @@ async function deleteBackupHistoryRPC(data = {}) {
 }
 
 async function clearDatabaseRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "clear_database",
-    {}
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -3196,13 +3141,16 @@ async function clearDatabaseRPC() {
 }
 
 async function getBackupHistoryRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_backup_history",
-    {}
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -3212,13 +3160,17 @@ async function getBackupHistoryRPC() {
 }
 
 async function updateBackupFileInfoRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_backup_file_info",
-    data
+    {
+      ...data,
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -3228,13 +3180,17 @@ async function updateBackupFileInfoRPC(data = {}) {
 }
 
 async function restoreDatabaseBackupRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "restore_database_backup",
-    data
+    {
+      ...data,
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -3263,10 +3219,7 @@ async function downloadDatabaseBackup(filePath) {
   return data;
 }
 
-async function uploadDatabaseBackup(
-  fileName,
-  jsonData
-) {
+async function uploadDatabaseBackup(fileName, jsonData) {
   const sessionId =
     localStorage.getItem(
       "pos_session_id"
@@ -3309,30 +3262,30 @@ async function uploadDatabaseBackup(
   }
 
   return {
-    path:
-      result.path,
-    size:
-      result.size
+    path: result.path,
+    size: result.size
   };
 }
 
-  
-  async function createFullBackup() {
-    
-  //  CREATE BACKUP VIA RPC
+async function createFullBackup() {
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  // 1. CREATE BACKUP VIA RPC
   const {
     data: backup,
     error
   } =
     await supabaseClient.rpc(
       "create_database_backup",
-      {}
+      {
+        p_session_id: sessionId
+      }
     );
-
   if (error) {
     throw error;
   }
-
   if (
     !backup?.backup_info?.backup_id
   ) {
@@ -3345,15 +3298,10 @@ async function uploadDatabaseBackup(
     backup
       .backup_info
       .backup_id;
-
   const fileName =
     backupId + ".json";
 
-
-  // =========================
   // 2. UPLOAD VIA VERCEL API
-  // =========================
-
   const upload =
     await uploadDatabaseBackup(
       fileName,
@@ -3366,11 +3314,7 @@ async function uploadDatabaseBackup(
     );
   }
 
-
-  // =========================
   // 3. UPDATE BACKUP HISTORY
-  // =========================
-
   const {
     data: updateResult,
     error: updateError
@@ -3378,33 +3322,21 @@ async function uploadDatabaseBackup(
     await supabaseClient.rpc(
       "update_backup_file_info",
       {
-        p_backup_id:
-          backupId,
-
-        p_file_path:
-          upload.path,
-
-        p_file_size:
-          upload.size
+        p_backup_id: backupId,
+        p_file_path: upload.path,
+        p_file_size: upload.size,
+        p_session_id: sessionId
       }
     );
 
   if (updateError) {
     throw updateError;
   }
-
-
   return {
     success: true,
-
-    backup_id:
-      backupId,
-
-    file_path:
-      upload.path,
-
-    file_size:
-      upload.size
+    backup_id: backupId,
+    file_path: upload.path,
+    file_size: upload.size
   };
 }
 
@@ -3412,10 +3344,7 @@ async function uploadDatabaseBackup(
 // RESTORE BACKUP VIA VERCEL
 // =========================
 
-async function restoreDatabaseBackupByPath(
-  filePath
-) {
-
+async function restoreDatabaseBackupByPath(filePath) {
   const sessionId =
     localStorage.getItem(
       "pos_session_id"
@@ -3432,7 +3361,6 @@ async function restoreDatabaseBackupByPath(
       "/api/backup/restore",
       {
         method: "POST",
-
         headers: {
           "Content-Type":
             "application/json",
@@ -3453,25 +3381,18 @@ async function restoreDatabaseBackupByPath(
     await response.json();
 
   if (!response.ok) {
-
     throw new Error(
       result.error ||
       "Restore backup gagal"
     );
   }
-
   return result;
 }
 
 
-async function restoreBackupById(
-  backupId
-) {
-
-  // =========================
+async function restoreBackupById(backupId) {
+  
   // 1. AMBIL INFO BACKUP
-  // =========================
-
   const {
     data: history,
     error
@@ -3492,31 +3413,24 @@ async function restoreBackupById(
   }
 
   if (!history) {
-
     throw new Error(
       "Backup tidak ditemukan"
     );
   }
 
   if (!history.file_path) {
-
     throw new Error(
       "File backup tidak ditemukan"
     );
   }
 
-
-  // =========================
   // 2. RESTORE VIA VERCEL API
-  // =========================
-
   return await restoreDatabaseBackupByPath(
     history.file_path
   );
 }
 
 async function deleteDatabaseBackup(filePath) {
-
   const sessionId =
     localStorage.getItem(
       "pos_session_id"
@@ -3533,11 +3447,9 @@ async function deleteDatabaseBackup(filePath) {
       "/api/backup/delete",
       {
         method: "POST",
-
         headers: {
           "Content-Type":
             "application/json",
-
           "x-session-id":
             sessionId
         },
@@ -3552,9 +3464,7 @@ async function deleteDatabaseBackup(filePath) {
 
   const responseText =
     await response.text();
-
   let result = {};
-
   try {
     result =
       responseText
@@ -3571,11 +3481,19 @@ async function deleteDatabaseBackup(filePath) {
       "Gagal menghapus file backup"
     );
   }
-
   return result;
 }
 
 async function deleteBackupById(backupId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    throw new Error(
+      "Session login tidak ditemukan"
+    );
+  }
+
   const {
     data: history,
     error
@@ -3588,13 +3506,11 @@ async function deleteBackupById(backupId) {
   if (error) {
     throw error;
   }
-
   if (!history) {
     throw new Error(
       "Backup tidak ditemukan"
     );
   }
-
   if (history.file_path) {
     await deleteDatabaseBackup(
       history.file_path
@@ -3603,20 +3519,21 @@ async function deleteBackupById(backupId) {
 
   const {
     error: deleteError
-  } = await supabaseClient.rpc(
-    "delete_backup_history",
-    {
-      p_backup_id: backupId
-    }
-  );
-
+  } =
+    await supabaseClient.rpc(
+      "delete_backup_history",
+      {
+        p_backup_id:backupId,
+        p_session_id: sessionId
+      }
+    );
   if (deleteError) {
     throw deleteError;
   }
-
   return {
     success: true,
-    backup_id: backupId
+    backup_id:
+      backupId
   };
 }
 
