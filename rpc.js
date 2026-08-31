@@ -532,8 +532,8 @@ async function getMemberPageDataRPC(branchId) {
   return await supabaseClient.rpc(
     "get_member_page_data",
     {
-      p_session_id: sessionId,
-      p_branch_id: branchId || "ALL"
+      p_branch_id: branchId || "ALL",
+      p_session_id: sessionId
     }
   ).then(({ data, error }) => {
 
