@@ -127,55 +127,83 @@ async function getDashboardDataRPC(branchId) {
   return data || {};
 }
 
+
 async function getLowStockRPC(branchId) {
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
   const { data, error } =
     await supabaseClient.rpc(
       "get_low_stock",
       {
         p_branch_id: branchId,
-        p_limit: 100
+        p_limit: 100,
+        p_session_id: sessionId
       }
     );
+
   if (error) {
     throw error;
   }
+
   return data || [];
 }
 
+
 async function getRecentTransactionsRPC(branchId) {
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
   const { data, error } =
     await supabaseClient.rpc(
       "get_recent_transactions",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+        p_session_id: sessionId
       }
     );
+
   if (error) {
     throw error;
   }
+
   return data || [];
 }
 
+
 async function getShiftPerformanceRPC(branchId) {
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
   const { data, error } =
     await supabaseClient.rpc(
       "get_shift_performance",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+        p_session_id: sessionId
       }
     );
+
   if (error) {
     throw error;
   }
+
   return data || [];
 }
 
 async function getTodayYesterdayRPC(branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+  
   const { data, error } =
     await supabaseClient.rpc(
       "get_today_yesterday_data",
       {
-        p_branch_id: branchId
+        p_branch_id: branchId,
+        p_session_id: sessionId
       }
     );
   if (error) {
@@ -190,6 +218,8 @@ async function getTodayYesterdayRPC(branchId) {
     // ===============================
 
 async function getRecentTransactionsPageRPC( branchId, startDate, endDate, status, table ) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "get_recent_transactions_page",
@@ -198,7 +228,8 @@ async function getRecentTransactionsPageRPC( branchId, startDate, endDate, statu
         p_start: startDate || null,
         p_end: endDate || null,
         p_status: status || "ALL",
-        p_table: table || "ALL"
+        p_table: table || "ALL",
+        p_session_id: sessionId
       }
     );
 
@@ -210,6 +241,8 @@ async function getRecentTransactionsPageRPC( branchId, startDate, endDate, statu
 
 
 async function getRecentTransactionSummaryRPC( branchId, startDate, endDate, status, table ) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "get_recent_transaction_summary",
@@ -218,7 +251,8 @@ async function getRecentTransactionSummaryRPC( branchId, startDate, endDate, sta
         p_start: startDate || null,
         p_end: endDate || null,
         p_status: status || "ALL",
-        p_table: table || "ALL"
+        p_table: table || "ALL",
+        p_session_id: sessionId
       }
     );
   if (error) {
@@ -228,11 +262,14 @@ async function getRecentTransactionSummaryRPC( branchId, startDate, endDate, sta
 }
 
 async function getReceiptDataRPC(trxId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "get_receipt_data",
       {
-        p_trx_id: trxId
+        p_trx_id: trxId,
+        p_session_id: sessionId
       }
     );
   if (error) {
@@ -242,12 +279,15 @@ async function getReceiptDataRPC(trxId) {
 }
 
 async function getSettingsPageDataRPC() {
-  const {
-    data,
-    error
-  } = await supabaseClient.rpc(
-    "get_settings_page_data"
-  );
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+  const { data, error } = 
+    await supabaseClient.rpc(
+      "get_settings_page_data",
+      {
+        p_session_id: sessionId
+      }
+    );
   if (error) {
     throw error;
   }
@@ -305,12 +345,15 @@ async function getGrossRevenueDataRPC(branchId, startDate, endDate) {
 }
 
 async function getGrossRevenueByDateRPC(start, end, branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_gross_revenue_by_date",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId,
       p_start: start || null,
       p_end: end || null
@@ -323,12 +366,15 @@ async function getGrossRevenueByDateRPC(start, end, branchId) {
 }
 
 async function getTopRevenueProductsRPC(start, end, branchId,limit = 10, offset = 0,isExport = false) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_top_revenue_products",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId,
       p_start: start || null,
       p_end: end || null,
@@ -347,73 +393,89 @@ async function getTopRevenueProductsRPC(start, end, branchId,limit = 10, offset 
     // LOGIC CHECKOUT
     // ===============================
 
-async function checkoutTransaction(payload){
+async function checkoutTransaction(payload) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "checkout_transaction",
       {
-        p_payload: payload
+        p_payload: payload,
+        p_session_id: sessionId
       }
     );
-  if(error){
+  if (error) {
     throw error;
   }
   return data;
 }
 
-async function getLowStockRPC(branchId) {
-
+async function checkoutTransaction(payload) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
-      "get_low_stock",
+      "checkout_transaction",
       {
-        p_branch_id: branchId,
-        p_limit: 100
+        p_payload: payload,
+        p_session_id: sessionId
       }
     );
 
-  if (error) throw error;
-
-  return data || [];
+  if (error) {
+    throw error;
+  }
+  return data;
 }
 
-async function getProductsRPC(branchId, role){
+async function getProductsRPC(branchId, role) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "get_products",
       {
+        p_session_id: sessionId,
         p_branch_id: branchId,
         p_role: role
       }
     );
-  if(error){
+
+  if (error) {
     throw error;
   }
   return data || [];
 }
 
 async function getRewardsRPC(memberId, branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "get_rewards",
       {
+        p_session_id: sessionId,
         p_member_id: memberId,
         p_branch_id: branchId
       }
     );
-  if(error){
+
+  if (error) {
     throw error;
   }
   return data || [];
 }
 
 async function getOrdersRPC() {
-  const {
-    data,
-    error
-  } = await supabaseClient.rpc(
-    "get_orders"
-  );
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_orders",
+      {
+        p_session_id: sessionId
+      }
+    );
   if (error) {
     throw error;
   }
@@ -421,7 +483,8 @@ async function getOrdersRPC() {
 }
 
 async function removeItemFromCartRPC(transId, productId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -429,7 +492,8 @@ async function removeItemFromCartRPC(transId, productId) {
     "remove_item_from_cart",
     {
       p_trans_id: transId,
-      p_product_id: productId
+      p_product_id: productId,
+      p_session_id: sessionId
     }
   );
 
@@ -444,13 +508,16 @@ async function removeItemFromCartRPC(transId, productId) {
     // ===============================
 
 async function checkMemberRPC(memberId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "check_member",
     {
-      p_member_id: memberId
+      p_member_id: memberId,
+      p_session_id: sessionId
     }
   );
   if (error) {
@@ -460,10 +527,12 @@ async function checkMemberRPC(memberId) {
 }
 
 async function getMemberPageDataRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   return await supabaseClient.rpc(
     "get_member_page_data",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId || "ALL"
     }
   ).then(({ data, error }) => {
@@ -471,7 +540,6 @@ async function getMemberPageDataRPC(branchId) {
     if (error) {
       throw error;
     }
-
     return data || {
       members: [],
       settings: {}
@@ -480,13 +548,15 @@ async function getMemberPageDataRPC(branchId) {
 }
 
 async function getTransactionNotificationsRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_transaction_notifications",
     {
+      p_session_id: sessionId,
       p_branch_id:
         branchId || "ALL"
     }
@@ -499,13 +569,15 @@ async function getTransactionNotificationsRPC(branchId) {
 }
 
 async function getMemberDetailPageRPC(memberId, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_member_detail_page",
     {
+      p_session_id: sessionId,
       p_member_id: memberId,
       p_branch_id: branchId || ""
     }
@@ -518,13 +590,15 @@ async function getMemberDetailPageRPC(memberId, branchId) {
 }
 
 async function getMembersRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_members",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId || null
     }
   );
@@ -536,57 +610,46 @@ async function getMembersRPC(branchId) {
 }
 
 async function searchMembersRPC(keyword) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "search_members",
     {
-      p_keyword:
-        keyword || ""
+      p_session_id: sessionId,
+      p_keyword: keyword || ""
     }
   );
-
   if (error) {
     throw error;
   }
-
   return data || [];
 }
 
 async function addMemberRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "add_member",
     {
-      p_id_member:
-        data.ID_Member,
-      p_nama:
-        data.Nama,
-      p_tgl_lahir:
-        data.Tgl_Lahir,
-      p_wa:
-        data.WA,
-      p_email:
-        data.Email,
-      p_instagram:
-        data.Instagram || "",
-      p_facebook:
-        data.Facebook || "",
-      p_tiktok:
-        data.TikTok || "",
-      p_address:
-        data.Address || "",
-      p_join_date:
-        data.Join_Date || "",
-      p_photo:
-        data.Photo || "",
-      p_branch_id:
-        data.branchId || ""
+      p_id_member: data.ID_Member,
+      p_nama: data.Nama,
+      p_tgl_lahir: data.Tgl_Lahir,
+      p_wa: data.WA,
+      p_email: data.Email,
+      p_instagram: data.Instagram || "",
+      p_facebook: data.Facebook || "",
+      p_tiktok: data.TikTok || "",
+      p_address: data.Address || "",
+      p_join_date: data.Join_Date || "",
+      p_photo: data.Photo || "",
+      p_branch_id: data.branchId || "",
+      p_session_id: sessionId
     }
   );
 
@@ -597,45 +660,31 @@ async function addMemberRPC(data) {
 }
 
 async function updateMemberRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_member",
     {
-      p_id_member:
-        data.ID_Member,
-      p_nama:
-        data.Nama,
-      p_tgl_lahir:
-        data.Tgl_Lahir,
-      p_wa:
-        data.WA,
-      p_email:
-        data.Email,
-      p_total_spend:
-        String(data.Total_Spend || "0"),
-      p_level_current:
-        data.Level_Current || "Kenal",
-      p_point:
-        String(data.Point || "0"),
-      p_level_season:
-        data.Level_Season_Terakhir || "",
-      p_instagram:
-        data.Instagram || "",
-      p_facebook:
-        data.Facebook || "",
-      p_tiktok:
-        data.TikTok || "",
-      p_address:
-        data.Address || "",
-      p_join_date:
-        data.Join_Date || "",
-      p_photo:
-        data.Photo || "",
-      p_branch_id:
-        data.branchId || ""
+      p_id_member: data.ID_Member,
+      p_nama: data.Nama,
+      p_tgl_lahir: data.Tgl_Lahir,
+      p_wa: data.WA,
+      p_email: data.Email,
+      p_total_spend: String(data.Total_Spend || "0"),
+      p_level_current: data.Level_Current || "AAAAAA",
+      p_point: String(data.Point || "0"),
+      p_level_season: data.Level_Season_Terakhir || "",
+      p_instagram: data.Instagram || "",
+      p_facebook: data.Facebook || "",
+      p_tiktok: data.TikTok || "",
+      p_address: data.Address || "",
+      p_join_date: data.Join_Date || "",
+      p_photo: data.Photo || "",
+      p_branch_id: data.branchId || "",
+      p_session_id: sessionId
     }
   );
 
@@ -647,15 +696,16 @@ async function updateMemberRPC(data) {
 
 
 async function getMemberTierHistoryRPC(memberId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_member_tier_history",
     {
-      p_member_id:
-        memberId
+      p_member_id: memberId,
+      p_session_id: sessionId
     }
   );
 
@@ -666,18 +716,17 @@ async function getMemberTierHistoryRPC(memberId) {
 }
 
 async function getRewardsRPC(memberId, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_rewards",
     {
-      p_member_id:
-        memberId,
-
-      p_branch_id:
-        branchId
+      p_member_id: memberId,
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -689,15 +738,16 @@ async function getRewardsRPC(memberId, branchId) {
 
 
 async function getMemberDashboardRPC(memberId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_member_dashboard",
     {
-      p_member_id:
-        memberId
+      p_member_id: memberId,
+      p_session_id: sessionId
     }
   );
 
@@ -708,37 +758,27 @@ async function getMemberDashboardRPC(memberId) {
 }
 
 async function addMemberRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "add_member",
     {
-      p_id_member:
-        data.ID_Member,
-      p_nama:
-        data.Nama,
-      p_tgl_lahir:
-        data.Tgl_Lahir,
-      p_wa:
-        data.WA,
-      p_email:
-        data.Email,
-      p_instagram:
-        data.Instagram || "",
-      p_facebook:
-        data.Facebook || "",
-      p_tiktok:
-        data.TikTok || "",
-      p_address:
-        data.Address || "",
-      p_join_date:
-        data.Join_Date || "",
-      p_photo:
-        data.Photo || "",
-      p_branch_id:
-        data.branchId || ""
+      p_id_member: data.ID_Member,
+      p_nama: data.Nama,
+      p_tgl_lahir: data.Tgl_Lahir,
+      p_wa: data.WA,
+      p_email: data.Email,
+      p_instagram: data.Instagram || "",
+      p_facebook: data.Facebook || "",
+      p_tiktok: data.TikTok || "",
+      p_address: data.Address || "",
+      p_join_date: data.Join_Date || "",
+      p_photo: data.Photo || "",
+      p_branch_id: data.branchId || "",
+      p_session_id: sessionId
     }
   );
 
@@ -749,47 +789,31 @@ async function addMemberRPC(data) {
 }
 
 async function updateMemberRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_member",
     {
-      p_id_member:
-        data.ID_Member,
-      p_nama:
-        data.Nama,
-      p_tgl_lahir:
-        data.Tgl_Lahir,
-      p_wa:
-        data.WA,
-      p_email:
-        data.Email,
-      p_total_spend:
-        String(data.Total_Spend || "0"),
-      p_level_current:
-        data.Level_Current || "",
-      p_point:
-        String(data.Point || "0"),
-      p_level_season:
-        data.Level_Season_Terakhir || "",
-      p_instagram:
-        data.Instagram || "",
-      p_facebook:
-        data.Facebook || "",
-      p_tiktok:
-        data.TikTok || "",
-      p_address:
-        data.Address || "",
-      p_join_date:
-        data.Join_Date || "",
-      p_photo:
-        data.Photo ||
-        data.PhotoBase64 ||
-        "",
-      p_branch_id:
-        data.branchId || ""
+      p_id_member: data.ID_Member,
+      p_nama: data.Nama,
+      p_tgl_lahir: data.Tgl_Lahir,
+      p_wa: data.WA,
+      p_email: data.Email,
+      p_total_spend: String(data.Total_Spend || "0"),
+      p_level_current: data.Level_Current || "",
+      p_point: String(data.Point || "0"),
+      p_level_season: data.Level_Season_Terakhir || "",
+      p_instagram: data.Instagram || "",
+      p_facebook: data.Facebook || "",
+      p_tiktok: data.TikTok || "",
+      p_address: data.Address || "",
+      p_join_date: data.Join_Date || "",
+      p_photo:  data.Photo || data.PhotoBase64 || "",
+      p_branch_id: data.branchId || "",
+      p_session_id: sessionId
     }
   );
 
@@ -804,14 +828,16 @@ async function updateMemberRPC(data) {
     // ===============================
 
 async function getTableDataRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_table_data",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -822,14 +848,16 @@ async function getTableDataRPC(branchId) {
 }
 
 async function getLatestTransactionByTableRPC(mejaId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_latest_transaction_by_table",
     {
-      p_meja: mejaId
+      p_meja: mejaId,
+      p_session_id: sessionId
     }
   );
 
@@ -840,7 +868,8 @@ async function getLatestTransactionByTableRPC(mejaId) {
 }
 
 async function reserveTableRPC(mejaId, name, note) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -850,10 +879,10 @@ async function reserveTableRPC(mejaId, name, note) {
       p_branch_id: state.branchId,
       p_meja_id: mejaId,
       p_name: name,
-      p_note: note || ""
+      p_note: note || "",
+      p_session_id: sessionId
     }
   );
-
   if (error) {
     throw error;
   }
@@ -869,14 +898,16 @@ async function reserveTableRPC(mejaId, name, note) {
 }
 
 async function clearTableStatusRPC(mejaId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "clear_table_status",
     {
-      p_meja_id: mejaId
+      p_meja_id: mejaId,
+      p_session_id: sessionId
     }
   );
 
@@ -887,7 +918,8 @@ async function clearTableStatusRPC(mejaId) {
 }
 
 async function addNewTableRPC(tableName, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -895,7 +927,8 @@ async function addNewTableRPC(tableName, branchId) {
     "add_new_table",
     {
       p_branch_id: branchId,
-      p_table_name: tableName
+      p_table_name: tableName,
+      p_session_id: sessionId
     }
   );
 
@@ -906,7 +939,8 @@ async function addNewTableRPC(tableName, branchId) {
 }
 
 async function getTableStatus(table) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -914,14 +948,14 @@ async function getTableStatus(table) {
     "get_table_status",
     {
       p_branch_id: state.branchId,
-      p_meja: table
+      p_meja: table,
+      p_session_id: sessionId
     }
   );
 
   if (error) {
     throw error;
   }
-
   return data;
 }
 
@@ -930,13 +964,16 @@ async function getTableStatus(table) {
     // ===============================
 
 async function getRecipeMasterLedgerRPC(branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_recipe_master_ledger",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -947,21 +984,22 @@ async function getRecipeMasterLedgerRPC(branchId) {
 }
 
 async function getInventoryPageRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_inventory_page",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
   if (error) {
     throw error;
   }
-
   return data || {
     summary: {},
     ingredients: [],
@@ -971,31 +1009,35 @@ async function getInventoryPageRPC(branchId) {
 }
 
 async function getInventoryDashboardRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_inventory_dashboard",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
-
   if (error) {
     throw error;
   }
-
   return data || {};
 }
 
 async function getRecipesRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_recipes"
+    "get_recipes",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -1005,14 +1047,16 @@ async function getRecipesRPC() {
 }
 
 async function getRecipeMasterLedgerRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_recipe_master_ledger",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1023,7 +1067,8 @@ async function getRecipeMasterLedgerRPC(branchId) {
 }
 
 async function getIngredientPurchasesRPC(branchId, startDate, endDate) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1032,7 +1077,8 @@ async function getIngredientPurchasesRPC(branchId, startDate, endDate) {
     {
       p_branch_id: branchId,
       p_start: startDate || null,
-      p_end: endDate || null
+      p_end: endDate || null,
+      p_session_id: sessionId
     }
   );
 
@@ -1043,14 +1089,16 @@ async function getIngredientPurchasesRPC(branchId, startDate, endDate) {
 }
 
 async function getInventorySummaryRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_inventory_summary",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1061,14 +1109,16 @@ async function getInventorySummaryRPC(branchId) {
 }
 
 async function getDailyIngredientUsageRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_daily_ingredient_usage",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1079,14 +1129,16 @@ async function getDailyIngredientUsageRPC(branchId) {
 }
 
 async function getLowIngredientStockRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_low_ingredient_stock",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1097,14 +1149,16 @@ async function getLowIngredientStockRPC(branchId) {
 }
 
 async function getCriticalIngredientsRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_critical_ingredients",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1115,13 +1169,15 @@ async function getCriticalIngredientsRPC(branchId) {
 }
 
 async function getStockHistoryRPC(limit = 50, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_stock_history",
     {
+      p_session_id: sessionId,
       p_limit: limit,
       p_branch_id: branchId
     }
@@ -1134,13 +1190,15 @@ async function getStockHistoryRPC(limit = 50, branchId) {
 }
 
 async function getLiveDeductionFeed(limit = 20, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_live_deduction_feed",
     {
+      p_session_id: sessionId,
       p_limit: limit,
       p_branch_id: branchId
     }
@@ -1153,7 +1211,8 @@ async function getLiveDeductionFeed(limit = 20, branchId) {
 }
 
 async function getIngredientSummaryRPC(ingredientName, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1161,7 +1220,8 @@ async function getIngredientSummaryRPC(ingredientName, branchId) {
     "get_ingredient_summary",
     {
       p_ingredient_name: ingredientName,
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1172,7 +1232,8 @@ async function getIngredientSummaryRPC(ingredientName, branchId) {
 }
 
 async function getIngredientUsageLogRPC( ingredientId, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1180,7 +1241,8 @@ async function getIngredientUsageLogRPC( ingredientId, branchId) {
     "get_ingredient_usage_log",
     {
       p_ingredient_id: ingredientId,
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1191,14 +1253,16 @@ async function getIngredientUsageLogRPC( ingredientId, branchId) {
 }
 
 async function saveRecipeRPC(payload) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "save_recipe",
     {
-      p_payload: payload
+      p_payload: payload,
+      p_session_id: sessionId
     }
   );
 
@@ -1209,39 +1273,24 @@ async function saveRecipeRPC(payload) {
 }
 
 async function saveMaterialRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "save_material",
     {
-      p_id:
-        generateIngredientId(),
-
-      p_name:
-        data.name || "",
-
-      p_value:
-        Number(data.value) || 0,
-
-      p_qty:
-        Number(data.qty) || 0,
-
-      p_unit:
-        data.unit || "",
-
-      p_min:
-        Number(data.min) || 0,
-
-      p_cost:
-        Number(data.cost) || 0,
-
-      p_branch_id:
-        data.branchId || "",
-
-      p_outlet:
-        data.outlet || ""
+      p_id: generateIngredientId(),
+      p_name: data.name || "",
+      p_value: Number(data.value) || 0,
+      p_qty: Number(data.qty) || 0,
+      p_unit: data.unit || "",
+      p_min: Number(data.min) || 0,
+      p_cost: Number(data.cost) || 0,
+      p_branch_id: data.branchId || "",
+      p_outlet: data.outlet || "",
+      p_session_id: sessionId
     }
   );
 
@@ -1252,31 +1301,20 @@ async function saveMaterialRPC(data = {}) {
 }
 
 async function adjustIngredientStockRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "adjust_ingredient_stock",
     {
-      p_ingredient_id:
-        String(
-          data.ingredientId || ""
-        ).trim(),
-
-      p_branch_id:
-        String(
-          data.branchId || ""
-        ).trim(),
-
-      p_type:
-        data.type || "",
-
-      p_qty:
-        Number(data.qty) || 0,
-
-      p_reason:
-        data.reason || ""
+      p_ingredient_id: String( data.ingredientId || "" ).trim(),
+      p_branch_id: String( data.branchId || "" ).trim(),
+      p_type: data.type || "",
+      p_qty: Number(data.qty) || 0,
+      p_reason: data.reason || "",
+      p_session_id: sessionId
     }
   );
 
@@ -1287,25 +1325,18 @@ async function adjustIngredientStockRPC(data = {}) {
 }
 
 async function updateIngredientThresholdRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_ingredient_threshold",
     {
-      p_ingredient_id:
-        String(
-          data.ingredientId || ""
-        ).trim(),
-
-      p_branch_id:
-        String(
-          data.branchId || ""
-        ).trim(),
-
-      p_min:
-        Number(data.min) || 0
+      p_ingredient_id:  String( data.ingredientId || "" ).trim(),
+      p_branch_id: String( data.branchId || "" ).trim(),
+      p_min: Number(data.min) || 0,
+      p_session_id: sessionId
     }
   );
 
@@ -1316,44 +1347,26 @@ async function updateIngredientThresholdRPC(data = {}) {
 }
 
 async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, supplierId, note, branchId, outlet, paymentMethod = "CASH", status = "PAID") {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "add_ingredient_purchase",
     {
-      p_date:
-        date,
-
-      p_ingredient_name:
-        ingredientName,
-
-      p_qty:
-        Number(qty) || 0,
-
-      p_total_price:
-        Number(totalPrice) || 0,
-
-      p_supplier:
-        supplier || "",
-      
-       p_supplier_id:
-        supplierId || null,
-
-      p_note:
-        note || "",
-
-      p_branch_id:
-        branchId,
-
-      p_outlet:
-        outlet || "",
-
-      p_payment_method:
-        paymentMethod || "CASH",
-
-      p_status:
-        status || "PAID"
+      p_date: date,
+      p_ingredient_name: ingredientName,
+      p_qty: Number(qty) || 0,
+      p_total_price: Number(totalPrice) || 0,
+      p_supplier: supplier || "",
+      p_supplier_id: supplierId || null,
+      p_note: note || "",
+      p_branch_id: branchId,
+      p_outlet: outlet || "",
+      p_payment_method: paymentMethod || "CASH",
+      p_status: status || "PAID",
+      p_session_id: sessionId
     }
   );
 
@@ -1364,36 +1377,23 @@ async function addPurchaseRPC(date, ingredientName, qty, totalPrice, supplier, s
 }
 
 async function saveIngredientPurchaseRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "save_ingredient_purchase",
     {
-      p_date:
-        getWIBDateTime(),
-
-      p_ingredient:
-        data.ingredient,
-
-      p_qty:
-        Number(data.qty) || 0,
-
-      p_total_price:
-        Number(data.totalPrice) || 0,
-
-      p_supplier:
-        data.supplier || "",
-
-      p_note:
-        data.note || "",
-
-      p_branch_id:
-        data.branchId,
-
-      p_payment_method:
-        data.paymentMethod || "CASH"
+      p_session_id: sessionId,
+      p_date: getWIBDateTime(),
+      p_ingredient: data.ingredient,
+      p_qty: Number(data.qty) || 0,
+      p_total_price: Number(data.totalPrice) || 0,
+      p_supplier: data.supplier || "",
+      p_note: data.note || "",
+      p_branch_id: data.branchId,
+      p_payment_method: data.paymentMethod || "CASH"
     }
   );
 
@@ -1419,7 +1419,8 @@ async function updateRecipeMasterRPC(data = {}) {
         data.productId
       );
   }
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   // SUPABASE RPC
   const {
     data: result,
@@ -1428,33 +1429,15 @@ async function updateRecipeMasterRPC(data = {}) {
     await supabaseClient.rpc(
       "update_recipe_master",
       {
-        p_recipe_id:
-          data.recipeId,
-
-        p_product_id:
-          data.productId,
-
-        p_branch_id:
-          data.branchId,
-
-        p_selling_price:
-          Number(
-            data.sellingPrice
-          ) || 0,
-
-        p_net_price:
-          Number(
-            data.netPrice
-          ) || 0,
-
-        p_product_name:
-          data.productName || "",
-
-        p_updated_by:
-          data.updatedBy || "",
-
-        p_image_url:
-          imageUrl || ""
+        p_recipe_id: data.recipeId,
+        p_product_id: data.productId,
+        p_branch_id: data.branchId,
+        p_session_id: sessionId,
+        p_selling_price: Number( data.sellingPrice ) || 0,
+        p_net_price: Number( data.netPrice ) || 0,
+        p_product_name: data.productName || "",
+        p_updated_by: data.updatedBy || "",
+        p_image_url: imageUrl || ""
       }
     );
 
@@ -1465,7 +1448,8 @@ async function updateRecipeMasterRPC(data = {}) {
 }
 
 async function addNewProductRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
@@ -1473,23 +1457,13 @@ async function addNewProductRPC(data = {}) {
     await supabaseClient.rpc(
       "add_new_product",
       {
-        p_product_id:
-          generateProductId(),
-
-        p_name:
-          data.name || "",
-
-        p_category:
-          data.category || "",
-
-        p_price:
-          Number(data.price) || 0,
-
-        p_branch_id:
-          data.branchId || "",
-
-        p_outlet:
-          data.outlet || ""
+        p_product_id: generateProductId(),
+        p_name: data.name || "",
+        p_category: data.category || "",
+        p_price: Number(data.price) || 0,
+        p_branch_id: data.branchId || "",
+        p_outlet: data.outlet || "",
+        p_session_id: sessionId
       }
     );
 
@@ -1500,14 +1474,16 @@ async function addNewProductRPC(data = {}) {
 }
 
 async function recalcAllProductStockRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "recalc_all_product_stock",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1520,7 +1496,9 @@ async function recalcAllProductStockRPC(branchId) {
 }
 
 async function logStockMovementRPC(data = {}) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+  
   const totalCost =
     (Number(data.qty) || 0) *
     (Number(data.unitPrice) || 0);
@@ -1531,41 +1509,19 @@ async function logStockMovementRPC(data = {}) {
   } = await supabaseClient.rpc(
     "log_stock_movement",
     {
-      p_id:
-        crypto.randomUUID(),
-
-      p_timestamp:
-        getWIBDateTime(),
-
-      p_ingredient_id:
-        data.ingredientId,
-
-      p_action:
-        data.action,
-
-      p_qty_change:
-        Number(data.qty) || 0,
-
-      p_unit_price:
-        Number(data.unitPrice) || 0,
-
-      p_total_cost:
-        totalCost,
-
-      p_before:
-        Number(data.before) || 0,
-
-      p_after:
-        Number(data.after) || 0,
-
-      p_source:
-        data.source || "",
-
-      p_notes:
-        data.note || "",
-
-      p_branch_id:
-        data.branchId || ""
+      p_id: crypto.randomUUID(),
+      p_timestamp: getWIBDateTime(),
+      p_ingredient_id: data.ingredientId,
+      p_action: data.action,
+      p_qty_change: Number(data.qty) || 0,
+      p_unit_price: Number(data.unitPrice) || 0,
+      p_total_cost: totalCost,
+      p_before: Number(data.before) || 0,
+      p_after: Number(data.after) || 0,
+      p_source: data.source || "",
+      p_notes: data.note || "",
+      p_branch_id: data.branchId || "",
+      p_session_id: sessionId
     }
   );
 
@@ -1575,26 +1531,19 @@ async function logStockMovementRPC(data = {}) {
   return result;
 }
 
-async function deductIngredientStockRPC(
-  productId,
-  qtySold,
-  branchId
-) {
-
+async function deductIngredientStockRPC(productId, qtySold, branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "deduct_ingredient_stock",
     {
-      p_product_id:
-        productId,
-
-      p_qty_sold:
-        Number(qtySold) || 0,
-
-      p_branch_id:
-        branchId
+      p_product_id: productId,
+      p_qty_sold: Number(qtySold) || 0,
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1607,15 +1556,16 @@ async function deductIngredientStockRPC(
 }
 
 async function getRecipeByProductRPC(productId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_recipe_by_product",
     {
-      p_product_id:
-        productId
+      p_product_id: productId,
+      p_session_id: sessionId
     }
   );
 
@@ -1626,14 +1576,16 @@ async function getRecipeByProductRPC(productId) {
 }
 
 async function getRecipeItemsRPC(recipeId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_recipe_items",
     {
-      p_recipe_id: recipeId
+      p_recipe_id: recipeId,
+      p_session_id: sessionId
     }
   );
 
@@ -1644,7 +1596,8 @@ async function getRecipeItemsRPC(recipeId) {
 }
 
 async function validateIngredientStockRPC(cartItems, branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1652,7 +1605,8 @@ async function validateIngredientStockRPC(cartItems, branchId) {
     "validate_ingredient_stock",
     {
       p_cart_items: cartItems,
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1666,14 +1620,16 @@ async function validateIngredientStockRPC(cartItems, branchId) {
 }
 
 async function validateStockRPC(items) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "validate_stock",
     {
-      p_items: items
+      p_items: items,
+      p_session_id: sessionId
     }
   );
 
@@ -1693,6 +1649,7 @@ async function getRecipeListRPC(branchId) {
   } = await supabaseClient.rpc(
     "get_recipe_list",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId
     }
   );
@@ -1704,13 +1661,15 @@ async function getRecipeListRPC(branchId) {
 }
 
 async function getProductsRPC(branchId, role) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_products",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId,
       p_role: role
     }
@@ -1723,14 +1682,16 @@ async function getProductsRPC(branchId, role) {
 }
 
 async function getIngredientsRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_ingredients",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1741,14 +1702,16 @@ async function getIngredientsRPC(branchId) {
 }
 
 async function getSuppliersRPC(branchId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_suppliers",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
@@ -1759,7 +1722,8 @@ async function getSuppliersRPC(branchId) {
 }
 
 async function updateSupplierRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
@@ -1775,7 +1739,8 @@ async function updateSupplierRPC(data) {
       p_status: data.status
         ? "Active"
         : "INACTIVE",
-      p_notes: data.notes
+      p_notes: data.notes,
+      p_session_id: sessionId
     }
   );
 
@@ -1788,7 +1753,8 @@ async function updateSupplierRPC(data) {
 }
 
 async function saveSupplierRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
@@ -1796,30 +1762,15 @@ async function saveSupplierRPC(data) {
     "save_supplier",
     {
       p_id: generateSupplierId(),
-
-      p_name:
-        data.name || "",
-
-      p_category:
-        data.category || "",
-
-      p_contact:
-        data.contact || "",
-
-      p_phone:
-        Number(data.phone) || 0,
-
-      p_status:
-        data.status || "",
-
-      p_notes:
-        data.address || "",
-
-      p_branch_id:
-        data.branchId || "",
-
-      p_outlet:
-        data.outlet || ""
+      p_name: data.name || "",
+      p_category: data.category || "",
+      p_contact: data.contact || "",
+      p_phone: Number(data.phone) || 0,
+      p_status: data.status || "",
+      p_notes: data.address || "",
+      p_branch_id: data.branchId || "",
+      p_outlet: data.outlet || "",
+      p_session_id: sessionId
     }
   );
 
@@ -1832,14 +1783,16 @@ async function saveSupplierRPC(data) {
 }
 
 async function getRecipePriceHistoryRPC(recipeId) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_recipe_price_history",
     {
-      p_recipe_id: recipeId
+      p_recipe_id: recipeId,
+      p_session_id: sessionId
     }
   );
 
@@ -1850,45 +1803,42 @@ async function getRecipePriceHistoryRPC(recipeId) {
 }
 
 async function getInventoryRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "get_inventory",
-    {}
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
     throw error;
   }
-
   return data || [];
 }
 
 async function generateIngredientIdRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
     "generate_ingredient_id",
-    {}
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
     throw error;
   }
-
   return data || "ING001";
 }
-
-
-
-
-
-
-
 
 
     // ===============================
@@ -1896,7 +1846,8 @@ async function generateIngredientIdRPC() {
     // ===============================
 
 async function getAnalyticsDashboardRPC(branchId, startDate, endDate) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1905,7 +1856,8 @@ async function getAnalyticsDashboardRPC(branchId, startDate, endDate) {
     {
       p_branch_id: branchId,
       p_start: startDate,
-      p_end: endDate
+      p_end: endDate,
+      p_session_id: sessionId
     }
   );
 
@@ -1917,7 +1869,8 @@ async function getAnalyticsDashboardRPC(branchId, startDate, endDate) {
 }
 
 async function getAnalyticsRPC(branchId, startDate, endDate) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1926,20 +1879,21 @@ async function getAnalyticsRPC(branchId, startDate, endDate) {
     {
       p_branch_id: branchId,
       p_start: startDate,
-      p_end: endDate
+      p_end: endDate,
+      p_session_id: sessionId
     }
   );
 
   if (error) {
     throw error;
   }
-
   return data;
 }
 
 
 async function getPaymentDistributionRPC(branchId, startDate, endDate) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1948,7 +1902,8 @@ async function getPaymentDistributionRPC(branchId, startDate, endDate) {
     {
       p_branch_id: branchId,
       p_start: startDate,
-      p_end: endDate
+      p_end: endDate,
+      p_session_id: sessionId
     }
   );
 
@@ -1960,7 +1915,8 @@ async function getPaymentDistributionRPC(branchId, startDate, endDate) {
 
 
 async function getPeakHoursRPC(branchId, startDate, endDate ) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1969,7 +1925,8 @@ async function getPeakHoursRPC(branchId, startDate, endDate ) {
     {
       p_branch_id: branchId,
       p_start: startDate,
-      p_end: endDate
+      p_end: endDate,
+      p_session_id: sessionId
     }
   );
 
@@ -1980,7 +1937,8 @@ async function getPeakHoursRPC(branchId, startDate, endDate ) {
 }
 
 async function getTopSellingItemsRPC(branchId, startDate, endDate) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -1989,7 +1947,8 @@ async function getTopSellingItemsRPC(branchId, startDate, endDate) {
     {
       p_branch_id: branchId,
       p_start: startDate,
-      p_end: endDate
+      p_end: endDate,
+      p_session_id: sessionId
     }
   );
 
@@ -2001,7 +1960,8 @@ async function getTopSellingItemsRPC(branchId, startDate, endDate) {
 
 
 async function getRawMaterialAnalysisRPC(branchId, startDate, endDate) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
@@ -2010,7 +1970,8 @@ async function getRawMaterialAnalysisRPC(branchId, startDate, endDate) {
     {
       p_branch_id: branchId,
       p_start: startDate,
-      p_end: endDate
+      p_end: endDate,
+      p_session_id: sessionId
     }
   );
 
@@ -2025,11 +1986,16 @@ async function getRawMaterialAnalysisRPC(branchId, startDate, endDate) {
     // ===============================
 
 async function getSettingsPageDataRPC() {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_settings_page_data"
+    "get_settings_page_data",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2039,7 +2005,9 @@ async function getSettingsPageDataRPC() {
 }
 
 async function getBranchOptionsRPC(data) {
- const client =
+  const sessionId =
+    localStorage.getItem("pos_session_id");  
+  const client =
     getActiveSupabase();
 
   if (!client) {
@@ -2053,8 +2021,8 @@ async function getBranchOptionsRPC(data) {
   } = await client.rpc(
     "get_branch_options",
     {
-      p_login_user_id:
-        String(data.loginUserId)
+      p_login_user_id: String(data.loginUserId),
+      p_session_id: sessionId
     }
   );
 
@@ -2065,6 +2033,8 @@ async function getBranchOptionsRPC(data) {
 }
 
 async function addNewBranchRPC(data) {
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
@@ -2074,7 +2044,8 @@ async function addNewBranchRPC(data) {
       p_branch_name: data.branchName,
       p_alamat: data.alamat,
       p_manager: data.manager,
-      p_phone: data.phone
+      p_phone: data.phone,
+      p_session_id: sessionId
     }
   );
 
@@ -2085,7 +2056,8 @@ async function addNewBranchRPC(data) {
 }
 
 async function updateBranchStatusRPC(branchId, active) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
@@ -2093,7 +2065,8 @@ async function updateBranchStatusRPC(branchId, active) {
     "update_branch_status",
     {
       p_branch_id: branchId,
-      p_active: active
+      p_active: active,
+      p_session_id: sessionId
     }
   );
 
@@ -2104,21 +2077,19 @@ async function updateBranchStatusRPC(branchId, active) {
 }
 
 async function updateBranchRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_branch",
     {
-      p_branch_id:
-        data.branchId,
-      p_branch_name:
-        data.branchName,
-      p_alamat:
-        data.alamat,
-      p_manager:
-        data.manager
+      p_branch_id: data.branchId,
+      p_branch_name: data.branchName,
+      p_alamat: data.alamat,
+      p_manager: data.manager,
+      p_session_id: sessionId
     }
   );
 
@@ -2129,12 +2100,16 @@ async function updateBranchRPC(data) {
 }
 
 async function getUsersRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_users"
+    "get_users",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2144,23 +2119,20 @@ async function getUsersRPC() {
 }
 
 async function addNewUserRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "add_new_user",
     {
-      p_username:
-        data.username,
-      p_password:
-        data.password,
-      p_role:
-        data.role,
-      p_branch_id:
-        data.branchId,
-      p_created_by:
-        data.createdBy
+      p_username: data.username,
+      p_password: data.password,
+      p_role: data.role,
+      p_branch_id: data.branchId,
+      p_created_by: data.createdBy,
+      p_session_id: sessionId
     }
   );
 
@@ -2173,21 +2145,19 @@ async function addNewUserRPC(data) {
 }
 
 async function updateUserRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "update_user",
     {
-      p_id:
-        String(data.id),
-      p_username:
-        data.username,
-      p_password:
-        data.password || null,
-      p_login_user_id:
-        String(data.login_user_id)
+      p_id: String(data.id),
+      p_username: data.username,
+      p_password: data.password || null,
+      p_session_id: sessionId,
+      p_login_user_id: String(data.login_user_id)
     }
   );
 
@@ -2200,17 +2170,17 @@ async function updateUserRPC(data) {
 }
 
 async function deleteUserRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "delete_user",
     {
-      p_id:
-        String(data.id),
-      p_login_user_id:
-        String(data.login_user_id)
+      p_id: String(data.id),
+      p_login_user_id: String(data.login_user_id),
+      p_session_id: sessionId
     }
   );
 
@@ -2223,12 +2193,16 @@ async function deleteUserRPC(data) {
 }
 
 async function getSettingsRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_settings"
+    "get_settings",
+    {
+      p_session_id: sessionId
+    }
   );
   if (error) {
     throw error;
@@ -2237,7 +2211,8 @@ async function getSettingsRPC() {
 }
 
 async function saveSettingsRPC(payload) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   // VALIDASI
   validateSettings(payload);
 
@@ -2247,7 +2222,8 @@ async function saveSettingsRPC(payload) {
   } = await supabaseClient.rpc(
     "save_settings",
     {
-      p_settings: payload
+      p_settings: payload,
+      p_session_id: sessionId
     }
   );
 
@@ -2258,12 +2234,16 @@ async function saveSettingsRPC(payload) {
 }
 
 async function getBusinessProfileRPC() {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data,
     error
   } = await supabaseClient.rpc(
-    "get_business_profile"
+    "get_business_profile",
+    {
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
@@ -2273,21 +2253,19 @@ async function getBusinessProfileRPC() {
 }
 
 async function saveBusinessProfileRPC(data) {
-
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const {
     data: result,
     error
   } = await supabaseClient.rpc(
     "save_business_profile",
     {
-      p_company_name:
-        data.company_name,
-      p_logo_url:
-        data.logo_url,
-      p_instagram:
-        data.instagram,
-      p_receipt_footer:
-        data.receipt_footer
+      p_company_name: data.company_name,
+      p_logo_url: data.logo_url,
+      p_instagram: data.instagram,
+      p_receipt_footer: data.receipt_footer,
+      p_session_id: sessionId
     }
   );
 
@@ -2298,6 +2276,8 @@ async function saveBusinessProfileRPC(data) {
 }
 
 async function getBranchInfoRPC(branchId) {
+  const sessionId =
+    localStorage.getItem("pos_session_id"); 
   const client =
     getActiveSupabase();
   const {
@@ -2306,8 +2286,8 @@ async function getBranchInfoRPC(branchId) {
   } = await client.rpc(
     "get_branch_info",
     {
-      p_branch_id:
-        branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
 
