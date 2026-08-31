@@ -19555,7 +19555,8 @@ async function loadInventoryPage(branchId) {
   }
 
   try {
-		
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -19714,7 +19715,8 @@ async function loadIngredients(branchId) {
   }
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -19814,6 +19816,8 @@ async function loadIngredientPurchases(branchId, start = null, end = null) {
   `;
 
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -20354,6 +20358,8 @@ window.confirmPurchaseStatus = async function () {
   }
 
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -20424,6 +20430,8 @@ async function loadSuppliers() {
   }
 
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const branchId =
       state.branchId;
 
@@ -20710,7 +20718,8 @@ async function saveeditSupplier() {
   };
 
   try {
-	
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     // UPDATE SUPPLIER
     const {
       data: updateData,
@@ -21052,6 +21061,8 @@ async function openRecipeModal(recipeId) {
   // PRICE HISTORY
 
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -21145,6 +21156,8 @@ async function saveRecipeMaster() {
   };
 
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     // PRODUCT IMAGE
     let imageUrl =
       currentRecipeData.image || "";
@@ -21703,7 +21716,8 @@ async function submitAdjust() {
   };
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -21784,7 +21798,8 @@ async function submitThreshold() {
   };
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -21865,7 +21880,8 @@ async function openUsageLogFromIngredient() {
     item.name || "-";
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22229,7 +22245,8 @@ async function saveRecipe() {
 
   try {
 
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22292,7 +22309,8 @@ async function loadIngredientsByBranch(branchId) {
 
   try {
 
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22388,7 +22406,8 @@ async function loadRecipeItems(recipeId) {
 
   try {
 
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22519,6 +22538,8 @@ async function loadRecipeProducts() {
   if (!branchId) return;
 
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22592,6 +22613,8 @@ function removeIngredient(index) {
 async function saveRecipeConfig() {
   if (!selectedRecipeId) return;
   try {
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     // PRODUCT ID
     const productId =
       currentRecipeData?.productId ||
@@ -22671,8 +22694,8 @@ window.loadIngredientSummary = async function(name) {
   if (!branchId) return;
 
   try {
-
-    // SUPABASE RPC
+		const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22810,7 +22833,8 @@ window.loadStockInData = async function () {
   }
 	
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -22863,7 +22887,8 @@ async function loadStockInIngredients( modal, branchId ) {
     `<option>Loading...</option>`;
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -23004,7 +23029,8 @@ window.saveStockIn = async function () {
     // TOTAL PRICE
     const totalPrice = Number(price) || 0;
 	
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -23088,7 +23114,8 @@ async function loadBranchDropdown() {
 
   try {
   
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -23255,7 +23282,8 @@ async function saveSupplier() {
 
   try {
 
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data: res,
       error
@@ -23688,7 +23716,8 @@ async function saveNewProduct() {
     return;
   }
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data: res,
       error
@@ -23774,7 +23803,8 @@ async function saveMaterial() {
   };
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data: res,
       error
@@ -25304,7 +25334,8 @@ async function saveTaxSettings() {
   };
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data: result,
       error
@@ -30871,7 +30902,8 @@ async function loadCashFlowPage() {
   }
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -30931,6 +30963,8 @@ async function loadCashFlowBranchOptions() {
   }
 
   try {
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -31355,7 +31389,8 @@ async function saveOwnerCapital() {
 }
 	
 async function addOwnerTransaction(data) {
-
+	const sessionId =
+		localStorage.getItem("pos_session_id");
   const {
     data: result,
     error
@@ -31515,7 +31550,8 @@ async function loadCashFlowNotification() {
   }
 
   try {
-    // SUPABASE RPC
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -32467,6 +32503,8 @@ async function startClearDigitalReceipts(){
 	
 async function getChatAnalytics(start, end, branchId, callback) {
   try {
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     const {
       data,
       error
