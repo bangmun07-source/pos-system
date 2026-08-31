@@ -1027,7 +1027,7 @@ async function getInventoryDashboardRPC(branchId) {
   return data || {};
 }
 
-async function getRecipesRPC() {
+async function getRecipesRPC(branchId) {
   const sessionId =
     localStorage.getItem("pos_session_id");
   const {
@@ -1042,6 +1042,10 @@ async function getRecipesRPC() {
   );
 
   if (error) {
+    console.error(
+      "getRecipesRPC ERROR:",
+      error
+    );
     throw error;
   }
   return data || [];
