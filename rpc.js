@@ -2847,7 +2847,7 @@ async function getCashFlowPageDataRPC(filter = {}) {
   } = await supabaseClient.rpc(
     "get_cash_flow_page_data",
     {
-      p_login_user_id: Number(filter.loginUserId),
+      p_login_user_id: filter.loginUserId,
       p_session_id: sessionId,
       p_branch_id: filter.branchId || "ALL",
       p_start: filter.startDate || null,
