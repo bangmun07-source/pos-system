@@ -107,57 +107,74 @@ async function connectTenant(slug) {
     // =====================================================
     // 3. BRANCH SYNC
     // =====================================================
-
+    
     try {
-
-      const { count: branchCount } =
-        await supabaseClient
-          .from("Branches")
-          .select("*", {
-            count: "exact",
-            head: true
-          });
-
-      fetch("/api/sync-tenant-branch-count", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          tenant_id: config.tenant_id
-        })
-      }).catch(() => {});
-
+    
+      const response = await fetch(
+        "/api/sync-tenant-branch-count",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            tenant_id: config.tenant_id
+          })
+        }
+      );
+    
+      const result = await response.json();
+    
+      console.log(
+        "SYNC BRANCH STATUS:",
+        response.status
+      );
+    
+      console.log(
+        "SYNC BRANCH RESULT:",
+        result
+      );
+    
+      if (!response.ok) {
+        throw new Error(
+          result.message ||
+          result.error ||
+          "Sync branch gagal"
+        );
+      }
+    
       return {
         ...config,
-        branch_count: branchCount || 0
+        branch_count:
+          result.branch_count ??
+          config.branch_count ??
+          0
       };
-
+    
     } catch (dbError) {
-
+    
       console.warn(
-        "Gagal konek DB tenant:",
+        "Gagal sync branch count:",
         dbError
       );
-
+    
       return config;
     }
-
-  } catch (err) {
-
-    // Tenant mismatch JANGAN masuk fallback cache
-    if (
-      err?.message?.startsWith("Tenant mismatch")
-    ) {
-      console.error(err);
-      throw err;
-    }
-
-    console.warn(
-      "Gagal ambil config tenant online, cek cache...",
-      err
-    );
-
+    
+    } catch (err) {
+    
+      // Tenant mismatch JANGAN masuk fallback cache
+      if (
+        err?.message?.startsWith("Tenant mismatch")
+      ) {
+        console.error(err);
+        throw err;
+      }
+    
+      console.warn(
+        "Gagal ambil config tenant online, cek cache...",
+        err
+      );
     // ==========================================
     // FALLBACK OFFLINE
     // ==========================================
