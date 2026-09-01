@@ -13686,78 +13686,88 @@ function navigate(pageId, params = {}) {
   }, 50);
 
 }
+
+	
 async function handleLogin() {
   const username = document.getElementById("username").value.trim();
   const password = document.getElementById("password").value.trim();
+
   try {
     let result;
 
-  
-    // MASTER LOGIN
-    if (!state.tenantSlug || state.tenantSlug === "master") {
-      result = await loginUserRPC(centralSupabase, username, password);
-    } 
-    // CUSTOMER LOGIN (DENGAN FALLBACK OFFLINE)
-    else {
-      try {
-        // Coba panggil API Vercel terlebih dahulu (Kondisi Online)
-        const response = await fetch("/api/auth/login", {
+    // ONLINE LOGIN
+    // MASTER & CUSTOMER
+    try {
+      const response =
+        await fetch("/api/auth/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            tenantSlug: state.tenantSlug,
+            tenantSlug: state.tenantSlug || "master",
             username: username,
             password: password
           })
         });
 
-        result = await response.json();
-        if (!response.ok) {
-          throw new Error(result.error || "Login gagal");
-        }
-      } catch (networkError) {
-       
-        // JIKA API VERCEL GAGAL DIHUBUNGI (OFFLINE)
-        if (!supabaseClient) {
-          throw new Error("Tenant offline tidak tersedia.");
-        }
-        // Ambil data user langsung dari Supabase tenant lokal
-        const { data: dbUser, error: dbError } = await supabaseClient
+      result = await response.json();
+      if (!response.ok) {
+        throw new Error(
+          result.error || "Login gagal"
+        );
+      }
+    } catch (networkError) {
+      // OFFLINE HANYA CUSTOMER
+      if (!state.tenantSlug || state.tenantSlug === "master") { throw networkError; }
+      if (!supabaseClient) {throw new Error("Tenant offline tidak tersedia.");}
+
+      const {
+        data: dbUser,
+        error: dbError
+      } =
+        await supabaseClient
           .from("Users")
-          .select("ID_User, Username, Password, Role, branchId")
-          .eq("Username", username)
+          .select(
+            "ID_User, Username, Password, Role, branchId"
+          )
+          .eq(
+            "Username",
+            username
+          )
           .maybeSingle();
 
-        if (dbError || !dbUser) {
-          throw new Error("Login offline gagal: Username tidak ditemukan.");
-        }
+      if (dbError || !dbUser
+	  ) {throw new Error( "Login offline gagal: Username tidak ditemukan.");}
+      if (dbUser.Password !== password
+      ) { throw new Error( "Login offline gagal: Password salah." );}
 
-        if (dbUser.Password !== password) {
-          throw new Error("Login offline gagal: Password salah.");
+      // OFFLINE SESSION
+      result = {
+        success: true,
+        session_id: "offline_session_" + Date.now(),
+
+        user: {
+          ID_User: dbUser.ID_User,
+          Username: dbUser.Username,
+          Role: dbUser.Role,
+          branchId: dbUser.branchId
         }
-				
-        // Buat struktur hasil yang sama persis seperti respons API Vercel
-        result = {
-          success: true,
-          session_id: "offline_session_" + Date.now(),
-          user: {
-            ID_User: dbUser.ID_User,
-            Username: dbUser.Username,
-            Role: dbUser.Role,
-            branchId: dbUser.branchId
-          }
-        };
-      }
+      };
     }
 
     // LOGIN RESULT VALIDATION
-    if (!result || !result.success) {
-      alert("Username atau password salah");
+    if (
+      !result ||
+      !result.success
+    ) {
+      alert(
+        "Username atau password salah"
+      );
       return;
     }
-
+	
+    // USER
     const user = {
       ...result.user,
       id: result.user.id || result.user.ID_User,
@@ -13765,23 +13775,41 @@ async function handleLogin() {
       role: result.user.role || result.user.Role,
       branchId: result.user.branchId
     };
-
+	  
     state.user = user;
     state.branchId = user.branchId || "";
     localStorage.setItem("pos_user", JSON.stringify(user));
 
     // SESSION
-    if (result.session_id) {
-      localStorage.setItem("pos_session_id", result.session_id);
+    if (result.session_id) {localStorage.setItem("pos_session_id",result.session_id);
+    } else {
+      throw new Error(
+        "Session login tidak dibuat."
+      );
     }
-    
-    if (state.branchId) {
-      localStorage.setItem("pos_branchId", state.branchId);
-    }
-	localStorage.setItem("pos_login_tenant", state.tenantSlug || "master");
-    navigate("dashboardPage");
+	  
+    // BRANCH
+    if (state.branchId) {localStorage.setItem( "pos_branchId", state.branchId );}
+    // TENANT
+    localStorage.setItem( "pos_login_tenant", state.tenantSlug || "master" );
+    // DEBUG
+    console.log(
+      "LOGIN SUCCESS:",
+      {
+        tenant: state.tenantSlug || "master",
+        user: user.username,
+        branchId: state.branchId,
+        sessionId: localStorage.getItem( "pos_session_id" )
+      }
+    );
+
+    navigate( "dashboardPage" );
+	  
   } catch (err) {
-    alert(err.message || "Login gagal");
+    alert(
+      err.message ||
+      "Login gagal"
+    );
   }
 }
 	
