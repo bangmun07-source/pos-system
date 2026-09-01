@@ -14467,8 +14467,8 @@ async function initExportButton() {
               start,
               end,
               status,
-              branchId:
-              state.branchId,
+              branchId: state.branchId,
+							sessionId,
 							tenantSlug: state.tenantSlug
             })
           }
@@ -14728,6 +14728,7 @@ async function exportRecentTransactions() {
 	        end,
 	        status,
 	        branchId,
+					sessionId,
 					tenantSlug: state.tenantSlug
 	      })
 	    }
@@ -15425,6 +15426,7 @@ async function exportGrossRevenuePDF() {
 					start,
 					end,
 					branchId,
+					sessionId,
 					tenantSlug: state.tenantSlug
 				})
 			});
@@ -18005,14 +18007,11 @@ async function exportMembersPDF() {
 
   // PAYLOAD
   const payload = {
-    type:
-      "members",
-    tier:
-      tier,
-    branchId:
-      branchId,
-		tenantSlug: 
-			state.tenantSlug
+    type: "members",
+    tier: tier,
+    branchId: branchId,
+		sessionId,
+		tenantSlug: state.tenantSlug
   };
 
   // REQUEST
@@ -18021,8 +18020,7 @@ async function exportMembersPDF() {
       await fetch(
         "/api/export-pdf",
         {
-          method:
-            "POST",
+          method: "POST",
           headers: {
             "Content-Type":
               "application/json"
@@ -21356,6 +21354,7 @@ async function exportRecipeReport() {
           body: JSON.stringify({
             type: "recipe",
             branchId,
+						sessionId,
 						tenantSlug: state.tenantSlug
           })
         }
@@ -23403,6 +23402,7 @@ async function exportInventoryPDF() {
           body: JSON.stringify({
             type: "inventory",
             branchId: branchId,
+						sessionId,
 						tenantSlug: state.tenantSlug
           })
         }
@@ -23968,6 +23968,7 @@ async function exportIngredientPurchases() {
             branchId: branchId,
             start: startDate,
             end: endDate,
+						sessionId,
 						tenantSlug: state.tenantSlug
           })
         }
@@ -24751,6 +24752,7 @@ async function exportAnalyticsPDF() {
 			start,
 			end,
 			branchId,
+			sessionId,
 			tenantSlug: state.tenantSlug
 		  })
 		});
@@ -28343,6 +28345,7 @@ async function exportExpensePDF() {
     const payload = {
       type: "expense",
       branchId: branchId,
+			sessionId,
       start: f?.startDate || null,
       end: f?.endDate || null,
       status: f?.status === "All Status"
@@ -28569,6 +28572,7 @@ async function exportOtherIncomePDF() {
             search: f.keyword,
             start: f.startDate,
             end: f.endDate,
+						sessionId,
 						tenantSlug: state.tenantSlug
           })
         }
@@ -33326,6 +33330,7 @@ async function exportCashFlowReport() {
 		  start: startDate,
 		  end: endDate,
 		  branchId: branch,
+			sessionId,
 		  loginUserId,
 			tenantSlug: state.tenantSlug
 		})
