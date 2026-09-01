@@ -104,44 +104,59 @@ async function connectTenant(slug) {
         config.supabase_url; 
     } 
  
-    // ===================================================== 
-    // 3. BRANCH SYNC 
-    // ===================================================== 
- 
-    try { 
- 
-      const { count: branchCount } = 
-        await supabaseClient 
-          .from("Branches") 
-          .select("*", { 
-            count: "exact", 
-            head: true 
-          }); 
- 
-      fetch("/api/sync-tenant-branch-count", { 
-        method: "POST", 
-        headers: { 
-          "Content-Type": "application/json" 
-        }, 
-        body: JSON.stringify({ 
-          tenant_id: config.tenant_id 
-        }) 
-      }).catch(() => {}); 
- 
-      return { 
-        ...config, 
-        branch_count: branchCount || 0 
-      }; 
- 
-    } catch (dbError) { 
- 
-      console.warn( 
-        "Gagal konek DB tenant:", 
-        dbError 
-      ); 
- 
-      return config; 
-    } 
+    // =====================================================
+    // 3. BRANCH SYNC
+    // =====================================================
+    
+    // MASTER TIDAK PERLU SYNC KE CUSTOMER
+    if (slug === "master") {
+      return config;
+    }
+    
+    try {
+    
+      const { count: branchCount, error: branchError } =
+        await supabaseClient
+          .from("Branches")
+          .select("*", {
+            count: "exact",
+            head: true
+          });
+    
+      if (branchError) {
+        console.warn(
+          "Gagal membaca Branches Customer:",
+          branchError
+        );
+    
+        return config;
+      }
+    
+      // Sync jumlah branch ke MASTER
+      fetch("/api/sync-tenant-branch-count", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          tenant_id: config.tenant_id
+        })
+      }).catch(() => {});
+    
+      return {
+        ...config,
+        branch_count: branchCount || 0
+      };
+    
+    } catch (dbError) {
+    
+      console.warn(
+        "Gagal konek DB tenant:",
+        dbError
+      );
+    
+      return config;
+    }
  
   } catch (err) { 
  
