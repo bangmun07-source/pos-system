@@ -77,19 +77,36 @@ export default async function handler(req, res) {
       );
 
     // 3. HITUNG BRANCH AKTUAL
-    const {
-      count: branchCount,
-      error: branchError
-    } = await tenantSupabase
-      .from("Branches")
-      .select("*", {
-        count: "exact",
-        head: true
-      });
+const {
+  count: branchCount,
+  error: branchError
+} = await tenantSupabase
+  .from("Branches")
+  .select("branchId", {
+    count: "exact",
+    head: true
+  });
 
-    if (branchError) {
-      throw branchError;
-    }
+if (branchError) {
+  console.error("CUSTOMER BRANCH ERROR:", {
+    message: branchError.message,
+    code: branchError.code,
+    details: branchError.details,
+    hint: branchError.hint
+  });
+
+  return res.status(500).json({
+    success: false,
+    step: "customer_branches",
+    message: "Gagal membaca Branches Customer",
+    customer_url: tenant.supabase_url,
+    code: branchError.code || null,
+    details: branchError.details || null,
+    hint: branchError.hint || null
+  });
+}
+
+console.log("CUSTOMER BRANCH COUNT:", branchCount);
 
     // 4. UPDATE MASTER
     const {
