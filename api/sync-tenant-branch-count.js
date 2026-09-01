@@ -1,8 +1,16 @@
 import { createClient } from "@supabase/supabase-js";
 
-// =====================================================
-// API HANDLER
-// =====================================================
+const CENTRAL_SUPABASE_URL =
+  process.env.SUPABASE_URL;
+
+const CENTRAL_SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const centralSupabase =
+  createClient(
+    CENTRAL_SUPABASE_URL,
+    CENTRAL_SUPABASE_SERVICE_ROLE_KEY
+  );
 
 export default async function handler(req, res) {
 
@@ -15,7 +23,9 @@ export default async function handler(req, res) {
 
   try {
 
-    const { tenant_id } = req.body || {};
+    const {
+      tenant_id
+    } = req.body || {};
 
     if (!tenant_id) {
       return res.status(400).json({
@@ -23,89 +33,31 @@ export default async function handler(req, res) {
         message: "tenant_id wajib diisi"
       });
     }
+    
 
-    // =====================================================
-    // MASTER
-    // =====================================================
-
-    const centralSupabase = createClient(
-      process.env.SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
-
-    // =====================================================
-    // 1. AMBIL CONFIG TENANT
-    // =====================================================
-
+    // 1. CONFIG TENANT DARI MASTER
     const {
       data: tenant,
       error: tenantError
     } = await centralSupabase
       .from("tenant_config")
       .select(
-        "tenant_id, tenant_name, supabase_url"
+        "id, tenant_id, tenant_name, supabase_url, supabase_anon_key"
       )
       .eq("tenant_id", tenant_id)
       .single();
-
     if (tenantError) {
-      return res.status(500).json({
-        success: false,
-        step: "tenant_config",
-        message: tenantError.message,
-        code: tenantError.code || null
-      });
+      throw tenantError;
     }
 
-    // =====================================================
-    // 2. AMBIL SERVICE ROLE CUSTOMER
-    // =====================================================
+    // 2. CONNECT KE DATABASE CUSTOMER
+    const tenantSupabase =
+      createClient(
+        tenant.supabase_url,
+        tenant.supabase_anon_key
+      );
 
-    const {
-      data: credential,
-      error: credentialError
-    } = await centralSupabase
-      .from("tenant_credentials")
-      .select("service_role_key")
-      .eq("tenant_id", tenant_id)
-      .single();
-
-    if (credentialError) {
-      return res.status(500).json({
-        success: false,
-        step: "tenant_credentials",
-        message: credentialError.message,
-        code: credentialError.code || null
-      });
-    }
-
-    if (!credential?.service_role_key) {
-      return res.status(500).json({
-        success: false,
-        step: "tenant_credentials",
-        message: "Service Role Customer tidak ditemukan"
-      });
-    }
-
-    // =====================================================
-    // 3. CONNECT CUSTOMER DENGAN SERVICE ROLE
-    // =====================================================
-
-    const tenantSupabase = createClient(
-      tenant.supabase_url,
-      credential.service_role_key,
-      {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false
-        }
-      }
-    );
-
-    // =====================================================
-    // 4. HITUNG BRANCH CUSTOMER
-    // =====================================================
-
+    // 3. HITUNG BRANCH AKTUAL
     const {
       count: branchCount,
       error: branchError
@@ -117,80 +69,40 @@ export default async function handler(req, res) {
       });
 
     if (branchError) {
-
-      console.error(
-        "CUSTOMER BRANCH ERROR:",
-        branchError
-      );
-
-      return res.status(500).json({
-        success: false,
-        step: "customer_branches",
-        message:
-          branchError.message ||
-          "Gagal membaca Branches Customer",
-        code: branchError.code || null,
-        details: branchError.details || null,
-        hint: branchError.hint || null
-      });
+      throw branchError;
     }
 
-    // =====================================================
-    // 5. UPDATE MASTER
-    // =====================================================
-
-    const actualBranchCount = branchCount || 0;
-
+    // 4. UPDATE MASTER
     const {
       data: updatedTenant,
       error: updateError
     } = await centralSupabase
       .from("tenant_config")
       .update({
-        branch_count: actualBranchCount
+        branch_count: branchCount
       })
       .eq("tenant_id", tenant_id)
       .select(
         "tenant_id, tenant_name, branch_count"
       )
       .single();
-
     if (updateError) {
-
-      return res.status(500).json({
-        success: false,
-        step: "master_update",
-        message:
-          updateError.message ||
-          "Gagal update branch_count",
-        code: updateError.code || null,
-        details: updateError.details || null
-      });
+      throw updateError;
     }
-
-    // =====================================================
-    // 6. SUCCESS
-    // =====================================================
-
+    
+    // 5. RESPONSE
     return res.status(200).json({
       success: true,
       tenant_id,
-      branch_count: actualBranchCount,
+      branch_count: branchCount,
       data: updatedTenant
     });
 
   } catch (error) {
-
-    console.error(
-      "SYNC BRANCH FATAL:",
-      error
-    );
-
     return res.status(500).json({
       success: false,
-      step: "fatal",
       message:
-        error?.message ||
+        error.message ||
         "Gagal sync branch count"
     });
   }
