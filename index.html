@@ -13680,31 +13680,18 @@ function navigate(pageId, params = {}) {
     clearInterval(window.dashboardInterval);
     window.dashboardInterval = null;
   }
-
   setTimeout(() => {
     initModule(pageId, params);
   }, 50);
-
 }
-
 	
 async function handleLogin() {
-  const username =
-    document.getElementById("username").value.trim();
-
-  const password =
-    document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value.trim();
 
   try {
-
     let result;
-
-    // ==========================================
-    // LOGIN MASTER & CUSTOMER ONLINE
-    // ==========================================
-
     try {
-
       const response =
         await fetch("/api/auth/login", {
           method: "POST",
@@ -13714,22 +13701,13 @@ async function handleLogin() {
           },
 
           body: JSON.stringify({
-            tenantSlug:
-              state.tenantSlug || "master",
-
+            tenantSlug: state.tenantSlug || "master",
             username,
             password
           })
         });
 
-      result =
-        await response.json();
-
-      console.log(
-        "LOGIN API RESULT:",
-        result
-      );
-
+      result = await response.json();
       if (!response.ok) {
         throw new Error(
           result.error ||
@@ -13738,11 +13716,7 @@ async function handleLogin() {
       }
 
     } catch (networkError) {
-
-      // ==========================================
       // MASTER TIDAK BOLEH OFFLINE FALLBACK
-      // ==========================================
-
       if (
         !state.tenantSlug ||
         state.tenantSlug === "master"
@@ -13750,10 +13724,7 @@ async function handleLogin() {
         throw networkError;
       }
 
-      // ==========================================
       // CUSTOMER OFFLINE
-      // ==========================================
-
       if (!supabaseClient) {
         throw new Error(
           "Tenant offline tidak tersedia."
@@ -13770,8 +13741,8 @@ async function handleLogin() {
             "ID_User, Username, Password, Role, branchId"
           )
           .eq(
-            "Username",
-            username
+            "Username", 
+			  username
           )
           .maybeSingle();
 
@@ -13794,31 +13765,19 @@ async function handleLogin() {
 
       result = {
         success: true,
-
         session_id:
           "offline_session_" +
           Date.now(),
-
         user: {
-          ID_User:
-            dbUser.ID_User,
-
-          Username:
-            dbUser.Username,
-
-          Role:
-            dbUser.Role,
-
-          branchId:
-            dbUser.branchId
+          ID_User: dbUser.ID_User,
+          Username: dbUser.Username,
+          Role: dbUser.Role,
+          branchId: dbUser.branchId
         }
       };
     }
 
-    // ==========================================
     // VALIDASI
-    // ==========================================
-
     if (
       !result ||
       !result.success
@@ -13826,108 +13785,36 @@ async function handleLogin() {
       alert(
         "Username atau password salah"
       );
-
       return;
     }
 
-    // ==========================================
     // USER
-    // ==========================================
-
     const user = {
       ...result.user,
 
-      id:
-        result.user.id ||
-        result.user.ID_User,
-
-      username:
-        result.user.username ||
-        result.user.Username,
-
-      role:
-        result.user.role ||
-        result.user.Role,
-
-      branchId:
-        result.user.branchId
+      id: result.user.id || result.user.ID_User,
+      username: result.user.username || result.user.Username,
+      role: result.user.role || result.user.Role,
+      branchId: result.user.branchId
     };
+    state.user = user;
+    state.branchId = user.branchId || "";
+    localStorage.setItem("pos_user", JSON.stringify(user));
 
-    state.user =
-      user;
-
-    state.branchId =
-      user.branchId || "";
-
-    localStorage.setItem(
-      "pos_user",
-      JSON.stringify(user)
-    );
-
-    // ==========================================
     // SESSION
-    // ==========================================
-
     if (!result.session_id) {
-
-      console.error(
-        "SESSION ID TIDAK ADA:",
-        result
-      );
-
       throw new Error(
         "Session login tidak dibuat."
       );
     }
 
-    localStorage.setItem(
-      "pos_session_id",
-      result.session_id
-    );
+    localStorage.setItem("pos_session_id", result.session_id);
+    if (state.branchId) {localStorage.setItem("pos_branchId", state.branchId);}
+    localStorage.setItem("pos_login_tenant", state.tenantSlug || "master");
 
-    // ==========================================
-    // BRANCH
-    // ==========================================
-
-    if (state.branchId) {
-
-      localStorage.setItem(
-        "pos_branchId",
-        state.branchId
-      );
-    }
-
-    // ==========================================
-    // TENANT
-    // ==========================================
-
-    localStorage.setItem(
-      "pos_login_tenant",
-      state.tenantSlug || "master"
-    );
-
-    // ==========================================
-    // DEBUG
-    // ==========================================
-
-    console.log(
-      "SESSION SAVED:",
-      localStorage.getItem(
-        "pos_session_id"
-      )
-    );
-
-    navigate(
-      "dashboardPage"
-    );
+    navigate("dashboardPage");
 
   } catch (err) {
-
-    console.error(
-      "LOGIN ERROR:",
-      err
-    );
-
     alert(
       err.message ||
       "Login gagal"
@@ -13958,10 +13845,7 @@ function initApp() {
       window.location.search
     );
   const page = params.get("page");
-
-  // TENANT CONTEXT
-  const urlTenant =
-    params.get("tenant");
+  const urlTenant = params.get("tenant");
   if (urlTenant) {
     state.tenantSlug = urlTenant.trim();
     localStorage.setItem("pos_tenantSlug", state.tenantSlug);
@@ -13972,13 +13856,9 @@ function initApp() {
         "pos_tenantSlug"
       ) || "";
   }
-
+	
   // USER
-  const user =
-    localStorage.getItem(
-      "pos_user"
-    );
-
+  const user = localStorage.getItem("pos_user");
   if (!user) {
     navigate(
       "loginPage"
@@ -14009,17 +13889,13 @@ function initApp() {
       ) ||
       "";
   }
-
-  // PAGE
+	
   if (page) {
     window.__ACTIVE_PAGE = page;
     navigate(page);
     return;
   }
-	
-  navigate(
-    "dashboardPage"
-  );
+  navigate("dashboardPage");
 }
 	
 function formatRupiah(angka) {
