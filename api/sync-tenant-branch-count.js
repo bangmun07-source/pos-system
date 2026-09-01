@@ -76,35 +76,38 @@ export default async function handler(req, res) {
         credential.service_role_key
       );
 
-    // 3. HITUNG BRANCH AKTUAL
-const {
-  count: branchCount,
-  error: branchError
-} = await tenantSupabase
-  .from("Branches")
-  .select("branchId", {
-    count: "exact",
-    head: true
-  });
 
-if (branchError) {
-  console.error("CUSTOMER BRANCH ERROR:", {
-    message: branchError.message,
-    code: branchError.code,
-    details: branchError.details,
-    hint: branchError.hint
-  });
+// 3. HITUNG BRANCH AKTUAL
+const branchResponse = await fetch(
+  `${tenant.supabase_url}/rest/v1/Branches?select=branchId`,
+  {
+    method: "GET",
+    headers: {
+      apikey: credential.service_role_key,
+      Authorization: `Bearer ${credential.service_role_key}`,
+      Prefer: "count=exact"
+    }
+  }
+);
 
+const branchText = await branchResponse.text();
+
+console.log("CUSTOMER HTTP STATUS:", branchResponse.status);
+console.log("CUSTOMER RESPONSE:", branchText);
+
+if (!branchResponse.ok) {
   return res.status(500).json({
     success: false,
     step: "customer_branches",
+    status: branchResponse.status,
     message: "Gagal membaca Branches Customer",
-    customer_url: tenant.supabase_url,
-    code: branchError.code || null,
-    details: branchError.details || null,
-    hint: branchError.hint || null
+    customer_response: branchText
   });
 }
+
+const branchData = JSON.parse(branchText);
+
+const branchCount = branchData.length;
 
 console.log("CUSTOMER BRANCH COUNT:", branchCount);
 
