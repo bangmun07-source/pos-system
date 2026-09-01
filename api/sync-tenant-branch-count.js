@@ -1,5 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
 
+// =====================================================
+// MASTER SUPABASE
+// =====================================================
+
 const CENTRAL_SUPABASE_URL =
   process.env.SUPABASE_URL;
 
@@ -12,7 +16,16 @@ const centralSupabase =
     CENTRAL_SUPABASE_SERVICE_ROLE_KEY
   );
 
+
+// =====================================================
+// API HANDLER
+// =====================================================
+
 export default async function handler(req, res) {
+
+  // =====================================================
+  // METHOD CHECK
+  // =====================================================
 
   if (req.method !== "POST") {
     return res.status(405).json({
@@ -22,6 +35,10 @@ export default async function handler(req, res) {
   }
 
   try {
+
+    // =====================================================
+    // INPUT
+    // =====================================================
 
     const {
       tenant_id
@@ -33,6 +50,7 @@ export default async function handler(req, res) {
         message: "tenant_id wajib diisi"
       });
     }
+
 
     // =====================================================
     // 1. AMBIL CONFIG TENANT DARI MASTER
@@ -46,15 +64,42 @@ export default async function handler(req, res) {
       .select(
         "id, tenant_id, tenant_name, supabase_url"
       )
-      .eq("tenant_id", tenant_id)
+      .eq(
+        "tenant_id",
+        tenant_id
+      )
       .single();
 
     if (tenantError) {
-      throw tenantError;
+      console.error(
+        "TENANT CONFIG ERROR:",
+        tenantError
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengambil konfigurasi tenant",
+        error: tenantError.message || null,
+        code: tenantError.code || null
+      });
     }
 
+
     // =====================================================
-    // 2. AMBIL SERVICE ROLE CUSTOMER DARI MASTER
+    // 2. VALIDASI TENANT
+    // =====================================================
+
+    if (!tenant) {
+      return res.status(404).json({
+        success: false,
+        message: "Tenant tidak ditemukan"
+      });
+    }
+
+
+    // =====================================================
+    // 3. AMBIL SERVICE ROLE CUSTOMER
+    //    DARI MASTER
     // =====================================================
 
     const {
@@ -62,22 +107,50 @@ export default async function handler(req, res) {
       error: credentialError
     } = await centralSupabase
       .from("tenant_credentials")
-      .select("service_role_key")
-      .eq("tenant_id", tenant_id)
+      .select(
+        "service_role_key"
+      )
+      .eq(
+        "tenant_id",
+        tenant_id
+      )
       .single();
 
     if (credentialError) {
-      throw credentialError;
+      console.error(
+        "CREDENTIAL ERROR:",
+        credentialError
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Gagal mengambil credential tenant",
+        error: credentialError.message || null,
+        code: credentialError.code || null
+      });
     }
 
-    if (!credential?.service_role_key) {
-      throw new Error(
-        "Service Role Customer tidak ditemukan"
-      );
-    }
 
     // =====================================================
-    // 3. CONNECT KE CUSTOMER DENGAN SERVICE ROLE
+    // 4. VALIDASI SERVICE ROLE
+    // =====================================================
+
+    if (
+      !credential ||
+      !credential.service_role_key
+    ) {
+
+      return res.status(500).json({
+        success: false,
+        message:
+          "Service Role Customer tidak ditemukan"
+      });
+    }
+
+
+    // =====================================================
+    // 5. CONNECT KE CUSTOMER DATABASE
+    //    SERVICE ROLE HANYA DI SERVER
     // =====================================================
 
     const tenantSupabase =
@@ -86,8 +159,9 @@ export default async function handler(req, res) {
         credential.service_role_key
       );
 
+
     // =====================================================
-    // 4. HITUNG BRANCH CUSTOMER
+    // 6. HITUNG BRANCH CUSTOMER
     // =====================================================
 
     const {
@@ -95,12 +169,21 @@ export default async function handler(req, res) {
       error: branchError
     } = await tenantSupabase
       .from("Branches")
-      .select("branchId", {
-        count: "exact",
-        head: true
-      });
+      .select(
+        "branchId",
+        {
+          count: "exact",
+          head: true
+        }
+      );
+
+
+    // =====================================================
+    // 7. HANDLE ERROR CUSTOMER
+    // =====================================================
 
     if (branchError) {
+
       console.error(
         "CUSTOMER BRANCH ERROR:",
         branchError
@@ -111,24 +194,43 @@ export default async function handler(req, res) {
         message:
           branchError.message ||
           "Gagal membaca Branches Customer",
-        code: branchError.code || null,
-        details: branchError.details || null,
-        hint: branchError.hint || null
+
+        code:
+          branchError.code ||
+          null,
+
+        details:
+          branchError.details ||
+          null,
+
+        hint:
+          branchError.hint ||
+          null
       });
     }
 
-    console.log(
-      "TENANT ID:",
-      tenant_id
-    );
-
-    console.log(
-      "BRANCH COUNT:",
-      branchCount
-    );
 
     // =====================================================
-    // 5. UPDATE MASTER
+    // 8. VALIDASI HASIL COUNT
+    // =====================================================
+
+    const actualBranchCount =
+      Number.isInteger(branchCount)
+        ? branchCount
+        : 0;
+
+
+    console.log(
+      "SYNC BRANCH SUCCESS",
+      {
+        tenant_id,
+        branch_count: actualBranchCount
+      }
+    );
+
+
+    // =====================================================
+    // 9. UPDATE MASTER
     // =====================================================
 
     const {
@@ -137,30 +239,75 @@ export default async function handler(req, res) {
     } = await centralSupabase
       .from("tenant_config")
       .update({
-        branch_count: branchCount || 0
+        branch_count:
+          actualBranchCount
       })
-      .eq("tenant_id", tenant_id)
+      .eq(
+        "tenant_id",
+        tenant_id
+      )
       .select(
         "tenant_id, tenant_name, branch_count"
       )
       .single();
 
-    if (updateError) {
-      throw updateError;
-    }
 
     // =====================================================
-    // 6. RESPONSE
+    // 10. HANDLE UPDATE ERROR
+    // =====================================================
+
+    if (updateError) {
+
+      console.error(
+        "MASTER UPDATE ERROR:",
+        updateError
+      );
+
+      return res.status(500).json({
+        success: false,
+        message:
+          updateError.message ||
+          "Gagal update branch_count",
+
+        code:
+          updateError.code ||
+          null,
+
+        details:
+          updateError.details ||
+          null,
+
+        hint:
+          updateError.hint ||
+          null
+      });
+    }
+
+
+    // =====================================================
+    // 11. RESPONSE
     // =====================================================
 
     return res.status(200).json({
+
       success: true,
+
       tenant_id,
-      branch_count: branchCount || 0,
-      data: updatedTenant
+
+      branch_count:
+        actualBranchCount,
+
+      data:
+        updatedTenant
+
     });
 
+
   } catch (error) {
+
+    // =====================================================
+    // FATAL ERROR
+    // =====================================================
 
     console.error(
       "SYNC BRANCH FATAL ERROR:",
@@ -168,19 +315,25 @@ export default async function handler(req, res) {
     );
 
     return res.status(500).json({
+
       success: false,
+
       message:
         error?.message ||
         "Gagal sync branch count",
+
       code:
         error?.code ||
         null,
+
       details:
         error?.details ||
         null,
+
       hint:
         error?.hint ||
         null
+
     });
   }
 }
