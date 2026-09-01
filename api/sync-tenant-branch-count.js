@@ -119,12 +119,14 @@ export default async function handler(req, res) {
       data: updatedTenant
     });
 
-  } catch (error) {
-    return res.status(500).json({
-      success: false,
-      message:
-        error.message ||
-        "Gagal sync branch count"
-    });
-  }
+ } catch (error) {
+
+  console.error("SYNC BRANCH ERROR:", error);
+
+  return res.status(500).json({
+    success: false,
+    message: error.message || "Gagal sync branch count",
+    details: error
+  });
+}
 }
