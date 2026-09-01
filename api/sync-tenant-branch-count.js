@@ -50,11 +50,30 @@ export default async function handler(req, res) {
       throw tenantError;
     }
 
-    // 2. CONNECT KE DATABASE CUSTOMER
+    // 2. AMBIL SERVICE ROLE CUSTOMER DARI MASTER
+    const {
+      data: credential,
+      error: credentialError
+    } = await centralSupabase
+      .from("tenant_credentials")
+      .select("service_role_key")
+      .eq("tenant_id", tenant_id)
+      .single();
+    
+    if (credentialError) {
+      throw credentialError;
+    }
+    
+    if (!credential?.service_role_key) {
+      throw new Error(
+        "Service Role Customer tidak ditemukan"
+      );
+    }
+    
     const tenantSupabase =
       createClient(
         tenant.supabase_url,
-        tenant.supabase_anon_key
+        credential.service_role_key
       );
 
     // 3. HITUNG BRANCH AKTUAL
