@@ -14453,6 +14453,8 @@ async function initExportButton() {
       `);
     }
     try {
+			const sessionId =
+  				localStorage.getItem("pos_session_id");
       const res =
         await fetch(
           "/api/export-pdf-report",
@@ -14462,7 +14464,6 @@ async function initExportButton() {
               "Content-Type":
                 "application/json"
             },
-
             body: JSON.stringify({
               start,
               end,
@@ -14710,8 +14711,8 @@ async function exportRecentTransactions() {
   `);
 
   try {
-
-    // CALL VERCEL API
+		const sessionId =
+		  localStorage.getItem("pos_session_id");
     const response =
 	  await fetch(
 	    "/api/export-pdf",
@@ -15414,7 +15415,8 @@ async function exportGrossRevenuePDF() {
   `);
 
   try {
-    // CALL VERCEL API
+    const sessionId =
+			localStorage.getItem("pos_session_id");
     const response =
       await fetch("/api/export-pdf", {
 				method: "POST",
@@ -18004,8 +18006,10 @@ async function exportMembersPDF() {
     </body>
     </html>
   `);
-
-  // PAYLOAD
+	
+	const sessionId =
+		localStorage.getItem("pos_session_id");
+	
   const payload = {
     type: "members",
     tier: tier,
@@ -21340,7 +21344,8 @@ async function exportRecipeReport() {
   `);
 
   try {
-    // CALL VERCEL API
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
@@ -23387,8 +23392,8 @@ async function exportInventoryPDF() {
   `);
 
   try {
-	
-    // CALL VERCEL
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
@@ -23952,7 +23957,8 @@ async function exportIngredientPurchases() {
   `);
 
   try {
-    // CALL VERCEL
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
@@ -24741,6 +24747,8 @@ async function exportAnalyticsPDF() {
   pdfTab.document.close();
   // CALL VERCEL API
   try {
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const response =
       await fetch("/api/export-pdf", {
 		  method: "POST",
@@ -28342,6 +28350,8 @@ async function exportExpensePDF() {
   `);
 
   try {
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const payload = {
       type: "expense",
       branchId: branchId,
@@ -28553,7 +28563,8 @@ async function exportOtherIncomePDF() {
   `);
 
   try {
-    // CALL VERCEL
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
@@ -33317,7 +33328,8 @@ async function exportCashFlowReport() {
   `);
 
   try {
-    // CALL VERCEL API
+		const sessionId =
+  		localStorage.getItem("pos_session_id");
     const response =
 	  await fetch("/api/export-pdf", {
 		method: "POST",
