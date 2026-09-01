@@ -30,7 +30,6 @@ function escapeHtml(value) {
     .replace(/'/g, "&#039;");
 }
 
-
 function normalize(value) {
   return String(value ?? "")
     .trim()
@@ -58,7 +57,6 @@ async function getBranchName(supabaseClient, branchId) {
   if (error) {
     return branchId;
   }
-
   return data?.branchName || branchId;
 }
 
@@ -70,7 +68,6 @@ export default async function handler(req, res) {
   }
 
   try {
-
     const {
       type = "",
       start,
@@ -81,6 +78,7 @@ export default async function handler(req, res) {
       tier = "ALL",
       search = "",
       loginUserId,
+      sessionId,
       tenantSlug
     } = req.body || {};
     
@@ -156,7 +154,6 @@ const logoSrc =
         status === "All Status"
           ? "ALL"
           : status || "ALL";
-
       const normalizedCategory =
         category === "All Categories"
           ? "ALL"
@@ -169,6 +166,7 @@ const logoSrc =
       } = await supabase.rpc(
         "get_expense_dashboard",
         {
+          p_session_id: sessionId,
           p_branch_id: branchId,
           p_status: normalizedStatus,
           p_category: normalizedCategory,
@@ -828,6 +826,7 @@ const logoSrc =
       } = await supabase.rpc(
         "get_members",
         {
+          p_session_id: sessionId,
           p_branch_id: null
         }
       );
@@ -863,9 +862,7 @@ const logoSrc =
       }
 
       // SUMMARY
-      const totalMembers =
-        rows.length;
-      
+      const totalMembers = rows.length;
       const {
         data: tier5Setting,
         error: tier5Error
@@ -1126,8 +1123,7 @@ const logoSrc =
                   <img
                     src="${logoSrc}"
                     class="logo"
-                    alt="Sistem POS"
-                  >   
+                    alt="Sistem POS">   
                 <div class="title">
                   Member Directory Report
                 </div>
@@ -1207,7 +1203,6 @@ const logoSrc =
         "Content-Type",
         "text/html; charset=utf-8"
       );
-
       return res
         .status(200)
         .send(html);
@@ -1221,7 +1216,6 @@ const logoSrc =
     else if (type === "recent-transactions") {
       
       if (!branchId) {
-    
         return res
           .status(400)
           .json({
@@ -1230,75 +1224,66 @@ const logoSrc =
           });
       }
     
-      // GET TRANSACTIONS
-      const {
-        data: transactions,
-        error: trxError
-      } = await supabase.rpc(
-        "get_recent_transactions_page",
-        {
-          p_branch_id: branchId,
-          p_start: start || null,
-          p_end: end || null,
-          p_status: status || "ALL",
-          p_table: "ALL"
-        }
-      );
-    
-      if (trxError) {
-        throw trxError;
-      }
-    
-      // GET SUMMARY
-      const {
-        data: summary,
-        error: summaryError
-      } = await supabase.rpc(
-        "get_recent_transaction_summary",
-        {
-          p_branch_id: branchId,
-          p_start: start || null,
-          p_end: end || null,
-          p_status: status || "ALL",
-          p_table: "ALL"
-        }
-      );
-    
-      if (summaryError) {
-        throw summaryError;
-      }
-      const rows =
-        Array.isArray(transactions)
-          ? transactions
-          : [];
-    
-      const reportSummary =
-        summary || {};
-    
-      const paymentDistribution =
-        reportSummary.paymentDistribution || {};
-    
-      const activeMembers =
-        Array.isArray(reportSummary.activeMembers)
-          ? reportSummary.activeMembers
-          : [];
-      const branchName =
-        await getBranchName(
-          supabase,
-          branchId
-        );
+              // GET TRANSACTIONS
+              const {
+                data: transactions,
+                error: trxError
+              } = await supabase.rpc(
+                "get_recent_transactions_page",
+                {
+                  p_session_id: sessionId,
+                  p_branch_id: branchId,
+                  p_start: start || null,
+                  p_end: end || null,
+                  p_status: status || "ALL",
+                  p_table: "ALL"
+                }
+              );
+            
+              if (trxError) {
+                throw trxError;
+              }
+            
+              // GET SUMMARY
+              const {
+                data: summary,
+                error: summaryError
+              } = await supabase.rpc(
+                "get_recent_transaction_summary",
+                {
+                  p_session_id: sessionId,
+                  p_branch_id: branchId,
+                  p_start: start || null,
+                  p_end: end || null,
+                  p_status: status || "ALL",
+                  p_table: "ALL"
+                }
+              );
+
+              if (summaryError) {
+                throw summaryError;
+              }
+              const rows = Array.isArray(transactions)
+                  ? transactions
+                  : [];
+              const reportSummary = summary || {};
+              const paymentDistribution = reportSummary.paymentDistribution || {};
+              const activeMembers = Array.isArray(reportSummary.activeMembers)
+                  ? reportSummary.activeMembers
+                  : [];
+              const branchName =
+                await getBranchName(
+                  supabase,
+                  branchId
+                );
  
       // TRANSACTION ROWS
-      const transactionRows =
-        rows.length
-    
-          ? rows.map(row => {
-    
+              const transactionRows = rows.length
+                  ? rows.map(row => {
               const items =
                 Array.isArray(row.items)
                   ? row.items
                   : [];
-    
               const itemsCount =
                 items.reduce(
                   (total, item) =>
@@ -1338,7 +1323,6 @@ const logoSrc =
                   </td>
                 </tr>
               `;
-    
             }).join("")
           : `
             <tr>
@@ -1351,23 +1335,13 @@ const logoSrc =
       // PAYMENT ROWS
       const paymentRows =
         Object.entries(paymentDistribution).length
-    
           ? Object.entries(paymentDistribution)
               .map(([method, total]) => {
-    
-                const amount =
-                  Number(total || 0);
-    
-                const revenue =
-                  Number(
-                    reportSummary.revenue || 0
-                  );
-    
-                const percent =
-                  revenue > 0
+                const amount = Number(total || 0);
+                const revenue = Number(reportSummary.revenue || 0);
+                const percent = revenue > 0
                     ? (amount / revenue) * 100
                     : 0;
-    
                 return `
                   <tr>  
                     <td>
@@ -1384,7 +1358,6 @@ const logoSrc =
                   </tr>
                 `;
               }).join("")
-    
           : `
             <tr>
               <td colspan="3" class="empty">
@@ -1396,9 +1369,7 @@ const logoSrc =
       // ACTIVE MEMBERS
       const memberRows =
         activeMembers.length
-    
           ? activeMembers.map(member => {
-    
               return `
                 <tr>
                   <td>
@@ -1414,15 +1385,12 @@ const logoSrc =
                   </td>
                 </tr>
               `;
-    
             }).join("")
           : `
             <tr>
-              <td
-                colspan="3"
-                class="empty"
-              >
-                No active member
+              <td colspan="3"
+                class="empty">
+                  No active member
               </td>
             </tr>
           `;
@@ -1616,7 +1584,6 @@ const logoSrc =
                     padding: 25px;     
                   }    
                 }
-                
               </style>  
             </head>
       
@@ -1633,7 +1600,6 @@ const logoSrc =
       
               <div class="report">
                 <div class="header">
-              
                   ${
                     logoSrc
                       ? `
@@ -1799,11 +1765,9 @@ const logoSrc =
         "Content-Type",
         "text/html; charset=utf-8"
       );
-    
       return res
         .status(200)
         .send(html);
-    
     }
 
 
@@ -1839,6 +1803,7 @@ const logoSrc =
             "get_cash_flow_page_data",
             {
               p_login_user_id: loginUserId,
+              p_session_id: sessionId,
               p_branch_id: branchId,
               p_start: start || null,
               p_end: end || null
@@ -1863,27 +1828,17 @@ const logoSrc =
               }
           
               // NORMALIZE
-              const account =
-                data.account || {};
-          
-              const summary =
-                data.summary || {};
-          
-              const history =
-                Array.isArray(data.history)
+              const account = data.account || {};
+              const summary = data.summary || {};
+              const history = Array.isArray(data.history)
                   ? data.history
                   : [];
-          
-              const transfers =
-                Array.isArray(data.transfers)
+              const transfers = Array.isArray(data.transfers)
                   ? data.transfers
                   : [];
-          
-              const ownerTransactions =
-                Array.isArray(data.ownerTransactions)
+              const ownerTransactions = Array.isArray(data.ownerTransactions)
                   ? data.ownerTransactions
                   : [];
-      
               const branchName =
                 await getBranchName(
                   supabase,
@@ -1965,7 +1920,6 @@ const logoSrc =
               const totalIncome =
                 incomeSource.reduce(
                   (sum, item) => {
-          
                     return (
                       sum +
                       number(
@@ -1974,14 +1928,12 @@ const logoSrc =
                         item.value
                       )
                     );
-          
                   },
                   0
                 );
           
               const incomeRows =
                 incomeSource.length
-          
                   ? incomeSource
                       .map(item => {
           
@@ -2021,11 +1973,9 @@ const logoSrc =
                       .join("")
                   : `
                     <tr>
-                      <td
-                        colspan="3"
-                        class="empty"
-                      >
-                        No income data
+                      <td colspan="3"
+                        class="empty">
+                          No income data
                       </td>
                     </tr>
                   `;
@@ -2041,7 +1991,6 @@ const logoSrc =
               const totalExpense =
                 expenseCategory.reduce(
                   (sum, item) => {
-          
                     return (
                       sum +
                       number(
@@ -2055,8 +2004,7 @@ const logoSrc =
                 );
           
               const expenseRows =
-                expenseCategory.length
-          
+                expenseCategory.length  
                   ? expenseCategory
                       .map(item => {
           
@@ -2093,13 +2041,10 @@ const logoSrc =
                         `;
                       })
                       .join("")
-          
                   : `
                     <tr>
-                      <td
-                        colspan="3"
-                        class="empty"
-                      >
+                      <td colspan="3"
+                        class="empty">
                         No expense data
                       </td>
                     </tr>
@@ -2108,7 +2053,6 @@ const logoSrc =
               // CASH FLOW HISTORY
               const historyRows =
                 history.length
-          
                   ? history
                       .map(item => {
                         return `
@@ -2150,13 +2094,10 @@ const logoSrc =
                         `;
                       })
                       .join("")
-          
                   : `
                     <tr>
-                      <td
-                        colspan="4"
-                        class="empty"
-                      >
+                      <td colspan="4"
+                        class="empty" >
                         No cash flow data
                       </td>
                     </tr>
@@ -2201,14 +2142,11 @@ const logoSrc =
                       `;
                     })
                     .join("")
-            
                 : `
                   <tr>
-                    <td
-                      colspan="4"
-                      class="empty"
-                    >
-                      No fund transfers
+                    <td colspan="4"
+                      class="empty">
+                        No fund transfers
                     </td>
                   </tr>
                 `;
@@ -2216,10 +2154,8 @@ const logoSrc =
               // OWNER TRANSACTIONS
               const ownerTransactionRows =
                 ownerTransactions.length
-          
                   ? ownerTransactions
                       .map(item => {
-          
                         return `
                           <tr>
                             <td>
@@ -2258,14 +2194,11 @@ const logoSrc =
                         `;
                       })
                       .join("")
-          
                   : `
                     <tr>
-                      <td
-                        colspan="4"
-                        class="empty"
-                      >
-                        No owner transactions
+                      <td colspan="4"
+                        class="empty">
+                          No owner transactions
                       </td>
                     </tr>
                   `;
@@ -2283,7 +2216,6 @@ const logoSrc =
                   </title>
           
                   <style>
-          
                     * {
                       box-sizing: border-box;
                     }
@@ -2456,25 +2388,19 @@ const logoSrc =
                 </head>
           
                 <body>
-          
                   <!-- TOOLBAR -->
                   <div class="export-toolbar">
                     <div>
                       📄 Cash Flow Report
                     </div>
           
-                    <button
-                      onclick="window.print()"
-                    >
+                    <button onclick="window.print()">
                       Download / Print PDF
                     </button>
-          
                   </div>
-          
           
                   <!-- REPORT -->
                   <div class="report">
-                  
                     <!-- HEADER -->
                     <div class="header">
           
@@ -2512,7 +2438,6 @@ const logoSrc =
                     </div>
           
                     <!-- SUMMARY -->
-          
                     <div class="kpi-grid">
                       <div class="kpi-card">
                         <div class="kpi-title">
@@ -2609,7 +2534,6 @@ const logoSrc =
                             <td class="right">
                               ${bankPercent.toFixed(1)}%
                             </td>
-          
                           </tr>
                         </tbody>
                       </table>
@@ -2617,17 +2541,13 @@ const logoSrc =
                     
                     <!-- INCOME SOURCE -->
                     <div class="card">
-          
                       <h3>
                         Income Source
                       </h3>
           
                       <table>
-          
                         <thead>
-          
                           <tr>
-          
                             <th>
                               Source
                             </th>
@@ -2648,9 +2568,7 @@ const logoSrc =
                       </table>
                     </div>
           
-          
                     <!-- EXPENSE CATEGORY -->
-          
                     <div class="card">
                       <h3>
                         Expense Category
@@ -2679,9 +2597,7 @@ const logoSrc =
                       </table>
                     </div>
           
-          
                     <!-- CASH FLOW HISTORY -->
-          
                     <div class="card">
                       <h3>
                         Cash Flow History
@@ -2705,7 +2621,6 @@ const logoSrc =
                             <th class="right">
                               Amount
                             </th>
-          
                           </tr>
                         </thead>
                         
@@ -2714,10 +2629,8 @@ const logoSrc =
                         </tbody>
                       </table>
                     </div>
-          
-          
+           
                     <!-- FUND TRANSFERS -->
-          
                     <div class="card">
                       <h3>
                         Fund Transfers
@@ -2750,7 +2663,6 @@ const logoSrc =
                       </table>
                     </div>
           
-          
                     <!-- OWNER TRANSACTIONS -->
                     <div class="card">
                       <h3>
@@ -2758,7 +2670,6 @@ const logoSrc =
                       </h3>
                       
                       <table>
-          
                         <thead>
                           <tr>
                             <th>
@@ -2783,10 +2694,8 @@ const logoSrc =
                         </tbody>
                       </table>
                     </div>
-          
-          
+              
                     <!-- FOOTER -->
-          
                     <div class="footer">
                       Generated by Sistem POS
                       •
@@ -2797,7 +2706,6 @@ const logoSrc =
                   </div>
                 </body>
                 </html>
-          
               `;
           
               // RETURN HTML
@@ -2809,11 +2717,7 @@ const logoSrc =
               return res
                 .status(200)
                 .send(html);
-          
             }
-
-
-
 
       // ===================================================
       // OTHER INCOME
@@ -2833,6 +2737,7 @@ const logoSrc =
             } = await supabase.rpc(
               "get_expense_dashboard",
               {
+                p_session_id: sessionId,
                 p_branch_id: branchId,
                 p_start: start || null,
                 p_end: end || null
@@ -2883,36 +2788,17 @@ const logoSrc =
               );
           
             // FILTER
-            const branchValue =
-              String(branchId || "").trim();
-          
-            const categoryValue =
-              String(category || "").trim();
-          
-            const statusValue =
-              String(status || "").trim();
-          
-            const searchValue =
-              String(search || "").trim();
-          
-            const startDate =
-              String(start || "").trim();
-          
-            const endDate =
-              String(end || "").trim();
-          
+            const branchValue = String(branchId || "").trim();
+            const categoryValue = String(category || "").trim();
+            const statusValue = String(status || "").trim();
+            const searchValue = String(search || "").trim();
+            const startDate = String(start || "").trim();
+            const endDate = String(end || "").trim();
             const filteredRows =
               rows.filter(r => {
-          
-                const rowBranch =
-                  norm(r.branchId);
-          
-                const rowCategory =
-                  norm(r.category);
-          
-                const rowStatus =
-                  norm(r.status);
-          
+                const rowBranch = norm(r.branchId);
+                const rowCategory = norm(r.category);
+                const rowStatus = norm(r.status);
                 const keyword =
                   JSON.stringify(r)
                     .toUpperCase();
@@ -2997,12 +2883,9 @@ const logoSrc =
                 ) {
                   return false;
                 }
-          
-                return true;
-          
+                return true;   
               });
           
-
             // CATEGORY BREAKDOWN 
             const categoryMap = {};
             let totalIncome = 0;
@@ -3018,17 +2901,15 @@ const logoSrc =
               categoryMap[cat] =
                 (categoryMap[cat] || 0) +
                 amount;
-          
-              totalIncome += amount;
-          
+              totalIncome += amount;   
             });
           
             const categoryBreakdown =
               Object.keys(categoryMap)
                 .map(cat => {
-          
-                  const amount =
-                    categoryMap[cat];
+                  
+            const amount =
+              categoryMap[cat];
           
                   return {
                     name: cat,
@@ -3041,7 +2922,6 @@ const logoSrc =
                           ) * 100
                         : 0
                   };
-          
                 })
                 .sort(
                   (a, b) =>
@@ -3074,12 +2954,10 @@ const logoSrc =
             // CATEGORY ROWS          
             const categoryRows =
               categoryBreakdown.length
-          
                 ? categoryBreakdown
                     .map(c => `
           
                       <tr>
-          
                         <td>
                           ${escapeHtml(c.name)}
                         </td>
@@ -3091,36 +2969,25 @@ const logoSrc =
                         <td class="right">
                           Rp ${rupiah(c.amount)}
                         </td>
-          
                       </tr>
-          
                     `)
                     .join("")
-          
                 : `
           
                   <tr>
-          
-                    <td
-                      colspan="3"
-                      class="empty"
-                    >
-                      No Data Found
+                    <td colspan="3"
+                      class="empty">
+                        No Data Found
                     </td>
-          
                   </tr>
-          
                 `;
           
             // LEDGER ROWS    
             const ledgerRows =
               filteredRows.length
-          
                 ? filteredRows
-                    .map(r => `
-          
+                    .map(r => `     
                       <tr>
-          
                         <td>
                           ${escapeHtml(
                             r.date || "-"
@@ -3166,21 +3033,15 @@ const logoSrc =
                             r.branchId || "-"
                           )}
                         </td>
-          
                       </tr>
-          
                     `)
                     .join("")
-          
                 : `
           
                   <tr>
-          
-                    <td
-                      colspan="8"
-                      class="empty"
-                    >
-                      No Data Found
+                    <td colspan="8"
+                      class="empty">
+                        No Data Found
                     </td>
                   </tr>
                 `;
@@ -3373,7 +3234,6 @@ const logoSrc =
                   </head>
                   
                     <body>
-                  
                       <div class="export-toolbar">          
                         <div>
                           📊 Other Income Report
@@ -3397,9 +3257,7 @@ const logoSrc =
                                 />          
                               `
                               : ""
-                          }
-
-                          
+                          } 
             
                           <div class="title">      
                             Other Income Report     
@@ -3513,7 +3371,6 @@ const logoSrc =
                           </table>          
                         </div>
                       
-                  
                         <!-- FOOTER -->          
                         <div class="footer">          
                           Generated by Sistem POS          
@@ -3556,6 +3413,7 @@ const logoSrc =
         } = await supabase.rpc(
           "get_gross_revenue_by_date",
           {
+            p_session_id: sessionId,
             p_branch_id: branchId,
             p_start: start || null,
             p_end: end || null
@@ -3573,6 +3431,7 @@ const logoSrc =
         } = await supabase.rpc(
           "get_top_revenue_products",
           {
+            p_session_id: sessionId,
             p_branch_id: branchId,
             p_start: start || null,
             p_end: end || null,
@@ -4274,7 +4133,8 @@ else if (type === "analytics") {
     {
       p_branch_id: branchId,
       p_start: start || null,
-      p_end: end || null
+      p_end: end || null,
+      p_session_id: sessionId
     }
   );
 
@@ -4794,46 +4654,63 @@ else if (type === "analytics") {
         </tr>
       `;
 
-  // ACTIVE MEMBERS
+  // ACTIVE MEMBERS 
   const activeMembers =
     Array.isArray(
       analytics.activeMemberList
     )
       ? analytics.activeMemberList
       : [];
-
+  
   const memberRows =
     activeMembers.length
-      ? activeMembers.map(
-          member => `
+      ? activeMembers.map(member => {
+        
+          const memberName =
+            member?.name ??
+            member?.Nama ??
+            "-";
+  
+          const tier =
+            member?.tier ??
+            member?.Tier ??
+            member?.Level_Current ??
+            "-";
+  
+          const point =
+            Number(
+              member?.point ??
+              member?.Point ??
+              0
+            );
+  
+          return `
             <tr>
               <td>
                 ${escapeHtml(
-                  member.name
+                  memberName
                 )}
               </td>
-
+  
               <td>
                 ${escapeHtml(
-                  member.tier || "-"
+                  tier
                 )}
               </td>
-
+  
               <td class="right">
-                ${Number(
-                  member.point || 0
-                ).toLocaleString(
+                ${point.toLocaleString(
                   "id-ID"
                 )} PTS
               </td>
             </tr>
-          `
-        ).join("")
-
+          `;
+        }).join("")
       : `
         <tr>
-          <td colspan="3" class="empty">
-            No active members
+          <td colspan="3"
+            class="empty">
+              No active members
           </td>
         </tr>
       `;
@@ -5379,7 +5256,8 @@ else if (type === "inventory") {
   } = await supabase.rpc(
     "get_inventory_page",
     {
-      p_branch_id: branchId
+      p_branch_id: branchId,
+      p_session_id: sessionId
     }
   );
   if (error) {
@@ -5819,6 +5697,7 @@ const html = `
   } = await supabase.rpc(
     "get_ingredient_purchases",
     {
+      p_session_id: sessionId,
       p_branch_id: branchId,
       p_start: start || null,
       p_end: end || null
@@ -6487,17 +6366,16 @@ const html = `
 
               <thead>
                 <tr>
-                  <tr>
-                    <th>Date</th>
-                    <th>Ingredient</th>
-                    <th class="right"> Qty </th>
-                    <th class="right"> Total Price </th>
-                    <th> Supplier </th>
-                    <th> Payment </th>
-                    <th> Status </th>
-                    <th class="right"> Balance Due </th>
-                    <th> Outlet </th>
-                    <th> Note </th>
+                  <th>Date</th>
+                  <th>Ingredient</th>
+                  <th class="right"> Qty </th>
+                  <th class="right"> Total Price </th>
+                  <th> Supplier </th>
+                  <th> Payment </th>
+                  <th> Status </th>
+                  <th class="right"> Balance Due </th>
+                  <th> Outlet </th>
+                  <th> Note </th>
                 </tr>
               </thead>
 
@@ -6552,7 +6430,11 @@ else if (type === "recipe") {
     data,
     error
   } = await supabase.rpc(
-    "get_recipes"
+    "get_recipes",
+    {
+      p_branch_id: branchId,
+      p_session_id: sessionId
+    }
   );
 
   if (error) {
