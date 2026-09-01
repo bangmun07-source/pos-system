@@ -18007,6 +18007,8 @@ async function exportMembersPDF() {
     </html>
   `);
 	
+// REQUEST
+try {	
 	const sessionId =
 		localStorage.getItem("pos_session_id");
 	
@@ -18018,8 +18020,6 @@ async function exportMembersPDF() {
 		tenantSlug: state.tenantSlug
   };
 
-  // REQUEST
-  try {
     const response =
       await fetch(
         "/api/export-pdf",
@@ -18029,7 +18029,6 @@ async function exportMembersPDF() {
             "Content-Type":
               "application/json"
           },
-
           body:
             JSON.stringify(
               payload
