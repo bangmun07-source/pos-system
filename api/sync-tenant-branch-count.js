@@ -78,20 +78,41 @@ export default async function handler(req, res) {
         credential.service_role_key
       );
 
-    // 3. HITUNG BRANCH AKTUAL
-    const {
-      count: branchCount,
-      error: branchError
-    } = await tenantSupabase
-      .from("Branches")
-      .select("*", {
-        count: "exact",
-        head: true
-      });
+   // 3. CONNECT KE CUSTOMER
+const tenantSupabase = createClient(
+  tenant.supabase_url,
+  credential.service_role_key
+);
 
-    if (branchError) {
-      throw branchError;
-    }
+console.log("TENANT ID:", tenant_id);
+console.log("TENANT URL:", tenant.supabase_url);
+console.log("SERVICE ROLE ADA:", !!credential.service_role_key);
+
+// 4. HITUNG BRANCH AKTUAL
+const {
+  count: branchCount,
+  error: branchError
+} = await tenantSupabase
+  .from("Branches")
+  .select("branchId", {
+    count: "exact",
+    head: true
+  });
+
+if (branchError) {
+  console.error("CUSTOMER BRANCH ERROR:", branchError);
+
+  return res.status(500).json({
+    success: false,
+    message: "Gagal membaca Branches Customer",
+    error: branchError.message,
+    code: branchError.code,
+    details: branchError.details,
+    hint: branchError.hint
+  });
+}
+
+console.log("BRANCH COUNT:", branchCount);
 
     // 4. UPDATE MASTER
     const {
