@@ -13788,12 +13788,9 @@ async function handleLogin() {
 
     } catch (networkError) {
 			
-			if (networkError.status === 403) {
-				throw new Error(
-					networkError.message ||
-					"Tenant tidak aktif"
-				);
-			}
+		if (networkError.status) {
+		  throw networkError;
+		}
 			
       // MASTER TIDAK BOLEH OFFLINE FALLBACK
     	if (
