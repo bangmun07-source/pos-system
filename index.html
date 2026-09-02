@@ -2918,15 +2918,27 @@
 	<aside id="billingSidebar"
 	  class=" fixed right-0 top-6 bottom-0 pointer-events-none w-0 bg-background translate-x-[120%] opacity-0 border border-outline-variant flex flex-col pt-24 pb-8 px-6 z-40 flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)] transition-all duration-300 ">
 		<div class="flex items-center justify-between mb-8">
-			<div>
-				<h2 class="font-headline text-2xl font-bold">Card Table</h2>
-				<p id="billing-table-info" class="text-on-surface-variant text-sm font-semibold">
-				  No Table Selected
-				</p>
-			</div>
-			<div class="bg-background-high p-3 rounded-2xl">
-				<span class="material-symbols-outlined text-foreground">Table</span>
-			</div>
+		  <div>
+		    <h2 class="font-headline text-2xl font-bold">
+		      Card Table
+		    </h2>
+		
+		    <p id="billing-table-info"
+		       class="text-on-surface-variant text-sm font-semibold">
+		      No Table Selected
+		    </p>
+		
+		    <span id="billing-table-status"
+		          class="inline-block mt-2 px-3 py-1 rounded-full bg-background-high text-xs font-bold">
+		      No Status
+		    </span>
+		  </div>
+		
+		  <div class="bg-background-high p-3 rounded-2xl">
+		    <span class="material-symbols-outlined text-foreground">
+		      Table
+		    </span>
+		  </div>
 		</div>
 	  <!-- Billing Mode -->
 	  <div id="billingActions" class="flex flex-col flex-1 min-h-0">
@@ -19485,13 +19497,27 @@ async function clearSelectedTable() {
 function renderBilling(data) {
   const container = document.getElementById("table-cart-items");
   const summary = document.getElementById("table-cart-summary");
+  const statusEl = document.getElementById("billing-table-status");
 
   if (!data) {
-    container.innerHTML = "<p class='text-muted text-sm'>No active transaction</p>";
+    container.innerHTML =
+      "<p class='text-muted text-sm'>No active transaction</p>";
+
+    summary.innerHTML = "";
+
+    if (statusEl) {
+      statusEl.innerText = "No Status";
+    }
+
     return;
   }
 
-  //  ITEMS
+  // STATUS
+  if (statusEl) {
+    statusEl.innerText = data.status || "No Status";
+  }
+
+  // ITEMS
   container.innerHTML = "";
 
   data.items.forEach(item => {
@@ -19501,40 +19527,61 @@ function renderBilling(data) {
           <div class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface-container font-bold text-sm">
             ${item.qty}x
           </div>
+
           <div>
-            <p class="text-sm font-semibold text-on-surface">${item.name}</p>
-            <p class="text-xs text-muted ">${item.note || ""}</p>
+            <p class="text-sm font-semibold text-on-surface">
+              ${item.name}
+            </p>
+
+            <p class="text-xs text-muted">
+              ${item.note || ""}
+            </p>
           </div>
         </div>
-        <p class="text-sm font-bold text-on-surface">${formatRupiah(item.total)}</p>
+
+        <p class="text-sm font-bold text-on-surface">
+          ${formatRupiah(item.total)}
+        </p>
       </div>
     `;
   });
 
-  //  SUMMARY
-
-  summary.innerHTML = `
-    <div class="space-y-2">
-      <div class="flex justify-between text-sm">
-        <span class="text-muted">Subtotal</span>
-        <span>${formatRupiah(data.subtotal)}</span>
-      </div>
-      <div class="flex justify-between text-sm">
-        <span class="text-muted">Tax</span>
-        <span>${formatRupiah(data.tax)}</span>
-      </div>
-      <div class="flex justify-between text-sm">
-        <span class="text-muted">Service</span>
-        <span>${formatRupiah(data.service)}</span>
-      </div>
-      <div class="flex justify-between pt-4">
-        <span class="font-bold">Total</span>
-        <span class="font-bold text-on-surface">${formatRupiah(data.total)}</span>
-      </div>
-    </div>
-  `;
+  // SUMMARY
+	summary.innerHTML = `
+	  <div class="space-y-2">
+	
+		<div class="flex justify-between text-sm">
+		  <span class="text-muted">Subtotal</span>
+		  <span>${formatRupiah(data.subtotal)}</span>
+		</div>
+	
+		<div class="flex justify-between text-sm">
+		  <span class="text-muted">Discount</span>
+		  <span>- ${formatRupiah(data.discount)}</span>
+		</div>
+	
+		<div class="flex justify-between text-sm">
+		  <span class="text-muted">Tax</span>
+		  <span>${formatRupiah(data.tax)}</span>
+		</div>
+	
+		<div class="flex justify-between text-sm">
+		  <span class="text-muted">Service</span>
+		  <span>${formatRupiah(data.service)}</span>
+		</div>
+	
+		<div class="flex justify-between pt-4">
+		  <span class="font-bold">Total</span>
+	
+		  <span class="font-bold text-on-surface">
+			${formatRupiah(data.total)}
+		  </span>
+		</div>
+	
+	  </div>
+	`;
 }
-
+	
 function initTablePage() {
   loadTables();
 }
