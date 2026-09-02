@@ -13504,7 +13504,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // 3. PAGE & BOOT APP
   const page = params.get("page") || window.__ACTIVE_PAGE || null;
   async function bootApp(targetPage = "dashboardPage") {
-    const ok = restoreSession();
+    const ok = await restoreSession();
     if (!ok) {
       navigate("loginPage");
       return;
@@ -13535,37 +13535,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-function bootApp(targetPage = "dashboardPage") {
-  const ok = restoreSession();
-  if (!ok) { navigate("loginPage");
-    return;
-  }
-  state.user = JSON.parse(localStorage.getItem("pos_user"));
-  state.branchId = localStorage.getItem("pos_branchId");
-  if (!state.branchId && state.user?.branchId ) {
-      state.branchId = state.user.branchId;
-  }
-  window.__ACTIVE_PAGE =  targetPage;
-  navigate(targetPage);
-}
 
-function restoreSession() {
+
+async function restoreSession() {
   const user = localStorage.getItem("pos_user");
   const branchId = localStorage.getItem("pos_branchId");
   const loginTenant = localStorage.getItem("pos_login_tenant");
-  // Tidak ada session
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  // TIDAK ADA USER
   if (!user) {
     return false;
   }
 
   const currentTenant = state.tenantSlug || "master";
-  // JIKA POS_LOGIN_TENANT BELUM ADA (Kasus login lama), 
-  // simpan otomatis tenant saat ini agar tidak mental saat refresh
-  if (!loginTenant) {
-    localStorage.setItem("pos_login_tenant", currentTenant);
-  } 
-  // JIKA SUDAH ADA TAPI BEDA TENANT, BARU HAPUS SESI
-  else if (loginTenant !== currentTenant) {
+
+  // SESSION ID TIDAK ADA
+  if (!sessionId) {
     localStorage.removeItem("pos_user");
     localStorage.removeItem("pos_branchId");
     localStorage.removeItem("pos_login_tenant");
@@ -13574,10 +13560,93 @@ function restoreSession() {
     state.branchId = "";
     return false;
   }
-  // Session valid untuk tenant yang sama
-  state.user = JSON.parse(user);
-  state.branchId = branchId;
-  return true;
+	
+  // TENANT BERBEDA
+  if (
+    loginTenant &&
+    loginTenant !== currentTenant
+  ) {
+    localStorage.removeItem("pos_user");
+    localStorage.removeItem("pos_branchId");
+    localStorage.removeItem("pos_login_tenant");
+    localStorage.removeItem("pos_session_id");
+    state.user = null;
+    state.branchId = "";
+    return false;
+  }
+
+  // VALIDASI SESSION + STATUS TENANT
+  try {
+    const response =
+      await fetch("/api/auth/login", {
+        method: "GET",
+
+        headers: {
+          "x-session-id": sessionId,
+          "x-tenant-slug": currentTenant
+        }
+      });
+
+    const result = await response.json();
+
+    // TENANT INACTIVE / SESSION INVALID
+    if (
+      !response.ok ||
+      !result.success
+    ) {
+
+      localStorage.removeItem("pos_user");
+      localStorage.removeItem("pos_branchId");
+      localStorage.removeItem("pos_login_tenant");
+      localStorage.removeItem("pos_session_id");
+      state.user = null;
+      state.branchId = "";
+
+      alert(
+        result.error ||
+        "Session tidak valid atau tenant tidak aktif."
+      );
+      return false;
+    }
+
+    // SESSION VALID
+    state.user = {
+      ...result.user,
+      id: result.user.id || result.user.ID_User,
+      username: result.user.username || result.user.Username,
+      role: result.user.role || result.user.Role,
+      branchId: result.user.branchId
+    };
+    state.branchId =result.user.branchId || "";
+    localStorage.setItem("pos_user", JSON.stringify(state.user));
+
+    if (state.branchId) {
+      localStorage.setItem(
+        "pos_branchId",
+        state.branchId
+      );
+    }
+
+    localStorage.setItem(
+      "pos_login_tenant",
+      currentTenant
+    );
+    return true;
+  } catch (error) {
+
+    // INTERNET / API TIDAK TERJANGKAU
+    console.warn(
+      "Validasi session gagal:",
+      error
+    );
+
+    // Jangan hapus session kalau hanya
+    // internet/API sedang tidak tersedia.
+
+    state.user = JSON.parse(user);
+    state.branchId = branchId || "";
+    return true;
+  }
 }
 
 function navigate(pageId, params = {}) {
@@ -13707,17 +13776,27 @@ async function handleLogin() {
           })
         });
 
-      result = await response.json();
-      if (!response.ok) {
-        throw new Error(
-          result.error ||
-          "Login gagal"
-        );
-      }
+		result = await response.json();
+		if (!response.ok) {
+		  const error = new Error(
+			result.error ||
+			"Login gagal"
+		  );
+		  error.status = response.status;
+		  throw error;
+		}
 
     } catch (networkError) {
+			
+			if (networkError.status === 403) {
+				throw new Error(
+					networkError.message ||
+					"Tenant tidak aktif"
+				);
+			}
+			
       // MASTER TIDAK BOLEH OFFLINE FALLBACK
-      if (
+    	if (
         !state.tenantSlug ||
         state.tenantSlug === "master"
       ) {
