@@ -32701,22 +32701,11 @@ async function getChatAnalytics(start, end, branchId, callback) {
 
 async function loadBackupList(){
   try {
-    // SUPABASE (AKTIFKAN NANTI)
-    const {
-		  data,
-		  error
-		} = await supabaseClient
-		  .from("Backup_History")
-		  .select("*")
-		  .order("created_at", {
-		    ascending: false
-		  });
-	
-	if (error) {
-	  throw error;
-	}
+
+    const data = await getBackupHistoryRPC();
+
     if(data.length === 0){
-		
+
       addBackupChatMessage(
         "bot",
         `
