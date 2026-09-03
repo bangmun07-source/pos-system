@@ -36,6 +36,8 @@ export default async function handler(req, res) {
       });
     }
 
+    const sessionId = req.headers["x-session-id"];
+
     // =====================================================
     // MASTER SUPABASE
     // =====================================================
@@ -176,10 +178,6 @@ export default async function handler(req, res) {
     // =====================================================
 
     else {
-
-      const sessionId =
-        req.headers["x-session-id"];
-
       if (!sessionId) {
         return res.status(401).json({
           success: false,
@@ -334,8 +332,7 @@ export default async function handler(req, res) {
     // =====================================================
     // RESTORE DATABASE
     // =====================================================
-    const sessionId = 
-      localStorage.getItem("pos_session_id");
+
     const {
       data: result,
       error: restoreError
