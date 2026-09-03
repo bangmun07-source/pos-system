@@ -26578,7 +26578,7 @@ document.addEventListener("input",function(e){
 	}
 });
 
-function updateExpenseAIInsight() {
+function updateExpenseAIInsight(filteredData) {
   const el = document.getElementById("expenseAIInsight");
   if (!el) return;
   const data = filteredData || allExpenseData || [];
