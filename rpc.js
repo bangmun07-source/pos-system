@@ -3477,49 +3477,60 @@ async function deleteBackupById(backupId) {
     );
   }
 
+  // 1. AMBIL FILE PATH VIA RPC
   const {
     data: history,
-    error
-  } = await supabaseClient
-    .from("Backup_History")
-    .select("backup_id,file_path")
-    .eq("backup_id", backupId)
-    .single();
+    error: historyError
+  } =
+    await supabaseClient.rpc(
+      "get_backup_file_info",
+      {
+        p_backup_id: backupId,
+        p_session_id: sessionId
+      }
+    );
 
-  if (error) {
-    throw error;
+  if (historyError) {
+    throw historyError;
   }
-  if (!history) {
+
+  if (!history?.success) {
     throw new Error(
+      history?.message ||
       "Backup tidak ditemukan"
     );
   }
-  if (history.file_path) {
-    await deleteDatabaseBackup(
-      history.file_path
+
+  if (!history.file_path) {
+    throw new Error(
+      "File backup tidak ditemukan"
     );
   }
 
+  // 2. HAPUS FILE DARI STORAGE
+  
+  await deleteDatabaseBackup(
+    history.file_path
+  );
+
+  // 3. HAPUS RECORD BACKUP_HISTORY
   const {
+    data: result,
     error: deleteError
   } =
     await supabaseClient.rpc(
       "delete_backup_history",
       {
-        p_backup_id:backupId,
+        p_backup_id: backupId,
         p_session_id: sessionId
       }
     );
+
   if (deleteError) {
     throw deleteError;
   }
-  return {
-    success: true,
-    backup_id:
-      backupId
-  };
+  return result;
 }
-
 
 
 
