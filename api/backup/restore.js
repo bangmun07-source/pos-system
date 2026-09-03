@@ -334,7 +334,8 @@ export default async function handler(req, res) {
     // =====================================================
     // RESTORE DATABASE
     // =====================================================
-
+    const sessionId = 
+      localStorage.getItem("pos_session_id");
     const {
       data: result,
       error: restoreError
@@ -342,11 +343,9 @@ export default async function handler(req, res) {
       await supabase.rpc(
         "restore_database_backup",
         {
-          p_backup:
-            backup,
-
-          p_restored_by:
-            user.ID_User
+          p_session_id: sessionId,
+          p_backup: backup,
+          p_restored_by: user.ID_User
         }
       );
 
