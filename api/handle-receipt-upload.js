@@ -188,7 +188,7 @@ module.exports = async function handler(req, res) {
 
   }
   catch (err) {
-
+console.error("HANDLE RECEIPT ERROR:", err);
     return res.status(500).json({
       success: false,
       error:
