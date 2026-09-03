@@ -26579,9 +26579,16 @@ document.addEventListener("input",function(e){
 });
 
 function updateExpenseAIInsight(filteredData) {
-  const el = document.getElementById("expenseAIInsight");
+  const el =
+    document.getElementById(
+      "expenseAIInsight"
+    );
+
   if (!el) return;
-  const data = filteredData || allExpenseData || [];
+  const data =
+    filteredData ||
+    allExpenseData ||
+    [];
 
   if (!data.length) {
     el.innerHTML =
@@ -26597,12 +26604,15 @@ function updateExpenseAIInsight(filteredData) {
       0
     );
 
-  const transactionCount =
-    data.length;
+  const transactionCount = data.length;
+  const averageExpense =
+    transactionCount > 0
+      ? totalExpense /
+        transactionCount
+      : 0;
 
   // CATEGORY
   const categories = {};
-
   data.forEach(item => {
     const category =
       item.category?.trim() ||
@@ -26618,7 +26628,10 @@ function updateExpenseAIInsight(filteredData) {
 
   const categoryEntries =
     Object.entries(categories)
-      .sort((a, b) => b[1] - a[1]);
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      );
 
   const biggestCategory =
     categoryEntries[0];
@@ -26640,72 +26653,234 @@ function updateExpenseAIInsight(filteredData) {
       "Tidak diketahui";
 
     paymentMethods[method] =
-      (paymentMethods[method] || 0) + 1;
+      (paymentMethods[method] || 0) +
+      1;
   });
 
   const dominantPayment =
     Object.entries(paymentMethods)
-      .sort((a, b) => b[1] - a[1])[0];
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      )[0];
 
   // BUDGET
-  let budgetInsight = "";
+  let budgetPercentage = null;
+  let budgetStatus = "";
   if (Number(expenseBudget) > 0) {
-    const percentage =
-      (totalExpense /
-        Number(expenseBudget)) *
-      100;
-	
-    if (percentage >= 100) {
-      budgetInsight =
-        ` Budget sudah terpakai <b>${percentage.toFixed(0)}%</b> dan telah melewati batas.`;
-    } else if (percentage >= 80) {
-      budgetInsight =
-        ` Budget sudah terpakai <b>${percentage.toFixed(0)}%</b> dan mulai mendekati batas.`;
+    budgetPercentage =
+      (
+        totalExpense /
+        Number(expenseBudget)
+      ) * 100;
+
+    if (
+      budgetPercentage >= 100
+    ) {
+      budgetStatus =
+        `Budget sudah terpakai <b>${budgetPercentage.toFixed(0)}%</b> dan telah melewati batas.`;
+    } else if (
+      budgetPercentage >= 80
+    ) {
+      budgetStatus =
+        `Budget sudah terpakai <b>${budgetPercentage.toFixed(0)}%</b> dan mulai mendekati batas.`;
     } else {
-      budgetInsight =
-        ` Budget baru terpakai <b>${percentage.toFixed(0)}%</b>.`;
+      budgetStatus =
+        `Budget baru terpakai <b>${budgetPercentage.toFixed(0)}%</b>.`;
     }
   }
 
-  // BUILD INSIGHT
+  // RINGKASAN
   let insight =
     `Terdapat <b>${transactionCount}</b> transaksi ` +
     `dengan total pengeluaran ` +
     `<b>Rp ${totalExpense.toLocaleString("id-ID")}</b>.`;
 
-
+  // KATEGORI TERBESAR
   if (biggestCategory) {
-    const percentage =
+    const categoryPercentage =
       totalExpense > 0
         ? (
             biggestCategory[1] /
             totalExpense
           ) * 100
         : 0;
-	
+
     insight +=
       ` Kategori terbesar adalah ` +
       `<b>${biggestCategory[0]}</b> ` +
       `sebesar <b>Rp ${biggestCategory[1].toLocaleString("id-ID")}</b> ` +
-      `(${percentage.toFixed(0)}%).`;
+      `(${categoryPercentage.toFixed(0)}% dari total).`;
   }
 
+  // PENGELUARAN TERBESAR
   if (biggestExpense) {
+
+    const biggestAmount =
+      Number(
+        biggestExpense.amount || 0
+      );
+
+    const biggestPercentage =
+      totalExpense > 0
+        ? (
+            biggestAmount /
+            totalExpense
+          ) * 100
+        : 0;
+
     insight +=
       ` Pengeluaran individual terbesar adalah ` +
       `<b>${biggestExpense.description || "Tanpa deskripsi"}</b> ` +
-      `sebesar <b>Rp ${Number(
-        biggestExpense.amount || 0
-      ).toLocaleString("id-ID")}</b>.`;
+      `sebesar <b>Rp ${biggestAmount.toLocaleString("id-ID")}</b>.`;
+
+    // MASUKAN PENGELUARAN BESAR
+    if (
+      biggestPercentage >= 30
+    ) {
+
+      insight +=
+        ` <b>Masukan:</b> Pengeluaran tersebut ` +
+        `menyumbang sekitar <b>${biggestPercentage.toFixed(0)}%</b> ` +
+        `dari total pengeluaran. Sebaiknya periksa apakah biaya ini ` +
+        `bersifat rutin, penting, atau masih dapat dioptimalkan.`;
+    }
   }
 
-  if (dominantPayment) {
-    insight +=
-      ` Metode pembayaran yang paling sering digunakan adalah ` +
-      `<b>${dominantPayment[0]}</b>.`;
+  // MASUKAN KATEGORI
+  if (biggestCategory) {
+
+    const categoryPercentage =
+      totalExpense > 0
+        ? (
+            biggestCategory[1] /
+            totalExpense
+          ) * 100
+        : 0;
+
+    if (
+      categoryPercentage >= 50
+    ) {
+
+      insight +=
+        ` Kategori <b>${biggestCategory[0]}</b> ` +
+        `menyumbang lebih dari setengah total pengeluaran. ` +
+        `<b>Masukan:</b> Pertimbangkan untuk mengevaluasi ` +
+        `komponen biaya pada kategori tersebut.`;
+
+    } else if (
+      categoryPercentage >= 35
+    ) {
+
+      insight +=
+        ` <b>Masukan:</b> Pengeluaran cukup terkonsentrasi ` +
+        `pada kategori <b>${biggestCategory[0]}</b>. ` +
+        `Kategori ini layak menjadi prioritas evaluasi.`;
+    }
   }
-  insight += budgetInsight;
-  el.innerHTML = insight;
+
+  // BUDGET INSIGHT
+  if (
+    budgetPercentage !== null
+  ) {
+
+    if (
+      budgetPercentage >= 100
+    ) {
+
+      insight +=
+        ` <b>Masukan:</b> Pengeluaran sudah melewati ` +
+        `budget. Prioritaskan evaluasi terhadap pengeluaran ` +
+        `yang tidak mendesak sebelum menambah biaya baru.`;
+
+    } else if (
+      budgetPercentage >= 80
+    ) {
+
+      insight +=
+        ` <b>Masukan:</b> Penggunaan budget sudah cukup tinggi. ` +
+        `Sebaiknya pantau pengeluaran berikutnya agar ` +
+        `tidak melewati batas.`;
+
+    } else if (
+      budgetPercentage <= 50
+    ) {
+
+      insight +=
+        ` <b>Masukan:</b> Penggunaan budget masih relatif rendah, ` +
+        `sehingga ruang pengeluaran masih cukup tersedia.`;
+    }
+  }
+
+  // POLA TRANSAKSI
+  if (
+    transactionCount >= 20 &&
+    averageExpense < 100000
+  ) {
+
+    insight +=
+      ` <b>Masukan:</b> Jumlah transaksi pengeluaran cukup banyak ` +
+      `dengan nilai rata-rata relatif kecil. ` +
+      `Periksa pengeluaran kecil yang berulang karena ` +
+      `akumulasinya dapat menjadi signifikan.`;
+
+  } else if (
+    transactionCount <= 5 &&
+    averageExpense > 1000000
+  ) {
+    insight +=
+      ` <b>Masukan:</b> Jumlah transaksi relatif sedikit, ` +
+      `tetapi nilai rata-ratanya cukup besar. ` +
+      `Sebaiknya berikan perhatian khusus pada setiap ` +
+      `pengeluaran bernilai tinggi.`;
+  }
+
+  // PAYMENT METHOD
+  if (dominantPayment) {
+    const paymentPercentage =
+      (
+        dominantPayment[1] /
+        transactionCount
+      ) * 100;
+
+    if (
+      paymentPercentage >= 70
+    ) {
+
+      insight +=
+        ` Sebagian besar transaksi menggunakan ` +
+        `<b>${dominantPayment[0]}</b> ` +
+        `(${paymentPercentage.toFixed(0)}% dari transaksi).`;
+    }
+  }
+
+  // KONDISI NORMAL
+  if (
+    budgetPercentage !== null &&
+    budgetPercentage < 80 &&
+    (!biggestCategory ||
+      (
+        biggestCategory[1] /
+        totalExpense
+      ) < 0.5)
+  ) {
+
+    insight +=
+      ` <b>Masukan:</b> Pola pengeluaran saat ini ` +
+      `masih terlihat cukup terkendali. ` +
+      `Pertahankan pemantauan terutama pada kategori ` +
+      `dengan pertumbuhan biaya paling tinggi.`;
+  }
+
+  // STATUS BUDGET
+  if (budgetStatus) {
+    insight +=
+      ` ${budgetStatus}`;
+  }
+
+  // RENDER
+  el.innerHTML =
+    insight;
 }
 
 async function saveExpenseBudget() {
