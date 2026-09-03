@@ -26426,31 +26426,17 @@ function initExpenseSettingPage() {
     );
 
   document
-	  .getElementById(
-	    "expenseStartDate"
-	  )
+	  .getElementById("expenseStartDate")
 	  ?.addEventListener(
 	    "change",
-	    async () => {
-	      state.expenseDashboardData = null;
-	      state.expenseDashboardFilter = null;
-	
-	      await loadExpenseDashboard();
-	    }
+	    filterExpenseTable
 	  );
 	
 	document
-	  .getElementById(
-	    "expenseEndDate"
-	  )
+	  .getElementById("expenseEndDate")
 	  ?.addEventListener(
 	    "change",
-	    async () => {
-	      state.expenseDashboardData = null;
-	      state.expenseDashboardFilter = null;
-	
-	      await loadExpenseDashboard();
-	    }
+	    filterExpenseTable
 	  );
 
   document
@@ -26593,12 +26579,9 @@ document.addEventListener("input",function(e){
 });
 
 function updateExpenseAIInsight() {
-  const el =
-    document.getElementById("expenseAIInsight");
+  const el = document.getElementById("expenseAIInsight");
   if (!el) return;
-	
-  const data =
-    allExpenseData || [];
+  const data = filteredData || allExpenseData || [];
 
   if (!data.length) {
     el.innerHTML =
@@ -28107,6 +28090,7 @@ function filterExpenseTable() {
   window.currentFilteredData = filtered;
   paginate(filtered);
   updateExpenseKPIs(filtered);
+	updateExpenseAIInsight(filtered);
   setTimeout(() => {
     renderCategoryBreakdown(filtered);
   }, 50);
