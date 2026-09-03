@@ -8522,7 +8522,7 @@
 		<!-- Category Breakdown with Trends -->
 				<div class="bg-background p-8 rounded-md space-y-8 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 					<div class="flex justify-between items-center">
-						<h4 class="font-['Manrope'] text-xl font-bold">Category Breakdown</h4>
+						<h4 class="text-xl md:text-lg font-bold">Expense Categories</h4>
 						<span class="material-symbols-outlined text-on-surface-variant cursor-pointer">more_vert</span>
 					</div>
 					<div id="categoryBreakdown" class="space-y-6"> </div>
@@ -8538,8 +8538,9 @@
 							<span class="material-symbols-outlined text-on-surface">auto_awesome</span>
 							<h4 class="font-['Manrope'] text-sm font-bold text-on-surface uppercase tracking-widest">Concierge AI Insights</h4>
 					</div>
-						<p class="text-xs lg:text-sm text-on-surface leading-relaxed mb-4">
-							"Staff salaries are trending 5% higher than Q3. Consider optimizing weekend shifts based on reservation data. Utility costs are stable, but HVAC maintenance scheduled for Nov 12 may impact next month's surplus."
+						<p id="expenseAIInsight"
+						   class="text-xs lg:text-sm text-on-surface leading-relaxed mb-4">
+						    Menganalisis pengeluaran...
 						</p>
 					
 						<button class="text-[10px] font-bold text-on-surface hover:underline uppercase tracking-wider">Detailed Budget Forecast →</button>
@@ -9403,7 +9404,7 @@
 									</div>
 							</div>
 						</div><div class="space-y-2">
-							<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Expense Title</label>
+							<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Description</label>
 							<input id="expenseTitle" class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface focus:ring-0 focus:bg-background transition-all placeholder:text-surface-variant" placeholder="e.g., Monthly HVAC Maintenance" type="text"/>
 						</div>
 						<!-- Category -->
@@ -26511,6 +26512,7 @@ function applyExpenseDashboard(data){
   updateExpenseKPIs(allExpenseData, expenseBudget);
   renderCategoryBreakdown();
   renderOtherIncome();
+	updateExpenseAIInsight();
 }
 
 async function loadExpenseDashboard() {
@@ -26581,6 +26583,139 @@ document.addEventListener("input",function(e){
 	 	.innerText = `${branch} • ${e.target.value}`;
 	}
 });
+
+function updateExpenseAIInsight() {
+  const el =
+    document.getElementById("expenseAIInsight");
+  if (!el) return;
+	
+  const data =
+    allExpenseData || [];
+
+  if (!data.length) {
+    el.innerHTML =
+      "Belum ada data pengeluaran pada periode yang dipilih.";
+    return;
+  }
+
+  // TOTAL
+  const totalExpense =
+    data.reduce(
+      (sum, item) =>
+        sum + Number(item.amount || 0),
+      0
+    );
+
+  const transactionCount =
+    data.length;
+
+  // CATEGORY
+  const categories = {};
+
+  data.forEach(item => {
+    const category =
+      item.category?.trim() ||
+      "Lainnya";
+
+    const amount =
+      Number(item.amount || 0);
+
+    categories[category] =
+      (categories[category] || 0) +
+      amount;
+  });
+
+  const categoryEntries =
+    Object.entries(categories)
+      .sort((a, b) => b[1] - a[1]);
+
+  const biggestCategory =
+    categoryEntries[0];
+
+  // BIGGEST EXPENSE
+  const biggestExpense =
+    [...data]
+      .sort(
+        (a, b) =>
+          Number(b.amount || 0) -
+          Number(a.amount || 0)
+      )[0];
+
+  // PAYMENT METHOD
+  const paymentMethods = {};
+  data.forEach(item => {
+    const method =
+      item.paymentMethod?.trim() ||
+      "Tidak diketahui";
+
+    paymentMethods[method] =
+      (paymentMethods[method] || 0) + 1;
+  });
+
+  const dominantPayment =
+    Object.entries(paymentMethods)
+      .sort((a, b) => b[1] - a[1])[0];
+
+  // BUDGET
+  let budgetInsight = "";
+  if (Number(expenseBudget) > 0) {
+    const percentage =
+      (totalExpense /
+        Number(expenseBudget)) *
+      100;
+	
+    if (percentage >= 100) {
+      budgetInsight =
+        ` Budget sudah terpakai <b>${percentage.toFixed(0)}%</b> dan telah melewati batas.`;
+    } else if (percentage >= 80) {
+      budgetInsight =
+        ` Budget sudah terpakai <b>${percentage.toFixed(0)}%</b> dan mulai mendekati batas.`;
+    } else {
+      budgetInsight =
+        ` Budget baru terpakai <b>${percentage.toFixed(0)}%</b>.`;
+    }
+  }
+
+  // BUILD INSIGHT
+  let insight =
+    `Terdapat <b>${transactionCount}</b> transaksi ` +
+    `dengan total pengeluaran ` +
+    `<b>Rp ${totalExpense.toLocaleString("id-ID")}</b>.`;
+
+
+  if (biggestCategory) {
+    const percentage =
+      totalExpense > 0
+        ? (
+            biggestCategory[1] /
+            totalExpense
+          ) * 100
+        : 0;
+	
+    insight +=
+      ` Kategori terbesar adalah ` +
+      `<b>${biggestCategory[0]}</b> ` +
+      `sebesar <b>Rp ${biggestCategory[1].toLocaleString("id-ID")}</b> ` +
+      `(${percentage.toFixed(0)}%).`;
+  }
+
+  if (biggestExpense) {
+    insight +=
+      ` Pengeluaran individual terbesar adalah ` +
+      `<b>${biggestExpense.description || "Tanpa deskripsi"}</b> ` +
+      `sebesar <b>Rp ${Number(
+        biggestExpense.amount || 0
+      ).toLocaleString("id-ID")}</b>.`;
+  }
+
+  if (dominantPayment) {
+    insight +=
+      ` Metode pembayaran yang paling sering digunakan adalah ` +
+      `<b>${dominantPayment[0]}</b>.`;
+  }
+  insight += budgetInsight;
+  el.innerHTML = insight;
+}
 
 async function saveExpenseBudget() {
   const branchId = state.branchId;
