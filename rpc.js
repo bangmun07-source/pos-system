@@ -3379,40 +3379,37 @@ async function restoreDatabaseBackupByPath(filePath) {
 
 
 async function restoreBackupById(backupId) {
-  
-  // 1. AMBIL INFO BACKUP
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    throw new Error("Session login tidak ditemukan");
+  }
+
   const {
     data: history,
     error
-  } =
-    await supabaseClient
-      .from("Backup_History")
-      .select(
-        "backup_id,file_path"
-      )
-      .eq(
-        "backup_id",
-        backupId
-      )
-      .single();
+  } = await supabaseClient.rpc(
+    "get_backup_file_info",
+    {
+      p_backup_id: backupId,
+      p_session_id: sessionId
+    }
+  );
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
-  if (!history) {
+  if (!history?.success) {
     throw new Error(
-      "Backup tidak ditemukan"
+      history?.message || "Backup tidak ditemukan"
     );
   }
 
   if (!history.file_path) {
-    throw new Error(
-      "File backup tidak ditemukan"
-    );
+    throw new Error("File backup tidak ditemukan");
   }
 
-  // 2. RESTORE VIA VERCEL API
   return await restoreDatabaseBackupByPath(
     history.file_path
   );
@@ -3420,9 +3417,7 @@ async function restoreBackupById(backupId) {
 
 async function deleteDatabaseBackup(filePath) {
   const sessionId =
-    localStorage.getItem(
-      "pos_session_id"
-    );
+    localStorage.getItem("pos_session_id");
 
   if (!sessionId) {
     throw new Error(
