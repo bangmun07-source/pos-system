@@ -8536,14 +8536,12 @@
 					
 					<div class="flex items-center gap-2 mb-4">
 							<span class="material-symbols-outlined text-on-surface">auto_awesome</span>
-							<h4 class="font-['Manrope'] text-sm font-bold text-on-surface uppercase tracking-widest">Concierge AI Insights</h4>
+							<h4 class="text-sm font-bold text-on-surface uppercase tracking-widest">Concierge AI Insights</h4>
 					</div>
 						<p id="expenseAIInsight"
 						   class="text-xs lg:text-sm text-on-surface leading-relaxed mb-4">
 						    Menganalisis pengeluaran...
 						</p>
-					
-						<button class="text-[10px] font-bold text-on-surface hover:underline uppercase tracking-wider">Detailed Budget Forecast →</button>
 					</div>
 				</div>
 			</section>
@@ -26428,22 +26426,32 @@ function initExpenseSettingPage() {
     );
 
   document
-    .getElementById(
-      "expenseStartDate"
-    )
-    ?.addEventListener(
-      "change",
-      filterExpenseTable
-    );
-
-  document
-    .getElementById(
-      "expenseEndDate"
-    )
-    ?.addEventListener(
-      "change",
-      filterExpenseTable
-    );
+	  .getElementById(
+	    "expenseStartDate"
+	  )
+	  ?.addEventListener(
+	    "change",
+	    async () => {
+	      state.expenseDashboardData = null;
+	      state.expenseDashboardFilter = null;
+	
+	      await loadExpenseDashboard();
+	    }
+	  );
+	
+	document
+	  .getElementById(
+	    "expenseEndDate"
+	  )
+	  ?.addEventListener(
+	    "change",
+	    async () => {
+	      state.expenseDashboardData = null;
+	      state.expenseDashboardFilter = null;
+	
+	      await loadExpenseDashboard();
+	    }
+	  );
 
   document
     .getElementById(
