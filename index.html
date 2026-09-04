@@ -6430,6 +6430,7 @@
 			<table class="w-full text-left">
 				<thead>
 					<tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant">
+						<th class="px-5 py-4">Full Name</th>
 						<th class="px-5 py-4">Username</th>
 						<th class="px-5 py-4">Role</th>
 						<th class="px-5 py-4">Password</th>
@@ -6439,7 +6440,7 @@
 				</thead>
 				<tbody id="userTableBody" class="divide-y divide-outline-variant">
 					<tr>
-						<td colspan="5" class="text-center text-muted ">
+						<td colspan="6" class="text-center text-muted ">
 							Loading...
 						</td>
 					</tr>
@@ -25529,43 +25530,58 @@ function loadUsers(users) {
   renderUsers();
 }
 
+
 function renderUsers() {
   const tbody = document.getElementById("userTableBody");
   if (!tbody) return;
+
   const start = (userCurrentPage - 1) * userPerPage;
   const end = start + userPerPage;
   const rows = (allUsers || []).slice(start, end);
+
   const role = state.user?.role?.toLowerCase();
+
   let html = "";
   rows.forEach(user => {
-  const userRole = user.role.toLowerCase();
-  const canManage =
+    const userRole = user.role.toLowerCase();
+    const canManage =
       role === "owner" ||
       (role === "admin" && userRole === "cashier");
+
     html += `
       <tr class="hover:bg-outline-variant transition">
+        <!-- FULL NAME -->
         <td class="px-5 py-4 font-medium">
+          ${user.Full_Name || "-"}
+        </td>
+
+        <!-- USERNAME -->
+        <td class="px-5 py-4">
           ${user.username}
         </td>
 
+        <!-- ROLE -->
         <td class="px-5 py-4">
           ${user.role}
         </td>
 
+        <!-- PASSWORD -->
         <td class="px-5 py-4">
           ••••••
         </td>
-		
+
+        <!-- OUTLET -->
         <td class="px-5 py-4">
           ${user.outlet}
         </td>
 
+        <!-- ACTIONS -->
         <td class="px-5 py-4">
-         <div class="flex justify-end gap-2">
+          <div class="flex justify-end gap-2">
+
             ${canManage ? `
               <button onclick="openEditUserModal('${user.id}')"
                 class="w-9 h-9 hover:bottom-theme transition rounded-md">
-
                 <span class="material-symbols-outlined text-sm">
                   edit
                 </span>
@@ -25573,7 +25589,6 @@ function renderUsers() {
 
               <button onclick="deleteUser('${user.id}')"
                 class="w-9 h-9 hover:bg-red-500/10 transition rounded-md">
-
                 <span class="material-symbols-outlined text-sm text-red-400">
                   delete
                 </span>
@@ -25584,6 +25599,7 @@ function renderUsers() {
       </tr>
     `;
   });
+
   tbody.innerHTML = html;
   renderUserPagination();
 }
