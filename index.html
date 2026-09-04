@@ -15199,6 +15199,10 @@ console.log(
   
   // RENDER + SEND
   const canvas = wrapper.querySelector("#receiptCanvas");
+	console.log(
+	  "CANVAS CASHIER BEFORE HTML2CANVAS:",
+	  canvas.querySelector("#receiptCashier")?.textContent
+	);
     setTimeout(() => {
       const receiptBackground = "#101715";
 			html2canvas(canvas, {
