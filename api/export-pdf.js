@@ -4516,96 +4516,107 @@ else if (type === "analytics") {
     "Jumat",
     "Sabtu"
   ];
-
-  const startDateObj =
-    start
-      ? new Date(
-          `${start}T00:00:00`
-        )
-      : new Date();
-
-  peakHours.forEach(
-    (day, dayIndex) => {
-
-      if (
-        !Array.isArray(day)
-      ) {
-        return;
+  
+  const startDateObj = start
+    ? new Date(`${start}T00:00:00`)
+    : new Date();
+  
+  const endDateObj = end
+    ? new Date(`${end}T00:00:00`)
+    : new Date(startDateObj);
+  
+  peakHours.forEach((day, dayIndex) => {
+  
+    if (!Array.isArray(day)) {
+      return;
+    }
+  
+    // SQL get_peak_hours:
+    // 0 = Minggu
+    // 1 = Senin
+    // 2 = Selasa
+    // 3 = Rabu
+    // 4 = Kamis
+    // 5 = Jumat
+    // 6 = Sabtu
+  
+    const dayName = dayNames[dayIndex];
+  
+    // Cari tanggal aktual dalam periode
+    // yang memiliki DOW sesuai dayIndex.
+    let foundDate = null;
+  
+    const checkDate = new Date(startDateObj);
+  
+    while (checkDate <= endDateObj) {
+  
+      if (checkDate.getDay() === dayIndex) {
+        foundDate = new Date(checkDate);
+        break;
       }
-
-      const currentDate =
-        new Date(startDateObj);
-      currentDate.setDate(
-        startDateObj.getDate() +
-        dayIndex
-      );
-
-      const dayName =
-        dayNames[
-          currentDate.getDay()
-        ];
-
-      const dateText =
-        currentDate.toLocaleDateString(
-          "id-ID"
-        );
-
-      day.forEach(
-        (count, hour) => {
-          const value =
-            Number(count || 0);
-          if (value <= 0) {
-            return;
-          }
-
-          const nextHour =
-            (hour + 1) % 24;
-
-          const hourLabel =
-            `${String(hour).padStart(
-              2,
-              "0"
-            )}:00 - ${String(nextHour).padStart(
-              2,
-              "0"
-            )}:00`;
-
-          peakHourRows.push(`
-            <tr>
-              <td>
-                ${escapeHtml(
-                  dateText
-                )}
-              </td>
-
-              <td>
-                ${escapeHtml(
-                  dayName
-                )}
-              </td>
-
-              <td class="center">
-                ${hourLabel}
-              </td>
-
-              <td class="center">
-                ${value.toLocaleString(
-                  "id-ID"
-                )}
-              </td>
-            </tr>
-          `);
-        }
+  
+      checkDate.setDate(
+        checkDate.getDate() + 1
       );
     }
-  );
-
+  
+    // Hari tersebut tidak ada dalam periode
+    if (!foundDate) {
+      return;
+    }
+  
+    const dateText =
+      foundDate.toLocaleDateString(
+        "id-ID"
+      );
+  
+    day.forEach((count, hour) => {
+  
+      const value = Number(count || 0);
+  
+      if (value <= 0) {
+        return;
+      }
+  
+      const nextHour =
+        (hour + 1) % 24;
+  
+      const hourLabel =
+        `${String(hour).padStart(2, "0")}:00 - ${String(nextHour).padStart(2, "0")}:00`;
+  
+      peakHourRows.push(`
+        <tr>
+          <td>
+            ${escapeHtml(dateText)}
+          </td>
+  
+          <td>
+            ${escapeHtml(dayName)}
+          </td>
+  
+          <td class="center">
+            ${hourLabel}
+          </td>
+  
+          <td class="center">
+            ${value.toLocaleString("id-ID")}
+          </td>
+        </tr>
+      `);
+  
+    });
+  
+  });
+  
   const peakRows =
     peakHourRows.length
       ? peakHourRows.join("")
       : `
         <tr>
-          <td colspan="4" class="empty" >
+          <td
+            colspan="4"
+            class="empty"
+          >
             No peak hour data
           </td>
         </tr>
