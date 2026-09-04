@@ -25685,6 +25685,7 @@ function openEditUserModal(id){
   if(!user) return;
   openModal("editUserModal");
   document.getElementById("editUserId").value = user.id;
+	document.getElementById("editUserFullName").value = user.full_name || "";
   document.getElementById("editUsername").value = user.username;
   document.getElementById("editPassword").value = "";
   document.getElementById("editRole").value = user.role;
@@ -25698,6 +25699,11 @@ async function saveEditUser() {
         .getElementById("editUserId")
         ?.value
         ?.trim() || "",
+    fullName:
+      document
+        .getElementById("editUserFullName")
+        ?.value
+        ?.trim() || "",
     username:
       document
         .getElementById("editUsername")
@@ -25705,13 +25711,18 @@ async function saveEditUser() {
         ?.trim() || "",
     login_user_id:
       state.user.id
-
   };
   const password =
     document
       .getElementById("editPassword")
       ?.value
       ?.trim() || "";
+  if (!data.fullName) {
+    alert(
+      "Full Name wajib diisi."
+    );
+    return;
+  }
   if (!data.username) {
     alert(
       "Username wajib diisi."
@@ -25722,7 +25733,7 @@ async function saveEditUser() {
     data.password =
       password;
   }
-	
+
   try {
     // SUPABASE RPC
     const res =
@@ -25741,16 +25752,14 @@ async function saveEditUser() {
       );
       return;
     }
-	
     closeEditUserModal();
     state.settingsPageData = null;
     await reloadSettingsPage();
     showToast(
       "User berhasil diperbarui."
     );
-  }
-  catch (err) {
 
+  } catch (err) {
     alert(
       err?.message ||
       "Gagal memperbarui user."
