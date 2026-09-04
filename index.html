@@ -15109,6 +15109,11 @@ async function sendReceiptWhatsapp() {
 }
 
 function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
+	  console.log("=== RECEIPT DATA ===");
+	  console.log(trx);
+	  console.log("TRX ID:", trx?.id);
+	  console.log("CREATED BY:", trx?.created_by);
+	  console.log("CASHIER:", trx?.cashier);
   const tpl = document.getElementById("receiptTemplate");
   if (!tpl) return;
   const wrapper = document.createElement("div");
