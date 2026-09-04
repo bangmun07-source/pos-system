@@ -2116,6 +2116,7 @@ async function addNewUserRPC(data) {
     "add_new_user",
     {
       p_username: data.username,
+      p_full_name: data.fullName,
       p_password: data.password,
       p_role: data.role,
       p_branch_id: data.branchId,
