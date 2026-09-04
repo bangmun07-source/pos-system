@@ -2317,6 +2317,13 @@
 									restaurant
 							</span>
 				    </div>
+						<!-- Cashier -->
+						<div id="receiptCashierCard" class="p-5 relative overflow-hidden rounded-md border border-outline-variant">
+						    <p class="text-[10px] uppercase tracking-widest text-[#787777] font-bold mb-1">
+						        Cashier
+						    </p>
+						    <p id="receiptCashier" class="font-display font-bold text-sm text-[#e0e0e0]"></p>
+						</div>	
 				</section>
 					
 				<!-- Items Table -->
@@ -15136,6 +15143,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   wrapper.querySelector("#receiptId").textContent = trx.id || "-";
   wrapper.querySelector("#receiptDate").textContent = trx.date || "-";
   wrapper.querySelector("#receiptTable").textContent = trx.table || "-";
+	wrapper.querySelector("#receiptCashier").textContent = trx.cashier || "-";
   wrapper.querySelector("#receiptPhone").textContent = trx.phone || "-";
   wrapper.querySelector("#receiptAddress").textContent = trx.address || "-";
   const footer = wrapper.querySelector("#receiptFooterText");
@@ -15284,6 +15292,7 @@ function renderReceipt(data) {
   wrapper.querySelector("#receiptId").textContent = data.trxId;
   wrapper.querySelector("#receiptDate").textContent = data.date;
   wrapper.querySelector("#receiptTable").textContent = data.table;
+	wrapper.querySelector("#receiptCashier").textContent = trx.cashier || "-";
   wrapper.querySelector("#receiptTotal").textContent = data.total;
   wrapper.querySelector("#receiptSubtotal").textContent = data.total;
   wrapper.querySelector("#receiptTax").textContent = data.tax;
