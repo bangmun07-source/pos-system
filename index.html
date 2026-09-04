@@ -13679,16 +13679,8 @@ async function restoreSession() {
     );
     return true;
   } catch (error) {
-
-    // INTERNET / API TIDAK TERJANGKAU
-    console.warn(
-      "Validasi session gagal:",
-      error
-    );
-
     // Jangan hapus session kalau hanya
     // internet/API sedang tidak tersedia.
-
     state.user = JSON.parse(user);
     state.branchId = branchId || "";
     return true;
@@ -15109,11 +15101,6 @@ async function sendReceiptWhatsapp() {
 }
 
 function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
-	  console.log("=== RECEIPT DATA ===");
-	  console.log(trx);
-	  console.log("TRX ID:", trx?.id);
-	  console.log("CREATED BY:", trx?.created_by);
-	  console.log("CASHIER:", trx?.cashier);
   const tpl = document.getElementById("receiptTemplate");
   if (!tpl) return;
   const wrapper = document.createElement("div");
@@ -15149,21 +15136,6 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   wrapper.querySelector("#receiptDate").textContent = trx.date || "-";
   wrapper.querySelector("#receiptTable").textContent = trx.table || "-";
 	wrapper.querySelector("#receiptCashier").textContent = trx.cashier || "-";
-console.log(
-  "ELEMENT CASHIER:",
-  wrapper.querySelector("#receiptCashier")
-);
-
-console.log(
-  "VALUE CASHIER:",
-  trx.cashier
-);
-
-console.log(
-  "RENDERED CASHIER:",
-  wrapper.querySelector("#receiptCashier")?.textContent
-);
-	
   wrapper.querySelector("#receiptPhone").textContent = trx.phone || "-";
   wrapper.querySelector("#receiptAddress").textContent = trx.address || "-";
   const footer = wrapper.querySelector("#receiptFooterText");
@@ -15199,10 +15171,6 @@ console.log(
   
   // RENDER + SEND
   const canvas = wrapper.querySelector("#receiptCanvas");
-	console.log(
-	  "CANVAS CASHIER BEFORE HTML2CANVAS:",
-	  canvas.querySelector("#receiptCashier")?.textContent
-	);
     setTimeout(() => {
       const receiptBackground = "#101715";
 			html2canvas(canvas, {
@@ -15211,20 +15179,8 @@ console.log(
 			  backgroundColor: "#101715"
 			})
       .then(receiptCanvas => {
-
-		    console.log(
-				"FINAL CANVAS SIZE:",
-				receiptCanvas.width,
-				receiptCanvas.height
-			  );
-			
 			  const image =
-				receiptCanvas.toDataURL("image/jpeg", 0.65);
-			
-			  console.log(
-				"IMAGE GENERATED:",
-				image.length
-			  );
+					receiptCanvas.toDataURL("image/jpeg", 0.65);
         return fetch(
           "/api/handle-receipt-upload",
           {
@@ -16178,12 +16134,10 @@ async function sendTransaction(payload){
     const btn = document.getElementById("btnCheckout");
     	if(btn){btn.disabled = true;}
 		const res = await checkoutTransaction(payload);
-	  console.log("CHECKOUT RES:", res);
 	    isProcessing = false;
 	    if(btn){
 	      btn.disabled = false;
 	    }
-
 	    if(!res){
 	      alert(
 	        "Backend mengembalikan NULL"
