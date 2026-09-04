@@ -2318,7 +2318,7 @@
 							</span>
 				    </div>
 						<!-- Cashier -->
-						<div id="receiptCashierCard" class="p-5 relative overflow-hidden rounded-md border border-outline-variant">
+						<div id="receiptCashierCard" class="p-5 relative overflow-hidden rounded-md border border-outline-variant col-span-2">
 						    <p class="text-[10px] uppercase tracking-widest text-[#787777] font-bold mb-1">
 						        Cashier
 						    </p>
@@ -15149,6 +15149,21 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   wrapper.querySelector("#receiptDate").textContent = trx.date || "-";
   wrapper.querySelector("#receiptTable").textContent = trx.table || "-";
 	wrapper.querySelector("#receiptCashier").textContent = trx.cashier || "-";
+console.log(
+  "ELEMENT CASHIER:",
+  wrapper.querySelector("#receiptCashier")
+);
+
+console.log(
+  "VALUE CASHIER:",
+  trx.cashier
+);
+
+console.log(
+  "RENDERED CASHIER:",
+  wrapper.querySelector("#receiptCashier")?.textContent
+);
+	
   wrapper.querySelector("#receiptPhone").textContent = trx.phone || "-";
   wrapper.querySelector("#receiptAddress").textContent = trx.address || "-";
   const footer = wrapper.querySelector("#receiptFooterText");
