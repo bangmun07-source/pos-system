@@ -25871,7 +25871,7 @@ function openAddUserModal(){
 async function saveNewUser() {
   const data = {
 	  username: document.getElementById("newUsername")?.value?.trim() || "",
-	  fullname: document.getElementById("newUserFullName")?.value?.trim() || "",
+	  fullName: document.getElementById("newUserFullName")?.value?.trim() || "",
 	  password: document.getElementById("newPassword")?.value?.trim() || "",
 	  role: document.getElementById("newUserRole")?.value || "",
 	  branchId:
@@ -25880,17 +25880,25 @@ async function saveNewUser() {
 	  createdBy: String(state.user.id)
 	};
   if (!data.branchId) {
-    alert(
-      "Silakan pilih outlet."
-    );
-    return;
-  }
-  if (!data.username) {
-    alert(
-      "Username wajib diisi."
-    );
-    return;
-  }
+	  alert(
+	    "Silakan pilih outlet."
+	  );
+	  return;
+	}
+	
+	if (!data.fullName) {
+	  alert(
+	    "Full Name wajib diisi."
+	  );
+	  return;
+	}
+	
+	if (!data.username) {
+	  alert(
+	    "Username wajib diisi."
+	  );
+	  return;
+	}
   if (!data.password) {
     alert(
       "Password wajib diisi."
