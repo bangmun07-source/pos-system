@@ -2144,6 +2144,7 @@ async function updateUserRPC(data) {
     {
       p_id: String(data.id),
       p_username: data.username,
+      p_full_name: data.fullName,
       p_password: data.password || null,
       p_session_id: sessionId,
       p_login_user_id: String(data.login_user_id)
