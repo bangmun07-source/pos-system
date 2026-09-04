@@ -15292,7 +15292,7 @@ function renderReceipt(data) {
   wrapper.querySelector("#receiptId").textContent = data.trxId;
   wrapper.querySelector("#receiptDate").textContent = data.date;
   wrapper.querySelector("#receiptTable").textContent = data.table;
-	wrapper.querySelector("#receiptCashier").textContent = trx.cashier || "-";
+	wrapper.querySelector("#receiptCashier").textContent = data.cashier || "-";
   wrapper.querySelector("#receiptTotal").textContent = data.total;
   wrapper.querySelector("#receiptSubtotal").textContent = data.total;
   wrapper.querySelector("#receiptTax").textContent = data.tax;
