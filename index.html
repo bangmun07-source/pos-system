@@ -7948,14 +7948,14 @@
 					</p>
 
 					<ul class="list-disc list-inside space-y-1 leading-relaxed text-muted">
-						<li>Instalasi database;.</li>
+						<li>Instalasi database.</li>
 						<li>Konfigurasi.</li>
 						<li>Pemeliharaan.</li>
-						<li>Troubleshooting;.</li>
-						<li>Perbaikan masalah;.</li>
+						<li>Troubleshooting.</li>
+						<li>Perbaikan masalah.</li>
 						<li>Pembaruan sistem.</li>
 						<li>Migrasi atau perubahan konfigurasi.</li>
-						<li>dan Kebutuhan teknis lainnya;.</li>	
+						<li>dan Kebutuhan teknis lainnya.</li>	
 					</ul>
 
           <p class="leading-relaxed mb-3 text-muted">
@@ -7964,6 +7964,158 @@
 						Customer dapat mencabut akses yang sebelumnya diberikan apabila akses tersebut tidak lagi diperlukan.
 					</p>
         </section>
+
+				<!-- 9 -->
+        <section>
+          <h2 class="text-xl font-semibold mb-3">
+            9. Keamanan Data
+          </h2>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						MUNO menerapkan mekanisme keamanan sesuai dengan arsitektur dan konfigurasi sistem yang digunakan. Mekanisme tersebut dapat meliputi:
+					</p>
+					
+					<ul class="list-disc list-inside space-y-1 leading-relaxed text-muted">
+						<li>Login pengguna.</li>
+						<li>Session pengguna.</li>
+						<li>Pembatasan akses berdasarkan role.</li>
+						<li>Pembatasan akses berdasarkan cabang atau outlet.</li>
+						<li>Pemisahan Customer Database.</li>
+						<li>Pembatasan akses database.</li>
+						<li>Row Level Security (RLS) pada bagian database yang menerapkan mekanisme tersebut.</li>
+						<li>Pembatasan akses terhadap fungsi tertentu.</li>	
+						<li>Serta pembatasan penggunaan kredensial database pada sisi server.</li>	
+					</ul>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						Credential dengan hak akses tinggi tidak ditempatkan pada frontend untuk penggunaan normal sistem.
+					</p>
+					
+					<p class="leading-relaxed mb-3 text-muted">
+						Meskipun berbagai mekanisme keamanan diterapkan, tidak ada sistem yang dapat menjamin keamanan secara absolut,
+						Customer juga bertanggung jawab menjaga keamanan akun, password, perangkat, serta akses yang diberikan kepada 
+						pengguna atau pihak ketiga.
+					</p>
+        </section>
+
+				<!-- 10 -->
+        <section>
+          <h2 class="text-xl font-semibold mb-3">
+            10. Backup dan Restore
+          </h2>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						MUNO menyediakan fitur backup manual melalui Chat Bot bagi Customer yang memilih untuk menggunakan fitur tersebut,
+						Customer dapat menjalankan proses backup melalui fitur yang tersedia pada MUNO.
+					</p>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						Backup MUNO bersifat opsional.
+					</p>
+					
+					<p class="leading-relaxed mb-3 text-muted">
+						MUNO tidak menyatakan bahwa backup dilakukan secara otomatis setiap hari atau bahwa selalu tersedia backup terbaru, 
+						kecuali terdapat ketentuan layanan khusus yang menyatakan sebaliknya. Customer juga dapat menggunakan mekanisme backup 
+						yang disediakan oleh penyedia database atau infrastruktur yang digunakan Customer. Customer bertanggung jawab menentukan 
+						metode backup yang digunakan untuk menjaga salinan data bisnisnya.
+					</p>
+        </section>
+
+				<!-- 11 -->
+        <section>
+          <h2 class="text-xl font-semibold mb-3">
+            11. Data pada Storage Customer
+          </h2>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						Selain database, MUNO dapat menggunakan Storage yang berada dalam lingkungan Customer untuk menyimpan 
+						file yang diperlukan dalam operasional Customer. File tersebut dapat mencakup:
+					</p>
+					
+					<ul class="list-disc list-inside space-y-1 leading-relaxed text-muted">
+						<li>Logo bisnis.</li>
+						<li>Gambar produk.</li>
+						<li>Lampiran.</li>
+						<li>Dokumen.</li>
+						<li>atau file lain yang digunakan oleh fitur MUNO.</li>
+					</ul>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						CFile Customer disimpan pada lingkungan Storage Customer masing-masing.
+						MUNO tidak menggunakan Storage Customer A sebagai Storage operasional Customer B begitu sebaliknya.
+					</p>
+        </section>
+
+				<!-- 12 -->
+        <section>
+          <h2 class="text-xl font-semibold mb-3">
+            12. Layanan Pihak Ketiga
+          </h2>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						MUNO dapat menggunakan layanan pihak ketiga untuk mendukung operasional platform.
+						Layanan tersebut dapat mencakup:
+					</p>
+					
+					<ul class="list-disc list-inside space-y-1 leading-relaxed text-muted">
+						<li>database.</li>
+						<li>cloud infrastructure.</li>
+						<li>hosting.</li>
+						<li>storage.</li>
+						<li>API.</li>
+						<li>layanan komunikasi.</li>
+						<li>dan layanan pendukung lainnya.</li>
+					</ul>
+
+          <p class="leading-relaxed mb-3 text-muted">
+						MUNO dapat menggunakan Supabase sebagai salah satu penyedia infrastruktur database dan layanan terkait.
+						Customer Database dan Storage Customer dapat berada pada infrastruktur penyedia layanan pihak ketiga 
+						sesuai dengan konfigurasi Customer.
+					</p>
+
+					<p class="leading-relaxed mb-3 text-muted">
+						Penggunaan layanan pihak ketiga dapat tunduk pada ketentuan layanan dan kebijakan privasi masing-masing penyedia.
+					</p>
+        </section>
+
+				<section>
+
+<h2 class="text-xl font-semibold mb-3">
+
+14. Chat Bot dan Fitur Berbasis AI
+
+</h2>
+
+<p class="leading-relaxed mb-3 text-muted">
+
+Apabila Customer menggunakan fitur Chat Bot atau fitur berbasis AI yang tersedia pada MUNO, sistem dapat memproses pertanyaan atau instruksi yang diberikan pengguna.
+
+Contohnya:
+
+</p>
+
+<ul class="list-disc list-inside space-y-1 leading-relaxed text-muted">
+
+<li>"Berapa omzet hari ini?"</li>
+
+<li>"Produk apa yang paling laris?"</li>
+
+<li>"Berapa transaksi hari ini?"</li>
+
+<li>"Bahan apa yang hampir habis?"</li>
+
+</ul>
+
+<p class="leading-relaxed mb-3 text-muted">
+
+Untuk memberikan jawaban, sistem dapat mengambil data operasional yang diperlukan 
+dari Customer Database sesuai dengan fungsi dan hak akses sistem.
+Apabila MUNO menggunakan layanan AI pihak ketiga, pemrosesan yang dilakukan melalui 
+layanan tersebut dapat tunduk pada kebijakan dan ketentuan layanan penyedia AI terkait.
+
+</p>
+
+</section>
       </div>
 		</div>
 	</div>
