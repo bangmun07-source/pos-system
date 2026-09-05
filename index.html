@@ -31775,33 +31775,33 @@ const docs = {
 				    point dengan nilai atau aturan yang berbeda dari pengaturan point
 				    umum.
 				  </li>
+					
+					<li> 
+						• <b>Season Tier</b> digunakan untuk mengatur periode berlakunya tingkatan membership serta proses penyesuaian level tier ketika periode tersebut berakhir.
+							Pengguna dapat menentukan periode season, misalnya selama
+							<b>1 tahun</b>. Selama season berlangsung, member dapat meningkatkan level
+							berdasarkan ketentuan <b>Membership Tier</b> yang telah ditentukan.
+							
+							Setelah periode season berakhir, sistem dapat melakukan penyesuaian level
+							tier berdasarkan aturan yang telah dikonfigurasi oleh pengguna.
+							
+							Sebagai contoh, apabila terdapat tingkatan:
+							<b>Level A</b>,
+							<b>Level B</b>,
+							<b>Level C</b>,
+							<b>Level D</b>, dan
+							<b>Level E</b>, maka pada saat season berakhir:
+							
+							<ul class="list-disc list-inside mt-2 space-y-1"> <li><b>Level E</b> turun menjadi <b>Level C</b>.</li> <li><b>Level D</b> turun menjadi <b>Level C</b>.</li> <li><b>Level C</b> turun menjadi <b>Level B</b>.</li> <li><b>Level B</b> tetap berada pada <b>Level B</b>.</li> <li><b>Level A</b> tetap berada pada <b>Level A</b>.</li> </ul>
+							
+							Nama setiap level tier dapat disesuaikan oleh pengguna sesuai dengan
+							kebutuhan dan strategi membership bisnis.
+							
+							Pengaturan <b>Season Tier</b> membantu bisnis menjalankan program membership
+							secara berkala sehingga level member dapat dievaluasi dan disesuaikan pada
+							setiap akhir periode season.
+					</li>
 				</ul>
-
-				<li> 
-					• <b>Season Tier</b> digunakan untuk mengatur periode berlakunya tingkatan membership serta proses penyesuaian level tier ketika periode tersebut berakhir.
-						Pengguna dapat menentukan periode season, misalnya selama
-						<b>1 tahun</b>. Selama season berlangsung, member dapat meningkatkan level
-						berdasarkan ketentuan <b>Membership Tier</b> yang telah ditentukan.
-						
-						Setelah periode season berakhir, sistem dapat melakukan penyesuaian level
-						tier berdasarkan aturan yang telah dikonfigurasi oleh pengguna.
-						
-						Sebagai contoh, apabila terdapat tingkatan:
-						<b>Level A</b>,
-						<b>Level B</b>,
-						<b>Level C</b>,
-						<b>Level D</b>, dan
-						<b>Level E</b>, maka pada saat season berakhir:
-						
-						<ul class="list-disc list-inside mt-2 space-y-1"> <li><b>Level E</b> turun menjadi <b>Level C</b>.</li> <li><b>Level D</b> turun menjadi <b>Level C</b>.</li> <li><b>Level C</b> turun menjadi <b>Level B</b>.</li> <li><b>Level B</b> tetap berada pada <b>Level B</b>.</li> <li><b>Level A</b> tetap berada pada <b>Level A</b>.</li> </ul>
-						
-						Nama setiap level tier dapat disesuaikan oleh pengguna sesuai dengan
-						kebutuhan dan strategi membership bisnis.
-						
-						Pengaturan <b>Season Tier</b> membantu bisnis menjalankan program membership
-						secara berkala sehingga level member dapat dievaluasi dan disesuaikan pada
-						setiap akhir periode season.
-				</li>
 		  </div>
 		
 		  <div>
@@ -32022,14 +32022,243 @@ const docs = {
     title: "INVENTORY",
     icon: "inventory_2",
     subtitle: "Pengelolaan stok bahan baku, supplier, dan hitung Hpp .",
-    content: `...`
+    content: `
+		<section class="space-y-6">
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">Deskripsi</h3>
+		
+		    <p class="text-muted leading-8">
+		      Inventory merupakan halaman pada sistem POS yang digunakan untuk
+		      mengelola bahan baku atau material, pembelian, supplier, komposisi
+		      material pada produk, serta perhitungan biaya bahan. Halaman ini
+		      membantu pengguna memantau kondisi stok, nilai persediaan, pembelian
+		      material, dan komposisi bahan yang digunakan dalam setiap produk.
+		    </p>
+		  </div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Informasi yang Ditampilkan
+		    </h3>
+		
+		    <ul class="space-y-3 text-muted leading-7">
+		
+		      <li>
+		        • <b>KPI</b> menampilkan ringkasan kondisi inventory secara
+		        keseluruhan, meliputi <b>Total Material SKU</b>,
+		        <b>Estimated Value</b>, <b>Critical Stock</b>, dan
+		        <b>Daily Deduction</b>.
+		      </li>
+		
+		      <li>
+		        • <b>Ingredient Stock</b> digunakan untuk memantau persediaan
+		        ingredient atau bahan yang tersedia. Informasi ini membantu pengguna
+		        mengetahui jumlah stok dan kondisi bahan yang digunakan dalam
+		        operasional bisnis.
+		      </li>
+		
+		      <li>
+		        • <b>Ingredient Purchase</b> digunakan untuk mencatat dan mengelola
+		        pembelian ingredient atau bahan dari supplier. Data pembelian dapat
+		        digunakan sebagai dasar untuk memperbarui persediaan dan memantau
+		        riwayat pembelian material.
+		      </li>
+		
+		      <li>
+		        • <b>Supplier</b> digunakan untuk mengelola informasi supplier yang
+		        menyediakan bahan atau material untuk kebutuhan bisnis. Pengguna
+		        dapat mengelola data supplier yang digunakan dalam proses pembelian
+		        ingredient.
+		      </li>
+		
+		      <li>
+		        • <b>Material Composition</b> digunakan untuk melihat komposisi
+		        material yang digunakan pada produk sekaligus mengetahui
+		        <b>Cost Value</b> dan persentase biaya material terhadap produk.
+		        Tabel juga menampilkan <b>Price</b> dan <b>Action</b>.
+		
+		        Pada bagian <b>Action</b>, pengguna dapat mengunggah atau mengganti
+		        foto produk serta mengubah nama produk dan harga sesuai kebutuhan
+		        bisnis.
+		      </li>
+		
+		      <li>
+		        • <b>Material Composition</b> juga digunakan untuk menambahkan
+		        ingredient ke dalam setiap produk. Pengguna dapat menentukan
+		        ingredient yang digunakan beserta jumlah atau komposisinya sehingga
+		        sistem dapat menghitung kebutuhan material dan biaya bahan yang
+		        digunakan pada produk.
+		      </li>
+		
+		    </ul>
+		  </div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Manfaat
+		    </h3>
+		
+		    <p class="text-muted leading-8">
+		      Halaman Inventory membantu pengguna mengontrol persediaan material,
+		      memantau pembelian, mengelola supplier, serta mengetahui komposisi dan
+		      biaya bahan pada setiap produk. Dengan informasi tersebut, pengguna
+		      dapat memantau kondisi stok, mengetahui material yang membutuhkan
+		      perhatian, serta membantu menentukan harga produk berdasarkan biaya
+		      bahan yang digunakan.
+		    </p>
+		  </div>
+		</section>
+		`
   },
 
   cashflow: {
     title: "CASH FLOW",
     icon: "account_balance_wallet",
     subtitle: "Mengelola arus kas, transfer dana, serta memantau kondisi keuangan bisnis.",
-    content: `...`
+    content: `
+		<section class="space-y-6">
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">Deskripsi</h3>
+		
+		    <p class="text-muted leading-8">
+		      Cash Flow merupakan halaman pada sistem POS yang digunakan untuk
+		      memantau dan mengelola arus kas bisnis. Halaman ini membantu pengguna
+		      melihat pergerakan dana masuk dan keluar, saldo akun, transfer dana,
+		      sumber pemasukan, kategori pengeluaran, serta perubahan modal pemilik
+		      dalam periode tertentu.
+		    </p>
+		  </div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Informasi yang Ditampilkan
+		    </h3>
+		
+		    <ul class="space-y-3 text-muted leading-7">
+		
+		      <li>
+		        • <b>Date Range</b> digunakan untuk menentukan periode tanggal yang
+		        ingin ditampilkan pada laporan Cash Flow. Pengguna dapat memilih
+		        rentang tanggal tertentu untuk melihat pergerakan arus kas dalam
+		        periode tersebut.
+		      </li>
+		
+		      <li>
+		        • <b>Export</b> digunakan untuk mengekspor data Cash Flow sehingga
+		        pengguna dapat menyimpan atau menggunakan data tersebut untuk
+		        kebutuhan laporan dan analisis keuangan.
+		      </li>
+		
+		      <li>
+		        • <b>KPI</b> menampilkan ringkasan kondisi arus kas yang meliputi
+		        <b>Cash In</b>, <b>Cash Out</b>, <b>Net Flow</b>, dan
+		        <b>Balance</b>.
+		      </li>
+		
+		      <li>
+		        • <b>Account Balance</b> digunakan untuk melihat saldo dana pada
+		        masing-masing akun yang digunakan dalam sistem.
+		      </li>
+		
+		      <li>
+		        • <b>Transfer Funds</b> digunakan untuk mencatat perpindahan dana
+		        dari satu akun ke akun lainnya sehingga pergerakan saldo antar-akun
+		        dapat dipantau dalam sistem.
+		      </li>
+		
+		      <li>
+		        • <b>Cash In vs Cash Out Chart</b> menampilkan grafik perbandingan
+		        antara dana yang masuk dan dana yang keluar berdasarkan periode
+		        yang dipilih. Grafik ini membantu pengguna melihat pola dan kondisi
+		        arus kas bisnis secara lebih mudah.
+		      </li>
+		
+		      <li>
+		        • <b>Income Source</b> menampilkan sumber dana masuk yang berasal
+		        dari <b>Sales</b> atau pemasukan utama bisnis serta
+		        <b>Other Income</b> atau pemasukan lainnya.
+		      </li>
+		
+		      <li>
+		        • <b>Expenses Category</b> menampilkan kategori dana keluar yang
+		        berasal dari <b>Expense</b> dan <b>Ingredient Purchase</b>.
+		        Informasi ini membantu pengguna mengetahui sumber utama pengeluaran
+		        bisnis.
+		      </li>
+		
+		      <li>
+		        • <b>Owner Equity</b> digunakan untuk mencatat aktivitas modal
+		        pemilik, yang meliputi <b>Add Capital</b> untuk penambahan modal
+		        dan <b>Withdraw Funds</b> untuk penarikan dana oleh pemilik.
+		      </li>
+		
+		    </ul>
+		  </div>
+
+			<div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Informasi dan Fungsi yang Tersedia
+		    </h3>
+		
+		    <ul class="space-y-3 text-muted leading-7">
+		
+		      <li>
+		        • <b>Backup</b> digunakan untuk membuat salinan data Customer yang
+		        diperlukan sebagai cadangan. Pengguna dapat menjalankan proses backup
+		        melalui Chat Bot sesuai dengan perintah yang tersedia.
+		      </li>
+		
+		      <li>
+		        • <b>Restore</b> digunakan untuk memulihkan data dari backup yang
+		        sebelumnya telah dibuat. Pengguna dapat memilih backup yang tersedia
+		        untuk menjalankan proses pemulihan data.
+		      </li>
+		
+		      <li>
+		        • <b>Delete Backup</b> digunakan untuk menghapus file atau data
+		        backup yang sudah tidak diperlukan. Pengguna dapat memilih backup
+		        tertentu yang ingin dihapus.
+		      </li>
+		
+		      <li>
+		        • <b>Delete Digital Receipt</b> digunakan untuk menghapus struk
+		        digital yang tersimpan pada sistem sesuai dengan data yang dipilih
+		        pengguna.
+		      </li>
+		
+		    </ul>
+		  </div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Manfaat
+		    </h3>
+		
+		    <p class="text-muted leading-8">
+		      Chat Bot membantu pengguna menjalankan fungsi tertentu pada MUNO
+		      dengan lebih praktis melalui perintah percakapan. Fitur ini dapat
+		      digunakan untuk mengelola backup dan restore data, membersihkan backup
+		      yang sudah tidak diperlukan, serta menghapus struk digital sesuai
+		      kebutuhan operasional bisnis.
+		    </p>
+		  </div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Manfaat
+		    </h3>
+		
+		    <p class="text-muted leading-8">
+		      Halaman Cash Flow membantu pengguna memahami kondisi keuangan bisnis
+		      berdasarkan pergerakan dana masuk dan keluar. Dengan informasi saldo
+		      akun, transfer dana, sumber pemasukan, kategori pengeluaran, serta
+		      aktivitas modal pemilik, pengguna dapat memantau arus kas dengan lebih
+		      terstruktur dan mengambil keputusan keuangan berdasarkan kondisi
+		      aktual bisnis.
+		    </p>
+		  </div>
+		</section>
+		`
   }
 	
 };
