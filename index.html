@@ -31492,6 +31492,22 @@ const docs = {
               apabila sudah tidak digunakan.
             </li>
 
+			 <li>
+			  • <b>Business Profile</b> digunakan untuk mengatur informasi dan identitas
+			  bisnis yang akan ditampilkan pada struk digital.
+			
+				Pengguna dapat mengunggah <b>Logo Bisnis</b> yang akan digunakan pada
+				struk, serta mengatur informasi <b>Instagram</b> bisnis dan <b>Footer Message</b> atau pesan penutup yang ditampilkan pada bagian
+				bawah struk.
+				
+				Informasi yang dapat diatur meliputi: <b>Logo Bisnis</b>, <b>Instagram</b>, dan <b>Footer Message</b>.
+				
+				Logo dan informasi yang diatur pada <b>Business Profile</b> digunakan
+				sebagai identitas bisnis Customer pada struk digital.
+				
+			</li>
+
+
             <li>
               • <b>Footer Information</b> menyediakan beberapa informasi pendukung
               yang terdiri dari
@@ -31658,90 +31674,154 @@ const docs = {
     content: `
     
     <section class="space-y-6">
-      <div>
-        <h3 class="text-xl font-bold mb-3">Deskripsi</h3>
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">Deskripsi</h3>
+	
+	
+				<p class="text-muted leading-8">
+				  Loyalty merupakan halaman pada sistem POS yang digunakan untuk mengelola
+				  program loyalitas pelanggan. Halaman ini memungkinkan pengguna mengatur
+				  perolehan point, reward, tingkatan membership, benefit khusus member,
+				  serta pengaturan point dan diskon berdasarkan kategori produk.
+				  Dengan pengaturan tersebut, Customer dapat memberikan keuntungan yang
+				  berbeda kepada member sesuai dengan strategi loyalty yang diterapkan.
+				</p>
+			</div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Informasi yang Ditampilkan
+		    </h3>
+	
+				<ul class="space-y-3 text-muted leading-7">
+				  <li>
+				    • <b>Point Earning Ratio</b> digunakan untuk mengatur jumlah point
+				    yang diperoleh pelanggan berdasarkan nilai transaksi.
+				
+				    Sebagai contoh, rasio dapat diatur menjadi
+				    <b>1 Point : Rp10.000</b> atau
+				    <b>2 Point : Rp10.000</b>.
+				
+				    Nilai rasio tersebut dapat disesuaikan dengan kebijakan bisnis sehingga
+				    sistem dapat menghitung point yang diterima member pada setiap transaksi.
+				  </li>
+				
+				  <li>
+				    • <b>Reward Product Table</b> digunakan untuk mengelola daftar produk
+				    yang dapat ditukarkan menggunakan point member.
+				
+				    Pengguna dapat menambahkan produk reward melalui tombol
+				    <b>Add Reward Product</b>.
+				
+				    Tabel menampilkan informasi berupa
+				    <b>Product Name</b>,
+				    <b>Category</b>,
+				    <b>Reward Point</b>, dan
+				    <b>Action</b>.
+				
+				    Pada kolom <b>Action</b>, pengguna dapat menghapus produk reward
+				    apabila sudah tidak digunakan lagi.
+				  </li>
+				
+				  <li>
+				    • <b>Membership Tier</b> digunakan untuk mengatur tingkatan membership
+				    berdasarkan total nominal pembelian pelanggan.
+				
+				    Pengguna dapat menentukan batas minimum total pengeluaran yang harus
+				    dicapai agar member dapat naik ke tier berikutnya. Sistem kemudian
+				    dapat menyesuaikan tingkatan member berdasarkan akumulasi transaksi.
+				  </li>
+				
+				  <li>
+				    • <b>Member Benefit</b> digunakan untuk memberikan keuntungan khusus
+				    kepada pelanggan yang terdaftar sebagai member.
+				
+				    Benefit yang tersedia dapat berupa
+				    <b>Diskon Khusus Member</b> dan
+				    <b>Diskon Ulang Tahun Member</b>.
+				
+				    Pengaturan ini memungkinkan bisnis memberikan penawaran khusus kepada
+				    member sebagai bentuk apresiasi dan untuk meningkatkan loyalitas
+				    pelanggan.
+				  </li>
+				
+				  <li>
+				    • <b>Product Category</b> digunakan untuk mengelola kategori produk
+				    yang digunakan dalam program loyalty.
+				
+				    Pengguna dapat mengganti atau menyesuaikan
+				    <b>Nama Category</b> sesuai dengan kebutuhan dan struktur bisnis yang
+				    digunakan.
+				
+				    Category tersebut dapat digunakan sebagai dasar untuk menentukan
+				    pengaturan <b>Discount Category</b> dan
+				    <b>Point Category</b>.
+				  </li>
+				
+				  <li>
+				    • <b>Discount Category</b> digunakan untuk mengatur besaran diskon
+				    berdasarkan kategori produk tertentu.
+				
+				    Pengguna dapat menentukan kategori produk yang mendapatkan diskon
+				    sehingga sistem dapat menerapkan ketentuan diskon sesuai dengan
+				    kategori yang telah dikonfigurasi.
+				  </li>
+				
+				  <li>
+				    • <b>Point Category</b> digunakan untuk mengatur perolehan point
+				    berdasarkan kategori produk.
+				
+				    Pengguna dapat menentukan kategori produk tertentu untuk memperoleh
+				    point dengan nilai atau aturan yang berbeda dari pengaturan point
+				    umum.
+				  </li>
+				</ul>
 
-        <p class="text-muted leading-8">
-          Loyalty merupakan halaman pada sistem POS yang digunakan untuk mengelola
-          program loyalitas pelanggan. Halaman ini memungkinkan pengguna mengatur
-          perolehan point, penukaran reward, serta tingkatan membership sehingga
-          pelanggan dapat memperoleh berbagai keuntungan berdasarkan aktivitas
-          pembelian yang dilakukan.
-        </p>
-      </div>
+				<li> 
+					• <b>Season Tier</b> digunakan untuk mengatur periode berlakunya tingkatan membership serta proses penyesuaian level tier ketika periode tersebut berakhir.
+						Pengguna dapat menentukan periode season, misalnya selama
+						<b>1 tahun</b>. Selama season berlangsung, member dapat meningkatkan level
+						berdasarkan ketentuan <b>Membership Tier</b> yang telah ditentukan.
+						
+						Setelah periode season berakhir, sistem dapat melakukan penyesuaian level
+						tier berdasarkan aturan yang telah dikonfigurasi oleh pengguna.
+						
+						Sebagai contoh, apabila terdapat tingkatan:
+						<b>Level A</b>,
+						<b>Level B</b>,
+						<b>Level C</b>,
+						<b>Level D</b>, dan
+						<b>Level E</b>, maka pada saat season berakhir:
+						
+						<ul class="list-disc list-inside mt-2 space-y-1"> <li><b>Level E</b> turun menjadi <b>Level C</b>.</li> <li><b>Level D</b> turun menjadi <b>Level C</b>.</li> <li><b>Level C</b> turun menjadi <b>Level B</b>.</li> <li><b>Level B</b> tetap berada pada <b>Level B</b>.</li> <li><b>Level A</b> tetap berada pada <b>Level A</b>.</li> </ul>
+						
+						Nama setiap level tier dapat disesuaikan oleh pengguna sesuai dengan
+						kebutuhan dan strategi membership bisnis.
+						
+						Pengaturan <b>Season Tier</b> membantu bisnis menjalankan program membership
+						secara berkala sehingga level member dapat dievaluasi dan disesuaikan pada
+						setiap akhir periode season.
+				</li>
+		  </div>
+		
+		  <div>
+		    <h3 class="text-xl font-bold mb-3">
+		      Manfaat
+		    </h3>
 
-      <div>
-        <h3 class="text-xl font-bold mb-3">
-          Informasi yang Ditampilkan
-        </h3>
+				<p class="text-muted leading-8">
+				  Halaman Loyalty membantu pengguna membangun hubungan jangka panjang
+				  dengan pelanggan melalui program membership yang terstruktur. Dengan
+				  pengaturan point, reward, membership tier, benefit member, diskon
+				  kategori, serta point berdasarkan kategori produk, bisnis dapat membuat
+				  program loyalty yang lebih fleksibel dan sesuai dengan strategi
+				  penjualan. Fitur ini dapat digunakan untuk mendorong pembelian berulang,
+				  memberikan apresiasi kepada member, serta meningkatkan keterikatan
+				  pelanggan terhadap bisnis.
+				</p>
+		  </div>
+		</section>
 
-        <ul class="space-y-3 text-muted leading-7">
-          <li>
-            • <b>Point Earning Ratio</b> digunakan untuk mengatur jumlah point
-            yang diperoleh pelanggan berdasarkan nilai transaksi.
-
-            Sebagai contoh, rasio dapat diatur menjadi
-            <b>1 Point : Rp10.000</b> atau
-            <b>2 Point : Rp10.000</b>.
-
-            Nilai rasio tersebut dapat disesuaikan dengan kebijakan dan regulasi
-            bisnis sehingga sistem akan secara otomatis menghitung point yang
-            diterima member pada setiap transaksi.
-          </li>
-
-          <li>
-            • <b>Redeem Point</b> digunakan untuk mengatur jumlah point yang
-            dibutuhkan pelanggan dalam menukarkan reward berdasarkan kategori
-            produk yang telah ditentukan.
-
-            Pengaturan ini memungkinkan setiap kategori reward memiliki jumlah
-            point penukaran yang berbeda sesuai dengan strategi loyalty bisnis.
-          </li>
-
-          <li>
-            • <b>Reward Product Table</b> digunakan untuk mengelola daftar produk
-            yang dapat ditukarkan menggunakan point member.
-
-            Tersedia tombol <b>Add Reward Product</b> untuk menambahkan produk
-            reward baru ke dalam sistem.
-
-            Tabel menampilkan informasi berupa
-            <b>Product Name</b>,
-            <b>Category</b>,
-            <b>Reward Point</b>, dan
-            <b>Action</b>.
-
-            Pada kolom <b>Action</b>, pengguna dapat menghapus produk reward
-            apabila sudah tidak digunakan lagi dalam program loyalty.
-          </li>
-
-          <li>
-            • <b>Membership Tier</b> digunakan untuk mengatur tingkatan
-            membership berdasarkan total nominal pembelian pelanggan.
-
-            Pengguna dapat menentukan batas minimum total pengeluaran yang harus
-            dicapai agar member dapat naik ke tier berikutnya. Pengaturan ini
-            membantu sistem melakukan peningkatan tier secara otomatis sesuai
-            dengan akumulasi transaksi setiap member.
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h3 class="text-xl font-bold mb-3">
-          Manfaat
-        </h3>
-
-        <p class="text-muted leading-8">
-          Halaman Loyalty membantu pengguna membangun hubungan jangka panjang
-          dengan pelanggan melalui program membership yang terstruktur. Dengan
-          pengaturan perolehan point, reward, serta membership tier, sistem dapat
-          meningkatkan loyalitas pelanggan, mendorong pembelian berulang, dan
-          memberikan pengalaman berbelanja yang lebih menarik sesuai dengan
-          strategi bisnis yang diterapkan.
-        </p>
-      </div>
-    </section>
     `
   },
 
