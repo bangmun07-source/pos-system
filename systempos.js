@@ -15473,12 +15473,183 @@ async function saveExpense() {
 }
 
 function openAddNewOtherIncome() {
-  const template = document.getElementById("addneweotherincome");
-  const wrapper = document.createElement("div");
-  wrapper.id = "addNewOtherIncomeWrapper";
-  wrapper.appendChild(template.content.cloneNode(true));
+  const template =
+    document.getElementById("addneweotherincome");
+  const wrapper =
+    document.createElement("div");
+  wrapper.id =
+    "addNewOtherIncomeWrapper";
+  wrapper.appendChild(
+    template.content.cloneNode(true)
+  );
+
   document.body.appendChild(wrapper);
-  loadOtherIncomeBranches("otherIncomeBranch");
+  loadOtherIncomeBranches(
+    "otherIncomeBranch"
+  );
+
+  // CATEGORY CHANGE
+  const categorySelect =
+    document.getElementById(
+      "otherIncomeCategory"
+    );
+  categorySelect.addEventListener(
+    "change",
+    async function () {
+      const category = this.value;
+      const assetContainer =
+        document.getElementById(
+          "otherIncomeAssetContainer"
+        );
+      const assetSelect =
+        document.getElementById(
+          "otherIncomeAsset"
+        );
+      const assetInfo =
+        document.getElementById(
+          "otherIncomeAssetInfo"
+        );
+      if (category !== "Asset Sale") {
+        assetContainer.classList.add(
+          "hidden"
+        );
+        assetSelect.innerHTML =
+          '<option value="">Pilih Asset</option>';
+        assetInfo.classList.add(
+          "hidden"
+        );
+        return;
+      }
+      // Tampilkan pilihan asset
+      assetContainer.classList.remove(
+        "hidden"
+      );
+      await loadOtherIncomeAssets();
+    }
+  );
+
+  // BRANCH CHANGE
+  const branchSelect =
+    document.getElementById(
+      "otherIncomeBranch"
+    );
+  branchSelect.addEventListener(
+    "change",
+    async function () {
+      const category =
+        document.getElementById(
+          "otherIncomeCategory"
+        ).value;
+      if (category === "Asset Sale") {
+        await loadOtherIncomeAssets();
+      }
+    }
+  );
+	
+  // ASSET CHANGE
+  const assetSelect =
+    document.getElementById(
+      "otherIncomeAsset"
+    );
+
+  assetSelect.addEventListener(
+    "change",
+    function () {
+
+      const option =
+        this.options[this.selectedIndex];
+
+      const info =
+        document.getElementById(
+          "otherIncomeAssetInfo"
+        );
+
+      const bookValue =
+        document.getElementById(
+          "otherIncomeAssetBookValue"
+        );
+
+      if (!this.value) {
+
+        info.classList.add(
+          "hidden"
+        );
+
+        return;
+      }
+
+      const value =
+        Number(
+          option.dataset.bookValue || 0
+        );
+      bookValue.textContent =
+        "Rp" +
+        value.toLocaleString("id-ID");
+      info.classList.remove(
+        "hidden"
+      );
+    }
+  );
+}
+
+async function loadOtherIncomeAssets() {
+  const branchId =
+    document.getElementById("otherIncomeBranch").value;
+
+  const select =
+    document.getElementById("otherIncomeAsset");
+
+  if (!branchId) {
+    select.innerHTML =
+      '<option value="">Pilih Branch terlebih dahulu</option>';
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Loading asset...</option>';
+
+  const { data, error } = await supabaseClient
+    .from("Assets")
+    .select(`
+      Asset_ID,
+      Asset_Name,
+      Book_Value,
+      Purchase_Cost,
+      Status,
+      BranchId
+    `)
+    .eq("BranchId", branchId)
+    .eq("Status", "Active")
+    .order("Asset_Name");
+
+  if (error) {
+    console.error("Load assets error:", error);
+
+    select.innerHTML =
+      '<option value="">Gagal memuat asset</option>';
+
+    return;
+  }
+
+  select.innerHTML =
+    '<option value="">Pilih Asset</option>';
+
+  data.forEach(asset => {
+    const option =
+      document.createElement("option");
+
+    option.value = asset.Asset_ID;
+
+    option.textContent =
+      `${asset.Asset_Name} — Rp${Number(
+        asset.Book_Value || 0
+      ).toLocaleString("id-ID")}`;
+
+    option.dataset.bookValue =
+      asset.Book_Value || 0;
+
+    select.appendChild(option);
+  });
 }
 
 async function submitOtherIncome() {
