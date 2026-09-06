@@ -1,4 +1,4 @@
-<script>
+
 /**
    * 1. GLOBAL STATE
 */
@@ -21009,4 +21009,4 @@ async function exportCashFlowReport() {
     pdfWindow.document.close();
   }
 }
-</script>
+
