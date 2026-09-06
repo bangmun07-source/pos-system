@@ -2699,10 +2699,10 @@ async function saveOtherIncomeRPC(data = {}) {
       p_status: data.status,
       p_branch_id: data.branchId,
       p_notes: data.notes,
+      p_asset_id: data.assetId || null,
       p_session_id: sessionId
     }
   );
-
   if (error) {
     throw error;
   }
