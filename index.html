@@ -20181,7 +20181,7 @@ function renderBilling(data) {
     container.innerHTML += `
       <div class="flex justify-between items-center bg-background p-4 rounded-2xl">
         <div class="flex items-center gap-4">
-          <div class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface-container font-bold text-sm">
+          <div class="w-10 h-10 flex items-center justify-center rounded-md text-on-surface font-bold text-sm">
             ${item.qty}x
           </div>
 
@@ -20190,7 +20190,7 @@ function renderBilling(data) {
               ${item.name}
             </p>
 
-            <p class="text-xs text-muted">
+            <p class="text-sm font-medium text-on-surface-variant">
               ${item.note || ""}
             </p>
           </div>
