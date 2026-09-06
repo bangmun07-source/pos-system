@@ -15489,30 +15489,40 @@ async function submitOtherIncome() {
     "-" +
     Math.floor(Math.random() * 10000);
   const refId = id;
+  const category =
+    document.getElementById("otherIncomeCategory").value;
+  // ASSET ID
+  let assetId = null;
+  if (category === "Asset Sale") {
+    assetId =
+      document.getElementById("otherIncomeAsset")?.value || null;
+
+    if (!assetId) {
+      showToast(
+        "Silakan pilih asset yang akan dijual",
+        "error"
+      );
+      return;
+    }
+  }
+
   const data = {
     id: id,
-		
     date:
       document.getElementById(
         "otherIncomeDate"
       ).value,
     refId: refId,
-		
     description:
       document.getElementById(
         "otherIncomeDescription"
       ).value,
 
-    category:
-      document.getElementById(
-        "otherIncomeCategory"
-      ).value,
-
+    category: category,
     method:
       document.getElementById(
         "otherIncomeMethod"
       ).value,
-
     amount:
       Number(
         document.getElementById(
@@ -15521,16 +15531,16 @@ async function submitOtherIncome() {
       ),
 
     status: "Paid",
-
     branchId:
       document.getElementById(
         "otherIncomeBranch"
       ).value,
-
     notes:
       document.getElementById(
         "otherIncomeNotes"
-      ).value
+      ).value,
+    // BARU
+    assetId: assetId
   };
 
   try {
@@ -15546,23 +15556,24 @@ async function submitOtherIncome() {
         "Gagal menyimpan Other Income"
       );
     }
+
     document
       .getElementById(
         "addNewOtherIncomeWrapper"
       )
       ?.remove();
-
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
     await loadExpenseDashboard();
+
     showToast(
       "Other Income berhasil disimpan",
       "success"
     );
-  }
-  catch (err) {
+
+  } catch (err) {
     showToast(
       err?.message ||
       "Gagal menyimpan Other Income",
