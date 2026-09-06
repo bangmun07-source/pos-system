@@ -18687,6 +18687,8 @@ function initCashFlowFilters() {
 function renderAccountBalance(data){
   document.getElementById("cf-cash").textContent = formatRupiah(data.Cash);
   document.getElementById("cf-bank").textContent = formatRupiah(data.Bank);
+	document.getElementById("cf-asset").textContent = formatRupiah(data.Asset);
+	// Total Balance tetap Cash + Bank
   document.getElementById("cf-total").textContent = formatRupiah(data.Balance);
 }
 
