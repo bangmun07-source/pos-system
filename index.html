@@ -10215,6 +10215,33 @@
 							<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">expand_more</span>
 						</div>
 					</div>
+					<!-- Asset Selection -->
+					<div id="otherIncomeAssetContainer" class="space-y-2 hidden">
+					    <label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
+					        Asset
+					    </label>
+					
+					    <div class="relative group">
+					        <select
+					            id="otherIncomeAsset"
+					            class="w-full appearance-none bg-background border border-outline-variant rounded-md px-4 pr-12 py-3 text-on-surface focus:ring-0 focus:bg-surface-container-high cursor-pointer transition-all"
+					        >
+					            <option value="">Select Asset</option>
+					        </select>
+					
+					        <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+					            expand_more
+					        </span>
+					    </div>
+					
+					    <!-- Informasi aset yang dipilih -->
+					    <div id="otherIncomeAssetInfo" class="hidden text-xs text-on-surface-variant mt-2">
+					        <div class="flex justify-between">
+					            <span>Book Value</span>
+					            <span id="otherIncomeAssetBookValue">Rp0</span>
+					        </div>
+					    </div>
+					</div>
 					<!-- Vendor -->
 					<div class="space-y-2">
 						<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Vendor / Supplier</label>
