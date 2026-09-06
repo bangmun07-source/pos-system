@@ -15595,9 +15595,10 @@ function openAddNewOtherIncome() {
 async function loadOtherIncomeAssets() {
   const branchId =
     document.getElementById("otherIncomeBranch").value;
-
   const select =
     document.getElementById("otherIncomeAsset");
+  const sessionId =
+    localStorage.getItem("pos_session_id");
 
   if (!branchId) {
     select.innerHTML =
@@ -15605,51 +15606,65 @@ async function loadOtherIncomeAssets() {
     return;
   }
 
-  select.innerHTML =
-    '<option value="">Loading asset...</option>';
-
-  const { data, error } = await supabaseClient
-    .from("Assets")
-    .select(`
-      Asset_ID,
-      Asset_Name,
-      Book_Value,
-      Purchase_Cost,
-      Status,
-      BranchId
-    `)
-    .eq("BranchId", branchId)
-    .eq("Status", "Active")
-    .order("Asset_Name");
-
-  if (error) {
-    console.error("Load assets error:", error);
-
+  if (!sessionId) {
     select.innerHTML =
-      '<option value="">Gagal memuat asset</option>';
-
+      '<option value="">Session tidak ditemukan</option>';
     return;
   }
-
   select.innerHTML =
-    '<option value="">Pilih Asset</option>';
+    '<option value="">Loading asset...</option>';
+	
+  try {
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_available_assets",
+      {
+        p_branch_id: branchId,
+        p_session_id: sessionId
+      }
+    );
 
-  data.forEach(asset => {
-    const option =
-      document.createElement("option");
+    if (error) {
+      console.error(
+        "Load assets error:",
+        error
+      );
+      select.innerHTML =
+        '<option value="">Gagal memuat asset</option>';
+      return;
+    }
+    select.innerHTML =
+      '<option value="">Pilih Asset</option>';
 
-    option.value = asset.Asset_ID;
+    if (!data || data.length === 0) {
+      select.innerHTML =
+        '<option value="">Tidak ada asset aktif</option>';
+      return;
+    }
 
-    option.textContent =
-      `${asset.Asset_Name} — Rp${Number(
-        asset.Book_Value || 0
-      ).toLocaleString("id-ID")}`;
+    data.forEach(asset => {
+      const option =
+        document.createElement("option");
+      option.value =
+        asset.Asset_ID;
+      option.textContent =
+        `${asset.Asset_Name} — Rp${Number(
+          asset.Book_Value || 0
+        ).toLocaleString("id-ID")}`;
+      option.dataset.bookValue =
+        asset.Book_Value || 0;
+      option.dataset.purchaseCost =
+        asset.Purchase_Cost || 0;
+      select.appendChild(option);
 
-    option.dataset.bookValue =
-      asset.Book_Value || 0;
+    });
 
-    select.appendChild(option);
-  });
+  } catch (err) {
+    select.innerHTML =
+      '<option value="">Gagal memuat asset</option>';
+  }
 }
 
 async function submitOtherIncome() {
