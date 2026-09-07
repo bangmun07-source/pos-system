@@ -13511,18 +13511,25 @@
           <!-- VIEW DETAIL -->
           <button onclick="viewAssetDetail(currentAsset)"
             class="w-full flex items-center justify-betweenp-4 rounded-mdhover:bg-backgroundtransition-all">
-            <div class="flex items-center gap-4">
+           	<div class="flex items-center gap-4">
               <div class="main-icon-box">
                 <span class="material-symbols-outlined text-3xl"
                   style="font-variation-settings:'FILL' 1;">
                   visibility
                 </span>
               </div>
-
-              <span class="font-medium text-sm lg:text:md text-on-surface" >
-                View Full Details
-              </span>
-            </div>
+							
+							<div class="text-left">
+								<span class="font-medium text-sm lg:text:md text-on-surface" >
+									View Full Details
+								</span>
+								
+								 <span id="modalAssetdetailStatus"
+										class="block text-xs text-on-surface-variant mt-1">
+										Lihat informasi lengkap asset
+									</span>
+								</div>
+							</div>
 						
             <span class="material-symbols-outlined text-on-surface-variant">
               chevron_right
