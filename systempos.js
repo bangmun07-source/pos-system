@@ -21378,7 +21378,6 @@ async function loadAssetPage() {
   }
 }
 
-
 /* =========================================================
    KPI
    ========================================================= */
@@ -21451,7 +21450,6 @@ function renderAssetKPI() {
       formatAssetCurrency(monthlyDepreciation);
   }
 }
-
 
 /* =========================================================
    ASSET TABLE
@@ -21982,6 +21980,154 @@ async function saveAssetDepreciationSetting() {
   }
 }
 
+function viewAssetDetail(asset) {
+  if (!asset) {
+    console.warn("Asset tidak ditemukan");
+    return;
+  }
+
+  currentAsset = asset;
+  const template =
+    document.getElementById(
+      "assetDetailModalTemplate"
+    );
+
+  if (!template) {
+    console.warn(
+      "assetDetailModalTemplate tidak ditemukan"
+    );
+    return;
+  }
+
+  // Tutup modal sebelumnya
+  document .getElementById("assetActionModalOverlay")
+    ?.remove();
+  document .getElementById("assetDetailModalOverlay")
+    ?.remove();
+
+  const modal = template.content.cloneNode(true);
+  document.body.appendChild(modal);
+
+  // BASIC
+  document.getElementById(
+    "detailAssetName"
+  ).textContent =
+    asset.Asset_Name || "-";
+
+  document.getElementById(
+    "detailAssetId"
+  ).textContent =
+    asset.Asset_ID || "-";
+
+  document.getElementById(
+    "detailAssetPurchaseDate"
+  ).textContent =
+    formatAssetDate(asset.Purchase_Date);
+
+  document.getElementById(
+    "detailAssetPurchaseCost"
+  ).textContent =
+    formatAssetCurrency(
+      asset.Purchase_Cost
+    );
+
+  // DEPRECIATION
+  const usefulLife = Number(asset.Useful_Life_Months || 0);
+  const monthlyDepreciation =
+    usefulLife > 0 &&
+    String(asset.Depreciation_Method || "")
+      .toUpperCase() === "STRAIGHT LINE"
+      ? Number(asset.Purchase_Cost || 0) /
+        usefulLife
+      : 0;
+
+  document.getElementById(
+    "detailAssetUsefulLife"
+  ).textContent =
+    usefulLife > 0
+      ? `${usefulLife} bulan`
+      : "Belum diatur";
+
+  document.getElementById(
+    "detailAssetMethod"
+  ).textContent =
+    usefulLife > 0
+      ? asset.Depreciation_Method || "-"
+      : "-";
+
+  // VALUE
+  document.getElementById(
+    "detailAssetAccumulated"
+  ).textContent =
+    formatAssetCurrency(
+      asset.Accumulated_Depreciation
+    );
+
+  document.getElementById(
+    "detailAssetBookValue"
+  ).textContent =
+    formatAssetCurrency(
+      asset.Book_Value
+    );
+
+  document.getElementById(
+    "detailAssetMonthlyDepreciation"
+  ).textContent =
+    usefulLife > 0
+      ? formatAssetCurrency(
+          monthlyDepreciation
+        )
+      : "-";
+
+  // STATUS
+  document.getElementById(
+    "detailAssetStatus"
+  ).textContent =
+    asset.Status || "-";
+
+  document.getElementById(
+    "detailAssetLastDepreciation"
+  ).textContent =
+    asset.Last_Depreciation_Date
+      ? formatAssetDate(
+          asset.Last_Depreciation_Date
+        )
+      : "Belum ada";
+
+  // NOTES
+  document.getElementById(
+    "detailAssetNotes"
+  ).textContent =
+    asset.Notes || "-";
+}
+
+function closeAssetDetailModal() {
+  const overlay =
+    document.getElementById(
+      "assetDetailModalOverlay"
+    );
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+function formatAssetDate(dateValue) {
+  if (!dateValue) {
+    return "-";
+  }
+  const date = new Date(dateValue);
+  if (isNaN(date.getTime())) {
+    return "-";
+  }
+  return date.toLocaleDateString(
+    "id-ID",
+    {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    }
+  );
+}
 
 /* =========================================================
    ASSET PAGINATION
