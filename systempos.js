@@ -21322,27 +21322,27 @@ function formatAssetPeriod(value) {
 
 async function loadAssetPage() {
   try {
-
+    const sessionId =
+      localStorage.getItem("pos_session_id");
     if (!state.branchId) {
       console.warn("BranchId belum tersedia");
       return;
     }
-    if (!state.sessionId) {
+    if (!sessionId) {
       console.warn("Session ID belum tersedia");
       return;
     }
-	  
+
     // LOAD ASSETS
     const { data: assets, error: assetError } =
       await supabaseClient.rpc("get_assets", {
         p_branch_id: state.branchId,
-        p_session_id: state.sessionId
+        p_session_id: sessionId
       });
 
     if (assetError) {
       throw assetError;
     }
-
     assetData = assets || [];
     // LOAD DEPRECIATION HISTORY
     const {
@@ -21352,17 +21352,22 @@ async function loadAssetPage() {
       "get_asset_depreciation_history",
       {
         p_branch_id: state.branchId,
-        p_session_id: state.sessionId
+        p_session_id: sessionId
       }
     );
+
     if (depreciationError) {
       throw depreciationError;
     }
+
     depreciationHistoryData = depreciation || [];
+    // =========================
     // RENDER
+    // =========================
     renderAssetKPI();
     renderAssetTable();
     renderDepreciationHistory();
+
   } catch (error) {
     console.error("loadAssetPage error:", error);
     assetData = [];
