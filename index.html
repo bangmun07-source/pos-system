@@ -13561,7 +13561,155 @@
     </div>
   </div>
 </template>	
+	
 
+<!-- POPPUP TRANSFER FUND -->
+
+<template id="assetDepreciationModalTemplate">
+
+  <div id="assetDepreciationModalOverlay"
+    class="fixed inset-0 z-[9999] flex items-center justify-center p-6" >
+    <div class="absolute inset-0 bg-background backdrop-blur-md"
+      onclick="closeAssetDepreciationModal()" >
+		</div>
+
+    <div class="relative w-full max-w-[450px]">
+      <div class="bg-background rounded-md border-b border-outline-variant overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+        <div class="flex items-center justify-between px-6 py-5 border border-outline-variant">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-on-surface">
+              percent
+            </span>
+						
+            <div>
+              <h1 class="text-md lg:text:lg font-headline font-bold uppercase tracking-[0.20em] text-foreground">
+                Atur Depresiasi
+              </h1>
+							
+              <div class="flex items-center gap-2 mt-1">
+                <span id="depreciationModalAssetName"
+                  class="text-xs font-semibold text-on-surface-variant" >
+                  Mesin Freezer
+                </span>
+
+                <span class="text-on-surface-variant opacity-30">
+                  •
+                </span>
+
+                <span id="depreciationModalAssetId"
+                  class="text-xs uppercase tracking-widest text-on-surface-variant" >
+                  AST-001
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button type="button"
+            onclick="closeAssetDepreciationModal()"
+            class="text-on-surface-variant hover:text-on-surface" >
+            ✕
+          </button>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p-6 space-y-5">
+          <!-- USEFUL LIFE -->
+          <div>
+            <label for="assetUsefulLifeInput"
+              class="block text-xs uppercase tracking-widest font-semibold text-on-surface-variant mb-2" >
+              Masa Manfaat
+            </label>
+
+            <div class="flex items-center gap-3">
+              <input id="assetUsefulLifeInput"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="36"
+                class="w-full px-4 py-3 rounded-md bg-background-high border border-outline-variant text-on-surface outline-none focus:border-on-surface-variant" />
+              <span class="text-sm text-on-surface-variant whitespace-nowrap" >
+                Bulan
+              </span>
+            </div>
+
+            <p class="text-xs text-on-surface-variant mt-2" >
+              Contoh: 36 bulan = masa manfaat 3 tahun.
+            </p>
+          </div>
+
+          <!-- DEPRECIATION METHOD -->
+          <div>
+            <label for="assetDepreciationMethod"
+              class="block text-xs uppercase tracking-widest font-semibold text-on-surface-variant mb-2" >
+              Metode Depresiasi
+            </label>
+
+            <select id="assetDepreciationMethod"
+              class="w-full px-4 py-3 rounded-md bg-background-high border border-outline-variant text-on-surface outline-none focus:border-on-surface-variant" >
+              <option value="Straight Line">
+                Straight Line
+              </option>
+            </select>
+          </div>
+
+          <!-- PREVIEW -->
+          <div class="p-4 rounded-md bg-outline-variant border border-outline-variant space-y-2" >
+            <div class="flex justify-between gap-4">
+              <span class="text-xs text-on-surface-variant">
+                Harga Perolehan
+              </span>
+
+              <span id="depreciationModalPurchaseCost"
+                class="text-xs font-semibold text-on-surface" >
+                Rp0
+              </span>
+            </div>
+
+            <div class="flex justify-between gap-4">
+              <span class="text-xs text-on-surface-variant">
+                Depresiasi / Bulan
+              </span>
+
+              <span id="depreciationModalMonthly"
+                class="text-xs font-semibold text-on-surface" >
+                Rp0
+              </span>
+            </div>
+          </div>
+
+          <!-- INFO -->
+          <div class="p-4 rounded-md bg-outline-variant border border-outline-variant flex gap-3" >
+            <span class="material-symbols-outlined text-foreground" >
+              info
+            </span>
+
+            <p class="text-xs text-on-surface-variant" >
+              Depresiasi dimulai pada bulan setelah
+              asset dibeli dan dihitung setiap bulan
+              berdasarkan metode Straight Line.
+            </p>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="px-6 py-5 flex justify-end gap-3 border border-outline-variant" >
+          <button type="button"
+            onclick="closeAssetDepreciationModal()"
+            class="px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface" >
+            Cancel
+          </button>
+
+          <button type="button"
+            onclick="saveAssetDepreciationSetting()"
+            class="px-5 py-2 rounded-md bg-on-surface text-background text-sm font-semibold hover:opacity-90 transition-all" >
+            Simpan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+	
 
 <!-- POPPUP TRANSFER FUND -->
 
