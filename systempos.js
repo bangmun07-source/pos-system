@@ -2032,12 +2032,12 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 	    }
 			
 	    // PUBLIC URL
-	    const {
-	      data: publicData
-	    } = supabase
-	      .storage
-	      .from("Recipes_Digital")
-	      .getPublicUrl(fileName);
+	   const {
+		  data: publicData
+		} = supabaseClient
+		  .storage
+		  .from("Recipes_Digital")
+		  .getPublicUrl(fileName);
 	
 	    const url = publicData?.publicUrl;
 	    if (!url) {
@@ -2052,16 +2052,16 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 			}
 	    // UPDATE RECEIPT URL
 	    const {
-			  data: rpcResult,
-			  error: rpcError
-			} = await supabase.rpc(
-			  "update_receipt_url",
-			  {
-			    p_trx_id: trx.id,
-			    p_receipt_url: url,
-			    p_session_id: sessionId
-			  }
-			);
+		  data: rpcResult,
+		  error: rpcError
+		} = await supabaseClient.rpc(
+		  "update_receipt_url",
+		  {
+		    p_trx_id: trx.id,
+		    p_receipt_url: url,
+		    p_session_id: sessionId
+		  }
+		);
 			
 			if (rpcError) {
 			  throw rpcError;
