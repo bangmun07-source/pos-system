@@ -21546,34 +21546,39 @@ function renderAssetTable() {
 			    ? "text-emerald-400"
 			    : "text-muted";
 			
-			const actionHTML =
-			  status === "ACTIVE"
-			    ? `
-			      <button
-			        type="button"
-			        onclick="openAssetDepreciationModal('${escapeAssetHTML(asset.Asset_ID)}')"
-			        class="px-3 py-1.5 rounded-md text-xs font-medium
-			               border border-outline-variant
-			               hover:bg-background
-			               transition">
-			        ${
-			          usefulLife > 0
-			            ? "Atur"
-			            : "Atur Depresiasi"
-			        }
-			      </button>
-			    `
-			    : `
-			      <button
-			        type="button"
+			const actionHTML = `
+			  <div class="relative inline-block">
+			
+			    <button type="button"
+			      onclick="toggleAssetActionMenu('${escapeAssetHTML(asset.Asset_ID)}')"
+			      class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-background-high transition-colors" title="Action">
+			      <span class="material-symbols-outlined text-[20px]">
+			        more_vert
+			      </span>
+			    </button>
+			
+			    <div id="asset-action-${escapeAssetHTML(asset.Asset_ID)}"
+			      class="hidden absolute right-0 top-full mt-1 z-50 min-w-[170px] bg-background border border-outline-variant rounded-md shadow-[0_4px_15px_rgba(0,0,0,0.25)] overflow-hidden">
+			      ${
+			        status === "ACTIVE"
+			          ? `
+			            <button type="button"
+			              onclick="openAssetDepreciationModal('${escapeAssetHTML(asset.Asset_ID)}')"
+			              class="w-full px-4 py-2.5 text-left text-sm hover:bg-background-high transition-colors">
+			              Atur Depresiasi
+			            </button>
+			          `
+			          : ""
+			      }
+			
+			      <button type="button"
 			        onclick="viewAssetDetail('${escapeAssetHTML(asset.Asset_ID)}')"
-			        class="px-3 py-1.5 rounded-md text-xs font-medium
-			               border border-outline-variant
-			               hover:bg-background
-			               transition">
-			        Detail
+			        class="w-full px-4 py-2.5 text-left text-sm  hover:bg-background-high transition-colors">
+			        	Detail Asset
 			      </button>
-			    `;
+			    </div>
+			  </div>
+			`;
       return `
         <tr class="hover:bg-background-high transition-colors">
           <!-- ASSET -->
@@ -21649,6 +21654,20 @@ function renderAssetTable() {
     filteredData.length,
     totalPages
   );
+}
+
+function toggleAssetActionMenu(assetId) {
+  document
+    .querySelectorAll('[id^="asset-action-"]')
+    .forEach(menu => {
+      menu.classList.add("hidden");
+    });
+  const menu = document.getElementById(
+    `asset-action-${assetId}`
+  );
+  if (menu) {
+    menu.classList.toggle("hidden");
+  }
 }
 
 /* =========================================================
