@@ -21254,3 +21254,734 @@ async function exportCashFlowReport() {
   }
 }
 
+/* =========================================================
+   ASSET MANAGEMENT
+   ========================================================= */
+
+let assetData = [];
+let depreciationHistoryData = [];
+
+let assetCurrentPage = 1;
+let depreciationCurrentPage = 1;
+
+const ASSET_PAGE_SIZE = 10;
+const DEPRECIATION_PAGE_SIZE = 10;
+
+
+/* =========================================================
+   FORMAT
+   ========================================================= */
+
+function formatAssetCurrency(value) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+
+function formatAssetNumber(value) {
+  return new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+
+function formatAssetDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
+
+function formatAssetPeriod(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("id-ID", {
+    month: "short",
+    year: "numeric"
+  });
+}
+
+
+/* =========================================================
+   LOAD ASSET DATA
+   ========================================================= */
+
+async function loadAssetPage() {
+  try {
+
+    assetData = [
+      {
+        Asset_ID: "AST-001",
+        Asset_Name: "Mesin Freezer",
+        Purchase_Date: "2026-09-01",
+        Purchase_Cost: 1000000,
+        Accumulated_Depreciation: 0,
+        Book_Value: 1000000,
+        Useful_Life_Months: 24,
+        Depreciation_Method: "Straight Line",
+        Last_Depreciation_Date: null,
+        Status: "Active"
+      },
+
+      {
+        Asset_ID: "AST-002",
+        Asset_Name: "Mesin Kopi",
+        Purchase_Date: "2026-09-01",
+        Purchase_Cost: 3000000,
+        Accumulated_Depreciation: 0,
+        Book_Value: 3000000,
+        Useful_Life_Months: 36,
+        Depreciation_Method: "Straight Line",
+        Last_Depreciation_Date: null,
+        Status: "Active"
+      },
+
+      {
+        Asset_ID: "AST-003",
+        Asset_Name: "Softcase",
+        Purchase_Date: "2026-09-01",
+        Purchase_Cost: 1000000,
+        Accumulated_Depreciation: 0,
+        Book_Value: 1000000,
+        Useful_Life_Months: 12,
+        Depreciation_Method: "Straight Line",
+        Last_Depreciation_Date: null,
+        Status: "Active"
+      }
+    ];
+
+    depreciationHistoryData = [];
+    renderAssetKPI();
+    renderAssetTable();
+    renderDepreciationHistory();
+  } catch (error) {
+    console.error("loadAssetPage error:", error);
+  }
+}
+
+
+/* =========================================================
+   KPI
+   ========================================================= */
+
+function renderAssetKPI() {
+  const activeAssets = assetData.filter(
+    asset => String(asset.Status).toUpperCase() === "ACTIVE"
+  );
+  const totalAssets = activeAssets.length;
+  const purchaseCost = activeAssets.reduce(
+    (sum, asset) => sum + Number(asset.Purchase_Cost || 0),
+    0
+  );
+  const accumulatedDepreciation = activeAssets.reduce(
+    (sum, asset) => sum + Number(asset.Accumulated_Depreciation || 0),
+    0
+  );
+  const bookValue = activeAssets.reduce(
+    (sum, asset) => sum + Number(asset.Book_Value || 0),
+    0
+  );
+
+  const monthlyDepreciation = activeAssets.reduce(
+    (sum, asset) => {
+      if (
+        String(asset.Depreciation_Method).toUpperCase() ===
+        "STRAIGHT LINE"
+      ) {
+        const usefulLife = Number(
+          asset.Useful_Life_Months || 0
+        );
+        if (usefulLife > 0) {
+          return sum +
+            (
+              Number(asset.Purchase_Cost || 0) /
+              usefulLife
+            );
+        }
+      }
+      return sum;
+    },
+    0
+  );
+
+  const totalCountElement = document.getElementById("asset-total-count");
+  const purchaseCostElement = document.getElementById("asset-purchase-cost");
+  const accumulatedElement =
+    document.getElementById(
+      "asset-accumulated-depreciation"
+    );
+  const bookValueElement = document.getElementById("asset-book-value");
+  const monthlyElement =
+    document.getElementById(
+      "asset-monthly-depreciation"
+    );
+
+  if (totalCountElement) {totalCountElement.textContent =
+      formatAssetNumber(totalAssets);
+  }
+  if (purchaseCostElement) {purchaseCostElement.textContent =
+      formatAssetCurrency(purchaseCost);
+  }
+  if (accumulatedElement) {accumulatedElement.textContent =
+      formatAssetCurrency(accumulatedDepreciation);
+  }
+  if (bookValueElement) {bookValueElement.textContent =
+      formatAssetCurrency(bookValue);
+  }
+  if (monthlyElement) {monthlyElement.textContent =
+      formatAssetCurrency(monthlyDepreciation);
+  }
+}
+
+
+/* =========================================================
+   ASSET TABLE
+   ========================================================= */
+
+function renderAssetTable() {
+  const tbody = document.getElementById("asset-table-body");
+  if (!tbody) return;
+  const searchInput = document.getElementById("assetSearchInput");
+  const statusFilter = document.getElementById("assetStatusFilter");
+  const search =
+    searchInput?.value
+      ?.trim()
+      ?.toLowerCase() || "";
+
+  const status =
+    statusFilter?.value || "all";
+
+  let filteredData = assetData.filter(asset => {
+    const matchesSearch =
+      !search ||
+      String(asset.Asset_ID)
+        .toLowerCase()
+        .includes(search) ||
+      String(asset.Asset_Name)
+        .toLowerCase()
+        .includes(search);
+
+    const matchesStatus =
+      status === "all" ||
+      String(asset.Status).toLowerCase() === status;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredData.length /
+        ASSET_PAGE_SIZE
+      )
+    );
+
+  if (assetCurrentPage > totalPages) {
+    assetCurrentPage = totalPages;
+  }
+
+  const start =
+    (assetCurrentPage - 1) *
+    ASSET_PAGE_SIZE;
+
+  const pageData =
+    filteredData.slice(
+      start,
+      start + ASSET_PAGE_SIZE
+    );
+
+  if (!pageData.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8"
+            class="text-center text-muted py-10">
+          No assets found
+        </td>
+      </tr>
+    `;
+    updateAssetPagination(
+      filteredData.length,
+      totalPages
+    );
+    return;
+  }
+
+  tbody.innerHTML =
+    pageData.map(asset => {
+      const usefulLife = Number(asset.Useful_Life_Months || 0);
+		
+      const depreciationPerMonth =
+        usefulLife > 0 &&
+        String(asset.Depreciation_Method)
+          .toUpperCase() === "STRAIGHT LINE"
+          ? Number(asset.Purchase_Cost || 0) /
+            usefulLife
+          : 0;
+
+      const status =
+        String(asset.Status || "")
+          .toUpperCase();
+
+      const statusClass =
+        status === "ACTIVE"
+          ? "text-emerald-400"
+          : "text-muted";
+      return `
+        <tr class="hover:bg-background-high transition-colors">
+          <!-- ASSET -->
+          <td class="px-6 py-4">
+            <div class="flex flex-col">
+              <span class="font-semibold text-sm">
+                ${escapeAssetHTML(asset.Asset_Name)}
+              </span>
+			  
+              <span class="text-[10px] text-muted mt-1">
+                ${escapeAssetHTML(asset.Asset_ID)}
+              </span>
+            </div>
+          </td>
+
+          <!-- PURCHASE DATE -->
+          <td class="px-6 py-4 text-sm text-muted">
+            ${formatAssetDate(asset.Purchase_Date)}
+          </td>
+
+          <!-- PURCHASE COST -->
+          <td class="px-6 py-4 text-right text-sm">
+            ${formatAssetCurrency(asset.Purchase_Cost)}
+          </td>
+
+          <!-- USEFUL LIFE -->
+          <td class="px-6 py-4 text-center">
+            <span class="text-sm">
+              ${
+                usefulLife > 0
+                  ? usefulLife + " bulan"
+                  : "-"
+              }
+            </span>
+          </td>
+
+          <!-- DEPRECIATION -->
+          <td class="px-6 py-4 text-right text-sm">
+            ${
+              depreciationPerMonth > 0
+                ? formatAssetCurrency(
+                    depreciationPerMonth
+                  )
+                : "-"
+            }
+          </td>
+
+          <!-- ACCUMULATED -->
+          <td class="px-6 py-4 text-right text-sm">
+            ${formatAssetCurrency(asset.Accumulated_Depreciation )}
+          </td>
+
+          <!-- BOOK VALUE -->
+          <td class="px-6 py-4 text-right text-sm font-semibold">
+            ${formatAssetCurrency( asset.Book_Value)}
+          </td>
+
+          <!-- STATUS -->
+          <td class="px-6 py-4 text-center">
+            <span class="${statusClass} text-[10px] font-bold uppercase tracking-widest">
+              ${escapeAssetHTML(asset.Status)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  updateAssetPagination(
+    filteredData.length,
+    totalPages
+  );
+}
+
+/* =========================================================
+   ASSET PAGINATION
+   ========================================================= */
+
+function updateAssetPagination(totalItems, totalPages) {
+  const info =
+    document.getElementById(
+      "asset-pagination-info"
+    );
+
+  const prevBtn =
+    document.getElementById(
+      "assetPrevBtn"
+    );
+
+  const nextBtn =
+    document.getElementById(
+      "assetNextBtn"
+    );
+	
+  if (info) {
+    if (totalItems === 0) {
+      info.textContent = "Showing 0 assets";
+    } else {
+      const start =
+        (assetCurrentPage - 1) *
+        ASSET_PAGE_SIZE + 1;
+		
+      const end =
+        Math.min(
+          assetCurrentPage *
+          ASSET_PAGE_SIZE,
+          totalItems
+        );
+      info.textContent = `Showing ${start}-${end} of ${totalItems} assets`;
+    }
+  }
+
+  if (prevBtn) {
+    prevBtn.disabled = assetCurrentPage <= 1;
+  }
+  if (nextBtn) {
+    nextBtn.disabled = assetCurrentPage >= totalPages;
+  }
+}
+
+
+/* =========================================================
+   DEPRECIATION HISTORY
+   ========================================================= */
+
+function renderDepreciationHistory() {
+  const tbody =
+    document.getElementById(
+      "depreciation-table-body"
+    );
+  if (!tbody) return;
+  const searchInput =
+    document.getElementById(
+      "depreciationSearchInput"
+    );
+
+  const search =
+    searchInput?.value
+      ?.trim()
+      ?.toLowerCase() || "";
+
+  const filteredData =
+    depreciationHistoryData.filter(item => {
+      return (
+        !search ||
+        String(item.Asset_ID)
+          .toLowerCase()
+          .includes(search) ||
+        String(item.Asset_Name)
+          .toLowerCase()
+          .includes(search)
+      );
+    });
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredData.length /
+        DEPRECIATION_PAGE_SIZE
+      )
+    );
+
+  if (
+    depreciationCurrentPage >
+    totalPages
+  ) {
+    depreciationCurrentPage =
+      totalPages;
+  }
+
+  const start =
+    (depreciationCurrentPage - 1) *
+    DEPRECIATION_PAGE_SIZE;
+
+  const pageData =
+    filteredData.slice(
+      start,
+      start + DEPRECIATION_PAGE_SIZE
+    );
+
+  if (!pageData.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="text-center text-muted py-10">
+          No depreciation history
+        </td>
+      </tr>
+    `;
+    updateDepreciationPagination(
+      filteredData.length,
+      totalPages
+    );
+    return;
+  }
+
+
+  tbody.innerHTML =
+    pageData.map(item => {
+      return `
+        <tr class="hover:bg-background-high transition-colors">
+          <td class="px-6 py-4 text-sm">
+            ${formatAssetPeriod(
+              item.Period
+            )}
+          </td>
+
+          <td class="px-6 py-4">
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold">
+                ${escapeAssetHTML(
+                  item.Asset_Name
+                )}
+              </span>
+
+              <span class="text-[10px] text-muted">
+                ${escapeAssetHTML(
+                  item.Asset_ID
+                )}
+              </span>
+            </div>
+          </td>
+
+          <td class="px-6 py-4 text-right text-sm">
+            ${formatAssetCurrency(
+              item.Depreciation_Amount
+            )}
+          </td>
+
+          <td class="px-6 py-4 text-right text-sm">
+            ${formatAssetCurrency(
+              item.Book_Value_Before
+            )}
+          </td>
+
+          <td
+            class="px-6 py-4 text-right
+            text-sm font-semibold">
+            ${formatAssetCurrency(
+              item.Book_Value_After
+            )}
+          </td>
+
+          <td class="px-6 py-4 text-sm text-muted">
+            ${formatAssetDateTime(
+              item.Created_At
+            )}
+          </td>
+        </tr>
+      `;
+    }).join("");
+
+  updateDepreciationPagination(
+    filteredData.length,
+    totalPages
+  );
+}
+
+
+/* =========================================================
+   DEPRECIATION PAGINATION
+   ========================================================= */
+
+function updateDepreciationPagination(
+  totalItems,
+  totalPages
+) {
+
+  const info =
+    document.getElementById(
+      "depreciation-pagination-info"
+    );
+
+  const prevBtn =
+    document.getElementById(
+      "depreciationPrevBtn"
+    );
+
+  const nextBtn =
+    document.getElementById(
+      "depreciationNextBtn"
+    );
+
+
+  if (info) {
+    if (totalItems === 0) {
+      info.textContent =
+        "Showing 0 depreciation records";
+
+    } else {
+      const start =
+        (depreciationCurrentPage - 1) *
+        DEPRECIATION_PAGE_SIZE + 1;
+
+      const end =
+        Math.min(
+          depreciationCurrentPage *
+          DEPRECIATION_PAGE_SIZE,
+          totalItems
+        );
+      info.textContent =
+        `Showing ${start}-${end} of ${totalItems} records`;
+    }
+  }
+
+  if (prevBtn) {
+    prevBtn.disabled = depreciationCurrentPage <= 1;
+  }
+
+  if (nextBtn) {
+    nextBtn.disabled = depreciationCurrentPage >= totalPages;
+  }
+}
+
+
+/* =========================================================
+   EVENT LISTENERS
+   ========================================================= */
+
+function initAssetPageEvents() {
+  const searchInput =
+    document.getElementById(
+      "assetSearchInput"
+    );
+
+  const statusFilter =
+    document.getElementById(
+      "assetStatusFilter"
+    );
+
+  const depreciationSearch =
+    document.getElementById(
+      "depreciationSearchInput"
+    );
+
+
+  searchInput?.addEventListener(
+    "input",
+    () => {
+      assetCurrentPage = 1;
+      renderAssetTable();
+    }
+  );
+
+  statusFilter?.addEventListener(
+    "change",
+    () => {
+      assetCurrentPage = 1;
+      renderAssetTable();
+    }
+  );
+
+  depreciationSearch?.addEventListener(
+    "input",
+    () => {
+      depreciationCurrentPage = 1;
+      renderDepreciationHistory();
+    }
+  );
+
+  document
+    .getElementById("assetPrevBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        if (assetCurrentPage > 1) {
+          assetCurrentPage--;
+          renderAssetTable();
+        }
+      }
+    );
+
+  document
+    .getElementById("assetNextBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        assetCurrentPage++;
+        renderAssetTable();
+      }
+    );
+
+  document
+    .getElementById("depreciationPrevBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+
+        if (depreciationCurrentPage > 1) {
+          depreciationCurrentPage--;
+          renderDepreciationHistory();
+        }
+      }
+    );
+	
+  document
+    .getElementById("depreciationNextBtn")
+    ?.addEventListener(
+      "click",
+      () => {
+        depreciationCurrentPage++;
+        renderDepreciationHistory();
+      }
+    );
+}
+
+
+/* =========================================================
+   DATE TIME
+   ========================================================= */
+
+function formatAssetDateTime(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeAssetHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+function initAssetPage() {
+  assetCurrentPage = 1;
+  depreciationCurrentPage = 1;
+  initAssetPageEvents();
+  loadAssetPage();
+}
