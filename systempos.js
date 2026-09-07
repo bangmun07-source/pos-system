@@ -21512,7 +21512,7 @@ function renderAssetTable() {
   if (!pageData.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8"
+        <td colspan="9"
             class="text-center text-muted py-10">
           No assets found
         </td>
@@ -21542,9 +21542,38 @@ function renderAssetTable() {
           .toUpperCase();
 
       const statusClass =
-        status === "ACTIVE"
-          ? "text-emerald-400"
-          : "text-muted";
+			  status === "ACTIVE"
+			    ? "text-emerald-400"
+			    : "text-muted";
+			
+			const actionHTML =
+			  status === "ACTIVE"
+			    ? `
+			      <button
+			        type="button"
+			        onclick="openAssetDepreciationModal('${escapeAssetHTML(asset.Asset_ID)}')"
+			        class="px-3 py-1.5 rounded-md text-xs font-medium
+			               border border-outline-variant
+			               hover:bg-background
+			               transition">
+			        ${
+			          usefulLife > 0
+			            ? "Atur"
+			            : "Atur Depresiasi"
+			        }
+			      </button>
+			    `
+			    : `
+			      <button
+			        type="button"
+			        onclick="viewAssetDetail('${escapeAssetHTML(asset.Asset_ID)}')"
+			        class="px-3 py-1.5 rounded-md text-xs font-medium
+			               border border-outline-variant
+			               hover:bg-background
+			               transition">
+			        Detail
+			      </button>
+			    `;
       return `
         <tr class="hover:bg-background-high transition-colors">
           <!-- ASSET -->
@@ -21608,6 +21637,11 @@ function renderAssetTable() {
               ${escapeAssetHTML(asset.Status)}
             </span>
           </td>
+
+					<!-- ACTION -->
+					<td class="px-6 py-4 text-center">
+					  ${actionHTML}
+					</td>
         </tr>
       `;
     }).join("");
