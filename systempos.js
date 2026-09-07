@@ -21323,53 +21323,53 @@ function formatAssetPeriod(value) {
 async function loadAssetPage() {
   try {
 
-    assetData = [
-      {
-        Asset_ID: "AST-001",
-        Asset_Name: "Mesin Freezer",
-        Purchase_Date: "2026-09-01",
-        Purchase_Cost: 1000000,
-        Accumulated_Depreciation: 0,
-        Book_Value: 1000000,
-        Useful_Life_Months: 24,
-        Depreciation_Method: "Straight Line",
-        Last_Depreciation_Date: null,
-        Status: "Active"
-      },
+    if (!state.branchId) {
+      console.warn("BranchId belum tersedia");
+      return;
+    }
+    if (!state.sessionId) {
+      console.warn("Session ID belum tersedia");
+      return;
+    }
+	  
+    // LOAD ASSETS
+    const { data: assets, error: assetError } =
+      await supabaseClient.rpc("get_assets", {
+        p_branch_id: state.branchId,
+        p_session_id: state.sessionId
+      });
 
-      {
-        Asset_ID: "AST-002",
-        Asset_Name: "Mesin Kopi",
-        Purchase_Date: "2026-09-01",
-        Purchase_Cost: 3000000,
-        Accumulated_Depreciation: 0,
-        Book_Value: 3000000,
-        Useful_Life_Months: 36,
-        Depreciation_Method: "Straight Line",
-        Last_Depreciation_Date: null,
-        Status: "Active"
-      },
+    if (assetError) {
+      throw assetError;
+    }
 
+    assetData = assets || [];
+    // LOAD DEPRECIATION HISTORY
+    const {
+      data: depreciation,
+      error: depreciationError
+    } = await supabaseClient.rpc(
+      "get_asset_depreciation_history",
       {
-        Asset_ID: "AST-003",
-        Asset_Name: "Softcase",
-        Purchase_Date: "2026-09-01",
-        Purchase_Cost: 1000000,
-        Accumulated_Depreciation: 0,
-        Book_Value: 1000000,
-        Useful_Life_Months: 12,
-        Depreciation_Method: "Straight Line",
-        Last_Depreciation_Date: null,
-        Status: "Active"
+        p_branch_id: state.branchId,
+        p_session_id: state.sessionId
       }
-    ];
-
-    depreciationHistoryData = [];
+    );
+    if (depreciationError) {
+      throw depreciationError;
+    }
+    depreciationHistoryData = depreciation || [];
+    // RENDER
     renderAssetKPI();
     renderAssetTable();
     renderDepreciationHistory();
   } catch (error) {
     console.error("loadAssetPage error:", error);
+    assetData = [];
+    depreciationHistoryData = [];
+    renderAssetKPI();
+    renderAssetTable();
+    renderDepreciationHistory();
   }
 }
 
