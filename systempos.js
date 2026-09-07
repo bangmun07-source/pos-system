@@ -21805,23 +21805,27 @@ function openAssetDepreciationModal(asset) {
   // Hitung preview awal
   updateAssetDepreciationPreview();
   // Update preview saat input berubah
-  if (usefulLifeEl) {
-    usefulLifeEl.addEventListener(
-      "input",
-      updateAssetDepreciationPreview
-    );
-  }
-
-  if (methodEl) {
-    methodEl.addEventListener(
-      "change",
-      updateAssetDepreciationPreview
-    );
-  }
-  // Fokus input
-  setTimeout(() => {
-    usefulLifeEl?.focus();
-  }, 50);
+	if (usefulLifeEl) {
+	  usefulLifeEl.addEventListener(
+	    "input",
+	    updateAssetDepreciationPreview
+	  );
+	}
+	
+	if (methodEl) {
+	  methodEl.addEventListener(
+	    "change",
+	    updateAssetDepreciationPreview
+	  );
+	}
+	
+	// Fokus input + pilih seluruh nilai lama
+	setTimeout(() => {
+	  if (usefulLifeEl) {
+	    usefulLifeEl.focus();
+	    usefulLifeEl.select();
+	  }
+	}, 50);
 }
 
 function updateAssetDepreciationPreview() {
