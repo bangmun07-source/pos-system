@@ -21549,34 +21549,20 @@ function renderAssetTable() {
 			const actionHTML = `
 			  <div class="relative inline-block">
 			
-			    <button type="button"
-			      onclick="toggleAssetActionMenu('${escapeAssetHTML(asset.Asset_ID)}')"
-			      class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-background-high transition-colors" title="Action">
-			      <span class="material-symbols-outlined text-[20px]">
-			        more_vert
-			      </span>
-			    </button>
+				<button
+				  type="button"
+				  onclick="openAssetActionModal('${escapeAssetHTML(asset.Asset_ID)}')"
+				  class="w-8 h-8 flex items-center justify-center
+						 rounded-md
+						 hover:bg-background-high
+						 transition-colors"
+				  title="Action"
+				>
+				  <span class="material-symbols-outlined text-[20px]">
+					more_vert
+				  </span>
+				</button>
 			
-			    <div id="asset-action-${escapeAssetHTML(asset.Asset_ID)}"
-			      class="hidden absolute right-0 top-full mt-1 z-50 min-w-[170px] bg-background border border-outline-variant rounded-md shadow-[0_4px_15px_rgba(0,0,0,0.25)] overflow-hidden">
-			      ${
-			        status === "ACTIVE"
-			          ? `
-			            <button type="button"
-			              onclick="openAssetDepreciationModal('${escapeAssetHTML(asset.Asset_ID)}')"
-			              class="w-full px-4 py-2.5 text-left text-sm hover:bg-background-high transition-colors">
-			              Atur Depresiasi
-			            </button>
-			          `
-			          : ""
-			      }
-			
-			      <button type="button"
-			        onclick="viewAssetDetail('${escapeAssetHTML(asset.Asset_ID)}')"
-			        class="w-full px-4 py-2.5 text-left text-sm  hover:bg-background-high transition-colors">
-			        	Detail Asset
-			      </button>
-			    </div>
 			  </div>
 			`;
       return `
@@ -21656,18 +21642,79 @@ function renderAssetTable() {
   );
 }
 
-function toggleAssetActionMenu(assetId) {
-  document
-    .querySelectorAll('[id^="asset-action-"]')
-    .forEach(menu => {
-      menu.classList.add("hidden");
-    });
-  const menu = document.getElementById(
-    `asset-action-${assetId}`
+let currentAsset = null;
+function openAssetActionModal(assetId) {
+  const asset = assetData.find(
+    item => String(item.Asset_ID) === String(assetId)
   );
-  if (menu) {
-    menu.classList.toggle("hidden");
+
+  if (!asset) {
+    console.warn("Asset tidak ditemukan:", assetId);
+    return;
   }
+
+  currentAsset = asset;
+  const template = document.getElementById("assetActionModalTemplate");
+  if (!template) {
+    console.warn("assetActionModalTemplate tidak ditemukan");
+    return;
+  }
+
+  // Hapus modal lama jika masih ada
+  document
+    .getElementById("assetActionModalOverlay")
+    ?.remove();
+  const modal = template.content.cloneNode(true);
+  document.body.appendChild(modal);
+	
+  // SET DATA
+  const nameEl = document.getElementById("modalAssetName");
+  const idEl = document.getElementById("modalAssetId");
+  const depreciationStatusEl =
+    document.getElementById(
+      "modalAssetDepreciationStatus"
+    );
+
+  if (nameEl) {
+    nameEl.textContent =
+      asset.Asset_Name || "-";
+  }
+
+  if (idEl) {
+    idEl.textContent =
+      asset.Asset_ID || "-";
+  }
+
+  if (depreciationStatusEl) {
+    const usefulLife =
+      Number(asset.Useful_Life_Months || 0);
+
+    if (usefulLife > 0) {
+      const depreciation =
+        String(asset.Depreciation_Method || "")
+          .toUpperCase() === "STRAIGHT LINE"
+          ? Number(asset.Purchase_Cost || 0) /
+            usefulLife
+          : 0;
+      depreciationStatusEl.textContent =
+        `${usefulLife} bulan • ${formatAssetCurrency(depreciation)} / bulan`;
+
+    } else {
+      depreciationStatusEl.textContent =
+        "Masa manfaat belum diatur";
+    }
+  }
+}
+
+function closeAssetActionModal() {
+  const overlay =
+    document.getElementById(
+      "assetActionModalOverlay"
+    );
+  if (overlay) {
+    overlay.remove();
+  }
+  currentAsset = null;
 }
 
 /* =========================================================
