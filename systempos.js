@@ -21717,6 +21717,268 @@ function closeAssetActionModal() {
   currentAsset = null;
 }
 
+function openAssetDepreciationModal(asset) {
+  if (!asset) {
+    console.warn("Asset tidak ditemukan");
+    return;
+  }
+
+  currentAsset = asset;
+  const template =
+    document.getElementById(
+      "assetDepreciationModalTemplate"
+    );
+
+  if (!template) {
+    console.warn(
+      "assetDepreciationModalTemplate tidak ditemukan"
+    );
+    return;
+  }
+  // Tutup modal sebelumnya
+  document .getElementById("assetActionModalOverlay")
+    ?.remove();
+  document .getElementById("assetDepreciationModalOverlay")
+    ?.remove();
+  const modal = template.content.cloneNode(true);
+  document.body.appendChild(modal);
+
+  // =========================
+  // DATA ASSET
+  // =========================
+
+  const nameEl =
+    document.getElementById(
+      "depreciationModalAssetName"
+    );
+
+  const idEl =
+    document.getElementById(
+      "depreciationModalAssetId"
+    );
+
+  const purchaseCostEl =
+    document.getElementById(
+      "depreciationModalPurchaseCost"
+    );
+
+  const usefulLifeEl =
+    document.getElementById(
+      "assetUsefulLifeInput"
+    );
+
+  const methodEl =
+    document.getElementById(
+      "assetDepreciationMethod"
+    );
+
+  if (nameEl) {
+    nameEl.textContent = asset.Asset_Name || "-";
+  }
+  if (idEl) {
+    idEl.textContent = asset.Asset_ID || "-";
+  }
+
+  if (purchaseCostEl) {
+    purchaseCostEl.textContent =
+      formatAssetCurrency(
+        Number(asset.Purchase_Cost || 0)
+      );
+  }
+  // Isi nilai lama jika sudah pernah diatur
+  if (usefulLifeEl) {
+    const usefulLife =
+      Number(asset.Useful_Life_Months || 0);
+
+    usefulLifeEl.value =
+      usefulLife > 0
+        ? usefulLife
+        : "";
+  }
+
+  if (methodEl) {
+    methodEl.value =
+      asset.Depreciation_Method ||
+      "Straight Line";
+  }
+
+  // Hitung preview awal
+  updateAssetDepreciationPreview();
+  // Update preview saat input berubah
+  if (usefulLifeEl) {
+    usefulLifeEl.addEventListener(
+      "input",
+      updateAssetDepreciationPreview
+    );
+  }
+
+  if (methodEl) {
+    methodEl.addEventListener(
+      "change",
+      updateAssetDepreciationPreview
+    );
+  }
+  // Fokus input
+  setTimeout(() => {
+    usefulLifeEl?.focus();
+  }, 50);
+}
+
+function updateAssetDepreciationPreview() {
+  const usefulLifeEl =
+    document.getElementById(
+      "assetUsefulLifeInput"
+    );
+
+  const monthlyEl =
+    document.getElementById(
+      "depreciationModalMonthly"
+    );
+
+  if (!usefulLifeEl || !monthlyEl) {
+    return;
+  }
+  const usefulLife = Number(usefulLifeEl.value || 0);
+  const purchaseCost = Number(currentAsset?.Purchase_Cost || 0);
+  const method =
+    document.getElementById(
+      "assetDepreciationMethod"
+    )?.value || "Straight Line";
+  let depreciation = 0;
+
+  if (
+    usefulLife > 0 &&
+    method.toUpperCase() === "STRAIGHT LINE"
+  ) {
+    depreciation =
+      purchaseCost / usefulLife;
+  }
+  monthlyEl.textContent = formatAssetCurrency(depreciation);
+}
+
+function formatAssetCurrency(value) {
+  return new Intl.NumberFormat(
+    "id-ID",
+    {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 2
+    }
+  ).format(Number(value || 0));
+}
+
+function closeAssetDepreciationModal() {
+  const overlay =
+    document.getElementById(
+      "assetDepreciationModalOverlay"
+    );
+  if (overlay) {
+    overlay.remove();
+  }
+}
+
+async function saveAssetDepreciationSetting() {
+
+  try {
+    if (!currentAsset) {
+      alert("Asset tidak ditemukan.");
+      return;
+    }
+    const usefulLifeEl =
+      document.getElementById(
+        "assetUsefulLifeInput"
+      );
+    const methodEl =
+      document.getElementById(
+        "assetDepreciationMethod"
+      );
+    const usefulLife = Number(usefulLifeEl?.value || 0);
+    const method = methodEl?.value || "Straight Line";
+    // VALIDASI
+    if (
+      !Number.isInteger(usefulLife) ||
+      usefulLife <= 0
+    ) {
+      alert(
+        "Masa manfaat harus diisi lebih dari 0 bulan."
+      );
+      usefulLifeEl?.focus();
+      return;
+    }
+
+    if (
+      method.toUpperCase() !==
+      "STRAIGHT LINE"
+    ) {
+      alert(
+        "Metode depresiasi belum didukung."
+      );
+      return;
+    }
+
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+    if (!sessionId) {
+      alert("Session ID tidak ditemukan.");
+      return;
+    }
+    if (!state.branchId) {
+      alert("Branch belum tersedia.");
+      return;
+    }
+    // SIMPAN
+    const { data, error } =
+      await supabaseClient.rpc(
+        "update_asset_depreciation_setting",
+        {
+          p_asset_id: currentAsset.Asset_ID,
+          p_useful_life_months: usefulLife,
+          p_depreciation_method: method,
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    // UPDATE DATA LOCAL
+    const assetIndex =
+      assetData.findIndex(
+        asset =>
+          String(asset.Asset_ID) ===
+          String(currentAsset.Asset_ID)
+      );
+
+    if (assetIndex !== -1) {
+      assetData[assetIndex]
+        .Useful_Life_Months = usefulLife;
+      assetData[assetIndex]
+        .Depreciation_Method = method;
+      currentAsset = assetData[assetIndex];
+    }
+    // TUTUP MODAL
+    closeAssetDepreciationModal();
+    // REFRESH UI
+    renderAssetKPI();
+    renderAssetTable();
+    console.log(
+      "Pengaturan depresiasi berhasil disimpan."
+    );
+
+  } catch (error) {
+    console.error(
+      "saveAssetDepreciationSetting error:",
+      error
+    );
+    alert(
+      error?.message ||
+      "Gagal menyimpan pengaturan depresiasi."
+    );
+  }
+}
+
+
 /* =========================================================
    ASSET PAGINATION
    ========================================================= */
@@ -21906,11 +22168,7 @@ function renderDepreciationHistory() {
    DEPRECIATION PAGINATION
    ========================================================= */
 
-function updateDepreciationPagination(
-  totalItems,
-  totalPages
-) {
-
+function updateDepreciationPagination( totalItems, totalPages ) {
   const info =
     document.getElementById(
       "depreciation-pagination-info"
@@ -21947,11 +22205,9 @@ function updateDepreciationPagination(
         `Showing ${start}-${end} of ${totalItems} records`;
     }
   }
-
   if (prevBtn) {
     prevBtn.disabled = depreciationCurrentPage <= 1;
   }
-
   if (nextBtn) {
     nextBtn.disabled = depreciationCurrentPage >= totalPages;
   }
