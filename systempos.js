@@ -1987,102 +1987,147 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
     </div>
   `).join("")
   : `<div class="text-xs opacity-50 text-center">No items</div>`;
-  
-  // RENDER + SEND
-  const canvas = wrapper.querySelector("#receiptCanvas");
-    setTimeout(() => {
-      const receiptBackground = "#101715";
-			html2canvas(canvas, {
-			  scale: 1,
-			  useCORS: true,
-			  backgroundColor: "#101715"
-			})
-      .then(receiptCanvas => {
-			  const image =
-					receiptCanvas.toDataURL("image/jpeg", 0.65);
-        return fetch(
-          "/api/handle-receipt-upload",
-          {
-            method:"POST",
-            headers:{
-              "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-              base64:image,
-              trxId:trx.id,
-							tenantSlug: state.tenantSlug
-            })
-          }
-        );
-      })
-      .then(async res => {
-			  const text =
-			    await res.text();
-			  let result;
-			  try {
-			    result =
-			      JSON.parse(text);
+	
+	 // RENDER + SEND
+	const canvas = wrapper.querySelector("#receiptCanvas");
+	setTimeout(async () => {
+	
+	  try {
+	    const receiptCanvas = await html2canvas(canvas, {
+	      scale: 1,
+	      useCORS: true,
+	      backgroundColor: "#101715"
+	    });
+	
+	    // CANVAS → BLOB
+	    const blob = await new Promise(resolve => {
+	      receiptCanvas.toBlob(
+	        resolve,
+	        "image/jpeg",
+	        0.65
+	      );
+	    });
+	
+	    if (!blob) {
+	      throw new Error("Gagal membuat gambar receipt");
+	    }
+	
+	    // UPLOAD LANGSUNG KE SUPABASE STORAGE
+	    const fileName = `${trx.id}.jpg`;
+	    const {
+	      error: uploadError
+	    } = await supabase
+	      .storage
+	      .from("Recipes_Digital")
+	      .upload(
+	        fileName,
+	        blob,
+	        {
+	          contentType: "image/jpeg",
+	          upsert: true
+	        }
+	      );
+	    if (uploadError) {
+	      throw uploadError;
+	    }
+			
+	    // PUBLIC URL
+	    const {
+	      data: publicData
+	    } = supabase
+	      .storage
+	      .from("Recipes_Digital")
+	      .getPublicUrl(fileName);
+	
+	    const url = publicData?.publicUrl;
+	    if (!url) {
+	      throw new Error(
+	        "Receipt URL tidak diterima"
+	      );
+	    }
+			const sessionId =
+  			localStorage.getItem("pos_session_id");
+			if (!sessionId) {
+			  throw new Error("Session login tidak ditemukan");
+			}
+	    // UPDATE RECEIPT URL
+	    const {
+			  data: rpcResult,
+			  error: rpcError
+			} = await supabase.rpc(
+			  "update_receipt_url",
+			  {
+			    p_trx_id: trx.id,
+			    p_receipt_url: url,
+			    p_session_id: sessionId
 			  }
-			  catch (e) {
-			    throw new Error(
-			      text ||
-			      `Receipt API error ${res.status}`
-			    );
-			  }
-			  return result;
-			})
-			.then(result => {
-        if (
-          !result.success ||
-          !result.url
-        ) {
-          throw new Error(
-            result.error ||
-            "Receipt URL tidak diterima"
-          );
-        }
-      
-        const url = result.url;
-        let wa =
-          String(phone || "")
-            .replace(/\D/g,"");
-      
-        if (wa.startsWith("0")) {
-          wa =
-            "62" +
-            wa.slice(1);
-        }
-        else if (!wa.startsWith("62")) {
-          wa =
-            "62" +
-            wa;
-        }
-        let finalMessage;
-        if(customMessage){
-          finalMessage =
-            customMessage +
-            "\n\n📎 Digital Receipt\n" +
-            url;
-        } else {
-          finalMessage =
-            "🧾 *Digital Receipt*\n\n" +
-            "Thank you for visiting.\n" +
-            "Enjoy the moment. Take it slow.\n\n" +
-            "Have a nice day.\n\n" +
-            "📎 Receipt:\n" +
-            url;
-        }
-        window.open(
-          "https://api.whatsapp.com/send?phone=" +
-          wa +
-          "&text=" +
-          encodeURIComponent(finalMessage),
-          "_blank"
-        );
-        wrapper.remove();
-      })
-      .catch(err => { });
-  },100);
+			);
+			
+			if (rpcError) {
+			  throw rpcError;
+			}
+			
+			if (!rpcResult?.success) {
+			  throw new Error(
+			    rpcResult?.message ||
+			    "Gagal menyimpan receipt URL"
+			  );
+			}
+			
+	    // WHATSAPP
+	    let wa =
+	      String(phone || "")
+	        .replace(/\D/g, "");
+	
+	    if (wa.startsWith("0")) {
+	      wa =
+	        "62" +
+	        wa.slice(1);
+	    }
+	    else if (!wa.startsWith("62")) {
+	      wa =
+	        "62" +
+	        wa;
+	    }
+	
+	    let finalMessage;
+	    if (customMessage) {
+	      finalMessage =
+	        customMessage +
+	        "\n\n📎 Digital Receipt\n" +
+	        url;
+	
+	    } else {
+	      finalMessage =
+	        "🧾 *Digital Receipt*\n\n" +
+	        "Thank you for visiting.\n" +
+	        "Enjoy the moment. Take it slow.\n\n" +
+	        "Have a nice day.\n\n" +
+	        "📎 Receipt:\n" +
+	        url;
+	    }
+			
+	    window.open(
+	      "https://api.whatsapp.com/send?phone=" +
+	      wa +
+	      "&text=" +
+	      encodeURIComponent(finalMessage),
+	      "_blank"
+	    );
+	    wrapper.remove();
+	  }
+	  catch (err) {
+	    console.error(
+	      "DIGITAL RECEIPT ERROR:",
+	      err
+	    );
+	    alert(
+	      err?.message ||
+	      "Gagal membuat digital receipt"
+	    );
+	    wrapper.remove();
+	  }
+	}, 100);
 }
 
 function goToRecentTransactions() {
