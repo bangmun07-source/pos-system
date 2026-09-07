@@ -1037,6 +1037,12 @@ function initModule(pageId) {
       initCashFlowPage();
       loadCashFlowNotification()
     break;
+
+		case "assetPage":
+		  waitBranch(() => {
+		    initAssetPage();
+		  });
+		break;
   }
 }
 	
