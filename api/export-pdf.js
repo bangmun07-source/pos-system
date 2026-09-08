@@ -2044,9 +2044,7 @@ const logoSrc =
                           <tr>
                             <td>
                              ${escapeHtml(
-                                item.name === "Operations"
-                                  ? "Expenses"
-                                  : item.name ?? item.category ?? "-"
+                                item.name ?? item.category ?? "-"
                               )}
                             </td>
           
