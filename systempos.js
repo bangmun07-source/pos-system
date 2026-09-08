@@ -15479,6 +15479,12 @@ async function saveExpense() {
         "Gagal menyimpan expense"
       );
     }
+
+	if (
+	  String(data.category || "").trim().toUpperCase() === "ASSET"
+	) {
+	  clearAssetCache();
+	}
 	
     state.cashFlowData = null;
     state.cashFlowFilter = null;
@@ -21323,63 +21329,126 @@ function formatAssetPeriod(value) {
 /* =========================================================
    LOAD ASSET DATA
    ========================================================= */
+state.assetData = null;
+state.assetDataBranchId = null;
 
+state.depreciationHistoryData = null;
+state.depreciationHistoryBranchId = null;
 async function loadAssetPage() {
   try {
     const sessionId =
       localStorage.getItem("pos_session_id");
+
     if (!state.branchId) {
       console.warn("BranchId belum tersedia");
       return;
     }
+
     if (!sessionId) {
       console.warn("Session ID belum tersedia");
       return;
     }
 
-    // LOAD ASSETS
-    const { data: assets, error: assetError } =
-      await supabaseClient.rpc("get_assets", {
-        p_branch_id: state.branchId,
-        p_session_id: sessionId
-      });
+    const branchId = state.branchId;
 
-    if (assetError) {
-      throw assetError;
-    }
-    assetData = assets || [];
-    // LOAD DEPRECIATION HISTORY
-    const {
-      data: depreciation,
-      error: depreciationError
-    } = await supabaseClient.rpc(
-      "get_asset_depreciation_history",
-      {
-        p_branch_id: state.branchId,
-        p_session_id: sessionId
+    // =====================================================
+    // CACHE ASSETS
+    // =====================================================
+
+    if (
+      state.assetData &&
+      state.assetDataBranchId === branchId
+    ) {
+      assetData = state.assetData;
+    } else {
+      const {
+        data: assets,
+        error: assetError
+      } = await supabaseClient.rpc(
+        "get_assets",
+        {
+          p_branch_id: branchId,
+          p_session_id: sessionId
+        }
+      );
+
+      if (assetError) {
+        throw assetError;
       }
-    );
 
-    if (depreciationError) {
-      throw depreciationError;
+      assetData = assets || [];
+
+      // SAVE CACHE
+      state.assetData = assetData;
+      state.assetDataBranchId = branchId;
     }
 
-    depreciationHistoryData = depreciation || [];
-    // =========================
+    // =====================================================
+    // CACHE DEPRECIATION HISTORY
+    // =====================================================
+
+    if (
+      state.depreciationHistoryData &&
+      state.depreciationHistoryBranchId === branchId
+    ) {
+      depreciationHistoryData =
+        state.depreciationHistoryData;
+    } else {
+      const {
+        data: depreciation,
+        error: depreciationError
+      } = await supabaseClient.rpc(
+        "get_asset_depreciation_history",
+        {
+          p_branch_id: branchId,
+          p_session_id: sessionId
+        }
+      );
+
+      if (depreciationError) {
+        throw depreciationError;
+      }
+
+      depreciationHistoryData =
+        depreciation || [];
+
+      // SAVE CACHE
+      state.depreciationHistoryData =
+        depreciationHistoryData;
+
+      state.depreciationHistoryBranchId =
+        branchId;
+    }
+
+    // =====================================================
     // RENDER
-    // =========================
+    // =====================================================
+
     renderAssetKPI();
     renderAssetTable();
     renderDepreciationHistory();
 
   } catch (error) {
-    console.error("loadAssetPage error:", error);
+    console.error(
+      "loadAssetPage error:",
+      error
+    );
+
     assetData = [];
     depreciationHistoryData = [];
+
     renderAssetKPI();
     renderAssetTable();
     renderDepreciationHistory();
   }
+}
+
+function clearAssetCache() {
+  state.assetData = null;
+  state.assetDataBranchId = null;
+
+  state.depreciationHistoryData = null;
+  state.depreciationHistoryBranchId = null;
 }
 
 /* =========================================================
@@ -21949,20 +22018,30 @@ async function saveAssetDepreciationSetting() {
     }
 
     // UPDATE DATA LOCAL
-    const assetIndex =
-      assetData.findIndex(
-        asset =>
-          String(asset.Asset_ID) ===
-          String(currentAsset.Asset_ID)
-      );
-
-    if (assetIndex !== -1) {
-      assetData[assetIndex]
-        .Useful_Life_Months = usefulLife;
-      assetData[assetIndex]
-        .Depreciation_Method = method;
-      currentAsset = assetData[assetIndex];
-    }
+	const assetIndex =
+	  assetData.findIndex(
+	    asset =>
+	      String(asset.Asset_ID) ===
+	      String(currentAsset.Asset_ID)
+	  );
+	
+	if (assetIndex !== -1) {
+	  assetData[assetIndex].Useful_Life_Months =
+	    usefulLife;
+	
+	  assetData[assetIndex].Depreciation_Method =
+	    method;
+	
+	  currentAsset =
+	    assetData[assetIndex];
+	
+	  // SYNC CACHE
+	  state.assetData =
+	    assetData;
+	    
+	  state.assetDataBranchId =
+	    state.branchId;
+	}
     // TUTUP MODAL
     closeAssetDepreciationModal();
     // REFRESH UI
