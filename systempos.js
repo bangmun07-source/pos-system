@@ -11141,7 +11141,7 @@ function renderAnalytics(data) {
   };
   setText("revenueValue", "Revenue: " + formatIDR(data.revenue || 0));
   setText("hppValue", "HPP: " + formatIDR(data.hpp || 0));
-  setText("opsValue", "Expense: " + formatIDR(data.operational || 0));
+  setText("opsValue", "OPEX: " + formatIDR(data.operational || 0));
   setText("otherincometValue","Other Income: " + formatIDR(data.otherIncome || 0));
   setText("grossProfitValue", "Gross Profit: " + formatIDR(data.grossProfit || 0));
   setText("netProfitValue", formatIDR(data.netProfit || 0));
