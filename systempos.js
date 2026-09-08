@@ -18901,6 +18901,8 @@ async function loadAccountBalance() {
   if (branchId === "ALL") {
     document.getElementById("cf-cash").textContent = "-";
     document.getElementById("cf-bank").textContent = "-";
+    document.getElementById("cf-inventory").textContent = "-";
+    document.getElementById("cf-asset").textContent = "-";
     document.getElementById("cf-total").textContent = "-";
     return;
   }
@@ -18926,18 +18928,19 @@ async function loadAccountBalance() {
   }
 }
 
-function initCashFlowFilters() {
-  document.getElementById("cf-start-date") ?.addEventListener("change", loadCashFlowPage);
-  document.getElementById("cf-end-date") ?.addEventListener("change", loadCashFlowPage);
-  document.getElementById("cf-branch") ?.addEventListener("change", loadCashFlowPage);
-}
 
-function renderAccountBalance(data){
-  document.getElementById("cf-cash").textContent = formatRupiah(data.Cash);
-  document.getElementById("cf-bank").textContent = formatRupiah(data.Bank);
-	document.getElementById("cf-asset").textContent = formatRupiah(data.Asset);
-	// Total Balance tetap Cash + Bank
-  document.getElementById("cf-total").textContent = formatRupiah(data.Balance);
+function renderAccountBalance(data) {
+  document.getElementById("cf-cash").textContent = formatRupiah(data?.Cash || 0);
+  document.getElementById("cf-bank").textContent = formatRupiah(data?.Bank || 0);
+  document.getElementById("cf-inventory").textContent = formatRupiah(data?.Inventory || 0);
+  document.getElementById("cf-asset").textContent = formatRupiah(data?.Asset || 0);
+  // Total Balance = Cash + Bank
+  const totalBalance =
+    (data?.Cash || 0) +
+    (data?.Bank || 0);
+
+  document.getElementById("cf-total").textContent =
+    formatRupiah(totalBalance);
 }
 
 function renderCashFlowSummary(data) {
