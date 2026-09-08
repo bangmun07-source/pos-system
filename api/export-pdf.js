@@ -2087,9 +2087,17 @@ const logoSrc =
           
                             <td>
                               ${escapeHtml(
-                                item.type ??
-                                item.Type ??
-                                "-"
+                                (
+                                  item.type ??
+                                  item.Type ??
+                                  "-"
+                                ).toUpperCase() === "OPEX"
+                                  ? "EXPENSE"
+                                  : (
+                                      item.type ??
+                                      item.Type ??
+                                      "-"
+                                    )
                               )}
                             </td>
           
