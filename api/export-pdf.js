@@ -1886,7 +1886,27 @@ const logoSrc =
                   account.bank_balance ??
                   0
                 );
-          
+
+            const assetBalance =
+              number(
+                account.asset ??
+                account.Asset ??
+                account.assets ??
+                account.Assets ??
+                account.assetBalance ??
+                account.asset_balance ??
+                0
+              );
+            
+            const inventoryBalance =
+              number(
+                account.inventory ??
+                account.Inventory ??
+                account.inventoryBalance ??
+                account.inventory_balance ??
+                0
+              );
+                
               const totalBalance =
                 number(
                   account.total ??
@@ -2533,6 +2553,34 @@ const logoSrc =
           
                             <td class="right">
                               ${bankPercent.toFixed(1)}%
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td>
+                              Asset
+                            </td>
+                          
+                            <td class="right">
+                              IDR ${rupiah(assetBalance)}
+                            </td>
+                          
+                            <td class="right">
+                              -
+                            </td>
+                          </tr>
+                          
+                          <tr>
+                            <td>
+                              Inventory
+                            </td>
+                          
+                            <td class="right">
+                              IDR ${rupiah(inventoryBalance)}
+                            </td>
+                          
+                            <td class="right">
+                              -
                             </td>
                           </tr>
                         </tbody>
