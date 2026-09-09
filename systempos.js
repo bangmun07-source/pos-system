@@ -22655,9 +22655,11 @@ async function loadAccountingOverview() {
   }
 }
 
+
 /* =========================================================
    OVERVIEW AKUNTANSI
    ========================================================= */
+
 async function loadAccountingOverview() {
 
   const periodEl =
@@ -22735,10 +22737,13 @@ async function loadAccountingOverview() {
 
 async function loadAccountingBranchOptions() {
 
-  if (state.accountingBranches) {
+  if (Array.isArray(state.accountingBranches) &&
+      state.accountingBranches.length > 0) {
+
     renderAccountingBranchOptions(
       state.accountingBranches
     );
+
     return;
   }
 
@@ -22757,7 +22762,8 @@ async function loadAccountingBranchOptions() {
 
     if (error) throw error;
 
-    state.accountingBranches = data || [];
+    state.accountingBranches =
+      Array.isArray(data) ? data : [];
 
     renderAccountingBranchOptions(
       state.accountingBranches
@@ -22818,11 +22824,19 @@ function getAccountingDateRange(period) {
   const today = new Date();
 
   const formatDate = (date) => {
-    const year = date.getFullYear();
+
+    const year =
+      date.getFullYear();
+
     const month =
-      String(date.getMonth() + 1).padStart(2, "0");
+      String(
+        date.getMonth() + 1
+      ).padStart(2, "0");
+
     const day =
-      String(date.getDate()).padStart(2, "0");
+      String(
+        date.getDate()
+      ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
   };
@@ -22848,8 +22862,11 @@ function getAccountingDateRange(period) {
           1
         );
 
-      start = formatDate(firstDayPreviousMonth);
-      end = formatDate(lastDayPreviousMonth);
+      start =
+        formatDate(firstDayPreviousMonth);
+
+      end =
+        formatDate(lastDayPreviousMonth);
 
       break;
     }
@@ -22876,8 +22893,11 @@ function getAccountingDateRange(period) {
           0
         );
 
-      start = formatDate(firstDayQuarter);
-      end = formatDate(lastDayQuarter);
+      start =
+        formatDate(firstDayQuarter);
+
+      end =
+        formatDate(lastDayQuarter);
 
       break;
     }
@@ -22898,8 +22918,11 @@ function getAccountingDateRange(period) {
           31
         );
 
-      start = formatDate(firstDayYear);
-      end = formatDate(lastDayYear);
+      start =
+        formatDate(firstDayYear);
+
+      end =
+        formatDate(lastDayYear);
 
       break;
     }
@@ -22921,8 +22944,11 @@ function getAccountingDateRange(period) {
           0
         );
 
-      start = formatDate(firstDayMonth);
-      end = formatDate(lastDayMonth);
+      start =
+        formatDate(firstDayMonth);
+
+      end =
+        formatDate(lastDayMonth);
 
       break;
     }
@@ -22937,57 +22963,47 @@ function getAccountingDateRange(period) {
 
 let accountingInitialized = false;
 
+
 async function initAccountingModule() {
 
-  try {
-
-    const periodEl =
-      document.getElementById(
-        "accounting-period"
-      );
-
-    const branchEl =
-      document.getElementById(
-        "accounting-branch"
-      );
-
-    if (!periodEl || !branchEl) {
-      console.warn(
-        "Accounting DOM belum tersedia"
-      );
-      return;
-    }
-
-    if (!accountingInitialized) {
-
-      periodEl.addEventListener(
-        "change",
-        loadAccountingOverview
-      );
-
-      branchEl.addEventListener(
-        "change",
-        loadAccountingOverview
-      );
-
-      accountingInitialized = true;
-    }
-
-    // Branch dulu
-    await loadAccountingBranchOptions();
-
-    // Baru data accounting
-    await loadAccountingOverview();
-
-  } catch (error) {
-
-    console.error(
-      "Accounting init error:",
-      error
+  const periodEl =
+    document.getElementById(
+      "accounting-period"
     );
 
+  const branchEl =
+    document.getElementById(
+      "accounting-branch"
+    );
+
+  if (!periodEl || !branchEl) {
+    console.warn(
+      "Accounting DOM belum tersedia"
+    );
+    return;
   }
+
+  if (!accountingInitialized) {
+
+    periodEl.addEventListener(
+      "change",
+      loadAccountingOverview
+    );
+
+    branchEl.addEventListener(
+      "change",
+      loadAccountingOverview
+    );
+
+    accountingInitialized = true;
+  }
+
+  await loadAccountingBranchOptions();
+
+  await loadAccountingOverview();
 }
+
+
 
 /* =========================================================
    RENDER ACCOUNTING OVERVIEW
