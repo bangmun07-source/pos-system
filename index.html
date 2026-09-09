@@ -15018,14 +15018,10 @@
 <!-- OVER VIEW PAGE -->
 	
 <template id="accountingOverviewPage">
-  <aside
-    id="sidebar"
+  <aside id="sidebar"
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
-
     <div class="sidebar-menu flex flex-col h-full">
-
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-
         <!-- DASHBOARD -->
         <a onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
@@ -15037,8 +15033,7 @@
         </a>
 
         <!-- SETTINGS -->
-        <a
-          onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
           style="display:none"
           class="settingsMenu">
           <span class="material-symbols-outlined sidebar-icon">
@@ -15128,12 +15123,10 @@
           <span class="sidebar-label">
             Overview
           </span>
-
         </a>
 		  
 				<!-- ACCOUNTING -->
 				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
-
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
           </span>
@@ -15141,11 +15134,10 @@
           <span class="sidebar-label">
             Accounting
           </span>
-
         </a>
 
 				<!-- ACCOUNTING TRANSACTIONS -->
-		<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
           </span>
@@ -15153,9 +15145,7 @@
           <span class="sidebar-label">
             Accounting Transactions
           </span>
-
         </a>
-
       </nav>
 
       <!-- FOOTER -->
@@ -15167,7 +15157,6 @@
           </span>
 
           <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-
             <p class="text-[10px] text-muted">
               SYSTEM STATUS
             </p>
@@ -15175,927 +15164,524 @@
             <span class="sidebar-label">
               SERVER ACTIVE
             </span>
-
           </div>
-
         </div>
       </div>
-
     </div>
   </aside>
 
-
   <!-- ================= MAIN ================= -->
-
-  <div
-    id="mainContent"
-    class="flex-1 flex flex-col h-screen">
-
-    <!-- HEADER -->
-    <header
-      class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
-
+  <div id="mainContent" class="flex-1 flex flex-col h-screen">
+    <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
       <div class="flex items-center gap-5 flex-1">
-
         <div class="w-[44px] h-[44px] flex items-center justify-center">
-
-          <img
-            id="munoLogo"
+          <img id="munoLogo"
             src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
             alt="MUNO"
             class="w-12 h-12 object-contain">
-
         </div>
 
         <span class="h-7 w-px bg-outline-variant"></span>
-
-        <p
-          class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+				
+        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
           MUNO
         </p>
-
       </div>
 
-
-      <!-- HEADER RIGHT -->
-
       <div class="ml-auto flex items-center gap-3">
-
-        <button
-          onclick="logout()"
+        <button onclick="logout()"
           class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
-
           <span class="material-symbols-outlined">
             logout
           </span>
-
         </button>
-
       </div>
-
     </header>
 
-
     <!-- ================= CONTENT ================= -->
-
-    <main
-      class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-
-
-      <!-- ================= HERO ================= -->
-
-      <section
-        class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
-
+    <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+      <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
         <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
-
-          <img
-            src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
+          <img src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
             class="w-full h-full object-cover"
             style="object-position:right 40%;"
             alt="">
-
         </div>
 
-        <div
-          class="absolute inset-0 bg-gradient-to-r from-[#101715] via-[#101715]/70 to-[#101715]/40">
-        </div>
+        <div class="absolute inset-0 bg-gradient-to-r from-[#101715] via-[#101715]/70 to-[#101715]/40"></div>
 
-
-        <div
-          class="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
-
-          <span
-            class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+          <span class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
             Finance Overview
           </span>
-
-          <h2
-            class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
-
+					
+          <h2 class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
             Accounting Dashboard
-
           </h2>
-
         </div>
-
       </section>
 
-
-      <!-- ================= FILTER ================= -->
-
-      <div
-        class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 mb-4 bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
-        <!-- PERIOD -->
-
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 mb-4 bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
         <div class="flex flex-col gap-2">
-
-          <label
-            class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
-
+          <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
             Period
-
           </label>
-
-          <select
-            id="accounting-period"
+					
+          <select id="accounting-period"
             class="w-full h-12 bg-background border border-outline-variant rounded-md px-4 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary">
-
-            <option value="month">
-              This Month
-            </option>
-
-            <option value="last_month">
-              Last Month
-            </option>
-
-            <option value="quarter">
-              This Quarter
-            </option>
-
-            <option value="year">
-              This Year
-            </option>
-
+            <option value="month"> This Month </option>
+            <option value="last_month"> Last Month </option>
+            <option value="quarter"> This Quarter </option>
+            <option value="year"> This Year </option>
           </select>
-
         </div>
-
-
-        <!-- BRANCH -->
-
+				
         <div class="flex flex-col gap-2">
-
-          <label
-            class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
-
+          <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
             Branch
-
           </label>
 
-          <select
-            id="accounting-branch"
+          <select id="accounting-branch"
             class="w-full h-12 bg-background border border-outline-variant rounded-md px-4 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary">
-
             <option value="ALL">
               All Branch
             </option>
-
           </select>
-
         </div>
 
-
         <!-- REFRESH -->
-
         <div class="flex flex-col gap-2">
-
-          <label
-            class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
-
+          <label class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
             Data
-
           </label>
 
-          <button
-            onclick="loadAccountingOverview()"
+          <button onclick="loadAccountingOverview()"
             class="h-12 rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
-
             <span class="material-symbols-outlined text-lg">
               refresh
             </span>
-
             Refresh Accounting
-
           </button>
-
         </div>
-
       </div>
-
-
+			
       <!-- ================= KPI ================= -->
-
-      <section
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-
-
-        <!-- CASH -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 payments
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-emerald-400">
               ASSET
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Cash
             </p>
 
-            <h3
-              id="accounting-cash"
+            <h3 id="accounting-cash"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
 
-
         <!-- BANK -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 account_balance
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-emerald-400">
               ASSET
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Bank
             </p>
 
-            <h3
-              id="accounting-bank"
+            <h3 id="accounting-bank"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
 
-
         <!-- INVENTORY -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 inventory_2
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-emerald-400">
               ASSET
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Inventory
             </p>
 
-            <h3
-              id="accounting-inventory"
+            <h3 id="accounting-inventory"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
-
-
+				
         <!-- AP -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 receipt_long
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-red-400">
               LIABILITY
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Accounts Payable
             </p>
 
-            <h3
-              id="accounting-ap"
+            <h3 id="accounting-ap"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
 
-
         <!-- REVENUE -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 trending_up
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-emerald-400">
               REVENUE
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Revenue
             </p>
 
-            <h3
-              id="accounting-revenue"
+            <h3 id="accounting-revenue"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
 
-
         <!-- EXPENSE -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 trending_down
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-red-400">
               EXPENSE
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Expense
             </p>
 
-            <h3
-              id="accounting-expense"
+            <h3 id="accounting-expense"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
 
-
         <!-- NET PROFIT -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 monitoring
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-primary">
               PROFIT
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Net Profit
             </p>
 
-            <h3
-              id="accounting-net-profit"
+            <h3 id="accounting-net-profit"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
 
-
         <!-- EQUITY -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6">
           <div class="flex justify-between">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 account_balance_wallet
-
               </span>
-
             </div>
 
             <span class="text-xs font-bold text-primary">
               EQUITY
             </span>
-
           </div>
 
           <div class="mt-8">
-
             <p class="text-xs lg:text-sm text-on-surface-variant uppercase tracking-widest">
               Owner Equity
             </p>
 
-            <h3
-              id="accounting-equity"
+            <h3 id="accounting-equity"
               class="text-2xl font-bold text-foreground mt-1">
-
               IDR 0
-
             </h3>
-
           </div>
-
         </div>
-
       </section>
-
-
-      <!-- ================= JOURNAL + AP ================= -->
-
-      <section
-        class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
-
-
-        <!-- RECENT JOURNAL -->
-
-        <div
-          class="lg:col-span-2 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
-
+			
+      <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+        <div class="lg:col-span-2 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
           <div class="flex items-center justify-between mb-8">
-
             <div class="flex items-center gap-3">
-
               <div class="main-icon-box">
-
-                <span
-                  class="material-symbols-outlined text-3xl"
+                <span class="material-symbols-outlined text-3xl"
                   style="font-variation-settings:'FILL' 1;">
-
                   receipt_long
-
                 </span>
-
               </div>
 
               <div>
-
-                <h4
-                  class="font-headline text-xl font-bold tracking-tight">
-
+                <h4 class="font-headline text-xl font-bold tracking-tight">
                   Recent Journal Entries
-
                 </h4>
 
                 <p class="text-xs lg:text-sm text-on-surface-variant">
-
                   Latest accounting transactions
-
                 </p>
-
               </div>
-
             </div>
 
-
-            <button
-              onclick="navigate('journalEntriesPage')"
+            <button onclick="navigate('journalEntriesPage')"
               class="text-xs font-bold uppercase tracking-wider text-primary">
-
               View All
-
             </button>
-
           </div>
 
-
-          <div
-            id="accounting-recent-journals"
+          <div id="accounting-recent-journals"
             class="space-y-2 h-[320px] overflow-y-auto custom-scrollbar">
-
-            <!-- JS -->
-
           </div>
-
         </div>
 
-
         <!-- AP SUMMARY -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
           <div class="flex items-center gap-3 mb-8">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 account_balance
-
               </span>
-
             </div>
-
+						
             <div>
-
-              <h4
-                class="font-headline text-xl font-bold tracking-tight">
-
+              <h4 class="font-headline text-xl font-bold tracking-tight">
                 Accounts Payable
-
               </h4>
 
               <p class="text-xs text-on-surface-variant">
-
                 Outstanding supplier balances
-
               </p>
-
             </div>
-
           </div>
 
-
-          <div
-            id="accounting-ap-list"
+          <div id="accounting-ap-list"
             class="space-y-3 h-[320px] overflow-y-auto custom-scrollbar">
-
-            <!-- JS -->
-
           </div>
 
-
-          <div
-            class="mt-6 pt-5 border-t border-outline-variant flex justify-between items-center">
-
+          <div class="mt-6 pt-5 border-t border-outline-variant flex justify-between items-center">
             <span class="font-semibold">
               Total Outstanding
             </span>
 
-            <span
-              id="accounting-ap-total"
+            <span id="accounting-ap-total"
               class="text-lg font-black">
-
               IDR 0
-
             </span>
-
           </div>
-
         </div>
-
       </section>
 
-
       <!-- ================= FINANCIAL POSITION ================= -->
-
-      <section
-        class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
-
-
-        <!-- ASSETS -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
-
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-10">
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
           <div class="flex items-center gap-3 mb-8">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 account_balance
-
               </span>
-
             </div>
-
+						
             <div>
-
-              <h4
-                class="font-headline text-xl font-bold tracking-tight">
-
+              <h4 class="font-headline text-xl font-bold tracking-tight">
                 Assets
-
               </h4>
-
+							
               <p class="text-xs text-on-surface-variant">
-
                 Current financial assets
-
               </p>
-
             </div>
-
           </div>
 
-
           <div class="space-y-5">
-
             <div class="flex justify-between">
-
               <span class="text-on-surface-variant">
                 Cash
               </span>
 
-              <span
-                id="accounting-assets-cash"
+              <span id="accounting-assets-cash"
                 class="font-bold">
-
                 IDR 0
-
               </span>
-
             </div>
 
-
             <div class="flex justify-between">
-
               <span class="text-on-surface-variant">
                 Bank
               </span>
 
-              <span
-                id="accounting-assets-bank"
+              <span id="accounting-assets-bank"
                 class="font-bold">
-
                 IDR 0
-
               </span>
-
             </div>
 
-
             <div class="flex justify-between">
-
               <span class="text-on-surface-variant">
                 Inventory
               </span>
 
-              <span
-                id="accounting-assets-inventory"
+              <span id="accounting-assets-inventory"
                 class="font-bold">
-
                 IDR 0
-
               </span>
-
             </div>
 
-
-            <div
-              class="pt-5 border-t border-outline-variant flex justify-between">
-
+            <div class="pt-5 border-t border-outline-variant flex justify-between">
               <span class="font-bold">
                 Total Assets
               </span>
 
-              <span
-                id="accounting-total-assets"
+              <span id="accounting-total-assets"
                 class="text-lg font-black">
-
                 IDR 0
-
               </span>
-
             </div>
-
           </div>
-
         </div>
 
-
         <!-- LIABILITIES + EQUITY -->
-
-        <div
-          class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
-
+        <div class="bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
           <div class="flex items-center gap-3 mb-8">
-
             <div class="main-icon-box">
-
-              <span
-                class="material-symbols-outlined text-3xl"
+              <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
-
                 balance
-
               </span>
-
             </div>
 
             <div>
-
-              <h4
-                class="font-headline text-xl font-bold tracking-tight">
-
+              <h4 class="font-headline text-xl font-bold tracking-tight">
                 Liabilities &amp; Equity
-
               </h4>
 
               <p class="text-xs text-on-surface-variant">
-
                 Financial position
-
               </p>
-
             </div>
-
           </div>
 
-
           <div class="space-y-5">
-
             <div class="flex justify-between">
-
               <span class="text-on-surface-variant">
                 Accounts Payable
               </span>
 
-              <span
-                id="accounting-liability-ap"
+              <span id="accounting-liability-ap"
                 class="font-bold">
-
                 IDR 0
-
               </span>
-
             </div>
 
-
             <div class="flex justify-between">
-
               <span class="text-on-surface-variant">
                 Owner Equity
               </span>
 
-              <span
-                id="accounting-liability-equity"
+              <span id="accounting-liability-equity"
                 class="font-bold">
-
                 IDR 0
-
               </span>
-
             </div>
 
-
-            <div
-              class="pt-5 border-t border-outline-variant flex justify-between">
-
+            <div class="pt-5 border-t border-outline-variant flex justify-between">
               <span class="font-bold">
                 Total Liabilities &amp; Equity
               </span>
-
-              <span
-                id="accounting-total-liabilities-equity"
+							
+              <span id="accounting-total-liabilities-equity"
                 class="text-lg font-black">
-
                 IDR 0
-
               </span>
-
             </div>
-
           </div>
-
         </div>
-
       </section>
-
     </main>
-
   </div>
-
 </template>	
 
 
