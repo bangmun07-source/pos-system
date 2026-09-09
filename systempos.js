@@ -22590,8 +22590,16 @@ async function loadAccountingOverview() {
     return;
   }
 
-  const period = periodEl.value || "month";
-  const branch = branchEl.value || "ALL";
+  // Pastikan branch selalu dimuat sebelum membaca branch
+  if (branchEl.options.length <= 1) {
+    await loadAccountingBranchOptions();
+  }
+
+  const period =
+    periodEl.value || "month";
+
+  const branch =
+    branchEl.value || "ALL";
 
   const { start, end } =
     getAccountingDateRange(period);
@@ -22609,25 +22617,21 @@ async function loadAccountingOverview() {
 
   try {
 
-    const {
-      data,
-      error
-    } = await supabaseClient.rpc(
-      "get_accounting_overview",
-      {
-        p_branch_id: branch,
-        p_start: start,
-        p_end: end,
-        p_session_id: sessionId
-      }
-    );
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_accounting_overview",
+        {
+          p_branch_id: branch,
+          p_start: start,
+          p_end: end,
+          p_session_id: sessionId
+        }
+      );
 
     console.log("ACCOUNTING RPC DATA:", data);
     console.log("ACCOUNTING RPC ERROR:", error);
 
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     if (!data) {
       throw new Error(
@@ -22637,8 +22641,7 @@ async function loadAccountingOverview() {
 
     renderAccountingOverview(data);
 
-  }
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "Accounting Overview Error:",
