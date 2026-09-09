@@ -2976,6 +2976,7 @@ async function checkout() {
 	    return;
 	  }
 	} else {
+		console.log("CHECKOUT PAYLOAD:", JSON.stringify(payload, null, 2));
 	  await hitungHPPDanKirim(payload);
 	}
 }	
