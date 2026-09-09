@@ -12059,9 +12059,8 @@
 	        </span>
 	      </a>
 
-				<a
-          class="active"
-          onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+					<!-- OVERVIEW -->
+				<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
 
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
@@ -15120,17 +15119,27 @@
           </span>
         </a>
 
-        <!-- ACCOUNTING -->
-        <a
-          class="active"
-          onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+         <!-- OVERVIEW -->
+        <a class="active" onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Overview
+          </span>
+
+        </a>
+		  
+		<!-- ACCOUNTING -->
+		<a onclick="navigate('accountingAccountsPage', { roles:['Owner'})">
 
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
           </span>
 
           <span class="sidebar-label">
-            Accounting
+            Overview
           </span>
 
         </a>
@@ -16076,6 +16085,2508 @@
   </div>
 
 </template>	
+
+
+<!--- ACCOUNTS PAGE --->
+
+<template id="accountingAccountsPage">
+
+  <aside
+    id="sidebar"
+    class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+
+    <div class="sidebar-menu flex flex-col h-full">
+
+      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+
+        <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
+          </span>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+
+        <!-- SETTINGS -->
+        <a
+          onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+
+        <!-- LOYALTY -->
+        <a onclick="navigate('loyaltysettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            military_tech
+          </span>
+          <span class="sidebar-label">
+            Loyalty &amp; Tiers
+          </span>
+        </a>
+
+        <!-- TAX -->
+        <a onclick="navigate('taxservicesettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Taxes &amp; Fees
+          </span>
+        </a>
+
+        <!-- EXPENSES -->
+        <a onclick="navigate('expensessettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            payments
+          </span>
+          <span class="sidebar-label">
+            Expenses
+          </span>
+        </a>
+
+        <!-- ANALYTICS -->
+        <a onclick="navigate('analyticsPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            analytics
+          </span>
+          <span class="sidebar-label">
+            Analytics
+          </span>
+        </a>
+
+        <!-- INVENTORY -->
+        <a onclick="navigate('inventoryPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Inventory
+          </span>
+        </a>
+
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+
+        <!-- ASSET -->
+        <a onclick="navigate('assetPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Asset
+          </span>
+        </a>
+
+         <!-- OVERVIEW -->
+        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Overview
+          </span>
+
+        </a>
+		  
+		<!-- ACCOUNTING -->
+		<a class="active"
+          onclick="navigate('accountingAccountsPage', { roles:['Owner'})">
+
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Overview
+          </span>
+
+        </a>
+
+      </nav>
+
+
+      <!-- FOOTER -->
+
+      <div class="mt-auto p-2 pb-2">
+
+        <div
+          class="flex h-10 items-center gap-3 overflow-hidden
+                 rounded-md border border-outline-variant">
+
+          <span
+            class="shrink-0 w-8 h-8 flex items-center justify-center">
+
+            <span
+              class="w-2 h-2 rounded-full bg-primary animate-pulse">
+            </span>
+
+          </span>
+
+          <div
+            class="whitespace-nowrap opacity-0
+                   group-hover:opacity-100
+                   transition-opacity duration-150">
+
+            <p class="text-[10px] text-muted">
+              SYSTEM STATUS
+            </p>
+
+            <span class="sidebar-label">
+              SERVER ACTIVE
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <div
+    id="mainContent"
+    class="flex-1 flex flex-col h-screen">
+
+
+    <!-- ================= HEADER ================= -->
+
+    <header
+      class="h-20 flex-shrink-0 z-40 bg-background
+             border border-outline-variant
+             flex items-center px-1 pr-5 overflow-visible">
+
+      <div class="flex items-center gap-5 flex-1">
+
+        <div
+          class="w-[44px] h-[44px]
+                 flex items-center justify-center">
+
+          <img
+            id="munoLogo"
+            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+            alt="MUNO"
+            class="w-12 h-12 object-contain">
+
+        </div>
+
+        <span
+          class="h-7 w-px bg-outline-variant">
+        </span>
+
+        <p
+          class="text-xl text-muted font-medium
+                 headline-font tracking-[0.2em]">
+
+          MUNO
+
+        </p>
+
+      </div>
+
+
+      <div class="ml-auto flex items-center gap-3">
+
+        <button
+          class="ml-auto w-10 h-10 flex items-center
+                 justify-center text-on-surface-variant
+                 hover:text-on-surface transition-colors
+                 rounded-md active:scale-95 duration-200">
+
+          <span class="material-symbols-outlined">
+            logout
+          </span>
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- ================= CONTENT ================= -->
+
+    <main
+      class="flex-1 overflow-auto custom-scrollbar
+             pt-4 pr-4 pb-10 pl-20">
+
+
+      <!-- ================= HERO ================= -->
+
+      <section
+        class="mb-4 mt-0 relative overflow-hidden
+               rounded-md bg-background
+               border border-outline-variant
+               shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+               min-h-[200px]">
+
+        <div
+          class="absolute inset-0 flex items-center
+                 justify-center overflow-hidden">
+
+          <img
+            src="https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF"
+            class="w-full h-full object-cover"
+            style="object-position:right 40%;"
+            alt="">
+
+        </div>
+
+        <div
+          class="absolute inset-0
+                 bg-gradient-to-r
+                 from-[#101715]
+                 via-[#101715]/70
+                 to-[#101715]/40">
+        </div>
+
+
+        <div
+          class="absolute inset-0 flex flex-col
+                 items-center justify-center
+                 text-center px-12">
+
+          <span
+            class="text-muted text-sm lg:text-base
+                   font-medium tracking-[0.25em] uppercase">
+
+            Account Management
+
+          </span>
+
+          <h2
+            class="lg:text-3xl md:text-2xl
+                   headline-font font-black
+                   text-[#e0e0e0] mt-2 mb-4
+                   leading-tight tracking-[0.25em]
+                   uppercase">
+
+            Accounts
+
+          </h2>
+
+        </div>
+
+      </section>
+
+
+      <!--- ACCOUNT SUMMARY --->
+
+      <section
+        class="grid grid-cols-2 md:grid-cols-3
+               lg:grid-cols-5 gap-4 mb-4">
+
+
+        <!-- ASSET -->
+
+        <div
+          class="bg-background rounded-md
+                 border border-outline-variant
+                 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+                 p-6">
+
+          <div class="flex justify-between">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                account_balance
+              </span>
+
+            </div>
+
+            <span class="text-xs font-bold text-emerald-400">
+              ASSET
+            </span>
+
+          </div>
+
+          <div class="mt-7">
+
+            <p
+              class="text-xs lg:text-sm
+                     text-on-surface-variant
+                     uppercase tracking-widest">
+
+              Asset Accounts
+
+            </p>
+
+            <h3 class="text-2xl font-bold mt-1">
+              0
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        <!-- LIABILITY -->
+
+        <div
+          class="bg-background rounded-md
+                 border border-outline-variant
+                 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+                 p-6">
+
+          <div class="flex justify-between">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                request_quote
+              </span>
+
+            </div>
+
+            <span class="text-xs font-bold text-amber-400">
+              LIABILITY
+            </span>
+
+          </div>
+
+          <div class="mt-7">
+
+            <p
+              class="text-xs lg:text-sm
+                     text-on-surface-variant
+                     uppercase tracking-widest">
+
+              Liability Accounts
+
+            </p>
+
+            <h3 class="text-2xl font-bold mt-1">
+              0
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        <!-- EQUITY -->
+
+        <div
+          class="bg-background rounded-md
+                 border border-outline-variant
+                 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+                 p-6">
+
+          <div class="flex justify-between">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                account_balance_wallet
+              </span>
+
+            </div>
+
+            <span class="text-xs font-bold text-blue-400">
+              EQUITY
+            </span>
+
+          </div>
+
+          <div class="mt-7">
+
+            <p
+              class="text-xs lg:text-sm
+                     text-on-surface-variant
+                     uppercase tracking-widest">
+
+              Equity Accounts
+
+            </p>
+
+            <h3 class="text-2xl font-bold mt-1">
+              0
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        <!-- REVENUE -->
+
+        <div
+          class="bg-background rounded-md
+                 border border-outline-variant
+                 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+                 p-6">
+
+          <div class="flex justify-between">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                trending_up
+              </span>
+
+            </div>
+
+            <span class="text-xs font-bold text-emerald-400">
+              REVENUE
+            </span>
+
+          </div>
+
+          <div class="mt-7">
+
+            <p
+              class="text-xs lg:text-sm
+                     text-on-surface-variant
+                     uppercase tracking-widest">
+
+              Revenue Accounts
+
+            </p>
+
+            <h3 class="text-2xl font-bold mt-1">
+              0
+            </h3>
+
+          </div>
+
+        </div>
+
+
+        <!-- EXPENSE -->
+
+        <div
+          class="bg-background rounded-md
+                 border border-outline-variant
+                 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+                 p-6">
+
+          <div class="flex justify-between">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                payments
+              </span>
+
+            </div>
+
+            <span class="text-xs font-bold text-red-400">
+              EXPENSE
+            </span>
+
+          </div>
+
+          <div class="mt-7">
+
+            <p
+              class="text-xs lg:text-sm
+                     text-on-surface-variant
+                     uppercase tracking-widest">
+
+              Expense Accounts
+
+            </p>
+
+            <h3 class="text-2xl font-bold mt-1">
+              0
+            </h3>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- CHART OF ACCOUNTS -->
+
+      <section
+        class="mb-4 bg-background rounded-md
+               border border-outline-variant
+               shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+               overflow-hidden">
+
+
+        <!-- SECTION HEADER -->
+
+        <div
+          class="p-6 border-b border-outline-variant
+                 flex flex-col gap-4
+                 lg:flex-row lg:items-center
+                 lg:justify-between">
+
+          <div class="flex items-center gap-3">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                account_tree
+              </span>
+
+            </div>
+
+            <div>
+
+              <h3
+                class="font-headline text-xl font-bold
+                       tracking-tight">
+
+                Chart of Accounts
+
+              </h3>
+
+              <p class="text-xs text-on-surface-variant mt-1">
+
+                Master list of accounts used in the accounting system
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <button
+            class="h-11 px-5 rounded-md
+                   bottom-theme
+                   border border-outline-variant
+                   text-sm font-semibold
+                   flex items-center justify-center
+                   gap-2">
+
+            <span class="material-symbols-outlined text-lg">
+              add
+            </span>
+
+            Add Account
+
+          </button>
+
+        </div>
+
+
+        <!-- FILTER -->
+
+        <div
+          class="p-5 border-b border-outline-variant">
+
+          <div
+            class="grid grid-cols-1
+                   md:grid-cols-2
+                   lg:grid-cols-4 gap-3">
+
+
+            <!-- SEARCH -->
+
+            <div class="relative lg:col-span-2">
+
+              <span
+                class="material-symbols-outlined
+                       absolute left-3 top-1/2
+                       -translate-y-1/2
+                       text-muted">
+
+                search
+
+              </span>
+
+              <input
+                type="text"
+                placeholder="Search account code or name..."
+                class="w-full h-11
+                       bg-background
+                       border border-outline-variant
+                       rounded-md pl-10 pr-4
+                       text-sm text-on-surface
+                       outline-none focus:ring-1
+                       focus:ring-primary">
+
+            </div>
+
+
+            <!-- TYPE -->
+
+            <select
+              class="h-11 bg-background
+                     border border-outline-variant
+                     rounded-md px-4 text-sm
+                     text-on-surface outline-none">
+
+              <option>
+                All Account Types
+              </option>
+
+              <option>
+                Asset
+              </option>
+
+              <option>
+                Liability
+              </option>
+
+              <option>
+                Equity
+              </option>
+
+              <option>
+                Revenue
+              </option>
+
+              <option>
+                Expense
+              </option>
+
+            </select>
+
+
+            <!-- STATUS -->
+
+            <select
+              class="h-11 bg-background
+                     border border-outline-variant
+                     rounded-md px-4 text-sm
+                     text-on-surface outline-none">
+
+              <option>
+                All Status
+              </option>
+
+              <option>
+                Active
+              </option>
+
+              <option>
+                Inactive
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="overflow-x-auto">
+
+          <table class="w-full min-w-[1000px]">
+
+            <thead>
+
+              <tr
+                class="border-b border-outline-variant
+                       bg-surface-variant/30">
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Code
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Account Name
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Type
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Parent Account
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Normal Balance
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Status
+
+                </th>
+
+                <th
+                  class="text-right px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Action
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+              <!-- ASSETS -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  1000
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <span
+                      class="material-symbols-outlined
+                             text-primary">
+
+                      account_balance
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Assets
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Main asset category
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-emerald-400/10
+                           px-3 py-1
+                           text-[10px] font-bold
+                           text-emerald-400">
+
+                    ASSET
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm text-muted">
+                  —
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Debit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- CASH -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  1100
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3 pl-6">
+
+                    <span
+                      class="material-symbols-outlined text-muted">
+
+                      subdirectory_arrow_right
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Cash
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Cash on hand
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-emerald-400/10
+                           px-3 py-1
+                           text-[10px] font-bold
+                           text-emerald-400">
+
+                    ASSET
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Assets
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Debit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- BANK -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  1200
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3 pl-6">
+
+                    <span
+                      class="material-symbols-outlined text-muted">
+
+                      subdirectory_arrow_right
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Bank
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Bank and digital payment balances
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-emerald-400/10
+                           px-3 py-1
+                           text-[10px] font-bold
+                           text-emerald-400">
+
+                    ASSET
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Assets
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Debit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- INVENTORY -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  1300
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3 pl-6">
+
+                    <span
+                      class="material-symbols-outlined text-muted">
+
+                      subdirectory_arrow_right
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Inventory
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Inventory asset value
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-emerald-400/10
+                           px-3 py-1
+                           text-[10px] font-bold
+                           text-emerald-400">
+
+                    ASSET
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Assets
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Debit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- LIABILITIES -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  2000
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <span
+                      class="material-symbols-outlined text-primary">
+
+                      account_balance
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Liabilities
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Main liability category
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-amber-400/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-amber-400">
+
+                    LIABILITY
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm text-muted">
+                  —
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Credit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- AP -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  2100
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3 pl-6">
+
+                    <span
+                      class="material-symbols-outlined text-muted">
+
+                      subdirectory_arrow_right
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Accounts Payable
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Outstanding supplier obligations
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-amber-400/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-amber-400">
+
+                    LIABILITY
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Liabilities
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Credit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- EQUITY -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  3000
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <span
+                      class="material-symbols-outlined text-primary">
+
+                      account_balance_wallet
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Owner Equity
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Owner's equity
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-blue-400/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-blue-400">
+
+                    EQUITY
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm text-muted">
+                  —
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Credit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- REVENUE -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  4000
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <span
+                      class="material-symbols-outlined text-primary">
+
+                      trending_up
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Sales Revenue
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Revenue from sales
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-emerald-400/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-emerald-400">
+
+                    REVENUE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm text-muted">
+                  —
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Credit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- EXPENSE -->
+
+              <tr
+                class="hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5 font-mono text-sm">
+                  5000
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <span
+                      class="material-symbols-outlined text-primary">
+
+                      payments
+
+                    </span>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Operating Expenses
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Business operating expenses
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-red-400/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-red-400">
+
+                    EXPENSE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm text-muted">
+                  —
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Debit
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           flex items-center justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+
+      <!-- ACCOUNT MAPPING -->
+
+      <section
+        class="mb-4 bg-background rounded-md
+               border border-outline-variant
+               shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+               overflow-hidden">
+
+
+        <!-- SECTION HEADER -->
+
+        <div
+          class="p-6 border-b border-outline-variant
+                 flex flex-col gap-4
+                 lg:flex-row lg:items-center
+                 lg:justify-between">
+
+          <div class="flex items-center gap-3">
+
+            <div class="main-icon-box">
+
+              <span class="material-symbols-outlined text-3xl">
+                account_tree
+              </span>
+
+            </div>
+
+            <div>
+
+              <h3
+                class="font-headline text-xl font-bold
+                       tracking-tight">
+
+                Account Mapping
+
+              </h3>
+
+              <p class="text-xs text-on-surface-variant mt-1">
+
+                Map operational transactions to debit and credit accounts
+
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <button
+            class="h-11 px-5 rounded-md
+                   bottom-theme
+                   border border-outline-variant
+                   text-sm font-semibold
+                   flex items-center justify-center
+                   gap-2">
+
+            <span class="material-symbols-outlined text-lg">
+              add
+            </span>
+
+            Add Mapping
+
+          </button>
+
+        </div>
+
+
+        <!-- FILTER -->
+
+        <div class="p-5 border-b border-outline-variant">
+
+          <div
+            class="grid grid-cols-1
+                   md:grid-cols-3 gap-3">
+
+
+            <div class="relative md:col-span-2">
+
+              <span
+                class="material-symbols-outlined
+                       absolute left-3 top-1/2
+                       -translate-y-1/2 text-muted">
+
+                search
+
+              </span>
+
+              <input
+                type="text"
+                placeholder="Search transaction or mapping..."
+                class="w-full h-11
+                       bg-background
+                       border border-outline-variant
+                       rounded-md pl-10 pr-4
+                       text-sm text-on-surface
+                       outline-none focus:ring-1
+                       focus:ring-primary">
+
+            </div>
+
+
+            <select
+              class="h-11 bg-background
+                     border border-outline-variant
+                     rounded-md px-4 text-sm
+                     text-on-surface outline-none">
+
+              <option>
+                All Transaction Types
+              </option>
+
+              <option>
+                Sales
+              </option>
+
+              <option>
+                Purchase
+              </option>
+
+              <option>
+                Payment
+              </option>
+
+              <option>
+                Expense
+              </option>
+
+              <option>
+                Inventory
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <!-- MAPPING TABLE -->
+
+        <div class="overflow-x-auto">
+
+          <table class="w-full min-w-[1000px]">
+
+            <thead>
+
+              <tr
+                class="border-b border-outline-variant
+                       bg-surface-variant/30">
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Transaction
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Source
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Debit Account
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Credit Account
+
+                </th>
+
+                <th
+                  class="text-left px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Status
+
+                </th>
+
+                <th
+                  class="text-right px-6 py-4
+                         text-[10px] font-bold
+                         uppercase tracking-[0.15em]
+                         text-muted">
+
+                  Action
+
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+              <!-- PURCHASE CREDIT -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <div class="main-icon-box">
+
+                      <span class="material-symbols-outlined">
+                        shopping_cart
+                      </span>
+
+                    </div>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Purchase on Credit
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Supplier purchase
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Purchase
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Inventory
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    1300
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Accounts Payable
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    2100
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           inline-flex items-center
+                           justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- PURCHASE CASH -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <div class="main-icon-box">
+
+                      <span class="material-symbols-outlined">
+                        shopping_cart
+                      </span>
+
+                    </div>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Purchase Paid
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Immediate supplier payment
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Purchase
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Inventory
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    1300
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Cash / Bank
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    1100 / 1200
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           inline-flex items-center
+                           justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- SUPPLIER PAYMENT -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <div class="main-icon-box">
+
+                      <span class="material-symbols-outlined">
+                        payments
+                      </span>
+
+                    </div>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Supplier Payment
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Settlement of payable
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Payment
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Accounts Payable
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    2100
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Cash / Bank
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    1100 / 1200
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           inline-flex items-center
+                           justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- SALES -->
+
+              <tr
+                class="border-b border-outline-variant
+                       hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <div class="main-icon-box">
+
+                      <span class="material-symbols-outlined">
+                        point_of_sale
+                      </span>
+
+                    </div>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Sales
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Sales transaction
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Sales
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Cash / Bank
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    1100 / 1200
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Sales Revenue
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    4000
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           inline-flex items-center
+                           justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+
+              <!-- EXPENSE -->
+
+              <tr
+                class="hover:bg-surface-variant/20">
+
+                <td class="px-6 py-5">
+
+                  <div class="flex items-center gap-3">
+
+                    <div class="main-icon-box">
+
+                      <span class="material-symbols-outlined">
+                        payments
+                      </span>
+
+                    </div>
+
+                    <div>
+
+                      <p class="font-semibold">
+                        Operating Expense
+                      </p>
+
+                      <p class="text-xs text-muted">
+                        Business expense transaction
+                      </p>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <td class="px-6 py-5 text-sm">
+                  Expense
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Operating Expense
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    5000
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <p class="font-semibold">
+                    Cash / Bank
+                  </p>
+
+                  <p class="text-xs text-muted">
+                    1100 / 1200
+                  </p>
+
+                </td>
+
+                <td class="px-6 py-5">
+
+                  <span
+                    class="inline-flex rounded-full
+                           bg-primary/10 px-3 py-1
+                           text-[10px] font-bold
+                           text-primary">
+
+                    ACTIVE
+
+                  </span>
+
+                </td>
+
+                <td class="px-6 py-5 text-right">
+
+                  <button
+                    class="w-9 h-9 rounded-md
+                           hover:bg-surface-variant
+                           inline-flex items-center
+                           justify-center">
+
+                    <span class="material-symbols-outlined text-lg">
+                      more_vert
+                    </span>
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+      <!-- MAPPING LOGIC PREVIEW -->
+
+      <section
+        class="mb-4 bg-background rounded-md
+               border border-outline-variant
+               shadow-[0_2px_10px_rgba(0,0,0,0.15)]
+               p-8">
+
+        <div class="flex items-center gap-3 mb-7">
+
+          <div class="main-icon-box">
+
+            <span class="material-symbols-outlined text-3xl">
+              conversion_path
+            </span>
+
+          </div>
+
+          <div>
+
+            <h3
+              class="font-headline text-xl font-bold
+                     tracking-tight">
+
+              Accounting Mapping Flow
+
+            </h3>
+
+            <p class="text-xs text-on-surface-variant mt-1">
+
+              Operational transaction → account mapping → journal
+
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="grid grid-cols-1
+                 md:grid-cols-3 gap-4">
+
+
+          <!-- STEP 1 -->
+
+          <div
+            class="border border-outline-variant
+                   rounded-md p-5">
+
+            <span
+              class="text-[10px] font-bold
+                     tracking-[0.2em] text-muted">
+
+              STEP 01
+
+            </span>
+
+            <div class="flex items-center gap-3 mt-3">
+
+              <div class="main-icon-box">
+
+                <span class="material-symbols-outlined">
+                  point_of_sale
+                </span>
+
+              </div>
+
+              <h4 class="font-bold">
+                Operational Transaction
+              </h4>
+
+            </div>
+
+            <p
+              class="text-xs text-on-surface-variant
+                     leading-5 mt-4">
+
+              Sales, purchases, payments, expenses
+              and other operational activities.
+
+            </p>
+
+          </div>
+
+
+          <!-- STEP 2 -->
+
+          <div
+            class="border border-outline-variant
+                   rounded-md p-5">
+
+            <span
+              class="text-[10px] font-bold
+                     tracking-[0.2em] text-muted">
+
+              STEP 02
+
+            </span>
+
+            <div class="flex items-center gap-3 mt-3">
+
+              <div class="main-icon-box">
+
+                <span class="material-symbols-outlined">
+                  account_tree
+                </span>
+
+              </div>
+
+              <h4 class="font-bold">
+                Account Mapping
+              </h4>
+
+            </div>
+
+            <p
+              class="text-xs text-on-surface-variant
+                     leading-5 mt-4">
+
+              Determine which account receives
+              the debit and which account receives
+              the credit.
+
+            </p>
+
+          </div>
+
+
+          <!-- STEP 3 -->
+
+          <div
+            class="border border-outline-variant
+                   rounded-md p-5">
+
+            <span
+              class="text-[10px] font-bold
+                     tracking-[0.2em] text-muted">
+
+              STEP 03
+
+            </span>
+
+            <div class="flex items-center gap-3 mt-3">
+
+              <div class="main-icon-box">
+
+                <span class="material-symbols-outlined">
+                  receipt_long
+                </span>
+
+              </div>
+
+              <h4 class="font-bold">
+                Journal Entry
+              </h4>
+
+            </div>
+
+            <p
+              class="text-xs text-on-surface-variant
+                     leading-5 mt-4">
+
+              The mapped transaction becomes
+              a balanced accounting journal entry.
+
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+    </main>
+
+  </div>
+
+</template>
 
 <!-- 
   MUNO KASIR: MASTER SPA LOGIC (Script.html)
