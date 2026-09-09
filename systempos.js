@@ -22656,7 +22656,6 @@ async function loadAccountingOverview() {
 /* =========================================================
    OVERVIEW AKUNTANSI
    ========================================================= */
-
 async function loadAccountingOverview() {
 
   const periodEl =
@@ -22703,19 +22702,10 @@ async function loadAccountingOverview() {
         }
       );
 
-    console.log(
-      "ACCOUNTING RPC DATA:",
-      data
-    );
+    console.log("ACCOUNTING RPC DATA:", data);
+    console.log("ACCOUNTING RPC ERROR:", error);
 
-    console.log(
-      "ACCOUNTING RPC ERROR:",
-      error
-    );
-
-    if (error) {
-      throw error;
-    }
+    if (error) throw error;
 
     if (!data) {
       throw new Error(
@@ -22741,6 +22731,52 @@ async function loadAccountingOverview() {
 }
 
 
+async function loadAccountingBranchOptions() {
+
+  if (state.accountingBranches) {
+    renderAccountingBranchOptions(
+      state.accountingBranches
+    );
+    return;
+  }
+
+  try {
+
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+
+    state.accountingBranches = data || [];
+
+    renderAccountingBranchOptions(
+      state.accountingBranches
+    );
+
+  } catch (err) {
+
+    console.error(
+      "Accounting branch error:",
+      err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat branch.",
+      "error"
+    );
+  }
+}
+
+
 function renderAccountingBranchOptions(branches) {
 
   const select =
@@ -22756,7 +22792,7 @@ function renderAccountingBranchOptions(branches) {
     </option>
   `;
 
-  branches.forEach(branch => {
+  (branches || []).forEach(branch => {
 
     select.innerHTML += `
       <option value="${branch.id}">
@@ -22765,7 +22801,15 @@ function renderAccountingBranchOptions(branches) {
     `;
 
   });
+
+  console.log("ACCOUNTING BRANCH:", {
+    disabled: select.disabled,
+    value: select.value,
+    options: select.options.length,
+    branches: branches
+  });
 }
+
 
 function getAccountingDateRange(period) {
 
@@ -22773,8 +22817,10 @@ function getAccountingDateRange(period) {
 
   const formatDate = (date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const month =
+      String(date.getMonth() + 1).padStart(2, "0");
+    const day =
+      String(date.getDate()).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
   };
@@ -22785,12 +22831,6 @@ function getAccountingDateRange(period) {
   switch (period) {
 
     case "last_month": {
-      const firstDayCurrentMonth =
-        new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          1
-        );
 
       const lastDayPreviousMonth =
         new Date(
@@ -22813,6 +22853,7 @@ function getAccountingDateRange(period) {
     }
 
     case "quarter": {
+
       const currentQuarter =
         Math.floor(today.getMonth() / 3);
 
@@ -22840,6 +22881,7 @@ function getAccountingDateRange(period) {
     }
 
     case "year": {
+
       const firstDayYear =
         new Date(
           today.getFullYear(),
@@ -22862,6 +22904,7 @@ function getAccountingDateRange(period) {
 
     case "month":
     default: {
+
       const firstDayMonth =
         new Date(
           today.getFullYear(),
@@ -22906,15 +22949,10 @@ async function initAccountingModule() {
         "accounting-branch"
       );
 
-    if (
-      !periodEl ||
-      !branchEl
-    ) {
-
+    if (!periodEl || !branchEl) {
       console.warn(
         "Accounting DOM belum tersedia"
       );
-
       return;
     }
 
@@ -22933,13 +22971,13 @@ async function initAccountingModule() {
       accountingInitialized = true;
     }
 
-    // SAMA SEPERTI CASH FLOW
+    // Branch dulu
     await loadAccountingBranchOptions();
 
+    // Baru data accounting
     await loadAccountingOverview();
 
-  }
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "Accounting init error:",
