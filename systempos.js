@@ -1045,7 +1045,9 @@ function initModule(pageId) {
 		break;
 
 		case "accountingPage":
-		  initAccountingModule();
+		  waitBranch(() => {
+		    initAccountingModule();
+		  });
 		break;
   }
 }
