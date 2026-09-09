@@ -22654,57 +22654,87 @@ async function loadAccountingOverview() {
 }
 
 /* =========================================================
-   ACCOUNTING BRANCH
+   OVERVIEW AKUNTANSI
    ========================================================= */
-async function loadAccountingBranchOptions() {
 
-  // CACHE
-  if (state.accountingBranches) {
+async function loadAccountingOverview() {
 
-    renderAccountingBranchOptions(
-      state.accountingBranches
-    );
+  const periodEl =
+    document.getElementById("accounting-period");
 
+  const branchEl =
+    document.getElementById("accounting-branch");
+
+  if (!periodEl || !branchEl) {
+    console.warn("Accounting filter belum tersedia.");
     return;
   }
 
+  const period =
+    periodEl.value || "month";
+
+  const branch =
+    branchEl.value || "ALL";
+
+  const { start, end } =
+    getAccountingDateRange(period);
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  console.log("ACCOUNTING FILTER:", {
+    period,
+    branch,
+    start,
+    end,
+    sessionId
+  });
+
   try {
 
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_accounting_overview",
+        {
+          p_branch_id: branch,
+          p_start: start,
+          p_end: end,
+          p_session_id: sessionId
+        }
+      );
 
-    const {
-      data,
+    console.log(
+      "ACCOUNTING RPC DATA:",
+      data
+    );
+
+    console.log(
+      "ACCOUNTING RPC ERROR:",
       error
-    } = await supabaseClient.rpc(
-      "get_expense_branches",
-      {
-        p_session_id: sessionId
-      }
     );
 
     if (error) {
       throw error;
     }
 
-    state.accountingBranches =
-      data || [];
+    if (!data) {
+      throw new Error(
+        "Accounting Overview tidak mengembalikan data."
+      );
+    }
 
-    renderAccountingBranchOptions(
-      state.accountingBranches
-    );
+    renderAccountingOverview(data);
 
-  }
-  catch (err) {
+  } catch (error) {
 
     console.error(
-      "Accounting branch error:",
-      err
+      "Accounting Overview Error:",
+      error
     );
 
     showToast(
-      err?.message ||
-      "Gagal memuat branch.",
+      error?.message ||
+      "Gagal memuat Accounting Overview.",
       "error"
     );
   }
@@ -22735,6 +22765,128 @@ function renderAccountingBranchOptions(branches) {
     `;
 
   });
+}
+
+function getAccountingDateRange(period) {
+
+  const today = new Date();
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  let start;
+  let end;
+
+  switch (period) {
+
+    case "last_month": {
+      const firstDayCurrentMonth =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          1
+        );
+
+      const lastDayPreviousMonth =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          0
+        );
+
+      const firstDayPreviousMonth =
+        new Date(
+          today.getFullYear(),
+          today.getMonth() - 1,
+          1
+        );
+
+      start = formatDate(firstDayPreviousMonth);
+      end = formatDate(lastDayPreviousMonth);
+
+      break;
+    }
+
+    case "quarter": {
+      const currentQuarter =
+        Math.floor(today.getMonth() / 3);
+
+      const firstMonthOfQuarter =
+        currentQuarter * 3;
+
+      const firstDayQuarter =
+        new Date(
+          today.getFullYear(),
+          firstMonthOfQuarter,
+          1
+        );
+
+      const lastDayQuarter =
+        new Date(
+          today.getFullYear(),
+          firstMonthOfQuarter + 3,
+          0
+        );
+
+      start = formatDate(firstDayQuarter);
+      end = formatDate(lastDayQuarter);
+
+      break;
+    }
+
+    case "year": {
+      const firstDayYear =
+        new Date(
+          today.getFullYear(),
+          0,
+          1
+        );
+
+      const lastDayYear =
+        new Date(
+          today.getFullYear(),
+          11,
+          31
+        );
+
+      start = formatDate(firstDayYear);
+      end = formatDate(lastDayYear);
+
+      break;
+    }
+
+    case "month":
+    default: {
+      const firstDayMonth =
+        new Date(
+          today.getFullYear(),
+          today.getMonth(),
+          1
+        );
+
+      const lastDayMonth =
+        new Date(
+          today.getFullYear(),
+          today.getMonth() + 1,
+          0
+        );
+
+      start = formatDate(firstDayMonth);
+      end = formatDate(lastDayMonth);
+
+      break;
+    }
+  }
+
+  return {
+    start,
+    end
+  };
 }
 
 
