@@ -22979,19 +22979,13 @@ let accountingInitialized = false;
 async function initAccountingModule() {
 
   const periodEl =
-    document.getElementById(
-      "accounting-period"
-    );
+    document.getElementById("accounting-period");
 
   const branchEl =
-    document.getElementById(
-      "accounting-branch"
-    );
+    document.getElementById("accounting-branch");
 
   if (!periodEl || !branchEl) {
-    console.warn(
-      "Accounting DOM belum tersedia"
-    );
+    console.warn("Accounting DOM belum tersedia");
     return;
   }
 
@@ -23010,10 +23004,10 @@ async function initAccountingModule() {
     accountingInitialized = true;
   }
 
-  // WAJIB LOAD BRANCH DULU
+  // LOAD BRANCH
   await loadAccountingBranchOptions();
 
-  // BARU LOAD DATA OVERVIEW
+  // LOAD OVERVIEW SETELAH BRANCH SELESAI
   await loadAccountingOverview();
 }
 
