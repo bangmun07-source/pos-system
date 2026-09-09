@@ -1043,6 +1043,10 @@ function initModule(pageId) {
 		    initAssetPage();
 		  });
 		break;
+
+		case "accountingPage":
+		  initAccountingModule();
+		break;
   }
 }
 	
@@ -22577,7 +22581,7 @@ async function loadAccountingOverview() {
   const period = document.getElementById('accounting-period').value;
   const branch = document.getElementById('accounting-branch').value;
   const { start, end } = getAccountingDateRange(period);
-  const sessionId = /* session existing app */;
+  const sessionId = localStorage.getItem("pos_session_id");
   const { data, error } = await supabase.rpc(
     'get_accounting_overview',
     {
@@ -22589,4 +22593,30 @@ async function loadAccountingOverview() {
   );
   if (error) throw error;
   renderAccountingOverview(data);
+}
+
+
+let accountingInitialized = false;
+async function initAccountingModule() {
+  try {
+    const periodEl = document.getElementById("accounting-period");
+    const branchEl = document.getElementById("accounting-branch");
+
+    if (!periodEl || !branchEl) {
+      console.warn("Accounting DOM belum tersedia");
+      return;
+    }
+
+    if (!accountingInitialized) {
+      periodEl.addEventListener("change", loadAccountingOverview);
+      branchEl.addEventListener("change", loadAccountingOverview);
+
+      accountingInitialized = true;
+    }
+
+    await loadAccountingOverview();
+
+  } catch (error) {
+    console.error("Accounting init error:", error);
+  }
 }
