@@ -22865,8 +22865,6 @@ function getAccountingDateRange(period) {
 }
 
 
-let accountingInitialized = false;
-
 async function initAccountingModule() {
 
   const periodEl =
@@ -22880,25 +22878,9 @@ async function initAccountingModule() {
     return;
   }
 
-  if (!accountingInitialized) {
-
-    periodEl.addEventListener(
-      "change",
-      loadAccountingOverview
-    );
-
-    branchEl.addEventListener(
-      "change",
-      loadAccountingOverview
-    );
-
-    accountingInitialized = true;
-  }
-
-  // LOAD BRANCH
+  periodEl.onchange = loadAccountingOverview;
+  branchEl.onchange = loadAccountingOverview;
   await loadAccountingBranchOptions();
-
-  // LOAD OVERVIEW SETELAH BRANCH SELESAI
   await loadAccountingOverview();
 }
 
