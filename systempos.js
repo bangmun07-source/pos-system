@@ -22998,23 +22998,28 @@ function renderAccountingOverview(data) {
   );
 
 
-  /* =======================================================
+    /* =======================================================
      FINANCIAL POSITION - LIABILITIES & EQUITY
      ======================================================= */
 
   setText(
-    "accounting-liability-ap",
-    financial.accountsPayable
+	"accounting-liability-ap",
+	financial.accountsPayable
   );
 
   setText(
-    "accounting-liability-equity",
-    financial.equity
+	"accounting-liability-tax",
+	financial.taxPayable
   );
 
   setText(
-    "accounting-total-liabilities-equity",
-    financial.totalLiabilitiesEquity
+	"accounting-liability-equity",
+	financial.equity
+  );
+
+  setText(
+	"accounting-total-liabilities-equity",
+	financial.totalLiabilitiesEquity
   );
 
 
