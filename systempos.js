@@ -1045,9 +1045,7 @@ function initModule(pageId) {
 		break;
 
 		case "accountingPage":
-		  waitBranch(() => {
 		    initAccountingModule();
-		  });
 		break;
   }
 }
@@ -22975,7 +22973,6 @@ function getAccountingDateRange(period) {
 
 let accountingInitialized = false;
 
-
 async function initAccountingModule() {
 
   const periodEl =
@@ -23010,8 +23007,10 @@ async function initAccountingModule() {
     accountingInitialized = true;
   }
 
+  // WAJIB LOAD BRANCH DULU
   await loadAccountingBranchOptions();
 
+  // BARU LOAD DATA OVERVIEW
   await loadAccountingOverview();
 }
 
