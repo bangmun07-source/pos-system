@@ -22756,8 +22756,30 @@ async function loadAccountingBranchOptions() {
     state.accountingBranches =
       Array.isArray(data) ? data : [];
 
+    console.log(
+      "ACCOUNTING BRANCH RPC:",
+      data
+    );
+
     renderAccountingBranchOptions(
       state.accountingBranches
+    );
+
+    const select =
+      document.getElementById("accounting-branch");
+
+    console.log(
+      "ACCOUNTING BRANCH SELECT:",
+      {
+        count: select?.options?.length,
+        value: select?.value,
+        options: [...(select?.options || [])].map(
+          o => ({
+            value: o.value,
+            text: o.text
+          })
+        )
+      }
     );
 
   } catch (err) {
