@@ -22735,17 +22735,8 @@ async function loadAccountingOverview() {
 }
 
 
+
 async function loadAccountingBranchOptions() {
-
-  if (Array.isArray(state.accountingBranches) &&
-      state.accountingBranches.length > 0) {
-
-    renderAccountingBranchOptions(
-      state.accountingBranches
-    );
-
-    return;
-  }
 
   try {
 
@@ -22788,9 +22779,7 @@ async function loadAccountingBranchOptions() {
 function renderAccountingBranchOptions(branches) {
 
   const select =
-    document.getElementById(
-      "accounting-branch"
-    );
+    document.getElementById("accounting-branch");
 
   if (!select) return;
 
@@ -22811,12 +22800,13 @@ function renderAccountingBranchOptions(branches) {
   });
 
   console.log("ACCOUNTING BRANCH:", {
-    disabled: select.disabled,
-    value: select.value,
     options: select.options.length,
-    branches: branches
+    branches: branches,
+    value: select.value
   });
 }
+
+
 
 
 function getAccountingDateRange(period) {
