@@ -22739,8 +22739,9 @@ async function loadAccountingOverview() {
 
 async function loadAccountingBranchOptions() {
 
-  try {
+  console.log("=== ACCOUNTING BRANCH START ===");
 
+  try {
     const sessionId =
       localStorage.getItem("pos_session_id");
 
@@ -22752,49 +22753,20 @@ async function loadAccountingBranchOptions() {
         }
       );
 
+    console.log("ACCOUNTING BRANCH DATA:", data);
+    console.log("ACCOUNTING BRANCH ERROR:", error);
+
     if (error) throw error;
 
     state.accountingBranches =
       Array.isArray(data) ? data : [];
 
-    console.log(
-      "ACCOUNTING BRANCH RPC:",
-      data
-    );
-
     renderAccountingBranchOptions(
       state.accountingBranches
     );
 
-    const select =
-      document.getElementById("accounting-branch");
-
-    console.log(
-      "ACCOUNTING BRANCH SELECT:",
-      {
-        count: select?.options?.length,
-        value: select?.value,
-        options: [...(select?.options || [])].map(
-          o => ({
-            value: o.value,
-            text: o.text
-          })
-        )
-      }
-    );
-
   } catch (err) {
-
-    console.error(
-      "Accounting branch error:",
-      err
-    );
-
-    showToast(
-      err?.message ||
-      "Gagal memuat branch.",
-      "error"
-    );
+    console.error("Accounting branch error:", err);
   }
 }
 
