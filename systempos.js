@@ -22620,3 +22620,367 @@ async function initAccountingModule() {
     console.error("Accounting init error:", error);
   }
 }
+
+/* =========================================================
+   RENDER ACCOUNTING OVERVIEW
+   ========================================================= */
+function renderAccountingOverview(data) {
+  if (!data) {
+    console.warn("Accounting overview data kosong");
+    return;
+  }
+
+  const toNumber = (value) => {
+    if (value === null || value === undefined || value === "") {
+      return 0;
+    }
+
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+  };
+
+  const formatIDR = (value) => {
+    const number = toNumber(value);
+
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(number);
+  };
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+
+    if (el) {
+      el.textContent = formatIDR(value);
+    }
+  };
+
+  const setPlainText = (id, value) => {
+    const el = document.getElementById(id);
+
+    if (el) {
+      el.textContent = value ?? "-";
+    }
+  };
+
+  const escapeHTML = (value) => {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  };
+
+
+  /* =======================================================
+     NORMALIZE DATA
+     ======================================================= */
+
+  const kpi = data.kpi || {};
+  const profitLoss = data.profitLoss || {};
+  const financial = data.financialPosition || {};
+
+  const apList = Array.isArray(data.accountsPayableList)
+    ? data.accountsPayableList
+    : [];
+
+  const recentJournals = Array.isArray(data.recentJournals)
+    ? data.recentJournals
+    : [];
+
+
+  /* =======================================================
+     KPI
+     ======================================================= */
+
+  setText("accounting-cash", kpi.cash);
+  setText("accounting-bank", kpi.bank);
+  setText("accounting-inventory", kpi.inventory);
+  setText("accounting-ap", kpi.accountsPayable);
+  setText("accounting-revenue", kpi.revenue);
+  setText("accounting-expense", kpi.expense);
+  setText("accounting-net-profit", kpi.netProfit);
+  setText("accounting-equity", kpi.equity);
+
+
+  /* =======================================================
+     FINANCIAL POSITION - ASSETS
+     ======================================================= */
+
+  setText(
+    "accounting-assets-cash",
+    financial.cash
+  );
+
+  setText(
+    "accounting-assets-bank",
+    financial.bank
+  );
+
+  setText(
+    "accounting-assets-inventory",
+    financial.inventory
+  );
+
+  setText(
+    "accounting-total-assets",
+    financial.totalAssets
+  );
+
+
+  /* =======================================================
+     FINANCIAL POSITION - LIABILITIES & EQUITY
+     ======================================================= */
+
+  setText(
+    "accounting-liability-ap",
+    financial.accountsPayable
+  );
+
+  setText(
+    "accounting-liability-equity",
+    financial.equity
+  );
+
+  setText(
+    "accounting-total-liabilities-equity",
+    financial.totalLiabilitiesEquity
+  );
+
+
+  /* =======================================================
+     ACCOUNTS PAYABLE LIST
+     ======================================================= */
+
+  const apContainer =
+    document.getElementById("accounting-ap-list");
+
+  const apTotal =
+    document.getElementById("accounting-ap-total");
+
+  if (apContainer) {
+
+    if (apList.length === 0) {
+
+      apContainer.innerHTML = `
+        <div class="h-full flex flex-col items-center justify-center text-center">
+          <span class="material-symbols-outlined text-4xl text-muted mb-3">
+            check_circle
+          </span>
+
+          <p class="text-sm font-semibold text-on-surface">
+            No Outstanding Payables
+          </p>
+
+          <p class="text-xs text-on-surface-variant mt-1">
+            All supplier balances are currently settled.
+          </p>
+        </div>
+      `;
+
+    } else {
+
+      apContainer.innerHTML = apList.map(item => {
+
+        const supplier =
+          escapeHTML(item.supplier || "-");
+
+        const status =
+          escapeHTML(item.status || "OUTSTANDING");
+
+        const date =
+          item.date
+            ? new Date(item.date).toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+              })
+            : "-";
+
+        const amount =
+          toNumber(item.amount);
+
+        return `
+          <div class="border border-outline-variant rounded-md p-4">
+
+            <div class="flex items-start justify-between gap-4">
+
+              <div class="min-w-0">
+
+                <p class="font-semibold text-sm truncate">
+                  ${supplier}
+                </p>
+
+                <p class="text-xs text-on-surface-variant mt-1">
+                  ${escapeHTML(date)}
+                </p>
+
+                <p class="text-[10px] uppercase tracking-wider text-red-400 mt-2">
+                  ${status}
+                </p>
+
+              </div>
+
+              <div class="text-right shrink-0">
+
+                <p class="font-bold text-sm">
+                  ${formatIDR(amount)}
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+        `;
+
+      }).join("");
+    }
+  }
+
+  /*
+   * Total AP menggunakan data dari financial position
+   * supaya konsisten dengan KPI dan Balance Sheet.
+   */
+  if (apTotal) {
+    apTotal.textContent =
+      formatIDR(financial.accountsPayable);
+  }
+
+
+  /* =======================================================
+     RECENT JOURNAL ENTRIES
+     ======================================================= */
+
+  const journalContainer =
+    document.getElementById("accounting-recent-journals");
+
+  if (journalContainer) {
+
+    if (recentJournals.length === 0) {
+
+      journalContainer.innerHTML = `
+        <div class="h-full flex flex-col items-center justify-center text-center">
+          <span class="material-symbols-outlined text-4xl text-muted mb-3">
+            receipt_long
+          </span>
+
+          <p class="text-sm font-semibold text-on-surface">
+            No Recent Journal Entries
+          </p>
+
+          <p class="text-xs text-on-surface-variant mt-1">
+            Journal transactions will appear here.
+          </p>
+        </div>
+      `;
+
+    } else {
+
+      journalContainer.innerHTML =
+        recentJournals.map(journal => {
+
+          const date =
+            journal.date
+              ? new Date(journal.date).toLocaleDateString("id-ID", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric"
+                })
+              : "-";
+
+          const description =
+            escapeHTML(
+              journal.description ||
+              journal.memo ||
+              journal.reference ||
+              "Journal Entry"
+            );
+
+          const reference =
+            escapeHTML(
+              journal.reference ||
+              journal.id ||
+              ""
+            );
+
+          const amount =
+            toNumber(
+              journal.amount ??
+              journal.total ??
+              journal.debit ??
+              0
+            );
+
+          return `
+            <div class="flex items-center justify-between gap-4
+                        border border-outline-variant rounded-md p-4">
+
+              <div class="flex items-center gap-3 min-w-0">
+
+                <div class="main-icon-box shrink-0">
+                  <span class="material-symbols-outlined">
+                    receipt_long
+                  </span>
+                </div>
+
+                <div class="min-w-0">
+
+                  <p class="text-sm font-semibold truncate">
+                    ${description}
+                  </p>
+
+                  <div class="flex items-center gap-2 mt-1">
+
+                    <span class="text-xs text-on-surface-variant">
+                      ${escapeHTML(date)}
+                    </span>
+
+                    ${
+                      reference
+                        ? `
+                          <span class="text-xs text-on-surface-variant">
+                            •
+                          </span>
+
+                          <span class="text-xs text-on-surface-variant truncate">
+                            ${reference}
+                          </span>
+                        `
+                        : ""
+                    }
+
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div class="font-bold text-sm shrink-0">
+                ${formatIDR(amount)}
+              </div>
+
+            </div>
+          `;
+
+        }).join("");
+    }
+  }
+
+
+  /* =======================================================
+     OPTIONAL: SAVE CURRENT ACCOUNTING DATA
+     ======================================================= */
+  window.currentAccountingOverview = data;
+
+  console.log(
+    "Accounting overview rendered:",
+    data
+  );
+}
+
+
