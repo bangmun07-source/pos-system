@@ -22575,49 +22575,225 @@ function initAssetPage() {
 
 
 /* =========================================================
-   OVERVIEW AKUTANSI
+   OVERVIEW AKUNTANSI
    ========================================================= */
 async function loadAccountingOverview() {
-  const period = document.getElementById('accounting-period').value;
-  const branch = document.getElementById('accounting-branch').value;
-  const { start, end } = getAccountingDateRange(period);
-  const sessionId = localStorage.getItem("pos_session_id");
-  const { data, error } = await supabase.rpc(
-    'get_accounting_overview',
-    {
-      p_branch_id: branch,
-      p_start: start,
-      p_end: end,
-      p_session_id: sessionId
+
+  const periodEl =
+    document.getElementById("accounting-period");
+
+  const branchEl =
+    document.getElementById("accounting-branch");
+
+  if (!periodEl || !branchEl) {
+    console.warn("Accounting filter belum tersedia.");
+    return;
+  }
+
+  const period = periodEl.value || "month";
+  const branch = branchEl.value || "ALL";
+
+  const { start, end } =
+    getAccountingDateRange(period);
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  console.log("ACCOUNTING FILTER:", {
+    period,
+    branch,
+    start,
+    end,
+    sessionId
+  });
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_accounting_overview",
+      {
+        p_branch_id: branch,
+        p_start: start,
+        p_end: end,
+        p_session_id: sessionId
+      }
+    );
+
+    console.log("ACCOUNTING RPC DATA:", data);
+    console.log("ACCOUNTING RPC ERROR:", error);
+
+    if (error) {
+      throw error;
     }
-  );
-  if (error) throw error;
-  renderAccountingOverview(data);
+
+    if (!data) {
+      throw new Error(
+        "Accounting Overview tidak mengembalikan data."
+      );
+    }
+
+    renderAccountingOverview(data);
+
+  }
+  catch (error) {
+
+    console.error(
+      "Accounting Overview Error:",
+      error
+    );
+
+    showToast(
+      error?.message ||
+      "Gagal memuat Accounting Overview.",
+      "error"
+    );
+  }
+}
+
+/* =========================================================
+   ACCOUNTING BRANCH
+   ========================================================= */
+async function loadAccountingBranchOptions() {
+
+  // CACHE
+  if (state.accountingBranches) {
+
+    renderAccountingBranchOptions(
+      state.accountingBranches
+    );
+
+    return;
+  }
+
+  try {
+
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
+    const {
+      data,
+      error
+    } = await supabaseClient.rpc(
+      "get_expense_branches",
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) {
+      throw error;
+    }
+
+    state.accountingBranches =
+      data || [];
+
+    renderAccountingBranchOptions(
+      state.accountingBranches
+    );
+
+  }
+  catch (err) {
+
+    console.error(
+      "Accounting branch error:",
+      err
+    );
+
+    showToast(
+      err?.message ||
+      "Gagal memuat branch.",
+      "error"
+    );
+  }
+}
+
+
+function renderAccountingBranchOptions(branches) {
+
+  const select =
+    document.getElementById(
+      "accounting-branch"
+    );
+
+  if (!select) return;
+
+  select.innerHTML = `
+    <option value="ALL">
+      All Branch
+    </option>
+  `;
+
+  branches.forEach(branch => {
+
+    select.innerHTML += `
+      <option value="${branch.id}">
+        ${branch.name}
+      </option>
+    `;
+
+  });
 }
 
 
 let accountingInitialized = false;
-async function initAccountingModule() {
-  try {
-    const periodEl = document.getElementById("accounting-period");
-    const branchEl = document.getElementById("accounting-branch");
 
-    if (!periodEl || !branchEl) {
-      console.warn("Accounting DOM belum tersedia");
+async function initAccountingModule() {
+
+  try {
+
+    const periodEl =
+      document.getElementById(
+        "accounting-period"
+      );
+
+    const branchEl =
+      document.getElementById(
+        "accounting-branch"
+      );
+
+    if (
+      !periodEl ||
+      !branchEl
+    ) {
+
+      console.warn(
+        "Accounting DOM belum tersedia"
+      );
+
       return;
     }
 
     if (!accountingInitialized) {
-      periodEl.addEventListener("change", loadAccountingOverview);
-      branchEl.addEventListener("change", loadAccountingOverview);
+
+      periodEl.addEventListener(
+        "change",
+        loadAccountingOverview
+      );
+
+      branchEl.addEventListener(
+        "change",
+        loadAccountingOverview
+      );
 
       accountingInitialized = true;
     }
 
+    // SAMA SEPERTI CASH FLOW
+    await loadAccountingBranchOptions();
+
     await loadAccountingOverview();
 
-  } catch (error) {
-    console.error("Accounting init error:", error);
+  }
+  catch (error) {
+
+    console.error(
+      "Accounting init error:",
+      error
+    );
+
   }
 }
 
