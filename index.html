@@ -15131,8 +15131,8 @@
 
         </a>
 		  
-		<!-- ACCOUNTING -->
-		<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<!-- ACCOUNTING -->
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
 
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
@@ -15140,6 +15140,18 @@
 
           <span class="sidebar-label">
             Accounting
+          </span>
+
+        </a>
+
+				<!-- ACCOUNTING TRANSACTIONS -->
+		<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Accounting Transactions
           </span>
 
         </a>
@@ -16206,7 +16218,7 @@
 	
 		  
 		<!-- ACCOUNTING -->
-		<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
 
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
@@ -16214,6 +16226,18 @@
 
           <span class="sidebar-label">
             Accounting
+          </span>
+
+        </a>
+
+				<!-- ACCOUNTING TRANSACTIONS -->
+				<a  onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Accounting Transactions
           </span>
 
         </a>
@@ -18588,6 +18612,1063 @@
 
 </template>
 
+
+<template id="accountingTransactionsPage">
+
+  <!-- SIDEBAR -->
+  <aside
+    id="sidebar"
+    class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+
+    <div class="sidebar-menu flex flex-col h-full">
+
+       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+
+        <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
+          </span>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+
+        <!-- SETTINGS -->
+        <a
+          onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+
+        <!-- LOYALTY -->
+        <a onclick="navigate('loyaltysettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            military_tech
+          </span>
+          <span class="sidebar-label">
+            Loyalty &amp; Tiers
+          </span>
+        </a>
+
+        <!-- TAX -->
+        <a onclick="navigate('taxservicesettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Taxes &amp; Fees
+          </span>
+        </a>
+
+        <!-- EXPENSES -->
+        <a onclick="navigate('expensessettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            payments
+          </span>
+          <span class="sidebar-label">
+            Expenses
+          </span>
+        </a>
+
+        <!-- ANALYTICS -->
+        <a onclick="navigate('analyticsPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            analytics
+          </span>
+          <span class="sidebar-label">
+            Analytics
+          </span>
+        </a>
+
+        <!-- INVENTORY -->
+        <a onclick="navigate('inventoryPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Inventory
+          </span>
+        </a>
+
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+
+        <!-- ASSET -->
+        <a onclick="navigate('assetPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Asset
+          </span>
+        </a>
+
+         <!-- OVERVIEW -->
+        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Overview
+          </span>
+
+        </a>
+	
+		  
+		<!-- ACCOUNTING -->
+		<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Accounting
+          </span>
+
+        </a>
+
+		 <!-- ACCOUNTING TRANSACTIONS -->
+		<a class="active" onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+
+          <span class="sidebar-label">
+            Accounting Transactions
+          </span>
+
+        </a>
+
+      </nav>
+
+      <!-- FOOTER -->
+      <div class="mt-auto p-2 pb-2">
+
+        <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
+
+          <span class="shrink-0 w-8 h-8 flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          </span>
+
+          <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <p class="text-[10px] text-muted">SYSTEM STATUS</p>
+            <span class="sidebar-label">SERVER ACTIVE</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent" class="flex-1 flex flex-col h-screen">
+
+    <!-- HEADER -->
+    <header
+      class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
+
+      <div class="flex items-center gap-5 flex-1">
+
+        <div class="w-[44px] h-[44px] flex items-center justify-center">
+          <img
+            id="munoLogo"
+            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+            alt="MUNO"
+            class="w-12 h-12 object-contain">
+        </div>
+
+        <span class="h-7 w-px bg-outline-variant"></span>
+
+        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+          MUNO
+        </p>
+
+      </div>
+
+      <div class="ml-auto flex items-center gap-3">
+
+        <button
+          onclick="logout()"
+          class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+
+          <span class="material-symbols-outlined">
+            logout
+          </span>
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+
+      <!-- HERO -->
+      <section
+        class="relative min-h-[200px] rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style="background-image:url('https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF')">
+        </div>
+
+        <div class="absolute inset-0 bg-black/60"></div>
+
+        <div
+          class="relative z-10 min-h-[200px] flex flex-col items-center justify-center text-center px-6">
+
+          <p class="text-xs uppercase tracking-[0.35em] text-white/70 mb-3">
+            Transaction Management
+          </p>
+
+          <h1 class="text-4xl font-headline tracking-[0.08em] text-white">
+            Transactions
+          </h1>
+
+          <p class="mt-3 text-sm text-white/70">
+            Journal Entries &amp; General Ledger
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- CONTENT -->
+      <section class="mt-5 space-y-5">
+
+
+        <!-- FILTERS -->
+        <section class="bg-background border border-outline-variant rounded-md p-5">
+
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+
+            <!-- DATE FROM -->
+            <div>
+
+              <label class="block text-xs text-muted mb-2">
+                Date From
+              </label>
+
+              <input
+                type="date"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+            </div>
+
+
+            <!-- DATE TO -->
+            <div>
+
+              <label class="block text-xs text-muted mb-2">
+                Date To
+              </label>
+
+              <input
+                type="date"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+            </div>
+
+
+            <!-- SOURCE -->
+            <div>
+
+              <label class="block text-xs text-muted mb-2">
+                Source
+              </label>
+
+              <select
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+                <option>All Sources</option>
+                <option>Sales</option>
+                <option>Purchasing</option>
+                <option>Payment</option>
+                <option>Expense</option>
+                <option>Inventory</option>
+                <option>Manual</option>
+
+              </select>
+
+            </div>
+
+
+            <!-- STATUS -->
+            <div>
+
+              <label class="block text-xs text-muted mb-2">
+                Status
+              </label>
+
+              <select
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+                <option>All Status</option>
+                <option>Posted</option>
+                <option>Draft</option>
+                <option>Void</option>
+
+              </select>
+
+            </div>
+
+
+            <!-- SEARCH -->
+            <div>
+
+              <label class="block text-xs text-muted mb-2">
+                Search
+              </label>
+
+              <input
+                type="text"
+                placeholder="Journal number or description..."
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- JOURNAL ENTRIES -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+
+          <!-- HEADER -->
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined">
+                  receipt_long
+                </span>
+              </div>
+
+              <div>
+
+                <h2 class="text-lg font-headline text-foreground">
+                  Journal Entries
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Recorded debit and credit transactions
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <button
+              class="h-10 px-4 rounded-md bg-primary text-on-primary text-sm font-medium flex items-center gap-2">
+
+              <span class="material-symbols-outlined text-[18px]">
+                add
+              </span>
+
+              New Journal
+
+            </button>
+
+          </div>
+
+
+          <!-- SUMMARY -->
+          <div class="grid grid-cols-2 md:grid-cols-4 border-b border-outline-variant">
+
+            <div class="p-4 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Total Entries
+              </p>
+
+              <p class="text-xl font-headline mt-1">
+                248
+              </p>
+
+            </div>
+
+
+            <div class="p-4 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Posted
+              </p>
+
+              <p class="text-xl font-headline mt-1">
+                241
+              </p>
+
+            </div>
+
+
+            <div class="p-4 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Draft
+              </p>
+
+              <p class="text-xl font-headline mt-1">
+                5
+              </p>
+
+            </div>
+
+
+            <div class="p-4">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Void
+              </p>
+
+              <p class="text-xl font-headline mt-1">
+                2
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- TABLE -->
+          <div class="overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+              <thead>
+
+                <tr class="border-b border-outline-variant text-left">
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Journal No.
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Date
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Source
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Description
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium text-right">
+                    Debit
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium text-right">
+                    Credit
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Status
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium text-right">
+                    Action
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00124
+                  </td>
+
+                  <td class="px-5 py-4 text-muted">
+                    09 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Sales
+                  </td>
+
+                  <td class="px-5 py-4">
+                    POS Sale
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 850,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 850,000
+                  </td>
+
+                  <td class="px-5 py-4 text-primary">
+                    Posted
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+
+                    <button class="text-muted hover:text-foreground">
+                      <span class="material-symbols-outlined text-[18px]">
+                        more_horiz
+                      </span>
+                    </button>
+
+                  </td>
+
+                </tr>
+
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00123
+                  </td>
+
+                  <td class="px-5 py-4 text-muted">
+                    09 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Purchasing
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Ingredient Purchase
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 1,250,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 1,250,000
+                  </td>
+
+                  <td class="px-5 py-4 text-primary">
+                    Posted
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+
+                    <button class="text-muted hover:text-foreground">
+                      <span class="material-symbols-outlined text-[18px]">
+                        more_horiz
+                      </span>
+                    </button>
+
+                  </td>
+
+                </tr>
+
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00122
+                  </td>
+
+                  <td class="px-5 py-4 text-muted">
+                    08 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Payment
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Supplier Payment
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 2,000,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 2,000,000
+                  </td>
+
+                  <td class="px-5 py-4 text-primary">
+                    Posted
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+
+                    <button class="text-muted hover:text-foreground">
+                      <span class="material-symbols-outlined text-[18px]">
+                        more_horiz
+                      </span>
+                    </button>
+
+                  </td>
+
+                </tr>
+
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00121
+                  </td>
+
+                  <td class="px-5 py-4 text-muted">
+                    08 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Expense
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Operational Expense
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 450,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 450,000
+                  </td>
+
+                  <td class="px-5 py-4 text-muted">
+                    Draft
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+
+                    <button class="text-muted hover:text-foreground">
+                      <span class="material-symbols-outlined text-[18px]">
+                        more_horiz
+                      </span>
+                    </button>
+
+                  </td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00120
+                  </td>
+
+                  <td class="px-5 py-4 text-muted">
+                    07 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Inventory
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Inventory Adjustment
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 125,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 125,000
+                  </td>
+
+                  <td class="px-5 py-4 text-primary">
+                    Posted
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+
+                    <button class="text-muted hover:text-foreground">
+                      <span class="material-symbols-outlined text-[18px]">
+                        more_horiz
+                      </span>
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </section>
+
+
+        <!-- GENERAL LEDGER -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+
+          <!-- HEADER -->
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined">
+                  menu_book
+                </span>
+              </div>
+
+              <div>
+
+                <h2 class="text-lg font-headline text-foreground">
+                  General Ledger
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Account-level transaction movements and balances
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <button
+              class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+
+              <span class="material-symbols-outlined text-[18px]">
+                download
+              </span>
+
+              Export
+
+            </button>
+
+          </div>
+
+
+          <!-- LEDGER FILTER -->
+          <div class="p-5 border-b border-outline-variant">
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+              <div>
+
+                <label class="block text-xs text-muted mb-2">
+                  Account
+                </label>
+
+                <select
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+                  <option>All Accounts</option>
+                  <option>1000 — Cash</option>
+                  <option>1100 — Bank</option>
+                  <option>1200 — Inventory</option>
+                  <option>2000 — Accounts Payable</option>
+                  <option>4000 — Sales Revenue</option>
+                  <option>5000 — Cost of Goods Sold</option>
+
+                </select>
+
+              </div>
+
+
+              <div>
+
+                <label class="block text-xs text-muted mb-2">
+                  Branch
+                </label>
+
+                <select
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+                  <option>All Branches</option>
+                  <option>Main Branch</option>
+                  <option>Branch 01</option>
+
+                </select>
+
+              </div>
+
+
+              <div>
+
+                <label class="block text-xs text-muted mb-2">
+                  Search
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Search ledger..."
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- LEDGER TABLE -->
+          <div class="overflow-x-auto">
+
+            <table class="w-full text-sm">
+
+              <thead>
+
+                <tr class="border-b border-outline-variant text-left">
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Date
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Journal No.
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Account
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium">
+                    Description
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium text-right">
+                    Debit
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium text-right">
+                    Credit
+                  </th>
+
+                  <th class="px-5 py-3 text-xs text-muted font-medium text-right">
+                    Balance
+                  </th>
+
+                </tr>
+
+              </thead>
+
+
+              <tbody>
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 text-muted">
+                    09 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00124
+                  </td>
+
+                  <td class="px-5 py-4">
+                    1000 — Cash
+                  </td>
+
+                  <td class="px-5 py-4">
+                    POS Sale
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 850,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    —
+                  </td>
+
+                  <td class="px-5 py-4 text-right font-medium">
+                    Rp 12,850,000
+                  </td>
+
+                </tr>
+
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 text-muted">
+                    09 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00124
+                  </td>
+
+                  <td class="px-5 py-4">
+                    4000 — Sales Revenue
+                  </td>
+
+                  <td class="px-5 py-4">
+                    POS Sale
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    —
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 850,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right font-medium">
+                    Rp 28,450,000
+                  </td>
+
+                </tr>
+
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 text-muted">
+                    09 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00123
+                  </td>
+
+                  <td class="px-5 py-4">
+                    1200 — Inventory
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Ingredient Purchase
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 1,250,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    —
+                  </td>
+
+                  <td class="px-5 py-4 text-right font-medium">
+                    Rp 18,250,000
+                  </td>
+
+                </tr>
+
+
+                <tr class="border-b border-outline-variant">
+
+                  <td class="px-5 py-4 text-muted">
+                    09 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00123
+                  </td>
+
+                  <td class="px-5 py-4">
+                    1000 — Cash
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Ingredient Purchase
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    —
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 1,250,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right font-medium">
+                    Rp 11,600,000
+                  </td>
+
+                </tr>
+
+
+                <tr>
+
+                  <td class="px-5 py-4 text-muted">
+                    08 Sep 2026
+                  </td>
+
+                  <td class="px-5 py-4 font-medium">
+                    JE-202609-00122
+                  </td>
+
+                  <td class="px-5 py-4">
+                    2000 — Accounts Payable
+                  </td>
+
+                  <td class="px-5 py-4">
+                    Supplier Payment
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    Rp 2,000,000
+                  </td>
+
+                  <td class="px-5 py-4 text-right">
+                    —
+                  </td>
+
+                  <td class="px-5 py-4 text-right font-medium">
+                    Rp 4,750,000
+                  </td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+
+          <!-- LEDGER FOOTER -->
+          <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-between">
+
+            <p class="text-xs text-muted">
+              Showing recent ledger movements
+            </p>
+
+            <button class="text-xs text-primary font-medium">
+              View Full Ledger
+            </button>
+
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+</template>
+	
 <!-- 
   MUNO KASIR: MASTER SPA LOGIC (Script.html)
   Handles Real-time Interaction, State, and Navigation
