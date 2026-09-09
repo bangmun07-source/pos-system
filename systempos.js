@@ -2939,25 +2939,8 @@ async function checkout() {
   };
 
   async function hitungHPPDanKirim(payload) {
-	  let hppTotal = 0;
-	  const norm = v =>
-	    String(v || "")
-	      .trim()
-	      .toUpperCase();
-		
-	  state.cart.forEach(item => {
-	    const r =
-	      state.recipeMap[norm(item.id)] ||
-	      state.recipeMap[norm(item.name)];
-	    if (!r) return;
-	    const cost =
-	      Number(r.cost) || 0;
-	    hppTotal +=
-	      cost * item.qty;
-	  });
-	  payload.hppTotal = hppTotal;
-	  await sendTransaction(payload);
-	} 
+  	await sendTransaction(payload);
+	}
     if (memberId) {
 
 	  try {
@@ -22584,4 +22567,26 @@ function initAssetPage() {
   depreciationCurrentPage = 1;
   initAssetPageEvents();
   loadAssetPage();
+}
+
+
+/* =========================================================
+   OVERVIEW AKUTANSI
+   ========================================================= */
+async function loadAccountingOverview() {
+  const period = document.getElementById('accounting-period').value;
+  const branch = document.getElementById('accounting-branch').value;
+  const { start, end } = getAccountingDateRange(period);
+  const sessionId = /* session existing app */;
+  const { data, error } = await supabase.rpc(
+    'get_accounting_overview',
+    {
+      p_branch_id: branch,
+      p_start: start,
+      p_end: end,
+      p_session_id: sessionId
+    }
+  );
+  if (error) throw error;
+  renderAccountingOverview(data);
 }
