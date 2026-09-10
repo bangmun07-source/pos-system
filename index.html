@@ -16079,45 +16079,66 @@
           </div>
         </div>
         <!-- TABLE -->
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full min-w-[1000px]">
             <thead>
-              <tr class="border-b border-outline-variant bg-surface-variant/30">
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+              <tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font">
+                <th class="text-left px-6 py-4">
                   Code
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Account Name
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Type
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Parent Account
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Normal Balance
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Status
                 </th>
 								
-                <th class="text-right px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-right px-6 py-4">
                   Action
                 </th>
               </tr>
             </thead>
 
-            <tbody id="accountsTableBody">
+            <tbody id="accountsTableBody class="divide-y divide-outline-variant"">
 							
 						</tbody>
           </table>
         </div>
+				<!-- FOOTER -->
+			  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
+			    <p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+			      Showing 1–10 of 50 Products
+			    </p>
+			
+			    <div class="flex items-center gap-2">
+			      <button class="px-3 py-2 text-muted font-medium headline-font transition">
+			
+			        <span class="material-symbols-outlined text-sm lg:text-base">
+			          chevron_left
+			        </span>
+			      </button>
+			
+			      <button class="px-3 py-2 text-muted font-medium headline-font transition">
+			        <span class="material-symbols-outlined text-sm lg:text-base">
+			          chevron_right
+			        </span>
+			      </button>
+			    </div>
+			  </div>
       </section>
       <!-- ACCOUNT MAPPING -->
       <section class="mb-4 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
@@ -16178,37 +16199,58 @@
         <div class="overflow-x-auto">
           <table class="w-full min-w-[1000px]">
             <thead>
-              <tr class="border-b border-outline-variant bg-surface-variant/30">
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+              <tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font">
+                <th class="text-left px-6 py-4">
                   Transaction
                 </th>
 								
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Source
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Debit Account
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Credit Account
                 </th>
 
-                <th class="text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Status
                 </th>
 
-                <th class="text-right px-6 py-4 text-[10px] font-bold uppercase tracking-[0.15em] text-muted">
+                <th class="text-left px-6 py-4">
                   Action
                 </th>
               </tr>
             </thead>
 						
-            <tbody id="accountingMappingsTableBody">
+            <tbody id="accountingMappingsTableBody class="text-center text-muted">
 						</tbody>
           </table>
         </div>
+				<!-- FOOTER -->
+			  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
+			    <p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+			      Showing 1–10 of 50 Products
+			    </p>
+			
+			    <div class="flex items-center gap-2">
+			      <button class="px-3 py-2 text-muted font-medium headline-font transition">
+			
+			        <span class="material-symbols-outlined text-sm lg:text-base">
+			          chevron_left
+			        </span>
+			      </button>
+			
+			      <button class="px-3 py-2 text-muted font-medium headline-font transition">
+			        <span class="material-symbols-outlined text-sm lg:text-base">
+			          chevron_right
+			        </span>
+			      </button>
+			    </div>
+			  </div>
       </section>
       <!-- MAPPING LOGIC PREVIEW -->
       <section class="mb-4 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-8">
