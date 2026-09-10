@@ -1047,6 +1047,10 @@ function initModule(pageId) {
 		case "accountingPage":
 		    initAccountingModule();
 		break;
+
+		case "accountingAccountsPage":
+	    	loadAccountingAccounts();
+	    break;
   }
 }
 	
@@ -22580,45 +22584,23 @@ function initAssetPage() {
    OVERVIEW AKUNTANSI
    ========================================================= */
 async function loadAccountingOverview() {
-
-  const periodEl =
-    document.getElementById("accounting-period");
-
-  const branchEl =
-    document.getElementById("accounting-branch");
-
+  const periodEl = document.getElementById("accounting-period");
+  const branchEl = document.getElementById("accounting-branch");
   if (!periodEl || !branchEl) {
     console.warn("Accounting filter belum tersedia.");
     return;
   }
-
   // Pastikan branch selalu dimuat sebelum membaca branch
   if (branchEl.options.length <= 1) {
     await loadAccountingBranchOptions();
   }
-
-  const period =
-    periodEl.value || "month";
-
-  const branch =
-    branchEl.value || "ALL";
-
-  const { start, end } =
-    getAccountingDateRange(period);
-
-  const sessionId =
-    localStorage.getItem("pos_session_id");
-
-  console.log("ACCOUNTING FILTER:", {
-    period,
-    branch,
-    start,
-    end,
-    sessionId
-  });
+  const period = periodEl.value || "month";
+  const branch = branchEl.value || "ALL";
+  const { start, end } = getAccountingDateRange(period);
 
   try {
-
+		const sessionId = 
+			localStorage.getItem("pos_session_id");
     const { data, error } =
       await supabaseClient.rpc(
         "get_accounting_overview",
@@ -22629,27 +22611,15 @@ async function loadAccountingOverview() {
           p_session_id: sessionId
         }
       );
-
-    console.log("ACCOUNTING RPC DATA:", data);
-    console.log("ACCOUNTING RPC ERROR:", error);
-
+		
     if (error) throw error;
-
     if (!data) {
       throw new Error(
         "Accounting Overview tidak mengembalikan data."
       );
     }
-
     renderAccountingOverview(data);
-
   } catch (error) {
-
-    console.error(
-      "Accounting Overview Error:",
-      error
-    );
-
     showToast(
       error?.message ||
       "Gagal memuat Accounting Overview.",
@@ -22659,13 +22629,9 @@ async function loadAccountingOverview() {
 }
 
 async function loadAccountingBranchOptions() {
-
-  console.log("=== ACCOUNTING BRANCH START ===");
-
+	
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-
+    const sessionId = localStorage.getItem("pos_session_id");
     const { data, error } =
       await supabaseClient.rpc(
         "get_expense_branches",
@@ -22673,242 +22639,157 @@ async function loadAccountingBranchOptions() {
           p_session_id: sessionId
         }
       );
-
-    console.log("ACCOUNTING BRANCH DATA:", data);
-    console.log("ACCOUNTING BRANCH ERROR:", error);
-
+		
     if (error) throw error;
-
-    state.accountingBranches =
-      Array.isArray(data) ? data : [];
-
-    renderAccountingBranchOptions(
-      state.accountingBranches
-    );
-
+    state.accountingBranches = Array.isArray(data) ? data : [];
+    renderAccountingBranchOptions( state.accountingBranches );
   } catch (err) {
     console.error("Accounting branch error:", err);
   }
 }
 
-
 function renderAccountingBranchOptions(branches) {
-
-  const select =
-    document.getElementById("accounting-branch");
-
+  const select = document.getElementById("accounting-branch");
   if (!select) return;
-
   select.innerHTML = `
     <option value="ALL">
       All Branch
     </option>
   `;
-
   (branches || []).forEach(branch => {
-
     select.innerHTML += `
       <option value="${branch.id}">
         ${branch.name}
       </option>
     `;
-
-  });
-
-  console.log("ACCOUNTING BRANCH:", {
-    options: select.options.length,
-    branches: branches,
-    value: select.value
   });
 }
 
-
-
-
 function getAccountingDateRange(period) {
-
   const today = new Date();
-
   const formatDate = (date) => {
-
-    const year =
-      date.getFullYear();
-
+    const year = date.getFullYear();
     const month =
       String(
         date.getMonth() + 1
       ).padStart(2, "0");
-
     const day =
       String(
         date.getDate()
       ).padStart(2, "0");
-
     return `${year}-${month}-${day}`;
   };
-
   let start;
   let end;
-
   switch (period) {
-
     case "last_month": {
-
       const lastDayPreviousMonth =
         new Date(
           today.getFullYear(),
           today.getMonth(),
           0
         );
-
       const firstDayPreviousMonth =
         new Date(
           today.getFullYear(),
           today.getMonth() - 1,
           1
         );
-
-      start =
-        formatDate(firstDayPreviousMonth);
-
-      end =
-        formatDate(lastDayPreviousMonth);
-
+      start = formatDate(firstDayPreviousMonth);
+      end = formatDate(lastDayPreviousMonth);
       break;
     }
 
     case "quarter": {
-
-      const currentQuarter =
-        Math.floor(today.getMonth() / 3);
-
-      const firstMonthOfQuarter =
-        currentQuarter * 3;
-
+      const currentQuarter = Math.floor(today.getMonth() / 3);
+      const firstMonthOfQuarter = currentQuarter * 3;
       const firstDayQuarter =
         new Date(
           today.getFullYear(),
           firstMonthOfQuarter,
           1
         );
-
       const lastDayQuarter =
         new Date(
           today.getFullYear(),
           firstMonthOfQuarter + 3,
           0
         );
-
-      start =
-        formatDate(firstDayQuarter);
-
-      end =
-        formatDate(lastDayQuarter);
-
+      start = formatDate(firstDayQuarter);
+      end = formatDate(lastDayQuarter);
       break;
     }
 
     case "year": {
-
       const firstDayYear =
         new Date(
           today.getFullYear(),
           0,
           1
         );
-
       const lastDayYear =
         new Date(
           today.getFullYear(),
           11,
           31
         );
-
-      start =
-        formatDate(firstDayYear);
-
-      end =
-        formatDate(lastDayYear);
-
+      start = formatDate(firstDayYear);
+      end = formatDate(lastDayYear);
       break;
     }
-
+			
     case "month":
     default: {
-
       const firstDayMonth =
         new Date(
           today.getFullYear(),
           today.getMonth(),
           1
         );
-
       const lastDayMonth =
         new Date(
           today.getFullYear(),
           today.getMonth() + 1,
           0
         );
-
-      start =
-        formatDate(firstDayMonth);
-
-      end =
-        formatDate(lastDayMonth);
-
+      start = formatDate(firstDayMonth);
+      end = formatDate(lastDayMonth);
       break;
     }
   }
-
   return {
-    start,
-    end
+    start, end
   };
 }
 
-
 async function initAccountingModule() {
-
-  const periodEl =
-    document.getElementById("accounting-period");
-
-  const branchEl =
-    document.getElementById("accounting-branch");
-
+  const periodEl = document.getElementById("accounting-period");
+  const branchEl = document.getElementById("accounting-branch");
   if (!periodEl || !branchEl) {
     console.warn("Accounting DOM belum tersedia");
     return;
   }
-
   periodEl.onchange = loadAccountingOverview;
   branchEl.onchange = loadAccountingOverview;
   await loadAccountingBranchOptions();
   await loadAccountingOverview();
 }
 
-
-
-/* =========================================================
-   RENDER ACCOUNTING OVERVIEW
-   ========================================================= */
+/* ======= RENDER ACCOUNTING OVERVIEW ======= */
 function renderAccountingOverview(data) {
   if (!data) {
     console.warn("Accounting overview data kosong");
     return;
   }
-
   const toNumber = (value) => {
     if (value === null || value === undefined || value === "") {
       return 0;
     }
-
     const number = Number(value);
     return Number.isFinite(number) ? number : 0;
   };
-
   const formatIDR = (value) => {
     const number = toNumber(value);
-
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
@@ -22916,23 +22797,18 @@ function renderAccountingOverview(data) {
       maximumFractionDigits: 0
     }).format(number);
   };
-
   const setText = (id, value) => {
     const el = document.getElementById(id);
-
     if (el) {
       el.textContent = formatIDR(value);
     }
   };
-
   const setPlainText = (id, value) => {
     const el = document.getElementById(id);
-
     if (el) {
       el.textContent = value ?? "-";
     }
   };
-
   const escapeHTML = (value) => {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -22942,28 +22818,18 @@ function renderAccountingOverview(data) {
       .replace(/'/g, "&#039;");
   };
 
-
-  /* =======================================================
-     NORMALIZE DATA
-     ======================================================= */
-
+  /* ====== NORMALIZE DATA ======= */
   const kpi = data.kpi || {};
   const profitLoss = data.profitLoss || {};
   const financial = data.financialPosition || {};
-
   const apList = Array.isArray(data.accountsPayableList)
     ? data.accountsPayableList
     : [];
-
   const recentJournals = Array.isArray(data.recentJournals)
     ? data.recentJournals
     : [];
 
-
-  /* =======================================================
-     KPI
-     ======================================================= */
-
+  /* ======= KPI ======= */
   setText("accounting-cash", kpi.cash);
   setText("accounting-bank", kpi.bank);
   setText("accounting-inventory", kpi.inventory);
@@ -22972,76 +22838,34 @@ function renderAccountingOverview(data) {
   setText("accounting-expense", kpi.expense);
   setText("accounting-net-profit", kpi.netProfit);
   setText("accounting-equity", kpi.equity);
-
-
-  /* =======================================================
-     FINANCIAL POSITION - ASSETS
-     ======================================================= */
-
-  setText(
-    "accounting-assets-cash",
-    financial.cash
-  );
-
-  setText(
-    "accounting-assets-bank",
-    financial.bank
-  );
-
-  setText(
-    "accounting-assets-inventory",
-    financial.inventory
-  );
-
-	setText(
-	  "accounting-assets-fixed",
-	  financial.fixedAssets
-	);
-
-  setText(
-    "accounting-total-assets",
-    financial.totalAssets
-  );
-
-    /* =======================================================
-     FINANCIAL POSITION - LIABILITIES & EQUITY
-     ======================================================= */
 	
-  setText(
-	"accounting-liability-ap",
-	financial.accountsPayable
-  );
+  /* ===== FINANCIAL POSITION - ASSETS ===== */
+  setText( "accounting-assets-cash",
+    financial.cash );
+  setText( "accounting-assets-bank",
+    financial.bank  );
+  setText( "accounting-assets-inventory",
+    financial.inventory );
+	setText( "accounting-assets-fixed",
+	  financial.fixedAssets );
+  setText( "accounting-total-assets",
+    financial.totalAssets );
 
-  setText(
-	"accounting-liability-tax",
-	financial.taxPayable
-  );
+    /* ====== FINANCIAL POSITION - LIABILITIES & EQUITY ====== */
+  setText( "accounting-liability-ap",
+		financial.accountsPayable );
+  setText( "accounting-liability-tax",
+		financial.taxPayable );
+  setText( "accounting-liability-equity",
+		financial.equity );
+  setText( "accounting-total-liabilities-equity",
+		financial.totalLiabilitiesEquity );
 
-  setText(
-	"accounting-liability-equity",
-	financial.equity
-  );
-
-  setText(
-	"accounting-total-liabilities-equity",
-	financial.totalLiabilitiesEquity
-  );
-
-
-  /* =======================================================
-     ACCOUNTS PAYABLE LIST
-     ======================================================= */
-
-  const apContainer =
-    document.getElementById("accounting-ap-list");
-
-  const apTotal =
-    document.getElementById("accounting-ap-total");
-
+  /* ====== ACCOUNTS PAYABLE LIST ====== */
+  const apContainer = document.getElementById("accounting-ap-list");
+  const apTotal = document.getElementById("accounting-ap-total");
   if (apContainer) {
-
     if (apList.length === 0) {
-
       apContainer.innerHTML = `
         <div class="h-full flex flex-col items-center justify-center text-center">
           <span class="material-symbols-outlined text-4xl text-muted mb-3">
@@ -23057,36 +22881,22 @@ function renderAccountingOverview(data) {
           </p>
         </div>
       `;
-
     } else {
-
       apContainer.innerHTML = apList.map(item => {
-
-        const supplier =
-          escapeHTML(item.supplier || "-");
-
-        const status =
-          escapeHTML(item.status || "OUTSTANDING");
-
-        const date =
-          item.date
+        const supplier = escapeHTML(item.supplier || "-");
+        const status = escapeHTML(item.status || "OUTSTANDING");
+        const date = item.date
             ? new Date(item.date).toLocaleDateString("id-ID", {
                 day: "2-digit",
                 month: "short",
                 year: "numeric"
               })
             : "-";
-
-        const amount =
-          toNumber(item.amount);
-
+        const amount = toNumber(item.amount);
         return `
           <div class="border border-outline-variant rounded-md p-4">
-
             <div class="flex items-start justify-between gap-4">
-
               <div class="min-w-0">
-
                 <p class="font-semibold text-sm truncate">
                   ${supplier}
                 </p>
@@ -23098,22 +22908,16 @@ function renderAccountingOverview(data) {
                 <p class="text-[10px] uppercase tracking-wider text-red-400 mt-2">
                   ${status}
                 </p>
-
               </div>
 
               <div class="text-right shrink-0">
-
                 <p class="font-bold text-sm">
                   ${formatIDR(amount)}
                 </p>
-
               </div>
-
             </div>
-
           </div>
         `;
-
       }).join("");
     }
   }
@@ -23127,18 +22931,10 @@ function renderAccountingOverview(data) {
       formatIDR(financial.accountsPayable);
   }
 
-
-  /* =======================================================
-     RECENT JOURNAL ENTRIES
-     ======================================================= */
-
-  const journalContainer =
-    document.getElementById("accounting-recent-journals");
-
+  /* ===== RECENT JOURNAL ENTRIES ===== */
+  const journalContainer = document.getElementById("accounting-recent-journals");
   if (journalContainer) {
-
     if (recentJournals.length === 0) {
-
       journalContainer.innerHTML = `
         <div class="h-full flex flex-col items-center justify-center text-center">
           <span class="material-symbols-outlined text-4xl text-muted mb-3">
@@ -23154,12 +22950,9 @@ function renderAccountingOverview(data) {
           </p>
         </div>
       `;
-
     } else {
-
       journalContainer.innerHTML =
         recentJournals.map(journal => {
-
           const date =
             journal.date
               ? new Date(journal.date).toLocaleDateString("id-ID", {
@@ -23193,11 +22986,8 @@ function renderAccountingOverview(data) {
             );
 
           return `
-            <div class="flex items-center justify-between gap-4
-                        border border-outline-variant rounded-md p-4">
-
+            <div class="flex items-center justify-between gap-4 border border-outline-variant rounded-md p-4">
               <div class="flex items-center gap-3 min-w-0">
-
                 <div class="main-icon-box shrink-0">
                   <span class="material-symbols-outlined">
                     receipt_long
@@ -23205,17 +22995,14 @@ function renderAccountingOverview(data) {
                 </div>
 
                 <div class="min-w-0">
-
                   <p class="text-sm font-semibold truncate">
                     ${description}
                   </p>
 
                   <div class="flex items-center gap-2 mt-1">
-
                     <span class="text-xs text-on-surface-variant">
                       ${escapeHTML(date)}
                     </span>
-
                     ${
                       reference
                         ? `
@@ -23229,34 +23016,176 @@ function renderAccountingOverview(data) {
                         `
                         : ""
                     }
-
                   </div>
-
                 </div>
-
               </div>
 
               <div class="font-bold text-sm shrink-0">
                 ${formatIDR(amount)}
               </div>
-
             </div>
           `;
-
         }).join("");
     }
   }
-
 
   /* =======================================================
      OPTIONAL: SAVE CURRENT ACCOUNTING DATA
      ======================================================= */
   window.currentAccountingOverview = data;
-
   console.log(
     "Accounting overview rendered:",
     data
   );
 }
 
+  /* =======================================================
+     ACCOUNTING
+     ======================================================= */
+
+async function loadAccountingAccounts() {
+    try {
+        const sessionId = localStorage.getItem("sessionId");
+        if (!sessionId) {
+            return;
+        }
+        const { data, error } = 
+					await supabaseClient.rpc(
+            "get_accounts",
+            {
+              p_session_id: sessionId
+            }
+        );
+        if (error) {
+            console.error("Gagal mengambil Accounts:", error);
+            return;
+        }
+        const accounts = Array.isArray(data) ? data : [];
+        renderAccountingAccounts(accounts);
+        updateAccountingAccountSummary(accounts);
+    } catch (err) {
+        console.error("loadAccountingAccounts error:", err);
+    }
+}
+
+function renderAccountingAccounts(accounts) {
+    const tbody = document.getElementById("accountsTableBody");
+    if (!tbody) {
+        console.warn("accountsTableBody tidak ditemukan");
+        return;
+    }
+    if (!accounts.length) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="px-6 py-10 text-center text-gray-400">
+                    Belum ada akun.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    tbody.innerHTML = accounts.map(account => {
+        const typeLabel = {
+            ASSET: "Asset",
+            LIABILITY: "Liability",
+            EQUITY: "Equity",
+            REVENUE: "Revenue",
+            COGS: "COGS",
+            EXPENSE: "Expense"
+        }[account.accountType] || account.accountType;
+        const typeClass = {
+            ASSET: "bg-blue-500/10 text-blue-400",
+            LIABILITY: "bg-red-500/10 text-red-400",
+            EQUITY: "bg-purple-500/10 text-purple-400",
+            REVENUE: "bg-green-500/10 text-green-400",
+            COGS: "bg-orange-500/10 text-orange-400",
+            EXPENSE: "bg-yellow-500/10 text-yellow-400"
+        }[account.accountType] || "bg-gray-500/10 text-gray-400";
+			
+        const statusClass = account.isActive
+            ? "bg-green-500/10 text-green-400"
+            : "bg-gray-500/10 text-gray-400";
+        const statusLabel = account.isActive
+            ? "ACTIVE"
+            : "INACTIVE";
+        return `
+            <tr class="border-b border-gray-800 hover:bg-gray-800/40">
+                <td class="px-6 py-4">
+                    <span class="font-mono text-sm text-gray-300">
+                        ${escapeHtml(account.accountCode || "-")}
+                    </span>
+                </td>
+
+                <td class="px-6 py-4">
+                    <div class="font-medium text-white">
+                        ${escapeHtml(account.accountName || "-")}
+                    </div>
+                </td>
+
+                <td class="px-6 py-4">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${typeClass}">
+                        ${typeLabel}
+                    </span>
+                </td>
+
+                <td class="px-6 py-4 text-gray-400">
+                    ${escapeHtml(account.parentName || "—")}
+                </td>
+
+                <td class="px-6 py-4">
+                    <span class="text-sm ${
+                        account.normalBalance === "DEBIT"
+                            ? "text-blue-400"
+                            : "text-green-400"
+                    }">
+                        ${account.normalBalance || "-"}
+                    </span>
+                </td>
+
+                <td class="px-6 py-4">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+                        ${statusLabel}
+                    </span>
+                </td>
+
+                <td class="px-6 py-4 text-right">
+                    <button type="button"
+                        class="text-gray-400 hover:text-white transition"
+                        onclick="editAccountingAccount('${escapeHtml(account.accountId)}')">
+                        <span class="material-symbols-outlined text-[20px]">
+                            more_vert
+                        </span>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join("");
+}
+
+function updateAccountingAccountSummary(accounts) {
+    const countByType = type =>
+        accounts.filter(account =>
+            account.accountType === type
+        ).length;
+    const assetEl = document.getElementById("accountingAssetCount");
+    const liabilityEl = document.getElementById("accountingLiabilityCount");
+    const equityEl = document.getElementById("accountingEquityCount");
+    const revenueEl = document.getElementById("accountingRevenueCount");
+    const expenseEl = document.getElementById("accountingExpenseCount");
+    if (assetEl) {
+        assetEl.textContent = countByType("ASSET");
+    }
+    if (liabilityEl) {
+        liabilityEl.textContent = countByType("LIABILITY");
+    }
+    if (equityEl) {
+        equityEl.textContent = countByType("EQUITY");
+    }
+    if (revenueEl) {
+        revenueEl.textContent = countByType("REVENUE");
+    }
+    if (expenseEl) {
+        expenseEl.textContent = countByType("EXPENSE");
+    }
+}
 
