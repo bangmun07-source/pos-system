@@ -23152,13 +23152,36 @@ function renderAccountingAccounts(accounts) {
                 </td>
 
                 <td class="px-6 py-4 text-right">
-                    <button type="button"
-                        class="text-gray-400 hover:text-white transition"
-                        onclick="editAccountingAccount('${escapeHtml(account.accountId)}')">
-                        <span class="material-symbols-outlined text-[20px]">
-                            more_vert
-                        </span>
-                    </button>
+                    <div class="relative inline-block">
+											<button type="button"
+												onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
+												class="text-gray-400 hover:text-white transition" >
+												<span class="material-symbols-outlined text-[20px]">
+													more_vert
+												</span>
+											</button>
+										
+											<div
+												id="accountMenu-${escapeHtml(account.accountId)}"
+												class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50" >
+												<button type="button"
+													onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
+													class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5" >
+													Edit Account
+												</button>
+										
+												<button
+													type="button"
+													onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
+													class="w-full text-left px-4 py-2 text-sm ${
+														account.isActive
+															? "text-red-400"
+															: "text-emerald-400"
+													} hover:bg-white/5" >
+													${account.isActive ? "Set Inactive" : "Set Active"}
+												</button>
+											</div>
+										</div>
                 </td>
             </tr>
         `;
@@ -23309,5 +23332,185 @@ async function saveAccountingAccount() {
     } catch (err) {
         console.error("saveAccountingAccount error:", err);
         alert("Terjadi kesalahan saat menyimpan account.");
+    }
+}
+
+function toggleAccountingAccountMenu(accountId) {
+    const menu = document.getElementById(
+        `accountMenu-${accountId}`
+    );
+
+    if (!menu) return;
+    document.querySelectorAll(
+        '[id^="accountMenu-"]'
+    ).forEach(el => {
+
+        if (el !== menu) {
+            el.classList.add("hidden");
+        }
+    });
+    menu.classList.toggle("hidden");
+}
+
+let editingAccountingAccountId = null;
+function editAccountingAccount(accountId) {
+    const account = (window.accountingAccounts || [])
+        .find(a => a.accountId === accountId);
+    if (!account) {
+        alert("Account tidak ditemukan.");
+        return;
+    }
+    editingAccountingAccountId = accountId;
+    const modal = document.getElementById( "addAccountingAccountModal" );
+    if (!modal) return;
+    document.getElementById(
+        "newAccountingAccountCode"
+    ).value = account.accountCode || "";
+
+    document.getElementById(
+        "newAccountingAccountName"
+    ).value = account.accountName || "";
+
+    document.getElementById(
+        "newAccountingAccountType"
+    ).value = account.accountType || "";
+
+    document.getElementById(
+        "newAccountingAccountNormalBalance"
+    ).value = account.normalBalance || "";
+	
+    populateAccountingParentAccounts();
+	
+    document.getElementById(
+        "newAccountingAccountParent"
+    ).value = account.parentId || "";
+
+    const title = document.getElementById( "accountModalTitle" );
+    const saveButton = document.getElementById( "accountModalSaveButton" );
+
+    if (title) {
+        title.textContent = "Edit Account"; }
+    if (saveButton) {
+        saveButton.textContent = "Update Account"; }
+    modal.classList.remove("hidden");
+}
+
+function openAddAccountingAccountModal() {
+    editingAccountingAccountId = null;
+    const modal = document.getElementById( "addAccountingAccountModal" );
+    if (!modal) return;
+    document.getElementById( "newAccountingAccountCode"
+    ).value = "";
+
+    document.getElementById( "newAccountingAccountName"
+    ).value = "";
+
+    document.getElementById( "newAccountingAccountType"
+    ).value = "";
+
+    document.getElementById( "newAccountingAccountParent"
+    ).value = "";
+
+    document.getElementById( "newAccountingAccountNormalBalance"
+    ).value = "";
+	
+    const title = document.getElementById( "accountModalTitle" );
+    const saveButton = document.getElementById( "accountModalSaveButton" );
+    if (title) {
+        title.textContent = "Add Account";
+    }
+    if (saveButton) {
+        saveButton.textContent = "Save Account";
+    }
+    populateAccountingParentAccounts();
+    modal.classList.remove("hidden");
+}
+
+async function saveAccountingAccount() {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) {
+        alert("Session tidak ditemukan.");
+        return;
+    }
+    const accountCode = document.getElementById( "newAccountingAccountCode" )?.value.trim();
+    const accountName = document.getElementById( "newAccountingAccountName" )?.value.trim();
+    const accountType = document.getElementById( "newAccountingAccountType" )?.value;
+    const parentId = document.getElementById( "newAccountingAccountParent" )?.value || null;
+    const normalBalance = document.getElementById( "newAccountingAccountNormalBalance" )?.value;
+	
+    if (!accountCode) { alert("Account Code wajib diisi.");
+        return;
+    }
+    if (!accountName) { alert("Account Name wajib diisi.");
+        return;
+    }
+    if (!accountType) { alert("Account Type wajib dipilih.");
+        return;
+    }
+    if (!normalBalance) { alert("Normal Balance wajib dipilih.");
+        return;
+    }
+
+    try {
+        let data;
+        let error;
+        if (editingAccountingAccountId) {
+            ({ data, error } = await supabaseClient.rpc(
+                "update_account",
+                {
+                    p_account_id: editingAccountingAccountId,
+                    p_account_code: accountCode,
+                    p_account_name: accountName,
+                    p_account_type: accountType,
+                    p_normal_balance: normalBalance,
+                    p_parent_id: parentId,
+                    p_session_id: sessionId
+                }
+            ));
+        } else {
+            ({ data, error } = await supabaseClient.rpc(
+                "create_account",
+                {
+                    p_account_code: accountCode,
+                    p_account_name: accountName,
+                    p_account_type: accountType,
+                    p_normal_balance: normalBalance,
+                    p_parent_id: parentId,
+                    p_session_id: sessionId
+                }
+            ));
+        }
+        if (error) {
+            console.error(
+                "save accounting account error:",
+                error
+            );
+            alert(
+                error.message ||
+                "Gagal menyimpan account."
+            );
+            return;
+        }
+        console.log(
+            "Account saved:",
+            data
+        );
+        closeAddAccountingAccountModal();
+        await loadAccountingAccounts();
+        editingAccountingAccountId = null;
+        alert(
+            "Account berhasil " +
+            (editingAccountingAccountId
+                ? "diubah."
+                : "disimpan.")
+        );
+    } catch (err) {
+        console.error(
+            "saveAccountingAccount error:",
+            err
+        );
+        alert(
+            "Terjadi kesalahan saat menyimpan account."
+        );
     }
 }
