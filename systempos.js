@@ -23418,3 +23418,55 @@ async function saveAccountingAccount() {
         );
     }
 }
+
+async function toggleAccountingAccountStatus(accountId) {
+    const account = (window.accountingAccounts || [])
+        .find(a => a.accountId === accountId);
+    if (!account) {
+        alert("Account tidak ditemukan.");
+        return;
+    }
+    const action = account.isActive
+        ? "menonaktifkan"
+        : "mengaktifkan";
+    const confirmed = confirm( `Yakin ingin ${action} account "${account.accountName}"?` );
+    if (!confirmed) return;
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) {
+        alert("Session tidak ditemukan.");
+        return;
+    }
+    try {
+        const { data, error } = await supabaseClient.rpc(
+            "toggle_account_status",
+            {
+                p_account_id: accountId,
+                p_session_id: sessionId
+            }
+        );
+        if (error) {
+            console.error(
+                "toggle_account_status error:",
+                error
+            );
+            alert(
+                error.message ||
+                "Gagal mengubah status account."
+            );
+            return;
+        }
+        console.log(
+            "Account status updated:",
+            data
+        );
+        await loadAccountingAccounts();
+    } catch (err) {
+        console.error(
+            "toggleAccountingAccountStatus error:",
+            err
+        );
+        alert(
+            "Terjadi kesalahan saat mengubah status account."
+        );
+    }
+}
