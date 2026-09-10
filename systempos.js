@@ -22992,16 +22992,20 @@ function renderAccountingOverview(data) {
     financial.inventory
   );
 
+	setText(
+	  "accounting-assets-fixed",
+	  financial.fixedAssets
+	);
+
   setText(
     "accounting-total-assets",
     financial.totalAssets
   );
 
-
     /* =======================================================
      FINANCIAL POSITION - LIABILITIES & EQUITY
      ======================================================= */
-
+	
   setText(
 	"accounting-liability-ap",
 	financial.accountsPayable
