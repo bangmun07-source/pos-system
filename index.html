@@ -16602,26 +16602,27 @@
   </div>
 	
 	<div id="addAccountingAccountModal"
-	     class="hidden fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4">
-	    <div class="w-full max-w-lg bg-background border border-outline-variant rounded-lg shadow-2xl">
-	        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
-	            <div>
-	                <h3 class="text-lg font-semibold text-white">
-	                    Add Account
-	                </h3>
-	                <p class="text-sm text-on-surface-variant mt-1">
-	                    Create a new chart of account
-	                </p>
-	            </div>
-	
-	            <button type="button"
-	                onclick="closeAddAccountingAccountModal()"
-	                class="text-gray-400 hover:text-white" >
-	                <span class="material-symbols-outlined">
-	                    close
-	                </span>
-	            </button>
-	        </div>
+     class="hidden fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-background border border-outline-variant rounded-lg shadow-2xl">
+        <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+            <div>
+                <h3 id="accountModalTitle" class="text-lg font-semibold text-white">
+                    Add Account
+                </h3>
+
+                <p class="text-sm text-on-surface-variant mt-1">
+                    Create a new chart of account
+                </p>
+            </div>
+
+            <button type="button"
+                onclick="closeAddAccountingAccountModal()"
+                class="text-gray-400 hover:text-white">
+                <span class="material-symbols-outlined">
+                    close
+                </span>
+            </button>
+        </div>
 	
 	        <div class="p-6 space-y-4">
 	            <div>
@@ -16694,7 +16695,8 @@
 	                Cancel
 	            </button>
 	
-	            <button type="button" onclick="saveAccountingAccount()"
+	            <button type="button" id="accountModalSaveButton"
+									onclick="saveAccountingAccount()"
 	                class="px-4 py-2 rounded-md bg-primary text-white hover:opacity-90">
 	                Save Account
 	            </button>
