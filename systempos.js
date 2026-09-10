@@ -22631,7 +22631,8 @@ async function loadAccountingOverview() {
 async function loadAccountingBranchOptions() {
 	
   try {
-    const sessionId = localStorage.getItem("pos_session_id");
+    const sessionId =
+  				localStorage.getItem("pos_session_id");
     const { data, error } =
       await supabaseClient.rpc(
         "get_expense_branches",
@@ -23045,7 +23046,8 @@ function renderAccountingOverview(data) {
 
 async function loadAccountingAccounts() {
     try {
-        const sessionId = localStorage.getItem("sessionId");
+        const sessionId =
+  				localStorage.getItem("pos_session_id");
         if (!sessionId) {
             return;
         }
@@ -23247,7 +23249,8 @@ function updateAccountingNormalBalance() {
 }
 
 async function saveAccountingAccount() {
-    const sessionId = localStorage.getItem("sessionId");
+    const sessionId =
+  				localStorage.getItem("pos_session_id");
     if (!sessionId) {
         alert("Session tidak ditemukan.");
         return;
