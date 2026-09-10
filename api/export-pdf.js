@@ -4160,8 +4160,6 @@ const logoSrc =
       }
       
       
-      
-      
 // ==========================================
 // ANALYTICS
 // ==========================================
@@ -4169,7 +4167,6 @@ const logoSrc =
 else if (type === "analytics") {
   // VALIDATION
   if (!branchId) {
-
     return res
       .status(400)
       .json({
@@ -4179,9 +4176,7 @@ else if (type === "analytics") {
   }
 
   // RPC
-  const {
-    data,
-    error
+  const { data, error
   } = await supabase.rpc(
     "get_analytics_dashboard",
     {
@@ -4191,100 +4186,41 @@ else if (type === "analytics") {
       p_session_id: sessionId
     }
   );
-
   if (error) {
     throw error;
   }
 
   // NORMALIZE
-  const report =
-    data || {};
-
-  const analytics =
-    report.analytics || {};
-
-  const weekly =
-    Array.isArray(
-      analytics.weekly
-    )
+  const report = data || {};
+  const analytics = report.analytics || {};
+  const weekly = Array.isArray(analytics.weekly)
       ? analytics.weekly
       : [];
-
-  const paymentDistribution =
-    Array.isArray(
-      report.paymentDistribution
-    )
+  const paymentDistribution = Array.isArray(report.paymentDistribution)
       ? report.paymentDistribution
       : [];
-
-  const topSelling =
-    Array.isArray(
-      report.topSelling
-    )
+  const topSelling =  Array.isArray(report.topSelling)
       ? report.topSelling
       : [];
-
-  const peakHours =
-    Array.isArray(
-      report.peakHours
-    )
+  const peakHours = Array.isArray(report.peakHours)
       ? report.peakHours
       : [];
 
-  const rawMaterials =
-    Array.isArray(
-      report.rawMaterials
-    )
+  const rawMaterials = Array.isArray(report.rawMaterials)
       ? report.rawMaterials
       : [];
   
-  const branchName =
-    await getBranchName(
-      supabase,
-      branchId
-    );
-
+  const branchName =  await getBranchName( supabase, branchId );
   // PROFIT SUMMARY
-  const revenue =
-    Number(
-      analytics.revenue || 0
-    );
-
-  const hpp =
-    Number(
-      analytics.hpp || 0
-    );
-
-  const grossProfit =
-    Number(
-      analytics.grossProfit || 0
-    );
-
-  const operational =
-    Number(
-      analytics.operational || 0
-    );
-
-  const netProfitBeforeOtherIncome =
-    Number(
-      analytics.netProfitBeforeOtherIncome || 0
-    );
-
-  const otherIncome =
-  Number(
-    analytics.otherIncome || 0
-  );
-
-  const netProfit =
-    Number(
-      analytics.netProfit || 0
-    );
-
-  const growth =
-    Number(
-      analytics.growth || 0
-    );
-
+  const revenue = Number( analytics.revenue || 0 );
+  const serviceRevenue = Number( analytics.serviceRevenue || 0 );
+  const hpp = Number( analytics.hpp || 0 );
+  const grossProfit = Number( analytics.grossProfit || 0 );
+  const operational = Number( analytics.operational || 0 );
+  const netProfitBeforeOtherIncome = Number( analytics.netProfitBeforeOtherIncome || 0 );
+  const otherIncome = Number( analytics.otherIncome || 0 );
+  const netProfit = Number( analytics.netProfit || 0 );
+  const growth = Number( analytics.growth || 0 );
   // PROFIT SUMMARY ROWS
   const profitSummaryRows = `
 
@@ -4295,6 +4231,16 @@ else if (type === "analytics") {
 
       <td class="right">
         IDR ${rupiah(revenue)}
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        Service Revenue
+      </td>
+    
+      <td class="right">
+        IDR ${rupiah(serviceRevenue)}
       </td>
     </tr>
 
@@ -4384,20 +4330,12 @@ else if (type === "analytics") {
               0;
 
             // Kalau weekly berupa angka
-            if (
-              typeof item ===
-              "number"
-            ) {
-              amount =
-                Number(item);
-            }
+            if ( typeof item === "number" ) 
+            { amount = Number(item); }
 
             // Kalau weekly berupa object
-            else if (
-              item &&
-              typeof item ===
-              "object"
-            ) {
+            else if ( item && typeof item === "object" ) 
+            {
               day =
                 item.day ??
                 item.date ??
@@ -4427,13 +4365,9 @@ else if (type === "analytics") {
             `;
           }
         ).join("")
-
       : `
         <tr>
-          <td
-            colspan="2"
-            class="empty"
-          >
+          <td colspan="2" class="empty">
             No weekly revenue data
           </td>
         </tr>
@@ -4487,10 +4421,7 @@ else if (type === "analytics") {
 
       : `
         <tr>
-          <td
-            colspan="3"
-            class="empty"
-          >
+          <td colspan="3" class="empty">
             No payment data
           </td>
         </tr>
@@ -4547,13 +4478,9 @@ else if (type === "analytics") {
             `;
           }
         ).join("")
-
       : `
         <tr>
-          <td
-            colspan="4"
-            class="empty"
-          >
+          <td colspan="4" class="empty">
             No top selling products
           </td>
         </tr>
@@ -4580,64 +4507,34 @@ else if (type === "analytics") {
     : new Date(startDateObj);
   
   peakHours.forEach((day, dayIndex) => {
-  
     if (!Array.isArray(day)) {
       return;
     }
-  
-    // SQL get_peak_hours:
-    // 0 = Minggu
-    // 1 = Senin
-    // 2 = Selasa
-    // 3 = Rabu
-    // 4 = Kamis
-    // 5 = Jumat
-    // 6 = Sabtu
-  
     const dayName = dayNames[dayIndex];
-  
     // Cari tanggal aktual dalam periode
     // yang memiliki DOW sesuai dayIndex.
     let foundDate = null;
-  
     const checkDate = new Date(startDateObj);
-  
     while (checkDate <= endDateObj) {
-  
       if (checkDate.getDay() === dayIndex) {
         foundDate = new Date(checkDate);
         break;
       }
-  
-      checkDate.setDate(
-        checkDate.getDate() + 1
-      );
+      checkDate.setDate( checkDate.getDate() + 1 );
     }
   
     // Hari tersebut tidak ada dalam periode
     if (!foundDate) {
       return;
     }
-  
-    const dateText =
-      foundDate.toLocaleDateString(
-        "id-ID"
-      );
-  
+    const dateText = foundDate.toLocaleDateString( "id-ID" );
     day.forEach((count, hour) => {
-  
       const value = Number(count || 0);
-  
       if (value <= 0) {
         return;
       }
-  
-      const nextHour =
-        (hour + 1) % 24;
-  
-      const hourLabel =
-        `${String(hour).padStart(2, "0")}:00 - ${String(nextHour).padStart(2, "0")}:00`;
-  
+    const nextHour = (hour + 1) % 24;
+    const hourLabel = `${String(hour).padStart(2, "0")}:00 - ${String(nextHour).padStart(2, "0")}:00`;
       peakHourRows.push(`
         <tr>
           <td>
@@ -4657,9 +4554,7 @@ else if (type === "analytics") {
           </td>
         </tr>
       `);
-  
     });
-  
   });
   
   const peakRows =
@@ -4667,19 +4562,14 @@ else if (type === "analytics") {
       ? peakHourRows.join("")
       : `
         <tr>
-          <td
-            colspan="4"
-            class="empty"
-          >
+          <td colspan="4" class="empty">
             No peak hour data
           </td>
         </tr>
       `;
 
   // RAW MATERIAL ROWS
-  const rawMaterialRows =
-    rawMaterials.length
-
+  const rawMaterialRows = rawMaterials.length
       ? rawMaterials.map(item => {
           const id = item?.id ?? "-";
           const name = item?.name ?? "-";
@@ -4720,17 +4610,12 @@ else if (type === "analytics") {
       `;
 
   // ACTIVE MEMBERS 
-  const activeMembers =
-    Array.isArray(
-      analytics.activeMemberList
-    )
+  const activeMembers = Array.isArray( analytics.activeMemberList )
       ? analytics.activeMemberList
       : [];
-  
   const memberRows =
     activeMembers.length
       ? activeMembers.map(member => {
-        
           const memberName =
             member?.name ??
             member?.Nama ??
@@ -4752,21 +4637,15 @@ else if (type === "analytics") {
           return `
             <tr>
               <td>
-                ${escapeHtml(
-                  memberName
-                )}
+                ${escapeHtml( memberName )}
               </td>
   
               <td>
-                ${escapeHtml(
-                  tier
-                )}
+                ${escapeHtml( tier )}
               </td>
   
               <td class="right">
-                ${point.toLocaleString(
-                  "id-ID"
-                )} PTS
+                ${point.toLocaleString( "id-ID" )} PTS
               </td>
             </tr>
           `;
