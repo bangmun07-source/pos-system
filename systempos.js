@@ -11128,6 +11128,7 @@ function renderAnalytics(data) {
     if (el) el.innerText = value;
   };
   setText("revenueValue", "Revenue: " + formatIDR(data.revenue || 0));
+	setText("serviceRevenueValue", "Service Revenue: " + formatIDR(data.serviceRevenue || 0));
   setText("hppValue", "HPP: " + formatIDR(data.hpp || 0));
   setText("opsValue", "OPEX: " + formatIDR(data.operational || 0));
 	setText("depreciationValue", "Depreciation: " + formatIDR(data.depreciation || 0));
