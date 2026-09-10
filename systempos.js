@@ -23271,70 +23271,6 @@ function updateAccountingNormalBalance() {
     }
 }
 
-async function saveAccountingAccount() {
-    const sessionId =
-  				localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-        alert("Session tidak ditemukan.");
-        return;
-    }
-    const accountCode = document.getElementById(
-        "newAccountingAccountCode"
-    )?.value.trim();
-    const accountName = document.getElementById(
-        "newAccountingAccountName"
-    )?.value.trim();
-    const accountType = document.getElementById(
-        "newAccountingAccountType"
-    )?.value;
-    const parentId = document.getElementById(
-        "newAccountingAccountParent"
-    )?.value || null;
-    const normalBalance = document.getElementById(
-        "newAccountingAccountNormalBalance"
-    )?.value;
-
-    if (!accountCode) { alert("Account Code wajib diisi.");
-        return;
-    }
-    if (!accountName) { alert("Account Name wajib diisi.");
-        return;
-    }
-    if (!accountType) { alert("Account Type wajib dipilih.");
-        return;
-    }
-    if (!normalBalance) { alert("Normal Balance wajib dipilih.");
-        return;
-    }
-    try {
-        const { data, error } = 
-					await supabaseClient.rpc(
-            "create_account",
-            {
-                p_account_code: accountCode,
-                p_account_name: accountName,
-                p_account_type: accountType,
-                p_normal_balance: normalBalance,
-                p_parent_id: parentId,
-                p_session_id: sessionId
-            }
-        );
-
-        if (error) {
-            console.error("create_account error:", error);
-            alert(error.message || "Gagal membuat account.");
-            return;
-        }
-        console.log("Account created:", data);
-        closeAddAccountingAccountModal();
-        await loadAccountingAccounts();
-        alert("Account berhasil ditambahkan.");
-    } catch (err) {
-        console.error("saveAccountingAccount error:", err);
-        alert("Terjadi kesalahan saat menyimpan account.");
-    }
-}
-
 function toggleAccountingAccountMenu(accountId) {
     const menu = document.getElementById(
         `accountMenu-${accountId}`
@@ -23392,37 +23328,6 @@ function editAccountingAccount(accountId) {
         title.textContent = "Edit Account"; }
     if (saveButton) {
         saveButton.textContent = "Update Account"; }
-    modal.classList.remove("hidden");
-}
-
-function openAddAccountingAccountModal() {
-    editingAccountingAccountId = null;
-    const modal = document.getElementById( "addAccountingAccountModal" );
-    if (!modal) return;
-    document.getElementById( "newAccountingAccountCode"
-    ).value = "";
-
-    document.getElementById( "newAccountingAccountName"
-    ).value = "";
-
-    document.getElementById( "newAccountingAccountType"
-    ).value = "";
-
-    document.getElementById( "newAccountingAccountParent"
-    ).value = "";
-
-    document.getElementById( "newAccountingAccountNormalBalance"
-    ).value = "";
-	
-    const title = document.getElementById( "accountModalTitle" );
-    const saveButton = document.getElementById( "accountModalSaveButton" );
-    if (title) {
-        title.textContent = "Add Account";
-    }
-    if (saveButton) {
-        saveButton.textContent = "Save Account";
-    }
-    populateAccountingParentAccounts();
     modal.classList.remove("hidden");
 }
 
@@ -23495,15 +23400,14 @@ async function saveAccountingAccount() {
             "Account saved:",
             data
         );
-        closeAddAccountingAccountModal();
-        await loadAccountingAccounts();
-        editingAccountingAccountId = null;
-        alert(
-            "Account berhasil " +
-            (editingAccountingAccountId
-                ? "diubah."
-                : "disimpan.")
-        );
+        const wasEditing = !!editingAccountingAccountId;
+		closeAddAccountingAccountModal();
+		await loadAccountingAccounts();
+		editingAccountingAccountId = null;
+		alert(
+		    "Account berhasil " +
+		    (wasEditing ? "diubah." : "disimpan.")
+		);
     } catch (err) {
         console.error(
             "saveAccountingAccount error:",
