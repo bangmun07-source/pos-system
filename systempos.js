@@ -23060,9 +23060,10 @@ async function loadAccountingAccounts() {
             console.error("Gagal mengambil Accounts:", error);
             return;
         }
-        const accounts = Array.isArray(data) ? data : [];
-        renderAccountingAccounts(accounts);
-        updateAccountingAccountSummary(accounts);
+			const accounts = Array.isArray(data) ? data : [];
+			window.accountingAccounts = accounts;
+			renderAccountingAccounts(accounts);
+			updateAccountingAccountSummary(accounts);
     } catch (err) {
         console.error("loadAccountingAccounts error:", err);
     }
@@ -23189,3 +23190,121 @@ function updateAccountingAccountSummary(accounts) {
     }
 }
 
+function openAddAccountingAccountModal() {
+    const modal = document.getElementById("addAccountingAccountModal");
+    if (!modal) return;
+    document.getElementById("newAccountingAccountCode").value = "";
+    document.getElementById("newAccountingAccountName").value = "";
+    document.getElementById("newAccountingAccountType").value = "";
+    document.getElementById("newAccountingAccountParent").value = "";
+    document.getElementById("newAccountingAccountNormalBalance").value = "";
+    populateAccountingParentAccounts();
+    modal.classList.remove("hidden");
+}
+
+function closeAddAccountingAccountModal() {
+    const modal = document.getElementById("addAccountingAccountModal");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
+}
+
+function populateAccountingParentAccounts() {
+    const select = document.getElementById("newAccountingAccountParent");
+    if (!select) return;
+    select.innerHTML = `
+        <option value="">No Parent Account</option>
+    `;
+    if (!window.accountingAccounts) return;
+    window.accountingAccounts.forEach(account => {
+        const option = document.createElement("option");
+        option.value = account.accountId;
+        option.textContent =
+            `${account.accountCode} — ${account.accountName}`;
+        select.appendChild(option);
+    });
+}
+
+function updateAccountingNormalBalance() {
+    const type = document.getElementById(
+        "newAccountingAccountType"
+    )?.value;
+    const balance = document.getElementById(
+        "newAccountingAccountNormalBalance"
+    );
+    if (!balance) return;
+    if (type === "ASSET" || type === "COGS" || type === "EXPENSE") {
+        balance.value = "DEBIT";
+    } else if (
+        type === "LIABILITY" ||
+        type === "EQUITY" ||
+        type === "REVENUE"
+    ) {
+        balance.value = "CREDIT";
+    } else {
+        balance.value = "";
+    }
+}
+
+async function saveAccountingAccount() {
+    const sessionId = localStorage.getItem("sessionId");
+    if (!sessionId) {
+        alert("Session tidak ditemukan.");
+        return;
+    }
+    const accountCode = document.getElementById(
+        "newAccountingAccountCode"
+    )?.value.trim();
+    const accountName = document.getElementById(
+        "newAccountingAccountName"
+    )?.value.trim();
+    const accountType = document.getElementById(
+        "newAccountingAccountType"
+    )?.value;
+    const parentId = document.getElementById(
+        "newAccountingAccountParent"
+    )?.value || null;
+    const normalBalance = document.getElementById(
+        "newAccountingAccountNormalBalance"
+    )?.value;
+
+    if (!accountCode) { alert("Account Code wajib diisi.");
+        return;
+    }
+    if (!accountName) { alert("Account Name wajib diisi.");
+        return;
+    }
+    if (!accountType) { alert("Account Type wajib dipilih.");
+        return;
+    }
+    if (!normalBalance) { alert("Normal Balance wajib dipilih.");
+        return;
+    }
+    try {
+        const { data, error } = 
+					await supabaseClient.rpc(
+            "create_account",
+            {
+                p_account_code: accountCode,
+                p_account_name: accountName,
+                p_account_type: accountType,
+                p_normal_balance: normalBalance,
+                p_parent_id: parentId,
+                p_session_id: sessionId
+            }
+        );
+
+        if (error) {
+            console.error("create_account error:", error);
+            alert(error.message || "Gagal membuat account.");
+            return;
+        }
+        console.log("Account created:", data);
+        closeAddAccountingAccountModal();
+        await loadAccountingAccounts();
+        alert("Account berhasil ditambahkan.");
+    } catch (err) {
+        console.error("saveAccountingAccount error:", err);
+        alert("Terjadi kesalahan saat menyimpan account.");
+    }
+}
