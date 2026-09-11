@@ -16585,7 +16585,7 @@
               </p>
 
               <p id="journalTotalEntries" class="text-xl font-headline mt-1">
-                248
+                0
               </p>
             </div>
 						
@@ -16595,7 +16595,7 @@
               </p>
 
               <p id="journalPostedEntries" class="text-xl font-headline mt-1">
-                241
+                0
               </p>
             </div>
 
@@ -16605,7 +16605,7 @@
               </p>
 
               <p id="journalDraftEntries" class="text-xl font-headline mt-1">
-                5
+                0
               </p>
             </div>
 						
@@ -16615,7 +16615,7 @@
               </p>
 
               <p id="journalVoidEntries" class="text-xl font-headline mt-1">
-                2
+                0
               </p>
             </div>
           </div>
@@ -16973,6 +16973,210 @@
       </section>
     </main>
   </div>
+	<!-- ==================== NEW JOURNAL MODAL ==================== -->
+	<div id="newJournalModal"
+	     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+	    <div class="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#111318] border border-white/10 shadow-2xl">
+	        <div class="flex items-center justify-between px-6 py-5 border-b border-white/10">
+	            <div>
+	                <h3 class="text-lg font-semibold text-white">
+	                    New Journal Entry
+	                </h3>
+	                <p class="text-sm text-gray-400 mt-1">
+	                    Create a manual journal entry
+	                </p>
+	            </div>
+	
+	            <button type="button"
+	                onclick="closeNewJournalModal()"
+	                class="w-9 h-9 rounded-lg flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/5 transition">
+	                <span class="material-symbols-outlined">close</span>
+	            </button>
+	        </div>
+	        <!-- BODY -->
+	        <div class="p-6 space-y-6">
+	            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	                <div>
+	                    <label class="block text-sm text-gray-400 mb-2">
+	                        Journal Date
+	                    </label>
+	
+	                    <input type="date"
+	                        id="newJournalDate"
+	                        class="w-full rounded-lg bg-[#181b21] border border-white/10 px-4 py-2.5 text-white outline-none focus:border-amber-500">
+	                </div>
+								
+	                <div>
+	                    <label class="block text-sm text-gray-400 mb-2">
+	                        Source
+	                    </label>
+										
+	                    <select id="newJournalSource"
+	                        class="w-full rounded-lg bg-[#181b21] border border-white/10 px-4 py-2.5 text-white outline-none focus:border-amber-500">
+	                        <option value="MANUAL">Manual</option>
+	                        <option value="SALES">Sales</option>
+	                        <option value="PURCHASE">Purchasing</option>
+	                        <option value="PAYMENT">Payment</option>
+	                        <option value="EXPENSE">Expense</option>
+	                        <option value="INVENTORY">Inventory</option>
+	                        <option value="EQUITY">Equity</option>
+	                    </select>
+	                </div>
+	                <!-- BRANCH -->
+	                <div>
+	                    <label class="block text-sm text-gray-400 mb-2">
+	                        Branch
+	                    </label>
+	
+	                    <select id="newJournalBranch"
+	                        class="w-full rounded-lg bg-[#181b21] border border-white/10 px-4 py-2.5 text-white outline-none focus:border-amber-500">
+	                    </select>
+	                </div>
+	                <!-- REFERENCE -->
+	                <div>
+	                    <label class="block text-sm text-gray-400 mb-2">
+	                        Reference ID
+	                        <span class="text-gray-500">(Optional)</span>
+	                    </label>
+	
+	                    <input type="text"
+	                        id="newJournalReference"
+	                        placeholder="e.g. INV-00123"
+	                        class="w-full rounded-lg bg-[#181b21] border border-white/10 px-4 py-2.5 text-white placeholder-gray-500 outline-none focus:border-amber-500">
+	                </div>
+	            </div>
+	            <!-- DESCRIPTION -->
+	            <div>
+	                <label class="block text-sm text-gray-400 mb-2">
+	                    Description
+	                </label>
+	
+	                <textarea id="newJournalDescription"
+	                    rows="2"
+	                    placeholder="Enter journal description..."
+	                    class="w-full rounded-lg bg-[#181b21] border border-white/10 px-4 py-2.5 text-white placeholder-gray-500 outline-none focus:border-amber-500 resize-none"></textarea>
+	            </div>
+	            <!-- JOURNAL LINES -->
+	            <div>
+	                <div class="flex items-center justify-between mb-3">
+	                    <div>
+	                        <h4 class="text-sm font-semibold text-white">
+	                            Journal Lines
+	                        </h4>
+	                        <p class="text-xs text-gray-500 mt-1">
+	                            Debit and credit must be balanced
+	                        </p>
+	                    </div>
+	
+	                    <button type="button"
+	                        onclick="addNewJournalLine()"
+	                        class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 hover:text-white transition">
+	                        <span class="material-symbols-outlined text-[18px]">
+	                            add
+	                        </span>
+	                        Add Line
+	                    </button>
+	                </div>
+	                <!-- TABLE -->
+	                <div class="overflow-x-auto rounded-xl border border-white/10">
+	                    <table class="w-full min-w-[800px]">
+	                        <thead class="bg-white/[0.03] border-b border-white/10">
+	                            <tr class="text-xs text-gray-500 uppercase">
+	                                <th class="text-left px-4 py-3 w-[32%]">
+	                                    Account
+	                                </th>
+																
+	                                <th class="text-left px-4 py-3 w-[28%]">
+	                                    Description
+	                                </th>
+																
+	                                <th class="text-right px-4 py-3 w-[17%]">
+	                                    Debit
+	                                </th>
+	
+	                                <th class="text-right px-4 py-3 w-[17%]">
+	                                    Credit
+	                                </th>
+	                                <th class="w-[6%]"></th>
+	                            </tr>
+	                        </thead>
+	
+	                        <tbody id="newJournalLinesContainer">
+	                        </tbody>
+	                    </table>
+	                </div>
+	            </div>
+	            <!-- TOTAL -->
+	            <div class="flex justify-end">
+	                <div class="w-full md:w-[420px] rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-3">
+	                    <div class="flex items-center justify-between text-sm">
+	                        <span class="text-gray-400">
+	                            Total Debit
+	                        </span>
+	
+	                        <span id="newJournalTotalDebit"
+	                            class="font-semibold text-white">
+	                            Rp 0
+	                        </span>
+	                    </div>
+	
+	                    <div class="flex items-center justify-between text-sm">
+	                        <span class="text-gray-400">
+	                            Total Credit
+	                        </span>
+	
+	                        <span id="newJournalTotalCredit"
+	                            class="font-semibold text-white">
+	                            Rp 0
+	                        </span>
+	                    </div>
+	
+	                    <div class="border-t border-white/10 pt-3 flex items-center justify-between">
+	                        <span class="text-gray-400">
+	                            Difference
+	                        </span>
+	
+	                        <span id="newJournalDifference"
+	                            class="font-semibold">
+	                            Rp 0
+	                        </span>
+	                    </div>
+	                </div>
+	            </div>
+	            <!-- STATUS -->
+	            <div>
+	                <label class="block text-sm text-gray-400 mb-2">
+	                    Status
+	                </label>
+	
+	                <select id="newJournalStatus"
+	                    class="w-full md:w-[240px] rounded-lg bg-[#181b21] border border-white/10 px-4 py-2.5 text-white outline-none focus:border-amber-500">
+	                    <option value="POSTED">Posted</option>
+	                    <option value="DRAFT">Draft</option>
+	                </select>
+	            </div>
+	        </div>
+	
+	        <!-- FOOTER -->
+	        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-white/10">
+	            <button type="button"
+	                onclick="closeNewJournalModal()"
+	                class="px-4 py-2.5 rounded-lg border border-white/10 text-sm text-gray-300 hover:bg-white/5 transition">
+	                Cancel
+	            </button>
+	
+	            <button type="button"
+	                id="saveNewJournalButton"
+	                onclick="saveNewJournalEntry()"
+	                class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-amber-500 text-black font-medium text-sm hover:bg-amber-400 transition">
+	                <span class="material-symbols-outlined text-[18px]">
+	                    save
+	                </span>
+	                Save Journal
+	            </button>
+	        </div>
+	    </div>
+	</div>
 </template>
 
 	
