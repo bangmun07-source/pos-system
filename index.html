@@ -16487,7 +16487,8 @@
                 Date From
               </label>
 
-              <input type="date"
+              <input id="journalDateFrom"
+								type="date"
                 class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
             </div>
             <!-- DATE TO -->
@@ -16496,7 +16497,8 @@
                 Date To
               </label>
 
-              <input type="date"
+              <input id="journalDateTo"
+								type="date"
                 class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
             </div>
             <!-- SOURCE -->
@@ -16505,15 +16507,17 @@
                 Source
               </label>
 
-              <select class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option>All Sources</option>
-                <option>Sales</option>
-                <option>Purchasing</option>
-                <option>Payment</option>
-                <option>Expense</option>
-                <option>Inventory</option>
-                <option>Manual</option>
-              </select>
+              <select id="journalSourceFilter"
+							  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+							  <option value="">All Sources</option>
+							  <option value="SALES">Sales</option>
+							  <option value="PURCHASE">Purchasing</option>
+							  <option value="PAYMENT">Payment</option>
+							  <option value="EXPENSE">Expense</option>
+							  <option value="INVENTORY">Inventory</option>
+							  <option value="EQUITY">Equity</option>
+							  <option value="MANUAL">Manual</option>
+							</select>
             </div>
             <!-- STATUS -->
             <div>
@@ -16521,12 +16525,13 @@
                 Status
               </label>
 
-              <select class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option>All Status</option>
-                <option>Posted</option>
-                <option>Draft</option>
-                <option>Void</option>
-              </select>
+							<select id="journalStatusFilter"
+							  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+							  <option value="">All Status</option>
+							  <option value="POSTED">Posted</option>
+							  <option value="DRAFT">Draft</option>
+							  <option value="VOID">Void</option>
+							</select>
             </div>
             <!-- SEARCH -->
             <div>
@@ -16534,7 +16539,8 @@
                 Search
               </label>
 
-              <input type="text"
+              <input id="journalSearch"
+								type="text"
                 placeholder="Journal number or description..."
                 class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
             </div>
@@ -16561,7 +16567,10 @@
               </div>
             </div>
 						
-            <button class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+            <button id="newJournalButton" 
+							type="button" 
+							onclick="openNewJournalModal()"
+							class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
               <span class="material-symbols-outlined text-sm">
                 add
               </span>
@@ -16575,7 +16584,7 @@
                 Total Entries
               </p>
 
-              <p class="text-xl font-headline mt-1">
+              <p id="journalTotalEntries" class="text-xl font-headline mt-1">
                 248
               </p>
             </div>
@@ -16585,18 +16594,17 @@
                 Posted
               </p>
 
-              <p class="text-xl font-headline mt-1">
+              <p id="journalPostedEntries" class="text-xl font-headline mt-1">
                 241
               </p>
             </div>
-
 
             <div class="p-4 border-r border-outline-variant">
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Draft
               </p>
 
-              <p class="text-xl font-headline mt-1">
+              <p id="journalDraftEntries" class="text-xl font-headline mt-1">
                 5
               </p>
             </div>
@@ -16606,7 +16614,7 @@
                 Void
               </p>
 
-              <p class="text-xl font-headline mt-1">
+              <p id="journalVoidEntries" class="text-xl font-headline mt-1">
                 2
               </p>
             </div>
@@ -16650,213 +16658,31 @@
                 </tr>
               </thead>
 							
-              <tbody>
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 font-medium">
-                    JE-202609-00124
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    09 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Sales
-                  </td>
-
-                  <td class="px-5 py-4">
-                    POS Sale
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 850,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 850,000
-                  </td>
-
-                  <td class="px-5 py-4 uppercase tracking-widest font-medium headline-font">
-                    Posted
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    <button class="text-muted hover:text-foreground">
-                      <span class="material-symbols-outlined text-[18px]">
-                        more_horiz
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 font-medium">
-                    JE-202609-00123
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    09 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Purchasing
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Ingredient Purchase
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 1,250,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 1,250,000
-                  </td>
-
-                  <td class="px-5 py-4 uppercase tracking-widest font-medium headline-font">
-                    Posted
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    <button class="text-muted hover:text-foreground">
-                      <span class="material-symbols-outlined text-[18px]">
-                        more_horiz
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 font-medium">
-                    JE-202609-00122
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    08 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Payment
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Supplier Payment
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 2,000,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 2,000,000
-                  </td>
-
-                  <td class="px-5 py-4 uppercase tracking-widest font-medium headline-font">
-                    Posted
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    <button class="text-muted hover:text-foreground">
-                      <span class="material-symbols-outlined text-[18px]">
-                        more_horiz
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 font-medium">
-                    JE-202609-00121
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    08 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Expense
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Operational Expense
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 450,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 450,000
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    Draft
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    <button class="text-muted hover:text-foreground">
-                      <span class="material-symbols-outlined text-[18px]">
-                        more_horiz
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="px-5 py-4 font-medium">
-                    JE-202609-00120
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    07 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Inventory
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Inventory Adjustment
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 125,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 125,000
-                  </td>
-
-                  <td class="px-5 py-4 uppercase tracking-widest font-medium headline-font">
-                    Posted
-                  </td>
-									
-                  <td class="px-5 py-4 text-right">
-                    <button class="text-muted hover:text-foreground">
-                      <span class="material-symbols-outlined text-[18px]">
-                        more_horiz
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
+              <tbody id="journalEntriesTableBody">
+								
+							</tbody>
             </table>
           </div>
 					<!-- FOOTER -->
 				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-				    <p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+				    <p id="journalEntriesPaginationInfo" class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
 				      Showing 1–10 of 50 Products
 				    </p>
 				
 				    <div class="flex items-center gap-2">
-				      <button class="px-3 py-2 text-muted font-medium headline-font transition">
+				      <button id="journalEntriesPrevButton" 
+								type="button" 
+								onclick="journalEntriesPrevPage()"
+								class="px-3 py-2 text-muted font-medium headline-font transition">
 				        <span class="material-symbols-outlined text-sm lg:text-base">
 				          chevron_left
 				        </span>
 				      </button>
 				
-				      <button class="px-3 py-2 text-muted font-medium headline-font transition">
+				      <button id="journalEntriesNextButton" 
+								type="button" 
+								onclick="journalEntriesNextPage()"
+								class="px-3 py-2 text-muted font-medium headline-font transition">
 				        <span class="material-symbols-outlined text-sm lg:text-base">
 				          chevron_right
 				        </span>
