@@ -23302,31 +23302,19 @@ function editAccountingAccount(accountId) {
     editingAccountingAccountId = accountId;
     const modal = document.getElementById( "addAccountingAccountModal" );
     if (!modal) return;
-    document.getElementById(
-        "newAccountingAccountCode"
+    document.getElementById( "newAccountingAccountCode"
     ).value = account.accountCode || "";
-
-    document.getElementById(
-        "newAccountingAccountName"
+    document.getElementById( "newAccountingAccountName"
     ).value = account.accountName || "";
-
-    document.getElementById(
-        "newAccountingAccountType"
+    document.getElementById( "newAccountingAccountType"
     ).value = account.accountType || "";
-
-    document.getElementById(
-        "newAccountingAccountNormalBalance"
+    document.getElementById( "newAccountingAccountNormalBalance"
     ).value = account.normalBalance || "";
-	
     populateAccountingParentAccounts();
-	
-    document.getElementById(
-        "newAccountingAccountParent"
+    document.getElementById( "newAccountingAccountParent"
     ).value = account.parentId || "";
-
     const title = document.getElementById( "accountModalTitle" );
     const saveButton = document.getElementById( "accountModalSaveButton" );
-
     if (title) {
         title.textContent = "Edit Account"; }
     if (saveButton) {
@@ -23475,19 +23463,17 @@ async function toggleAccountingAccountStatus(accountId) {
 }
 
 
-/* =======================================================
-   ACCOUNT MAPPING
-   ======================================================= */
+/* ====== ACCOUNT MAPPING ====== */
 let editingAccountingMappingId = null;
+const ACCOUNTING_MAPPING_PAGE_SIZE = 10;
+let accountingMappingCurrentPage = 1;
 async function loadAccountingMappings() {
     try {
         const sessionId =
             localStorage.getItem("pos_session_id");
-
         if (!sessionId) {
             return;
         }
-
         const { data, error } =
             await supabaseClient.rpc(
                 "get_account_mappings",
@@ -23495,7 +23481,6 @@ async function loadAccountingMappings() {
                     p_session_id: sessionId
                 }
             );
-
         if (error) {
             console.error(
                 "Gagal mengambil Account Mappings:",
@@ -23503,7 +23488,6 @@ async function loadAccountingMappings() {
             );
             return;
         }
-
         const mappings = Array.isArray(data) ? data : [];
         window.accountingMappings = mappings;
         renderAccountingMappings();
@@ -23515,24 +23499,18 @@ async function loadAccountingMappings() {
     }
 }
 
-
-/* =======================================================
-   RENDER ACCOUNT MAPPINGS
-   ======================================================= */
-
+/* ====== RENDER ACCOUNT MAPPINGS ====== */
 function renderAccountingMappings() {
     const tbody =
         document.getElementById(
             "accountingMappingsTableBody"
         );
-
     if (!tbody) {
         console.warn(
             "accountingMappingsTableBody tidak ditemukan"
         );
         return;
     }
-
     const search =
         (
             document.getElementById(
@@ -23541,22 +23519,17 @@ function renderAccountingMappings() {
         )
         .trim()
         .toLowerCase();
-
     const typeFilter =
         document.getElementById(
             "accountingMappingTypeFilter"
         )?.value || "";
-
     let mappings =
         Array.isArray(window.accountingMappings)
             ? window.accountingMappings
             : [];
-
     /* SEARCH */
-
     if (search) {
         mappings = mappings.filter(mapping => {
-
             const text = [
                 mapping.mappingName,
                 mapping.transactionType,
@@ -23569,15 +23542,11 @@ function renderAccountingMappings() {
                 .filter(Boolean)
                 .join(" ")
                 .toLowerCase();
-
             return text.includes(search);
         });
     }
-
     /* FILTER TRANSACTION TYPE */
-
-    if (
-        typeFilter &&
+    if (typeFilter &&
         typeFilter !== "All Transaction Types"
     ) {
         mappings = mappings.filter(mapping =>
@@ -23587,10 +23556,27 @@ function renderAccountingMappings() {
         );
     }
 
+    /* ====== PAGINATION ====== */
+    const totalMappings = mappings.length;
+    const totalPages = Math.max(
+        1,
+        Math.ceil(
+            totalMappings /
+            ACCOUNTING_MAPPING_PAGE_SIZE
+        )
+    );
+    if (accountingMappingCurrentPage > totalPages) {
+        accountingMappingCurrentPage = totalPages;
+    }
+    if (accountingMappingCurrentPage < 1) {
+        accountingMappingCurrentPage = 1;
+    }
+
+    const startIndex = (accountingMappingCurrentPage - 1) * ACCOUNTING_MAPPING_PAGE_SIZE;
+    const endIndex = startIndex + ACCOUNTING_MAPPING_PAGE_SIZE;
+    const pageMappings =  mappings.slice( startIndex, endIndex );
     /* EMPTY */
-
-    if (!mappings.length) {
-
+    if (!totalMappings) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="6"
@@ -23599,26 +23585,19 @@ function renderAccountingMappings() {
                 </td>
             </tr>
         `;
-
         updateAccountingMappingPaginationInfo(0);
-
         return;
     }
-
     /* TABLE */
-
-    tbody.innerHTML = mappings.map(mapping => {
-
+    tbody.innerHTML = pageMappings.map(mapping => {
         const statusClass =
             mapping.isActive
                 ? "bg-green-500/10 text-green-400"
                 : "bg-gray-500/10 text-gray-400";
-
         const statusLabel =
             mapping.isActive
                 ? "ACTIVE"
                 : "INACTIVE";
-
         const debitAccount =
             mapping.debitAccountCode ||
             mapping.debitAccountName
@@ -23655,7 +23634,6 @@ function renderAccountingMappings() {
 
         return `
             <tr class="border-b border-gray-800 hover:bg-gray-800/40">
-
                 <!-- TRANSACTION -->
                 <td class="px-6 py-4">
                     <div class="font-medium text-white">
@@ -23700,7 +23678,6 @@ function renderAccountingMappings() {
                 <!-- ACTION -->
                 <td class="px-6 py-4">
                     <div class="relative">
-
                         <button type="button"
                             onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
                             class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-white hover:bg-white/5 transition">
@@ -23708,12 +23685,10 @@ function renderAccountingMappings() {
                             <span class="material-symbols-outlined text-lg">
                                 more_vert
                             </span>
-
                         </button>
 
                         <div id="accountingMappingMenu-${escapeHtml(mapping.mappingId)}"
                              class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
-
                             <button type="button"
                                 onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
                                 class="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/5">
@@ -23727,19 +23702,15 @@ function renderAccountingMappings() {
                                     ? "Deactivate"
                                     : "Activate"}
                             </button>
-
                         </div>
                     </div>
                 </td>
-
             </tr>
         `;
-
     }).join("");
 
-    updateAccountingMappingPaginationInfo(
-        mappings.length
-    );
+    updateAccountingMappingPaginationInfo( totalMappings );
+    updateAccountingMappingPaginationButtons( totalPages );
 }
 
 
@@ -23748,22 +23719,86 @@ function renderAccountingMappings() {
    ======================================================= */
 
 function updateAccountingMappingPaginationInfo(total) {
-
-    const info =
-        document.getElementById(
+    const info = document.getElementById(
             "accountingMappingPaginationInfo"
         );
-
     if (!info) return;
-
     if (!total) {
         info.textContent =
             "Showing 0–0 of 0 Mappings";
         return;
     }
-
+    const start =
+        ((accountingMappingCurrentPage - 1) *
+            ACCOUNTING_MAPPING_PAGE_SIZE) + 1;
+    const end =
+        Math.min(
+            accountingMappingCurrentPage *
+                ACCOUNTING_MAPPING_PAGE_SIZE,
+            total
+        );
     info.textContent =
-        `Showing 1–${total} of ${total} Mappings`;
+        `Showing ${start}–${end} of ${total} Mappings`;
+}
+
+
+/* =======================================================
+   PAGINATION BUTTONS
+   ======================================================= */
+
+function updateAccountingMappingPaginationButtons(totalPages) {
+    const prevButton = document.getElementById(
+            "accountingMappingPrevButton"
+        );
+    const nextButton = document.getElementById(
+            "accountingMappingNextButton"
+        );
+    if (prevButton) {
+        prevButton.disabled = accountingMappingCurrentPage <= 1;
+        prevButton.classList.toggle( "opacity-40", prevButton.disabled );
+        prevButton.classList.toggle( "cursor-not-allowed", prevButton.disabled );
+    }
+    if (nextButton) {
+        nextButton.disabled = accountingMappingCurrentPage >= totalPages;
+        nextButton.classList.toggle( "opacity-40", nextButton.disabled );
+        nextButton.classList.toggle( "cursor-not-allowed", nextButton.disabled );
+    }
+}
+
+/* =======================================================
+   PAGINATION NAVIGATION
+   ======================================================= */
+
+function accountingMappingPrevPage() {
+    if (accountingMappingCurrentPage <= 1) {
+        return;
+    }
+    accountingMappingCurrentPage--;
+    renderAccountingMappings();
+}
+
+
+function accountingMappingNextPage() {
+    const mappings =
+        Array.isArray(window.accountingMappings)
+            ? window.accountingMappings
+            : [];
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                mappings.length /
+                ACCOUNTING_MAPPING_PAGE_SIZE
+            )
+        );
+    if (
+        accountingMappingCurrentPage >=
+        totalPages
+    ) {
+        return;
+    }
+    accountingMappingCurrentPage++;
+    renderAccountingMappings();
 }
 
 
