@@ -25310,17 +25310,26 @@ let generalLedgerData = [];
 let generalLedgerAccounts = [];
 
 async function loadGeneralLedger() {
-	const sessionId = localStorage.getItem("pos_session_id");
-		if (!sessionId) {
-				console.error("Session tidak ditemukan");
-				return;
+	const sessionId = localStorage.getItem("pos_session_id"); 
+
+	if (!sessionId) { 
+		console.error("Session tidak ditemukan"); 
+		return; 
+	} 
+
+	try { 
+		let accountId = document.getElementById("generalLedgerAccountFilter")?.value || ""; 
+		let branchId = document.getElementById("generalLedgerBranchFilter")?.value || ""; 
+		const search = document.getElementById("generalLedgerSearch")?.value?.trim() || ""; 
+
+		// Default option harus dianggap sebagai tidak ada filter
+		if (accountId === "All Accounts") {
+			accountId = "";
 		}
 
-	try {
-		const accountId = document.getElementById("generalLedgerAccountFilter")?.value || "";
-		const branchId = document.getElementById("generalLedgerBranchFilter")?.value || "";
-		const search = document.getElementById("generalLedgerSearch")?.value?.trim() || "";
-
+		if (branchId === "All Branches") {
+			branchId = "";
+		}
 		const { data, error } = await supabaseClient.rpc(
 			"get_general_ledger",
 			{
@@ -25418,8 +25427,16 @@ function renderGeneralLedger() {
 }
 
 function getFilteredGeneralLedger() {
-	const accountId = document.getElementById("generalLedgerAccountFilter")?.value || "";
-	const branchId = document.getElementById("generalLedgerBranchFilter")?.value || "";
+	let accountId = document.getElementById("generalLedgerAccountFilter")?.value || ""; 
+	let branchId = document.getElementById("generalLedgerBranchFilter")?.value || "";
+	
+	if (accountId === "All Accounts") {
+		accountId = "";
+	}
+	
+	if (branchId === "All Branches") {
+		branchId = "";
+	}
 	const search = document.getElementById("generalLedgerSearch")?.value
 					?.trim()
 					.toLowerCase() || "";
