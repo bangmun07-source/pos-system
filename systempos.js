@@ -24228,4 +24228,60 @@ function initAccountingMappingFilters() {
     }
 }
 
+async function toggleAccountingMappingStatus(mappingId) {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) {
+        alert("Session tidak ditemukan.");
+        return;
+    }
+    const mapping = (window.accountingMappings || [])
+        .find(m => m.mappingId === mappingId);
+    if (!mapping) {
+        alert("Account mapping tidak ditemukan.");
+        return;
+    }
+    const action = mapping.isActive
+        ? "menonaktifkan"
+        : "mengaktifkan";
+    if (!confirm(
+        `Yakin ingin ${action} mapping "${mapping.mappingName}"?`
+    )) {
+        return;
+    }
 
+    try {
+        const { data, error } = await supabaseClient.rpc(
+            "toggle_account_mapping_status",
+            {
+                p_mapping_id: mappingId,
+                p_session_id: sessionId
+            }
+        );
+
+        if (error) {
+            console.error(
+                "toggle_account_mapping_status error:",
+                error
+            );
+            alert(
+                error.message ||
+                "Gagal mengubah status account mapping."
+            );
+            return;
+        }
+        console.log(
+            "Account mapping status updated:",
+            data
+        );
+        await loadAccountingMappings();
+    } catch (err) {
+        console.error(
+            "toggleAccountingMappingStatus error:",
+            err
+        );
+
+        alert(
+            "Terjadi kesalahan saat mengubah status account mapping."
+        );
+    }
+}
