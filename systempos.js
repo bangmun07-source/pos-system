@@ -1049,9 +1049,10 @@ function initModule(pageId) {
 		break;
 
 		case "accountingAccountsPage": {
+		    initAccountingAccountFilters();
+		    initAccountingMappingFilters();
 		    loadAccountingAccounts();
 		    loadAccountingMappings();
-		    initAccountingMappingFilters();
 		    break;
 		}
   }
