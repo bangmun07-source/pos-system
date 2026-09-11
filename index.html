@@ -10626,51 +10626,6 @@
             Cash Flow
           </span>
         </a>
-        <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            inventory_2
-          </span>
-          <span class="sidebar-label">
-            Asset
-          </span>
-        </a>
-         <!-- OVERVIEW -->
-        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance
-          </span>
-          <span class="sidebar-label">
-            Overview
-          </span>
-        </a>
-				<!-- ACCOUNTING -->
-				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance
-          </span>
-          <span class="sidebar-label">
-            Accounting
-          </span>
-        </a>
-				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance
-          </span>
-          <span class="sidebar-label">
-            Journal Entries
-          </span>
-        </a>
-				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance
-          </span>
-          <span class="sidebar-label">
-            Accounting Reports
-          </span>
-        </a>
       </nav>
 	
 		<!-- FOOTER -->
@@ -11925,130 +11880,86 @@
 <!-- CASH FLOW PAGE  -->
 
 <template id="cashFlowPage">
-<!-- ================= SIDEBAR ================= -->
-	<aside
-	  id="sidebar"
+	<aside id="sidebar"
 	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
-	  <!-- SIDEBAR CONTENT -->
 	  <div class="sidebar-menu flex flex-col h-full">
-		<!-- MENU -->
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-			  <!-- DASHBOARD -->
-			  <a onclick="navigate('dashboardPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  home
-					</span>
-			
-					<span
-					  class="sidebar-label">
-					  Dashboard
-					</span>
-			  </a>
-		
-			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
-				 style="display:none"
-					 class="settingsMenu">
-					<span class="material-symbols-outlined sidebar-icon">
-					  settings
-					</span>
-		
-					<span class="sidebar-label">
-					  Settings
-					</span>
-			  </a>
-		
-			  <!-- LOYALTY -->
-			  <a onclick="navigate('loyaltysettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  military_tech
-					</span>
-		
-					<span class="sidebar-label">
-					  Loyalty &amp; Tiers
-					</span>
-			  </a>
-		
-			  <!-- TAX-->
-			  <a onclick="navigate('taxservicesettingPage')">
-					 <span class="material-symbols-outlined sidebar-icon"> 					  
-						 account_balance
-					</span>
-			
-					<span class="sidebar-label">
-					   Taxes &amp; Fees
-					</span>
-			  </a>
-		
-			  <!-- EXPENSES -->
-			  <a onclick="navigate('expensessettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  payments
-					</span>
-			
-					<span class="sidebar-label">
-					  Expenses
-					</span>
-			  </a>
-			
-			  <!-- ANALYTICS -->
-			  <a onclick="navigate('analyticsPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  analytics
-					</span>
-			
-					<span class="sidebar-label">
-						Analytics
-					</span>
-			  </a>
-			
-			<!-- ANALYTICS -->
-			  <a onclick="navigate('inventoryPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  inventory_2
-					</span>
-			
-					<span class="sidebar-label">
-						Inventory
-					</span>
-			  </a>
-		
-				<!-- CASH FLOW -->
-				<a class="active" onclick="navigate('cashFlowPage', { roles:['Owner'] })">
-					<span class="material-symbols-outlined sidebar-icon">
-					  account_balance_wallet
-					</span>
-		
-					<span class="sidebar-label">
-						Cash Flow
-					</span>
-			  </a>
-
-					<!-- ASSET -->
-	      <a onclick="navigate('assetPage')">
-	        <span class="material-symbols-outlined sidebar-icon">
-	          inventory_2
-	        </span>
-	        <span class="sidebar-label">
-	          Asset
-	        </span>
-	      </a>
-
-					<!-- OVERVIEW -->
-				<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
-
+         <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
+          </span>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+        <!-- SETTINGS -->
+        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+        <!-- CASH FLOW -->
+        <a class="active" onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+        <!-- ASSET -->
+        <a onclick="navigate('assetPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Asset
+          </span>
+        </a>
+         <!-- OVERVIEW -->
+        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance
           </span>
-
           <span class="sidebar-label">
             Overview
           </span>
-
         </a>
-			</nav>
-	
-		<!-- FOOTER -->
+				<!-- ACCOUNTING -->
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Accounting
+          </span>
+        </a>
+				<!-- JOURNAL ENTRIES -->
+				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Journal Entries
+          </span>
+        </a>
+				<!-- ACCOUNTING REPORTS -->
+				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Accounting Reports
+          </span>
+        </a>
+      </nav>
+			<!-- FOOTER -->
 			<div class="mt-auto p-2 pb-2">
 			  <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
 					<span class=" shrink-0 w-8 h-8 flex items-center justify-center">
@@ -12801,137 +12712,105 @@
 
 
 <template id="assetPage">
-
-<!-- ================= SIDEBAR ================= -->
-<aside
-	  id="sidebar"
-	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
-	  <!-- SIDEBAR CONTENT -->
-	  <div class="sidebar-menu flex flex-col h-full">
-		<!-- MENU -->
+	<aside id="sidebar"
+		  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+		<div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-			  <!-- DASHBOARD -->
-			  <a onclick="navigate('dashboardPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  home
-					</span>
-			
-					<span
-					  class="sidebar-label">
-					  Dashboard
-					</span>
-			  </a>
-		
-			<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
-				 style="display:none"
-					 class="settingsMenu">
-					<span class="material-symbols-outlined sidebar-icon">
-					  settings
-					</span>
-		
-					<span class="sidebar-label">
-					  Settings
-					</span>
-			  </a>
-		
-			  <!-- LOYALTY -->
-			  <a onclick="navigate('loyaltysettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  military_tech
-					</span>
-		
-					<span class="sidebar-label">
-					  Loyalty &amp; Tiers
-					</span>
-			  </a>
-		
-			  <!-- TAX-->
-			  <a onclick="navigate('taxservicesettingPage')">
-					 <span class="material-symbols-outlined sidebar-icon"> 					  
-						 account_balance
-					</span>
-			
-					<span class="sidebar-label">
-					   Taxes &amp; Fees
-					</span>
-			  </a>
-		
-			  <!-- EXPENSES -->
-			  <a onclick="navigate('expensessettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  payments
-					</span>
-			
-					<span class="sidebar-label">
-					  Expenses
-					</span>
-			  </a>
-			
-			  <!-- ANALYTICS -->
-			  <a onclick="navigate('analyticsPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  analytics
-					</span>
-			
-					<span class="sidebar-label">
-						Analytics
-					</span>
-			  </a>
-			
-			<!-- ANALYTICS -->
-			  <a onclick="navigate('inventoryPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  inventory_2
-					</span>
-			
-					<span class="sidebar-label">
-						Inventory
-					</span>
-			  </a>
-		
-				<!-- CASH FLOW -->
-				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
-					<span class="material-symbols-outlined sidebar-icon">
-					  account_balance_wallet
-					</span>
-		
-					<span class="sidebar-label">
-						Cash Flow
-					</span>
-			  </a>
-
-				<!-- ASSET -->
-	      <a class="active" onclick="navigate('assetPage')">
-	        <span class="material-symbols-outlined sidebar-icon">
-	          inventory_2
-	        </span>
-	        <span class="sidebar-label">
-	          Asset
-	        </span>
-	      </a>
-			</nav>
-
-    <!-- FOOTER -->
-    <div class="mt-auto p-2 pb-2">
-      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
-        <span class="shrink-0 w-8 h-8 flex items-center justify-center">
-          <span class="w-2 h-2 rounded-md bg-primary animate-pulse"></span>
-        </span>
-
-        <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-          <p class="text-[10px] text-muted">
-            SYSTEM STATUS
-          </p>
-
-          <span class="sidebar-label">
-            SERVER ACTIVE
+         <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
           </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</aside>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+        <!-- SETTINGS -->
+        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+        <!-- ASSET -->
+        <a class="active" onclick="navigate('assetPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Asset
+          </span>
+        </a>
+         <!-- OVERVIEW -->
+        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Overview
+          </span>
+        </a>
+				<!-- ACCOUNTING -->
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Accounting
+          </span>
+        </a>
+				<!-- JOURNAL ENTRIES -->
+				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Journal Entries
+          </span>
+        </a>
+				<!-- ACCOUNTING REPORTS -->
+				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Accounting Reports
+          </span>
+        </a>
+      </nav>
+	    <!-- FOOTER -->
+	    <div class="mt-auto p-2 pb-2">
+	      <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
+	        <span class="shrink-0 w-8 h-8 flex items-center justify-center">
+	          <span class="w-2 h-2 rounded-md bg-primary animate-pulse"></span>
+	        </span>
+	
+	        <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+	          <p class="text-[10px] text-muted">
+	            SYSTEM STATUS
+	          </p>
+	
+	          <span class="sidebar-label">
+	            SERVER ACTIVE
+	          </span>
+	        </div>
+	      </div>
+	    </div>
+	  </div>
+	</aside>
 
 
 <!-- ================= CONTENT WRAPPER ================= -->
