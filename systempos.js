@@ -24359,25 +24359,15 @@ async function saveAccountingMapping() {
    ======================================================= */
 
 function toggleAccountingMappingMenu(mappingId) {
-
-    const menu =
-        document.getElementById(
-            `accountingMappingMenu-${mappingId}`
-        );
-
-    if (!menu) return;
-
-    document.querySelectorAll(
-        '[id^="accountingMappingMenu-"]'
-    ).forEach(el => {
-
-        if (el !== menu) {
-            el.classList.add("hidden");
-        }
-
-    });
-
-    menu.classList.toggle("hidden");
+	const menu = document.getElementById( `accountingMappingMenu-${mappingId}` );
+	if (!menu) return;
+	document.querySelectorAll( '[id^="accountingMappingMenu-"]'
+	).forEach(el => {
+			if (el !== menu) {
+					el.classList.add("hidden");
+			}
+	});
+	menu.classList.toggle("hidden");
 }
 
 
@@ -24386,88 +24376,77 @@ function toggleAccountingMappingMenu(mappingId) {
    ======================================================= */
 
 function initAccountingMappingFilters() {
+	const search = document.getElementById( "accountingMappingSearch" );
+	const typeFilter = document.getElementById( "accountingMappingTypeFilter" );
+	if (search) {
+		search.addEventListener( "input",
+			renderAccountingMappings
+		);
+	}
 
-    const search =
-        document.getElementById(
-            "accountingMappingSearch"
-        );
-
-    const typeFilter =
-        document.getElementById(
-            "accountingMappingTypeFilter"
-        );
-
-    if (search) {
-        search.addEventListener(
-            "input",
-            renderAccountingMappings
-        );
-    }
-
-    if (typeFilter) {
-        typeFilter.addEventListener(
-            "change",
-            renderAccountingMappings
-        );
-    }
+	if (typeFilter) {
+		typeFilter.addEventListener(
+			"change",
+			renderAccountingMappings
+		);
+ 	}
 }
 
 async function toggleAccountingMappingStatus(mappingId) {
-    const sessionId = localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-        alert("Session tidak ditemukan.");
-        return;
-    }
-    const mapping = (window.accountingMappings || [])
-        .find(m => m.mappingId === mappingId);
-    if (!mapping) {
-        alert("Account mapping tidak ditemukan.");
-        return;
-    }
-    const action = mapping.isActive
-        ? "menonaktifkan"
-        : "mengaktifkan";
-    if (!confirm(
-        `Yakin ingin ${action} mapping "${mapping.mappingName}"?`
-    )) {
-        return;
-    }
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) {
+			alert("Session tidak ditemukan.");
+			return;
+	}
+	const mapping = (window.accountingMappings || [])
+			.find(m => m.mappingId === mappingId);
+	if (!mapping) {
+			alert("Account mapping tidak ditemukan.");
+			return;
+	}
+	const action = mapping.isActive
+			? "menonaktifkan"
+			: "mengaktifkan";
+	if (!confirm(
+			`Yakin ingin ${action} mapping "${mapping.mappingName}"?`
+	)) {
+			return;
+	}
 
-    try {
-        const { data, error } = await supabaseClient.rpc(
-            "toggle_account_mapping_status",
-            {
-                p_mapping_id: mappingId,
-                p_session_id: sessionId
-            }
-        );
+	try {
+		const { data, error } = await supabaseClient.rpc(
+				"toggle_account_mapping_status",
+				{
+					p_mapping_id: mappingId,
+					p_session_id: sessionId
+				}
+		);
 
-        if (error) {
-            console.error(
-                "toggle_account_mapping_status error:",
-                error
-            );
-            alert(
-                error.message ||
-                "Gagal mengubah status account mapping."
-            );
-            return;
-        }
-        console.log(
-            "Account mapping status updated:",
-            data
-        );
-        await loadAccountingMappings();
-    } catch (err) {
-        console.error(
-            "toggleAccountingMappingStatus error:",
-            err
-        );
-
-        alert(
-            "Terjadi kesalahan saat mengubah status account mapping."
-        );
-    }
+		if (error) {
+				console.error(
+						"toggle_account_mapping_status error:",
+						error
+				);
+				alert(
+						error.message ||
+						"Gagal mengubah status account mapping."
+				);
+				return;
+		}
+		console.log(
+				"Account mapping status updated:",
+				data
+		);
+		await loadAccountingMappings();
+	} catch (err) {
+		console.error(
+				"toggleAccountingMappingStatus error:",
+				err
+		);
+		alert(
+				"Terjadi kesalahan saat mengubah status account mapping."
+		);
+	}
 }
 
 /* =============================
@@ -24479,247 +24458,200 @@ let journalEntriesCurrentPage = 1;
 let journalEntriesData = [];
 
 async function loadJournalEntries() {
-	try {
-	const sessionId =
-	localStorage.getItem("pos_session_id");
-	    if (!sessionId) {
-	        return;
-	    }
-	    const { data, error } =
-	        await supabaseClient.rpc(
-	            "get_journal_entries",
-	            {
-	                p_session_id: sessionId
-	            }
-	        );
-	    if (error) {
-	        console.error(
-	            "Gagal mengambil Journal Entries:",
-	            error
-	        );
-	        return;
-	    }
-	    const entries = Array.isArray(data) ? data : [];
-	    journalEntriesData = entries;
-	    window.journalEntries = entries;
-	    journalEntriesCurrentPage = 1;
-	    renderJournalEntries(entries);
-	    updateJournalEntriesSummary(entries);
-		} catch (err) {
-		    console.error(
-		        "loadJournalEntries error:",
-		        err
-		    );
+try {
+const sessionId =
+localStorage.getItem("pos_session_id");
+		if (!sessionId) {
+			return;
 		}
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_journal_entries",
+				{
+					p_session_id: sessionId
+				}
+			);
+		if (error) {
+			console.error(
+					"Gagal mengambil Journal Entries:",
+					error
+			);
+			return;
+		}
+		const entries = Array.isArray(data) ? data : [];
+		journalEntriesData = entries;
+		window.journalEntries = entries;
+		journalEntriesCurrentPage = 1;
+		renderJournalEntries(entries);
+		updateJournalEntriesSummary(entries);
+	} catch (err) {
+		console.error(
+				"loadJournalEntries error:",
+				err
+		);
+	}
 }
 
 
 function renderJournalEntries(entries) {
 	const tbody = document.getElementById( "journalEntriesTableBody" );
 	if (!tbody) {
-	    console.warn(
-	        "journalEntriesTableBody tidak ditemukan"
-	    );
-	    return;
+		console.warn(
+				"journalEntriesTableBody tidak ditemukan"
+		);
+		return;
 	}
 	const filteredEntries = getFilteredJournalEntries(entries);
 	const total = filteredEntries.length;
 	const totalPages =
 	    Math.max(
-	        1,
-	        Math.ceil(
-	            total /
-	            JOURNAL_ENTRIES_PAGE_SIZE
-	        )
+				1,
+				Math.ceil(
+					total /
+					JOURNAL_ENTRIES_PAGE_SIZE
+	      )
 	    );
-if (
-    journalEntriesCurrentPage > totalPages
-) {
-    journalEntriesCurrentPage = totalPages;
-}
-const startIndex =
-    (
-        journalEntriesCurrentPage - 1
-    ) *
-    JOURNAL_ENTRIES_PAGE_SIZE;
-const endIndex =
-    startIndex +
-    JOURNAL_ENTRIES_PAGE_SIZE;
-const pageEntries =
-    filteredEntries.slice(
-        startIndex,
-        endIndex
-    );
+	if (
+	    journalEntriesCurrentPage > totalPages
+	) {
+	    journalEntriesCurrentPage = totalPages;
+	}
+	const startIndex =
+		(
+				journalEntriesCurrentPage - 1
+		) *
+		JOURNAL_ENTRIES_PAGE_SIZE;
+	const endIndex =
+		startIndex +
+		JOURNAL_ENTRIES_PAGE_SIZE;
+	const pageEntries =
+		filteredEntries.slice(
+				startIndex,
+				endIndex
+		);
 if (!pageEntries.length) {
-    tbody.innerHTML = `
-        <tr>
-            <td
-                colspan="8"
-                class="px-5 py-10 text-center text-muted">
-                Belum ada journal entries.
-            </td>
-        </tr>
+	tbody.innerHTML = `
+			<tr>
+				<td colspan="8" class="px-5 py-10 text-center text-muted">
+						Belum ada journal entries.
+				</td>
+			</tr>
     `;
 	} else {
-	    tbody.innerHTML =
-	        pageEntries
-	            .map(
-	                journal =>
-	                    renderJournalEntryRow(
-	                        journal
-	                    )
-	            )
+		tbody.innerHTML =
+			pageEntries
+				.map(
+					journal =>
+						renderJournalEntryRow(
+								journal
+							)
+						)
 	  	.join("");
 	}
-	updateJournalEntriesPagination(
-	    total,
-	    totalPages
-	);
+	updateJournalEntriesPagination( total, totalPages );
 }
-
 
 function renderJournalEntryRow(journal) {
 	const sourceLabel = {
-	    SALES: "Sales",
-	    PURCHASE: "Purchasing",
-	    PAYMENT: "Payment",
-	    EXPENSE: "Expense",
-	    INVENTORY: "Inventory",
-	    EQUITY: "Equity",
-	    MANUAL: "Manual"
+		SALES: "Sales",
+		PURCHASE: "Purchasing",
+		PAYMENT: "Payment",
+		EXPENSE: "Expense",
+		INVENTORY: "Inventory",
+		EQUITY: "Equity",
+		MANUAL: "Manual"
 	}[
 	    journal.source
 	] || journal.source || "-";
 	
 	const statusLabel = {
-	    POSTED: "Posted",
-	    DRAFT: "Draft",
-	    VOID: "Void"
-	}[
-	    journal.status
-	] || journal.status || "-";
+		POSTED: "Posted",
+		DRAFT: "Draft",
+		VOID: "Void"
+	}[ journal.status ] || journal.status || "-";
 	
 	const statusClass = {
-	    POSTED: "text-emerald-400",
-	    DRAFT: "text-yellow-400",
-	    VOID: "text-red-400"
-	}[
-	    journal.status
-	] || "text-muted";
+		POSTED: "text-emerald-400",
+		DRAFT: "text-yellow-400",
+		VOID: "text-red-400"
+	}[ journal.status ] || "text-muted";
 	
-	return `
+		return `
 	    <tr class="border-b border-outline-variant hover:bg-white/[0.02]">
-	        <td class="px-5 py-4 font-medium">
-	            ${escapeHtml(
-	                journal.journalNo || "-"
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4 text-muted">
-	            ${formatJournalDate(
-	                journal.journalDate
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4">
-	            ${escapeHtml(
-	                sourceLabel
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4">
-	            ${escapeHtml(
-	                journal.description || "-"
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4 text-right">
-	            ${formatJournalCurrency(
-	                journal.totalDebit
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4 text-right">
-	            ${formatJournalCurrency(
-	                journal.totalCredit
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4 uppercase tracking-widest font-medium headline-font ${statusClass}">
-	            ${escapeHtml(
-	                statusLabel
-	            )}
-	        </td>
-	
-	        <td class="px-5 py-4 text-right">
-	            <button type="button"
-	                onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
-	                class="text-muted hover:text-foreground">
-	                <span class="material-symbols-outlined text-[18px]">
-	                    more_horiz
-	                </span>
-	            </button>
-	        </td>
-	    </tr>
+				<td class="px-5 py-4 font-medium">
+						${escapeHtml( journal.journalNo || "-" )}
+				</td>
+
+				<td class="px-5 py-4 text-muted">
+						${formatJournalDate( journal.journalDate )}
+				</td>
+
+				<td class="px-5 py-4">
+						${escapeHtml( sourceLabel )}
+				</td>
+
+				<td class="px-5 py-4">
+						${escapeHtml( journal.description || "-" )}
+				</td>
+
+				<td class="px-5 py-4 text-right">
+						${formatJournalCurrency( journal.totalDebit )}
+				</td>
+
+				<td class="px-5 py-4 text-right">
+						${formatJournalCurrency( journal.totalCredit )}
+				</td>
+
+				<td class="px-5 py-4 uppercase tracking-widest font-medium headline-font ${statusClass}">
+						${escapeHtml( statusLabel )}
+				</td>
+
+				<td class="px-5 py-4 text-right">
+					<button type="button"
+						onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
+						class="text-muted hover:text-foreground">
+						<span class="material-symbols-outlined text-md">
+								more_horiz
+						</span>
+					</button>
+				</td>
+		</tr>
 	`;
 }
 
 function getFilteredJournalEntries( entries ) {
-	const dateFrom = document.getElementById(
-	        "journalDateFrom"
-	    )?.value || "";
-	const dateTo = document.getElementById(
-	        "journalDateTo"
-	    )?.value || "";
-	const source = document.getElementById(
-	        "journalSourceFilter"
-	    )?.value || "";
-	const status = document.getElementById(
-	        "journalStatusFilter"
-	    )?.value || "";
-	const search =
-	    ( 
-				document.getElementById(
-	            "journalSearch"
-	        )?.value || ""
-	    )
-	    .trim()
-	    .toLowerCase();
+	const dateFrom = document.getElementById( "journalDateFrom" )?.value || "";
+	const dateTo = document.getElementById( "journalDateTo" )?.value || "";
+	const source = document.getElementById( "journalSourceFilter" )?.value || "";
+	const status = document.getElementById( "journalStatusFilter" )?.value || "";
+	const search = ( document.getElementById( "journalSearch" )?.value || "" )
+		.trim()
+		.toLowerCase();
 	return entries.filter(journal => {
-	    const journalDate = journal.journalDate || "";
-	    if ( dateFrom && journalDate < dateFrom ) 
-					{ return false; }
-	    if ( dateTo && journalDate > dateTo ) 	
-					{ return false; }
-	    if ( source && journal.source !== source ) 
-					{ return false; }
-	    if ( status && journal.status !== status ) 
-					{ return false; }
-	    if (search) {
-	        const journalNo = String(
-	                journal.journalNo || ""
-	            ).toLowerCase();
-	        const description = String(
-	                journal.description || ""
-	            ).toLowerCase();
-	        if ( !journalNo.includes(search) &&  !description.includes(search) ) 
-					{ return false; }
-	    }
-	    return true;
+		const journalDate = journal.journalDate || "";
+		if ( dateFrom && journalDate < dateFrom ) 
+				{ return false; }
+		if ( dateTo && journalDate > dateTo ) 	
+				{ return false; }
+		if ( source && journal.source !== source ) 
+				{ return false; }
+		if ( status && journal.status !== status ) 
+				{ return false; }
+		if (search) {
+				const journalNo = String( journal.journalNo || "" ).toLowerCase();
+				const description = String( journal.description || "" ).toLowerCase();
+				if ( !journalNo.includes(search) &&  !description.includes(search) ) 
+				{ return false; }
+		}
+		return true;
 	});
 }
 
 function updateJournalEntriesSummary( entries ) {
 	const total = entries.length;
-	const posted = entries.filter(
-	        journal => journal.status === "POSTED"
-	    ).length;
-	const draft = entries.filter(
-	        journal => journal.status === "DRAFT"
-	    ).length;
-	const voided = entries.filter(
-	        journal => journal.status === "VOID"
-	    ).length;
+	const posted = entries.filter( journal => journal.status === "POSTED" ).length;
+	const draft = entries.filter( journal => journal.status === "DRAFT" ).length;
+	const voided = entries.filter( journal => journal.status === "VOID" ).length;
 	const totalEl = document.getElementById( "journalTotalEntries" );
 	const postedEl = ocument.getElementById( "journalPostedEntries" );
 	const draftEl = document.getElementById( "journalDraftEntries" );
@@ -24730,7 +24662,6 @@ function updateJournalEntriesSummary( entries ) {
 	if (draftEl) { draftEl.textContent = draft.toLocaleString("id-ID"); }
 	if (voidEl) { voidEl.textContent =  voided.toLocaleString("id-ID"); }
 }
-
 
 function updateJournalEntriesPagination( total, totalPages ) {
 	const info = document.getElementById( "journalEntriesPaginationInfo" );
@@ -24745,11 +24676,11 @@ function updateJournalEntriesPagination( total, totalPages ) {
 						* JOURNAL_ENTRIES_PAGE_SIZE
 	        ) + 1;
 	const end =
-	    Math.min(
-	        journalEntriesCurrentPage *
-	        JOURNAL_ENTRIES_PAGE_SIZE,
-	        total
-	    );
+		Math.min(
+			journalEntriesCurrentPage *
+			JOURNAL_ENTRIES_PAGE_SIZE,
+			total
+		);
 	if (info) { info.textContent = `Showing ${start}–${end} of ${total} Entries`; }
 	if (prevButton) { prevButton.disabled = journalEntriesCurrentPage <= 1; }
 	if (nextButton) { nextButton.disabled = journalEntriesCurrentPage >= totalPages; }
@@ -24765,17 +24696,16 @@ function journalEntriesPrevPage() {
 function journalEntriesNextPage() {
 	const filteredEntries = getFilteredJournalEntries( journalEntriesData );
 	const totalPages =
-	    Math.max(
-	        1,
-	        Math.ceil(
-	            filteredEntries.length /
-	            JOURNAL_ENTRIES_PAGE_SIZE
-	        )
-	    );
-	
+		Math.max(
+				1,
+				Math.ceil(
+						filteredEntries.length /
+						JOURNAL_ENTRIES_PAGE_SIZE
+				)
+		);
+
 	if ( journalEntriesCurrentPage >= totalPages ) 
 		{ return; }
-	
 	journalEntriesCurrentPage++;
 	renderJournalEntries( journalEntriesData );
 }
@@ -24787,12 +24717,12 @@ function initJournalEntriesFilters() {
 	const status =  document.getElementById( "journalStatusFilter" );
 	const search = document.getElementById( "journalSearch" );
 	const resetPage =
-	    () => {
-	        journalEntriesCurrentPage = 1;
-	        renderJournalEntries(
-	            journalEntriesData
-	        );
-	    };
+		() => {
+				journalEntriesCurrentPage = 1;
+				renderJournalEntries(
+						journalEntriesData
+				);
+		};
 	dateFrom?.addEventListener( "change", resetPage );
 	dateTo?.addEventListener( "change", resetPage );
 	source?.addEventListener( "change", resetPage );
@@ -24803,15 +24733,7 @@ function initJournalEntriesFilters() {
 function formatJournalDate( dateValue ) {
 	if (!dateValue) { return "-"; }
 	const date = new Date( `${dateValue}T00:00:00` );
-	if (
-	    Number.isNaN(
-	        date.getTime()
-	    )
-	) {
-	    return escapeHtml(
-	        String(dateValue)
-	    );
-	}
+	if ( Number.isNaN( date.getTime() ) ) { return escapeHtml(  String(dateValue) ); }
 	return date.toLocaleDateString( "en-GB",
 		{
 			day: "2-digit",
@@ -24868,56 +24790,54 @@ function populateNewJournalBranches() {
 	const branchEl = document.getElementById("newJournalBranch");
 	if (!branchEl) return;
 	const branches =
-			window.branches ||
-			window.branchList ||
-			window.outlets ||
-			[];
+		window.branches ||
+		window.branchList ||
+		window.outlets ||
+		[];
 	branchEl.innerHTML = "";
 	if (!Array.isArray(branches) || branches.length === 0) {
-			branchEl.innerHTML = `  <option value="">Select Branch</option> `;
-			return;
+		branchEl.innerHTML = `  <option value="">Select Branch</option> `;
+		return;
 	}
 	branches.forEach(branch => {
-			const branchId =
-					branch.branchId ??
-					branch.id ??
-					branch.ID ??
-					"";
-			const branchName =
-					branch.branchName ??
-					branch.name ??
-					branch.Name ??
-					branch.outlet ??
-					branch.Outlet ??
-					branchId;
-			if (!branchId) return;
-			const option = document.createElement("option");
-			option.value = branchId;
-			option.textContent = branchName;
-			branchEl.appendChild(option);
+		const branchId =
+			branch.branchId ??
+			branch.id ??
+			branch.ID ??
+			"";
+		const branchName =
+			branch.branchName ??
+			branch.name ??
+			branch.Name ??
+			branch.outlet ??
+			branch.Outlet ??
+			branchId;
+		if (!branchId) return;
+		const option = document.createElement("option");
+		option.value = branchId;
+		option.textContent = branchName;
+		branchEl.appendChild(option);
 	});
 }
 
 function getNewJournalAccounts() {
 	const accounts = window.accountingAccounts || [];
-	return accounts.filter(account =>
-			account && account.isActive !== false
-	);
+	return accounts.filter(account => account && account.isActive !== false );
 }
 
 function buildNewJournalAccountOptions() {
 	const accounts = getNewJournalAccounts();
 	let html = ` <option value="">Select account</option> `;
 	accounts.forEach(account => {
-			const accountId = account.accountId;
-			const accountCode = account.accountCode || "";
-			const accountName = account.accountName || "";
-			if (!accountId) return;
-			html += `
-					<option value="${escapeHtml(accountId)}">
-							${escapeHtml(accountCode)} - ${escapeHtml(accountName)}
-					</option>
-			`;
+		const accountId = account.accountId;
+		const accountCode = account.accountCode || "";
+		const accountName = account.accountName || "";
+		if (!accountId) return;
+		html += `
+			<option value="${escapeHtml(accountId)}">
+					${escapeHtml(accountCode)} - ${escapeHtml(accountName)}
+			</option>
+		`;
 	});
 	return html;
 }
@@ -24931,51 +24851,51 @@ function addNewJournalLine() {
 	row.id = `newJournalLine-${lineId}`;
 	row.className = "border-b border-white/5 last:border-b-0";
 	row.innerHTML = `
-			<td class="px-4 py-3">
-					<select id="newJournalAccount-${lineId}"
-							class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-amber-500"
-							onchange="calculateNewJournalTotals()">
-							${buildNewJournalAccountOptions()}
-					</select>
-			</td>
+		<td class="px-4 py-3">
+			<select id="newJournalAccount-${lineId}"
+				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+				onchange="calculateNewJournalTotals()">
+				${buildNewJournalAccountOptions()}
+			</select>
+		</td>
 
-			<td class="px-4 py-3">
-				<input type="text"
-						id="newJournalLineDescription-${lineId}"
-						placeholder="Description"
-						class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-500">
-			</td>
+		<td class="px-4 py-3">
+			<input type="text"
+				id="newJournalLineDescription-${lineId}"
+				placeholder="Description"
+				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface placeholder-gray-500 outline-none focus:border-amber-500">
+		</td>
 
-			<td class="px-4 py-3">
-				<input type="number"
-						id="newJournalDebit-${lineId}"
-						min="0"
-						step="1"
-						value="0"
-						class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white text-right outline-none focus:border-amber-500"
-						oninput="handleNewJournalDebitInput(${lineId})">
-			</td>
+		<td class="px-4 py-3">
+			<input type="number"
+				id="newJournalDebit-${lineId}"
+				min="0"
+				step="1"
+				value="0"
+				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+				oninput="handleNewJournalDebitInput(${lineId})">
+		</td>
 
-			<td class="px-4 py-3">
-				<input type="number"
-						id="newJournalCredit-${lineId}"
-						min="0"
-						step="1"
-						value="0"
-						class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white text-right outline-none focus:border-amber-500"
-						oninput="handleNewJournalCreditInput(${lineId})">
-			</td>
+		<td class="px-4 py-3">
+			<input type="number"
+				id="newJournalCredit-${lineId}"
+				min="0"
+				step="1"
+				value="0"
+				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+				oninput="handleNewJournalCreditInput(${lineId})">
+		</td>
 
-			<td class="px-4 py-3 text-center">
-				<button type="button"
-					onclick="removeNewJournalLine(${lineId})"
-					class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition">
+		<td class="px-4 py-3 text-center">
+			<button type="button"
+				onclick="removeNewJournalLine(${lineId})"
+				class="w-8 h-8 rounded-md flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition">
 
-					<span class="material-symbols-outlined text-[18px]">
-							delete
-					</span>
-				</button>
-			</td>
+				<span class="material-symbols-outlined text-md">
+						delete
+				</span>
+			</button>
+		</td>
 	`;
 	container.appendChild(row);
 }
@@ -25188,4 +25108,193 @@ async function saveNewJournalEntry() {
 						`;
 		}
 	}
+}
+
+/* ============================================================
+   JOURNAL DETAIL
+   ============================================================ */
+
+async function openJournalEntryDetail(journalId) {
+	const modal = document.getElementById("journalEntryDetailModal");
+	if (!modal) { console.error("journalEntryDetailModal tidak ditemukan");
+			return; }
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { alert("Session tidak ditemukan");
+			return; }
+
+	try {
+			const { data, error } = await supabaseClient.rpc(
+					"get_journal_entry",
+					{
+						p_journal_id: journalId,
+						p_session_id: sessionId
+					}
+			);
+
+			if (error) {
+				console.error("get_journal_entry error:", error);
+				alert(error.message || "Gagal memuat detail journal");
+					return; }
+			if (!data) { alert("Journal tidak ditemukan");
+					return; }
+			renderJournalEntryDetail(data);
+			modal.classList.remove("hidden");
+			modal.classList.add("flex");
+	} catch (err) {
+			console.error("openJournalEntryDetail error:", err);
+			alert("Gagal memuat detail journal");
+	}
+}
+
+function closeJournalEntryDetail() {
+	const modal = document.getElementById("journalEntryDetailModal");
+	if (!modal) return;
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+}
+
+
+
+
+function renderJournalEntryDetail(journal) {
+	const sourceLabels = {
+		SALES: "Sales",
+		PURCHASE: "Purchasing",
+		PAYMENT: "Payment",
+		EXPENSE: "Expense",
+		INVENTORY: "Inventory",
+		EQUITY: "Equity",
+		MANUAL: "Manual"
+	};
+
+	const statusLabels = {
+		POSTED: "Posted",
+		DRAFT: "Draft",
+		VOID: "Void"
+	};
+
+    setElementText( "journalDetailTitle",  journal.journalNo || "Journal Entry" );
+    setElementText( "journalDetailSubtitle", journal.description || "Journal details" );
+    setElementText( "journalDetailNo", journal.journalNo || "-" );
+    setElementText( "journalDetailDate", formatJournalDate(journal.journalDate) );
+    setElementText( "journalDetailSource", sourceLabels[journal.source] || journal.source || "-" );
+    setElementText( "journalDetailStatus", statusLabels[journal.status] || journal.status || "-" );
+    setElementText( "journalDetailDescription", journal.description || "-" );
+    setElementText( "journalDetailReference", journal.referenceId || "-" );
+    setElementText( "journalDetailBranch", journal.branchId || "-" );
+
+    const container = document.getElementById( "journalDetailLinesContainer" );
+    if (!container) return;
+    const lines = Array.isArray(journal.lines)
+            ? journal.lines
+            : [];
+    let totalDebit = 0;
+    let totalCredit = 0;
+    if (!lines.length) {
+			container.innerHTML = `
+				<tr>
+					<td colspan="4" class="px-4 py-8 text-center text-sm text-muted">
+						No journal lines found
+					</td>
+				</tr>
+			`;
+    } else {
+        container.innerHTML =
+          lines.map(line => {
+            const debit =
+                Number(line.debit || 0);
+            const credit =
+                Number(line.credit || 0);
+              totalDebit += debit;
+              totalCredit += credit;
+                return `
+									<tr class="border-b border-outline-variant hover:bg-background-low transition-all">
+										<td class="px-4 py-4">
+											<div class="text-sm font-medium text-on-surface">
+													${escapeHtml( line.accountCode || "-" )}
+											</div>
+
+											<div class="text-xs text-on-surface-variant mt-1">
+													${escapeHtml( line.accountName || "-" )}
+											</div>
+										</td>
+
+										<td class="px-4 py-4 text-sm text-on-surface-variant">
+												${escapeHtml( line.description || "-" )}
+										</td>
+
+										<td class="px-4 py-4 text-right text-sm text-on-surface">
+												${ debit > 0
+														? formatJournalCurrency(debit)
+														: "-"
+												}
+										</td>
+										
+										<td class="px-4 py-4 text-right text-sm text-on-surface">
+												${ credit > 0
+														? formatJournalCurrency(credit)
+														: "-"
+												}
+										</td>
+									</tr>
+							`;
+       }).join("");
+    }
+
+    setElementText( "journalDetailTotalDebit", formatJournalCurrency(totalDebit) );
+    setElementText( "journalDetailTotalCredit", formatJournalCurrency(totalCredit) );
+    const difference = totalDebit - totalCredit;
+    const differenceEl = document.getElementById( "journalDetailDifference" );
+    if (differenceEl) {
+        differenceEl.textContent = formatJournalCurrency( Math.abs(difference) );
+        differenceEl.classList.remove(
+					"text-emerald-400",
+					"text-red-400",
+					"text-on-surface"
+        );
+		if (difference === 0) {
+				differenceEl.classList.add(
+						"text-emerald-400"
+				);
+		} else {
+			differenceEl.classList.add(
+					"text-red-400"
+			);
+		}
+	}
+}
+
+function setElementText(id, value) {
+	const element = document.getElementById(id);
+	if (!element) return;
+	element.textContent = value ?? "-";
+}
+
+function formatJournalDate(dateValue) {
+	if (!dateValue) { return "-"; }
+	const date = new Date( `${String(dateValue).substring(0, 10)}T00:00:00` );
+	if (Number.isNaN(date.getTime())) {
+			return String(dateValue);
+	}
+	return date.toLocaleDateString(
+		"en-GB",
+		{
+				day: "2-digit",
+				month: "short",
+				year: "numeric"
+		}
+	);
+}
+
+function formatJournalCurrency(value) {
+	return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
+}
+
+function escapeHtml(value) {
+	return String(value ?? "")
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
 }
