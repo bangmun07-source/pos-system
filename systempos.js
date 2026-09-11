@@ -25498,6 +25498,50 @@ function populateGeneralLedgerAccounts() {
 	}
 }
 
+async function populateGeneralLedgerBranches() {
+  const select = document.getElementById("generalLedgerBranchFilter");
+  if (!select) return;
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) return;
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_branches",
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) {
+      console.error("get_expense_branches error:", error);
+      return;
+    }
+
+    const branches = data || [];
+    const currentValue = select.value;
+    select.innerHTML = ` <option value="">All Branches</option> `;
+
+    branches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch.id;
+      option.textContent = branch.name;
+      select.appendChild(option);
+    });
+
+    if (
+      currentValue &&
+      branches.some(branch =>
+        String(branch.id) === String(currentValue)
+      )
+    ) {
+      select.value = currentValue;
+    }
+
+  } catch (err) {
+    console.error("populateGeneralLedgerBranches error:", err);
+  }
+}
+
 function initGeneralLedgerFilters() {
 	const accountFilter = document.getElementById("generalLedgerAccountFilter");
 	const branchFilter = document.getElementById("generalLedgerBranchFilter");
@@ -25634,15 +25678,23 @@ function escapeHtml(value) {
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
 }
-function initGeneralLedger() {
-	initGeneralLedgerFilters();
-	const prevButton = document.getElementById("generalLedgerPrevButton");
-	const nextButton = document.getElementById("generalLedgerNextButton");
-	const exportButton = document.getElementById("generalLedgerExportButton");
 
-	if (prevButton) { prevButton.onclick = generalLedgerPreviousPage; }
-	if (nextButton) {
-			nextButton.onclick = generalLedgerNextPage; }
-	if (exportButton) { exportButton.onclick = exportGeneralLedger; }
-	loadGeneralLedger();
+async function initGeneralLedger() {
+  initGeneralLedgerFilters();
+
+  const prevButton = document.getElementById("generalLedgerPrevButton");
+  const nextButton = document.getElementById("generalLedgerNextButton");
+  const exportButton = document.getElementById("generalLedgerExportButton");
+
+  if (prevButton) {
+    prevButton.onclick = generalLedgerPreviousPage;
+  }
+  if (nextButton) {
+    nextButton.onclick = generalLedgerNextPage;
+  }
+  if (exportButton) {
+    exportButton.onclick = exportGeneralLedger;
+  }
+  await populateGeneralLedgerBranches();
+  await loadGeneralLedger();
 }
