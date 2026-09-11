@@ -24826,3 +24826,366 @@ function formatJournalCurrency( value ) {
 	return `Rp ${amount.toLocaleString( "id-ID" )}`;
 }
 
+let newJournalLineCounter = 0;
+function openNewJournalModal() {
+	const modal = document.getElementById("newJournalModal");
+	if (!modal) return;
+	const today = new Date().toISOString().split("T")[0];
+	const dateEl = document.getElementById("newJournalDate");
+	const sourceEl = document.getElementById("newJournalSource");
+	const branchEl = document.getElementById("newJournalBranch");
+	const referenceEl = document.getElementById("newJournalReference");
+	const descriptionEl = document.getElementById("newJournalDescription");
+	const statusEl = document.getElementById("newJournalStatus");
+
+	if (dateEl) dateEl.value = today;
+	if (sourceEl) sourceEl.value = "MANUAL";
+	if (referenceEl) referenceEl.value = "";
+	if (descriptionEl) descriptionEl.value = "";
+	if (statusEl) statusEl.value = "POSTED";
+
+	populateNewJournalBranches();
+	const container = document.getElementById("newJournalLinesContainer");
+
+	if (container) { container.innerHTML = ""; }
+	newJournalLineCounter = 0;
+	addNewJournalLine();
+	addNewJournalLine();
+	calculateNewJournalTotals();
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
+}
+
+
+function closeNewJournalModal() {
+	const modal = document.getElementById("newJournalModal");
+	if (!modal) return;
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+}
+
+function populateNewJournalBranches() {
+	const branchEl = document.getElementById("newJournalBranch");
+	if (!branchEl) return;
+	const branches =
+			window.branches ||
+			window.branchList ||
+			window.outlets ||
+			[];
+	branchEl.innerHTML = "";
+	if (!Array.isArray(branches) || branches.length === 0) {
+			branchEl.innerHTML = `  <option value="">Select Branch</option> `;
+			return;
+	}
+	branches.forEach(branch => {
+			const branchId =
+					branch.branchId ??
+					branch.id ??
+					branch.ID ??
+					"";
+			const branchName =
+					branch.branchName ??
+					branch.name ??
+					branch.Name ??
+					branch.outlet ??
+					branch.Outlet ??
+					branchId;
+			if (!branchId) return;
+			const option = document.createElement("option");
+			option.value = branchId;
+			option.textContent = branchName;
+			branchEl.appendChild(option);
+	});
+}
+
+function getNewJournalAccounts() {
+	const accounts = window.accountingAccounts || [];
+	return accounts.filter(account =>
+			account && account.isActive !== false
+	);
+}
+
+function buildNewJournalAccountOptions() {
+	const accounts = getNewJournalAccounts();
+	let html = ` <option value="">Select account</option> `;
+	accounts.forEach(account => {
+			const accountId = account.accountId;
+			const accountCode = account.accountCode || "";
+			const accountName = account.accountName || "";
+			if (!accountId) return;
+			html += `
+					<option value="${escapeHtml(accountId)}">
+							${escapeHtml(accountCode)} - ${escapeHtml(accountName)}
+					</option>
+			`;
+	});
+	return html;
+}
+
+function addNewJournalLine() {
+	const container = document.getElementById("newJournalLinesContainer");
+	if (!container) return;
+	newJournalLineCounter++;
+	const lineId = newJournalLineCounter;
+	const row = document.createElement("tr");
+	row.id = `newJournalLine-${lineId}`;
+	row.className = "border-b border-white/5 last:border-b-0";
+	row.innerHTML = `
+			<td class="px-4 py-3">
+					<select id="newJournalAccount-${lineId}"
+							class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white outline-none focus:border-amber-500"
+							onchange="calculateNewJournalTotals()">
+							${buildNewJournalAccountOptions()}
+					</select>
+			</td>
+
+			<td class="px-4 py-3">
+				<input type="text"
+						id="newJournalLineDescription-${lineId}"
+						placeholder="Description"
+						class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-amber-500">
+			</td>
+
+			<td class="px-4 py-3">
+				<input type="number"
+						id="newJournalDebit-${lineId}"
+						min="0"
+						step="1"
+						value="0"
+						class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white text-right outline-none focus:border-amber-500"
+						oninput="handleNewJournalDebitInput(${lineId})">
+			</td>
+
+			<td class="px-4 py-3">
+				<input type="number"
+						id="newJournalCredit-${lineId}"
+						min="0"
+						step="1"
+						value="0"
+						class="w-full rounded-lg bg-[#181b21] border border-white/10 px-3 py-2 text-sm text-white text-right outline-none focus:border-amber-500"
+						oninput="handleNewJournalCreditInput(${lineId})">
+			</td>
+
+			<td class="px-4 py-3 text-center">
+				<button type="button"
+					onclick="removeNewJournalLine(${lineId})"
+					class="w-8 h-8 rounded-lg flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition">
+
+					<span class="material-symbols-outlined text-[18px]">
+							delete
+					</span>
+				</button>
+			</td>
+	`;
+	container.appendChild(row);
+}
+
+function removeNewJournalLine(lineId) {
+	const row = document.getElementById(`newJournalLine-${lineId}`);
+	if (!row) return;
+	row.remove();
+	calculateNewJournalTotals();
+}
+
+function handleNewJournalDebitInput(lineId) {
+	const debitEl = document.getElementById(`newJournalDebit-${lineId}`);
+	const creditEl = document.getElementById(`newJournalCredit-${lineId}`);
+	if (!debitEl || !creditEl) return;
+	const debit = Number(debitEl.value || 0);
+	if (debit > 0) {
+			creditEl.value = "0";
+	}
+	calculateNewJournalTotals();
+}
+
+function handleNewJournalCreditInput(lineId) {
+	const debitEl = document.getElementById(`newJournalDebit-${lineId}`);
+	const creditEl = document.getElementById(`newJournalCredit-${lineId}`);
+	if (!debitEl || !creditEl) return;
+	const credit = Number(creditEl.value || 0);
+	if (credit > 0) {
+			debitEl.value = "0";
+	}
+	calculateNewJournalTotals();
+}
+
+function calculateNewJournalTotals() {
+	const container = document.getElementById("newJournalLinesContainer");
+	if (!container) return;
+	let totalDebit = 0;
+	let totalCredit = 0;
+	const rows = container.querySelectorAll("tr");
+	rows.forEach(row => {
+			const debitEl = row.querySelector('input[id^="newJournalDebit-"]');
+			const creditEl = row.querySelector('input[id^="newJournalCredit-"]');
+			totalDebit += Number(debitEl?.value || 0);
+			totalCredit += Number(creditEl?.value || 0);
+	});
+	const difference = totalDebit - totalCredit;
+	const debitDisplay = document.getElementById("newJournalTotalDebit");
+	const creditDisplay = document.getElementById("newJournalTotalCredit");
+	const differenceDisplay = document.getElementById("newJournalDifference");
+	if (debitDisplay) { debitDisplay.textContent = formatJournalCurrency(totalDebit); }
+	if (creditDisplay) { creditDisplay.textContent = formatJournalCurrency(totalCredit); }
+	if (differenceDisplay) {
+			differenceDisplay.textContent =
+					formatJournalCurrency(Math.abs(difference));
+			differenceDisplay.classList.remove(
+					"text-green-400",
+					"text-red-400",
+					"text-gray-400"
+			);
+			if (difference === 0) {
+					differenceDisplay.classList.add("text-green-400");
+			} else {
+					differenceDisplay.classList.add("text-red-400");
+			}
+	}
+
+	return {
+			totalDebit,
+			totalCredit,
+			difference
+	};
+}
+
+function getNewJournalLines() {
+	const container = document.getElementById("newJournalLinesContainer");
+	if (!container) return [];
+	const rows = container.querySelectorAll("tr");
+	const lines = [];
+	rows.forEach(row => {
+			const accountEl = row.querySelector('select[id^="newJournalAccount-"]');
+			const descriptionEl =  row.querySelector('input[id^="newJournalLineDescription-"]');
+			const debitEl = row.querySelector('input[id^="newJournalDebit-"]');
+			const creditEl = row.querySelector('input[id^="newJournalCredit-"]');
+			const accountId = accountEl?.value || null;
+			const description = descriptionEl?.value?.trim() || null;
+			const debit = Number(debitEl?.value || 0);
+			const credit = Number(creditEl?.value || 0);
+			lines.push({
+					accountId,
+					description,
+					debit,
+					credit
+			});
+	});
+	return lines;
+}
+
+async function saveNewJournalEntry() {
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { alert("Session tidak ditemukan.");
+			return; }
+	const dateEl = document.getElementById("newJournalDate");
+	const sourceEl = document.getElementById("newJournalSource");
+	const branchEl = document.getElementById("newJournalBranch");
+	const referenceEl = document.getElementById("newJournalReference");
+	const descriptionEl = document.getElementById("newJournalDescription");
+	const statusEl = document.getElementById("newJournalStatus");
+	const saveButton = document.getElementById("saveNewJournalButton");
+	const journalDate = dateEl?.value || "";
+	const source = sourceEl?.value || "";
+	const branchId = branchEl?.value || "";
+	const referenceId = referenceEl?.value?.trim() || null;
+	const description = descriptionEl?.value?.trim() || "";
+	const status = statusEl?.value || "POSTED";
+
+	if (!journalDate) { alert("Journal date wajib diisi."); dateEl?.focus();
+			return; }
+	if (!source) { alert("Source wajib dipilih."); sourceEl?.focus();
+			return; }
+	if (!description) { alert("Description wajib diisi."); descriptionEl?.focus();
+			return; }
+	if (!branchId) { alert("Branch wajib dipilih."); branchEl?.focus();
+			return; }
+	const lines = getNewJournalLines();
+	if (lines.length < 2) { alert("Journal minimal harus memiliki 2 line.");
+			return; }
+
+	for (let i = 0; i < lines.length; i++) {
+			const line = lines[i];
+		
+			if (!line.accountId) { alert(`Account pada line ${i + 1} wajib dipilih.`);
+					return; }
+		
+			const debit = Number(line.debit || 0);
+			const credit = Number(line.credit || 0);
+		
+			if (debit <= 0 && credit <= 0) { alert(`Debit atau Credit pada line ${i + 1} wajib diisi.`);
+					return; }
+			if (debit > 0 && credit > 0) { alert(`Line ${i + 1} tidak boleh memiliki Debit dan Credit sekaligus.`);
+					return; }
+	}
+	const totalDebit = lines.reduce(
+			(sum, line) => sum + Number(line.debit || 0),
+			0
+	);
+	const totalCredit = lines.reduce(
+			(sum, line) => sum + Number(line.credit || 0),
+			0
+	);
+	if (totalDebit <= 0 || totalCredit <= 0) {
+			alert("Total Debit dan Credit harus lebih dari 0.");
+			return;
+	}
+	if (totalDebit !== totalCredit) {
+			alert(
+					`Journal belum balance.\n\n` +
+					`Debit: ${formatJournalCurrency(totalDebit)}\n` +
+					`Credit: ${formatJournalCurrency(totalCredit)}`
+			);
+			return;
+	}
+	const originalButtonHtml = saveButton?.innerHTML;
+	try {
+			if (saveButton) {
+					saveButton.disabled = true;
+					saveButton.innerHTML = `
+							<span class="material-symbols-outlined text-[18px] animate-spin">
+									progress_activity
+							</span>
+							Saving...
+					`;
+			}
+			const { data, error } = await supabaseClient.rpc(
+					"create_journal_entry",
+					{
+							p_journal_date: journalDate,
+							p_branch_id: branchId,
+							p_source: source,
+							p_reference_id: referenceId,
+							p_description: description,
+							p_status: status,
+							p_lines: lines,
+							p_session_id: sessionId
+					}
+			);
+			if (error) {
+					console.error("create_journal_entry error:", error);
+					throw error;
+			}
+			console.log("Journal created:", data);
+			closeNewJournalModal();
+			await loadJournalEntries();
+			alert("Journal berhasil disimpan.");
+	} catch (error) {
+			console.error("saveNewJournalEntry error:", error);
+			alert(
+					error?.message ||
+					"Gagal menyimpan journal."
+			);
+	} finally {
+		if (saveButton) {
+				saveButton.disabled = false;
+				saveButton.innerHTML =
+						originalButtonHtml ||
+						`
+						<span class="material-symbols-outlined text-[18px]">
+								save
+						</span>
+						Save Journal
+						`;
+		}
+	}
+}
