@@ -2034,7 +2034,7 @@
 		      </section>
 
 		      <!-- Itemized List -->
-		      <section class="px-6 space-y-4 mb-6 overflow-y-auto max-h-[320px]">
+		      <section class="px-6 space-y-4 mb-6 overflow-y-auto custom-scrollbar max-h-[320px]">
 		        <div class="grid grid-cols-12 text-xs uppercase tracking-widest font-bold text-on-surface-variant">
 		          <div class="col-span-8">
 		            Item
@@ -2564,7 +2564,7 @@
     </div>
 </header>
 	
-<main class="flex-1 overflow-y-auto flex h-screen overflow-hidden relative pl-14 ">
+<main class="flex-1 overflow-y-auto custom-scrollbar flex h-screen overflow-hidden relative pl-14 ">
 	<section id="productSection" class="relative w-full pl-8 mx-auto md:px-2 lg:px-2 flex flex-col transition-all duration-300">
 		<!-- Category Chips -->
 		<div id="pos-category-list"
@@ -16973,7 +16973,6 @@
       </section>
     </main>
   </div>
-	
 	<!-- ==================== NEW JOURNAL MODAL ==================== -->
 	<div id="newJournalModal"
 	    class="fixed inset-0 z-50 hidden items-center justify-center bg-background">
@@ -17067,103 +17066,103 @@
 					<div>
 						<div class="flex items-center justify-between mb-3">
 							<div>
-									<h4 class="font-headline text-lg font-bold text-on-surface">
-											Journal Lines
-									</h4>
+								<h4 class="font-headline text-lg font-bold text-on-surface">
+										Journal Lines
+								</h4>
 
-									<p class="text-xs lg:text-sm text-on-surface-variant mt-1">
-											Debit and credit must be balanced
-									</p>
-								</div>
-
-								<button type="button"
-									onclick="addNewJournalLine()"
-									class="inline-flex items-center gap-2 h-11 px-4 rounded-md bottom-theme border border-outline-variant text-sm text-on-surface font-semibold active:scale-95 transition-all">
-									<span class="material-symbols-outlined text-[18px]">
-											add
-									</span>
-									Add Line
-								</button>
+								<p class="text-xs lg:text-sm text-on-surface-variant mt-1">
+										Debit and credit must be balanced
+								</p>
 							</div>
-							<!-- TABLE -->
-							<div class="overflow-x-auto custom-scrollbar rounded-md border border-outline-variant">
-								<table class="w-full min-w-[800px]">
-									<thead class="border-b border-outline-variant">
-										<tr class="text-[11px] font-bold uppercase tracking-[0.2em] text-muted">
-											<th class="text-left px-4 py-3 w-[32%]">
-													Account
-											</th>
 
-											<th class="text-left px-4 py-3 w-[28%]">
-													Description
-											</th>
+							<button type="button"
+								onclick="addNewJournalLine()"
+								class="inline-flex items-center gap-2 h-11 px-4 rounded-md bottom-theme border border-outline-variant text-sm text-on-surface font-semibold active:scale-95 transition-all">
+								<span class="material-symbols-outlined text-[18px]">
+										add
+								</span>
+								Add Line
+							</button>
+						</div>
+						<!-- TABLE -->
+						<div class="overflow-x-auto custom-scrollbar rounded-md border border-outline-variant">
+							<table class="w-full min-w-[800px]">
+								<thead class="border-b border-outline-variant">
+									<tr class="text-[11px] font-bold uppercase tracking-[0.2em] text-muted">
+										<th class="text-left px-4 py-3 w-[32%]">
+												Account
+										</th>
 
-											<th class="text-right px-4 py-3 w-[17%]">
-													Debit
-											</th>
+										<th class="text-left px-4 py-3 w-[28%]">
+												Description
+										</th>
 
-											<th class="text-right px-4 py-3 w-[17%]">
-													Credit
-											</th>
+										<th class="text-right px-4 py-3 w-[17%]">
+												Debit
+										</th>
 
-											<th class="w-[6%]"></th>
-									</tr>
-								</thead>
-							
-								<tbody id="newJournalLinesContainer">
-								</tbody>
-							</table>
+										<th class="text-right px-4 py-3 w-[17%]">
+												Credit
+										</th>
+
+										<th class="w-[6%]"></th>
+								</tr>
+							</thead>
+						
+							<tbody id="newJournalLinesContainer">
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- TOTAL -->
+				<div class="flex justify-end">
+					<div class="w-full md:w-[420px] rounded-md border border-outline-variant bg-background shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-4 space-y-3">
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-on-surface-variant">
+									Total Debit
+							</span>
+
+							<span id="newJournalTotalDebit"
+										class="font-semibold text-on-surface">
+									Rp 0
+							</span>
+						</div>
+
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-on-surface-variant">
+									Total Credit
+							</span>
+
+							<span id="newJournalTotalCredit"
+										class="font-semibold text-on-surface">
+									Rp 0
+							</span>
+						</div>
+
+						<div class="border-t border-outline-variant pt-3 flex items-center justify-between">
+							<span class="text-on-surface-variant">
+									Difference
+							</span>
+
+							<span id="newJournalDifference"
+										class="font-semibold text-on-surface">
+									Rp 0
+							</span>
 						</div>
 					</div>
-					<!-- TOTAL -->
-					<div class="flex justify-end">
-						<div class="w-full md:w-[420px] rounded-md border border-outline-variant bg-background shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-4 space-y-3">
-							<div class="flex items-center justify-between text-sm">
-								<span class="text-on-surface-variant">
-										Total Debit
-								</span>
+				</div>
+				<!-- STATUS -->
+				<div>
+					<label class="block text-[11px] font-bold uppercase tracking-[0.25em] text-muted mb-2">
+							Status
+					</label>
 
-								<span id="newJournalTotalDebit"
-											class="font-semibold text-on-surface">
-										Rp 0
-								</span>
-							</div>
-
-							<div class="flex items-center justify-between text-sm">
-								<span class="text-on-surface-variant">
-										Total Credit
-								</span>
-
-								<span id="newJournalTotalCredit"
-											class="font-semibold text-on-surface">
-										Rp 0
-								</span>
-							</div>
-
-							<div class="border-t border-outline-variant pt-3 flex items-center justify-between">
-								<span class="text-on-surface-variant">
-										Difference
-								</span>
-
-								<span id="newJournalDifference"
-											class="font-semibold text-on-surface">
-										Rp 0
-								</span>
-							</div>
-						</div>
-					</div>
-					<!-- STATUS -->
-					<div>
-						<label class="block text-[11px] font-bold uppercase tracking-[0.25em] text-muted mb-2">
-								Status
-						</label>
-
-						<select id="newJournalStatus"
-							class="w-full md:w-[240px] h-12 bg-background border border-outline-variant rounded-md px-4 pr-10 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
-							<option value="POSTED">Posted</option>
-							<option value="DRAFT">Draft</option>
-						</select>
-					</div>
+					<select id="newJournalStatus"
+						class="w-full md:w-[240px] h-12 bg-background border border-outline-variant rounded-md px-4 pr-10 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
+						<option value="POSTED">Posted</option>
+						<option value="DRAFT">Draft</option>
+					</select>
+				</div>
 			</div>
 			<!-- FOOTER -->
 			<div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant">
@@ -17185,6 +17184,210 @@
 			</div>
 		</div>
 	</div>
+	<!-- ==================== JOURNAL DETAIL MODAL ==================== -->
+	<div id="journalEntryDetailModal"
+	     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60">
+	  <div class="w-full max-w-5xl max-h-[90vh] overflow-y-auto custom-scrollbar rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	
+	    <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant">
+				<div>
+					<h3 id="journalDetailTitle"
+							class="font-headline text-xl font-bold tracking-tight text-on-surface">
+							Journal Entry
+					</h3>
+		
+					<p id="journalDetailSubtitle"
+						 class="text-xs lg:text-sm text-on-surface-variant mt-1">
+							Journal details
+					</p>
+				</div>
+	
+				<button type="button"
+							onclick="closeJournalEntryDetail()"
+							class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-background transition-all">
+					<span class="material-symbols-outlined">
+							close
+					</span>
+				</button>
+			</div>
+	  	<!-- BODY -->
+	    <div class="p-6 space-y-6">
+				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+					<div class="bg-background rounded-md border border-outline-variant p-4">
+						<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
+								Journal No
+						</p>
+	
+						<p id="journalDetailNo"
+							 class="text-sm font-semibold text-on-surface mt-2">
+								-
+						</p>
+					</div>
+	
+					<div class="bg-background rounded-md  border border-outline-variant p-4">
+						<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
+								Date
+						</p>
+	
+						<p id="journalDetailDate"
+							 class="text-sm font-semibold text-on-surface mt-2">
+								-
+						</p>
+					</div>
+	
+					<div class="bg-background rounded-md border border-outline-variant p-4">
+						<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
+								Source
+						</p>
+					
+						<p id="journalDetailSource"
+							 class="text-sm font-semibold text-on-surface mt-2">
+								-
+						</p>
+					</div>
+								
+					<div class="bg-background rounded-md border border-outline-variant p-4">
+						<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
+								Status
+						</p>
+	
+						<p id="journalDetailStatus"
+							 class="text-sm font-semibold text-on-surface mt-2">
+								-
+						</p>
+					</div>
+				</div>
+				<!-- DESCRIPTION -->
+				<div class="bg-background rounded-md border border-outline-variant p-6">
+					<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted mb-2">
+							Description
+					</p>
+		
+					<p id="journalDetailDescription"
+						 class="text-sm text-on-surface">
+							-
+					</p>
+				</div>
+	      <!-- REFERENCE / BRANCH -->
+	      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					<div class="bg-background rounded-md border border-outline-variant p-4">
+						<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
+								Reference ID
+						</p>
+		
+						<p id="journalDetailReference"
+							 class="text-sm text-on-surface mt-2">
+								-
+						</p>
+					</div>
+	
+					<div class="bg-background rounded-md border border-outline-variant p-4">
+						<p class="text-[11px] font-bold uppercase tracking-[0.25em] text-muted">
+								Branch
+						</p>
+	
+						<p id="journalDetailBranch"
+							 class="text-sm text-on-surface mt-2">
+								-
+						</p>
+					</div>
+				</div>
+	       <!-- JOURNAL LINES -->
+				<div>
+					<div class="flex items-center gap-3 mb-4">
+						<div class="main-icon-box">
+							<span class="material-symbols-outlined text-3xl"
+										style="font-variation-settings:'FILL' 1;">
+									account_tree
+							</span>
+						</div>
+	
+	          <div>
+							<h4 class="font-headline text-lg font-bold text-on-surface">
+									Journal Lines
+							</h4>
+	
+							<p class="text-xs lg:text-sm text-on-surface-variant">
+									Debit and credit details
+							</p>
+	          </div>
+	        </div>
+	
+					<div class="overflow-x-auto custom-scrollbar rounded-md border border-outline-variant">
+						<table class="w-full min-w-[800px]">
+							<thead class="border-b border-outline-variant">
+								<tr class="text-[11px] font-bold uppercase tracking-[0.2em] text-muted">
+									<th class="text-left px-4 py-3">
+											Account
+									</th>
+	
+									<th class="text-left px-4 py-3">
+											Description
+									</th>
+	
+									<th class="text-right px-4 py-3">
+											Debit
+									</th>
+	
+									<th class="text-right px-4 py-3">
+											Credit
+									</th>
+								</tr>
+							</thead>
+												
+							<tbody id="journalDetailLinesContainer">
+							</tbody>
+						</table>
+					</div>
+				</div>
+	      <!-- TOTAL -->
+	      <div class="flex justify-end">
+	        <div class="w-full md:w-[420px] rounded-md border border-outline-variant bg-background shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-4 space-y-3">
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-on-surface-variant">
+									Total Debit
+							</span>
+	
+							<span id="journalDetailTotalDebit"
+										class="font-semibold text-on-surface">
+									Rp 0
+							</span>
+						</div>
+	
+						<div class="flex items-center justify-between text-sm">
+							<span class="text-on-surface-variant">
+									Total Credit
+							</span>
+							
+							<span id="journalDetailTotalCredit"
+										class="font-semibold text-on-surface">
+									Rp 0
+							</span>
+						</div>
+										
+						<div class="border-t border-outline-variant pt-3 flex items-center justify-between">
+							<span class="text-on-surface-variant">
+									Difference
+							</span>
+												
+							<span id="journalDetailDifference"
+									class="font-semibold text-on-surface">
+									Rp 0
+							</span>
+						</div>
+					</div>
+				</div>
+			</div>
+	    <!-- FOOTER -->
+	    <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-outline-variant">
+				<button type="button"
+								onclick="closeJournalEntryDetail()"
+								class="h-11 px-5 rounded-md text-sm text-on-surface-variant font-semibold hover:text-on-surface-variant transition-all">
+						Close
+				</button>
+			</div>
+		</div>
+	</div>
 </template>
 
 	
@@ -17194,7 +17397,7 @@
   <aside id="sidebar"
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
-      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2 ">
          <!-- DASHBOARD -->
         <a onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
