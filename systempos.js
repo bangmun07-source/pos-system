@@ -1057,9 +1057,10 @@ function initModule(pageId) {
 		}
 
 		case "accountingTransactionsPage": {
-				initJournalEntriesFilters();
-				loadJournalEntries();
-		break;
+		    initJournalEntriesFilters();
+		    initGeneralLedger();
+		    loadJournalEntries();
+		    break;
 		}
   }
 }
