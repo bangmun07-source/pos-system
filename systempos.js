@@ -24653,7 +24653,7 @@ function updateJournalEntriesSummary( entries ) {
 	const draft = entries.filter( journal => journal.status === "DRAFT" ).length;
 	const voided = entries.filter( journal => journal.status === "VOID" ).length;
 	const totalEl = document.getElementById( "journalTotalEntries" );
-	const postedEl = ocument.getElementById( "journalPostedEntries" );
+	const postedEl = document.getElementById( "journalPostedEntries" );
 	const draftEl = document.getElementById( "journalDraftEntries" );
 	const voidEl = document.getElementById( "journalVoidEntries" );
 
