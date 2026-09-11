@@ -25292,9 +25292,339 @@ function formatJournalCurrency(value) {
 
 function escapeHtml(value) {
 	return String(value ?? "")
-			.replace(/&/g, "&amp;")
-			.replace(/</g, "&lt;")
-			.replace(/>/g, "&gt;")
-			.replace(/"/g, "&quot;")
-			.replace(/'/g, "&#039;");
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+
+// ============================================================
+// GENERAL LEDGER
+// ============================================================
+
+const GENERAL_LEDGER_PAGE_SIZE = 10;
+let generalLedgerCurrentPage = 1;
+let generalLedgerData = [];
+let generalLedgerAccounts = [];
+
+async function loadGeneralLedger() {
+	const sessionId = localStorage.getItem("pos_session_id");
+		if (!sessionId) {
+				console.error("Session tidak ditemukan");
+				return;
+		}
+
+	try {
+		const accountId = document.getElementById("generalLedgerAccountFilter")?.value || "";
+		const branchId = document.getElementById("generalLedgerBranchFilter")?.value || "";
+		const search = document.getElementById("generalLedgerSearch")?.value?.trim() || "";
+
+		const { data, error } = await supabaseClient.rpc(
+			"get_general_ledger",
+			{
+				p_session_id: sessionId,
+				p_account_id: accountId || null,
+				p_branch_id: branchId || null,
+				p_search: search || null
+			}
+		);
+        if (error) {
+            console.error("get_general_ledger error:", error);
+            alert(error.message || "Gagal memuat General Ledger");
+            return;
+        }
+		generalLedgerData = Array.isArray(data) ? data : [];
+		generalLedgerCurrentPage = 1;
+
+		renderGeneralLedger();
+		populateGeneralLedgerAccounts();
+
+	} catch (err) {
+		console.error("loadGeneralLedger error:", err);
+		alert(err.message || "Gagal memuat General Ledger");
+	}
+}
+
+function renderGeneralLedger() {
+	const tbody = document.getElementById("generalLedgerTableBody");
+		if (!tbody) return;
+	const filteredData = getFilteredGeneralLedger();
+	const totalItems = filteredData.length;
+	const totalPages = Math.max( 1, Math.ceil(totalItems / GENERAL_LEDGER_PAGE_SIZE) );
+		if (generalLedgerCurrentPage > totalPages) { generalLedgerCurrentPage = totalPages; }
+	const startIndex = (generalLedgerCurrentPage - 1) * GENERAL_LEDGER_PAGE_SIZE;
+	const endIndex = startIndex + GENERAL_LEDGER_PAGE_SIZE;
+	const pageData = filteredData.slice(startIndex, endIndex);
+	
+	if (!pageData.length) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="7" class="px-5 py-8 text-center text-sm text-muted">
+					No ledger entries found
+				</td>
+			</tr>
+		`;
+		updateGeneralLedgerPagination(0, 0, 0); return;
+	}
+	tbody.innerHTML = pageData.map(row => {
+		const debit = Number(row.debit || 0);
+		const credit = Number(row.credit || 0);
+		const balance = Number(row.balance || 0);
+		return `
+			<tr class="border-b border-outline-variant hover:bg-background-low transition-all">
+				<td class="px-5 py-4 text-muted">
+						${formatGeneralLedgerDate(row.journalDate)}
+				</td>
+
+				<td class="px-5 py-4 font-medium text-on-surface">
+						${escapeHtml(row.journalNo || "-")}
+				</td>
+
+				<td class="px-5 py-4 text-on-surface">
+						<div class="text-sm font-medium">
+								${escapeHtml(row.accountCode || "-")}
+						</div>
+
+						<div class="text-xs text-on-surface-variant mt-1">
+								${escapeHtml(row.accountName || "-")}
+						</div>
+				</td>
+
+				<td class="px-5 py-4 text-on-surface-variant">
+						${escapeHtml(row.description || "-")}
+				</td>
+
+				<td class="px-5 py-4 text-right text-on-surface">
+						${debit > 0 ? formatGeneralLedgerCurrency(debit) : "—"}
+				</td>
+
+				<td class="px-5 py-4 text-right text-on-surface">
+						${credit > 0 ? formatGeneralLedgerCurrency(credit) : "—"}
+				</td>
+
+				<td class="px-5 py-4 text-right font-medium text-on-surface">
+						${formatGeneralLedgerCurrency(balance)}
+				</td>
+			</tr>
+		`;
+	}).join("");
+	updateGeneralLedgerPagination(
+		startIndex + 1,
+		Math.min(endIndex, totalItems),
+		totalItems
+	);
+}
+
+function getFilteredGeneralLedger() {
+	const accountId = document.getElementById("generalLedgerAccountFilter")?.value || "";
+	const branchId = document.getElementById("generalLedgerBranchFilter")?.value || "";
+	const search = document.getElementById("generalLedgerSearch")?.value
+					?.trim()
+					.toLowerCase() || "";
+	return generalLedgerData.filter(row => {
+		if ( accountId && String(row.accountId || "") !== String(accountId) ) { 
+			return false; }
+		if ( branchId && String(row.branchId || "") !== String(branchId) ) {
+			return false; }
+		if (search) {
+				const searchable = [
+					row.journalNo,
+					row.accountCode,
+					row.accountName,
+					row.description,
+					row.referenceId,
+					row.source
+				]
+					.filter(Boolean)
+					.join(" ")
+					.toLowerCase();
+		if (!searchable.includes(search)) { return false; }
+	}
+		return true;
+	});
+}
+
+function populateGeneralLedgerAccounts() {
+	const select = document.getElementById("generalLedgerAccountFilter");
+	if (!select) return;
+	const currentValue = select.value;
+	const accounts = generalLedgerData
+		.filter(row => row.accountId)
+		.reduce((map, row) => {
+
+		if (!map.has(row.accountId)) {
+			map.set(row.accountId, {
+				accountId: row.accountId,
+				accountCode: row.accountCode,
+				accountName: row.accountName
+				});
+			}
+			return map;
+		}, new Map());
+
+	const sortedAccounts = Array.from(accounts.values())
+		.sort((a, b) => String(a.accountCode || "")
+			.localeCompare(String(b.accountCode || "")) );
+		select.innerHTML = ` <option value="">All Accounts</option>
+			${sortedAccounts.map(account => `
+				<option value="${escapeHtml(account.accountId)}">
+					${escapeHtml(account.accountCode || "-")} — ${escapeHtml(account.accountName || "-")}
+				</option>
+			`).join("")}
+		`;
+	
+	if ( currentValue && sortedAccounts.some( account => String(account.accountId) === String(currentValue) )
+	) {
+		select.value = currentValue;
+	}
+}
+
+function initGeneralLedgerFilters() {
+	const accountFilter = document.getElementById("generalLedgerAccountFilter");
+	const branchFilter = document.getElementById("generalLedgerBranchFilter");
+	const searchInput = document.getElementById("generalLedgerSearch");
+
+	if (accountFilter) {
+			accountFilter.addEventListener("change", () => { generalLedgerCurrentPage = 1; renderGeneralLedger(); });
+	}
+	if (branchFilter) {
+			branchFilter.addEventListener("change", () => { generalLedgerCurrentPage = 1; renderGeneralLedger(); });
+	}
+	if (searchInput) {
+		searchInput.addEventListener("input", () => { generalLedgerCurrentPage = 1; renderGeneralLedger(); });
+  }
+}
+
+function updateGeneralLedgerPagination( start, end, total ) {
+	const info = document.getElementById("generalLedgerPaginationInfo");
+	const prevButton = document.getElementById("generalLedgerPrevButton");
+	const nextButton = document.getElementById("generalLedgerNextButton");
+
+	if (info) {
+		if (!total) {  info.textContent = "Showing 0–0 of 0 Entries";
+		} else { info.textContent = `Showing ${start}–${end} of ${total} Entries`; }
+	}
+
+  const totalPages = Math.max( 1, Math.ceil(total / GENERAL_LEDGER_PAGE_SIZE) );
+	
+	if (prevButton) {
+		prevButton.disabled = generalLedgerCurrentPage <= 1;
+		prevButton.classList.toggle( "opacity-40", generalLedgerCurrentPage <= 1 );
+		prevButton.classList.toggle( "cursor-not-allowed", generalLedgerCurrentPage <= 1 );
+	}
+	
+	if (nextButton) {
+		nextButton.disabled = generalLedgerCurrentPage >= totalPages;
+		nextButton.classList.toggle( "opacity-40", generalLedgerCurrentPage >= totalPages );
+		nextButton.classList.toggle( "cursor-not-allowed", generalLedgerCurrentPage >= totalPages );
+	}
+}
+
+function generalLedgerPreviousPage() {
+	if (generalLedgerCurrentPage <= 1) return;
+	generalLedgerCurrentPage--;
+	renderGeneralLedger();
+}
+
+function generalLedgerNextPage() {
+	const filteredData = getFilteredGeneralLedger();
+	const totalPages = Math.max(
+		1,
+		Math.ceil(
+			filteredData.length /
+			GENERAL_LEDGER_PAGE_SIZE
+		)
+	);
+
+	if (generalLedgerCurrentPage >= totalPages) {
+			return; }
+	generalLedgerCurrentPage++;
+	renderGeneralLedger();
+}
+
+function exportGeneralLedger() {
+  const data = getFilteredGeneralLedger();
+	
+	if (!data.length) { alert("Tidak ada data General Ledger untuk diekspor."); 
+		return; }
+	
+	const headers = [
+		"Date",
+		"Journal No.",
+		"Account Code",
+		"Account Name",
+		"Description",
+		"Debit",
+		"Credit",
+		"Balance"
+	];
+
+	const rows = data.map(row => [
+		formatGeneralLedgerDate(row.journalDate),
+		row.journalNo || "",
+		row.accountCode || "",
+		row.accountName || "",
+		row.description || "",
+		Number(row.debit || 0),
+		Number(row.credit || 0),
+		Number(row.balance || 0)
+	]);
+	
+	const csv = [ headers, ...rows ]
+		.map(row =>
+			row.map(value =>
+				`"${String(value ?? "").replace(/"/g, '""')}"`
+			).join(",")
+		)
+	.join("\n");
+	const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement("a");
+
+	link.href = url;
+	link.download = `general-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+	URL.revokeObjectURL(url);
+}
+
+function formatGeneralLedgerCurrency(value) {
+  return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
+}
+
+function formatGeneralLedgerDate(value) {
+	if (!value) return "-";
+	const date = new Date( `${String(value).substring(0, 10)}T00:00:00` );
+	if (Number.isNaN(date.getTime())) { return String(value); }
+  return date.toLocaleDateString(
+		"en-GB",
+		{
+			day: "2-digit",
+			month: "short",
+			year: "numeric"
+		}
+  );
+}
+
+function escapeHtml(value) {
+	return String(value ?? "")
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+function initGeneralLedger() {
+	initGeneralLedgerFilters();
+	const prevButton = document.getElementById("generalLedgerPrevButton");
+	const nextButton = document.getElementById("generalLedgerNextButton");
+	const exportButton = document.getElementById("generalLedgerExportButton");
+
+	if (prevButton) { prevButton.onclick = generalLedgerPreviousPage; }
+	if (nextButton) {
+			nextButton.onclick = generalLedgerNextPage; }
+	if (exportButton) { exportButton.onclick = exportGeneralLedger; }
+	loadGeneralLedger();
 }
