@@ -16057,24 +16057,25 @@
                 search
               </span>
 
-              <input type="text"
+              <input id="accountingAccountSearch" type="text"
                 placeholder="Search account code or name..."
                 class="w-full h-11 bg-background border border-outline-variant rounded-md pl-10 pr-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
             </div>
             <!-- TYPE -->
-            <select class="h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none">
-              <option> All Account Types </option>
-              <option> Asset </option>
-              <option> Liability </option>
-              <option> Equity </option>
-              <option> Revenue </option>
-              <option> Expense </option>
+            <select id="accountingAccountTypeFilter" class="h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none">
+						  <option value="">All Account Types</option>
+						  <option value="ASSET">Asset</option>
+						  <option value="LIABILITY">Liability</option>
+						  <option value="EQUITY">Equity</option>
+						  <option value="REVENUE">Revenue</option>
+						  <option value="COGS">COGS</option>
+						  <option value="EXPENSE">Expense</option>
             </select>
             <!-- STATUS -->
-            <select class="h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none">
-              <option> All Status </option>
-              <option> Active </option>
-              <option> Inactive </option>
+            <select id="accountingAccountStatusFilter" class="h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none">
+						  <option value="">All Status</option>
+						  <option value="ACTIVE">Active</option>
+						  <option value="INACTIVE">Inactive</option>
             </select>
           </div>
         </div>
@@ -16119,26 +16120,34 @@
           </table>
         </div>
 				<!-- FOOTER -->
-			  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-			    <p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
-			      Showing 1–10 of 50 Products
-			    </p>
-			
-			    <div class="flex items-center gap-2">
-			      <button class="px-3 py-2 text-muted font-medium headline-font transition">
-			
-			        <span class="material-symbols-outlined text-sm lg:text-base">
-			          chevron_left
-			        </span>
-			      </button>
-			
-			      <button class="px-3 py-2 text-muted font-medium headline-font transition">
-			        <span class="material-symbols-outlined text-sm lg:text-base">
-			          chevron_right
-			        </span>
-			      </button>
-			    </div>
-			  </div>
+				<div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
+				  <p id="accountingAccountPaginationInfo"
+				     class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+				    Showing 0–0 of 0 Accounts
+				  </p>
+				
+				  <div class="flex items-center gap-2">
+				    <button
+				      id="accountingAccountPrevButton"
+				      type="button"
+				      onclick="accountingAccountPrevPage()"
+				      class="px-3 py-2 text-muted font-medium headline-font transition">
+				      <span class="material-symbols-outlined text-sm lg:text-base">
+				        chevron_left
+				      </span>
+				    </button>
+				
+				    <button
+				      id="accountingAccountNextButton"
+				      type="button"
+				      onclick="accountingAccountNextPage()"
+				      class="px-3 py-2 text-muted font-medium headline-font transition">
+				      <span class="material-symbols-outlined text-sm lg:text-base">
+				        chevron_right
+				      </span>
+				    </button>
+				  </div>
+				</div>
       </section>
       <!-- ACCOUNT MAPPING -->
       <section class="mb-4 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
@@ -16239,6 +16248,7 @@
 			    <div class="flex items-center gap-2">
 			      <button id="accountingMappingPrevButton"
         			type="button"
+							onclick="accountingMappingPrevPage()"
 							class="px-3 py-2 text-muted font-medium headline-font transition">
 			        <span class="material-symbols-outlined text-sm lg:text-base">
 			          chevron_left
@@ -16247,6 +16257,7 @@
 			
 			      <button id="accountingMappingNextButton"
 							type="button"
+							onclick="accountingMappingNextPage()"
 							class="px-3 py-2 text-muted font-medium headline-font transition">
 			        <span class="material-symbols-outlined text-sm lg:text-base">
 			          chevron_right
