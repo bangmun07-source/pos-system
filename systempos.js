@@ -1048,9 +1048,12 @@ function initModule(pageId) {
 		    initAccountingModule();
 		break;
 
-		case "accountingAccountsPage":
-	    	loadAccountingAccounts();
-	    break;
+		case "accountingAccountsPage": {
+		    loadAccountingAccounts();
+		    loadAccountingMappings();
+		    initAccountingMappingFilters();
+		    break;
+		}
   }
 }
 	
@@ -23470,3 +23473,759 @@ async function toggleAccountingAccountStatus(accountId) {
         );
     }
 }
+
+
+/* =======================================================
+   ACCOUNT MAPPING
+   ======================================================= */
+let editingAccountingMappingId = null;
+async function loadAccountingMappings() {
+    try {
+        const sessionId =
+            localStorage.getItem("pos_session_id");
+
+        if (!sessionId) {
+            return;
+        }
+
+        const { data, error } =
+            await supabaseClient.rpc(
+                "get_account_mappings",
+                {
+                    p_session_id: sessionId
+                }
+            );
+
+        if (error) {
+            console.error(
+                "Gagal mengambil Account Mappings:",
+                error
+            );
+            return;
+        }
+
+        const mappings = Array.isArray(data) ? data : [];
+        window.accountingMappings = mappings;
+        renderAccountingMappings();
+    } catch (err) {
+        console.error(
+            "loadAccountingMappings error:",
+            err
+        );
+    }
+}
+
+
+/* =======================================================
+   RENDER ACCOUNT MAPPINGS
+   ======================================================= */
+
+function renderAccountingMappings() {
+    const tbody =
+        document.getElementById(
+            "accountingMappingsTableBody"
+        );
+
+    if (!tbody) {
+        console.warn(
+            "accountingMappingsTableBody tidak ditemukan"
+        );
+        return;
+    }
+
+    const search =
+        (
+            document.getElementById(
+                "accountingMappingSearch"
+            )?.value || ""
+        )
+        .trim()
+        .toLowerCase();
+
+    const typeFilter =
+        document.getElementById(
+            "accountingMappingTypeFilter"
+        )?.value || "";
+
+    let mappings =
+        Array.isArray(window.accountingMappings)
+            ? window.accountingMappings
+            : [];
+
+    /* SEARCH */
+
+    if (search) {
+        mappings = mappings.filter(mapping => {
+
+            const text = [
+                mapping.mappingName,
+                mapping.transactionType,
+                mapping.source,
+                mapping.debitAccountCode,
+                mapping.debitAccountName,
+                mapping.creditAccountCode,
+                mapping.creditAccountName
+            ]
+                .filter(Boolean)
+                .join(" ")
+                .toLowerCase();
+
+            return text.includes(search);
+        });
+    }
+
+    /* FILTER TRANSACTION TYPE */
+
+    if (
+        typeFilter &&
+        typeFilter !== "All Transaction Types"
+    ) {
+        mappings = mappings.filter(mapping =>
+            String(mapping.transactionType || "")
+                .toUpperCase() ===
+            typeFilter.toUpperCase()
+        );
+    }
+
+    /* EMPTY */
+
+    if (!mappings.length) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    class="px-6 py-10 text-center text-gray-400">
+                    Belum ada account mapping.
+                </td>
+            </tr>
+        `;
+
+        updateAccountingMappingPaginationInfo(0);
+
+        return;
+    }
+
+    /* TABLE */
+
+    tbody.innerHTML = mappings.map(mapping => {
+
+        const statusClass =
+            mapping.isActive
+                ? "bg-green-500/10 text-green-400"
+                : "bg-gray-500/10 text-gray-400";
+
+        const statusLabel =
+            mapping.isActive
+                ? "ACTIVE"
+                : "INACTIVE";
+
+        const debitAccount =
+            mapping.debitAccountCode ||
+            mapping.debitAccountName
+                ? `
+                    <div class="font-medium text-white">
+                        ${escapeHtml(
+                            mapping.debitAccountName || "-"
+                        )}
+                    </div>
+                    <div class="text-xs text-muted mt-1 font-mono">
+                        ${escapeHtml(
+                            mapping.debitAccountCode || "-"
+                        )}
+                    </div>
+                  `
+                : "—";
+
+        const creditAccount =
+            mapping.creditAccountCode ||
+            mapping.creditAccountName
+                ? `
+                    <div class="font-medium text-white">
+                        ${escapeHtml(
+                            mapping.creditAccountName || "-"
+                        )}
+                    </div>
+                    <div class="text-xs text-muted mt-1 font-mono">
+                        ${escapeHtml(
+                            mapping.creditAccountCode || "-"
+                        )}
+                    </div>
+                  `
+                : "—";
+
+        return `
+            <tr class="border-b border-gray-800 hover:bg-gray-800/40">
+
+                <!-- TRANSACTION -->
+                <td class="px-6 py-4">
+                    <div class="font-medium text-white">
+                        ${escapeHtml(
+                            mapping.mappingName || "-"
+                        )}
+                    </div>
+
+                    <div class="text-xs text-muted mt-1">
+                        ${escapeHtml(
+                            mapping.transactionType || "-"
+                        )}
+                    </div>
+                </td>
+
+                <!-- SOURCE -->
+                <td class="px-6 py-4">
+                    <span class="text-sm text-gray-300">
+                        ${escapeHtml(
+                            mapping.source || "-"
+                        )}
+                    </span>
+                </td>
+
+                <!-- DEBIT -->
+                <td class="px-6 py-4">
+                    ${debitAccount}
+                </td>
+
+                <!-- CREDIT -->
+                <td class="px-6 py-4">
+                    ${creditAccount}
+                </td>
+
+                <!-- STATUS -->
+                <td class="px-6 py-4">
+                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+                        ${statusLabel}
+                    </span>
+                </td>
+
+                <!-- ACTION -->
+                <td class="px-6 py-4">
+                    <div class="relative">
+
+                        <button type="button"
+                            onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
+                            class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-white hover:bg-white/5 transition">
+
+                            <span class="material-symbols-outlined text-lg">
+                                more_vert
+                            </span>
+
+                        </button>
+
+                        <div id="accountingMappingMenu-${escapeHtml(mapping.mappingId)}"
+                             class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
+
+                            <button type="button"
+                                onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
+                                class="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/5">
+                                Edit
+                            </button>
+
+                            <button type="button"
+                                onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
+                                class="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/5">
+                                ${mapping.isActive
+                                    ? "Deactivate"
+                                    : "Activate"}
+                            </button>
+
+                        </div>
+                    </div>
+                </td>
+
+            </tr>
+        `;
+
+    }).join("");
+
+    updateAccountingMappingPaginationInfo(
+        mappings.length
+    );
+}
+
+
+/* =======================================================
+   PAGINATION INFO
+   ======================================================= */
+
+function updateAccountingMappingPaginationInfo(total) {
+
+    const info =
+        document.getElementById(
+            "accountingMappingPaginationInfo"
+        );
+
+    if (!info) return;
+
+    if (!total) {
+        info.textContent =
+            "Showing 0–0 of 0 Mappings";
+        return;
+    }
+
+    info.textContent =
+        `Showing 1–${total} of ${total} Mappings`;
+}
+
+
+/* =======================================================
+   ACCOUNT DROPDOWN
+   ======================================================= */
+
+function populateAccountingMappingAccounts() {
+
+    const debitSelect =
+        document.getElementById(
+            "newAccountingMappingDebitAccount"
+        );
+
+    const creditSelect =
+        document.getElementById(
+            "newAccountingMappingCreditAccount"
+        );
+
+    if (!debitSelect || !creditSelect) {
+        return;
+    }
+
+    const accounts =
+        Array.isArray(window.accountingAccounts)
+            ? window.accountingAccounts
+                .filter(account => account.isActive)
+                .sort((a, b) =>
+                    String(a.accountCode || "")
+                        .localeCompare(
+                            String(b.accountCode || "")
+                        )
+                )
+            : [];
+
+    const options = accounts.map(account => `
+        <option value="${escapeHtml(account.accountId)}">
+            ${escapeHtml(account.accountCode || "")}
+            — 
+            ${escapeHtml(account.accountName || "")}
+        </option>
+    `).join("");
+
+    debitSelect.innerHTML = `
+        <option value="">Select Debit Account</option>
+        ${options}
+    `;
+
+    creditSelect.innerHTML = `
+        <option value="">Select Credit Account</option>
+        ${options}
+    `;
+}
+
+
+/* =======================================================
+   OPEN ADD MODAL
+   ======================================================= */
+
+function openAddAccountingMappingModal() {
+
+    editingAccountingMappingId = null;
+
+    const modal =
+        document.getElementById(
+            "addAccountingMappingModal"
+        );
+
+    if (!modal) return;
+
+    document.getElementById(
+        "newAccountingMappingName"
+    ).value = "";
+
+    document.getElementById(
+        "newAccountingMappingType"
+    ).value = "";
+
+    document.getElementById(
+        "newAccountingMappingSource"
+    ).value = "";
+
+    populateAccountingMappingAccounts();
+
+    document.getElementById(
+        "newAccountingMappingDebitAccount"
+    ).value = "";
+
+    document.getElementById(
+        "newAccountingMappingCreditAccount"
+    ).value = "";
+
+    const title =
+        document.getElementById(
+            "accountingMappingModalTitle"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "accountingMappingModalSaveButton"
+        );
+
+    if (title) {
+        title.textContent = "Add Mapping";
+    }
+
+    if (saveButton) {
+        saveButton.textContent = "Save Mapping";
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+/* =======================================================
+   CLOSE MODAL
+   ======================================================= */
+
+function closeAddAccountingMappingModal() {
+
+    const modal =
+        document.getElementById(
+            "addAccountingMappingModal"
+        );
+
+    if (!modal) return;
+
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+
+    editingAccountingMappingId = null;
+}
+
+
+/* =======================================================
+   EDIT ACCOUNT MAPPING
+   ======================================================= */
+
+function editAccountingMapping(mappingId) {
+
+    const mapping =
+        (window.accountingMappings || [])
+            .find(
+                mapping =>
+                    mapping.mappingId === mappingId
+            );
+
+    if (!mapping) {
+        alert("Account mapping tidak ditemukan.");
+        return;
+    }
+
+    editingAccountingMappingId =
+        mappingId;
+
+    const modal =
+        document.getElementById(
+            "addAccountingMappingModal"
+        );
+
+    if (!modal) return;
+
+    populateAccountingMappingAccounts();
+
+    document.getElementById(
+        "newAccountingMappingName"
+    ).value =
+        mapping.mappingName || "";
+
+    document.getElementById(
+        "newAccountingMappingType"
+    ).value =
+        mapping.transactionType || "";
+
+    document.getElementById(
+        "newAccountingMappingSource"
+    ).value =
+        mapping.source || "";
+
+    document.getElementById(
+        "newAccountingMappingDebitAccount"
+    ).value =
+        mapping.debitAccountId || "";
+
+    document.getElementById(
+        "newAccountingMappingCreditAccount"
+    ).value =
+        mapping.creditAccountId || "";
+
+    const title =
+        document.getElementById(
+            "accountingMappingModalTitle"
+        );
+
+    const saveButton =
+        document.getElementById(
+            "accountingMappingModalSaveButton"
+        );
+
+    if (title) {
+        title.textContent = "Edit Mapping";
+    }
+
+    if (saveButton) {
+        saveButton.textContent = "Update Mapping";
+    }
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
+
+
+/* =======================================================
+   SAVE ACCOUNT MAPPING
+   ======================================================= */
+
+async function saveAccountingMapping() {
+
+    const sessionId =
+        localStorage.getItem(
+            "pos_session_id"
+        );
+
+    if (!sessionId) {
+        alert("Session tidak ditemukan.");
+        return;
+    }
+
+    const mappingName =
+        document.getElementById(
+            "newAccountingMappingName"
+        )?.value.trim();
+
+    const transactionType =
+        document.getElementById(
+            "newAccountingMappingType"
+        )?.value;
+
+    const source =
+        document.getElementById(
+            "newAccountingMappingSource"
+        )?.value.trim();
+
+    const debitAccountId =
+        document.getElementById(
+            "newAccountingMappingDebitAccount"
+        )?.value || null;
+
+    const creditAccountId =
+        document.getElementById(
+            "newAccountingMappingCreditAccount"
+        )?.value || null;
+
+
+    /* VALIDATION */
+
+    if (!mappingName) {
+        alert("Mapping Name wajib diisi.");
+        return;
+    }
+
+    if (!transactionType) {
+        alert("Transaction Type wajib dipilih.");
+        return;
+    }
+
+    if (!source) {
+        alert("Source wajib diisi.");
+        return;
+    }
+
+    if (
+        !debitAccountId &&
+        !creditAccountId
+    ) {
+        alert(
+            "Debit atau Credit Account wajib dipilih."
+        );
+        return;
+    }
+
+
+    try {
+
+        let data;
+        let error;
+
+        /* EDIT */
+
+        if (editingAccountingMappingId) {
+
+            ({ data, error } =
+                await supabaseClient.rpc(
+                    "update_account_mapping",
+                    {
+                        p_mapping_id:
+                            editingAccountingMappingId,
+
+                        p_mapping_name:
+                            mappingName,
+
+                        p_transaction_type:
+                            transactionType,
+
+                        p_source:
+                            source,
+
+                        p_debit_account_id:
+                            debitAccountId,
+
+                        p_credit_account_id:
+                            creditAccountId,
+
+                        p_session_id:
+                            sessionId
+                    }
+                )
+            );
+
+        }
+
+        /* ADD */
+
+        else {
+
+            ({ data, error } =
+                await supabaseClient.rpc(
+                    "create_account_mapping",
+                    {
+                        p_mapping_name:
+                            mappingName,
+
+                        p_transaction_type:
+                            transactionType,
+
+                        p_source:
+                            source,
+
+                        p_debit_account_id:
+                            debitAccountId,
+
+                        p_credit_account_id:
+                            creditAccountId,
+
+                        p_session_id:
+                            sessionId
+                    }
+                )
+            );
+        }
+
+
+        if (error) {
+
+            console.error(
+                "save accounting mapping error:",
+                error
+            );
+
+            alert(
+                error.message ||
+                "Gagal menyimpan account mapping."
+            );
+
+            return;
+        }
+
+
+        console.log(
+            "Account mapping saved:",
+            data
+        );
+
+
+        const wasEditing =
+            !!editingAccountingMappingId;
+
+        closeAddAccountingMappingModal();
+
+        await loadAccountingMappings();
+
+        editingAccountingMappingId = null;
+
+        alert(
+            "Account Mapping berhasil " +
+            (wasEditing
+                ? "diubah."
+                : "disimpan.")
+        );
+
+
+    } catch (err) {
+
+        console.error(
+            "saveAccountingMapping error:",
+            err
+        );
+
+        alert(
+            "Terjadi kesalahan saat menyimpan account mapping."
+        );
+    }
+}
+
+
+/* =======================================================
+   ACTION MENU
+   ======================================================= */
+
+function toggleAccountingMappingMenu(mappingId) {
+
+    const menu =
+        document.getElementById(
+            `accountingMappingMenu-${mappingId}`
+        );
+
+    if (!menu) return;
+
+    document.querySelectorAll(
+        '[id^="accountingMappingMenu-"]'
+    ).forEach(el => {
+
+        if (el !== menu) {
+            el.classList.add("hidden");
+        }
+
+    });
+
+    menu.classList.toggle("hidden");
+}
+
+
+/* =======================================================
+   SEARCH + FILTER EVENT
+   ======================================================= */
+
+function initAccountingMappingFilters() {
+
+    const search =
+        document.getElementById(
+            "accountingMappingSearch"
+        );
+
+    const typeFilter =
+        document.getElementById(
+            "accountingMappingTypeFilter"
+        );
+
+    if (search) {
+        search.addEventListener(
+            "input",
+            renderAccountingMappings
+        );
+    }
+
+    if (typeFilter) {
+        typeFilter.addEventListener(
+            "change",
+            renderAccountingMappings
+        );
+    }
+}
+
+
