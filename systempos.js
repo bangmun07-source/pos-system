@@ -24463,3 +24463,360 @@ async function toggleAccountingMappingStatus(mappingId) {
         );
     }
 }
+
+/* =============================
+JOURNAL ENTRIES
+============================= */
+
+const JOURNAL_ENTRIES_PAGE_SIZE = 10;
+let journalEntriesCurrentPage = 1;
+let journalEntriesData = [];
+
+async function loadJournalEntries() {
+	try {
+	const sessionId =
+	localStorage.getItem("pos_session_id");
+	    if (!sessionId) {
+	        return;
+	    }
+	    const { data, error } =
+	        await supabaseClient.rpc(
+	            "get_journal_entries",
+	            {
+	                p_session_id: sessionId
+	            }
+	        );
+	    if (error) {
+	        console.error(
+	            "Gagal mengambil Journal Entries:",
+	            error
+	        );
+	        return;
+	    }
+	    const entries = Array.isArray(data) ? data : [];
+	    journalEntriesData = entries;
+	    window.journalEntries = entries;
+	    journalEntriesCurrentPage = 1;
+	    renderJournalEntries(entries);
+	    updateJournalEntriesSummary(entries);
+		} catch (err) {
+		    console.error(
+		        "loadJournalEntries error:",
+		        err
+		    );
+		}
+}
+
+
+function renderJournalEntries(entries) {
+	const tbody = document.getElementById( "journalEntriesTableBody" );
+	if (!tbody) {
+	    console.warn(
+	        "journalEntriesTableBody tidak ditemukan"
+	    );
+	    return;
+	}
+	const filteredEntries = getFilteredJournalEntries(entries);
+	const total = filteredEntries.length;
+	const totalPages =
+	    Math.max(
+	        1,
+	        Math.ceil(
+	            total /
+	            JOURNAL_ENTRIES_PAGE_SIZE
+	        )
+	    );
+if (
+    journalEntriesCurrentPage > totalPages
+) {
+    journalEntriesCurrentPage = totalPages;
+}
+const startIndex =
+    (
+        journalEntriesCurrentPage - 1
+    ) *
+    JOURNAL_ENTRIES_PAGE_SIZE;
+const endIndex =
+    startIndex +
+    JOURNAL_ENTRIES_PAGE_SIZE;
+const pageEntries =
+    filteredEntries.slice(
+        startIndex,
+        endIndex
+    );
+if (!pageEntries.length) {
+    tbody.innerHTML = `
+        <tr>
+            <td
+                colspan="8"
+                class="px-5 py-10 text-center text-muted">
+                Belum ada journal entries.
+            </td>
+        </tr>
+    `;
+	} else {
+	    tbody.innerHTML =
+	        pageEntries
+	            .map(
+	                journal =>
+	                    renderJournalEntryRow(
+	                        journal
+	                    )
+	            )
+	  	.join("");
+	}
+	updateJournalEntriesPagination(
+	    total,
+	    totalPages
+	);
+}
+
+
+function renderJournalEntryRow(journal) {
+	const sourceLabel = {
+	    SALES: "Sales",
+	    PURCHASE: "Purchasing",
+	    PAYMENT: "Payment",
+	    EXPENSE: "Expense",
+	    INVENTORY: "Inventory",
+	    EQUITY: "Equity",
+	    MANUAL: "Manual"
+	}[
+	    journal.source
+	] || journal.source || "-";
+	
+	const statusLabel = {
+	    POSTED: "Posted",
+	    DRAFT: "Draft",
+	    VOID: "Void"
+	}[
+	    journal.status
+	] || journal.status || "-";
+	
+	const statusClass = {
+	    POSTED: "text-emerald-400",
+	    DRAFT: "text-yellow-400",
+	    VOID: "text-red-400"
+	}[
+	    journal.status
+	] || "text-muted";
+	
+	return `
+	    <tr class="border-b border-outline-variant hover:bg-white/[0.02]">
+	        <td class="px-5 py-4 font-medium">
+	            ${escapeHtml(
+	                journal.journalNo || "-"
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4 text-muted">
+	            ${formatJournalDate(
+	                journal.journalDate
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4">
+	            ${escapeHtml(
+	                sourceLabel
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4">
+	            ${escapeHtml(
+	                journal.description || "-"
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4 text-right">
+	            ${formatJournalCurrency(
+	                journal.totalDebit
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4 text-right">
+	            ${formatJournalCurrency(
+	                journal.totalCredit
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4 uppercase tracking-widest font-medium headline-font ${statusClass}">
+	            ${escapeHtml(
+	                statusLabel
+	            )}
+	        </td>
+	
+	        <td class="px-5 py-4 text-right">
+	            <button type="button"
+	                onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
+	                class="text-muted hover:text-foreground">
+	                <span class="material-symbols-outlined text-[18px]">
+	                    more_horiz
+	                </span>
+	            </button>
+	        </td>
+	    </tr>
+	`;
+}
+
+function getFilteredJournalEntries( entries ) {
+	const dateFrom = document.getElementById(
+	        "journalDateFrom"
+	    )?.value || "";
+	const dateTo = document.getElementById(
+	        "journalDateTo"
+	    )?.value || "";
+	const source = document.getElementById(
+	        "journalSourceFilter"
+	    )?.value || "";
+	const status = document.getElementById(
+	        "journalStatusFilter"
+	    )?.value || "";
+	const search =
+	    ( 
+				document.getElementById(
+	            "journalSearch"
+	        )?.value || ""
+	    )
+	    .trim()
+	    .toLowerCase();
+	return entries.filter(journal => {
+	    const journalDate = journal.journalDate || "";
+	    if ( dateFrom && journalDate < dateFrom ) 
+					{ return false; }
+	    if ( dateTo && journalDate > dateTo ) 	
+					{ return false; }
+	    if ( source && journal.source !== source ) 
+					{ return false; }
+	    if ( status && journal.status !== status ) 
+					{ return false; }
+	    if (search) {
+	        const journalNo = String(
+	                journal.journalNo || ""
+	            ).toLowerCase();
+	        const description = String(
+	                journal.description || ""
+	            ).toLowerCase();
+	        if ( !journalNo.includes(search) &&  !description.includes(search) ) 
+					{ return false; }
+	    }
+	    return true;
+	});
+}
+
+function updateJournalEntriesSummary( entries ) {
+	const total = entries.length;
+	const posted = entries.filter(
+	        journal => journal.status === "POSTED"
+	    ).length;
+	const draft = entries.filter(
+	        journal => journal.status === "DRAFT"
+	    ).length;
+	const voided = entries.filter(
+	        journal => journal.status === "VOID"
+	    ).length;
+	const totalEl = document.getElementById( "journalTotalEntries" );
+	const postedEl = ocument.getElementById( "journalPostedEntries" );
+	const draftEl = document.getElementById( "journalDraftEntries" );
+	const voidEl = document.getElementById( "journalVoidEntries" );
+
+	if (totalEl) { totalEl.textContent = total.toLocaleString("id-ID"); }
+	if (postedEl) { postedEl.textContent = posted.toLocaleString("id-ID"); }
+	if (draftEl) { draftEl.textContent = draft.toLocaleString("id-ID"); }
+	if (voidEl) { voidEl.textContent =  voided.toLocaleString("id-ID"); }
+}
+
+
+function updateJournalEntriesPagination( total, totalPages ) {
+	const info = document.getElementById( "journalEntriesPaginationInfo" );
+	const prevButton = document.getElementById( "journalEntriesPrevButton" );
+	const nextButton = document.getElementById( "journalEntriesNextButton" );
+	const start = 
+		total === 0
+	        ? 0
+	        :
+	        (
+						( journalEntriesCurrentPage - 1  ) 
+						* JOURNAL_ENTRIES_PAGE_SIZE
+	        ) + 1;
+	const end =
+	    Math.min(
+	        journalEntriesCurrentPage *
+	        JOURNAL_ENTRIES_PAGE_SIZE,
+	        total
+	    );
+	if (info) { info.textContent = `Showing ${start}–${end} of ${total} Entries`; }
+	if (prevButton) { prevButton.disabled = journalEntriesCurrentPage <= 1; }
+	if (nextButton) { nextButton.disabled = journalEntriesCurrentPage >= totalPages; }
+}
+
+function journalEntriesPrevPage() {
+	if ( journalEntriesCurrentPage <= 1 ) 
+		{ return; }
+	journalEntriesCurrentPage--;
+	renderJournalEntries( journalEntriesData );
+}
+
+function journalEntriesNextPage() {
+	const filteredEntries = getFilteredJournalEntries( journalEntriesData );
+	const totalPages =
+	    Math.max(
+	        1,
+	        Math.ceil(
+	            filteredEntries.length /
+	            JOURNAL_ENTRIES_PAGE_SIZE
+	        )
+	    );
+	
+	if ( journalEntriesCurrentPage >= totalPages ) 
+		{ return; }
+	
+	journalEntriesCurrentPage++;
+	renderJournalEntries( journalEntriesData );
+}
+
+function initJournalEntriesFilters() {
+	const dateFrom = document.getElementById( "journalDateFrom" );
+	const dateTo = document.getElementById( "journalDateTo" );
+	const source = document.getElementById( "journalSourceFilter" );
+	const status =  document.getElementById( "journalStatusFilter" );
+	const search = document.getElementById( "journalSearch" );
+	const resetPage =
+	    () => {
+	        journalEntriesCurrentPage = 1;
+	        renderJournalEntries(
+	            journalEntriesData
+	        );
+	    };
+	dateFrom?.addEventListener( "change", resetPage );
+	dateTo?.addEventListener( "change", resetPage );
+	source?.addEventListener( "change", resetPage );
+	status?.addEventListener( "change", resetPage );
+	search?.addEventListener( "input", resetPage );
+}
+
+function formatJournalDate( dateValue ) {
+	if (!dateValue) { return "-"; }
+	const date = new Date( `${dateValue}T00:00:00` );
+	if (
+	    Number.isNaN(
+	        date.getTime()
+	    )
+	) {
+	    return escapeHtml(
+	        String(dateValue)
+	    );
+	}
+	return date.toLocaleDateString( "en-GB",
+		{
+			day: "2-digit",
+			month: "short",
+			year: "numeric"
+		}
+	);
+}
+
+function formatJournalCurrency( value ) {
+	const amount = Number(value || 0);
+	return `Rp ${amount.toLocaleString( "id-ID" )}`;
+}
+
