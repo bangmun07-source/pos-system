@@ -1053,7 +1053,13 @@ function initModule(pageId) {
 		    initAccountingMappingFilters();
 		    loadAccountingAccounts();
 		    loadAccountingMappings();
-		    break;
+		break;
+		}
+
+		case "accountingTransactionsPage": {
+				initJournalEntriesFilters();
+				loadJournalEntries();
+		break;
 		}
   }
 }
