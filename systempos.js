@@ -22925,7 +22925,6 @@ function renderAccountingOverview(data) {
       }).join("");
     }
   }
-
   /*
    * Total AP menggunakan data dari financial position
    * supaya konsisten dengan KPI dan Balance Sheet.
@@ -23033,9 +23032,7 @@ function renderAccountingOverview(data) {
     }
   }
 
-  /* =======================================================
-     OPTIONAL: SAVE CURRENT ACCOUNTING DATA
-     ======================================================= */
+  /* ====== OPTIONAL: SAVE CURRENT ACCOUNTING DATA ====== */
   window.currentAccountingOverview = data;
   console.log(
     "Accounting overview rendered:",
@@ -23043,9 +23040,9 @@ function renderAccountingOverview(data) {
   );
 }
 
-  /* =======================================================
-     ACCOUNTING
-     ======================================================= */
+  /* ============================= 
+  			ACCOUNTING 
+  ============================== */
 
 async function loadAccountingAccounts() {
     try {
@@ -23074,13 +23071,52 @@ async function loadAccountingAccounts() {
     }
 }
 
+function initAccountingAccountFilters() {
+    const search = document.getElementById( "accountingAccountSearch" );
+    const typeFilter = document.getElementById( "accountingAccountTypeFilter" );
+    const statusFilter = document.getElementById( "accountingAccountStatusFilter" );
+    const resetPage = () => {
+        accountingAccountCurrentPage = 1;
+        renderAccountingAccounts(
+            window.accountingAccounts || []
+        );
+    };
+    search?.addEventListener("input", resetPage);
+    typeFilter?.addEventListener("change", resetPage);
+    statusFilter?.addEventListener("change", resetPage);
+}
+
 function renderAccountingAccounts(accounts) {
     const tbody = document.getElementById("accountsTableBody");
     if (!tbody) {
         console.warn("accountsTableBody tidak ditemukan");
         return;
     }
-    if (!accounts.length) {
+    const searchEl = document.getElementById("accountingAccountSearch");
+    const typeFilterEl = document.getElementById("accountingAccountTypeFilter");
+    const statusFilterEl = document.getElementById("accountingAccountStatusFilter");
+
+    const search = (searchEl?.value || "").trim().toLowerCase();
+    const typeFilter = typeFilterEl?.value || "";
+    const statusFilter = statusFilterEl?.value || "";
+    // FILTER
+    let filteredAccounts = accounts.filter(account => {
+        const matchSearch =
+            !search ||
+            (account.accountCode || "").toLowerCase().includes(search) ||
+            (account.accountName || "").toLowerCase().includes(search);
+        const matchType =
+            !typeFilter ||
+            account.accountType === typeFilter;
+        const matchStatus =
+            !statusFilter ||
+            (statusFilter === "ACTIVE"
+                ? account.isActive === true
+                : account.isActive === false);
+        return matchSearch && matchType && matchStatus;
+    });
+    // EMPTY
+    if (!filteredAccounts.length) {
         tbody.innerHTML = `
             <tr>
                 <td colspan="7" class="px-6 py-10 text-center text-gray-400">
@@ -23088,9 +23124,29 @@ function renderAccountingAccounts(accounts) {
                 </td>
             </tr>
         `;
+        updateAccountingAccountPaginationInfo(0);
+        updateAccountingAccountPaginationButtons(1);
         return;
     }
-    tbody.innerHTML = accounts.map(account => {
+    // PAGINATION
+    const totalAccounts = filteredAccounts.length;
+    const totalPages = Math.max(
+        1,
+        Math.ceil(
+            totalAccounts / ACCOUNTING_ACCOUNT_PAGE_SIZE
+        )
+    );
+
+    if (accountingAccountCurrentPage > totalPages) {
+        accountingAccountCurrentPage = totalPages;
+    }
+    const startIndex =
+        (accountingAccountCurrentPage - 1) *
+        ACCOUNTING_ACCOUNT_PAGE_SIZE;
+    const endIndex = startIndex + ACCOUNTING_ACCOUNT_PAGE_SIZE;
+    const pageAccounts = filteredAccounts.slice(startIndex, endIndex);
+    // RENDER
+    tbody.innerHTML = pageAccounts.map(account => {
         const typeLabel = {
             ASSET: "Asset",
             LIABILITY: "Liability",
@@ -23107,7 +23163,6 @@ function renderAccountingAccounts(accounts) {
             COGS: "bg-orange-500/10 text-orange-400",
             EXPENSE: "bg-yellow-500/10 text-yellow-400"
         }[account.accountType] || "bg-gray-500/10 text-gray-400";
-			
         const statusClass = account.isActive
             ? "bg-green-500/10 text-green-400"
             : "bg-gray-500/10 text-gray-400";
@@ -23156,39 +23211,124 @@ function renderAccountingAccounts(accounts) {
 
                 <td class="px-6 py-4 text-right">
                     <div class="relative inline-block">
-											<button type="button"
-												onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
-												class="text-gray-400 hover:text-white transition" >
-												<span class="material-symbols-outlined text-[20px]">
-													more_vert
-												</span>
-											</button>
-										
-											<div
-												id="accountMenu-${escapeHtml(account.accountId)}"
-												class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50" >
-												<button type="button"
-													onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
-													class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5" >
-													Edit Account
-												</button>
-										
-												<button
-													type="button"
-													onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
-													class="w-full text-left px-4 py-2 text-sm ${
-														account.isActive
-															? "text-red-400"
-															: "text-emerald-400"
-													} hover:bg-white/5" >
-													${account.isActive ? "Set Inactive" : "Set Active"}
-												</button>
-											</div>
-										</div>
+                        <button type="button"
+                            onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
+                            class="text-gray-400 hover:text-white transition">
+                            <span class="material-symbols-outlined text-[20px]">
+                                more_vert
+                            </span>
+                        </button>
+
+                        <div id="accountMenu-${escapeHtml(account.accountId)}"
+                            class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50">
+                            <button type="button"
+                                onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
+                                class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5">
+                                Edit Account
+                            </button>
+
+                            <button type="button"
+                                onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
+                                class="w-full text-left px-4 py-2 text-sm ${
+                                    account.isActive
+                                        ? "text-red-400"
+                                        : "text-emerald-400"
+                                } hover:bg-white/5">
+                                ${account.isActive ? "Set Inactive" : "Set Active"}
+                            </button>
+                        </div>
+                    </div>
                 </td>
             </tr>
         `;
     }).join("");
+    // PAGINATION INFO + BUTTON
+    updateAccountingAccountPaginationInfo(totalAccounts);
+    updateAccountingAccountPaginationButtons(totalPages);
+}
+
+function updateAccountingAccountPaginationInfo(total) {
+    const info = document.getElementById( "accountingAccountPaginationInfo" );
+    if (!info) return;
+    if (!total) {
+        info.textContent = "Showing 0–0 of 0 Accounts";
+        return;
+    }
+    const start =
+        ((accountingAccountCurrentPage - 1) *
+            ACCOUNTING_ACCOUNT_PAGE_SIZE) + 1;
+    const end = Math.min(
+        accountingAccountCurrentPage *
+            ACCOUNTING_ACCOUNT_PAGE_SIZE,
+        total
+    );
+    info.textContent =
+        `Showing ${start}–${end} of ${total} Accounts`;
+}
+
+function updateAccountingAccountPaginationButtons(totalPages) {
+    const prevButton = document.getElementById( "accountingAccountPrevButton" );
+    const nextButton = document.getElementById( "accountingAccountNextButton" );
+    if (prevButton) {
+        prevButton.disabled = accountingAccountCurrentPage <= 1;
+        prevButton.classList.toggle( "opacity-40", prevButton.disabled );
+        prevButton.classList.toggle( "cursor-not-allowed", prevButton.disabled );
+    }
+    if (nextButton) {
+        nextButton.disabled = accountingAccountCurrentPage >= totalPages;
+        nextButton.classList.toggle( "opacity-40", nextButton.disabled );
+        nextButton.classList.toggle( "cursor-not-allowed", nextButton.disabled );
+    }
+}
+
+function accountingAccountPrevPage() {
+    if (accountingAccountCurrentPage <= 1) return;
+    accountingAccountCurrentPage--;
+    renderAccountingAccounts( window.accountingAccounts || [] );
+}
+
+function accountingAccountNextPage() {
+    const accounts = Array.isArray(window.accountingAccounts)
+        ? window.accountingAccounts
+        : [];
+    const search = document.getElementById("accountingAccountSearch")
+            ?.value.trim().toLowerCase() || "";
+    const typeFilter = document.getElementById("accountingAccountTypeFilter")
+            ?.value || "";
+    const statusFilter = document.getElementById("accountingAccountStatusFilter")
+            ?.value || "";
+    const filteredAccounts = accounts.filter(account => {
+        const matchSearch =
+            !search ||
+            (account.accountCode || "")
+                .toLowerCase()
+                .includes(search) ||
+            (account.accountName || "")
+                .toLowerCase()
+                .includes(search);
+        const matchType =
+            !typeFilter ||
+            account.accountType === typeFilter;
+        const matchStatus =
+            !statusFilter ||
+            (statusFilter === "ACTIVE"
+                ? account.isActive === true
+                : account.isActive === false);
+        return matchSearch && matchType && matchStatus;
+    });
+
+    const totalPages = Math.max(
+        1,
+        Math.ceil(
+            filteredAccounts.length /
+            ACCOUNTING_ACCOUNT_PAGE_SIZE
+        )
+    );
+    if (accountingAccountCurrentPage >= totalPages) {
+        return;
+    }
+    accountingAccountCurrentPage++;
+    renderAccountingAccounts(accounts);
 }
 
 function updateAccountingAccountSummary(accounts) {
@@ -23292,6 +23432,8 @@ function toggleAccountingAccountMenu(accountId) {
 }
 
 let editingAccountingAccountId = null;
+const ACCOUNTING_ACCOUNT_PAGE_SIZE = 10;
+let accountingAccountCurrentPage = 1;
 function editAccountingAccount(accountId) {
     const account = (window.accountingAccounts || [])
         .find(a => a.accountId === accountId);
