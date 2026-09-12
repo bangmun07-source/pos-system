@@ -26808,25 +26808,27 @@ function bindOtherLiabilityEvents() {
 }
 
 async function loadLiabilities() {
-	const sessionId = localStorage.getItem("pos_session_id");
-	const branchId = localStorage.getItem("branchId");
-	if (!sessionId || !branchId) {
-			console.error("Session / branch tidak ditemukan");
-			return; }
-  const tbody = document.getElementById("otherLiabilitiesTableBody");
-
+	const tbody = document.getElementById("otherLiabilitiesTableBody");
+	
 	if (tbody) {
 		tbody.innerHTML = `
 			<tr>
-				<td colspan="8" class="text-center py-8 text-slate-400">
-					Memuat data...
+				<td colspan="8"
+					class="text-center py-8 text-gray-400">
+					Memuat data liability...
 				</td>
 			</tr>
 		`;
 	}
+	
+try {
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { throw new Error("Session tidak ditemukan"); }
+	const branchId = state.branchId;
 
-	try {
-		const { data, error } = await supabaseClient.rpc(
+	if (!branchId) { throw new Error("Branch belum tersedia"); }
+	const { data, error } =
+		await supabaseClient.rpc(
 			"get_liabilities",
 			{
 				p_session_id: sessionId,
@@ -26834,33 +26836,68 @@ async function loadLiabilities() {
 			}
 		);
 
-		if (error) {
-			console.error("get_liabilities:", error);
-			throw error; }
-		liabilityData = Array.isArray(data)
-			? data
-			: (data?.data || []);
-		filteredLiabilities = [...liabilityData];
-		liabilityCurrentPage = 1;
-		updateDebtSummary();
-		renderLiabilities();
+	if (error) { throw error; }
 
-	} catch (err) {
-			console.error(err);
-			if (tbody) {
-				tbody.innerHTML = `
-					<tr>
-						<td colspan="8" class="text-center py-8 text-red-400">
-								Gagal memuat data liability
-						</td>
-					</tr>
-				`;
-			}
-
-		showAccountingDebtMessage(
-			err.message || "Gagal memuat liability",
-			"error"
+	if (!data) {
+		throw new Error(
+			"Response get_liabilities kosong"
 		);
+	}
+
+
+	if (data.success !== true) {
+		throw new Error(
+			data.message ||
+			"Gagal mengambil data liability"
+		);
+	}
+
+	let rows = data.data || [];
+	if (!Array.isArray(rows)) { rows = []; }
+
+	liabilityData = rows.map(item => {
+			return {
+					liability_id: item.liability_id || "",
+					liability_type: item.liability_type || "",
+					creditor: item.creditor || "-",
+					description: item.description || "",
+					start_date: item.start_date || null,
+					due_date: item.due_date || null,
+					original_amount: Number(item.original_amount) || 0,
+					paid_principal: Number(item.paid_principal) || 0,
+					paid_interest: Number(item.paid_interest) || 0,
+					outstanding_principal: Math.max( 0, Number(item.outstanding_principal) || 0 ),
+					interest_type: item.interest_type || null,
+					interest_rate: Number(item.interest_rate) || 0,
+					interest_amount: Number(item.interest_amount) || 0,
+					liability_account_id: item.liability_account_id || "",
+					status: String( item.status || "ACTIVE" ).toUpperCase(),
+					branch_id: item.branch_id || branchId,
+					created_at: item.created_at || null
+			};
+	});
+
+	filteredLiabilities = [...liabilityData];
+	liabilityCurrentPage = 1;
+	updateDebtSummary();
+	renderLiabilities();
+
+} catch (error) {
+	console.error(
+		"loadLiabilities error:",
+		error
+	);
+
+	if (tbody) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="8"
+					class="text-center py-8 text-red-500">
+					Gagal memuat data liability
+				</td>
+			</tr>
+			`;
+		}
 	}
 }
 
