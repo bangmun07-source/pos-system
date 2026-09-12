@@ -5416,14 +5416,14 @@ function openMemberProfile(memberId) {
     else if (current === tier2) {
       tierBadge.classList.add(
         "bg-slate-500",
-        "text-white"
+        "text-on-surface"
       );
     }
 
     else {
       tierBadge.classList.add(
         "bg-zinc-700",
-        "text-white"
+        "text-on-surface"
       );
     }
   }
@@ -8497,7 +8497,7 @@ function renderRecipePagination() {
       <button onclick="changeRecipePage(${i})"
         class="w-8 h-8 rounded-md text-xs font-bold transition-colors
           ${recipeCurrentPage === i
-            ? 'text-white'
+            ? 'text-on-surface'
             : 'text-muted  hover:bg-outline-variant'}">
         ${i}
       </button>
@@ -9142,7 +9142,7 @@ function renderInventoryPagination() {
       <button onclick="changeInventoryPage(${i})"
         class="w-8 h-8 rounded-md text-xs font-bold transition-colors
           ${inventoryCurrentPage === i
-            ? "text-white"
+            ? "text-on-surface"
             : "text-muted hover:bg-outline-variant"}">
         ${i}
       </button>
@@ -11235,7 +11235,7 @@ function renderActiveMembers(data) {
       </div>
 
       <div class="flex flex-col">
-        <span class="text-sm text-white font-semibold">${name}</span>
+        <span class="text-sm text-on-surface font-semibold">${name}</span>
         <span class="text-[10px] text-muted ">${id}</span>
       </div>
     `;
@@ -12163,7 +12163,7 @@ function renderBranchPagination() {
         class="w-7 h-7 rounded-md transition text-xs font-bold
         ${
           i === branchCurrentPage
-            ? 'text-white'
+            ? 'text-on-surface'
             : 'text-muted  hover:bg-outline-variant'}
         }">
         ${i}
@@ -12566,7 +12566,7 @@ function renderUserPagination() {
         class="w-8 h-8 rounded-md transition text-xs font-bold
         ${
           i === userCurrentPage
-            ? 'text-white'
+            ? 'text-on-surface'
             : 'text-muted  hover:bg-outline-variant'}
         }">
         ${i}
@@ -13968,7 +13968,7 @@ function renderExpenseTable(data) {
             </button>
 
             <button onclick="showExpenseMenu(event, ${index})"
-              class="text-on-surface-variant hover:text-white transition-colors">
+              class="text-on-surface-variant hover:text-on-surface transition-colors">
               <span class="material-symbols-outlined text-lg">
                 more_vert
               </span>
@@ -23225,7 +23225,7 @@ function renderAccountingAccounts(accounts) {
                 </td>
 
                 <td class="px-6 py-4">
-                    <div class="font-medium text-white">
+                    <div class="font-medium text-on-surface">
                         ${escapeHtml(account.accountName || "-")}
                     </div>
                 </td>
@@ -23260,7 +23260,7 @@ function renderAccountingAccounts(accounts) {
                     <div class="relative inline-block">
                         <button type="button"
                             onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
-                            class="text-gray-400 hover:text-white transition">
+                            class="text-gray-400 hover:text-on-surface transition">
                             <span class="material-symbols-outlined text-[20px]">
                                 more_vert
                             </span>
@@ -23791,7 +23791,7 @@ function renderAccountingMappings() {
             mapping.debitAccountCode ||
             mapping.debitAccountName
                 ? `
-                    <div class="font-medium text-white">
+                    <div class="font-medium text-on-surface">
                         ${escapeHtml(
                             mapping.debitAccountName || "-"
                         )}
@@ -23808,7 +23808,7 @@ function renderAccountingMappings() {
             mapping.creditAccountCode ||
             mapping.creditAccountName
                 ? `
-                    <div class="font-medium text-white">
+                    <div class="font-medium text-on-surface">
                         ${escapeHtml(
                             mapping.creditAccountName || "-"
                         )}
@@ -23825,7 +23825,7 @@ function renderAccountingMappings() {
             <tr class="border-b border-gray-800 hover:bg-gray-800/40">
                 <!-- TRANSACTION -->
                 <td class="px-6 py-4">
-                    <div class="font-medium text-white">
+                    <div class="font-medium text-on-surface">
                         ${escapeHtml(
                             mapping.mappingName || "-"
                         )}
@@ -23869,7 +23869,7 @@ function renderAccountingMappings() {
                     <div class="relative">
                         <button type="button"
                             onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
-                            class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-white hover:bg-white/5 transition">
+                            class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition">
 
                             <span class="material-symbols-outlined text-lg">
                                 more_vert
@@ -23880,13 +23880,13 @@ function renderAccountingMappings() {
                              class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
                             <button type="button"
                                 onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
-                                class="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/5">
+                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-white/5">
                                 Edit
                             </button>
 
                             <button type="button"
                                 onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
-                                class="w-full px-4 py-3 text-left text-sm text-white hover:bg-white/5">
+                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-white/5">
                                 ${mapping.isActive
                                     ? "Deactivate"
                                     : "Activate"}
@@ -24496,42 +24496,59 @@ JOURNAL ENTRIES
 const JOURNAL_ENTRIES_PAGE_SIZE = 10;
 let journalEntriesCurrentPage = 1;
 let journalEntriesData = [];
+let journalEntriesLoaded = false;
 
 async function loadJournalEntries() {
-try {
-const sessionId =
-localStorage.getItem("pos_session_id");
-		if (!sessionId) {
-			return;
-		}
-		const { data, error } =
-			await supabaseClient.rpc(
-				"get_journal_entries",
-				{
-					p_session_id: sessionId
-				}
-			);
-		if (error) {
-			console.error(
-					"Gagal mengambil Journal Entries:",
-					error
-			);
-			return;
-		}
-		const entries = Array.isArray(data) ? data : [];
-		journalEntriesData = entries;
-		window.journalEntries = entries;
-		journalEntriesCurrentPage = 1;
-		renderJournalEntries(entries);
-		updateJournalEntriesSummary(entries);
-	} catch (err) {
-		console.error(
-				"loadJournalEntries error:",
-				err
-		);
-	}
-}
+  try {
+    if (journalEntriesLoaded) {
+      console.log("JOURNAL ENTRIES CACHE HIT");
+      journalEntriesCurrentPage = 1;
+      renderJournalEntries(journalEntriesData);
+      updateJournalEntriesSummary(journalEntriesData);
+      return;
+    }
+    // ===== RPC LOAD =====
+    console.log("JOURNAL ENTRIES RPC LOAD");
 
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      return;
+    }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_journal_entries",
+        {
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) {
+      console.error(
+        "Gagal mengambil Journal Entries:",
+        error
+      );
+      return;
+    }
+
+    const entries = Array.isArray(data) ? data : [];
+    // ===== SAVE DATA TO CACHE =====
+    journalEntriesData = entries;
+    window.journalEntries = entries;
+    journalEntriesLoaded = true;
+    journalEntriesCurrentPage = 1;
+    renderJournalEntries(entries);
+    updateJournalEntriesSummary(entries);
+
+  } catch (err) {
+    console.error(
+      "loadJournalEntries error:",
+      err
+    );
+  }
+}
 
 function renderJournalEntries(entries) {
 	const tbody = document.getElementById( "journalEntriesTableBody" );
@@ -25127,6 +25144,14 @@ async function saveNewJournalEntry() {
 			}
 			console.log("Journal created:", data);
 			closeNewJournalModal();
+			// ===== CLEAR JOURNAL ENTRIES CACHE =====
+			journalEntriesLoaded = false;
+			journalEntriesData = [];
+			window.journalEntries = [];
+			
+			// ===== CLEAR GENERAL LEDGER CACHE =====
+			generalLedgerLoaded = false;
+			generalLedgerData = [];
 			await loadJournalEntries();
 			alert("Journal berhasil disimpan.");
 	} catch (error) {
@@ -25192,9 +25217,6 @@ function closeJournalEntryDetail() {
 	modal.classList.add("hidden");
 	modal.classList.remove("flex");
 }
-
-
-
 
 function renderJournalEntryDetail(journal) {
 	const sourceLabels = {
@@ -25347,6 +25369,7 @@ const GENERAL_LEDGER_PAGE_SIZE = 10;
 let generalLedgerCurrentPage = 1;
 let generalLedgerData = [];
 let generalLedgerAccounts = [];
+let generalLedgerLoaded = false;
 
 async function loadGeneralLedger() {
 	const sessionId = localStorage.getItem("pos_session_id"); 
@@ -25357,38 +25380,39 @@ async function loadGeneralLedger() {
 	} 
 
 	try { 
-		let accountId = document.getElementById("generalLedgerAccountFilter")?.value || ""; 
-		let branchId = document.getElementById("generalLedgerBranchFilter")?.value || ""; 
-		const search = document.getElementById("generalLedgerSearch")?.value?.trim() || ""; 
-
-		// Default option harus dianggap sebagai tidak ada filter
-		if (accountId === "All Accounts") {
-			accountId = "";
+		// ===== CACHE HIT =====
+		if (generalLedgerLoaded) {
+			console.log("GENERAL LEDGER CACHE HIT");
+			generalLedgerCurrentPage = 1;
+			renderGeneralLedger();
+			populateGeneralLedgerAccounts();
+			return;
 		}
 
-		if (branchId === "All Branches") {
-			branchId = "";
-		}
+		// ===== RPC LOAD =====
+		console.log("GENERAL LEDGER RPC LOAD");
 		const { data, error } = await supabaseClient.rpc(
 			"get_general_ledger",
 			{
 				p_session_id: sessionId,
-				p_account_id: accountId || null,
-				p_branch_id: branchId || null,
-				p_search: search || null
+				p_account_id: null,
+				p_branch_id: null,
+				p_search: null
 			}
 		);
-        if (error) {
-            console.error("get_general_ledger error:", error);
-            alert(error.message || "Gagal memuat General Ledger");
-            return;
-        }
-		generalLedgerData = Array.isArray(data) ? data : [];
-		generalLedgerCurrentPage = 1;
 
+		if (error) {
+			console.error("get_general_ledger error:", error);
+			alert(error.message || "Gagal memuat General Ledger");
+			return;
+		}
+		// ===== SAVE DATA TO CACHE =====
+		generalLedgerData = Array.isArray(data) ? data : [];
+		generalLedgerLoaded = true;
+		generalLedgerCurrentPage = 1;
+		// ===== RENDER =====
 		renderGeneralLedger();
 		populateGeneralLedgerAccounts();
-
 	} catch (err) {
 		console.error("loadGeneralLedger error:", err);
 		alert(err.message || "Gagal memuat General Ledger");
@@ -25744,7 +25768,8 @@ async function initGeneralLedger() {
    ========================================================= */
 
 let accountingReportsInitialized = false;
-
+let accountingReportsData = null;
+let accountingReportsFilter = null;
 /* ====== FORMAT ===== */
 
 function formatAccountingReportAmount(value) {
@@ -25821,272 +25846,252 @@ function initAccountingReportsDates() {
 
 async function loadTrialBalance() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
-    return; }
-  const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
-  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
-	  console.log("ACCOUNTING FILTER", {
-		branchId,
-		toDate,
-		sessionId
-	  });
-  const tbody = document.getElementById( "trialBalanceTableBody" );
-  const totalDebitEl = document.getElementById( "trialBalanceTotalDebit" );
-  const totalCreditEl = document.getElementById( "trialBalanceTotalCredit" );
+  if (!sessionId) {
+    console.warn("Session ID tidak ditemukan.");
+    return [];
+  }
+  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
+  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
+
+  const { data, error } = await supabaseClient.rpc(
+    "get_trial_balance",
+    {
+      p_branch_id: branchId,
+      p_to_date: toDate,
+      p_session_id: sessionId
+    }
+  );
+
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
+
+function renderTrialBalance(rows) {
+  const tbody = document.getElementById("trialBalanceTableBody");
+  const totalDebitEl = document.getElementById("trialBalanceTotalDebit");
+  const totalCreditEl = document.getElementById("trialBalanceTotalCredit");
 
   if (!tbody) return;
-  tbody.innerHTML = `
-    <tr>
-      <td colspan="4" class="px-4 py-8 text-center">
-        Loading...
-      </td>
-    </tr>
-  `;
 
-  try {
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_trial_balance",
-        {
-          p_branch_id: branchId,
-          p_to_date: toDate,
-          p_session_id: sessionId
-        }
-      );
-  console.log("TRIAL BALANCE RESULT", data);
-  console.log("TRIAL BALANCE ERROR", error);
-    if (error) throw error;
-    const rows = Array.isArray(data)
-      ? data
-      : [];
+  tbody.innerHTML = "";
 
-    tbody.innerHTML = "";
-    let totalDebit = 0;
-    let totalCredit = 0;
-    if (!rows.length) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="4" class="px-4 py-8 text-center text-gray-400">
-            No accounting data available
-          </td>
-        </tr>
-      `;
-    } else {
-      rows.forEach(row => {
-        const debit = Number(row.debit || 0);
-        const credit = Number(row.credit || 0);
-        totalDebit += debit;
-        totalCredit += credit;
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-		  <td class="px-4 py-3">${row.accountCode || "-"}</td>
-		  <td class="px-4 py-3">${row.accountName || "-"}</td>
-		  <td class="px-4 py-3">${row.accountType || "-"}</td>
-		  <td class="px-4 py-3 text-right">${formatAccountingReportAmount(debit)}</td>
-		  <td class="px-4 py-3 text-right">${formatAccountingReportAmount(credit)}</td>
-		`;
-        tbody.appendChild(tr);
-      });
-    }
-    if (totalDebitEl) { totalDebitEl.textContent = formatAccountingReportAmount(totalDebit); }
-    if (totalCreditEl) { totalCreditEl.textContent = formatAccountingReportAmount(totalCredit); }
-  } catch (error) {
-    console.error(
-      "loadTrialBalance error:",
-      error
-    );
+  let totalDebit = 0;
+  let totalCredit = 0;
+
+  if (!rows.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="4" class="px-4 py-8 text-center text-red-400">
-          Failed to load Trial Balance
+        <td colspan="4" class="px-4 py-8 text-center text-gray-400">
+          No accounting data available
         </td>
       </tr>
     `;
+  } else {
+    rows.forEach(row => {
+      const debit = Number(row.debit || 0);
+      const credit = Number(row.credit || 0);
+      totalDebit += debit;
+      totalCredit += credit;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="px-4 py-3">${row.accountCode || "-"}</td>
+        <td class="px-4 py-3">${row.accountName || "-"}</td>
+        <td class="px-4 py-3">${row.accountType || "-"}</td>
+        <td class="px-4 py-3 text-right">
+          ${formatAccountingReportAmount(debit)}
+        </td>
+        <td class="px-4 py-3 text-right">
+          ${formatAccountingReportAmount(credit)}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
   }
+  if (totalDebitEl) { totalDebitEl.textContent = formatAccountingReportAmount(totalDebit); }
+  if (totalCreditEl) { totalCreditEl.textContent = formatAccountingReportAmount(totalCredit); }
 }
 
 /* ======== PROFIT & LOSS ======== */
 
 async function loadProfitLoss() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
-    return; }
-  const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
-  const fromDate = document.getElementById( "accountingReportsPeriodFrom" )?.value || null;
-  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
-	  console.log("ACCOUNTING FILTER", {
-    branchId,
-    toDate,
-    sessionId
+  if (!sessionId) {
+    console.warn("Session ID tidak ditemukan.");
+    return [];
+  }
+  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
+  const fromDate = document.getElementById("accountingReportsPeriodFrom")?.value || null;
+  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
+	
+  const { data, error } = await supabaseClient.rpc(
+    "get_profit_loss",
+    {
+      p_branch_id: branchId,
+      p_from_date: fromDate,
+      p_to_date: toDate,
+      p_session_id: sessionId
+    }
+  );
+  if (error) throw error;
+  return Array.isArray(data) ? data : [];
+}
+
+function renderProfitLoss(rows) {
+  let revenue = 0;
+  let cogs = 0;
+  let expenses = 0;
+  rows.forEach(row => { const amount = Number(row.amount || 0);
+    switch (row.accountType) {
+      case "REVENUE":
+        revenue += amount;
+        break;
+      case "COGS":
+        cogs += amount;
+        break;
+      case "EXPENSE":
+        expenses += amount;
+        break;
+    }
   });
 
-  try {
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_profit_loss",
-        {
-          p_branch_id: branchId,
-          p_from_date: fromDate,
-          p_to_date: toDate,
-          p_session_id: sessionId
-        }
-      );
-  console.log("TRIAL BALANCE RESULT", data);
-  console.log("TRIAL BALANCE ERROR", error);
-    if (error) throw error;
-    const rows = Array.isArray(data)
-      ? data
-      : [];
+  const grossProfit = revenue - cogs;
+  const netProfit = grossProfit - expenses;
+  const revenueEl = document.getElementById("profitLossRevenue");
+  const cogsEl = document.getElementById("profitLossCOGS");
+  const grossProfitEl = document.getElementById("profitLossGrossProfit");
+  const expensesEl = document.getElementById("profitLossExpenses");
+  const netProfitEl = document.getElementById("profitLossNetProfit");
 
-    let revenue = 0;
-    let cogs = 0;
-    let expenses = 0;
-    rows.forEach(row => {
-      const amount = Number(row.amount || 0);
-      switch (row.accountType) {
-        case "REVENUE":
-          revenue += amount;
-          break;
-
-        case "COGS":
-          cogs += amount;
-          break;
-
-        case "EXPENSE":
-          expenses += amount;
-          break;
-      }
-    });
-    const grossProfit = revenue - cogs;
-    const netProfit = grossProfit - expenses;
-    const revenueEl = document.getElementById( "profitLossRevenue" );
-    const cogsEl = document.getElementById( "profitLossCOGS" );
-    const grossProfitEl = document.getElementById( "profitLossGrossProfit" );
-    const expensesEl = document.getElementById( "profitLossExpenses" );
-    const netProfitEl = document.getElementById( "profitLossNetProfit" );
-
-    if (revenueEl) { revenueEl.textContent = formatAccountingReportAmount(revenue); }
-    if (cogsEl) { cogsEl.textContent = formatAccountingReportAmount(cogs); }
-    if (grossProfitEl) { grossProfitEl.textContent = formatAccountingReportAmount(grossProfit); }
-    if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(expenses); }
-    if (netProfitEl) { netProfitEl.textContent = formatAccountingReportAmount(netProfit); }
-  } catch (error) {
-    console.error(
-      "loadProfitLoss error:",
-      error
-    );
-  }
+  if (revenueEl) { revenueEl.textContent = formatAccountingReportAmount(revenue); }
+  if (cogsEl) { cogsEl.textContent = formatAccountingReportAmount(cogs); }
+  if (grossProfitEl) { grossProfitEl.textContent = formatAccountingReportAmount(grossProfit); }
+  if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(expenses); }
+  if (netProfitEl) { netProfitEl.textContent = formatAccountingReportAmount(netProfit); }
 }
+
+
+/* ======== BALANCE SHEET ======== */
 
 async function loadBalanceSheet() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
-    return; }
-  const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
-  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
-  console.log("ACCOUNTING FILTER", {
-    branchId,
-    toDate,
-    sessionId
-  });
-  try {
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_balance_sheet",
-        {
-          p_branch_id: branchId,
-          p_to_date: toDate,
-          p_session_id: sessionId
-        }
-      );
-
-  console.log("TRIAL BALANCE RESULT", data);
-  console.log("TRIAL BALANCE ERROR", error);		
-	  
-    if (error) throw error;
-    const result = data || {};
-    const accounts = Array.isArray(result.accounts)
-        ? result.accounts
-        : [];
-
-    const currentProfit = Number(result.currentProfit || 0);
-    let cash = 0;
-    let bank = 0;
-    let inventory = 0;
-    let totalAssets = 0;
-    let accountsPayable = 0;
-    let totalLiabilities = 0;
-    let ownerEquity = 0;
-    let totalEquity = 0;
-
-    accounts.forEach(account => {
-      const balance = Number(account.balance || 0);
-      switch (account.accountType) {
-
-        case "ASSET":
-          totalAssets += balance;
-          if (account.accountCode === "1100") { cash += balance; }
-          else if (account.accountCode === "1200") { bank += balance; }
-          else if (account.accountCode === "1300") { inventory += balance; }
-          break;
-
-        case "LIABILITY":
-          totalLiabilities += balance;
-          /*
-           * AP default account.
-           * Kalau nanti Account Mapping menggunakan
-           * account berbeda, bisa kita sesuaikan.
-           */
-          if (account.accountCode === "2100") { accountsPayable += balance; }
-
-          break;
-			  
-        case "EQUITY":
-          totalEquity += balance;
-          ownerEquity += balance;
-          break;
-      }
-    });
-
-    /*
-     * Current Profit menjadi bagian Equity
-     */
-    totalEquity += currentProfit;
-    const cashEl = document.getElementById( "balanceSheetCash" );
-    const bankEl = document.getElementById( "balanceSheetBank" );
-    const inventoryEl = document.getElementById( "balanceSheetInventory" );
-    const totalAssetsEl = document.getElementById( "balanceSheetTotalAssets" );
-    const accountsPayableEl = document.getElementById( "balanceSheetAccountsPayable" );
-    const totalLiabilitiesEl = document.getElementById( "balanceSheetTotalLiabilities" );
-    const ownerEquityEl = document.getElementById( "balanceSheetOwnerEquity" );
-    const currentProfitEl = document.getElementById( "balanceSheetCurrentProfit" );
-    const totalEquityEl = document.getElementById( "balanceSheetTotalEquity" );
-
-    if (cashEl) { cashEl.textContent = formatAccountingReportAmount(cash); }
-    if (bankEl) { bankEl.textContent = formatAccountingReportAmount(bank); }
-    if (inventoryEl) { inventoryEl.textContent = formatAccountingReportAmount(inventory); }
-    if (totalAssetsEl) { totalAssetsEl.textContent = formatAccountingReportAmount(totalAssets); }
-    if (accountsPayableEl) { accountsPayableEl.textContent = formatAccountingReportAmount(accountsPayable); }
-    if (totalLiabilitiesEl) { totalLiabilitiesEl.textContent = formatAccountingReportAmount(totalLiabilities); }
-    if (ownerEquityEl) { ownerEquityEl.textContent = formatAccountingReportAmount(ownerEquity); }
-    if (currentProfitEl) { currentProfitEl.textContent = formatAccountingReportAmount(currentProfit); }
-    if (totalEquityEl) { totalEquityEl.textContent = formatAccountingReportAmount(totalEquity); }
-  } catch (error) {
-    console.error(
-      "loadBalanceSheet error:",
-      error
-    );
+  if (!sessionId) {
+    console.warn("Session ID tidak ditemukan.");
+    return {};
   }
+  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
+  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
+	
+  const { data, error } = await supabaseClient.rpc(
+    "get_balance_sheet",
+    {
+      p_branch_id: branchId,
+      p_to_date: toDate,
+      p_session_id: sessionId
+    }
+  );
+  if (error) throw error;
+  return data || {};
+}
+
+function renderBalanceSheet(result) {
+  const accounts = Array.isArray(result.accounts)
+    ? result.accounts
+    : [];
+  const currentProfit = Number(result.currentProfit || 0);
+	
+  let cash = 0;
+  let bank = 0;
+  let inventory = 0;
+  let totalAssets = 0;
+  let accountsPayable = 0;
+  let totalLiabilities = 0;
+  let ownerEquity = 0;
+  let totalEquity = 0;
+	
+  accounts.forEach(account => {
+    const balance = Number(account.balance || 0);
+
+    switch (account.accountType) {
+      case "ASSET":
+        totalAssets += balance;
+        if (account.accountCode === "1100") {
+          cash += balance;
+        } else if (account.accountCode === "1200") {
+          bank += balance;
+        } else if (account.accountCode === "1300") {
+          inventory += balance;
+        }
+        break;
+      case "LIABILITY":
+        totalLiabilities += balance;
+        if (account.accountCode === "2100") {
+          accountsPayable += balance;
+        }
+        break;
+      case "EQUITY":
+        totalEquity += balance;
+        ownerEquity += balance;
+        break;
+    }
+  });
+
+  totalEquity += currentProfit;
+  const cashEl = document.getElementById("balanceSheetCash");
+  const bankEl = document.getElementById("balanceSheetBank");
+  const inventoryEl = document.getElementById("balanceSheetInventory");
+  const totalAssetsEl = document.getElementById("balanceSheetTotalAssets");
+  const accountsPayableEl = document.getElementById("balanceSheetAccountsPayable");
+  const totalLiabilitiesEl = document.getElementById("balanceSheetTotalLiabilities");
+  const ownerEquityEl = document.getElementById("balanceSheetOwnerEquity");
+  const currentProfitEl = document.getElementById("balanceSheetCurrentProfit");
+  const totalEquityEl = document.getElementById("balanceSheetTotalEquity");
+	
+  if (cashEl) { cashEl.textContent = formatAccountingReportAmount(cash); }
+  if (bankEl) { bankEl.textContent = formatAccountingReportAmount(bank); }
+  if (inventoryEl) { inventoryEl.textContent = formatAccountingReportAmount(inventory); }
+  if (totalAssetsEl) { totalAssetsEl.textContent = formatAccountingReportAmount(totalAssets); }
+  if (accountsPayableEl) { accountsPayableEl.textContent = formatAccountingReportAmount(accountsPayable); }
+  if (totalLiabilitiesEl) { totalLiabilitiesEl.textContent = formatAccountingReportAmount(totalLiabilities); }
+  if (ownerEquityEl) { ownerEquityEl.textContent = formatAccountingReportAmount(ownerEquity); }
+  if (currentProfitEl) { currentProfitEl.textContent = formatAccountingReportAmount(currentProfit); }
+  if (totalEquityEl) { totalEquityEl.textContent = formatAccountingReportAmount(totalEquity); }
 }
 
 /* ====== LOAD ALL ACCOUNTING REPORTS ====== */
 
 async function loadAccountingReports() {
-  await Promise.all([
+  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
+  const fromDate = document.getElementById("accountingReportsPeriodFrom")?.value || null;
+  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
+  const basis = document.getElementById("accountingReportsBasis")?.value || null;
+  const currentFilter = { branchId, fromDate, toDate, basis };
+  if (
+    state.accountingReportsData &&
+    state.accountingReportsFilter &&
+    JSON.stringify(state.accountingReportsFilter) ===
+      JSON.stringify(currentFilter)
+  ) {
+    renderTrialBalance( state.accountingReportsData.trialBalance );
+    renderProfitLoss( state.accountingReportsData.profitLoss );
+    renderBalanceSheet( state.accountingReportsData.balanceSheet );
+    return;
+  }
+  const [
+    trialBalance,
+    profitLoss,
+    balanceSheet
+  ] = await Promise.all([
     loadTrialBalance(),
     loadProfitLoss(),
     loadBalanceSheet()
   ]);
+  // ===== SAVE DATA TO CACHE =====
+  state.accountingReportsData = { trialBalance, profitLoss, balanceSheet };
+  state.accountingReportsFilter = currentFilter;
+  // ===== RENDER =====
+  renderTrialBalance(trialBalance);
+  renderProfitLoss(profitLoss);
+  renderBalanceSheet(balanceSheet);
 }
 
 function initAccountingReportsFilters() {
@@ -26528,8 +26533,8 @@ function renderSupplierDebtTable() {
                             <button
                                 type="button"
                                 onclick="openSupplierPaymentModal('${escapeHtml(item.id)}')"
-                                class="px-3 py-1.5 rounded-lg
-                                       bg-gray-900 text-white
+                                class="px-3 py-1.5 rounded-md
+                                       bg-gray-900 text-on-surface
                                        text-xs font-medium
                                        hover:bg-gray-700">
                                 Bayar
@@ -26960,7 +26965,7 @@ function renderLiabilities() {
 	if (!rows.length) {
 		tbody.innerHTML = `
 			<tr>
-				<td colspan="8" class="text-center py-10 text-slate-400">
+				<td colspan="8" class="text-center py-10 text-on-surface-variant">
 					Tidak ada data liability
 				</td>
 			</tr>
@@ -26973,12 +26978,12 @@ function renderLiabilities() {
 		const id = item.liability_id;
 		const type = getLiabilityTypeLabel(item.liability_type);
 		const creditor = escapeHtml(item.creditor || "-");
-		const description = escapeHtml(item.description || "-");
 		const startDate = formatLiabilityDate(item.start_date);
 		const dueDate = item.due_date
 					? formatLiabilityDate(item.due_date)
 					: "-";
 		const original = formatRupiah(item.original_amount);
+		const paid = formatRupiah(item.paid_principal);
 		const outstanding = formatRupiah(item.outstanding_principal);
 		const status = String(item.status || "ACTIVE").toUpperCase();
 
@@ -26987,42 +26992,61 @@ function renderLiabilities() {
 		if (status === "CANCELLED") { statusClass = "bg-red-500/10 text-red-400"; }
 
     return `
-			<tr class="border-b border-slate-800 hover:bg-slate-800/40">
-				<td class="px-4 py-3">
-					<div class="font-medium text-white">
+			<tr class="border-b border-outline-variant hover:bg-white/5">
+				<td class="px-5 py-3">
+					<div class="font-medium text-on-surface">
 						${type}
 					</div>
-
-					<div class="text-xs text-slate-500 mt-1">
+		
+					<div class="text-xs text-on-surface-variant">
 						${id}
 					</div>
 				</td>
-					<td class="px-4 py-3 text-slate-300"> ${creditor} </td>
-					<td class="px-4 py-3 text-slate-400 text-sm"> ${description} </td>
-					<td class="px-4 py-3 text-slate-400 text-sm"> ${startDate} </td>
-					<td class="px-4 py-3 text-slate-400 text-sm"> ${dueDate} </td>
-					<td class="px-4 py-3 text-right text-slate-300"> ${original} </td>
-					<td class="px-4 py-3 text-right font-semibold text-white"> ${outstanding} </td>
-					<td class="px-4 py-3">
-						<div class="flex items-center gap-2">
-							<span class=" inline-flex px-2.5 py-1 rounded-full text-xs font-medium ${statusClass} ">
-								${status}
-							</span>
-	
-							${ status === "ACTIVE"
-								? `
-									<button type="button"
-										onclick="openLiabilityPaymentModal('${escapeJs(id)}')"
-										class="p-1.5 rounded-lg hover:bg-emerald-500/10 text-emerald-400"
-										title="Bayar">
-										<span class="material-symbols-outlined text-[18px]">
-												payments
-										</span>
-									</button>
-								`
-							: ""
-						}
-					</div>
+		
+				<td class="px-5 py-3 text-slate-300">
+					${creditor}
+				</td>
+		
+				<td class="px-5 py-3 text-on-surface-variant text-sm">
+					${startDate}
+				</td>
+		
+				<td class="px-5 py-3 text-on-surface-variant text-sm">
+					${dueDate}
+				</td>
+		
+				<td class="px-5 py-3 text-right text-on-surface">
+					${original}
+				</td>
+		
+				<td class="px-5 py-3 text-right text-on-surface">
+					${paid}
+				</td>
+		
+				<td class="px-5 py-3 text-right font-semibold text-on-surface">
+					${outstanding}
+				</td>
+		
+				<td class="px-5 py-3">
+					<span class="inline-flex px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
+						${status}
+					</span>
+				</td>
+		
+				<td class="px-5 py-3">
+					${status === "ACTIVE"
+						? `
+							<button type="button"
+								onclick="openLiabilityPaymentModal('${escapeJs(id)}')"
+								class="p-1.5 rounded-md hover:text-on-surface text-on-surface-variant"
+								title="Bayar">
+								<span class="material-symbols-outlined text-[18px]">
+									payments
+								</span>
+							</button>
+						`
+						: ""
+					}
 				</td>
 			</tr>
 		`;
@@ -27051,7 +27075,7 @@ function renderLiabilityPagination(total, totalPages) {
 	const end = Math.min( liabilityCurrentPage * liabilityPageSize, total );
   container.innerHTML = `
   	<div class="flex items-center justify-between">
-			<div class="text-xs text-slate-500">
+			<div class="text-xs text-on-surface-variant">
 				Menampilkan ${start}-${end} dari ${total}
 			</div>
 			
@@ -27059,20 +27083,20 @@ function renderLiabilityPagination(total, totalPages) {
 				<button type="button"
 					onclick="changeLiabilityPage(${liabilityCurrentPage - 1})"
 					${liabilityCurrentPage <= 1 ? "disabled" : ""}
-					class=" px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 disabled:opacity-30 hover:bg-slate-800 ">
+					class=" px-2.5 py-1.5 rounded-md border border-outline-variant text-on-surface-variant disabled:opacity-30 hover:text-on-surface">
 					<span class="material-symbols-outlined text-[18px]">
 						chevron_left
 					</span>
 				</button>
 
-				<span class="px-3 text-xs text-slate-400">
+				<span class="px-3 text-xs text-on-surface-variant">
 					${liabilityCurrentPage} / ${totalPages}
 				</span>
 
 				<button type="button"
 					onclick="changeLiabilityPage(${liabilityCurrentPage + 1})"
 					${liabilityCurrentPage >= totalPages ? "disabled" : ""}
-					class="px-2.5 py-1.5 rounded-lg border border-slate-700 text-slate-400 disabled:opacity-30 hover:bg-slate-800">
+					class="px-2.5 py-1.5 rounded-md border border-outline-variant text-on-surface-variant disabled:opacity-30 hover:text-on-surface">
 					<span class="material-symbols-outlined text-[18px]">
 							chevron_right
 					</span>
@@ -27291,128 +27315,126 @@ function openLiabilityPaymentModal(liabilityId) {
     if (!modal) {
 			modal = document.createElement("div");
 			modal.id = "liabilityPaymentModal";
-			modal.className = "fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 p-4";
-	
-	
-				 modal.innerHTML = `
-						<div class=" w-full max-w-lg rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl">
-							<div class=" flex items-center justify-between px-5 py-4 border-b border-slate-800">
-								<div>
-									<h3 class="text-white font-semibold">
-										Pembayaran Liability
-									</h3>
-	
-									<p id="liabilityPaymentCreditor"
-										class="text-xs text-slate-500 mt-1">
-									</p>
-								</div>
-									
-								<button type="button"
-									onclick="closeLiabilityPaymentModal()"
-									class="text-slate-400 hover:text-white">
-									<span class="material-symbols-outlined">
-										close
-									</span>
-								</button>
-							</div>
-	
-							<div class="p-5 space-y-4">
-								<input type="hidden" id="liabilityPaymentId" >
-									<div class=" rounded-xl bg-slate-800/60 p-4">
-										<div class="text-xs text-slate-500">
-											Outstanding Principal
-										</div>
-	
-										<div id="liabilityPaymentOutstanding"
-											class="text-xl font-bold text-white mt-1">
-										</div>
-									</div>
-	
-									<div>
-										<label class="block text-xs text-slate-400 mb-1">
-											Tanggal Pembayaran
-										</label>
-	
-										<input type="date"
-											id="liabilityPaymentDate"
-											class="w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-white" >
-									</div>
-	
-									<div>
-										<label class="block text-xs text-slate-400 mb-1">
-											Pokok
-										</label>
-	
-										<input type="number"
-											min="0"
-											id="liabilityPaymentPrincipal"
-											class=" w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-white" >
-									</div>
-	
-									<div>
-										<label class="block text-xs text-slate-400 mb-1">
-											Bunga
-										</label>
-										
-										<input type="number"
-											min="0"
-											value="0"
-											id="liabilityPaymentInterest"
-											class=" w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-white" >
-									</div>
-	
-	
-									<div>
-										<label class="block text-xs text-slate-400 mb-1">
-											Metode Pembayaran
-										</label>
-											
-										<select id="liabilityPaymentMethod"
-											class=" w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-white" >
-											<option value="BANK"> Bank </option>
-											<option value="CASH"> Cash </option>
-											<option value="QRIS"> QRIS </option>
-										</select>
-									</div>
-	
-									<div>
-										<label class="block text-xs text-slate-400 mb-1">
-												No. Referensi
-										</label>
-	
-										<input type="text" 
-											id="liabilityPaymentReference" 
-											class=" w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-white" >
-									</div>
-	
+			modal.className = "fixed inset-0 z-[9999] hidden items-center justify-center bg-background p-4";
+			 modal.innerHTML = `
+					<div class=" w-full max-w-lg rounded-md border border-outline-variant bg-background shadow-2xl">
+						<div class=" flex items-center justify-between px-5 py-4 border-b border-outline-variant">
 							<div>
-								<label class="block text-xs text-slate-400 mb-1">
-									Catatan
-								</label>
-	
-								<textarea id="liabilityPaymentNote" rows="2"
-									class=" w-full rounded-lg bg-slate-950 border border-slate-700 px-3 py-2 text-white">
-								</textarea>
+								<h3 class="text-on-surface font-semibold">
+									Pembayaran Liability
+								</h3>
+
+								<p id="liabilityPaymentCreditor"
+									class="text-sm text-on-surface-variant mt-1">
+								</p>
 							</div>
-									
-							<div class=" flex items-center justify-end gap-2 pt-2 ">
-							
+								
 							<button type="button"
 								onclick="closeLiabilityPaymentModal()"
-								class=" px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:bg-slate-800 ">
-									Batal
-							</button>
-							
-							<button type="button"
-								id="saveLiabilityPaymentBtn"
-								onclick="saveLiabilityPayment()"
-								class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-medium ">
-								Simpan Pembayaran
+								class="text-on-surface-variant hover:text-on-surface">
+								<span class="material-symbols-outlined">
+									close
+								</span>
 							</button>
 						</div>
+
+						<div class="p-5 space-y-4">
+							<input type="hidden" id="liabilityPaymentId" >
+								<div class=" rounded-md bg-background border border-outline-variant p-4">
+									<div class="text-sm text-slate-500">
+										Outstanding Principal
+									</div>
+
+									<div id="liabilityPaymentOutstanding"
+										class="text-xl font-bold text-on-surface mt-1">
+									</div>
+								</div>
+
+								<div>
+									<label class="block text-xs text-on-surface-variant mb-2">
+										Tanggal Pembayaran
+									</label>
+
+									<input type="date"
+										id="liabilityPaymentDate"
+										class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+								</div>
+
+								<div>
+									<label class="block text-xs text-on-surface-variant mb-2">
+										Pokok
+									</label>
+
+									<input type="number"
+										min="0"
+										id="liabilityPaymentPrincipal"
+										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+								</div>
+
+								<div>
+									<label class="block text-xs text-on-surface-variant mb-2">
+										Bunga
+									</label>
+									
+									<input type="number"
+										min="0"
+										value="0"
+										id="liabilityPaymentInterest"
+										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+								</div>
+
+
+								<div>
+									<label class="block text-xs text-on-surface-variant mb-2">
+										Metode Pembayaran
+									</label>
+										
+									<select id="liabilityPaymentMethod"
+										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+										<option value="BANK"> Bank </option>
+										<option value="CASH"> Cash </option>
+										<option value="QRIS"> QRIS </option>
+									</select>
+								</div>
+
+								<div>
+									<label class="block text-xs text-on-surface-variant mb-2">
+											No. Referensi
+									</label>
+
+									<input type="text" 
+										id="liabilityPaymentReference" 
+										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+								</div>
+
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								Catatan
+							</label>
+
+							<textarea id="liabilityPaymentNote" rows="2"
+								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+							</textarea>
+						</div>
+								
+						<div class=" flex items-center justify-end gap-2 pt-3">
+						
+						<button type="button"
+							onclick="closeLiabilityPaymentModal()"
+							class=" px-4 py-2 text-on-surface-variant hover:text-on-surface ">
+								Cancel
+						</button>
+						
+						<button type="button"
+							id="saveLiabilityPaymentBtn"
+							onclick="saveLiabilityPayment()"
+							class="px-4 py-2 bottom-theme text-on-surface font-medium ">
+							Simpan Pembayaran
+						</button>
 					</div>
 				</div>
-			`;
+			</div>
+		`;
     document.body.appendChild(modal); }
     document.getElementById( "liabilityPaymentId" ).value = liabilityId;
     document.getElementById( "liabilityPaymentCreditor" ).textContent = `${getLiabilityTypeLabel(liability.liability_type)} • ${liability.creditor}`;
