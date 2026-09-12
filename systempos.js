@@ -22904,14 +22904,13 @@ function renderAccountingOverview(data) {
     financial.totalAssets );
 
     /* ====== FINANCIAL POSITION - LIABILITIES & EQUITY ====== */
-  setText( "accounting-liability-ap",
-		financial.accountsPayable );
-  setText( "accounting-liability-tax",
-		financial.taxPayable );
-  setText( "accounting-liability-equity",
-		financial.equity );
-  setText( "accounting-total-liabilities-equity",
-		financial.totalLiabilitiesEquity );
+	setText( "accounting-liability-ap", financial.accountsPayable );
+	setText( "accounting-liability-tax", financial.taxPayable );
+	setText( "accounting-liability-bank-loan", financial.bankLoanPayable );
+	setText( "accounting-liability-long-term-debt", financial.longTermDebt );
+	setText( "accounting-liability-other-payable", financial.otherPayable );
+	setText( "accounting-liability-equity", financial.equity );
+	setText( "accounting-total-liabilities-equity", financial.totalLiabilitiesEquity );
 
   /* ====== ACCOUNTS PAYABLE LIST ====== */
   const apContainer = document.getElementById("accounting-ap-list");
