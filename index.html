@@ -16116,8 +16116,8 @@
   </div>
 	
 	<div id="addAccountingAccountModal"
-     class="hidden fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4">
-    <div class="w-full max-w-lg bg-background border border-outline-variant rounded-lg shadow-2xl">
+     class="hidden fixed inset-0 z-[9999] bg-background flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
         <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
             <div>
                 <h3 id="accountModalTitle" class="text-lg font-semibold text-white">
@@ -16131,7 +16131,7 @@
 
             <button type="button"
                 onclick="closeAddAccountingAccountModal()"
-                class="text-gray-400 hover:text-white">
+                class="text-muted hover:text-on-surface">
                 <span class="material-symbols-outlined">
                     close
                 </span>
@@ -16140,25 +16140,25 @@
 	
 	        <div class="p-6 space-y-4">
 	            <div>
-	                <label class="block text-sm text-on-surface-variant mb-2">
-	                    Account Code
-	                </label>
-	
-	                <input id="newAccountingAccountCode"
-	                    type="text"
-	                    placeholder="Contoh: 1100"
-	                    class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+								<label class="block text-sm text-on-surface-variant mb-2">
+									Account Code
+								</label>
+
+								<input id="newAccountingAccountCode"
+									type="text"
+									placeholder="Contoh: 1100"
+									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
 	            </div>
 	            <!-- ACCOUNT NAME -->
 	            <div>
-	                <label class="block text-sm text-on-surface-variant mb-2">
-	                    Account Name
-	                </label>
-	
-	                <input id="newAccountingAccountName"
-	                    type="text"
-	                    placeholder="Contoh: Cash"
-	                    class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+								<label class="block text-sm text-on-surface-variant mb-2">
+									Account Name
+								</label>
+
+								<input id="newAccountingAccountName"
+									type="text"
+									placeholder="Contoh: Cash"
+									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
 	            </div>
 	            <!-- ACCOUNT TYPE -->
 	            <div>
@@ -16167,64 +16167,64 @@
 	                </label>
 	
 	                <select id="newAccountingAccountType" onchange="updateAccountingNormalBalance()"
-	                    class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
-	                    <option value="">Select Account Type</option>
-	                    <option value="ASSET">Asset</option>
-	                    <option value="LIABILITY">Liability</option>
-	                    <option value="EQUITY">Equity</option>
-	                    <option value="REVENUE">Revenue</option>
-	                    <option value="COGS">COGS</option>
-	                    <option value="EXPENSE">Expense</option>
+										class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+										<option value="">Select Account Type</option>
+										<option value="ASSET">Asset</option>
+										<option value="LIABILITY">Liability</option>
+										<option value="EQUITY">Equity</option>
+										<option value="REVENUE">Revenue</option>
+										<option value="COGS">COGS</option>
+										<option value="EXPENSE">Expense</option>
 	                </select>
 	            </div>
 	            <!-- PARENT -->
 	            <div>
-	                <label class="block text-sm text-on-surface-variant mb-2">
-	                    Parent Account
-	                </label>
-	
-	                <select id="newAccountingAccountParent"
-	                    class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
-	                    <option value="">No Parent Account</option>
-	                </select>
+								<label class="block text-sm text-on-surface-variant mb-2">
+									Parent Account
+								</label>
+
+								<select id="newAccountingAccountParent"
+									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+									<option value="">No Parent Account</option>
+								</select>
 	            </div>
 	            <!-- NORMAL BALANCE -->
 	            <div>
-	                <label class="block text-sm text-on-surface-variant mb-2">
-	                    Normal Balance
-	                </label>
-	
-	                <select id="newAccountingAccountNormalBalance"
-	                    class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
-	                    <option value="">Select Normal Balance</option>
-	                    <option value="DEBIT">Debit</option>
-	                    <option value="CREDIT">Credit</option>
-	                </select>
+								<label class="block text-sm text-on-surface-variant mb-2">
+									Normal Balance
+								</label>
+
+								<select id="newAccountingAccountNormalBalance"
+									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+									<option value="">Select Normal Balance</option>
+									<option value="DEBIT">Debit</option>
+									<option value="CREDIT">Credit</option>
+								</select>
 	            </div>
 	        </div>
 	
 	        <div class="flex justify-end gap-3 px-6 py-4 border-t border-outline-variant">
-	            <button type="button" onclick="closeAddAccountingAccountModal()"
-	                class="px-4 py-2 rounded-md border border-outline-variant text-gray-300 hover:bg-white/5">
-	                Cancel
-	            </button>
-	
-	            <button type="button" id="accountModalSaveButton"
-									onclick="saveAccountingAccount()"
-	                class="px-4 py-2 rounded-md bg-primary text-white hover:opacity-90">
-	                Save Account
-	            </button>
+						<button type="button" onclick="closeAddAccountingAccountModal()"
+							class="px-4 py-2 text-gray-300 hover:bg-white/5">
+							Cancel
+						</button>
+
+						<button type="button" id="accountModalSaveButton"
+							onclick="saveAccountingAccount()"
+							class="px-4 py-2 rounded-md bottom-theme border border-outline-variant text-sm font-semibold transition">
+							Save Account
+						</button>
 	        </div>
 	    </div>
 	</div>
 <!-- ADD / EDIT ACCOUNT MAPPING MODAL -->
 <div id="addAccountingMappingModal"
-     class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
-  <div class="w-full max-w-2xl mx-4 bg-background border border-outline-variant rounded-lg shadow-2xl overflow-hidden">
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-background">
+  <div class="w-full max-w-2xl mx-4 bg-background border border-outline-variant rounded-md shadow-2xl overflow-hidden">
     <div class="px-6 py-5 border-b border-outline-variant flex items-center justify-between">
       <div>
         <h3 id="accountingMappingModalTitle"
-            class="font-headline text-xl font-bold tracking-tight">
+					class="font-headline text-xl font-bold tracking-tight">
           Add Mapping
         </h3>
 
@@ -16234,8 +16234,8 @@
       </div>
 
       <button type="button"
-              onclick="closeAddAccountingMappingModal()"
-              class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-surface-container transition">
+				onclick="closeAddAccountingMappingModal()"
+				class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface transition">
         <span class="material-symbols-outlined">
           close
         </span>
@@ -16251,9 +16251,9 @@
         </label>
 
         <input id="newAccountingMappingName"
-               type="text"
-               placeholder="e.g. Purchase on Credit"
-               class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
+				 type="text"
+				 placeholder="e.g. Purchase on Credit"
+				 class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
       </div>
 
       <!-- TRANSACTION TYPE + SOURCE -->
@@ -16264,14 +16264,14 @@
           </label>
 
           <select id="newAccountingMappingType"
-                  class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
-            <option value="">Select Transaction Type</option>
-            <option value="SALES">Sales</option>
-            <option value="PURCHASE">Purchase</option>
-            <option value="PAYMENT">Payment</option>
-            <option value="EXPENSE">Expense</option>
-            <option value="INVENTORY">Inventory</option>
+              class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
+           	<option value="SALES">Sales</option>
+						<option value="PURCHASE">Purchase</option>
+						<option value="PAYMENT">Payment</option>
+						<option value="EXPENSE">Expense</option>
+						<option value="INVENTORY">Inventory</option>
 						<option value="EQUITY">Equity</option>
+						<option value="TRANSFER">Transfer</option>
           </select>
         </div>
 
@@ -16281,9 +16281,9 @@
           </label>
 
           <input id="newAccountingMappingSource"
-                 type="text"
-                 placeholder="e.g. Purchase"
-                 class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
+					 type="text"
+					 placeholder="e.g. Purchase"
+					 class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
         </div>
       </div>
 
@@ -16294,7 +16294,7 @@
         </label>
 
         <select id="newAccountingMappingDebitAccount"
-                class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
+					class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
           <option value="">Select Debit Account</option>
         </select>
       </div>
@@ -16306,7 +16306,7 @@
         </label>
 
         <select id="newAccountingMappingCreditAccount"
-                class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
+					class="w-full h-11 bg-background border border-outline-variant rounded-md px-4 text-sm text-on-surface outline-none focus:ring-1 focus:ring-primary">
           <option value="">Select Credit Account</option>
         </select>
       </div>
@@ -16819,7 +16819,7 @@
 	<!-- ==================== NEW JOURNAL MODAL ==================== -->
 	<div id="newJournalModal"
 	    class="fixed inset-0 z-50 hidden items-center justify-center bg-background">
-	    <div class="w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	    <div class="w-full max-w-5xl max-h-[90vh] overflow-y-auto custom-scrollbar rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
         <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant">
 					<div>
 						<h3 class="font-headline text-xl font-bold tracking-tight text-on-surface">
@@ -17868,11 +17868,9 @@
 					</span>
 			  </a>
       </nav>
-
       <!-- FOOTER -->
       <div class="mt-auto p-2 pb-2">
         <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
-
           <span class="shrink-0 w-8 h-8 flex items-center justify-center">
             <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
           </span>
@@ -17886,22 +17884,14 @@
               SERVER ACTIVE
             </span>
           </div>
-
         </div>
       </div>
-
     </div>
   </aside>
-
-
   <!-- MAIN CONTENT -->
   <div id="mainContent" class="flex-1 flex flex-col h-screen">
-
-    <!-- HEADER -->
     <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
-
       <div class="flex items-center gap-5 flex-1">
-
         <div class="w-[44px] h-[44px] flex items-center justify-center">
           <img id="munoLogo"
             src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
@@ -17914,39 +17904,27 @@
         <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
           MUNO
         </p>
-
       </div>
 
       <div class="ml-auto flex items-center gap-3">
-
         <button onclick="logout()"
           class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
-
           <span class="material-symbols-outlined">
             logout
           </span>
-
         </button>
-
       </div>
-
     </header>
-
-
     <!-- PAGE CONTENT -->
     <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
-
-      <!-- HERO -->
       <section class="relative min-h-[200px] rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-
         <div class="absolute inset-0 bg-cover bg-center"
           style="background-image:url('https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF')">
         </div>
 
         <div class="absolute inset-0 bg-black/60"></div>
-
+				
         <div class="relative z-10 min-h-[200px] flex flex-col items-center justify-center text-center px-6">
-
           <span class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
             Debt Management
           </span>
@@ -17954,21 +17932,12 @@
           <h2 class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
             Debt &amp; Liabilities
           </h2>
-
         </div>
-
       </section>
-
-
       <!-- CONTENT -->
       <section class="mt-5 space-y-5">
-
-
-        <!-- SUMMARY -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-
           <div class="p-5 border-b border-outline-variant flex items-center gap-3">
-
             <div class="main-icon-box">
               <span class="material-symbols-outlined text-3xl"
                 style="font-variation-settings:'FILL' 1;">
@@ -17985,15 +17954,11 @@
                 Outstanding obligations and debt balances
               </p>
             </div>
-
           </div>
-
-
+					
           <div class="grid grid-cols-2 md:grid-cols-4">
-
             <!-- TOTAL -->
             <div class="p-5 border-r border-outline-variant">
-
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Total Liabilities
               </p>
@@ -18002,13 +17967,9 @@
                 class="text-xl font-headline mt-1">
                 Rp 0
               </p>
-
             </div>
-
-
             <!-- SUPPLIER -->
             <div class="p-5 border-r border-outline-variant">
-
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Supplier Payables
               </p>
@@ -18017,13 +17978,9 @@
                 class="text-xl font-headline mt-1">
                 Rp 0
               </p>
-
             </div>
-
-
             <!-- BANK -->
             <div class="p-5 border-r border-outline-variant">
-
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Bank Debt
               </p>
@@ -18032,13 +17989,9 @@
                 class="text-xl font-headline mt-1">
                 Rp 0
               </p>
-
             </div>
-
-
             <!-- OTHER -->
             <div class="p-5">
-
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Other Liabilities
               </p>
@@ -18047,21 +18000,13 @@
                 class="text-xl font-headline mt-1">
                 Rp 0
               </p>
-
             </div>
-
           </div>
-
         </section>
-
-
         <!-- SUPPLIER PAYABLES -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-
           <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-
             <div class="flex items-center gap-3">
-
               <div class="main-icon-box">
                 <span class="material-symbols-outlined text-3xl">
                   local_shipping
@@ -18069,7 +18014,6 @@
               </div>
 
               <div>
-
                 <h2 class="text-lg font-bold font-headline text-foreground">
                   Supplier Payables
                 </h2>
@@ -18079,26 +18023,18 @@
                 </p>
 
               </div>
-
             </div>
-
           </div>
-
-
           <!-- FILTER -->
           <div class="p-5 border-b border-outline-variant">
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
               <div>
-
                 <label class="block text-xs text-muted mb-2">
                   Status
                 </label>
 
                 <select id="supplierDebtStatusFilter"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
                   <option value="">
                     All Status
                   </option>
@@ -18114,32 +18050,23 @@
                   <option value="CANCELLED">
                     Cancelled
                   </option>
-
                 </select>
-
               </div>
 
-
               <div>
-
                 <label class="block text-xs text-muted mb-2">
                   Supplier
                 </label>
 
                 <select id="supplierDebtSupplierFilter"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
                   <option value="">
                     All Suppliers
                   </option>
-
                 </select>
-
               </div>
-
-
+							
               <div>
-
                 <label class="block text-xs text-muted mb-2">
                   Search
                 </label>
@@ -18148,23 +18075,14 @@
                   type="text"
                   placeholder="Purchase or supplier..."
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
-
               </div>
-
             </div>
-
           </div>
-
-
           <!-- TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
-
             <table class="w-full text-sm">
-
               <thead>
-
                 <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-
                   <th class="px-5 py-3">
                     Purchase
                   </th>
@@ -18196,82 +18114,53 @@
                   <th class="px-5 py-3">
                     Action
                   </th>
-
                 </tr>
-
               </thead>
 
-
-              <tbody id="supplierDebtTableBody">
+              <tbody id="supplierDebtTableBody" class="divide-y divide-outline-variant">
               </tbody>
-
             </table>
-
           </div>
-
-
           <!-- FOOTER -->
           <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-
             <p id="supplierDebtPaginationInfo"
               class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
-
               Showing 0–0 of 0
-
             </p>
 
-
             <div class="flex items-center gap-2">
-
               <button id="supplierDebtPrevButton"
                 type="button"
                 onclick="supplierDebtPrevPage()"
                 class="px-3 py-2 text-muted font-medium headline-font transition">
-
                 <span class="material-symbols-outlined text-sm lg:text-base">
                   chevron_left
                 </span>
-
               </button>
-
 
               <button id="supplierDebtNextButton"
                 type="button"
                 onclick="supplierDebtNextPage()"
                 class="px-3 py-2 text-muted font-medium headline-font transition">
-
                 <span class="material-symbols-outlined text-sm lg:text-base">
                   chevron_right
                 </span>
-
               </button>
-
             </div>
-
           </div>
-
         </section>
-
-
         <!-- OTHER LIABILITIES -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-
           <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-
             <div class="flex items-center gap-3">
-
               <div class="main-icon-box">
-
                 <span class="material-symbols-outlined text-3xl"
                   style="font-variation-settings:'FILL' 1;">
                   request_quote
                 </span>
-
               </div>
 
-
               <div>
-
                 <h2 class="text-lg font-bold font-headline text-foreground">
                   Other Liabilities
                 </h2>
@@ -18279,42 +18168,30 @@
                 <p class="text-xs text-muted mt-1">
                   Bank loans, long-term debt and other obligations
                 </p>
-
               </div>
-
             </div>
-
 
             <button id="newLiabilityButton"
               type="button"
               onclick="openNewLiabilityModal()"
               class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-
               <span class="material-symbols-outlined text-sm">
                 add
               </span>
-
               New Liability
-
             </button>
-
           </div>
-
 
           <!-- FILTER -->
           <div class="p-5 border-b border-outline-variant">
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
               <div>
-
                 <label class="block text-xs text-muted mb-2">
                   Liability Type
                 </label>
 
                 <select id="liabilityTypeFilter"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
                   <option value="">
                     All Types
                   </option>
@@ -18330,21 +18207,16 @@
                   <option value="OTHER_PAYABLE">
                     Other Payable
                   </option>
-
                 </select>
-
               </div>
 
-
               <div>
-
                 <label class="block text-xs text-muted mb-2">
                   Status
                 </label>
 
                 <select id="liabilityStatusFilter"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
                   <option value="">
                     All Status
                   </option>
@@ -18360,14 +18232,10 @@
                   <option value="CANCELLED">
                     Cancelled
                   </option>
-
                 </select>
-
               </div>
 
-
               <div>
-
                 <label class="block text-xs text-muted mb-2">
                   Search
                 </label>
@@ -18376,23 +18244,14 @@
                   type="text"
                   placeholder="Creditor or liability..."
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
-
               </div>
-
             </div>
-
           </div>
-
-
           <!-- TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
-
             <table class="w-full text-sm">
-
               <thead>
-
                 <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-
                   <th class="px-5 py-3">
                     Type
                   </th>
@@ -18428,33 +18287,21 @@
                   <th class="px-5 py-3">
                     Action
                   </th>
-
                 </tr>
-
               </thead>
 
-
-              <tbody id="otherLiabilitiesTableBody">
+              <tbody id="otherLiabilitiesTableBody" class="divide-y divide-outline-variant">
               </tbody>
-
             </table>
-
           </div>
-
-
           <!-- FOOTER -->
           <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-
             <p id="otherLiabilitiesPaginationInfo"
               class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
-
               Showing 0–0 of 0
-
             </p>
 
-
             <div class="flex items-center gap-2">
-
               <button id="otherLiabilitiesPrevButton"
                 type="button"
                 onclick="otherLiabilitiesPrevPage()"
@@ -18463,44 +18310,29 @@
                 <span class="material-symbols-outlined text-sm lg:text-base">
                   chevron_left
                 </span>
-
               </button>
-
 
               <button id="otherLiabilitiesNextButton"
                 type="button"
                 onclick="otherLiabilitiesNextPage()"
                 class="px-3 py-2 text-muted font-medium headline-font transition">
-
                 <span class="material-symbols-outlined text-sm lg:text-base">
                   chevron_right
                 </span>
-
               </button>
-
             </div>
-
           </div>
-
         </section>
-
       </section>
-
     </main>
-
   </div>
-
 
   <!-- PAYMENT MODAL -->
   <div id="supplierPaymentModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 px-4">
-
     <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
-
       <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-
         <div>
-
           <h2 class="text-lg font-bold font-headline text-foreground">
             Supplier Payment
           </h2>
@@ -18508,29 +18340,21 @@
           <p class="text-xs text-muted mt-1">
             Record supplier debt payment
           </p>
-
         </div>
-
 
         <button type="button"
           onclick="closeSupplierPaymentModal()"
           class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground rounded-md">
-
           <span class="material-symbols-outlined">
             close
           </span>
-
         </button>
-
       </div>
 
 
       <div class="p-5 space-y-4">
-
         <div class="grid grid-cols-2 gap-4">
-
           <div>
-
             <p class="text-[11px] text-muted uppercase tracking-wider">
               Purchase
             </p>
@@ -18539,12 +18363,10 @@
               class="text-sm mt-1">
               -
             </p>
-
           </div>
 
 
           <div>
-
             <p class="text-[11px] text-muted uppercase tracking-wider">
               Supplier
             </p>
@@ -18553,16 +18375,11 @@
               class="text-sm mt-1">
               -
             </p>
-
           </div>
-
         </div>
 
-
         <div class="grid grid-cols-3 gap-3">
-
           <div>
-
             <p class="text-[11px] text-muted uppercase tracking-wider">
               Total
             </p>
@@ -18576,7 +18393,6 @@
 
 
           <div>
-
             <p class="text-[11px] text-muted uppercase tracking-wider">
               Paid
             </p>
@@ -18585,12 +18401,9 @@
               class="text-sm mt-1">
               Rp 0
             </p>
-
           </div>
 
-
           <div>
-
             <p class="text-[11px] text-muted uppercase tracking-wider">
               Outstanding
             </p>
@@ -18599,14 +18412,10 @@
               class="text-sm mt-1">
               Rp 0
             </p>
-
           </div>
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Payment Date
           </label>
@@ -18614,12 +18423,9 @@
           <input id="supplierPaymentDate"
             type="date"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Amount
           </label>
@@ -18628,19 +18434,15 @@
             type="number"
             min="1"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Payment Method
           </label>
-
+					
           <select id="supplierPaymentMethod"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
             <option value="CASH">
               Cash
             </option>
@@ -18652,14 +18454,10 @@
             <option value="QRIS">
               QRIS
             </option>
-
           </select>
-
         </div>
-
-
+				
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Reference No.
           </label>
@@ -18668,12 +18466,9 @@
             type="text"
             placeholder="Optional"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Note
           </label>
@@ -18681,49 +18476,31 @@
           <textarea id="supplierPaymentNote"
             rows="3"
             class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none"></textarea>
-
         </div>
-
       </div>
 
-
       <div class="p-5 border-t border-outline-variant flex justify-end gap-3">
-
         <button type="button"
           onclick="closeSupplierPaymentModal()"
           class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium">
-
           Cancel
-
         </button>
-
 
         <button id="saveSupplierPaymentButton"
           type="button"
           onclick="saveSupplierPayment()"
           class="h-10 px-4 rounded-md bottom-theme text-sm font-medium">
-
           Pay
-
         </button>
-
       </div>
-
     </div>
-
   </div>
-
-
   <!-- NEW LIABILITY MODAL -->
   <div id="newLiabilityModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 px-4">
-
     <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
-
       <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-
         <div>
-
           <h2 class="text-lg font-bold font-headline text-foreground">
             New Liability
           </h2>
@@ -18731,34 +18508,25 @@
           <p class="text-xs text-muted mt-1">
             Record a new debt or liability
           </p>
-
         </div>
-
-
+				
         <button type="button"
           onclick="closeNewLiabilityModal()"
           class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground rounded-md">
-
           <span class="material-symbols-outlined">
             close
           </span>
-
         </button>
-
       </div>
 
-
       <div class="p-5 space-y-4">
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Liability Type
           </label>
 
           <select id="newLiabilityType"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
             <option value="BANK_LOAN">
               Bank Loan
             </option>
@@ -18770,14 +18538,10 @@
             <option value="OTHER_PAYABLE">
               Other Payable
             </option>
-
           </select>
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Creditor
           </label>
@@ -18786,14 +18550,10 @@
             type="text"
             placeholder="Bank / person / institution..."
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
-
         </div>
 
-
         <div class="grid grid-cols-2 gap-4">
-
           <div>
-
             <label class="block text-xs text-muted mb-2">
               Date
             </label>
@@ -18801,12 +18561,9 @@
             <input id="newLiabilityDate"
               type="date"
               class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
           </div>
 
-
           <div>
-
             <label class="block text-xs text-muted mb-2">
               Due Date
             </label>
@@ -18814,14 +18571,10 @@
             <input id="newLiabilityDueDate"
               type="date"
               class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
           </div>
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Amount
           </label>
@@ -18830,30 +18583,22 @@
             type="number"
             min="1"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Account
           </label>
 
           <select id="newLiabilityAccount"
             class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-
             <option value="">
               Select liability account
             </option>
-
           </select>
-
         </div>
 
-
         <div>
-
           <label class="block text-xs text-muted mb-2">
             Note
           </label>
@@ -18861,38 +18606,25 @@
           <textarea id="newLiabilityNote"
             rows="3"
             class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none"></textarea>
-
         </div>
-
       </div>
 
-
       <div class="p-5 border-t border-outline-variant flex justify-end gap-3">
-
         <button type="button"
           onclick="closeNewLiabilityModal()"
           class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium">
-
           Cancel
-
         </button>
-
 
         <button id="saveNewLiabilityButton"
           type="button"
           onclick="saveNewLiability()"
           class="h-10 px-4 rounded-md bottom-theme text-sm font-medium">
-
           Save Liability
-
         </button>
-
       </div>
-
     </div>
-
   </div>
-
 </template>	
 	
 	
