@@ -27418,7 +27418,8 @@ function closeLiabilityPaymentModal() {
 
 async function saveLiabilityPayment() {
 	const sessionId = localStorage.getItem("pos_session_id");
-	const liabilityId = document.getElementById( "liabilityPaymentId" )?.value;
+	const branchId = state.branchId;
+	const liabilityId = document.getElementById("liabilityPaymentId")?.value;
 	const paymentDate = document.getElementById( "liabilityPaymentDate" )?.value;
 	const principal =  Number( document.getElementById( "liabilityPaymentPrincipal" )?.value || 0 );
 	const interest = Number( document.getElementById( "liabilityPaymentInterest" )?.value || 0 );
@@ -27431,6 +27432,12 @@ async function saveLiabilityPayment() {
 			"Session tidak ditemukan",
 			"error" );
 		return; }
+	
+	if (!branchId) {
+    showAccountingDebtMessage(
+			"Branch belum tersedia",
+			"error" );
+    return; }
 
 	if (!liabilityId) {
 		showAccountingDebtMessage(
@@ -27487,6 +27494,7 @@ try {
 				"create_liability_payment",
 				{
 					p_session_id: sessionId,
+					p_branch_id: branchId,
 					p_liability_id: liabilityId,
 					p_payment_date: paymentDate,
 					p_principal_amount: principal,
@@ -27497,6 +27505,7 @@ try {
 					p_note: note
 				}
 			);
+
 
 		if (error) {
 			console.error( "create_liability_payment:", error );
