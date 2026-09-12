@@ -10125,7 +10125,7 @@ window.saveStockIn = async function () {
       "success"
     );
 
-  }   } catch (error) {
+  } catch (error) {
     console.error(
       "ADD INGREDIENT PURCHASE ERROR:",
       error
