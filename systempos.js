@@ -26113,26 +26113,16 @@ async function initAccountingReports() {
 
 let supplierDebtData = [];
 let supplierDebtFiltered = [];
-
 let supplierDebtCurrentPage = 1;
 const supplierDebtPageSize = 10;
-
 let currentSupplierPaymentPurchase = null;
 
-
-/* =========================================================
-   INIT PAGE
-   ========================================================= */
-
 async function initAccountingDebtPage() {
-
-    supplierDebtCurrentPage = 1;
-    supplierDebtData = [];
-    supplierDebtFiltered = [];
-
-    initSupplierDebtFilters();
-
-    await loadSupplierDebt();
+	supplierDebtCurrentPage = 1;
+	supplierDebtData = [];
+	supplierDebtFiltered = [];
+	initSupplierDebtFilters();
+	await loadSupplierDebt();
 
     // Other Liabilities belum diaktifkan
     // nanti kita tambahkan setelah Supplier Payables selesai.
@@ -26144,31 +26134,30 @@ async function initAccountingDebtPage() {
    ========================================================= */
 
 function initSupplierDebtFilters() {
+	const statusEl = document.getElementById("supplierDebtStatusFilter");
+	const supplierEl = document.getElementById("supplierDebtSupplierFilter");
+	const searchEl = document.getElementById("supplierDebtSearch");
 
-    const statusEl = document.getElementById("supplierDebtStatusFilter");
-    const supplierEl = document.getElementById("supplierDebtSupplierFilter");
-    const searchEl = document.getElementById("supplierDebtSearch");
+	if (statusEl) {
+		statusEl.onchange = () => {
+			supplierDebtCurrentPage = 1;
+			applySupplierDebtFilters();
+		};
+	}
 
-    if (statusEl) {
-        statusEl.onchange = () => {
-            supplierDebtCurrentPage = 1;
-            applySupplierDebtFilters();
-        };
-    }
+	if (supplierEl) {
+		supplierEl.onchange = () => {
+			supplierDebtCurrentPage = 1;
+			applySupplierDebtFilters();
+		};
+	}
 
-    if (supplierEl) {
-        supplierEl.onchange = () => {
-            supplierDebtCurrentPage = 1;
-            applySupplierDebtFilters();
-        };
-    }
-
-    if (searchEl) {
-        searchEl.oninput = () => {
-            supplierDebtCurrentPage = 1;
-            applySupplierDebtFilters();
-        };
-    }
+	if (searchEl) {
+		searchEl.oninput = () => {
+			supplierDebtCurrentPage = 1;
+			applySupplierDebtFilters();
+		};
+	}
 }
 
 
@@ -26177,185 +26166,84 @@ function initSupplierDebtFilters() {
    ========================================================= */
 
 async function loadSupplierDebt() {
+	const tbody = document.getElementById("supplierDebtTableBody");
+	if (tbody) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="8"
+					class="text-center py-8 text-gray-400">
+					Memuat data hutang supplier...
+				</td>
+			</tr>
+		`;
+	}
 
-    const tbody = document.getElementById("supplierDebtTableBody");
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
+		if (!sessionId) { throw new Error("Session tidak ditemukan"); }
+    const branchId = state.branchId;
+    if (!branchId) { throw new Error("Branch belum tersedia"); }
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_supplier_debts",
+				{
+					p_session_id: sessionId,
+					p_branch_id: branchId
+				}
+			);
 
-    if (tbody) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="8" class="text-center py-8 text-gray-400">
-                    Memuat data hutang supplier...
-                </td>
-            </tr>
-        `;
-    }
+    if (error) { throw error; }
+		if (!data) { throw new Error(
+				"Response get_supplier_debts kosong" ); }
+		if (data.success !== true) { throw new Error( data.message ||
+				"Gagal mengambil hutang supplier" ); }
 
-    try {
-
-        const sessionId = localStorage.getItem("pos_session_id");
-
-        if (!sessionId) {
-            throw new Error("Session tidak ditemukan");
-        }
-
-        const branchId = state.branchId;
-
-        if (!branchId) {
-            throw new Error("Branch belum tersedia");
-        }
-
-
-        /* -----------------------------------------------------
-           AMBIL PURCHASE PENDING
-           ----------------------------------------------------- */
-
-        const { data: purchases, error: purchaseError } =
-            await supabaseClient
-                .from("Ingredient_Purchases")
-                .select(`
-                    "ID",
-                    "Date",
-                    "Ingredient",
-                    "Qty",
-                    "Total_Price",
-                    "Name_Supplier",
-                    "Supplier_ID",
-                    "branchId",
-                    "Status"
-                `)
-                .eq("branchId", branchId)
-                .in("Status", ["PENDING", "PAID"])
-                .order("Date", { ascending: false });
-
-        if (purchaseError) {
-            throw purchaseError;
-        }
-
-
-        /* -----------------------------------------------------
-           AMBIL SUPPLIER PAYMENTS
-           ----------------------------------------------------- */
-
-        const purchaseIds = (purchases || []).map(p => p.ID);
-
-        let payments = [];
-
-        if (purchaseIds.length > 0) {
-
-            const { data: paymentData, error: paymentError } =
-                await supabaseClient
-                    .from("Supplier_Payments")
-                    .select(`
-                        "Payment_ID",
-                        "Purchase_ID",
-                        "Amount",
-                        "Payment_Date",
-                        "Payment_Method"
-                    `)
-                    .in("Purchase_ID", purchaseIds);
-
-            if (paymentError) {
-                throw paymentError;
-            }
-
-            payments = paymentData || [];
-        }
-
-
-        /* -----------------------------------------------------
-           GROUP PAYMENT BY PURCHASE
-           ----------------------------------------------------- */
-
-        const paymentMap = {};
-
-        payments.forEach(payment => {
-
-            const purchaseId = payment.Purchase_ID;
-
-            if (!paymentMap[purchaseId]) {
-                paymentMap[purchaseId] = 0;
-            }
-
-            paymentMap[purchaseId] += Number(payment.Amount) || 0;
-        });
-
-
-        /* -----------------------------------------------------
-           BUILD DATA
-           ----------------------------------------------------- */
-
-        supplierDebtData = (purchases || []).map(purchase => {
-
-            const total = Number(purchase.Total_Price) || 0;
-
-            const paid =
-                paymentMap[purchase.ID] || 0;
-
-            /*
-             * PAID purchase yang dibuat langsung dari purchasing
-             * belum mempunyai row Supplier_Payments.
-             *
-             * Karena status PAID berarti sudah dibayar,
-             * tampilkan Paid = Total.
-             */
-            const actualPaid =
-                purchase.Status === "PAID"
-                    ? Math.max(total, paid)
-                    : paid;
-
-            const outstanding =
-                Math.max(0, total - actualPaid);
-
-            return {
-                id: purchase.ID,
-                date: purchase.Date,
-                ingredient: purchase.Ingredient || "-",
-                supplier: purchase.Name_Supplier || "-",
-                supplierId: purchase.Supplier_ID || "",
-                total,
-                paid: actualPaid,
-                outstanding,
-                status: outstanding <= 0 ? "PAID" : "PENDING"
-            };
-        });
-
-
-        /* -----------------------------------------------------
-           UPDATE SUMMARY
-           ----------------------------------------------------- */
+		let rows = data.data || [];
+		if (!Array.isArray(rows)) { rows = []; }
+			
+		supplierDebtData =
+			rows.map(item => {
+				const total = Number(item.total) || 0;
+				const paid = Number(item.paid) || 0;
+				const outstanding = Math.max( 0, Number(item.outstanding) || 0 );
+						
+				return {
+					id: item.purchase_id || "",
+					date: item.date || null,
+					ingredient: item.ingredient || "-",
+					supplier: item.supplier || "-",
+					supplierId: item.supplier_id || "",
+					total: total,
+					paid: paid,
+					outstanding: outstanding,
+					status: outstanding <= 0
+									? "PAID"
+									: "PENDING"
+					};
+				});
 
         updateSupplierDebtSummary();
-
-
-        /* -----------------------------------------------------
-           SUPPLIER FILTER
-           ----------------------------------------------------- */
-
         populateSupplierDebtFilter();
-
-
-        /* -----------------------------------------------------
-           APPLY FILTER + RENDER
-           ----------------------------------------------------- */
-
         applySupplierDebtFilters();
 
-    } catch (error) {
+	} catch (error) {
+			console.error(
+					"loadSupplierDebt error:",
+					error
+			);
 
-        console.error("loadSupplierDebt error:", error);
-
-        if (tbody) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="text-center py-8 text-red-500">
-                        Gagal memuat data hutang supplier
-                    </td>
-                </tr>
-            `;
-        }
-    }
+		if (tbody) {
+			tbody.innerHTML = `
+				<tr>
+					<td colspan="8"
+							class="text-center py-8 text-red-500">
+							Gagal memuat data hutang supplier
+					</td>
+				</tr>
+			`;
+   	}
+  }
 }
-
 
 /* =========================================================
    SUMMARY
