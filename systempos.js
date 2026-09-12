@@ -1060,7 +1060,12 @@ function initModule(pageId) {
 		    initJournalEntriesFilters();
 		    initGeneralLedger();
 		    loadJournalEntries();
-		    break;
+		break;
+		}
+
+		case "accountingDebtPage": {
+		    initAccountingDebtPage();
+		break;
 		}
 			
 		case "accountingReportsPage":
@@ -26101,3 +26106,793 @@ async function initAccountingReports() {
     );
   }
 }
+
+/* =========================================================
+   ACCOUNTING - DEBT & LIABILITIES
+   ========================================================= */
+
+let supplierDebtData = [];
+let supplierDebtFiltered = [];
+
+let supplierDebtCurrentPage = 1;
+const supplierDebtPageSize = 10;
+
+let currentSupplierPaymentPurchase = null;
+
+
+/* =========================================================
+   INIT PAGE
+   ========================================================= */
+
+async function initAccountingDebtPage() {
+
+    supplierDebtCurrentPage = 1;
+    supplierDebtData = [];
+    supplierDebtFiltered = [];
+
+    initSupplierDebtFilters();
+
+    await loadSupplierDebt();
+
+    // Other Liabilities belum diaktifkan
+    // nanti kita tambahkan setelah Supplier Payables selesai.
+}
+
+
+/* =========================================================
+   FILTER INITIALIZATION
+   ========================================================= */
+
+function initSupplierDebtFilters() {
+
+    const statusEl = document.getElementById("supplierDebtStatusFilter");
+    const supplierEl = document.getElementById("supplierDebtSupplierFilter");
+    const searchEl = document.getElementById("supplierDebtSearch");
+
+    if (statusEl) {
+        statusEl.onchange = () => {
+            supplierDebtCurrentPage = 1;
+            applySupplierDebtFilters();
+        };
+    }
+
+    if (supplierEl) {
+        supplierEl.onchange = () => {
+            supplierDebtCurrentPage = 1;
+            applySupplierDebtFilters();
+        };
+    }
+
+    if (searchEl) {
+        searchEl.oninput = () => {
+            supplierDebtCurrentPage = 1;
+            applySupplierDebtFilters();
+        };
+    }
+}
+
+
+/* =========================================================
+   LOAD SUPPLIER DEBT
+   ========================================================= */
+
+async function loadSupplierDebt() {
+
+    const tbody = document.getElementById("supplierDebtTableBody");
+
+    if (tbody) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8" class="text-center py-8 text-gray-400">
+                    Memuat data hutang supplier...
+                </td>
+            </tr>
+        `;
+    }
+
+    try {
+
+        const sessionId = localStorage.getItem("pos_session_id");
+
+        if (!sessionId) {
+            throw new Error("Session tidak ditemukan");
+        }
+
+        const branchId = state.branchId;
+
+        if (!branchId) {
+            throw new Error("Branch belum tersedia");
+        }
+
+
+        /* -----------------------------------------------------
+           AMBIL PURCHASE PENDING
+           ----------------------------------------------------- */
+
+        const { data: purchases, error: purchaseError } =
+            await supabaseClient
+                .from("Ingredient_Purchases")
+                .select(`
+                    "ID",
+                    "Date",
+                    "Ingredient",
+                    "Qty",
+                    "Total_Price",
+                    "Name_Supplier",
+                    "Supplier_ID",
+                    "branchId",
+                    "Status"
+                `)
+                .eq("branchId", branchId)
+                .in("Status", ["PENDING", "PAID"])
+                .order("Date", { ascending: false });
+
+        if (purchaseError) {
+            throw purchaseError;
+        }
+
+
+        /* -----------------------------------------------------
+           AMBIL SUPPLIER PAYMENTS
+           ----------------------------------------------------- */
+
+        const purchaseIds = (purchases || []).map(p => p.ID);
+
+        let payments = [];
+
+        if (purchaseIds.length > 0) {
+
+            const { data: paymentData, error: paymentError } =
+                await supabaseClient
+                    .from("Supplier_Payments")
+                    .select(`
+                        "Payment_ID",
+                        "Purchase_ID",
+                        "Amount",
+                        "Payment_Date",
+                        "Payment_Method"
+                    `)
+                    .in("Purchase_ID", purchaseIds);
+
+            if (paymentError) {
+                throw paymentError;
+            }
+
+            payments = paymentData || [];
+        }
+
+
+        /* -----------------------------------------------------
+           GROUP PAYMENT BY PURCHASE
+           ----------------------------------------------------- */
+
+        const paymentMap = {};
+
+        payments.forEach(payment => {
+
+            const purchaseId = payment.Purchase_ID;
+
+            if (!paymentMap[purchaseId]) {
+                paymentMap[purchaseId] = 0;
+            }
+
+            paymentMap[purchaseId] += Number(payment.Amount) || 0;
+        });
+
+
+        /* -----------------------------------------------------
+           BUILD DATA
+           ----------------------------------------------------- */
+
+        supplierDebtData = (purchases || []).map(purchase => {
+
+            const total = Number(purchase.Total_Price) || 0;
+
+            const paid =
+                paymentMap[purchase.ID] || 0;
+
+            /*
+             * PAID purchase yang dibuat langsung dari purchasing
+             * belum mempunyai row Supplier_Payments.
+             *
+             * Karena status PAID berarti sudah dibayar,
+             * tampilkan Paid = Total.
+             */
+            const actualPaid =
+                purchase.Status === "PAID"
+                    ? Math.max(total, paid)
+                    : paid;
+
+            const outstanding =
+                Math.max(0, total - actualPaid);
+
+            return {
+                id: purchase.ID,
+                date: purchase.Date,
+                ingredient: purchase.Ingredient || "-",
+                supplier: purchase.Name_Supplier || "-",
+                supplierId: purchase.Supplier_ID || "",
+                total,
+                paid: actualPaid,
+                outstanding,
+                status: outstanding <= 0 ? "PAID" : "PENDING"
+            };
+        });
+
+
+        /* -----------------------------------------------------
+           UPDATE SUMMARY
+           ----------------------------------------------------- */
+
+        updateSupplierDebtSummary();
+
+
+        /* -----------------------------------------------------
+           SUPPLIER FILTER
+           ----------------------------------------------------- */
+
+        populateSupplierDebtFilter();
+
+
+        /* -----------------------------------------------------
+           APPLY FILTER + RENDER
+           ----------------------------------------------------- */
+
+        applySupplierDebtFilters();
+
+    } catch (error) {
+
+        console.error("loadSupplierDebt error:", error);
+
+        if (tbody) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-8 text-red-500">
+                        Gagal memuat data hutang supplier
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+
+
+/* =========================================================
+   SUMMARY
+   ========================================================= */
+
+function updateSupplierDebtSummary() {
+
+    const supplierPayables =
+        supplierDebtData
+            .reduce((sum, item) => {
+                return sum + item.outstanding;
+            }, 0);
+
+    const totalLiabilitiesEl =
+        document.getElementById("debtTotalLiabilities");
+
+    const supplierPayablesEl =
+        document.getElementById("debtSupplierPayables");
+
+    const bankLoansEl =
+        document.getElementById("debtBankLoans");
+
+    const otherLiabilitiesEl =
+        document.getElementById("debtOtherLiabilities");
+
+
+    if (supplierPayablesEl) {
+        supplierPayablesEl.textContent =
+            formatAccountingCurrency(supplierPayables);
+    }
+
+    /*
+     * Untuk sementara:
+     *
+     * Bank Loan = 0
+     * Other Liabilities = 0
+     *
+     * Nanti setelah modul tersebut dibuat,
+     * summary akan mengambil data sebenarnya.
+     */
+
+    if (bankLoansEl) {
+        bankLoansEl.textContent =
+            formatAccountingCurrency(0);
+    }
+
+    if (otherLiabilitiesEl) {
+        otherLiabilitiesEl.textContent =
+            formatAccountingCurrency(0);
+    }
+
+    if (totalLiabilitiesEl) {
+        totalLiabilitiesEl.textContent =
+            formatAccountingCurrency(supplierPayables);
+    }
+}
+
+
+/* =========================================================
+   SUPPLIER FILTER OPTIONS
+   ========================================================= */
+
+function populateSupplierDebtFilter() {
+
+    const select =
+        document.getElementById("supplierDebtSupplierFilter");
+
+    if (!select) return;
+
+
+    const currentValue = select.value;
+
+    const suppliers = new Map();
+
+    supplierDebtData.forEach(item => {
+
+        if (
+            item.supplierId &&
+            item.supplier !== "-"
+        ) {
+            suppliers.set(
+                item.supplierId,
+                item.supplier
+            );
+        }
+    });
+
+
+    select.innerHTML = `
+        <option value="">Semua Supplier</option>
+    `;
+
+
+    [...suppliers.entries()]
+        .sort((a, b) =>
+            a[1].localeCompare(b[1])
+        )
+        .forEach(([id, name]) => {
+
+            const option =
+                document.createElement("option");
+
+            option.value = id;
+            option.textContent = name;
+
+            select.appendChild(option);
+        });
+
+
+    if (
+        [...select.options]
+            .some(option => option.value === currentValue)
+    ) {
+        select.value = currentValue;
+    }
+}
+
+
+/* =========================================================
+   APPLY FILTER
+   ========================================================= */
+
+function applySupplierDebtFilters() {
+
+    const status =
+        document.getElementById(
+            "supplierDebtStatusFilter"
+        )?.value || "";
+
+    const supplierId =
+        document.getElementById(
+            "supplierDebtSupplierFilter"
+        )?.value || "";
+
+    const search =
+        document.getElementById(
+            "supplierDebtSearch"
+        )?.value
+        ?.trim()
+        ?.toLowerCase() || "";
+
+
+    supplierDebtFiltered =
+        supplierDebtData.filter(item => {
+
+            /* STATUS */
+
+            if (
+                status &&
+                item.status !== status
+            ) {
+                return false;
+            }
+
+
+            /* SUPPLIER */
+
+            if (
+                supplierId &&
+                item.supplierId !== supplierId
+            ) {
+                return false;
+            }
+
+
+            /* SEARCH */
+
+            if (search) {
+
+                const searchable = [
+                    item.id,
+                    item.ingredient,
+                    item.supplier
+                ]
+                .join(" ")
+                .toLowerCase();
+
+                if (!searchable.includes(search)) {
+                    return false;
+                }
+            }
+
+
+            return true;
+        });
+
+
+    renderSupplierDebtTable();
+}
+
+
+/* =========================================================
+   RENDER TABLE
+   ========================================================= */
+
+function renderSupplierDebtTable() {
+
+    const tbody =
+        document.getElementById(
+            "supplierDebtTableBody"
+        );
+
+    if (!tbody) return;
+
+
+    const total =
+        supplierDebtFiltered.length;
+
+    const totalPages =
+        Math.max(
+            1,
+            Math.ceil(
+                total / supplierDebtPageSize
+            )
+        );
+
+
+    if (
+        supplierDebtCurrentPage >
+        totalPages
+    ) {
+        supplierDebtCurrentPage =
+            totalPages;
+    }
+
+
+    const start =
+        (supplierDebtCurrentPage - 1)
+        * supplierDebtPageSize;
+
+    const end =
+        start + supplierDebtPageSize;
+
+    const rows =
+        supplierDebtFiltered.slice(
+            start,
+            end
+        );
+
+
+    if (rows.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="8"
+                    class="text-center py-10 text-gray-400">
+                    Tidak ada hutang supplier
+                </td>
+            </tr>
+        `;
+
+    } else {
+
+        tbody.innerHTML =
+            rows.map(item => {
+
+                const statusClass =
+                    item.status === "PAID"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-amber-100 text-amber-700";
+
+
+                const action =
+                    item.status === "PENDING"
+                        ? `
+                            <button
+                                type="button"
+                                onclick="openSupplierPaymentModal('${escapeHtml(item.id)}')"
+                                class="px-3 py-1.5 rounded-lg
+                                       bg-gray-900 text-white
+                                       text-xs font-medium
+                                       hover:bg-gray-700">
+                                Bayar
+                            </button>
+                          `
+                        : `
+                            <span class="text-xs text-gray-400">
+                                Lunas
+                            </span>
+                          `;
+
+
+                return `
+                    <tr class="border-b border-gray-100
+                               hover:bg-gray-50">
+
+                        <td class="px-4 py-3 text-sm font-medium">
+                            ${escapeHtml(item.id)}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm">
+                            ${escapeHtml(item.supplier)}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm">
+                            ${formatAccountingDate(item.date)}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-right">
+                            ${formatAccountingCurrency(item.total)}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-right">
+                            ${formatAccountingCurrency(item.paid)}
+                        </td>
+
+                        <td class="px-4 py-3 text-sm text-right font-semibold">
+                            ${formatAccountingCurrency(item.outstanding)}
+                        </td>
+
+                        <td class="px-4 py-3">
+                            <span class="
+                                inline-flex
+                                px-2.5 py-1
+                                rounded-full
+                                text-xs
+                                font-medium
+                                ${statusClass}">
+                                ${item.status}
+                            </span>
+                        </td>
+
+                        <td class="px-4 py-3 text-center">
+                            ${action}
+                        </td>
+
+                    </tr>
+                `;
+
+            }).join("");
+    }
+
+
+    updateSupplierDebtPagination(
+        total,
+        totalPages
+    );
+}
+
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+function updateSupplierDebtPagination( total, totalPages ) {
+	const info = document.getElementById( "supplierDebtPaginationInfo" );
+	const prev = document.getElementById( "supplierDebtPrevButton" );
+	const next = document.getElementById( "supplierDebtNextButton" );
+	const start = total === 0
+					? 0
+					: ( (supplierDebtCurrentPage - 1) * supplierDebtPageSize  ) + 1;
+	const end =  Math.min( supplierDebtCurrentPage * supplierDebtPageSize, total );
+	if (info) { info.textContent = total === 0
+							? "0 data"
+							: `${start}-${end} dari ${total}`; }
+	if (prev) {
+		prev.disabled = supplierDebtCurrentPage <= 1;
+		prev.onclick = () => {
+		if ( supplierDebtCurrentPage > 1 ) {
+				supplierDebtCurrentPage--;
+				renderSupplierDebtTable();
+			}
+		};
+	}
+
+
+    if (next) { 
+			next.disabled = supplierDebtCurrentPage >= totalPages;
+      next.onclick = () => {
+			if ( supplierDebtCurrentPage < totalPages ) {
+				supplierDebtCurrentPage++;
+				renderSupplierDebtTable();
+			}
+		};
+	}
+}
+
+/* ===== OPEN SUPPLIER PAYMENT MODAL ====== */
+
+function openSupplierPaymentModal( purchaseId ) {
+	const purchase = supplierDebtData.find( item => item.id === purchaseId );
+	if (!purchase) {
+		alert("Data purchase tidak ditemukan.");
+		return;
+	}
+	currentSupplierPaymentPurchase =  purchase;
+	document.getElementById( "supplierPaymentPurchase"  ).value =  purchase.id;
+	document.getElementById( "supplierPaymentSupplier" ).value = purchase.supplier;
+	document.getElementById( "supplierPaymentTotal" ).value = formatAccountingCurrency( purchase.total );
+	document.getElementById( "supplierPaymentPaid" ).value = formatAccountingCurrency( purchase.paid );
+	document.getElementById( "supplierPaymentOutstanding" ).value = formatAccountingCurrency( purchase.outstanding );
+	document.getElementById( "supplierPaymentDate" ).value = getTodayAccountingDate();
+	document.getElementById( "supplierPaymentAmount" ).value = purchase.outstanding;
+	document.getElementById( "supplierPaymentMethod" ).value = "CASH";
+	document.getElementById( "supplierPaymentReference" ).value = "";
+	document.getElementById( "supplierPaymentNote" ).value = "";
+	const modal = document.getElementById( "supplierPaymentModal"  );
+
+	if (modal) {
+		modal.classList.remove("hidden");
+	}
+}
+
+/* ====== CLOSE PAYMENT MODAL ======= */
+
+function closeSupplierPaymentModal() {
+	currentSupplierPaymentPurchase = null;
+	const modal = document.getElementById( "supplierPaymentModal" );
+	if (modal) { modal.classList.add("hidden"); }
+}
+
+/* ======== SAVE SUPPLIER PAYMENT ======== */
+
+async function saveSupplierPayment() {
+	const purchase = currentSupplierPaymentPurchase;
+
+	if (!purchase) {
+		alert("Purchase belum dipilih.");
+		return;
+	}
+
+	const sessionId =  localStorage.getItem( "pos_session_id" );
+
+	if (!sessionId) {
+		alert("Session tidak ditemukan.");
+		return;
+	}
+const paymentDate = document.getElementById( "supplierPaymentDate" )?.value;
+const amount = Number( document.getElementById( "supplierPaymentAmount" )?.value ) || 0;
+const method = document.getElementById( "supplierPaymentMethod" )?.value || "CASH";
+const referenceNo = document.getElementById( "supplierPaymentReference" )?.value ?.trim() || null;
+const note = document.getElementById( "supplierPaymentNote" )?.value ?.trim() || null;
+
+if (!paymentDate) {
+	alert("Tanggal pembayaran wajib diisi.");
+	return;
+}
+if (amount <= 0) {
+	alert("Jumlah pembayaran harus lebih dari 0.");
+	return;
+}
+if ( amount > purchase.outstanding )  {
+	alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(purchase.outstanding)}`
+	); return;
+}
+	
+const button = document.getElementById( "saveSupplierPaymentButton" );
+
+try {
+	if (button) { button.disabled = true; button.textContent = "Menyimpan..."; }
+	
+  const { data, error } =
+	await supabaseClient.rpc(
+		"create_supplier_payment",
+		{
+			p_session_id: sessionId,
+			p_purchase_id: purchase.id,
+			p_payment_date: paymentDate,
+			p_amount: amount,
+			p_payment_method: method,
+			p_reference_no: referenceNo,
+			p_note: note
+		}
+	);
+
+	if (error) {  throw error; }
+	console.log(
+		"Supplier payment result:",
+		data
+	);
+	closeSupplierPaymentModal();
+	alert(
+		data?.message ||
+		"Pembayaran supplier berhasil."
+	);
+	await loadSupplierDebt();
+
+} catch (error) {
+	console.error(
+			"saveSupplierPayment error:",
+			error
+	);
+	alert( error?.message ||
+			"Gagal menyimpan pembayaran supplier."
+	);
+} finally {
+	if (button) {
+		button.disabled = false;
+		button.textContent =
+				"Simpan Pembayaran";
+		}
+	}
+}
+
+function formatAccountingCurrency(value) {
+	return new Intl.NumberFormat(
+		"id-ID",
+		{
+			style: "currency",
+			currency: "IDR",
+			maximumFractionDigits: 0
+		}
+	).format(
+			Number(value) || 0
+	);
+}
+
+function formatAccountingDate(value) {
+	if (!value) return "-";
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) {
+		return value;
+	}
+	return date.toLocaleDateString(
+		"id-ID",
+		{
+			day: "2-digit",
+			month: "short",
+			year: "numeric"
+		}
+	);
+}
+
+function getTodayAccountingDate() {
+	const now = new Date();
+	const offset = now.getTimezoneOffset() * 60000;
+	return new Date( now.getTime() - offset )
+	.toISOString()
+	.split("T")[0];
+}
+
+function escapeHtml(value) {
+	return String(value ?? "")
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
+}
+
