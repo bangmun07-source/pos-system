@@ -25766,8 +25766,8 @@ async function populateAccountingReportsBranches() {
 /* ===== DEFAULT DATE ====== */
 
 function initAccountingReportsDates() {
-  const fromEl = document.getElementById( "accountingReportsPeriodFrom" );
-  const toEl = document.getElementById( "accountingReportsPeriodTo" );
+  const fromEl = document.getElementById("accountingReportsPeriodFrom");
+  const toEl = document.getElementById("accountingReportsPeriodTo");
 
   if (!fromEl || !toEl) return;
 
@@ -25776,8 +25776,9 @@ function initAccountingReportsDates() {
   const month = String(today.getMonth() + 1).padStart(2, "0");
   const day = String(today.getDate()).padStart(2, "0");
   const todayString = `${year}-${month}-${day}`;
+  const firstDayString = `${year}-${month}-01`;
 
-  if (!fromEl.value) { fromEl.value = `${year}-${month}-01`; }
+  if (!fromEl.value) { fromEl.value = firstDayString; }
   if (!toEl.value) { toEl.value = todayString; }
 }
 
@@ -25837,22 +25838,12 @@ async function loadTrialBalance() {
         totalCredit += credit;
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td class="px-4 py-3">
-            ${row.accountCode || "-"}
-          </td>
-
-          <td class="px-4 py-3">
-            ${row.accountName || "-"}
-          </td>
-
-          <td class="px-4 py-3 text-right">
-            ${formatAccountingReportAmount(debit)}
-          </td>
-
-          <td class="px-4 py-3 text-right">
-            ${formatAccountingReportAmount(credit)}
-          </td>
-        `;
+		  <td class="px-4 py-3">${row.accountCode || "-"}</td>
+		  <td class="px-4 py-3">${row.accountName || "-"}</td>
+		  <td class="px-4 py-3">${row.accountType || "-"}</td>
+		  <td class="px-4 py-3 text-right">${formatAccountingReportAmount(debit)}</td>
+		  <td class="px-4 py-3 text-right">${formatAccountingReportAmount(credit)}</td>
+		`;
         tbody.appendChild(tr);
       });
     }
