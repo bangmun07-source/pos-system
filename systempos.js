@@ -27133,7 +27133,7 @@ function closeNewLiabilityModal() {
 
 async function saveNewLiability() {
 	const sessionId = localStorage.getItem("pos_session_id");
-	const branchId = localStorage.getItem("branchId");
+	const branchId = state.branchId;
 	const type = document.getElementById("newLiabilityType")?.value;
 	const creditor = document.getElementById("newLiabilityCreditor")?.value.trim();
 	const date = document.getElementById("newLiabilityDate")?.value;
