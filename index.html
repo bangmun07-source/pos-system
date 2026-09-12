@@ -17391,7 +17391,7 @@
                 Branch
               </label>
 
-              <select class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+              <select id="accountingReportsBranchFilter" class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
                 <option>All Branches</option>
                 <option>Main Branch</option>
                 <option>Branch 01</option>
@@ -17403,7 +17403,8 @@
                 Period From
               </label>
 
-              <input type="date"
+              <input id="accountingReportsPeriodTo"
+								type="date"
                 class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
             </div>
 						
@@ -17412,7 +17413,8 @@
                 Period To
               </label>
 
-              <input type="date"
+              <input id="accountingReportsPeriodTo"
+								type="date"
                 class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
             </div>
 						
@@ -17421,7 +17423,7 @@
                 Accounting Basis
               </label>
 
-              <select class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+              <select id="accountingReportsBasis" class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
                 <option>Accrual</option>
                 <option>Cash</option>
               </select>
@@ -17483,116 +17485,8 @@
                 </tr>
               </thead>
 							
-              <tbody>
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 text-muted">
-                    1000
-                  </td>
-
-                  <td class="px-5 py-4 font-medium">
-                    Cash
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Asset
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 12,850,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    —
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 text-muted">
-                    1100
-                  </td>
-									
-                  <td class="px-5 py-4 font-medium">
-                    Bank
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Asset
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 18,450,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    —
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 text-muted">
-                    1200
-                  </td>
-
-                  <td class="px-5 py-4 font-medium">
-                    Inventory
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Asset
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 18,250,000
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    —
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 text-muted">
-                    2000
-                  </td>
-
-                  <td class="px-5 py-4 font-medium">
-                    Accounts Payable
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Liability
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    —
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 4,750,000
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="px-5 py-4 text-muted">
-                    4000
-                  </td>
-
-                  <td class="px-5 py-4 font-medium">
-                    Sales Revenue
-                  </td>
-
-                  <td class="px-5 py-4">
-                    Revenue
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    —
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 28,450,000
-                  </td>
-                </tr>
+              <tbody id="trialBalanceTableBody">
+              
               </tbody>
 
 
@@ -17604,12 +17498,12 @@
                     Total
                   </td>
 
-                  <td class="px-5 py-4 text-right font-medium">
-                    Rp 49,550,000
+                  <td id="trialBalanceTotalDebit" class="px-5 py-4 text-right font-medium">
+                    -
                   </td>
 
-                  <td class="px-5 py-4 text-right font-medium">
-                    Rp 49,550,000
+                  <td id="trialBalanceTotalCredit" class="px-5 py-4 text-right font-medium">
+                    -
                   </td>
                 </tr>
               </tfoot>
@@ -17652,8 +17546,8 @@
                   Revenue
                 </span>
 
-                <span class="text-sm">
-                  Rp 28,450,000
+                <span id="profitLossRevenue" class="text-sm">
+                  -
                 </span>
               </div>
 
@@ -17662,8 +17556,8 @@
                   Cost of Goods Sold
                 </span>
 
-                <span class="text-sm">
-                  Rp 11,250,000
+                <span id="profitLossCOGS" class="text-sm">
+                  -
                 </span>
               </div>
 
@@ -17672,8 +17566,8 @@
                   Gross Profit
                 </span>
 
-                <span class="text-sm font-medium">
-                  Rp 17,200,000
+                <span id="profitLossGrossProfit" class="text-sm font-medium">
+                  -
                 </span>
               </div>
 
@@ -17682,8 +17576,8 @@
                   Operating Expenses
                 </span>
 
-                <span class="text-sm">
-                  Rp 6,450,000
+                <span id="profitLossExpenses" class="text-sm">
+                  -
                 </span>
               </div>
 
@@ -17692,8 +17586,8 @@
                   Net Profit
                 </span>
 
-                <span class="font-headline text-primary">
-                  Rp 10,750,000
+                <span id="profitLossNetProfit" class="font-headline text-primary">
+                  -
                 </span>
               </div>
             </div>
@@ -17737,25 +17631,23 @@
               <div class="space-y-3">
                 <div class="flex justify-between text-sm">
                   <span>Cash</span>
-                  <span>Rp 12,850,000</span>
+                  <span id="balanceSheetCash">-</span>
                 </div>
 
                 <div class="flex justify-between text-sm">
                   <span>Bank</span>
-                  <span>Rp 18,450,000</span>
+                  <span id="balanceSheetBank">-</span>
                 </div>
 
                 <div class="flex justify-between text-sm">
                   <span>Inventory</span>
-                  <span>Rp 18,250,000</span>
+                  <span id="balanceSheetInventory">-</span>
                 </div>
               </div>
 							
               <div class="flex justify-between border-t border-outline-variant mt-4 pt-4 font-medium">
                 <span>Total Assets</span>
-                <span>
-                  Rp 49,550,000
-                </span>
+                <span id="balanceSheetTotalAssets">-</span>
               </div>
             </div>
             <!-- LIABILITIES -->
@@ -17766,24 +17658,14 @@
 							
               <div class="space-y-3">
                 <div class="flex justify-between text-sm">
-                  <span>
-                    Accounts Payable
-                  </span>
-
-                  <span>
-                    Rp 4,750,000
-                  </span>
+                  <span> Accounts Payable </span>
+                  <span id="balanceSheetAccountsPayable">-</span>
                 </div>
               </div>
 
               <div class="flex justify-between border-t border-outline-variant mt-4 pt-4 font-medium">
-                <span>
-                  Total Liabilities
-                </span>
-
-                <span>
-                  Rp 4,750,000
-                </span>
+                <span> Total Liabilities </span>
+                <span id="balanceSheetTotalLiabilities">-</span>
               </div>
             </div>
             <!-- EQUITY -->
@@ -17794,34 +17676,19 @@
 
               <div class="space-y-3">
                 <div class="flex justify-between text-sm">
-                  <span>
-                    Owner Equity
-                  </span>
-
-                  <span>
-                    Rp 34,050,000
-                  </span>
+                  <span> Owner Equity </span>
+                  <span id="balanceSheetOwnerEquity">-</span>
                 </div>
 
                 <div class="flex justify-between text-sm">
-                  <span>
-                    Current Profit
-                  </span>
-
-                  <span>
-                    Rp 10,750,000
-                  </span>
+                  <span> Current Profit </span>
+                  <span id="balanceSheetCurrentProfit">-</span>
                 </div>
               </div>
 
               <div class="flex justify-between border-t border-outline-variant mt-4 pt-4 font-medium">
-                <span>
-                  Total Equity
-                </span>
-
-                <span>
-                  Rp 44,800,000
-                </span>
+                <span> Total Equity </span>
+                <span id="balanceSheetTotalEquity">-</span>
               </div>
             </div>
           </div>
@@ -17885,84 +17752,8 @@
                 </tr>
               </thead>
 
-              <tbody>
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 font-medium">
-                    Supplier A
-                  </td>
-
-                  <td class="px-5 py-4">
-                    INV-001248
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    01 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    15 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 2,500,000
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    Outstanding
-                  </td>
-                </tr>
-
-                <tr class="border-b border-outline-variant">
-                  <td class="px-5 py-4 font-medium">
-                    Supplier B
-                  </td>
-
-                  <td class="px-5 py-4">
-                    INV-001249
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    03 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    17 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 1,750,000
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    Outstanding
-                  </td>
-                </tr>
-
-                <tr>
-                  <td class="px-5 py-4 font-medium">
-                    Supplier C
-                  </td>
-
-                  <td class="px-5 py-4">
-                    INV-001250
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    05 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    19 Sep 2026
-                  </td>
-
-                  <td class="px-5 py-4 text-right">
-                    Rp 500,000
-                  </td>
-
-                  <td class="px-5 py-4 text-muted">
-                    Outstanding
-                  </td>
-                </tr>
+              <tbody id="accountsPayableTableBody">
+  
               </tbody>
 
               <tfoot>
@@ -17973,7 +17764,7 @@
                     Total Outstanding
                   </td>
 
-                  <td class="px-5 py-4 text-right font-medium">
+                  <td id="accountsPayableTotal" class="px-5 py-4 text-right font-medium">
                     Rp 4,750,000
                   </td>
 									
