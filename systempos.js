@@ -27183,22 +27183,23 @@ async function saveNewLiability() {
 			saveBtn.innerHTML = "Menyimpan...";
 		}
 		const { data, error } =
-			await supabaseClient.rpc(
-				"create_liability",
-				{
-					p_session_id: sessionId,
-					p_liability_type: type,
-					p_creditor: creditor,
-					p_description: note,
-					p_start_date: date,
-					p_due_date: dueDate,
-					p_original_amount: amount,
-					p_funding_method: fundingMethod,
-					p_interest_type: null,
-					p_interest_rate: null,
-					p_interest_amount: 0
-				}
-			);
+	    await supabaseClient.rpc(
+	        "create_liability",
+	        {
+	            p_session_id: sessionId,
+	            p_branch_id: branchId,
+	            p_liability_type: type,
+	            p_creditor: creditor,
+	            p_description: note,
+	            p_start_date: date,
+	            p_due_date: dueDate,
+	            p_original_amount: amount,
+	            p_funding_method: fundingMethod,
+	            p_interest_type: null,
+	            p_interest_rate: null,
+	            p_interest_amount: 0
+	        }
+	    );
 
 		if (error) {
 				console.error("create_liability:", error);
