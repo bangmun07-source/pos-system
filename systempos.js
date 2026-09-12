@@ -26123,9 +26123,7 @@ async function initAccountingDebtPage() {
 	supplierDebtFiltered = [];
 	initSupplierDebtFilters();
 	await loadSupplierDebt();
-
-    // Other Liabilities belum diaktifkan
-    // nanti kita tambahkan setelah Supplier Payables selesai.
+	await initOtherLiability();
 }
 
 
@@ -27167,7 +27165,7 @@ async function saveNewLiability() {
 
 		if (error) {
 				console.error("create_liability:", error);
-				throw error; 
+				throw error; }  
 		if (!data?.success) {
 			throw new Error(
 				data?.message ||
