@@ -25825,6 +25825,11 @@ async function loadTrialBalance() {
     return; }
   const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
   const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
+	  console.log("ACCOUNTING FILTER", {
+		branchId,
+		toDate,
+		sessionId
+	  });
   const tbody = document.getElementById( "trialBalanceTableBody" );
   const totalDebitEl = document.getElementById( "trialBalanceTotalDebit" );
   const totalCreditEl = document.getElementById( "trialBalanceTotalCredit" );
@@ -25848,7 +25853,8 @@ async function loadTrialBalance() {
           p_session_id: sessionId
         }
       );
-
+  console.log("TRIAL BALANCE RESULT", data);
+  console.log("TRIAL BALANCE ERROR", error);
     if (error) throw error;
     const rows = Array.isArray(data)
       ? data
@@ -25908,6 +25914,11 @@ async function loadProfitLoss() {
   const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
   const fromDate = document.getElementById( "accountingReportsPeriodFrom" )?.value || null;
   const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
+	  console.log("ACCOUNTING FILTER", {
+    branchId,
+    toDate,
+    sessionId
+  });
 
   try {
     const { data, error } =
@@ -25920,7 +25931,8 @@ async function loadProfitLoss() {
           p_session_id: sessionId
         }
       );
-
+  console.log("TRIAL BALANCE RESULT", data);
+  console.log("TRIAL BALANCE ERROR", error);
     if (error) throw error;
     const rows = Array.isArray(data)
       ? data
@@ -25972,7 +25984,11 @@ async function loadBalanceSheet() {
     return; }
   const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
   const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
-
+  console.log("ACCOUNTING FILTER", {
+    branchId,
+    toDate,
+    sessionId
+  });
   try {
     const { data, error } =
       await supabaseClient.rpc(
@@ -25983,6 +25999,9 @@ async function loadBalanceSheet() {
           p_session_id: sessionId
         }
       );
+
+  console.log("TRIAL BALANCE RESULT", data);
+  console.log("TRIAL BALANCE ERROR", error);		
 	  
     if (error) throw error;
     const result = data || {};
