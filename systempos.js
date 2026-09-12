@@ -10125,10 +10125,35 @@ window.saveStockIn = async function () {
       "success"
     );
 
-  } catch (error) {
+  }   } catch (error) {
+    console.error(
+      "ADD INGREDIENT PURCHASE ERROR:",
+      error
+    );
+
+    console.error(
+      "MESSAGE:",
+      error?.message
+    );
+
+    console.error(
+      "DETAILS:",
+      error?.details
+    );
+
+    console.error(
+      "HINT:",
+      error?.hint
+    );
+
+    const err =
+      error?.message ||
+      error?.details ||
+      "";
+
     let message =
       "Gagal menyimpan purchase";
-    const err = error?.message || "";
+
     if (
       err.includes(
         "Saldo Cash tidak mencukupi"
@@ -10145,6 +10170,12 @@ window.saveStockIn = async function () {
       message =
         "Saldo Bank tidak mencukupi";
     }
+    else {
+      message =
+        err ||
+        "Gagal menyimpan purchase";
+    }
+
     alert(message);
   }
 };
