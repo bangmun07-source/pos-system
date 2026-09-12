@@ -1062,6 +1062,10 @@ function initModule(pageId) {
 		    loadJournalEntries();
 		    break;
 		}
+			
+		case "accountingReportsPage":
+    		initAccountingReports();
+    break;
   }
 }
 	
@@ -25697,4 +25701,381 @@ async function initGeneralLedger() {
   }
   await populateGeneralLedgerBranches();
   await loadGeneralLedger();
+}
+
+
+/* =========================================================
+   ACCOUNTING REPORTS
+   ========================================================= */
+
+let accountingReportsInitialized = false;
+
+/* ====== FORMAT ===== */
+
+function formatAccountingReportAmount(value) {
+  const amount = Number(value || 0);
+  return new Intl.NumberFormat("id-ID").format(amount);
+}
+
+/* ======= BRANCH DROPDOWN ======== */
+
+async function populateAccountingReportsBranches() {
+  const select = document.getElementById( "accountingReportsBranchFilter" );
+  if (!select) return;
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
+    return; }
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_branches",
+      {
+        p_session_id: sessionId
+      }
+    );
+    if (error) throw error;
+    const branches = data || [];
+    const currentValue = select.value;
+    select.innerHTML = "";
+    const allOption = document.createElement("option");
+    allOption.value = "";
+    allOption.textContent = "All Branches";
+    select.appendChild(allOption);
+    branches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch.id;
+      option.textContent = branch.name;
+      select.appendChild(option);
+    });
+
+    if (
+      currentValue &&
+      branches.some(
+        branch => String(branch.id) === String(currentValue)
+      )
+    ) {
+      select.value = currentValue;
+    }
+  } catch (error) {
+    console.error(
+      "populateAccountingReportsBranches error:",
+      error
+    );
+  }
+}
+
+/* ===== DEFAULT DATE ====== */
+
+function initAccountingReportsDates() {
+  const fromEl = document.getElementById( "accountingReportsPeriodFrom" );
+  const toEl = document.getElementById( "accountingReportsPeriodTo" );
+
+  if (!fromEl || !toEl) return;
+
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  const todayString = `${year}-${month}-${day}`;
+
+  if (!fromEl.value) { fromEl.value = `${year}-${month}-01`; }
+  if (!toEl.value) { toEl.value = todayString; }
+}
+
+/* ====== TRIAL BALANCE ====== */
+
+async function loadTrialBalance() {
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
+    return; }
+  const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
+  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
+  const tbody = document.getElementById( "trialBalanceTableBody" );
+  const totalDebitEl = document.getElementById( "trialBalanceTotalDebit" );
+  const totalCreditEl = document.getElementById( "trialBalanceTotalCredit" );
+
+  if (!tbody) return;
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="4" class="px-4 py-8 text-center">
+        Loading...
+      </td>
+    </tr>
+  `;
+
+  try {
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_trial_balance",
+        {
+          p_branch_id: branchId,
+          p_to_date: toDate,
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+    const rows = Array.isArray(data)
+      ? data
+      : [];
+
+    tbody.innerHTML = "";
+    let totalDebit = 0;
+    let totalCredit = 0;
+    if (!rows.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="px-4 py-8 text-center text-gray-400">
+            No accounting data available
+          </td>
+        </tr>
+      `;
+    } else {
+      rows.forEach(row => {
+        const debit = Number(row.debit || 0);
+        const credit = Number(row.credit || 0);
+        totalDebit += debit;
+        totalCredit += credit;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td class="px-4 py-3">
+            ${row.accountCode || "-"}
+          </td>
+
+          <td class="px-4 py-3">
+            ${row.accountName || "-"}
+          </td>
+
+          <td class="px-4 py-3 text-right">
+            ${formatAccountingReportAmount(debit)}
+          </td>
+
+          <td class="px-4 py-3 text-right">
+            ${formatAccountingReportAmount(credit)}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    if (totalDebitEl) { totalDebitEl.textContent = formatAccountingReportAmount(totalDebit); }
+    if (totalCreditEl) { totalCreditEl.textContent = formatAccountingReportAmount(totalCredit); }
+  } catch (error) {
+    console.error(
+      "loadTrialBalance error:",
+      error
+    );
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="px-4 py-8 text-center text-red-400">
+          Failed to load Trial Balance
+        </td>
+      </tr>
+    `;
+  }
+}
+
+/* ======== PROFIT & LOSS ======== */
+
+async function loadProfitLoss() {
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
+    return; }
+  const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
+  const fromDate = document.getElementById( "accountingReportsPeriodFrom" )?.value || null;
+  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
+
+  try {
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_profit_loss",
+        {
+          p_branch_id: branchId,
+          p_from_date: fromDate,
+          p_to_date: toDate,
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+    const rows = Array.isArray(data)
+      ? data
+      : [];
+
+    let revenue = 0;
+    let cogs = 0;
+    let expenses = 0;
+    rows.forEach(row => {
+      const amount = Number(row.amount || 0);
+      switch (row.accountType) {
+        case "REVENUE":
+          revenue += amount;
+          break;
+
+        case "COGS":
+          cogs += amount;
+          break;
+
+        case "EXPENSE":
+          expenses += amount;
+          break;
+      }
+    });
+    const grossProfit = revenue - cogs;
+    const netProfit = grossProfit - expenses;
+    const revenueEl = document.getElementById( "profitLossRevenue" );
+    const cogsEl = document.getElementById( "profitLossCOGS" );
+    const grossProfitEl = document.getElementById( "profitLossGrossProfit" );
+    const expensesEl = document.getElementById( "profitLossExpenses" );
+    const netProfitEl = document.getElementById( "profitLossNetProfit" );
+
+    if (revenueEl) { revenueEl.textContent = formatAccountingReportAmount(revenue); }
+    if (cogsEl) { cogsEl.textContent = formatAccountingReportAmount(cogs); }
+    if (grossProfitEl) { grossProfitEl.textContent = formatAccountingReportAmount(grossProfit); }
+    if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(expenses); }
+    if (netProfitEl) { netProfitEl.textContent = formatAccountingReportAmount(netProfit); }
+  } catch (error) {
+    console.error(
+      "loadProfitLoss error:",
+      error
+    );
+  }
+}
+
+async function loadBalanceSheet() {
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
+    return; }
+  const branchId = document.getElementById( "accountingReportsBranchFilter" )?.value || null;
+  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || null;
+
+  try {
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_balance_sheet",
+        {
+          p_branch_id: branchId,
+          p_to_date: toDate,
+          p_session_id: sessionId
+        }
+      );
+	  
+    if (error) throw error;
+    const result = data || {};
+    const accounts = Array.isArray(result.accounts)
+        ? result.accounts
+        : [];
+
+    const currentProfit = Number(result.currentProfit || 0);
+    let cash = 0;
+    let bank = 0;
+    let inventory = 0;
+    let totalAssets = 0;
+    let accountsPayable = 0;
+    let totalLiabilities = 0;
+    let ownerEquity = 0;
+    let totalEquity = 0;
+
+    accounts.forEach(account => {
+      const balance = Number(account.balance || 0);
+      switch (account.accountType) {
+
+        case "ASSET":
+          totalAssets += balance;
+          if (account.accountCode === "1100") { cash += balance; }
+          else if (account.accountCode === "1200") { bank += balance; }
+          else if (account.accountCode === "1300") { inventory += balance; }
+          break;
+
+        case "LIABILITY":
+          totalLiabilities += balance;
+          /*
+           * AP default account.
+           * Kalau nanti Account Mapping menggunakan
+           * account berbeda, bisa kita sesuaikan.
+           */
+          if (account.accountCode === "2100") { accountsPayable += balance; }
+
+          break;
+			  
+        case "EQUITY":
+          totalEquity += balance;
+          ownerEquity += balance;
+          break;
+      }
+    });
+
+    /*
+     * Current Profit menjadi bagian Equity
+     */
+    totalEquity += currentProfit;
+    const cashEl = document.getElementById( "balanceSheetCash" );
+    const bankEl = document.getElementById( "balanceSheetBank" );
+    const inventoryEl = document.getElementById( "balanceSheetInventory" );
+    const totalAssetsEl = document.getElementById( "balanceSheetTotalAssets" );
+    const accountsPayableEl = document.getElementById( "balanceSheetAccountsPayable" );
+    const totalLiabilitiesEl = document.getElementById( "balanceSheetTotalLiabilities" );
+    const ownerEquityEl = document.getElementById( "balanceSheetOwnerEquity" );
+    const currentProfitEl = document.getElementById( "balanceSheetCurrentProfit" );
+    const totalEquityEl = document.getElementById( "balanceSheetTotalEquity" );
+
+    if (cashEl) { cashEl.textContent = formatAccountingReportAmount(cash); }
+    if (bankEl) { bankEl.textContent = formatAccountingReportAmount(bank); }
+    if (inventoryEl) { inventoryEl.textContent = formatAccountingReportAmount(inventory); }
+    if (totalAssetsEl) { totalAssetsEl.textContent = formatAccountingReportAmount(totalAssets); }
+    if (accountsPayableEl) { accountsPayableEl.textContent = formatAccountingReportAmount(accountsPayable); }
+    if (totalLiabilitiesEl) { totalLiabilitiesEl.textContent = formatAccountingReportAmount(totalLiabilities); }
+    if (ownerEquityEl) { ownerEquityEl.textContent = formatAccountingReportAmount(ownerEquity); }
+    if (currentProfitEl) { currentProfitEl.textContent = formatAccountingReportAmount(currentProfit); }
+    if (totalEquityEl) { totalEquityEl.textContent = formatAccountingReportAmount(totalEquity); }
+  } catch (error) {
+    console.error(
+      "loadBalanceSheet error:",
+      error
+    );
+  }
+}
+
+/* ====== LOAD ALL ACCOUNTING REPORTS ====== */
+
+async function loadAccountingReports() {
+  await Promise.all([
+    loadTrialBalance(),
+    loadProfitLoss(),
+    loadBalanceSheet()
+  ]);
+}
+
+function initAccountingReportsFilters() {
+  const branchFilter = document.getElementById( "accountingReportsBranchFilter" );
+  const fromDate = document.getElementById( "accountingReportsPeriodFrom" );
+  const toDate = document.getElementById( "accountingReportsPeriodTo" );
+  const basis = document.getElementById( "accountingReportsBasis" );
+	
+  if (branchFilter) { branchFilter.onchange = loadAccountingReports; }
+  if (fromDate) { fromDate.onchange = loadAccountingReports; }
+  if (toDate) { toDate.onchange = loadAccountingReports; }
+
+  /*
+   * Untuk sekarang basis belum mengubah
+   * perhitungan karena journal accounting
+   * kita masih berbasis accrual.
+   */
+  if (basis) {
+    basis.onchange =
+      loadAccountingReports;
+  }
+}
+
+async function initAccountingReports() {
+  try {
+    initAccountingReportsDates();
+    initAccountingReportsFilters();
+    await populateAccountingReportsBranches();
+    await loadAccountingReports();
+    accountingReportsInitialized = true;
+  } catch (error) {
+    console.error(
+      "initAccountingReports error:",
+      error
+    );
+  }
 }
