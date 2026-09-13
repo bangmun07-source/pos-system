@@ -17634,105 +17634,206 @@
           </div>
         </section>
         <!-- BALANCE SHEET -->
-        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="main-icon-box">
-                <span class="material-symbols-outlined">
-                  account_balance
-                </span>
-              </div>
+				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined">
+				          account_balance
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-headline text-foreground">
+				          Balance Sheet
+				        </h2>
+				
+				        <p class="text-xs text-muted mt-1">
+				          Financial position by assets, liabilities and equity
+				        </p>
+				      </div>
+				    </div>
+				
+				    <button class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+				      <span class="material-symbols-outlined text-[18px]">
+				        download
+				      </span>
+				      Export
+				    </button>
+				  </div>
+				  <!-- BALANCE SHEET CONTENT -->
+				  <div class="p-5">
+				    <!-- ==== ASSETS ==== -->
+				    <div class="mb-8">
+				      <p class="text-xs text-muted uppercase tracking-wider mb-4">
+				        Assets
+				      </p>
+				      <!-- CURRENT ASSETS -->
+				      <div class="mb-5">
+				        <div class="flex justify-between items-center mb-3">
+				          <span class="text-sm font-medium">
+				            Current Assets
+				          </span>
+				        </div>
+				
+				        <div id="balanceSheetCurrentAssets"
+				          class="space-y-3">
+				        </div>
+								
+				        <div class="flex justify-between border-t border-outline-variant mt-4 pt-3 font-medium text-sm">
+				          <span>
+				            Total Current Assets
+				          </span>
+				
+				          <span id="balanceSheetTotalCurrentAssets">
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- NON CURRENT ASSETS -->
+				      <div>
+				        <div class="flex justify-between items-center mb-3">
+				          <span class="text-sm font-medium">
+				            Non-Current Assets
+				          </span>
+				        </div>
+				
+				        <div id="balanceSheetNonCurrentAssets"
+				          class="space-y-3">
+				        </div>
+				
+				        <div class="flex justify-between border-t border-outline-variant mt-4 pt-3 font-medium text-sm">
+				          <span>
+				            Total Non-Current Assets
+				          </span>
+				
+				          <span id="balanceSheetTotalNonCurrentAssets">
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- TOTAL ASSETS -->
+				      <div class="flex justify-between border-t-2 border-outline-variant mt-5 pt-4 font-headline">
+				        <span>
+				          TOTAL ASSETS
+				        </span>
+				
+				        <span id="balanceSheetTotalAssets">
+				          -
+				        </span>
+				      </div>
+				    </div>
+				    <!-- ===== LIABILITIES ===== -->
+				    <div class="mb-8">
+				      <p class="text-xs text-muted uppercase tracking-wider mb-4">
+				        Liabilities
+				      </p>
+				      <!-- CURRENT LIABILITIES -->
+				      <div class="mb-5">
+				        <div class="flex justify-between items-center mb-3">
+				          <span class="text-sm font-medium">
+				            Current Liabilities
+				          </span>
+				        </div>
+				
+				        <div id="balanceSheetCurrentLiabilities"
+				          class="space-y-3">
+				        </div>
+				
+				        <div class="flex justify-between border-t border-outline-variant mt-4 pt-3 font-medium text-sm">
+				          <span>
+				            Total Current Liabilities
+				          </span>
+				
+				          <span id="balanceSheetTotalCurrentLiabilities">
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- NON CURRENT LIABILITIES -->
+				      <div>
+				        <div class="flex justify-between items-center mb-3">
+				          <span class="text-sm font-medium">
+				            Non-Current Liabilities
+				          </span>
+				        </div>
+								
+				        <div id="balanceSheetNonCurrentLiabilities"
+				          class="space-y-3">
+				        </div>
+								
+				        <div class="flex justify-between border-t border-outline-variant mt-4 pt-3 font-medium text-sm">
+				          <span>
+				            Total Non-Current Liabilities
+				          </span>
+				
+				          <span id="balanceSheetTotalNonCurrentLiabilities">
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- TOTAL LIABILITIES -->
+				      <div class="flex justify-between border-t-2 border-outline-variant mt-5 pt-4 font-headline">
+				        <span>
+				          TOTAL LIABILITIES
+				        </span>
+				
+				        <span id="balanceSheetTotalLiabilities">
+				          -
+				        </span>
+				      </div>
+				    </div>
+				    <!-- ===== EQUITY ===== -->
+				    <div>
+				      <p class="text-xs text-muted uppercase tracking-wider mb-4">
+				        Equity
+				      </p>
+				      <!-- EQUITY ACCOUNTS -->
+				      <div id="balanceSheetEquity"
+				        class="space-y-3">
+				      </div>
+				      <!-- CURRENT YEAR EARNINGS -->
+				      <div class="flex justify-between text-sm py-3 border-t border-outline-variant mt-3">
+				        <span>
+				          Current Year Earnings
+				        </span>
+				
+				        <span id="balanceSheetCurrentProfit">
+				          -
+				        </span>
+				      </div>
+				      <!-- TOTAL EQUITY -->
+				      <div class="flex justify-between border-t-2 border-outline-variant mt-4 pt-4 font-headline">
+				        <span>
+				          TOTAL EQUITY
+				        </span>
+				
+				        <span id="balanceSheetTotalEquity">
+				          -
+				        </span>
+				      </div>
+				    </div>
+				    <!-- ===== TOTAL LIABILITIES + EQUITY ===== -->
+				    <div class="flex justify-between border-t-2 border-outline-variant mt-8 pt-5 font-headline">
+				      <span>
+				        TOTAL LIABILITIES + EQUITY
+				      </span>
 							
-              <div>
-                <h2 class="text-lg font-headline text-foreground">
-                  Balance Sheet
-                </h2>
-
-                <p class="text-xs text-muted mt-1">
-                  Financial position by assets, liabilities and equity
-                </p>
-              </div>
-            </div>
-
-            <button class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px]">
-                download
-              </span>
-              Export
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-3">
-            <div class="p-5 border-b lg:border-b-0 lg:border-r border-outline-variant">
-              <p class="text-xs text-muted uppercase tracking-wider mb-4">
-                Assets
-              </p>
-
-              <div class="space-y-3">
-                <div class="flex justify-between text-sm">
-                  <span>Cash</span>
-                  <span id="balanceSheetCash">-</span>
-                </div>
-
-                <div class="flex justify-between text-sm">
-                  <span>Bank</span>
-                  <span id="balanceSheetBank">-</span>
-                </div>
-
-                <div class="flex justify-between text-sm">
-                  <span>Inventory</span>
-                  <span id="balanceSheetInventory">-</span>
-                </div>
-              </div>
-							
-              <div class="flex justify-between border-t border-outline-variant mt-4 pt-4 font-medium">
-                <span>Total Assets</span>
-                <span id="balanceSheetTotalAssets">-</span>
-              </div>
-            </div>
-            <!-- LIABILITIES -->
-            <div class="p-5 border-b lg:border-b-0 lg:border-r border-outline-variant">
-              <p class="text-xs text-muted uppercase tracking-wider mb-4">
-                Liabilities
-              </p>
-							
-              <div class="space-y-3">
-                <div class="flex justify-between text-sm">
-                  <span> Accounts Payable </span>
-                  <span id="balanceSheetAccountsPayable">-</span>
-                </div>
-              </div>
-
-              <div class="flex justify-between border-t border-outline-variant mt-4 pt-4 font-medium">
-                <span> Total Liabilities </span>
-                <span id="balanceSheetTotalLiabilities">-</span>
-              </div>
-            </div>
-            <!-- EQUITY -->
-            <div class="p-5">
-              <p class="text-xs text-muted uppercase tracking-wider mb-4">
-                Equity
-              </p>
-
-              <div class="space-y-3">
-                <div class="flex justify-between text-sm">
-                  <span> Owner Equity </span>
-                  <span id="balanceSheetOwnerEquity">-</span>
-                </div>
-
-                <div class="flex justify-between text-sm">
-                  <span> Current Profit </span>
-                  <span id="balanceSheetCurrentProfit">-</span>
-                </div>
-              </div>
-
-              <div class="flex justify-between border-t border-outline-variant mt-4 pt-4 font-medium">
-                <span> Total Equity </span>
-                <span id="balanceSheetTotalEquity">-</span>
-              </div>
-            </div>
-          </div>
-        </section>
+				      <span id="balanceSheetTotalLiabilitiesEquity">
+				        -
+				      </span>
+				    </div>
+				    <!-- ==== BALANCE CHECK ==== -->
+				    <div class="flex justify-between mt-3 pt-3 text-xs text-muted">
+				      <span>
+				        Balance Check
+				      </span>
+				      <span id="balanceSheetCheck">
+				        -
+				      </span>
+				    </div>
+				  </div>
+				</section>
         <!-- ACCOUNTS PAYABLE -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <div class="p-5 border-b border-outline-variant flex items-center justify-between">
