@@ -26160,6 +26160,15 @@ function sumBalance(accounts) {
   );
 }
 
+function formatBalanceSheetAmount(amount) {
+  const value = Number(amount || 0);
+  if (value === 0) return "";
+  const formatted = formatAccountingReportAmount(Math.abs(value));
+  return value < 0
+    ? `(${formatted})`
+    : formatted;
+}
+
 /* ===== RENDER ACCOUNT ROW ===== */
 function renderBalanceSheetAccounts( elementId, accounts ) {
   const container = document.getElementById(elementId);
@@ -26179,38 +26188,45 @@ function renderBalanceSheetAccounts( elementId, accounts ) {
 
   accounts.forEach(account => {
     const balance = Number(account.balance || 0);
-    let debit = 0;
-    let credit = 0;
-
-    if (
-      account.normalBalance === "DEBIT"
-    ) {
-      if (balance >= 0) {
-        debit = balance;
-      } else {
-        credit = Math.abs(balance);
-      }
-    } else {
-      if (balance >= 0) {
-        credit = balance;
-      } else {
-        debit = Math.abs(balance);
-      }
-    }
+		let debit = 0;
+		let credit = 0;
+		
+		if (account.normalBalance === "DEBIT") {
+		  if (balance >= 0) {
+		    debit = balance;
+		  } else {
+		    credit = balance;
+		  }
+		} else {
+		  if (balance >= 0) {
+		    credit = balance;
+		  } else {
+		    debit = balance;
+		  }
+		}
     const row = document.createElement("div");
+		
     row.className = "grid grid-cols-[1fr_180px_180px] gap-4 text-sm";
+		
     const name = document.createElement("span");
+		
     name.textContent = account.accountName || "-";
+		
     const debitEl = document.createElement("span");
+		
     debitEl.className = "text-right";
-    debitEl.textContent = debit !== 0
-        ? formatAccountingReportAmount(debit)
-        : "";
+		debitEl.textContent =
+		  debit !== 0
+		    ? formatBalanceSheetAmount(debit)
+		    : "";
+		
     const creditEl = document.createElement("span");
+		
     creditEl.className = "text-right";
-    creditEl.textContent = credit !== 0
-        ? formatAccountingReportAmount(credit)
-        : "";
+		creditEl.textContent =
+		  credit !== 0
+		    ? formatBalanceSheetAmount(credit)
+		    : "";
     row.appendChild(name);
     row.appendChild(debitEl);
     row.appendChild(creditEl);
