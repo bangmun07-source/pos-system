@@ -26254,10 +26254,11 @@ function renderBalanceSheetAccounts(elementId, accounts) {
 	
 	  const row = document.createElement("div");
 	  row.className =
-	    "grid grid-cols-[1fr_180px_180px] gap-4 text-sm text-muted";
+	    "grid grid-cols-[1fr_180px_180px] gap-4 text-sm";
 	
-	  const name = document.createElement("span");
-	  name.textContent = account.accountName || "-";
+	const name = document.createElement("span");
+	name.className = "text-on-surface-variant";
+	name.textContent = account.accountName || "-";
 	
 	  const debitEl = document.createElement("span");
 	  debitEl.className = "text-right";
@@ -26270,8 +26271,8 @@ function renderBalanceSheetAccounts(elementId, accounts) {
 	        )
 	      : "";
 	
-	  const creditEl = document.createElement("span");
-	  creditEl.className = "text-right";
+		const creditEl = document.createElement("span");
+		creditEl.className = "text-right text-on-surface";
 	
 	  creditEl.textContent =
 	    credit !== 0
