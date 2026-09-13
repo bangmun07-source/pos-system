@@ -26074,7 +26074,7 @@ function renderBalanceSheet(result) {
   renderBalanceSheetAccounts( "balanceSheetNonCurrentAssets", nonCurrentAssets );
   renderBalanceSheetAccounts( "balanceSheetCurrentLiabilities", currentLiabilities );
   renderBalanceSheetAccounts( "balanceSheetNonCurrentLiabilities", nonCurrentLiabilities );
-  renderBalanceSheetAccounts( balanceSheetEquity", equityAccounts );
+  renderBalanceSheetAccounts( "balanceSheetEquity", equityAccounts );
 	
   /* ====== CURRENT YEAR EARNINGS ====== */
   setBalanceSheetAmount( "balanceSheetCurrentProfit", currentProfit );
