@@ -26160,21 +26160,23 @@ function sumBalance(accounts) {
   );
 }
 
-function formatBalanceSheetAmount(amount) {
+function formatBalanceSheetAmount(amount, forceNegative = false) {
   const value = Number(amount || 0);
   if (value === 0) return "";
+
   const formatted = formatAccountingReportAmount(Math.abs(value));
-  return value < 0
+
+  return (value < 0 || forceNegative)
     ? `(${formatted})`
     : formatted;
 }
 
 /* ===== RENDER ACCOUNT ROW ===== */
-function renderBalanceSheetAccounts( elementId, accounts ) {
+function renderBalanceSheetAccounts(elementId, accounts) {
   const container = document.getElementById(elementId);
-
   if (!container) return;
   container.innerHTML = "";
+
   if (!accounts.length) {
     container.innerHTML = `
       <div class="grid grid-cols-[1fr_180px_180px] gap-4 text-sm text-muted">
@@ -26188,45 +26190,49 @@ function renderBalanceSheetAccounts( elementId, accounts ) {
 
   accounts.forEach(account => {
     const balance = Number(account.balance || 0);
-		let debit = 0;
-		let credit = 0;
-		
-		if (account.normalBalance === "DEBIT") {
-		  if (balance >= 0) {
-		    debit = balance;
-		  } else {
-		    credit = balance;
-		  }
-		} else {
-		  if (balance >= 0) {
-		    credit = balance;
-		  } else {
-		    debit = balance;
-		  }
-		}
+    let debit = 0;
+    let credit = 0;
+    if (account.normalBalance === "DEBIT") {
+      if (balance >= 0) {
+        debit = balance;
+      } else {
+        credit = Math.abs(balance);
+      }
+    } else {
+      if (balance >= 0) {
+        credit = balance;
+      } else {
+        debit = Math.abs(balance);
+      }
+    }
+    const isReduction =
+      (
+        account.balanceSheetCategory === "EQUITY" &&
+        account.normalBalance === "DEBIT"
+      ) ||
+      (
+        account.balanceSheetCategory === "NON_CURRENT_ASSET" &&
+        account.normalBalance === "CREDIT"
+      );
+
     const row = document.createElement("div");
-		
-    row.className = "grid grid-cols-[1fr_180px_180px] gap-4 text-sm";
-		
+    row.className =
+      "grid grid-cols-[1fr_180px_180px] gap-4 text-sm";
     const name = document.createElement("span");
-		
     name.textContent = account.accountName || "-";
-		
     const debitEl = document.createElement("span");
-		
     debitEl.className = "text-right";
-		debitEl.textContent =
-		  debit !== 0
-		    ? formatBalanceSheetAmount(debit)
-		    : "";
-		
+    debitEl.textContent =
+      debit !== 0
+        ? formatBalanceSheetAmount(debit, isReduction)
+        : "";
+
     const creditEl = document.createElement("span");
-		
     creditEl.className = "text-right";
-		creditEl.textContent =
-		  credit !== 0
-		    ? formatBalanceSheetAmount(credit)
-		    : "";
+    creditEl.textContent =
+      credit !== 0
+        ? formatBalanceSheetAmount(credit, false)
+        : "";
     row.appendChild(name);
     row.appendChild(debitEl);
     row.appendChild(creditEl);
