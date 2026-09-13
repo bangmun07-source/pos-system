@@ -3060,7 +3060,8 @@ async function sendTransaction(payload){
       state.currentMemberPoint = 0;
       state.paymentMethod = null;
       state.discountActive = false;
-
+			state.accountingReportsData = null;
+			state.accountingReportsFilter = null;
       const memberInput = document.getElementById("member-input");
       const tableInput = document.getElementById("table-input");
       if(memberInput){
