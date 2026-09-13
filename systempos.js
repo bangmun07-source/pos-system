@@ -26124,21 +26124,26 @@ function renderBalanceSheet(result) {
 	  );
 	}
   /* ==== TOTAL EQUITY ==== */
-  const equityDebit = equityAccounts.reduce(
-      (sum, account) => {
-        const balance = Number(account.balance || 0);
-        if ( account.normalBalance === "DEBIT" ) 
-				{ return sum + balance; }
-        return sum;
-      },
-      0
-    )
-    +
-    (
-      currentProfit < 0
-        ? Math.abs(currentProfit)
-        : 0
-    );
+  const equityDebit = -(
+	  equityAccounts.reduce(
+	    (sum, account) => {
+	      const balance = Number(account.balance || 0);
+	
+	      if (account.normalBalance === "DEBIT") {
+	        return sum + balance;
+	      }
+	
+	      return sum;
+	    },
+	    0
+	  )
+	  +
+	  (
+	    currentProfit < 0
+	      ? Math.abs(currentProfit)
+	      : 0
+	  )
+	);
   const equityCredit = equityAccounts.reduce(
       (sum, account) => {
         const balance = Number(account.balance || 0);
