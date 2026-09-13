@@ -25980,7 +25980,6 @@ async function loadBalanceSheet() {
   }
   const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
   const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
-	
   const { data, error } = await supabaseClient.rpc(
     "get_balance_sheet",
     {
@@ -25992,24 +25991,24 @@ async function loadBalanceSheet() {
   if (error) throw error;
   return data || {};
 }
-
-function renderBalanceSheet(result) {
+unction renderBalanceSheet(result) {
   const accounts = Array.isArray(result?.accounts)
-    ? result.accounts
-    : [];
+      ? result.accounts
+      : [];
   const currentProfit = Number(result?.currentProfit || 0);
-  /* ======= GROUP ACCOUNT ======== */
+
+  /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
   const nonCurrentAssets = [];
   const currentLiabilities = [];
   const nonCurrentLiabilities = [];
   const equityAccounts = [];
-
+	
   accounts.forEach(account => {
     const balance = Number(account.balance || 0);
     if (balance === 0) return;
-
-    switch (account.balanceSheetCategory) {
+    switch ( account.balanceSheetCategory ) 
+		{
       case "CURRENT_ASSET":
         currentAssets.push(account);
         break;
@@ -26027,118 +26026,228 @@ function renderBalanceSheet(result) {
         break;
     }
   });
-	
-  /* ==== TOTAL ASSETS ===== */
-  const totalCurrentAssets =
-    currentAssets.reduce(
-      (sum, account) =>
-        sum + Number(account.balance || 0),
-      0
-    );
-
-  const totalNonCurrentAssets =
-    nonCurrentAssets.reduce(
-      (sum, account) =>
-        sum + Number(account.balance || 0),
-      0
-    );
-
+  /* ===== TOTALS ===== */
+  const totalCurrentAssets = sumBalance(currentAssets);
+  const totalNonCurrentAssets = sumBalance(nonCurrentAssets);
   const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
-  /* ===== TOTAL LIABILITIES ===== */
-  const totalCurrentLiabilities =
-    currentLiabilities.reduce(
-      (sum, account) =>
-        sum + Number(account.balance || 0),
-      0
-    );
-  const totalNonCurrentLiabilities =
-    nonCurrentLiabilities.reduce(
-      (sum, account) =>
-        sum + Number(account.balance || 0),
-      0
-    );
+  const totalCurrentLiabilities = sumBalance(currentLiabilities);
+  const totalNonCurrentLiabilities = sumBalance(nonCurrentLiabilities);
   const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
-  /* ==== TOTAL EQUITY ==== */
+  /*
+   * Equity memakai normal balance.
+   *
+   * Credit-normal  -> menambah equity
+   * Debit-normal   -> mengurangi equity
+   */
   const totalEquityAccounts =
     equityAccounts.reduce(
-      (sum, account) =>
-        sum + Number(account.balance || 0),
+      (sum, account) => {
+        const balance = Number(account.balance || 0);
+        if ( account.normalBalance === "DEBIT" ) 
+				{ return sum - balance; }
+        return sum + balance;
+      },
       0
     );
   const totalEquity = totalEquityAccounts + currentProfit;
   const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
   const balanceCheck = totalAssets - totalLiabilitiesAndEquity;
 
-  /* ====== RENDER ACCOUNT LIST ====== */
+  /* ===== RENDER ACCOUNT ROWS ===== */
   renderBalanceSheetAccounts( "balanceSheetCurrentAssets", currentAssets );
   renderBalanceSheetAccounts( "balanceSheetNonCurrentAssets", nonCurrentAssets );
   renderBalanceSheetAccounts( "balanceSheetCurrentLiabilities", currentLiabilities );
   renderBalanceSheetAccounts( "balanceSheetNonCurrentLiabilities", nonCurrentLiabilities );
   renderBalanceSheetAccounts( "balanceSheetEquity", equityAccounts );
-	
-  /* ====== CURRENT YEAR EARNINGS ====== */
-  setBalanceSheetAmount( "balanceSheetCurrentProfit", currentProfit );
-  setBalanceSheetAmount( "balanceSheetTotalCurrentAssets", totalCurrentAssets );
-  setBalanceSheetAmount( "balanceSheetTotalNonCurrentAssets", totalNonCurrentAssets );
-  setBalanceSheetAmount( "balanceSheetTotalAssets", totalAssets );
-  setBalanceSheetAmount( "balanceSheetTotalCurrentLiabilities", totalCurrentLiabilities );
-  setBalanceSheetAmount( "balanceSheetTotalNonCurrentLiabilities", totalNonCurrentLiabilities );
-  setBalanceSheetAmount( "balanceSheetTotalLiabilities", totalLiabilities );
-  setBalanceSheetAmount( "balanceSheetTotalEquity", totalEquity );
-  setBalanceSheetAmount( "balanceSheetTotalLiabilitiesEquity", totalLiabilitiesAndEquity );
+
+  /* ==== TOTAL CURRENT ASSETS ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetTotalCurrentAssetsDebit",
+    "balanceSheetTotalCurrentAssetsCredit",
+    totalCurrentAssets,
+    "DEBIT"
+  );
+  /* ==== TOTAL NON CURRENT ASSETS ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetTotalNonCurrentAssetsDebit",
+    "balanceSheetTotalNonCurrentAssetsCredit",
+    totalNonCurrentAssets,
+    "DEBIT"
+  );
+  /* ==== TOTAL ASSETS ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetTotalAssetsDebit",
+    "balanceSheetTotalAssetsCredit",
+    totalAssets,
+    "DEBIT"
+  );
+  /* ==== TOTAL CURRENT LIABILITIES ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetTotalCurrentLiabilitiesDebit",
+    "balanceSheetTotalCurrentLiabilitiesCredit",
+    totalCurrentLiabilities,
+    "CREDIT"
+  );
+  /* ==== TOTAL NON CURRENT LIABILITIES ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetTotalNonCurrentLiabilitiesDebit",
+    "balanceSheetTotalNonCurrentLiabilitiesCredit",
+    totalNonCurrentLiabilities,
+    "CREDIT"
+  );
+  /* ==== TOTAL LIABILITIES ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetTotalLiabilitiesDebit",
+    "balanceSheetTotalLiabilitiesCredit",
+    totalLiabilities,
+    "CREDIT"
+  );
+  /* ==== CURRENT YEAR EARNINGS ==== */
+  setBalanceSheetDebitCredit(
+    "balanceSheetCurrentProfitDebit",
+    "balanceSheetCurrentProfitCredit",
+    Math.abs(currentProfit),
+    currentProfit < 0
+      ? "DEBIT"
+      : "CREDIT"
+  );
+  /* ==== TOTAL EQUITY ==== */
+  const equityDebit = equityAccounts.reduce(
+      (sum, account) => {
+        const balance = Number(account.balance || 0);
+        if ( account.normalBalance === "DEBIT" ) 
+				{ return sum + balance; }
+        return sum;
+      },
+      0
+    )
+    +
+    (
+      currentProfit < 0
+        ? Math.abs(currentProfit)
+        : 0
+    );
+  const equityCredit = equityAccounts.reduce(
+      (sum, account) => {
+        const balance = Number(account.balance || 0);
+        if ( account.normalBalance === "CREDIT" ) 
+				{ return sum + balance; }
+        return sum;
+      },
+      0
+    )
+    +
+    ( 
+			currentProfit > 0
+        ? currentProfit
+        : 0
+    );
+  setBalanceSheetDebitCreditValues( "balanceSheetTotalEquityDebit", "balanceSheetTotalEquityCredit", equityDebit, equityCredit );
+  setBalanceSheetAmount( "balanceSheetNetEquity", totalEquity );
+  setBalanceSheetAmount( "balanceSheetTotalLiabilitiesEquityCredit", totalLiabilitiesAndEquity );
+  setBalanceSheetEmpty( "balanceSheetTotalLiabilitiesEquityDebit" );
   setBalanceSheetAmount( "balanceSheetCheck", balanceCheck );
 }
 
+/* ===== SUM BALANCES ====== */
+function sumBalance(accounts) {
+  return accounts.reduce(
+    (sum, account) =>
+      sum +
+      Number(account.balance || 0),
+    0
+  );
+}
 
-/* ======= RENDER ACCOUNT ROWS ======= */
-
-function renderBalanceSheetAccounts(elementId, accounts) {
+/* ===== RENDER ACCOUNT ROW ===== */
+function renderBalanceSheetAccounts( elementId, accounts ) {
   const container = document.getElementById(elementId);
 
   if (!container) return;
   container.innerHTML = "";
   if (!accounts.length) {
     container.innerHTML = `
-      <div class="flex justify-between text-sm text-muted">
+      <div class="grid grid-cols-[1fr_180px_180px] gap-4 text-sm text-muted">
         <span>-</span>
+        <span></span>
+        <span></span>
       </div>
     `;
     return;
   }
-	
+
   accounts.forEach(account => {
-    const row = document.createElement("div");
-    row.className = "flex justify-between text-sm";
-    const name = document.createElement("span");
-    name.textContent = account.accountName || "-";
-    const amount = document.createElement("span");
-	  
-    let displayBalance = Number(account.balance || 0);
-	  
+    const balance = Number(account.balance || 0);
+    let debit = 0;
+    let credit = 0;
+
     if (
-      account.balanceSheetCategory === "EQUITY" &&
       account.normalBalance === "DEBIT"
     ) {
-      displayBalance = -displayBalance;
+      if (balance >= 0) {
+        debit = balance;
+      } else {
+        credit = Math.abs(balance);
+      }
+    } else {
+      if (balance >= 0) {
+        credit = balance;
+      } else {
+        debit = Math.abs(balance);
+      }
     }
-    amount.textContent =
-      formatAccountingReportAmount(
-        displayBalance
-      );
+    const row = document.createElement("div");
+    row.className = "grid grid-cols-[1fr_180px_180px] gap-4 text-sm";
+    const name = document.createElement("span");
+    name.textContent = account.accountName || "-";
+    const debitEl = document.createElement("span");
+    debitEl.className = "text-right";
+    debitEl.textContent = debit !== 0
+        ? formatAccountingReportAmount(debit)
+        : "";
+    const creditEl = document.createElement("span");
+    creditEl.className = "text-right";
+    creditEl.textContent = credit !== 0
+        ? formatAccountingReportAmount(credit)
+        : "";
     row.appendChild(name);
-    row.appendChild(amount);
+    row.appendChild(debitEl);
+    row.appendChild(creditEl);
     container.appendChild(row);
   });
 }
 
-/* =====  SET AMOUNT ===== */
-function setBalanceSheetAmount(elementId, amount) {
+/* ===== SET DEBIT / CREDIT ===== */
+function setBalanceSheetDebitCredit( debitId, creditId, amount, normalBalance ) {
+  const value = Number(amount || 0);
+  const debit = normalBalance === "DEBIT"
+      ? value
+      : 0;
+  const credit = normalBalance === "CREDIT"
+      ? value
+      : 0;
+  setBalanceSheetAmount( debitId, debit );
+  setBalanceSheetAmount( creditId, credit );
+}
+/* ===== SET DEBIT / CREDIT VALUES ===== */
+function setBalanceSheetDebitCreditValues( debitId, creditId, debit, credit ) {
+  setBalanceSheetAmount( debitId, debit );
+  setBalanceSheetAmount( creditId, credit );
+}
+/* ==== SET AMOUNT ==== */
+function setBalanceSheetAmount( elementId, amount ) {
   const element = document.getElementById(elementId);
   if (!element) return;
-  element.textContent =
-    formatAccountingReportAmount(
-      Number(amount || 0)
-    );
+  const value = Number(amount || 0);
+  element.textContent = value !== 0
+      ? formatAccountingReportAmount(value)
+      : "";
+}
+/* ==== CLEAR AMOUNT ===== */
+function setBalanceSheetEmpty(elementId) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+  element.textContent = "";
 }
 /* ====== LOAD ALL ACCOUNTING REPORTS ====== */
 
