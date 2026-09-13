@@ -26028,9 +26028,19 @@ function renderBalanceSheet(result) {
     }
   });
   /* ===== TOTALS ===== */
-  const totalCurrentAssets = sumBalance(currentAssets);
-  const totalNonCurrentAssets = sumBalance(nonCurrentAssets);
-  const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
+	const totalCurrentAssets = sumBalance(currentAssets);
+	const totalNonCurrentAssets = nonCurrentAssets.reduce(
+	  (sum, account) => {
+	    const balance = Number(account.balance || 0);
+	    if (
+	      account.balanceSheetCategory === "NON_CURRENT_ASSET" &&
+	      account.normalBalance === "CREDIT"
+	    ) { return sum - balance; }
+	    return sum + balance;
+	  },
+	  0
+	);
+	const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
   const totalCurrentLiabilities = sumBalance(currentLiabilities);
   const totalNonCurrentLiabilities = sumBalance(nonCurrentLiabilities);
   const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
