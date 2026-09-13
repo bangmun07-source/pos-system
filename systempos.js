@@ -26103,15 +26103,26 @@ function renderBalanceSheet(result) {
     totalLiabilities,
     "CREDIT"
   );
-  /* ==== CURRENT YEAR EARNINGS ==== */
-  setBalanceSheetDebitCredit(
-    "balanceSheetCurrentProfitDebit",
-    "balanceSheetCurrentProfitCredit",
-    Math.abs(currentProfit),
-    currentProfit < 0
-      ? "DEBIT"
-      : "CREDIT"
-  );
+	/* ==== CURRENT YEAR EARNINGS ==== */
+	if (currentProfit < 0) {
+	  setBalanceSheetAmount(
+	    "balanceSheetCurrentProfitDebit",
+	    currentProfit
+	  );
+	  setBalanceSheetAmount(
+	    "balanceSheetCurrentProfitCredit",
+	    0
+	  );
+	} else {
+	  setBalanceSheetAmount(
+	    "balanceSheetCurrentProfitDebit",
+	    0
+	  );
+	  setBalanceSheetAmount(
+	    "balanceSheetCurrentProfitCredit",
+	    currentProfit
+	  );
+	}
   /* ==== TOTAL EQUITY ==== */
   const equityDebit = equityAccounts.reduce(
       (sum, account) => {
