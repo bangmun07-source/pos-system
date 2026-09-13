@@ -25991,7 +25991,8 @@ async function loadBalanceSheet() {
   if (error) throw error;
   return data || {};
 }
-unction renderBalanceSheet(result) {
+
+function renderBalanceSheet(result) {
   const accounts = Array.isArray(result?.accounts)
       ? result.accounts
       : [];
