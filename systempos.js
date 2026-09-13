@@ -26206,8 +26206,8 @@ function renderBalanceSheetAccounts(elementId, accounts) {
     container.innerHTML = `
       <div class="grid grid-cols-[1fr_180px_180px] gap-4 text-sm text-muted">
         <span>-</span>
-        <span></span>
-        <span></span>
+        <span>-</span>
+        <span>-</span>
       </div>
     `;
     return;
@@ -26254,7 +26254,7 @@ function renderBalanceSheetAccounts(elementId, accounts) {
 	
 	  const row = document.createElement("div");
 	  row.className =
-	    "grid grid-cols-[1fr_180px_180px] gap-4 text-sm";
+	    "grid grid-cols-[1fr_180px_180px] gap-4 text-sm text-muted";
 	
 	  const name = document.createElement("span");
 	  name.textContent = account.accountName || "-";
@@ -26727,18 +26727,9 @@ function applySupplierDebtFilters() {
    ========================================================= */
 
 function renderSupplierDebtTable() {
-
-    const tbody =
-        document.getElementById(
-            "supplierDebtTableBody"
-        );
-
+    const tbody =  document.getElementById( "supplierDebtTableBody" );
     if (!tbody) return;
-
-
-    const total =
-        supplierDebtFiltered.length;
-
+    const total = supplierDebtFiltered.length;
     const totalPages =
         Math.max(
             1,
@@ -26747,127 +26738,85 @@ function renderSupplierDebtTable() {
             )
         );
 
-
-    if (
-        supplierDebtCurrentPage >
-        totalPages
-    ) {
-        supplierDebtCurrentPage =
-            totalPages;
-    }
-
-
-    const start =
-        (supplierDebtCurrentPage - 1)
-        * supplierDebtPageSize;
-
-    const end =
-        start + supplierDebtPageSize;
-
-    const rows =
-        supplierDebtFiltered.slice(
-            start,
-            end
-        );
-
+    if ( supplierDebtCurrentPage > totalPages ) 
+		{ supplierDebtCurrentPage = totalPages; }
+	
+    const start = (supplierDebtCurrentPage - 1) * supplierDebtPageSize;
+    const end = start + supplierDebtPageSize;
+    const rows = supplierDebtFiltered.slice( start, end );
 
     if (rows.length === 0) {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="8"
-                    class="text-center py-10 text-gray-400">
-                    Tidak ada hutang supplier
-                </td>
-            </tr>
-        `;
-
+			tbody.innerHTML = `
+				<tr>
+					<td colspan="8"
+						class="text-center py-10 text-gray-400">
+						Tidak ada hutang supplier
+					</td>
+				</tr>
+      `;
     } else {
+			tbody.innerHTML =
+				rows.map(item => {
+					const statusClass =
+						item.status === "PAID"
+							? "text-green-700"
+							: "text-amber-700";
 
-        tbody.innerHTML =
-            rows.map(item => {
+					const action =
+						item.status === "PENDING"
+							? `
+								<button type="button"
+									onclick="openSupplierPaymentModal('${escapeHtml(item.id)}')"
+									class="px-3 py-1.5 text-on-surface-variant text-xs font-medium hover:text-on-surface">
+									Bayar
+								</button>
+							`
+						: `
+								<span class="text-xs text-on-surface-variant">
+									Lunas
+								</span>
+							`;
 
-                const statusClass =
-                    item.status === "PAID"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700";
+          return `
+						<tr class="border-b border-outline-variant hover:bg-white/5">
+							<td class="px-4 py-3 text-sm font-medium">
+								${escapeHtml(item.id)}
+							</td>
 
+							<td class="px-4 py-3 text-sm">
+								${escapeHtml(item.supplier)}
+							</td>
 
-                const action =
-                    item.status === "PENDING"
-                        ? `
-                            <button
-                                type="button"
-                                onclick="openSupplierPaymentModal('${escapeHtml(item.id)}')"
-                                class="px-3 py-1.5 rounded-md
-                                       bg-gray-900 text-on-surface
-                                       text-xs font-medium
-                                       hover:bg-gray-700">
-                                Bayar
-                            </button>
-                          `
-                        : `
-                            <span class="text-xs text-gray-400">
-                                Lunas
-                            </span>
-                          `;
+							<td class="px-4 py-3 text-sm">
+								${formatAccountingDate(item.date)}
+							</td>
 
+							<td class="px-4 py-3 text-sm text-right">
+								${formatAccountingCurrency(item.total)}
+							</td>
 
-                return `
-                    <tr class="border-b border-gray-100
-                               hover:bg-gray-50">
+							<td class="px-4 py-3 text-sm text-right">
+								${formatAccountingCurrency(item.paid)}
+							</td>
 
-                        <td class="px-4 py-3 text-sm font-medium">
-                            ${escapeHtml(item.id)}
-                        </td>
+							<td class="px-4 py-3 text-sm text-right font-semibold">
+								${formatAccountingCurrency(item.outstanding)}
+							</td>
 
-                        <td class="px-4 py-3 text-sm">
-                            ${escapeHtml(item.supplier)}
-                        </td>
+							<td class="px-4 py-3">
+								<span class=" inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+									${item.status}
+								</span>
+							</td>
 
-                        <td class="px-4 py-3 text-sm">
-                            ${formatAccountingDate(item.date)}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-right">
-                            ${formatAccountingCurrency(item.total)}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-right">
-                            ${formatAccountingCurrency(item.paid)}
-                        </td>
-
-                        <td class="px-4 py-3 text-sm text-right font-semibold">
-                            ${formatAccountingCurrency(item.outstanding)}
-                        </td>
-
-                        <td class="px-4 py-3">
-                            <span class="
-                                inline-flex
-                                px-2.5 py-1
-                                rounded-full
-                                text-xs
-                                font-medium
-                                ${statusClass}">
-                                ${item.status}
-                            </span>
-                        </td>
-
-                        <td class="px-4 py-3 text-center">
-                            ${action}
-                        </td>
-
-                    </tr>
-                `;
-
-            }).join("");
+							<td class="px-4 py-3 text-center">
+									${action}
+							</td>
+						</tr>
+					`;
+				}).join("");
     }
-
-
-    updateSupplierDebtPagination(
-        total,
-        totalPages
-    );
+  updateSupplierDebtPagination( total, totalPages );
 }
 
 
@@ -26909,28 +26858,28 @@ function updateSupplierDebtPagination( total, totalPages ) {
 }
 
 /* ===== OPEN SUPPLIER PAYMENT MODAL ====== */
-
-function openSupplierPaymentModal( purchaseId ) {
-	const purchase = supplierDebtData.find( item => item.id === purchaseId );
+function openSupplierPaymentModal(purchaseId) {
+	const purchase = supplierDebtData.find(item => item.id === purchaseId);
 	if (!purchase) {
 		alert("Data purchase tidak ditemukan.");
 		return;
 	}
-	currentSupplierPaymentPurchase =  purchase;
-	document.getElementById( "supplierPaymentPurchase"  ).value =  purchase.id;
-	document.getElementById( "supplierPaymentSupplier" ).value = purchase.supplier;
-	document.getElementById( "supplierPaymentTotal" ).value = formatAccountingCurrency( purchase.total );
-	document.getElementById( "supplierPaymentPaid" ).value = formatAccountingCurrency( purchase.paid );
-	document.getElementById( "supplierPaymentOutstanding" ).value = formatAccountingCurrency( purchase.outstanding );
-	document.getElementById( "supplierPaymentDate" ).value = getTodayAccountingDate();
-	document.getElementById( "supplierPaymentAmount" ).value = purchase.outstanding;
-	document.getElementById( "supplierPaymentMethod" ).value = "CASH";
-	document.getElementById( "supplierPaymentReference" ).value = "";
-	document.getElementById( "supplierPaymentNote" ).value = "";
-	const modal = document.getElementById( "supplierPaymentModal"  );
+	currentSupplierPaymentPurchase = purchase;
+	document.getElementById("supplierPaymentPurchase").textContent = purchase.id || "-";
+	document.getElementById("supplierPaymentSupplier").textContent = purchase.supplier || "-";
+	document.getElementById("supplierPaymentTotal").textContent = formatAccountingCurrency(purchase.total);
+	document.getElementById("supplierPaymentPaid").textContent = formatAccountingCurrency(purchase.paid);
+	document.getElementById("supplierPaymentOutstanding").textContent = formatAccountingCurrency(purchase.outstanding);
+	document.getElementById("supplierPaymentDate").value = getTodayAccountingDate();
+	document.getElementById("supplierPaymentAmount").value = purchase.outstanding;
+	document.getElementById("supplierPaymentMethod").value = "CASH";
+	document.getElementById("supplierPaymentReference").value = "";
+	document.getElementById("supplierPaymentNote").value = "";
+	const modal = document.getElementById("supplierPaymentModal");
 
 	if (modal) {
 		modal.classList.remove("hidden");
+		modal.classList.add("flex");
 	}
 }
 
@@ -26938,8 +26887,12 @@ function openSupplierPaymentModal( purchaseId ) {
 
 function closeSupplierPaymentModal() {
 	currentSupplierPaymentPurchase = null;
-	const modal = document.getElementById( "supplierPaymentModal" );
-	if (modal) { modal.classList.add("hidden"); }
+	const modal = document.getElementById("supplierPaymentModal");
+
+	if (modal) {
+		modal.classList.add("hidden");
+		modal.classList.remove("flex");
+	}
 }
 
 /* ======== SAVE SUPPLIER PAYMENT ======== */
@@ -27543,7 +27496,6 @@ async function saveNewLiability() {
 		}
 	}
 }
-
 
 function resetNewLiabilityForm() {
 	[
