@@ -26090,71 +26090,56 @@ function renderBalanceSheet(result) {
 }
 
 
-/* =========================================
-   RENDER ACCOUNT ROWS
-   ========================================= */
+/* ======= RENDER ACCOUNT ROWS ======= */
 
 function renderBalanceSheetAccounts(elementId, accounts) {
-  const container =
-    document.getElementById(elementId);
+  const container = document.getElementById(elementId);
 
   if (!container) return;
-
   container.innerHTML = "";
-
   if (!accounts.length) {
     container.innerHTML = `
       <div class="flex justify-between text-sm text-muted">
         <span>-</span>
       </div>
     `;
-
     return;
   }
-
+	
   accounts.forEach(account => {
-
     const row = document.createElement("div");
-
-    row.className =
-      "flex justify-between text-sm";
-
+    row.className = "flex justify-between text-sm";
     const name = document.createElement("span");
-
-    name.textContent =
-      account.accountName || "-";
-
+    name.textContent = account.accountName || "-";
     const amount = document.createElement("span");
-
+	  
+    let displayBalance = Number(account.balance || 0);
+	  
+    if (
+      account.balanceSheetCategory === "EQUITY" &&
+      account.normalBalance === "DEBIT"
+    ) {
+      displayBalance = -displayBalance;
+    }
     amount.textContent =
       formatAccountingReportAmount(
-        Number(account.balance || 0)
+        displayBalance
       );
-
     row.appendChild(name);
     row.appendChild(amount);
-
     container.appendChild(row);
   });
 }
 
-
-/* =========================================
-   SET AMOUNT
-   ========================================= */
-
+/* =====  SET AMOUNT ===== */
 function setBalanceSheetAmount(elementId, amount) {
-  const element =
-    document.getElementById(elementId);
-
+  const element = document.getElementById(elementId);
   if (!element) return;
-
   element.textContent =
     formatAccountingReportAmount(
       Number(amount || 0)
     );
 }
-
 /* ====== LOAD ALL ACCOUNTING REPORTS ====== */
 
 async function loadAccountingReports() {
