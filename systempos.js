@@ -26269,13 +26269,15 @@ function setBalanceSheetDebitCreditValues( debitId, creditId, debit, credit ) {
   setBalanceSheetAmount( creditId, credit );
 }
 /* ==== SET AMOUNT ==== */
-function setBalanceSheetAmount( elementId, amount ) {
+function setBalanceSheetAmount(elementId, amount) {
   const element = document.getElementById(elementId);
   if (!element) return;
+
   const value = Number(amount || 0);
+
   element.textContent = value !== 0
-      ? formatAccountingReportAmount(value)
-      : "";
+    ? formatBalanceSheetAmount(value)
+    : "";
 }
 /* ==== CLEAR AMOUNT ===== */
 function setBalanceSheetEmpty(elementId) {
