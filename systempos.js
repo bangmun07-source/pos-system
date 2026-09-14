@@ -29431,9 +29431,7 @@ function closeTaxObligationPaymentModal() {
 /* =========================================================
    SAVE TAX OBLIGATION PAYMENT
 ========================================================= */
-
 async function saveTaxObligationPayment() {
-
   const button =
     document.getElementById(
       "saveTaxObligationPaymentButton"
@@ -29506,13 +29504,19 @@ async function saveTaxObligationPayment() {
         methodEl?.value || "CASH"
       ).toUpperCase();
 
+    const userReference =
+      referenceEl?.value?.trim() || "";
+
     const reference =
-      referenceEl?.value?.trim() ||
       `TAX-OBL-PAY-${taxYear}-${Date.now()}`;
 
     const note =
-      noteEl?.value?.trim() ||
-      `Pembayaran Tax Obligation ${taxYear}`;
+      userReference
+        ? `${noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}`} - Ref: ${userReference}`
+        : (
+            noteEl?.value?.trim() ||
+            `Pembayaran Tax Obligation ${taxYear}`
+          );
 
 
     /* =====================================================
@@ -29547,7 +29551,9 @@ async function saveTaxObligationPayment() {
 
     const taxAmount =
       Number(
-        obligation?.tax_amount || 0
+        obligation?.tax_amount ??
+        obligation?.taxAmount ??
+        0
       );
 
 
@@ -29559,50 +29565,43 @@ async function saveTaxObligationPayment() {
 
 
     /* =====================================================
-       GET CURRENT 2210 BALANCE
+       GET OUTSTANDING TAX YEAR TERPILIH
     ===================================================== */
 
-    const { data: balanceData, error: balanceError } =
+    const {
+      data: summaryData,
+      error: summaryError
+    } =
       await supabaseClient.rpc(
-        "get_balance_sheet",
+        "get_tax_obligation_payment_summary",
         {
-          p_branch_id: branchId,
-          p_to_date: paymentDate,
-          p_session_id: sessionId
+          p_session_id:
+            sessionId,
+
+          p_branch_id:
+            branchId,
+
+          p_tax_year:
+            taxYear
         }
       );
 
-    if (balanceError) {
-      throw balanceError;
+
+    if (summaryError) {
+      throw summaryError;
     }
 
 
-    const balanceSheet =
-      typeof balanceData === "string"
-        ? JSON.parse(balanceData)
-        : balanceData;
-
-
-    const accounts =
-      Array.isArray(balanceSheet?.accounts)
-        ? balanceSheet.accounts
-        : [];
-
-
-    const obligationAccount =
-      accounts.find(account =>
-        account.accountId ===
-          TAX_OBLIGATION_PAYABLE_ACCOUNT_ID
-        ||
-        account.accountCode ===
-          TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE
-      );
+    const summary =
+      typeof summaryData === "string"
+        ? JSON.parse(summaryData)
+        : summaryData;
 
 
     const outstanding =
       Math.max(
         Number(
-          obligationAccount?.balance || 0
+          summary?.outstanding || 0
         ),
         0
       );
@@ -29610,10 +29609,9 @@ async function saveTaxObligationPayment() {
 
     if (outstanding <= 0) {
       throw new Error(
-        "Tax Obligation Payable 2210 sudah tidak memiliki saldo."
+        `Tax Obligation ${taxYear} sudah lunas.`
       );
     }
-
 
     if (amount > outstanding) {
       throw new Error(
@@ -29622,33 +29620,45 @@ async function saveTaxObligationPayment() {
     }
 
 
+
+    const paymentAccountId =
+      method === "CASH"
+        ? TAX_OBLIGATION_CASH_ACCOUNT_ID
+        : TAX_OBLIGATION_BANK_ACCOUNT_ID;
+
+
+    if (!paymentAccountId) {
+      throw new Error(
+        `Account pembayaran untuk ${method} tidak ditemukan.`
+      );
+    }
+
+
     /* =====================================================
-       PAYMENT ACCOUNT
-       
-       CASH  -> 1100
-       BANK  -> 1200
-       QRIS  -> 1200
+       BUTTON STATE
     ===================================================== */
 
-    let paymentAccountId;
+    if (button) {
 
-    if (method === "CASH") {
+      button.disabled = true;
 
-      paymentAccountId =
-        TAX_OBLIGATION_CASH_ACCOUNT_ID;
+      button.dataset.originalText =
+        button.innerHTML;
 
-    } else {
-
-      paymentAccountId =
-        TAX_OBLIGATION_BANK_ACCOUNT_ID;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-sm animate-spin">
+          progress_activity
+        </span>
+        Processing...
+      `;
     }
 
 
     /* =====================================================
        JOURNAL
        
-       DEBIT  2210 Tax Obligation Payable
-       CREDIT 1100 Cash / 1200 Bank
+       DR 2210 Tax Obligation Payable
+       CR 1100 Cash / 1200 Bank
     ===================================================== */
 
     const lines = [
@@ -29684,31 +29694,10 @@ async function saveTaxObligationPayment() {
     ];
 
 
-    /* =====================================================
-       BUTTON STATE
-    ===================================================== */
-
-    if (button) {
-
-      button.disabled = true;
-
-      button.dataset.originalText =
-        button.innerHTML;
-
-      button.innerHTML = `
-        <span class="material-symbols-outlined text-sm animate-spin">
-          progress_activity
-        </span>
-        Processing...
-      `;
-    }
-
-
-    /* =====================================================
-       CREATE JOURNAL
-    ===================================================== */
-
-    const { data, error } =
+    const {
+      data,
+      error
+    } =
       await supabaseClient.rpc(
         "create_journal_entry",
         {
@@ -29751,6 +29740,40 @@ async function saveTaxObligationPayment() {
 
 
     /* =====================================================
+       UPDATE STATUS
+    ===================================================== */
+
+    const {
+      data: statusData,
+      error: statusError
+    } =
+      await supabaseClient.rpc(
+        "update_tax_obligation_status",
+        {
+          p_session_id:
+            sessionId,
+
+          p_branch_id:
+            branchId,
+
+          p_tax_year:
+            taxYear
+        }
+      );
+
+
+    if (statusError) {
+
+      console.error(
+        "update_tax_obligation_status error:",
+        statusError
+      );
+
+      throw statusError;
+    }
+
+
+    /* =====================================================
        SUCCESS
     ===================================================== */
 
@@ -29759,17 +29782,41 @@ async function saveTaxObligationPayment() {
       data
     );
 
+    console.log(
+      "Tax Obligation status:",
+      statusData
+    );
+
 
     closeTaxObligationPaymentModal();
-
 
     await loadTaxObligation();
 
 
-    showToast(
-      `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil.`,
-      "success"
-    );
+    const finalStatus =
+      statusData?.status ||
+      "RECORDED";
+
+    const finalOutstanding =
+      Number(
+        statusData?.outstanding || 0
+      );
+
+
+    if (finalStatus === "PAID") {
+
+      showToast(
+        `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil dan sudah lunas.`,
+        "success"
+      );
+
+    } else {
+
+      showToast(
+        `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil. Outstanding ${formatAccountingTaxCurrency(finalOutstanding)}.`,
+        "success"
+      );
+    }
 
 
   } catch (error) {
@@ -29802,6 +29849,10 @@ async function saveTaxObligationPayment() {
     }
   }
 }
+
+
+
+
 
 
 async function loadTaxObligationPaymentSummary() {
