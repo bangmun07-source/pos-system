@@ -25973,6 +25973,7 @@ function renderProfitLoss(rows) {
   if (grossProfitEl) { grossProfitEl.textContent = formatAccountingReportAmount(grossProfit); }
   if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(expenses); }
   if (netProfitEl) { netProfitEl.textContent = formatAccountingReportAmount(netProfit); }
+	return { revenue, cogs, expenses, grossProfit, netProfit };
 }
 
 
@@ -26002,7 +26003,17 @@ function renderBalanceSheet(result, profitLossResult) {
   const accounts = Array.isArray(result?.accounts)
       ? result.accounts
       : [];
-	const currentProfit = Number(profitLossResult?.netProfit ?? 0);
+
+	 const currentProfit = Number(
+    profitLossResult?.netProfit ??
+    result?.currentProfit ??
+    0
+  );
+	console.log("BALANCE SHEET PROFIT DEBUG", {
+  rpcCurrentProfit: result?.currentProfit,
+  profitLossNetProfit: profitLossResult?.netProfit,
+  finalCurrentProfit: currentProfit
+});
 
   /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
@@ -26346,9 +26357,10 @@ async function loadAccountingReports() {
   ) {
     renderTrialBalance( state.accountingReportsData.trialBalance );
     renderProfitLoss( state.accountingReportsData.profitLoss );
+		const calculatedProfitLoss = renderProfitLoss( state.accountingReportsData.profitLoss );
     renderBalanceSheet(
 		  state.accountingReportsData.balanceSheet,
-		  state.accountingReportsData.profitLoss
+		  calculatedProfitLoss
 		);
     return;
   }
@@ -26366,8 +26378,8 @@ async function loadAccountingReports() {
   state.accountingReportsFilter = currentFilter;
   // ===== RENDER =====
   renderTrialBalance(trialBalance);
-  renderProfitLoss(profitLoss);
-  renderBalanceSheet(balanceSheet, profitLoss);
+  const calculatedProfitLoss = renderProfitLoss(profitLoss);
+  renderBalanceSheet(balanceSheet, calculatedProfitLoss);
 }
 
 function initAccountingReportsFilters() {
