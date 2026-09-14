@@ -28553,7 +28553,7 @@ function closeTaxSettingsModal() {
    SAVE TAX SETTINGS
 ========================================================= */
 
-async function saveTaxSettings() {
+async function saveTaxObligasiSettings() {
 
   let sessionId;
 
@@ -28601,7 +28601,7 @@ async function saveTaxSettings() {
 
   const button =
     document.getElementById(
-      "saveTaxSettingsButton"
+      "saveTaxObligasiSettingsButton"
     );
 
 
