@@ -26350,7 +26350,10 @@ async function loadAccountingReports() {
   ) {
     renderTrialBalance( state.accountingReportsData.trialBalance );
     renderProfitLoss( state.accountingReportsData.profitLoss );
-    renderBalanceSheet( state.accountingReportsData.balanceSheet );
+    renderBalanceSheet(
+		  state.accountingReportsData.balanceSheet,
+		  state.accountingReportsData.profitLoss
+		);
     return;
   }
   const [
@@ -26368,7 +26371,7 @@ async function loadAccountingReports() {
   // ===== RENDER =====
   renderTrialBalance(trialBalance);
   renderProfitLoss(profitLoss);
-  renderBalanceSheet(balanceSheet);
+  renderBalanceSheet(balanceSheet, profitLoss);
 }
 
 function initAccountingReportsFilters() {
