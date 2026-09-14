@@ -19017,6 +19017,844 @@
     </div>
   </div>
 </template>	
+
+
+<!-- ACCOUNTING TAX -->
+<template id="accountingTaxPage">
+
+  <aside id="sidebar"
+    class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-2xl overflow-hidden transition-[width] duration-200 ease-out group">
+
+    <div class="sidebar-menu flex flex-col h-full">
+
+      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+
+        <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
+          </span>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+
+        <!-- SETTINGS -->
+        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+
+        <!-- LOYALTY -->
+        <a onclick="navigate('loyaltysettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            military_tech
+          </span>
+          <span class="sidebar-label">
+            Loyalty &amp; Tiers
+          </span>
+        </a>
+
+        <!-- TAX -->
+        <a onclick="navigate('taxservicesettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Taxes &amp; Fees
+          </span>
+        </a>
+
+        <!-- EXPENSES -->
+        <a onclick="navigate('expensessettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            payments
+          </span>
+          <span class="sidebar-label">
+            Expenses
+          </span>
+        </a>
+
+        <!-- ANALYTICS -->
+        <a onclick="navigate('analyticsPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            analytics
+          </span>
+          <span class="sidebar-label">
+            Analytics
+          </span>
+        </a>
+
+        <!-- INVENTORY -->
+        <a onclick="navigate('inventoryPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Inventory
+          </span>
+        </a>
+
+        <!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            request_quote
+          </span>
+          <span class="sidebar-label">
+            Debt &amp; Liabilities
+          </span>
+        </a>
+
+        <!-- ACCOUNTING TAX -->
+        <a class="active"
+          onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+
+      </nav>
+
+      <!-- FOOTER -->
+      <div class="mt-auto p-2 pb-2">
+        <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
+
+          <span class="shrink-0 w-8 h-8 flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          </span>
+
+          <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <p class="text-[10px] text-muted">
+              SYSTEM STATUS
+            </p>
+
+            <span class="sidebar-label">
+              SERVER ACTIVE
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </aside>
+
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent" class="flex-1 flex flex-col h-screen">
+
+    <!-- HEADER -->
+    <header
+      class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
+
+      <div class="flex items-center gap-5 flex-1">
+
+        <div class="w-[44px] h-[44px] flex items-center justify-center">
+
+          <img
+            id="munoLogo"
+            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+            alt="MUNO"
+            class="w-12 h-12 object-contain">
+
+        </div>
+
+        <span class="h-7 w-px bg-outline-variant"></span>
+
+        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+          MUNO
+        </p>
+
+      </div>
+
+      <div class="ml-auto flex items-center gap-3">
+
+        <button
+          onclick="logout()"
+          class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+
+          <span class="material-symbols-outlined">
+            logout
+          </span>
+
+        </button>
+
+      </div>
+
+    </header>
+
+
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+
+      <!-- HERO -->
+      <section
+        class="relative min-h-[200px] rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+
+        <div
+          class="absolute inset-0 bg-cover bg-center"
+          style="background-image:url('https://lh3.googleusercontent.com/d/1t83hLLmXKQGxTvKM_CNQirsWY9vhmdDF')">
+        </div>
+
+        <div class="absolute inset-0 bg-background"></div>
+
+        <div
+          class="relative z-10 min-h-[200px] flex flex-col items-center justify-center text-center px-6">
+
+          <span
+            class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
+            Accounting
+          </span>
+
+          <h2
+            class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
+            Tax Management
+          </h2>
+
+        </div>
+
+      </section>
+
+
+      <!-- CONTENT -->
+      <section class="mt-5 space-y-5">
+
+
+        <!-- TAX OBLIGATION -->
+        <section
+          class="bg-background border border-outline-variant rounded-md overflow-hidden">
+
+          <!-- HEADER -->
+          <div
+            class="p-5 border-b border-outline-variant flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+              <div class="main-icon-box">
+
+                <span
+                  class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  receipt_long
+                </span>
+
+              </div>
+
+              <div>
+
+                <h2
+                  class="text-lg font-bold font-headline text-foreground">
+                  Tax Obligation
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Annual tax obligation based on outlet revenue
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <!-- TAX SETTINGS -->
+            <button
+              type="button"
+              onclick="openTaxSettingsModal()"
+              class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2 hover:bg-background">
+
+              <span class="material-symbols-outlined text-sm">
+                settings
+              </span>
+
+              Tax Settings
+
+            </button>
+
+          </div>
+
+
+          <!-- FILTER -->
+          <div class="p-5 border-b border-outline-variant">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              <!-- YEAR -->
+              <div>
+
+                <label class="block text-xs text-muted mb-2">
+                  Tax Year
+                </label>
+
+                <select
+                  id="taxObligationYear"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+                  <option value="2026">
+                    2026
+                  </option>
+
+                  <option value="2025">
+                    2025
+                  </option>
+
+                  <option value="2024">
+                    2024
+                  </option>
+
+                </select>
+
+              </div>
+
+
+              <!-- BRANCH -->
+              <div>
+
+                <label class="block text-xs text-muted mb-2">
+                  Outlet
+                </label>
+
+                <div
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground flex items-center">
+
+                  <span
+                    id="taxObligationBranchName">
+                    Current Outlet
+                  </span>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- SUMMARY -->
+          <div class="grid grid-cols-2 md:grid-cols-4">
+
+            <!-- REVENUE -->
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Revenue
+              </p>
+
+              <p
+                id="taxObligationRevenue"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+
+            </div>
+
+
+            <!-- RATE -->
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Tax Rate
+              </p>
+
+              <p
+                id="taxObligationRate"
+                class="text-xl font-headline mt-1">
+                0%
+              </p>
+
+            </div>
+
+
+            <!-- TAXABLE -->
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Taxable Amount
+              </p>
+
+              <p
+                id="taxObligationTaxable"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+
+            </div>
+
+
+            <!-- TAX -->
+            <div class="p-5">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Tax Amount
+              </p>
+
+              <p
+                id="taxObligationAmount"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- FOOTER -->
+          <div
+            class="p-5 border-t border-outline-variant flex items-center justify-between">
+
+            <div>
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Status
+              </p>
+
+              <p
+                id="taxObligationStatus"
+                class="text-sm mt-1">
+                Not Recorded
+              </p>
+
+            </div>
+
+
+            <button
+              id="recordTaxObligationButton"
+              type="button"
+              onclick="recordTaxObligation()"
+              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+
+              <span class="material-symbols-outlined text-sm">
+                post_add
+              </span>
+
+              Record Obligation
+
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <!-- TAX PAYMENT -->
+        <section
+          class="bg-background border border-outline-variant rounded-md overflow-hidden">
+
+          <div
+            class="p-5 border-b border-outline-variant flex items-center justify-between">
+
+            <div class="flex items-center gap-3">
+
+              <div class="main-icon-box">
+
+                <span
+                  class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  payments
+                </span>
+
+              </div>
+
+              <div>
+
+                <h2
+                  class="text-lg font-bold font-headline text-foreground">
+                  Tax Payment
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Payment of outstanding tax payable
+                </p>
+
+              </div>
+
+            </div>
+
+
+            <button
+              id="accountingTaxPaymentButton"
+              type="button"
+              onclick="openTaxPaymentModal()"
+              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+
+              <span class="material-symbols-outlined text-sm">
+                payments
+              </span>
+
+              Pay Tax
+
+            </button>
+
+          </div>
+
+
+          <!-- PAYMENT SUMMARY -->
+          <div class="grid grid-cols-2 md:grid-cols-3">
+
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Tax Payable
+              </p>
+
+              <p
+                id="accountingTaxPayable"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+
+            </div>
+
+
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Paid
+              </p>
+
+              <p
+                id="accountingTaxPaid"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+
+            </div>
+
+
+            <div class="p-5">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Outstanding
+              </p>
+
+              <p
+                id="accountingTaxOutstanding"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- TAX SETTINGS INFORMATION -->
+        <section
+          class="bg-background border border-outline-variant rounded-md overflow-hidden">
+
+          <div
+            class="p-5 border-b border-outline-variant flex items-center gap-3">
+
+            <div class="main-icon-box">
+
+              <span
+                class="material-symbols-outlined text-3xl">
+                settings
+              </span>
+
+            </div>
+
+            <div>
+
+              <h2
+                class="text-lg font-bold font-headline text-foreground">
+                Current Tax Settings
+              </h2>
+
+              <p class="text-xs text-muted mt-1">
+                Active accounting tax configuration
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="grid grid-cols-2 md:grid-cols-4">
+
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Tax Name
+              </p>
+
+              <p
+                id="currentTaxSettingName"
+                class="text-sm mt-1">
+                -
+              </p>
+
+            </div>
+
+
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Tax Rate
+              </p>
+
+              <p
+                id="currentTaxSettingRate"
+                class="text-xl font-headline mt-1">
+                0%
+              </p>
+
+            </div>
+
+
+            <div class="p-5 border-r border-outline-variant">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Effective From
+              </p>
+
+              <p
+                id="currentTaxSettingFrom"
+                class="text-sm mt-1">
+                -
+              </p>
+
+            </div>
+
+
+            <div class="p-5">
+
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Status
+              </p>
+
+              <p
+                id="currentTaxSettingStatus"
+                class="text-sm mt-1">
+                -
+              </p>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </section>
+
+    </main>
+
+  </div>
+
+
+  <!-- TAX SETTINGS MODAL -->
+  <div
+    id="taxSettingsModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
+
+    <div
+      class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
+
+      <!-- HEADER -->
+      <div
+        class="p-5 border-b border-outline-variant flex items-center justify-between">
+
+        <div>
+
+          <h2
+            class="text-lg font-bold font-headline text-foreground">
+            Tax Settings
+          </h2>
+
+          <p class="text-xs text-muted mt-1">
+            Configure accounting tax rules
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          onclick="closeTaxSettingsModal()"
+          class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground rounded-md">
+
+          <span class="material-symbols-outlined">
+            close
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- CONTENT -->
+      <div class="p-5 space-y-4">
+
+        <!-- NAME -->
+        <div>
+
+          <label class="block text-xs text-muted mb-2">
+            Tax Name
+          </label>
+
+          <input
+            id="taxSettingName"
+            type="text"
+            placeholder="Annual Revenue Tax"
+            class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+
+        </div>
+
+
+        <!-- RATE -->
+        <div>
+
+          <label class="block text-xs text-muted mb-2">
+            Tax Rate (%)
+          </label>
+
+          <input
+            id="taxSettingRate"
+            type="number"
+            min="0"
+            step="0.0001"
+            placeholder="0.5000"
+            class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+
+          <p class="text-[11px] text-muted mt-1">
+            Example: 0.5 = 0.5%
+          </p>
+
+        </div>
+
+
+        <!-- EFFECTIVE DATES -->
+        <div class="grid grid-cols-2 gap-4">
+
+          <div>
+
+            <label class="block text-xs text-muted mb-2">
+              Effective From
+            </label>
+
+            <input
+              id="taxSettingEffectiveFrom"
+              type="date"
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+          </div>
+
+
+          <div>
+
+            <label class="block text-xs text-muted mb-2">
+              Effective To
+            </label>
+
+            <input
+              id="taxSettingEffectiveTo"
+              type="date"
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+
+          </div>
+
+        </div>
+
+
+        <!-- ACTIVE -->
+        <div
+          class="flex items-center justify-between p-4 rounded-md border border-outline-variant">
+
+          <div>
+
+            <p class="text-sm font-medium">
+              Active
+            </p>
+
+            <p class="text-[11px] text-muted mt-1">
+              Use this tax setting for calculation
+            </p>
+
+          </div>
+
+          <input
+            id="taxSettingActive"
+            type="checkbox"
+            checked
+            class="w-4 h-4">
+
+        </div>
+
+
+        <!-- NOTE -->
+        <div>
+
+          <label class="block text-xs text-muted mb-2">
+            Note
+          </label>
+
+          <textarea
+            id="taxSettingNote"
+            rows="3"
+            placeholder="Optional"
+            class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none"></textarea>
+
+        </div>
+
+      </div>
+
+
+      <!-- FOOTER -->
+      <div
+        class="p-5 border-t border-outline-variant flex justify-end gap-3">
+
+        <button
+          type="button"
+          onclick="closeTaxSettingsModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium">
+
+          Cancel
+
+        </button>
+
+
+        <button
+          id="saveTaxSettingsButton"
+          type="button"
+          onclick="saveTaxSettings()"
+          class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+
+          Save Changes
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</template>
 	
 	
 <!-- 
