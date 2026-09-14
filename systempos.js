@@ -28286,7 +28286,7 @@ async function initAccountingTaxPage() {
     }
 
     await Promise.all([
-      loadTaxSettings(),
+      loadTaxObligasiSettings(),
       loadTaxObligation()
     ]);
 
@@ -28313,7 +28313,7 @@ async function initAccountingTaxPage() {
    TAX SETTINGS
 ========================================================= */
 
-async function loadTaxSettings() {
+async function loadTaxObligasiSettings() {
 
   const sessionId =
     getAccountingTaxSessionId();
@@ -28329,7 +28329,7 @@ async function loadTaxSettings() {
   if (error) {
 
     console.error(
-      "loadTaxSettings error:",
+      "loadTaxObligasiSettings error:",
       error
     );
 
@@ -28427,7 +28427,7 @@ async function openTaxSettingsModal() {
 
   try {
 
-    await loadTaxSettings();
+    await loadTaxObligasiSettings();
 
     const setting =
       currentTaxSettings || {};
