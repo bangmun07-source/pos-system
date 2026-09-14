@@ -1067,6 +1067,11 @@ function initModule(pageId) {
 		    initAccountingDebtPage();
 		break;
 		}
+
+		case "accountingTaxPage": {
+		    initAccountingTaxPage();
+		break;
+		}
 			
 		case "accountingReportsPage":
     		initAccountingReports();
@@ -28182,4 +28187,978 @@ function showAccountingDebtMessage( message, type = "success" ) {
 	setTimeout(() => {
 		item.remove();
 	}, 3500);
+}
+
+
+/* =========================================================
+   ACCOUNTING TAX PAGE
+========================================================= */
+
+let currentTaxSettings = null;
+let currentTaxObligation = null;
+let accountingTaxLoading = false;
+let accountingTaxRecording = false;
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function getAccountingTaxSessionId() {
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    throw new Error("Session tidak ditemukan.");
+  }
+
+  return sessionId;
+}
+
+
+function getAccountingTaxBranchId() {
+  const branchId = state?.branchId;
+
+  if (!branchId) {
+    throw new Error("Outlet/Branch belum dipilih.");
+  }
+
+  return branchId;
+}
+
+
+function formatAccountingTaxCurrency(value) {
+  const amount = Number(value || 0);
+
+  return "Rp " + amount.toLocaleString("id-ID");
+}
+
+
+function getAccountingTaxYear() {
+  const yearEl = document.getElementById("taxObligationYear");
+
+  const year = Number(yearEl?.value);
+
+  if (
+    Number.isInteger(year) &&
+    year >= 2000 &&
+    year <= 9999
+  ) {
+    return year;
+  }
+
+  return new Date().getFullYear();
+}
+
+
+function getTodayAccountingTaxDate() {
+  const now = new Date();
+
+  const year = now.getFullYear();
+
+  const month = String(
+    now.getMonth() + 1
+  ).padStart(2, "0");
+
+  const day = String(
+    now.getDate()
+  ).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+
+/* =========================================================
+   INIT PAGE
+========================================================= */
+
+async function initAccountingTaxPage() {
+  if (accountingTaxLoading) return;
+
+  accountingTaxLoading = true;
+
+  try {
+    const yearEl =
+      document.getElementById("taxObligationYear");
+
+    if (yearEl && !yearEl.value) {
+      yearEl.value =
+        String(new Date().getFullYear());
+    }
+
+    await Promise.all([
+      loadTaxSettings(),
+      loadTaxObligation()
+    ]);
+
+  } catch (error) {
+
+    console.error(
+      "initAccountingTaxPage error:",
+      error
+    );
+
+    alert(
+      error?.message ||
+      "Gagal memuat Accounting Tax."
+    );
+
+  } finally {
+
+    accountingTaxLoading = false;
+  }
+}
+
+
+/* =========================================================
+   TAX SETTINGS
+========================================================= */
+
+async function loadTaxSettings() {
+
+  const sessionId =
+    getAccountingTaxSessionId();
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_tax_settings",
+      {
+        p_session_id: sessionId
+      }
+    );
+
+  if (error) {
+
+    console.error(
+      "loadTaxSettings error:",
+      error
+    );
+
+    throw error;
+  }
+
+  currentTaxSettings =
+    data || null;
+
+  renderCurrentTaxSettings();
+
+  return currentTaxSettings;
+}
+
+
+/* =========================================================
+   RENDER CURRENT TAX SETTINGS
+========================================================= */
+
+function renderCurrentTaxSettings() {
+
+  const setting =
+    currentTaxSettings || {};
+
+  const nameEl =
+    document.getElementById(
+      "currentTaxSettingName"
+    );
+
+  const rateEl =
+    document.getElementById(
+      "currentTaxSettingRate"
+    );
+
+  const fromEl =
+    document.getElementById(
+      "currentTaxSettingFrom"
+    );
+
+  const statusEl =
+    document.getElementById(
+      "currentTaxSettingStatus"
+    );
+
+
+  if (nameEl) {
+
+    nameEl.textContent =
+      setting.tax_name || "-";
+  }
+
+
+  if (rateEl) {
+
+    const rate =
+      Number(setting.tax_rate);
+
+    rateEl.textContent =
+      Number.isFinite(rate)
+        ? `${rate.toFixed(4)}%`
+        : "0.0000%";
+  }
+
+
+  if (fromEl) {
+
+    fromEl.textContent =
+      setting.effective_from || "-";
+  }
+
+
+  if (statusEl) {
+
+    statusEl.textContent =
+      setting.is_active === false
+        ? "Inactive"
+        : "Active";
+  }
+}
+
+
+/* =========================================================
+   OPEN TAX SETTINGS MODAL
+========================================================= */
+
+async function openTaxSettingsModal() {
+
+  const modal =
+    document.getElementById(
+      "taxSettingsModal"
+    );
+
+  if (!modal) return;
+
+
+  try {
+
+    await loadTaxSettings();
+
+    const setting =
+      currentTaxSettings || {};
+
+
+    const nameEl =
+      document.getElementById(
+        "taxSettingName"
+      );
+
+    const rateEl =
+      document.getElementById(
+        "taxSettingRate"
+      );
+
+    const fromEl =
+      document.getElementById(
+        "taxSettingEffectiveFrom"
+      );
+
+    const toEl =
+      document.getElementById(
+        "taxSettingEffectiveTo"
+      );
+
+    const activeEl =
+      document.getElementById(
+        "taxSettingActive"
+      );
+
+    const noteEl =
+      document.getElementById(
+        "taxSettingNote"
+      );
+
+
+    if (nameEl) {
+
+      nameEl.value =
+        setting.tax_name ||
+        "Annual Revenue Tax";
+    }
+
+
+    if (rateEl) {
+
+      const rate =
+        Number(setting.tax_rate);
+
+      rateEl.value =
+        Number.isFinite(rate)
+          ? rate
+          : 0.5;
+    }
+
+
+    if (fromEl) {
+
+      fromEl.value =
+        setting.effective_from ||
+        getTodayAccountingTaxDate();
+    }
+
+
+    if (toEl) {
+
+      toEl.value =
+        setting.effective_to || "";
+    }
+
+
+    if (activeEl) {
+
+      activeEl.checked =
+        setting.is_active !== false;
+    }
+
+
+    if (noteEl) {
+
+      noteEl.value =
+        setting.note || "";
+    }
+
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+  } catch (error) {
+
+    console.error(
+      "openTaxSettingsModal error:",
+      error
+    );
+
+    alert(
+      error?.message ||
+      "Gagal memuat Tax Settings."
+    );
+  }
+}
+
+
+/* =========================================================
+   CLOSE TAX SETTINGS MODAL
+========================================================= */
+
+function closeTaxSettingsModal() {
+
+  const modal =
+    document.getElementById(
+      "taxSettingsModal"
+    );
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+
+/* =========================================================
+   SAVE TAX SETTINGS
+========================================================= */
+
+async function saveTaxSettings() {
+
+  let sessionId;
+
+  try {
+
+    sessionId =
+      getAccountingTaxSessionId();
+
+  } catch (error) {
+
+    alert(error.message);
+    return;
+  }
+
+
+  const nameEl =
+    document.getElementById(
+      "taxSettingName"
+    );
+
+  const rateEl =
+    document.getElementById(
+      "taxSettingRate"
+    );
+
+  const fromEl =
+    document.getElementById(
+      "taxSettingEffectiveFrom"
+    );
+
+  const toEl =
+    document.getElementById(
+      "taxSettingEffectiveTo"
+    );
+
+  const activeEl =
+    document.getElementById(
+      "taxSettingActive"
+    );
+
+  const noteEl =
+    document.getElementById(
+      "taxSettingNote"
+    );
+
+  const button =
+    document.getElementById(
+      "saveTaxSettingsButton"
+    );
+
+
+  const taxName =
+    nameEl?.value?.trim();
+
+  const taxRate =
+    Number(rateEl?.value);
+
+  const effectiveFrom =
+    fromEl?.value;
+
+  const effectiveTo =
+    toEl?.value || null;
+
+  const isActive =
+    activeEl?.checked ?? true;
+
+  const note =
+    noteEl?.value?.trim() || null;
+
+
+  /* =======================================================
+     VALIDATION
+  ======================================================= */
+
+  if (!taxName) {
+
+    alert(
+      "Tax Name wajib diisi."
+    );
+
+    return;
+  }
+
+
+  if (
+    !Number.isFinite(taxRate) ||
+    taxRate < 0
+  ) {
+
+    alert(
+      "Tax Rate tidak valid."
+    );
+
+    return;
+  }
+
+
+  if (!effectiveFrom) {
+
+    alert(
+      "Effective From wajib diisi."
+    );
+
+    return;
+  }
+
+
+  if (
+    effectiveTo &&
+    effectiveTo < effectiveFrom
+  ) {
+
+    alert(
+      "Effective To tidak boleh lebih kecil dari Effective From."
+    );
+
+    return;
+  }
+
+
+  try {
+
+    if (button) {
+
+      button.disabled = true;
+
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-sm animate-spin">
+          progress_activity
+        </span>
+        Saving...
+      `;
+    }
+
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "save_tax_settings",
+        {
+          p_session_id: sessionId,
+          p_tax_name: taxName,
+          p_tax_rate: taxRate,
+          p_effective_from: effectiveFrom,
+          p_effective_to: effectiveTo,
+          p_is_active: isActive,
+          p_note: note
+        }
+      );
+
+
+    if (error) {
+
+      console.error(
+        "saveTaxSettings error:",
+        error
+      );
+
+      throw error;
+    }
+
+
+    /*
+     * RPC mengembalikan data setting
+     * yang baru dibuat.
+     */
+    currentTaxSettings =
+      data || null;
+
+    renderCurrentTaxSettings();
+
+    closeTaxSettingsModal();
+
+
+    /*
+     * Setting berubah.
+     * Reload obligation agar calculation
+     * menggunakan setting terbaru.
+     */
+    await loadTaxObligation();
+
+
+    alert(
+      "Tax Settings berhasil disimpan."
+    );
+
+  } catch (error) {
+
+    console.error(
+      "saveTaxSettings error:",
+      error
+    );
+
+    alert(
+      error?.message ||
+      "Gagal menyimpan Tax Settings."
+    );
+
+  } finally {
+
+    if (button) {
+
+      button.disabled = false;
+
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-sm">
+          save
+        </span>
+        Save Changes
+      `;
+    }
+  }
+}
+
+
+/* =========================================================
+   TAX OBLIGATION
+========================================================= */
+
+async function loadTaxObligation() {
+
+  const sessionId =
+    getAccountingTaxSessionId();
+
+  const branchId =
+    getAccountingTaxBranchId();
+
+  const taxYear =
+    getAccountingTaxYear();
+
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      "get_tax_obligation",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_tax_year: taxYear
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "loadTaxObligation error:",
+      error
+    );
+
+    throw error;
+  }
+
+
+  currentTaxObligation =
+    data || null;
+
+
+  renderTaxObligation(
+    currentTaxObligation
+  );
+
+
+  return currentTaxObligation;
+}
+
+
+/* =========================================================
+   RENDER TAX OBLIGATION
+========================================================= */
+
+function renderTaxObligation(data) {
+
+  const obligation =
+    data || {};
+
+
+  const revenueEl =
+    document.getElementById(
+      "taxObligationRevenue"
+    );
+
+  const rateEl =
+    document.getElementById(
+      "taxObligationRate"
+    );
+
+  const taxableEl =
+    document.getElementById(
+      "taxObligationTaxable"
+    );
+
+  const amountEl =
+    document.getElementById(
+      "taxObligationAmount"
+    );
+
+  const statusEl =
+    document.getElementById(
+      "taxObligationStatus"
+    );
+
+  const branchEl =
+    document.getElementById(
+      "taxObligationBranchName"
+    );
+
+
+  /* =======================================================
+     REVENUE
+  ======================================================= */
+
+  if (revenueEl) {
+
+    revenueEl.textContent =
+      formatAccountingTaxCurrency(
+        obligation.revenue_amount
+      );
+  }
+
+
+  /* =======================================================
+     TAX RATE
+  ======================================================= */
+
+  if (rateEl) {
+
+    const rate =
+      Number(obligation.tax_rate);
+
+    rateEl.textContent =
+      Number.isFinite(rate)
+        ? `${rate.toFixed(4)}%`
+        : "0.0000%";
+  }
+
+
+  /* =======================================================
+     TAXABLE AMOUNT
+  ======================================================= */
+
+  if (taxableEl) {
+
+    taxableEl.textContent =
+      formatAccountingTaxCurrency(
+        obligation.taxable_amount
+      );
+  }
+
+
+  /* =======================================================
+     TAX AMOUNT
+  ======================================================= */
+
+  if (amountEl) {
+
+    amountEl.textContent =
+      formatAccountingTaxCurrency(
+        obligation.tax_amount
+      );
+  }
+
+
+  /* =======================================================
+     BRANCH
+  ======================================================= */
+
+  if (branchEl) {
+
+    branchEl.textContent =
+      obligation.branch_id ||
+      state?.branchId ||
+      "Current Outlet";
+  }
+
+
+  /* =======================================================
+     STATUS
+  ======================================================= */
+
+  if (statusEl) {
+
+    const status =
+      String(
+        obligation.status || ""
+      ).toUpperCase();
+
+
+    if (status === "RECORDED") {
+
+      statusEl.textContent =
+        "Recorded";
+
+    } else if (status === "VOID") {
+
+      statusEl.textContent =
+        "Void";
+
+    } else if (status === "DRAFT") {
+
+      statusEl.textContent =
+        "Draft";
+
+    } else {
+
+      /*
+       * get_tax_obligation saat ini
+       * belum mengembalikan status
+       * Tax_Obligations.
+       */
+      statusEl.textContent =
+        "Ready to Record";
+    }
+  }
+
+
+  /* =======================================================
+     RECORD BUTTON
+  ======================================================= */
+
+  const recordButton =
+    document.getElementById(
+      "recordTaxObligationButton"
+    );
+
+
+  if (recordButton) {
+
+    const status =
+      String(
+        obligation.status || ""
+      ).toUpperCase();
+
+
+    /*
+     * Jika sudah RECORDED,
+     * jangan izinkan record ulang.
+     */
+    if (status === "RECORDED") {
+
+      recordButton.disabled = true;
+
+      recordButton.classList.add(
+        "opacity-50",
+        "cursor-not-allowed"
+      );
+
+      recordButton.innerHTML = `
+        <span class="material-symbols-outlined text-sm">
+          check_circle
+        </span>
+        Recorded
+      `;
+
+    } else {
+
+      recordButton.disabled =
+        accountingTaxRecording;
+
+      recordButton.classList.remove(
+        "opacity-50",
+        "cursor-not-allowed"
+      );
+
+      if (!accountingTaxRecording) {
+
+        recordButton.innerHTML = `
+          <span class="material-symbols-outlined text-sm">
+            task_alt
+          </span>
+          Record Tax Obligation
+        `;
+      }
+    }
+  }
+}
+
+
+/* =========================================================
+   YEAR CHANGE
+========================================================= */
+
+document.addEventListener(
+  "change",
+  function(event) {
+
+    if (
+      event.target?.id !==
+      "taxObligationYear"
+    ) {
+      return;
+    }
+
+
+    loadTaxObligation()
+      .catch(error => {
+
+        console.error(
+          "Tax year change error:",
+          error
+        );
+
+        alert(
+          error?.message ||
+          "Gagal memuat Tax Obligation."
+        );
+      });
+  }
+);
+
+
+/* =========================================================
+   RECORD TAX OBLIGATION
+========================================================= */
+
+async function recordTaxObligation() {
+  if (accountingTaxRecording) return;
+
+  const sessionId = getAccountingTaxSessionId();
+  const branchId = getAccountingTaxBranchId();
+  const taxYear = getAccountingTaxYear();
+
+  if (!sessionId) {
+    showToast("Session tidak ditemukan.", "error");
+    return;
+  }
+
+  if (!branchId) {
+    showToast("Branch belum dipilih.", "error");
+    return;
+  }
+
+  if (!taxYear || Number.isNaN(Number(taxYear))) {
+    showToast("Tax Year tidak valid.", "error");
+    return;
+  }
+
+  const recordButton = document.getElementById("recordTaxObligationButton");
+
+  try {
+    accountingTaxRecording = true;
+
+    if (recordButton) {
+      recordButton.disabled = true;
+      recordButton.dataset.originalText =
+        recordButton.textContent || "Record Tax Obligation";
+      recordButton.textContent = "Recording...";
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      "record_tax_obligation",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_tax_year: Number(taxYear)
+      }
+    );
+
+    if (error) {
+      console.error("record_tax_obligation error:", error);
+      throw error;
+    }
+
+    const result =
+      typeof data === "string"
+        ? JSON.parse(data)
+        : data;
+
+    if (!result || result.success !== true) {
+      throw new Error(
+        result?.message ||
+        "Gagal mencatat tax obligation."
+      );
+    }
+
+    if (result.already_recorded) {
+      showToast(
+        `Tax obligation ${taxYear} sudah tercatat.`,
+        "info"
+      );
+    } else {
+      showToast(
+        `Tax obligation ${taxYear} berhasil dicatat.`,
+        "success"
+      );
+    }
+
+    // Reload data setelah recording
+    await loadTaxObligation();
+
+  } catch (error) {
+    console.error("Failed to record tax obligation:", error);
+
+    showToast(
+      error?.message ||
+      "Gagal mencatat tax obligation.",
+      "error"
+    );
+
+  } finally {
+    accountingTaxRecording = false;
+
+    if (recordButton) {
+      recordButton.disabled = false;
+      recordButton.textContent =
+        recordButton.dataset.originalText ||
+        "Record Tax Obligation";
+    }
+  }
 }
