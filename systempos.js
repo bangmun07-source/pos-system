@@ -28707,7 +28707,7 @@ async function saveTaxObligasiSettings() {
     if (error) {
 
       console.error(
-        "saveTaxSettings error:",
+        "saveTaxObligasiSettings error:",
         error
       );
 
@@ -28742,7 +28742,7 @@ async function saveTaxObligasiSettings() {
   } catch (error) {
 
     console.error(
-      "saveTaxSettings error:",
+      "saveTaxObligasiSettings error:",
       error
     );
 
