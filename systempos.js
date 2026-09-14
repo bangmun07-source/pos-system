@@ -29162,3 +29162,643 @@ async function recordTaxObligation() {
     }
   }
 }
+
+/* =========================================================
+   TAX OBLIGATION PAYMENT
+   Khusus 2210 - Tax Obligation Payable
+   BUKAN Sales Tax Payable 2200
+========================================================= */
+
+const TAX_OBLIGATION_PAYABLE_ACCOUNT_ID =
+  "ACC-4DC408145FCA";
+
+const TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE =
+  "2210";
+
+const TAX_OBLIGATION_CASH_ACCOUNT_ID =
+  "ACC-84AE6A4B9528";
+
+const TAX_OBLIGATION_BANK_ACCOUNT_ID =
+  "ACC-1CE751522EEC";
+
+
+/* =========================================================
+   OPEN TAX OBLIGATION PAYMENT MODAL
+========================================================= */
+
+async function openTaxObligationPaymentModal() {
+
+  const modal = document.getElementById(
+    "taxObligationPaymentModal"
+  );
+
+  if (!modal) return;
+
+  try {
+
+    const sessionId =
+      getAccountingTaxSessionId();
+
+    const branchId =
+      getAccountingTaxBranchId();
+
+    const taxYear =
+      getAccountingTaxYear();
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    if (!branchId) {
+      throw new Error("Branch belum dipilih.");
+    }
+
+    if (!taxYear) {
+      throw new Error("Tax Year tidak valid.");
+    }
+
+
+    /* =====================================================
+       ACCOUNT WAJIB 2210
+    ===================================================== */
+
+    const accountEl =
+      document.getElementById(
+        "taxObligationPaymentAccount"
+      );
+
+    if (accountEl) {
+      accountEl.textContent =
+        "2210 · Tax Obligation Payable";
+    }
+
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    const dateEl =
+      document.getElementById(
+        "taxObligationPaymentDate"
+      );
+
+    if (dateEl && !dateEl.value) {
+      dateEl.value =
+        getTodayAccountingTaxDate();
+    }
+
+
+    /* =====================================================
+       LOAD TAX OBLIGATION
+    ===================================================== */
+
+    const obligation =
+      await loadTaxObligation();
+
+    const taxAmount =
+      Number(obligation?.tax_amount || 0);
+
+
+    if (taxAmount <= 0) {
+      throw new Error(
+        "Tidak ada Tax Obligation yang harus dibayar."
+      );
+    }
+
+
+    /* =====================================================
+       GET BALANCE 2210
+       Supaya outstanding berasal dari account
+       Tax Obligation Payable, bukan 2200.
+    ===================================================== */
+
+    const toDate =
+      `${taxYear}-12-31`;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_balance_sheet",
+        {
+          p_branch_id: branchId,
+          p_to_date: toDate,
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) {
+      console.error(
+        "get_balance_sheet tax obligation payment error:",
+        error
+      );
+
+      throw error;
+    }
+
+
+    const balanceSheet =
+      typeof data === "string"
+        ? JSON.parse(data)
+        : data;
+
+
+    const accounts =
+      Array.isArray(balanceSheet?.accounts)
+        ? balanceSheet.accounts
+        : [];
+
+
+    const obligationAccount =
+      accounts.find(account =>
+        account.accountId ===
+          TAX_OBLIGATION_PAYABLE_ACCOUNT_ID
+        ||
+        account.accountCode ===
+          TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE
+      );
+
+
+    /*
+     * Karena 2210 normal balance CREDIT,
+     * balance positif = hutang tax obligation.
+     */
+
+    let outstanding =
+      Number(
+        obligationAccount?.balance || 0
+      );
+
+
+    /*
+     * Jangan sampai melebihi nilai obligation
+     * tahun yang sedang dipilih.
+     */
+    outstanding =
+      Math.min(
+        Math.max(outstanding, 0),
+        taxAmount
+      );
+
+
+    const outstandingEl =
+      document.getElementById(
+        "taxObligationPaymentOutstanding"
+      );
+
+    if (outstandingEl) {
+      outstandingEl.textContent =
+        formatAccountingTaxCurrency(
+          outstanding
+        );
+    }
+
+
+    /* =====================================================
+       AMOUNT DEFAULT
+    ===================================================== */
+
+    const amountEl =
+      document.getElementById(
+        "taxObligationPaymentAmount"
+      );
+
+    if (amountEl) {
+
+      amountEl.value =
+        outstanding > 0
+          ? outstanding
+          : "";
+
+      amountEl.max =
+        String(outstanding);
+    }
+
+
+    /* =====================================================
+       METHOD DEFAULT
+    ===================================================== */
+
+    const methodEl =
+      document.getElementById(
+        "taxObligationPaymentMethod"
+      );
+
+    if (methodEl && !methodEl.value) {
+      methodEl.value = "CASH";
+    }
+
+
+    /* =====================================================
+       SHOW MODAL
+    ===================================================== */
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+
+  } catch (error) {
+
+    console.error(
+      "openTaxObligationPaymentModal error:",
+      error
+    );
+
+    showToast(
+      error?.message ||
+        "Gagal membuka Tax Obligation Payment.",
+      "error"
+    );
+  }
+}
+
+
+/* =========================================================
+   CLOSE TAX OBLIGATION PAYMENT MODAL
+========================================================= */
+
+function closeTaxObligationPaymentModal() {
+
+  const modal =
+    document.getElementById(
+      "taxObligationPaymentModal"
+    );
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+
+/* =========================================================
+   SAVE TAX OBLIGATION PAYMENT
+========================================================= */
+
+async function saveTaxObligationPayment() {
+
+  const button =
+    document.getElementById(
+      "saveTaxObligationPaymentButton"
+    );
+
+  try {
+
+    const sessionId =
+      getAccountingTaxSessionId();
+
+    const branchId =
+      getAccountingTaxBranchId();
+
+    const taxYear =
+      getAccountingTaxYear();
+
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    if (!branchId) {
+      throw new Error("Branch belum dipilih.");
+    }
+
+    if (!taxYear) {
+      throw new Error("Tax Year tidak valid.");
+    }
+
+
+    /* =====================================================
+       FORM
+    ===================================================== */
+
+    const dateEl =
+      document.getElementById(
+        "taxObligationPaymentDate"
+      );
+
+    const amountEl =
+      document.getElementById(
+        "taxObligationPaymentAmount"
+      );
+
+    const methodEl =
+      document.getElementById(
+        "taxObligationPaymentMethod"
+      );
+
+    const referenceEl =
+      document.getElementById(
+        "taxObligationPaymentReference"
+      );
+
+    const noteEl =
+      document.getElementById(
+        "taxObligationPaymentNote"
+      );
+
+
+    const paymentDate =
+      dateEl?.value ||
+      getTodayAccountingTaxDate();
+
+    const amount =
+      Number(amountEl?.value || 0);
+
+    const method =
+      String(
+        methodEl?.value || "CASH"
+      ).toUpperCase();
+
+    const reference =
+      referenceEl?.value?.trim() ||
+      `TAX-OBL-PAY-${taxYear}-${Date.now()}`;
+
+    const note =
+      noteEl?.value?.trim() ||
+      `Pembayaran Tax Obligation ${taxYear}`;
+
+
+    /* =====================================================
+       VALIDATION
+    ===================================================== */
+
+    if (!paymentDate) {
+      throw new Error(
+        "Tanggal pembayaran wajib diisi."
+      );
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error(
+        "Jumlah pembayaran tidak valid."
+      );
+    }
+
+    if (!["CASH", "BANK", "QRIS"].includes(method)) {
+      throw new Error(
+        "Metode pembayaran tidak valid."
+      );
+    }
+
+
+    /* =====================================================
+       GET OBLIGATION
+    ===================================================== */
+
+    const obligation =
+      await loadTaxObligation();
+
+    const taxAmount =
+      Number(
+        obligation?.tax_amount || 0
+      );
+
+
+    if (taxAmount <= 0) {
+      throw new Error(
+        "Tax Obligation tidak memiliki tagihan."
+      );
+    }
+
+
+    /* =====================================================
+       GET CURRENT 2210 BALANCE
+    ===================================================== */
+
+    const { data: balanceData, error: balanceError } =
+      await supabaseClient.rpc(
+        "get_balance_sheet",
+        {
+          p_branch_id: branchId,
+          p_to_date: paymentDate,
+          p_session_id: sessionId
+        }
+      );
+
+    if (balanceError) {
+      throw balanceError;
+    }
+
+
+    const balanceSheet =
+      typeof balanceData === "string"
+        ? JSON.parse(balanceData)
+        : balanceData;
+
+
+    const accounts =
+      Array.isArray(balanceSheet?.accounts)
+        ? balanceSheet.accounts
+        : [];
+
+
+    const obligationAccount =
+      accounts.find(account =>
+        account.accountId ===
+          TAX_OBLIGATION_PAYABLE_ACCOUNT_ID
+        ||
+        account.accountCode ===
+          TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE
+      );
+
+
+    const outstanding =
+      Math.max(
+        Number(
+          obligationAccount?.balance || 0
+        ),
+        0
+      );
+
+
+    if (outstanding <= 0) {
+      throw new Error(
+        "Tax Obligation Payable 2210 sudah tidak memiliki saldo."
+      );
+    }
+
+
+    if (amount > outstanding) {
+      throw new Error(
+        `Pembayaran tidak boleh lebih dari outstanding ${formatAccountingTaxCurrency(outstanding)}.`
+      );
+    }
+
+
+    /* =====================================================
+       PAYMENT ACCOUNT
+       
+       CASH  -> 1100
+       BANK  -> 1200
+       QRIS  -> 1200
+    ===================================================== */
+
+    let paymentAccountId;
+
+    if (method === "CASH") {
+
+      paymentAccountId =
+        TAX_OBLIGATION_CASH_ACCOUNT_ID;
+
+    } else {
+
+      paymentAccountId =
+        TAX_OBLIGATION_BANK_ACCOUNT_ID;
+    }
+
+
+    /* =====================================================
+       JOURNAL
+       
+       DEBIT  2210 Tax Obligation Payable
+       CREDIT 1100 Cash / 1200 Bank
+    ===================================================== */
+
+    const lines = [
+
+      {
+        accountId:
+          TAX_OBLIGATION_PAYABLE_ACCOUNT_ID,
+
+        description:
+          `Tax Obligation Payable ${taxYear}`,
+
+        debit:
+          amount,
+
+        credit:
+          0
+      },
+
+      {
+        accountId:
+          paymentAccountId,
+
+        description:
+          `Pembayaran Tax Obligation ${taxYear} - ${method}`,
+
+        debit:
+          0,
+
+        credit:
+          amount
+      }
+
+    ];
+
+
+    /* =====================================================
+       BUTTON STATE
+    ===================================================== */
+
+    if (button) {
+
+      button.disabled = true;
+
+      button.dataset.originalText =
+        button.innerHTML;
+
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-sm animate-spin">
+          progress_activity
+        </span>
+        Processing...
+      `;
+    }
+
+
+    /* =====================================================
+       CREATE JOURNAL
+    ===================================================== */
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "create_journal_entry",
+        {
+          p_journal_date:
+            paymentDate,
+
+          p_branch_id:
+            branchId,
+
+          p_source:
+            "PAYMENT",
+
+          p_reference_id:
+            reference,
+
+          p_description:
+            note,
+
+          p_status:
+            "POSTED",
+
+          p_lines:
+            lines,
+
+          p_session_id:
+            sessionId
+        }
+      );
+
+
+    if (error) {
+
+      console.error(
+        "saveTaxObligationPayment error:",
+        error
+      );
+
+      throw error;
+    }
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    console.log(
+      "Tax Obligation Payment journal:",
+      data
+    );
+
+
+    closeTaxObligationPaymentModal();
+
+
+    await loadTaxObligation();
+
+
+    showToast(
+      `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil.`,
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error(
+      "saveTaxObligationPayment error:",
+      error
+    );
+
+    showToast(
+      error?.message ||
+        "Gagal menyimpan Tax Obligation Payment.",
+      "error"
+    );
+
+  } finally {
+
+    if (button) {
+
+      button.disabled = false;
+
+      button.innerHTML =
+        button.dataset.originalText ||
+        `
+          <span class="material-symbols-outlined text-sm">
+            payments
+          </span>
+          Pay Tax Obligation
+        `;
+    }
+  }
+}
