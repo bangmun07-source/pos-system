@@ -18356,6 +18356,64 @@
             </div>
           </div>
         </section>
+				<!-- TAX PAYABLE -->
+				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined text-3xl"
+				          style="font-variation-settings:'FILL' 1;">
+				          receipt_long
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-bold font-headline text-foreground">
+				          Tax Payable
+				        </h2>
+				
+				        <p class="text-xs text-muted mt-1">
+				          Outstanding tax obligations
+				        </p>
+				      </div>
+				    </div>
+				
+				    <button id="taxPaymentButton"
+				      type="button"
+				      onclick="openTaxPaymentModal()"
+				      class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				      <span class="material-symbols-outlined text-sm">
+				        payments
+				      </span>
+				      Pay Tax
+				    </button>
+				  </div>
+				
+				  <div class="p-5">
+				    <div class="flex items-center justify-between">
+				      <div>
+				        <p class="text-[11px] text-muted uppercase tracking-wider">
+				          Outstanding
+				        </p>
+				
+				        <p id="taxPayableOutstanding"
+				          class="text-2xl font-headline mt-1">
+				          Rp 0
+				        </p>
+				      </div>
+				
+				      <div>
+				        <p class="text-[11px] text-muted uppercase tracking-wider text-right">
+				          Account
+				        </p>
+				
+				        <p class="text-sm mt-1 text-right">
+				          2200 · Tax Payable
+				        </p>
+				      </div>
+				    </div>
+				  </div>
+				</section>
         <!-- OTHER LIABILITIES -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <div class="p-5 border-b border-outline-variant flex items-center justify-between">
@@ -18388,7 +18446,6 @@
               New Liability
             </button>
           </div>
-
           <!-- FILTER -->
           <div class="p-5 border-b border-outline-variant">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -18700,6 +18757,135 @@
       </div>
     </div>
   </div>
+	<!-- TAX PAYMENT MODAL -->
+	<div id="taxPaymentModal"
+	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
+	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div>
+	        <h2 class="text-lg font-bold font-headline text-foreground">
+	          Tax Payment
+	        </h2>
+	
+	        <p class="text-xs text-muted mt-1">
+	          Record payment of outstanding tax payable
+	        </p>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeTaxPaymentModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground rounded-md">
+	        <span class="material-symbols-outlined">
+	          close
+	        </span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-4">
+	      <!-- TAX PAYABLE ACCOUNT -->
+	      <div>
+	        <p class="text-[11px] text-muted uppercase tracking-wider">
+	          Account
+	        </p>
+	
+	        <p id="taxPaymentAccount"
+	          class="text-sm mt-1">
+	          Tax Payable
+	        </p>
+	      </div>
+	      <!-- OUTSTANDING -->
+	      <div class="p-4 rounded-md border border-outline-variant">
+	        <p class="text-[11px] text-muted uppercase tracking-wider">
+	          Outstanding Tax Payable
+	        </p>
+	
+	        <p id="taxPaymentOutstanding"
+	          class="text-xl font-headline mt-1">
+	          Rp 0
+	        </p>
+	      </div>
+	      <!-- DATE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Payment Date
+	        </label>
+	
+	        <input id="taxPaymentDate"
+	          type="date"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	      <!-- AMOUNT -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Amount
+	        </label>
+	
+	        <input id="taxPaymentAmount"
+	          type="number"
+	          min="1"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	      <!-- PAYMENT METHOD -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Payment Method
+	        </label>
+	
+	        <select id="taxPaymentMethod"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	          <option value="CASH">
+	            Cash
+	          </option>
+	
+	          <option value="BANK">
+	            Bank
+	          </option>
+	
+	          <option value="QRIS">
+	            QRIS
+	          </option>
+	        </select>
+	      </div>
+	      <!-- REFERENCE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Reference No.
+	        </label>
+	
+	        <input id="taxPaymentReference"
+	          type="text"
+	          placeholder="Optional"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+	      </div>
+	      <!-- NOTE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Note
+	        </label>
+	
+	        <textarea id="taxPaymentNote"
+	          rows="3"
+	          placeholder="Optional"
+	          class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none"></textarea>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex justify-end gap-3">
+	      <button type="button"
+	        onclick="closeTaxPaymentModal()"
+	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium">
+	        Cancel
+	      </button>
+	
+	      <button id="saveTaxPaymentButton"
+	        type="button"
+	        onclick="saveTaxPayment()"
+	        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium">
+	        Pay Tax
+	      </button>
+	    </div>
+	  </div>
+	</div>
   <!-- NEW LIABILITY MODAL -->
   <div id="newLiabilityModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
