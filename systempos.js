@@ -26415,6 +26415,7 @@ async function initAccountingDebtPage() {
 	initSupplierDebtFilters();
 	await loadSupplierDebt();
 	await initOtherLiability();
+	await loadTaxPayable();
 }
 
 
