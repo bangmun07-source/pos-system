@@ -28814,7 +28814,7 @@ async function loadTaxObligation() {
     currentTaxObligation
   );
 
-
+	await loadTaxObligationPaymentSummary();
   return currentTaxObligation;
 }
 
@@ -29800,5 +29800,190 @@ async function saveTaxObligationPayment() {
           Pay Tax Obligation
         `;
     }
+  }
+}
+
+
+async function loadTaxObligationPaymentSummary() {
+  const payableEl = document.getElementById("accountingTaxObligationPayable");
+  const paidEl = document.getElementById("accountingTaxObligationPaid");
+  const outstandingEl = document.getElementById("accountingTaxObligationOutstanding");
+
+  if (!payableEl || !paidEl || !outstandingEl) return;
+
+  const sessionId = localStorage.getItem("pos_session_id");
+  const branchId = state.branchId;
+
+  if (!sessionId || !branchId) {
+    payableEl.textContent = "Rp 0";
+    paidEl.textContent = "Rp 0";
+    outstandingEl.textContent = "Rp 0";
+    return;
+  }
+
+  try {
+    const yearEl = document.getElementById("taxObligationYear");
+    const taxYear = Number(
+      yearEl?.value || new Date().getFullYear()
+    );
+
+    /*
+     * ==========================================
+     * 1. AMBIL TAX OBLIGATION
+     * ==========================================
+     */
+    const { data: obligation, error: obligationError } =
+      await supabaseClient
+        .from("Tax_Obligations")
+        .select(`
+          "Obligation_ID",
+          "Tax_Amount",
+          "Status"
+        `)
+        .eq("Branch_ID", branchId)
+        .eq("Tax_Year", taxYear)
+        .maybeSingle();
+
+    if (obligationError) {
+      throw obligationError;
+    }
+
+    const payable =
+      obligation && obligation.Status !== "VOID"
+        ? Number(obligation.Tax_Amount || 0)
+        : 0;
+
+    /*
+     * ==========================================
+     * 2. CARI JOURNAL PAYMENT TAX OBLIGATION
+     * ==========================================
+     *
+     * Format reference payment yang sekarang:
+     *
+     * TAX-OBL-PAY-2026-1789385300563
+     *
+     * Jadi kita ambil semua payment untuk
+     * tahun yang sedang dipilih.
+     */
+    let paid = 0;
+
+    if (payable > 0 || obligation) {
+      const referencePrefix = `TAX-OBL-PAY-${taxYear}-`;
+
+      const { data: paymentJournals, error: paymentError } =
+        await supabaseClient
+          .from("Journal_Entries")
+          .select(`
+            "Journal_ID",
+            "Reference_ID",
+            "Status"
+          `)
+          .eq("Branch_ID", branchId)
+          .eq("Source", "PAYMENT")
+          .eq("Status", "POSTED")
+          .like("Reference_ID", `${referencePrefix}%`);
+
+      if (paymentError) {
+        throw paymentError;
+      }
+
+      const journalIds = (paymentJournals || [])
+        .map(row => row.Journal_ID)
+        .filter(Boolean);
+
+      /*
+       * ==========================================
+       * 3. AMBIL DEBIT ACCOUNT 2210
+       * ==========================================
+       *
+       * Payment:
+       *
+       * Dr Tax Obligation Payable (2210)
+       * Cr Cash / Bank
+       *
+       * Jadi Paid = SUM Debit pada account 2210.
+       */
+      if (journalIds.length > 0) {
+        const { data: paymentLines, error: lineError } =
+          await supabaseClient
+            .from("Journal_Entry_Lines")
+            .select(`
+              "Journal_ID",
+              "Account_ID",
+              "Debit",
+              "Credit"
+            `)
+            .in("Journal_ID", journalIds)
+            .eq("Account_ID", "ACC-4DC408145FCA")
+            .gt("Debit", 0);
+
+        if (lineError) {
+          throw lineError;
+        }
+
+        paid = (paymentLines || []).reduce(
+          (total, line) => total + Number(line.Debit || 0),
+          0
+        );
+      }
+    }
+
+    /*
+     * ==========================================
+     * 4. OUTSTANDING
+     * ==========================================
+     */
+    const outstanding = Math.max(
+      0,
+      payable - paid
+    );
+
+    /*
+     * ==========================================
+     * 5. RENDER
+     * ==========================================
+     */
+    const formatRupiah = value =>
+      new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        maximumFractionDigits: 0
+      }).format(value);
+
+    payableEl.textContent = formatRupiah(payable);
+    paidEl.textContent = formatRupiah(paid);
+    outstandingEl.textContent = formatRupiah(outstanding);
+
+    /*
+     * Optional:
+     * Disable payment button kalau tidak ada outstanding.
+     */
+    const paymentButton = document.getElementById(
+      "accountingTaxObligationPaymentButton"
+    );
+
+    if (paymentButton) {
+      paymentButton.disabled = outstanding <= 0;
+
+      paymentButton.classList.toggle(
+        "opacity-50",
+        outstanding <= 0
+      );
+
+      paymentButton.classList.toggle(
+        "cursor-not-allowed",
+        outstanding <= 0
+      );
+    }
+
+  } catch (error) {
+    console.error(
+      "Error loading tax obligation payment summary:",
+      error
+    );
+
+    payableEl.textContent = "Rp 0";
+    paidEl.textContent = "Rp 0";
+    outstandingEl.textContent = "Rp 0";
   }
 }
