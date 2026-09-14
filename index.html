@@ -17551,88 +17551,174 @@
           </div>
         </section>
         <!-- PROFIT & LOSS -->
-        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="main-icon-box">
-                <span class="material-symbols-outlined">
-                  trending_up
-                </span>
-              </div>
-							
-              <div>
-                <h2 class="text-lg font-headline text-foreground">
-                  Profit &amp; Loss
-                </h2>
-
-                <p class="text-xs text-muted mt-1">
-                  Revenue, cost and operating expenses for the selected period
-                </p>
-              </div>
-            </div>
+				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined">
+				          trending_up
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-headline text-foreground">
+				          Profit &amp; Loss
+				        </h2>
+				
+				        <p class="text-xs text-muted mt-1">
+				          Revenue, cost and operating expenses for the selected period
+				        </p>
+				      </div>
+				    </div>
 						
-            <button class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px]">
-                download
-              </span>
-              Export
-            </button>
-          </div>
-
-          <div class="p-5">
-            <div class="space-y-3">
-              <div class="flex items-center justify-between py-3 border-b border-outline-variant">
-                <span class="text-sm font-medium">
-                  Revenue
-                </span>
-
-                <span id="profitLossRevenue" class="text-sm">
-                  -
-                </span>
-              </div>
-
-              <div class="flex items-center justify-between py-3 border-b border-outline-variant">
-                <span class="text-sm">
-                  Cost of Goods Sold
-                </span>
-
-                <span id="profitLossCOGS" class="text-sm">
-                  -
-                </span>
-              </div>
-
-              <div class="flex items-center justify-between py-3 border-b border-outline-variant">
-                <span class="text-sm font-medium">
-                  Gross Profit
-                </span>
-
-                <span id="profitLossGrossProfit" class="text-sm font-medium">
-                  -
-                </span>
-              </div>
-
-              <div class="flex items-center justify-between py-3 border-b border-outline-variant">
-                <span class="text-sm">
-                  Operating Expenses
-                </span>
-
-                <span id="profitLossExpenses" class="text-sm">
-                  -
-                </span>
-              </div>
-
-              <div class="flex items-center justify-between py-4">
-                <span class="font-headline">
-                  Net Profit
-                </span>
-
-                <span id="profitLossNetProfit" class="font-headline text-primary">
-                  -
-                </span>
-              </div>
-            </div>
-          </div>
-        </section>
+				    <button class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+				      <span class="material-symbols-outlined text-[18px]">
+				        download
+				      </span>
+				      Export
+				    </button>
+				  </div>
+				  <!-- CONTENT -->
+				  <div class="p-5">
+				    <div id="profitLossContent" class="space-y-3">
+				      <!-- REVENUE -->
+				      <div class="mb-5">
+				        <div class="flex items-center justify-between py-3 border-b border-outline-variant">
+				          <span class="text-sm font-medium">
+				            Revenue
+				          </span>
+				
+				          <span id="profitLossRevenue"
+				            class="text-sm font-medium">
+				            -
+				          </span>
+				        </div>
+				        <!-- Revenue Accounts -->
+				        <div id="profitLossRevenueAccounts"
+				          class="ml-5 mt-1 space-y-1" >
+				        </div>
+				        <!-- Total Revenue -->
+				        <div class="flex items-center justify-between py-3 border-t border-outline-variant mt-2" >
+				          <span class="text-sm font-medium">
+				            Total Revenue
+				          </span>
+				
+				          <span id="profitLossTotalRevenue"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- COST OF GOODS SOLD -->
+				      <div class="mb-5">
+				        <div class="flex items-center justify-between py-3 border-b border-outline-variant">
+				          <span class="text-sm font-medium">
+				            Cost of Goods Sold
+				          </span>
+				
+				          <span id="profitLossCOGS"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				        <!-- COGS Accounts -->
+				        <div id="profitLossCOGSAccounts"
+				          class="ml-5 mt-1 space-y-1" >
+				        </div>
+				
+				        <!-- Total COGS -->
+				        <div class="flex items-center justify-between py-3 border-t border-outline-variant mt-2" >
+				          <span class="text-sm font-medium">
+				            Total Cost of Goods Sold
+				          </span>
+				
+				          <span id="profitLossTotalCOGS"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- GROSS PROFIT -->
+				      <div class="flex items-center justify-between py-4 border-t-2 border-outline-variant" >
+				        <span class="text-sm font-headline">
+				          Gross Profit
+				        </span>
+				
+				        <span id="profitLossGrossProfit"
+				          class="text-sm font-headline" >
+				          -
+				        </span>
+				      </div>
+				      <!-- OPERATING EXPENSES -->
+				      <div class="mb-5">
+				        <div class="flex items-center justify-between py-3 border-b border-outline-variant">
+				          <span class="text-sm font-medium">
+				            Operating Expenses
+				          </span>
+				
+				          <span id="profitLossOperatingExpenses"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				        <!-- Operating Expense Accounts -->
+				        <div id="profitLossOperatingExpenseAccounts"
+				          class="ml-5 mt-1 space-y-1" >
+				        </div>
+				        <!-- Total Operating Expenses -->
+				        <div class="flex items-center justify-between py-3 border-t border-outline-variant mt-2" >
+				          <span class="text-sm font-medium">
+				            Total Operating Expenses
+				          </span>
+				
+				          <span id="profitLossTotalOperatingExpenses"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- OTHER EXPENSES -->
+				      <div class="mb-5">
+				        <div class="flex items-center justify-between py-3 border-b border-outline-variant">
+				          <span class="text-sm font-medium">
+				            Other Expenses
+				          </span>
+				          <span id="profitLossOtherExpenses"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				
+				        <!-- Other Expense Accounts -->
+				        <div id="profitLossOtherExpenseAccounts"
+				          class="ml-5 mt-1 space-y-1" >
+				        </div>
+				        <!-- Total Other Expenses -->
+				        <div class="flex items-center justify-between py-3 border-t border-outline-variant mt-2" >
+				          <span class="text-sm font-medium">
+				            Total Other Expenses
+				          </span>
+				
+				          <span id="profitLossTotalOtherExpenses"
+				            class="text-sm font-medium" >
+				            -
+				          </span>
+				        </div>
+				      </div>
+				      <!-- NET PROFIT -->
+				      <div class="flex items-center justify-between py-5 border-t-2 border-outline-variant" >
+				        <span class="font-headline">
+				          Net Profit
+				        </span>
+				
+				        <span id="profitLossNetProfit"
+				          class="font-headline text-primary" >
+				          -
+				        </span>
+				      </div>
+				    </div>
+				  </div>
+				</section>
         <!-- BALANCE SHEET -->
 				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
 				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
