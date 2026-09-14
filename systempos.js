@@ -26053,16 +26053,15 @@ function renderProfitLoss(rows) {
   const expensesEl = document.getElementById("profitLossExpenses");
   const netProfitEl = document.getElementById("profitLossNetProfit");
 	
-  if (revenueEl) { revenueEl.textContent = formatAccountingReportAmount(revenue); }
+  if (revenueEl) { revenueEl.textContent = ""; }
   if (totalRevenueEl) { totalRevenueEl.textContent = formatAccountingReportAmount(revenue); }
-  if (cogsEl) { cogsEl.textContent = formatAccountingReportAmount(cogs); }
+  if (cogsEl) { cogsEl.textContent = ""; }
   if (totalCOGSel) { totalCOGSel.textContent = formatAccountingReportAmount(cogs); }
   if (grossProfitEl) { grossProfitEl.textContent = formatAccountingReportAmount(grossProfit); }
-  if (operatingExpensesEl) { operatingExpensesEl.textContent = formatAccountingReportAmount(operatingExpenses); }
+  if (operatingExpensesEl) { operatingExpensesEl.textContent = ""; }
   if (totalOperatingExpensesEl) { totalOperatingExpensesEl.textContent = formatAccountingReportAmount(operatingExpenses); }
-  if (otherExpensesEl) { otherExpensesEl.textContent = formatAccountingReportAmount(otherExpenses); }
+  if (otherExpensesEl) { otherExpensesEl.textContent = ""; }
   if (totalOtherExpensesEl) { totalOtherExpensesEl.textContent = formatAccountingReportAmount(otherExpenses); }
-  if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(totalExpenses); }
   if (netProfitEl) { netProfitEl.textContent = formatAccountingReportAmount(netProfit); }
   // RETURN
   return {
