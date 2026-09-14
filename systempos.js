@@ -25943,37 +25943,137 @@ async function loadProfitLoss() {
 }
 
 function renderProfitLoss(rows) {
+  const data = Array.isArray(rows) ? rows : [];
+
   let revenue = 0;
   let cogs = 0;
-  let expenses = 0;
-  rows.forEach(row => { const amount = Number(row.amount || 0);
-    switch (row.accountType) {
-      case "REVENUE":
-        revenue += amount;
-        break;
-      case "COGS":
-        cogs += amount;
-        break;
-      case "EXPENSE":
-        expenses += amount;
-        break;
+  let operatingExpenses = 0;
+  let otherExpenses = 0;
+	
+  const revenueAccounts = [];
+  const cogsAccounts = [];
+  const operatingExpenseAccounts = [];
+  const otherExpenseAccounts = [];
+
+  data.forEach(row => {
+    const amount = Number(row.amount || 0);
+    if (!amount) return;
+    const accountType = row.accountType;
+    const accountCode = String(row.accountCode || "");
+    const accountName = row.accountName || "-";
+    const parentId = row.parentId || null;
+    const account = { ...row, amount, accountCode, accountName, parentId };
+    // REVENUE
+    if (accountType === "REVENUE") {
+      revenue += amount;
+      revenueAccounts.push(account);
+      return;
+    }
+    // COGS
+    if (accountType === "COGS") {
+      cogs += amount;
+      cogsAccounts.push(account);
+      return;
+    }
+    // EXPENSE
+    if (accountType === "EXPENSE") {
+      if (
+        accountCode === "6100" ||
+        accountCode.startsWith("61")
+      ) {
+        operatingExpenses += amount;
+        operatingExpenseAccounts.push(account);
+      } else {
+        otherExpenses += amount;
+        otherExpenseAccounts.push(account);
+      }
+      return;
     }
   });
 
+  // TOTAL
   const grossProfit = revenue - cogs;
-  const netProfit = grossProfit - expenses;
+  const totalExpenses = operatingExpenses + otherExpenses;
+  const netProfit = grossProfit - totalExpenses;
+	
+  // HELPER RENDER DETAIL ACCOUNT
+  function renderAccountRows(containerId, accounts) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.innerHTML = "";
+    if (!accounts.length) {
+      return;
+    }
+
+    accounts
+      .sort((a, b) =>
+        String(a.accountCode).localeCompare(
+          String(b.accountCode),
+          undefined,
+          { numeric: true }
+        )
+      )
+      .forEach(account => {
+        const row = document.createElement("div");
+
+        row.className =
+          "flex items-center justify-between py-2 text-xs text-muted";
+
+        row.innerHTML = `
+        	<span class="flex items-center gap-2">
+            <span class="font-mono text-[11px]">
+              ${account.accountCode}
+            </span>
+            <span>
+              ${account.accountName}
+            </span>
+          </span>
+
+          <span>
+            ${formatAccountingReportAmount(account.amount)}
+          </span>
+        `;
+        container.appendChild(row);
+      });
+  }
+  renderAccountRows( "profitLossRevenueAccounts", revenueAccounts );
+  renderAccountRows( "profitLossCOGSAccounts", cogsAccounts );
+  renderAccountRows( "profitLossOperatingExpenseAccounts", operatingExpenseAccounts );
+  renderAccountRows( "profitLossOtherExpenseAccounts", otherExpenseAccounts );
+
   const revenueEl = document.getElementById("profitLossRevenue");
+  const totalRevenueEl = document.getElementById("profitLossTotalRevenue");
   const cogsEl = document.getElementById("profitLossCOGS");
+  const totalCOGSel = document.getElementById("profitLossTotalCOGS");
   const grossProfitEl = document.getElementById("profitLossGrossProfit");
+  const operatingExpensesEl = document.getElementById("profitLossOperatingExpenses");
+  const totalOperatingExpensesEl = document.getElementById("profitLossTotalOperatingExpenses");
+  const otherExpensesEl = document.getElementById("profitLossOtherExpenses");
+  const totalOtherExpensesEl = document.getElementById("profitLossTotalOtherExpenses");
   const expensesEl = document.getElementById("profitLossExpenses");
   const netProfitEl = document.getElementById("profitLossNetProfit");
-
+	
   if (revenueEl) { revenueEl.textContent = formatAccountingReportAmount(revenue); }
+  if (totalRevenueEl) { totalRevenueEl.textContent = formatAccountingReportAmount(revenue); }
   if (cogsEl) { cogsEl.textContent = formatAccountingReportAmount(cogs); }
+  if (totalCOGSel) { totalCOGSel.textContent = formatAccountingReportAmount(cogs); }
   if (grossProfitEl) { grossProfitEl.textContent = formatAccountingReportAmount(grossProfit); }
-  if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(expenses); }
+  if (operatingExpensesEl) { operatingExpensesEl.textContent = formatAccountingReportAmount(operatingExpenses); }
+  if (totalOperatingExpensesEl) { totalOperatingExpensesEl.textContent = formatAccountingReportAmount(operatingExpenses); }
+  if (otherExpensesEl) { otherExpensesEl.textContent = formatAccountingReportAmount(otherExpenses); }
+  if (totalOtherExpensesEl) { totalOtherExpensesEl.textContent = formatAccountingReportAmount(otherExpenses); }
+  if (expensesEl) { expensesEl.textContent = formatAccountingReportAmount(totalExpenses); }
   if (netProfitEl) { netProfitEl.textContent = formatAccountingReportAmount(netProfit); }
-	return { revenue, cogs, expenses, grossProfit, netProfit };
+  // RETURN
+  return {
+    revenue,
+    cogs,
+    operatingExpenses,
+    otherExpenses,
+    expenses: totalExpenses,
+    grossProfit,
+    netProfit
+  };
 }
 
 
