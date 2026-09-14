@@ -27026,6 +27026,328 @@ function escapeHtml(value) {
 		.replace(/'/g, "&#039;");
 }
 
+
+/* =========================================================
+   TAX PAYABLE
+   ========================================================= */
+
+let taxPayableData = null;
+
+
+/* =========================================================
+   LOAD TAX PAYABLE
+   ========================================================= */
+
+async function loadTaxPayable() {
+  const sessionId = localStorage.getItem("pos_session_id");
+  const branchId = state.branchId;
+
+  if (!sessionId) {
+    console.error("Session tidak ditemukan.");
+    return;
+  }
+
+  if (!branchId) {
+    console.error("Branch tidak ditemukan.");
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient.rpc("get_tax_payable", {
+      p_session_id: sessionId,
+      p_branch_id: branchId
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    console.log("Tax payable result:", data);
+
+    const result = data || {};
+
+    taxPayableData = {
+      accountId: result.account_id || "ACC-52FE300A7C2A",
+      totalCredit: Number(result.total_credit) || 0,
+      totalDebit: Number(result.total_debit) || 0,
+      outstanding: Math.max(0, Number(result.outstanding) || 0)
+    };
+
+    updateTaxPayableUI();
+
+  } catch (error) {
+    console.error("loadTaxPayable error:", error);
+
+    taxPayableData = {
+      accountId: "ACC-52FE300A7C2A",
+      totalCredit: 0,
+      totalDebit: 0,
+      outstanding: 0
+    };
+
+    updateTaxPayableUI();
+  }
+}
+
+
+/* =========================================================
+   UPDATE TAX PAYABLE UI
+   ========================================================= */
+
+function updateTaxPayableUI() {
+  const outstanding =
+    Number(taxPayableData?.outstanding) || 0;
+
+  const outstandingEl =
+    document.getElementById("taxPayableOutstanding");
+
+  if (outstandingEl) {
+    outstandingEl.textContent =
+      formatAccountingCurrency(outstanding);
+  }
+
+  const modalOutstandingEl =
+    document.getElementById("taxPaymentOutstanding");
+
+  if (modalOutstandingEl) {
+    modalOutstandingEl.textContent =
+      formatAccountingCurrency(outstanding);
+  }
+
+  const amountEl =
+    document.getElementById("taxPaymentAmount");
+
+  if (amountEl && document.getElementById("taxPaymentModal")) {
+    const modal =
+      document.getElementById("taxPaymentModal");
+
+    if (!modal.classList.contains("hidden")) {
+      amountEl.max = outstanding;
+    }
+  }
+}
+
+
+/* =========================================================
+   OPEN TAX PAYMENT MODAL
+   ========================================================= */
+
+async function openTaxPaymentModal() {
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    alert("Session tidak ditemukan.");
+    return;
+  }
+
+  /*
+   * Pastikan saldo terbaru sebelum membuka pembayaran.
+   */
+  await loadTaxPayable();
+
+  const outstanding =
+    Number(taxPayableData?.outstanding) || 0;
+
+  if (outstanding <= 0) {
+    alert("Tax Payable tidak memiliki saldo terutang.");
+    return;
+  }
+
+  document.getElementById("taxPaymentAccount").textContent =
+    "2200 · Tax Payable";
+
+  document.getElementById("taxPaymentOutstanding").textContent =
+    formatAccountingCurrency(outstanding);
+
+  document.getElementById("taxPaymentDate").value =
+    getTodayAccountingDate();
+
+  document.getElementById("taxPaymentAmount").value =
+    outstanding;
+
+  document.getElementById("taxPaymentAmount").max =
+    outstanding;
+
+  document.getElementById("taxPaymentMethod").value =
+    "CASH";
+
+  document.getElementById("taxPaymentReference").value =
+    "";
+
+  document.getElementById("taxPaymentNote").value =
+    "";
+
+  const modal =
+    document.getElementById("taxPaymentModal");
+
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+}
+
+
+/* =========================================================
+   CLOSE TAX PAYMENT MODAL
+   ========================================================= */
+
+function closeTaxPaymentModal() {
+  const modal =
+    document.getElementById("taxPaymentModal");
+
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
+
+/* =========================================================
+   SAVE TAX PAYMENT
+   ========================================================= */
+
+async function saveTaxPayment() {
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    alert("Session tidak ditemukan.");
+    return;
+  }
+
+  const branchId = state.branchId;
+
+  if (!branchId) {
+    alert("Branch tidak ditemukan.");
+    return;
+  }
+
+  const paymentDate =
+    document.getElementById("taxPaymentDate")?.value;
+
+  const amount =
+    Number(
+      document.getElementById("taxPaymentAmount")?.value
+    ) || 0;
+
+  const method =
+    document.getElementById("taxPaymentMethod")?.value ||
+    "CASH";
+
+  const referenceNo =
+    document
+      .getElementById("taxPaymentReference")
+      ?.value
+      ?.trim() || null;
+
+  const note =
+    document
+      .getElementById("taxPaymentNote")
+      ?.value
+      ?.trim() || null;
+
+
+  /* =======================================================
+     VALIDATION
+     ======================================================= */
+
+  if (!paymentDate) {
+    alert("Tanggal pembayaran wajib diisi.");
+    return;
+  }
+
+  if (amount <= 0) {
+    alert("Jumlah pembayaran harus lebih dari 0.");
+    return;
+  }
+
+  const outstanding =
+    Number(taxPayableData?.outstanding) || 0;
+
+  if (outstanding <= 0) {
+    alert("Tax Payable tidak memiliki saldo terutang.");
+    return;
+  }
+
+  if (amount > outstanding) {
+    alert(
+      `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}`
+    );
+    return;
+  }
+
+  if (!["CASH", "BANK", "QRIS"].includes(method)) {
+    alert("Metode pembayaran tidak valid.");
+    return;
+  }
+
+
+  /* =======================================================
+     SAVE
+     ======================================================= */
+
+  const button =
+    document.getElementById("saveTaxPaymentButton");
+
+  try {
+
+    if (button) {
+      button.disabled = true;
+      button.textContent = "Menyimpan...";
+    }
+
+    const { data, error } =
+      await supabaseClient.rpc("create_tax_payment", {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_payment_date: paymentDate,
+        p_amount: amount,
+        p_payment_method: method,
+        p_reference_no: referenceNo,
+        p_note: note
+      });
+
+    if (error) {
+      throw error;
+    }
+
+    console.log("Tax payment result:", data);
+
+    closeTaxPaymentModal();
+
+    alert(
+      data?.message ||
+      "Pembayaran Tax Payable berhasil."
+    );
+
+    /*
+     * Refresh saldo setelah pembayaran.
+     */
+    await loadTaxPayable();
+
+  } catch (error) {
+
+    console.error(
+      "saveTaxPayment error:",
+      error
+    );
+
+    alert(
+      error?.message ||
+      "Gagal menyimpan pembayaran Tax Payable."
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = "Pay Tax";
+    }
+
+  }
+}
+
+
 /* =========================================================
    OTHER LIABILITY
    ========================================================= */
