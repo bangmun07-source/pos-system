@@ -27505,7 +27505,7 @@ async function saveTaxObligationPayment() {
     await loadTaxObligation();
 
     const finalStatus = statusData?.status || "RECORDED";
-    const finalOutstanding = Number( statusData? .outstanding || 0 );
+    const finalOutstanding = Number( statusData?.outstanding || 0 );
 
     if (finalStatus === "PAID") {
       showToast(
