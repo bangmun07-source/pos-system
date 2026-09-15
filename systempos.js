@@ -9990,7 +9990,7 @@ async function loadStockInIngredients( modal, branchId ) {
 	
 window.stockModalEl = null;
 window.saveStockIn = async function () {
-  const modal = document.querySelector( );
+  const modal = document.querySelector(".stock-modal");
   if (!modal) return;
 	
   const ingredient = modal.querySelector( "#ingredientName" )?.value;
