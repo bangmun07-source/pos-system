@@ -757,12 +757,8 @@ async function handleLogin() {
 	
 function logout() {
   localStorage.removeItem("pos_user");
-  localStorage.removeItem(
-    "pos_branchId"
-  );
-  localStorage.removeItem(
-    "pos_session_id"
-  );
+  localStorage.removeItem( "pos_branchId" );
+  localStorage.removeItem( "pos_session_id" );
   state.user = null;
   state.branchId = null;
   state.cart = [];
@@ -9994,73 +9990,23 @@ async function loadStockInIngredients( modal, branchId ) {
 	
 window.stockModalEl = null;
 window.saveStockIn = async function () {
-  const modal =
-    document.querySelector(
-      ".stock-modal"
-    );
+  const modal = document.querySelector( );
   if (!modal) return;
-
-  const ingredient =
-    modal.querySelector(
-      "#ingredientName"
-    )?.value;
-
-  const qty =
-    modal.querySelector(
-      "#stockQty"
-    )?.value;
-
-  const price =
-    modal.querySelector(
-      "#purchasePrice"
-    )?.value;
-
-  // SUPPLIER
-  const supplierSelect =
-    modal.querySelector(
-      "#supplierSelect"
-    );
-  const supplier =
-    supplierSelect?.value || "";
-  const supplierId =
-    supplierSelect
-      ?.options[
-        supplierSelect.selectedIndex
-      ]
+	
+  const ingredient = modal.querySelector( "#ingredientName" )?.value;
+  const qty = modal.querySelector( "#stockQty" )?.value;
+  const price = modal.querySelector( "#purchasePrice" )?.value;
+  const supplierSelect = modal.querySelector( "#supplierSelect" );
+  const supplier = supplierSelect?.value || "";
+  const supplierId = supplierSelect
+      ?.options[ supplierSelect.selectedIndex ]
       ?.dataset.id || null;
-
-  const note =
-    modal.querySelector(
-      "textarea"
-    )?.value;
-
-  // PAYMENT
-  const paymentMethod =
-    modal.querySelector(
-      "#purchasePaymentMethod"
-    )?.value ||
-    "CASH";
-
-  const status =
-    modal.querySelector(
-      "#purchasePaymentStatus"
-    )?.value ||
-    "PAID";
-
-  const branchSelect =
-    modal.querySelector(
-      "#branchSelect"
-    );
-
+  const note = modal.querySelector( "textarea" )?.value;
+  const paymentMethod = modal.querySelector( "#purchasePaymentMethod" )?.value || "CASH";
+  const status = modal.querySelector( "#purchasePaymentStatus" )?.value || "PAID";
+  const branchSelect = modal.querySelector( "#branchSelect" );
   const branchId = state.branchId;
-
-  const outletName =
-    branchSelect
-      ? branchSelect.options[
-          branchSelect.selectedIndex
-        ]?.text || ""
-      : "";
-
+  const outletName = branchSelect ? branchSelect.options[ branchSelect.selectedIndex ]?.text || "" : "";
   if (!branchId) {
     alert(
       "Branch belum dipilih!"
@@ -10089,12 +10035,8 @@ window.saveStockIn = async function () {
     );
 
   try {
-
-    // TOTAL PRICE
     const totalPrice = Number(price) || 0;
-	
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -10129,6 +10071,8 @@ window.saveStockIn = async function () {
     state.supplierBranchId = null;
     state.recipeData = null;
     state.recipeDataBranchId = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     // CLOSE MODAL
     closeModal();
     showToast(
@@ -10137,63 +10081,17 @@ window.saveStockIn = async function () {
     );
 
   } catch (error) {
-    console.error(
-      "ADD INGREDIENT PURCHASE ERROR:",
-      error
-    );
-
-    console.error(
-      "MESSAGE:",
-      error?.message
-    );
-
-    console.error(
-      "DETAILS:",
-      error?.details
-    );
-
-    console.error(
-      "HINT:",
-      error?.hint
-    );
-
-    const err =
-      error?.message ||
-      error?.details ||
-      "";
-
-    let message =
-      "Gagal menyimpan purchase";
-
-    if (
-      err.includes(
-        "Saldo Cash tidak mencukupi"
-      )
-    ) {
-      message =
-        "Saldo Cash tidak mencukupi";
-    }
-    else if (
-      err.includes(
-        "Saldo Bank tidak mencukupi"
-      )
-    ) {
-      message =
-        "Saldo Bank tidak mencukupi";
-    }
-    else {
-      message =
-        err ||
-        "Gagal menyimpan purchase";
-    }
-
+    const err = error?.message || error?.details || "";
+    let message = "Gagal menyimpan purchase";
+    if ( rr.includes( "Saldo Cash tidak mencukupi" ) ) { message = "Saldo Cash tidak mencukupi"; }
+    else if ( err.includes( "Saldo Bank tidak mencukupi" ) ) { message = "Saldo Bank tidak mencukupi"; }
+    else { message = err || "Gagal menyimpan purchase"; }
     alert(message);
   }
 };
 	
 window.closeModal = function () {
-  document.querySelectorAll(".fixed.inset-0")
-    .forEach(el => el.remove());
+  document.querySelectorAll(".fixed.inset-0") .forEach(el => el.remove());
   document.body.style.overflow = "auto";
 };
 
@@ -10206,9 +10104,7 @@ document.addEventListener("change", function(e) {
 });
 
 async function loadBranchDropdown() {
-
   try {
-  
     const sessionId =
       localStorage.getItem("pos_session_id");
     const {
@@ -10225,54 +10121,28 @@ async function loadBranchDropdown() {
       throw error;
     }
 
-    // NORMALIZE DATA
     const branches = data || [];
-    // SELECT ELEMENT
-    const materialSelect =
-      document.getElementById(
-        "material_branch"
-      );
+    const materialSelect = document.getElementById( "material_branch" );
+    const supplierSelect = document.getElementById( "supplier_branch" );
+    const stockBranchSelect = document.getElementById( "branchSelect" );
 
-    const supplierSelect =
-      document.getElementById(
-        "supplier_branch"
-      );
-
-    const stockBranchSelect =
-      document.getElementById(
-        "branchSelect"
-      );
-
-    // CLEAR OPTIONS
-    if (materialSelect) {
-      materialSelect.innerHTML = "";
-    }
-    if (supplierSelect) {
-      supplierSelect.innerHTML = "";
-    }
-    if (stockBranchSelect) {
-      stockBranchSelect.innerHTML = "";
-    }
-
-    // RENDER BRANCH
+    if (materialSelect) { materialSelect.innerHTML = ""; }
+    if (supplierSelect) { supplierSelect.innerHTML = ""; }
+    if (stockBranchSelect) { stockBranchSelect.innerHTML = ""; }
+   
     branches.forEach(branch => {
-      // STOCK IN
       if (stockBranchSelect) {
         const option = document.createElement("option");
         option.value = branch.id;
         option.textContent = branch.name;
         stockBranchSelect.appendChild(option);
       }
-
-      // MATERIAL
       if (materialSelect) {
         const option = document.createElement("option");
         option.value = branch.id;
         option.textContent = branch.name;
         materialSelect.appendChild(option);
       }
-
-      // SUPPLIER
       if (supplierSelect) {
         const option = document.createElement("option");
         option.value = branch.id;
@@ -10280,8 +10150,6 @@ async function loadBranchDropdown() {
         supplierSelect.appendChild(option);
       }
     });
-
-    // LOCK USER BRANCH
     if (materialSelect) {
       materialSelect.value = state.branchId;
       materialSelect.disabled = true;
@@ -10305,11 +10173,9 @@ async function loadBranchDropdown() {
 }
 
 window.openAddMaterialModal = function () {
-  // HAPUS semua dulu (anti numpuk)
   document.querySelectorAll("#add-material-modal-wrapper").forEach(el => el.remove());
   const tpl = document.getElementById("addmaterialModalTemplate");
   const clone = tpl.content.cloneNode(true);
-  // kasih wrapper sendiri (INI KUNCI)
   const wrapper = document.createElement("div");
   wrapper.id = "add-material-modal-wrapper";
   wrapper.appendChild(clone);
@@ -10329,56 +10195,21 @@ function openSupplierModal() {
 }
 	
 async function saveSupplier() {
-  const branchSelect =
-    document.getElementById(
-      "supplier_branch"
-    );
+  const branchSelect = document.getElementById( "supplier_branch" );
 
-  const data = {
-    name:
-      document.getElementById(
-        "supplier_name"
-      ).value,
-
-    category:
-      document.getElementById(
-        "supplier_category"
-      ).value,
-
-    contact:
-      document.getElementById(
-        "supplier_contact"
-      ).value,
-
-    phone:
-      document.getElementById(
-        "supplier_phone"
-      ).value,
-
-    address:
-      document.getElementById(
-        "supplier_address"
-      ).value,
-
-    status:
-      document.getElementById(
-        "supplier_status"
-      ).checked
+  const data = { name: document.getElementById( "supplier_name" ).value,
+    category: document.getElementById( "supplier_category" ).value,
+    contact: document.getElementById( "supplier_contact" ).value,
+    phone: document.getElementById( "supplier_phone" ).value,
+    address: document.getElementById( "supplier_address" ).value,
+    status: document.getElementById( "supplier_status" ).checked
         ? "Active"
         : "Inactive",
-
     branchId: branchSelect.value,
-	
-    outlet:
-      branchSelect.options[
-        branchSelect.selectedIndex
-      ].text
-  };
+    outlet: branchSelect.options[ branchSelect.selectedIndex ].text };
 
   try {
-
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     const {
       data: res,
       error
@@ -10398,21 +10229,8 @@ async function saveSupplier() {
         }
       );
 
-    if (error) {
-      throw error;
-    }
-
-    // SUCCESS CHECK
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal menyimpan supplier"
-      );
-    }
-
+    if (error) { throw error; }
+    if ( res && res.success === false ) { throw new Error(  res.message || "Gagal menyimpan supplier" ); }
     // CLEAR CACHE
     closeSupplierModal();
     state.supplierData = null;
@@ -10452,19 +10270,10 @@ async function exportInventoryPDF() {
     );
     return;
   }
-  const pdfWindow =
-    window.open(
-      "",
-      "_blank"
-    );
-
-  if (!pdfWindow) {
-    alert(
-      "Popup diblokir browser"
-    );
+  const pdfWindow = window.open( "", "_blank" );
+  if (!pdfWindow) { alert( "Popup diblokir browser" );
     return;
   }
-
   // LOADING
   pdfWindow.document.write(`
     <html>
@@ -10475,16 +10284,14 @@ async function exportInventoryPDF() {
         display:flex;
         align-items:center;
         justify-content:center;
-        height:100vh;
-      ">
+        height:100vh; ">
         Generating Inventory Report...
       </body>
     </html>
   `);
 
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
@@ -10503,7 +10310,6 @@ async function exportInventoryPDF() {
           })
         }
       );
-
     // CHECK RESPONSE
     if (!response.ok) {
       const errorText = await response.text();
@@ -10512,7 +10318,6 @@ async function exportInventoryPDF() {
         "Export Inventory gagal"
       );
     }
-
     // GET HTML
     const html = await response.text();
     if (!html) {
@@ -10529,7 +10334,6 @@ async function exportInventoryPDF() {
   catch (err) {
     pdfWindow.document.open();
     pdfWindow.document.write(`
-	
       <html>
         <body style=" font-family:Arial; padding:40px;">
           <h2>
@@ -10547,10 +10351,7 @@ async function exportInventoryPDF() {
     `);
 
     pdfWindow.document.close();
-    alert(
-      err?.message ||
-      "Export PDF gagal"
-    );
+    alert( err?.message || "Export PDF gagal" );
   }
 }
 
@@ -10560,19 +10361,14 @@ function previewRecipeImage(e) {
 
   const reader = new FileReader();
   reader.onload = function () {
-    document.getElementById(
-      "recipeImagePreview"
-    ).src = reader.result;
-  };
+    document.getElementById( "recipeImagePreview" ).src = reader.result; };
   reader.readAsDataURL(file);
 }
 
 function fileToBase64(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      resolve(reader.result);
-    };
+    reader.onload = () => { resolve(reader.result); };
     reader.readAsDataURL(file);
   });
 }
@@ -10584,25 +10380,14 @@ async function compressImage(file, maxWidth = 1200, quality = 0.8) {
       let width = img.width;
       let height = img.height;
       if (width > maxWidth) {
-        height =
-          height *
-          (maxWidth / width);
+        height = height * (maxWidth / width);
         width = maxWidth;
       }
-      const canvas =
-        document.createElement(
-          "canvas"
-        );
+      const canvas = document.createElement( "canvas" );
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(
-        img,
-        0,
-        0,
-        width,
-        height
-      );
+      ctx.drawImage( img, 0, 0, width, height );
       canvas.toBlob(
         blob => resolve(blob),
         "image/jpeg",
@@ -10645,18 +10430,11 @@ function switchTab(tab) {
 }
 
 function openModal(templateId) {
-  const old =
-    document.getElementById(templateId);
-  if (old) {
-    old.remove();
-  }
-  const tpl =
-    document.getElementById(
-      templateId + "Template"
-    );
+  const old = document.getElementById(templateId);
+  if (old) { old.remove(); }
+  const tpl = document.getElementById( templateId + "Template" );
   if (!tpl) return;
-  const modal =
-    tpl.content
+  const modal = tpl.content
       .firstElementChild
       .cloneNode(true);
   modal.id = templateId;
@@ -10665,17 +10443,13 @@ function openModal(templateId) {
 
 
 async function openAddProductModal() {
-  openModal(
-    "addProductModal"
-  );
+  openModal( "addProductModal" );
   await loadProductCategories();
 }
 
 async function loadProductCategories() {
   const branchId = state.branchId;
-  if (!branchId) {
-    return;
-  }
+  if (!branchId) { return; }
 
   try {
     const categories =
@@ -10684,10 +10458,7 @@ async function loadProductCategories() {
       );
 
     // PRODUCT CATEGORY SELECT
-    const select =
-      document.getElementById(
-        "newProductCategory"
-      );
+    const select = document.getElementById( "newProductCategory" );
 
     if (select) {
       select.innerHTML =
@@ -10697,10 +10468,7 @@ async function loadProductCategories() {
 
       categories.forEach(
         category => {
-          const option =
-            document.createElement(
-              "option"
-            );
+          const option = document.createElement( "option" );
           option.value = category.category_name;
           option.textContent = category.category_name;
           select.appendChild(option);
@@ -10711,109 +10479,48 @@ async function loadProductCategories() {
     // CATEGORY SETTINGS UI
     categories.forEach(
       category => {
-        const key =
-          category.category_key;
-
-        const nameInput =
-          document.getElementById(
-            `${key}_name`
-          );
-
-        const discountInput =
-          document.getElementById(
-            `${key}_discount`
-          );
-
-        const rewardInput =
-          document.getElementById(
-            `${key}_reward`
-          );
-        if (nameInput) {
-          nameInput.value =
-            category.category_name || "";
-        }
-        if (discountInput) {
-          discountInput.value =
-            category.discount ?? 0;
-        }
-        if (rewardInput) {
-          rewardInput.value =
-            category.reward ?? 0;
-        }
+        const key = category.category_key;
+        const nameInput = document.getElementById( `${key}_name` );
+        const discountInput = document.getElementById( `${key}_discount` );
+        const rewardInput = document.getElementById( `${key}_reward` );
+        if (nameInput) { nameInput.value = category.category_name || ""; }
+        if (discountInput) { discountInput.value = category.discount ?? 0; }
+        if (rewardInput) { rewardInput.value = category.reward ?? 0; }
       }
     );
   }
   catch (err) {
-		if (select) {
-			select.innerHTML =
-				`<option value="">
-					Gagal memuat category
-				</option>`;
+		if (select) { select.innerHTML =
+			`<option value="">
+				Gagal memuat category
+			</option>`;
     }
   }
 }
 
 async function saveNewProduct() {
-  const name =
-    document
-      .getElementById("newProductName")
-      ?.value
-      .trim();
-
-  const category =
-    document
-      .getElementById("newProductCategory")
-      ?.value;
-
-  const price =
-    Number(
-      document
-        .getElementById("newProductPrice")
-        ?.value || 0
-    );
-
+  const name = document .getElementById("newProductName") ?.value .trim();
+  const category = document .getElementById("newProductCategory") ?.value;
+  const price = Number( document .getElementById("newProductPrice") ?.value || 0 );
   const branchId = state.branchId;
-
-  const branchSelect =
-    document.getElementById(
-      "newProductBranch"
-    );
-
-  const outlet =
-    branchSelect
-      ? branchSelect.options[
-          branchSelect.selectedIndex
-        ]?.text || ""
-      : state.branchName || "";
-
+  const branchSelect = document.getElementById( "newProductBranch" );
+  const outlet = branchSelect ? branchSelect.options[ branchSelect.selectedIndex ]?.text || "" : state.branchName || "";
   // VALIDATION
   if (!name) {
-    alert(
-      "Product Name wajib diisi."
-    );
-    return;
-  }
+    alert( "Product Name wajib diisi." );
+    return; }
   if (!category) {
-    alert(
-      "Category wajib dipilih."
-    );
-    return;
-  }
+    alert( "Category wajib dipilih." );
+    return; }
   if (price <= 0) {
-    alert(
-      "Selling Price tidak valid."
-    );
-    return;
-  }
+    alert( "Selling Price tidak valid." );
+    return; }
   if (!branchId) {
-    alert(
-      "Branch belum dipilih."
-    );
-    return;
-  }
+    alert( "Branch belum dipilih." );
+    return; }
+	
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     const {
       data: res,
       error
@@ -10829,21 +10536,11 @@ async function saveNewProduct() {
 					p_session_id: sessionId
         }
       );
-
     // RPC ERROR
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
     // SUCCESS CHECK
-    if (
-      !res ||
-      res.success === false
-    ) {
-      throw new Error(
-        res?.message ||
-        "Gagal menyimpan product."
-      );
-    }
+    if ( !res || res.success === false ) 
+				{ throw new Error( res?.message || "Gagal menyimpan product." ); }
     closeAddProductModal();
     state.products = null;
     state.productBranchId = null;
@@ -10863,9 +10560,7 @@ async function saveNewProduct() {
     );
   }
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menyimpan product."
+    alert( err?.message || "Gagal menyimpan product."
     );
   }
 }
@@ -15520,59 +15215,33 @@ async function saveExpense() {
   try {
     // SUPABASE RPC
     const res = await addExpenseRPC(data);
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal menyimpan expense"
-      );
-    }
-
-	if (
-	  String(data.category || "").trim().toUpperCase() === "ASSET"
-	) {
-	  clearAssetCache();
-	}
+    if ( res && res.success === false )  
+				{ throw new Error( res.message || "Gagal menyimpan expense" ); }
+		if ( String(data.category || "").trim().toUpperCase() === "ASSET" ) 
+				{ clearAssetCache(); }
 	
     state.cashFlowData = null;
     state.cashFlowFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
     await loadExpenseDashboard();
+		closeAddExpensePopup();
     showToast(
       "Expense berhasil disimpan",
       "success"
     );
   }
   catch (error) {
-    const errText =
-      error?.message ||
-      JSON.stringify(error);
+    const errText = error?.message || JSON.stringify(error);
 
-    let message =
-      "Gagal menyimpan expense";
-    if (
-      errText.includes(
-        "Saldo Cash tidak mencukupi"
-      )
-    ) {
-      message =
-        "Saldo Cash tidak mencukupi";
-    }
-    else if (
-      errText.includes(
-        "Saldo Bank tidak mencukupi"
-      )
-    ) {
-      message =
-        "Saldo Bank tidak mencukupi";
-    }
-    else if (errText) {
-      message =
-        errText;
-    }
+    let message = "Gagal menyimpan expense";
+    if ( errText.includes( "Saldo Cash tidak mencukupi" )
+    ) { message = "Saldo Cash tidak mencukupi"; }
+    else if ( errText.includes( "Saldo Bank tidak mencukupi" )
+    ) { message = "Saldo Bank tidak mencukupi"; }
+    else if (errText) {  message = errText; }
     showToast(
       message,
       "error"
@@ -15581,151 +15250,80 @@ async function saveExpense() {
 }
 
 function openAddNewOtherIncome() {
-  const template =
-    document.getElementById("addneweotherincome");
-  const wrapper =
-    document.createElement("div");
-  wrapper.id =
-    "addNewOtherIncomeWrapper";
-  wrapper.appendChild(
-    template.content.cloneNode(true)
-  );
+  const template = document.getElementById("addneweotherincome");
+  const wrapper = document.createElement("div");
+	
+  wrapper.id = "addNewOtherIncomeWrapper";
+  wrapper.appendChild( template.content.cloneNode(true) );
 
   document.body.appendChild(wrapper);
-  loadOtherIncomeBranches(
-    "otherIncomeBranch"
-  );
+  loadOtherIncomeBranches( "otherIncomeBranch" );
 
   // CATEGORY CHANGE
-  const categorySelect =
-    document.getElementById(
-      "otherIncomeCategory"
-    );
-  categorySelect.addEventListener(
-    "change",
+  const categorySelect =  document.getElementById( "otherIncomeCategory" );
+  categorySelect.addEventListener( "change",
     async function () {
       const category = this.value;
-      const assetContainer =
-        document.getElementById(
-          "otherIncomeAssetContainer"
-        );
-      const assetSelect =
-        document.getElementById(
-          "otherIncomeAsset"
-        );
-      const assetInfo =
-        document.getElementById(
-          "otherIncomeAssetInfo"
-        );
+      const assetContainer = document.getElementById( "otherIncomeAssetContainer" );
+      const assetSelect = document.getElementById( "otherIncomeAsset" );
+      const assetInfo = document.getElementById( "otherIncomeAssetInfo" );
+			
       if (category !== "Asset Sale") {
-        assetContainer.classList.add(
-          "hidden"
-        );
-        assetSelect.innerHTML =
-          '<option value="">Pilih Asset</option>';
-        assetInfo.classList.add(
-          "hidden"
-        );
+        assetContainer.classList.add( "hidden" );
+        assetSelect.innerHTML = '<option value="">Pilih Asset</option>';
+        assetInfo.classList.add( "hidden" );
         return;
       }
       // Tampilkan pilihan asset
-      assetContainer.classList.remove(
-        "hidden"
-      );
+      assetContainer.classList.remove( "hidden" );
       await loadOtherIncomeAssets();
     }
   );
 
   // BRANCH CHANGE
-  const branchSelect =
-    document.getElementById(
-      "otherIncomeBranch"
-    );
-  branchSelect.addEventListener(
-    "change",
+  const branchSelect =  document.getElementById( "otherIncomeBranch" );
+  branchSelect.addEventListener( "change",
     async function () {
-      const category =
-        document.getElementById(
-          "otherIncomeCategory"
-        ).value;
+      const category = document.getElementById( "otherIncomeCategory" ).value;
       if (category === "Asset Sale") {
         await loadOtherIncomeAssets();
       }
     }
   );
-	
   // ASSET CHANGE
-  const assetSelect =
-    document.getElementById(
-      "otherIncomeAsset"
-    );
-
-  assetSelect.addEventListener(
-    "change",
+  const assetSelect = document.getElementById( "otherIncomeAsset" );
+  assetSelect.addEventListener( "change",
     function () {
+      const option =  this.options[this.selectedIndex];
+      const info = document.getElementById( "otherIncomeAssetInfo" );
+      const bookValue = document.getElementById( "otherIncomeAssetBookValue" );
 
-      const option =
-        this.options[this.selectedIndex];
-
-      const info =
-        document.getElementById(
-          "otherIncomeAssetInfo"
-        );
-
-      const bookValue =
-        document.getElementById(
-          "otherIncomeAssetBookValue"
-        );
-
-      if (!this.value) {
-
-        info.classList.add(
-          "hidden"
-        );
-
+      if (!this.value) { info.classList.add( "hidden" );
         return;
       }
 
-      const value =
-        Number(
-          option.dataset.bookValue || 0
-        );
+      const value = Number( option.dataset.bookValue || 0 );
       bookValue.textContent =
-        "Rp" +
-        value.toLocaleString("id-ID");
-      info.classList.remove(
-        "hidden"
-      );
+        "Rp" + value.toLocaleString("id-ID");
+      info.classList.remove( "hidden" );
     }
   );
 }
 
 async function loadOtherIncomeAssets() {
-  const branchId =
-    document.getElementById("otherIncomeBranch").value;
-  const select =
-    document.getElementById("otherIncomeAsset");
-  const sessionId =
-    localStorage.getItem("pos_session_id");
+  const branchId = document.getElementById("otherIncomeBranch").value;
+  const select = document.getElementById("otherIncomeAsset");
+  const sessionId = localStorage.getItem("pos_session_id");
 
-  if (!branchId) {
-    select.innerHTML =
-      '<option value="">Pilih Branch terlebih dahulu</option>';
-    return;
-  }
-
-  if (!sessionId) {
-    select.innerHTML =
-      '<option value="">Session tidak ditemukan</option>';
-    return;
-  }
-  select.innerHTML =
-    '<option value="">Loading asset...</option>';
+  if (!branchId) { select.innerHTML = '<option value="">Pilih Branch terlebih dahulu</option>';
+    return; }
+  if (!sessionId) {  select.innerHTML = '<option value="">Session tidak ditemukan</option>';
+    return; }
+	
+  select.innerHTML = '<option value="">Loading asset...</option>';
 	
   try {
-    const {
-      data,
-      error
+    const { data, error
     } = await supabaseClient.rpc(
       "get_available_assets",
       {
@@ -15734,128 +15332,68 @@ async function loadOtherIncomeAssets() {
       }
     );
 
-    if (error) {
-      console.error(
-        "Load assets error:",
-        error
-      );
-      select.innerHTML =
-        '<option value="">Gagal memuat asset</option>';
-      return;
-    }
-    select.innerHTML =
-      '<option value="">Pilih Asset</option>';
+    if (error) { select.innerHTML = '<option value="">Gagal memuat asset</option>';
+      return; }
+		
+    select.innerHTML = '<option value="">Pilih Asset</option>';
 
-    if (!data || data.length === 0) {
-      select.innerHTML =
-        '<option value="">Tidak ada asset aktif</option>';
-      return;
-    }
+    if (!data || data.length === 0) { select.innerHTML = '<option value="">Tidak ada asset aktif</option>';
+      return; }
 
     data.forEach(asset => {
-      const option =
-        document.createElement("option");
-      option.value =
-        asset.Asset_ID;
-      option.textContent =
-        `${asset.Asset_Name} — Rp${Number(
-          asset.Book_Value || 0
-        ).toLocaleString("id-ID")}`;
-      option.dataset.bookValue =
-        asset.Book_Value || 0;
-      option.dataset.purchaseCost =
-        asset.Purchase_Cost || 0;
-      select.appendChild(option);
-
+      const option = document.createElement("option");
+      option.value = asset.Asset_ID;
+      option.textContent = `${asset.Asset_Name} — Rp${Number( asset.Book_Value || 0 ).toLocaleString("id-ID")}`;
+      option.dataset.bookValue = asset.Book_Value || 0;
+      option.dataset.purchaseCost = asset.Purchase_Cost || 0; 
+			select.appendChild(option);
     });
 
   } catch (err) {
-    select.innerHTML =
-      '<option value="">Gagal memuat asset</option>';
+    select.innerHTML = '<option value="">Gagal memuat asset</option>';
   }
 }
 
 async function submitOtherIncome() {
   const now = new Date();
-  const id =
-    "OI-" +
-    now.getTime() +
-    "-" +
-    Math.floor(Math.random() * 10000);
+  const id = "OI-" + now.getTime() + "-" + Math.floor(Math.random() * 10000);
   const refId = id;
-  const category =
-    document.getElementById("otherIncomeCategory").value;
+  const category = document.getElementById("otherIncomeCategory").value;
   // ASSET ID
   let assetId = null;
   if (category === "Asset Sale") {
-    assetId =
-      document.getElementById("otherIncomeAsset")?.value || null;
+    assetId = document.getElementById("otherIncomeAsset")?.value || null;
 
     if (!assetId) {
       showToast(
         "Silakan pilih asset yang akan dijual",
-        "error"
-      );
+        "error" 
+			);
       return;
     }
   }
 
   const data = {
     id: id,
-    date:
-      document.getElementById(
-        "otherIncomeDate"
-      ).value,
+    date: document.getElementById( "otherIncomeDate" ).value,
     refId: refId,
-    description:
-      document.getElementById(
-        "otherIncomeDescription"
-      ).value,
-
+    description: document.getElementById( "otherIncomeDescription" ).value,
     category: category,
-    method:
-      document.getElementById(
-        "otherIncomeMethod"
-      ).value,
-    amount:
-      Number(
-        document.getElementById(
-          "otherIncomeAmount"
-        ).value || 0
-      ),
-
+    method: document.getElementById( "otherIncomeMethod" ).value,
+    amount: Number( document.getElementById( "otherIncomeAmount" ).value || 0 ),
     status: "Paid",
-    branchId:
-      document.getElementById(
-        "otherIncomeBranch"
-      ).value,
-    notes:
-      document.getElementById(
-        "otherIncomeNotes"
-      ).value,
-    // BARU
+    branchId: document.getElementById( "otherIncomeBranch" ).value,
+    notes: document.getElementById( "otherIncomeNotes" ).value,
     assetId: assetId
   };
 
   try {
-    const res =
-      await saveOtherIncomeRPC(data);
+    const res = await saveOtherIncomeRPC(data);
 
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal menyimpan Other Income"
-      );
-    }
+    if ( res && res.success === false ) 
+		{ throw new Error( res.message || "Gagal menyimpan Other Income" ); }
 
-    document
-      .getElementById(
-        "addNewOtherIncomeWrapper"
-      )
-      ?.remove();
+    document .getElementById( "addNewOtherIncomeWrapper" ) ?.remove();
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
     state.cashFlowData = null;
@@ -15868,8 +15406,7 @@ async function submitOtherIncome() {
     );
 
   } catch (err) {
-    showToast(
-      err?.message ||
+    showToast( err?.message ||
       "Gagal menyimpan Other Income",
       "error"
     );
@@ -15882,7 +15419,6 @@ document.addEventListener("click", function (e) {
   exportExpensePDF();
 });
 
-
 async function exportExpensePDF() {
   const f = getExpenseFilters();
   const branchId = state?.branchId || "";
@@ -15894,13 +15430,8 @@ async function exportExpensePDF() {
     );
     return;
   }
-
   // OPEN WINDOW
-  const pdfWindow =
-    window.open(
-      "",
-      "_blank"
-    );
+  const pdfWindow =  window.open( "", "_blank" );
 
   if (!pdfWindow) {
     showToast(
@@ -16000,24 +15531,19 @@ async function exportExpensePDF() {
 
     // HTTP ERROR
     if (!response.ok) {
-
-      const errorText =
-        await response.text();
+      const errorText = await response.text();
       throw new Error(
         errorText ||
         `Export gagal (${response.status})`
       );
     }
-		
     // GET HTML REPORT
-    const html =
-      await response.text();
+    const html = await response.text();
     if (!html) {
       throw new Error(
         "Server mengembalikan HTML kosong"
       );
     }
-
     // RENDER REPORT
     pdfWindow.document.open();
     pdfWindow.document.write(html);
@@ -16025,7 +15551,6 @@ async function exportExpensePDF() {
   }
 
   catch (err) {
-    // ERROR PAGE
     pdfWindow.document.open();
     pdfWindow.document.write(`
       <!DOCTYPE html>
@@ -16034,16 +15559,13 @@ async function exportExpensePDF() {
 		        background:#0B0F14;
 		        color:white;
 		        font-family:Arial;
-		        padding:40px;
-		      ">
+		        padding:40px;">
 	
 		        <h2>
 		          Export Failed
 		        </h2>
 		
-		        <p style="
-		          color:#aaa;
-		        ">
+		        <p style=" color:#aaa;">
 		          Gagal membuat Expense Report.
 		        </p>
 		
@@ -16052,18 +15574,14 @@ async function exportExpensePDF() {
 		          background:#151A21;
 		          padding:15px;
 		          border-radius:10px;
-		          color:#ff6b6b;
-		        ">${String(
-		          err?.message ||
-		          err ||
-		          "Unknown error"
-		        )
-		          .replace(/&/g, "&amp;")
-		          .replace(/</g, "&lt;")
-		          .replace(/>/g, "&gt;")
-		        }</pre>
-	      	</body>
-	      </html>
+		          color:#ff6b6b;">
+								${String( err?.message || err || "Unknown error" )
+			          .replace(/&/g, "&amp;")
+			          .replace(/</g, "&lt;")
+			          .replace(/>/g, "&gt;") }
+					</pre>
+				</body>
+			</html>
     `);
     pdfWindow.document.close();
   }
@@ -16073,10 +15591,11 @@ function paginate(data) {
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const pageData = data.slice(start, end);
+	
   renderExpenseTable(pageData);
   renderPagination(data); 
-  document.getElementById("expenseTableInfo").innerText =
-    `Showing ${start + 1} - ${Math.min(end, data.length)} of ${data.length}`;
+	
+  document.getElementById("expenseTableInfo").innerText = `Showing ${start + 1} - ${Math.min(end, data.length)} of ${data.length}`;
 }
 	
 function renderPagination(data) {
@@ -16171,8 +15690,7 @@ async function exportOtherIncomePDF() {
         display:flex;
         align-items:center;
         justify-content:center;
-        height:100vh;
-      ">
+        height:100vh; ">
         Generating Other Income Report...
       </body>
     </html>
@@ -16217,9 +15735,7 @@ async function exportOtherIncomePDF() {
     // GET HTML
     const html = await response.text();
     if (!html) {
-      throw new Error(
-        "Response export kosong"
-      );
+      throw new Error( "Response export kosong" );
     }
 
     // SHOW REPORT
@@ -16234,31 +15750,23 @@ async function exportOtherIncomePDF() {
       <html>
         <body style="
           font-family:Arial;
-          padding:40px;
-        ">
+          padding:40px; ">
           <h2>
             Export PDF Failed
           </h2>
 
           <pre>
-						${String(
-						  err?.message ||
-						  "Export PDF gagal"
-						)}
+						${String( err?.message || "Export PDF gagal" )}
           </pre>
         </body>
       </html>
     `);
 
     win.document.close();
-    alert(
-      err?.message ||
-      "Export PDF gagal"
-    );
+    alert( err?.message || "Export PDF gagal" );
   }
 }
 
-	
     // ==================================
     // MEMBER & LOYALTY UPDATES
     // ==================================
@@ -16315,9 +15823,7 @@ async function loadCategorySettings() {
   try {
     const branchId = state.branchId;
 
-    if (!branchId) {
-      return;
-    }
+    if (!branchId) {  return; }
 
     const categories =
       await getCategoriesRPC(
@@ -16326,90 +15832,35 @@ async function loadCategorySettings() {
 
     // RESET UI
     for (let i = 1; i <= 5; i++) {
-      const name =
-        document.getElementById(
-          `category_${i}_name`
-        );
-
-      const discount =
-        document.getElementById(
-          `category_${i}_discount`
-        );
-
-      const reward =
-        document.getElementById(
-          `category_${i}_reward`
-        );
-      if (name) {
-        name.value = "";
-      }
-      if (discount) {
-        discount.value = 0;
-      }
-      if (reward) {
-        reward.value = 0;
-      }
+      const name = document.getElementById( `category_${i}_name` );
+      const discount = document.getElementById( `category_${i}_discount` );
+      const reward = document.getElementById( `category_${i}_reward` );
+			
+      if (name) { name.value = ""; }
+      if (discount) { discount.value = 0; }
+      if (reward) { reward.value = 0; }
     }
 		
     // LOAD DATABASE → UI
     categories.forEach(
       category => {
-
-        const key =
-          String(
-            category.category_key || ""
-          );
-
-        const match =
-          key.match(
-            /^category_(\d+)$/
-          );
+        const key =  String( category.category_key || "" );
+        const match = key.match( /^category_(\d+)$/ );
 
         if (!match) return;
+				
+        const index = Number(match[1]);
 
-        const index =
-          Number(match[1]);
+        if ( index < 1 || index > 5 ) 
+						{ return; }
 
-        if (
-          index < 1 ||
-          index > 5
-        ) {
-          return;
-        }
+        const name = document.getElementById( `category_${index}_name` );
+        const discount = document.getElementById( `category_${index}_discount` );
+        const reward = document.getElementById( `category_${index}_reward` );
 
-        const name =
-          document.getElementById(
-            `category_${index}_name`
-          );
-
-        const discount =
-          document.getElementById(
-            `category_${index}_discount`
-          );
-
-        const reward =
-          document.getElementById(
-            `category_${index}_reward`
-          );
-
-        if (name) {
-          name.value =
-            category.category_name || "";
-        }
-
-        if (discount) {
-          discount.value =
-            Number(
-              category.discount ?? 0
-            );
-        }
-
-        if (reward) {
-          reward.value =
-            Number(
-              category.reward ?? 0
-            );
-        }
+        if (name) { name.value =  category.category_name || ""; }
+        if (discount) { discount.value =  Number( category.discount ?? 0 ); }
+        if (reward) { reward.value = Number( category.reward ?? 0 ); }
       }
     );
   }
@@ -16456,55 +15907,30 @@ function applyLoyaltySettings(s) {
   setValue("tier_5_name",s.tier_5_name_value);
 	
   renderTierSettings(s);
-  const slider =
-    document.getElementById("point_ratio");
-  if(slider){
-    slider.value =
-      Number(s.point_ratio || 0);
-  }
-  const pointText =
-    document.getElementById("point_ratio_text");
-  if(pointText){
-    pointText.textContent =
-      "IDR " +
-      Number(s.point_ratio || 0)
-      .toLocaleString("id-ID");
-  }
+  const slider = document.getElementById("point_ratio");
+  if(slider){ slider.value = Number(s.point_ratio || 0); }
+  const pointText = document.getElementById("point_ratio_text");
+  if(pointText){ pointText.textContent =
+      "IDR " + Number(s.point_ratio || 0)
+      .toLocaleString("id-ID"); }
   setInputValue("point_amount", s.point_reward);
-	setInputValue(
-	  "memberDiscountInput",
-	  s.member_discount
-	);
-
-setInputValue(
-	  "birthdayDiscountInput",
-	  s.birthday_discount
-	);
+	setInputValue( "memberDiscountInput", s.member_discount );
+	setInputValue( "birthdayDiscountInput", s.birthday_discount );
 }
 
 async function loadLoyaltySettings() {
-
   // LOAD FROM STATE
-  if (state.loyaltySettings) {
-    applyLoyaltySettings(
-      state.loyaltySettings
-    );
-    return;
-  }
+  if (state.loyaltySettings) { applyLoyaltySettings( state.loyaltySettings );
+    	return; }
 
   try {
-
-    // SUPABASE RPC
     const s = await getSettingsRPC();
-    // SAVE STATE
     state.loyaltySettings = s || {};
-    // APPLY UI
     applyLoyaltySettings(state.loyaltySettings);
   }
 
   catch (err) {
-    showToast(
-      err?.message ||
+    showToast( err?.message ||
       "Gagal memuat Loyalty Settings",
       "error"
     );
@@ -16519,20 +15945,14 @@ function initPointRatioListener() {
     let value = Number(slider.value) || 0;
     value = Math.round(value / 500) * 500;
     slider.value = value;
-    text.innerText =
-      "IDR " +
-      value.toLocaleString("id-ID");
+    text.innerText = "IDR " + value.toLocaleString("id-ID");
   };
 }
 
 function setInputValue(id, value) {
   const el = document.getElementById(id);
   if (!el) return;
-  // kalau slider → pakai angka asli
-  if (el.type === "range") {
-    el.value = Number(value || 0);
-  } 
-  // kalau input biasa → format rupiah
+  if (el.type === "range") { el.value = Number(value || 0); } 
   else {
     el.value = Number(value || 0).toLocaleString("id-ID");
   }
@@ -16548,39 +15968,31 @@ async function saveLoyaltySettings() {
     tier_5: parseNumber("tier_5"),
 
     // NAMA TIER
-    tier_1_name:
-      document
+    tier_1_name: document
         .getElementById("tier_1_name")
         ?.value
         ?.trim() || "",
-    tier_2_name:
-      document
+    tier_2_name: document
         .getElementById("tier_2_name")
         ?.value
         ?.trim() || "",
-    tier_3_name:
-      document
+    tier_3_name: document
         .getElementById("tier_3_name")
         ?.value
         ?.trim() || "",
-    tier_4_name:
-      document
+    tier_4_name: document
         .getElementById("tier_4_name")
         ?.value
         ?.trim() || "",
-    tier_5_name:
-      document
+    tier_5_name: document
         .getElementById("tier_5_name")
         ?.value
         ?.trim() || "",
-
     // POINT SYSTEM
     point_ratio: parseNumber("point_ratio"),
     point_reward: parseNumber("point_amount"),
-						
     // MEMBER DISCOUNT
     member_discount: parseNumber("memberDiscountInput"),
-
     // BIRTHDAY DISCOUNT
     birthday_discount: parseNumber("birthdayDiscountInput")
   };
@@ -16588,8 +16000,7 @@ async function saveLoyaltySettings() {
   // CATEGORY
   const categoryPayload = [];
   for (let i = 1; i <= 5; i++) {
-    const name =
-      document
+    const name = document
         .getElementById(`category_${i}_name`)
         ?.value
         ?.trim() || "";
@@ -16609,12 +16020,10 @@ async function saveLoyaltySettings() {
   }
 
   try {
-    // SUPABASE RPC
     const res =
       await saveSettingsRPC(
         payload
       );
- 
     // SAVE CATEGORIES
     for (const category of categoryPayload) {
       await saveCategoryRPC(
@@ -16627,14 +16036,9 @@ async function saveLoyaltySettings() {
     }
 	
     // HANDLE RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal menyimpan Loyalty Settings"
-      );
+    if ( res && res.success === false )  
+		{ throw new Error( res.message ||
+      "Gagal menyimpan Loyalty Settings" );
     }
 
     // SUCCESS
@@ -16643,7 +16047,6 @@ async function saveLoyaltySettings() {
     );
 		state.rewardProducts = null;
 		state.rewardProductsBranchId = null;
-    // CLEAR STATE
     state.loyaltySettings = null;
     state.memberPageData = null;
     state.settingsPageData = null;
@@ -16659,41 +16062,14 @@ async function saveLoyaltySettings() {
 }
 
 function validateSettings(p) {
-  if (
-    Number(p.tier_1) >=
-    Number(p.tier_2)
-  ) {
-    throw new Error(
-      "Tier 1 harus lebih kecil dari Tier 2"
-    );
-  }
-
-  if (
-    Number(p.tier_2) >=
-    Number(p.tier_3)
-  ) {
-    throw new Error(
-      "Tier 2 harus lebih kecil dari Tier 3"
-    );
-  }
-
-  if (
-    Number(p.tier_3) >=
-    Number(p.tier_4)
-  ) {
-    throw new Error(
-      "Tier 3 harus lebih kecil dari Tier 4"
-    );
-  }
-
-  if (
-    Number(p.tier_4) >=
-    Number(p.tier_5)
-  ) {
-    throw new Error(
-      "Tier 4 harus lebih kecil dari Tier 5"
-    );
-  }
+  if ( Number(p.tier_1) >= Number(p.tier_2) ) 
+			{ throw new Error( "Tier 1 harus lebih kecil dari Tier 2" ); }
+  if ( Number(p.tier_2) >= Number(p.tier_3) ) 
+			{ throw new Error( "Tier 2 harus lebih kecil dari Tier 3" ); }
+  if ( Number(p.tier_3) >= Number(p.tier_4) ) 
+			{ throw new Error( "Tier 3 harus lebih kecil dari Tier 4" ); }
+  if ( Number(p.tier_4) >=  Number(p.tier_5) ) 
+			{ throw new Error( "Tier 4 harus lebih kecil dari Tier 5" ); }
 }
 	
 function parseNumber(id) {
@@ -16702,30 +16078,16 @@ function parseNumber(id) {
 }
 
 async function loadSeasonStatus() {
-  const badge =
-    document.getElementById(
-      "season_status_badge"
-    );
-  if (!badge) {
-    setTimeout(
-      loadSeasonStatus,
-      50
-    );
-    return;
-  }
-
+  const badge = document.getElementById( "season_status_badge" );
+  if (!badge) { setTimeout( loadSeasonStatus, 50 );
+    return; }
   // LOAD FROM STATE
   if (state.seasonStatus) {
-    updateSeasonUI(
-      state.seasonStatus
-    );
-    return;
-  }
+    updateSeasonUI( state.seasonStatus );
+    return; }
 
   try {
-    // SUPABASE RPC
-    const data =
-      await getSeasonConfigRPC();
+    const data = await getSeasonConfigRPC();
     state.seasonStatus = data || {};
     updateSeasonUI(state.seasonStatus);
   }
@@ -16754,15 +16116,8 @@ function refreshSeasonStatus(){
 }	
 
 async function openSeason() {
-  const startDate =
-    document.getElementById(
-      "season_start"
-    )?.value;
-  const endDate =
-    document.getElementById(
-      "season_end"
-    )?.value;
-
+  const startDate = document.getElementById( "season_start" )?.value;
+  const endDate = document.getElementById( "season_end" )?.value;
   // VALIDASI
   if (!startDate) {
     showToast(
@@ -16771,7 +16126,6 @@ async function openSeason() {
     );
     return;
   }
-
   if (!endDate) {
     showToast(
       "End date wajib diisi",
@@ -16781,24 +16135,19 @@ async function openSeason() {
   }
 
   try {
-    // SUPABASE RPC
     const res =
       await openSeasonRPC(
         startDate,
-        endDate
-      );
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal membuka season"
-      );
-    }
-    // CLEAR CACHE STATE
+        endDate 
+			);
+		
+    if ( res && res.success === false ) 
+				{ throw new Error( res.message || "Gagal membuka season" ); }
+
+		
     state.seasonStatus = null;
     await loadSeasonStatus();
+		
     showToast(
       "Season berhasil dibuka",
       "success"
@@ -16806,8 +16155,7 @@ async function openSeason() {
   }
 
   catch (err) {
-    showToast(
-      err?.message ||
+    showToast( err?.message ||
       "Gagal membuka season",
       "error"
     );
@@ -16816,7 +16164,6 @@ async function openSeason() {
 
 async function closeSeason() {
   try {
-    // KONFIRMASI
     const confirmed =
       confirm(
         "Tutup season sekarang?\n\n" +
@@ -16824,42 +16171,24 @@ async function closeSeason() {
         "untuk reset tier dan spend."
       );
 
-    if (!confirmed) {
-      return;
-    }
-    // SUPABASE RPC
-    const res =
-      await closeSeasonRPC();
-   
-    // CHECK RESULT
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal menutup season"
-      );
-    }
+    if (!confirmed) { return; }
+    const res = await closeSeasonRPC();
+    if ( res && res.success === false ) 
+			{ throw new Error( res.message || "Gagal menutup season" ); }
 		
-    // CLEAR STATE
     state.seasonStatus = null;
     state.memberPageData = null;
     await loadSeasonStatus();
 
-    // NOTIFICATION
     showToast(
-      `Season berhasil ditutup. ${
-        res?.members_processed || 0
+      `Season berhasil ditutup. ${ res?.members_processed || 0
       } member diproses.`,
       "success"
     );
-
   }
 
   catch (err) {
-    showToast(
-      err?.message ||
+    showToast( err?.message ||
       "Gagal menutup season",
       "error"
     );
@@ -16867,11 +16196,8 @@ async function closeSeason() {
 }
 
 async function toggleAutoSeason() {
-
   try {
-    const res =
-      await toggleAutoSeasonRPC();
-
+    const res = await toggleAutoSeasonRPC();
     if (!res?.success) {
       throw new Error(
         res?.message ||
@@ -16879,7 +16205,6 @@ async function toggleAutoSeason() {
       );
     }
 
-    // Refresh status season
     state.seasonStatus = null;
     await refreshSeasonStatus();
     showToast(
@@ -16944,12 +16269,11 @@ async function loadRewardProducts() {
     )?.value ||
     state.branchId;
 
-  // CACHE
+
   if (
     state.rewardProducts &&
     state.rewardProductsBranchId === branchId
   ) {
-
     rewardData = state.rewardProducts;
     rewardPage = 1;
     renderRewardProductsTable();
@@ -16957,12 +16281,10 @@ async function loadRewardProducts() {
   }
 
   try {
-
     const res =
       await getRewardProductsRPC(
         branchId
       );
-		
     // AMBIL ARRAY REWARDS
     const data =
       Array.isArray(res)
@@ -16970,8 +16292,6 @@ async function loadRewardProducts() {
         : Array.isArray(res?.rewards)
           ? res.rewards
           : [];
-
-    // CACHE
     state.rewardProducts = data;
     state.rewardProductsBranchId = branchId;
     rewardData = state.rewardProducts;
@@ -16988,18 +16308,11 @@ async function loadRewardProducts() {
 }
 	
 function renderRewardProductsTable() {
-  const tbody =
-    document.getElementById("rewardTableBody");
+  const tbody = document.getElementById("rewardTableBody");
   if (!tbody) return;
   tbody.innerHTML = "";
-  const start =
-    (rewardPage - 1) * rewardLimit;
-  const data =
-    rewardData.slice(
-      start,
-      start + rewardLimit
-    );
-
+  const start = (rewardPage - 1) * rewardLimit;
+  const data = rewardData.slice( start, start + rewardLimit );
   if (!data.length) {
     tbody.innerHTML = `
       <tr>
@@ -17016,7 +16329,6 @@ function renderRewardProductsTable() {
   tbody.innerHTML = data
     .map(r => `
       <tr class="border border-outline-variant hover:bg-outline-variant">
-
         <td class="px-6 py-4 font-medium">
           ${r.productName}
         </td>
@@ -17041,56 +16353,35 @@ function renderRewardProductsTable() {
         </td>
       </tr>
     `)
-    .join("");
+  .join("");
   updateRewardPagination();
 }
 
 function changeRewardPage(step) {
-  const totalPages =
-    Math.ceil(
-      rewardData.length / rewardLimit
-    ) || 1;
-  const newPage =
-    rewardPage + step;
-  if (
-    newPage < 1 ||
-    newPage > totalPages
-  ) {
-    return;
-  }
+  const totalPages = Math.ceil( rewardData.length / rewardLimit ) || 1;
+  const newPage = rewardPage + step;
+  if ( newPage < 1 || newPage > totalPages ) 
+		{ return; }
+	
   rewardPage = newPage;
   renderRewardProductsTable();
 }
 
 function updateRewardPagination() {
-  const totalPages =
-    Math.ceil(
-      rewardData.length /
-      rewardLimit
-    ) || 1;
-  document.getElementById(
-    "rewardPrevBtn"
-  ).disabled =
-    rewardPage <= 1;
-  document.getElementById(
-    "rewardNextBtn"
-  ).disabled =
-    rewardPage >= totalPages;
+  const totalPages = Math.ceil( rewardData.length / rewardLimit ) || 1;
+	
+  document.getElementById( "rewardPrevBtn" )
+		.disabled = rewardPage <= 1;
+  document.getElementById( "rewardNextBtn" )
+		.disabled = rewardPage >= totalPages;
 }
 	
 async function deleteReward(id) {
-  if (
-    !confirm(
-      "Hapus reward ini?"
-    )
-  ) {
-    return;
-  }
+  if ( !confirm( "Hapus reward ini?" ) ) 
+			{ return; }
 
   try {
-    // SUPABASE RPC
-    const res =
-      await deleteRewardRPC(id);
+    const res = await deleteRewardRPC(id);
 
     if (!res?.success) {
       throw new Error(
@@ -17099,7 +16390,6 @@ async function deleteReward(id) {
       );
     }
 
-    // CLEAR CACHE
     state.rewardProducts = null;
     state.rewardProductsBranchId = null;
 		rewardData = [];  
@@ -17121,17 +16411,13 @@ async function deleteReward(id) {
 function loadRewardBranch(){
   const select = document.getElementById("rewardBranch");
   if(!select) return;
-  const branch =
-    allBranches.find(
-      b => b.branchId === state.branchId
-    );
+  const branch = allBranches.find( b => b.branchId === state.branchId );
+	
   select.innerHTML = `
     <option value="${state.branchId}">
-      ${
-        branch
+      ${ branch
         ? branch.branchName
-        : state.branchId
-      }
+        : state.branchId }
     </option>
   `;
   select.value = state.branchId;
@@ -17157,33 +16443,24 @@ function onRewardProductChange() {
   const select = document.getElementById("rewardProduct");
   if (!select || !select.selectedOptions.length) return;
   const opt = select.selectedOptions[0];
-  document.getElementById("rewardCategory").textContent =
-    opt.dataset.category || "-";
+  document.getElementById("rewardCategory").textContent = opt.dataset.category || "-";
 }	
 
 async function loadRewardProductsForModal() {
 
-  const branchId =
-    document.getElementById(
-      "rewardBranch"
-    )?.value ||
-    state.branchId;
-
-  const role =
-    state.user?.role?.toLowerCase() || "";
+  const branchId = document.getElementById( "rewardBranch" )?.value || state.branchId;
+  const role = state.user?.role?.toLowerCase() || "";
 
   try {
-    // LOAD PRODUCTS FROM RPC
+
     const products =
       await getProductsRPC(
         branchId,
         role
       );
 
-    const select =
-      document.getElementById(
-        "rewardProduct"
-      );
+    const select = document.getElementById( "rewardProduct" );
+		
     if (!select) return;
     select.innerHTML =
       `
@@ -17223,23 +16500,14 @@ document.addEventListener("change", e => {
 });
 
 async function saveRewardProduct() {
-  const product =
-    document
-      .getElementById("rewardProduct")
-      ?.selectedOptions[0];
-
+  const product = document .getElementById("rewardProduct") ?.selectedOptions[0];
   if (!product || !product.value) {
     alert(
       "Pilih produk terlebih dahulu."
     );
     return;
   }
-  const branchId =
-    document.getElementById(
-      "rewardBranch"
-    )?.value ||
-    state.branchId;
-
+  const branchId = document.getElementById( "rewardBranch" )?.value || state.branchId;
   const payload = {
     ID_Reward: "R" + Date.now(),
     Branch_ID: branchId,
@@ -17252,24 +16520,19 @@ async function saveRewardProduct() {
   };
 
   try {
-
-    // SAVE VIA SUPABASE RPC
     const result =
       await saveRewardProductRPC(
         payload
       );
     // VALIDATE RESULT
-    if (
-      result &&
-      result.success === false
-    ) {
+    if ( result && result.success === false ) 
+		{
       throw new Error(
         result.message ||
         "Gagal menyimpan reward."
       );
     }
     closeAddRewardModal();
-    // CLEAR CACHE
     state.rewardProducts = null;
     state.rewardProductsBranchId = null;
     await loadRewardProducts();
@@ -17295,19 +16558,17 @@ const docs = {
   icon: "Home",
   subtitle: "Ringkasan performa bisnis dan informasi penting secara real-time.",
   content: `
-  
       <section class="space-y-6">
         <div>
           <h3 class="text-xl font-bold mb-3">Deskripsi</h3>
-
-          <p class="text-muted leading-8">
-            Dashboard merupakan halaman utama sistem POS yang menampilkan
-            ringkasan kondisi bisnis secara real-time. Halaman ini dirancang untuk
-            memberikan gambaran cepat mengenai performa penjualan, aktivitas
-            transaksi, kondisi stok, serta performa operasional sehingga pengguna
-            dapat memantau perkembangan bisnis tanpa harus membuka setiap menu
-            secara terpisah.
-          </p>
+	          <p class="text-muted leading-8">
+	            Dashboard merupakan halaman utama sistem POS yang menampilkan
+	            ringkasan kondisi bisnis secara real-time. Halaman ini dirancang untuk
+	            memberikan gambaran cepat mengenai performa penjualan, aktivitas
+	            transaksi, kondisi stok, serta performa operasional sehingga pengguna
+	            dapat memantau perkembangan bisnis tanpa harus membuka setiap menu
+	            secara terpisah.
+	          </p>
         </div>
 
         <div>
@@ -21863,35 +21124,12 @@ function openAssetDepreciationModal(asset) {
     ?.remove();
   const modal = template.content.cloneNode(true);
   document.body.appendChild(modal);
-
-  // =========================
   // DATA ASSET
-  // =========================
-
-  const nameEl =
-    document.getElementById(
-      "depreciationModalAssetName"
-    );
-
-  const idEl =
-    document.getElementById(
-      "depreciationModalAssetId"
-    );
-
-  const purchaseCostEl =
-    document.getElementById(
-      "depreciationModalPurchaseCost"
-    );
-
-  const usefulLifeEl =
-    document.getElementById(
-      "assetUsefulLifeInput"
-    );
-
-  const methodEl =
-    document.getElementById(
-      "assetDepreciationMethod"
-    );
+  const nameEl = document.getElementById( "depreciationModalAssetName" );
+  const idEl = document.getElementById( "depreciationModalAssetId" );
+  const purchaseCostEl = document.getElementById( "depreciationModalPurchaseCost" );
+  const usefulLifeEl = document.getElementById( "assetUsefulLifeInput" );
+  const methodEl = document.getElementById( "assetDepreciationMethod" );
 
   if (nameEl) {
     nameEl.textContent = asset.Asset_Name || "-";
@@ -21899,47 +21137,24 @@ function openAssetDepreciationModal(asset) {
   if (idEl) {
     idEl.textContent = asset.Asset_ID || "-";
   }
-
   if (purchaseCostEl) {
-    purchaseCostEl.textContent =
-      formatAssetCurrency(
-        Number(asset.Purchase_Cost || 0)
-      );
+    purchaseCostEl.textContent = formatAssetCurrency( Number(asset.Purchase_Cost || 0) );
   }
   // Isi nilai lama jika sudah pernah diatur
   if (usefulLifeEl) {
-    const usefulLife =
-      Number(asset.Useful_Life_Months || 0);
-
-    usefulLifeEl.value =
-      usefulLife > 0
+    const usefulLife = Number(asset.Useful_Life_Months || 0);
+    usefulLifeEl.value =  usefulLife > 0
         ? usefulLife
         : "";
   }
-
   if (methodEl) {
-    methodEl.value =
-      asset.Depreciation_Method ||
-      "Straight Line";
+    methodEl.value = asset.Depreciation_Method || "Straight Line";
   }
-
   // Hitung preview awal
   updateAssetDepreciationPreview();
   // Update preview saat input berubah
-	if (usefulLifeEl) {
-	  usefulLifeEl.addEventListener(
-	    "input",
-	    updateAssetDepreciationPreview
-	  );
-	}
-	
-	if (methodEl) {
-	  methodEl.addEventListener(
-	    "change",
-	    updateAssetDepreciationPreview
-	  );
-	}
-	
+	if (usefulLifeEl) { usefulLifeEl.addEventListener( "input", updateAssetDepreciationPreview ); }
+	if (methodEl) { methodEl.addEventListener( "change", updateAssetDepreciationPreview ); }
 	// Fokus input + pilih seluruh nilai lama
 	setTimeout(() => {
 	  if (usefulLifeEl) {
@@ -21950,34 +21165,17 @@ function openAssetDepreciationModal(asset) {
 }
 
 function updateAssetDepreciationPreview() {
-  const usefulLifeEl =
-    document.getElementById(
-      "assetUsefulLifeInput"
-    );
-
-  const monthlyEl =
-    document.getElementById(
-      "depreciationModalMonthly"
-    );
-
-  if (!usefulLifeEl || !monthlyEl) {
-    return;
-  }
+  const usefulLifeEl = document.getElementById( "assetUsefulLifeInput" );
+  const monthlyEl = document.getElementById( "depreciationModalMonthly" );
+  if (!usefulLifeEl || !monthlyEl) { return; }
+	
   const usefulLife = Number(usefulLifeEl.value || 0);
   const purchaseCost = Number(currentAsset?.Purchase_Cost || 0);
-  const method =
-    document.getElementById(
-      "assetDepreciationMethod"
-    )?.value || "Straight Line";
+  const method = document.getElementById( "assetDepreciationMethod" )?.value || "Straight Line";
+	
   let depreciation = 0;
-
-  if (
-    usefulLife > 0 &&
-    method.toUpperCase() === "STRAIGHT LINE"
-  ) {
-    depreciation =
-      purchaseCost / usefulLife;
-  }
+  if ( usefulLife > 0 && method.toUpperCase() === "STRAIGHT LINE" ) 
+			{ depreciation = purchaseCost / usefulLife; }
   monthlyEl.textContent = formatAssetCurrency(depreciation);
 }
 
@@ -21993,13 +21191,8 @@ function formatAssetCurrency(value) {
 }
 
 function closeAssetDepreciationModal() {
-  const overlay =
-    document.getElementById(
-      "assetDepreciationModalOverlay"
-    );
-  if (overlay) {
-    overlay.remove();
-  }
+  const overlay = document.getElementById( "assetDepreciationModalOverlay" );
+  if (overlay) { overlay.remove(); }
 }
 
 async function saveAssetDepreciationSetting() {
@@ -22009,49 +21202,29 @@ async function saveAssetDepreciationSetting() {
       alert("Asset tidak ditemukan.");
       return;
     }
-    const usefulLifeEl =
-      document.getElementById(
-        "assetUsefulLifeInput"
-      );
-    const methodEl =
-      document.getElementById(
-        "assetDepreciationMethod"
-      );
+    const usefulLifeEl = document.getElementById( "assetUsefulLifeInput" );
+    const methodEl = document.getElementById( "assetDepreciationMethod" );
     const usefulLife = Number(usefulLifeEl?.value || 0);
     const method = methodEl?.value || "Straight Line";
     // VALIDASI
-    if (
-      !Number.isInteger(usefulLife) ||
-      usefulLife <= 0
-    ) {
-      alert(
-        "Masa manfaat harus diisi lebih dari 0 bulan."
-      );
+    if ( !Number.isInteger(usefulLife) || usefulLife <= 0 ) {
+      alert( "Masa manfaat harus diisi lebih dari 0 bulan." );
       usefulLifeEl?.focus();
       return;
     }
-
-    if (
-      method.toUpperCase() !==
-      "STRAIGHT LINE"
-    ) {
-      alert(
-        "Metode depresiasi belum didukung."
-      );
+    if ( method.toUpperCase() !== "STRAIGHT LINE" ) {
+      alert( "Metode depresiasi belum didukung." );
       return;
     }
-
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-      alert("Session ID tidak ditemukan.");
+    const sessionId = localStorage.getItem("pos_session_id");
+		
+    if (!sessionId) { alert("Session ID tidak ditemukan.");
       return;
     }
-    if (!state.branchId) {
-      alert("Branch belum tersedia.");
+    if (!state.branchId) { alert("Branch belum tersedia.");
       return;
     }
-    // SIMPAN
+		
     const { data, error } =
       await supabaseClient.rpc(
         "update_asset_depreciation_setting",
@@ -22068,38 +21241,19 @@ async function saveAssetDepreciationSetting() {
     }
 
     // UPDATE DATA LOCAL
-	const assetIndex =
-	  assetData.findIndex(
-	    asset =>
-	      String(asset.Asset_ID) ===
-	      String(currentAsset.Asset_ID)
-	  );
-	
-	if (assetIndex !== -1) {
-	  assetData[assetIndex].Useful_Life_Months =
-	    usefulLife;
-	
-	  assetData[assetIndex].Depreciation_Method =
-	    method;
-	
-	  currentAsset =
-	    assetData[assetIndex];
-	
-	  // SYNC CACHE
-	  state.assetData =
-	    assetData;
-	    
-	  state.assetDataBranchId =
-	    state.branchId;
+	const assetIndex = assetData.findIndex( asset => String(asset.Asset_ID) === String(currentAsset.Asset_ID) );
+
+	if (assetIndex !== -1) { assetData[assetIndex].Useful_Life_Months = usefulLife;
+	  assetData[assetIndex].Depreciation_Method = method;
+	  currentAsset = assetData[assetIndex];
+
+	  state.assetData = assetData;
+	  state.assetDataBranchId = state.branchId;
 	}
-    // TUTUP MODAL
+
     closeAssetDepreciationModal();
-    // REFRESH UI
     renderAssetKPI();
     renderAssetTable();
-    console.log(
-      "Pengaturan depresiasi berhasil disimpan."
-    );
 
   } catch (error) {
     console.error(
@@ -22114,55 +21268,22 @@ async function saveAssetDepreciationSetting() {
 }
 
 function viewAssetDetail(asset) {
-  if (!asset) {
-    console.warn("Asset tidak ditemukan");
-    return;
-  }
+  if (!asset) { return; }
 
   currentAsset = asset;
-  const template =
-    document.getElementById(
-      "assetDetailModalTemplate"
-    );
+  const template = document.getElementById( "assetDetailModalTemplate" );
 
-  if (!template) {
-    console.warn(
-      "assetDetailModalTemplate tidak ditemukan"
-    );
-    return;
-  }
+  if (!template) {  return; }
 
   // Tutup modal sebelumnya
-  document .getElementById("assetActionModalOverlay")
-    ?.remove();
-  document .getElementById("assetDetailModalOverlay")
-    ?.remove();
-
+  document .getElementById("assetActionModalOverlay") ?.remove();
+  document .getElementById("assetDetailModalOverlay") ?.remove();
   const modal = template.content.cloneNode(true);
   document.body.appendChild(modal);
-
-  // BASIC
-  document.getElementById(
-    "detailAssetName"
-  ).textContent =
-    asset.Asset_Name || "-";
-
-  document.getElementById(
-    "detailAssetId"
-  ).textContent =
-    asset.Asset_ID || "-";
-
-  document.getElementById(
-    "detailAssetPurchaseDate"
-  ).textContent =
-    formatAssetDate(asset.Purchase_Date);
-
-  document.getElementById(
-    "detailAssetPurchaseCost"
-  ).textContent =
-    formatAssetCurrency(
-      asset.Purchase_Cost
-    );
+  document.getElementById( "detailAssetName" ).textContent = asset.Asset_Name || "-";
+  document.getElementById( "detailAssetId" ).textContent = asset.Asset_ID || "-";
+  document.getElementById( "detailAssetPurchaseDate" ).textContent = formatAssetDate(asset.Purchase_Date);
+  document.getElementById( "detailAssetPurchaseCost" ).textContent = formatAssetCurrency( asset.Purchase_Cost );
 
   // DEPRECIATION
   const usefulLife = Number(asset.Useful_Life_Months || 0);
@@ -22174,84 +21295,39 @@ function viewAssetDetail(asset) {
         usefulLife
       : 0;
 
-  document.getElementById(
-    "detailAssetUsefulLife"
-  ).textContent =
+  document.getElementById( "detailAssetUsefulLife" ).textContent =
     usefulLife > 0
       ? `${usefulLife} bulan`
       : "Belum diatur";
-
-  document.getElementById(
-    "detailAssetMethod"
-  ).textContent =
+  document.getElementById( "detailAssetMethod" ).textContent =
     usefulLife > 0
       ? asset.Depreciation_Method || "-"
       : "-";
-
-  // VALUE
-  document.getElementById(
-    "detailAssetAccumulated"
-  ).textContent =
-    formatAssetCurrency(
-      asset.Accumulated_Depreciation
-    );
-
-  document.getElementById(
-    "detailAssetBookValue"
-  ).textContent =
-    formatAssetCurrency(
-      asset.Book_Value
-    );
-
-  document.getElementById(
-    "detailAssetMonthlyDepreciation"
-  ).textContent =
-    usefulLife > 0
-      ? formatAssetCurrency(
-          monthlyDepreciation
-        )
-      : "-";
-
-  // STATUS
-  document.getElementById(
-    "detailAssetStatus"
-  ).textContent =
-    asset.Status || "-";
-
-  document.getElementById(
-    "detailAssetLastDepreciation"
-  ).textContent =
-    asset.Last_Depreciation_Date
-      ? formatAssetDate(
-          asset.Last_Depreciation_Date
-        )
-      : "Belum ada";
-
-  // NOTES
-  document.getElementById(
-    "detailAssetNotes"
-  ).textContent =
+  document.getElementById( "detailAssetAccumulated" ).textContent = 
+		formatAssetCurrency( asset.Accumulated_Depreciation );
+  document.getElementById( "detailAssetBookValue" ).textContent =
+    formatAssetCurrency( asset.Book_Value );
+  document.getElementById( "detailAssetMonthlyDepreciation" ).textContent =
+    usefulLife > 0 ? formatAssetCurrency( monthlyDepreciation ) : "-";
+  document.getElementById( "detailAssetStatus" ).textContent = 
+		asset.Status || "-";
+  document.getElementById( "detailAssetLastDepreciation" ).textContent =
+    asset.Last_Depreciation_Date ? formatAssetDate( asset.Last_Depreciation_Date ) : "Belum ada";
+  document.getElementById( "detailAssetNotes" ).textContent =
     asset.Notes || "-";
 }
 
 function closeAssetDetailModal() {
-  const overlay =
-    document.getElementById(
-      "assetDetailModalOverlay"
-    );
+  const overlay = document.getElementById( "assetDetailModalOverlay" );
   if (overlay) {
     overlay.remove();
   }
 }
 
 function formatAssetDate(dateValue) {
-  if (!dateValue) {
-    return "-";
-  }
+  if (!dateValue) { return "-";  }
   const date = new Date(dateValue);
-  if (isNaN(date.getTime())) {
-    return "-";
-  }
+  if (isNaN(date.getTime())) { return "-"; }
   return date.toLocaleDateString(
     "id-ID",
     {
@@ -22267,20 +21343,9 @@ function formatAssetDate(dateValue) {
    ========================================================= */
 
 function updateAssetPagination(totalItems, totalPages) {
-  const info =
-    document.getElementById(
-      "asset-pagination-info"
-    );
-
-  const prevBtn =
-    document.getElementById(
-      "assetPrevBtn"
-    );
-
-  const nextBtn =
-    document.getElementById(
-      "assetNextBtn"
-    );
+  const info = document.getElementById( "asset-pagination-info" );
+  const prevBtn = document.getElementById( "assetPrevBtn" );
+  const nextBtn = document.getElementById( "assetNextBtn" );
 	
   if (info) {
     if (totalItems === 0) {
@@ -22289,7 +21354,6 @@ function updateAssetPagination(totalItems, totalPages) {
       const start =
         (assetCurrentPage - 1) *
         ASSET_PAGE_SIZE + 1;
-		
       const end =
         Math.min(
           assetCurrentPage *
@@ -22300,37 +21364,22 @@ function updateAssetPagination(totalItems, totalPages) {
     }
   }
 
-  if (prevBtn) {
-    prevBtn.disabled = assetCurrentPage <= 1;
-  }
-  if (nextBtn) {
-    nextBtn.disabled = assetCurrentPage >= totalPages;
-  }
+  if (prevBtn) { prevBtn.disabled = assetCurrentPage <= 1; }
+  if (nextBtn) { nextBtn.disabled = assetCurrentPage >= totalPages; }
 }
-
 
 /* =========================================================
    DEPRECIATION HISTORY
    ========================================================= */
 
 function renderDepreciationHistory() {
-  const tbody =
-    document.getElementById(
-      "depreciation-table-body"
-    );
+  const tbody = document.getElementById( "depreciation-table-body" );
   if (!tbody) return;
-  const searchInput =
-    document.getElementById(
-      "depreciationSearchInput"
-    );
-
-  const search =
-    searchInput?.value
+  const searchInput = document.getElementById( "depreciationSearchInput" );
+  const search = searchInput?.value
       ?.trim()
       ?.toLowerCase() || "";
-
-  const filteredData =
-    depreciationHistoryData.filter(item => {
+  const filteredData = depreciationHistoryData.filter(item => {
       return (
         !search ||
         String(item.Asset_ID)
@@ -22342,32 +21391,13 @@ function renderDepreciationHistory() {
       );
     });
 
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        filteredData.length /
-        DEPRECIATION_PAGE_SIZE
-      )
-    );
+  const totalPages = Math.max( 1, Math.ceil( filteredData.length / DEPRECIATION_PAGE_SIZE ) );
 
-  if (
-    depreciationCurrentPage >
-    totalPages
-  ) {
-    depreciationCurrentPage =
-      totalPages;
-  }
+  if ( depreciationCurrentPage > totalPages ) 
+			{ depreciationCurrentPage = totalPages; }
 
-  const start =
-    (depreciationCurrentPage - 1) *
-    DEPRECIATION_PAGE_SIZE;
-
-  const pageData =
-    filteredData.slice(
-      start,
-      start + DEPRECIATION_PAGE_SIZE
-    );
+  const start = (depreciationCurrentPage - 1) * DEPRECIATION_PAGE_SIZE;
+  const pageData = filteredData.slice( start, start + DEPRECIATION_PAGE_SIZE );
 
   if (!pageData.length) {
     tbody.innerHTML = `
@@ -22384,57 +21414,40 @@ function renderDepreciationHistory() {
     return;
   }
 
-
   tbody.innerHTML =
     pageData.map(item => {
       return `
         <tr class="hover:bg-background-high transition-colors">
           <td class="px-6 py-4 text-sm">
-            ${formatAssetPeriod(
-              item.Period
-            )}
+            ${formatAssetPeriod( item.Period )}
           </td>
 
           <td class="px-6 py-4">
             <div class="flex flex-col">
               <span class="text-sm font-semibold">
-                ${escapeAssetHTML(
-                  item.Asset_Name
-                )}
+                ${escapeAssetHTML( item.Asset_Name )}
               </span>
 
               <span class="text-[10px] text-muted">
-                ${escapeAssetHTML(
-                  item.Asset_ID
-                )}
+                ${escapeAssetHTML( item.Asset_ID )}
               </span>
             </div>
           </td>
 
           <td class="px-6 py-4 text-right text-sm">
-            ${formatAssetCurrency(
-              item.Depreciation_Amount
-            )}
+            ${formatAssetCurrency( item.Depreciation_Amount )}
           </td>
 
           <td class="px-6 py-4 text-right text-sm">
-            ${formatAssetCurrency(
-              item.Book_Value_Before
-            )}
+            ${formatAssetCurrency( item.Book_Value_Before )}
           </td>
 
-          <td
-            class="px-6 py-4 text-right
-            text-sm font-semibold">
-            ${formatAssetCurrency(
-              item.Book_Value_After
-            )}
+          <td class="px-6 py-4 text-right text-sm font-semibold">
+            ${formatAssetCurrency( item.Book_Value_After )}
           </td>
 
           <td class="px-6 py-4 text-sm text-muted">
-            ${formatAssetDateTime(
-              item.Created_At
-            )}
+            ${formatAssetDateTime( item.Created_At )}
           </td>
         </tr>
       `;
@@ -22452,141 +21465,40 @@ function renderDepreciationHistory() {
    ========================================================= */
 
 function updateDepreciationPagination( totalItems, totalPages ) {
-  const info =
-    document.getElementById(
-      "depreciation-pagination-info"
-    );
-
-  const prevBtn =
-    document.getElementById(
-      "depreciationPrevBtn"
-    );
-
-  const nextBtn =
-    document.getElementById(
-      "depreciationNextBtn"
-    );
-
+  const info = document.getElementById( "depreciation-pagination-info" );
+  const prevBtn = document.getElementById( "depreciationPrevBtn" );
+  const nextBtn = document.getElementById( "depreciationNextBtn" );
 
   if (info) {
     if (totalItems === 0) {
       info.textContent =
         "Showing 0 depreciation records";
-
     } else {
-      const start =
-        (depreciationCurrentPage - 1) *
-        DEPRECIATION_PAGE_SIZE + 1;
-
-      const end =
-        Math.min(
-          depreciationCurrentPage *
-          DEPRECIATION_PAGE_SIZE,
-          totalItems
-        );
-      info.textContent =
-        `Showing ${start}-${end} of ${totalItems} records`;
+      const start = (depreciationCurrentPage - 1) * DEPRECIATION_PAGE_SIZE + 1;
+      const end = Math.min( depreciationCurrentPage * DEPRECIATION_PAGE_SIZE, totalItems );
+      info.textContent = `Showing ${start}-${end} of ${totalItems} records`;
     }
   }
-  if (prevBtn) {
-    prevBtn.disabled = depreciationCurrentPage <= 1;
-  }
-  if (nextBtn) {
-    nextBtn.disabled = depreciationCurrentPage >= totalPages;
-  }
+  if (prevBtn) { prevBtn.disabled = depreciationCurrentPage <= 1; }
+  if (nextBtn) { nextBtn.disabled = depreciationCurrentPage >= totalPages; }
 }
-
 
 /* =========================================================
    EVENT LISTENERS
    ========================================================= */
 
 function initAssetPageEvents() {
-  const searchInput =
-    document.getElementById(
-      "assetSearchInput"
-    );
+  const searchInput = document.getElementById( "assetSearchInput" );
+  const statusFilter = document.getElementById( "assetStatusFilter" );
+  const depreciationSearch = document.getElementById( "depreciationSearchInput" );
 
-  const statusFilter =
-    document.getElementById(
-      "assetStatusFilter"
-    );
-
-  const depreciationSearch =
-    document.getElementById(
-      "depreciationSearchInput"
-    );
-
-
-  searchInput?.addEventListener(
-    "input",
-    () => {
-      assetCurrentPage = 1;
-      renderAssetTable();
-    }
-  );
-
-  statusFilter?.addEventListener(
-    "change",
-    () => {
-      assetCurrentPage = 1;
-      renderAssetTable();
-    }
-  );
-
-  depreciationSearch?.addEventListener(
-    "input",
-    () => {
-      depreciationCurrentPage = 1;
-      renderDepreciationHistory();
-    }
-  );
-
-  document
-    .getElementById("assetPrevBtn")
-    ?.addEventListener(
-      "click",
-      () => {
-
-        if (assetCurrentPage > 1) {
-          assetCurrentPage--;
-          renderAssetTable();
-        }
-      }
-    );
-
-  document
-    .getElementById("assetNextBtn")
-    ?.addEventListener(
-      "click",
-      () => {
-        assetCurrentPage++;
-        renderAssetTable();
-      }
-    );
-
-  document
-    .getElementById("depreciationPrevBtn")
-    ?.addEventListener(
-      "click",
-      () => {
-
-        if (depreciationCurrentPage > 1) {
-          depreciationCurrentPage--;
-          renderDepreciationHistory();
-        }
-      }
-    );
-	
-  document
-    .getElementById("depreciationNextBtn")
-    ?.addEventListener(
-      "click",
-      () => {
-        depreciationCurrentPage++;
-        renderDepreciationHistory();
-      }
-    );
+  searchInput?.addEventListener( "input", () => { assetCurrentPage = 1; renderAssetTable(); } );
+  statusFilter?.addEventListener( "change", () => { assetCurrentPage = 1; renderAssetTable(); } );
+  depreciationSearch?.addEventListener( "input", () => { depreciationCurrentPage = 1; renderDepreciationHistory(); } );
+  document .getElementById("assetPrevBtn") ?.addEventListener( "click", () => { if (assetCurrentPage > 1) { assetCurrentPage--; renderAssetTable(); } } );
+  document .getElementById("assetNextBtn") ?.addEventListener( "click", () => { assetCurrentPage++; renderAssetTable(); } );
+  document .getElementById("depreciationPrevBtn") ?.addEventListener( "click", () => { if (depreciationCurrentPage > 1) { depreciationCurrentPage--; renderDepreciationHistory(); } } );
+  document .getElementById("depreciationNextBtn") ?.addEventListener( "click", () => { depreciationCurrentPage++; renderDepreciationHistory(); } );
 }
 
 
@@ -24054,77 +22966,38 @@ function populateAccountingMappingAccounts() {
    ======================================================= */
 
 function openAddAccountingMappingModal() {
-
     editingAccountingMappingId = null;
-
-    const modal =
-        document.getElementById(
-            "addAccountingMappingModal"
-        );
+    const modal = document.getElementById( "addAccountingMappingModal" );
 
     if (!modal) return;
 
-    document.getElementById(
-        "newAccountingMappingName"
-    ).value = "";
-
-    document.getElementById(
-        "newAccountingMappingType"
-    ).value = "";
-
-    document.getElementById(
-        "newAccountingMappingSource"
-    ).value = "";
+    document.getElementById( "newAccountingMappingName" ).value = "";
+    document.getElementById( "newAccountingMappingType" ).value = "";
+    document.getElementById( "newAccountingMappingSource" ).value = "";
 
     populateAccountingMappingAccounts();
 
-    document.getElementById(
-        "newAccountingMappingDebitAccount"
-    ).value = "";
+    document.getElementById( "newAccountingMappingDebitAccount" ).value = "";
+    document.getElementById( "newAccountingMappingCreditAccount" ).value = "";
 
-    document.getElementById(
-        "newAccountingMappingCreditAccount"
-    ).value = "";
+    const title = document.getElementById( "accountingMappingModalTitle" );
+    const saveButton = document.getElementById( "accountingMappingModalSaveButton" );
 
-    const title =
-        document.getElementById(
-            "accountingMappingModalTitle"
-        );
-
-    const saveButton =
-        document.getElementById(
-            "accountingMappingModalSaveButton"
-        );
-
-    if (title) {
-        title.textContent = "Add Mapping";
-    }
-
-    if (saveButton) {
-        saveButton.textContent = "Save Mapping";
-    }
-
+    if (title) { title.textContent = "Add Mapping"; }
+    if (saveButton) {  saveButton.textContent = "Save Mapping"; }
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 }
-
 
 /* =======================================================
    CLOSE MODAL
    ======================================================= */
 
 function closeAddAccountingMappingModal() {
-
-    const modal =
-        document.getElementById(
-            "addAccountingMappingModal"
-        );
-
+    const modal = document.getElementById( "addAccountingMappingModal" );
     if (!modal) return;
-
     modal.classList.add("hidden");
     modal.classList.remove("flex");
-
     editingAccountingMappingId = null;
 }
 
@@ -24134,269 +23007,118 @@ function closeAddAccountingMappingModal() {
    ======================================================= */
 
 function editAccountingMapping(mappingId) {
-
-    const mapping =
-        (window.accountingMappings || [])
-            .find(
-                mapping =>
-                    mapping.mappingId === mappingId
-            );
+    const mapping = (window.accountingMappings || []) .find( mapping => mapping.mappingId === mappingId );
 
     if (!mapping) {
         alert("Account mapping tidak ditemukan.");
         return;
     }
 
-    editingAccountingMappingId =
-        mappingId;
-
-    const modal =
-        document.getElementById(
-            "addAccountingMappingModal"
-        );
-
+    editingAccountingMappingId = mappingId;
+    const modal = document.getElementById( "addAccountingMappingModal" );
     if (!modal) return;
 
     populateAccountingMappingAccounts();
+	
+    document.getElementById( "newAccountingMappingName" ).value = mapping.mappingName || "";
+    document.getElementById( "newAccountingMappingType" ).value = mapping.transactionType || "";
+    document.getElementById( "newAccountingMappingSource" ).value = mapping.source || "";
+    document.getElementById( "newAccountingMappingDebitAccount" ).value = mapping.debitAccountId || "";
+    document.getElementById( "newAccountingMappingCreditAccount" ).value = mapping.creditAccountId || "";
 
-    document.getElementById(
-        "newAccountingMappingName"
-    ).value =
-        mapping.mappingName || "";
+    const title = document.getElementById( "accountingMappingModalTitle" );
+    const saveButton = document.getElementById( "accountingMappingModalSaveButton" );
 
-    document.getElementById(
-        "newAccountingMappingType"
-    ).value =
-        mapping.transactionType || "";
-
-    document.getElementById(
-        "newAccountingMappingSource"
-    ).value =
-        mapping.source || "";
-
-    document.getElementById(
-        "newAccountingMappingDebitAccount"
-    ).value =
-        mapping.debitAccountId || "";
-
-    document.getElementById(
-        "newAccountingMappingCreditAccount"
-    ).value =
-        mapping.creditAccountId || "";
-
-    const title =
-        document.getElementById(
-            "accountingMappingModalTitle"
-        );
-
-    const saveButton =
-        document.getElementById(
-            "accountingMappingModalSaveButton"
-        );
-
-    if (title) {
-        title.textContent = "Edit Mapping";
-    }
-
-    if (saveButton) {
-        saveButton.textContent = "Update Mapping";
-    }
+    if (title) { title.textContent = "Edit Mapping"; }
+    if (saveButton) { saveButton.textContent = "Update Mapping"; }
 
     modal.classList.remove("hidden");
     modal.classList.add("flex");
 }
-
 
 /* =======================================================
    SAVE ACCOUNT MAPPING
    ======================================================= */
 
 async function saveAccountingMapping() {
+	const sessionId = localStorage.getItem( "pos_session_id" );
 
-    const sessionId =
-        localStorage.getItem(
-            "pos_session_id"
-        );
+	if (!sessionId) {
+			alert("Session tidak ditemukan.");
+			return;
+	}
 
-    if (!sessionId) {
-        alert("Session tidak ditemukan.");
-        return;
-    }
+	const mappingName = document.getElementById( "newAccountingMappingName" )?.value.trim();
+	const transactionType = document.getElementById( "newAccountingMappingType" )?.value;
+	const source = document.getElementById( "newAccountingMappingSource" )?.value.trim();
+	const debitAccountId = document.getElementById( "newAccountingMappingDebitAccount" )?.value || null;
+	const creditAccountId = document.getElementById( "newAccountingMappingCreditAccount" )?.value || null;
+	/* VALIDATION */
+	if (!mappingName) {
+			alert("Mapping Name wajib diisi.");
+			return; }
+	if (!transactionType) {
+			alert("Transaction Type wajib dipilih.");
+			return; }
+	if (!source) {
+			alert("Source wajib diisi.");
+			return; }
+	if ( !debitAccountId && !creditAccountId ) {
+			alert( "Debit atau Credit Account wajib dipilih." );
+			return; }
 
-    const mappingName =
-        document.getElementById(
-            "newAccountingMappingName"
-        )?.value.trim();
+	try {
+		let data;
+		let error;
+		if (editingAccountingMappingId) {
+			({ data, error } =
+				await supabaseClient.rpc(
+					"update_account_mapping",
+						{
+							p_mapping_id: editingAccountingMappingId,
+							p_mapping_name: mappingName,
+							p_transaction_type: transactionType,
+							p_source: source,
+							p_debit_account_id: debitAccountId,
+							p_credit_account_id: creditAccountId,
+							p_session_id: sessionId
+						}
+					)
+				);
+			}
 
-    const transactionType =
-        document.getElementById(
-            "newAccountingMappingType"
-        )?.value;
+			else {
+				({ data, error } =
+					await supabaseClient.rpc(
+						"create_account_mapping",
+						{
+							p_mapping_name: mappingName,
+							p_transaction_type: transactionType,
+							p_source: source,
+							p_debit_account_id: debitAccountId,
+							p_credit_account_id: creditAccountId,
+							p_session_id: sessionId
+						}
+					)
+				);
+			}
 
-    const source =
-        document.getElementById(
-            "newAccountingMappingSource"
-        )?.value.trim();
+			if (error) { alert( error.message || "Gagal menyimpan account mapping." );
+					return; }
 
-    const debitAccountId =
-        document.getElementById(
-            "newAccountingMappingDebitAccount"
-        )?.value || null;
+			const wasEditing = !!editingAccountingMappingId;
+			closeAddAccountingMappingModal();
+			await loadAccountingMappings();
+			editingAccountingMappingId = null;
+			alert( "Account Mapping berhasil " + (wasEditing
+							? "diubah."
+							: "disimpan.") );
 
-    const creditAccountId =
-        document.getElementById(
-            "newAccountingMappingCreditAccount"
-        )?.value || null;
-
-
-    /* VALIDATION */
-
-    if (!mappingName) {
-        alert("Mapping Name wajib diisi.");
-        return;
-    }
-
-    if (!transactionType) {
-        alert("Transaction Type wajib dipilih.");
-        return;
-    }
-
-    if (!source) {
-        alert("Source wajib diisi.");
-        return;
-    }
-
-    if (
-        !debitAccountId &&
-        !creditAccountId
-    ) {
-        alert(
-            "Debit atau Credit Account wajib dipilih."
-        );
-        return;
-    }
-
-
-    try {
-
-        let data;
-        let error;
-
-        /* EDIT */
-
-        if (editingAccountingMappingId) {
-
-            ({ data, error } =
-                await supabaseClient.rpc(
-                    "update_account_mapping",
-                    {
-                        p_mapping_id:
-                            editingAccountingMappingId,
-
-                        p_mapping_name:
-                            mappingName,
-
-                        p_transaction_type:
-                            transactionType,
-
-                        p_source:
-                            source,
-
-                        p_debit_account_id:
-                            debitAccountId,
-
-                        p_credit_account_id:
-                            creditAccountId,
-
-                        p_session_id:
-                            sessionId
-                    }
-                )
-            );
-
-        }
-
-        /* ADD */
-
-        else {
-
-            ({ data, error } =
-                await supabaseClient.rpc(
-                    "create_account_mapping",
-                    {
-                        p_mapping_name:
-                            mappingName,
-
-                        p_transaction_type:
-                            transactionType,
-
-                        p_source:
-                            source,
-
-                        p_debit_account_id:
-                            debitAccountId,
-
-                        p_credit_account_id:
-                            creditAccountId,
-
-                        p_session_id:
-                            sessionId
-                    }
-                )
-            );
-        }
-
-
-        if (error) {
-
-            console.error(
-                "save accounting mapping error:",
-                error
-            );
-
-            alert(
-                error.message ||
-                "Gagal menyimpan account mapping."
-            );
-
-            return;
-        }
-
-
-        console.log(
-            "Account mapping saved:",
-            data
-        );
-
-
-        const wasEditing =
-            !!editingAccountingMappingId;
-
-        closeAddAccountingMappingModal();
-
-        await loadAccountingMappings();
-
-        editingAccountingMappingId = null;
-
-        alert(
-            "Account Mapping berhasil " +
-            (wasEditing
-                ? "diubah."
-                : "disimpan.")
-        );
-
-
-    } catch (err) {
-
-        console.error(
-            "saveAccountingMapping error:",
-            err
-        );
-
-        alert(
-            "Terjadi kesalahan saat menyimpan account mapping."
-        );
-    }
+	} catch (err) {
+		alert(
+			"Terjadi kesalahan saat menyimpan account mapping."
+		);
+	}
 }
 
 
@@ -24407,12 +23129,8 @@ async function saveAccountingMapping() {
 function toggleAccountingMappingMenu(mappingId) {
 	const menu = document.getElementById( `accountingMappingMenu-${mappingId}` );
 	if (!menu) return;
-	document.querySelectorAll( '[id^="accountingMappingMenu-"]'
-	).forEach(el => {
-			if (el !== menu) {
-					el.classList.add("hidden");
-			}
-	});
+	document.querySelectorAll( '[id^="accountingMappingMenu-"]' )
+		.forEach(el => { if (el !== menu) { el.classList.add("hidden"); } });
 	menu.classList.toggle("hidden");
 }
 
@@ -24424,74 +23142,40 @@ function toggleAccountingMappingMenu(mappingId) {
 function initAccountingMappingFilters() {
 	const search = document.getElementById( "accountingMappingSearch" );
 	const typeFilter = document.getElementById( "accountingMappingTypeFilter" );
-	if (search) {
-		search.addEventListener( "input",
-			renderAccountingMappings
-		);
-	}
-
-	if (typeFilter) {
-		typeFilter.addEventListener(
-			"change",
-			renderAccountingMappings
-		);
- 	}
+	
+	if (search) { search.addEventListener( "input", renderAccountingMappings ); }
+	if (typeFilter) { typeFilter.addEventListener( "change", renderAccountingMappings ); }
 }
 
 async function toggleAccountingMappingStatus(mappingId) {
 	const sessionId = localStorage.getItem("pos_session_id");
-	if (!sessionId) {
-			alert("Session tidak ditemukan.");
-			return;
-	}
+	if (!sessionId) { alert("Session tidak ditemukan.");
+			return; }
 	const mapping = (window.accountingMappings || [])
 			.find(m => m.mappingId === mappingId);
 	if (!mapping) {
 			alert("Account mapping tidak ditemukan.");
-			return;
-	}
+			return; }
 	const action = mapping.isActive
 			? "menonaktifkan"
 			: "mengaktifkan";
-	if (!confirm(
-			`Yakin ingin ${action} mapping "${mapping.mappingName}"?`
-	)) {
-			return;
-	}
+	if (!confirm( `Yakin ingin ${action} mapping "${mapping.mappingName}"?` )) {
+			return; }
 
 	try {
 		const { data, error } = await supabaseClient.rpc(
-				"toggle_account_mapping_status",
-				{
-					p_mapping_id: mappingId,
-					p_session_id: sessionId
-				}
+			"toggle_account_mapping_status",
+			{
+				p_mapping_id: mappingId,
+				p_session_id: sessionId
+			}
 		);
 
-		if (error) {
-				console.error(
-						"toggle_account_mapping_status error:",
-						error
-				);
-				alert(
-						error.message ||
-						"Gagal mengubah status account mapping."
-				);
-				return;
-		}
-		console.log(
-				"Account mapping status updated:",
-				data
-		);
+		if (error) { alert( error.message || "Gagal mengubah status account mapping." );
+			return; }
 		await loadAccountingMappings();
 	} catch (err) {
-		console.error(
-				"toggleAccountingMappingStatus error:",
-				err
-		);
-		alert(
-				"Terjadi kesalahan saat mengubah status account mapping."
-		);
+		alert( "Terjadi kesalahan saat mengubah status account mapping." );
 	}
 }
 
@@ -24513,11 +23197,8 @@ async function loadJournalEntries() {
       updateJournalEntriesSummary(journalEntriesData);
       return;
     }
-    // ===== RPC LOAD =====
-    console.log("JOURNAL ENTRIES RPC LOAD");
 
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
 
     if (!sessionId) {
       return;
@@ -24531,16 +23212,9 @@ async function loadJournalEntries() {
         }
       );
 
-    if (error) {
-      console.error(
-        "Gagal mengambil Journal Entries:",
-        error
-      );
-      return;
-    }
+    if (error) { return; }
 
     const entries = Array.isArray(data) ? data : [];
-    // ===== SAVE DATA TO CACHE =====
     journalEntriesData = entries;
     window.journalEntries = entries;
     journalEntriesLoaded = true;
@@ -24549,11 +23223,8 @@ async function loadJournalEntries() {
     updateJournalEntriesSummary(entries);
 
   } catch (err) {
-    console.error(
-      "loadJournalEntries error:",
-      err
-    );
-  }
+		return;
+	}
 }
 
 function renderJournalEntries(entries) {
@@ -24566,51 +23237,30 @@ function renderJournalEntries(entries) {
 	}
 	const filteredEntries = getFilteredJournalEntries(entries);
 	const total = filteredEntries.length;
-	const totalPages =
-	    Math.max(
-				1,
-				Math.ceil(
-					total /
-					JOURNAL_ENTRIES_PAGE_SIZE
-	      )
-	    );
-	if (
-	    journalEntriesCurrentPage > totalPages
-	) {
-	    journalEntriesCurrentPage = totalPages;
-	}
-	const startIndex =
-		(
-				journalEntriesCurrentPage - 1
-		) *
-		JOURNAL_ENTRIES_PAGE_SIZE;
-	const endIndex =
-		startIndex +
-		JOURNAL_ENTRIES_PAGE_SIZE;
-	const pageEntries =
-		filteredEntries.slice(
-				startIndex,
-				endIndex
-		);
-if (!pageEntries.length) {
-	tbody.innerHTML = `
+	const totalPages = Math.max( 1, Math.ceil( total / JOURNAL_ENTRIES_PAGE_SIZE ) );
+	if ( journalEntriesCurrentPage > totalPages ) { journalEntriesCurrentPage = totalPages; }
+	const startIndex = ( journalEntriesCurrentPage - 1 ) * JOURNAL_ENTRIES_PAGE_SIZE;
+	const endIndex = startIndex + JOURNAL_ENTRIES_PAGE_SIZE;
+	const pageEntries = filteredEntries.slice( startIndex, endIndex );
+	if (!pageEntries.length) {
+		tbody.innerHTML = `
 			<tr>
 				<td colspan="8" class="px-5 py-10 text-center text-muted">
-						Belum ada journal entries.
+					Belum ada journal entries.
 				</td>
 			</tr>
-    `;
-	} else {
-		tbody.innerHTML =
-			pageEntries
-				.map(
-					journal =>
-						renderJournalEntryRow(
+		`;
+		} else {
+			tbody.innerHTML =
+				pageEntries
+					.map(
+						journal =>
+							renderJournalEntryRow(
 								journal
 							)
 						)
-	  	.join("");
-	}
+			.join("");
+		}
 	updateJournalEntriesPagination( total, totalPages );
 }
 
@@ -26491,11 +25141,6 @@ function initAccountingReportsFilters() {
   if (fromDate) { fromDate.onchange = loadAccountingReports; }
   if (toDate) { toDate.onchange = loadAccountingReports; }
 
-  /*
-   * Untuk sekarang basis belum mengubah
-   * perhitungan karena journal accounting
-   * kita masih berbasis accrual.
-   */
   if (basis) {
     basis.onchange =
       loadAccountingReports;
@@ -26592,6 +25237,20 @@ async function loadSupplierDebt() {
 		if (!sessionId) { throw new Error("Session tidak ditemukan"); }
     const branchId = state.branchId;
     if (!branchId) { throw new Error("Branch belum tersedia"); }
+		const currentFilter = { branchId };
+    // ===== CACHE HIT =====
+    if (
+      state.accountingSupplierDebtData &&
+      state.accountingSupplierDebtFilter &&
+      JSON.stringify(state.accountingSupplierDebtFilter) ===
+        JSON.stringify(currentFilter)
+    ) {
+      supplierDebtData = state.accountingSupplierDebtData;
+      updateSupplierDebtSummary();
+      populateSupplierDebtFilter();
+      applySupplierDebtFilters();
+      return;
+    }
 		const { data, error } =
 			await supabaseClient.rpc(
 				"get_supplier_debts",
@@ -26630,17 +25289,14 @@ async function loadSupplierDebt() {
 									: "PENDING"
 					};
 				});
-
+		
+		  	state.accountingSupplierDebtData = supplierDebtData;
+		    state.accountingSupplierDebtFilter = currentFilter;
         updateSupplierDebtSummary();
         populateSupplierDebtFilter();
         applySupplierDebtFilters();
 
 	} catch (error) {
-			console.error(
-					"loadSupplierDebt error:",
-					error
-			);
-
 		if (tbody) {
 			tbody.innerHTML = `
 				<tr>
@@ -26654,193 +25310,102 @@ async function loadSupplierDebt() {
   }
 }
 
-/* =========================================================
-   SUMMARY
-   ========================================================= */
+/* ==== SUMMARY ==== */
 
 function updateSupplierDebtSummary() {
+	const supplierPayables = supplierDebtData.reduce(
+		(sum, item) => sum + Number(item.outstanding || 0),
+		0
+	);
+	const bankLoan = liabilityData
+		.filter(
+			x =>
+				x.status !== "CANCELLED" &&
+				String(x.liability_type).toUpperCase() === "BANK_LOAN"
+		)
+		.reduce(
+			(sum, x) => sum + Number(x.outstanding_principal || 0),
+			0
+		);
+	const otherLiability = liabilityData
+		.filter(
+			x =>
+				x.status !== "CANCELLED" &&
+				String(x.liability_type).toUpperCase() !== "BANK_LOAN"
+		)
+		.reduce(
+			(sum, x) => sum + Number(x.outstanding_principal || 0),
+			0
+		);
+	const totalLiabilities = supplierPayables + bankLoan + otherLiability;
+	const totalLiabilitiesEl = document.getElementById("debtTotalLiabilities");
+	const supplierPayablesEl = document.getElementById("debtSupplierPayables");
+	const bankLoansEl = document.getElementById("debtBankLoans");
+	const otherLiabilitiesEl = document.getElementById("debtOtherLiabilities");
 
-    const supplierPayables =
-        supplierDebtData
-            .reduce((sum, item) => {
-                return sum + item.outstanding;
-            }, 0);
-
-    const totalLiabilitiesEl =
-        document.getElementById("debtTotalLiabilities");
-
-    const supplierPayablesEl =
-        document.getElementById("debtSupplierPayables");
-
-    const bankLoansEl =
-        document.getElementById("debtBankLoans");
-
-    const otherLiabilitiesEl =
-        document.getElementById("debtOtherLiabilities");
-
-
-    if (supplierPayablesEl) {
-        supplierPayablesEl.textContent =
-            formatAccountingCurrency(supplierPayables);
-    }
-
-    /*
-     * Untuk sementara:
-     *
-     * Bank Loan = 0
-     * Other Liabilities = 0
-     *
-     * Nanti setelah modul tersebut dibuat,
-     * summary akan mengambil data sebenarnya.
-     */
-
-    if (bankLoansEl) {
-        bankLoansEl.textContent =
-            formatAccountingCurrency(0);
-    }
-
-    if (otherLiabilitiesEl) {
-        otherLiabilitiesEl.textContent =
-            formatAccountingCurrency(0);
-    }
-
-    if (totalLiabilitiesEl) {
-        totalLiabilitiesEl.textContent =
-            formatAccountingCurrency(supplierPayables);
-    }
+	if (supplierPayablesEl) { supplierPayablesEl.textContent = formatAccountingCurrency(supplierPayables); }
+	if (bankLoansEl) { bankLoansEl.textContent = formatAccountingCurrency(bankLoan); }
+	if (otherLiabilitiesEl) { otherLiabilitiesEl.textContent = formatAccountingCurrency(otherLiability); }
+	if (totalLiabilitiesEl) { totalLiabilitiesEl.textContent = formatAccountingCurrency(totalLiabilities); }
 }
 
 
-/* =========================================================
-   SUPPLIER FILTER OPTIONS
-   ========================================================= */
+/* ===== SUPPLIER FILTER OPTIONS ===== */
 
 function populateSupplierDebtFilter() {
+	const select = document.getElementById("supplierDebtSupplierFilter");
 
-    const select =
-        document.getElementById("supplierDebtSupplierFilter");
+	if (!select) return;
 
-    if (!select) return;
+	const currentValue = select.value;
+	const suppliers = new Map();
+	supplierDebtData.forEach(item => {
+		if ( item.supplierId && item.supplier !== "-" ) 
+				{ suppliers.set( item.supplierId, item.supplier ); }
+	});
 
+	select.innerHTML = `<option value="">Semua Supplier</option> `;
+	[...suppliers.entries()]
+		.sort((a, b) => a[1].localeCompare(b[1]) )
+		.forEach(([id, name]) => {
+				const option = document.createElement("option");
+				option.value = id;
+				option.textContent = name;
+				select.appendChild(option);
+			});
 
-    const currentValue = select.value;
-
-    const suppliers = new Map();
-
-    supplierDebtData.forEach(item => {
-
-        if (
-            item.supplierId &&
-            item.supplier !== "-"
-        ) {
-            suppliers.set(
-                item.supplierId,
-                item.supplier
-            );
-        }
-    });
-
-
-    select.innerHTML = `
-        <option value="">Semua Supplier</option>
-    `;
-
-
-    [...suppliers.entries()]
-        .sort((a, b) =>
-            a[1].localeCompare(b[1])
-        )
-        .forEach(([id, name]) => {
-
-            const option =
-                document.createElement("option");
-
-            option.value = id;
-            option.textContent = name;
-
-            select.appendChild(option);
-        });
-
-
-    if (
-        [...select.options]
-            .some(option => option.value === currentValue)
-    ) {
-        select.value = currentValue;
-    }
+	if ( [...select.options] .some(option => option.value === currentValue) ) 
+			{ select.value = currentValue; }
 }
 
 
-/* =========================================================
-   APPLY FILTER
-   ========================================================= */
+/* ==== APPLY FILTER ==== */
 
 function applySupplierDebtFilters() {
+	const status = document.getElementById( "supplierDebtStatusFilter" )?.value || "";
+	const supplierId =  document.getElementById( "supplierDebtSupplierFilter" )?.value || "";
+	const search = document.getElementById( "supplierDebtSearch" )?.value
+		?.trim()
+		?.toLowerCase() || "";
 
-    const status =
-        document.getElementById(
-            "supplierDebtStatusFilter"
-        )?.value || "";
-
-    const supplierId =
-        document.getElementById(
-            "supplierDebtSupplierFilter"
-        )?.value || "";
-
-    const search =
-        document.getElementById(
-            "supplierDebtSearch"
-        )?.value
-        ?.trim()
-        ?.toLowerCase() || "";
-
-
-    supplierDebtFiltered =
-        supplierDebtData.filter(item => {
-
-            /* STATUS */
-
-            if (
-                status &&
-                item.status !== status
-            ) {
-                return false;
-            }
-
-
-            /* SUPPLIER */
-
-            if (
-                supplierId &&
-                item.supplierId !== supplierId
-            ) {
-                return false;
-            }
-
-
-            /* SEARCH */
-
-            if (search) {
-
-                const searchable = [
-                    item.id,
-                    item.ingredient,
-                    item.supplier
-                ]
-                .join(" ")
-                .toLowerCase();
-
-                if (!searchable.includes(search)) {
-                    return false;
-                }
-            }
-
-
-            return true;
-        });
-
-
-    renderSupplierDebtTable();
+	supplierDebtFiltered = supplierDebtData.filter(item => {
+		if ( status && item.status !== status ) 
+				{ return false; }
+		if ( supplierId && item.supplierId !== supplierId ) 
+				{ return false; }
+		if ( search ) {
+				const searchable = [
+						item.id,
+						item.ingredient,
+						item.supplier ]
+				.join(" ")
+				.toLowerCase();
+				if (!searchable.includes(search)) {
+						return false; }
+			}
+		 return true;
+	});
+  renderSupplierDebtTable();
 }
 
 
@@ -27018,10 +25583,8 @@ function closeSupplierPaymentModal() {
 }
 
 /* ======== SAVE SUPPLIER PAYMENT ======== */
-
 async function saveSupplierPayment() {
 	const purchase = currentSupplierPaymentPurchase;
-
 	if (!purchase) {
 		alert("Purchase belum dipilih.");
 		return;
@@ -27076,6 +25639,11 @@ try {
 		"Supplier payment result:",
 		data
 	);
+
+	state.accountingSupplierDebtData = null;
+	state.accountingSupplierDebtFilter = null;
+	state.accountingReportsData = null;
+	state.accountingReportsFilter = null;
 	closeSupplierPaymentModal();
 	alert(
 		data?.message ||
@@ -27152,23 +25720,21 @@ function escapeHtml(value) {
    ========================================================= */
 
 let taxPayableData = null;
-
-
-/* =========================================================
-   LOAD TAX PAYABLE
-   ========================================================= */
-
+/* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
   const sessionId = localStorage.getItem("pos_session_id");
   const branchId = state.branchId;
-
-  if (!sessionId) {
-    console.error("Session tidak ditemukan.");
-    return;
-  }
-
-  if (!branchId) {
-    console.error("Branch tidak ditemukan.");
+  if (!sessionId) { return; }
+  if (!branchId) { return; }
+	const currentFilter = {  branchId };
+  if (
+    state.accountingTaxPayableData &&
+    state.accountingTaxPayableFilter &&
+    JSON.stringify(state.accountingTaxPayableFilter) ===
+      JSON.stringify(currentFilter)
+  ) {
+    taxPayableData = state.accountingTaxPayableData;
+    updateTaxPayableUI();
     return;
   }
 
@@ -27181,66 +25747,37 @@ async function loadTaxPayable() {
     if (error) {
       throw error;
     }
-
-    console.log("Tax payable result:", data);
-
     const result = data || {};
-
     taxPayableData = {
       accountId: result.account_id || "ACC-52FE300A7C2A",
       totalCredit: Number(result.total_credit) || 0,
       totalDebit: Number(result.total_debit) || 0,
       outstanding: Math.max(0, Number(result.outstanding) || 0)
     };
-
+		state.accountingTaxPayableData = taxPayableData;
+		state.accountingTaxPayableFilter = currentFilter;
     updateTaxPayableUI();
-
   } catch (error) {
-    console.error("loadTaxPayable error:", error);
-
     taxPayableData = {
       accountId: "ACC-52FE300A7C2A",
       totalCredit: 0,
       totalDebit: 0,
       outstanding: 0
     };
-
     updateTaxPayableUI();
   }
 }
 
-
-/* =========================================================
-   UPDATE TAX PAYABLE UI
-   ========================================================= */
-
+/* ==== UPDATE TAX PAYABLE UI ==== */
 function updateTaxPayableUI() {
-  const outstanding =
-    Number(taxPayableData?.outstanding) || 0;
-
-  const outstandingEl =
-    document.getElementById("taxPayableOutstanding");
-
-  if (outstandingEl) {
-    outstandingEl.textContent =
-      formatAccountingCurrency(outstanding);
-  }
-
-  const modalOutstandingEl =
-    document.getElementById("taxPaymentOutstanding");
-
-  if (modalOutstandingEl) {
-    modalOutstandingEl.textContent =
-      formatAccountingCurrency(outstanding);
-  }
-
-  const amountEl =
-    document.getElementById("taxPaymentAmount");
-
+  const outstanding = Number(taxPayableData?.outstanding) || 0;
+  const outstandingEl = document.getElementById("taxPayableOutstanding");
+  if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+  const modalOutstandingEl = document.getElementById("taxPaymentOutstanding");
+  if (modalOutstandingEl) { modalOutstandingEl.textContent = formatAccountingCurrency(outstanding); }
+  const amountEl = document.getElementById("taxPaymentAmount");
   if (amountEl && document.getElementById("taxPaymentModal")) {
-    const modal =
-      document.getElementById("taxPaymentModal");
-
+    const modal = document.getElementById("taxPaymentModal");
     if (!modal.classList.contains("hidden")) {
       amountEl.max = outstanding;
     }
@@ -27248,57 +25785,32 @@ function updateTaxPayableUI() {
 }
 
 
-/* =========================================================
-   OPEN TAX PAYMENT MODAL
-   ========================================================= */
+/* ===== OPEN TAX PAYMENT MODAL ===== */
 
 async function openTaxPaymentModal() {
   const sessionId = localStorage.getItem("pos_session_id");
-
   if (!sessionId) {
     alert("Session tidak ditemukan.");
     return;
   }
-
-  /*
-   * Pastikan saldo terbaru sebelum membuka pembayaran.
-   */
   await loadTaxPayable();
-
-  const outstanding =
-    Number(taxPayableData?.outstanding) || 0;
+  const outstanding = Number(taxPayableData?.outstanding) || 0;
 
   if (outstanding <= 0) {
     alert("Tax Payable tidak memiliki saldo terutang.");
     return;
   }
 
-  document.getElementById("taxPaymentAccount").textContent =
-    "2200 · Tax Payable";
-
-  document.getElementById("taxPaymentOutstanding").textContent =
-    formatAccountingCurrency(outstanding);
-
-  document.getElementById("taxPaymentDate").value =
-    getTodayAccountingDate();
-
-  document.getElementById("taxPaymentAmount").value =
-    outstanding;
-
-  document.getElementById("taxPaymentAmount").max =
-    outstanding;
-
-  document.getElementById("taxPaymentMethod").value =
-    "CASH";
-
-  document.getElementById("taxPaymentReference").value =
-    "";
-
-  document.getElementById("taxPaymentNote").value =
-    "";
-
-  const modal =
-    document.getElementById("taxPaymentModal");
+  document.getElementById("taxPaymentAccount").textContent = "2200 · Tax Payable";
+  document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
+  document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
+  document.getElementById("taxPaymentAmount").value = outstanding;
+  document.getElementById("taxPaymentAmount").max = outstanding;
+  document.getElementById("taxPaymentMethod").value = "CASH";
+  document.getElementById("taxPaymentReference").value = "";
+  document.getElementById("taxPaymentNote").value = "";
+	
+  const modal = document.getElementById("taxPaymentModal");
 
   if (modal) {
     modal.classList.remove("hidden");
@@ -27306,111 +25818,62 @@ async function openTaxPaymentModal() {
   }
 }
 
-
-/* =========================================================
-   CLOSE TAX PAYMENT MODAL
-   ========================================================= */
-
+/* ==== CLOSE TAX PAYMENT MODAL ==== */
 function closeTaxPaymentModal() {
-  const modal =
-    document.getElementById("taxPaymentModal");
-
+  const modal = document.getElementById("taxPaymentModal");
   if (modal) {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   }
 }
 
-
-/* =========================================================
-   SAVE TAX PAYMENT
-   ========================================================= */
-
+/* ==== SAVE TAX PAYMENT ==== */
 async function saveTaxPayment() {
-  const sessionId =
-    localStorage.getItem("pos_session_id");
+  const sessionId = localStorage.getItem("pos_session_id");
 
   if (!sessionId) {
     alert("Session tidak ditemukan.");
     return;
   }
-
   const branchId = state.branchId;
-
   if (!branchId) {
     alert("Branch tidak ditemukan.");
     return;
   }
 
-  const paymentDate =
-    document.getElementById("taxPaymentDate")?.value;
+  const paymentDate = document.getElementById("taxPaymentDate")?.value;
 
-  const amount =
-    Number(
-      document.getElementById("taxPaymentAmount")?.value
-    ) || 0;
-
-  const method =
-    document.getElementById("taxPaymentMethod")?.value ||
-    "CASH";
-
-  const referenceNo =
-    document
-      .getElementById("taxPaymentReference")
+  const amount = Number( document.getElementById("taxPaymentAmount")?.value ) || 0;
+  const method = document.getElementById("taxPaymentMethod")?.value || "CASH";
+  const referenceNo = document .getElementById("taxPaymentReference")
       ?.value
       ?.trim() || null;
-
-  const note =
-    document
-      .getElementById("taxPaymentNote")
+  const note = document .getElementById("taxPaymentNote")
       ?.value
       ?.trim() || null;
-
-
-  /* =======================================================
-     VALIDATION
-     ======================================================= */
-
+	
   if (!paymentDate) {
     alert("Tanggal pembayaran wajib diisi.");
-    return;
-  }
-
+    return; }
   if (amount <= 0) {
     alert("Jumlah pembayaran harus lebih dari 0.");
-    return;
-  }
+    return; }
 
-  const outstanding =
-    Number(taxPayableData?.outstanding) || 0;
+  const outstanding = Number(taxPayableData?.outstanding) || 0;
 
   if (outstanding <= 0) {
     alert("Tax Payable tidak memiliki saldo terutang.");
-    return;
-  }
-
+    return; }
   if (amount > outstanding) {
-    alert(
-      `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}`
-    );
-    return;
-  }
-
+    alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}` );
+    return; }
   if (!["CASH", "BANK", "QRIS"].includes(method)) {
     alert("Metode pembayaran tidak valid.");
-    return;
-  }
+    return; }
 
-
-  /* =======================================================
-     SAVE
-     ======================================================= */
-
-  const button =
-    document.getElementById("saveTaxPaymentButton");
+  const button = document.getElementById("saveTaxPaymentButton");
 
   try {
-
     if (button) {
       button.disabled = true;
       button.textContent = "Menyimpan...";
@@ -27427,31 +25890,19 @@ async function saveTaxPayment() {
         p_note: note
       });
 
-    if (error) {
-      throw error;
-    }
-
-    console.log("Tax payment result:", data);
+    if (error) { hrow error; }
+		state.accountingTaxPayableData = null;
+		state.accountingTaxPayableFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;	
 
     closeTaxPaymentModal();
-
     alert(
       data?.message ||
       "Pembayaran Tax Payable berhasil."
     );
-
-    /*
-     * Refresh saldo setelah pembayaran.
-     */
     await loadTaxPayable();
-
   } catch (error) {
-
-    console.error(
-      "saveTaxPayment error:",
-      error
-    );
-
     alert(
       error?.message ||
       "Gagal menyimpan pembayaran Tax Payable."
@@ -27523,20 +25974,10 @@ try {
 		);
 
 	if (error) { throw error; }
-
 	if (!data) {
-		throw new Error(
-			"Response get_liabilities kosong"
-		);
-	}
-
-
+		throw new Error( "Response get_liabilities kosong" ); }
 	if (data.success !== true) {
-		throw new Error(
-			data.message ||
-			"Gagal mengambil data liability"
-		);
-	}
+		throw new Error( data.message || "Gagal mengambil data liability" ); }
 
 	let rows = data.data || [];
 	if (!Array.isArray(rows)) { rows = []; }
@@ -27811,10 +26252,7 @@ function openNewLiabilityModal() {
 	const dateEl = document.getElementById("newLiabilityDate");
 	if (dateEl && !dateEl.value) { dateEl.value = new Date().toISOString().split("T")[0]; }
 	const accountEl = document.getElementById("newLiabilityAccount");
-    /*
-     * Field HTML lama bernama Account.
-     * Untuk RPC sekarang dipakai sebagai Funding Method.
-     */
+ 
 	if (accountEl) {
 		accountEl.innerHTML = `
 			<option value="">Pilih sumber dana</option>
@@ -27915,6 +26353,10 @@ async function saveNewLiability() {
 				"Gagal membuat liability"
 			);
 		}
+			state.accountingLiabilitiesData = null;
+			state.accountingLiabilitiesFilter = null;
+			state.accountingReportsData = null;
+			state.accountingReportsFilter = null;
 			closeNewLiabilityModal();
 			resetNewLiabilityForm();
 			await loadLiabilities();
@@ -27923,7 +26365,6 @@ async function saveNewLiability() {
 					"success" );
 
 	} catch (err) {
-			console.error(err);
 			showAccountingDebtMessage(
 					err.message ||
 					"Gagal menyimpan liability",
@@ -28003,7 +26444,7 @@ function openLiabilityPaymentModal(liabilityId) {
 						<div class="p-5 space-y-4">
 							<input type="hidden" id="liabilityPaymentId" >
 								<div class=" rounded-md bg-background border border-outline-variant p-4">
-									<div class="text-sm text-slate-500">
+									<div class="text-sm text-on-surface-variant">
 										Outstanding Principal
 									</div>
 
@@ -28044,8 +26485,7 @@ function openLiabilityPaymentModal(liabilityId) {
 										id="liabilityPaymentInterest"
 										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
 								</div>
-
-
+								
 								<div>
 									<label class="block text-xs text-on-surface-variant mb-2">
 										Metode Pembayaran
@@ -28069,34 +26509,34 @@ function openLiabilityPaymentModal(liabilityId) {
 										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
 								</div>
 
-						<div>
-							<label class="block text-xs text-on-surface-variant mb-2">
-								Catatan
-							</label>
-
-							<textarea id="liabilityPaymentNote" rows="2"
-								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
-							</textarea>
-						</div>
+								<div>
+									<label class="block text-xs text-on-surface-variant mb-2">
+										Catatan
+									</label>
+		
+									<textarea id="liabilityPaymentNote" rows="2"
+										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+									</textarea>
+								</div>
+										
+								<div class=" flex items-center justify-end gap-2 pt-3">
 								
-						<div class=" flex items-center justify-end gap-2 pt-3">
-						
-						<button type="button"
-							onclick="closeLiabilityPaymentModal()"
-							class=" px-4 py-2 text-on-surface-variant hover:text-on-surface ">
-								Cancel
-						</button>
-						
-						<button type="button"
-							id="saveLiabilityPaymentBtn"
-							onclick="saveLiabilityPayment()"
-							class="px-4 py-2 bottom-theme text-on-surface font-medium ">
-							Simpan Pembayaran
-						</button>
+								<button type="button"
+									onclick="closeLiabilityPaymentModal()"
+									class=" px-4 py-2 text-on-surface-variant hover:text-on-surface ">
+										Cancel
+								</button>
+								
+								<button type="button"
+									id="saveLiabilityPaymentBtn"
+									onclick="saveLiabilityPayment()"
+									class="px-4 py-2 bottom-theme text-on-surface font-medium ">
+									Simpan Pembayaran
+								</button>
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
-		`;
+				`;
     document.body.appendChild(modal); }
     document.getElementById( "liabilityPaymentId" ).value = liabilityId;
     document.getElementById( "liabilityPaymentCreditor" ).textContent = `${getLiabilityTypeLabel(liability.liability_type)} • ${liability.creditor}`;
@@ -28134,37 +26574,31 @@ async function saveLiabilityPayment() {
 			"Session tidak ditemukan",
 			"error" );
 		return; }
-	
 	if (!branchId) {
     showAccountingDebtMessage(
 			"Branch belum tersedia",
 			"error" );
     return; }
-
 	if (!liabilityId) {
 		showAccountingDebtMessage(
 			"Liability tidak ditemukan",
 			"error" );
 		return; }
-
 	if (!paymentDate) {
 		showAccountingDebtMessage(
 			"Tanggal pembayaran wajib diisi",
 			"error" );
 		return; }
-	
 	if (principal <= 0 && interest <= 0) {
 		showAccountingDebtMessage(
 			"Masukkan pokok atau bunga",
 			"error" );
 		return; }
-		
 	if (principal < 0 || interest < 0) {
 		showAccountingDebtMessage(
 			"Nominal tidak valid",
 			"error" );
 		return; }
-
 	const liability = liabilityData.find(
 		x =>
 			String(x.liability_id) ===
@@ -28184,7 +26618,6 @@ async function saveLiabilityPayment() {
 			"Pembayaran pokok melebihi outstanding",
 			"error" );
 		return; }
-		
 	const btn = document.getElementById( "saveLiabilityPaymentBtn" );
 	
 try {
@@ -28217,7 +26650,10 @@ try {
 		if (!data?.success) { throw new Error( 
 			data?.message || "Gagal menyimpan pembayaran" );
 		}
-	
+		state.accountingLiabilitiesData = null;
+		state.accountingLiabilitiesFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
 		closeLiabilityPaymentModal();
 		await loadLiabilities();
 		showAccountingDebtMessage(
@@ -28225,7 +26661,6 @@ try {
 				"success"
 		);
 	} catch (err) {
-		console.error(err);
 		showAccountingDebtMessage(
 			err.message || "Gagal menyimpan pembayaran",
 			"error"
@@ -28320,36 +26755,30 @@ let accountingTaxRecording = false;
 
 function getAccountingTaxSessionId() {
   const sessionId = localStorage.getItem("pos_session_id");
-
   if (!sessionId) {
     throw new Error("Session tidak ditemukan.");
   }
-
   return sessionId;
 }
 
 
 function getAccountingTaxBranchId() {
   const branchId = state?.branchId;
-
   if (!branchId) {
     throw new Error("Outlet/Branch belum dipilih.");
   }
-
   return branchId;
 }
 
 
 function formatAccountingTaxCurrency(value) {
   const amount = Number(value || 0);
-
   return "Rp " + amount.toLocaleString("id-ID");
 }
 
 
 function getAccountingTaxYear() {
   const yearEl = document.getElementById("taxObligationYear");
-
   const year = Number(yearEl?.value);
 
   if (
@@ -28359,24 +26788,15 @@ function getAccountingTaxYear() {
   ) {
     return year;
   }
-
   return new Date().getFullYear();
 }
 
 
 function getTodayAccountingTaxDate() {
   const now = new Date();
-
   const year = now.getFullYear();
-
-  const month = String(
-    now.getMonth() + 1
-  ).padStart(2, "0");
-
-  const day = String(
-    now.getDate()
-  ).padStart(2, "0");
-
+  const month = String( now.getMonth() + 1 ).padStart(2, "0");
+  const day = String( now.getDate() ).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -28391,12 +26811,10 @@ async function initAccountingTaxPage() {
   accountingTaxLoading = true;
 
   try {
-    const yearEl =
-      document.getElementById("taxObligationYear");
+    const yearEl = document.getElementById("taxObligationYear");
 
     if (yearEl && !yearEl.value) {
-      yearEl.value =
-        String(new Date().getFullYear());
+      yearEl.value = String(new Date().getFullYear());
     }
 
     await Promise.all([
@@ -28405,19 +26823,11 @@ async function initAccountingTaxPage() {
     ]);
 
   } catch (error) {
-
-    console.error(
-      "initAccountingTaxPage error:",
-      error
-    );
-
     alert(
       error?.message ||
       "Gagal memuat Accounting Tax."
     );
-
   } finally {
-
     accountingTaxLoading = false;
   }
 }
@@ -28428,10 +26838,12 @@ async function initAccountingTaxPage() {
 ========================================================= */
 
 async function loadTaxObligasiSettings() {
-
-  const sessionId =
-    getAccountingTaxSessionId();
-
+	if (accountingTaxSettingsData) {
+    currentTaxSettings = accountingTaxSettingsData;
+    renderCurrentTaxSettings();
+    return currentTaxSettings;
+  }
+  const sessionId = getAccountingTaxSessionId();
   const { data, error } =
     await supabaseClient.rpc(
       "get_tax_settings",
@@ -28440,203 +26852,63 @@ async function loadTaxObligasiSettings() {
       }
     );
 
-  if (error) {
-
-    console.error(
-      "loadTaxObligasiSettings error:",
-      error
-    );
-
-    throw error;
-  }
-
-  currentTaxSettings =
-    data || null;
-
+  if (error) { throw error; }
+	
+  currentTaxSettings = data || null;
+  state.accountingTaxSettingsData = currentTaxSettings;
   renderCurrentTaxSettings();
-
   return currentTaxSettings;
 }
 
-
-/* =========================================================
-   RENDER CURRENT TAX SETTINGS
-========================================================= */
-
 function renderCurrentTaxSettings() {
+  const setting = currentTaxSettings || {};
+  const nameEl = document.getElementById( "currentTaxSettingName" );
+  const rateEl = document.getElementById( "currentTaxSettingRate" );
+  const fromEl = document.getElementById( "currentTaxSettingFrom" );
+  const statusEl = document.getElementById( "currentTaxSettingStatus" );
 
-  const setting =
-    currentTaxSettings || {};
-
-  const nameEl =
-    document.getElementById(
-      "currentTaxSettingName"
-    );
-
-  const rateEl =
-    document.getElementById(
-      "currentTaxSettingRate"
-    );
-
-  const fromEl =
-    document.getElementById(
-      "currentTaxSettingFrom"
-    );
-
-  const statusEl =
-    document.getElementById(
-      "currentTaxSettingStatus"
-    );
-
-
-  if (nameEl) {
-
-    nameEl.textContent =
-      setting.tax_name || "-";
-  }
-
-
+  if (nameEl) { nameEl.textContent = setting.tax_name || "-";}
   if (rateEl) {
-
-    const rate =
-      Number(setting.tax_rate);
-
-    rateEl.textContent =
-      Number.isFinite(rate)
+    const rate = Number(setting.tax_rate);
+    rateEl.textContent = Number.isFinite(rate)
         ? `${rate.toFixed(4)}%`
-        : "0.0000%";
-  }
-
-
-  if (fromEl) {
-
-    fromEl.textContent =
-      setting.effective_from || "-";
-  }
-
-
+        : "0.0000%"; }
+  if (fromEl) { fromEl.textContent = setting.effective_from || "-"; }
   if (statusEl) {
-
     statusEl.textContent =
       setting.is_active === false
         ? "Inactive"
-        : "Active";
-  }
+        : "Active"; }
 }
 
-
-/* =========================================================
-   OPEN TAX SETTINGS MODAL
-========================================================= */
-
+/* ==== OPEN TAX SETTINGS MODAL ==== */
 async function openTaxSettingsModal() {
-
-  const modal =
-    document.getElementById(
-      "taxSettingsModal"
-    );
-
+  const modal = document.getElementById( "taxSettingsModal" );
   if (!modal) return;
-
-
+	
   try {
-
     await loadTaxObligasiSettings();
-
-    const setting =
-      currentTaxSettings || {};
-
-
-    const nameEl =
-      document.getElementById(
-        "taxSettingName"
-      );
-
-    const rateEl =
-      document.getElementById(
-        "taxSettingRate"
-      );
-
-    const fromEl =
-      document.getElementById(
-        "taxSettingEffectiveFrom"
-      );
-
-    const toEl =
-      document.getElementById(
-        "taxSettingEffectiveTo"
-      );
-
-    const activeEl =
-      document.getElementById(
-        "taxSettingActive"
-      );
-
-    const noteEl =
-      document.getElementById(
-        "taxSettingNote"
-      );
-
-
-    if (nameEl) {
-
-      nameEl.value =
-        setting.tax_name ||
-        "Annual Revenue Tax";
-    }
-
-
-    if (rateEl) {
-
-      const rate =
-        Number(setting.tax_rate);
-
-      rateEl.value =
-        Number.isFinite(rate)
+    const setting = currentTaxSettings || {};
+    const nameEl = document.getElementById( "taxSettingName" );
+    const rateEl = document.getElementById( "taxSettingRate" );
+    const fromEl = document.getElementById( "taxSettingEffectiveFrom" );
+    const toEl = document.getElementById( "taxSettingEffectiveTo" );
+    const activeEl = document.getElementById( "taxSettingActive" );
+    const noteEl = document.getElementById( "taxSettingNote" );
+		
+    if (nameEl) { nameEl.value = setting.tax_name || "Annual Revenue Tax"; }
+    if (rateEl) { const rate = Number(setting.tax_rate);
+      rateEl.value = Number.isFinite(rate)
           ? rate
-          : 0.5;
-    }
-
-
-    if (fromEl) {
-
-      fromEl.value =
-        setting.effective_from ||
-        getTodayAccountingTaxDate();
-    }
-
-
-    if (toEl) {
-
-      toEl.value =
-        setting.effective_to || "";
-    }
-
-
-    if (activeEl) {
-
-      activeEl.checked =
-        setting.is_active !== false;
-    }
-
-
-    if (noteEl) {
-
-      noteEl.value =
-        setting.note || "";
-    }
-
-
+          : 0.5; }
+    if (fromEl) { fromEl.value = setting.effective_from || getTodayAccountingTaxDate(); }
+    if (toEl) { toEl.value = setting.effective_to || ""; }
+    if (activeEl) { activeEl.checked = setting.is_active !== false; }
+    if (noteEl) { noteEl.value = setting.note || ""; }
+		
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-
   } catch (error) {
-
-    console.error(
-      "openTaxSettingsModal error:",
-      error
-    );
-
     alert(
       error?.message ||
       "Gagal memuat Tax Settings."
@@ -28644,165 +26916,60 @@ async function openTaxSettingsModal() {
   }
 }
 
-
-/* =========================================================
-   CLOSE TAX SETTINGS MODAL
-========================================================= */
-
 function closeTaxSettingsModal() {
-
-  const modal =
-    document.getElementById(
-      "taxSettingsModal"
-    );
-
+  const modal = document.getElementById( "taxSettingsModal" );
   if (!modal) return;
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
 
 
-/* =========================================================
-   SAVE TAX SETTINGS
-========================================================= */
-
 async function saveTaxObligasiSettings() {
-
   let sessionId;
-
   try {
-
-    sessionId =
-      getAccountingTaxSessionId();
-
+    sessionId = getAccountingTaxSessionId();
   } catch (error) {
-
     alert(error.message);
-    return;
-  }
+    return; }
+	
+  const nameEl = document.getElementById( "taxSettingName" );
+  const rateEl = document.getElementById( "taxSettingRate" );
+  const fromEl = document.getElementById( "taxSettingEffectiveFrom" );
+  const toEl = document.getElementById( "taxSettingEffectiveTo" );
+  const activeEl = document.getElementById( "taxSettingActive" );
+  const noteEl = document.getElementById( "taxSettingNote" );
+  const button = document.getElementById( "saveTaxObligasiSettingsButton" );
+  const taxName = nameEl?.value?.trim();
+  const taxRate = Number(rateEl?.value);
+  const effectiveFrom = fromEl?.value;
+  const effectiveTo = toEl?.value || null;
+  const isActive = activeEl?.checked ?? true;
+  const note = noteEl?.value?.trim() || null;
 
-
-  const nameEl =
-    document.getElementById(
-      "taxSettingName"
-    );
-
-  const rateEl =
-    document.getElementById(
-      "taxSettingRate"
-    );
-
-  const fromEl =
-    document.getElementById(
-      "taxSettingEffectiveFrom"
-    );
-
-  const toEl =
-    document.getElementById(
-      "taxSettingEffectiveTo"
-    );
-
-  const activeEl =
-    document.getElementById(
-      "taxSettingActive"
-    );
-
-  const noteEl =
-    document.getElementById(
-      "taxSettingNote"
-    );
-
-  const button =
-    document.getElementById(
-      "saveTaxObligasiSettingsButton"
-    );
-
-
-  const taxName =
-    nameEl?.value?.trim();
-
-  const taxRate =
-    Number(rateEl?.value);
-
-  const effectiveFrom =
-    fromEl?.value;
-
-  const effectiveTo =
-    toEl?.value || null;
-
-  const isActive =
-    activeEl?.checked ?? true;
-
-  const note =
-    noteEl?.value?.trim() || null;
-
-
-  /* =======================================================
-     VALIDATION
-  ======================================================= */
-
+  /* ===== VALIDATION ===== */
   if (!taxName) {
-
-    alert(
-      "Tax Name wajib diisi."
-    );
-
-    return;
-  }
-
-
-  if (
-    !Number.isFinite(taxRate) ||
-    taxRate < 0
-  ) {
-
-    alert(
-      "Tax Rate tidak valid."
-    );
-
-    return;
-  }
-
-
+    alert( "Tax Name wajib diisi." );
+    return; }
+  if ( !Number.isFinite(taxRate) || taxRate < 0 ) {
+    alert( "Tax Rate tidak valid." );
+    return; }
   if (!effectiveFrom) {
-
-    alert(
-      "Effective From wajib diisi."
-    );
-
-    return;
-  }
-
-
-  if (
-    effectiveTo &&
-    effectiveTo < effectiveFrom
-  ) {
-
-    alert(
-      "Effective To tidak boleh lebih kecil dari Effective From."
-    );
-
-    return;
-  }
-
+    alert( "Effective From wajib diisi." );
+    return; }
+  if ( effectiveTo && effectiveTo < effectiveFrom ) {
+    alert( "Effective To tidak boleh lebih kecil dari Effective From." );
+    return; }
 
   try {
-
-    if (button) {
-
-      button.disabled = true;
-
-      button.innerHTML = `
-        <span class="material-symbols-outlined text-sm animate-spin">
-          progress_activity
-        </span>
-        Saving...
-      `;
-    }
-
-
+	    if (button) {
+	      button.disabled = true;
+	      button.innerHTML = `
+	        <span class="material-symbols-outlined text-sm animate-spin">
+	          progress_activity
+	        </span>
+	        Saving...
+	      `;
+	    }
     const { data, error } =
       await supabaseClient.rpc(
         "save_tax_settings",
@@ -28817,60 +26984,20 @@ async function saveTaxObligasiSettings() {
         }
       );
 
-
-    if (error) {
-
-      console.error(
-        "saveTaxObligasiSettings error:",
-        error
-      );
-
-      throw error;
-    }
-
-
-    /*
-     * RPC mengembalikan data setting
-     * yang baru dibuat.
-     */
-    currentTaxSettings =
-      data || null;
-
+    if (error) { throw error; }
+		state.accountingTaxSettingsData = null;
+    currentTaxSettings = data || null;
     renderCurrentTaxSettings();
-
     closeTaxSettingsModal();
-
-
-    /*
-     * Setting berubah.
-     * Reload obligation agar calculation
-     * menggunakan setting terbaru.
-     */
     await loadTaxObligation();
-
-
-    alert(
-      "Tax Settings berhasil disimpan."
-    );
+    alert( "Tax Settings berhasil disimpan." );
 
   } catch (error) {
-
-    console.error(
-      "saveTaxObligasiSettings error:",
-      error
-    );
-
-    alert(
-      error?.message ||
-      "Gagal menyimpan Tax Settings."
-    );
+    alert( error?.message || "Gagal menyimpan Tax Settings." );
 
   } finally {
-
     if (button) {
-
       button.disabled = false;
-
       button.innerHTML = `
         <span class="material-symbols-outlined text-sm">
           save
@@ -28887,16 +27014,22 @@ async function saveTaxObligasiSettings() {
 ========================================================= */
 
 async function loadTaxObligation() {
-
-  const sessionId =
-    getAccountingTaxSessionId();
-
-  const branchId =
-    getAccountingTaxBranchId();
-
-  const taxYear =
-    getAccountingTaxYear();
-
+  const sessionId = getAccountingTaxSessionId();
+  const branchId = getAccountingTaxBranchId();
+  const taxYear = getAccountingTaxYear();
+	const currentFilter = { branchId, taxYear };
+  // ===== CACHE HIT =====
+  if (
+    state.accountingTaxData &&
+    state.accountingTaxFilter &&
+    JSON.stringify(state.accountingTaxFilter) ===
+      JSON.stringify(currentFilter)
+  ) {
+    currentTaxObligation = state.accountingTaxData;
+    renderTaxObligation(currentTaxObligation);
+    await loadTaxObligationPaymentSummary();
+    return currentTaxObligation;
+  }
 
   const { data, error } =
     await supabaseClient.rpc(
@@ -28908,26 +27041,13 @@ async function loadTaxObligation() {
       }
     );
 
-
-  if (error) {
-
-    console.error(
-      "loadTaxObligation error:",
-      error
-    );
-
-    throw error;
-  }
-
-
-  currentTaxObligation =
-    data || null;
-
-
-  renderTaxObligation(
-    currentTaxObligation
-  );
-
+  if (error) { throw error; }
+  currentTaxObligation = data || null;
+	 // ===== SAVE CACHE =====
+  state.accountingTaxData = currentTaxObligation;
+  state.accountingTaxFilter = currentFilter;
+	
+  renderTaxObligation( currentTaxObligation );
 	await loadTaxObligationPaymentSummary();
   return currentTaxObligation;
 }
@@ -28938,200 +27058,46 @@ async function loadTaxObligation() {
 ========================================================= */
 
 function renderTaxObligation(data) {
-
-  const obligation =
-    data || {};
-
-
-  const revenueEl =
-    document.getElementById(
-      "taxObligationRevenue"
-    );
-
-  const rateEl =
-    document.getElementById(
-      "taxObligationRate"
-    );
-
-  const taxableEl =
-    document.getElementById(
-      "taxObligationTaxable"
-    );
-
-  const amountEl =
-    document.getElementById(
-      "taxObligationAmount"
-    );
-
-  const statusEl =
-    document.getElementById(
-      "taxObligationStatus"
-    );
-
-  const branchEl =
-    document.getElementById(
-      "taxObligationBranchName"
-    );
-
-
-  /* =======================================================
-     REVENUE
-  ======================================================= */
-
-  if (revenueEl) {
-
-    revenueEl.textContent =
-      formatAccountingTaxCurrency(
-        obligation.revenue_amount
-      );
-  }
-
-
-  /* =======================================================
-     TAX RATE
-  ======================================================= */
-
-  if (rateEl) {
-
-    const rate =
-      Number(obligation.tax_rate);
-
-    rateEl.textContent =
-      Number.isFinite(rate)
+  const obligation = data || {};
+  const revenueEl = document.getElementById( "taxObligationRevenue" );
+  const rateEl = document.getElementById( "taxObligationRate" );
+  const taxableEl = document.getElementById( "taxObligationTaxable" );
+  const amountEl = document.getElementById( "taxObligationAmount" );
+  const statusEl = document.getElementById( "taxObligationStatus" );
+  const branchEl = document.getElementById( "taxObligationBranchName" );
+	
+  if (revenueEl) { revenueEl.textContent = formatAccountingTaxCurrency( obligation.revenue_amount ); }
+  if (rateEl) { const rate = Number(obligation.tax_rate);
+    rateEl.textContent = Number.isFinite(rate)
         ? `${rate.toFixed(4)}%`
-        : "0.0000%";
+        : "0.0000%"; }
+  if (taxableEl) { taxableEl.textContent =  formatAccountingTaxCurrency( obligation.taxable_amount ); }
+  if (amountEl) { amountEl.textContent = formatAccountingTaxCurrency( obligation.tax_amount ); }
+  if (branchEl) { branchEl.textContent = obligation.branch_id || state?.branchId || "Current Outlet"; }
+  if (statusEl) { const status = String( obligation.status || "" ).toUpperCase();
+	  if (status === "RECORDED") { statusEl.textContent = "Recorded"; } 
+		else if (status === "VOID") { statusEl.textContent = "Void"; } 
+		else if (status === "DRAFT") { statusEl.textContent =  "Draft"; } 
+		else { statusEl.textContent = "Ready to Record"; }
   }
-
-
-  /* =======================================================
-     TAXABLE AMOUNT
-  ======================================================= */
-
-  if (taxableEl) {
-
-    taxableEl.textContent =
-      formatAccountingTaxCurrency(
-        obligation.taxable_amount
-      );
-  }
-
-
-  /* =======================================================
-     TAX AMOUNT
-  ======================================================= */
-
-  if (amountEl) {
-
-    amountEl.textContent =
-      formatAccountingTaxCurrency(
-        obligation.tax_amount
-      );
-  }
-
-
-  /* =======================================================
-     BRANCH
-  ======================================================= */
-
-  if (branchEl) {
-
-    branchEl.textContent =
-      obligation.branch_id ||
-      state?.branchId ||
-      "Current Outlet";
-  }
-
-
-  /* =======================================================
-     STATUS
-  ======================================================= */
-
-  if (statusEl) {
-
-    const status =
-      String(
-        obligation.status || ""
-      ).toUpperCase();
-
-
-    if (status === "RECORDED") {
-
-      statusEl.textContent =
-        "Recorded";
-
-    } else if (status === "VOID") {
-
-      statusEl.textContent =
-        "Void";
-
-    } else if (status === "DRAFT") {
-
-      statusEl.textContent =
-        "Draft";
-
-    } else {
-
-      /*
-       * get_tax_obligation saat ini
-       * belum mengembalikan status
-       * Tax_Obligations.
-       */
-      statusEl.textContent =
-        "Ready to Record";
-    }
-  }
-
-
-  /* =======================================================
-     RECORD BUTTON
-  ======================================================= */
-
-  const recordButton =
-    document.getElementById(
-      "recordTaxObligationButton"
-    );
-
-
+	
+  const recordButton = document.getElementById( "recordTaxObligationButton" );
+	
   if (recordButton) {
-
-    const status =
-      String(
-        obligation.status || ""
-      ).toUpperCase();
-
-
-    /*
-     * Jika sudah RECORDED,
-     * jangan izinkan record ulang.
-     */
+    const status = String( obligation.status || "" ).toUpperCase();
     if (status === "RECORDED") {
-
       recordButton.disabled = true;
-
-      recordButton.classList.add(
-        "opacity-50",
-        "cursor-not-allowed"
-      );
-
+      recordButton.classList.add( "opacity-50", "cursor-not-allowed" );
       recordButton.innerHTML = `
         <span class="material-symbols-outlined text-sm">
           check_circle
         </span>
         Recorded
       `;
-
     } else {
-
-      recordButton.disabled =
-        accountingTaxRecording;
-
-      recordButton.classList.remove(
-        "opacity-50",
-        "cursor-not-allowed"
-      );
-
+      recordButton.disabled = accountingTaxRecording;
+      recordButton.classList.remove( "opacity-50", "cursor-not-allowed" );
       if (!accountingTaxRecording) {
-
         recordButton.innerHTML = `
           <span class="material-symbols-outlined text-sm">
             task_alt
@@ -29143,43 +27109,22 @@ function renderTaxObligation(data) {
   }
 }
 
-
-/* =========================================================
-   YEAR CHANGE
-========================================================= */
-
-document.addEventListener(
-  "change",
+document.addEventListener( "change",
   function(event) {
-
-    if (
-      event.target?.id !==
-      "taxObligationYear"
-    ) {
-      return;
-    }
-
+    if ( event.target?.id !== "taxObligationYear" ) { 
+			return; }
 
     loadTaxObligation()
-      .catch(error => {
-
-        console.error(
-          "Tax year change error:",
-          error
-        );
-
-        alert(
-          error?.message ||
-          "Gagal memuat Tax Obligation."
-        );
-      });
+		.catch(error => {
+			alert( error?.message ||
+				"Gagal memuat Tax Obligation."
+			);
+		});
   }
 );
 
 
-/* =========================================================
-   RECORD TAX OBLIGATION
-========================================================= */
+/* ==== RECORD TAX OBLIGATION ==== */
 
 async function recordTaxObligation() {
   if (accountingTaxRecording) return;
@@ -29190,28 +27135,21 @@ async function recordTaxObligation() {
 
   if (!sessionId) {
     showToast("Session tidak ditemukan.", "error");
-    return;
-  }
-
+    return; }
   if (!branchId) {
     showToast("Branch belum dipilih.", "error");
-    return;
-  }
-
+    return; }
   if (!taxYear || Number.isNaN(Number(taxYear))) {
     showToast("Tax Year tidak valid.", "error");
-    return;
-  }
+    return; }
 
   const recordButton = document.getElementById("recordTaxObligationButton");
 
   try {
     accountingTaxRecording = true;
-
     if (recordButton) {
       recordButton.disabled = true;
-      recordButton.dataset.originalText =
-        recordButton.textContent || "Record Tax Obligation";
+      recordButton.dataset.originalText = recordButton.textContent || "Record Tax Obligation";
       recordButton.textContent = "Recording...";
     }
 
@@ -29226,11 +27164,9 @@ async function recordTaxObligation() {
 
     if (error) {
       console.error("record_tax_obligation error:", error);
-      throw error;
-    }
-
-    const result =
-      typeof data === "string"
+      throw error; }
+		
+    const result = typeof data === "string"
         ? JSON.parse(data)
         : data;
 
@@ -29240,7 +27176,6 @@ async function recordTaxObligation() {
         "Gagal mencatat tax obligation."
       );
     }
-
     if (result.already_recorded) {
       showToast(
         `Tax obligation ${taxYear} sudah tercatat.`,
@@ -29252,13 +27187,8 @@ async function recordTaxObligation() {
         "success"
       );
     }
-
-    // Reload data setelah recording
     await loadTaxObligation();
-
   } catch (error) {
-    console.error("Failed to record tax obligation:", error);
-
     showToast(
       error?.message ||
       "Gagal mencatat tax obligation.",
@@ -29267,7 +27197,6 @@ async function recordTaxObligation() {
 
   } finally {
     accountingTaxRecording = false;
-
     if (recordButton) {
       recordButton.disabled = false;
       recordButton.textContent =
@@ -29277,11 +27206,6 @@ async function recordTaxObligation() {
   }
 }
 
-/* =========================================================
-   TAX OBLIGATION PAYMENT
-   Khusus 2210 - Tax Obligation Payable
-   BUKAN Sales Tax Payable 2200
-========================================================= */
 
 const TAX_OBLIGATION_PAYABLE_ACCOUNT_ID =
   "ACC-4DC408145FCA";
@@ -29296,99 +27220,38 @@ const TAX_OBLIGATION_BANK_ACCOUNT_ID =
   "ACC-1CE751522EEC";
 
 
-/* =========================================================
-   OPEN TAX OBLIGATION PAYMENT MODAL
-========================================================= */
+/* ===== OPEN TAX OBLIGATION PAYMENT MODAL ===== */
 
 async function openTaxObligationPaymentModal() {
-
-  const modal = document.getElementById(
-    "taxObligationPaymentModal"
-  );
-
+  const modal = document.getElementById( "taxObligationPaymentModal" );
   if (!modal) return;
 
   try {
+    const sessionId = getAccountingTaxSessionId();
+    const branchId = getAccountingTaxBranchId();
+    const taxYear = getAccountingTaxYear();
 
-    const sessionId =
-      getAccountingTaxSessionId();
-
-    const branchId =
-      getAccountingTaxBranchId();
-
-    const taxYear =
-      getAccountingTaxYear();
-
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
-
-    if (!branchId) {
-      throw new Error("Branch belum dipilih.");
-    }
-
-    if (!taxYear) {
-      throw new Error("Tax Year tidak valid.");
-    }
-
-
-    /* =====================================================
-       ACCOUNT WAJIB 2210
-    ===================================================== */
-
-    const accountEl =
-      document.getElementById(
-        "taxObligationPaymentAccount"
-      );
-
-    if (accountEl) {
-      accountEl.textContent =
-        "2210 · Tax Obligation Payable";
-    }
-
-
-    /* =====================================================
-       DATE
-    ===================================================== */
-
-    const dateEl =
-      document.getElementById(
-        "taxObligationPaymentDate"
-      );
-
-    if (dateEl && !dateEl.value) {
-      dateEl.value =
-        getTodayAccountingTaxDate();
-    }
-
-
-    /* =====================================================
-       LOAD TAX OBLIGATION
-    ===================================================== */
-
-    const obligation =
-      await loadTaxObligation();
-
-    const taxAmount =
-      Number(obligation?.tax_amount || 0);
-
-
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
+    if (!branchId) { throw new Error("Branch belum dipilih."); }
+    if (!taxYear) { throw new Error("Tax Year tidak valid."); }
+    /* ====== ACCOUNT WAJIB 2210 ======= */
+    const accountEl = document.getElementById( "taxObligationPaymentAccount" );
+		
+    if (accountEl) { accountEl.textContent = "2210 · Tax Obligation Payable"; }
+    /* ==== DATE ===== */
+    const dateEl = document.getElementById( "taxObligationPaymentDate" );
+		
+    if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingTaxDate(); }
+    /* ==== LOAD TAX OBLIGATION ==== */
+    const obligation = await loadTaxObligation();
+    const taxAmount = Number(obligation?.tax_amount || 0);
     if (taxAmount <= 0) {
       throw new Error(
         "Tidak ada Tax Obligation yang harus dibayar."
       );
     }
 
-
-    /* =====================================================
-       GET BALANCE 2210
-       Supaya outstanding berasal dari account
-       Tax Obligation Payable, bukan 2200.
-    ===================================================== */
-
-    const toDate =
-      `${taxYear}-12-31`;
-
+    const toDate = `${taxYear}-12-31`;
     const { data, error } =
       await supabaseClient.rpc(
         "get_balance_sheet",
@@ -29399,122 +27262,45 @@ async function openTaxObligationPaymentModal() {
         }
       );
 
-    if (error) {
-      console.error(
-        "get_balance_sheet tax obligation payment error:",
-        error
-      );
+    if (error) { throw error; }
 
-      throw error;
-    }
-
-
-    const balanceSheet =
-      typeof data === "string"
+    const balanceSheet = typeof data === "string"
         ? JSON.parse(data)
         : data;
-
-
-    const accounts =
-      Array.isArray(balanceSheet?.accounts)
+    const accounts = Array.isArray(balanceSheet?.accounts)
         ? balanceSheet.accounts
         : [];
 
 
-    const obligationAccount =
-      accounts.find(account =>
-        account.accountId ===
-          TAX_OBLIGATION_PAYABLE_ACCOUNT_ID
-        ||
-        account.accountCode ===
-          TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE
-      );
+    const obligationAccount = accounts.find(account => account.accountId ===
+      		TAX_OBLIGATION_PAYABLE_ACCOUNT_ID || account.accountCode === 
+					TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE );
+		
+    let outstanding = Number( obligationAccount?.balance || 0 );
+		
+    outstanding = Math.min( Math.max(outstanding, 0), taxAmount );
+		
+    const outstandingEl = document.getElementById( "taxObligationPaymentOutstanding" );
 
-
-    /*
-     * Karena 2210 normal balance CREDIT,
-     * balance positif = hutang tax obligation.
-     */
-
-    let outstanding =
-      Number(
-        obligationAccount?.balance || 0
-      );
-
-
-    /*
-     * Jangan sampai melebihi nilai obligation
-     * tahun yang sedang dipilih.
-     */
-    outstanding =
-      Math.min(
-        Math.max(outstanding, 0),
-        taxAmount
-      );
-
-
-    const outstandingEl =
-      document.getElementById(
-        "taxObligationPaymentOutstanding"
-      );
-
-    if (outstandingEl) {
-      outstandingEl.textContent =
-        formatAccountingTaxCurrency(
-          outstanding
-        );
-    }
-
-
-    /* =====================================================
-       AMOUNT DEFAULT
-    ===================================================== */
-
-    const amountEl =
-      document.getElementById(
-        "taxObligationPaymentAmount"
-      );
+    if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency( outstanding ); }
+    /* ==== AMOUNT DEFAULT ==== */
+    const amountEl = document.getElementById( "taxObligationPaymentAmount" );
 
     if (amountEl) {
-
-      amountEl.value =
-        outstanding > 0
+      amountEl.value = outstanding > 0
           ? outstanding
           : "";
-
-      amountEl.max =
-        String(outstanding);
+      amountEl.max = String(outstanding);
     }
+    /* ==== METHOD DEFAULT ==== */
+    const methodEl = document.getElementById( "taxObligationPaymentMethod" );
+    if (methodEl && !methodEl.value) { methodEl.value = "CASH"; }
 
 
-    /* =====================================================
-       METHOD DEFAULT
-    ===================================================== */
-
-    const methodEl =
-      document.getElementById(
-        "taxObligationPaymentMethod"
-      );
-
-    if (methodEl && !methodEl.value) {
-      methodEl.value = "CASH";
-    }
-
-
-    /* =====================================================
-       SHOW MODAL
-    ===================================================== */
-
+    /* ==== SHOW MODAL ==== */
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-
   } catch (error) {
-
-    console.error(
-      "openTaxObligationPaymentModal error:",
-      error
-    );
-
     showToast(
       error?.message ||
         "Gagal membuka Tax Obligation Payment.",
@@ -29523,20 +27309,10 @@ async function openTaxObligationPaymentModal() {
   }
 }
 
-
-/* =========================================================
-   CLOSE TAX OBLIGATION PAYMENT MODAL
-========================================================= */
-
 function closeTaxObligationPaymentModal() {
-
-  const modal =
-    document.getElementById(
-      "taxObligationPaymentModal"
-    );
+  const modal = document.getElementById( "taxObligationPaymentModal" );
 
   if (!modal) return;
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
@@ -29546,123 +27322,49 @@ function closeTaxObligationPaymentModal() {
    SAVE TAX OBLIGATION PAYMENT
 ========================================================= */
 async function saveTaxObligationPayment() {
-  const button =
-    document.getElementById(
-      "saveTaxObligationPaymentButton"
-    );
+  const button = document.getElementById( "saveTaxObligationPaymentButton" );
 
   try {
-
-    const sessionId =
-      getAccountingTaxSessionId();
-
-    const branchId =
-      getAccountingTaxBranchId();
-
-    const taxYear =
-      getAccountingTaxYear();
-
-
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
-
-    if (!branchId) {
-      throw new Error("Branch belum dipilih.");
-    }
-
-    if (!taxYear) {
-      throw new Error("Tax Year tidak valid.");
-    }
-
-
-    /* =====================================================
-       FORM
-    ===================================================== */
-
-    const dateEl =
-      document.getElementById(
-        "taxObligationPaymentDate"
-      );
-
-    const amountEl =
-      document.getElementById(
-        "taxObligationPaymentAmount"
-      );
-
-    const methodEl =
-      document.getElementById(
-        "taxObligationPaymentMethod"
-      );
-
-    const referenceEl =
-      document.getElementById(
-        "taxObligationPaymentReference"
-      );
-
-    const noteEl =
-      document.getElementById(
-        "taxObligationPaymentNote"
-      );
-
-
-    const paymentDate =
-      dateEl?.value ||
-      getTodayAccountingTaxDate();
-
-    const amount =
-      Number(amountEl?.value || 0);
-
-    const method =
-      String(
-        methodEl?.value || "CASH"
-      ).toUpperCase();
-
-    const userReference =
-      referenceEl?.value?.trim() || "";
-
-    const reference =
-      `TAX-OBL-PAY-${taxYear}-${Date.now()}`;
-
-    const note =
-      userReference
+    const sessionId = getAccountingTaxSessionId();
+    const branchId = getAccountingTaxBranchId();
+    const taxYear = getAccountingTaxYear();
+		
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
+    if (!branchId) { throw new Error("Branch belum dipilih."); }
+    if (!taxYear) { throw new Error("Tax Year tidak valid."); }
+    /* ===== FORM ===== */
+    const dateEl = document.getElementById( "taxObligationPaymentDate" );
+    const amountEl = document.getElementById( "taxObligationPaymentAmount" );
+    const methodEl = document.getElementById( "taxObligationPaymentMethod" );
+    const referenceEl = document.getElementById( "taxObligationPaymentReference" );
+    const noteEl = document.getElementById( "taxObligationPaymentNote" );
+    const paymentDate = dateEl?.value || getTodayAccountingTaxDate();
+    const amount = Number(amountEl?.value || 0);
+    const method = String( methodEl?.value || "CASH" ).toUpperCase();
+    const userReference = referenceEl?.value?.trim() || "";
+    const reference = `TAX-OBL-PAY-${taxYear}-${Date.now()}`;
+    const note = userReference
         ? `${noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}`} - Ref: ${userReference}`
-        : (
-            noteEl?.value?.trim() ||
-            `Pembayaran Tax Obligation ${taxYear}`
-          );
-
-
-    /* =====================================================
-       VALIDATION
-    ===================================================== */
-
+        : ( noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}` );
+    /* ==== VALIDATION ==== */
     if (!paymentDate) {
       throw new Error(
         "Tanggal pembayaran wajib diisi."
       );
     }
-
     if (!Number.isFinite(amount) || amount <= 0) {
       throw new Error(
         "Jumlah pembayaran tidak valid."
       );
     }
-
     if (!["CASH", "BANK", "QRIS"].includes(method)) {
       throw new Error(
         "Metode pembayaran tidak valid."
       );
     }
+    /* ==== GET OBLIGATION ==== */
 
-
-    /* =====================================================
-       GET OBLIGATION
-    ===================================================== */
-
-    const obligation =
-      await loadTaxObligation();
-
+    const obligation = await loadTaxObligation();
     const taxAmount =
       Number(
         obligation?.tax_amount ??
@@ -29670,18 +27372,12 @@ async function saveTaxObligationPayment() {
         0
       );
 
-
     if (taxAmount <= 0) {
       throw new Error(
         "Tax Obligation tidak memiliki tagihan."
       );
     }
-
-
-    /* =====================================================
-       GET OUTSTANDING TAX YEAR TERPILIH
-    ===================================================== */
-
+    /* ==== GET OUTSTANDING TAX YEAR TERPILIH ==== */
     const {
       data: summaryData,
       error: summaryError
@@ -29689,14 +27385,9 @@ async function saveTaxObligationPayment() {
       await supabaseClient.rpc(
         "get_tax_obligation_payment_summary",
         {
-          p_session_id:
-            sessionId,
-
-          p_branch_id:
-            branchId,
-
-          p_tax_year:
-            taxYear
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_tax_year: taxYear
         }
       );
 
@@ -29733,32 +27424,20 @@ async function saveTaxObligationPayment() {
       );
     }
 
-
-
     const paymentAccountId =
       method === "CASH"
         ? TAX_OBLIGATION_CASH_ACCOUNT_ID
         : TAX_OBLIGATION_BANK_ACCOUNT_ID;
-
 
     if (!paymentAccountId) {
       throw new Error(
         `Account pembayaran untuk ${method} tidak ditemukan.`
       );
     }
-
-
-    /* =====================================================
-       BUTTON STATE
-    ===================================================== */
-
+    /* ==== BUTTON STATE ==== */
     if (button) {
-
       button.disabled = true;
-
-      button.dataset.originalText =
-        button.innerHTML;
-
+      button.dataset.originalText = button.innerHTML;
       button.innerHTML = `
         <span class="material-symbols-outlined text-sm animate-spin">
           progress_activity
@@ -29766,45 +27445,20 @@ async function saveTaxObligationPayment() {
         Processing...
       `;
     }
-
-
-    /* =====================================================
-       JOURNAL
-       
-       DR 2210 Tax Obligation Payable
-       CR 1100 Cash / 1200 Bank
-    ===================================================== */
-
     const lines = [
-
       {
-        accountId:
-          TAX_OBLIGATION_PAYABLE_ACCOUNT_ID,
-
-        description:
-          `Tax Obligation Payable ${taxYear}`,
-
-        debit:
-          amount,
-
-        credit:
-          0
+        accountId: TAX_OBLIGATION_PAYABLE_ACCOUNT_ID,
+        description: `Tax Obligation Payable ${taxYear}`,
+        debit: amount,
+        credit:  0
       },
 
       {
-        accountId:
-          paymentAccountId,
-
-        description:
-          `Pembayaran Tax Obligation ${taxYear} - ${method}`,
-
-        debit:
-          0,
-
-        credit:
-          amount
+        accountId:  paymentAccountId,
+        description: `Pembayaran Tax Obligation ${taxYear} - ${method}`,
+        debit: 0,
+        credit: amount
       }
-
     ];
 
 
@@ -29815,48 +27469,19 @@ async function saveTaxObligationPayment() {
       await supabaseClient.rpc(
         "create_journal_entry",
         {
-          p_journal_date:
-            paymentDate,
-
-          p_branch_id:
-            branchId,
-
-          p_source:
-            "PAYMENT",
-
-          p_reference_id:
-            reference,
-
-          p_description:
-            note,
-
-          p_status:
-            "POSTED",
-
-          p_lines:
-            lines,
-
-          p_session_id:
-            sessionId
+          p_journal_date: paymentDate,
+          p_branch_id: branchId,
+          p_source: "PAYMENT",
+          p_reference_id: reference,
+          p_description: note,
+          p_status: "POSTED",
+          p_lines: lines,
+          p_session_id: sessionId
         }
       );
 
-
-    if (error) {
-
-      console.error(
-        "saveTaxObligationPayment error:",
-        error
-      );
-
-      throw error;
-    }
-
-
-    /* =====================================================
-       UPDATE STATUS
-    ===================================================== */
-
+    if (error) { throw error; }
+    /* ====  UPDATE STATUS ==== */
     const {
       data: statusData,
       error: statusError
@@ -29864,117 +27489,61 @@ async function saveTaxObligationPayment() {
       await supabaseClient.rpc(
         "update_tax_obligation_status",
         {
-          p_session_id:
-            sessionId,
-
-          p_branch_id:
-            branchId,
-
-          p_tax_year:
-            taxYear
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_tax_year: taxYear
         }
       );
 
-
-    if (statusError) {
-
-      console.error(
-        "update_tax_obligation_status error:",
-        statusError
-      );
-
-      throw statusError;
-    }
-
-
-    /* =====================================================
-       SUCCESS
-    ===================================================== */
-
-    console.log(
-      "Tax Obligation Payment journal:",
-      data
-    );
-
-    console.log(
-      "Tax Obligation status:",
-      statusData
-    );
-
-
+    if (statusError) { throw statusError; }
+		state.accountingTaxData = null;
+		state.accountingTaxFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+    /* ==== SUCCESS ==== */
     closeTaxObligationPaymentModal();
-
     await loadTaxObligation();
 
-
-    const finalStatus =
-      statusData?.status ||
-      "RECORDED";
-
-    const finalOutstanding =
-      Number(
-        statusData?.outstanding || 0
-      );
-
+    const finalStatus = statusData?.status || "RECORDED";
+    const finalOutstanding = Number( statusData? .outstanding || 0 );
 
     if (finalStatus === "PAID") {
-
       showToast(
         `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil dan sudah lunas.`,
         "success"
       );
-
     } else {
-
       showToast(
         `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil. Outstanding ${formatAccountingTaxCurrency(finalOutstanding)}.`,
         "success"
       );
     }
 
-
   } catch (error) {
-
-    console.error(
-      "saveTaxObligationPayment error:",
-      error
-    );
-
     showToast(
       error?.message ||
         "Gagal menyimpan Tax Obligation Payment.",
       "error"
     );
-
   } finally {
-
     if (button) {
-
       button.disabled = false;
-
-      button.innerHTML =
-        button.dataset.originalText ||
-        `
-          <span class="material-symbols-outlined text-sm">
-            payments
-          </span>
-          Pay Tax Obligation
-        `;
+      button.innerHTML = button.dataset.originalText ||
+			`
+				<span class="material-symbols-outlined text-sm">
+					payments
+				</span>
+				Pay Tax Obligation
+			`;
     }
   }
 }
-
-
-
-
-
 
 async function loadTaxObligationPaymentSummary() {
   try {
     const sessionId = getAccountingTaxSessionId();
     const branchId = getAccountingTaxBranchId();
     const taxYear = getAccountingTaxYear();
-
     const { data, error } = await supabaseClient.rpc(
       "get_tax_obligation_payment_summary",
       {
@@ -29984,63 +27553,21 @@ async function loadTaxObligationPaymentSummary() {
       }
     );
 
-    if (error) {
-      console.error(
-        "Error loading tax obligation payment summary:",
-        error
-      );
-      throw error;
-    }
-
+    if (error) { throw error; }
+		
     const summary = data || {};
-
-    const payable =
-      Number(summary.taxObligationPayable || 0);
-
-    const paid =
-      Number(summary.paid || 0);
-
-    const outstanding =
-      Number(summary.outstanding || 0);
-
-    const payableEl =
-      document.getElementById(
-        "accountingTaxObligationPayable"
-      );
-
-    const paidEl =
-      document.getElementById(
-        "accountingTaxObligationPaid"
-      );
-
-    const outstandingEl =
-      document.getElementById(
-        "accountingTaxObligationOutstanding"
-      );
-
-    if (payableEl) {
-      payableEl.textContent =
-        formatAccountingCurrency(payable);
-    }
-
-    if (paidEl) {
-      paidEl.textContent =
-        formatAccountingCurrency(paid);
-    }
-
-    if (outstandingEl) {
-      outstandingEl.textContent =
-        formatAccountingCurrency(outstanding);
-    }
-
+    const payable = Number(summary.taxObligationPayable || 0);
+    const paid = Number(summary.paid || 0);
+    const outstanding = Number(summary.outstanding || 0);
+    const payableEl = document.getElementById( "accountingTaxObligationPayable" );
+    const paidEl = document.getElementById( "accountingTaxObligationPaid" );
+    const outstandingEl = document.getElementById( "accountingTaxObligationOutstanding" );
+		
+    if (payableEl) { payableEl.textContent = formatAccountingCurrency(payable); }
+    if (paidEl) { paidEl.textContent = formatAccountingCurrency(paid); }
+    if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
     return summary;
-
   } catch (error) {
-    console.error(
-      "Error loading tax obligation payment summary:",
-      error
-    );
-
     throw error;
   }
 }
