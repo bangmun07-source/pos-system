@@ -26841,8 +26841,8 @@ async function initAccountingTaxPage() {
 ========================================================= */
 
 async function loadTaxObligasiSettings() {
-	if (accountingTaxSettingsData) {
-    currentTaxSettings = accountingTaxSettingsData;
+	if (state.accountingTaxSettingsData) {
+	currentTaxSettings = state.accountingTaxSettingsData;
     renderCurrentTaxSettings();
     return currentTaxSettings;
   }
