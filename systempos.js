@@ -10073,8 +10073,11 @@ window.saveStockIn = async function () {
     state.recipeDataBranchId = null;
 		state.accountingReportsData = null;
 		state.accountingReportsFilter = null;
+		state.accountingSupplierDebtData = null;
+		state.accountingSupplierDebtFilter = null;
     // CLOSE MODAL
     closeModal();
+		await loadInventoryPage(state.branchId);
     showToast(
       "Purchase berhasil disimpan",
       "success"
