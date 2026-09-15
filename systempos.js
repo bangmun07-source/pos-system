@@ -25890,7 +25890,7 @@ async function saveTaxPayment() {
         p_note: note
       });
 
-    if (error) { hrow error; }
+    if (error) { throw error; }
 		state.accountingTaxPayableData = null;
 		state.accountingTaxPayableFilter = null;
 		state.accountingReportsData = null;
