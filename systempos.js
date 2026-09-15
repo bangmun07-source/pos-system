@@ -27504,8 +27504,8 @@ async function saveTaxObligationPayment() {
     closeTaxObligationPaymentModal();
     await loadTaxObligation();
 
-    const finalStatus = statusData?.status || "RECORDED";
-    const finalOutstanding = Number( statusData?.outstanding || 0 );
+	const finalStatus = statusData?.status || "RECORDED";
+	const finalOutstanding = Number(statusData?.outstanding || 0);
 
     if (finalStatus === "PAID") {
       showToast(
