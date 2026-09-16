@@ -8783,6 +8783,8 @@ async function submitAdjust() {
       }
     );
 
+console.log("ADJUST STOCK RESULT:", data);
+console.log("ADJUST STOCK ERROR:", error);
     if (error) {
       throw error;
     }
