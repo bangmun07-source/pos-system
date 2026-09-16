@@ -13058,53 +13058,18 @@ function getExpenseFilters() {
 function initExpenseSettingPage() {
   loadExpenseBranches("expenseBranchFilter");
   loadExpenseDashboard();
-  document
-    .getElementById(
-      "expenseSearchInput"
-    )
-    ?.addEventListener(
-      "input",
-      filterExpenseTable
-    );
-
-  document
-    .getElementById(
-      "expenseCategoryFilter"
-    )
-    ?.addEventListener(
-      "change",
-      filterExpenseTable
-    );
-
-  document
-    .getElementById(
-      "expenseStatusFilter"
-    )
-    ?.addEventListener(
-      "change",
-      filterExpenseTable
-    );
-
-  document
-	  .getElementById("expenseStartDate")
-	  ?.addEventListener(
-	    "change",
-	    filterExpenseTable
-	  );
-	
-	document
-	  .getElementById("expenseEndDate")
-	  ?.addEventListener(
-	    "change",
-	    filterExpenseTable
-	  );
-
-  document
-    .getElementById(
-      "expenseBranchFilter"
-    )
-    ?.addEventListener(
-      "change",
+  document .getElementById( "expenseSearchInput" )
+    ?.addEventListener( "input", filterExpenseTable );
+  document .getElementById( "expenseCategoryFilter" )
+    ?.addEventListener( "change", filterExpenseTable );
+  document .getElementById( "expenseStatusFilter" )
+    ?.addEventListener( "change", filterExpenseTable );
+  document .getElementById("expenseStartDate")
+	  ?.addEventListener( "change", filterExpenseTable );
+	document .getElementById("expenseEndDate")
+	  ?.addEventListener( "change", filterExpenseTable );
+  document .getElementById( "expenseBranchFilter" )
+    ?.addEventListener( "change",
       async () => {
         state.expenseDashboardData = null;
         state.expenseDashboardFilter = null;
@@ -13113,15 +13078,8 @@ function initExpenseSettingPage() {
     );
 
   setTimeout(() => {
-    document
-      .getElementById(
-        "btnNewExpense"
-      )
-      ?.addEventListener(
-        "click",
-        openAddExpensePopup
-      );
-  }, 50);
+    document .getElementById( "btnNewExpense" )
+      ?.addEventListener( "click", openAddExpensePopup ); }, 50);
 }
 
 function bindExpenseSearch() {
@@ -20937,12 +20895,8 @@ function renderAssetTable() {
 				<button
 				  type="button"
 				  onclick="openAssetActionModal('${escapeAssetHTML(asset.Asset_ID)}')"
-				  class="w-8 h-8 flex items-center justify-center
-						 rounded-md
-						 hover:bg-background-high
-						 transition-colors"
-				  title="Action"
-				>
+				  class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-outline-variant transition-colors"
+				  title="Action" >
 				  <span class="material-symbols-outlined text-[20px]">
 					more_vert
 				  </span>
@@ -20951,7 +20905,7 @@ function renderAssetTable() {
 			  </div>
 			`;
       return `
-        <tr class="hover:bg-background-high transition-colors">
+        <tr class="border-b border-outline-variant hover:bg-outline-variant text-on-surface-variant transition-colors">
           <!-- ASSET -->
           <td class="px-6 py-4">
             <div class="flex flex-col">
@@ -20959,7 +20913,7 @@ function renderAssetTable() {
                 ${escapeAssetHTML(asset.Asset_Name)}
               </span>
 			  
-              <span class="text-[10px] text-muted mt-1">
+              <span class="text-xs text-muted mt-1">
                 ${escapeAssetHTML(asset.Asset_ID)}
               </span>
             </div>
@@ -21420,7 +21374,7 @@ function renderDepreciationHistory() {
   tbody.innerHTML =
     pageData.map(item => {
       return `
-        <tr class="hover:bg-background-high transition-colors">
+        <tr class="border-b border-outline-variant hover:bg-outline-variant transition-colors">
           <td class="px-6 py-4 text-sm">
             ${formatAssetPeriod( item.Period )}
           </td>
@@ -21877,7 +21831,7 @@ function renderAccountingOverview(data) {
                   ${escapeHTML(date)}
                 </p>
 
-                <p class="text-[10px] uppercase tracking-wider text-red-400 mt-2">
+                <p class="text-[10px] uppercase tracking-wider text-red-200 mt-2">
                   ${status}
                 </p>
               </div>
@@ -21999,13 +21953,8 @@ function renderAccountingOverview(data) {
         }).join("");
     }
   }
-
   /* ====== OPTIONAL: SAVE CURRENT ACCOUNTING DATA ====== */
   window.currentAccountingOverview = data;
-  console.log(
-    "Accounting overview rendered:",
-    data
-  );
 }
 
   /* ============================= 
@@ -22087,7 +22036,7 @@ function renderAccountingAccounts(accounts) {
     if (!filteredAccounts.length) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" class="px-6 py-10 text-center text-gray-400">
+                <td colspan="7" class="px-6 py-10 text-center text-on-surface-variant">
                     Belum ada akun.
                 </td>
             </tr>
@@ -22124,13 +22073,13 @@ function renderAccountingAccounts(accounts) {
             EXPENSE: "Expense"
         }[account.accountType] || account.accountType;
         const typeClass = {
-            ASSET: "bg-blue-500/10 text-blue-400",
-            LIABILITY: "bg-red-500/10 text-red-400",
-            EQUITY: "bg-purple-500/10 text-purple-400",
-            REVENUE: "bg-green-500/10 text-green-400",
-            COGS: "bg-orange-500/10 text-orange-400",
-            EXPENSE: "bg-yellow-500/10 text-yellow-400"
-        }[account.accountType] || "bg-gray-500/10 text-gray-400";
+            ASSET: "bg-blue-500/10 text-blue-200",
+            LIABILITY: "bg-red-500/10 text-red-200",
+            EQUITY: "bg-purple-500/10 text-purple-200",
+            REVENUE: "bg-green-500/10 text-green-200",
+            COGS: "bg-orange-500/10 text-orange-200",
+            EXPENSE: "bg-yellow-500/10 text-yellow-200"
+        }[account.accountType] || "text-on-surface-variant";
         const statusClass = account.isActive
             ? "bg-green-500/10 text-green-400"
             : "bg-gray-500/10 text-gray-400";
@@ -22138,9 +22087,9 @@ function renderAccountingAccounts(accounts) {
             ? "ACTIVE"
             : "INACTIVE";
         return `
-            <tr class="border-b border-gray-800 hover:bg-gray-800/40">
+            <tr class="border-b border-outline-variant hover:bg-outline-variant">
                 <td class="px-6 py-4">
-                    <span class="font-mono text-sm text-gray-300">
+                    <span class="font-mono text-sm text-on-surface-variant">
                         ${escapeHtml(account.accountCode || "-")}
                     </span>
                 </td>
@@ -22152,27 +22101,27 @@ function renderAccountingAccounts(accounts) {
                 </td>
 
                 <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${typeClass}">
+                    <span class="px-2.5 py-1 rounded-md text-xs font-medium ${typeClass}">
                         ${typeLabel}
                     </span>
                 </td>
 
-                <td class="px-6 py-4 text-gray-400">
+                <td class="px-6 py-4 text-on-surface-variant">
                     ${escapeHtml(account.parentName || "—")}
                 </td>
 
                 <td class="px-6 py-4">
                     <span class="text-sm ${
                         account.normalBalance === "DEBIT"
-                            ? "text-blue-400"
-                            : "text-green-400"
+                            ? "text-blue-200"
+                            : "text-green-200"
                     }">
                         ${account.normalBalance || "-"}
                     </span>
                 </td>
 
                 <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+                    <span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
                         ${statusLabel}
                     </span>
                 </td>
@@ -22181,7 +22130,7 @@ function renderAccountingAccounts(accounts) {
                     <div class="relative inline-block">
                         <button type="button"
                             onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
-                            class="text-gray-400 hover:text-on-surface transition">
+                            class="text-on-surface-variant hover:text-on-surface transition">
                             <span class="material-symbols-outlined text-[20px]">
                                 more_vert
                             </span>
@@ -22191,7 +22140,7 @@ function renderAccountingAccounts(accounts) {
                             class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50">
                             <button type="button"
                                 onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
-                                class="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5">
+                                class="w-full text-left px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface">
                                 Edit Account
                             </button>
 
@@ -22199,9 +22148,9 @@ function renderAccountingAccounts(accounts) {
                                 onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
                                 class="w-full text-left px-4 py-2 text-sm ${
                                     account.isActive
-                                        ? "text-red-400"
-                                        : "text-emerald-400"
-                                } hover:bg-white/5">
+                                        ? "text-red-200"
+                                        : "text-emerald-200"
+                                } hover: hover:bg-outline-variant">
                                 ${account.isActive ? "Set Inactive" : "Set Active"}
                             </button>
                         </div>
@@ -22690,7 +22639,7 @@ function renderAccountingMappings() {
         tbody.innerHTML = `
             <tr>
                 <td colspan="6"
-                    class="px-6 py-10 text-center text-gray-400">
+                    class="px-6 py-10 text-center text-on-surface-variant">
                     Belum ada account mapping.
                 </td>
             </tr>
@@ -22743,7 +22692,7 @@ function renderAccountingMappings() {
                 : "—";
 
         return `
-            <tr class="border-b border-gray-800 hover:bg-gray-800/40">
+            <tr class="border-b border-outline-variant hover:bg-outline-variant">
                 <!-- TRANSACTION -->
                 <td class="px-6 py-4">
                     <div class="font-medium text-on-surface">
@@ -23293,7 +23242,7 @@ function renderJournalEntryRow(journal) {
 	}[ journal.status ] || "text-muted";
 	
 		return `
-	    <tr class="border-b border-outline-variant hover:bg-white/[0.02]">
+	    <tr class="border-b border-outline-variant hover:bg-outline-variant">
 				<td class="px-5 py-4 font-medium">
 						${escapeHtml( journal.journalNo || "-" )}
 				</td>
@@ -23778,7 +23727,7 @@ async function saveNewJournalEntry() {
 			if (saveButton) {
 					saveButton.disabled = true;
 					saveButton.innerHTML = `
-							<span class="material-symbols-outlined text-[18px] animate-spin">
+							<span class="material-symbols-outlined text-md animate-spin">
 									progress_activity
 							</span>
 							Saving...
@@ -23825,7 +23774,7 @@ async function saveNewJournalEntry() {
 				saveButton.innerHTML =
 						originalButtonHtml ||
 						`
-						<span class="material-symbols-outlined text-[18px]">
+						<span class="material-symbols-outlined text-md">
 								save
 						</span>
 						Save Journal
@@ -23929,7 +23878,7 @@ function renderJournalEntryDetail(journal) {
               totalDebit += debit;
               totalCredit += credit;
                 return `
-									<tr class="border-b border-outline-variant hover:bg-background-low transition-all">
+									<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
 										<td class="px-4 py-4">
 											<div class="text-sm font-medium text-on-surface">
 													${escapeHtml( line.accountCode || "-" )}
@@ -24104,7 +24053,7 @@ function renderGeneralLedger() {
 		const credit = Number(row.credit || 0);
 		const balance = Number(row.balance || 0);
 		return `
-			<tr class="border-b border-outline-variant hover:bg-background-low transition-all">
+			<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
 				<td class="px-5 py-4 text-muted">
 						${formatGeneralLedgerDate(row.journalDate)}
 				</td>
@@ -24540,7 +24489,7 @@ function renderTrialBalance(rows) {
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="4" class="px-4 py-8 text-center text-gray-400">
+        <td colspan="4" class="px-4 py-8 text-center text-on-surface-variant">
           No accounting data available
         </td>
       </tr>
@@ -24674,7 +24623,7 @@ function renderProfitLoss(rows) {
 
         row.innerHTML = `
         	<span class="flex items-center gap-2">
-            <span class="font-mono text-[11px]">
+            <span class="font-mono text-sm">
               ${account.accountCode}
             </span>
             <span>
@@ -25228,7 +25177,7 @@ async function loadSupplierDebt() {
 		tbody.innerHTML = `
 			<tr>
 				<td colspan="8"
-					class="text-center py-8 text-gray-400">
+					class="text-center py-8 text-on-surface-variant">
 					Memuat data hutang supplier...
 				</td>
 			</tr>
@@ -25468,7 +25417,7 @@ function renderSupplierDebtTable() {
 							`;
 
           return `
-						<tr class="border-b border-outline-variant hover:bg-white/5">
+						<tr class="border-b border-outline-variant hover:bg-outline-variant">
 							<td class="px-4 py-3 text-sm font-medium">
 								${escapeHtml(item.id)}
 							</td>
@@ -25954,7 +25903,7 @@ async function loadLiabilities() {
 		tbody.innerHTML = `
 			<tr>
 				<td colspan="8"
-					class="text-center py-8 text-gray-400">
+					class="text-center py-8 text-on-surface-variant">
 					Memuat data liability...
 				</td>
 			</tr>
@@ -26099,7 +26048,7 @@ function renderLiabilities() {
 		if (status === "CANCELLED") { statusClass = "bg-red-500/10 text-red-400"; }
 
     return `
-			<tr class="border-b border-outline-variant hover:bg-white/5">
+			<tr class="border-b border-outline-variant hover:bg-outline-variant">
 				<td class="px-5 py-3">
 					<div class="font-medium text-on-surface">
 						${type}
