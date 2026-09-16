@@ -22073,16 +22073,16 @@ function renderAccountingAccounts(accounts) {
             EXPENSE: "Expense"
         }[account.accountType] || account.accountType;
         const typeClass = {
-            ASSET: "bg-blue-500/10 text-blue-200",
-            LIABILITY: "bg-red-500/10 text-red-200",
-            EQUITY: "bg-purple-500/10 text-purple-200",
-            REVENUE: "bg-green-500/10 text-green-200",
-            COGS: "bg-orange-500/10 text-orange-200",
-            EXPENSE: "bg-yellow-500/10 text-yellow-200"
+            ASSET: "bg-blue-500/10 text-blue-600",
+            LIABILITY: "bg-red-500/10 text-red-600",
+            EQUITY: "bg-purple-500/10 text-purple-600",
+            REVENUE: "bg-green-500/10 text-green-600",
+            COGS: "bg-orange-500/10 text-orange-600",
+            EXPENSE: "bg-yellow-500/10 text-yellow-600"
         }[account.accountType] || "text-on-surface-variant";
         const statusClass = account.isActive
-            ? "bg-green-500/10 text-green-400"
-            : "bg-gray-500/10 text-gray-400";
+            ? "bg-green-500/10 text-green-600"
+            : "bg-gray-500/10 text-gray-600";
         const statusLabel = account.isActive
             ? "ACTIVE"
             : "INACTIVE";
@@ -22113,8 +22113,8 @@ function renderAccountingAccounts(accounts) {
                 <td class="px-6 py-4">
                     <span class="text-sm ${
                         account.normalBalance === "DEBIT"
-                            ? "text-blue-200"
-                            : "text-green-200"
+                            ? "text-blue-600"
+                            : "text-green-600"
                     }">
                         ${account.normalBalance || "-"}
                     </span>
@@ -22148,8 +22148,8 @@ function renderAccountingAccounts(accounts) {
                                 onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
                                 class="w-full text-left px-4 py-2 text-sm ${
                                     account.isActive
-                                        ? "text-red-200"
-                                        : "text-emerald-200"
+                                        ? "text-red-600"
+                                        : "text-emerald-600"
                                 } hover: hover:bg-outline-variant">
                                 ${account.isActive ? "Set Inactive" : "Set Active"}
                             </button>
@@ -22651,8 +22651,8 @@ function renderAccountingMappings() {
     tbody.innerHTML = pageMappings.map(mapping => {
         const statusClass =
             mapping.isActive
-                ? "bg-green-500/10 text-green-400"
-                : "bg-gray-500/10 text-gray-400";
+                ? "bg-green-500/10 text-green-600"
+                : "bg-read-500/10 text-read-600";
         const statusLabel =
             mapping.isActive
                 ? "ACTIVE"
@@ -22710,7 +22710,7 @@ function renderAccountingMappings() {
 
                 <!-- SOURCE -->
                 <td class="px-6 py-4">
-                    <span class="text-sm text-gray-300">
+                    <span class="text-sm text-on-surface-variant">
                         ${escapeHtml(
                             mapping.source || "-"
                         )}
@@ -22750,13 +22750,13 @@ function renderAccountingMappings() {
                              class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
                             <button type="button"
                                 onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
-                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-white/5">
+                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
                                 Edit
                             </button>
 
                             <button type="button"
                                 onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
-                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-white/5">
+                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
                                 ${mapping.isActive
                                     ? "Deactivate"
                                     : "Activate"}
