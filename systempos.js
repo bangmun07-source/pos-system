@@ -8790,6 +8790,8 @@ async function submitAdjust() {
     state.inventoryBranchId = null;
     state.ingredients = null;
     state.ingredientsCacheKey = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     closeAdjustStockModal();
     await loadInventoryPage(state.branchId);
     await loadIngredients(state.branchId);
