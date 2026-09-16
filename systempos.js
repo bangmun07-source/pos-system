@@ -8168,16 +8168,10 @@ async function saveRecipeMaster() {
 
   // PAYLOAD
   const payload = {
-    recipeId:
-      currentRecipeData.id,
-    productId:
-      currentRecipeData.productId,
-    branchId:
-      currentRecipeData.branchId,
-    productName:
-      document.getElementById(
-        "recipeNameInput"
-      ).value,
+    recipeId: currentRecipeData.id,
+    productId: currentRecipeData.productId,
+    branchId: currentRecipeData.branchId,
+    productName: document.getElementById( "recipeNameInput" ).value,
 
     sellingPrice:
       Number(
@@ -8193,11 +8187,7 @@ async function saveRecipeMaster() {
       ),
 
     netPrice:
-      Number(
-        document
-          .getElementById(
-            "recipeNetPrice"
-          )
+      Number( document .getElementById( "recipeNetPrice" )
           .value
           .replace(
             /[^0-9]/g,
@@ -9596,31 +9586,33 @@ function renderRecipeProducts(recipes) {
 async function loadRecipeProducts() {
   const branchId = state.branchId;
   if (!branchId) return;
+  if (
+    state.recipeProductsBranchId === branchId &&
+    Array.isArray(state.recipeProductsData)
+  ) { renderRecipeProducts(state.recipeProductsData);
+    return; }
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_recipe_list",
       {
-				p_session_id: sessionId,
+        p_session_id: sessionId,
         p_branch_id: branchId
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
+		
     const recipes = data || [];
     state.recipeProductsData = recipes;
     state.recipeProductsBranchId = branchId;
     renderRecipeProducts(recipes);
-  }
-  catch (err) {
+
+  } catch (err) {
     state.recipeProductsData = [];
+    state.recipeProductsBranchId = branchId;
     renderRecipeProducts([]);
   }
 }
@@ -9745,17 +9737,12 @@ async function saveRecipeConfig() {
 
 window.loadIngredientSummary = async function(name) {
   if (!name) return;
-  const branchId =
-    document.getElementById(
-      "branchSelect"
-    )?.value ||
-    state.branchId;
+  const branchId = document.getElementById( "branchSelect" )?.value || state.branchId;
 
   if (!branchId) return;
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -9768,9 +9755,7 @@ window.loadIngredientSummary = async function(name) {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     // RESULT
     const res = data || {};
@@ -9789,15 +9774,8 @@ window.loadIngredientSummary = async function(name) {
       );
 
     // RENDER
-    const costEl =
-      document.getElementById(
-        "totalCostPreview"
-      );
-
-    const stockEl =
-      document.getElementById(
-        "newStockPreview"
-      );
+    const costEl = document.getElementById( "totalCostPreview" );
+    const stockEl = document.getElementById( "newStockPreview" );
 
     if (costEl) {
       costEl.innerText =
@@ -9807,16 +9785,9 @@ window.loadIngredientSummary = async function(name) {
         );
     }
 
-
-    if (stockEl) {
-      stockEl.innerText =
-        totalQty.toLocaleString(
-          "id-ID"
-        );
-    }
+    if (stockEl) { stockEl.innerText = totalQty.toLocaleString( "id-ID" ); }
   }
-  catch (err) {
-  }
+  catch (err) { }
 };
 	
 window.openStockInModal = function () {
@@ -10524,11 +10495,8 @@ async function saveNewProduct() {
 	
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const {
-      data: res,
-      error
-    } =
-      await supabaseClient.rpc(
+    const { data: res, error
+    } = await supabaseClient.rpc(
         "add_new_product",
         {
           p_name: name,
@@ -10555,6 +10523,7 @@ async function saveNewProduct() {
     state.inventoryBranchId = null;
     await loadProducts();
     await loadRecipes();
+		await loadRecipeProducts();
     await loadInventoryPage(state.branchId);
     // SUCCESS TOAST
     showToast(
