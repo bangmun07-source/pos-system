@@ -13776,8 +13776,8 @@
 
           <button type="button"
             onclick="saveAssetDepreciationSetting()"
-            class="px-5 py-2 rounded-md bg-on-surface text-background text-sm font-semibold hover:opacity-90 transition-all" >
-            Simpan
+            class="px-5 py-2 rounded-md bottom-theme bg-on-surface text-on-surface text-sm font-semibold transition-all" >
+            Save
           </button>
         </div>
       </div>
@@ -16161,7 +16161,7 @@
     <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
         <div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
             <div>
-                <h3 id="accountModalTitle" class="text-lg font-semibold text-white">
+                <h3 id="accountModalTitle" class="text-lg font-semibold text-on-surface-variant">
                     Add Account
                 </h3>
 
@@ -16188,7 +16188,7 @@
 								<input id="newAccountingAccountCode"
 									type="text"
 									placeholder="Contoh: 1100"
-									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+									class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface-variant outline-none focus:border-primary">
 	            </div>
 	            <!-- ACCOUNT NAME -->
 	            <div>
@@ -16199,7 +16199,7 @@
 								<input id="newAccountingAccountName"
 									type="text"
 									placeholder="Contoh: Cash"
-									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+									class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface-variant outline-none focus:border-primary">
 	            </div>
 	            <!-- ACCOUNT TYPE -->
 	            <div>
@@ -16208,7 +16208,7 @@
 	                </label>
 	
 	                <select id="newAccountingAccountType" onchange="updateAccountingNormalBalance()"
-										class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+										class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
 										<option value="">Select Account Type</option>
 										<option value="ASSET">Asset</option>
 										<option value="LIABILITY">Liability</option>
@@ -16225,7 +16225,7 @@
 								</label>
 
 								<select id="newAccountingAccountParent"
-									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+									class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface-variant outline-none focus:border-primary">
 									<option value="">No Parent Account</option>
 								</select>
 	            </div>
@@ -16236,7 +16236,7 @@
 								</label>
 
 								<select id="newAccountingAccountNormalBalance"
-									class="w-full bg-surface border border-outline-variant rounded-md px-4 py-3 text-white outline-none focus:border-primary">
+									class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface-variant outline-none focus:border-primary">
 									<option value="">Select Normal Balance</option>
 									<option value="DEBIT">Debit</option>
 									<option value="CREDIT">Credit</option>
@@ -16246,7 +16246,7 @@
 	
 	        <div class="flex justify-end gap-3 px-6 py-4 border-t border-outline-variant">
 						<button type="button" onclick="closeAddAccountingAccountModal()"
-							class="px-4 py-2 text-gray-300 hover:bg-white/5">
+							class="px-4 py-2 text-on-surface-variant hover:text-on-surface">
 							Cancel
 						</button>
 
@@ -16313,6 +16313,7 @@
 						<option value="INVENTORY">Inventory</option>
 						<option value="EQUITY">Equity</option>
 						<option value="TRANSFER">Transfer</option>
+						<option value="LIABILITY">Liability</option>
           </select>
         </div>
 
@@ -16557,6 +16558,7 @@
 							  <option value="INVENTORY">Inventory</option>
 							  <option value="EQUITY">Equity</option>
 							  <option value="MANUAL">Manual</option>
+								<option value="LIABILITY">Liability</option>
 							</select>
             </div>
             <!-- STATUS -->
