@@ -14859,153 +14859,156 @@ function filterExpenseTable() {
 }
 	
 function updateExpenseKPIs(data = [], budget = null) {
-  if (budget === null) {
-    budget = expenseBudget || 0;
-  }
-  const branchId = state?.branchId;
-  const filteredData = data.filter(item =>
-    String(item.branchId || "").trim() === String(branchId || "").trim()
-  );
+  if (budget === null) { budget = expenseBudget || 0; }
+  const filteredData = Array.isArray(data) ? data : [];
+
   let totalExpense = 0;
   const categoryMap = {};
+
   filteredData.forEach(item => {
-    const status = item.status || item.Status;
-    // hanya hitung yang sudah dibayar
-    if (status !== "Paid") return;
-    const amount = Number(
-      item.amount || item.Amount || 0
-    );
+    const status = String(
+      item.status ?? item.Status ?? ""
+    ).trim().toUpperCase();
+    // Hanya hitung yang sudah dibayar
+    if (status !== "PAID") return;
+    const amount = Number( item.amount ?? item.Amount ?? 0 );
     totalExpense += amount;
     const cat =
-      item.category || item.Category || "Other";
-    categoryMap[cat] =
-      (categoryMap[cat] || 0) + amount;
+      item.category ??
+      item.Category ??
+      "Other";
+    categoryMap[cat] = (categoryMap[cat] || 0) + amount;
   });
 
   // TOTAL EXPENSE
   const totalEl = document.getElementById("kpiTotalExpense");
-  if (totalEl) {
-    totalEl.innerText = `IDR ${totalExpense.toLocaleString("id-ID")}`;
-  }
+
+  if (totalEl) { totalEl.innerText = `IDR ${totalExpense.toLocaleString("id-ID")}`; }
+
   // LARGEST CATEGORY
   let largestCategory = "-";
   let largestAmount = 0;
-  for (let cat in categoryMap) {
+
+  for (const cat in categoryMap) {
     if (categoryMap[cat] > largestAmount) {
       largestAmount = categoryMap[cat];
       largestCategory = cat;
     }
   }
+
   const catEl = document.getElementById("kpiLargestCategory");
   const catAmtEl = document.getElementById("kpiLargestCategoryAmount");
-  if (catEl) catEl.innerText = largestCategory;
-  if (catAmtEl) catAmtEl.innerText = `IDR ${largestAmount.toLocaleString("id-ID")}`;
-  // BUDGET FLOW
-  const currentBudget =
-    Number(budget || 0);
-  const remaining =
-    currentBudget - totalExpense;
-    // USED % (TOTAL vs BUDGET)
-    const usedPercent = currentBudget > 0
+
+  if (catEl) { catEl.innerText = largestCategory; }
+  if (catAmtEl) { catAmtEl.innerText = `IDR ${largestAmount.toLocaleString("id-ID")}`; }
+
+  // BUDGET
+  const currentBudget = Number(budget || 0);
+  const remaining = currentBudget - totalExpense;
+  const usedPercent = currentBudget > 0
       ? (totalExpense / currentBudget) * 100
       : 0;
-    const safeUsed = Math.max(0, Math.min(100, usedPercent));
-    // REMAINING % (SUDAH PUNYA)
-    const remainPercent = currentBudget > 0
+  const safeUsed = Math.max(0, Math.min(100, usedPercent));
+  const remainPercent = currentBudget > 0
       ? (remaining / currentBudget) * 100
       : 0;
-    const safeRemain = Math.max(0, Math.min(100, remainPercent));
-    //  CARD 1: TOTAL vs BUDGET
-    const budgetTotalEl = document.getElementById("kpiBudgetTotal");
-    if (budgetTotalEl) {
-      budgetTotalEl.innerText = `/ IDR ${currentBudget.toLocaleString("id-ID")}`;
-    }
-    const usedBar = document.getElementById("kpiBudgetBar");
-    if (usedBar) {
-      usedBar.style.width = `${safeUsed}%`;
-    }
-    const utilText = document.getElementById("kpiBudgetUtilizedText");
-    if (utilText) {
-      utilText.innerText = `${safeUsed.toFixed(1)}% Budget Utilized`;
-    }
-    //  CARD 2: BUDGET REMAINING (JANGAN DIUBAH LOGICNYA)
-    const percentEl = document.getElementById("kpiRemainingPercent");
-    const remainEl = document.getElementById("kpiRemainingAmount");
-    if (percentEl) {
-      percentEl.innerText = `${safeRemain.toFixed(0)}%`;
-    }
-    if (remainEl) {
-      remainEl.innerText = `IDR ${remaining.toLocaleString("id-ID")}`;
-    }
-    const remainBar = document.getElementById("expenseBudgetBar");
-    if (remainBar) {
-      remainBar.style.width = `${safeRemain}%`;
-    }
+  const safeRemain = Math.max(0, Math.min(100, remainPercent));
+  const budgetTotalEl = document.getElementById("kpiBudgetTotal");
+  if (budgetTotalEl) {
+    budgetTotalEl.innerText =
+      `/ IDR ${currentBudget.toLocaleString("id-ID")}`;
+  }
+  const usedBar = document.getElementById("kpiBudgetBar");
+  if (usedBar) { usedBar.style.width = `${safeUsed}%`; }
+  const utilText = document.getElementById("kpiBudgetUtilizedText");
+  if (utilText) { utilText.innerText = `${safeUsed.toFixed(1)}% Budget Utilized`; }
+  const percentEl = document.getElementById("kpiRemainingPercent");
+  const remainEl = document.getElementById("kpiRemainingAmount");
+  if (percentEl) { percentEl.innerText = `${safeRemain.toFixed(0)}%`; }
+  if (remainEl) { remainEl.innerText = `IDR ${remaining.toLocaleString("id-ID")}`; }
+  const remainBar = document.getElementById("expenseBudgetBar");
+  if (remainBar) { remainBar.style.width = `${safeRemain}%`; }
+  const monthLabel = document.getElementById("kpiBudgetMonthLabel");
+  if (monthLabel) {
+    const monthName = new Date().toLocaleString("en-US", { month: "short" });
+    monthLabel.innerText = `Left for ${monthName}`; }
+  const now = new Date();
+  const thisMonth = `${now.getFullYear()}-${String( now.getMonth() + 1 ).padStart(2, "0")}`;
+  const lastMonthCalc =
+    now.getMonth() === 0
+      ? {
+          y: now.getFullYear() - 1,
+          m: 12
+        }
+      : {
+          y: now.getFullYear(),
+          m: now.getMonth()
+        };
+  const lastMonth = `${lastMonthCalc.y}-${String( lastMonthCalc.m ).padStart(2, "0")}`;
 
-    // MONTH LABEL
-    const monthLabel = document.getElementById("kpiBudgetMonthLabel");
-    if (monthLabel) {
-      const monthName = new Date().toLocaleString("en-US", {
-        month: "short"
-      });
-      monthLabel.innerText = `Left for ${monthName}`;
+  let thisMonthTotal = 0;
+  let lastMonthTotal = 0;
+
+  filteredData.forEach(item => {
+    const status = String( item.status ?? item.Status ?? "" ).trim().toUpperCase();
+    if (status !== "PAID") return;
+
+    const amount = Number( item.amount ?? item.Amount ?? 0 );
+    const tanggal = item.tanggal ?? item.Tanggal ?? "";
+    const itemMonth = typeof tanggal === "string"
+        ? tanggal.slice(0, 7)
+        : "";
+
+    if (itemMonth === thisMonth) {
+      thisMonthTotal += amount;
     }
-    // TREND (bulan ini vs bulan lalu)
-    const now = new Date();
-    // FIX SAFE MONTH KEY (anti bug timezone)
-    const thisMonth =
-      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
-    const lastMonthCalc =
-      now.getMonth() === 0
-        ? { y: now.getFullYear() - 1, m: 12 }
-        : { y: now.getFullYear(), m: now.getMonth() };
-    const lastMonth =
-      `${lastMonthCalc.y}-${String(lastMonthCalc.m).padStart(2, "0")}`;
-    let thisMonthTotal = 0;
-    let lastMonthTotal = 0;
+    if (itemMonth === lastMonth) {
+      lastMonthTotal += amount;
+    }
+  });
 
-    filteredData.forEach(item => {
-      const amount = Number(item.amount || 0);
-      let itemMonth = "";
-      if (item.tanggal instanceof Date) {
-        itemMonth = item.tanggal.toISOString().slice(0, 7);
-      } else if (typeof item.tanggal === "string") {
-        itemMonth = item.tanggal.slice(0, 7);
-      }
-      if (itemMonth === thisMonth) thisMonthTotal += amount;
-      if (itemMonth === lastMonth) lastMonthTotal += amount;
-    });
-
-  // TREND LOGIC (ANTI FAKE 100%)
   let trend = 0;
-  if (thisMonthTotal === 0 && lastMonthTotal === 0) {
+  if (
+    thisMonthTotal === 0 &&
+    lastMonthTotal === 0
+  ) {
     trend = 0;
-  } 
-  else if (lastMonthTotal === 0) {
-    trend = 0; // jangan paksa 100% biar gak misleading
-  } 
-  else {
-    trend = ((thisMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
+  } else if (lastMonthTotal === 0) {
+    trend = 0;
+  } else {
+    trend =
+      ((thisMonthTotal - lastMonthTotal) /
+        lastMonthTotal) * 100;
   }
   const safeTrend = isFinite(trend) ? trend : 0;
-  // UI UPDATE
-  const trendWrapper = document.getElementById("kpiExpenseTrend");
-  const trendValue = document.getElementById("kpiExpenseTrendValue");
-  const trendIcon = document.getElementById("kpiExpenseTrendIcon");
+  const trendWrapper = document.getElementById( "kpiExpenseTrend" );
+  const trendValue = document.getElementById( "kpiExpenseTrendValue" );
+  const trendIcon = document.getElementById( "kpiExpenseTrendIcon" );
   if (trendValue) {
-    trendValue.innerText = `${Math.abs(safeTrend).toFixed(1)}%`;
+    trendValue.innerText =
+      `${Math.abs(safeTrend).toFixed(1)}%`;
   }
   if (trendWrapper) {
     if (safeTrend >= 0) {
       trendWrapper.classList.add("text-error");
-      trendWrapper.classList.remove("text-on-surface");
+      trendWrapper.classList.remove(
+        "text-on-surface"
+      );
     } else {
-      trendWrapper.classList.add("text-on-surface");
-      trendWrapper.classList.remove("text-error");
+      trendWrapper.classList.add(
+        "text-on-surface"
+      );
+      trendWrapper.classList.remove(
+        "text-error"
+      );
     }
   }
+
   if (trendIcon) {
-    trendIcon.innerText = safeTrend >= 0 ? "arrow_upward" : "arrow_downward";
+    trendIcon.innerText =
+      safeTrend >= 0
+        ? "arrow_upward"
+        : "arrow_downward";
   }
 }
 
