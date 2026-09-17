@@ -15089,7 +15089,7 @@ function selectExpenseMethod(method) {
   let activeId = "";
   if (method === "Cash")
     activeId = "expenseMethodCash";
-  if (method === "Bank Transfer")
+  if (method === "Bank")
     activeId = "expenseMethodBank";
   if (method === "QRIS")
     activeId = "expenseMethodQris";
