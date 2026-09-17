@@ -20584,26 +20584,13 @@ state.assetDataBranchId = null;
 state.depreciationHistoryData = null;
 state.depreciationHistoryBranchId = null;
 async function loadAssetPage() {
+	
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-
-    if (!state.branchId) {
-      console.warn("BranchId belum tersedia");
-      return;
-    }
-
-    if (!sessionId) {
-      console.warn("Session ID belum tersedia");
-      return;
-    }
-
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!state.branchId) { return; }
+    if (!sessionId) { return; }
     const branchId = state.branchId;
-
-    // =====================================================
     // CACHE ASSETS
-    // =====================================================
-
     if (
       state.assetData &&
       state.assetDataBranchId === branchId
@@ -20621,21 +20608,13 @@ async function loadAssetPage() {
         }
       );
 
-      if (assetError) {
-        throw assetError;
-      }
-
+      if (assetError) { throw assetError; }
+			
       assetData = assets || [];
-
-      // SAVE CACHE
       state.assetData = assetData;
       state.assetDataBranchId = branchId;
     }
-
-    // =====================================================
     // CACHE DEPRECIATION HISTORY
-    // =====================================================
-
     if (
       state.depreciationHistoryData &&
       state.depreciationHistoryBranchId === branchId
@@ -20654,48 +20633,128 @@ async function loadAssetPage() {
         }
       );
 
-      if (depreciationError) {
-        throw depreciationError;
-      }
-
-      depreciationHistoryData =
-        depreciation || [];
-
-      // SAVE CACHE
-      state.depreciationHistoryData =
-        depreciationHistoryData;
-
-      state.depreciationHistoryBranchId =
-        branchId;
+      if (depreciationError) { throw depreciationError; }
+      depreciationHistoryData = depreciation || [];
+      state.depreciationHistoryData = depreciationHistoryData;
+      state.depreciationHistoryBranchId = branchId;
     }
-
-    // =====================================================
     // RENDER
-    // =====================================================
-
     renderAssetKPI();
     renderAssetTable();
     renderDepreciationHistory();
-
   } catch (error) {
-    console.error(
-      "loadAssetPage error:",
-      error
-    );
-
+   
     assetData = [];
     depreciationHistoryData = [];
-
     renderAssetKPI();
     renderAssetTable();
     renderDepreciationHistory();
   }
 }
 
+// RUN MONTHLY DEPRECIATION
+async function runMonthlyDepreciation() {
+  const button = document.getElementById( "runMonthlyDepreciationBtn" );
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    const branchId = state.branchId;
+    if (!branchId) { return; }
+    if (!sessionId) { return; }
+    // CONFIRM
+    const confirmed = confirm(
+      "Run monthly depreciation untuk semua asset aktif bulan ini?"
+    );
+
+    if (!confirmed) { return; }
+    // LOADING
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-lg animate-spin">
+          progress_activity
+        </span>
+
+        <span>
+          Processing...
+        </span>
+      `;
+    }
+		
+    // CALL RPC
+    const { data, error } =
+      await supabaseClient.rpc(
+        "run_monthly_depreciation",
+        {
+          p_branch_id: branchId,
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) { throw error; }
+    console.log(
+      "Monthly depreciation berhasil:",
+      data
+    );
+
+    // CLEAR CACHE
+    state.assetData = null;
+    state.assetDataBranchId = null;
+    state.depreciationHistoryData = null;
+    state.depreciationHistoryBranchId = null;
+    // RELOAD
+    await loadAssetPage();
+    alert(
+      "Monthly depreciation berhasil dijalankan."
+    );
+
+  } catch (error) {
+    console.error(
+      "runMonthlyDepreciation error:",
+      error
+    );
+    alert(
+      error?.message ||
+      "Gagal menjalankan monthly depreciation."
+    );
+  } finally {
+
+    // RESTORE BUTTON
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-lg">
+          calendar_month
+        </span>
+
+        <span>
+          Run Depreciation
+        </span>
+      `;
+    }
+  }
+}
+
+// BUTTON EVENT
+
+document.addEventListener(
+  "click",
+  function (event) {
+    const button =
+      event.target.closest(
+        "#runMonthlyDepreciationBtn"
+      );
+    if (!button) {
+      return;
+    }
+    runMonthlyDepreciation();
+  }
+);
+
+
 function clearAssetCache() {
   state.assetData = null;
   state.assetDataBranchId = null;
-
   state.depreciationHistoryData = null;
   state.depreciationHistoryBranchId = null;
 }
