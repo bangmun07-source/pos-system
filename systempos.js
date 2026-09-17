@@ -9727,6 +9727,7 @@ async function saveRecipeConfig() {
     // RELOAD
     await loadInventoryPage(state.branchId);
     await loadRecipes();
+		await loadRecipeProducts();
     alert(
       "Recipe updated!"
     );
