@@ -12611,7 +12611,7 @@
 </div>
 </template>
 
-
+<!-- ASSET PAGE -->
 
 <template id="assetPage">
 	<aside id="sidebar"
@@ -13113,24 +13113,37 @@
           </div>
         </div>
 
-        <!-- SEARCH -->
-        <div class="relative w-full md:w-72">
-          <span class="material-symbols-outlined
-            absolute left-4 top-1/2 -translate-y-1/2
-            text-on-surface-variant text-lg">
 
-            	search
-          </span>
-
-          <input id="depreciationSearchInput"
-            class="w-full bg-transparent
-            border border-outline-variant rounded-md
-            pl-12 pr-6 py-2.5 text-sm text-on-surface
-            focus:ring-1 focus:ring-primary transition-all"
-            placeholder="Search depreciation..."
-            type="text">
-        </div>
-      </div>
+			<!-- SEARCH + ACTION -->
+			<div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+			  <div class="relative w-full md:w-72">
+			    <span class="material-symbols-outlined
+			      absolute left-4 top-1/2 -translate-y-1/2
+			      text-on-surface-variant text-lg">
+			      search
+			    </span>
+			
+			    <input id="depreciationSearchInput"
+			      class="w-full bg-transparent
+			      border border-outline-variant rounded-md
+			      pl-12 pr-6 py-2.5 text-sm text-on-surface
+			      focus:ring-1 focus:ring-primary transition-all"
+			      placeholder="Search depreciation..."
+			      type="text">
+			  </div>
+			
+			  <button id="runMonthlyDepreciationBtn"
+			    type="button"
+			    class="shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 rounded-md bottom-theme text-on-surface text-sm font-semibold text-sm">
+			    <span class="material-symbols-outlined text-lg">
+			      calendar_month
+			    </span>
+			
+			    <span>
+			      Depreciation
+			    </span>
+			  </button>
+			</div>
 
       <!-- TABLE -->
       <div class="overflow-x-auto custom-scrollbar">
@@ -13138,7 +13151,6 @@
           <thead>
             <tr class="sticky top-0 border border-outline-variant
               text-[11px] text-muted uppercase tracking-widest">
-
               <th class="px-6 py-4">
                 Period
               </th>
