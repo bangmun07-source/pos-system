@@ -27334,7 +27334,8 @@ async function saveTaxObligationPayment() {
           p_tax_year: taxYear
         }
       );
-
+console.error("STATUS ERROR:", statusError);
+console.error("STATUS DATA:", statusData);
     if (statusError) { throw statusError; }
 		state.accountingTaxData = null;
 		state.accountingTaxFilter = null;
