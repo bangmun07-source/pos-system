@@ -26628,6 +26628,7 @@ let accountingTaxRecording = false;
 let taxPaymentsData = [];
 let taxPaymentsPage = 1;
 const taxPaymentsPerPage = 10;
+let currentTaxPayment = null;
 
 
 /* =========================================================
@@ -27348,7 +27349,7 @@ async function saveTaxObligationPayment() {
 		  "record_tax_obligation_payment",
 		  {
 		    p_session_id: sessionId,
-		    p_branch_id: branchId,
+		    p_payment_id: currentTaxPayment.payment_id,
 		    p_payment_date: paymentDate,
 		    p_amount: amount,
 		    p_payment_method: method,
@@ -27610,21 +27611,18 @@ function changeTaxPaymentsPage(direction) {
 }
 
 function openTaxPaymentFromRow(paymentId) {
-  const payment = taxPaymentsData.find( item => String(item.payment_id) === String(paymentId) );
-
+  const payment = taxPaymentsData.find(
+    item => String(item.payment_id) === String(paymentId)
+  );
   if (!payment) {
-    showToast(
-      "Tax payment tidak ditemukan.",
-      "error" );
+    showToast("Tax payment tidak ditemukan.", "error");
     return;
   }
-
-  if ( String(payment.status).toUpperCase() !== "OUTSTANDING" ) 
-			{ showToast(
-		      "Tax payment ini sudah tidak outstanding.",
-		      "info" );
-		    return; 
-			}
+  if (String(payment.status).toUpperCase() !== "OUTSTANDING") {
+    showToast("Tax payment ini sudah tidak outstanding.", "info");
+    return;
+  }
+  currentTaxPayment = payment;
   openTaxObligationPaymentModal();
 }
 
