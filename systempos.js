@@ -27270,17 +27270,11 @@ async function saveTaxObligationPayment() {
       );
 
 
-    if (summaryError) {
-      throw summaryError;
-    }
-
-
+    if (summaryError) { throw summaryError; }
     const summary =
       typeof summaryData === "string"
         ? JSON.parse(summaryData)
         : summaryData;
-
-
     const outstanding =
       Math.max(
         Number(
@@ -27289,29 +27283,15 @@ async function saveTaxObligationPayment() {
         0
       );
 
-
-    if (outstanding <= 0) {
-      throw new Error(
-        `Tax Obligation ${taxYear} sudah lunas.`
-      );
-    }
-
-    if (amount > outstanding) {
-      throw new Error(
-        `Pembayaran tidak boleh lebih dari outstanding ${formatAccountingTaxCurrency(outstanding)}.`
-      );
-    }
+    if (outstanding <= 0) { throw new Error( `Tax Obligation ${taxYear} sudah lunas.` );}
+    if (amount > outstanding) { throw new Error( `Pembayaran tidak boleh lebih dari outstanding ${formatAccountingTaxCurrency(outstanding)}.` );}
 
     const paymentAccountId =
       method === "CASH"
         ? TAX_OBLIGATION_CASH_ACCOUNT_ID
         : TAX_OBLIGATION_BANK_ACCOUNT_ID;
 
-    if (!paymentAccountId) {
-      throw new Error(
-        `Account pembayaran untuk ${method} tidak ditemukan.`
-      );
-    }
+    if (!paymentAccountId) { throw new Error( `Account pembayaran untuk ${method} tidak ditemukan.` );}
     /* ==== BUTTON STATE ==== */
     if (button) {
       button.disabled = true;
@@ -27340,11 +27320,8 @@ async function saveTaxObligationPayment() {
     ];
 
 
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.rpc(
+    const { data, error
+    } = await supabaseClient.rpc(
         "create_journal_entry",
         {
           p_journal_date: paymentDate,
@@ -27359,6 +27336,24 @@ async function saveTaxObligationPayment() {
       );
 
     if (error) { throw error; }
+	  /* ==== RECORD TAX PAYMENT ==== */
+		const {
+		  data: paymentData,
+		  error: paymentError
+		} = await supabaseClient.rpc(
+		  "record_tax_obligation_payment",
+		  {
+		    p_session_id: sessionId,
+		    p_branch_id: branchId,
+		    p_payment_date: paymentDate,
+		    p_amount: amount,
+		    p_payment_method: method,
+		    p_reference_no: reference,
+		    p_note: note
+		  }
+		);
+		
+		if (paymentError) { throw paymentError; }
     /* ====  UPDATE STATUS ==== */
     const {
       data: statusData,
@@ -27382,8 +27377,8 @@ async function saveTaxObligationPayment() {
     closeTaxObligationPaymentModal();
     await loadTaxObligation();
 
-	const finalStatus = statusData?.status || "RECORDED";
-	const finalOutstanding = Number(statusData?.outstanding || 0);
+		const finalStatus = statusData?.status || "RECORDED";
+		const finalOutstanding = Number(statusData?.outstanding || 0);
 
     if (finalStatus === "PAID") {
       showToast(
