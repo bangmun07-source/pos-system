@@ -26791,11 +26791,18 @@ function closeTaxSettingsModal() {
 
 async function saveTaxObligasiSettings() {
   let sessionId;
-  try {
-    const sessionId = localStorage.getItem("pos_session_id");
-  } catch (error) {
-    alert(error.message);
-    return; }
+
+	try {
+	  sessionId = localStorage.getItem("pos_session_id");
+			} catch (error) {
+			  alert(error.message);
+			  return;
+			}
+			
+			if (!sessionId) {
+			  alert("Session tidak ditemukan. Silakan login ulang.");
+			  return;
+			}
 	
   const nameEl = document.getElementById( "taxSettingName" );
   const rateEl = document.getElementById( "taxSettingRate" );
