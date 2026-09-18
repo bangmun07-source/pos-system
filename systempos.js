@@ -26625,6 +26625,9 @@ let currentTaxSettings = null;
 let currentTaxObligation = null;
 let accountingTaxLoading = false;
 let accountingTaxRecording = false;
+let taxPaymentsData = [];
+let taxPaymentsPage = 1;
+const taxPaymentsPerPage = 10;
 
 
 /* =========================================================
@@ -26695,10 +26698,11 @@ async function initAccountingTaxPage() {
       yearEl.value = String(new Date().getFullYear());
     }
 
-    await Promise.all([
-      loadTaxObligasiSettings(),
-      loadTaxObligation()
-    ]);
+	await Promise.all([
+		loadTaxObligasiSettings(),
+		loadTaxObligation(),
+		loadTaxPayments()
+	]);
 
   } catch (error) {
     alert(
@@ -27444,3 +27448,183 @@ async function loadTaxObligationPaymentSummary() {
     throw error;
   }
 }
+
+
+/* ===== TAX PAYMENTS ===== */
+async function loadTaxPayments() {
+  try {
+    const sessionId = getAccountingTaxSessionId();
+    const branchId = getAccountingTaxBranchId();
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_tax_payments",
+        {
+          p_session_id: sessionId,
+          p_branch_id: branchId
+        }
+      );
+
+    if (error) { throw error; }
+    const result = typeof data === "string"
+        ? JSON.parse(data)
+        : data;
+
+    taxPaymentsData = Array.isArray(result)
+        ? result
+        : [];
+
+    taxPaymentsPage = 1;
+    renderTaxPayments();
+    return taxPaymentsData;
+  } catch (error) {
+    console.error("loadTaxPayments error:", error);
+    taxPaymentsData = [];
+    renderTaxPayments();
+    throw error;
+  }
+}
+
+function renderTaxPayments() {
+  const tbody = document.getElementById("taxPaymentsTableBody");
+  const paginationInfo = document.getElementById("taxPaymentsPaginationInfo");
+  const prevButton = document.getElementById("taxPaymentsPrevButton");
+  const nextButton = document.getElementById("taxPaymentsNextButton");
+  if (!tbody) return;
+
+  const total = Array.isArray(taxPaymentsData)
+      ? taxPaymentsData.length
+      : 0;
+  const totalPages = Math.max( Math.ceil(total / taxPaymentsPerPage), 1 );
+	
+  if (taxPaymentsPage > totalPages) { taxPaymentsPage = totalPages; }
+  const startIndex = (taxPaymentsPage - 1) * taxPaymentsPerPage;
+  const endIndex = Math.min( startIndex + taxPaymentsPerPage, total );
+  const pageData = taxPaymentsData.slice( startIndex, endIndex );
+
+  if (!pageData.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6"
+          class="px-5 py-10 text-center text-muted">
+          No tax payment data
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML =
+      pageData.map(payment => {
+        const paymentId = payment.payment_id || "";
+        const paymentDate = payment.payment_date || "-";
+        const note = payment.note || payment.reference_no || "-";
+        const amount = formatAccountingTaxCurrency( payment.amount );
+        const method = payment.payment_method
+            ? String(payment.payment_method).toUpperCase()
+            : "—";
+        const status = String( payment.status || "OUTSTANDING" ).toUpperCase();
+				
+        const statusHtml =
+          status === "PAID"
+            ? `
+              <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-outline-variant">
+                PAID
+              </span>
+            `
+            : status === "VOID"
+              ? `
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-outline-variant">
+                  VOID
+                </span>
+              `
+              : `
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border border-outline-variant">
+                  OUTSTANDING
+                </span>
+              `;
+        const actionHtml =
+          status === "OUTSTANDING"
+            ? `
+              <button type="button"
+                onclick="openTaxPaymentFromRow('${paymentId}')"
+                class="h-9 px-3 rounded-md bottom-theme text-xs font-medium inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-sm">
+                  payments
+                </span>
+                Pay
+              </button>
+            `
+            : `
+              <span class="text-xs text-muted">
+                —
+              </span>
+            `;
+        return `
+          <tr class="hover:bg-background transition-colors">
+            <td class="px-5 py-3 whitespace-nowrap">
+              ${paymentDate}
+            </td>
+
+            <td class="px-5 py-3">
+              ${note}
+            </td>
+
+            <td class="px-5 py-3 text-right whitespace-nowrap">
+              ${amount}
+            </td>
+
+            <td class="px-5 py-3 whitespace-nowrap">
+              ${method}
+            </td>
+
+            <td class="px-5 py-3 whitespace-nowrap">
+              ${statusHtml}
+            </td>
+
+            <td class="px-5 py-3 text-right whitespace-nowrap">
+              ${actionHtml}
+            </td>
+          </tr>
+        `;
+      }).join("");
+  }
+
+  /* ===== PAGINATION INFO ===== */
+  if (paginationInfo) {
+    if (total === 0) {  paginationInfo.textContent = "Showing 0–0 of 0";
+    } else { paginationInfo.textContent = `Showing ${startIndex + 1}–${endIndex} of ${total}`; }
+  }
+  /* ===== PAGINATION BUTTON ===== */
+  if (prevButton) { prevButton.disabled = taxPaymentsPage <= 1; }
+  if (nextButton) { nextButton.disabled = taxPaymentsPage >= totalPages; }
+}
+
+function changeTaxPaymentsPage(direction) {
+  const total = Array.isArray(taxPaymentsData)
+      ? taxPaymentsData.length
+      : 0;
+  const totalPages = Math.max( Math.ceil(total / taxPaymentsPerPage), 1 );
+  const nextPage = taxPaymentsPage + Number(direction);
+
+  if ( nextPage < 1 || nextPage > totalPages ) { return; }
+  taxPaymentsPage = nextPage;
+  renderTaxPayments();
+}
+
+function openTaxPaymentFromRow(paymentId) {
+  const payment = taxPaymentsData.find( item => String(item.payment_id) === String(paymentId) );
+
+  if (!payment) {
+    showToast(
+      "Tax payment tidak ditemukan.",
+      "error" );
+    return;
+  }
+
+  if ( String(payment.status).toUpperCase() !== "OUTSTANDING" ) 
+			{ showToast(
+		      "Tax payment ini sudah tidak outstanding.",
+		      "info" );
+		    return; 
+			}
+  openTaxObligationPaymentModal();
+}
+
