@@ -5397,21 +5397,21 @@ function openMemberProfile(memberId) {
     if (current === tier5) {
       tierBadge.classList.add(
         "bg-cyan-400",
-        "text-black"
+        "text-on-surface"
       );
     }
 
     else if (current === tier4) {
       tierBadge.classList.add(
-        "bg-slate-300",
-        "text-black"
+        "bg-gray-400",
+        "text-on-surface"
       );
     }
 
     else if (current === tier3) {
       tierBadge.classList.add(
         "bg-amber-500",
-        "text-black"
+        "text-on-surface"
       );
     }
 
@@ -5596,7 +5596,7 @@ function renderTierTimeline(history, modal) {
   if (!container) return;
   if (!history || !history.length) {
     container.innerHTML = `
-      <div class="text-sm text-muted">
+      <div class="text-sm text-on-surface-variant ">
         No tier history
       </div>
     `;
@@ -5636,75 +5636,44 @@ function renderTierTimeline(history, modal) {
           absolute left-[15px] top-2 bottom-0 w-px
           ${current
             ? "bg-gradient-to-b from-primary to-primary-container/20"
-            : "bg-outline-variant/30"}
-        "></div>
-        <div class="
-          absolute left-0 top-1
-          w-8 h-8 rounded-md
-          flex items-center justify-center
-          z-10
+            : "bg-outline-variant/30"} "></div>
+        <div class=" absolute left-0 top-1 w-8 h-8 rounded-md flex items-center justify-center z-10
           ${current
             ? "bg-primary shadow-[0_0_15px_rgba(255,193,116,0.3)]"
-            : "bg-surface-container-highest border border-outline-variant/30"}
-        ">
-          <span class="
-            material-symbols-outlined text-sm
+            : "bg-surface-container-highest border border-outline-variant"} ">
+          <span class=" material-symbols-outlined text-sm
             ${current
               ? "text-on-primary"
-              : "text-secondary"}
-          ">
+              : "text-secondary"} ">
             ${icon}
           </span>
         </div>
 
-        <div class="
-          p-5 rounded-md
-
+        <div class=" p-5 rounded-md
           ${current
-            ? "bg-surface-container-low/40 border border-primary/20"
-            : "bg-surface-container-low/20 border border-outline-variant"}
-        ">
+            ? "bg-background border border-outline-variant"
+            : "bg-background border border-outline-variant"} ">
           <div class="flex justify-between items-start mb-2">
             <div>
-              <h4 class="
-                font-headline text-lg font-bold
+              <h4 class=" font-headline text-lg font-bold
                 ${current
                   ? "text-on-surface"
-                  : "text-on-surface"}
-              ">
+                  : "text-on-surface"} ">
                 ${tier} Status
               </h4>
 			  
-              <p class="
-                font-label text-[10px]
-                text-on-surface-variant
-                uppercase tracking-widest
-                font-bold opacity-60
-              ">
+              <p class=" font-label text-[10px] text-on-surface-variant uppercase tracking-widest font-bold ">
                 ${year}
               </p>
 			  
-              <p class="
-                text-xs
-                text-on-surface-variant
-                leading-relaxed
-                mt-2
-              ">
+              <p class=" text-xs text-on-surface-variant leading-relaxed mt-2 ">
                 ${description}
               </p>
             </div>
             ${
               current
                 ? `
-                  <div class="
-                    bottom-theme
-                    px-2 py-1
-                    rounded
-                    text-[10px]
-                    font-bold
-                    text-on-surface
-                    border border-primary/20
-                  ">
+                  <div class=" bg-outline-variant px-2 py-1 rounded-md text-[10px] font-bold text-on-surface border border-outline-variant">
                     CURRENT
                   </div>
                 `
@@ -20945,23 +20914,23 @@ function renderAssetTable() {
           <!-- ASSET -->
           <td class="px-6 py-4">
             <div class="flex flex-col">
-              <span class="font-semibold text-sm">
+              <span class="font-semibold text-on-surface text-sm">
                 ${escapeAssetHTML(asset.Asset_Name)}
               </span>
 			  
-              <span class="text-xs text-muted mt-1">
+              <span class="text-xs text-on-surface-variant mt-1">
                 ${escapeAssetHTML(asset.Asset_ID)}
               </span>
             </div>
           </td>
 
           <!-- PURCHASE DATE -->
-          <td class="px-6 py-4 text-sm text-muted">
+          <td class="px-6 py-4 text-sm text-on-surface-variant">
             ${formatAssetDate(asset.Purchase_Date)}
           </td>
 
           <!-- PURCHASE COST -->
-          <td class="px-6 py-4 text-right text-sm">
+          <td class="px-6 py-4 text-right text-on-surface text-sm">
             ${formatAssetCurrency(asset.Purchase_Cost)}
           </td>
 
@@ -20988,12 +20957,12 @@ function renderAssetTable() {
           </td>
 
           <!-- ACCUMULATED -->
-          <td class="px-6 py-4 text-right text-sm">
+          <td class="px-6 py-4 text-right text-on-surface text-sm">
             ${formatAssetCurrency(asset.Accumulated_Depreciation )}
           </td>
 
           <!-- BOOK VALUE -->
-          <td class="px-6 py-4 text-right text-sm font-semibold">
+          <td class="px-6 py-4 text-right text-sm text-on-surface font-semibold">
             ${formatAssetCurrency( asset.Book_Value)}
           </td>
 
@@ -22146,7 +22115,7 @@ function renderAccountingAccounts(accounts) {
                     ${escapeHtml(account.parentName || "—")}
                 </td>
 
-                <td class="px-6 py-4">
+                <td class="px-6 py-4 font-semibold text-center">
                     <span class="text-sm ${
                         account.normalBalance === "DEBIT"
                             ? "text-blue-600"
@@ -22176,7 +22145,7 @@ function renderAccountingAccounts(accounts) {
                             class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50">
                             <button type="button"
                                 onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
-                                class="w-full text-left px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface">
+                                class="w-full text-left px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-outline-variant">
                                 Edit Account
                             </button>
 
@@ -22523,38 +22492,23 @@ async function toggleAccountingAccountStatus(accountId) {
         return;
     }
     try {
-        const { data, error } = await supabaseClient.rpc(
-            "toggle_account_status",
-            {
-                p_account_id: accountId,
-                p_session_id: sessionId
-            }
-        );
-        if (error) {
-            console.error(
-                "toggle_account_status error:",
-                error
-            );
-            alert(
-                error.message ||
-                "Gagal mengubah status account."
-            );
-            return;
-        }
-        console.log(
-            "Account status updated:",
-            data
-        );
+			const { data, error } = await supabaseClient.rpc(
+				"toggle_account_status",
+				{
+					p_account_id: accountId,
+					p_session_id: sessionId
+				}
+			);
+			if (error) {
+				alert(
+					error.message || "Gagal mengubah status account." );
+				return; }
+
         await loadAccountingAccounts();
     } catch (err) {
-        console.error(
-            "toggleAccountingAccountStatus error:",
-            err
-        );
-        alert(
-            "Terjadi kesalahan saat mengubah status account."
-        );
-    }
+			alert(
+				"Terjadi kesalahan saat mengubah status account." );
+	}
 }
 
 
@@ -22586,59 +22540,38 @@ async function loadAccountingMappings() {
         const mappings = Array.isArray(data) ? data : [];
         window.accountingMappings = mappings;
         renderAccountingMappings();
-    } catch (err) {
-        console.error(
-            "loadAccountingMappings error:",
-            err
-        );
-    }
+    } catch (err) { }
 }
 
 /* ====== RENDER ACCOUNT MAPPINGS ====== */
 function renderAccountingMappings() {
-    const tbody =
-        document.getElementById(
-            "accountingMappingsTableBody"
-        );
-    if (!tbody) {
-        console.warn(
-            "accountingMappingsTableBody tidak ditemukan"
-        );
-        return;
-    }
+    const tbody = document.getElementById( "accountingMappingsTableBody" );
+    if (!tbody) { return; }
     const search =
-        (
-            document.getElementById(
-                "accountingMappingSearch"
-            )?.value || ""
-        )
+        ( document.getElementById( "accountingMappingSearch" )?.value || "" )
         .trim()
         .toLowerCase();
-    const typeFilter =
-        document.getElementById(
-            "accountingMappingTypeFilter"
-        )?.value || "";
-    let mappings =
-        Array.isArray(window.accountingMappings)
-            ? window.accountingMappings
-            : [];
+    const typeFilter = document.getElementById( "accountingMappingTypeFilter" )?.value || "";
+    let mappings = Array.isArray(window.accountingMappings)
+				? window.accountingMappings
+				: [];
     /* SEARCH */
     if (search) {
-        mappings = mappings.filter(mapping => {
-            const text = [
-                mapping.mappingName,
-                mapping.transactionType,
-                mapping.source,
-                mapping.debitAccountCode,
-                mapping.debitAccountName,
-                mapping.creditAccountCode,
-                mapping.creditAccountName
-            ]
-                .filter(Boolean)
-                .join(" ")
-                .toLowerCase();
-            return text.includes(search);
-        });
+			mappings = mappings.filter(mapping => {
+				const text = [
+					mapping.mappingName,
+					mapping.transactionType,
+					mapping.source,
+					mapping.debitAccountCode,
+					mapping.debitAccountName,
+					mapping.creditAccountCode,
+					mapping.creditAccountName
+				]
+					.filter(Boolean)
+					.join(" ")
+					.toLowerCase();
+				return text.includes(search);
+			});
     }
     /* FILTER TRANSACTION TYPE */
     if (typeFilter &&
@@ -22661,11 +22594,9 @@ function renderAccountingMappings() {
         )
     );
     if (accountingMappingCurrentPage > totalPages) {
-        accountingMappingCurrentPage = totalPages;
-    }
+        accountingMappingCurrentPage = totalPages; }
     if (accountingMappingCurrentPage < 1) {
-        accountingMappingCurrentPage = 1;
-    }
+        accountingMappingCurrentPage = 1; }
 
     const startIndex = (accountingMappingCurrentPage - 1) * ACCOUNTING_MAPPING_PAGE_SIZE;
     const endIndex = startIndex + ACCOUNTING_MAPPING_PAGE_SIZE;
@@ -22697,16 +22628,12 @@ function renderAccountingMappings() {
             mapping.debitAccountCode ||
             mapping.debitAccountName
                 ? `
-                    <div class="font-medium text-on-surface">
-                        ${escapeHtml(
-                            mapping.debitAccountName || "-"
-                        )}
-                    </div>
-                    <div class="text-xs text-muted mt-1 font-mono">
-                        ${escapeHtml(
-                            mapping.debitAccountCode || "-"
-                        )}
-                    </div>
+									<div class="font-medium text-on-surface">
+											${escapeHtml( mapping.debitAccountName || "-" )}
+									</div>
+									<div class="text-xs text-muted mt-1 font-mono">
+											${escapeHtml( mapping.debitAccountCode || "-" )}
+									</div>
                   `
                 : "—";
 
@@ -22714,98 +22641,82 @@ function renderAccountingMappings() {
             mapping.creditAccountCode ||
             mapping.creditAccountName
                 ? `
-                    <div class="font-medium text-on-surface">
-                        ${escapeHtml(
-                            mapping.creditAccountName || "-"
-                        )}
-                    </div>
-                    <div class="text-xs text-muted mt-1 font-mono">
-                        ${escapeHtml(
-                            mapping.creditAccountCode || "-"
-                        )}
-                    </div>
-                  `
-                : "—";
+							<div class="font-medium text-on-surface">
+									${escapeHtml( mapping.creditAccountName || "-" )}
+							</div>
+							<div class="text-xs text-muted mt-1 font-mono">
+									${escapeHtml( mapping.creditAccountCode || "-" )}
+							</div>
+						`
+					: "—";
+      return `
+				<tr class="border-b border-outline-variant hover:bg-outline-variant">
+					<!-- TRANSACTION -->
+					<td class="px-6 py-4">
+						<div class="font-medium text-on-surface">
+								${escapeHtml( mapping.mappingName || "-" )}
+						</div>
+				
+						<div class="text-xs text-muted mt-1">
+								${escapeHtml( mapping.transactionType || "-" )}
+						</div>
+					</td>
+					<!-- SOURCE -->
+					<td class="px-6 py-4">
+						<span class="text-sm text-on-surface-variant">
+								${escapeHtml( mapping.source || "-" )}
+						</span>
+					</td>
+					<!-- DEBIT -->
+					<td class="px-6 py-4">
+							${debitAccount}
+					</td>
+					<!-- CREDIT -->
+					<td class="px-6 py-4">
+							${creditAccount}
+					</td>
+					<!-- STATUS -->
+					<td class="px-6 py-4">
+						<span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+								${statusLabel}
+						</span>
+					</td>
+					<!-- ACTION -->
+					<td class="px-6 py-4">
+						<div class="relative">
+							<button type="button"
+								onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
+								class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition">
+	
+								<span class="material-symbols-outlined text-lg">
+										more_vert
+								</span>
+							</button>
+		
+							<div id="accountingMappingMenu-${escapeHtml(mapping.mappingId)}"
+								 class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
+								<button type="button"
+									onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
+									class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
+										Edit
+								</button>
+	
+								<button type="button"
+										onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
+										class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
+										${mapping.isActive
+												? "Deactivate"
+												: "Activate"}
+								</button>
+							</div>
+						</div>
+					</td>
+				</tr>
+			`;
+		}).join("");
 
-        return `
-            <tr class="border-b border-outline-variant hover:bg-outline-variant">
-                <!-- TRANSACTION -->
-                <td class="px-6 py-4">
-                    <div class="font-medium text-on-surface">
-                        ${escapeHtml(
-                            mapping.mappingName || "-"
-                        )}
-                    </div>
-
-                    <div class="text-xs text-muted mt-1">
-                        ${escapeHtml(
-                            mapping.transactionType || "-"
-                        )}
-                    </div>
-                </td>
-
-                <!-- SOURCE -->
-                <td class="px-6 py-4">
-                    <span class="text-sm text-on-surface-variant">
-                        ${escapeHtml(
-                            mapping.source || "-"
-                        )}
-                    </span>
-                </td>
-
-                <!-- DEBIT -->
-                <td class="px-6 py-4">
-                    ${debitAccount}
-                </td>
-
-                <!-- CREDIT -->
-                <td class="px-6 py-4">
-                    ${creditAccount}
-                </td>
-
-                <!-- STATUS -->
-                <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
-                        ${statusLabel}
-                    </span>
-                </td>
-
-                <!-- ACTION -->
-                <td class="px-6 py-4">
-                    <div class="relative">
-                        <button type="button"
-                            onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
-                            class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition">
-
-                            <span class="material-symbols-outlined text-lg">
-                                more_vert
-                            </span>
-                        </button>
-
-                        <div id="accountingMappingMenu-${escapeHtml(mapping.mappingId)}"
-                             class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
-                            <button type="button"
-                                onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
-                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
-                                Edit
-                            </button>
-
-                            <button type="button"
-                                onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
-                                class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
-                                ${mapping.isActive
-                                    ? "Deactivate"
-                                    : "Activate"}
-                            </button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join("");
-
-    updateAccountingMappingPaginationInfo( totalMappings );
-    updateAccountingMappingPaginationButtons( totalPages );
+	updateAccountingMappingPaginationInfo( totalMappings );
+	updateAccountingMappingPaginationButtons( totalPages );
 }
 
 
@@ -25998,11 +25909,6 @@ try {
 	renderLiabilities();
 
 } catch (error) {
-	console.error(
-		"loadLiabilities error:",
-		error
-	);
-
 	if (tbody) {
 		tbody.innerHTML = `
 			<tr>
@@ -26095,7 +26001,7 @@ function renderLiabilities() {
 					</div>
 				</td>
 		
-				<td class="px-5 py-3 text-slate-300">
+				<td class="px-5 py-3 text-on-surface">
 					${creditor}
 				</td>
 		
