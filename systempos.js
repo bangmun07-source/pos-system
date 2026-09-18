@@ -27125,56 +27125,36 @@ async function openTaxObligationPaymentModal() {
     const dateEl = document.getElementById( "taxObligationPaymentDate" );
 		
     if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingTaxDate(); }
-    /* ==== LOAD TAX OBLIGATION ==== */
-    const obligation = await loadTaxObligation();
-    const taxAmount = Number(obligation?.tax_amount || 0);
-    if (taxAmount <= 0) {
-      throw new Error(
-        "Tidak ada Tax Obligation yang harus dibayar."
-      );
-    }
-
-    const toDate = `${taxYear}-12-31`;
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_balance_sheet",
-        {
-          p_branch_id: branchId,
-          p_to_date: toDate,
-          p_session_id: sessionId
-        }
-      );
-
-    if (error) { throw error; }
-
-    const balanceSheet = typeof data === "string"
-        ? JSON.parse(data)
-        : data;
-    const accounts = Array.isArray(balanceSheet?.accounts)
-        ? balanceSheet.accounts
-        : [];
-
-
-    const obligationAccount = accounts.find(account => account.accountId ===
-      		TAX_OBLIGATION_PAYABLE_ACCOUNT_ID || account.accountCode === 
-					TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE );
+    /* ==== GET PAYMENT AMOUNT ==== */
+		const paymentAmount = Number(
+		  currentTaxPayment?.amount || 0
+		);
 		
-    let outstanding = Number( obligationAccount?.balance || 0 );
+		if (paymentAmount <= 0) {
+		  throw new Error(
+		    "Jumlah Tax Payment tidak valid."
+		  );
+		}
 		
-    outstanding = Math.min( Math.max(outstanding, 0), taxAmount );
+		/* ==== OUTSTANDING ==== */
+		const outstandingEl = document.getElementById(
+		  "taxObligationPaymentOutstanding"
+		);
 		
-    const outstandingEl = document.getElementById( "taxObligationPaymentOutstanding" );
-
-    if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency( outstanding ); }
-    /* ==== AMOUNT DEFAULT ==== */
-    const amountEl = document.getElementById( "taxObligationPaymentAmount" );
-
-    if (amountEl) {
-      amountEl.value = outstanding > 0
-          ? outstanding
-          : "";
-      amountEl.max = String(outstanding);
-    }
+		if (outstandingEl) {
+		  outstandingEl.textContent =
+		    formatAccountingTaxCurrency(paymentAmount);
+		}
+		
+		/* ==== AMOUNT DEFAULT ==== */
+		const amountEl = document.getElementById(
+		  "taxObligationPaymentAmount"
+		);
+		
+		if (amountEl) {
+		  amountEl.value = paymentAmount;
+		  amountEl.max = String(paymentAmount);
+		}
     /* ==== METHOD DEFAULT ==== */
     const methodEl = document.getElementById( "taxObligationPaymentMethod" );
     if (methodEl && !methodEl.value) { methodEl.value = "CASH"; }
