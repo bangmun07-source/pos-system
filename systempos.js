@@ -26635,24 +26635,6 @@ let currentTaxPayment = null;
    HELPERS
 ========================================================= */
 
-function getAccountingTaxSessionId() {
-  const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) {
-    throw new Error("Session tidak ditemukan.");
-  }
-  return sessionId;
-}
-
-
-function getAccountingTaxBranchId() {
-  const branchId = state?.branchId;
-  if (!branchId) {
-    throw new Error("Outlet/Branch belum dipilih.");
-  }
-  return branchId;
-}
-
-
 function formatAccountingTaxCurrency(value) {
   const amount = Number(value || 0);
   return "Rp " + amount.toLocaleString("id-ID");
@@ -26726,7 +26708,7 @@ async function loadTaxObligasiSettings() {
     renderCurrentTaxSettings();
     return currentTaxSettings;
   }
-  const sessionId = getAccountingTaxSessionId();
+  const sessionId = localStorage.getItem("pos_session_id");
   const { data, error } =
     await supabaseClient.rpc(
       "get_tax_settings",
@@ -26810,7 +26792,7 @@ function closeTaxSettingsModal() {
 async function saveTaxObligasiSettings() {
   let sessionId;
   try {
-    sessionId = getAccountingTaxSessionId();
+    const sessionId = localStorage.getItem("pos_session_id");
   } catch (error) {
     alert(error.message);
     return; }
@@ -26897,8 +26879,8 @@ async function saveTaxObligasiSettings() {
 ========================================================= */
 
 async function loadTaxObligation() {
-  const sessionId = getAccountingTaxSessionId();
-  const branchId = getAccountingTaxBranchId();
+  const sessionId = localStorage.getItem("pos_session_id");
+  const branchId = state.branchId;
   const taxYear = getAccountingTaxYear();
 	const currentFilter = { branchId, taxYear };
   // ===== CACHE HIT =====
@@ -27012,8 +26994,8 @@ document.addEventListener( "change",
 async function recordTaxObligation() {
   if (accountingTaxRecording) return;
 
-  const sessionId = getAccountingTaxSessionId();
-  const branchId = getAccountingTaxBranchId();
+	const sessionId = localStorage.getItem("pos_session_id");
+  const branchId = state.branchId;
   const taxYear = getAccountingTaxYear();
 
   if (!sessionId) {
@@ -27110,8 +27092,8 @@ async function openTaxObligationPaymentModal() {
   if (!modal) return;
 
   try {
-    const sessionId = getAccountingTaxSessionId();
-    const branchId = getAccountingTaxBranchId();
+	  const sessionId = localStorage.getItem("pos_session_id");
+	  const branchId = state.branchId;
     const taxYear = getAccountingTaxYear();
 
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
@@ -27188,8 +27170,8 @@ async function saveTaxObligationPayment() {
   const button = document.getElementById( "saveTaxObligationPaymentButton" );
 
   try {
-    const sessionId = getAccountingTaxSessionId();
-    const branchId = getAccountingTaxBranchId();
+	  const sessionId = localStorage.getItem("pos_session_id");
+	  const branchId = state.branchId;
     const taxYear = getAccountingTaxYear();
 		
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
@@ -27399,8 +27381,8 @@ async function saveTaxObligationPayment() {
 
 async function loadTaxObligationPaymentSummary() {
   try {
-    const sessionId = getAccountingTaxSessionId();
-    const branchId = getAccountingTaxBranchId();
+	  const sessionId = localStorage.getItem("pos_session_id");
+	  const branchId = state.branchId;
     const taxYear = getAccountingTaxYear();
     const { data, error } = await supabaseClient.rpc(
       "get_tax_obligation_payment_summary",
@@ -27434,8 +27416,8 @@ async function loadTaxObligationPaymentSummary() {
 /* ===== TAX PAYMENTS ===== */
 async function loadTaxPayments() {
   try {
-    const sessionId = getAccountingTaxSessionId();
-    const branchId = getAccountingTaxBranchId();
+	  const sessionId = localStorage.getItem("pos_session_id");
+	  const branchId = state.branchId;
     const { data, error } =
       await supabaseClient.rpc(
         "get_tax_payments",
