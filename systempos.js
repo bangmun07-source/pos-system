@@ -5632,19 +5632,18 @@ function renderTierTimeline(history, modal) {
 
     return `
       <div class="relative pl-10">
-        <div class="
-          absolute left-[15px] top-2 bottom-0 w-px
+        <div class=" absolute left-[15px] top-2 bottom-0 w-px
           ${current
-            ? "bg-gradient-to-b from-primary to-primary-container/20"
-            : "bg-outline-variant/30"} "></div>
+            ? "bg-gradient-to-b from-on-surface to-text-on-surface-variant"
+            : "bg-outline-variant"} "></div>
         <div class=" absolute left-0 top-1 w-8 h-8 rounded-md flex items-center justify-center z-10
           ${current
-            ? "bg-primary shadow-[0_0_15px_rgba(255,193,116,0.3)]"
-            : "bg-surface-container-highest border border-outline-variant"} ">
+            ? "bg-background shadow-[0_0_15px_rgba(255,193,116,0.3)]"
+            : "bg-background border border-outline-variant"} ">
           <span class=" material-symbols-outlined text-sm
             ${current
-              ? "text-on-primary"
-              : "text-secondary"} ">
+              ? "text-on-surface-variant"
+              : "text-on-surface"} ">
             ${icon}
           </span>
         </div>
@@ -5867,31 +5866,24 @@ function renderTierProgression(history = []) {
         No tier history
       </p>
     `;
-
     return;
   }
 
   el.innerHTML = history.map((item, index) => {
-
     const isCurrent = index === 0;
-
     return `
       <div class="relative flex items-center justify-between pl-8">
-
-        <div class="
-          absolute left-0 w-2 h-2 rounded-md
+        <div class=" absolute left-0 w-2 h-2 rounded-md
           ${isCurrent
             ? "bg-primary shadow-[0_0_8px_rgba(245,158,11,0.6)]"
-            : "bg-outline-variant"}
-        "></div>
+            : "bg-outline-variant"} ">
+			</div>
 
         <div>
-          <p class="
-            text-[10px] font-bold tracking-widest uppercase
+          <p class=" text-[10px] font-bold tracking-widest uppercase
             ${isCurrent
               ? "text-on-surface"
-              : "text-on-surface-variant/60"}
-          ">
+              : "text-on-surface-variant"} ">
             ${item.year}
           </p>
 
@@ -5899,8 +5891,7 @@ function renderTierProgression(history = []) {
             text-sm font-semibold
             ${isCurrent
               ? "text-on-surface"
-              : "text-on-surface/80"}
-          ">
+              : "text-on-surface-variant"} ">
             ${item.tier}
           </p>
         </div>
@@ -5908,14 +5899,7 @@ function renderTierProgression(history = []) {
         ${
           isCurrent
             ? `
-            <span class="
-              text-[10px]
-              bg-primary-container/20
-              text-on-surface
-              border border-primary/30
-              px-2 py-0.5
-              rounded-md
-            ">
+            <span class=" text-[10px] bg-background text-on-surface border border-outline-variant px-2 py-0.5 rounded-md ">
               Current
             </span>
           `
