@@ -19508,38 +19508,102 @@
           </div>
           <!-- SUMMARY -->
           <div class="grid grid-cols-2 md:grid-cols-4 border-t border-outline-variant">
-            <div class="p-5 border-r border-outline-variant">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Commercial Profit
-              </p>
-
-              <p id="pphBadanCommercialProfit"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
-
-            <div class="p-5 border-r border-outline-variant">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Fiscal Adjustment
-              </p>
-
-              <p id="pphBadanFiscalAdjustment"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
-
-            <div class="p-5 border-r border-outline-variant">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Taxable Income
-              </p>
-
-              <p id="pphBadanTaxableIncome"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
+						  <div class="p-5 border-r border-outline-variant">
+						    <p class="text-[11px] text-muted uppercase tracking-wider">
+						      Commercial Profit
+						    </p>
+						
+						    <p id="pphBadanCommercialProfit"
+						      class="text-xl font-headline mt-1">
+						      Rp 0
+						    </p>
+						  </div>
+						
+						  <div class="p-5 border-r border-outline-variant">
+						    <p class="text-[11px] text-muted uppercase tracking-wider">
+						      Positive Adjustment
+						    </p>
+						
+						    <p id="pphBadanPositiveAdjustment"
+						      class="text-xl font-headline mt-1">
+						      Rp 0
+						    </p>
+						  </div>
+						
+						  <div class="p-5 border-r border-outline-variant">
+						    <p class="text-[11px] text-muted uppercase tracking-wider">
+						      Negative Adjustment
+						    </p>
+						
+						    <p id="pphBadanNegativeAdjustment"
+						      class="text-xl font-headline mt-1">
+						      Rp 0
+						    </p>
+						  </div>
+						
+						  <div class="p-5">
+						    <p class="text-[11px] text-muted uppercase tracking-wider">
+						      Taxable Income
+						    </p>
+						
+						    <p id="pphBadanTaxableIncome"
+						      class="text-xl font-headline mt-1">
+						      Rp 0
+						    </p>
+						  </div>
+						</div>
+						<!-- FISCAL ADJUSTMENT -->
+						<section class="border-t border-outline-variant">
+						  <div class="p-5 border-b border-outline-variant">
+						    <h3 class="text-sm font-semibold text-foreground">
+						      Fiscal Adjustment
+						    </h3>
+						
+						    <p class="text-xs text-muted mt-1">
+						      Adjust commercial profit to taxable income.
+						    </p>
+						  </div>
+						
+						  <div class="p-5 space-y-4">
+						    <div class="flex items-center justify-between gap-4">
+						      <div>
+						        <p class="text-sm font-medium">
+						          Positive Adjustment
+						        </p>
+						
+						        <p class="text-[11px] text-muted mt-1">
+						          Add back expenses that are not fiscally deductible.
+						        </p>
+						      </div>
+						
+						      <input id="pphBadanPositiveAdjustmentInput"
+						        type="number"
+						        min="0"
+						        step="1"
+						        value="0"
+						        class="w-48 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						    </div>
+						    <!-- NEGATIVE -->
+						    <div class="flex items-center justify-between gap-4">
+						      <div>
+						        <p class="text-sm font-medium">
+						          Negative Adjustment
+						        </p>
+						
+						        <p class="text-[11px] text-muted mt-1">
+						          Deduct amounts allowed as fiscal adjustments.
+						        </p>
+						      </div>
+						
+						      <input id="pphBadanNegativeAdjustmentInput"
+						        type="number"
+						        min="0"
+						        step="1"
+						        value="0"
+						        class="w-48 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						    </div>
+						  </div>
+						</section>					
 
             <div class="p-5">
               <p class="text-[11px] text-muted uppercase tracking-wider">
