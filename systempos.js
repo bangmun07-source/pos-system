@@ -27975,3 +27975,16 @@ function changePphBadanPage(direction) {
   pphBadanRecordsPage = nextPage;
   renderPphBadanRecords();
 }
+
+function formatPphBadanDate(value) {
+  if (!value) { return "-"; }
+
+  const date = new Date(`${value}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) { return String(value); }
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+}
