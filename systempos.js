@@ -26685,7 +26685,8 @@ async function initAccountingTaxPage() {
 	await Promise.all([
 		loadTaxObligasiSettings(),
 		loadTaxObligation(),
-		loadTaxPayments()
+	  loadTaxPayments(),
+	  loadPphBadanRecords()
 	]);
 
   } catch (error) {
@@ -27758,8 +27759,9 @@ async function calculatePphBadan() {
 document.addEventListener(
   "change",
   function(event) {
-    if ( event.target?.id !== "pphBadanYear"
-    ) { return; }
+    if ( event.target?.id !== "pphBadanYear" ) 
+				{ return; }
+
     const ids = [
       "pphBadanCommercialProfit",
       "pphBadanPositiveAdjustment",
@@ -27772,8 +27774,204 @@ document.addEventListener(
       const el = document.getElementById(id);
       if (el) { el.textContent = "Rp 0"; }
     });
-
     const statusEl = document.getElementById( "pphBadanStatus" );
+
     if (statusEl) { statusEl.textContent = "Not Calculated"; }
+    loadPphBadanRecords();
   }
 );
+
+
+let pphBadanRecords = [];
+let pphBadanRecordsPage = 1;
+const pphBadanRecordsPerPage = 10;
+
+async function loadPphBadanRecords() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    const branchId = state.branchId;
+
+    if (!sessionId || !branchId) { return; }
+
+    const taxYearEl = document.getElementById("pphBadanYear");
+    const taxYear = Number(taxYearEl?.value || 0);
+
+    const { data, error
+    } = await supabaseClient.rpc(
+      "get_pph_badan_records",
+      {
+        p_branch_id: branchId,
+        p_session_id: sessionId,
+        p_tax_year:
+          taxYear >= 2000 && taxYear <= 9999
+            ? taxYear
+            : null
+      }
+    );
+
+    if (error) {
+      console.error(
+        "get_pph_badan_records error:",
+        error
+      );
+      throw error; }
+		
+    pphBadanRecords = typeof data === "string"
+        ? JSON.parse(data)
+        : (data || []);
+    pphBadanRecordsPage = 1;
+    renderPphBadanRecords();
+  } catch (error) {
+    console.error(
+      "loadPphBadanRecords error:",
+      error
+    );
+    pphBadanRecords = [];
+    renderPphBadanRecords();
+  }
+}
+
+function renderPphBadanRecords() {
+  const tbody = document.getElementById( "pphBadanTableBody" );
+  const paginationInfo = document.getElementById( "pphBadanPaginationInfo" );
+  const prevButton = document.getElementById( "pphBadanPrevButton" );
+  const nextButton = document.getElementById( "pphBadanNextButton" );
+
+  if (!tbody) return;
+  const total = pphBadanRecords.length;
+  const totalPages =
+    Math.max(
+      Math.ceil(
+        total / pphBadanRecordsPerPage
+      ),
+      1
+    );
+
+  if ( pphBadanRecordsPage > totalPages ) 
+			{ pphBadanRecordsPage = totalPages; }
+  const start = (pphBadanRecordsPage - 1) * pphBadanRecordsPerPage;
+  const end = Math.min( start + pphBadanRecordsPerPage, total );
+  const rows = pphBadanRecords.slice(start, end);
+
+if (!rows.length) {
+	tbody.innerHTML = `
+		<tr>
+			<td
+				colspan="6"
+				class="px-5 py-10 text-center text-muted" >
+				No PPh Badan data
+			</td>
+		</tr>
+	`;
+} else {
+	tbody.innerHTML =
+		rows.map(row => {
+
+			const period =
+				`${formatPphBadanDate(row.fromDate)}
+				 - 
+				 ${formatPphBadanDate(row.toDate)}`;
+			const status = String( row.status || "DRAFT" ).toUpperCase();
+
+			return `
+				<tr class="hover:bg-surface-container transition-colors" >
+					<td class="px-5 py-4 font-medium">
+						${row.taxYear ?? "-"}
+					</td>
+
+					<td class="px-5 py-4 text-muted whitespace-nowrap">
+						${period}
+					</td>
+
+					<td class="px-5 py-4 text-right whitespace-nowrap">
+						${formatAccountingTaxCurrency( row.taxableIncome )}
+					</td>
+
+					<td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
+						${formatAccountingTaxCurrency( row.taxAmount )}
+					</td>
+
+					<td class="px-5 py-4">
+						${getPphBadanStatusBadge(status)}
+					</td>
+
+					<td class="px-5 py-4 text-right">
+						<button type="button"
+							onclick="openPphBadanRecordMenu('${row.id}')"
+							class="w-9 h-9 inline-flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high"
+							title="Action" >
+
+							<span class="material-symbols-outlined text-lg">
+								more_vert
+							</span>
+						</button>
+					</td>
+				</tr>
+			`;
+		}).join("");
+  }
+
+  if (paginationInfo) { paginationInfo.textContent = total === 0
+			? "Showing 0–0 of 0"
+			: `Showing ${start + 1}–${end} of ${total}`; }
+  if (prevButton) { prevButton.disabled = pphBadanRecordsPage <= 1; }
+  if (nextButton) { nextButton.disabled = pphBadanRecordsPage >= totalPages; }
+}
+
+function getPphBadanStatusBadge(status) {
+  const normalized = String(status || "") .toUpperCase();
+  const config = {
+    DRAFT: {
+      label: "Draft",
+      className: "bg-surface-container-high text-muted"
+    },
+
+    CALCULATED: {
+      label: "Calculated",
+      className: "bg-blue-500/10 text-blue-600"
+    },
+
+    RECORDED: {
+      label: "Recorded",
+      className: "bg-green-500/10 text-green-600"
+    },
+
+    PARTIALLY_PAID: {
+      label: "Partially Paid",
+      className: "bg-yellow-500/10 text-yellow-600"
+    },
+
+    PAID: {
+      label: "Paid",
+      className: "bg-green-500/10 text-green-600"
+    }
+  };
+
+  const item = config[normalized] || {
+      label: normalized || "Unknown",
+      className: "bg-surface-container-high text-muted"
+    };
+
+  return `
+    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${item.className}" >
+      ${item.label}
+    </span>
+  `;
+}
+
+function changePphBadanPage(direction) {
+  const totalPages =
+    Math.max(
+      Math.ceil(
+        pphBadanRecords.length /
+        pphBadanRecordsPerPage
+      ),
+      1
+    );
+
+  const nextPage = pphBadanRecordsPage + direction;
+  if ( nextPage < 1 || nextPage > totalPages ) 
+			{ return; }
+  pphBadanRecordsPage = nextPage;
+  renderPphBadanRecords();
+}
