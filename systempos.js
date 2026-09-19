@@ -26675,6 +26675,7 @@ async function initAccountingTaxPage() {
   accountingTaxLoading = true;
 
   try {
+	changeTaxRegime();
     const yearEl = document.getElementById("taxObligationYear");
 
     if (yearEl && !yearEl.value) {
@@ -27596,3 +27597,19 @@ function openTaxPaymentFromRow(paymentId) {
   openTaxObligationPaymentModal();
 }
 
+
+function changeTaxRegime() {
+  const regime = document.getElementById("taxRegime")?.value;
+  const finalSection = document.getElementById("pphFinalSection");
+  const badanSection = document.getElementById("pphBadanNormalSection");
+
+  if (!finalSection || !badanSection) return;
+
+  if (regime === "BADAN_NORMAL") {
+    finalSection.classList.add("hidden");
+    badanSection.classList.remove("hidden");
+  } else {
+    finalSection.classList.remove("hidden");
+    badanSection.classList.add("hidden");
+  }
+}
