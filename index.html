@@ -19145,12 +19145,9 @@
 	                  Tax Year
 	                </label>
 	
-	                <select id="taxObligationYear"
-	                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-	                  <option value="2026"> 2026 </option>
-	                  <option value="2025"> 2025 </option>
-	                  <option value="2024"> 2024 </option>
-	                </select>
+									<select id="taxObligationYear"
+									  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+									</select>
 	              </div>
 	              <!-- BRANCH -->
 	              <div>
@@ -19158,11 +19155,10 @@
 	                  Outlet
 	                </label>
 	
-	                <div class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground flex items-center">
-	                  <span id="taxObligationBranchName">
-	                    Current Outlet
-	                  </span>
-	                </div>
+	                <select id="taxObligationBranchFilter"
+									  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+									  <option value="">All Branch</option>
+									</select>
 	              </div>
 	            </div>
 	          </div>
@@ -19485,25 +19481,23 @@
                   Tax Year
                 </label>
 
-                <select id="pphBadanYear"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value="2026">2026</option>
-                  <option value="2025">2025</option>
-                  <option value="2024">2024</option>
-                </select>
+								<select id="pphBadanYear"
+								  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+								</select>
               </div>
 
               <div>
-                <label class="block text-xs text-muted mb-2">
-                  Outlet
-                </label>
-
-                <div class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground flex items-center">
-                  <span id="pphBadanBranchName">
-                    Current Outlet
-                  </span>
-                </div>
-              </div>
+							  <label class="block text-xs text-muted mb-2">
+							    Outlet
+							  </label>
+							
+							  <select id="pphBadanBranchFilter"
+							    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+							    <option value="">
+							      All Branch
+							    </option>
+							  </select>
+							</div>
             </div>
           </div>
           <!-- SUMMARY -->
