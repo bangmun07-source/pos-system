@@ -28433,10 +28433,10 @@ async function savePphBadanCalculation() {
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const branchId = state.branchId;
+    const branchId = getPphBadanBranchId();
 
     if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
-    if (!branchId) { throw new Error( "Branch belum dipilih." ); }
+    if (!branchId) { throw new Error("Pilih branch terlebih dahulu untuk menyimpan PPh Badan."); }
 
     const button = document.getElementById( "savePphBadanButton" );
     pphBadanSaving = true;
