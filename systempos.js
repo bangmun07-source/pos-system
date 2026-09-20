@@ -28553,6 +28553,17 @@ function closePphBadanActionMenu() {
   selectedPphBadanRecordId = null;
 }
 
+function closePphBadanPaymentModal() {
+  const modal = document.getElementById("pphBadanPaymentModal");
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  selectedPphBadanRecordId = null;
+}
+
 function viewPphBadanDetailFromAction() {
   const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
   if (!record) {
