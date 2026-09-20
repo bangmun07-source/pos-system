@@ -28198,6 +28198,56 @@ function openPphBadanRecordMenu(recordId) {
   modal.classList.add("flex");
 }
 
+function payPphBadanFromAction() {
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(selectedPphBadanRecordId)
+  );
+
+  if (!record) {
+    showToast("Data PPh Badan tidak ditemukan.", "error");
+    return;
+  }
+
+  const paymentRecordId = record.id;
+
+  closePphBadanActionMenu();
+
+  // kembalikan ID untuk proses pembayaran
+  selectedPphBadanRecordId = paymentRecordId;
+
+  const modal = document.getElementById("pphBadanPaymentModal");
+
+  if (!modal) {
+    console.error("PPh Badan Payment modal tidak ditemukan.");
+    return;
+  }
+
+  const yearEl = document.getElementById("pphBadanPaymentYear");
+  const outstandingEl = document.getElementById("pphBadanPaymentOutstanding");
+  const amountEl = document.getElementById("pphBadanPaymentAmount");
+  const dateEl = document.getElementById("pphBadanPaymentDate");
+
+  if (yearEl) {
+    yearEl.textContent = record.taxYear ?? "-";
+  }
+
+  if (outstandingEl) {
+    outstandingEl.textContent =
+      formatAccountingTaxCurrency(record.taxAmount);
+  }
+
+  if (amountEl) {
+    amountEl.value = Number(record.taxAmount || 0);
+  }
+
+  if (dateEl) {
+    dateEl.value = new Date().toISOString().slice(0, 10);
+  }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
 function closePphBadanActionMenu() {
   const modal = document.getElementById("pphBadanActionModal");
 
@@ -28229,31 +28279,21 @@ function viewPphBadanDetailFromAction() {
 function getPphBadanStatusBadge(status) {
   const normalized = String(status || "") .toUpperCase();
   const config = {
-    DRAFT: {
-      label: "Draft",
-      className: "bg-surface-container-high text-muted"
-    },
-
-    CALCULATED: {
-      label: "Calculated",
-      className: "bg-blue-500/10 text-blue-600"
-    },
-
-    RECORDED: {
-      label: "Recorded",
-      className: "bg-green-500/10 text-green-600"
-    },
-
-    PARTIALLY_PAID: {
-      label: "Partially Paid",
-      className: "bg-yellow-500/10 text-yellow-600"
-    },
-
-    PAID: {
-      label: "Paid",
-      className: "bg-green-500/10 text-green-600"
-    }
-  };
+	  CALCULATED: {
+	    label: "Calculated",
+	    className: "bg-blue-500/10 text-blue-600"
+	  },
+	
+	  OUTSTANDING: {
+	    label: "Outstanding",
+	    className: "bg-yellow-500/10 text-yellow-600"
+	  },
+	
+	  PAID: {
+	    label: "Paid",
+	    className: "bg-green-500/10 text-green-600"
+	  }
+	};
 
   const item = config[normalized] || {
       label: normalized || "Unknown",
