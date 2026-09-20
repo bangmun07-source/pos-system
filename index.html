@@ -19303,7 +19303,7 @@
 					
 					      <div>
 					        <h2 class="text-lg font-bold font-headline text-foreground">
-					          Tax Payments
+					          Tax Payments PPh Final
 					        </h2>
 					
 					        <p class="text-xs text-muted mt-1">
@@ -19422,7 +19422,7 @@
 	              </p>
 	
 	              <p id="currentTaxSettingRate"
-	                class="text-xl font-headline mt-1">
+	                class="text-xl font-bold font-headline mt-1">
 	                0%
 	              </p>
 	            </div>
@@ -19508,7 +19508,7 @@
 						    </p>
 						
 						    <p id="pphBadanCommercialProfit"
-						      class="text-xl font-headline mt-1">
+						      class="text-xl font-bold font-headline mt-1">
 						      Rp 0
 						    </p>
 						  </div>
@@ -19541,7 +19541,7 @@
 						    </p>
 						
 						    <p id="pphBadanTaxableIncome"
-						      class="text-xl font-headline mt-1">
+						      class="text-xl font-bold font-headline mt-1">
 						      Rp 0
 						    </p>
 						  </div>
@@ -19605,7 +19605,7 @@
               </p>
 
               <p id="pphBadanTaxAmount"
-                class="text-xl font-headline mt-1">
+                class="text-xl font-bold font-headline mt-1">
                 Rp 0
               </p>
             </div>
@@ -19623,30 +19623,32 @@
                 Not Calculated
               </p>
             </div>
-
-            <button id="calculatePphBadanButton"
-              type="button"
-              onclick="calculatePphBadan()"
-              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">
-                calculate
-              </span>
-              Calculate PPh Badan
-            </button>
-
-						<button id="savePphBadanButton"
-							type="button"
-							onclick="savePphBadanCalculation()"
-							class="px-4 py-2 rounded-md border border-outline-variant hover:bg-surface-container-high disabled:opacity-50">
-							<span class="material-symbols-outlined text-sm align-middle">
-								save
-							</span>
-							Save Calculation
-						</button>	
+						
+						<div class="flex items-center gap-2">
+	            <button id="calculatePphBadanButton"
+	              type="button"
+	              onclick="calculatePphBadan()"
+	              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	              <span class="material-symbols-outlined text-sm">
+	                calculate
+	              </span>
+	              Calculate PPh Badan
+	            </button>
+	
+							<button id="savePphBadanButton"
+								type="button"
+								onclick="savePphBadanCalculation()"
+								class="px-4 py-2 rounded-md bottom-theme text-sm font-medium">
+								<span class="material-symbols-outlined text-sm align-middle">
+									save
+								</span>
+								Save Calculation
+							</button>	
+						</div>
           </div>
         </section>
 				<!-- PPH BADAN RECORDS -->
-				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				<section class="bg-background border border-outline-variant rounded-md overflow-hidden space-y-5">
 				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
 				    <div class="flex items-center gap-3">
 				      <div class="main-icon-box">
