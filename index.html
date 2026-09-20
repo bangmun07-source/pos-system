@@ -19609,191 +19609,189 @@
                 Rp 0
               </p>
             </div>
-          </div>
-
-          <!-- STATUS -->
-          <div class="p-5 border-t border-outline-variant flex items-center justify-between">
-            <div>
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Status
-              </p>
-
-              <p id="pphBadanStatus"
-                class="text-sm mt-1">
-                Not Calculated
-              </p>
-            </div>
-						
-						<div class="flex items-center gap-2">
-	            <button id="calculatePphBadanButton"
-	              type="button"
-	              onclick="calculatePphBadan()"
-	              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-	              <span class="material-symbols-outlined text-sm">
-	                calculate
-	              </span>
-	              Calculate PPh Badan
-	            </button>
+	          <!-- STATUS -->
+	          <div class="p-5 border-t border-outline-variant flex items-center justify-between">
+	            <div>
+	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	                Status
+	              </p>
 	
-							<button id="savePphBadanButton"
-								type="button"
-								onclick="savePphBadanCalculation()"
-								class="px-4 py-2 rounded-md bottom-theme text-sm font-medium">
-								<span class="material-symbols-outlined text-sm align-middle">
-									save
-								</span>
-								Save Calculation
-							</button>	
-						</div>
-          </div>
-        </section>
-				<!-- PPH BADAN RECORDS -->
-				<section class="bg-background border border-outline-variant rounded-md overflow-hidden space-y-5">
-				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-				    <div class="flex items-center gap-3">
-				      <div class="main-icon-box">
-				        <span class="material-symbols-outlined text-3xl"
-				          style="font-variation-settings:'FILL' 1;">
-				          receipt_long
-				        </span>
-				      </div>
+	              <p id="pphBadanStatus"
+	                class="text-sm mt-1">
+	                Not Calculated
+	              </p>
+	            </div>
 							
-				      <div>
-				        <h2 class="text-lg font-bold font-headline text-foreground">
-				          PPh Badan Records
-				        </h2>
-				
-				        <p class="text-xs text-muted mt-1">
-				          Annual corporate income tax records
-				        </p>
-				      </div>
-				    </div>
-				  </div>
-				  <!-- TABLE -->
-				  <div class="overflow-x-auto custom-scrollbar">
-				    <table class="w-full text-sm">
-				      <thead>
-				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-				          <th class="px-5 py-3 text-left"> Tax Year </th>
-				          <th class="px-5 py-3 text-left"> Period </th>
-				          <th class="px-5 py-3 text-right"> Taxable Income </th>
-				          <th class="px-5 py-3 text-right"> PPh Badan </th>
-				          <th class="px-5 py-3 text-left"> Status </th>
-				          <th class="px-5 py-3 text-right"> Action </th>
-				        </tr>
-				      </thead>
-							
-				      <tbody id="pphBadanTableBody"
-				        class="divide-y divide-outline-variant">
-				        <tr>
-				          <td colspan="6"
-				            class="px-5 py-10 text-center text-muted">
-				            No PPh Badan data
-				          </td>
-				        </tr>
-				      </tbody>
-				    </table>
-				  </div>
-				  <!-- PAGINATION -->
-				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
-				    <div>
-				      <p id="pphBadanPaginationInfo"
-				        class="text-xs text-muted">
-				        Showing 0–0 of 0
-				      </p>
-				    </div>
-				
-				    <div class="flex items-center gap-2">
-				      <button id="pphBadanPrevButton"
-				        type="button"
-				        onclick="changePphBadanPage(-1)"
-				        class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
-				        <span class="material-symbols-outlined text-sm">
-				          chevron_left
-				        </span>
-				      </button>
-				
-				      <button id="pphBadanNextButton"
-				        type="button"
-				        onclick="changePphBadanPage(1)"
-				        class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
-				        <span class="material-symbols-outlined text-sm">
-				          chevron_right
-				        </span>
-				      </button>
-				    </div>
-				  </div>
-				</section>		
-        <!-- PPH 25 -->
-        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex items-center gap-3">
-            <div class="main-icon-box">
-              <span class="material-symbols-outlined text-3xl"
-                style="font-variation-settings:'FILL' 1;">
-                payments
-              </span>
-            </div>
-
-            <div>
-              <h2 class="text-lg font-bold font-headline text-foreground">
-                PPh 25
-              </h2>
-
-              <p class="text-xs text-muted mt-1">
-                Monthly income tax installment
-              </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 md:grid-cols-4">
-            <div class="p-5 border-r border-outline-variant">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Annual PPh 25
-              </p>
-
-              <p id="pph25Annual"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
-
-            <div class="p-5 border-r border-outline-variant">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Paid
-              </p>
-
-              <p id="pph25Paid"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
-
-            <div class="p-5 border-r border-outline-variant">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                PPh 25 Prepaid
-              </p>
-
-              <p id="pph25Prepaid"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
-
-            <div class="p-5">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Remaining PPh Badan
-              </p>
-
-              <p id="pphBadanRemaining"
-                class="text-xl font-headline mt-1">
-                Rp 0
-              </p>
-            </div>
-          </div>
-        </section>
-      </div>
-		</section>
-	</main>
+							<div class="flex items-center gap-2">
+		            <button id="calculatePphBadanButton"
+		              type="button"
+		              onclick="calculatePphBadan()"
+		              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+		              <span class="material-symbols-outlined text-sm">
+		                calculate
+		              </span>
+		              Calculate PPh Badan
+		            </button>
+		
+								<button id="savePphBadanButton"
+									type="button"
+									onclick="savePphBadanCalculation()"
+									class="px-4 py-2 rounded-md bottom-theme text-sm font-medium">
+									<span class="material-symbols-outlined text-sm align-middle">
+										save
+									</span>
+									Save Calculation
+								</button>	
+							</div>
+	          </div>
+	        </section>
+					<!-- PPH BADAN RECORDS -->
+					<section class="bg-background border border-outline-variant rounded-md overflow-hidden space-y-5">
+					  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+					    <div class="flex items-center gap-3">
+					      <div class="main-icon-box">
+					        <span class="material-symbols-outlined text-3xl"
+					          style="font-variation-settings:'FILL' 1;">
+					          receipt_long
+					        </span>
+					      </div>
+								
+					      <div>
+					        <h2 class="text-lg font-bold font-headline text-foreground">
+					          PPh Badan Records
+					        </h2>
+					
+					        <p class="text-xs text-muted mt-1">
+					          Annual corporate income tax records
+					        </p>
+					      </div>
+					    </div>
+					  </div>
+					  <!-- TABLE -->
+					  <div class="overflow-x-auto custom-scrollbar">
+					    <table class="w-full text-sm">
+					      <thead>
+					        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					          <th class="px-5 py-3 text-left"> Tax Year </th>
+					          <th class="px-5 py-3 text-left"> Period </th>
+					          <th class="px-5 py-3 text-right"> Taxable Income </th>
+					          <th class="px-5 py-3 text-right"> PPh Badan </th>
+					          <th class="px-5 py-3 text-left"> Status </th>
+					          <th class="px-5 py-3 text-right"> Action </th>
+					        </tr>
+					      </thead>
+								
+					      <tbody id="pphBadanTableBody"
+					        class="divide-y divide-outline-variant">
+					        <tr>
+					          <td colspan="6"
+					            class="px-5 py-10 text-center text-muted">
+					            No PPh Badan data
+					          </td>
+					        </tr>
+					      </tbody>
+					    </table>
+					  </div>
+					  <!-- PAGINATION -->
+					  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+					    <div>
+					      <p id="pphBadanPaginationInfo"
+					        class="text-xs text-muted">
+					        Showing 0–0 of 0
+					      </p>
+					    </div>
+					
+					    <div class="flex items-center gap-2">
+					      <button id="pphBadanPrevButton"
+					        type="button"
+					        onclick="changePphBadanPage(-1)"
+					        class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+					        <span class="material-symbols-outlined text-sm">
+					          chevron_left
+					        </span>
+					      </button>
+					
+					      <button id="pphBadanNextButton"
+					        type="button"
+					        onclick="changePphBadanPage(1)"
+					        class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+					        <span class="material-symbols-outlined text-sm">
+					          chevron_right
+					        </span>
+					      </button>
+					    </div>
+					  </div>
+					</section>		
+	        <!-- PPH 25 -->
+	        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+	          <div class="p-5 border-b border-outline-variant flex items-center gap-3">
+	            <div class="main-icon-box">
+	              <span class="material-symbols-outlined text-3xl"
+	                style="font-variation-settings:'FILL' 1;">
+	                payments
+	              </span>
+	            </div>
+	
+	            <div>
+	              <h2 class="text-lg font-bold font-headline text-foreground">
+	                PPh 25
+	              </h2>
+	
+	              <p class="text-xs text-muted mt-1">
+	                Monthly income tax installment
+	              </p>
+	            </div>
+	          </div>
+	
+	          <div class="grid grid-cols-2 md:grid-cols-4">
+	            <div class="p-5 border-r border-outline-variant">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	                Annual PPh 25
+	              </p>
+	
+	              <p id="pph25Annual"
+	                class="text-xl font-headline mt-1">
+	                Rp 0
+	              </p>
+	            </div>
+	
+	            <div class="p-5 border-r border-outline-variant">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	                Paid
+	              </p>
+	
+	              <p id="pph25Paid"
+	                class="text-xl font-headline mt-1">
+	                Rp 0
+	              </p>
+	            </div>
+	
+	            <div class="p-5 border-r border-outline-variant">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	                PPh 25 Prepaid
+	              </p>
+	
+	              <p id="pph25Prepaid"
+	                class="text-xl font-headline mt-1">
+	                Rp 0
+	              </p>
+	            </div>
+	
+	            <div class="p-5">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	                Remaining PPh Badan
+	              </p>
+	
+	              <p id="pphBadanRemaining"
+	                class="text-xl font-headline mt-1">
+	                Rp 0
+	              </p>
+	            </div>
+	          </div>
+	        </section>
+	      </div>
+			</section>
+		</main>
 	</div>
 	<!-- TAX SETTINGS MODAL -->
 	<div id="taxSettingsModal"
