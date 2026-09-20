@@ -28406,6 +28406,144 @@ function payPphBadanFromAction() {
   modal.classList.add("flex");
 }
 
+
+let pphBadanPaying = false;
+
+async function savePphBadanPayment() {
+  if (pphBadanPaying) return;
+
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(selectedPphBadanRecordId)
+  );
+
+  if (!record) {
+    showToast("Data PPh Badan tidak ditemukan.", "error");
+    return;
+  }
+
+  const status = String(record.status || "").toUpperCase();
+
+  if (status !== "OUTSTANDING") {
+    showToast(
+      "PPh Badan hanya dapat dibayar saat status OUTSTANDING.",
+      "error"
+    );
+    return;
+  }
+
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    showToast("Session tidak ditemukan.", "error");
+    return;
+  }
+
+  const paymentDate =
+    document.getElementById("pphBadanPaymentDate")?.value || "";
+
+  const amount =
+    Number(
+      document.getElementById("pphBadanPaymentAmount")?.value || 0
+    );
+
+  const paymentMethod =
+    document.getElementById("pphBadanPaymentMethod")?.value || "";
+
+  const reference =
+    document.getElementById("pphBadanPaymentReference")?.value?.trim() || "";
+
+  const note =
+    document.getElementById("pphBadanPaymentNote")?.value?.trim() || "";
+
+  if (!paymentDate) {
+    showToast("Payment Date wajib diisi.", "error");
+    return;
+  }
+
+  if (amount <= 0) {
+    showToast("Payment Amount harus lebih besar dari 0.", "error");
+    return;
+  }
+
+  if (!paymentMethod) {
+    showToast("Payment Method wajib dipilih.", "error");
+    return;
+  }
+
+  const confirmed = confirm(
+    `Bayar PPh Badan ${record.taxYear}?\n\n` +
+    `Amount: ${formatAccountingTaxCurrency(amount)}\n` +
+    `Method: ${paymentMethod}\n` +
+    `Date: ${paymentDate}`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    pphBadanPaying = true;
+
+    const button = document.getElementById(
+      "savePphBadanPaymentButton"
+    );
+
+    if (button) {
+      button.disabled = true;
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      "pay_pph_badan",
+      {
+        p_session_id: sessionId,
+        p_id: record.id,
+        p_payment_date: paymentDate,
+        p_payment_method: paymentMethod,
+        p_amount: amount,
+        p_reference: reference || null,
+        p_note: note || null
+      }
+    );
+
+    if (error) {
+      console.error("pay_pph_badan error:", error);
+      throw error;
+    }
+
+    console.log("PPh Badan payment success:", data);
+
+    closePphBadanPaymentModal();
+
+    showToast(
+      `PPh Badan ${record.taxYear} berhasil dibayar.`,
+      "success"
+    );
+
+    await loadPphBadanRecords();
+
+  } catch (error) {
+    console.error(
+      "savePphBadanPayment error:",
+      error
+    );
+
+    showToast(
+      error?.message ||
+        "Gagal melakukan pembayaran PPh Badan.",
+      "error"
+    );
+
+  } finally {
+    pphBadanPaying = false;
+
+    const button = document.getElementById(
+      "savePphBadanPaymentButton"
+    );
+
+    if (button) {
+      button.disabled = false;
+    }
+  }
+}
+
 function closePphBadanActionMenu() {
   const modal = document.getElementById("pphBadanActionModal");
 
