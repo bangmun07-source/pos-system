@@ -28064,25 +28064,27 @@ function openPphBadanRecordMenu(recordId) {
     return;
   }
 
-  selectedPphBadanRecordId = record.id;
-
   const modal = document.getElementById("pphBadanActionModal");
   const info = document.getElementById("pphBadanActionInfo");
   const buttons = document.getElementById("pphBadanActionButtons");
 
-  if (!modal || !buttons) return;
+  if (!modal || !buttons) {
+    console.error("PPh Badan Action popup tidak ditemukan.");
+    return;
+  }
 
-  const status = String(record.status || "DRAFT").toUpperCase();
+  selectedPphBadanRecordId = record.id;
+
+  const status = String(
+    record.status || "DRAFT"
+  ).toUpperCase();
 
   if (info) {
     info.textContent =
       `PPh Badan ${record.taxYear} • ${formatAccountingTaxCurrency(record.taxAmount)}`;
   }
 
-  let actionButtons = "";
-
-  // VIEW DETAIL — selalu tersedia
-  actionButtons += `
+  let html = `
     <button
       type="button"
       onclick="viewPphBadanDetailFromAction()"
@@ -28093,7 +28095,10 @@ function openPphBadanRecordMenu(recordId) {
       </span>
 
       <div>
-        <div class="font-medium">View Detail</div>
+        <div class="font-medium">
+          View Detail
+        </div>
+
         <div class="text-xs text-muted">
           Lihat detail perhitungan PPh Badan
         </div>
@@ -28101,81 +28106,107 @@ function openPphBadanRecordMenu(recordId) {
     </button>
   `;
 
-  // CALCULATED
   if (status === "CALCULATED") {
-    actionButtons += `
-      <button type="button"
+
+    html += `
+      <button
+        type="button"
         onclick="recordPphBadanFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left" >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left"
+      >
         <span class="material-symbols-outlined text-lg">
           fact_check
         </span>
 
         <div>
-          <div class="font-medium">Record PPh Badan</div>
+          <div class="font-medium">
+            Record PPh Badan
+          </div>
+
           <div class="text-xs text-muted">
-            Catat kewajiban PPh Badan ke Accounting
+            Catat kewajiban PPh Badan
           </div>
         </div>
       </button>
 
-      <button type="button"
+      <button
+        type="button"
         onclick="deletePphBadanFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-left text-red-600" >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-left text-red-600"
+      >
         <span class="material-symbols-outlined text-lg">
           delete
         </span>
 
         <div>
-          <div class="font-medium">Delete Calculation</div>
+          <div class="font-medium">
+            Delete Calculation
+          </div>
+
           <div class="text-xs text-muted">
-            Hapus hasil perhitungan yang belum direcord
+            Hapus perhitungan yang belum direcord
           </div>
         </div>
       </button>
     `;
-  }
 
-  // OUTSTANDING / PARTIALLY PAID
-  else if (
-    status === "RECORDED" ||
+  } else if (
     status === "OUTSTANDING" ||
     status === "PARTIALLY_PAID"
   ) {
-    actionButtons += `
-      <button type="button"
+
+    html += `
+      <button
+        type="button"
         onclick="payPphBadanFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left" >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left"
+      >
         <span class="material-symbols-outlined text-lg">
           payments
         </span>
 
         <div>
-          <div class="font-medium">Pay PPh Badan</div>
+          <div class="font-medium">
+            Pay PPh Badan
+          </div>
+
           <div class="text-xs text-muted">
             Bayar kewajiban PPh Badan
           </div>
         </div>
       </button>
     `;
-  }
 
-  // PAID
-  else if (status === "PAID") {
-    actionButtons += `
+  } else if (status === "PAID") {
+
+    html += `
       <div class="px-4 py-3 rounded-lg bg-surface-container-high">
-        <div class="font-medium">PPh Badan sudah dibayar</div>
-        <div class="text-xs text-muted">
-          Tidak ada action pembayaran yang tersedia.
+        <div class="font-medium">
+          PPh Badan sudah dibayar
+        </div>
+
+        <div class="text-xs text-muted mt-1">
+          Kewajiban pajak sudah lunas.
         </div>
       </div>
     `;
   }
 
-  buttons.innerHTML = actionButtons;
+  buttons.innerHTML = html;
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+}
+
+function closePphBadanActionMenu() {
+  const modal = document.getElementById("pphBadanActionModal");
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  selectedPphBadanRecordId = null;
 }
 
 function viewPphBadanDetailFromAction() {
