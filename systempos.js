@@ -27703,28 +27703,24 @@ function openTaxPaymentFromRow(paymentId) {
 
 function changeTaxRegime() {
   const regime = document.getElementById("taxRegime")?.value;
-
   const finalSection = document.getElementById("pphFinalSection");
   const badanSection = document.getElementById("pphBadanNormalSection");
 
+	console.log("VALUE:", document.getElementById("taxRegime")?.value);
+console.log("CLASS:", e?.className);
+console.log("STYLE:", e?.style.cssText);
+console.log("DISPLAY:", e ? getComputedStyle(e).display : null);
+
   if (!finalSection || !badanSection) return;
 
-  if (regime === "BADAN_NORMAL") {
-    // PPh FINAL HIDE
-    finalSection.classList.add("hidden");
-    finalSection.style.setProperty("display", "none", "important");
-
-    // PPh BADAN SHOW
-    badanSection.classList.remove("hidden");
-    badanSection.style.removeProperty("display");
-  } else {
-    // PPh FINAL SHOW
+  if (regime === "FINAL") {
     finalSection.classList.remove("hidden");
-    finalSection.style.removeProperty("display");
-
-    // PPh BADAN HIDE
     badanSection.classList.add("hidden");
-    badanSection.style.setProperty("display", "none", "important");
+  }
+
+  if (regime === "BADAN_NORMAL") {
+    finalSection.classList.add("hidden");
+    badanSection.classList.remove("hidden");
   }
 }
 
