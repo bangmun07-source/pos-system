@@ -27710,10 +27710,16 @@ function changeTaxRegime() {
 
   if (regime === "BADAN_NORMAL") {
     finalSection.classList.add("hidden");
+    finalSection.style.display = "none";
+
     badanSection.classList.remove("hidden");
+    badanSection.style.display = "";
   } else {
     finalSection.classList.remove("hidden");
+    finalSection.style.display = "";
+
     badanSection.classList.add("hidden");
+    badanSection.style.display = "none";
   }
 }
 
