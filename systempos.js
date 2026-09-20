@@ -28198,6 +28198,118 @@ function openPphBadanRecordMenu(recordId) {
   modal.classList.add("flex");
 }
 
+function recordPphBadanFromAction() {
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(selectedPphBadanRecordId)
+  );
+
+  if (!record) {
+    showToast("Data PPh Badan tidak ditemukan.", "error");
+    return;
+  }
+
+  const status = String(record.status || "").toUpperCase();
+
+  if (status !== "CALCULATED") {
+    showToast("PPh Badan ini sudah tidak berstatus Calculated.", "info");
+    return;
+  }
+
+  console.log("Record PPh Badan:", record);
+
+  showToast(
+    `PPh Badan ${record.taxYear} siap untuk di-record.`,
+    "success"
+  );
+}
+
+let pphBadanDeleting = false;
+
+async function deletePphBadanFromAction() {
+  if (pphBadanDeleting) return;
+
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(selectedPphBadanRecordId)
+  );
+
+  if (!record) {
+    showToast("Data PPh Badan tidak ditemukan.", "error");
+    return;
+  }
+
+  const status = String(record.status || "").toUpperCase();
+
+  if (status !== "CALCULATED") {
+    showToast(
+      "Hanya PPh Badan dengan status Calculated yang bisa dihapus.",
+      "error"
+    );
+    return;
+  }
+
+  const confirmed = confirm(
+    `Hapus perhitungan PPh Badan ${record.taxYear}?\n\n` +
+    `Tax Amount: ${formatAccountingTaxCurrency(record.taxAmount)}`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    pphBadanDeleting = true;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "delete_pph_badan_calculation",
+        {
+          p_id: record.id,
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) {
+      console.error(
+        "delete_pph_badan_calculation error:",
+        error
+      );
+      throw error;
+    }
+
+    console.log(
+      "PPh Badan deleted:",
+      data
+    );
+
+    closePphBadanActionMenu();
+
+    showToast(
+      `PPh Badan ${record.taxYear} berhasil dihapus.`,
+      "success"
+    );
+
+    await loadPphBadanRecords();
+
+  } catch (error) {
+    console.error(
+      "deletePphBadanFromAction error:",
+      error
+    );
+
+    showToast(
+      error?.message || "Gagal menghapus PPh Badan.",
+      "error"
+    );
+
+  } finally {
+    pphBadanDeleting = false;
+  }
+}
+
 function payPphBadanFromAction() {
   const record = pphBadanRecords.find(
     row => String(row.id) === String(selectedPphBadanRecordId)
@@ -28209,41 +28321,22 @@ function payPphBadanFromAction() {
   }
 
   const paymentRecordId = record.id;
-
   closePphBadanActionMenu();
-
-  // kembalikan ID untuk proses pembayaran
+  
   selectedPphBadanRecordId = paymentRecordId;
-
   const modal = document.getElementById("pphBadanPaymentModal");
-
   if (!modal) {
     console.error("PPh Badan Payment modal tidak ditemukan.");
-    return;
-  }
-
+    return; }
   const yearEl = document.getElementById("pphBadanPaymentYear");
   const outstandingEl = document.getElementById("pphBadanPaymentOutstanding");
   const amountEl = document.getElementById("pphBadanPaymentAmount");
   const dateEl = document.getElementById("pphBadanPaymentDate");
 
-  if (yearEl) {
-    yearEl.textContent = record.taxYear ?? "-";
-  }
-
-  if (outstandingEl) {
-    outstandingEl.textContent =
-      formatAccountingTaxCurrency(record.taxAmount);
-  }
-
-  if (amountEl) {
-    amountEl.value = Number(record.taxAmount || 0);
-  }
-
-  if (dateEl) {
-    dateEl.value = new Date().toISOString().slice(0, 10);
-  }
-
+  if (yearEl) { yearEl.textContent = record.taxYear ?? "-"; }
+  if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency(record.taxAmount); }
+  if (amountEl) { amountEl.value = Number(record.taxAmount || 0); }
+  if (dateEl) { dateEl.value = new Date().toISOString().slice(0, 10); }
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
@@ -28252,29 +28345,19 @@ function closePphBadanActionMenu() {
   const modal = document.getElementById("pphBadanActionModal");
 
   if (!modal) return;
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
-
   selectedPphBadanRecordId = null;
 }
 
 function viewPphBadanDetailFromAction() {
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId)
-  );
-
+  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
-
+    return; }
   closePphBadanActionMenu();
-
-  // sementara kita tampilkan detail di console
   console.log("PPh Badan Detail:", record);
 }
-
 
 function getPphBadanStatusBadge(status) {
   const normalized = String(status || "") .toUpperCase();
