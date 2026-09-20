@@ -27703,23 +27703,28 @@ function openTaxPaymentFromRow(paymentId) {
 
 function changeTaxRegime() {
   const regime = document.getElementById("taxRegime")?.value;
+
   const finalSection = document.getElementById("pphFinalSection");
   const badanSection = document.getElementById("pphBadanNormalSection");
 
   if (!finalSection || !badanSection) return;
 
   if (regime === "BADAN_NORMAL") {
+    // PPh FINAL HIDE
     finalSection.classList.add("hidden");
-    finalSection.style.display = "none";
+    finalSection.style.setProperty("display", "none", "important");
 
+    // PPh BADAN SHOW
     badanSection.classList.remove("hidden");
-    badanSection.style.display = "";
+    badanSection.style.removeProperty("display");
   } else {
+    // PPh FINAL SHOW
     finalSection.classList.remove("hidden");
-    finalSection.style.display = "";
+    finalSection.style.removeProperty("display");
 
+    // PPh BADAN HIDE
     badanSection.classList.add("hidden");
-    badanSection.style.display = "none";
+    badanSection.style.setProperty("display", "none", "important");
   }
 }
 
