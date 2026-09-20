@@ -20044,6 +20044,35 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- PPH BADAN ACTION POPUP -->
+	<div id="pphBadanActionModal"
+	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 p-4"
+	  onclick="if (event.target === this) closePphBadanActionMenu()" >
+	  <div class="w-full max-w-sm rounded-xl bg-surface border border-outline-variant shadow-2xl"
+	    onclick="event.stopPropagation()" >
+	    <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
+	      <div>
+	        <h3 class="text-base font-semibold">PPh Badan Action</h3>
+	
+	        <p id="pphBadanActionInfo" class="text-sm text-muted mt-1">
+	          -
+	        </p>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closePphBadanActionMenu()"
+	        class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-container-high">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	
+	    <div id="pphBadanActionButtons"
+	      class="p-4 space-y-2" >
+				
+			</div>
+	  </div>
+	</div>
 </template>
 	
 	
