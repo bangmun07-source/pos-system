@@ -28198,7 +28198,11 @@ function openPphBadanRecordMenu(recordId) {
   modal.classList.add("flex");
 }
 
-function recordPphBadanFromAction() {
+let pphBadanRecording = false;
+
+async function recordPphBadanFromAction() {
+  if (pphBadanRecording) return;
+
   const record = pphBadanRecords.find(
     row => String(row.id) === String(selectedPphBadanRecordId)
   );
@@ -28211,16 +28215,77 @@ function recordPphBadanFromAction() {
   const status = String(record.status || "").toUpperCase();
 
   if (status !== "CALCULATED") {
-    showToast("PPh Badan ini sudah tidak berstatus Calculated.", "info");
+    showToast(
+      "PPh Badan ini sudah tidak berstatus Calculated.",
+      "info"
+    );
     return;
   }
 
-  console.log("Record PPh Badan:", record);
-
-  showToast(
-    `PPh Badan ${record.taxYear} siap untuk di-record.`,
-    "success"
+  const confirmed = confirm(
+    `Record PPh Badan ${record.taxYear}?\n\n` +
+    `Tax Amount: ${formatAccountingTaxCurrency(record.taxAmount)}\n\n` +
+    `Jurnal akan dibuat:\n` +
+    `Dr 6700 — PPh Badan Normal\n` +
+    `Cr 2220 — PPh Badan Payable`
   );
+
+  if (!confirmed) return;
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    pphBadanRecording = true;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "record_pph_badan",
+        {
+          p_session_id: sessionId,
+          p_id: record.id
+        }
+      );
+
+    if (error) {
+      console.error(
+        "record_pph_badan error:",
+        error
+      );
+      throw error;
+    }
+
+    console.log(
+      "PPh Badan recorded:",
+      data
+    );
+
+    closePphBadanActionMenu();
+
+    showToast(
+      `PPh Badan ${record.taxYear} berhasil di-record.`,
+      "success"
+    );
+
+    await loadPphBadanRecords();
+
+  } catch (error) {
+    console.error(
+      "recordPphBadanFromAction error:",
+      error
+    );
+
+    showToast(
+      error?.message || "Gagal melakukan Record PPh Badan.",
+      "error"
+    );
+
+  } finally {
+    pphBadanRecording = false;
+  }
 }
 
 let pphBadanDeleting = false;
