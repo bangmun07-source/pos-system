@@ -20073,6 +20073,145 @@
 			</div>
 	  </div>
 	</div>
+
+	<!-- PPH BADAN PAYMENT MODAL -->
+	<div id="pphBadanPaymentModal"
+	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
+	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div>
+	        <h2 class="text-lg font-bold font-headline text-foreground">
+	          Pay PPh Badan
+	        </h2>
+	
+	        <p class="text-xs text-muted mt-1">
+	          Payment of outstanding PPh Badan
+	        </p>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closePphBadanPaymentModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground rounded-md">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-4">
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Tax Year
+	        </label>
+	
+	        <div
+	          id="pphBadanPaymentYear"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm flex items-center">
+	          -
+	        </div>
+	      </div>
+	
+	      <!-- LIABILITY ACCOUNT -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Liability Account
+	        </label>
+	
+	        <div class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm flex items-center">
+	          2210 · Tax Obligation Payable
+	        </div>
+	      </div>
+	
+	      <!-- OUTSTANDING -->
+	      <div class="p-4 rounded-md border border-outline-variant">
+	        <p class="text-[11px] text-muted uppercase tracking-wider">
+	          Outstanding PPh Badan
+	        </p>
+	
+	        <p id="pphBadanPaymentOutstanding"
+	          class="text-xl font-headline mt-1" >
+	          Rp 0
+	        </p>
+	      </div>
+	
+	      <!-- PAYMENT DATE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Payment Date
+	        </label>
+	
+	        <input id="pphBadanPaymentDate"
+	          type="date"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	
+	      <!-- AMOUNT -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Payment Amount
+	        </label>
+	
+	        <input id="pphBadanPaymentAmount"
+	          type="number"
+	          min="1"
+	          step="1"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	      <!-- PAYMENT METHOD -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Payment Method
+	        </label>
+	
+	        <select id="pphBadanPaymentMethod"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	          <option value="CASH">Cash</option>
+	          <option value="BANK">Bank</option>
+	          <option value="QRIS">QRIS</option>
+	        </select>
+	      </div>
+	      <!-- REFERENCE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Reference
+	        </label>
+	
+	        <input id="pphBadanPaymentReference"
+	          type="text"
+	          placeholder="Optional reference"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+	      </div>
+	      <!-- NOTE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Note
+	        </label>
+	
+	        <textarea id="pphBadanPaymentNote"
+	          rows="3"
+	          placeholder="Optional"
+	          class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+					</textarea>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex justify-end gap-3">
+	      <button type="button"
+	        onclick="closePphBadanPaymentModal()"
+	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium" >
+	        Cancel
+	      </button>
+	
+	      <button id="savePphBadanPaymentButton"
+	        type="button"
+	        onclick="savePphBadanPayment()"
+	        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2" >
+	        <span class="material-symbols-outlined text-sm">
+	          payments
+	        </span>
+	        Pay PPh Badan
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>
 	
 	
