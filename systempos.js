@@ -26655,6 +26655,16 @@ function getAccountingTaxYear() {
   return new Date().getFullYear();
 }
 
+function getTaxObligationBranchId() {
+  const el = document.getElementById("taxObligationBranchFilter");
+  return el?.value || null;
+}
+
+function getPphBadanBranchId() {
+  const el = document.getElementById("pphBadanBranchFilter");
+  return el?.value || null;
+}
+
 
 function getTodayAccountingTaxDate() {
   const now = new Date();
@@ -26663,6 +26673,39 @@ function getTodayAccountingTaxDate() {
   const day = String( now.getDate() ).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+function populateAccountingTaxYears() {
+  const currentYear = new Date().getFullYear();
+  const years = 10;
+  const selects = [
+    document.getElementById("taxObligationYear"),
+    document.getElementById("pphBadanYear")
+  ];
+
+  selects.forEach(select => {
+    if (!select) return;
+    const currentValue = select.value;
+    select.innerHTML = "";
+    for (let i = 0; i < years; i++) {
+      const year = currentYear - i;
+      const option = document.createElement("option");
+      option.value = String(year);
+      option.textContent = String(year);
+      select.appendChild(option);
+    }
+
+    // Pertahankan pilihan sebelumnya jika masih tersedia
+    if (
+      currentValue &&
+      [...select.options].some(option => option.value === currentValue)
+    ) {
+      select.value = currentValue;
+    } else {
+      select.value = String(currentYear);
+    }
+  });
+}
+
 
 
 /* =========================================================
@@ -26681,7 +26724,8 @@ async function initAccountingTaxPage() {
     if (yearEl && !yearEl.value) {
       yearEl.value = String(new Date().getFullYear());
     }
-
+	populateAccountingTaxYears();
+	await loadAccountingTaxBranchFilters();
 	await Promise.all([
 		loadTaxObligasiSettings(),
 		loadTaxObligation(),
@@ -26698,7 +26742,6 @@ async function initAccountingTaxPage() {
     accountingTaxLoading = false;
   }
 }
-
 
 /* =========================================================
    TAX SETTINGS
@@ -26746,6 +26789,51 @@ function renderCurrentTaxSettings() {
       setting.is_active === false
         ? "Inactive"
         : "Active"; }
+}
+
+async function loadAccountingTaxBranchFilters() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) return;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+
+    const branches = typeof data === "string"
+        ? JSON.parse(data)
+        : (data || []);
+
+    const selects = [
+      document.getElementById("taxObligationBranchFilter"),
+      document.getElementById("pphBadanBranchFilter")
+    ];
+
+    selects.forEach(select => {
+      if (!select) return;
+      select.innerHTML = ` <option value="">All Branch</option> `;
+
+      branches.forEach(branch => { const option = document.createElement("option");
+        option.value = branch.id || "";
+        option.textContent =
+          branch.name || branch.id || "Unnamed Branch";
+
+        select.appendChild(option);
+      });
+    });
+
+  } catch (error) {
+    console.error(
+      "loadAccountingTaxBranchFilters error:",
+      error
+    );
+  }
 }
 
 /* ==== OPEN TAX SETTINGS MODAL ==== */
@@ -26889,7 +26977,7 @@ async function saveTaxObligasiSettings() {
 
 async function loadTaxObligation() {
   const sessionId = localStorage.getItem("pos_session_id");
-  const branchId = state.branchId;
+  const branchId = getTaxObligationBranchId();
   const taxYear = getAccountingTaxYear();
 	const currentFilter = { branchId, taxYear };
   // ===== CACHE HIT =====
@@ -26926,6 +27014,22 @@ async function loadTaxObligation() {
   return currentTaxObligation;
 }
 
+document.addEventListener("change", function(event) {
+  if (event.target?.id !== "taxObligationBranchFilter") {
+    return;
+  }
+
+  state.accountingTaxData = null;
+  state.accountingTaxFilter = null;
+
+  loadTaxObligation()
+    .catch(error => {
+      alert(
+        error?.message ||
+        "Gagal memuat Tax Obligation."
+      );
+    });
+});
 
 /* =========================================================
    RENDER TAX OBLIGATION
@@ -26938,7 +27042,6 @@ function renderTaxObligation(data) {
   const taxableEl = document.getElementById( "taxObligationTaxable" );
   const amountEl = document.getElementById( "taxObligationAmount" );
   const statusEl = document.getElementById( "taxObligationStatus" );
-  const branchEl = document.getElementById( "taxObligationBranchName" );
 	
   if (revenueEl) { revenueEl.textContent = formatAccountingTaxCurrency( obligation.revenue_amount ); }
   if (rateEl) { const rate = Number(obligation.tax_rate);
@@ -26947,7 +27050,6 @@ function renderTaxObligation(data) {
         : "0.0000%"; }
   if (taxableEl) { taxableEl.textContent =  formatAccountingTaxCurrency( obligation.taxable_amount ); }
   if (amountEl) { amountEl.textContent = formatAccountingTaxCurrency( obligation.tax_amount ); }
-  if (branchEl) { branchEl.textContent = obligation.branch_id || state?.branchId || "Current Outlet"; }
   if (statusEl) { const status = String( obligation.status || "" ).toUpperCase();
 	  if (status === "RECORDED") { statusEl.textContent = "Recorded"; } 
 		else if (status === "VOID") { statusEl.textContent = "Void"; } 
@@ -27392,7 +27494,7 @@ console.error("STATUS DATA:", statusData);
 async function loadTaxObligationPaymentSummary() {
   try {
 	  const sessionId = localStorage.getItem("pos_session_id");
-	  const branchId = state.branchId;
+	  const branchId = getTaxObligationBranchId();
     const taxYear = getAccountingTaxYear();
     const { data, error } = await supabaseClient.rpc(
       "get_tax_obligation_payment_summary",
@@ -27633,6 +27735,10 @@ function getPphBadanYear() {
   return new Date().getFullYear();
 }
 
+function getPphBadanBranchId() {
+  const branchEl = document.getElementById("pphBadanBranchFilter");
+  return branchEl?.value || null;
+}
 
 /* ===== LOAD PPH BADAN CALCULATION ===== */
 
@@ -27642,11 +27748,10 @@ async function calculatePphBadan() {
 	
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
-		const branchId = state.branchId;
+		const branchId = getPphBadanBranchId();
 		const taxYear = getPphBadanYear();
 
 		if (!sessionId) { throw new Error("Session tidak ditemukan. Silakan login ulang."); }
-		if (!branchId) { throw new Error("Branch belum dipilih."); }
 		if (!taxYear) { throw new Error("Tax Year tidak valid."); }
 		/* ===== DATE RANGE ===== */
 		const fromDate = `${taxYear}-01-01`;
@@ -27713,14 +27818,12 @@ async function calculatePphBadan() {
 		const taxableIncomeEl = document.getElementById( "pphBadanTaxableIncome" );
 		const taxAmountEl = document.getElementById( "pphBadanTaxAmount" );
 		const statusEl = document.getElementById( "pphBadanStatus" );
-		const branchEl = document.getElementById( "pphBadanBranchName" );
 	
 		if (commercialProfitEl) { commercialProfitEl.textContent = formatAccountingTaxCurrency( commercialProfit ); }
 		if (positiveEl) { positiveEl.textContent = formatAccountingTaxCurrency( positive ); }
 		if (negativeEl) { negativeEl.textContent = formatAccountingTaxCurrency( negative ); }
 		if (taxableIncomeEl) { taxableIncomeEl.textContent = formatAccountingTaxCurrency( taxableIncome ); }
 		if (taxAmountEl) { taxAmountEl.textContent = formatAccountingTaxCurrency( taxAmount ); }
-		if (branchEl) { branchEl.textContent = branchId || "Current Outlet"; }
 		if (statusEl) { statusEl.textContent = "Calculated"; }
 	
 		/* ===== STORE TEMP RESULT ===== */
@@ -27781,6 +27884,34 @@ document.addEventListener(
   }
 );
 
+document.addEventListener(
+  "change",
+  function(event) {
+    if (event.target?.id !== "pphBadanBranchFilter") {
+      return;
+    }
+    const ids = [
+      "pphBadanCommercialProfit",
+      "pphBadanPositiveAdjustment",
+      "pphBadanNegativeAdjustment",
+      "pphBadanTaxableIncome",
+      "pphBadanTaxAmount"
+    ];
+
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = "Rp 0";
+      }
+    });
+		
+    const statusEl = document.getElementById("pphBadanStatus");
+		
+    if (statusEl) { statusEl.textContent = "Not Calculated"; }
+    window.currentPphBadanCalculation = null;
+    loadPphBadanRecords();
+  }
+);
 
 let pphBadanRecords = [];
 let pphBadanRecordsPage = 1;
@@ -27789,9 +27920,10 @@ const pphBadanRecordsPerPage = 10;
 async function loadPphBadanRecords() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const branchId = state.branchId;
+    const branchId = getPphBadanBranchId();
 
-    if (!sessionId || !branchId) { return; }
+    if (!sessionId) { return; }
+			  
 
     const taxYearEl = document.getElementById("pphBadanYear");
     const taxYear = Number(taxYearEl?.value || 0);
