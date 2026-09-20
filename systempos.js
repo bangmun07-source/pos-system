@@ -28052,6 +28052,149 @@ if (!rows.length) {
   if (nextButton) { nextButton.disabled = pphBadanRecordsPage >= totalPages; }
 }
 
+let selectedPphBadanRecordId = null;
+
+function openPphBadanRecordMenu(recordId) {
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(recordId)
+  );
+
+  if (!record) {
+    showToast("Data PPh Badan tidak ditemukan.", "error");
+    return;
+  }
+
+  selectedPphBadanRecordId = record.id;
+
+  const modal = document.getElementById("pphBadanActionModal");
+  const info = document.getElementById("pphBadanActionInfo");
+  const buttons = document.getElementById("pphBadanActionButtons");
+
+  if (!modal || !buttons) return;
+
+  const status = String(record.status || "DRAFT").toUpperCase();
+
+  if (info) {
+    info.textContent =
+      `PPh Badan ${record.taxYear} • ${formatAccountingTaxCurrency(record.taxAmount)}`;
+  }
+
+  let actionButtons = "";
+
+  // VIEW DETAIL — selalu tersedia
+  actionButtons += `
+    <button
+      type="button"
+      onclick="viewPphBadanDetailFromAction()"
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left"
+    >
+      <span class="material-symbols-outlined text-lg">
+        visibility
+      </span>
+
+      <div>
+        <div class="font-medium">View Detail</div>
+        <div class="text-xs text-muted">
+          Lihat detail perhitungan PPh Badan
+        </div>
+      </div>
+    </button>
+  `;
+
+  // CALCULATED
+  if (status === "CALCULATED") {
+    actionButtons += `
+      <button type="button"
+        onclick="recordPphBadanFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left" >
+        <span class="material-symbols-outlined text-lg">
+          fact_check
+        </span>
+
+        <div>
+          <div class="font-medium">Record PPh Badan</div>
+          <div class="text-xs text-muted">
+            Catat kewajiban PPh Badan ke Accounting
+          </div>
+        </div>
+      </button>
+
+      <button type="button"
+        onclick="deletePphBadanFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-left text-red-600" >
+        <span class="material-symbols-outlined text-lg">
+          delete
+        </span>
+
+        <div>
+          <div class="font-medium">Delete Calculation</div>
+          <div class="text-xs text-muted">
+            Hapus hasil perhitungan yang belum direcord
+          </div>
+        </div>
+      </button>
+    `;
+  }
+
+  // OUTSTANDING / PARTIALLY PAID
+  else if (
+    status === "RECORDED" ||
+    status === "OUTSTANDING" ||
+    status === "PARTIALLY_PAID"
+  ) {
+    actionButtons += `
+      <button type="button"
+        onclick="payPphBadanFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left" >
+        <span class="material-symbols-outlined text-lg">
+          payments
+        </span>
+
+        <div>
+          <div class="font-medium">Pay PPh Badan</div>
+          <div class="text-xs text-muted">
+            Bayar kewajiban PPh Badan
+          </div>
+        </div>
+      </button>
+    `;
+  }
+
+  // PAID
+  else if (status === "PAID") {
+    actionButtons += `
+      <div class="px-4 py-3 rounded-lg bg-surface-container-high">
+        <div class="font-medium">PPh Badan sudah dibayar</div>
+        <div class="text-xs text-muted">
+          Tidak ada action pembayaran yang tersedia.
+        </div>
+      </div>
+    `;
+  }
+
+  buttons.innerHTML = actionButtons;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function viewPphBadanDetailFromAction() {
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(selectedPphBadanRecordId)
+  );
+
+  if (!record) {
+    showToast("Data PPh Badan tidak ditemukan.", "error");
+    return;
+  }
+
+  closePphBadanActionMenu();
+
+  // sementara kita tampilkan detail di console
+  console.log("PPh Badan Detail:", record);
+}
+
+
 function getPphBadanStatusBadge(status) {
   const normalized = String(status || "") .toUpperCase();
   const config = {
