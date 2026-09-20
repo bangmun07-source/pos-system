@@ -27529,7 +27529,8 @@ async function loadTaxObligationPaymentSummary() {
 async function loadTaxPayments() {
   try {
 	  const sessionId = localStorage.getItem("pos_session_id");
-	  const branchId = state.branchId;
+	 	const branchId = document.getElementById("taxPaymentBranchFilter")?.value || null;
+
     const { data, error } =
       await supabaseClient.rpc(
         "get_tax_payments",
