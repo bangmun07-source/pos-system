@@ -1322,7 +1322,7 @@ function renderTransactions(data) {
         <td class="px-6 py-4 text-center">
           <button
             onclick="openTransactionModal('${trx.id}')"
-            class="text-blue-400 hover:underline text-sm">
+            class="text-blue-700 hover:underline text-sm">
             View
           </button>
         </td>
@@ -3525,7 +3525,7 @@ function updateSummary(subtotal, member = null) {
       <span>${format(calc.service)}</span>
     </div>
 
-	 <div class="flex justify-between m-3 text-sm text-tertiary">
+	 <div class="flex justify-between m-3 text-sm text-blue-700">
 	  <span>
 	    Discount${calc.discountRate > 0 ? ` (${calc.discountRate}%)` : ""}
 	  </span>
@@ -4058,64 +4058,34 @@ async function uploadMemberImage(
 
 async function loadMembers(callback) {
 
-  const el =
-    document.getElementById(
-      "member-table-body"
-    );
+  const el = document.getElementById( "member-table-body" );
 
   if (!el) return;
 
   // LOAD FROM CACHE
   if (state.memberPageData) {
-    const data =
-      state.memberPageData;
-    state.members =
-      data.members || [];
-    state.settings =
-      data.settings || {};
-    renderTierFilter(
-      state.settings
-    );
-    renderTierSettings(
-      state.settings
-    );
-    renderMembers(
-      state.members
-    );
+    const data = state.memberPageData;
+    state.members = data.members || [];
+    state.settings = data.settings || {};
+    renderTierFilter( state.settings );
+    renderTierSettings( state.settings );
+    renderMembers( state.members );
 
-    if (callback) {
-      callback();
-    }
-    return;
-  }
+    if (callback) { callback(); } 
+			return; }
 
   // LOAD FROM SUPABASE RPC
   try {
-	  
-    const res =
-      await getMemberPageDataRPC(
-        state.branchId,
-      );
+    const res = await getMemberPageDataRPC( state.branchId, );
 
-    state.memberPageData =
-      res;
-    state.members =
-      res.members || [];
-    state.settings =
-      res.settings || {};
-    renderTierFilter(
-      state.settings
-    );
-    renderTierSettings(
-      state.settings
-    );
-    renderMembers(
-      state.members
-    );
+    state.memberPageData = res;
+    state.members = res.members || [];
+    state.settings = res.settings || {};
+    renderTierFilter( state.settings );
+    renderTierSettings( state.settings );
+    renderMembers( state.members );
 
-    if (callback) {
-      callback();
-    }
+    if (callback) { callback(); }
   } catch (err) {
     showToast(
       "Gagal memuat member",
@@ -4193,11 +4163,7 @@ function renderMembers(data = state.members) {
       </td>
       <td class="px-8 py-5">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-md
-                      bg-background
-                      flex items-center justify-center
-                      font-bold text-xs">
-
+          <div class="w-8 h-8 rounded-md bg-background flex items-center justify-center font-bold text-xs">
             ${(m.Nama || "")
               .substring(0,2)
               .toUpperCase()}
@@ -4225,23 +4191,19 @@ function renderMembers(data = state.members) {
       </td>
 
       <td class="px-8 py-5 text-center">
-      <button 
-        onclick="handleMemberCard(this)"
+      <button onclick="handleMemberCard(this)"
         data-phone="${m.WA || ''}"
         data-name="${m.Nama || ''}"
         data-memberid="${m.ID_Member || ''}"
         data-level="${m.Level_Current || ''}"
         data-point="${m.Point || 0}"
-        class="text-tertiary"
-      >
+        class="text-blue-700" >
         <span class="material-symbols-outlined">chat</span>
       </button>
       </td>
       <td class="px-8 py-5 text-right">
-        <button
-          class="text-muted hover:text-on-surface transition-colors"
-          onclick="openMemberProfile('${String(m.ID_Member).trim()}')"
-        >
+        <button class="text-muted hover:text-on-surface transition-colors"
+          onclick="openMemberProfile('${String(m.ID_Member).trim()}')" >
           <span class="material-symbols-outlined">
             more_vert
           </span>
@@ -8928,7 +8890,7 @@ function renderUsageLog(data) {
       new Date(a.timestamp)
   )
   .slice(0, 10).forEach(log => {
-    let badgeColor = "text-tertiary";
+    let badgeColor = "text-blue-700";
     let badgeName = "POS Deduction";
     if (
       log.action === "add"
