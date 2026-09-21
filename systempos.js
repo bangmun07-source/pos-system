@@ -25909,6 +25909,64 @@ function updateTaxPayableUI() {
   }
 }
 
+async function recordPpnPayment() {
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    alert("Session tidak ditemukan.");
+    return;
+  }
+
+  const branchId = state.branchId;
+
+  if (!branchId) {
+    alert("Branch tidak ditemukan.");
+    return;
+  }
+
+  await loadTaxPayable();
+
+  const amount =
+    Number(taxPayableData?.outstanding) || 0;
+
+  if (amount <= 0) {
+    alert("Tax Payable tidak memiliki saldo terutang.");
+    return;
+  }
+
+  try {
+    const { data, error } =
+      await supabaseClient.rpc("record_ppn_payment", {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_amount: amount,
+        p_payment_date: getTodayAccountingDate(),
+        p_note: "PPN Tax Payable"
+      });
+
+    if (error) throw error;
+
+    state.accountingTaxPayableData = null;
+    state.accountingTaxPayableFilter = null;
+
+    await loadTaxPayable();
+    await loadPpnPayments();
+
+    alert(
+      data?.message ||
+      "PPN berhasil dicatat sebagai outstanding."
+    );
+
+  } catch (error) {
+    console.error("recordPpnPayment error:", error);
+
+    alert(
+      error?.message ||
+      "Gagal mencatat PPN."
+    );
+  }
+}
+
 function openPpnPaymentFromRow(paymentId) {
   const payment = ppnPaymentsData.find(
     item => String(item.payment_id) === String(paymentId)
