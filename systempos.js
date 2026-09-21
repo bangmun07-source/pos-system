@@ -26082,6 +26082,7 @@ async function saveTaxPayment() {
 		  await supabaseClient.rpc("create_ppn_payment", {
 		    p_session_id: sessionId,
 		    p_branch_id: branchId,
+		    p_payment_id: currentPpnPayment?.payment_id,
 		    p_payment_date: paymentDate,
 		    p_amount: amount,
 		    p_payment_method: method,
