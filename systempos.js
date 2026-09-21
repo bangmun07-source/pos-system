@@ -21820,7 +21820,7 @@ function renderAccountingOverview(data) {
                   ${escapeHTML(date)}
                 </p>
 
-                <p class="text-[10px] uppercase tracking-wider text-red-200 mt-2">
+                <p class="text-[10px] uppercase tracking-wider text-red-1000 mt-2">
                   ${status}
                 </p>
               </div>
@@ -22062,16 +22062,16 @@ function renderAccountingAccounts(accounts) {
             EXPENSE: "Expense"
         }[account.accountType] || account.accountType;
         const typeClass = {
-            ASSET: "bg-blue-500/10 text-blue-600",
-            LIABILITY: "bg-red-500/10 text-red-600",
-            EQUITY: "bg-purple-500/10 text-purple-600",
-            REVENUE: "bg-green-500/10 text-green-600",
-            COGS: "bg-orange-500/10 text-orange-600",
-            EXPENSE: "bg-yellow-500/10 text-yellow-600"
+            ASSET: "bg-blue-500/10 text-blue-1000",
+            LIABILITY: "bg-red-500/10 text-red-1000",
+            EQUITY: "bg-purple-500/10 text-purple-1000",
+            REVENUE: "bg-green-500/10 text-green-1000",
+            COGS: "bg-orange-500/10 text-orange-1000",
+            EXPENSE: "bg-yellow-500/10 text-yellow-1000"
         }[account.accountType] || "text-on-surface-variant";
         const statusClass = account.isActive
-            ? "bg-green-500/10 text-green-600"
-            : "bg-gray-500/10 text-gray-600";
+            ? "bg-green-500/10 text-green-1000"
+            : "bg-red-500/10 text-red-1000";
         const statusLabel = account.isActive
             ? "ACTIVE"
             : "INACTIVE";
@@ -22099,11 +22099,11 @@ function renderAccountingAccounts(accounts) {
                     ${escapeHtml(account.parentName || "—")}
                 </td>
 
-                <td class="px-6 py-4 font-semibold text-center">
+                <td class="px-6 py-4 font-bold text-center">
                     <span class="text-sm ${
                         account.normalBalance === "DEBIT"
-                            ? "text-blue-600"
-                            : "text-green-600"
+                            ? "text-blue-1000"
+                            : "text-green-1000"
                     }">
                         ${account.normalBalance || "-"}
                     </span>
@@ -23167,9 +23167,9 @@ function renderJournalEntryRow(journal) {
 	}[ journal.status ] || journal.status || "-";
 	
 	const statusClass = {
-		POSTED: "text-emerald-400",
-		DRAFT: "text-yellow-400",
-		VOID: "text-red-400"
+		POSTED: "text-emerald-1000",
+		DRAFT: "text-yellow-1000",
+		VOID: "text-red-1000"
 	}[ journal.status ] || "text-muted";
 	
 		return `
@@ -23198,7 +23198,7 @@ function renderJournalEntryRow(journal) {
 						${formatJournalCurrency( journal.totalCredit )}
 				</td>
 
-				<td class="px-5 py-4 uppercase tracking-widest font-medium headline-font ${statusClass}">
+				<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}">
 						${escapeHtml( statusLabel )}
 				</td>
 
@@ -28404,11 +28404,9 @@ function openPphBadanRecordMenu(recordId) {
   }
 
   let html = `
-    <button
-      type="button"
+    <button type="button"
       onclick="viewPphBadanDetailFromAction()"
-      class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left"
-    >
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left" >
       <span class="material-symbols-outlined text-lg">
         visibility
       </span>
@@ -28428,11 +28426,9 @@ function openPphBadanRecordMenu(recordId) {
   if (status === "CALCULATED") {
 
     html += `
-      <button
-        type="button"
+      <button type="button"
         onclick="recordPphBadanFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left"
-      >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left" >
         <span class="material-symbols-outlined text-lg">
           fact_check
         </span>
@@ -28451,8 +28447,7 @@ function openPphBadanRecordMenu(recordId) {
       <button
         type="button"
         onclick="deletePphBadanFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-500/10 text-left text-red-600"
-      >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-red-600/10 text-left text-red-1000" >
         <span class="material-symbols-outlined text-lg">
           delete
         </span>
@@ -28478,8 +28473,7 @@ function openPphBadanRecordMenu(recordId) {
       <button
         type="button"
         onclick="payPphBadanFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container-high text-left"
-      >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left" >
         <span class="material-symbols-outlined text-lg">
           payments
         </span>
@@ -28499,7 +28493,7 @@ function openPphBadanRecordMenu(recordId) {
   } else if (status === "PAID") {
 
     html += `
-      <div class="px-4 py-3 rounded-lg bg-surface-container-high">
+      <div class="px-4 py-3 rounded-md bg-background border border-outline-variant">
         <div class="font-medium">
           PPh Badan sudah dibayar
         </div>
@@ -28756,38 +28750,18 @@ async function savePphBadanPayment() {
     showToast("Session tidak ditemukan.", "error");
     return;
   }
+  const paymentDate = document.getElementById("pphBadanPaymentDate")?.value || "";
+  const amount = Number( document.getElementById("pphBadanPaymentAmount")?.value || 0 );
+  const paymentMethod = document.getElementById("pphBadanPaymentMethod")?.value || "";
+  const reference = document.getElementById("pphBadanPaymentReference")?.value?.trim() || "";
+  const note = document.getElementById("pphBadanPaymentNote")?.value?.trim() || "";
 
-  const paymentDate =
-    document.getElementById("pphBadanPaymentDate")?.value || "";
-
-  const amount =
-    Number(
-      document.getElementById("pphBadanPaymentAmount")?.value || 0
-    );
-
-  const paymentMethod =
-    document.getElementById("pphBadanPaymentMethod")?.value || "";
-
-  const reference =
-    document.getElementById("pphBadanPaymentReference")?.value?.trim() || "";
-
-  const note =
-    document.getElementById("pphBadanPaymentNote")?.value?.trim() || "";
-
-  if (!paymentDate) {
-    showToast("Payment Date wajib diisi.", "error");
-    return;
-  }
-
-  if (amount <= 0) {
-    showToast("Payment Amount harus lebih besar dari 0.", "error");
-    return;
-  }
-
-  if (!paymentMethod) {
-    showToast("Payment Method wajib dipilih.", "error");
-    return;
-  }
+  if (!paymentDate) { showToast("Payment Date wajib diisi.", "error");
+    	return; }
+  if (amount <= 0) { showToast("Payment Amount harus lebih besar dari 0.", "error");
+    	return; }
+  if (!paymentMethod) { showToast("Payment Method wajib dipilih.", "error");
+    	return; }
 
   const confirmed = confirm(
     `Bayar PPh Badan ${record.taxYear}?\n\n` +
@@ -28801,13 +28775,9 @@ async function savePphBadanPayment() {
   try {
     pphBadanPaying = true;
 
-    const button = document.getElementById(
-      "savePphBadanPaymentButton"
-    );
+    const button = document.getElementById( "savePphBadanPaymentButton" ;
 
-    if (button) {
-      button.disabled = true;
-    }
+    if (button) { button.disabled = true; }
 
     const { data, error } = await supabaseClient.rpc(
       "pay_pph_badan",
@@ -28822,40 +28792,24 @@ async function savePphBadanPayment() {
       }
     );
 
-    if (error) {
-      console.error("pay_pph_badan error:", error);
-      throw error;
-    }
-
-    console.log("PPh Badan payment success:", data);
+    if (error) { throw error; }
 
     closePphBadanPaymentModal();
-
     showToast(
-      `PPh Badan ${record.taxYear} berhasil dibayar.`,
-      "success"
+      `PPh Badan ${record.taxYear} berhasil dibayar.`, "success"
     );
 
     await loadPphBadanRecords();
 
   } catch (error) {
-    console.error(
-      "savePphBadanPayment error:",
-      error
-    );
-
     showToast(
-      error?.message ||
-        "Gagal melakukan pembayaran PPh Badan.",
-      "error"
+      error?.message || "Gagal melakukan pembayaran PPh Badan.", "error"
     );
 
   } finally {
     pphBadanPaying = false;
 
-    const button = document.getElementById(
-      "savePphBadanPaymentButton"
-    );
+    const button = document.getElementById( "savePphBadanPaymentButton" );
 
     if (button) {
       button.disabled = false;
@@ -28897,27 +28851,27 @@ function getPphBadanStatusBadge(status) {
   const config = {
 	  CALCULATED: {
 	    label: "Calculated",
-	    className: "bg-blue-500/10 text-blue-600"
+	    className: "bg-blue-600/10 text-blue-1000"
 	  },
 	
 	  OUTSTANDING: {
 	    label: "Outstanding",
-	    className: "bg-yellow-500/10 text-yellow-600"
+	    className: "bg-yellow-600/10 text-yellow-1000"
 	  },
 	
 	  PAID: {
 	    label: "Paid",
-	    className: "bg-green-500/10 text-green-600"
+	    className: "bg-green-600/10 text-green-1000"
 	  }
 	};
 
   const item = config[normalized] || {
       label: normalized || "Unknown",
-      className: "bg-surface-container-high text-muted"
+      className: "bg-background text-muted"
     };
 
   return `
-    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${item.className}" >
+    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${item.className}" >
       ${item.label}
     </span>
   `;
@@ -29012,28 +28966,12 @@ async function savePphBadanCalculation() {
       }
     );
 
-    if (error) {
-      console.error(
-        "save_pph_badan_calculation error:",
-        error
-      );
-      throw error; }
-    console.log(
-      "PPh Badan saved:",
-      data
-    );
-
+    if (error) { throw error; }
     showToast(
-      `PPh Badan ${result.taxYear} berhasil disimpan.`,
-      "success"
-    );
+      `PPh Badan ${result.taxYear} berhasil disimpan.`, "success" );
 
     await loadPphBadanRecords();
   } catch (error) {
-    console.error(
-      "savePphBadanCalculation error:",
-      error
-    );
     showToast( error?.message || "Gagal menyimpan PPh Badan.", "error" );
 
   } finally {
