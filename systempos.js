@@ -25651,6 +25651,247 @@ async function loadTaxPayable() {
   }
 }
 
+
+let currentPpnPayment = null;
+let ppnPaymentsData = [];
+let ppnPaymentsPage = 1;
+const ppnPaymentsPerPage = 10;
+
+async function loadPpnPayments() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+    const branchId = state.branchId || null;
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_ppn_payments",
+        {
+          p_session_id: sessionId,
+          p_branch_id: branchId
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+    const result =
+      typeof data === "string"
+        ? JSON.parse(data)
+        : data;
+    ppnPaymentsData =
+      Array.isArray(result)
+        ? result
+        : [];
+
+    ppnPaymentsPage = 1;
+    renderPpnPayments();
+    return ppnPaymentsData;
+
+  } catch (error) {
+    console.error(
+      "loadPpnPayments error:",
+      error
+    );
+    ppnPaymentsData = [];
+    renderPpnPayments();
+    throw error;
+  }
+}		
+
+function renderPpnPayments() {
+  const tbody = document.getElementById("ppnPaymentsTableBody");
+  const paginationInfo = document.getElementById("ppnPaymentsPaginationInfo");
+  const prevButton = document.getElementById("ppnPaymentsPrevButton");
+  const nextButton = document.getElementById("ppnPaymentsNextButton");
+
+  if (!tbody) return;
+
+  const data = Array.isArray(ppnPaymentsData)
+    ? ppnPaymentsData
+    : [];
+
+  const total = data.length;
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total / ppnPaymentsPerPage)
+  );
+
+  if (ppnPaymentsPage > totalPages) {
+    ppnPaymentsPage = totalPages;
+  }
+
+  const startIndex =
+    (ppnPaymentsPage - 1) * ppnPaymentsPerPage;
+
+  const endIndex =
+    Math.min(
+      startIndex + ppnPaymentsPerPage,
+      total
+    );
+
+  const pageData =
+    data.slice(startIndex, endIndex);
+
+  if (pageData.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6"
+          class="px-5 py-10 text-center text-muted">
+          No PPN payment data
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML = pageData.map(payment => {
+
+      const paymentId =
+        payment.payment_id || "";
+
+      const paymentDate =
+        payment.payment_date
+          ? new Date(payment.payment_date)
+              .toLocaleDateString("id-ID")
+          : "-";
+
+      const note =
+        payment.note || "-";
+
+      const amount =
+        Number(payment.amount) || 0;
+
+      const method =
+        payment.payment_method || "-";
+
+      const status =
+        String(payment.status || "OUTSTANDING")
+          .toUpperCase();
+
+      let statusClass =
+        "bg-surface-container-high text-muted";
+
+      if (status === "PAID") {
+        statusClass =
+          "bg-green-500/10 text-green-500";
+      } else if (status === "VOID") {
+        statusClass =
+          "bg-red-500/10 text-red-500";
+      } else if (status === "OUTSTANDING") {
+        statusClass =
+          "bg-yellow-500/10 text-yellow-500";
+      }
+
+      const action =
+        status === "OUTSTANDING"
+          ? `
+            <button
+              type="button"
+              onclick="openPpnPaymentFromRow('${paymentId}')"
+              class="px-3 py-1.5 rounded-md bottom-theme text-xs font-medium">
+              Pay
+            </button>
+          `
+          : "-";
+      return `
+        <tr class="hover:bg-background/50">
+
+          <td class="px-5 py-3">
+            ${paymentDate}
+          </td>
+
+          <td class="px-5 py-3">
+            ${note}
+          </td>
+
+          <td class="px-5 py-3 text-right font-medium">
+            ${formatAccountingCurrency(amount)}
+          </td>
+
+          <td class="px-5 py-3">
+            ${method}
+          </td>
+
+          <td class="px-5 py-3">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+              ${status}
+            </span>
+          </td>
+
+          <td class="px-5 py-3 text-right">
+            ${action}
+          </td>
+
+        </tr>
+      `;
+    }).join("");
+  }
+  if (paginationInfo) {
+    paginationInfo.textContent =
+      total === 0
+        ? "Showing 0–0 of 0"
+        : `Showing ${startIndex + 1}–${endIndex} of ${total}`;
+  }
+  if (prevButton) {
+    prevButton.disabled =
+      ppnPaymentsPage <= 1;
+  }
+  if (nextButton) {
+    nextButton.disabled =
+      ppnPaymentsPage >= totalPages;
+  }
+}
+
+function changePpnPaymentsPage(direction) {
+  const total =
+    Array.isArray(ppnPaymentsData)
+      ? ppnPaymentsData.length
+      : 0;
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(total / ppnPaymentsPerPage)
+    );
+
+  ppnPaymentsPage += direction;
+
+  if (ppnPaymentsPage < 1) {
+    ppnPaymentsPage = 1;
+  }
+
+  if (ppnPaymentsPage > totalPages) {
+    ppnPaymentsPage = totalPages;
+  }
+
+  renderPpnPayments();
+}
+
+function changePpnPaymentsPage(direction) {
+  const total =
+    Array.isArray(ppnPaymentsData)
+      ? ppnPaymentsData.length
+      : 0;
+
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(total / ppnPaymentsPerPage)
+    );
+
+  ppnPaymentsPage += direction;
+
+  if (ppnPaymentsPage < 1) {
+    ppnPaymentsPage = 1;
+  }
+
+  if (ppnPaymentsPage > totalPages) {
+    ppnPaymentsPage = totalPages;
+  }
+  renderPpnPayments();
+}
+
 /* ==== UPDATE TAX PAYABLE UI ==== */
 function updateTaxPayableUI() {
   const outstanding = Number(taxPayableData?.outstanding) || 0;
@@ -25667,9 +25908,25 @@ function updateTaxPayableUI() {
   }
 }
 
+function openPpnPaymentFromRow(paymentId) {
+  const payment = ppnPaymentsData.find(
+    item => String(item.payment_id) === String(paymentId)
+  );
+
+  if (!payment) {
+    showToast("PPN payment tidak ditemukan.", "error");
+    return;
+  }
+
+  if (String(payment.status).toUpperCase() !== "OUTSTANDING") {
+    showToast("PPN payment ini sudah tidak outstanding.", "info");
+    return;
+  }
+  currentPpnPayment = payment;
+  openTaxPaymentModal();
+}
 
 /* ===== OPEN TAX PAYMENT MODAL ===== */
-
 async function openTaxPaymentModal() {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) {
@@ -25763,15 +26020,15 @@ async function saveTaxPayment() {
     }
 
     const { data, error } =
-      await supabaseClient.rpc("create_tax_payment", {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_payment_date: paymentDate,
-        p_amount: amount,
-        p_payment_method: method,
-        p_reference_no: referenceNo,
-        p_note: note
-      });
+		  await supabaseClient.rpc("create_ppn_payment", {
+		    p_session_id: sessionId,
+		    p_branch_id: branchId,
+		    p_payment_date: paymentDate,
+		    p_amount: amount,
+		    p_payment_method: method,
+		    p_reference_no: referenceNo,
+		    p_note: note
+		  });
 
     if (error) { throw error; }
 		state.accountingTaxPayableData = null;
