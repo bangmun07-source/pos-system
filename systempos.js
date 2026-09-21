@@ -28775,7 +28775,7 @@ async function savePphBadanPayment() {
   try {
     pphBadanPaying = true;
 
-    const button = document.getElementById( "savePphBadanPaymentButton" ;
+    const button = document.getElementById("savePphBadanPaymentButton");
 
     if (button) { button.disabled = true; }
 
