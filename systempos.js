@@ -1286,10 +1286,10 @@ function renderTransactions(data) {
   tbody.innerHTML = data.map(trx => {
     const statusColor =
       trx.status === "Paid"
-        ? "text-green-500"
+        ? "text-green-700"
         : trx.status === "Pending"
-        ? "text-yellow-500"
-        : "text-red-500";
+        ? "text-yellow-700"
+        : "text-red-700";
 
     return `
       <tr class="hover:bg-outline-variant transition-colors">
@@ -7974,8 +7974,8 @@ function renderRecipes() {
 
           <div class="w-16 h-1 bg-outline-variant rounded-full overflow-hidden">
             <div class="h-full 
-              ${item.costPercent > 60 ? 'bg-red-500' :
-                item.costPercent >= 40 ? 'bg-yellow-400' :
+              ${item.costPercent > 60 ? 'bg-red-700' :
+                item.costPercent >= 40 ? 'bg-yellow-700' :
                 'bg-emerald-500'}"
               style="width:${item.costPercent}%">
             </div>
@@ -7983,7 +7983,7 @@ function renderRecipes() {
         </div>
       </td>
 
-      <td class="px-6 py-4 font-bold text-green-400">
+      <td class="px-6 py-4 font-semibold text-green-700">
         Rp ${item.profit.toLocaleString("id-ID")}
       </td>
 
@@ -8552,10 +8552,10 @@ function renderIngredients(data) {
         <td class="px-8 py-5 text-center">
           ${
             isCritical
-              ? `<span class="px-3 py-1 bg-red-500/20 text-red-400 text-[10px] font-black rounded-md uppercase">Critical</span>`
+              ? `<span class="px-3 py-1 bg-red-600/20 text-red-700 text-[10px] font-black rounded-md uppercase">Critical</span>`
               : isLow
-                ? `<span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 text-[10px] font-black rounded-md uppercase">Low</span>`
-                : `<span class="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-black rounded-md uppercase">Optimal</span>`
+                ? `<span class="px-3 py-1 bg-yellow-600/20 text-yellow-700 text-[10px] font-black rounded-md uppercase">Low</span>`
+                : `<span class="px-3 py-1 bg-green-600/20 text-green-700 text-[10px] font-black rounded-md uppercase">Optimal</span>`
           }
         </td>
 
@@ -8683,28 +8683,13 @@ function openThresholdFromIngredient() {
   wrapper.id = "inventoryThresholdWrapper";
   wrapper.appendChild(tpl.content.cloneNode(true));
   document.body.appendChild(wrapper);
-  document.getElementById(
-    "thresholdItemName"
-  ).innerText =
-    currentThresholdItem.name;
-  document.getElementById(
-    "thresholdValue"
-  ).value =
-    currentThresholdItem.min || 0;
+  document.getElementById( "thresholdItemName" ).innerText = currentThresholdItem.name;
+  document.getElementById( "thresholdValue" ).value = currentThresholdItem.min || 0;
 }
 
 async function submitAdjust() {
-  const qty =
-    Number(
-      document.getElementById(
-        "modalQty"
-      ).value || 0
-    );
-
-  const reason =
-    document.getElementById(
-      "modalReason"
-    ).value;
+  const qty = Number( document.getElementById( "modalQty" ).value || 0 );
+  const reason = document.getElementById( "modalReason" ).value;
 
   if (!currentAdjustItem) {
     return;
@@ -8775,25 +8760,12 @@ function openThresholdFromIngredient() {
   wrapper.id = "inventoryThresholdWrapper";
   wrapper.appendChild(tpl.content.cloneNode(true));
   document.body.appendChild(wrapper);
-  document.getElementById(
-    "thresholdItemName"
-  ).innerText =
-    currentThresholdItem.name;
-
-  document.getElementById(
-    "thresholdValue"
-  ).value =
-    currentThresholdItem.min || 0;
-
+  document.getElementById( "thresholdItemName" ).innerText = currentThresholdItem.name;
+  document.getElementById( "thresholdValue" ).value = currentThresholdItem.min || 0;
 }
 
 async function submitThreshold() {
-  const min =
-    Number(
-      document.getElementById(
-        "thresholdValue"
-      ).value || 0
-    );
+  const min = Number( document.getElementById( "thresholdValue" ).value || 0 );
   if (!currentThresholdItem) {
     return;
   }
@@ -8807,9 +8779,7 @@ async function submitThreshold() {
   try {
     const sessionId =
       localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const { data, error
     } = await supabaseClient.rpc(
       "update_ingredient_threshold",
       {
@@ -8820,10 +8790,7 @@ async function submitThreshold() {
       }
     );
 
-    if (error) {
-      throw error;
-    }
-
+    if (error) { throw error; }
     // CLEAR CACHE
     state.inventoryData = null;
     state.inventoryBranchId = null;
@@ -8859,39 +8826,21 @@ async function openUsageLogFromIngredient() {
     !item ||
     !item.id ||
     !item.branchId
-  ) {
-    return;
-  }
+  ) { return; }
 
-  const tpl =
-    document.getElementById(
-      "inventorydetailusageModal"
-    );
+  const tpl = document.getElementById( "inventorydetailusageModal" );
 
-  if (!tpl) {
-    return;
-  }
-  document
-    .getElementById(
-      "inventoryUsageLogWrapper"
-    )
-    ?.remove();
+  if (!tpl) { return; }
+  document .getElementById( "inventoryUsageLogWrapper" ) ?.remove();
   const wrapper = document.createElement("div");
   wrapper.id = "inventoryUsageLogWrapper";
   wrapper.appendChild(tpl.content.cloneNode(true));
   document.body.appendChild(wrapper);
-
-  document.getElementById(
-    "usageLogItemName"
-  ).innerText =
-    item.name || "-";
+  document.getElementById( "usageLogItemName" ).innerText = item.name || "-";
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_ingredient_usage_log",
       {
@@ -8901,12 +8850,8 @@ async function openUsageLogFromIngredient() {
       }
     );
 
-    if (error) {
-      throw error;
-    }
-    const usageData =
-      data || [];
-
+    if (error) { throw error; }
+    const usageData = data || [];
     // RENDER
     renderUsageLog(usageData);
     renderUsageSummary(
@@ -8932,15 +8877,12 @@ function renderUsageSummary(data, currentStock) {
     !currentStockEl ||
     !totalOutEl ||
     !avgDailyEl
-  ) {
-    return;
-  }
+  ) { return; }
   if (!data.length) {
     currentStockEl.innerText = currentStock;
     totalOutEl.innerText = 0;
     avgDailyEl.innerText = 0;
-    return;
-  }
+    return; }
   const totalOut = data
     .filter(r => r.action === "OUT")
     .reduce(
@@ -8965,10 +8907,7 @@ function renderUsageSummary(data, currentStock) {
 }
 
 function renderUsageLog(data) {
-  const tbody =
-    document.getElementById(
-      "usageLogTableBody"
-    );
+  const tbody = document.getElementById( "usageLogTableBody" );
   if (!tbody) return;
   tbody.innerHTML = "";
   if (!data.length) {
@@ -8980,8 +8919,7 @@ function renderUsageLog(data) {
         </td>
       </tr>
     `;
-    return;
-  }
+    return; }
 
   data
   .sort(
@@ -16128,9 +16066,9 @@ function updateSeasonUI(res) {
     "text-[10px] font-inter tracking-widest uppercase px-3 py-1 rounded-md";
   // APPLY STYLE
   switch (status) {
-    case "OPEN": badge.classList.add("bg-green-500/20", "text-green-400");
+    case "OPEN": badge.classList.add("bg-green-500/20", "text-green-700");
       break;
-    case "CLOSED": badge.classList.add("bg-red-500/20", "text-red-400");
+    case "CLOSED": badge.classList.add("bg-red-500/20", "text-red-700");
       break;
     case "AUTO": badge.classList.add("bg-primary/20", "text-on-surface");
       break;
@@ -16155,11 +16093,7 @@ function initRewardPagination() {
 
 async function loadRewardProducts() {
   const branchId =
-    document.getElementById(
-      "rewardBranchFilter"
-    )?.value ||
-    state.branchId;
-
+    document.getElementById( "rewardBranchFilter" )?.value || state.branchId;
 
   if (
     state.rewardProducts &&
@@ -22062,16 +21996,16 @@ function renderAccountingAccounts(accounts) {
             EXPENSE: "Expense"
         }[account.accountType] || account.accountType;
         const typeClass = {
-            ASSET: "bg-blue-500/10 text-blue-1000",
-            LIABILITY: "bg-red-500/10 text-red-1000",
-            EQUITY: "bg-purple-500/10 text-purple-1000",
-            REVENUE: "bg-green-500/10 text-green-1000",
-            COGS: "bg-orange-500/10 text-orange-1000",
-            EXPENSE: "bg-yellow-500/10 text-yellow-1000"
+            ASSET: "bg-blue-500/10 text-blue-700",
+            LIABILITY: "bg-red-600/10 text-red-700",
+            EQUITY: "bg-purple-600/10 text-purple-700",
+            REVENUE: "bg-green-600/10 text-green-700",
+            COGS: "bg-orange-600/10 text-orange-700",
+            EXPENSE: "bg-yellow-600/10 text-yellow-700"
         }[account.accountType] || "text-on-surface-variant";
         const statusClass = account.isActive
-            ? "bg-green-500/10 text-green-1000"
-            : "bg-red-500/10 text-red-1000";
+            ? "bg-green-600/10 text-green-700"
+            : "bg-red-600/10 text-red-700";
         const statusLabel = account.isActive
             ? "ACTIVE"
             : "INACTIVE";
@@ -22102,8 +22036,8 @@ function renderAccountingAccounts(accounts) {
                 <td class="px-6 py-4 font-bold text-center">
                     <span class="text-sm ${
                         account.normalBalance === "DEBIT"
-                            ? "text-blue-1000"
-                            : "text-green-1000"
+                            ? "text-blue-700"
+                            : "text-green-700"
                     }">
                         ${account.normalBalance || "-"}
                     </span>
@@ -22602,8 +22536,8 @@ function renderAccountingMappings() {
     tbody.innerHTML = pageMappings.map(mapping => {
         const statusClass =
             mapping.isActive
-                ? "bg-green-500/10 text-green-600"
-                : "bg-read-500/10 text-read-600";
+                ? "bg-green-600/10 text-green-700"
+                : "bg-read-600/10 text-read-700";
         const statusLabel =
             mapping.isActive
                 ? "ACTIVE"
@@ -23547,14 +23481,14 @@ function calculateNewJournalTotals() {
 			differenceDisplay.textContent =
 					formatJournalCurrency(Math.abs(difference));
 			differenceDisplay.classList.remove(
-					"text-green-400",
-					"text-red-400",
-					"text-gray-400"
+					"text-green-700",
+					"text-red-700",
+					"text-gray-700"
 			);
 			if (difference === 0) {
-					differenceDisplay.classList.add("text-green-400");
+					differenceDisplay.classList.add("text-green-700");
 			} else {
-					differenceDisplay.classList.add("text-red-400");
+					differenceDisplay.classList.add("text-red-700");
 			}
 	}
 
@@ -25320,7 +25254,7 @@ function renderSupplierDebtTable() {
 			tbody.innerHTML = `
 				<tr>
 					<td colspan="8"
-						class="text-center py-10 text-gray-400">
+						class="text-center py-10 text-on-surface-variant">
 						Tidak ada hutang supplier
 					</td>
 				</tr>
@@ -25775,13 +25709,13 @@ function renderPpnPayments() {
 
       if (status === "PAID") {
         statusClass =
-          "bg-green-500/10 text-green-500";
+          "bg-green-600/10 text-green-700";
       } else if (status === "VOID") {
         statusClass =
-          "bg-red-500/10 text-red-500";
+          "bg-red-600/10 text-red-700";
       } else if (status === "OUTSTANDING") {
         statusClass =
-          "bg-yellow-500/10 text-yellow-500";
+          "bg-yellow-600/10 text-yellow-700";
       }
 
       const action =
@@ -28851,17 +28785,17 @@ function getPphBadanStatusBadge(status) {
   const config = {
 	  CALCULATED: {
 	    label: "Calculated",
-	    className: "bg-blue-600/10 text-blue-1000"
+	    className: "bg-blue-600/10 text-blue-700"
 	  },
 	
 	  OUTSTANDING: {
 	    label: "Outstanding",
-	    className: "bg-yellow-600/10 text-yellow-1000"
+	    className: "bg-yellow-600/10 text-yellow-700"
 	  },
 	
 	  PAID: {
 	    label: "Paid",
-	    className: "bg-green-600/10 text-green-1000"
+	    className: "bg-green-600/10 text-green-700"
 	  }
 	};
 
