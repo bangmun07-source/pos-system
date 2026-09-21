@@ -1198,7 +1198,7 @@ function renderLowStock(items) {
   el.innerHTML = items.map(i => `
     <div class="flex justify-between text-sm py-1 border-b border-outline-variant">
       <span>${i.nama}</span>
-      <span class="text-red-400 font-bold">${i.stok}</span>
+      <span class="text-red-700 font-bold">${i.stok}</span>
     </div>
   `).join("");
 }
@@ -3440,7 +3440,7 @@ function renderCart() {
 						<button onclick="decreaseQty(${index})">-</button>
 						<span class="min-w-[20px] text-center">${item.qty}</span>
 						<button onclick="increaseQty(${index})">+</button>
-						<button onclick="removeItemById('${item.id}')" class="text-red-500 ml-2"> 🗑️
+						<button onclick="removeItemById('${item.id}')" class="text-red-700 ml-2"> 🗑️
 						</button>
 					</div>
 				</div>	
@@ -4297,38 +4297,21 @@ function ensureIngredientStockAlertModal() {
 	
 window.ingredientStockData = [];
 function openIngredientStockAlert(data = []) {
-  const modal =
-    ensureIngredientStockAlertModal();
+  const modal = ensureIngredientStockAlertModal();
 
-  if (!modal) {
-    return;
-  }
-  const list =
-    document.getElementById(
-      "ingredientStockAlertList"
-    );
+  if (!modal) { return; }
+  const list = document.getElementById( "ingredientStockAlertList" );
 
-  if (!list) {
-    return;
-  }
+  if (!list) { return; }
 
   list.innerHTML = "";
-
   data.forEach(item => {
-
-    const qty =
-      Number(item.qty || 0);
-
-    const min =
-      Number(item.min || 0);
-
-    const statusClass =
-      qty <= 0
-        ? "text-red-500"
-        : "text-orange-400";
-
-    const statusText =
-      qty <= 0
+    const qty = Number(item.qty || 0);
+    const min = Number(item.min || 0);
+    const statusClass = qty <= 0
+        ? "text-red-700"
+        : "text-orange-700";
+    const statusText = qty <= 0
         ? "OUT"
         : "LOW";
 
@@ -4336,40 +4319,25 @@ function openIngredientStockAlert(data = []) {
       <div class="py-5 border-b border-outline-variant">
         <div class="flex justify-between gap-4">
           <div class="flex items-start gap-3">
-            <div
-              class="w-9 h-9 rounded-md
-              flex items-center
-              justify-center
-              flex-shrink-0">
-
-              <span
-                class="material-symbols-outlined
-                text-on-surface text-xl">
+            <div class="w-9 h-9 rounded-md flex items-center justify-center flex-shrink-0">
+              <span class="material-symbols-outlined text-on-surface text-xl">
                 inventory_2
               </span>
             </div>
 			  
             <div>
-              <p
-                class="font-bold text-xs lg:text-sm text-on-surface">
+              <p class="font-bold text-xs lg:text-sm text-on-surface">
                 ${item.name || "-"}
               </p>
 
-              <p
-                class="text-xs
-                text-on-surface-variant
-                mt-2">
-                Current Stock :
-                <span
-                  class="font-semibold text-on-surface">
+              <p class="text-xs text-on-surface-variant mt-2"> 
+			  	Current Stock :
+                <span class="font-semibold text-on-surface">
                   ${qty} ${item.unit || ""}
                 </span>
               </p>
 
-              <p
-                class="text-xs
-                text-on-surface-variant
-                mt-1">
+              <p class="text-xs text-on-surface-variant mt-1">
                 Minimum Stock :
                 <span
                   class="font-semibold text-on-surface">
@@ -4379,8 +4347,7 @@ function openIngredientStockAlert(data = []) {
             </div>
           </div>
 
-          <span
-            class="text-xs font-bold ${statusClass}">
+          <span class="text-xs font-bold ${statusClass}">
             ${statusText}
           </span>
         </div>
@@ -5918,21 +5885,13 @@ async function loadNotifications() {
 	badge.innerText = "";
 	if (window.ingredientStockData.length > 0) {
 		list.innerHTML += `
-		<div
- 
-		onclick="handleNotification(this)"
+		<div onclick="handleNotification(this)"
 		data-type="ingredient"
-		class="
-		p-4 border-b border-outline-variant
-		hover:bg-outline-variant
-		cursor-pointer
-		transition-all
-		"
-		data-type="ingredient"
-		>
+		class=" p-4 border-b border-outline-variant hover:bg-outline-variant cursor-pointer transition-all "
+		data-type="ingredient" >
 			<div class="flex items-start gap-3">
-				<div class="w-10 h-10 rounded-md bg-red-500/10 flex items-center justify-center">
-					<span class="material-symbols-outlined text-red-500">
+				<div class="w-10 h-10 rounded-md bg-red-600/10 flex items-center justify-center">
+					<span class="material-symbols-outlined text-red-700">
 						warning
 					</span>
 				</div>
@@ -5945,7 +5904,6 @@ async function loadNotifications() {
 					<p class="text-xs text-on-surface-variant mt-1">
 						${ingredients.length}
 						ingredient perlu restock
-
 						• Klik untuk melihat detail
 					</p>
 				</div>
@@ -9073,8 +9031,8 @@ function showToast(msg, type = "success") {
     pointer-events-auto
     ${
       type === "error"
-      ? "text-red-500"
-      : "text-emerald-500"
+      ? "text-red-700"
+      : "text-emerald-700"
     }
   `;
 
@@ -9409,7 +9367,7 @@ function renderRecipeBuilder(data = []) {
       </select>
 
       <button onclick="removeIngredient(${index})"
-        class="p-2 text-red-400 hover:bg-red-500/10 rounded-md">
+        class="p-2 text-red-700 hover:bg-red-600/10 rounded-md">
         🗑
       </button>
     `;
@@ -9480,7 +9438,7 @@ function updateLiveStockUI(deductionMap) {
     if (!el) return;
     const qty = deductionMap[id].qty;
     el.innerHTML = `
-      <div class="text-xs text-red-400">
+      <div class="text-xs text-red-700">
         -${qty.toLocaleString("id-ID")}
       </div>
     `;
@@ -10680,9 +10638,9 @@ function renderWeeklyChart(weekly) {
     let colorClass = "bg-outline-variant";
     // WARNA HALUS (bukan ngejreng)
     if (val > prev) {
-      colorClass = "bg-emerald-400/70 hover:bg-emerald-400";
+      colorClass = "bg-emerald-600/70 hover:bg-emerald-600";
     } else if (val < prev) {
-      colorClass = "bg-red-400/70 hover:bg-red-400";
+      colorClass = "bg-red-600/70 hover:bg-red-700";
     } else {
       colorClass = "bg-outline-variant hover:bg-primary-container";
     }
@@ -10727,7 +10685,7 @@ function renderAnalytics(data) {
     if (growthEl) {
       const parent = growthEl.parentElement;
       // reset warna dulu
-      parent.classList.remove("text-emerald-400", "text-red-400");
+      parent.classList.remove("text-emerald-700", "text-red-700");
       if (data.growth === null) {
         growthEl.innerText = "No data";
       } else {
@@ -10735,9 +10693,9 @@ function renderAnalytics(data) {
         const sign = g > 0 ? "+" : "";
         growthEl.innerText = `${sign}${g.toFixed(1)}% vs last period`;
         if (g > 0) {
-          parent.classList.add("text-emerald-400");
+          parent.classList.add("text-emerald-700");
         } else if (g < 0) {
-          parent.classList.add("text-red-400");
+          parent.classList.add("text-red-700");
         }
       }
     }
@@ -11010,30 +10968,30 @@ function renderRawMaterialPage() {
   const rows = rawMaterialData.slice(start, end);
   tbody.innerHTML = rows.map(item => {
     let statusClass = `
-      bg-emerald-500/10
-      text-emerald-500
-      border-emerald-500/20
+      bg-emerald-600/10
+      text-emerald-700
+      border-emerald-600/20
     `;
     if (item.status === "Warning") {
       statusClass = `
-        bg-amber-500/10
-        text-amber-500
-        border-amber-500/20
+        bg-amber-600/10
+        text-amber-700
+        border-amber-600/20
       `;
     }
     if (item.status === "Critical") {
       statusClass = `
-        bg-red-500/10
-        text-red-500
-        border-red-500/20
+        bg-red-600/10
+        text-red-700
+        border-red-600/20
       `;
     }
     const daysColor =
       item.status === "Critical"
-        ? "text-red-500"
+        ? "text-red-700"
         : item.status === "Warning"
-        ? "text-amber-500"
-        : "text-emerald-500";
+        ? "text-amber-700"
+        : "text-emerald-700";
     return `
       <tr class="hover:bg-outline-variant transition-colors">
         <td class="px-8 py-6">
@@ -12057,8 +12015,8 @@ function renderUsers() {
               </button>
 
               <button onclick="deleteUser('${user.id}')"
-                class="w-9 h-9 hover:bg-red-500/10 transition rounded-md">
-                <span class="material-symbols-outlined text-sm text-red-400">
+                class="w-9 h-9 hover:bg-red-600/10 transition rounded-md">
+                <span class="material-symbols-outlined text-sm text-red-700">
                   delete
                 </span>
               </button>
@@ -13497,26 +13455,26 @@ function showExpenseReceipt(index) {
         case "paid":
             status.classList.add(
                 "bottom-theme",
-                "text-on-surface-400"
+                "text-on-surface"
             );
             break;
         case "pending":
             status.classList.add(
-                "bg-yellow-500",
-                "text-yellow-400"
+                "bg-yellow-600",
+                "text-yellow-700"
             );
             break;
 
         case "void":
             status.classList.add(
-                "bg-red-500",
-                "text-red-400"
+                "bg-red-600",
+                "text-red-700"
             );
             break;
         default:
             status.classList.add(
-                "bg-gray-500/20",
-                "text-gray-400"
+                "bg-gray-600/20",
+                "text-gray-700"
             );
             break;
     }
@@ -16028,9 +15986,9 @@ function updateSeasonUI(res) {
     "text-[10px] font-inter tracking-widest uppercase px-3 py-1 rounded-md";
   // APPLY STYLE
   switch (status) {
-    case "OPEN": badge.classList.add("bg-green-500/20", "text-green-700");
+    case "OPEN": badge.classList.add("bg-green-600/20", "text-green-700");
       break;
-    case "CLOSED": badge.classList.add("bg-red-500/20", "text-red-700");
+    case "CLOSED": badge.classList.add("bg-red-600/20", "text-red-700");
       break;
     case "AUTO": badge.classList.add("bg-primary/20", "text-on-surface");
       break;
@@ -16131,7 +16089,7 @@ function renderRewardProductsTable() {
         <td class="px-6 py-4">
           <div class="flex justify-end gap-2">
             <button onclick="deleteReward('${r.id}')"
-              class="w-8 h-8 hover:text-red-400 flex items-center justify-center transition-all">
+              class="w-8 h-8 hover:text-red-700 flex items-center justify-center transition-all">
               <span class="material-symbols-outlined text-[15px]">
                 delete
               </span>
@@ -18345,8 +18303,8 @@ function renderOwnerHistory(rows) {
           <div class="text-right px-4">
             <div class="${
               isCapital
-                ? "text-emerald-400"
-                : "text-red-400"
+                ? "text-emerald-700"
+                : "text-red-700"
               } font-bold">
 
               ${
@@ -19598,7 +19556,7 @@ async function loadBackupList(){
           </button>
 
           <button onclick="deleteBackup('${item.backup_id}')"
-          	class="px-4 py-2 rounded-md bg-red-500/10 border border-red-500/10 text-red-400 text-xs">
+          	class="px-4 py-2 rounded-md bg-red-600/10 border border-red-600/10 text-red-700 text-xs">
             	DELETE
           </button>
         </div>
@@ -19927,7 +19885,7 @@ async function deleteBackup(id) {
     <div id="${progressId}-box"
       class="w-full bg-outline-variant/10 rounded-md h-2 overflow-hidden">
       <div id="${progressId}"
-        class="h-full bg-red-400 rounded-md transition-all duration-500"
+        class="h-full bg-red-700 rounded-md transition-all duration-500"
         style="width:5%">
 			</div>
     </div>
@@ -21716,7 +21674,7 @@ function renderAccountingOverview(data) {
                   ${escapeHTML(date)}
                 </p>
 
-                <p class="text-[10px] uppercase tracking-wider text-red-1000 mt-2">
+                <p class="text-[10px] uppercase tracking-wider text-red-700 mt-2">
                   ${status}
                 </p>
               </div>
@@ -21958,7 +21916,7 @@ function renderAccountingAccounts(accounts) {
             EXPENSE: "Expense"
         }[account.accountType] || account.accountType;
         const typeClass = {
-            ASSET: "bg-blue-500/10 text-blue-700",
+            ASSET: "bg-blue-600/10 text-blue-700",
             LIABILITY: "bg-red-600/10 text-red-700",
             EQUITY: "bg-purple-600/10 text-purple-700",
             REVENUE: "bg-green-600/10 text-green-700",
@@ -22033,8 +21991,8 @@ function renderAccountingAccounts(accounts) {
                                 onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
                                 class="w-full text-left px-4 py-2 text-sm ${
                                     account.isActive
-                                        ? "text-red-600"
-                                        : "text-emerald-600"
+                                        ? "text-red-700"
+                                        : "text-emerald-700"
                                 } hover: hover:bg-outline-variant">
                                 ${account.isActive ? "Set Inactive" : "Set Active"}
                             </button>
@@ -23063,9 +23021,9 @@ function renderJournalEntryRow(journal) {
 	}[ journal.status ] || journal.status || "-";
 	
 	const statusClass = {
-		POSTED: "text-emerald-1000",
-		DRAFT: "text-yellow-1000",
-		VOID: "text-red-1000"
+		POSTED: "text-emerald-700",
+		DRAFT: "text-yellow-700",
+		VOID: "text-red-700"
 	}[ journal.status ] || "text-muted";
 	
 		return `
@@ -23286,6 +23244,7 @@ function populateNewJournalBranches() {
 		window.branchList ||
 		window.outlets ||
 		[];
+	console.log("BRANCH DATA:", branches);
 	branchEl.innerHTML = "";
 	if (!Array.isArray(branches) || branches.length === 0) {
 		branchEl.innerHTML = `  <option value="">Select Branch</option> `;
@@ -23345,7 +23304,7 @@ function addNewJournalLine() {
 	row.innerHTML = `
 		<td class="px-4 py-3">
 			<select id="newJournalAccount-${lineId}"
-				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+				class="custom-scrollbar w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
 				onchange="calculateNewJournalTotals()">
 				${buildNewJournalAccountOptions()}
 			</select>
@@ -23355,7 +23314,7 @@ function addNewJournalLine() {
 			<input type="text"
 				id="newJournalLineDescription-${lineId}"
 				placeholder="Description"
-				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface placeholder-gray-500 outline-none focus:border-amber-500">
+				class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface placeholder-on-surface-variant outline-none focus:border-amber-500">
 		</td>
 
 		<td class="px-4 py-3">
@@ -23381,8 +23340,7 @@ function addNewJournalLine() {
 		<td class="px-4 py-3 text-center">
 			<button type="button"
 				onclick="removeNewJournalLine(${lineId})"
-				class="w-8 h-8 rounded-md flex items-center justify-center text-gray-500 hover:text-red-400 hover:bg-red-400/10 transition">
-
+				class="w-8 h-8 rounded-md flex items-center justify-center text-on-surface-variant hover:text-red-700 transition">
 				<span class="material-symbols-outlined text-md">
 						delete
 				</span>
@@ -23573,11 +23531,8 @@ async function saveNewJournalEntry() {
 							p_session_id: sessionId
 					}
 			);
-			if (error) {
-					console.error("create_journal_entry error:", error);
-					throw error;
-			}
-			console.log("Journal created:", data);
+			if (error) { throw error; }
+		
 			closeNewJournalModal();
 			// ===== CLEAR JOURNAL ENTRIES CACHE =====
 			journalEntriesLoaded = false;
@@ -23590,11 +23545,7 @@ async function saveNewJournalEntry() {
 			await loadJournalEntries();
 			alert("Journal berhasil disimpan.");
 	} catch (error) {
-			console.error("saveNewJournalEntry error:", error);
-			alert(
-					error?.message ||
-					"Gagal menyimpan journal."
-			);
+			alert( error?.message || "Gagal menyimpan journal." );
 	} finally {
 		if (saveButton) {
 				saveButton.disabled = false;
@@ -23696,45 +23647,43 @@ function renderJournalEntryDetail(journal) {
 				</tr>
 			`;
     } else {
-        container.innerHTML =
-          lines.map(line => {
-            const debit =
-                Number(line.debit || 0);
-            const credit =
-                Number(line.credit || 0);
-              totalDebit += debit;
-              totalCredit += credit;
-                return `
-									<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
-										<td class="px-4 py-4">
-											<div class="text-sm font-medium text-on-surface">
-													${escapeHtml( line.accountCode || "-" )}
-											</div>
+			container.innerHTML =
+				lines.map(line => {
+					const debit = Number(line.debit || 0);
+					const credit = Number(line.credit || 0);
+						totalDebit += debit;
+						totalCredit += credit;
+							return `
+								<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
+									<td class="px-4 py-4">
+										<div class="text-sm font-medium text-on-surface">
+												${escapeHtml( line.accountCode || "-" )}
+										</div>
 
-											<div class="text-xs text-on-surface-variant mt-1">
-													${escapeHtml( line.accountName || "-" )}
-											</div>
-										</td>
+										<div class="text-xs text-on-surface-variant mt-1">
+												${escapeHtml( line.accountName || "-" )}
+										</div>
+									</td>
 
-										<td class="px-4 py-4 text-sm text-on-surface-variant">
-												${escapeHtml( line.description || "-" )}
-										</td>
+									<td class="px-4 py-4 text-sm text-on-surface-variant">
+											${escapeHtml( line.description || "-" )}
+									</td>
 
-										<td class="px-4 py-4 text-right text-sm text-on-surface">
-												${ debit > 0
-														? formatJournalCurrency(debit)
-														: "-"
-												}
-										</td>
-										
-										<td class="px-4 py-4 text-right text-sm text-on-surface">
-												${ credit > 0
-														? formatJournalCurrency(credit)
-														: "-"
-												}
-										</td>
-									</tr>
-							`;
+									<td class="px-4 py-4 text-right text-sm text-on-surface">
+											${ debit > 0
+													? formatJournalCurrency(debit)
+													: "-"
+											}
+									</td>
+									
+									<td class="px-4 py-4 text-right text-sm text-on-surface">
+											${ credit > 0
+													? formatJournalCurrency(credit)
+													: "-"
+											}
+									</td>
+								</tr>
+						`;
        }).join("");
     }
 
@@ -23745,17 +23694,17 @@ function renderJournalEntryDetail(journal) {
     if (differenceEl) {
         differenceEl.textContent = formatJournalCurrency( Math.abs(difference) );
         differenceEl.classList.remove(
-					"text-emerald-400",
-					"text-red-400",
+					"text-emerald-700",
+					"text-red-700",
 					"text-on-surface"
         );
 		if (difference === 0) {
 				differenceEl.classList.add(
-						"text-emerald-400"
+						"text-emerald-700"
 				);
 		} else {
 			differenceEl.classList.add(
-					"text-red-400"
+					"text-red-700"
 			);
 		}
 	}
