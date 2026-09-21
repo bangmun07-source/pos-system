@@ -25063,6 +25063,7 @@ async function initAccountingDebtPage() {
 	await loadSupplierDebt();
 	await initOtherLiability();
 	await loadTaxPayable();
+	await loadPpnPayments();
 }
 
 
@@ -26041,7 +26042,9 @@ async function saveTaxPayment() {
       data?.message ||
       "Pembayaran Tax Payable berhasil."
     );
+	
     await loadTaxPayable();
+	await loadPpnPayments();
   } catch (error) {
     alert(
       error?.message ||
