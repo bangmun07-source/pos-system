@@ -13059,7 +13059,7 @@
       <div class="px-6 py-4 flex items-center justify-between
         border-t border-outline-variant">
         <p id="asset-pagination-info"
-          class="text-xs text-muted font-medium">
+          class="text-xs text-on-surface-variantfont-medium">
           	Showing assets
         </p>
 
@@ -13160,21 +13160,21 @@
 		  <!-- FOOTER -->
 		  <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
 		    <p id="depreciation-pagination-info"
-		      class="text-xs text-on-surface-variantfont-medium">
+		      class="text-xs text-on-surface-variant font-medium">
 		      Showing depreciation history
 		    </p>
 		
 		    <div class="flex items-center gap-2">
 					<button id="depreciationPrevBtn"
 		        class="p-2 text-on-surface-variant hover:text-on-surface">
-		        <span class="material-symbols-outlined">
+		        <span class="material-symbols-outlined text-sm lg:text-base">
 		          chevron_left
 		        </span>
 		      </button>
 		
 		      <button id="depreciationNextBtn"
 		        class="p-2 text-on-surface-variant hover:text-on-surface">
-		        <span class="material-symbols-outlined">
+		        <span class="material-symbols-outlined text-sm lg:text-base">
 		          chevron_right
 		        </span>
 		      </button>
@@ -15154,8 +15154,8 @@
               </div>
             </div>
 
-            <button onclick="navigate('journalEntriesPage')"
-              class="text-xs font-bold uppercase tracking-wider text-primary">
+            <button onclick="navigate('accountingTransactionsPage')"
+              class="text-xs font-bold uppercase tracking-wider text-on-surface">
               View All
             </button>
           </div>
@@ -15548,7 +15548,7 @@
               </span>
             </div>
 
-            <span class="text-xs font-bold text-emerald-400">
+            <span class="text-xs font-bold text-blue-600">
               ASSET
             </span>
           </div>
@@ -15572,7 +15572,7 @@
               </span>
             </div>
 
-            <span class="text-xs font-bold text-amber-400">
+            <span class="text-xs font-bold text-red-1000">
               LIABILITY
             </span>
           </div>
@@ -15596,7 +15596,7 @@
               </span>
             </div>
 
-            <span class="text-xs font-bold text-blue-400">
+            <span class="text-xs font-bold text-purple-1000">
               EQUITY
             </span>
           </div>
@@ -15620,7 +15620,7 @@
               </span>
             </div>
 
-            <span class="text-xs font-bold text-emerald-400">
+            <span class="text-xs font-bold text-emerald-1000">
               REVENUE
             </span>
           </div>
@@ -15644,7 +15644,7 @@
               </span>
             </div>
 
-            <span class="text-xs font-bold text-red-400">
+            <span class="text-xs font-bold text-yellow-1000">
               EXPENSE
             </span>
           </div>
@@ -15742,7 +15742,7 @@
 				<!-- FOOTER -->
 				<div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
 				  <p id="accountingAccountPaginationInfo"
-				     class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+				     class="text-xs text-on-surface-variant font-medium">
 				    Showing 0–0 of 0 Accounts
 				  </p>
 				
@@ -15843,7 +15843,8 @@
         </div>
 				<!-- FOOTER -->
 			  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-			    <p id="accountingMappingPaginationInfo" class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+			    <p id="accountingMappingPaginationInfo" 
+						class="text-xs text-on-surface-variant font-medium">
 			      Showing 1–10 of 50 Products
 			    </p>
 			
@@ -16486,7 +16487,8 @@
           </div>
 					<!-- FOOTER -->
 				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-				    <p id="journalEntriesPaginationInfo" class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+				    <p id="journalEntriesPaginationInfo" 
+							class="text-xs text-on-surface-variant font-medium">
 				      Showing 1–10 of 50 Products
 				    </p>
 				
@@ -16616,7 +16618,8 @@
           </div>
           <!-- FOOTER -->
 				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-				    <p id="generalLedgerPaginationInfo" class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+				    <p id="generalLedgerPaginationInfo" 
+							class="text-xs text-on-surface-variant font-medium">
 				      Showing 1–10 of 50 Products
 				    </p>
 				
@@ -17598,16 +17601,16 @@
 				        </div>
 				      </div>
 				      <!-- TOTAL ASSETS -->
-				      <div class="grid grid-cols-[1fr_180px_180px] gap-4 border-t-2 border-outline-variant mt-5 pt-4 font-headline">
+				      <div class="grid grid-cols-[1fr_180px_180px] gap-4 border-t-2 border-outline-variant mt-5 pt-4 font-headline font-bold">
 				        <span>
 				          TOTAL ASSETS
 				        </span>
 				
-				        <span id="balanceSheetTotalAssetsDebit" class="text-right" >
+				        <span id="balanceSheetTotalAssetsDebit" class="text-right font-bold" >
 				          -
 				        </span>
 								
-				        <span id="balanceSheetTotalAssetsCredit" class="text-right" >
+				        <span id="balanceSheetTotalAssetsCredit" class="text-right font-bold" >
 				          -
 				        </span>
 				      </div>
@@ -17669,16 +17672,16 @@
 				        </div>
 				      </div>
 				      <!-- TOTAL LIABILITIES -->
-				      <div class="grid grid-cols-[1fr_180px_180px] gap-4 border-t-2 border-outline-variant mt-5 pt-4 font-headline">
+				      <div class="grid grid-cols-[1fr_180px_180px] gap-4 border-t-2 border-outline-variant mt-5 pt-4 font-headline font-bold">
 				        <span>
 				          TOTAL LIABILITIES
 				        </span>
 				
-				        <span id="balanceSheetTotalLiabilitiesDebit" class="text-right" >
+				        <span id="balanceSheetTotalLiabilitiesDebit" class="text-right font-bold" >
 				          -
 				        </span>
 				
-				        <span id="balanceSheetTotalLiabilitiesCredit" class="text-right" >
+				        <span id="balanceSheetTotalLiabilitiesCredit" class="text-right font-bold" >
 				          -
 				        </span>
 				      </div>
@@ -17737,17 +17740,17 @@
 				    </div>
 				
 				    <!-- ======= TOTAL LIABILITIES + EQUITY ======= -->
-				    <div class="grid grid-cols-[1fr_180px_180px] gap-4 border-t-2 border-outline-variant mt-8 pt-5 font-headline">
+				    <div class="grid grid-cols-[1fr_180px_180px] gap-4 border-t-2 border-outline-variant mt-8 pt-5 font-headline font-bold">
 				      <span>
 				        TOTAL LIABILITIES + EQUITY
 				      </span>
 				
 				      <span id="balanceSheetTotalLiabilitiesEquityDebit"
-				        class="text-right" >
+				        class="text-right font-bold" >
 				        -
 				      </span>
 				      <span id="balanceSheetTotalLiabilitiesEquityCredit"
-				        class="text-right" >
+				        class="text-right font-bold" >
 				        -
 				      </span>
 				    </div>
@@ -18205,7 +18208,7 @@
           <!-- FOOTER -->
           <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
             <p id="supplierDebtPaginationInfo"
-              class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+              class="text-xs text-on-surface-variantfont-medium">
               Showing 0–0 of 0
             </p>
 
@@ -18358,7 +18361,7 @@
 				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
 				    <div>
 				      <p id="ppnPaymentsPaginationInfo"
-				        class="text-xs text-muted">
+				        class="text-xs text-on-surface-variantfont-medium">
 				        Showing 0–0 of 0
 				      </p>
 				    </div>
@@ -18514,11 +18517,11 @@
                     Outstanding
                   </th>
 
-                  <th class="px-5 py-3">
+                  <th class="px-5 py-3 text-center">
                     Status
                   </th>
 
-                  <th class="px-5 py-3">
+                  <th class="px-5 py-3 text-center">
                     Action
                   </th>
                 </tr>
@@ -18531,7 +18534,7 @@
           <!-- FOOTER -->
           <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
             <p id="otherLiabilitiesPaginationInfo"
-              class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+              class="text-xs text-on-surface-variantfont-medium">
               Showing 0–0 of 0
             </p>
 
@@ -19429,11 +19432,11 @@
 					            Method
 					          </th>
 					
-					          <th class="px-5 py-3 text-left">
+					          <th class="px-5 py-3 text-center">
 					            Status
 					          </th>
 										
-					          <th class="px-5 py-3 text-right">
+					          <th class="px-5 py-3 text-center">
 					            Action
 					          </th>
 					        </tr>
@@ -19454,7 +19457,7 @@
 					  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
 					    <div>
 					      <p id="taxPaymentsPaginationInfo"
-					        class="text-xs text-muted">
+					        class="text-xs text-on-surface-variantfont-medium">
 					        Showing 0–0 of 0
 					      </p>
 					    </div>
@@ -19772,8 +19775,8 @@
 					          <th class="px-5 py-3 text-left"> Period </th>
 					          <th class="px-5 py-3 text-right"> Taxable Income </th>
 					          <th class="px-5 py-3 text-right"> PPh Badan </th>
-					          <th class="px-5 py-3 text-left"> Status </th>
-					          <th class="px-5 py-3 text-right"> Action </th>
+					          <th class="px-5 py-3 text-center"> Status </th>
+					          <th class="px-5 py-3 text-center"> Action </th>
 					        </tr>
 					      </thead>
 								
@@ -19792,7 +19795,7 @@
 					  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
 					    <div>
 					      <p id="pphBadanPaginationInfo"
-					        class="text-xs text-muted">
+					        class="text-xs text-on-surface-variantfont-medium">
 					        Showing 0–0 of 0
 					      </p>
 					    </div>
@@ -19841,7 +19844,7 @@
 	
 	          <div class="grid grid-cols-2 md:grid-cols-4">
 	            <div class="p-5 border-r border-outline-variant">
-	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
 	                Annual PPh 25
 	              </p>
 	
@@ -19852,7 +19855,7 @@
 	            </div>
 	
 	            <div class="p-5 border-r border-outline-variant">
-	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
 	                Paid
 	              </p>
 	
@@ -19863,7 +19866,7 @@
 	            </div>
 	
 	            <div class="p-5 border-r border-outline-variant">
-	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
 	                PPh 25 Prepaid
 	              </p>
 	
@@ -19874,7 +19877,7 @@
 	            </div>
 	
 	            <div class="p-5">
-	              <p class="text-[11px] text-muted uppercase tracking-wider">
+	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
 	                Remaining PPh Badan
 	              </p>
 	
@@ -20015,8 +20018,7 @@
 	<!-- TAX OBLIGATION PAYMENT MODAL -->
 	<div id="taxObligationPaymentModal"
 		class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
-		<div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-2xl">
-			<!-- HEADER -->
+		<div class="w-full max-w-lg bg-background border border-outline-variant rounded-md">
 			<div class="p-5 border-b border-outline-variant flex items-center justify-between">
 				<div>
 					<h2 class="text-lg font-bold font-headline text-foreground">
@@ -20046,7 +20048,7 @@
 	
 					<div class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground flex items-center">
 						<span id="taxObligationPaymentAccount">
-							2210 · Tax Obligation Payable
+							2210 · Tax PPh Final Payable
 						</span>
 					</div>
 				</div>
@@ -20143,9 +20145,9 @@
 
 	<!-- PPH BADAN ACTION POPUP -->
 	<div id="pphBadanActionModal"
-	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/50 p-4"
+	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4"
 	  onclick="if (event.target === this) closePphBadanActionMenu()" >
-	  <div class="w-full max-w-sm rounded-xl bg-surface border border-outline-variant shadow-2xl"
+	  <div class="w-full max-w-sm rounded-md bg-background border border-outline-variant"
 	    onclick="event.stopPropagation()" >
 	    <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
 	      <div>
@@ -20158,7 +20160,7 @@
 	
 	      <button type="button"
 	        onclick="closePphBadanActionMenu()"
-	        class="w-8 h-8 inline-flex items-center justify-center rounded-md hover:bg-surface-container-high">
+	        class="w-4 h-4 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface">
 	        <span class="material-symbols-outlined">close</span>
 	      </button>
 	    </div>
