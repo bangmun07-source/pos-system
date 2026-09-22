@@ -19750,6 +19750,239 @@
 					    </div>
 					  </div>
 					</section>
+					<!-- PPH BADAN TAX RULE MODAL -->
+					<div id="pphBadanTaxRuleModal"
+					  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+					  <div class="w-full max-w-2xl bg-background border border-outline-variant rounded-md shadow-2xl overflow-hidden">
+					    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+					      <div class="flex items-center gap-3">
+					        <div class="main-icon-box">
+					          <span class="material-symbols-outlined text-3xl"
+					            style="font-variation-settings:'FILL' 1;">
+					            account_balance
+					          </span>
+					        </div>
+					
+					        <div>
+					          <h2 class="text-lg font-bold font-headline text-foreground">
+					            PPh Badan Tax Rule
+					          </h2>
+					
+					          <p class="text-xs text-muted mt-1">
+					            Configure corporate income tax rules
+					          </p>
+					        </div>
+					      </div>
+					
+					      <button type="button"
+					        onclick="closePphBadanTaxRuleModal()"
+					        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+					        <span class="material-symbols-outlined">
+					          close
+					        </span>
+					      </button>
+					    </div>
+					    <!-- BODY -->
+					    <div class="p-5 space-y-5">
+					      <div>
+					        <label for="pphBadanTaxRuleYear"
+					          class="block text-sm font-medium text-foreground mb-2">
+					          Tax Year
+					        </label>
+					
+					        <select id="pphBadanTaxRuleYear"
+					          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					        </select>
+					      </div>
+					      <!-- RATES -->
+					      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					        <div>
+					          <label for="pphBadanTaxRuleBaseRate"
+					            class="block text-sm font-medium text-foreground mb-2">
+					            Base Rate
+					          </label>
+					
+					          <div class="relative">
+					            <input id="pphBadanTaxRuleBaseRate"
+					              type="number"
+					              min="0"
+					              step="0.01"
+					              placeholder="22"
+					              class="w-full h-11 px-3 pr-10 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+					              %
+					            </span>
+					          </div>
+					
+					          <p class="text-xs text-muted mt-1">
+					            General corporate income tax rate.
+					          </p>
+					        </div>
+					
+					        <div>
+					          <label for="pphBadanTaxRuleFacilityRate"
+					            class="block text-sm font-medium text-foreground mb-2">
+					            Facility Rate
+					          </label>
+					
+					          <div class="relative">
+					            <input id="pphBadanTaxRuleFacilityRate"
+					              type="number"
+					              min="0"
+					              step="0.01"
+					              placeholder="50"
+					              class="w-full h-11 px-3 pr-10 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+					              %
+					            </span>
+					          </div>
+					
+					          <p class="text-xs text-muted mt-1">
+					            Percentage of the base rate used for the facility.
+					          </p>
+					        </div>
+					      </div>
+					      <!-- TURNOVER -->
+					      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					        <div>
+					          <label for="pphBadanTaxRuleFacilityTurnoverLimit"
+					            class="block text-sm font-medium text-foreground mb-2">
+					            Facility Turnover Limit
+					          </label>
+					
+					          <div class="relative">
+					            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+					              Rp
+					            </span>
+					
+					            <input id="pphBadanTaxRuleFacilityTurnoverLimit"
+					              type="number"
+					              min="0"
+					              step="1"
+					              placeholder="4800000000"
+					              class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					          </div>
+					
+					          <p class="text-xs text-muted mt-1">
+					            Turnover threshold for the tax facility.
+					          </p>
+					        </div>
+					        <!-- MAXIMUM TURNOVER LIMIT -->
+					        <div>
+					          <label for="pphBadanTaxRuleMaximumTurnoverLimit"
+					            class="block text-sm font-medium text-foreground mb-2">
+					            Maximum Turnover Limit
+					          </label>
+					
+					          <div class="relative">
+					            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+					              Rp
+					            </span>
+					
+					            <input id="pphBadanTaxRuleMaximumTurnoverLimit"
+					              type="number"
+					              min="0"
+					              step="1"
+					              placeholder="50000000000"
+					              class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					          </div>
+					
+					          <p class="text-xs text-muted mt-1">
+					            Maximum annual turnover eligible for this rule.
+					          </p>
+					        </div>
+					      </div>
+					      <!-- EFFECTIVE PERIOD -->
+					      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					        <div>
+					          <label for="pphBadanTaxRuleEffectiveFrom"
+					            class="block text-sm font-medium text-foreground mb-2">
+					            Effective From
+					          </label>
+					
+					          <input id="pphBadanTaxRuleEffectiveFrom"
+					            type="date"
+					            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					        </div>
+					        <!-- EFFECTIVE TO -->
+					        <div>
+					          <label for="pphBadanTaxRuleEffectiveTo"
+					            class="block text-sm font-medium text-foreground mb-2">
+					            Effective To
+					          </label>
+					
+					          <input id="pphBadanTaxRuleEffectiveTo"
+					            type="date"
+					            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					        </div>
+					      </div>
+					      <!-- ACTIVE -->
+					      <div class="border border-outline-variant rounded-md p-4 flex items-center justify-between gap-4">
+					        <div>
+					          <p class="text-sm font-medium text-foreground">
+					            Active Rule
+					          </p>
+					
+					          <p class="text-xs text-muted mt-1">
+					            Use this rule when calculating PPh Badan.
+					          </p>
+					        </div>
+					
+					        <label class="relative inline-flex items-center cursor-pointer">
+					          <input id="pphBadanTaxRuleIsActive"
+					            type="checkbox"
+					            class="sr-only peer"
+					            checked>
+					          <div class="w-11 h-6 bg-surface-container-high border border-outline-variant rounded-full peer
+											 peer-checked:bg-primary
+											 after:content-['']
+											 after:absolute
+											 after:top-[2px]
+											 after:left-[2px]
+											 after:w-5
+											 after:h-5
+											 after:bg-white
+											 after:border
+											 after:border-outline-variant
+											 after:rounded-full
+											 after:transition-all
+											 peer-checked:after:translate-x-full">
+					          </div>
+					        </label>
+					      </div>
+					      <!-- NOTE -->
+					      <div>
+					        <label for="pphBadanTaxRuleNote"
+					          class="block text-sm font-medium text-foreground mb-2">
+					          Note
+					        </label>
+					
+					        <textarea id="pphBadanTaxRuleNote"
+					          rows="3"
+					          placeholder="Example: PPh Badan rule for fiscal year 2026"
+					          class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+					      </div>
+					    </div>
+					    <!-- FOOTER -->
+					    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+					      <button type="button"
+					        onclick="closePphBadanTaxRuleModal()"
+					        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+					        Cancel
+					      </button>
+					
+					      <button id="savePphBadanTaxRuleButton"
+					        type="button"
+					        onclick="savePphBadanTaxRule()"
+					        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+					        <span class="material-symbols-outlined text-sm">
+					          save
+					        </span>
+					        Save Rule
+					      </button>
+					    </div>
+					  </div>
+					</div>			
 	      </div>
 			</section>
 		</main>
