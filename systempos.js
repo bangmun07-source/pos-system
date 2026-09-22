@@ -27918,7 +27918,7 @@ async function calculatePphBadan() {
 
     try {
         const sessionId = localStorage.getItem("pos_session_id");
-        const branchId = getPphBadanBranchId();
+        const branchId = getPphBadanBranchId() || "ALL";
         const taxYear = getPphBadanYear();
 
         if (!sessionId) {
