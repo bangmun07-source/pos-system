@@ -29075,7 +29075,7 @@ async function savePphBadanCalculation() {
       const invalidBranch = branchAllocations.some( branch => !branch.branchId || branch.branchId.toUpperCase() === "ALL" );
 
       if (invalidBranch) { throw new Error( "Terdapat branch ID yang tidak valid pada hasil perhitungan." ); }
-
+		}
     const button = document.getElementById( "savePphBadanButton" );
     pphBadanSaving = true;
 
