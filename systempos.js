@@ -26894,7 +26894,8 @@ async function initAccountingTaxPage() {
 		loadTaxObligasiSettings(),
 		loadTaxObligation(),
 	  loadTaxPayments(),
-	  loadPphBadanRecords()
+	  loadPphBadanRecords(),
+	  loadPphBadanTaxRule()
 	]);
 
   } catch (error) {
@@ -28047,6 +28048,7 @@ document.addEventListener(
 
     if (statusEl) { statusEl.textContent = "Not Calculated"; }
     loadPphBadanRecords();
+		loadPphBadanTaxRule();
   }
 );
 
@@ -28578,31 +28580,25 @@ let pphBadanPaying = false;
 async function savePphBadanPayment() {
   if (pphBadanPaying) return;
 
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId)
-  );
+  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
 
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   const status = String(record.status || "").toUpperCase();
 
   if (status !== "OUTSTANDING") {
     showToast(
       "PPh Badan hanya dapat dibayar saat status OUTSTANDING.",
-      "error"
-    );
-    return;
-  }
+      "error" );
+    return; }
 
   const sessionId = localStorage.getItem("pos_session_id");
 
   if (!sessionId) {
     showToast("Session tidak ditemukan.", "error");
-    return;
-  }
+    return; }
   const paymentDate = document.getElementById("pphBadanPaymentDate")?.value || "";
   const amount = Number( document.getElementById("pphBadanPaymentAmount")?.value || 0 );
   const paymentMethod = document.getElementById("pphBadanPaymentMethod")?.value || "";
@@ -28627,9 +28623,7 @@ async function savePphBadanPayment() {
 
   try {
     pphBadanPaying = true;
-
     const button = document.getElementById("savePphBadanPaymentButton");
-
     if (button) { button.disabled = true; }
 
     const { data, error } = await supabaseClient.rpc(
@@ -28646,14 +28640,11 @@ async function savePphBadanPayment() {
     );
 
     if (error) { throw error; }
-
     closePphBadanPaymentModal();
     showToast(
       `PPh Badan ${record.taxYear} berhasil dibayar.`, "success"
     );
-
     await loadPphBadanRecords();
-
   } catch (error) {
     showToast(
       error?.message || "Gagal melakukan pembayaran PPh Badan.", "error"
@@ -28661,9 +28652,7 @@ async function savePphBadanPayment() {
 
   } finally {
     pphBadanPaying = false;
-
     const button = document.getElementById( "savePphBadanPaymentButton" );
-
     if (button) {
       button.disabled = false;
     }
@@ -28812,13 +28801,11 @@ async function savePphBadanCalculation() {
     );
 
     if (error) { throw error; }
-    showToast(
-      `PPh Badan ${result.taxYear} berhasil disimpan.`, "success" );
+    showToast( `PPh Badan ${result.taxYear} berhasil disimpan.`, "success" );
 
     await loadPphBadanRecords();
   } catch (error) {
     showToast( error?.message || "Gagal menyimpan PPh Badan.", "error" );
-
   } finally {
     pphBadanSaving = false;
     const button = document.getElementById( "savePphBadanButton" );
@@ -28837,13 +28824,98 @@ async function savePphBadanCalculation() {
   }
 }
 
+async function loadPphBadanTaxRule() {
+  const yearEl = document.getElementById("pphBadanYear");
+  const sessionId = localStorage.getItem("pos_session_id");
+	
+  if (!yearEl || !sessionId) return;
+  const taxYear = Number(yearEl.value);
+  if (!Number.isInteger(taxYear)) return;
+
+  const { data, error } = await supabaseClient.rpc(
+    "get_pph_badan_tax_rule",
+    {
+      p_tax_year: taxYear,
+      p_date: `${taxYear}-12-31`,
+      p_session_id: sessionId
+    }
+  );
+
+  if (error) {
+    console.error("LOAD PPH BADAN TAX RULE ERROR:", error);
+    resetPphBadanTaxRuleDisplay();
+    return; }
+
+  if (!data || data.found !== true) {
+    resetPphBadanTaxRuleDisplay();
+    return; }
+
+  const baseRate = Number(data.baseRate || 0);
+  const facilityRate = Number(data.facilityRate || 0);
+  const facilityLimit = Number( data.facilityTurnoverLimit || 0 );
+  const maximumLimit = Number( data.turnoverLimit || 0 );
+	
+  document.getElementById("pphBadanBaseRate").textContent = `${baseRate}%`;
+  document.getElementById("pphBadanFacilityRate").textContent = `${facilityRate}%`;
+  document.getElementById("pphBadanFacilityTurnoverLimit").textContent = formatAccountingTaxCurrency(facilityLimit);
+  document.getElementById("pphBadanMaximumTurnoverLimit").textContent = formatAccountingTaxCurrency(maximumLimit);
+  document.getElementById("pphBadanEffectiveFrom").textContent = formatPphBadanTaxRuleDate(data.effectiveFrom);
+  document.getElementById("pphBadanEffectiveTo").textContent = formatPphBadanTaxRuleDate(data.effectiveTo);
+  window.currentPphBadanTaxRule = data;
+}
+
+function resetPphBadanTaxRuleDisplay() {
+  const base = document.getElementById("pphBadanBaseRate");
+  const facility = document.getElementById("pphBadanFacilityRate");
+  const facilityLimit = document.getElementById( "pphBadanFacilityTurnoverLimit" );
+  const maximumLimit = document.getElementById( "pphBadanMaximumTurnoverLimit" );
+  const from = document.getElementById( "pphBadanEffectiveFrom" );
+  const to = document.getElementById( "pphBadanEffectiveTo" );
+
+  if (base) base.textContent = "0%";
+  if (facility) facility.textContent = "0%";
+  if (facilityLimit) facilityLimit.textContent = "Rp 0";
+  if (maximumLimit) maximumLimit.textContent = "Rp 0";
+  if (from) from.textContent = "—";
+  if (to) to.textContent = "—";
+  window.currentPphBadanTaxRule = null;
+}
+
+
+function formatPphBadanTaxRuleDate(value) {
+  if (!value) return "—";
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) {
+    return value; }
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
+
 function openPphBadanTaxRuleModal() {
   const modal = document.getElementById("pphBadanTaxRuleModal");
   if (!modal) return;
+
+  const rule = window.currentPphBadanTaxRule;
+
+  if (rule) {
+    document.getElementById("pphBadanTaxRuleYear").value = rule.taxYear ?? "";
+    document.getElementById("pphBadanTaxRuleBaseRate").value = rule.baseRate ?? 0;
+    document.getElementById("pphBadanTaxRuleFacilityRate").value = rule.facilityRate ?? 0;
+    document.getElementById("pphBadanTaxRuleFacilityTurnoverLimit").value = rule.facilityTurnoverLimit ?? 0;
+    document.getElementById("pphBadanTaxRuleMaximumTurnoverLimit").value = rule.turnoverLimit ?? 0;
+    document.getElementById("pphBadanTaxRuleEffectiveFrom").value = rule.effectiveFrom ?? "";
+    document.getElementById("pphBadanTaxRuleEffectiveTo").value = rule.effectiveTo ?? "";
+    document.getElementById("pphBadanTaxRuleIsActive").checked = rule.isActive === true;
+    document.getElementById("pphBadanTaxRuleNote").value = rule.note ?? "";
+  }
+
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
-
 
 function closePphBadanTaxRuleModal() {
   const modal = document.getElementById("pphBadanTaxRuleModal");
