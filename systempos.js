@@ -28223,134 +28223,88 @@ function renderPphBadanCalculationResult(result) {
    PPH BADAN - OPEN FISCAL ADJUSTMENT MODAL
    ========================================================= */
 
-function openPphBadanFiscalAdjustmentModal(
-    branches,
-    taxYear
-) {
+function openPphBadanFiscalAdjustmentModal( branches, taxYear ) {
 
-    const modal = document.getElementById(
-        "pphBadanFiscalAdjustmentModal"
-    );
+	const modal = document.getElementById( "pphBadanFiscalAdjustmentModal" );
+	const tbody = document.getElementById( "pphBadanFiscalAdjustmentTableBody" );
+	const yearEl = document.getElementById( "pphBadanFiscalAdjustmentYear" );
+	const commercialProfitEl = document.getElementById( "pphBadanFiscalAdjustmentCommercialProfit" );
+	const outletCountEl = document.getElementById( "pphBadanFiscalAdjustmentOutletCount" );
 
-    const tbody = document.getElementById(
-        "pphBadanFiscalAdjustmentTableBody"
-    );
+	if (!modal || !tbody) { throw new Error( "Fiscal Adjustment modal tidak ditemukan." ); }
 
-    const yearEl = document.getElementById(
-        "pphBadanFiscalAdjustmentYear"
-    );
+	const safeBranches = Array.isArray(branches)
+		? branches
+		: [];
 
-    const commercialProfitEl = document.getElementById(
-        "pphBadanFiscalAdjustmentCommercialProfit"
-    );
+	if (yearEl) { yearEl.textContent = taxYear || "—"; }
 
-    const outletCountEl = document.getElementById(
-        "pphBadanFiscalAdjustmentOutletCount"
-    );
+	const totalCommercialProfit =
+		safeBranches.reduce(
+			(sum, branch) =>
+				sum + Number(
+					branch.commercialProfit || 0
+				),
+			0
+		);
 
-    if (!modal || !tbody) {
-        throw new Error(
-            "Fiscal Adjustment modal tidak ditemukan."
-        );
-    }
+  if (commercialProfitEl) { commercialProfitEl.textContent = formatAccountingTaxCurrency( totalCommercialProfit ); }
+	if (outletCountEl) { outletCountEl.textContent = safeBranches.length; }
 
-    const safeBranches = Array.isArray(branches)
-        ? branches
-        : [];
+	tbody.innerHTML = safeBranches.map(
+		(branch, index) => {
+			const branchId =
+					branch.branchId ??
+					branch.Branch_ID ??
+					"";
+			const branchName =
+					branch.branchName ??
+					branch.Branch_Name ??
+					branchId;
+			const commercialProfit =  Number( branch.commercialProfit || 0 );
 
-    if (yearEl) {
-        yearEl.textContent = taxYear || "—";
-    }
+			return `
+				<tr>
+					<td class="px-4 py-3">
+						<div class="font-medium text-foreground">
+							${branchName}
+						</div>
+						<div class="text-[11px] text-muted mt-0.5">
+							${branchId}
+						</div>
+						<input type="hidden"
+							data-pph-branch-id
+							value="${branchId}" >
+					</td>
 
-    const totalCommercialProfit =
-        safeBranches.reduce(
-            (sum, branch) =>
-                sum + Number(
-                    branch.commercialProfit || 0
-                ),
-            0
-        );
+					<td class="px-4 py-3 text-right whitespace-nowrap">
+						${formatAccountingTaxCurrency( commercialProfit )}
+					</td>
 
-    if (commercialProfitEl) {
-        commercialProfitEl.textContent =
-            formatAccountingTaxCurrency(
-                totalCommercialProfit
-            );
-    }
+					<td class="px-4 py-3">
+						<input type="number"
+							min="0"
+							step="1"
+							value="0"
+							data-pph-positive
+							class="w-full min-w-[150px] h-9 px-3 rounded-md border border-outline-variant bg-background text-foreground text-right outline-none">
+					</td>
 
-    if (outletCountEl) {
-        outletCountEl.textContent =
-            safeBranches.length;
-    }
+					<td class="px-4 py-3">
+						<input type="number"
+							min="0"
+							step="1"
+							value="0"
+							data-pph-negative
+							class="w-full min-w-[150px] h-9 px-3 rounded-md border border-outline-variant bg-background text-foreground text-right outline-none">
+					</td>
+				</tr>
+			`;
+		}
+	).join("");
 
-    tbody.innerHTML = safeBranches.map(
-        (branch, index) => {
-
-            const branchId =
-                branch.branchId ??
-                branch.Branch_ID ??
-                "";
-
-            const branchName =
-                branch.branchName ??
-                branch.Branch_Name ??
-                branchId;
-
-            const commercialProfit =
-                Number(
-                    branch.commercialProfit || 0
-                );
-
-            return `
-                <tr>
-                    <td class="px-4 py-3">
-                        <div class="font-medium text-foreground">
-                            ${branchName}
-                        </div>
-                        <div class="text-[11px] text-muted mt-0.5">
-                            ${branchId}
-                        </div>
-                        <input
-                            type="hidden"
-                            data-pph-branch-id
-                            value="${branchId}"
-                        >
-                    </td>
-
-                    <td class="px-4 py-3 text-right whitespace-nowrap">
-                        ${formatAccountingTaxCurrency(
-                            commercialProfit
-                        )}
-                    </td>
-
-                    <td class="px-4 py-3">
-                        <input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value="0"
-                            data-pph-positive
-                            class="w-full min-w-[150px] h-9 px-3 rounded-md border border-outline-variant bg-surface-container-low text-foreground text-right outline-none focus:border-primary"
-                        >
-                    </td>
-
-                    <td class="px-4 py-3">
-                        <input
-                            type="number"
-                            min="0"
-                            step="1"
-                            value="0"
-                            data-pph-negative
-                            class="w-full min-w-[150px] h-9 px-3 rounded-md border border-outline-variant bg-surface-container-low text-foreground text-right outline-none focus:border-primary"
-                        >
-                    </td>
-                </tr>
-            `;
-        }
-    ).join("");
-
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 
