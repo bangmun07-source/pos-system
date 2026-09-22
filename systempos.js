@@ -27912,319 +27912,179 @@ function getPphBadanBranchId() {
 
 
 async function calculatePphBadan() {
-    if (pphBadanCalculating) return;
+	if (pphBadanCalculating) return;
+	
+	const button = document.getElementById("calculatePphBadanButton");
+	
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
+		const branchId = getPphBadanBranchId() || "ALL";
+		const taxYear = getPphBadanYear();
+	
+		if (!sessionId) { throw new Error("Session tidak ditemukan. Silakan login ulang."); }
+		if (!taxYear) { throw new Error("Tax Year tidak valid."); }
+	
+		const fromDate = `${taxYear}-01-01`;
+		const toDate = `${taxYear}-12-31`;
+	
+		/* ==== BUTTON STATE ==== */
+	
+		pphBadanCalculating = true;
+	
+		if (button) {
+			button.disabled = true;
+			button.dataset.originalText = button.innerHTML;
+			button.innerHTML = `
+				<span class="material-symbols-outlined text-sm animate-spin">
+					progress_activity
+				</span>
+				Calculating...
+			`;
+		}
+	
+		/* ===== SINGLE BRANCH ===== */
+		if (branchId !== "ALL") {
+			const positiveInput = document.getElementById( "pphBadanPositiveAdjustmentInput" );
+			const negativeInput = document.getElementById( "pphBadanNegativeAdjustmentInput" );
+			const positiveAdjustment = Math.max( Number(positiveInput?.value || 0), 0 );
+			const negativeAdjustment = Math.max( Number(negativeInput?.value || 0), 0 );
+		
+			const { data, error } 
+				= await supabaseClient.rpc(
+					"get_pph_badan_calculation",
+						{
+							p_branch_id: branchId,
+							p_from_date: fromDate,
+							p_to_date: toDate,
+							p_session_id: sessionId,
+							p_positive_adjustment: positiveAdjustment,
+							p_negative_adjustment: negativeAdjustment,
+							p_branch_adjustments: null
+						}
+					);
+	
+				if (error) {
+						console.error(
+								"get_pph_badan_calculation error:",
+								error
+						);
+						throw error; }
+	
+				const result = typeof data === "string"
+						? JSON.parse(data)
+						: data;
+	
+				if (!result) { throw new Error( "Data perhitungan PPh Badan tidak ditemukan." );	}
+	
+				renderPphBadanCalculationResult(result);
+				window.currentPphBadanCalculation = result;
+				window.pendingPphBadanBaseCalculation = null;
 
-    const button = document.getElementById("calculatePphBadanButton");
-
-    try {
-        const sessionId = localStorage.getItem("pos_session_id");
-        const branchId = getPphBadanBranchId() || "ALL";
-        const taxYear = getPphBadanYear();
-
-        if (!sessionId) {
-            throw new Error("Session tidak ditemukan. Silakan login ulang.");
-        }
-
-        if (!taxYear) {
-            throw new Error("Tax Year tidak valid.");
-        }
-
-        const fromDate = `${taxYear}-01-01`;
-        const toDate = `${taxYear}-12-31`;
-
-        /* =====================================================
-           BUTTON STATE
-           ===================================================== */
-
-        pphBadanCalculating = true;
-
-        if (button) {
-            button.disabled = true;
-            button.dataset.originalText = button.innerHTML;
-            button.innerHTML = `
-                <span class="material-symbols-outlined text-sm animate-spin">
-                    progress_activity
-                </span>
-                Calculating...
-            `;
-        }
-
-        /* =====================================================
-           SINGLE BRANCH
-           ===================================================== */
-
-        if (branchId !== "ALL") {
-
-            const positiveInput = document.getElementById(
-                "pphBadanPositiveAdjustmentInput"
-            );
-
-            const negativeInput = document.getElementById(
-                "pphBadanNegativeAdjustmentInput"
-            );
-
-            const positiveAdjustment = Math.max(
-                Number(positiveInput?.value || 0),
-                0
-            );
-
-            const negativeAdjustment = Math.max(
-                Number(negativeInput?.value || 0),
-                0
-            );
-
-            const { data, error } = await supabaseClient.rpc(
-                "get_pph_badan_calculation",
-                {
-                    p_branch_id: branchId,
-                    p_from_date: fromDate,
-                    p_to_date: toDate,
-                    p_session_id: sessionId,
-                    p_positive_adjustment: positiveAdjustment,
-                    p_negative_adjustment: negativeAdjustment,
-                    p_branch_adjustments: null
-                }
-            );
-
-            if (error) {
-                console.error(
-                    "get_pph_badan_calculation error:",
-                    error
-                );
-                throw error;
-            }
-
-            const result = typeof data === "string"
-                ? JSON.parse(data)
-                : data;
-
-            if (!result) {
-                throw new Error(
-                    "Data perhitungan PPh Badan tidak ditemukan."
-                );
-            }
-
-            renderPphBadanCalculationResult(result);
-
-            window.currentPphBadanCalculation = result;
-            window.pendingPphBadanBaseCalculation = null;
-
-            console.log(
-                "PPh Badan Calculation - Single Branch:",
-                result
-            );
-
-            showToast(
-                `PPh Badan ${taxYear} berhasil dihitung.`,
-                "success"
-            );
-
-            return;
-        }
-
-        /* =====================================================
-           ALL BRANCH
-           FIRST CALCULATION = BASE DATA ONLY
-           ===================================================== */
-
-        const { data, error } = await supabaseClient.rpc(
-            "get_pph_badan_calculation",
-            {
-                p_branch_id: "ALL",
-                p_from_date: fromDate,
-                p_to_date: toDate,
-                p_session_id: sessionId,
-
-                // ALL tidak memakai input global
-                p_positive_adjustment: 0,
-                p_negative_adjustment: 0,
-
-                // Belum ada fiscal adjustment
-                p_branch_adjustments: null
-            }
-        );
-
-        if (error) {
-            console.error(
-                "get_pph_badan_calculation ALL error:",
-                error
-            );
-            throw error;
-        }
-
-        const result = typeof data === "string"
-            ? JSON.parse(data)
-            : data;
-
-        if (!result) {
-            throw new Error(
-                "Data perhitungan PPh Badan tidak ditemukan."
-            );
-        }
-
-        if (
-            !Array.isArray(result.branches) ||
-            result.branches.length === 0
-        ) {
-            throw new Error(
-                "Data outlet untuk fiscal adjustment tidak ditemukan."
-            );
-        }
-
-        /* =====================================================
-           STORE BASE CALCULATION
-           ===================================================== */
-
-        window.pendingPphBadanBaseCalculation = result;
-        window.currentPphBadanCalculation = null;
-
-        /* =====================================================
-           OPEN FISCAL ADJUSTMENT POPUP
-           ===================================================== */
-
-        openPphBadanFiscalAdjustmentModal(
-            result.branches,
-            taxYear
-        );
-
-        console.log(
-            "PPh Badan Base Calculation - ALL:",
-            result
-        );
-
-        showToast(
-            "Silakan masukkan fiscal adjustment untuk setiap outlet.",
-            "success"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "calculatePphBadan error:",
-            error
-        );
-
-        const statusEl = document.getElementById(
-            "pphBadanStatus"
-        );
-
-        if (statusEl) {
-            statusEl.textContent = "Calculation Failed";
-        }
-
-        showToast(
-            error?.message ||
-            "Gagal menghitung PPh Badan.",
-            "error"
-        );
-
-    } finally {
-
-        pphBadanCalculating = false;
-
-        if (button) {
-            button.disabled = false;
-
-            button.innerHTML =
-                button.dataset.originalText ||
-                `
-                    <span class="material-symbols-outlined text-sm">
-                        calculate
-                    </span>
-                    Calculate PPh Badan
-                `;
-        }
-    }
+				console.log(
+						"PPh Badan Calculation - Single Branch:",
+						result
+				);
+	
+				showToast( `PPh Badan ${taxYear} berhasil dihitung.`, "success" ); return; }
+	
+		/* ===== ALL BRANCH FIRST CALCULATION = BASE DATA ONLY ===== */
+	
+		const { data, error } 
+			= await supabaseClient.rpc(
+				"get_pph_badan_calculation",
+				{
+					p_branch_id: "ALL",
+					p_from_date: fromDate,
+					p_to_date: toDate,
+					p_session_id: sessionId,
+					p_positive_adjustment: 0,
+					p_negative_adjustment: 0,
+					p_branch_adjustments: null
+				}
+			);
+	
+		if (error) {
+				console.error(
+						"get_pph_badan_calculation ALL error:",
+						error
+				);
+				throw error; }
+	
+		const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
+	
+		if (!result) { throw new Error( "Data perhitungan PPh Badan tidak ditemukan." ); }
+		if ( !Array.isArray(result.branches) || result.branches.length === 0 ) 
+			{ throw new Error( "Data outlet untuk fiscal adjustment tidak ditemukan." ); }
+		/* ===== STORE BASE CALCULATION ===== */
+		window.pendingPphBadanBaseCalculation = result;
+		window.currentPphBadanCalculation = null;
+		/* ===== OPEN FISCAL ADJUSTMENT POPUP ===== */
+		openPphBadanFiscalAdjustmentModal( result.branches, taxYear );
+		console.log(
+				"PPh Badan Base Calculation - ALL:",
+				result
+		);
+		showToast(
+				"Silakan masukkan fiscal adjustment untuk setiap outlet.",
+				"success"
+		);
+	} catch (error) {
+		console.error(
+				"calculatePphBadan error:",
+				error
+		);
+		const statusEl = document.getElementById( "pphBadanStatus" );
+	
+		if (statusEl) { statusEl.textContent = "Calculation Failed"; }
+		showToast(
+			error?.message ||
+			"Gagal menghitung PPh Badan.",
+			"error"
+		);
+	} finally {
+		pphBadanCalculating = false;
+		if (button) {
+			button.disabled = false;
+			button.innerHTML = button.dataset.originalText ||
+				`
+					<span class="material-symbols-outlined text-sm">
+						calculate
+					</span>
+					Calculate PPh Badan
+				`;
+		}
+	}
 }
 
 
-/* =========================================================
-   PPH BADAN - RENDER RESULT
-   ========================================================= */
+/* ===== PPH BADAN - RENDER RESULT ===== */
 
 function renderPphBadanCalculationResult(result) {
+    const commercialProfit = Number( result.commercialProfit || 0 );
+    const positive = Number( result.positiveAdjustment || 0 );
+    const negative = Number( result.negativeAdjustment || 0 );
+    const taxableIncome = Number( result.taxableIncome || 0 );
+    const taxAmount = Number( result.taxAmount || 0 );
+    const commercialProfitEl = document.getElementById( "pphBadanCommercialProfit" );
+    const positiveEl = document.getElementById( "pphBadanPositiveAdjustment" );
+    const negativeEl = document.getElementById( "pphBadanNegativeAdjustment" );
+    const taxableIncomeEl = document.getElementById( "pphBadanTaxableIncome" );
+    const taxAmountEl = document.getElementById( "pphBadanTaxAmount" );
+    const statusEl = document.getElementById( "pphBadanStatus" );
 
-    const commercialProfit = Number(
-        result.commercialProfit || 0
-    );
-
-    const positive = Number(
-        result.positiveAdjustment || 0
-    );
-
-    const negative = Number(
-        result.negativeAdjustment || 0
-    );
-
-    const taxableIncome = Number(
-        result.taxableIncome || 0
-    );
-
-    const taxAmount = Number(
-        result.taxAmount || 0
-    );
-
-    const commercialProfitEl = document.getElementById(
-        "pphBadanCommercialProfit"
-    );
-
-    const positiveEl = document.getElementById(
-        "pphBadanPositiveAdjustment"
-    );
-
-    const negativeEl = document.getElementById(
-        "pphBadanNegativeAdjustment"
-    );
-
-    const taxableIncomeEl = document.getElementById(
-        "pphBadanTaxableIncome"
-    );
-
-    const taxAmountEl = document.getElementById(
-        "pphBadanTaxAmount"
-    );
-
-    const statusEl = document.getElementById(
-        "pphBadanStatus"
-    );
-
-    if (commercialProfitEl) {
-        commercialProfitEl.textContent =
-            formatAccountingTaxCurrency(commercialProfit);
-    }
-
-    if (positiveEl) {
-        positiveEl.textContent =
-            formatAccountingTaxCurrency(positive);
-    }
-
-    if (negativeEl) {
-        negativeEl.textContent =
-            formatAccountingTaxCurrency(negative);
-    }
-
-    if (taxableIncomeEl) {
-        taxableIncomeEl.textContent =
-            formatAccountingTaxCurrency(taxableIncome);
-    }
-
-    if (taxAmountEl) {
-        taxAmountEl.textContent =
-            formatAccountingTaxCurrency(taxAmount);
-    }
-
-    if (statusEl) {
-        statusEl.textContent = "Calculated";
-    }
+    if (commercialProfitEl) { commercialProfitEl.textContent = formatAccountingTaxCurrency(commercialProfit); }
+    if (positiveEl) { positiveEl.textContent = formatAccountingTaxCurrency(positive); }
+    if (negativeEl) { negativeEl.textContent = formatAccountingTaxCurrency(negative);  }
+    if (taxableIncomeEl) { taxableIncomeEl.textContent = formatAccountingTaxCurrency(taxableIncome); }
+    if (taxAmountEl) { taxAmountEl.textContent = formatAccountingTaxCurrency(taxAmount); }
+    if (statusEl) { statusEl.textContent = "Calculated"; }
 }
 
-
-/* =========================================================
-   PPH BADAN - OPEN FISCAL ADJUSTMENT MODAL
-   ========================================================= */
+/* ==== PPH BADAN - OPEN FISCAL ADJUSTMENT MODAL ==== */
 
 function openPphBadanFiscalAdjustmentModal( branches, taxYear ) {
-
 	const modal = document.getElementById( "pphBadanFiscalAdjustmentModal" );
 	const tbody = document.getElementById( "pphBadanFiscalAdjustmentTableBody" );
 	const yearEl = document.getElementById( "pphBadanFiscalAdjustmentYear" );
@@ -28302,253 +28162,148 @@ function openPphBadanFiscalAdjustmentModal( branches, taxYear ) {
 			`;
 		}
 	).join("");
-
 	modal.classList.remove("hidden");
 	modal.classList.add("flex");
 }
 
 
 function closePphBadanFiscalAdjustmentModal() {
+	const modal = document.getElementById( "pphBadanFiscalAdjustmentModal" );
 
-    const modal = document.getElementById(
-        "pphBadanFiscalAdjustmentModal"
-    );
+	if (!modal) return;
 
-    if (!modal) return;
-
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
 }
 
 
-/* =========================================================
-   PPH BADAN - APPLY FISCAL ADJUSTMENTS
-   ========================================================= */
+/* ==== PPH BADAN - APPLY FISCAL ADJUSTMENTS ==== */
 
 async function applyPphBadanFiscalAdjustments() {
+	if (pphBadanCalculating) return;
 
-    if (pphBadanCalculating) return;
+	try {
+		const sessionId = localStorage.getItem( "pos_session_id" );
+		const taxYear = getPphBadanYear();
 
-    try {
+		if (!sessionId) { throw new Error( "Session tidak ditemukan. Silakan login ulang." ); }
+		if (!taxYear) { throw new Error( "Tax Year tidak valid." ); }
+		
+		const tbody = document.getElementById( "pphBadanFiscalAdjustmentTableBody" );
 
-        const sessionId = localStorage.getItem(
-            "pos_session_id"
-        );
+		if (!tbody) { throw new Error( "Fiscal Adjustment table tidak ditemukan." ); }
+		const rows = Array.from( tbody.querySelectorAll("tr") );
+		const branchAdjustments = [];
+	
+		rows.forEach(row => {
+			const branchIdInput = row.querySelector( "[data-pph-branch-id]" );
+			const positiveInput = row.querySelector( "[data-pph-positive]" );
+			const negativeInput = row.querySelector( "[data-pph-negative]" );
+	
+			if (!branchIdInput) return;
+	
+			const branchId = branchIdInput.value;
+			const positiveAdjustment = Math.max( Number( positiveInput?.value || 0 ), 0 );
+			const negativeAdjustment = Math.max( Number( negativeInput?.value || 0 ), 0 );
+	
+				branchAdjustments.push({
+					branchId,
+					positiveAdjustment,
+					negativeAdjustment
+				});
+			});
+	
+		if (branchAdjustments.length === 0) { throw new Error( "Tidak ada outlet untuk dihitung." ); }
+	
+		const totalPositiveAdjustment = branchAdjustments.reduce( 
+			(sum, item) => sum + Number(item.positiveAdjustment || 0), 0 );
+		const totalNegativeAdjustment = branchAdjustments.reduce(
+			(sum, item) => sum + Number(item.negativeAdjustment || 0), 0 );
+		const fromDate = `${taxYear}-01-01`;
+		const toDate = `${taxYear}-12-31`;
+		const button = document.getElementById( "applyPphBadanFiscalAdjustmentButton" );
+	
+		pphBadanCalculating = true;
+	
+		if (button) {
+			button.disabled = true;
+			button.dataset.originalText = button.innerHTML;
+				button.innerHTML = `
+					<span class="material-symbols-outlined text-sm animate-spin">
+						progress_activity
+					</span>
+					Recalculating...
+				`;
+			}
+		/* ===== FINAL RPC ===== */
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_pph_badan_calculation",
+				{
+					p_branch_id: "ALL",
+					p_from_date: fromDate,
+					p_to_date: toDate,
+					p_session_id: sessionId,
+					p_positive_adjustment: 0,
+					p_negative_adjustment: 0,
+					p_branch_adjustments: branchAdjustments
+				}
+			);
 
-        const taxYear = getPphBadanYear();
+		if (error) {
+			console.error(
+				"Final PPh Badan calculation error:",
+				error
+			);
+			throw error;
+		}
 
-        if (!sessionId) {
-            throw new Error(
-                "Session tidak ditemukan. Silakan login ulang."
-            );
-        }
+		const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
 
-        if (!taxYear) {
-            throw new Error(
-                "Tax Year tidak valid."
-            );
-        }
+		if (!result) { throw new Error( "Hasil final PPh Badan tidak ditemukan." ); }
 
-        const tbody = document.getElementById(
-            "pphBadanFiscalAdjustmentTableBody"
-        );
+		window.currentPphBadanCalculation = result;
+		window.pendingPphBadanBaseCalculation = null;
 
-        if (!tbody) {
-            throw new Error(
-                "Fiscal Adjustment table tidak ditemukan."
-            );
-        }
+		const positiveEl = document.getElementById( "pphBadanPositiveAdjustment" );
+		const negativeEl = document.getElementById( "pphBadanNegativeAdjustment" );
+		
+		if (positiveEl) { positiveEl.textContent = formatAccountingTaxCurrency( totalPositiveAdjustment ); }
+		if (negativeEl) { negativeEl.textContent = formatAccountingTaxCurrency( totalNegativeAdjustment ); }
+		
+		renderPphBadanCalculationResult( result );
+		closePphBadanFiscalAdjustmentModal();
+		console.log(
+				"PPh Badan FINAL Calculation:",
+				result
+		);
+		showToast( `PPh Badan ${taxYear} berhasil dihitung dengan fiscal adjustment.`, "success" );
 
-        const rows = Array.from(
-            tbody.querySelectorAll("tr")
-        );
+	} catch (error) {
+		console.error(
+			"applyPphBadanFiscalAdjustments error:",
+			error
+		);
+		showToast( error?.message || "Gagal menghitung ulang PPh Badan.", "error" );
+	} finally {
+		pphBadanCalculating = false;
+		const button = document.getElementById( "applyPphBadanFiscalAdjustmentButton" );
 
-        const branchAdjustments = [];
-
-        rows.forEach(row => {
-
-            const branchIdInput =
-                row.querySelector(
-                    "[data-pph-branch-id]"
-                );
-
-            const positiveInput =
-                row.querySelector(
-                    "[data-pph-positive]"
-                );
-
-            const negativeInput =
-                row.querySelector(
-                    "[data-pph-negative]"
-                );
-
-            if (!branchIdInput) return;
-
-            const branchId =
-                branchIdInput.value;
-
-            const positiveAdjustment =
-                Math.max(
-                    Number(
-                        positiveInput?.value || 0
-                    ),
-                    0
-                );
-
-            const negativeAdjustment =
-                Math.max(
-                    Number(
-                        negativeInput?.value || 0
-                    ),
-                    0
-                );
-
-            branchAdjustments.push({
-                branchId,
-                positiveAdjustment,
-                negativeAdjustment
-            });
-        });
-
-        if (branchAdjustments.length === 0) {
-            throw new Error(
-                "Tidak ada outlet untuk dihitung."
-            );
-        }
-
-        const fromDate =
-            `${taxYear}-01-01`;
-
-        const toDate =
-            `${taxYear}-12-31`;
-
-        const button = document.getElementById(
-            "applyPphBadanFiscalAdjustmentButton"
-        );
-
-        pphBadanCalculating = true;
-
-        if (button) {
-            button.disabled = true;
-            button.dataset.originalText =
-                button.innerHTML;
-
-            button.innerHTML = `
-                <span class="material-symbols-outlined text-sm animate-spin">
-                    progress_activity
-                </span>
-                Recalculating...
-            `;
-        }
-
-        /* =====================================================
-           FINAL RPC
-           ===================================================== */
-
-        const { data, error } =
-            await supabaseClient.rpc(
-                "get_pph_badan_calculation",
-                {
-                    p_branch_id: "ALL",
-                    p_from_date: fromDate,
-                    p_to_date: toDate,
-                    p_session_id: sessionId,
-
-                    // ALL tidak menggunakan global adjustment
-                    p_positive_adjustment: 0,
-                    p_negative_adjustment: 0,
-
-                    // Adjustment per outlet
-                    p_branch_adjustments:
-                        branchAdjustments
-                }
-            );
-
-        if (error) {
-            console.error(
-                "Final PPh Badan calculation error:",
-                error
-            );
-            throw error;
-        }
-
-        const result =
-            typeof data === "string"
-                ? JSON.parse(data)
-                : data;
-
-        if (!result) {
-            throw new Error(
-                "Hasil final PPh Badan tidak ditemukan."
-            );
-        }
-
-        /* =====================================================
-           STORE FINAL RESULT
-           ===================================================== */
-
-        window.currentPphBadanCalculation =
-            result;
-
-        window.pendingPphBadanBaseCalculation =
-            null;
-
-        /* =====================================================
-           RENDER
-           ===================================================== */
-
-        renderPphBadanCalculationResult(
-            result
-        );
-
-        closePphBadanFiscalAdjustmentModal();
-
-        console.log(
-            "PPh Badan FINAL Calculation:",
-            result
-        );
-
-        showToast(
-            `PPh Badan ${taxYear} berhasil dihitung dengan fiscal adjustment.`,
-            "success"
-        );
-
-    } catch (error) {
-
-        console.error(
-            "applyPphBadanFiscalAdjustments error:",
-            error
-        );
-
-        showToast(
-            error?.message ||
-            "Gagal menghitung ulang PPh Badan.",
-            "error"
-        );
-
-    } finally {
-
-        pphBadanCalculating = false;
-
-        const button = document.getElementById(
-            "applyPphBadanFiscalAdjustmentButton"
-        );
-
-        if (button) {
-            button.disabled = false;
-
-            button.innerHTML =
-                button.dataset.originalText ||
-                `
-                    <span class="material-symbols-outlined text-sm">
-                        calculate
-                    </span>
-                    Recalculate
-                `;
-        }
-    }
+	if (button) {
+		button.disabled = false;
+		button.innerHTML =
+			button.dataset.originalText ||
+			`
+				<span class="material-symbols-outlined text-sm">
+					calculate
+				</span>
+				Recalculate
+			`;
+		}
+	}
 }
-
 
 /* ===== CHANGE PPH BADAN YEAR ===== */
 document.addEventListener(
@@ -28581,8 +28336,7 @@ document.addEventListener(
   "change",
   function(event) {
     if (event.target?.id !== "pphBadanBranchFilter") {
-      return;
-    }
+      return; }
     const ids = [
       "pphBadanCommercialProfit",
       "pphBadanPositiveAdjustment",
