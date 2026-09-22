@@ -28219,6 +28219,12 @@ async function applyPphBadanFiscalAdjustments() {
 			(sum, item) => sum + Number(item.positiveAdjustment || 0), 0 );
 		const totalNegativeAdjustment = branchAdjustments.reduce(
 			(sum, item) => sum + Number(item.negativeAdjustment || 0), 0 );
+		const positiveAdjustmentInput = document.getElementById("pphBadanPositiveAdjustmentInput");
+		const negativeAdjustmentInput = document.getElementById("pphBadanNegativeAdjustmentInput");
+		
+		if (positiveAdjustmentInput) { positiveAdjustmentInput.value = totalPositiveAdjustment; }
+		if (negativeAdjustmentInput) { negativeAdjustmentInput.value = totalNegativeAdjustment; }
+		
 		const fromDate = `${taxYear}-01-01`;
 		const toDate = `${taxYear}-12-31`;
 		const button = document.getElementById( "applyPphBadanFiscalAdjustmentButton" );
