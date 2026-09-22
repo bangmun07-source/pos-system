@@ -26843,7 +26843,8 @@ function populateAccountingTaxYears() {
   const years = 10;
   const selects = [
     document.getElementById("taxObligationYear"),
-    document.getElementById("pphBadanYear")
+	  document.getElementById("pphBadanYear"),
+	  document.getElementById("pphBadanTaxRuleYear")
   ];
 
   selects.forEach(select => {
@@ -28901,8 +28902,17 @@ function openPphBadanTaxRuleModal() {
 
   const rule = window.currentPphBadanTaxRule;
 
+  const yearEl = document.getElementById("pphBadanYear");
+  const modalYearEl = document.getElementById("pphBadanTaxRuleYear");
+
+  if (modalYearEl) {
+    modalYearEl.value =
+      rule?.taxYear ??
+      yearEl?.value ??
+      new Date().getFullYear();
+  }
+
   if (rule) {
-    document.getElementById("pphBadanTaxRuleYear").value = rule.taxYear ?? "";
     document.getElementById("pphBadanTaxRuleBaseRate").value = rule.baseRate ?? 0;
     document.getElementById("pphBadanTaxRuleFacilityRate").value = rule.facilityRate ?? 0;
     document.getElementById("pphBadanTaxRuleFacilityTurnoverLimit").value = rule.facilityTurnoverLimit ?? 0;
@@ -28912,9 +28922,99 @@ function openPphBadanTaxRuleModal() {
     document.getElementById("pphBadanTaxRuleIsActive").checked = rule.isActive === true;
     document.getElementById("pphBadanTaxRuleNote").value = rule.note ?? "";
   }
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+}
+
+async function savePphBadanTaxRule() {
+  const button = document.getElementById("savePphBadanTaxRuleButton");
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan. Silakan login ulang.");
+    }
+    const rule = window.currentPphBadanTaxRule;
+    const taxYear = Number( document.getElementById("pphBadanTaxRuleYear")?.value );
+    const baseRate = Number( document.getElementById("pphBadanTaxRuleBaseRate")?.value || 0 );
+    const facilityRate = Number( document.getElementById("pphBadanTaxRuleFacilityRate")?.value || 0 );
+    const facilityTurnoverLimit = Number( document.getElementById( "pphBadanTaxRuleFacilityTurnoverLimit" )?.value || 0 );
+    const maximumTurnoverLimit = Number( document.getElementById( "pphBadanTaxRuleMaximumTurnoverLimit" )?.value || 0 );
+    const effectiveFrom = document.getElementById("pphBadanTaxRuleEffectiveFrom")?.value || null;
+    const effectiveTo = document.getElementById("pphBadanTaxRuleEffectiveTo")?.value || null;
+    const isActive = document.getElementById("pphBadanTaxRuleIsActive")?.checked === true;
+    const note = document.getElementById("pphBadanTaxRuleNote")?.value?.trim() || null;
+
+    if (!Number.isInteger(taxYear)) {
+      throw new Error("Tax Year tidak valid."); }
+    if (!effectiveFrom) {
+      throw new Error("Effective From wajib diisi."); }
+    if (effectiveTo && effectiveTo < effectiveFrom) {
+      throw new Error("Effective To tidak boleh lebih kecil dari Effective From."); }
+    if (facilityTurnoverLimit > maximumTurnoverLimit) {
+      throw new Error( "Facility Turnover Limit tidak boleh lebih besar dari Maximum Turnover Limit." ); }
+
+    if (button) {
+      button.disabled = true;
+      button.dataset.originalText = button.innerHTML;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-sm animate-spin">
+          progress_activity
+        </span>
+        Saving...
+      `;
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      "save_pph_badan_tax_rule",
+      {
+        p_session_id: sessionId,
+        p_rule_id: rule?.ruleId ?? null,
+        p_tax_year: taxYear,
+        p_base_rate: baseRate,
+        p_facility_rate: facilityRate,
+        p_turnover_limit: maximumTurnoverLimit,
+        p_facility_turnover_limit: facilityTurnoverLimit,
+        p_effective_from: effectiveFrom,
+        p_effective_to: effectiveTo,
+        p_is_active: isActive,
+        p_note: note
+      }
+    );
+
+    if (error) {
+      console.error(
+        "SAVE PPH BADAN TAX RULE ERROR:",
+        error
+      );
+      throw error; }
+
+    console.log(
+      "PPh Badan Tax Rule saved:",
+      data
+    );
+    closePphBadanTaxRuleModal();
+    await loadPphBadanTaxRule();
+    showToast(
+      `PPh Badan Tax Rule ${taxYear} berhasil disimpan.`,
+      "success"
+    );
+  } catch (error) {
+    showToast(
+      error?.message || "Gagal menyimpan PPh Badan Tax Rule.",
+      "error"
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = button.dataset.originalText ||
+        `
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+          Save Rule
+        `;
+    }
+  }
 }
 
 function closePphBadanTaxRuleModal() {
