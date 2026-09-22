@@ -29034,20 +29034,51 @@ let pphBadanSaving = false;
 
 async function savePphBadanCalculation() {
   if (pphBadanSaving) return;
+
   const result = window.currentPphBadanCalculation;
+
   if (!result) {
-    showToast( "Silakan Calculate PPh Badan terlebih dahulu.", "error" );
+    showToast(
+      "Silakan Calculate PPh Badan terlebih dahulu.",
+      "error"
+    );
     return; }
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const branchId = getPphBadanBranchId();
+    const selectedBranchId = getPphBadanBranchId();
 
-    if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
-    if (!branchId) { throw new Error("Pilih branch terlebih dahulu untuk menyimpan PPh Badan."); }
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
+
+    const branchId = selectedBranchId || "ALL";
+
+    let branchAllocations = null;
+
+    if (branchId === "ALL") {
+      if ( !Array.isArray(result.branches) || result.branches.length === 0 ) 
+				{ throw new Error( "Hasil per outlet tidak ditemukan. Silakan Calculate ALL terlebih dahulu." ); }
+
+      branchAllocations = result.branches.map(branch => ({
+        branchId: branch.branchId ?? branch.Branch_ID ?? "",
+        revenue: Number(branch.revenue || 0),
+        cogs: Number(branch.cogs || 0),
+        expense: Number(branch.expense || 0),
+        commercialProfit: Number(branch.commercialProfit || 0),
+        positiveAdjustment: Number(branch.positiveAdjustment || 0),
+        negativeAdjustment: Number(branch.negativeAdjustment || 0),
+        taxableIncome: Number(branch.taxableIncome || 0),
+        facilityTaxableIncome: Number(branch.facilityTaxableIncome || 0),
+        normalTaxableIncome: Number(branch.normalTaxableIncome || 0),
+        allocatedTaxAmount: Number(branch.allocatedTaxAmount || 0)
+      }));
+
+      const invalidBranch = branchAllocations.some( branch => !branch.branchId || branch.branchId.toUpperCase() === "ALL" );
+
+      if (invalidBranch) { throw new Error( "Terdapat branch ID yang tidak valid pada hasil perhitungan." ); }
 
     const button = document.getElementById( "savePphBadanButton" );
     pphBadanSaving = true;
+
     if (button) {
       button.disabled = true;
       button.dataset.originalText = button.innerHTML;
@@ -29059,38 +29090,55 @@ async function savePphBadanCalculation() {
       `;
     }
 
-    const { data, error
-    } = await supabaseClient.rpc(
-      "save_pph_badan_calculation",
-      {
-        p_branch_id: branchId,
-        p_tax_year: Number( result.taxYear ),
-        p_from_date: `${result.taxYear}-01-01`,
-        p_to_date: `${result.taxYear}-12-31`,
-        p_session_id: sessionId,
-        p_revenue: Number(result.revenue || 0),
-        p_cogs: Number(result.cogs || 0),
-        p_expense: Number(result.expense || 0),
-        p_commercial_profit: Number( result.commercialProfit || 0 ),
-        p_positive_adjustment: Number( result.positiveAdjustment || 0 ),
-        p_negative_adjustment: Number( result.negativeAdjustment || 0 ),
-        p_taxable_income: Number( result.taxableIncome || 0 ),
-        p_base_rate: Number(result.baseRate || 0),
-        p_facility_rate: Number(result.facilityRate || 0),
-        p_facility_taxable_income: Number( result.facilityTaxableIncome || 0 ),
-        p_normal_taxable_income: Number( result.normalTaxableIncome || 0 ),
-        p_tax_amount: Number(result.taxAmount || 0),
-        p_status: "CALCULATED",
-        p_note: `PPh Badan ${result.taxYear}`
-      }
+    const { data, error } =
+      await supabaseClient.rpc(
+        "save_pph_badan_calculation",
+        {
+          p_branch_id: branchId,
+          p_tax_year: Number(result.taxYear),
+          p_from_date: `${result.taxYear}-01-01`,
+          p_to_date: `${result.taxYear}-12-31`,
+          p_session_id: sessionId,
+          p_revenue: Number(result.revenue || 0),
+          p_cogs: Number(result.cogs || 0),
+          p_expense: Number(result.expense || 0),
+          p_commercial_profit: Number(result.commercialProfit || 0),
+          p_positive_adjustment: Number(result.positiveAdjustment || 0),
+          p_negative_adjustment: Number(result.negativeAdjustment || 0),
+          p_taxable_income: Number(result.taxableIncome || 0),
+          p_base_rate: Number(result.baseRate || 0),
+          p_facility_rate: Number(result.facilityRate || 0),
+          p_facility_taxable_income: Number(result.facilityTaxableIncome || 0),
+          p_normal_taxable_income: Number(result.normalTaxableIncome || 0),
+          p_tax_amount: Number(result.taxAmount || 0),
+          p_status: "CALCULATED",
+          p_note: `PPh Badan ${result.taxYear}`,
+          p_branch_allocations: branchAllocations
+        }
+      );
+
+    if (error) {
+      console.error(
+        "save_pph_badan_calculation error:",
+        error
+      );
+      throw error; }
+
+    console.log(
+      "PPh Badan Save Result:",
+      data
     );
 
-    if (error) { throw error; }
     showToast( `PPh Badan ${result.taxYear} berhasil disimpan.`, "success" );
-
     await loadPphBadanRecords();
   } catch (error) {
-    showToast( error?.message || "Gagal menyimpan PPh Badan.", "error" );
+    console.error(
+      "savePphBadanCalculation error:",
+      error
+    );
+
+    showToast( error?.message || "Gagal menyimpan PPh Badan.",  "error" );
+
   } finally {
     pphBadanSaving = false;
     const button = document.getElementById( "savePphBadanButton" );
@@ -29098,13 +29146,13 @@ async function savePphBadanCalculation() {
     if (button) {
       button.disabled = false;
       button.innerHTML =
-        button.dataset.originalText ||
-        `
-          <span class="material-symbols-outlined text-sm">
-            save
-          </span>
-          Save Calculation
-        `;
+			button.dataset.originalText ||
+			`
+				<span class="material-symbols-outlined text-sm">
+					save
+				</span>
+				Save Calculation
+			`;
     }
   }
 }
