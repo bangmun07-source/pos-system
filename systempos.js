@@ -28672,7 +28672,6 @@ async function savePphBadanPayment() {
 
 function closePphBadanActionMenu() {
   const modal = document.getElementById("pphBadanActionModal");
-
   if (!modal) return;
   modal.classList.add("hidden");
   modal.classList.remove("flex");
@@ -28681,12 +28680,9 @@ function closePphBadanActionMenu() {
 
 function closePphBadanPaymentModal() {
   const modal = document.getElementById("pphBadanPaymentModal");
-
   if (!modal) return;
-
   modal.classList.add("hidden");
   modal.classList.remove("flex");
-
   selectedPphBadanRecordId = null;
 }
 
@@ -28764,9 +28760,7 @@ let pphBadanSaving = false;
 
 async function savePphBadanCalculation() {
   if (pphBadanSaving) return;
-
   const result = window.currentPphBadanCalculation;
-
   if (!result) {
     showToast( "Silakan Calculate PPh Badan terlebih dahulu.", "error" );
     return; }
@@ -28782,9 +28776,7 @@ async function savePphBadanCalculation() {
     pphBadanSaving = true;
     if (button) {
       button.disabled = true;
-      button.dataset.originalText =
-        button.innerHTML;
-
+      button.dataset.originalText = button.innerHTML;
       button.innerHTML = `
         <span class="material-symbols-outlined text-sm animate-spin">
           progress_activity
@@ -28843,4 +28835,19 @@ async function savePphBadanCalculation() {
         `;
     }
   }
+}
+
+function openPphBadanTaxRuleModal() {
+  const modal = document.getElementById("pphBadanTaxRuleModal");
+  if (!modal) return;
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+
+function closePphBadanTaxRuleModal() {
+  const modal = document.getElementById("pphBadanTaxRuleModal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
 }
