@@ -19646,73 +19646,110 @@
 					    </div>
 					  </div>
 					</section>		
-	        <!-- PPH 25 -->
-	        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-	          <div class="p-5 border-b border-outline-variant flex items-center gap-3">
-	            <div class="main-icon-box">
-	              <span class="material-symbols-outlined text-3xl"
-	                style="font-variation-settings:'FILL' 1;">
-	                payments
-	              </span>
-	            </div>
-	
-	            <div>
-	              <h2 class="text-lg font-bold font-headline text-foreground">
-	                PPh 25
-	              </h2>
-	
-	              <p class="text-xs text-muted mt-1">
-	                Monthly income tax installment
-	              </p>
-	            </div>
-	          </div>
-	
-	          <div class="grid grid-cols-2 md:grid-cols-4">
-	            <div class="p-5 border-r border-outline-variant">
-	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-	                Annual PPh 25
-	              </p>
-	
-	              <p id="pph25Annual"
-	                class="text-xl font-headline mt-1">
-	                Rp 0
-	              </p>
-	            </div>
-	
-	            <div class="p-5 border-r border-outline-variant">
-	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-	                Paid
-	              </p>
-	
-	              <p id="pph25Paid"
-	                class="text-xl font-headline mt-1">
-	                Rp 0
-	              </p>
-	            </div>
-	
-	            <div class="p-5 border-r border-outline-variant">
-	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-	                PPh 25 Prepaid
-	              </p>
-	
-	              <p id="pph25Prepaid"
-	                class="text-xl font-headline mt-1">
-	                Rp 0
-	              </p>
-	            </div>
-	
-	            <div class="p-5">
-	              <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-	                Remaining PPh Badan
-	              </p>
-	
-	              <p id="pphBadanRemaining"
-	                class="text-xl font-headline mt-1">
-	                Rp 0
-	              </p>
-	            </div>
-	          </div>
-	        </section>
+					<!-- PPH BADAN TAX RULE -->
+					<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+					  <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-3">
+					    <div class="flex items-center gap-3">
+					      <div class="main-icon-box">
+					        <span class="material-symbols-outlined text-3xl"
+					          style="font-variation-settings:'FILL' 1;">
+					          account_balance
+					        </span>
+					      </div>
+					
+					      <div>
+					        <h2 class="text-lg font-bold font-headline text-foreground">
+					          PPh Badan Tax Rule
+					        </h2>
+					
+					        <p class="text-xs text-muted mt-1">
+					          Corporate income tax rules by effective period
+					        </p>
+					      </div>
+					    </div>
+					
+					    <button id="editPphBadanTaxRuleButton"
+					      type="button"
+					      onclick="openPphBadanTaxRuleModal()"
+					      class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+					      <span class="material-symbols-outlined text-sm">
+					        edit
+					      </span>
+					
+					      Edit Rule
+					    </button>
+					  </div>
+					
+					  <div class="grid grid-cols-2 md:grid-cols-4">
+					    <div class="p-5 border-r border-outline-variant">
+					      <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					        Base Rate
+					      </p>
+					
+					      <p id="pphBadanBaseRate"
+					        class="text-xl font-headline mt-1">
+					        0%
+					      </p>
+					    </div>
+					
+					    <div class="p-5 border-r border-outline-variant">
+					      <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					        Facility Rate
+					      </p>
+					
+					      <p id="pphBadanFacilityRate"
+					        class="text-xl font-headline mt-1">
+					        0%
+					      </p>
+					    </div>
+					
+					    <div class="p-5 border-r border-outline-variant">
+					      <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					        Facility Turnover Limit
+					      </p>
+					
+					      <p id="pphBadanFacilityTurnoverLimit"
+					        class="text-xl font-headline mt-1">
+					        Rp 0
+					      </p>
+					    </div>
+					
+					    <div class="p-5">
+					      <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					        Maximum Turnover Limit
+					      </p>
+					
+					      <p id="pphBadanMaximumTurnoverLimit"
+					        class="text-xl font-headline mt-1">
+					        Rp 0
+					      </p>
+					    </div>
+					  </div>
+					
+					  <div class="grid grid-cols-2 border-t border-outline-variant">
+					    <div class="p-5 border-r border-outline-variant">
+					      <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					        Effective From
+					      </p>
+					
+					      <p id="pphBadanEffectiveFrom"
+					        class="text-sm font-headline mt-1">
+					        —
+					      </p>
+					    </div>
+					
+					    <div class="p-5">
+					      <p class="uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					        Effective To
+					      </p>
+					
+					      <p id="pphBadanEffectiveTo"
+					        class="text-sm font-headline mt-1">
+					        —
+					      </p>
+					    </div>
+					  </div>
+					</section>
 	      </div>
 			</section>
 		</main>
