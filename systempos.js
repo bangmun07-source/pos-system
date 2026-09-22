@@ -28164,13 +28164,14 @@ if (!rows.length) {
 } else {
 	tbody.innerHTML =
 		rows.map(row => {
-
 			const period =
-				`${formatPphBadanDate(row.fromDate)}
-				 - 
-				 ${formatPphBadanDate(row.toDate)}`;
-			const status = String( row.status || "DRAFT" ).toUpperCase();
-
+					`${formatPphBadanDate(row.fromDate)}
+					 - 
+					 ${formatPphBadanDate(row.toDate)}`;
+			const status = String(row.status || "DRAFT").toUpperCase();
+			const paidAmount = Number(row.paidAmount || 0);
+			const remainingAmount = Number(row.remainingAmount || 0);
+	
 			return `
 				<tr class="hover:bg-surface-container transition-colors" >
 					<td class="px-5 py-4 font-medium">
@@ -28189,16 +28190,23 @@ if (!rows.length) {
 						${formatAccountingTaxCurrency( row.taxAmount )}
 					</td>
 
-					<td class="px-5 py-4">
+					<td class="px-5 py-4 text-right whitespace-nowrap">
+					    ${formatAccountingTaxCurrency(paidAmount)}
+					</td>
+					
+					<td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
+					    ${formatAccountingTaxCurrency(remainingAmount)}
+					</td>
+
+					<td class="px-5 py-4 text-center">
 						${getPphBadanStatusBadge(status)}
 					</td>
 
-					<td class="px-5 py-4 text-right">
+					<td class="px-5 py-4 text-center">
 						<button type="button"
 							onclick="openPphBadanRecordMenu('${row.id}')"
-							class="w-9 h-9 inline-flex items-center justify-center rounded-md border border-outline-variant hover:bg-surface-container-high"
+							class="w-9 h-9 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface"
 							title="Action" >
-
 							<span class="material-symbols-outlined text-lg">
 								more_vert
 							</span>
