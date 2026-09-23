@@ -28961,12 +28961,98 @@ function closePphBadanPaymentModal() {
 }
 
 function viewPphBadanDetailFromAction() {
-  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
+  const record = pphBadanRecords.find(
+    row => String(row.id) === String(selectedPphBadanRecordId)
+  );
+
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return; }
+    return;
+  }
+
   closePphBadanActionMenu();
-  console.log("PPh Badan Detail:", record);
+
+  const modal = document.getElementById("pphBadanDetailModal");
+
+  if (!modal) {
+    console.error("PPh Badan Detail modal tidak ditemukan.");
+    return;
+  }
+
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+
+  const money = value =>
+    formatAccountingTaxCurrency(Number(value || 0));
+
+  const date = value =>
+    value ? formatPphBadanDate(value) : "-";
+
+  const dateTime = value => {
+    if (!value) return "-";
+
+    const d = new Date(value);
+
+    if (Number.isNaN(d.getTime())) {
+      return String(value);
+    }
+
+    return d.toLocaleString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  };
+
+  const status = String( record.status || "DRAFT" ).toUpperCase();
+
+  setText( "pphBadanDetailSubtitle", `PPh Badan ${record.taxYear ?? "-"}` );
+  setText( "pphBadanDetailId", record.id ?? "-" );
+
+  const statusEl = document.getElementById("pphBadanDetailStatus");
+
+  if (statusEl) { statusEl.innerHTML = getPphBadanStatusBadge(status); }
+	
+  setText( "pphBadanDetailTaxYear", record.taxYear ?? "-" );
+  setText( "pphBadanDetailFromDate", date(record.fromDate) );
+  setText( "pphBadanDetailToDate", date(record.toDate) );
+  setText( "pphBadanDetailRevenue", money(record.revenue) );
+  setText( "pphBadanDetailCogs", money(record.cogs) );
+  setText( "pphBadanDetailExpense", money(record.expense) );
+  setText( "pphBadanDetailCommercialProfit", money(record.commercialProfit) );
+  setText( "pphBadanDetailPositiveAdjustment", money(record.positiveAdjustment) );
+  setText( "pphBadanDetailNegativeAdjustment", money(record.negativeAdjustment) );
+  setText( "pphBadanDetailTaxableIncome", money(record.taxableIncome) );
+  setText( "pphBadanDetailBaseRate", `${Number(record.baseRate || 0)}%` );
+  setText( "pphBadanDetailFacilityRate", `${Number(record.facilityRate || 0)}%` );
+  setText( "pphBadanDetailTaxAmount", money(record.taxAmount) );
+  setText( "pphBadanDetailPaidAmount", money(record.paidAmount) );
+  setText( "pphBadanDetailRemainingAmount", money(record.remainingAmount) );
+  setText( "pphBadanDetailBranch", record.branchId ?? "-" );
+  setText( "pphBadanDetailNote", record.note ?? "-" );
+  setText( "pphBadanDetailJournalId", record.journalId ?? "-" );
+  setText( "pphBadanDetailCreatedAt", dateTime(record.createdAt) );
+  setText( "pphBadanDetailUpdatedAt", dateTime(record.updatedAt) );
+
+  console.log(
+    "PPh Badan Detail:",
+    record
+  );
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closePphBadanDetailModal() {
+  const modal = document.getElementById("pphBadanDetailModal");
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
 }
 
 function getPphBadanStatusBadge(status) {
