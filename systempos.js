@@ -30036,16 +30036,17 @@ function openAccountsReceivableModal() {
   }
 
   // Reset form
-  const fields = [
-    "accountsReceivableType",
-    "accountsReceivableParty",
-    "accountsReceivableReferenceNo",
-    "accountsReceivableReferenceId",
-    "accountsReceivableDate",
-    "accountsReceivableDueDate",
-    "accountsReceivableAmount",
-    "accountsReceivableNote"
-  ];
+	const fields = [
+	"accountsReceivableType",
+	"accountsReceivableParty",
+	"accountsReceivableReferenceNo",
+	"accountsReceivableReferenceId",
+	"accountsReceivableDate",
+	"accountsReceivableDueDate",
+	"accountsReceivableAmount",
+	"accountsReceivableSourceMethod",
+	"accountsReceivableNote"
+	];
 
   fields.forEach(id => {
     const el = document.getElementById(id);
@@ -30149,6 +30150,10 @@ async function saveAccountsReceivable() {
       "accountsReceivableAmount"
     );
 
+		const sourceMethodEl = document.getElementById(
+		  "accountsReceivableSourceMethod"
+		);
+
     const noteEl = document.getElementById(
       "accountsReceivableNote"
     );
@@ -30177,55 +30182,78 @@ async function saveAccountsReceivable() {
           .replace(/[^\d]/g, "")
       );
 
-    const note =
-      noteEl?.value?.trim() || null;
-
-
-    /* -----------------------------------------------------
-       VALIDATION
-    ----------------------------------------------------- */
-
-    if (!arType) {
-      showToast(
-        "Pilih tipe piutang.",
-        "error"
-      );
-      return;
-    }
-
-    if (!partyName) {
-      showToast(
-        "Nama pihak wajib diisi.",
-        "error"
-      );
-      return;
-    }
-
-    if (!arDate) {
-      showToast(
-        "Tanggal piutang wajib diisi.",
-        "error"
-      );
-      return;
-    }
-
-    if (!totalAmount || totalAmount <= 0) {
-      showToast(
-        "Nominal piutang harus lebih dari 0.",
-        "error"
-      );
-      return;
-    }
-
-    const branchId = state.branchId || null;
-    if (!branchId) {
-      showToast(
-        "Branch belum dipilih.",
-        "error"
-      );
-      return;
-    }
-
+    const sourceMethod =
+		  sourceMethodEl?.value?.trim();
+		
+		const note =
+		  noteEl?.value?.trim() || null;
+		
+		
+		/* -----------------------------------------------------
+		   VALIDATION
+		----------------------------------------------------- */
+		
+		if (!arType) {
+		  showToast(
+		    "Pilih tipe piutang.",
+		    "error"
+		  );
+		  return;
+		}
+		
+		if (!partyName) {
+		  showToast(
+		    "Nama pihak wajib diisi.",
+		    "error"
+		  );
+		  return;
+		}
+		
+		if (!arDate) {
+		  showToast(
+		    "Tanggal piutang wajib diisi.",
+		    "error"
+		  );
+		  return;
+		}
+		
+		if (!totalAmount || totalAmount <= 0) {
+		  showToast(
+		    "Nominal piutang harus lebih dari 0.",
+		    "error"
+		  );
+		  return;
+		}
+		
+		if (!sourceMethod) {
+		  showToast(
+		    "Pilih payment method.",
+		    "error"
+		  );
+		  return;
+		}
+		
+		if (
+		  !["CASH", "BANK", "QRIS"].includes(
+		    sourceMethod
+		  )
+		) {
+		  showToast(
+		    "Payment method tidak valid.",
+		    "error"
+		  );
+		  return;
+		}
+		
+		const branchId = state.branchId || null;
+		
+		if (!branchId) {
+		  showToast(
+		    "Branch belum dipilih.",
+		    "error"
+		  );
+		  return;
+		}
 
     /* -----------------------------------------------------
        RPC
@@ -30245,6 +30273,7 @@ async function saveAccountsReceivable() {
           p_ar_date: arDate,
           p_due_date: dueDate,
           p_total_amount: totalAmount,
+					p_source_method: sourceMethod,
           p_note: note
         }
       );
