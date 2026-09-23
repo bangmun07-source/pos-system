@@ -29452,6 +29452,50 @@ function closePphBadanTaxRuleModal() {
    									RECEIVABLE PAGE
 ========================================================= */
 
+let accountsReceivableRecords = [];
+let accountsReceivableRecordsPage = 1;
+const accountsReceivableRecordsPerPage = 10;
+
+let selectedAccountsReceivableId = null;
+
+async function initAccountsReceivablePage() {
+  try {
+    accountsReceivableRecordsPage = 1;
+    await loadAccountsReceivableRecords();
+    renderAccountsReceivableRecords();
+
+  } catch (error) {
+    console.error(
+      "initAccountsReceivablePage error:",
+      error
+    );
+    accountsReceivableRecords = [];
+    renderAccountsReceivableRecords();
+  }
+}
+
+async function loadAccountsReceivableRecords() {
+  try {
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    const branchId =
+      state.branchId || null;
+
+    // RPC receivable di sini
+  } catch (error) {
+    console.error(
+      "loadAccountsReceivableRecords error:",
+      error
+    );
+  }
+}
+
+
 function renderAccountsReceivableRecords() {
   const tbody = document.getElementById("accountsReceivableTableBody");
   const paginationInfo = document.getElementById("accountsReceivablePaginationInfo");
@@ -29579,8 +29623,6 @@ function renderAccountsReceivableRecords() {
       accountsReceivableRecordsPage >= totalPages;
   }
 }
-
-let selectedAccountsReceivableId = null;
 
 function openAccountsReceivableRecordMenu(recordId) {
 
@@ -29761,59 +29803,6 @@ function openAccountsReceivableRecordMenu(recordId) {
 /* =========================================================
    RECEIVABLE — NEW / SAVE DRAFT
 ========================================================= */
-
-/* =========================================================
-   RECEIVABLE — INIT
-========================================================= */
-
-let accountsReceivableRecords = [];
-let accountsReceivableRecordsPage = 1;
-const accountsReceivableRecordsPerPage = 10;
-
-let selectedAccountsReceivableId = null;
-
-
-/* =========================================================
-   INIT PAGE
-========================================================= */
-
-async function initAccountsReceivablePage() {
-  try {
-    accountsReceivableRecordsPage = 1;
-    await loadAccountsReceivableRecords();
-    renderAccountsReceivableRecords();
-
-  } catch (error) {
-    console.error(
-      "initAccountsReceivablePage error:",
-      error
-    );
-    accountsReceivableRecords = [];
-    renderAccountsReceivableRecords();
-  }
-}
-
-async function loadAccountsReceivableRecords() {
-  try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
-
-    const branchId =
-      state.branchId || null;
-
-    // RPC receivable di sini
-  } catch (error) {
-    console.error(
-      "loadAccountsReceivableRecords error:",
-      error
-    );
-  }
-}
-
 
 function openAccountsReceivableModal() {
   const modal = document.getElementById(
