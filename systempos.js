@@ -1068,6 +1068,11 @@ function initModule(pageId) {
 		    initAccountingTaxPage();
 		break;
 		}
+
+		case "accountingReceivablePage": {
+		  initAccountsReceivablePage();
+		break;
+		}
 			
 		case "accountingReportsPage":
     		initAccountingReports();
@@ -29545,8 +29550,7 @@ function renderAccountsReceivableRecords() {
               type="button"
               onclick="openAccountsReceivableRecordMenu('${row.id}')"
               class="w-9 h-9 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface"
-              title="Action"
-            >
+              title="Action" >
               <span class="material-symbols-outlined text-lg">
                 more_vert
               </span>
@@ -29752,3 +29756,435 @@ function openAccountsReceivableRecordMenu(recordId) {
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
+
+
+/* =========================================================
+   RECEIVABLE — NEW / SAVE DRAFT
+========================================================= */
+
+/* =========================================================
+   RECEIVABLE — INIT
+========================================================= */
+
+let accountsReceivableRecords = [];
+let accountsReceivableRecordsPage = 1;
+const accountsReceivableRecordsPerPage = 10;
+
+let selectedAccountsReceivableId = null;
+
+
+/* =========================================================
+   INIT PAGE
+========================================================= */
+
+async function initAccountsReceivablePage() {
+  try {
+    accountsReceivableRecordsPage = 1;
+    await loadAccountsReceivableRecords();
+    renderAccountsReceivableRecords();
+
+  } catch (error) {
+    console.error(
+      "initAccountsReceivablePage error:",
+      error
+    );
+    accountsReceivableRecords = [];
+    renderAccountsReceivableRecords();
+  }
+}
+
+async function loadAccountsReceivableRecords() {
+  try {
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    const branchId =
+      state.branchId || null;
+
+    // RPC receivable di sini
+  } catch (error) {
+    console.error(
+      "loadAccountsReceivableRecords error:",
+      error
+    );
+  }
+}
+
+
+function openAccountsReceivableModal() {
+  const modal = document.getElementById(
+    "accountsReceivableModal"
+  );
+
+  if (!modal) {
+    console.error(
+      "Accounts Receivable modal tidak ditemukan."
+    );
+    return;
+  }
+
+  // Reset form
+  const fields = [
+    "accountsReceivableType",
+    "accountsReceivableParty",
+    "accountsReceivableReferenceNo",
+    "accountsReceivableReferenceId",
+    "accountsReceivableDate",
+    "accountsReceivableDueDate",
+    "accountsReceivableAmount",
+    "accountsReceivableNote"
+  ];
+
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+
+    if (!el) return;
+
+    if (el.tagName === "SELECT") {
+      el.value = "BUSINESS";
+    } else {
+      el.value = "";
+    }
+  });
+
+  // Default tanggal piutang = hari ini
+  const dateEl = document.getElementById(
+    "accountsReceivableDate"
+  );
+
+  if (dateEl) {
+    dateEl.value = new Date().toISOString().split("T")[0];
+  }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+
+function closeAccountsReceivableModal() {
+  const modal = document.getElementById(
+    "accountsReceivableModal"
+  );
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+
+/* ==== SAVE RECEIVABLE AS DRAFT ==== */
+
+async function saveAccountsReceivable() {
+
+  const button = document.getElementById(
+    "saveAccountsReceivableButton"
+  );
+
+  try {
+
+    if (button) {
+      button.disabled = true;
+      button.dataset.originalText =
+        button.innerHTML;
+
+      button.innerHTML = `
+        <span class="material-symbols-outlined animate-spin text-base">
+          progress_activity
+        </span>
+        Saving...
+      `;
+    }
+
+    const sessionId =
+      localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error(
+        "Session tidak ditemukan."
+      );
+    }
+
+    /* -----------------------------------------------------
+       GET FORM VALUE
+    ----------------------------------------------------- */
+
+    const typeEl = document.getElementById(
+      "accountsReceivableType"
+    );
+
+    const partyEl = document.getElementById(
+      "accountsReceivableParty"
+    );
+
+    const referenceNoEl = document.getElementById(
+      "accountsReceivableReferenceNo"
+    );
+
+    const referenceIdEl = document.getElementById(
+      "accountsReceivableReferenceId"
+    );
+
+    const dateEl = document.getElementById(
+      "accountsReceivableDate"
+    );
+
+    const dueDateEl = document.getElementById(
+      "accountsReceivableDueDate"
+    );
+
+    const amountEl = document.getElementById(
+      "accountsReceivableAmount"
+    );
+
+    const noteEl = document.getElementById(
+      "accountsReceivableNote"
+    );
+
+    const arType =
+      typeEl?.value?.trim();
+
+    const partyName =
+      partyEl?.value?.trim();
+
+    const referenceNo =
+      referenceNoEl?.value?.trim() || null;
+
+    const referenceId =
+      referenceIdEl?.value?.trim() || null;
+
+    const arDate =
+      dateEl?.value || null;
+
+    const dueDate =
+      dueDateEl?.value || null;
+
+    const totalAmount =
+      Number(
+        String(amountEl?.value || "")
+          .replace(/[^\d]/g, "")
+      );
+
+    const note =
+      noteEl?.value?.trim() || null;
+
+
+    /* -----------------------------------------------------
+       VALIDATION
+    ----------------------------------------------------- */
+
+    if (!arType) {
+      showToast(
+        "Pilih tipe piutang.",
+        "error"
+      );
+      return;
+    }
+
+    if (!partyName) {
+      showToast(
+        "Nama pihak wajib diisi.",
+        "error"
+      );
+      return;
+    }
+
+    if (!arDate) {
+      showToast(
+        "Tanggal piutang wajib diisi.",
+        "error"
+      );
+      return;
+    }
+
+    if (!totalAmount || totalAmount <= 0) {
+      showToast(
+        "Nominal piutang harus lebih dari 0.",
+        "error"
+      );
+      return;
+    }
+
+    const branchId = state.branchId || null;
+    if (!branchId) {
+      showToast(
+        "Branch belum dipilih.",
+        "error"
+      );
+      return;
+    }
+
+
+    /* -----------------------------------------------------
+       RPC
+    ----------------------------------------------------- */
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "save_accounts_receivable",
+        {
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_ar_type: arType,
+          p_party_id: null,
+          p_party_name: partyName,
+          p_reference_id: referenceId,
+          p_reference_no: referenceNo,
+          p_ar_date: arDate,
+          p_due_date: dueDate,
+          p_total_amount: totalAmount,
+          p_note: note
+        }
+      );
+
+    if (error) {
+      console.error(
+        "save_accounts_receivable error:",
+        error
+      );
+
+      throw new Error(
+        error.message ||
+        "Gagal menyimpan piutang."
+      );
+    }
+
+
+    /* -----------------------------------------------------
+       SUCCESS
+    ----------------------------------------------------- */
+
+    console.log(
+      "Accounts Receivable saved:",
+      data
+    );
+
+    closeAccountsReceivableModal();
+
+    showToast(
+      "Piutang berhasil disimpan sebagai Draft.",
+      "success"
+    );
+
+
+    /* -----------------------------------------------------
+       REFRESH DATA
+       Kalau function loader kamu sudah ada,
+       panggil di sini.
+    ----------------------------------------------------- */
+
+    if (
+      typeof loadAccountsReceivableRecords ===
+      "function"
+    ) {
+      await loadAccountsReceivableRecords();
+    }
+
+    if (
+      typeof renderAccountsReceivableRecords ===
+      "function"
+    ) {
+      renderAccountsReceivableRecords();
+    }
+
+  } catch (err) {
+
+    console.error(
+      "Save Accounts Receivable failed:",
+      err
+    );
+
+    showToast(
+      err.message ||
+      "Gagal menyimpan piutang.",
+      "error"
+    );
+
+  } finally {
+
+    if (button) {
+      button.disabled = false;
+
+      if (button.dataset.originalText) {
+        button.innerHTML =
+          button.dataset.originalText;
+      }
+    }
+  }
+}
+
+/* ==== RECEIVABLE ACTIONS ==== */
+
+function closeAccountsReceivableActionMenu() {
+  const modal = document.getElementById(
+    "accountsReceivableActionModal"
+  );
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  selectedAccountsReceivableId = null;
+}
+
+
+function viewAccountsReceivableDetailFromAction() {
+  const recordId = selectedAccountsReceivableId;
+
+  closeAccountsReceivableActionMenu();
+
+  if (!recordId) return;
+  if ( typeof openAccountsReceivableDetail === "function" ) 
+		{ openAccountsReceivableDetail(recordId); }
+}
+
+
+function recordAccountsReceivableFromAction() {
+  const recordId = selectedAccountsReceivableId;
+
+  closeAccountsReceivableActionMenu();
+
+  if (!recordId) return;
+  if ( typeof recordAccountsReceivable === "function" ) 
+		{ recordAccountsReceivable(recordId); }
+}
+
+
+function deleteAccountsReceivableFromAction() {
+  const recordId = selectedAccountsReceivableId;
+
+  closeAccountsReceivableActionMenu();
+
+  if (!recordId) return;
+  if ( typeof deleteAccountsReceivable === "function" ) 
+		{ deleteAccountsReceivable(recordId); }
+}
+
+
+function receiveAccountsReceivablePaymentFromAction() {
+  const recordId = selectedAccountsReceivableId;
+
+  closeAccountsReceivableActionMenu();
+
+  if (!recordId) return;
+  if ( typeof openAccountsReceivablePaymentModal === "function" ) 
+		{ openAccountsReceivablePaymentModal(recordId); }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
