@@ -20986,29 +20986,55 @@
       </div>
     </div>
   </aside>
-  <!-- MAIN CONTENT -->
-  <main class="ml-16 pt-20 min-h-screen bg-background">
-    <div class="p-6 space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h1 class="text-2xl font-semibold">
-            Accounts Receivable
-          </h1>
-
-          <p class="text-sm text-muted mt-1">
-            Manage receivables, payments, and outstanding balances.
-          </p>
+	<!-- MAIN CONTENT -->
+  <div id="mainContent" class="flex-1 flex flex-col h-screen">
+    <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
+      <div class="flex items-center gap-5 flex-1">
+        <div class="w-[44px] h-[44px] flex items-center justify-center">
+          <img id="munoLogo"
+            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+            alt="MUNO"
+            class="w-12 h-12 object-contain">
         </div>
 
-        <button type="button"
-          onclick="openAccountsReceivableModal()"
-          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90 transition" >
-          <span class="material-symbols-outlined text-lg">
-            add
+        <span class="h-7 w-px bg-outline-variant"></span>
+
+        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+          MUNO
+        </p>
+      </div>
+		
+      <div class="ml-auto flex items-center gap-3">
+        <button onclick="logout()"
+          class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+          <span class="material-symbols-outlined">
+            logout
           </span>
-          New Receivable
         </button>
       </div>
+    </header>
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+			<section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <img src="https://lh3.googleusercontent.com/d/1A6iAplqifTz16AS_szzuX1AQcwXxDuqG"
+            class="w-full h-full object-cover"
+            style="object-position:right 40%;"
+            alt="">
+        </div>
+				
+        <div class="absolute inset-0 bg-gradient-to-r from-[#101715] via-[#101715]/70 to-[#101715]/40"> </div>
+				
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+          <span class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
+           	Accounts Receivable
+          </span>
+					
+          <h2 class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
+            Manage receivables, payments, and outstanding balances.
+          </h2>
+        </div>
+      </section>
       <!-- OVERVIEW CARDS -->
       <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
@@ -21024,7 +21050,7 @@
               </p>
             </div>
 
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
               <span class="material-symbols-outlined">
                 account_balance_wallet
               </span>
@@ -21045,7 +21071,7 @@
               </p>
             </div>
 
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
               <span class="material-symbols-outlined">
                 person
               </span>
@@ -21066,7 +21092,7 @@
               </p>
             </div>
 						
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
               <span class="material-symbols-outlined">
                 business
               </span>
@@ -21087,7 +21113,7 @@
               </p>
             </div>
 
-            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
               <span class="material-symbols-outlined">
                 receipt_long
               </span>
@@ -21140,6 +21166,15 @@
                 oninput="loadAccountsReceivableRecords()"
                 class="h-10 w-56 pl-10 pr-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" />
             </div>
+						
+						 <button type="button"
+		          onclick="openAccountsReceivableModal()"
+		          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90 transition" >
+		          <span class="material-symbols-outlined text-lg">
+		            add
+		          </span>
+		          New Receivable
+		        </button>
           </div>
         </div>
         <!-- TABLE -->
@@ -21411,7 +21446,7 @@
       </div>
       <!-- DETAIL -->
       <div class="p-5 space-y-5">
-        <div class="flex items-center justify-between p-4 rounded-lg bg-background border border-outline-variant" >
+        <div class="flex items-center justify-between p-4 rounded-md bg-background border border-outline-variant" >
           <div>
             <p class="text-xs text-muted">
               Status
@@ -21514,7 +21549,7 @@
           </h4>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="p-4 rounded-lg bg-background border border-outline-variant" >
+            <div class="p-4 rounded-md bg-background border border-outline-variant" >
               <p class="text-xs text-muted">
                 Total
               </p>
@@ -21525,7 +21560,7 @@
               </p>
             </div>
 
-            <div class="p-4 rounded-lg bg-background border border-outline-variant" >
+            <div class="p-4 rounded-md bg-background border border-outline-variant" >
               <p class="text-xs text-muted">
                 Paid
               </p>
@@ -21536,7 +21571,7 @@
               </p>
             </div>
 
-            <div class="p-4 rounded-lg bg-background border border-outline-variant" >
+            <div class="p-4 rounded-md bg-background border border-outline-variant" >
               <p class="text-xs text-muted">
                 Outstanding
               </p>
@@ -21600,7 +21635,7 @@
       </div>
       <!-- FORM -->
       <div class="p-5 space-y-5">
-        <div class="p-4 rounded-lg bg-background border border-outline-variant">
+        <div class="p-4 rounded-md bg-background border border-outline-variant">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs text-muted">
