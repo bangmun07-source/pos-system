@@ -29461,16 +29461,14 @@ let selectedAccountsReceivableId = null;
 async function initAccountsReceivablePage() {
   try {
     accountsReceivableRecordsPage = 1;
+
     await loadAccountsReceivableRecords();
-    renderAccountsReceivableRecords();
 
   } catch (error) {
     console.error(
       "initAccountsReceivablePage error:",
       error
     );
-    accountsReceivableRecords = [];
-    renderAccountsReceivableRecords();
   }
 }
 
@@ -29486,12 +29484,47 @@ async function loadAccountsReceivableRecords() {
     const branchId =
       state.branchId || null;
 
-    // RPC receivable di sini
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_accounts_receivable",
+        {
+          p_session_id: sessionId,
+          p_branch_id: branchId
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    const result =
+      typeof data === "string"
+        ? JSON.parse(data)
+        : data;
+
+    accountsReceivableRecords =
+      Array.isArray(result)
+        ? result
+        : [];
+
+    accountsReceivableRecordsPage = 1;
+    console.log(
+      "Accounts Receivable data:",
+      accountsReceivableRecords
+    );
+
+    renderAccountsReceivableRecords();
+    return accountsReceivableRecords;
+
   } catch (error) {
     console.error(
       "loadAccountsReceivableRecords error:",
       error
     );
+
+    accountsReceivableRecords = [];
+    renderAccountsReceivableRecords();
+    throw error;
   }
 }
 
