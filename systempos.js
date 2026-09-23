@@ -29603,6 +29603,41 @@ function formatAccountsReceivableDate(value) {
   });
 }
 
+function getAccountsReceivableStatusBadge(status) {
+  const value = String(status || "DRAFT").toUpperCase();
+
+  const config = {
+    DRAFT: {
+      label: "Draft",
+      className:
+        "bg-surface-container-high text-on-surface-variant"
+    },
+
+    OUTSTANDING: {
+      label: "Outstanding",
+      className:
+        "bg-yellow-500/10 text-yellow-400"
+    },
+
+    PAID: {
+      label: "Paid",
+      className:
+        "bg-green-500/10 text-green-400"
+    }
+  };
+
+  const item =
+    config[value] || config.DRAFT;
+
+  return `
+    <span
+      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${item.className}"
+    >
+      ${item.label}
+    </span>
+  `;
+}
+		
 function renderAccountsReceivableRecords() {
   const tbody = document.getElementById("accountsReceivableTableBody");
   const paginationInfo = document.getElementById("accountsReceivablePaginationInfo");
