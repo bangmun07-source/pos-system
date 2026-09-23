@@ -21027,17 +21027,17 @@
 				
         <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
           <span class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
-           	Accounts Receivable
+           	Manage receivables
           </span>
 					
           <h2 class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
-            Manage receivables, payments, and outstanding balances.
+            Accounts Receivable
           </h2>
         </div>
       </section>
       <!-- OVERVIEW CARDS -->
       <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-muted">
@@ -21058,7 +21058,7 @@
           </div>
         </div>
         <!-- EMPLOYEE -->
-        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-muted">
@@ -21079,7 +21079,7 @@
           </div>
         </div>
         <!-- BUSINESS -->
-        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-muted">
@@ -21100,7 +21100,7 @@
           </div>
         </div>
         <!-- TAX / OTHER -->
-        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm text-muted">
@@ -21122,7 +21122,7 @@
         </div>
       </section>
       <!-- RECEIVABLE TABLE -->
-      <section class="bg-surface-container border border-outline-variant rounded-xl overflow-hidden" >
+      <section class="bg-surface-container border border-outline-variant rounded-md overflow-hidden mt-4" >
         <!-- SECTION HEADER -->
         <div class="px-5 py-4 border-b border-outline-variant flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4" >
           <div>
@@ -21169,7 +21169,7 @@
 						
 						 <button type="button"
 		          onclick="openAccountsReceivableModal()"
-		          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90 transition" >
+		          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bottom-theme text-sm font-medium flex items-center transition" >
 		          <span class="material-symbols-outlined text-lg">
 		            add
 		          </span>
@@ -21237,9 +21237,9 @@
   </main>
   <!-- ACTION POPUP -->
   <div id="accountsReceivableActionModal"
-    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4"
     onclick="if (event.target === this) closeAccountsReceivableActionMenu()" >
-    <div class="w-full max-w-md bg-surface-container border border-outline-variant rounded-xl shadow-2xl overflow-hidden" >
+    <div class="w-full max-w-md bg-background border border-outline-variant rounded-md shadow-2xl overflow-hidden" >
       <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between" >
         <div>
           <h3 class="font-semibold">
@@ -21268,9 +21268,9 @@
   </div>
   <!-- NEW RECEIVABLE MODAL -->
   <div id="accountsReceivableModal"
-    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4"
     onclick="if (event.target === this) closeAccountsReceivableModal()" >
-    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-surface-container border border-outline-variant rounded-xl shadow-2xl">
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-background border border-outline-variant rounded-md shadow-2xl">
       <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between sticky top-0 bg-surface-container z-10" >
         <div>
           <h3 class="font-semibold">
@@ -21423,7 +21423,7 @@
   <div id="accountsReceivableDetailModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
     onclick="if (event.target === this) closeAccountsReceivableDetailModal()" >
-    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-surface-container border border-outline-variant rounded-xl shadow-2xl">
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-surface-container border border-outline-variant rounded-md shadow-2xl">
       <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between sticky top-0 bg-surface-container z-10" >
         <div>
           <h3 class="font-semibold">
@@ -21613,7 +21613,7 @@
   <div id="accountsReceivablePaymentModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
     onclick="if (event.target === this) closeAccountsReceivablePaymentModal()" >
-    <div class="w-full max-w-lg bg-surface-container border border-outline-variant rounded-xl shadow-2xl" >
+    <div class="w-full max-w-lg bg-surface-container border border-outline-variant rounded-md shadow-2xl" >
       <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between" >
         <div>
           <h3 class="font-semibold">
