@@ -29441,3 +29441,314 @@ function closePphBadanTaxRuleModal() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
+
+
+/* =========================================================
+   									RECEIVABLE PAGE
+========================================================= */
+
+function renderAccountsReceivableRecords() {
+  const tbody = document.getElementById("accountsReceivableTableBody");
+  const paginationInfo = document.getElementById("accountsReceivablePaginationInfo");
+  const prevButton = document.getElementById("accountsReceivablePrevButton");
+  const nextButton = document.getElementById("accountsReceivableNextButton");
+
+  if (!tbody) return;
+
+  const total = accountsReceivableRecords.length;
+
+  const totalPages = Math.max(
+    Math.ceil(total / accountsReceivableRecordsPerPage),
+    1
+  );
+
+  if (accountsReceivableRecordsPage > totalPages) {
+    accountsReceivableRecordsPage = totalPages;
+  }
+
+  const start =
+    (accountsReceivableRecordsPage - 1) *
+    accountsReceivableRecordsPerPage;
+
+  const end = Math.min(
+    start + accountsReceivableRecordsPerPage,
+    total
+  );
+
+  const rows = accountsReceivableRecords.slice(start, end);
+
+  if (!rows.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td
+          colspan="8"
+          class="px-5 py-10 text-center text-muted"
+        >
+          No Accounts Receivable data
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML = rows.map(row => {
+
+      const status = String(
+        row.status || "DRAFT"
+      ).toUpperCase();
+
+      const totalAmount = Number(
+        row.totalAmount || 0
+      );
+
+      const paidAmount = Number(
+        row.paidAmount || 0
+      );
+
+      const remainingAmount = Number(
+        row.remainingAmount ?? (
+          totalAmount - paidAmount
+        )
+      );
+
+      return `
+        <tr class="hover:bg-surface-container transition-colors">
+
+          <td class="px-5 py-4 font-medium">
+            ${row.arTypeLabel || row.arType || "-"}
+          </td>
+
+          <td class="px-5 py-4">
+            ${row.partyName || "-"}
+          </td>
+
+          <td class="px-5 py-4 text-muted whitespace-nowrap">
+            ${formatAccountsReceivableDate(row.arDate)}
+          </td>
+
+          <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
+            ${formatAccountingTaxCurrency(totalAmount)}
+          </td>
+
+          <td class="px-5 py-4 text-right whitespace-nowrap">
+            ${formatAccountingTaxCurrency(paidAmount)}
+          </td>
+
+          <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
+            ${formatAccountingTaxCurrency(remainingAmount)}
+          </td>
+
+          <td class="px-5 py-4 text-center">
+            ${getAccountsReceivableStatusBadge(status)}
+          </td>
+
+          <td class="px-5 py-4 text-center">
+            <button
+              type="button"
+              onclick="openAccountsReceivableRecordMenu('${row.id}')"
+              class="w-9 h-9 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface"
+              title="Action"
+            >
+              <span class="material-symbols-outlined text-lg">
+                more_vert
+              </span>
+            </button>
+          </td>
+
+        </tr>
+      `;
+    }).join("");
+  }
+
+  if (paginationInfo) {
+    paginationInfo.textContent =
+      total === 0
+        ? "Showing 0–0 of 0"
+        : `Showing ${start + 1}–${end} of ${total}`;
+  }
+
+  if (prevButton) {
+    prevButton.disabled =
+      accountsReceivableRecordsPage <= 1;
+  }
+
+  if (nextButton) {
+    nextButton.disabled =
+      accountsReceivableRecordsPage >= totalPages;
+  }
+}
+
+let selectedAccountsReceivableId = null;
+
+function openAccountsReceivableRecordMenu(recordId) {
+
+  const record = accountsReceivableRecords.find(
+    row => String(row.id) === String(recordId)
+  );
+
+  if (!record) {
+    showToast(
+      "Data piutang tidak ditemukan.",
+      "error"
+    );
+    return;
+  }
+
+  const modal = document.getElementById(
+    "accountsReceivableActionModal"
+  );
+
+  const info = document.getElementById(
+    "accountsReceivableActionInfo"
+  );
+
+  const buttons = document.getElementById(
+    "accountsReceivableActionButtons"
+  );
+
+  if (!modal || !buttons) {
+    console.error(
+      "Accounts Receivable Action popup tidak ditemukan."
+    );
+    return;
+  }
+
+  selectedAccountsReceivableId = record.id;
+
+  const status = String(
+    record.status || "DRAFT"
+  ).toUpperCase();
+
+  const totalAmount = Number(
+    record.totalAmount || 0
+  );
+
+  const remainingAmount = Number(
+    record.remainingAmount ?? totalAmount
+  );
+
+  if (info) {
+    info.textContent =
+      `${record.partyName || "Piutang"} • ` +
+      `${formatAccountingTaxCurrency(remainingAmount)}`;
+  }
+
+  let html = `
+    <button
+      type="button"
+      onclick="viewAccountsReceivableDetailFromAction()"
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left"
+    >
+      <span class="material-symbols-outlined text-lg">
+        visibility
+      </span>
+
+      <div>
+        <div class="font-medium">
+          View Detail
+        </div>
+
+        <div class="text-xs text-muted">
+          Lihat detail piutang
+        </div>
+      </div>
+    </button>
+  `;
+
+  /*
+   * DRAFT
+   */
+  if (status === "DRAFT") {
+
+    html += `
+      <button
+        type="button"
+        onclick="recordAccountsReceivableFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left"
+      >
+        <span class="material-symbols-outlined text-lg">
+          fact_check
+        </span>
+
+        <div>
+          <div class="font-medium">
+            Record Receivable
+          </div>
+
+          <div class="text-xs text-muted">
+            Catat piutang ke accounting
+          </div>
+        </div>
+      </button>
+
+      <button
+        type="button"
+        onclick="deleteAccountsReceivableFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-red-600/10 text-left text-red-1000"
+      >
+        <span class="material-symbols-outlined text-lg">
+          delete
+        </span>
+
+        <div>
+          <div class="font-medium">
+            Delete
+          </div>
+
+          <div class="text-xs text-muted">
+            Hapus piutang yang belum direcord
+          </div>
+        </div>
+      </button>
+    `;
+
+  /*
+   * OUTSTANDING
+   */
+  } else if (status === "OUTSTANDING") {
+
+    html += `
+      <button
+        type="button"
+        onclick="receiveAccountsReceivablePaymentFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left"
+      >
+        <span class="material-symbols-outlined text-lg">
+          payments
+        </span>
+
+        <div>
+          <div class="font-medium">
+            Receive Payment
+          </div>
+
+          <div class="text-xs text-muted">
+            Terima pembayaran piutang
+          </div>
+        </div>
+      </button>
+    `;
+
+  /*
+   * PAID
+   */
+  } else if (status === "PAID") {
+
+    html += `
+      <div
+        class="px-4 py-3 rounded-md bg-background border border-outline-variant"
+      >
+        <div class="font-medium">
+          Piutang sudah lunas
+        </div>
+
+        <div class="text-xs text-muted mt-1">
+          Seluruh piutang sudah diterima.
+        </div>
+      </div>
+    `;
+  }
+
+  buttons.innerHTML = html;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
