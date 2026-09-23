@@ -21311,7 +21311,7 @@
 
         <button type="button"
           onclick="closeAccountsReceivableModal()"
-          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md text-on-surface-variant hover:text-on-surface" >
           <span class="material-symbols-outlined">
             close
           </span>
@@ -21412,6 +21412,15 @@
             placeholder="0"
             class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
         </div>
+
+				<div> <label for="accountsReceivableSourceMethod" class="block text-sm font-medium mb-2"> Payment Method </label>
+					<select id="accountsReceivableSourceMethod" class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary">
+						<option value="">Select payment method</option>
+						<option value="CASH">Cash</option>
+						<option value="BANK">Bank / Transfer</option>
+						<option value="QRIS">QRIS</option>
+					</select>
+				</div>
         <!-- NOTE -->
         <div>
           <label for="accountsReceivableNote"
@@ -21430,14 +21439,14 @@
       <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-end gap-3" >
         <button type="button"
           onclick="closeAccountsReceivableModal()"
-          class="px-4 py-2.5 rounded-md border border-outline-variant hover:bg-background" >
+          class="px-4 py-2.5 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface" >
           Cancel
         </button>
 
         <button id="saveAccountsReceivableButton"
           type="button"
           onclick="saveAccountsReceivable()"
-          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90" >
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bottom-theme text-sm font-medium" >
           <span class="material-symbols-outlined text-sm">
             save
           </span>
@@ -21466,7 +21475,7 @@
 
         <button type="button"
           onclick="closeAccountsReceivableDetailModal()"
-          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md text-on-surface-variant hover:text-on-surface" >
           <span class="material-symbols-outlined">
             close
           </span>
@@ -21655,7 +21664,7 @@
 
         <button type="button"
           onclick="closeAccountsReceivablePaymentModal()"
-          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md text-on-surface-variant hover:text-on-surface" >
           <span class="material-symbols-outlined">
             close
           </span>
@@ -21758,14 +21767,14 @@
       <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-end gap-3" >
         <button type="button"
           onclick="closeAccountsReceivablePaymentModal()"
-          class="px-4 py-2.5 rounded-md border border-outline-variant hover:bg-background" >
+          class="px-4 py-2.5 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface" >
           Cancel
         </button>
 
         <button id="saveAccountsReceivablePaymentButton"
           type="button"
           onclick="saveAccountsReceivablePayment()"
-          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90" >
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bottom-theme text-sm font-medium" >
           <span class="material-symbols-outlined text-sm">
             payments
           </span>
