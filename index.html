@@ -21037,93 +21037,120 @@
       </section>
       <!-- OVERVIEW CARDS -->
       <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-muted">
-                Total Receivables
-              </p>
-
-              <p id="accountsReceivableTotal"
-                class="text-2xl font-semibold mt-2" >
-                Rp 0
-              </p>
-            </div>
-
-            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
-              <span class="material-symbols-outlined">
-                account_balance_wallet
-              </span>
-            </div>
-          </div>
-        </div>
-        <!-- EMPLOYEE -->
-        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-muted">
-                Employee Receivables
-              </p>
-
-              <p id="accountsReceivableEmployee"
-                class="text-2xl font-semibold mt-2" >
-                Rp 0
-              </p>
-            </div>
-
-            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
-              <span class="material-symbols-outlined">
-                person
-              </span>
-            </div>
-          </div>
-        </div>
-        <!-- BUSINESS -->
-        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-muted">
-                Business Receivables
-              </p>
-
-              <p id="accountsReceivableBusiness"
-                class="text-2xl font-semibold mt-2" >
-                Rp 0
-              </p>
-            </div>
-						
-            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
-              <span class="material-symbols-outlined">
-                business
-              </span>
-            </div>
-          </div>
-        </div>
-        <!-- TAX / OTHER -->
-        <div class="bg-surface-container border border-outline-variant rounded-md p-5" >
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-muted">
-                Tax / Other Receivables
-              </p>
-
-              <p id="accountsReceivableOther"
-                class="text-2xl font-semibold mt-2" >
-                Rp 0
-              </p>
-            </div>
-
-            <div class="w-10 h-10 rounded-md bg-primary/10 flex items-center justify-center" >
-              <span class="material-symbols-outlined">
-                receipt_long
-              </span>
-            </div>
-          </div>
-        </div>
+				<div class="bg-background rounded-md overflow-hidden border border-outline-variant group shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
+					<div class="absolute right-0 p-5 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-90">
+						<span class="material-symbols-outlined text-[200px] animate-float">
+							account_balance_wallet
+						</span>
+					</div>
+			
+					<div class="flex justify-between items-start">
+						<div class="main-icon-box">
+							<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;" >
+								account_balance_wallet
+							</span>
+						</div>
+					</div>
+			
+					<div class="mt-8">
+						<p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+							Total Outstanding
+						</p>
+			
+						<h3 id="accountsReceivableTotal"
+							class="text-lg lg:text-2xl font-bold text-foreground mt-2" >
+							IDR 0
+						</h3>
+					</div>
+				</div>
+				<!-- Employee Receivables -->
+				<div class="bg-background rounded-md overflow-hidden border border-outline-variant group shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative" >
+					<div class="absolute right-0 p-5 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-90">
+						<span class="material-symbols-outlined text-[200px] animate-float">
+							person
+						</span>
+					</div>
+			
+					<div class="flex justify-between items-start">
+						<div class="main-icon-box">
+							<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;" >
+								person
+							</span>
+						</div>
+					</div>
+			
+					<div class="mt-8">
+						<p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest" >
+							Employee Receivables
+						</p>
+			
+						<h3 id="accountsReceivableEmployee"
+							class="text-lg lg:text-2xl font-bold text-foreground mt-2" >
+							IDR 0
+						</h3>
+					</div>
+				</div>
+				<!-- Business Receivables -->
+				<div class="bg-background rounded-md overflow-hidden border border-outline-variant group shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
+					<div class="absolute right-0 p-5 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-90">
+						<span class="material-symbols-outlined text-[200px] animate-float">
+							business
+						</span>
+					</div>
+			
+					<div class="flex justify-between items-start">
+						<div class="main-icon-box">
+							<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;" >
+								business
+							</span>
+						</div>
+					</div>
+			
+					<div class="mt-8">
+						<p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
+							Business Receivables
+						</p>
+			
+						<h3 id="accountsReceivableBusiness"
+							class="text-lg lg:text-2xl font-bold text-foreground mt-2" >
+							IDR 0
+						</h3>
+					</div>
+				</div>
+				<!-- Overdue Receivables -->
+				<div class="bg-background rounded-md overflow-hidden border border-outline-variant group shadow-[0_2px_10px_rgba(0,0,0,0.15)] p-6 relative">
+					<div class="absolute right-0 p-5 opacity-5 group-hover:opacity-20 transition-all duration-700 group-hover:scale-90">
+						<span class="material-symbols-outlined text-[200px] animate-float">
+							event_busy
+						</span>
+					</div>
+			
+					<div class="flex justify-between items-start">
+						<div class="main-icon-box">
+							<span class="material-symbols-outlined text-3xl"
+								style="font-variation-settings:'FILL' 1;" >
+								event_busy
+							</span>
+						</div>
+					</div>
+			
+					<div class="mt-8">
+						<p class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest" >
+							Overdue Receivables
+						</p>
+			
+						<h3 id="accountsReceivableOverdue"
+							class="text-lg lg:text-2xl font-bold text-foreground mt-2" >
+							IDR 0
+						</h3>
+					</div>
+				</div>
       </section>
       <!-- RECEIVABLE TABLE -->
       <section class="bg-surface-container border border-outline-variant rounded-md overflow-hidden mt-4" >
-        <!-- SECTION HEADER -->
         <div class="px-5 py-4 border-b border-outline-variant flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4" >
           <div>
             <h2 class="font-semibold">
