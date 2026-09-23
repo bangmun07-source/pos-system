@@ -29474,40 +29474,18 @@ async function initAccountsReceivablePage() {
 
 async function loadAccountsReceivableRecords() {
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
-    const branchId =
-      state.branchId || null;
-
-    const typeEl =
-      document.getElementById(
-        "accountsReceivableTypeFilter"
-      );
-
-    const statusEl =
-      document.getElementById(
-        "accountsReceivableStatusFilter"
-      );
-
-    const searchEl =
-      document.getElementById(
-        "accountsReceivableSearch"
-      );
-
-    const arType =
-      typeEl?.value || "ALL";
-
-    const status =
-      statusEl?.value || "ALL";
-
-    const search =
-      searchEl?.value?.trim() || null;
-
+    const branchId = state.branchId || null;
+    const typeEl = document.getElementById( "accountsReceivableTypeFilter" );
+    const statusEl = document.getElementById( "accountsReceivableStatusFilter" );
+    const searchEl = document.getElementById( "accountsReceivableSearch" );
+    const arType = typeEl?.value || "ALL";
+    const status = statusEl?.value || "ALL";
+    const search = searchEl?.value?.trim() || null;
+		
     const { data, error } =
       await supabaseClient.rpc(
         "get_accounts_receivable",
@@ -29520,50 +29498,66 @@ async function loadAccountsReceivableRecords() {
         }
       );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
-    const result =
-      typeof data === "string"
-        ? JSON.parse(data)
-        : data;
+    const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
 
-    accountsReceivableRecords =
-      Array.isArray(result)
-        ? result
-        : [];
+    accountsReceivableRecords = Array.isArray(result)
+			? result
+			: [];
 
     accountsReceivableRecordsPage = 1;
-
-    console.log(
-      "Accounts Receivable filters:",
-      {
-        branchId,
-        arType,
-        status,
-        search
-      }
-    );
-
-    console.log(
-      "Accounts Receivable data:",
-      accountsReceivableRecords
-    );
-
+		updateAccountsReceivableOverview();
     renderAccountsReceivableRecords();
     return accountsReceivableRecords;
 
   } catch (error) {
-    console.error(
-      "loadAccountsReceivableRecords error:",
-      error
-    );
-
     accountsReceivableRecords = [];
     renderAccountsReceivableRecords();
     throw error;
   }
+}
+
+function updateAccountsReceivableOverview() {
+  const totalEl = document.getElementById( "accountsReceivableTotal" );
+  const employeeEl = document.getElementById( "accountsReceivableEmployee" );
+  const businessEl = document.getElementById( "accountsReceivableBusiness" );
+  const overdueEl = document.getElementById( "accountsReceivableOverdue" );
+
+  let totalOutstanding = 0;
+  let employeeOutstanding = 0;
+  let businessOutstanding = 0;
+  let overdueOutstanding = 0;
+
+  const today = new Date().toISOString().split("T")[0];
+
+  accountsReceivableRecords.forEach(row => {
+    const status = String(row.status || "") .toUpperCase();
+
+    // Hanya piutang yang masih outstanding
+    if (status !== "OUTSTANDING") { return; }
+
+    const remainingAmount = Number(row.remainingAmount || 0);
+
+    if (remainingAmount <= 0) { return; }
+
+    // TOTAL OUTSTANDING
+    totalOutstanding += remainingAmount;
+
+    // BERDASARKAN TIPE
+    const arType = String(row.arType || "") .toUpperCase();
+
+    if (arType === "EMPLOYEE") { employeeOutstanding += remainingAmount; }
+    if (arType === "BUSINESS") { businessOutstanding += remainingAmount; }
+    if ( row.dueDate && row.dueDate < today )  { overdueOutstanding += remainingAmount; }
+  });
+
+  if (totalEl) { totalEl.textContent = formatAccountingTaxCurrency( totalOutstanding ); }
+  if (employeeEl) { employeeEl.textContent = formatAccountingTaxCurrency( employeeOutstanding ); }
+  if (businessEl) { businessEl.textContent = formatAccountingTaxCurrency( businessOutstanding ); }
+  if (overdueEl) { overdueEl.textContent = formatAccountingTaxCurrency( overdueOutstanding ); }
 }
 
 /* =========================================================
