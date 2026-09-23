@@ -29514,13 +29514,22 @@ async function loadAccountsReceivableRecords() {
     return accountsReceivableRecords;
 
   } catch (error) {
-    accountsReceivableRecords = [];
-    renderAccountsReceivableRecords();
-    throw error;
-  }
+	  console.error(
+	    "loadAccountsReceivableRecords error:",
+	    error
+	  );
+	  accountsReceivableRecords = [];
+	  updateAccountsReceivableOverview();
+	  renderAccountsReceivableRecords();
+	  throw error;
+	}
 }
 
 function updateAccountsReceivableOverview() {
+	  console.log(
+    "UPDATE KPI AR DIPANGGIL",
+    accountsReceivableRecords
+  );
   const totalEl = document.getElementById( "accountsReceivableTotal" );
   const employeeEl = document.getElementById( "accountsReceivableEmployee" );
   const businessEl = document.getElementById( "accountsReceivableBusiness" );
