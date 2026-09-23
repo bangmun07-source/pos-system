@@ -29484,12 +29484,39 @@ async function loadAccountsReceivableRecords() {
     const branchId =
       state.branchId || null;
 
+    const typeEl =
+      document.getElementById(
+        "accountsReceivableTypeFilter"
+      );
+
+    const statusEl =
+      document.getElementById(
+        "accountsReceivableStatusFilter"
+      );
+
+    const searchEl =
+      document.getElementById(
+        "accountsReceivableSearch"
+      );
+
+    const arType =
+      typeEl?.value || "ALL";
+
+    const status =
+      statusEl?.value || "ALL";
+
+    const search =
+      searchEl?.value?.trim() || null;
+
     const { data, error } =
       await supabaseClient.rpc(
         "get_accounts_receivable",
         {
           p_session_id: sessionId,
-          p_branch_id: branchId
+          p_branch_id: branchId,
+          p_ar_type: arType,
+          p_status: status,
+          p_search: search
         }
       );
 
@@ -29508,6 +29535,17 @@ async function loadAccountsReceivableRecords() {
         : [];
 
     accountsReceivableRecordsPage = 1;
+
+    console.log(
+      "Accounts Receivable filters:",
+      {
+        branchId,
+        arType,
+        status,
+        search
+      }
+    );
+
     console.log(
       "Accounts Receivable data:",
       accountsReceivableRecords
@@ -29672,7 +29710,7 @@ function renderAccountsReceivableRecords() {
     tbody.innerHTML = `
       <tr>
         <td
-          colspan="8"
+          colspan="9"
           class="px-5 py-10 text-center text-muted"
         >
           No Accounts Receivable data
@@ -29681,71 +29719,84 @@ function renderAccountsReceivableRecords() {
     `;
   } else {
     tbody.innerHTML = rows.map(row => {
-
-      const status = String(
-        row.status || "DRAFT"
-      ).toUpperCase();
-
-      const totalAmount = Number(
-        row.totalAmount || 0
-      );
-
-      const paidAmount = Number(
-        row.paidAmount || 0
-      );
-
-      const remainingAmount = Number(
-        row.remainingAmount ?? (
-          totalAmount - paidAmount
-        )
-      );
-
-      return `
-        <tr class="hover:bg-surface-container transition-colors">
-
-          <td class="px-5 py-4 font-medium">
-            ${row.arTypeLabel || row.arType || "-"}
-          </td>
-
-          <td class="px-5 py-4">
-            ${row.partyName || "-"}
-          </td>
-
-          <td class="px-5 py-4 text-muted whitespace-nowrap">
-            ${formatAccountsReceivableDate(row.arDate)}
-          </td>
-
-          <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
-            ${formatAccountingTaxCurrency(totalAmount)}
-          </td>
-
-          <td class="px-5 py-4 text-right whitespace-nowrap">
-            ${formatAccountingTaxCurrency(paidAmount)}
-          </td>
-
-          <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
-            ${formatAccountingTaxCurrency(remainingAmount)}
-          </td>
-
-          <td class="px-5 py-4 text-center">
-            ${getAccountsReceivableStatusBadge(status)}
-          </td>
-
-          <td class="px-5 py-4 text-center">
-            <button
-              type="button"
-              onclick="openAccountsReceivableRecordMenu('${row.id}')"
-              class="w-9 h-9 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface"
-              title="Action" >
-              <span class="material-symbols-outlined text-lg">
-                more_vert
-              </span>
-            </button>
-          </td>
-
-        </tr>
-      `;
-    }).join("");
+		  const status = String(
+		    row.status || "DRAFT"
+		  ).toUpperCase();
+		
+		  const totalAmount = Number(
+		    row.totalAmount || 0
+		  );
+		
+		  const paidAmount = Number(
+		    row.paidAmount || 0
+		  );
+		
+		  const remainingAmount = Number(
+		    row.remainingAmount ?? (
+		      totalAmount - paidAmount
+		    )
+		  );
+		
+		  return `
+		    <tr class="hover:bg-surface-container transition-colors">
+		
+		      <!-- TYPE -->
+		      <td class="px-5 py-4 font-medium">
+		        ${row.arTypeLabel || row.arType || "-"}
+		      </td>
+		
+		      <!-- PARTY -->
+		      <td class="px-5 py-4">
+		        ${row.partyName || "-"}
+		      </td>
+		
+		      <!-- DATE -->
+		      <td class="px-5 py-4 text-muted whitespace-nowrap">
+		        ${formatAccountsReceivableDate(row.arDate)}
+		      </td>
+		
+		      <!-- DUE DATE -->
+		      <td class="px-5 py-4 text-muted whitespace-nowrap">
+		        ${formatAccountsReceivableDate(row.dueDate)}
+		      </td>
+		
+		      <!-- TOTAL -->
+		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
+		        ${formatAccountingTaxCurrency(totalAmount)}
+		      </td>
+		
+		      <!-- PAID -->
+		      <td class="px-5 py-4 text-right whitespace-nowrap">
+		        ${formatAccountingTaxCurrency(paidAmount)}
+		      </td>
+		
+		      <!-- OUTSTANDING -->
+		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
+		        ${formatAccountingTaxCurrency(remainingAmount)}
+		      </td>
+		
+		      <!-- STATUS -->
+		      <td class="px-5 py-4 text-center">
+		        ${getAccountsReceivableStatusBadge(status)}
+		      </td>
+		
+		      <!-- ACTION -->
+		      <td class="px-5 py-4 text-center">
+		        <button
+		          type="button"
+		          onclick="openAccountsReceivableRecordMenu('${row.id}')"
+		          class="w-9 h-9 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface"
+		          title="Action"
+		        >
+		          <span class="material-symbols-outlined text-lg">
+		            more_vert
+		          </span>
+		        </button>
+		      </td>
+		
+		    </tr>
+		  `;
+		}).join("");
   }
 
   if (paginationInfo) {
@@ -29764,6 +29815,29 @@ function renderAccountsReceivableRecords() {
     nextButton.disabled =
       accountsReceivableRecordsPage >= totalPages;
   }
+}
+
+function changeAccountsReceivablePage(direction) {
+
+  const total =
+    accountsReceivableRecords.length;
+
+  const totalPages = Math.max(
+    Math.ceil(
+      total / accountsReceivableRecordsPerPage
+    ),
+    1
+  );
+
+  const nextPage =
+    accountsReceivableRecordsPage + direction;
+
+  if (nextPage < 1) return;
+  if (nextPage > totalPages) return;
+
+  accountsReceivableRecordsPage = nextPage;
+
+  renderAccountsReceivableRecords();
 }
 
 function openAccountsReceivableRecordMenu(recordId) {
