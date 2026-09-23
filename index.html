@@ -18902,6 +18902,15 @@
             Tax
           </span>
         </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
+          </span>
+        </a>
         <!-- CASH FLOW -->
         <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
@@ -19239,29 +19248,12 @@
 					    <table class="w-full text-sm">
 					      <thead>
 					        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-					          <th class="px-5 py-3 text-left">
-					            Payment Date
-					          </th>
-										
-					          <th class="px-5 py-3 text-left">
-					            Note
-					          </th>
-					
-					          <th class="px-5 py-3 text-right">
-					            Amount
-					          </th>
-					
-					          <th class="px-5 py-3 text-left">
-					            Method
-					          </th>
-					
-					          <th class="px-5 py-3 text-center">
-					            Status
-					          </th>
-										
-					          <th class="px-5 py-3 text-center">
-					            Action
-					          </th>
+					          <th class="px-5 py-3 text-left"> Payment Date </th>
+					          <th class="px-5 py-3 text-left"> Note </th>
+					          <th class="px-5 py-3 text-right"> Amount </th>
+					          <th class="px-5 py-3 text-left"> Method </th>
+					          <th class="px-5 py-3 text-center"> Status </th>
+					          <th class="px-5 py-3 text-center"> Action </th>
 					        </tr>
 					      </thead>
 					
@@ -20264,7 +20256,6 @@
 			</div>
 	  </div>
 	</div>
-
 	<!-- PPH BADAN PAYMENT MODAL -->
 	<div id="pphBadanPaymentModal"
 	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
@@ -20299,7 +20290,6 @@
 	          -
 	        </div>
 	      </div>
-	
 	      <!-- LIABILITY ACCOUNT -->
 	      <div>
 	        <label class="block text-xs text-muted mb-2">
@@ -20864,6 +20854,865 @@
 	  </div>
 	</div>
 </template>
+
+<!-- ACCOUNTS RECEIVABLE PAGE -->
+
+<template id="accountingReceivablePage">
+  <!-- SIDEBAR -->
+	<aside id="sidebar"
+    class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
+    <div class="sidebar-menu flex flex-col h-full">
+      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+        <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
+          </span>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+        <!-- SETTINGS -->
+        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+        <!-- LOYALTY -->
+        <a onclick="navigate('loyaltysettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            military_tech
+          </span>
+          <span class="sidebar-label">
+            Loyalty &amp; Tiers
+          </span>
+        </a>
+        <!-- TAX -->
+        <a onclick="navigate('taxservicesettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance
+          </span>
+          <span class="sidebar-label">
+            Taxes &amp; Fees
+          </span>
+        </a>
+        <!-- EXPENSES -->
+        <a onclick="navigate('expensessettingPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            payments
+          </span>
+          <span class="sidebar-label">
+            Expenses
+          </span>
+        </a>
+        <!-- ANALYTICS -->
+        <a onclick="navigate('analyticsPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            analytics
+          </span>
+          <span class="sidebar-label">
+            Analytics
+          </span>
+        </a>
+        <!-- INVENTORY -->
+        <a onclick="navigate('inventoryPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Inventory
+          </span>
+        </a>
+        <!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            request_quote
+          </span>
+          <span class="sidebar-label">
+            Debt &amp; Liabilities
+          </span>
+        </a>
+        <!-- ACCOUNTING TAX -->
+        <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a class="active"
+          onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
+          </span>
+        </a>
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+      </nav>
+      <!-- FOOTER -->
+      <div class="mt-auto p-2 pb-2">
+        <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
+          <span class="shrink-0 w-8 h-8 flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          </span>
+
+          <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <p class="text-[10px] text-muted">
+              SYSTEM STATUS
+            </p>
+
+            <span class="sidebar-label">
+              SERVER ACTIVE
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <!-- MAIN CONTENT -->
+  <main class="ml-16 pt-20 min-h-screen bg-background">
+    <div class="p-6 space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-semibold">
+            Accounts Receivable
+          </h1>
+
+          <p class="text-sm text-muted mt-1">
+            Manage receivables, payments, and outstanding balances.
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="openAccountsReceivableModal()"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90 transition" >
+          <span class="material-symbols-outlined text-lg">
+            add
+          </span>
+          New Receivable
+        </button>
+      </div>
+      <!-- OVERVIEW CARDS -->
+      <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-muted">
+                Total Receivables
+              </p>
+
+              <p id="accountsReceivableTotal"
+                class="text-2xl font-semibold mt-2" >
+                Rp 0
+              </p>
+            </div>
+
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+              <span class="material-symbols-outlined">
+                account_balance_wallet
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- EMPLOYEE -->
+        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-muted">
+                Employee Receivables
+              </p>
+
+              <p id="accountsReceivableEmployee"
+                class="text-2xl font-semibold mt-2" >
+                Rp 0
+              </p>
+            </div>
+
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+              <span class="material-symbols-outlined">
+                person
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- BUSINESS -->
+        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-muted">
+                Business Receivables
+              </p>
+
+              <p id="accountsReceivableBusiness"
+                class="text-2xl font-semibold mt-2" >
+                Rp 0
+              </p>
+            </div>
+						
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+              <span class="material-symbols-outlined">
+                business
+              </span>
+            </div>
+          </div>
+        </div>
+        <!-- TAX / OTHER -->
+        <div class="bg-surface-container border border-outline-variant rounded-xl p-5" >
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-sm text-muted">
+                Tax / Other Receivables
+              </p>
+
+              <p id="accountsReceivableOther"
+                class="text-2xl font-semibold mt-2" >
+                Rp 0
+              </p>
+            </div>
+
+            <div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center" >
+              <span class="material-symbols-outlined">
+                receipt_long
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- RECEIVABLE TABLE -->
+      <section class="bg-surface-container border border-outline-variant rounded-xl overflow-hidden" >
+        <!-- SECTION HEADER -->
+        <div class="px-5 py-4 border-b border-outline-variant flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4" >
+          <div>
+            <h2 class="font-semibold">
+              Receivables
+            </h2>
+
+            <p class="text-sm text-muted mt-1">
+              Track receivables and payment status.
+            </p>
+          </div>
+          <!-- FILTERS -->
+          <div class="flex flex-wrap items-center gap-3">
+            <select id="accountsReceivableTypeFilter"
+              onchange="loadAccountsReceivableRecords()"
+              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
+              <option value="ALL"> All Types </option>
+              <option value="EMPLOYEE"> Employee </option>
+              <option value="BUSINESS"> Business </option>
+              <option value="TAX"> Tax </option>
+              <option value="OTHER"> Other </option>
+            </select>
+            <!-- STATUS -->
+            <select id="accountsReceivableStatusFilter"
+              onchange="loadAccountsReceivableRecords()"
+              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
+              <option value="ALL"> All Status </option>
+              <option value="DRAFT"> Draft </option>
+              <option value="OUTSTANDING"> Outstanding </option>
+              <option value="PAID"> Paid </option>
+            </select>
+            <!-- SEARCH -->
+            <div class="relative">
+              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg" >
+                search
+              </span>
+
+              <input id="accountsReceivableSearch"
+                type="text"
+                placeholder="Search receivable..."
+                oninput="loadAccountsReceivableRecords()"
+                class="h-10 w-56 pl-10 pr-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" />
+            </div>
+          </div>
+        </div>
+        <!-- TABLE -->
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-sm">
+            <thead class="bg-background border-b border-outline-variant">
+              <tr>
+                <th class="px-5 py-3 text-left font-medium text-muted whitespace-nowrap" > Type </th>
+                <th class="px-5 py-3 text-left font-medium text-muted whitespace-nowrap"> Party </th>
+                <th class="px-5 py-3 text-left font-medium text-muted whitespace-nowrap"> Date </th>
+                <th class="px-5 py-3 text-left font-medium text-muted whitespace-nowrap"> Due Date </th>
+                <th class="px-5 py-3 text-right font-medium text-muted whitespace-nowrap"> Total </th>
+                <th class="px-5 py-3 text-right font-medium text-muted whitespace-nowrap"> Paid </th>
+                <th class="px-5 py-3 text-right font-medium text-muted whitespace-nowrap"> Outstanding </th>
+                <th class="px-5 py-3 text-center font-medium text-muted whitespace-nowrap"> Status </th>
+                <th class="px-5 py-3 text-center font-medium text-muted whitespace-nowrap">  Action </th>
+              </tr>
+            </thead>
+
+            <tbody id="accountsReceivableTableBody"
+              class="divide-y divide-outline-variant" >
+              <tr>
+                <td colspan="9"
+                  class="px-5 py-10 text-center text-muted" >
+                  No Accounts Receivable data
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- PAGINATION -->
+        <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-between" >
+          <div id="accountsReceivablePaginationInfo"
+            class="text-sm text-muted" >
+            Showing 0–0 of 0
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="accountsReceivablePrevButton"
+              type="button"
+              onclick="changeAccountsReceivablePage(-1)"
+              class="w-9 h-9 inline-flex items-center justify-center rounded-md border border-outline-variant hover:bg-background disabled:opacity-40 disabled:pointer-events-none">
+              <span class="material-symbols-outlined text-lg">
+                chevron_left
+              </span>
+            </button>
+
+            <button id="accountsReceivableNextButton"
+              type="button"
+              onclick="changeAccountsReceivablePage(1)"
+              class="w-9 h-9 inline-flex items-center justify-center rounded-md border border-outline-variant hover:bg-background disabled:opacity-40 disabled:pointer-events-none">
+              <span class="material-symbols-outlined text-lg">
+                chevron_right
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <!-- ACTION POPUP -->
+  <div id="accountsReceivableActionModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
+    onclick="if (event.target === this) closeAccountsReceivableActionMenu()" >
+    <div class="w-full max-w-md bg-surface-container border border-outline-variant rounded-xl shadow-2xl overflow-hidden" >
+      <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between" >
+        <div>
+          <h3 class="font-semibold">
+            Receivable Actions
+          </h3>
+
+          <p id="accountsReceivableActionInfo"
+            class="text-sm text-muted mt-1" >
+            -
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="closeAccountsReceivableActionMenu()"
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+      <!-- ACTIONS -->
+      <div id="accountsReceivableActionButtons"
+        class="p-2" >
+      </div>
+    </div>
+  </div>
+  <!-- NEW RECEIVABLE MODAL -->
+  <div id="accountsReceivableModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
+    onclick="if (event.target === this) closeAccountsReceivableModal()" >
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-surface-container border border-outline-variant rounded-xl shadow-2xl">
+      <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between sticky top-0 bg-surface-container z-10" >
+        <div>
+          <h3 class="font-semibold">
+            New Receivable
+          </h3>
+
+          <p class="text-sm text-muted mt-1">
+            Create a receivable for review before recording.
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="closeAccountsReceivableModal()"
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+      <!-- FORM -->
+      <div class="p-5 space-y-5">
+        <div>
+          <label for="accountsReceivableType"
+            class="block text-sm font-medium mb-2" >
+            Receivable Type
+          </label>
+
+          <select id="accountsReceivableType"
+            onchange="handleAccountsReceivableTypeChange()"
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" >
+            <option value=""> Select receivable type </option>
+            <option value="EMPLOYEE"> Piutang Karyawan </option>
+            <option value="BUSINESS"> Piutang Usaha </option>
+            <option value="TAX"> Piutang Tax </option>
+            <option value="OTHER"> Piutang Lainnya </option>
+          </select>
+        </div>
+        <!-- PARTY -->
+        <div>
+          <label for="accountsReceivableParty"
+            class="block text-sm font-medium mb-2" >
+            Party / Recipient
+          </label>
+
+          <input id="accountsReceivableParty"
+            type="text"
+            placeholder="Employee, customer, company, etc."
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+        </div>
+        <!-- REFERENCE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="accountsReceivableReferenceNo"
+              class="block text-sm font-medium mb-2" >
+              Reference No.
+            </label>
+
+            <input id="accountsReceivableReferenceNo"
+              type="text"
+              placeholder="Optional"
+              class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+          </div>
+
+          <div>
+            <label for="accountsReceivableReferenceId"
+              class="block text-sm font-medium mb-2" >
+              Reference ID
+            </label>
+
+            <input id="accountsReceivableReferenceId"
+              type="text"
+              placeholder="Optional"
+              class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary"/>
+          </div>
+        </div>
+        <!-- DATE -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="accountsReceivableDate"
+              class="block text-sm font-medium mb-2" >
+              Receivable Date
+            </label>
+
+            <input id="accountsReceivableDate"
+              type="date"
+              class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+          </div>
+
+          <div>
+            <label for="accountsReceivableDueDate"
+              class="block text-sm font-medium mb-2" >
+              Due Date
+            </label>
+
+            <input id="accountsReceivableDueDate"
+              type="date"
+              class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+          </div>
+        </div>
+        <!-- AMOUNT -->
+        <div>
+          <label for="accountsReceivableAmount"
+            class="block text-sm font-medium mb-2" >
+            Amount
+          </label>
+
+          <input id="accountsReceivableAmount"
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0"
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+        </div>
+        <!-- NOTE -->
+        <div>
+          <label for="accountsReceivableNote"
+            class="block text-sm font-medium mb-2" >
+            Note
+          </label>
+
+          <textarea id="accountsReceivableNote"
+            rows="3"
+            placeholder="Optional note..."
+            class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant outline-none focus:border-primary resize-none" >
+					</textarea>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-end gap-3" >
+        <button type="button"
+          onclick="closeAccountsReceivableModal()"
+          class="px-4 py-2.5 rounded-md border border-outline-variant hover:bg-background" >
+          Cancel
+        </button>
+
+        <button id="saveAccountsReceivableButton"
+          type="button"
+          onclick="saveAccountsReceivable()"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90" >
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+
+          Save Receivable
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- DETAIL MODAL -->
+  <div id="accountsReceivableDetailModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
+    onclick="if (event.target === this) closeAccountsReceivableDetailModal()" >
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto custom-scrollbar bg-surface-container border border-outline-variant rounded-xl shadow-2xl">
+      <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between sticky top-0 bg-surface-container z-10" >
+        <div>
+          <h3 class="font-semibold">
+            Receivable Detail
+          </h3>
+
+          <p id="accountsReceivableDetailSubtitle"
+            class="text-sm text-muted mt-1" >
+            -
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="closeAccountsReceivableDetailModal()"
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+      <!-- DETAIL -->
+      <div class="p-5 space-y-5">
+        <div class="flex items-center justify-between p-4 rounded-lg bg-background border border-outline-variant" >
+          <div>
+            <p class="text-xs text-muted">
+              Status
+            </p>
+
+            <div id="accountsReceivableDetailStatus"
+              class="mt-1" >
+              -
+            </div>
+          </div>
+
+          <div class="text-right">
+            <p class="text-xs text-muted">
+              Receivable ID
+            </p>
+
+            <p id="accountsReceivableDetailId"
+              class="text-sm font-medium mt-1" >
+              -
+            </p>
+          </div>
+        </div>
+        <!-- BASIC INFORMATION -->
+        <div>
+          <h4 class="font-medium mb-3">
+            Basic Information
+          </h4>
+					
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p class="text-xs text-muted">
+                Type
+              </p>
+							
+              <p id="accountsReceivableDetailType"
+                class="mt-1" >
+                -
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-muted">
+                Party
+              </p>
+              <p id="accountsReceivableDetailParty"
+                class="mt-1" >
+                -
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-muted">
+                Receivable Date
+              </p>
+							
+              <p id="accountsReceivableDetailDate"
+                class="mt-1" >
+                -
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-muted">
+                Due Date
+              </p>
+							
+              <p id="accountsReceivableDetailDueDate"
+                class="mt-1" >
+                -
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-muted">
+                Reference No.
+              </p>
+							
+              <p id="accountsReceivableDetailReferenceNo"
+                class="mt-1" >
+                -
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs text-muted">
+                Branch
+              </p>
+							
+              <p id="accountsReceivableDetailBranch"
+                class="mt-1" >
+                -
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- AMOUNTS -->
+        <div>
+          <h4 class="font-medium mb-3">
+            Amount
+          </h4>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="p-4 rounded-lg bg-background border border-outline-variant" >
+              <p class="text-xs text-muted">
+                Total
+              </p>
+
+              <p id="accountsReceivableDetailTotal"
+                class="text-lg font-semibold mt-1" >
+                Rp 0
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg bg-background border border-outline-variant" >
+              <p class="text-xs text-muted">
+                Paid
+              </p>
+
+              <p id="accountsReceivableDetailPaid"
+                class="text-lg font-semibold mt-1" >
+                Rp 0
+              </p>
+            </div>
+
+            <div class="p-4 rounded-lg bg-background border border-outline-variant" >
+              <p class="text-xs text-muted">
+                Outstanding
+              </p>
+
+              <p id="accountsReceivableDetailRemaining"
+                class="text-lg font-semibold mt-1" >
+                Rp 0
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- NOTE -->
+        <div>
+          <p class="text-xs text-muted">
+            Note
+          </p>
+
+          <p id="accountsReceivableDetailNote"
+            class="mt-1"
+          >
+            -
+          </p>
+        </div>
+        <!-- JOURNAL -->
+        <div>
+          <p class="text-xs text-muted">
+            Journal ID
+          </p>
+
+          <p id="accountsReceivableDetailJournalId"
+            class="mt-1 font-medium" >
+            -
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- RECEIVE PAYMENT MODAL -->
+  <div id="accountsReceivablePaymentModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 p-4"
+    onclick="if (event.target === this) closeAccountsReceivablePaymentModal()" >
+    <div class="w-full max-w-lg bg-surface-container border border-outline-variant rounded-xl shadow-2xl" >
+      <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between" >
+        <div>
+          <h3 class="font-semibold">
+            Receive Payment
+          </h3>
+
+          <p class="text-sm text-muted mt-1">
+            Record receivable payment.
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="closeAccountsReceivablePaymentModal()"
+          class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background" >
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+      <!-- FORM -->
+      <div class="p-5 space-y-5">
+        <div class="p-4 rounded-lg bg-background border border-outline-variant">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-xs text-muted">
+                Receivable
+              </p>
+
+              <p id="accountsReceivablePaymentParty"
+                class="font-medium mt-1" >
+                -
+              </p>
+            </div>
+
+            <div class="text-right">
+              <p class="text-xs text-muted">
+                Outstanding
+              </p>
+
+              <p id="accountsReceivablePaymentOutstanding"
+                class="font-semibold mt-1" >
+                Rp 0
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- DATE -->
+        <div>
+          <label for="accountsReceivablePaymentDate"
+            class="block text-sm font-medium mb-2" >
+            Payment Date
+          </label>
+
+          <input id="accountsReceivablePaymentDate"
+            type="date"
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+        </div>
+        <!-- AMOUNT -->
+        <div>
+          <label for="accountsReceivablePaymentAmount"
+            class="block text-sm font-medium mb-2" >
+            Payment Amount
+          </label>
+
+          <input id="accountsReceivablePaymentAmount"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="0"
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+        </div>
+        <!-- PAYMENT METHOD -->
+        <div>
+          <label for="accountsReceivablePaymentMethod"
+            class="block text-sm font-medium mb-2" >
+            Payment Method
+          </label>
+
+          <select id="accountsReceivablePaymentMethod"
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" >
+            <option value=""> Select payment method </option>
+            <option value="CASH"> Cash </option>
+            <option value="BANK"> Bank </option>
+            <option value="QRIS"> QRIS </option>
+          </select>
+        </div>
+        <!-- REFERENCE -->
+        <div>
+          <label for="accountsReceivablePaymentReference"
+            class="block text-sm font-medium mb-2" >
+            Reference No.
+          </label>
+
+          <input id="accountsReceivablePaymentReference"
+            type="text"
+            placeholder="Optional"
+            class="w-full h-11 px-3 rounded-md bg-background border border-outline-variant outline-none focus:border-primary" />
+        </div>
+        <!-- NOTE -->
+        <div>
+          <label for="accountsReceivablePaymentNote"
+            class="block text-sm font-medium mb-2" >
+            Note
+          </label>
+
+          <textarea id="accountsReceivablePaymentNote"
+            rows="3"
+            placeholder="Optional note..."
+            class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant outline-none focus:border-primary resize-none">
+					</textarea>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <div class="px-5 py-4 border-t border-outline-variant flex items-center justify-end gap-3" >
+        <button type="button"
+          onclick="closeAccountsReceivablePaymentModal()"
+          class="px-4 py-2.5 rounded-md border border-outline-variant hover:bg-background" >
+          Cancel
+        </button>
+
+        <button id="saveAccountsReceivablePaymentButton"
+          type="button"
+          onclick="saveAccountsReceivablePayment()"
+          class="inline-flex items-center gap-2 px-4 py-2.5 rounded-md bg-primary text-on-primary font-medium hover:opacity-90" >
+          <span class="material-symbols-outlined text-sm">
+            payments
+          </span>
+          Receive Payment
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
 	
 	
 <!-- 
