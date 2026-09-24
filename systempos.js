@@ -30363,6 +30363,122 @@ function recordAccountsReceivableFromAction() {
 		{ recordAccountsReceivable(recordId); }
 }
 
+async function recordAccountsReceivable(recordId) {
+  if (!recordId) {
+    showToast("ID piutang tidak ditemukan.", "error");
+    return;
+  }
+
+  const record = accountsReceivableRecords.find(
+    row => String(row.id) === String(recordId)
+  );
+
+  if (!record) {
+    showToast("Data piutang tidak ditemukan.", "error");
+    return;
+  }
+
+  const status = String(record.status || "").toUpperCase();
+
+  if (status !== "DRAFT") {
+    showToast(
+      "Piutang hanya dapat di-Record saat status masih DRAFT.",
+      "error"
+    );
+    return;
+  }
+
+  const amount = Number(record.totalAmount || 0);
+
+  if (amount <= 0) {
+    showToast("Nominal piutang tidak valid.", "error");
+    return;
+  }
+
+  const sourceMethod = String(
+    record.sourceMethod || ""
+  ).toUpperCase();
+
+  const sourceLabels = {
+    CASH: "Cash",
+    BANK: "Bank / Transfer",
+    QRIS: "QRIS"
+  };
+
+  if (!sourceLabels[sourceMethod]) {
+    showToast(
+      "Payment Method piutang belum valid.",
+      "error"
+    );
+    return;
+  }
+
+  const confirmed = confirm(
+    `Record piutang "${record.partyName || "Piutang"}" sebesar ` +
+    `${formatAccountingTaxCurrency(amount)} melalui ` +
+    `${sourceLabels[sourceMethod]}?`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "record_accounts_receivable",
+        {
+          p_session_id: sessionId,
+          p_id: recordId
+        }
+      );
+
+    if (error) {
+      console.error(
+        "record_accounts_receivable error:",
+        error
+      );
+
+      throw new Error(
+        error.message || "Gagal melakukan Record piutang."
+      );
+    }
+
+    const result =
+      typeof data === "string"
+        ? JSON.parse(data)
+        : data;
+
+    console.log(
+      "Accounts Receivable recorded:",
+      result
+    );
+
+    showToast(
+      "Piutang berhasil di-Record.",
+      "success"
+    );
+
+    await loadAccountsReceivableRecords();
+
+  } catch (error) {
+    console.error(
+      "recordAccountsReceivable error:",
+      error
+    );
+
+    showToast(
+      error.message || "Gagal melakukan Record piutang.",
+      "error"
+    );
+  }
+}
+
+
 
 function deleteAccountsReceivableFromAction() {
   const recordId = selectedAccountsReceivableId;
