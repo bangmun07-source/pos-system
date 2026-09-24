@@ -30302,7 +30302,7 @@ function openAccountsReceivableDetail(recordId) {
 	const status = String(record.status || "DRAFT") .toUpperCase();
 	const totalAmount = Number(record.totalAmount || 0);
 	const paidAmount = Number(record.paidAmount || 0);
-	const remainingAmount = Number( ecord.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
+	const remainingAmount = Number( record.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
 	
 	/* ---- STATUS ---- */
 	if (statusEl) { statusEl.innerHTML = getAccountsReceivableStatusBadge(status); }
