@@ -30351,8 +30351,6 @@ function closeAccountsReceivableDetailModal() {
 	modal.classList.remove("flex");
 }
 
-
-
 function recordAccountsReceivableFromAction() {
   const recordId = selectedAccountsReceivableId;
 
@@ -30478,8 +30476,6 @@ async function recordAccountsReceivable(recordId) {
   }
 }
 
-
-
 function deleteAccountsReceivableFromAction() {
   const recordId = selectedAccountsReceivableId;
 
@@ -30490,7 +30486,6 @@ function deleteAccountsReceivableFromAction() {
 		{ deleteAccountsReceivable(recordId); }
 }
 
-
 function receiveAccountsReceivablePaymentFromAction() {
   const recordId = selectedAccountsReceivableId;
 
@@ -30499,6 +30494,252 @@ function receiveAccountsReceivablePaymentFromAction() {
   if (!recordId) return;
   if ( typeof openAccountsReceivablePaymentModal === "function" ) 
 		{ openAccountsReceivablePaymentModal(recordId); }
+}
+
+function openAccountsReceivablePaymentModal(recordId) {
+  const record = accountsReceivableRecords.find(
+    row => String(row.id) === String(recordId)
+  );
+
+  if (!record) {
+    showToast("Data piutang tidak ditemukan.", "error");
+    return;
+  }
+
+  const status = String(record.status || "").toUpperCase();
+
+  if (status !== "OUTSTANDING") {
+    showToast(
+      "Piutang ini belum dapat menerima pembayaran.",
+      "error"
+    );
+    return;
+  }
+	
+  const totalAmount = Number(record.totalAmount || 0);
+  const paidAmount = Number(record.paidAmount || 0);
+  const outstanding = Number( record.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
+
+  if (outstanding <= 0) {
+    showToast("Piutang sudah lunas.", "error");
+    return;
+  }
+
+  selectedAccountsReceivableId = recordId;
+	
+  const modal = document.getElementById( "accountsReceivablePaymentModal" );
+  const partyEl = document.getElementById( "accountsReceivablePaymentParty" );
+  const outstandingEl = document.getElementById( "accountsReceivablePaymentOutstanding" );
+  const dateEl = document.getElementById( "accountsReceivablePaymentDate" );
+  const amountEl = document.getElementById( "accountsReceivablePaymentAmount" );
+  const methodEl = document.getElementById( "accountsReceivablePaymentMethod" );
+  const referenceEl = document.getElementById( "accountsReceivablePaymentReference" );
+  const noteEl = document.getElementById( "accountsReceivablePaymentNote" );
+
+  if (!modal) {
+    console.error(
+      "Accounts Receivable payment modal tidak ditemukan."
+    );
+    return;
+  }
+	
+  if (partyEl) { partyEl.textContent = record.partyName || "Piutang"; }
+  if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency(outstanding); }
+  if (dateEl) { dateEl.value = new Date().toISOString().split("T")[0]; }
+  if (amountEl) {
+    amountEl.value = "";
+    amountEl.max = String(outstanding);
+    amountEl.placeholder =
+      `Maks. ${outstanding}`;
+  }
+  if (methodEl) { methodEl.value = ""; }
+  if (referenceEl) { referenceEl.value = ""; }
+  if (noteEl) { noteEl.value = ""; }
+		
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+async function saveAccountsReceivablePayment() {
+  const recordId = selectedAccountsReceivableId;
+
+  if (!recordId) {
+    showToast(
+      "Piutang belum dipilih.",
+      "error"
+    );
+    return;
+  }
+
+  const record = accountsReceivableRecords.find(
+    row => String(row.id) === String(recordId)
+  );
+
+  if (!record) {
+    showToast(
+      "Data piutang tidak ditemukan.",
+      "error"
+    );
+    return;
+  }
+
+  const dateEl = document.getElementById( "accountsReceivablePaymentDate" );
+  const amountEl = document.getElementById( "accountsReceivablePaymentAmount" );
+  const methodEl = document.getElementById( "accountsReceivablePaymentMethod" );
+  const referenceEl = document.getElementById( "accountsReceivablePaymentReference" );
+  const noteEl = document.getElementById( "accountsReceivablePaymentNote" );
+  const date = dateEl?.value || "";
+  const amount = Number(amountEl?.value || 0);
+  const paymentMethod = String(methodEl?.value || "").toUpperCase();
+  const referenceNo = referenceEl?.value?.trim() || null;
+  const note = noteEl?.value?.trim() || null;
+  const totalAmount = Number(record.totalAmount || 0);
+  const paidAmount = Number(record.paidAmount || 0);
+  const outstanding = Number( record.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
+
+  if (!date) {
+    showToast(
+      "Payment date wajib diisi.",
+      "error"
+    );
+    return;
+  }
+
+  if (!Number.isInteger(amount) || amount <= 0) {
+    showToast(
+      "Payment amount harus lebih dari 0.",
+      "error"
+    );
+    return;
+  }
+
+  if (amount > outstanding) {
+    showToast(
+      "Payment amount melebihi outstanding.",
+      "error"
+    );
+    return;
+  }
+
+  if (!["CASH", "BANK", "QRIS"].includes(paymentMethod)) {
+    showToast(
+      "Payment method wajib dipilih.",
+      "error"
+    );
+    return;
+  }
+
+  const methodLabels = {
+    CASH: "Cash",
+    BANK: "Bank",
+    QRIS: "QRIS"
+  };
+
+  const confirmed = confirm(
+    `Terima pembayaran piutang "${record.partyName || "Piutang"}" ` +
+    `sebesar ${formatAccountingTaxCurrency(amount)} ` +
+    `melalui ${methodLabels[paymentMethod]}?`
+  );
+
+  if (!confirmed) return;
+
+  const button = document.getElementById( "saveAccountsReceivablePaymentButton" );
+
+  try {
+    if (button) {
+      button.disabled = true;
+      button.classList.add(
+        "opacity-50",
+        "cursor-not-allowed"
+      );
+    }
+
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error(
+        "Session tidak ditemukan."
+      );
+    }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "receive_accounts_receivable_payment",
+        {
+          p_session_id: sessionId,
+          p_ar_id: recordId,
+          p_payment_date: date,
+          p_amount: amount,
+          p_payment_method: paymentMethod,
+          p_reference_no: referenceNo,
+          p_note: note
+        }
+      );
+
+    if (error) {
+      console.error(
+        "receive_accounts_receivable_payment error:",
+        error
+      );
+
+      throw new Error(
+        error.message ||
+        "Gagal menerima pembayaran piutang."
+      );
+    }
+
+    const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
+
+    console.log(
+      "Accounts Receivable payment recorded:",
+      result
+    );
+
+    closeAccountsReceivablePaymentModal();
+
+    showToast(
+      result?.status === "PAID"
+        ? "Piutang berhasil dilunasi."
+        : "Pembayaran piutang berhasil diterima.",
+      "success"
+    );
+
+    await loadAccountsReceivableRecords();
+
+  } catch (error) {
+    console.error(
+      "saveAccountsReceivablePayment error:",
+      error
+    );
+
+    showToast(
+      error.message ||
+      "Gagal menerima pembayaran piutang.",
+      "error"
+    );
+
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.classList.remove(
+        "opacity-50",
+        "cursor-not-allowed"
+      );
+    }
+  }
+}
+
+function closeAccountsReceivablePaymentModal() {
+  const modal = document.getElementById( "accountsReceivablePaymentModal" );
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  selectedAccountsReceivableId = null;
 }
 
 async function deleteAccountsReceivable(recordId) {
