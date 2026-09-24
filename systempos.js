@@ -29845,50 +29845,27 @@ function changeAccountsReceivablePage(direction) {
 
 function openAccountsReceivableRecordMenu(recordId) {
 
-  const record = accountsReceivableRecords.find(
-    row => String(row.id) === String(recordId)
-  );
+  const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
 
   if (!record) {
-    showToast(
-      "Data piutang tidak ditemukan.",
-      "error"
-    );
-    return;
-  }
-
-  const modal = document.getElementById(
-    "accountsReceivableActionModal"
-  );
-
-  const info = document.getElementById(
-    "accountsReceivableActionInfo"
-  );
-
-  const buttons = document.getElementById(
-    "accountsReceivableActionButtons"
-  );
+    showToast( "Data piutang tidak ditemukan.", "error" );
+    return; }
+	
+  const modal = document.getElementById( "accountsReceivableActionModal" );
+  const info = document.getElementById( "accountsReceivableActionInfo" );
+  const buttons = document.getElementById( "accountsReceivableActionButtons" );
 
   if (!modal || !buttons) {
     console.error(
       "Accounts Receivable Action popup tidak ditemukan."
     );
-    return;
-  }
+    return; }
 
   selectedAccountsReceivableId = record.id;
 
-  const status = String(
-    record.status || "DRAFT"
-  ).toUpperCase();
-
-  const totalAmount = Number(
-    record.totalAmount || 0
-  );
-
-  const remainingAmount = Number(
-    record.remainingAmount ?? totalAmount
-  );
+  const status = String( record.status || "DRAFT" ).toUpperCase();
+  const totalAmount = Number( record.totalAmount || 0 );
+  const remainingAmount = Number( record.remainingAmount ?? totalAmount );
 
   if (info) {
     info.textContent =
@@ -29897,11 +29874,9 @@ function openAccountsReceivableRecordMenu(recordId) {
   }
 
   let html = `
-    <button
-      type="button"
+    <button type="button"
       onclick="viewAccountsReceivableDetailFromAction()"
-      class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left"
-    >
+      class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left">
       <span class="material-symbols-outlined text-lg">
         visibility
       </span>
@@ -29924,11 +29899,9 @@ function openAccountsReceivableRecordMenu(recordId) {
   if (status === "DRAFT") {
 
     html += `
-      <button
-        type="button"
+      <button type="button"
         onclick="recordAccountsReceivableFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left"
-      >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left">
         <span class="material-symbols-outlined text-lg">
           fact_check
         </span>
@@ -29944,11 +29917,9 @@ function openAccountsReceivableRecordMenu(recordId) {
         </div>
       </button>
 
-      <button
-        type="button"
+      <button type="button"
         onclick="deleteAccountsReceivableFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-red-600/10 text-left text-red-1000"
-      >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-red-600/10 text-left text-red-700">
         <span class="material-symbols-outlined text-lg">
           delete
         </span>
@@ -29971,11 +29942,9 @@ function openAccountsReceivableRecordMenu(recordId) {
   } else if (status === "OUTSTANDING") {
 
     html += `
-      <button
-        type="button"
+      <button type="button"
         onclick="receiveAccountsReceivablePaymentFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left"
-      >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left">
         <span class="material-symbols-outlined text-lg">
           payments
         </span>
@@ -29998,9 +29967,7 @@ function openAccountsReceivableRecordMenu(recordId) {
   } else if (status === "PAID") {
 
     html += `
-      <div
-        class="px-4 py-3 rounded-md bg-background border border-outline-variant"
-      >
+      <div class="px-4 py-3 rounded-md bg-background border border-outline-variant">
         <div class="font-medium">
           Piutang sudah lunas
         </div>
@@ -30013,7 +29980,6 @@ function openAccountsReceivableRecordMenu(recordId) {
   }
 
   buttons.innerHTML = html;
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
@@ -30024,9 +29990,7 @@ function openAccountsReceivableRecordMenu(recordId) {
 ========================================================= */
 
 function openAccountsReceivableModal() {
-  const modal = document.getElementById(
-    "accountsReceivableModal"
-  );
+  const modal = document.getElementById( "accountsReceivableModal" );
 
   if (!modal) {
     console.error(
@@ -30061,23 +30025,16 @@ function openAccountsReceivableModal() {
   });
 
   // Default tanggal piutang = hari ini
-  const dateEl = document.getElementById(
-    "accountsReceivableDate"
-  );
+  const dateEl = document.getElementById( "accountsReceivableDate" );
 
-  if (dateEl) {
-    dateEl.value = new Date().toISOString().split("T")[0];
-  }
+  if (dateEl) { dateEl.value = new Date().toISOString().split("T")[0]; }
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
 
-
 function closeAccountsReceivableModal() {
-  const modal = document.getElementById(
-    "accountsReceivableModal"
-  );
+  const modal = document.getElementById( "accountsReceivableModal" );
 
   if (!modal) return;
 
@@ -30090,17 +30047,14 @@ function closeAccountsReceivableModal() {
 
 async function saveAccountsReceivable() {
 
-  const button = document.getElementById(
-    "saveAccountsReceivableButton"
-  );
+  const button = document.getElementById( "saveAccountsReceivableButton" );
 
   try {
 
     if (button) {
       button.disabled = true;
       button.dataset.originalText =
-        button.innerHTML;
-
+      	button.innerHTML;
       button.innerHTML = `
         <span class="material-symbols-outlined animate-spin text-base">
           progress_activity
@@ -30109,90 +30063,34 @@ async function saveAccountsReceivable() {
       `;
     }
 
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      throw new Error(
-        "Session tidak ditemukan."
-      );
-    }
+    if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
 
     /* -----------------------------------------------------
        GET FORM VALUE
     ----------------------------------------------------- */
 
-    const typeEl = document.getElementById(
-      "accountsReceivableType"
-    );
-
-    const partyEl = document.getElementById(
-      "accountsReceivableParty"
-    );
-
-    const referenceNoEl = document.getElementById(
-      "accountsReceivableReferenceNo"
-    );
-
-    const referenceIdEl = document.getElementById(
-      "accountsReceivableReferenceId"
-    );
-
-    const dateEl = document.getElementById(
-      "accountsReceivableDate"
-    );
-
-    const dueDateEl = document.getElementById(
-      "accountsReceivableDueDate"
-    );
-
-    const amountEl = document.getElementById(
-      "accountsReceivableAmount"
-    );
-
-		const sourceMethodEl = document.getElementById(
-		  "accountsReceivableSourceMethod"
-		);
-
-    const noteEl = document.getElementById(
-      "accountsReceivableNote"
-    );
-
-    const arType =
-      typeEl?.value?.trim();
-
-    const partyName =
-      partyEl?.value?.trim();
-
-    const referenceNo =
-      referenceNoEl?.value?.trim() || null;
-
-    const referenceId =
-      referenceIdEl?.value?.trim() || null;
-
-    const arDate =
-      dateEl?.value || null;
-
-    const dueDate =
-      dueDateEl?.value || null;
-
-    const totalAmount =
-      Number(
-        String(amountEl?.value || "")
-          .replace(/[^\d]/g, "")
-      );
-
-    const sourceMethod =
-		  sourceMethodEl?.value?.trim();
-		
-		const note =
-		  noteEl?.value?.trim() || null;
-		
-		
-		/* -----------------------------------------------------
-		   VALIDATION
-		----------------------------------------------------- */
-		
+    const typeEl = document.getElementById( "accountsReceivableType" );
+    const partyEl = document.getElementById( "accountsReceivableParty" );
+    const referenceNoEl = document.getElementById( "accountsReceivableReferenceNo" );
+    const referenceIdEl = document.getElementById( "accountsReceivableReferenceId" );
+    const dateEl = document.getElementById( "accountsReceivableDate" );
+    const dueDateEl = document.getElementById( "accountsReceivableDueDate" );
+    const amountEl = document.getElementById( "accountsReceivableAmount" );
+		const sourceMethodEl = document.getElementById( "accountsReceivableSourceMethod" );
+    const noteEl = document.getElementById( "accountsReceivableNote" );
+    const arType = typeEl?.value?.trim();
+    const partyName = partyEl?.value?.trim();
+    const referenceNo = referenceNoEl?.value?.trim() || null;
+    const referenceId = referenceIdEl?.value?.trim() || null;
+    const arDate = dateEl?.value || null;
+    const dueDate = dueDateEl?.value || null;
+    const totalAmount = Number( String(amountEl?.value || "") .replace(/[^\d]/g, "") );
+    const sourceMethod = sourceMethodEl?.value?.trim();
+		const note = noteEl?.value?.trim() || null;
+	
+		/* --- VALIDATION --- */
 		if (!arType) {
 		  showToast(
 		    "Pilih tipe piutang.",
@@ -30255,9 +30153,7 @@ async function saveAccountsReceivable() {
 		  return;
 		}
 
-    /* -----------------------------------------------------
-       RPC
-    ----------------------------------------------------- */
+    /* ----- RPC ----- */
 
     const { data, error } =
       await supabaseClient.rpc(
@@ -30291,9 +30187,7 @@ async function saveAccountsReceivable() {
     }
 
 
-    /* -----------------------------------------------------
-       SUCCESS
-    ----------------------------------------------------- */
+    /* ---- SUCCESS ---- */
 
     console.log(
       "Accounts Receivable saved:",
@@ -30301,18 +30195,10 @@ async function saveAccountsReceivable() {
     );
 
     closeAccountsReceivableModal();
-
     showToast(
       "Piutang berhasil disimpan sebagai Draft.",
       "success"
     );
-
-
-    /* -----------------------------------------------------
-       REFRESH DATA
-       Kalau function loader kamu sudah ada,
-       panggil di sini.
-    ----------------------------------------------------- */
 
     if (
       typeof loadAccountsReceivableRecords ===
@@ -30329,12 +30215,10 @@ async function saveAccountsReceivable() {
     }
 
   } catch (err) {
-
     console.error(
       "Save Accounts Receivable failed:",
       err
     );
-
     showToast(
       err.message ||
       "Gagal menyimpan piutang.",
@@ -30342,10 +30226,7 @@ async function saveAccountsReceivable() {
     );
 
   } finally {
-
-    if (button) {
-      button.disabled = false;
-
+    if (button) { button.disabled = false;
       if (button.dataset.originalText) {
         button.innerHTML =
           button.dataset.originalText;
@@ -30365,7 +30246,6 @@ function closeAccountsReceivableActionMenu() {
 
   modal.classList.add("hidden");
   modal.classList.remove("flex");
-
   selectedAccountsReceivableId = null;
 }
 
@@ -30413,6 +30293,86 @@ function receiveAccountsReceivablePaymentFromAction() {
 		{ openAccountsReceivablePaymentModal(recordId); }
 }
 
+async function deleteAccountsReceivable(recordId) {
+
+	if (!recordId) {
+			showToast(
+				"Data piutang belum dipilih.",
+				"error"
+			);
+		return;
+	}
+
+	const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
+	
+	if (!record) {
+			showToast(
+				"Data piutang tidak ditemukan.",
+				"error"
+			);
+		return;
+	}
+
+	const status = String(record.status || "").toUpperCase();
+
+// Hanya DRAFT yang boleh dihapus
+	if (status !== "DRAFT") {
+			showToast(
+				"Piutang hanya dapat dihapus sebelum Record.",
+				"error"
+			);
+		return;
+	}
+
+	const confirmed = confirm( `Hapus piutang "${record.partyName || "Piutang"}" sebesar ${formatAccountingTaxCurrency( record.totalAmount || 0 )}?` );
+
+	if (!confirmed) { return; }
+
+	try {
+	
+	const sessionId = localStorage.getItem("pos_session_id");
+	
+	if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
+	
+	const { data, error } =
+		await supabaseClient.rpc(
+			"delete_accounts_receivable",
+			{
+				p_session_id: sessionId,
+				p_id: recordId
+			}
+		);
+	
+	if (error) {
+		console.error(
+			"delete_accounts_receivable error:",
+			error
+		);
+	
+		throw new Error( error.message || "Gagal menghapus piutang." ); }
+		
+		console.log(
+			"Accounts Receivable deleted:",
+			data
+		);
+		
+		showToast( "Piutang berhasil dihapus.", "success" );
+	
+		await loadAccountsReceivableRecords();
+
+	} catch (error) {
+		console.error(
+		  "deleteAccountsReceivable error:",
+		  error
+		);
+		
+		showToast(
+		  error.message ||
+		  "Gagal menghapus piutang.",
+		  "error"
+		);
+	}
+}
 
 
 
