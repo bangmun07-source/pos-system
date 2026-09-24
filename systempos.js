@@ -30261,6 +30261,98 @@ function viewAccountsReceivableDetailFromAction() {
 }
 
 
+function openAccountsReceivableDetail(recordId) {
+
+	const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
+	
+	if (!record) {
+		showToast(
+			"Data piutang tidak ditemukan.",
+			"error"
+		);
+		return;
+	}
+
+	/* --- ELEMENT --- */
+	const modal = document.getElementById( "accountsReceivableDetailModal" );
+	
+	if (!modal) {
+		console.error(
+			"Accounts Receivable detail modal tidak ditemukan."
+		);
+		return;
+	}
+	
+	const subtitle = document.getElementById( "accountsReceivableDetailSubtitle" );
+	const statusEl = document.getElementById( "accountsReceivableDetailStatus" );
+	const idEl = document.getElementById( "accountsReceivableDetailId" );
+	const typeEl = document.getElementById( "accountsReceivableDetailType" );
+	const partyEl = document.getElementById( "accountsReceivableDetailParty" );
+	const dateEl = document.getElementById( "accountsReceivableDetailDate" );
+	const dueDateEl = document.getElementById( "accountsReceivableDetailDueDate" );
+	const referenceNoEl = document.getElementById( "accountsReceivableDetailReferenceNo" );
+	const branchEl = document.getElementById( "accountsReceivableDetailBranch" );
+	const sourceMethodEl = document.getElementById( "accountsReceivableDetailSourceMethod" );
+	const totalEl = document.getElementById( "accountsReceivableDetailTotal" );
+	const paidEl = document.getElementById( "accountsReceivableDetailPaid" );
+	const remainingEl = document.getElementById( "accountsReceivableDetailRemaining" );
+	const noteEl = document.getElementById( "accountsReceivableDetailNote" );
+	const journalIdEl = document.getElementById( "accountsReceivableDetailJournalId" );
+	/* --- DATA --- */
+	const status = String(record.status || "DRAFT") .toUpperCase();
+	const totalAmount = Number(record.totalAmount || 0);
+	const paidAmount = Number(record.paidAmount || 0);
+	const remainingAmount = Number( ecord.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
+	
+	/* ---- STATUS ---- */
+	if (statusEl) { statusEl.innerHTML = getAccountsReceivableStatusBadge(status); }
+	/* --- BASIC INFORMATION --- */
+	if (subtitle) { subtitle.textContent = record.partyName || "Receivable"; }
+	if (idEl) { idEl.textContent = record.id || "-"; }
+	if (typeEl) { typeEl.textContent = record.arTypeLabel || record.arType || "-"; }
+	if (partyEl) { partyEl.textContent = record.partyName || "-"; }
+	if (dateEl) { dateEl.textContent = formatAccountsReceivableDate( record.arDate ); }
+	if (dueDateEl) { dueDateEl.textContent = record.dueDate ? formatAccountsReceivableDate( record.dueDate ) : "-"; }
+	if (referenceNoEl) { referenceNoEl.textContent = record.referenceNo || "-"; }
+	if (branchEl) { branchEl.textContent = state.branchId || "-"; }
+	if (sourceMethodEl) { 
+		const sourceMethod = String( record.sourceMethod || "" ).toUpperCase();
+	
+		const labels = {
+		  CASH: "Cash",
+		  BANK: "Bank / Transfer",
+		  QRIS: "QRIS"
+		};
+	
+		sourceMethodEl.textContent = labels[sourceMethod] || "-";
+	}
+
+/* ---- AMOUNTS ---- */
+
+	if (totalEl) { totalEl.textContent = formatAccountingTaxCurrency( totalAmount ); }
+	if (paidEl) { paidEl.textContent = formatAccountingTaxCurrency( paidAmount ); }
+	if (remainingEl) { remainingEl.textContent = formatAccountingTaxCurrency( remainingAmount ); }
+	/* --- NOTE --- */
+	if (noteEl) { noteEl.textContent = record.note || "-"; }
+	/* --- JOURNAL --- */
+	if (journalIdEl) { journalIdEl.textContent = record.journalId || "-"; }
+	
+	/* --- OPEN MODAL --- */
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
+}
+
+function closeAccountsReceivableDetailModal() {
+	const modal = document.getElementById( "accountsReceivableDetailModal" );
+	
+	if (!modal) return;
+	
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+}
+
+
+
 function recordAccountsReceivableFromAction() {
   const recordId = selectedAccountsReceivableId;
 
