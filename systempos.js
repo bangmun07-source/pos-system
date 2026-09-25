@@ -21581,10 +21581,19 @@ const assetsContainer = document.getElementById("accounting-assets-list");
 const liabilitiesEquityContainer = document.getElementById("accounting-liabilities-equity-list");
 const assets = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "ASSET" );
 const liabilities = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "LIABILITY" );
-const equity = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "EQUITY" );
+const equity = balanceSheetAccounts.filter(  account => String(account.accountType || "").toUpperCase() === "EQUITY" );
 const totalAssets = assets.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
 const totalLiabilities = liabilities.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
-const totalEquity = equity.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
+const totalEquity = equity.reduce((sum, account) => {
+  const accountId = String(account.accountId || "");
+
+  // Owner Withdrawal = contra equity
+  if (accountId === "ACC-9302C84A9071") {
+    return sum - Math.abs(toNumber(account.balance));
+  }
+
+  return sum + toNumber(account.balance);
+}, currentProfit);
 const totalLiabilitiesEquity = totalLiabilities + totalEquity;
 const difference = totalAssets - totalLiabilitiesEquity;
 
@@ -21679,32 +21688,49 @@ if (liabilitiesEquityContainer) {
       Equity
     </div>
 
-    <div class="space-y-5 mt-4">
+		<div class="space-y-5 mt-4">
+		  <div class="flex justify-between items-center gap-4">
+		    <div class="min-w-0">
+		      <p class="text-on-surface-variant">
+		        Current Year Earnings
+		      </p>
+		
+		      <p class="text-[10px] text-muted font-mono">
+		        3300
+		      </p>
+		    </div>
+		
+		    <span class="font-bold whitespace-nowrap">
+		      ${formatIDR(currentProfit)}
+		    </span>
+		  </div>
       ${equity.length
-        ? equity.map(account => `
-            <div class="flex justify-between items-center gap-4">
-              <div class="min-w-0">
-                <p class="text-on-surface-variant">
-                  ${escapeHTML(account.accountName || "-")}
-                </p>
-
-                <p class="text-[10px] text-muted font-mono">
-                  ${escapeHTML(account.accountCode || "")}
-                </p>
-              </div>
-
-              <span class="font-bold whitespace-nowrap">
-                ${formatIDR(account.balance)}
-              </span>
-
-            </div>
-          `).join("")
-        : `
-          <div class="text-sm text-muted">
-            No equity accounts
-          </div>
-        `
-      }
+			  ? equity.map(account => {
+			      const accountId = String(account.accountId || "");
+			      const rawBalance = toNumber(account.balance);
+			      const displayBalance = accountId === "ACC-9302C84A9071"
+							? -Math.abs(rawBalance)
+							: rawBalance;
+			      return `
+			        <div class="flex justify-between items-center gap-4">
+			          <div class="min-w-0">
+			            <p class="text-on-surface-variant">
+			              ${escapeHTML(account.accountName || "-")}
+			            </p>
+			            <p class="text-[10px] text-muted font-mono">
+			              ${escapeHTML(account.accountCode || "")}
+			              · ${escapeHTML(account.accountId || "")}
+			            </p>
+			          </div>
+			
+			          <span class="font-bold whitespace-nowrap">
+			            ${formatIDR(displayBalance)}
+			          </span>
+			        </div>
+			      `;
+			    }).join("")
+			  : `<div class="text-sm text-muted">No equity accounts</div>`
+			}
     </div>
 
     <div class="pt-5 mt-5 border-t border-outline-variant flex justify-between">
