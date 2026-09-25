@@ -21556,6 +21556,7 @@ function renderAccountingOverview(data) {
   const kpi = data.kpi || {};
   const profitLoss = data.profitLoss || {};
   const financial = data.financialPosition || {};
+	const currentProfit = toNumber(financial.currentProfit);
 	const balanceSheetAccounts = Array.isArray(data.balanceSheetAccounts)
 	  ? data.balanceSheetAccounts
 	  : [];
