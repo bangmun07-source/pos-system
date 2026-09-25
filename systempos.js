@@ -21556,6 +21556,9 @@ function renderAccountingOverview(data) {
   const kpi = data.kpi || {};
   const profitLoss = data.profitLoss || {};
   const financial = data.financialPosition || {};
+	const balanceSheetAccounts = Array.isArray(data.balanceSheetAccounts)
+	  ? data.balanceSheetAccounts
+	  : [];
   const apList = Array.isArray(data.accountsPayableList)
     ? data.accountsPayableList
     : [];
@@ -21573,26 +21576,171 @@ function renderAccountingOverview(data) {
   setText("accounting-net-profit", kpi.netProfit);
   setText("accounting-equity", kpi.equity);
 	
-  /* ===== FINANCIAL POSITION - ASSETS ===== */
-  setText( "accounting-assets-cash",
-    financial.cash );
-  setText( "accounting-assets-bank",
-    financial.bank  );
-  setText( "accounting-assets-inventory",
-    financial.inventory );
-	setText( "accounting-assets-fixed",
-	  financial.fixedAssets );
-  setText( "accounting-total-assets",
-    financial.totalAssets );
+  /* ===== FINANCIAL POSITION - ACCOUNT DETAIL ===== */
+const assetsContainer = document.getElementById("accounting-assets-list");
+const liabilitiesEquityContainer = document.getElementById("accounting-liabilities-equity-list");
+const assets = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "ASSET" );
+const liabilities = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "LIABILITY" );
+const equity = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "EQUITY" );
+const totalAssets = assets.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
+const totalLiabilities = liabilities.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
+const totalEquity = equity.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
+const totalLiabilitiesEquity = totalLiabilities + totalEquity;
+const difference = totalAssets - totalLiabilitiesEquity;
 
-    /* ====== FINANCIAL POSITION - LIABILITIES & EQUITY ====== */
-	setText( "accounting-liability-ap", financial.accountsPayable );
-	setText( "accounting-liability-tax", financial.taxPayable );
-	setText( "accounting-liability-bank-loan", financial.bankLoanPayable );
-	setText( "accounting-liability-long-term-debt", financial.longTermDebt );
-	setText( "accounting-liability-other-payable", financial.otherPayable );
-	setText( "accounting-liability-equity", financial.equity );
-	setText( "accounting-total-liabilities-equity", financial.totalLiabilitiesEquity );
+/* ===== ASSETS ===== */
+if (assetsContainer) {
+  assetsContainer.innerHTML = `
+    ${assets.length
+      ? assets.map(account => `
+          <div class="flex justify-between items-center gap-4">
+            <div class="min-w-0">
+              <p class="text-on-surface-variant">
+                ${escapeHTML(account.accountName || "-")}
+              </p>
+
+							<p class="text-[10px] text-muted font-mono">
+							  ${escapeHTML(account.accountCode || "")}
+							  · ${escapeHTML(account.accountId || "")}
+							</p>
+            </div>
+
+            <span class="font-bold whitespace-nowrap">
+              ${formatIDR(account.balance)}
+            </span>
+          </div>
+        `).join("")
+      : `
+        <div class="text-sm text-muted">
+          No asset accounts
+        </div>
+      `
+    }
+		
+    <div class="pt-5 border-t border-outline-variant flex justify-between">
+      <span class="font-bold">
+        Total Assets
+      </span>
+
+      <span class="text-lg font-black">
+        ${formatIDR(totalAssets)}
+      </span>
+    </div>
+  `;
+}
+
+/* ===== LIABILITIES + EQUITY ===== */
+if (liabilitiesEquityContainer) {
+  liabilitiesEquityContainer.innerHTML = `
+    <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-red-600">
+      Liabilities
+    </div>
+		
+    <div class="space-y-5 mt-4">
+      ${liabilities.length
+        ? liabilities.map(account => `
+            <div class="flex justify-between items-center gap-4">
+              <div class="min-w-0">
+                <p class="text-on-surface-variant">
+                  ${escapeHTML(account.accountName || "-")}
+                </p>
+
+								<p class="text-[10px] text-muted font-mono">
+								  ${escapeHTML(account.accountCode || "")}
+								  · ${escapeHTML(account.accountId || "")}
+								</p>
+              </div>
+
+              <span class="font-bold whitespace-nowrap">
+                ${formatIDR(account.balance)}
+              </span>
+
+            </div>
+          `).join("")
+        : `
+          <div class="text-sm text-muted">
+            No liability accounts
+          </div>
+        `
+      }
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-outline-variant flex justify-between">
+      <span class="font-bold">
+        Total Liabilities
+      </span>
+			
+      <span class="font-bold">
+        ${formatIDR(totalLiabilities)}
+      </span>
+    </div>
+
+    <div class="text-[11px] font-bold uppercase tracking-[0.2em] text-primary mt-7">
+      Equity
+    </div>
+
+    <div class="space-y-5 mt-4">
+      ${equity.length
+        ? equity.map(account => `
+            <div class="flex justify-between items-center gap-4">
+              <div class="min-w-0">
+                <p class="text-on-surface-variant">
+                  ${escapeHTML(account.accountName || "-")}
+                </p>
+
+                <p class="text-[10px] text-muted font-mono">
+                  ${escapeHTML(account.accountCode || "")}
+                </p>
+              </div>
+
+              <span class="font-bold whitespace-nowrap">
+                ${formatIDR(account.balance)}
+              </span>
+
+            </div>
+          `).join("")
+        : `
+          <div class="text-sm text-muted">
+            No equity accounts
+          </div>
+        `
+      }
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-outline-variant flex justify-between">
+      <span class="font-bold">
+        Total Equity
+      </span>
+
+      <span class="font-bold">
+        ${formatIDR(totalEquity)}
+      </span>
+    </div>
+
+    <div class="pt-5 mt-5 border-t border-outline-variant flex justify-between">
+      <span class="font-bold">
+        Total Liabilities &amp; Equity
+      </span>
+
+      <span class="text-lg font-black">
+        ${formatIDR(totalLiabilitiesEquity)}
+      </span>
+    </div>
+
+    <div class=" pt-4 mt-4 border-t border-outline-variant flex justify-between
+      ${Math.abs(difference) < 0.01
+        ? "text-emerald-600"
+        : "text-red-600"} ">
+      <span class="font-bold">
+        Difference
+      </span>
+
+      <span class="font-black">
+        ${formatIDR(difference)}
+      </span>
+    </div>
+  `;
+}
 
   /* ====== ACCOUNTS PAYABLE LIST ====== */
   const apContainer = document.getElementById("accounting-ap-list");
@@ -21763,6 +21911,8 @@ function renderAccountingOverview(data) {
   /* ====== OPTIONAL: SAVE CURRENT ACCOUNTING DATA ====== */
   window.currentAccountingOverview = data;
 }
+
+
 
   /* ============================= 
   			ACCOUNTING 
