@@ -9985,27 +9985,22 @@
 						</div>
 					</div>
 					<!-- Expense Status -->
-					<div class="space-y-3">
+					<div class="space-y-2">
 					  <label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
 					    Expense Status
 					  </label>
 					
-					  <div class="flex p-1 bg-background border border-outline-variant rounded-md max-w-md">
-					    <button
-					      type="button"
-					      id="expenseStatusPaid"
-					      onclick="selectExpenseStatus('PAID')"
-					      class="flex-1 py-2 text-sm font-semibold rounded-md bg-surface-container-high text-on-surface shadow-sm">
-					      Paid
-					    </button>
+					  <div class="relative group">
+					    <select
+					      id="expenseStatus"
+					      class="w-full appearance-none bg-background border border-outline-variant rounded-md px-4 py-3 pr-12 text-on-surface focus:ring-0 focus:bg-background cursor-pointer transition-all">
+					      <option value="PAID">Paid</option>
+					      <option value="PENDING">Pending</option>
+					    </select>
 					
-					    <button
-					      type="button"
-					      id="expenseStatusPending"
-					      onclick="selectExpenseStatus('PENDING')"
-					      class="flex-1 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">
-					      Pending
-					    </button>
+					    <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+					      expand_more
+					    </span>
 					  </div>
 					</div>
 					<!-- Amount Input (Highlight Section) -->
