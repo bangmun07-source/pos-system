@@ -14331,10 +14331,7 @@ async function saveOtherIncomeStatus() {
     return;
   }
 
-  const status =
-    document.getElementById(
-      "editOtherIncomeStatus"
-    )?.value;
+  const status = document.getElementById( "editOtherIncomeStatus" )?.value;
 
   if (!status) {
     showToast(
@@ -14443,36 +14440,12 @@ function loadOtherIncomeBranches(
 }
 
 function initOtherIncomeEvents() {
-  document.getElementById("otherIncomeSearchInput")
-    ?.addEventListener(
-      "input",
-      filterOtherIncomeTable
-    );
-  document.getElementById("otherIncomeCategoryFilter")
-    ?.addEventListener(
-      "change",
-      filterOtherIncomeTable
-    );
-  document.getElementById("otherIncomeStatusFilter")
-    ?.addEventListener(
-      "change",
-      filterOtherIncomeTable
-    );
-  document.getElementById("otherIncomeBranchFilter")
-    ?.addEventListener(
-      "change",
-      filterOtherIncomeTable
-    );
-  document.getElementById("expenseStartDate")
-    ?.addEventListener(
-      "change",
-      filterOtherIncomeTable
-    );
-  document.getElementById("expenseEndDate")
-    ?.addEventListener(
-      "change",
-      filterOtherIncomeTable
-    );
+  document.getElementById("otherIncomeSearchInput") ?.addEventListener( "input", filterOtherIncomeTable );
+  document.getElementById("otherIncomeCategoryFilter") ?.addEventListener( "change", filterOtherIncomeTable );
+  document.getElementById("otherIncomeStatusFilter") ?.addEventListener( "change", filterOtherIncomeTable );
+  document.getElementById("otherIncomeBranchFilter") ?.addEventListener( "change", filterOtherIncomeTable );
+  document.getElementById("expenseStartDate") ?.addEventListener( "change", filterOtherIncomeTable );
+  document.getElementById("expenseEndDate") ?.addEventListener( "change", filterOtherIncomeTable );
 }
 
 function closeAddNewOtherIncome() {
@@ -14936,35 +14909,14 @@ async function saveExpense() {
 
   const data = {
     branchId: branchSelect.value,
-    tanggal:
-      document.getElementById(
-        "expenseDate"
-      )?.value || "",
-    category:
-      document.getElementById(
-        "expenseCategory"
-      )?.value || "",
-    description:
-      document.getElementById(
-        "expenseTitle"
-      )?.value || "",
-    amount:
-      Number(
-        (
-          document.getElementById(
-            "expenseAmount"
-          )?.value || "0"
-        ).replace(/[^\d]/g, "")
-      ),
+    tanggal: document.getElementById( "expenseDate" )?.value || "",
+    category: document.getElementById( "expenseCategory" )?.value || "",
+    description: document.getElementById( "expenseTitle" )?.value || "",
+    amount: Number( ( document.getElementById( "expenseAmount" )?.value || "0" ).replace(/[^\d]/g, "") ),
     method: selectedExpenseMethod,
     createdBy: state.userName || "Admin",
     type: "Expense",
-    outlet:
-      branchSelect.options[
-        branchSelect.selectedIndex
-      ]?.text || "",
-    status: "Paid"
-  };
+    outlet: branchSelect.options[ branchSelect.selectedIndex ]?.text || "", status: "Paid" };
 
   try {
     // SUPABASE RPC
@@ -15135,7 +15087,7 @@ async function submitOtherIncome() {
     category: category,
     method: document.getElementById( "otherIncomeMethod" ).value,
     amount: Number( document.getElementById( "otherIncomeAmount" ).value || 0 ),
-    status: "Paid",
+    status: document.getElementById("otherIncomeStatus").value,
     branchId: document.getElementById( "otherIncomeBranch" ).value,
     notes: document.getElementById( "otherIncomeNotes" ).value,
     assetId: assetId
