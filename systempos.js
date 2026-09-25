@@ -21583,7 +21583,16 @@ const liabilitiesEquityContainer = document.getElementById("accounting-liabiliti
 const assets = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "ASSET" );
 const liabilities = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "LIABILITY" );
 const equity = balanceSheetAccounts.filter(  account => String(account.accountType || "").toUpperCase() === "EQUITY" );
-const totalAssets = assets.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
+const totalAssets = assets.reduce((sum, account) => {
+  const balance = toNumber(account.balance);
+  const normalBalance = String(account.normalBalance || "").toUpperCase();
+
+  return sum + (
+    normalBalance === "CREDIT"
+      ? -Math.abs(balance)
+      : balance
+  );
+}, 0);
 const totalLiabilities = liabilities.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
 const totalEquity = equity.reduce((sum, account) => {
   const accountId = String(account.accountId || "");
@@ -21615,9 +21624,13 @@ if (assetsContainer) {
 							</p>
             </div>
 
-            <span class="font-bold whitespace-nowrap">
-              ${formatIDR(account.balance)}
-            </span>
+						<span class="font-bold whitespace-nowrap">
+						  ${formatIDR(
+						    String(account.normalBalance || "").toUpperCase() === "CREDIT"
+						      ? -Math.abs(toNumber(account.balance))
+						      : toNumber(account.balance)
+						  )}
+						</span>
           </div>
         `).join("")
       : `
