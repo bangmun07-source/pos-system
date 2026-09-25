@@ -9984,6 +9984,30 @@
 							  onclick="selectExpenseMethod('QRIS')" class="flex-1 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">Qris</button>
 						</div>
 					</div>
+					<!-- Expense Status -->
+					<div class="space-y-3">
+					  <label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
+					    Expense Status
+					  </label>
+					
+					  <div class="flex p-1 bg-background border border-outline-variant rounded-md max-w-md">
+					    <button
+					      type="button"
+					      id="expenseStatusPaid"
+					      onclick="selectExpenseStatus('PAID')"
+					      class="flex-1 py-2 text-sm font-semibold rounded-md bg-surface-container-high text-on-surface shadow-sm">
+					      Paid
+					    </button>
+					
+					    <button
+					      type="button"
+					      id="expenseStatusPending"
+					      onclick="selectExpenseStatus('PENDING')"
+					      class="flex-1 py-2 text-sm font-medium text-on-surface-variant hover:text-on-surface transition-colors">
+					      Pending
+					    </button>
+					  </div>
+					</div>
 					<!-- Amount Input (Highlight Section) -->
 					<div class="p-6 bg-background rounded-md border border-outline-variant">
 						<div class="flex items-center justify-between">
