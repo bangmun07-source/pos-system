@@ -13802,26 +13802,10 @@ function formatFileSize(bytes) {
 }
 
 function removeExpenseAttachment() {
-
-  const input =
-    document.getElementById(
-      "expenseAttachmentInput"
-    );
-
-  if (input) {
-    input.value = "";
-  }
-
-  const selectedFile =
-    document.getElementById(
-      "expenseSelectedFile"
-    );
-
-  if (selectedFile) {
-    selectedFile.classList.add(
-      "hidden"
-    );
-  }
+  const input = document.getElementById( "expenseAttachmentInput" );
+  if (input) { input.value = ""; }
+  const selectedFile = document.getElementById( "expenseSelectedFile" );
+  if (selectedFile) { selectedFile.classList.add( "hidden" ); }
 }
 
 function fileToBase64(file) {
@@ -13851,12 +13835,8 @@ async function uploadExpenseAttachment() {
     return;
   }
 
-  const input =
-    document.getElementById(
-      "expenseAttachmentInput"
-    );
-  const file =
-    input?.files?.[0];
+  const input = document.getElementById( "expenseAttachmentInput" );
+  const file = input?.files?.[0];
 
   if (!file) {
     showToast(
@@ -13873,21 +13853,13 @@ async function uploadExpenseAttachment() {
       file.type === "image/png" ||
       file.type === "image/webp"
     ) {
-  
-      const compressed =
-        await compressImage(file);
-      base64 =
-        await fileToBase64(
-          compressed
-        );
+      const compressed = await compressImage(file);
+      base64 = await fileToBase64( compressed );
     }
 
     // PDF
     else if ( file.type === "application/pdf" ) {
-      base64 =
-        await fileToBase64(
-          file
-        );
+      base64 = await fileToBase64( file );
     }
 
     // FORMAT LAIN
@@ -13925,36 +13897,21 @@ async function uploadExpenseAttachment() {
         }
       );
 
-    const result =
-      await response.json();
+    const result = await response.json();
 
     if (
       !response.ok ||
       !result.success
-    ) {
-
-      throw new Error(
-        result.error ||
-        "Upload attachment gagal"
-      );
-    }
+    ) { throw new Error( result.error || "Upload attachment gagal" ); }
 
     // URL HASIL UPLOAD
-    const url =
-      result.url;
-
-    if (!url) {
-      throw new Error(
-        "URL attachment tidak ditemukan"
-      );
-    }
+    const url = result.url;
+    if (!url) { throw new Error( "URL attachment tidak ditemukan" ); }
 	
     // SIMPAN URL KE OPERATIONS
     await updateExpenseAttachmentRPC({
-      Ref_ID:
-        expense.refId,
-      Attachment_URL:
-        url
+      Ref_ID: expense.refId,
+      Attachment_URL: url
     });
 
     // SUCCESS
@@ -14123,7 +14080,7 @@ function renderOtherIncomeTable() {
           ${formatRupiah(item.amount)}
         </td>
 
-        <td class="px-4 py-5">
+        <td class="px-4 py-5 text-on-surface">
           ${renderOtherIncomeStatus(item.status)}
         </td>
 
@@ -14155,10 +14112,10 @@ function renderOtherIncomeTable() {
 function renderOtherIncomeStatus(status) {
   const map = {
     Paid: {
-      color: "white"
+      color: "emerald-700"
     },
     Pending: {
-      color: "primary"
+      color: "blue-700"
     },
     Void: {
       color: "error"
@@ -14166,7 +14123,6 @@ function renderOtherIncomeStatus(status) {
     Cancelled: {
       color: "error"
     }
-
   };
   const config =
     map[status] || map.Pending;
