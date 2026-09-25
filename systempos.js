@@ -21346,12 +21346,19 @@ async function loadAccountingOverview() {
     }
     renderAccountingOverview(data);
   } catch (error) {
-    showToast(
-      error?.message ||
-      "Gagal memuat Accounting Overview.",
-      "error"
-    );
-  }
+	  console.error("GET ACCOUNTING OVERVIEW ERROR:", {
+	    message: error?.message,
+	    details: error?.details,
+	    hint: error?.hint,
+	    code: error?.code,
+	    error
+	  });
+	
+	  showToast(
+	    error?.message || "Gagal memuat Accounting Overview.",
+	    "error"
+	  );
+	}
 }
 
 async function loadAccountingBranchOptions() {
