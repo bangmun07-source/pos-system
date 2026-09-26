@@ -21368,7 +21368,7 @@ function openAssetPurchaseActionMenu(purchaseId) {
       <!-- RECORD -->
       <button type="button"
         onclick="recordAssetPurchaseFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-md  text-on-surface-variant hover:text-on-surface transition text-left" >
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant transition text-left" >
         <div class="main-icon-box">
 					<span class="material-symbols-outlined text-3xl">receipt_long</span>
 				</div>
@@ -21413,7 +21413,7 @@ function openAssetPurchaseActionMenu(purchaseId) {
         <!-- PAY -->
         <button type="button"
           onclick="payAssetPurchaseFromAction()"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-md text-on-surface-variant hover:text-on-surface transition text-left" >
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant transition text-left" >
           <div class="main-icon-box">
 						<span class="material-symbols-outlined text-3xl">
 	            payments
@@ -21504,37 +21504,65 @@ async function recordAssetPurchaseFromAction() {
 
 
 async function deleteAssetPurchaseFromAction() {
-
   if (!activeAssetPurchaseAction) return;
 
   const purchaseId = activeAssetPurchaseAction.Purchase_ID;
+  const status = String( activeAssetPurchaseAction.Status || "" ).toUpperCase();
 
+  if (status !== "DRAFT") {
+    closeAssetPurchaseActionMenu();
+    alert("Asset purchase yang sudah RECORDED tidak dapat dihapus.");
+    return; }
+
+  const assetName = activeAssetPurchaseAction.Asset_Name || "asset";
+  const confirmed = confirm( `Hapus asset purchase "${assetName}"?\n\nData DRAFT akan dihapus permanen.` );
+
+  if (!confirmed) return;
   closeAssetPurchaseActionMenu();
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) {
+    alert("Session tidak ditemukan. Silakan login kembali.");
+    return;
+  }
 
-  console.log("Delete:", purchaseId);
+  try {
 
-  // RPC DELETE nanti di sini
+    const { data, error } = await supabaseClient.rpc(
+      "delete_asset_purchase",
+      {
+        p_session_id: sessionId,
+        p_purchase_id: purchaseId
+      }
+    );
+
+    console.log("DELETE ASSET PURCHASE:", data);
+    console.log("DELETE ASSET PURCHASE ERROR:", error);
+    if (error) { throw error; }
+    // Refresh tabel
+    await loadAssetPurchases();
+    console.log("Asset purchase berhasil dihapus:", purchaseId);
+
+  } catch (error) {
+    console.error("❌ DELETE ASSET PURCHASE ERROR:", error);
+    alert(
+      error?.message ||
+      "Gagal menghapus asset purchase."
+    );
+  }
 }
-
 
 function payAssetPurchaseFromAction() {
-
   if (!activeAssetPurchaseAction) return;
 
   const purchaseId = activeAssetPurchaseAction.Purchase_ID;
 
   closeAssetPurchaseActionMenu();
-
   console.log("Pay:", purchaseId);
-
-  // Buka payment modal nanti
 }
 
-// SAVE DRAFT
 async function saveAssetPurchaseDraft() {
 
-  const sessionId =
-    localStorage.getItem("pos_session_id");
+  const sessionId = localStorage.getItem("pos_session_id");
 
   if (!sessionId) {
     alert("Session tidak ditemukan.");
@@ -21638,12 +21666,7 @@ async function saveAssetPurchaseDraft() {
   }
 }
 
-
-	
-/* =========================================================
-   DEPRECIATION HISTORY
-   ========================================================= */
-
+/* === DEPRECIATION HISTORY === */
 function renderDepreciationHistory() {
   const tbody = document.getElementById( "depreciation-table-body" );
   if (!tbody) return;
@@ -21731,11 +21754,7 @@ function renderDepreciationHistory() {
   );
 }
 
-
-/* =========================================================
-   DEPRECIATION PAGINATION
-   ========================================================= */
-
+/* === DEPRECIATION PAGINATION === */
 function updateDepreciationPagination( totalItems, totalPages ) {
   const info = document.getElementById( "depreciation-pagination-info" );
   const prevBtn = document.getElementById( "depreciationPrevBtn" );
@@ -21755,10 +21774,7 @@ function updateDepreciationPagination( totalItems, totalPages ) {
   if (nextBtn) { nextBtn.disabled = depreciationCurrentPage >= totalPages; }
 }
 
-/* =========================================================
-   EVENT LISTENERS
-   ========================================================= */
-
+/* ==== EVENT LISTENERS ==== */
 function initAssetPageEvents() {
   const searchInput = document.getElementById( "assetSearchInput" );
   const statusFilter = document.getElementById( "assetStatusFilter" );
@@ -21773,11 +21789,7 @@ function initAssetPageEvents() {
   document .getElementById("depreciationNextBtn") ?.addEventListener( "click", () => { depreciationCurrentPage++; renderDepreciationHistory(); } );
 }
 
-
-/* =========================================================
-   DATE TIME
-   ========================================================= */
-
+/* ==== DATE TIME ==== */
 function formatAssetDateTime(value) {
   if (!value) return "-";
   const date = new Date(value);
@@ -21794,11 +21806,7 @@ function formatAssetDateTime(value) {
   });
 }
 
-
-/* =========================================================
-   HTML ESCAPE
-   ========================================================= */
-
+/* ===== HTML ESCAPE ===== */
 function escapeAssetHTML(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -21808,11 +21816,7 @@ function escapeAssetHTML(value) {
     .replace(/'/g, "&#039;");
 }
 
-
-/* =========================================================
-   INITIALIZE
-   ========================================================= */
-
+/* === INITIALIZE === */
 function initAssetPage() {
   assetCurrentPage = 1;
   depreciationCurrentPage = 1;
@@ -21822,9 +21826,7 @@ function initAssetPage() {
 }
 
 
-/* =========================================================
-   OVERVIEW AKUNTANSI
-   ========================================================= */
+/* === OVERVIEW AKUNTANSI === */
 async function loadAccountingOverview() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
