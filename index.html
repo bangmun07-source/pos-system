@@ -12936,14 +12936,9 @@
     </div>
 
     <!-- ================= ASSET TABLE ================= -->
-    <section class="bg-background rounded-md overflow-hidden
-      border border-outline-variant
-      shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-      mb-4 relative">
-			
+    <section class="bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-4 relative">
       <!-- HEADER -->
-      <div class="px-6 py-8 flex flex-col lg:flex-row
-        lg:items-center lg:justify-between gap-6">
+      <div class="px-6 py-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
         <div class="flex items-center gap-4">
           <div class="main-icon-box">
             <span class="material-symbols-outlined text-3xl"
@@ -13084,83 +13079,114 @@
         </div>
       </div>
     </section>
-		<!-- ASSET PURCHASE & FINANCING -->
-		<section class="mt-8">
-		  <div class="flex items-center justify-between mb-4">
-		    <div>
-		      <h2 class="text-lg font-black tracking-tight">
-		        Asset Purchase & Financing
-		      </h2>
-		      <p class="text-xs text-on-surface-variant">
-		        Manage asset purchases, financing, and installment payments.
-		      </p>
-		    </div>
+		<!-- ================= ASSET PURCHASE & FINANCING TABLE ================= -->
+		<section class="bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-4 relative">
+		  <div class="px-6 py-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+		    <div class="flex items-center gap-4">
+		      <div class="main-icon-box">
+		        <span class="material-symbols-outlined text-3xl"
+		          style="font-variation-settings:'FILL' 1;">
+		          account_balance
+		        </span>
+		      </div>
 		
+		      <div>
+		        <h2 class="font-headline text-2xl font-bold tracking-tight">
+		          Asset Purchase & Financing
+		        </h2>
+						
+		        <p class="text-xs text-muted mt-1">
+		          Manage asset purchases, financing, and installment payments.
+		        </p>
+		      </div>
+		    </div>
+		    <!-- ACTION -->
 		    <button type="button"
 		      onclick="openAddAssetPurchaseModal()"
-		      class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl
-		             bg-primary text-on-primary font-bold text-xs
-		             hover:opacity-90 transition">
-		      <span class="material-symbols-rounded text-[18px]">
+		      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bottom-theme text-on-surface text-sm font-semibold transition-all">
+		      <span class="material-symbols-outlined text-lg">
 		        add
 		      </span>
 		      Add New Asset
 		    </button>
 		  </div>
+		  <!-- TABLE -->
+		  <div class="overflow-x-auto custom-scrollbar">
+		    <table class="w-full text-left border-collapse">
+		      <thead>
+		        <tr class="sticky top-0 border border-outline-variant
+		          text-[11px] text-muted uppercase tracking-widest">
 		
-		  <div class="rounded-2xl border border-outline-variant bg-surface overflow-hidden">
-		    <div class="overflow-x-auto custom-scrollbar">
-		      <table class="w-full text-left">
-		        <thead>
-		          <tr class="border-b border-outline-variant">
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider">
-		              Asset
-		            </th>
-								
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider">
-		              Purchase Date
-		            </th>
+		          <th class="px-6 py-4">
+		            Asset
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-right">
-		              Purchase Cost
-		            </th>
+		          <th class="px-6 py-4">
+		            Purchase Date
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-right">
-		              Interest
-		            </th>
+		          <th class="px-6 py-4 text-right">
+		            Purchase Cost
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-right">
-		              Total Obligation
-		            </th>
+		          <th class="px-6 py-4 text-right">
+		            Interest
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-right">
-		              Paid
-		            </th>
+		          <th class="px-6 py-4 text-right">
+		            Total Obligation
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-right">
-		              Outstanding
-		            </th>
+		          <th class="px-6 py-4 text-right">
+		            Paid
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider">
-		              Status
-		            </th>
+		          <th class="px-6 py-4 text-right">
+		            Outstanding
+		          </th>
 		
-		            <th class="px-4 py-3 text-[10px] font-black uppercase tracking-wider text-right">
-		              Action
-		            </th>
-		          </tr>
-		        </thead>
+		          <th class="px-6 py-4 text-center">
+		            Status
+		          </th>
 		
-		        <tbody id="asset-purchase-table-body">
-		          <tr>
-		            <td
-		              colspan="9"
-		              class="px-4 py-10 text-center text-xs text-on-surface-variant">
-		              No asset purchases found.
-		            </td>
-		          </tr>
-		        </tbody>
-		      </table>
+		          <th class="px-4 py-4 text-center">
+		            Action
+		          </th>
+		        </tr>
+		      </thead>
+		
+		      <tbody id="asset-purchase-table-body" class="divide-y divide-white/5 text-on-surface">
+		        <tr>
+		          <td colspan="9"
+		            class="text-center text-on-surface-variant py-10">
+		            Loading...
+		          </td>
+		        </tr>
+		      </tbody>
+		    </table>
+		  </div>
+		
+		  <!-- FOOTER -->
+		  <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
+		    <p id="asset-purchase-pagination-info"
+		      class="text-xs text-on-surface-variant font-semibold">
+		      Showing asset purchases
+		    </p>
+		
+		    <div class="flex items-center gap-2">
+		      <button id="assetPurchasePrevBtn"
+		        class="p-2 text-on-surface-variant hover:text-on-surface">
+		        <span class="material-symbols-outlined">
+		          chevron_left
+		        </span>
+		      </button>
+		
+		      <button id="assetPurchaseNextBtn"
+		        class="p-2 text-on-surface-variant hover:text-on-surface">
+		        <span class="material-symbols-outlined">
+		          chevron_right
+		        </span>
+		      </button>
 		    </div>
 		  </div>
 		</section>
