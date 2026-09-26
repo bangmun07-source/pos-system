@@ -21086,6 +21086,248 @@ function updateAssetPagination(totalItems, totalPages) {
   if (nextBtn) { nextBtn.disabled = assetCurrentPage >= totalPages; }
 }
 
+
+// =====================================================
+// ASSET PURCHASE - ADD NEW ASSET / DRAFT
+// =====================================================
+
+function openAddAssetPurchaseModal() {
+  const modal = document.getElementById("addAssetPurchaseModal");
+  if (!modal) return;
+
+  // Reset form
+  const nameEl = document.getElementById("assetPurchaseName");
+  const dateEl = document.getElementById("assetPurchaseDate");
+  const costEl = document.getElementById("assetPurchaseCost");
+  const interestEl = document.getElementById("assetPurchaseInterest");
+  const paymentTypeEl = document.getElementById("assetPurchasePaymentType");
+  const noteEl = document.getElementById("assetPurchaseNote");
+
+  if (nameEl) nameEl.value = "";
+
+  if (dateEl) {
+    dateEl.value = new Date().toISOString().slice(0, 10);
+  }
+
+  if (costEl) costEl.value = "";
+
+  if (interestEl) interestEl.value = "0";
+
+  if (paymentTypeEl) {
+    paymentTypeEl.value = "CREDIT";
+  }
+
+  if (noteEl) noteEl.value = "";
+
+  updateAssetPurchaseTotal();
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  setTimeout(() => {
+    nameEl?.focus();
+  }, 50);
+}
+
+
+function closeAddAssetPurchaseModal() {
+  const modal = document.getElementById("addAssetPurchaseModal");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+
+// =====================================================
+// TOTAL OBLIGATION
+// =====================================================
+
+function updateAssetPurchaseTotal() {
+  const cost =
+    Number(document.getElementById("assetPurchaseCost")?.value || 0);
+
+  const interest =
+    Number(document.getElementById("assetPurchaseInterest")?.value || 0);
+
+  const total = cost + interest;
+
+  const totalEl =
+    document.getElementById("assetPurchaseTotal");
+
+  if (totalEl) {
+    totalEl.textContent =
+      "Rp " + total.toLocaleString("id-ID");
+  }
+
+  return total;
+}
+
+
+// =====================================================
+// INPUT LISTENER
+// =====================================================
+
+document.addEventListener("input", function (event) {
+
+  if (
+    event.target?.id === "assetPurchaseCost" ||
+    event.target?.id === "assetPurchaseInterest"
+  ) {
+    updateAssetPurchaseTotal();
+  }
+
+});
+
+
+// =====================================================
+// SAVE DRAFT
+// =====================================================
+
+async function saveAssetPurchaseDraft() {
+
+  const sessionId =
+    localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    alert("Session tidak ditemukan.");
+    return;
+  }
+
+  const branchId =
+    typeof getCurrentBranchId === "function"
+      ? getCurrentBranchId()
+      : null;
+
+  if (!branchId) {
+    alert("Branch belum dipilih.");
+    return;
+  }
+
+  const assetName =
+    document.getElementById("assetPurchaseName")?.value.trim();
+
+  const purchaseDate =
+    document.getElementById("assetPurchaseDate")?.value;
+
+  const purchaseCost =
+    Number(document.getElementById("assetPurchaseCost")?.value || 0);
+
+  const interestAmount =
+    Number(document.getElementById("assetPurchaseInterest")?.value || 0);
+
+  const paymentType =
+    document.getElementById("assetPurchasePaymentType")?.value;
+
+  const note =
+    document.getElementById("assetPurchaseNote")?.value.trim() || null;
+
+  // -----------------------------
+  // VALIDATION
+  // -----------------------------
+
+  if (!assetName) {
+    alert("Asset name wajib diisi.");
+    return;
+  }
+
+  if (!purchaseDate) {
+    alert("Purchase date wajib diisi.");
+    return;
+  }
+
+  if (!purchaseCost || purchaseCost <= 0) {
+    alert("Purchase cost harus lebih dari 0.");
+    return;
+  }
+
+  if (interestAmount < 0) {
+    alert("Interest tidak boleh negatif.");
+    return;
+  }
+
+  const totalObligation =
+    purchaseCost + interestAmount;
+
+  const saveButton =
+    document.querySelector(
+      '#addAssetPurchaseModal button[onclick="saveAssetPurchaseDraft()"]'
+    );
+
+  try {
+
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = "Saving...";
+    }
+
+    // =================================================
+    // RPC
+    // =================================================
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "add_asset_purchase",
+        {
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_asset_name: assetName,
+          p_purchase_date: purchaseDate,
+          p_purchase_cost: purchaseCost,
+          p_interest_amount: interestAmount,
+          p_total_obligation: totalObligation,
+          p_payment_type: paymentType,
+          p_note: note
+        }
+      );
+
+    if (error) {
+      console.error(
+        "add_asset_purchase RPC error:",
+        error
+      );
+
+      throw error;
+    }
+
+    console.log(
+      "Asset Purchase Draft Saved:",
+      data
+    );
+
+    closeAddAssetPurchaseModal();
+
+    // Refresh tabel purchase
+    if (typeof loadAssetPurchases === "function") {
+      await loadAssetPurchases();
+    }
+
+    alert("Asset purchase draft berhasil disimpan.");
+
+  } catch (error) {
+
+    console.error(
+      "SAVE ASSET PURCHASE ERROR:",
+      error
+    );
+
+    alert(
+      error?.message ||
+      "Gagal menyimpan asset purchase draft."
+    );
+
+  } finally {
+
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = "Save Draft";
+    }
+
+  }
+}
+
+
+	
 /* =========================================================
    DEPRECIATION HISTORY
    ========================================================= */
