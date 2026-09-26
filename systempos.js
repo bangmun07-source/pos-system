@@ -21775,6 +21775,7 @@ function initAssetPage() {
   depreciationCurrentPage = 1;
   initAssetPageEvents();
   loadAssetPage();
+	loadAssetPurchases();
 }
 
 
