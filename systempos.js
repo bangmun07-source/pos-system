@@ -20998,34 +20998,25 @@ function viewAssetDetail(asset) {
 
   // DEPRECIATION
   const usefulLife = Number(asset.Useful_Life_Months || 0);
-  const monthlyDepreciation =
-    usefulLife > 0 &&
+  const monthlyDepreciation = usefulLife > 0 &&
     String(asset.Depreciation_Method || "")
       .toUpperCase() === "STRAIGHT LINE"
       ? Number(asset.Purchase_Cost || 0) /
         usefulLife
       : 0;
-
-  document.getElementById( "detailAssetUsefulLife" ).textContent =
-    usefulLife > 0
-      ? `${usefulLife} bulan`
-      : "Belum diatur";
-  document.getElementById( "detailAssetMethod" ).textContent =
-    usefulLife > 0
-      ? asset.Depreciation_Method || "-"
-      : "-";
-  document.getElementById( "detailAssetAccumulated" ).textContent = 
-		formatAssetCurrency( asset.Accumulated_Depreciation );
-  document.getElementById( "detailAssetBookValue" ).textContent =
-    formatAssetCurrency( asset.Book_Value );
-  document.getElementById( "detailAssetMonthlyDepreciation" ).textContent =
-    usefulLife > 0 ? formatAssetCurrency( monthlyDepreciation ) : "-";
-  document.getElementById( "detailAssetStatus" ).textContent = 
-		asset.Status || "-";
-  document.getElementById( "detailAssetLastDepreciation" ).textContent =
-    asset.Last_Depreciation_Date ? formatAssetDate( asset.Last_Depreciation_Date ) : "Belum ada";
-  document.getElementById( "detailAssetNotes" ).textContent =
-    asset.Notes || "-";
+	
+  document.getElementById( "detailAssetUsefulLife" ).textContent = usefulLife > 0
+		? `${usefulLife} bulan`
+		: "Belum diatur";
+  document.getElementById( "detailAssetMethod" ).textContent = usefulLife > 0
+		? asset.Depreciation_Method || "-"
+		: "-";
+  document.getElementById( "detailAssetAccumulated" ).textContent = formatAssetCurrency( asset.Accumulated_Depreciation );
+  document.getElementById( "detailAssetBookValue" ).textContent = formatAssetCurrency( asset.Book_Value );
+  document.getElementById( "detailAssetMonthlyDepreciation" ).textContent = usefulLife > 0 ? formatAssetCurrency( monthlyDepreciation ) : "-";
+  document.getElementById( "detailAssetStatus" ).textContent =  asset.Status || "-";
+  document.getElementById( "detailAssetLastDepreciation" ).textContent = asset.Last_Depreciation_Date ? formatAssetDate( asset.Last_Depreciation_Date ) : "Belum ada";
+  document.getElementById( "detailAssetNotes" ).textContent = asset.Notes || "-";
 }
 
 function closeAssetDetailModal() {
@@ -21049,10 +21040,7 @@ function formatAssetDate(dateValue) {
   );
 }
 
-/* =========================================================
-   ASSET PAGINATION
-   ========================================================= */
-
+/* === ASSET PAGINATION === */
 function updateAssetPagination(totalItems, totalPages) {
   const info = document.getElementById( "asset-pagination-info" );
   const prevBtn = document.getElementById( "assetPrevBtn" );
@@ -21079,11 +21067,7 @@ function updateAssetPagination(totalItems, totalPages) {
   if (nextBtn) { nextBtn.disabled = assetCurrentPage >= totalPages; }
 }
 
-
-// =====================================================
 // ASSET PURCHASE - ADD NEW ASSET / DRAFT
-// =====================================================
-
 function openAddAssetPurchaseModal() {
   const modal = document.getElementById("addAssetPurchaseModal");
   if (!modal) return;
@@ -21131,36 +21115,21 @@ function closeAddAssetPurchaseModal() {
   modal.classList.remove("flex");
 }
 
-
-// =====================================================
 // TOTAL OBLIGATION
-// =====================================================
-
 function updateAssetPurchaseTotal() {
-  const cost =
-    Number(document.getElementById("assetPurchaseCost")?.value || 0);
-
-  const interest =
-    Number(document.getElementById("assetPurchaseInterest")?.value || 0);
-
+  const cost = Number(document.getElementById("assetPurchaseCost")?.value || 0);
+  const interest = Number(document.getElementById("assetPurchaseInterest")?.value || 0);
   const total = cost + interest;
-
-  const totalEl =
-    document.getElementById("assetPurchaseTotal");
+  const totalEl = document.getElementById("assetPurchaseTotal");
 
   if (totalEl) {
     totalEl.textContent =
       "Rp " + total.toLocaleString("id-ID");
   }
-
   return total;
 }
 
-
-// =====================================================
 // INPUT LISTENER
-// =====================================================
-
 document.addEventListener("input", function (event) {
 
   if (
@@ -21172,11 +21141,7 @@ document.addEventListener("input", function (event) {
 
 });
 
-
-// =====================================================
 // SAVE DRAFT
-// =====================================================
-
 async function saveAssetPurchaseDraft() {
 
   const sessionId =
