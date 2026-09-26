@@ -21141,6 +21141,352 @@ document.addEventListener("input", function (event) {
 
 });
 
+// ASSET PURCHASE
+let assetPurchaseRows = [];
+
+async function loadAssetPurchases() {
+  const tbody = document.getElementById("asset-purchase-table-body");
+  const branchFilter = document.getElementById("assetPurchaseBranchFilter");
+
+  if (!tbody) return;
+
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-4 py-8 text-center text-error">
+          Session tidak ditemukan.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  const branchId = branchFilter?.value || null;
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="9" class="px-4 py-8 text-center text-muted">
+        Loading...
+      </td>
+    </tr>
+  `;
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "get_asset_purchases",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId
+      }
+    );
+
+    if (error) {
+      console.error("get_asset_purchases error:", error);
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="px-4 py-8 text-center text-error">
+            ${escapeHtmlAssetPurchase(error.message || "Gagal memuat data.")}
+          </td>
+        </tr>
+      `;
+      return;
+    }
+    // Simpan untuk popup Action
+    window.assetPurchaseRows = Array.isArray(data) ? data : [];
+    renderAssetPurchases(window.assetPurchaseRows);
+    updateAssetPurchasePaginationInfo( window.assetPurchaseRows.length );
+
+  } catch (err) {
+    console.error("loadAssetPurchases error:", err);
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-4 py-8 text-center text-error">
+          Gagal memuat asset purchase.
+        </td>
+      </tr>
+    `;
+  }
+}
+
+function renderAssetPurchases(rows) {
+  const tbody = document.getElementById("asset-purchase-table-body");
+
+  if (!tbody) return;
+
+  if (!rows || rows.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-4 py-8 text-center text-muted">
+          Belum ada asset purchase.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(row => {
+    const status = String(row.Status || "").toUpperCase();
+    return `
+      <tr class="border-b border-outline-variant hover:bg-outline-variant transition">
+        <!-- ASSET -->
+        <td class="px-4 py-3 font-semibold text-on-surface">
+          ${escapeHtmlAssetPurchase(row.Asset_Name)}
+        </td>
+
+        <!-- DATE -->
+        <td class="px-4 py-3 text-muted">
+          ${formatAssetPurchaseDate(row.Purchase_Date)}
+        </td>
+
+        <!-- PURCHASE COST -->
+        <td class="px-4 py-3 text-right">
+          ${formatAssetPurchaseCurrency(row.Purchase_Cost)}
+        </td>
+
+        <!-- INTEREST -->
+        <td class="px-4 py-3 text-right">
+          ${formatAssetPurchaseCurrency(row.Interest_Amount)}
+        </td>
+
+        <!-- TOTAL -->
+        <td class="px-4 py-3 text-right font-semibold">
+          ${formatAssetPurchaseCurrency(row.Total_Obligation)}
+        </td>
+
+        <!-- PAID -->
+        <td class="px-4 py-3 text-right">
+          ${formatAssetPurchaseCurrency(row.Paid_Amount)}
+        </td>
+
+        <!-- OUTSTANDING -->
+        <td class="px-4 py-3 text-right">
+          ${formatAssetPurchaseCurrency(row.Outstanding_Amount)}
+        </td>
+
+        <!-- STATUS -->
+        <td class="px-4 py-3">
+          ${renderAssetPurchaseStatus(status)}
+        </td>
+
+        <!-- ACTION -->
+        <td class="px-4 py-3 text-center">
+          <buttontype="button"
+            onclick="openAssetPurchaseActionMenu('${escapeHtmlAssetPurchase(row.Purchase_ID)}')"
+            class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition"
+            title="Action" >
+            <span class="material-symbols-rounded text-[20px]">
+              more_vert
+            </span>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function renderAssetPurchaseStatus(status) {
+  const s = String(status || "").toUpperCase();
+
+  if (s === "DRAFT") {
+    return `
+      <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-600/20 text-blue-700">
+        DRAFT
+      </span>
+    `;
+  }
+
+  if (s === "RECORDED") {
+    return `
+      <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-yellow-600/20 text-yellow-700">
+        RECORDED
+      </span>
+    `;
+  }
+
+  return `
+    <span class="text-xs text-muted">
+      ${escapeHtmlAssetPurchase(s)}
+    </span>
+  `;
+}
+
+let activeAssetPurchaseAction = null;
+
+function openAssetPurchaseActionMenu(purchaseId) {
+  const rows = window.assetPurchaseRows || [];
+
+  const row = rows.find(
+    item => String(item.Purchase_ID) === String(purchaseId)
+  );
+
+  if (!row) {
+    console.error("Asset purchase tidak ditemukan:", purchaseId);
+    return;
+  }
+
+  activeAssetPurchaseAction = row;
+
+  const modal = document.getElementById("assetPurchaseActionModal");
+  const subtitle = document.getElementById("assetPurchaseActionSubtitle");
+  const list = document.getElementById("assetPurchaseActionList");
+
+  if (!modal || !list) return;
+
+  const status = String(row.Status || "").toUpperCase();
+  const outstanding = Number(row.Outstanding_Amount || 0);
+
+  subtitle.textContent = `${row.Asset_Name} • ${formatAssetPurchaseCurrency(row.Total_Obligation)}`;
+
+  // DRAFT
+  if (status === "DRAFT") {
+    list.innerHTML = `
+      <!-- RECORD -->
+      <button type="button"
+        onclick="recordAssetPurchaseFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition text-left" >
+        <span class="material-symbols-rounded text-on-surface">
+          receipt_long
+        </span>
+
+        <div>
+          <div class="font-semibold text-on-surface">
+            Record
+          </div>
+
+          <div class="text-xs text-on-surface-variant">
+            Record asset purchase ke accounting
+          </div>
+        </div>
+      </button>
+			
+      <!-- DELETE -->
+      <button type="button"
+        onclick="deleteAssetPurchaseFromAction()"
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant hover:bg-error/10 hover:border-error transition text-left" >
+        <span class="material-symbols-rounded text-error">
+          delete
+        </span>
+
+        <div>
+          <div class="font-semibold text-on-surface">
+            Delete
+          </div>
+
+          <div class="text-xs text-muted">
+            Hapus asset purchase
+          </div>
+        </div>
+      </button>
+    `;
+
+  // RECORDED
+  } else if (status === "RECORDED") {
+    if (outstanding > 0) {
+      list.innerHTML = `
+        <!-- PAY -->
+        <button
+          type="button"
+          onclick="payAssetPurchaseFromAction()"
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition text-left" >
+          <span class="material-symbols-rounded text-primary">
+            payments
+          </span>
+
+          <div>
+            <div class="font-semibold text-on-surface">
+              Pay
+            </div>
+
+            <div class="text-xs text-muted">
+              Outstanding:
+              ${formatAssetPurchaseCurrency(outstanding)}
+            </div>
+          </div>
+        </button>
+      `;
+
+    } else {
+      list.innerHTML = `
+        <div class="px-4 py-3 rounded-md bg-background">
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-rounded text-primary">
+              check_circle
+            </span>
+
+            <div>
+              <div class="font-semibold text-on-surface">
+                Fully Paid
+              </div>
+
+              <div class="text-xs text-muted">
+                Asset purchase sudah lunas.
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+
+function closeAssetPurchaseActionMenu() {
+
+  const modal = document.getElementById("assetPurchaseActionModal");
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  activeAssetPurchaseAction = null;
+}
+
+async function recordAssetPurchaseFromAction() {
+
+  if (!activeAssetPurchaseAction) return;
+
+  const purchaseId = activeAssetPurchaseAction.Purchase_ID;
+
+  closeAssetPurchaseActionMenu();
+
+  console.log("Record:", purchaseId);
+
+  // RPC RECORD nanti di sini
+}
+
+
+async function deleteAssetPurchaseFromAction() {
+
+  if (!activeAssetPurchaseAction) return;
+
+  const purchaseId = activeAssetPurchaseAction.Purchase_ID;
+
+  closeAssetPurchaseActionMenu();
+
+  console.log("Delete:", purchaseId);
+
+  // RPC DELETE nanti di sini
+}
+
+
+function payAssetPurchaseFromAction() {
+
+  if (!activeAssetPurchaseAction) return;
+
+  const purchaseId = activeAssetPurchaseAction.Purchase_ID;
+
+  closeAssetPurchaseActionMenu();
+
+  console.log("Pay:", purchaseId);
+
+  // Buka payment modal nanti
+}
+
 // SAVE DRAFT
 async function saveAssetPurchaseDraft() {
 
