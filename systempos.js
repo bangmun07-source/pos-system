@@ -21299,9 +21299,9 @@ function renderAssetPurchases(rows) {
             onclick="openAssetPurchaseActionMenu('${escapeHtmlAssetPurchase(row.Purchase_ID)}')"
             class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition"
             title="Action" >
-            <span class="material-symbols-rounded text-[20px]">
-              more_vert
-            </span>
+		        <span class="material-symbols-outlined text-lg">
+		          payments
+		        </span>
           </button>
         </td>
       </tr>
@@ -21409,8 +21409,7 @@ function openAssetPurchaseActionMenu(purchaseId) {
     if (outstanding > 0) {
       list.innerHTML = `
         <!-- PAY -->
-        <button
-          type="button"
+        <button type="button"
           onclick="payAssetPurchaseFromAction()"
           class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition text-left" >
           <span class="material-symbols-rounded text-primary">
@@ -30727,10 +30726,7 @@ async function saveAccountsReceivable() {
 
     if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
 
-    /* -----------------------------------------------------
-       GET FORM VALUE
-    ----------------------------------------------------- */
-
+    /* --- GET FORM VALUE --- */
     const typeEl = document.getElementById( "accountsReceivableType" );
     const partyEl = document.getElementById( "accountsReceivableParty" );
     const referenceNoEl = document.getElementById( "accountsReceivableReferenceNo" );
@@ -30845,40 +30841,20 @@ async function saveAccountsReceivable() {
         "Gagal menyimpan piutang."
       );
     }
-
-
-    /* ---- SUCCESS ---- */
-
-    console.log(
-      "Accounts Receivable saved:",
-      data
-    );
-
+		
     closeAccountsReceivableModal();
     showToast(
       "Piutang berhasil disimpan sebagai Draft.",
       "success"
     );
 
-    if (
-      typeof loadAccountsReceivableRecords ===
-      "function"
-    ) {
-      await loadAccountsReceivableRecords();
-    }
+    if ( typeof loadAccountsReceivableRecords === "function" )
+			{ await loadAccountsReceivableRecords(); }
 
-    if (
-      typeof renderAccountsReceivableRecords ===
-      "function"
-    ) {
-      renderAccountsReceivableRecords();
-    }
+    if ( typeof renderAccountsReceivableRecords === "function" ) 
+			{ renderAccountsReceivableRecords(); }
 
   } catch (err) {
-    console.error(
-      "Save Accounts Receivable failed:",
-      err
-    );
     showToast(
       err.message ||
       "Gagal menyimpan piutang.",
@@ -31106,10 +31082,9 @@ async function recordAccountsReceivable(recordId) {
       );
     }
 
-    const result =
-      typeof data === "string"
-        ? JSON.parse(data)
-        : data;
+    const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
 
     console.log(
       "Accounts Receivable recorded:",
