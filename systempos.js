@@ -20459,9 +20459,7 @@ async function runMonthlyDepreciation() {
     }
   }
 }
-
 // BUTTON EVENT
-
 document.addEventListener(
   "click",
   function (event) {
@@ -20824,10 +20822,7 @@ function openAssetDepreciationModal(asset) {
   }
 
   currentAsset = asset;
-  const template =
-    document.getElementById(
-      "assetDepreciationModalTemplate"
-    );
+  const template = document.getElementById( "assetDepreciationModalTemplate" );
 
   if (!template) {
     console.warn(
@@ -20836,10 +20831,8 @@ function openAssetDepreciationModal(asset) {
     return;
   }
   // Tutup modal sebelumnya
-  document .getElementById("assetActionModalOverlay")
-    ?.remove();
-  document .getElementById("assetDepreciationModalOverlay")
-    ?.remove();
+  document .getElementById("assetActionModalOverlay") ?.remove();
+  document .getElementById("assetDepreciationModalOverlay") ?.remove();
   const modal = template.content.cloneNode(true);
   document.body.appendChild(modal);
   // DATA ASSET
@@ -21194,38 +21187,20 @@ async function saveAssetPurchaseDraft() {
     return;
   }
 
-  const branchId =
-    typeof getCurrentBranchId === "function"
-      ? getCurrentBranchId()
-      : null;
+	const branchId = state.branchId;
 
   if (!branchId) {
     alert("Branch belum dipilih.");
     return;
   }
 
-  const assetName =
-    document.getElementById("assetPurchaseName")?.value.trim();
-
-  const purchaseDate =
-    document.getElementById("assetPurchaseDate")?.value;
-
-  const purchaseCost =
-    Number(document.getElementById("assetPurchaseCost")?.value || 0);
-
-  const interestAmount =
-    Number(document.getElementById("assetPurchaseInterest")?.value || 0);
-
-  const paymentType =
-    document.getElementById("assetPurchasePaymentType")?.value;
-
-  const note =
-    document.getElementById("assetPurchaseNote")?.value.trim() || null;
-
-  // -----------------------------
+  const assetName = document.getElementById("assetPurchaseName")?.value.trim();
+  const purchaseDate = document.getElementById("assetPurchaseDate")?.value;
+  const purchaseCost = Number(document.getElementById("assetPurchaseCost")?.value || 0);
+  const interestAmount = Number(document.getElementById("assetPurchaseInterest")?.value || 0);
+  const paymentType = document.getElementById("assetPurchasePaymentType")?.value;
+  const note = document.getElementById("assetPurchaseNote")?.value.trim() || null;
   // VALIDATION
-  // -----------------------------
-
   if (!assetName) {
     alert("Asset name wajib diisi.");
     return;
@@ -21246,25 +21221,15 @@ async function saveAssetPurchaseDraft() {
     return;
   }
 
-  const totalObligation =
-    purchaseCost + interestAmount;
-
-  const saveButton =
-    document.querySelector(
-      '#addAssetPurchaseModal button[onclick="saveAssetPurchaseDraft()"]'
-    );
+  const totalObligation = purchaseCost + interestAmount;
+  const saveButton = document.querySelector( '#addAssetPurchaseModal button[onclick="saveAssetPurchaseDraft()"]' );
 
   try {
-
     if (saveButton) {
       saveButton.disabled = true;
       saveButton.textContent = "Saving...";
     }
-
-    // =================================================
     // RPC
-    // =================================================
-
     const { data, error } =
       await supabaseClient.rpc(
         "add_asset_purchase",
@@ -21287,8 +21252,7 @@ async function saveAssetPurchaseDraft() {
         error
       );
 
-      throw error;
-    }
+      throw error; }
 
     console.log(
       "Asset Purchase Draft Saved:",
@@ -21296,16 +21260,13 @@ async function saveAssetPurchaseDraft() {
     );
 
     closeAddAssetPurchaseModal();
-
     // Refresh tabel purchase
     if (typeof loadAssetPurchases === "function") {
       await loadAssetPurchases();
     }
 
     alert("Asset purchase draft berhasil disimpan.");
-
   } catch (error) {
-
     console.error(
       "SAVE ASSET PURCHASE ERROR:",
       error
@@ -21315,14 +21276,11 @@ async function saveAssetPurchaseDraft() {
       error?.message ||
       "Gagal menyimpan asset purchase draft."
     );
-
   } finally {
-
     if (saveButton) {
       saveButton.disabled = false;
       saveButton.textContent = "Save Draft";
     }
-
   }
 }
 
