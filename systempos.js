@@ -21297,9 +21297,9 @@ function renderAssetPurchases(rows) {
         <td class="px-4 py-3 text-center">
           <buttontype="button"
             onclick="openAssetPurchaseActionMenu('${escapeHtmlAssetPurchase(row.Purchase_ID)}')"
-            class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition"
+            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-on-surface-variant hover:text-on-surface transition"
             title="Action" >
-		        <span class="material-symbols-outlined text-lg">
+		        <span class="material-symbols-outlined text-3xl">
 		          payments
 		        </span>
           </button>
@@ -21368,10 +21368,10 @@ function openAssetPurchaseActionMenu(purchaseId) {
       <!-- RECORD -->
       <button type="button"
         onclick="recordAssetPurchaseFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition text-left" >
-        <span class="material-symbols-rounded text-on-surface">
-          receipt_long
-        </span>
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md  text-on-surface-variant hover:text-on-surface transition text-left" >
+        <div class="main-icon-box">
+					<span class="material-symbols-outlined text-3xl">receipt_long</span>
+				</div>
 
         <div>
           <div class="font-semibold text-on-surface">
@@ -21387,11 +21387,13 @@ function openAssetPurchaseActionMenu(purchaseId) {
       <!-- DELETE -->
       <button type="button"
         onclick="deleteAssetPurchaseFromAction()"
-        class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant hover:bg-error/10 hover:border-error transition text-left" >
-        <span class="material-symbols-rounded text-error">
-          delete
-        </span>
-
+        class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-error/10 hover:border-error transition text-left" >
+       	<div class="main-icon-box">
+					<span class="material-symbols-outlined text-3xltext-error">
+	          delete
+	        </span>
+				</div>
+				
         <div>
           <div class="font-semibold text-on-surface">
             Delete
@@ -21411,11 +21413,13 @@ function openAssetPurchaseActionMenu(purchaseId) {
         <!-- PAY -->
         <button type="button"
           onclick="payAssetPurchaseFromAction()"
-          class="w-full flex items-center gap-3 px-4 py-3 rounded-md border border-outline-variant text-on-surface-variant hover:text-on-surface transition text-left" >
-          <span class="material-symbols-rounded text-primary">
-            payments
-          </span>
-
+          class="w-full flex items-center gap-3 px-4 py-3 rounded-md text-on-surface-variant hover:text-on-surface transition text-left" >
+          <div class="main-icon-box">
+						<span class="material-symbols-outlined text-3xl">
+	            payments
+	          </span>
+					</div>
+					
           <div>
             <div class="font-semibold text-on-surface">
               Pay
@@ -21433,9 +21437,11 @@ function openAssetPurchaseActionMenu(purchaseId) {
       list.innerHTML = `
         <div class="px-4 py-3 rounded-md bg-background">
           <div class="flex items-center gap-3">
-            <span class="material-symbols-rounded text-primary">
-              check_circle
-            </span>
+            <div class="main-icon-box">
+							<span class="material-symbols-outlined text-3xl">
+	              check_circle
+	            </span>
+						</div>
 
             <div>
               <div class="font-semibold text-on-surface">
