@@ -14794,6 +14794,10 @@ function openAddExpensePopup() {
   document.body.appendChild(wrapper);
   // default payment method
   selectExpenseMethod("Cash");
+	const statusSelect = wrapper.querySelector("#expenseStatus");
+		if (statusSelect) {
+			statusSelect.value = "PAID";
+		}
   loadExpenseBranches("expenseBranchSelect");
   // ambil select branch
   const branchSelect = wrapper.querySelector("#expenseBranchSelect");
@@ -14872,7 +14876,8 @@ async function saveExpense() {
     method: selectedExpenseMethod,
     createdBy: state.userName || "Admin",
     type: "Expense",
-    outlet: branchSelect.options[ branchSelect.selectedIndex ]?.text || "", status: "Paid" };
+    outlet: branchSelect.options[ branchSelect.selectedIndex ]?.text || "", 
+		status: document.getElementById("expenseStatus")?.value || "PAID" };
 
   try {
     // SUPABASE RPC
