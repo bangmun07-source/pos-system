@@ -21495,11 +21495,71 @@ async function recordAssetPurchaseFromAction() {
 
   const purchaseId = activeAssetPurchaseAction.Purchase_ID;
 
+  if (!purchaseId) {
+    alert("Purchase ID tidak ditemukan.");
+    return;
+  }
+
+  const confirmed = confirm(
+    "Record asset purchase ini?\n\n" +
+    "Setelah direcord, data akan masuk ke Assets dan Accounting."
+  );
+
+  if (!confirmed) return;
+
   closeAssetPurchaseActionMenu();
 
-  console.log("Record:", purchaseId);
+  try {
 
-  // RPC RECORD nanti di sini
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
+
+    console.log("Record Asset Purchase:", purchaseId);
+
+    const { data, error } = await supabaseClient.rpc(
+      "record_asset_purchase",
+      {
+        p_session_id: sessionId,
+        p_purchase_id: purchaseId
+      }
+    );
+
+    if (error) {
+      console.error("record_asset_purchase error:", error);
+      throw new Error(error.message || "Gagal record asset purchase.");
+    }
+
+    console.log("record_asset_purchase result:", data);
+
+    if (!data?.success) {
+      throw new Error(
+        data?.message || "Asset purchase gagal direcord."
+      );
+    }
+
+    alert(
+      "Asset purchase berhasil direcord.\n\n" +
+      "Asset ID: " + (data.asset_id || "-") + "\n" +
+      "Journal: " + (data.journal_no || "-")
+    );
+
+    // Refresh tabel Asset Purchase
+    if (typeof loadAssetPurchases === "function") {
+      await loadAssetPurchases();
+    }
+
+  } catch (err) {
+
+    console.error("Record Asset Purchase:", err);
+
+    alert(
+      "Gagal record asset purchase:\n" +
+      (err?.message || "Terjadi kesalahan.")
+    );
+  }
 }
 
 
