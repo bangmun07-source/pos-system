@@ -20483,6 +20483,22 @@ function escapeHtmlAssetPurchase(value) {
     .replace(/'/g, "&#039;");
 }
 
+function formatAssetPurchaseCurrency(value) {
+  const amount = Number(value || 0);
+  return "Rp " + amount.toLocaleString("id-ID");
+}
+
+function formatAssetPurchaseDate(value) {
+  if (!value) return "-";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) { return value; }
+  return date.toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+
 function clearAssetCache() {
   state.assetData = null;
   state.assetDataBranchId = null;
