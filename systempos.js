@@ -21457,6 +21457,20 @@ function openAssetPurchaseActionMenu(purchaseId) {
   modal.classList.add("flex");
 }
 
+function updateAssetPurchasePaginationInfo(count) {
+  const el = document.getElementById("asset-purchase-pagination-info");
+
+  if (!el) return;
+
+  const total = Number(count || 0);
+
+  if (total === 0) {
+    el.textContent = "0 data";
+    return;
+  }
+
+  el.textContent = `${total} data`;
+}
 
 function closeAssetPurchaseActionMenu() {
 
