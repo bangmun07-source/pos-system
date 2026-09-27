@@ -21614,14 +21614,46 @@ async function deleteAssetPurchaseFromAction() {
 function payAssetPurchaseFromAction() {
   if (!activeAssetPurchaseAction) return;
 
-  const purchaseId = activeAssetPurchaseAction.Purchase_ID;
+  const purchase = activeAssetPurchaseAction;
 
+  const modal = document.getElementById("assetPurchasePaymentModal");
+  if (!modal) {
+    console.warn("assetPurchasePaymentModal tidak ditemukan");
+    return;
+  }
+  // SET DATA POPUP
+  document.getElementById("assetPurchasePaymentId").value = purchase.Purchase_ID || "";
+  document.getElementById("assetPurchasePaymentAsset").textContent = purchase.Asset_Name || "-";
+
+  const outstanding = Number(purchase.Outstanding_Amount || 0);
+
+  document.getElementById("assetPurchasePaymentOutstanding").textContent = formatRupiah(outstanding);
+  document.getElementById("assetPurchasePaymentDate").value = new Date().toISOString().split("T")[0];
+  // Default: bayar seluruh outstanding
+  document.getElementById("assetPurchasePaymentPrincipal").value = outstanding;
+  document.getElementById("assetPurchasePaymentInterest").value = 0;
+  document.getElementById("assetPurchasePaymentTotal").textContent = formatRupiah(outstanding);
+  document.getElementById("assetPurchasePaymentMethod").value = "BANK";
+  document.getElementById("assetPurchasePaymentReference").value = "";
+  document.getElementById("assetPurchasePaymentNote").value = "";
+  // Tutup action menu
   closeAssetPurchaseActionMenu();
-  console.log("Pay:", purchaseId);
+  // Buka payment modal
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+
+function closeAssetPurchasePaymentModal() {
+  const modal = document.getElementById("assetPurchasePaymentModal");
+
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
 }
 
 async function saveAssetPurchaseDraft() {
-
   const sessionId = localStorage.getItem("pos_session_id");
 
   if (!sessionId) {
