@@ -21643,6 +21643,111 @@ function payAssetPurchaseFromAction() {
   modal.classList.add("flex");
 }
 
+async function saveAssetPurchasePayment() {
+  try {
+    const purchaseId =
+      document.getElementById("assetPurchasePaymentId")?.value?.trim();
+
+    const paymentDate =
+      document.getElementById("assetPurchasePaymentDate")?.value;
+
+    const principal =
+      Number(document.getElementById("assetPurchasePaymentPrincipal")?.value || 0);
+
+    const interest =
+      Number(document.getElementById("assetPurchasePaymentInterest")?.value || 0);
+
+    const paymentMethod =
+      document.getElementById("assetPurchasePaymentMethod")?.value;
+
+    const referenceNo =
+      document.getElementById("assetPurchasePaymentReference")?.value?.trim() || null;
+
+    const note =
+      document.getElementById("assetPurchasePaymentNote")?.value?.trim() || null;
+
+    if (!purchaseId) {
+      alert("Purchase ID tidak ditemukan.");
+      return;
+    }
+
+    if (!paymentDate) {
+      alert("Tanggal pembayaran wajib diisi.");
+      return;
+    }
+
+    if (principal <= 0) {
+      alert("Pokok pembayaran harus lebih dari 0.");
+      return;
+    }
+
+    if (interest < 0) {
+      alert("Bunga tidak valid.");
+      return;
+    }
+
+    const total = principal + interest;
+
+    if (total <= 0) {
+      alert("Total pembayaran harus lebih dari 0.");
+      return;
+    }
+
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) {
+      alert("Session tidak ditemukan.");
+      return;
+    }
+
+    const btn = document.getElementById("saveAssetPurchasePaymentBtn");
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = "Menyimpan...";
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      "pay_asset_purchase",
+      {
+        p_session_id: sessionId,
+        p_purchase_id: purchaseId,
+        p_payment_date: paymentDate,
+        p_principal_amount: principal,
+        p_interest_amount: interest,
+        p_payment_method: paymentMethod,
+        p_reference_no: referenceNo,
+        p_note: note
+      }
+    );
+
+    if (error) {
+      console.error("pay_asset_purchase error:", error);
+      throw new Error(error.message || "Gagal menyimpan pembayaran asset.");
+    }
+
+    console.log("pay_asset_purchase result:", data);
+
+    alert("Pembayaran asset berhasil disimpan.");
+
+    closeAssetPurchasePaymentModal();
+
+    // Refresh tabel Asset Purchase
+    await loadAssetPurchases();
+
+  } catch (err) {
+    console.error("saveAssetPurchasePayment:", err);
+    alert(err.message || "Gagal menyimpan pembayaran.");
+  } finally {
+    const btn = document.getElementById("saveAssetPurchasePaymentBtn");
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "Simpan Pembayaran";
+    }
+  }
+}
+
 
 function closeAssetPurchasePaymentModal() {
   const modal = document.getElementById("assetPurchasePaymentModal");
