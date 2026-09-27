@@ -13467,6 +13467,142 @@
 		    </div>
 		  </div>
 		</div>
+		<!-- ================= ASSET PURCHASE PAYMENT MODAL ================= -->
+		<div id="assetPurchasePaymentModal"
+		  class="fixed inset-0 z-[120] hidden items-center justify-center bg-background p-4"
+		  onclick="if (event.target === this) closeAssetPurchasePaymentModal()">
+		  <div class="w-full max-w-lg rounded-md border border-outline-variant bg-background shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
+		    <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
+		      <div>
+		        <h3 class="text-on-surface font-semibold">
+		          Pembayaran Asset
+		        </h3>
+		
+		        <p id="assetPurchasePaymentAsset"
+		          class="text-sm text-on-surface-variant mt-1">
+		        </p>
+		      </div>
+		
+		      <button type="button"
+		        onclick="closeAssetPurchasePaymentModal()"
+		        class="text-on-surface-variant hover:text-on-surface">
+		        <span class="material-symbols-outlined">
+		          close
+		        </span>
+		      </button>
+		    </div>
+		    <!-- BODY -->
+		    <div class="p-5 space-y-4">
+		      <input type="hidden" id="assetPurchasePaymentId">
+		      <div class="rounded-md bg-background border border-outline-variant p-4">
+		        <div class="text-sm text-on-surface-variant">
+		          Outstanding Principal
+		        </div>
+		
+		        <div id="assetPurchasePaymentOutstanding"
+		          class="text-xl font-bold text-on-surface mt-1">
+		          Rp 0
+		        </div>
+		      </div>
+		      <!-- PAYMENT DATE -->
+		      <div>
+		        <label class="block text-xs text-on-surface-variant mb-2">
+		          Tanggal Pembayaran
+		        </label>
+		
+		        <input type="date"
+		          id="assetPurchasePaymentDate"
+		          class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+		      </div>
+		      <!-- PRINCIPAL -->
+		      <div>
+		        <label class="block text-xs text-on-surface-variant mb-2">
+		          Pokok
+		        </label>
+		
+		        <input type="number"
+		          min="0"
+		          step="1"
+		          id="assetPurchasePaymentPrincipal"
+		          class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+		      </div>
+		      <!-- INTEREST -->
+		      <div>
+		        <label class="block text-xs text-on-surface-variant mb-2">
+		          Bunga
+		        </label>
+		
+		        <input type="number"
+		          min="0"
+		          step="1"
+		          value="0"
+		          id="assetPurchasePaymentInterest"
+		          class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+		      </div>
+		      <!-- TOTAL -->
+		      <div class="rounded-md bg-background border border-outline-variant p-4">
+		        <div class="flex items-center justify-between">
+		          <span class="text-sm text-on-surface-variant">
+		            Total Pembayaran
+		          </span>
+		
+		          <span id="assetPurchasePaymentTotal"
+		            class="text-lg font-bold text-on-surface">
+		            Rp 0
+		          </span>
+		        </div>
+		      </div>
+		      <!-- PAYMENT METHOD -->
+		      <div>
+		        <label class="block text-xs text-on-surface-variant mb-2">
+		          Metode Pembayaran
+		        </label>
+		
+		        <select id="assetPurchasePaymentMethod"
+		          class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+		          <option value="CASH"> Cash </option>
+							<option value="BANK"> Bank </option>
+		          <option value="QRIS"> QRIS </option>
+		        </select>
+		      </div>
+		      <!-- REFERENCE -->
+		      <div>
+		        <label class="block text-xs text-on-surface-variant mb-2">
+		          No. Referensi
+		        </label>
+		
+		        <input type="text"
+		          id="assetPurchasePaymentReference"
+		          class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+		      </div>
+		      <!-- NOTE -->
+		      <div>
+		        <label class="block text-xs text-on-surface-variant mb-2">
+		          Catatan
+		        </label>
+		
+		        <textarea id="assetPurchasePaymentNote"
+		          rows="2"
+		          class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface"></textarea>
+		      </div>
+		      <!-- FOOTER -->
+		      <div class="flex items-center justify-end gap-2 pt-3">
+		        <button type="button"
+		          onclick="closeAssetPurchasePaymentModal()"
+		          class="px-4 py-2 text-on-surface-variant hover:text-on-surface">
+		          Cancel
+		        </button>
+		
+		        <button type="button"
+		          id="saveAssetPurchasePaymentBtn"
+		          onclick="saveAssetPurchasePayment()"
+		          class="px-4 py-2 bottom-theme text-on-surface font-medium">
+		          Simpan Pembayaran
+		        </button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
   </main>
 </div>
 </template>
