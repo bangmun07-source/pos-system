@@ -11775,7 +11775,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -12621,7 +12621,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -15708,7 +15708,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -16525,7 +16525,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -17402,7 +17402,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -18132,81 +18132,54 @@
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-			  <!-- DASHBOARD -->
-			  <a onclick="navigate('dashboardPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  home
-					</span>
-					<span class="sidebar-label">
-					  Dashboard
-					</span>
-			  </a>
-				<!-- SETTINGS -->
-			  <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
-				 style="display:none"
-					 class="settingsMenu">
-					<span class="material-symbols-outlined sidebar-icon">
-					  settings
-					</span>
-					<span class="sidebar-label">
-					  Settings
-					</span>
-			  </a>
-			  <!-- LOYALTY -->
-			  <a onclick="navigate('loyaltysettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  military_tech
-					</span>
-					<span class="sidebar-label">
-					  Loyalty &amp; Tiers
-					</span>
-			  </a>
-			  <!-- TAX-->
-			  <a onclick="navigate('taxservicesettingPage')">
-					 <span class="material-symbols-outlined sidebar-icon"> 					  
-						 account_balance
-					</span>
-					<span class="sidebar-label">
-					   Taxes &amp; Fees
-					</span>
-			  </a>
-			  <!-- EXPENSES -->
-			  <a onclick="navigate('expensessettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  payments
-					</span>
-					<span class="sidebar-label">
-					  Expenses
-					</span>
-			  </a>
-			  <!-- ANALYTICS -->
-			  <a onclick="navigate('analyticsPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  analytics
-					</span>
-					<span class="sidebar-label">
-						Analytics
-					</span>
-			  </a>
-				<!-- INVENTORY -->
-			  <a onclick="navigate('inventoryPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-					  inventory_2
-					</span>
-					<span class="sidebar-label">
-						Inventory
-					</span>
-			  </a>
+         <!-- DASHBOARD -->
+        <a onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            home
+          </span>
+          <span class="sidebar-label">
+            Dashboard
+          </span>
+        </a>
+        <!-- SETTINGS -->
+        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+          style="display:none"
+          class="settingsMenu">
+          <span class="material-symbols-outlined sidebar-icon">
+            settings
+          </span>
+          <span class="sidebar-label">
+            Settings
+          </span>
+        </a>
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_balance_wallet
+          </span>
+          <span class="sidebar-label">
+            Cash Flow
+          </span>
+        </a>
+        <!-- ASSET -->
+        <a onclick="navigate('assetPage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            inventory_2
+          </span>
+          <span class="sidebar-label">
+            Asset
+          </span>
+        </a>
 				<!-- DEBT & LIABILITIES -->
         <a class="active" onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
           <span class="sidebar-label">
-            Debt & Liabilities
+            Debt &amp; Liabilities
           </span>
         </a>
-				<!-- ACCOUNTING TAX -->
+        <!-- ACCOUNTING TAX -->
         <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
@@ -18215,15 +18188,42 @@
             Tax
           </span>
         </a>
-				<!-- CASH FLOW -->
-				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
-					<span class="material-symbols-outlined sidebar-icon">
-					  account_balance_wallet
-					</span>
-					<span class="sidebar-label">
-						Cash Flow
-					</span>
-			  </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
+          </span>
+        </a>
+				<!-- ACCOUNTING -->
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            account_tree
+          </span>
+          <span class="sidebar-label">
+            COA
+          </span>
+        </a>
+				<!-- JOURNAL ENTRIES -->
+				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            menu_book
+          </span>
+          <span class="sidebar-label">
+            Journal Entries
+          </span>
+        </a>
+				<!-- ACCOUNTING REPORTS -->
+				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            balance
+          </span>
+          <span class="sidebar-label">
+            Accounting Reports
+          </span>
+        </a>
       </nav>
       <!-- FOOTER -->
       <div class="mt-auto p-2 pb-2">
@@ -19149,7 +19149,7 @@
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-        <!-- DASHBOARD -->
+         <!-- DASHBOARD -->
         <a onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
@@ -19169,52 +19169,25 @@
             Settings
           </span>
         </a>
-        <!-- LOYALTY -->
-        <a onclick="navigate('loyaltysettingPage')">
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            military_tech
+            account_balance_wallet
           </span>
           <span class="sidebar-label">
-            Loyalty &amp; Tiers
+            Cash Flow
           </span>
         </a>
-        <!-- TAX -->
-        <a onclick="navigate('taxservicesettingPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance
-          </span>
-          <span class="sidebar-label">
-            Taxes &amp; Fees
-          </span>
-        </a>
-        <!-- EXPENSES -->
-        <a onclick="navigate('expensessettingPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            payments
-          </span>
-          <span class="sidebar-label">
-            Expenses
-          </span>
-        </a>
-        <!-- ANALYTICS -->
-        <a onclick="navigate('analyticsPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            analytics
-          </span>
-          <span class="sidebar-label">
-            Analytics
-          </span>
-        </a>
-        <!-- INVENTORY -->
-        <a onclick="navigate('inventoryPage')">
+        <!-- ASSET -->
+        <a onclick="navigate('assetPage')">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
           <span class="sidebar-label">
-            Inventory
+            Asset
           </span>
         </a>
-        <!-- DEBT & LIABILITIES -->
+				<!-- DEBT & LIABILITIES -->
         <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
@@ -19224,8 +19197,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a class="active"
-          onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+        <a class="active" onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -19242,13 +19214,31 @@
             RECEIVABLE
           </span>
         </a>
-        <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+				<!-- ACCOUNTING -->
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            account_balance_wallet
+            account_tree
           </span>
           <span class="sidebar-label">
-            Cash Flow
+            COA
+          </span>
+        </a>
+				<!-- JOURNAL ENTRIES -->
+				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            menu_book
+          </span>
+          <span class="sidebar-label">
+            Journal Entries
+          </span>
+        </a>
+				<!-- ACCOUNTING REPORTS -->
+				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            balance
+          </span>
+          <span class="sidebar-label">
+            Accounting Reports
           </span>
         </a>
       </nav>
@@ -21194,7 +21184,7 @@
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-        <!-- DASHBOARD -->
+         <!-- DASHBOARD -->
         <a onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
@@ -21214,52 +21204,25 @@
             Settings
           </span>
         </a>
-        <!-- LOYALTY -->
-        <a onclick="navigate('loyaltysettingPage')">
+        <!-- CASH FLOW -->
+        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            military_tech
+            account_balance_wallet
           </span>
           <span class="sidebar-label">
-            Loyalty &amp; Tiers
+            Cash Flow
           </span>
         </a>
-        <!-- TAX -->
-        <a onclick="navigate('taxservicesettingPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance
-          </span>
-          <span class="sidebar-label">
-            Taxes &amp; Fees
-          </span>
-        </a>
-        <!-- EXPENSES -->
-        <a onclick="navigate('expensessettingPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            payments
-          </span>
-          <span class="sidebar-label">
-            Expenses
-          </span>
-        </a>
-        <!-- ANALYTICS -->
-        <a onclick="navigate('analyticsPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            analytics
-          </span>
-          <span class="sidebar-label">
-            Analytics
-          </span>
-        </a>
-        <!-- INVENTORY -->
-        <a onclick="navigate('inventoryPage')">
+        <!-- ASSET -->
+        <a onclick="navigate('assetPage')">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
           <span class="sidebar-label">
-            Inventory
+            Asset
           </span>
         </a>
-        <!-- DEBT & LIABILITIES -->
+				<!-- DEBT & LIABILITIES -->
         <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
@@ -21286,13 +21249,31 @@
             RECEIVABLE
           </span>
         </a>
-        <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+				<!-- ACCOUNTING -->
+				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            account_balance_wallet
+            account_tree
           </span>
           <span class="sidebar-label">
-            Cash Flow
+            COA
+          </span>
+        </a>
+				<!-- JOURNAL ENTRIES -->
+				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            menu_book
+          </span>
+          <span class="sidebar-label">
+            Journal Entries
+          </span>
+        </a>
+				<!-- ACCOUNTING REPORTS -->
+				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            balance
+          </span>
+          <span class="sidebar-label">
+            Accounting Reports
           </span>
         </a>
       </nav>
