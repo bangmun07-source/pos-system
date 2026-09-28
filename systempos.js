@@ -12993,126 +12993,62 @@ function updateExpenseAIInsight(filteredData) {
     );
 
   if (!el) return;
-  const data =
-    filteredData ||
-    allExpenseData ||
-    [];
+  const data = filteredData || allExpenseData || [];
 
   if (!data.length) {
-    el.innerHTML =
-      "Belum ada data pengeluaran pada periode yang dipilih.";
-    return;
-  }
+    el.innerHTML = "Belum ada data pengeluaran pada periode yang dipilih.";
+    return; }
 
-  // TOTAL
-  const totalExpense =
-    data.reduce(
-      (sum, item) =>
-        sum + Number(item.amount || 0),
-      0
-    );
-
+  const totalExpense = data.reduce( (sum, item) => sum + Number(item.amount || 0), 0 ;
   const transactionCount = data.length;
-  const averageExpense =
-    transactionCount > 0
-      ? totalExpense /
-        transactionCount
-      : 0;
-
-  // CATEGORY
+  const averageExpense = transactionCount > 0
+		? totalExpense / transactionCount
+		: 0;
   const categories = {};
   data.forEach(item => {
-    const category =
-      item.category?.trim() ||
-      "Lainnya";
+    const category = item.category?.trim() || "Lainnya";
+    const amount = Number(item.amount || 0);
 
-    const amount =
-      Number(item.amount || 0);
-
-    categories[category] =
-      (categories[category] || 0) +
-      amount;
+    categories[category] = (categories[category] || 0) + amount;
   });
 
-  const categoryEntries =
-    Object.entries(categories)
-      .sort(
-        (a, b) =>
-          b[1] - a[1]
-      );
-
-  const biggestCategory =
-    categoryEntries[0];
-
-  // BIGGEST EXPENSE
-  const biggestExpense =
-    [...data]
-      .sort(
-        (a, b) =>
-          Number(b.amount || 0) -
-          Number(a.amount || 0)
-      )[0];
-
-  // PAYMENT METHOD
+  const categoryEntries = Object.entries(categories) .sort( (a, b) => b[1] - a[1] );
+  const biggestCategory = categoryEntries[0];
+  const biggestExpense =  [...data] .sort( (a, b) => Number(b.amount || 0) - Number(a.amount || 0) )[0];
   const paymentMethods = {};
   data.forEach(item => {
-    const method =
-      item.paymentMethod?.trim() ||
-      "Tidak diketahui";
+    const method = item.paymentMethod?.trim() || "Tidak diketahui";
 
-    paymentMethods[method] =
-      (paymentMethods[method] || 0) +
-      1;
+    paymentMethods[method] = (paymentMethods[method] || 0) + 1;
   });
 
-  const dominantPayment =
-    Object.entries(paymentMethods)
-      .sort(
-        (a, b) =>
-          b[1] - a[1]
-      )[0];
-
-  // BUDGET
+  const dominantPayment = Object.entries(paymentMethods) .sort( (a, b) => b[1] - a[1] )[0];
+	
   let budgetPercentage = null;
   let budgetStatus = "";
   if (Number(expenseBudget) > 0) {
-    budgetPercentage =
-      (
-        totalExpense /
-        Number(expenseBudget)
-      ) * 100;
-
+    budgetPercentage = ( totalExpense / Number(expenseBudget) ) * 100;
     if (
       budgetPercentage >= 100
-    ) {
-      budgetStatus =
-        `Budget sudah terpakai <b>${budgetPercentage.toFixed(0)}%</b> dan telah melewati batas.`;
+    ) { budgetStatus = `Budget sudah terpakai <b>${budgetPercentage.toFixed(0)}%</b> dan telah melewati batas.`;
     } else if (
       budgetPercentage >= 80
     ) {
-      budgetStatus =
-        `Budget sudah terpakai <b>${budgetPercentage.toFixed(0)}%</b> dan mulai mendekati batas.`;
+      budgetStatus = `Budget sudah terpakai <b>${budgetPercentage.toFixed(0)}%</b> dan mulai mendekati batas.`;
     } else {
-      budgetStatus =
-        `Budget baru terpakai <b>${budgetPercentage.toFixed(0)}%</b>.`;
+      budgetStatus = `Budget baru terpakai <b>${budgetPercentage.toFixed(0)}%</b>.`;
     }
   }
-
   // RINGKASAN
   let insight =
     `Terdapat <b>${transactionCount}</b> transaksi ` +
     `dengan total pengeluaran ` +
     `<b>Rp ${totalExpense.toLocaleString("id-ID")}</b>.`;
-
   // KATEGORI TERBESAR
   if (biggestCategory) {
     const categoryPercentage =
       totalExpense > 0
-        ? (
-            biggestCategory[1] /
-            totalExpense
-          ) * 100
-        : 0;
+        ? ( biggestCategory[1] / totalExpense ) * 100 : 0;
 
     insight +=
       ` Kategori terbesar adalah ` +
@@ -13123,30 +13059,18 @@ function updateExpenseAIInsight(filteredData) {
 
   // PENGELUARAN TERBESAR
   if (biggestExpense) {
+    const biggestAmount = Number( biggestExpense.amount || 0 );
 
-    const biggestAmount =
-      Number(
-        biggestExpense.amount || 0
-      );
-
-    const biggestPercentage =
-      totalExpense > 0
-        ? (
-            biggestAmount /
-            totalExpense
-          ) * 100
-        : 0;
+    const biggestPercentage = totalExpense > 0 ? ( biggestAmount / totalExpense ) * 100 : 0;
 
     insight +=
       ` Pengeluaran individual terbesar adalah ` +
       `<b>${biggestExpense.description || "Tanpa deskripsi"}</b> ` +
       `sebesar <b>Rp ${biggestAmount.toLocaleString("id-ID")}</b>.`;
-
     // MASUKAN PENGELUARAN BESAR
     if (
       biggestPercentage >= 30
     ) {
-
       insight +=
         ` <b>Masukan:</b> Pengeluaran tersebut ` +
         `menyumbang sekitar <b>${biggestPercentage.toFixed(0)}%</b> ` +
@@ -13154,48 +13078,34 @@ function updateExpenseAIInsight(filteredData) {
         `bersifat rutin, penting, atau masih dapat dioptimalkan.`;
     }
   }
-
   // MASUKAN KATEGORI
   if (biggestCategory) {
-
-    const categoryPercentage =
-      totalExpense > 0
-        ? (
-            biggestCategory[1] /
-            totalExpense
-          ) * 100
-        : 0;
+    const categoryPercentage = totalExpense > 0 ? ( biggestCategory[1] /  totalExpense ) * 100 : 0;
 
     if (
       categoryPercentage >= 50
     ) {
-
       insight +=
         ` Kategori <b>${biggestCategory[0]}</b> ` +
         `menyumbang lebih dari setengah total pengeluaran. ` +
         `<b>Masukan:</b> Pertimbangkan untuk mengevaluasi ` +
         `komponen biaya pada kategori tersebut.`;
-
     } else if (
       categoryPercentage >= 35
     ) {
-
       insight +=
         ` <b>Masukan:</b> Pengeluaran cukup terkonsentrasi ` +
         `pada kategori <b>${biggestCategory[0]}</b>. ` +
         `Kategori ini layak menjadi prioritas evaluasi.`;
     }
   }
-
   // BUDGET INSIGHT
   if (
     budgetPercentage !== null
   ) {
-
     if (
       budgetPercentage >= 100
     ) {
-
       insight +=
         ` <b>Masukan:</b> Pengeluaran sudah melewati ` +
         `budget. Prioritaskan evaluasi terhadap pengeluaran ` +
@@ -13204,34 +13114,28 @@ function updateExpenseAIInsight(filteredData) {
     } else if (
       budgetPercentage >= 80
     ) {
-
       insight +=
         ` <b>Masukan:</b> Penggunaan budget sudah cukup tinggi. ` +
         `Sebaiknya pantau pengeluaran berikutnya agar ` +
         `tidak melewati batas.`;
-
     } else if (
       budgetPercentage <= 50
     ) {
-
       insight +=
         ` <b>Masukan:</b> Penggunaan budget masih relatif rendah, ` +
         `sehingga ruang pengeluaran masih cukup tersedia.`;
     }
   }
-
   // POLA TRANSAKSI
   if (
     transactionCount >= 20 &&
     averageExpense < 100000
   ) {
-
     insight +=
       ` <b>Masukan:</b> Jumlah transaksi pengeluaran cukup banyak ` +
       `dengan nilai rata-rata relatif kecil. ` +
       `Periksa pengeluaran kecil yang berulang karena ` +
       `akumulasinya dapat menjadi signifikan.`;
-
   } else if (
     transactionCount <= 5 &&
     averageExpense > 1000000
@@ -13242,85 +13146,53 @@ function updateExpenseAIInsight(filteredData) {
       `Sebaiknya berikan perhatian khusus pada setiap ` +
       `pengeluaran bernilai tinggi.`;
   }
-
   // PAYMENT METHOD
   if (dominantPayment) {
     const paymentPercentage =
-      (
-        dominantPayment[1] /
-        transactionCount
-      ) * 100;
+      ( dominantPayment[1] / transactionCount ) * 100;
 
     if (
       paymentPercentage >= 70
     ) {
-
       insight +=
         ` Sebagian besar transaksi menggunakan ` +
         `<b>${dominantPayment[0]}</b> ` +
         `(${paymentPercentage.toFixed(0)}% dari transaksi).`;
     }
   }
-
   // KONDISI NORMAL
   if (
     budgetPercentage !== null &&
     budgetPercentage < 80 &&
-    (!biggestCategory ||
-      (
-        biggestCategory[1] /
-        totalExpense
-      ) < 0.5)
+    (!biggestCategory || ( biggestCategory[1] / totalExpense ) < 0.5)
   ) {
-
     insight +=
       ` <b>Masukan:</b> Pola pengeluaran saat ini ` +
       `masih terlihat cukup terkendali. ` +
       `Pertahankan pemantauan terutama pada kategori ` +
       `dengan pertumbuhan biaya paling tinggi.`;
   }
-
   // STATUS BUDGET
-  if (budgetStatus) {
-    insight +=
-      ` ${budgetStatus}`;
-  }
-
+  if (budgetStatus) { insight += ` ${budgetStatus}`; }
   // RENDER
-  el.innerHTML =
-    insight;
+  el.innerHTML = insight;
 }
 
 async function saveExpenseBudget() {
   const branchId = state.branchId;
   if (!branchId) {
-    showToast(
-      "Branch belum tersedia.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Branch belum tersedia.", "error" );
+    return; }
 
   const payload = {
     branchId: branchId,
-    Month:
-      document.getElementById(
-        "budgetMonth"
-      ).value,
-
-    Budget:
-      Number(
-        document.getElementById(
-          "budgetAmount"
-        ).value
-      )
+    Month: document.getElementById( "budgetMonth" ).value,
+    Budget: Number( document.getElementById( "budgetAmount" ).value )
   };
 
   try {
-
-    await saveExpenseBudgetRPC(
-      payload
-    );
+    await saveExpenseBudgetRPC( payload );
+		
     closeBudgetModal();
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
@@ -13329,13 +13201,8 @@ async function saveExpenseBudget() {
       "Budget berhasil disimpan."
     );
   }
-
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal menyimpan budget.",
-      "error"
-    );
+    showToast( err?.message || "Gagal menyimpan budget.", "error" );
   }
 }
 
@@ -13457,31 +13324,22 @@ function showExpenseReceipt(index) {
     status.textContent = expense.status || "-";
     status.className = "px-4 py-1 rounded-md text-sm font-semibold";
     switch ((expense.status || "").toLowerCase()) {
-        case "paid":
-            status.classList.add(
-                "bottom-theme",
-                "text-on-surface"
-            );
-            break;
-        case "pending":
-            status.classList.add(
-                "bg-yellow-600",
-                "text-yellow-700"
-            );
-            break;
-
-        case "void":
-            status.classList.add(
-                "bg-red-600",
-                "text-red-700"
-            );
-            break;
-        default:
-            status.classList.add(
-                "bg-gray-600/20",
-                "text-gray-700"
-            );
-            break;
+		case "paid":
+			status.classList.add(
+					"bottom-theme", "text-on-surface"
+			); break;
+		case "pending":
+			status.classList.add(
+					"bg-yellow-600", "text-yellow-700"
+			); break;
+		case "void":
+			status.classList.add(
+				"bg-red-600", "text-red-700"
+			); break;
+		default:
+			status.classList.add(
+				"bg-gray-600/20", "text-gray-700"
+			); break;
     }
     modal.classList.remove("hidden");
     modal.classList.add("flex");
@@ -13532,18 +13390,11 @@ function showExpenseStatusModal(expense) {
 async function saveExpenseStatus() {
   const expense = expenseData[selectedExpenseIndex];
   if (!expense) return;
-  const newStatus =
-    document.getElementById(
-      "expenseNewStatus"
-    ).value;
+  const newStatus = document.getElementById( "expenseNewStatus" ).value;
 
   if (newStatus === expense.status) {
-    showToast(
-      "Status tidak berubah.",
-      "info"
-    );
-    return;
-  }
+    showToast( "Status tidak berubah.", "info" );
+    return; }
 
   try {
     const res =
@@ -13553,18 +13404,10 @@ async function saveExpenseStatus() {
       );
 
     if (!res?.success) {
-      showToast(
-        res?.message ||
-        "Gagal memperbarui status.",
-        "error"
-      );
-      return;
-    }
+      showToast( res?.message || "Gagal memperbarui status.", "error"
+      ); return; }
 
-    showToast(
-      "Status berhasil diperbarui.",
-      "success"
-    );
+    showToast( "Status berhasil diperbarui.", "success" );
 
     closeExpenseStatusModal();
     // CLEAR CACHE
@@ -13572,16 +13415,14 @@ async function saveExpenseStatus() {
     state.cashFlowFilter = null;
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     selectedExpenseIndex = null;
     await loadExpenseDashboard();
   }
 
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memperbarui status.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memperbarui status.", "error" );
   }
 }
 	
@@ -13618,105 +13459,97 @@ function viewExpenseAttachment() {
 	}
 	const file = document.getElementById("expenseAttachmentFile");
 	if (file) {
-			if (expense.Attachment_URL) {
-					file.innerHTML = `
-					<a href="${expense.Attachment_URL}"
-					target="_blank"
-					class="flex items-center gap-3 p-4 rounded-md bg-background-high hover:bg-outline-variant/10 transition">
-							<span class="material-symbols-outlined text-on-surface">
-									description
-							</span>
+		if (expense.Attachment_URL) {
+			file.innerHTML = `
+			<a href="${expense.Attachment_URL}"
+				target="_blank"
+				class="flex items-center gap-3 p-4 rounded-md bg-background-high hover:bg-outline-variant/10 transition">
+				<span class="material-symbols-outlined text-on-surface">
+					description
+				</span>
 
-							<span class="text-xs lg:text-sm text-on-surface">
-									Open Attachment
-							</span>
-					</a>
-					`;
-			} else {
-					file.innerHTML = `
-					<div class="p-4 rounded-md bg-background-high text-xs lg:text-sm text-on-surface-variant text-center">
-							No attachment available
-					</div>
-					`;
-			}
+				<span class="text-xs lg:text-sm text-on-surface">
+					Open Attachment
+				</span>
+			</a>
+			`;
+		} else {
+			file.innerHTML = `
+			<div class="p-4 rounded-md bg-background-high text-xs lg:text-sm text-on-surface-variant text-center">
+				No attachment available
+			</div>
+			`;
+		}
 	}
 	modal.classList.remove("hidden");
 	modal.classList.add("flex");
 }
 
 function closeExpenseAttachmentModal(){
-    const modal = document.getElementById("expense-attachment-modal");
-    if(!modal) return;
-    modal.remove();
+	const modal = document.getElementById("expense-attachment-modal");
+	if(!modal) return;
+	modal.remove();
 }
 
 function openExpenseAttachmentFile() {
-    const expense = expenseData[selectedExpenseIndex];
-    if (!expense) return;
-    closeExpenseAttachmentModal();
-    let modal =
-        document.getElementById(
-            "expense-view-attachment-modal"
-        );
+	const expense = expenseData[selectedExpenseIndex];
+	if (!expense) return;
+	closeExpenseAttachmentModal();
+	let modal = document.getElementById( "expense-view-attachment-modal" );
 
-    if (!modal) {
-        const template = document.getElementById("expenseViewAttachmentModalTemplate");
-        document.body.appendChild(template.content.cloneNode(true));
-        modal = document.getElementById("expense-view-attachment-modal");
-    }
-    document.getElementById("viewAttachmentRef").textContent = expense.refId || "-";
-    const fileName =
-        expense.Attachment_URL
-        ? expense.Attachment_URL.split("/").pop()
-        : "Unknown File";
-    document.getElementById(
-        "viewAttachmentName"
-    ).textContent =
-        fileName;
-    const preview =document.getElementById("viewAttachmentPreview");
-    if (!expense.Attachment_URL) {
-        preview.innerHTML = `
-            <div class="text-center">
-							<span class="material-symbols-outlined text-6xl text-outline/50">
-									description
-							</span>
-			
-							<p class="mt-3 text-on-surface-variant">
-									No attachment available
-							</p>
-            </div>
-        `;
-    } else {
-        preview.innerHTML = `
-          <div class="p-6 rounded-md bg-background-high text-center space-y-4">
-						<span class="material-symbols-outlined text-6xl text-on-surface">
-								picture_as_pdf
-						</span>
-			
-						<div>
-							<p class="font-semibold text-on-surface">
-									PDF Document
-							</p>
-			
-							<p class="text-xs text-on-surface-variant mt-1">
-									${expense.Attachment_URL.split("/").pop()}
-							</p>
-						</div>
+	if (!modal) {
+		const template = document.getElementById("expenseViewAttachmentModalTemplate");
+		document.body.appendChild(template.content.cloneNode(true));
+		modal = document.getElementById("expense-view-attachment-modal");
+	}
+	document.getElementById("viewAttachmentRef").textContent = expense.refId || "-";
+	const fileName = expense.Attachment_URL
+		? expense.Attachment_URL.split("/").pop()
+		: "Unknown File";
+	document.getElementById( "viewAttachmentName" ).textContent = fileName;
+	const preview =document.getElementById("viewAttachmentPreview");
+	if (!expense.Attachment_URL) {
+		preview.innerHTML = `
+			<div class="text-center">
+				<span class="material-symbols-outlined text-6xl text-outline/50">
+					description
+				</span>
 
-						<a href="${expense.Attachment_URL}"
-						target="_blank"
-						class="inline-flex items-center justify-center gap-2 px-6 h-11 bg-background bottom-theme border border-white/5 rounded-md  font-bold text-on-surface">
-
-								<span class="material-symbols-outlined">
-										open_in_new
-								</span>
-								Open PDF
-						</a>
+				<p class="mt-3 text-on-surface-variant">
+					No attachment available
+				</p>
+			</div>
+		`;
+	} else {
+		preview.innerHTML = `
+			<div class="p-6 rounded-md bg-background-high text-center space-y-4">
+				<span class="material-symbols-outlined text-6xl text-on-surface">
+					picture_as_pdf
+				</span>
+	
+				<div>
+					<p class="font-semibold text-on-surface">
+							PDF Document
+					</p>
+	
+					<p class="text-xs text-on-surface-variant mt-1">
+							${expense.Attachment_URL.split("/").pop()}
+					</p>
 				</div>
-       `;
-    }
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+
+				<a href="${expense.Attachment_URL}"
+					target="_blank"
+					class="inline-flex items-center justify-center gap-2 px-6 h-11 bg-background bottom-theme border border-white/5 rounded-md  font-bold text-on-surface">
+					<span class="material-symbols-outlined">
+						open_in_new
+					</span>
+					Open PDF
+				</a>
+			</div>
+		 `;
+	}
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 function closeExpenseViewAttachmentModal() {
@@ -13726,79 +13559,71 @@ function closeExpenseViewAttachmentModal() {
 }
 
 function downloadExpenseAttachment() {
-    const expense = expenseData[selectedExpenseIndex];
-    if (!expense) return;
-    if (!expense.Attachment_URL) {
-        showToast(
-            "No attachment available.",
-            "info"
-        );
-        return;
-    }
-    window.open(
-        expense.Attachment_URL,
-        "_blank"
-    );
+	const expense = expenseData[selectedExpenseIndex];
+	if (!expense) return;
+	if (!expense.Attachment_URL) {
+		showToast( "No attachment available.", "info" );
+		return; }
+	window.open(
+		expense.Attachment_URL,
+		"_blank"
+	);
 }
 
 let selectedAttachmentExpenseIndex = null;
 function openExpenseAddAttachmentModal() {
-    const expense = expenseData[selectedExpenseIndex];
-    if (!expense) return;
-    selectedAttachmentExpenseIndex = selectedExpenseIndex;
-    let modal = document.getElementById("expense-add-attachment-modal");
-    if (!modal) {
-        const template = document.getElementById("expenseAddAttachmentModalTemplate");
-        document.body.appendChild(template.content.cloneNode(true));
-        modal = document.getElementById("expense-add-attachment-modal");
-    }
-    document.getElementById("uploadAttachmentRef").textContent = expense.refId || "-";
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	const expense = expenseData[selectedExpenseIndex];
+	if (!expense) return;
+	selectedAttachmentExpenseIndex = selectedExpenseIndex;
+	let modal = document.getElementById("expense-add-attachment-modal");
+	if (!modal) {
+			const template = document.getElementById("expenseAddAttachmentModalTemplate");
+			document.body.appendChild(template.content.cloneNode(true));
+			modal = document.getElementById("expense-add-attachment-modal");
+	}
+	document.getElementById("uploadAttachmentRef").textContent = expense.refId || "-";
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 function closeExpenseAddAttachmentModal() {
-    const modal = document.getElementById("expense-add-attachment-modal");
-    if (!modal) return;
-    modal.remove();
-    selectedAttachmentExpenseIndex = null;
+	const modal = document.getElementById("expense-add-attachment-modal");
+	if (!modal) return;
+	modal.remove();
+	selectedAttachmentExpenseIndex = null;
 }
 
 function previewExpenseAttachment(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    // batas 10 MB
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-        showToast(
-            "File maksimal 10 MB",
-            "error"
-        );
-        event.target.value = "";
-        return;
-    }
-    document.getElementById("expenseSelectedFile").classList.remove("hidden");
-    document.getElementById("expenseFileName").textContent = file.name;
-    document.getElementById("expenseFileSize").textContent = formatFileSize(file.size);
+	const file = event.target.files[0];
+	if (!file) return;
+	// batas 10 MB
+	const maxSize = 10 * 1024 * 1024;
+	if (file.size > maxSize) {
+			showToast(
+					"File maksimal 10 MB",
+					"error"
+			);
+			event.target.value = "";
+			return;
+	}
+	document.getElementById("expenseSelectedFile").classList.remove("hidden");
+	document.getElementById("expenseFileName").textContent = file.name;
+	document.getElementById("expenseFileSize").textContent = formatFileSize(file.size);
 }
 
 function formatFileSize(bytes) {
-    if (bytes === 0)
-        return "0 Bytes";
-    const sizes = [
-        "Bytes",
-        "KB",
-        "MB",
-        "GB"
-    ];
-    const i = Math.floor(Math.log(bytes) / Math.log(1024));
-    return (Math.round(bytes / Math.pow(1024,i)
-        )
-        +
-        " "
-        +
-        sizes[i]
-    );
+	if (bytes === 0)
+		return "0 Bytes";
+	const sizes = [
+		"Bytes", "KB", "MB", "GB" ];
+	const i = Math.floor(Math.log(bytes) / Math.log(1024));
+	return (Math.round(bytes / Math.pow(1024,i)
+		)
+		+
+		" "
+		+
+		sizes[i]
+	);
 }
 
 function removeExpenseAttachment() {
@@ -13811,15 +13636,9 @@ function removeExpenseAttachment() {
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      resolve(reader.result);
-    };
-
-    reader.onerror = () => {
-      reject(
-        new Error("Gagal membaca file")
-      );
-    };
+		
+    reader.onload = () => { resolve(reader.result); };
+    reader.onerror = () => { reject( new Error("Gagal membaca file") ); };
     reader.readAsDataURL(file);
   });
 }
@@ -13828,23 +13647,15 @@ async function uploadExpenseAttachment() {
   const expense = expenseData[selectedAttachmentExpenseIndex];
 	
   if (!expense) {
-    showToast(
-      "Expense tidak ditemukan",
-      "error"
-    );
-    return;
-  }
+    showToast( "Expense tidak ditemukan", "error" );
+    return; }
 
   const input = document.getElementById( "expenseAttachmentInput" );
   const file = input?.files?.[0];
 
   if (!file) {
-    showToast(
-      "Pilih file terlebih dahulu",
-      "warning"
-    );
-    return;
-  }
+    showToast( "Pilih file terlebih dahulu", "warning" );
+    return; }
 
   try {
     let base64;
@@ -13864,15 +13675,10 @@ async function uploadExpenseAttachment() {
 
     // FORMAT LAIN
     else {
-      throw new Error(
-        "Format file tidak didukung. Gunakan PDF, JPG, atau PNG."
-      );
+      throw new Error( "Format file tidak didukung. Gunakan PDF, JPG, atau PNG." );
     }
-
     if (!base64) {
-      throw new Error(
-        "Gagal membaca file"
-      );
+      throw new Error( "Gagal membaca file" );
     }
 
     // UPLOAD KE VERCEL API
@@ -13880,13 +13686,11 @@ async function uploadExpenseAttachment() {
       await fetch(
         "/api/handle-expense-attachment",
         {
-          method:
-            "POST",
+          method: "POST",
           headers: {
             "Content-Type":
               "application/json"
           },
-
           body:
             JSON.stringify({
               base64,
@@ -13899,9 +13703,7 @@ async function uploadExpenseAttachment() {
 
     const result = await response.json();
 
-    if (
-      !response.ok ||
-      !result.success
+    if ( !response.ok || !result.success
     ) { throw new Error( result.error || "Upload attachment gagal" ); }
 
     // URL HASIL UPLOAD
@@ -13916,9 +13718,8 @@ async function uploadExpenseAttachment() {
 
     // SUCCESS
     showToast(
-      "Attachment berhasil disimpan",
-      "success"
-    );
+      "Attachment berhasil disimpan", "success" );
+		
     closeExpenseAddAttachmentModal();
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
@@ -14155,7 +13956,6 @@ function renderOtherIncomePagination() {
   `;
 
   for (let i = 1; i <= totalPages; i++) {
-
     wrapper.innerHTML += `
       <button onclick="goToOtherIncomePage(${i})"
         class=" w-8 h-8 rounded-md flex items-center justify-center text-xs font-bold
@@ -14166,11 +13966,9 @@ function renderOtherIncomePagination() {
       </button>
     `;
   }
-
   wrapper.innerHTML += `
     <button onclick="changeOtherIncomePage(1)"
       class="w-8 h-8 rounded-md flex items-center justify-center transition-colors">
-
       <span class="material-symbols-outlined text-sm">
         chevron_right
       </span>
@@ -14179,33 +13977,16 @@ function renderOtherIncomePagination() {
 }
 
 function viewOtherIncome(refId) {
-    const item =
-        filteredOtherIncomeData.find(
-            x => x.refId === refId
-        );
+    const item = filteredOtherIncomeData.find( x => x.refId === refId );
     if (!item) {
-        showToast(
-            "Data tidak ditemukan",
-            "error"
-        );
-        return;
-    }
-    let modal =
-        document.getElementById(
-            "other-income-detail-modal"
-        );
+			showToast( "Data tidak ditemukan", "error" );
+			return; }
+    let modal = document.getElementById( "other-income-detail-modal" );
     if (!modal) {
         const template =
-            document.getElementById(
-                "otherIncomeDetailModalTemplate"
-            );
-        document.body.appendChild(
-            template.content.cloneNode(true)
-        );
-        modal =
-            document.getElementById(
-                "other-income-detail-modal"
-            );
+					document.getElementById( "otherIncomeDetailModalTemplate" );
+					document.body.appendChild( template.content.cloneNode(true) );
+        modal = document.getElementById( "other-income-detail-modal" );
     }
     document.getElementById("otherIncomeDetailRef").textContent = item.refId || "-";
     document.getElementById("otherIncomeDetailDescription").textContent = item.description || "-";
@@ -14220,105 +14001,59 @@ function viewOtherIncome(refId) {
 }
 
 function closeOtherIncomeDetailModal(){
-    const modal =
-        document.getElementById(
-            "other-income-detail-modal"
-        );
-    if (!modal) return;
-    modal.remove();
+	const modal = document.getElementById( "other-income-detail-modal" );
+	if (!modal) return;
+	modal.remove();
 }
 
 function editOtherIncomeStatus(refId) {
-    const item =
-        allOtherIncomeData.find(
-            x => x.refId === refId
-        );
-    if (!item) {
-        showToast("Data tidak ditemukan","error");
-        return;
-    }
-    selectedOtherIncome = item;
-    let modal =
-        document.getElementById(
-            "edit-other-income-status-modal"
-        );
-    if (!modal) {
-        const template =
-            document.getElementById(
-                "editOtherIncomeStatusTemplate"
-            );
-        document.body.appendChild(
-            template.content.cloneNode(true)
-        );
-        modal =
-            document.getElementById(
-                "edit-other-income-status-modal"
-            );
-    }
-    document.getElementById(
-        "editOtherIncomeRef"
-    ).textContent =
-        item.refId;
-    document.getElementById(
-        "editOtherIncomeStatus"
-    ).value =
-        item.status || "Pending";
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	const item = allOtherIncomeData.find( x => x.refId === refId );
+	if (!item) {
+		showToast("Data tidak ditemukan","error");
+		return; }
+	selectedOtherIncome = item;
+	let modal = document.getElementById( "edit-other-income-status-modal" );
+	if (!modal) {
+		const template =
+			document.getElementById( "editOtherIncomeStatusTemplate" );
+			document.body.appendChild( template.content.cloneNode(true) );
+		modal = document.getElementById( "edit-other-income-status-modal" );
+	}
+	document.getElementById( "editOtherIncomeRef" ).textContent = item.refId;
+	document.getElementById( "editOtherIncomeStatus" ).value = item.status || "Pending";
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 function closeOtherIncomeStatusModal(){
-    const modal =
-			document.getElementById(
-					"edit-other-income-status-modal"
-        );
-    if(modal){
-			modal.classList.add("hidden");
-			modal.classList.remove("flex");
-    }
+	const modal = document.getElementById( "edit-other-income-status-modal" );
+	if(modal){
+		modal.classList.add("hidden");
+		modal.classList.remove("flex");
+	}
 }	
 
 async function saveOtherIncomeStatus() {
   if (!selectedOtherIncome) {
-    showToast(
-      "Data tidak ditemukan",
-      "error"
-    );
-    return;
-  }
-
+    showToast( "Data tidak ditemukan", "error" );
+    return; }
   const status = document.getElementById( "editOtherIncomeStatus" )?.value;
 
   if (!status) {
-    showToast(
-      "Status tidak dipilih",
-      "warning"
-    );
-    return;
-  }
+    showToast( "Status tidak dipilih", "warning" );
+    return; }
 
   try {
-
     const res =
       await updateOtherIncomeStatusRPC(
         selectedOtherIncome.refId,
         status
       );
 
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal mengubah status"
-      );
-    }
+    if ( res && res.success === false
+    ) { throw new Error(  res.message || "Gagal mengubah status" ); }
 
-    showToast(
-      "Status berhasil diubah",
-      "success"
-    );
+    showToast( "Status berhasil diubah", "success" );
 
     // CLEAR CASH FLOW CACHE
     state.cashFlowData = null;
@@ -14326,14 +14061,12 @@ async function saveOtherIncomeStatus() {
     closeOtherIncomeStatusModal();
     state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     await loadExpenseDashboard();
   }
   catch (err) {
-    showToast(
-      err.message ||
-      "Gagal mengubah status",
-      "error"
-    );
+    showToast( err.message || "Gagal mengubah status", "error" );
   }
 }
 
@@ -14357,30 +14090,23 @@ function updateOtherIncomeTableInfo() {
   const el = document.getElementById("otherIncomeTableInfo");
   if (!el) return;
   const total = filteredOtherIncomeData.length;
-  const start =
-    total === 0
-      ? 0
-      : ((otherIncomeCurrentPage - 1) * otherIncomeRowsPerPage) + 1;
-  const end =
-    Math.min(
-      otherIncomeCurrentPage * otherIncomeRowsPerPage,
-      total
-    );
-  el.innerText =
-    `Showing ${start} to ${end} of ${total} Ledger Entries`;
+  const start = total === 0
+		? 0
+		: ((otherIncomeCurrentPage - 1) * otherIncomeRowsPerPage) + 1;
+  const end = Math.min(
+		otherIncomeCurrentPage * otherIncomeRowsPerPage,
+		total );
+  el.innerText = `Showing ${start} to ${end} of ${total} Ledger Entries`;
 }
 
 function loadOtherIncomeBranches(
   selectId = "otherIncomeBranchFilter"
 ) {
-  const select =
-    document.getElementById(selectId);
+  const select = document.getElementById(selectId);
 
   if (!select) return;
   select.innerHTML = "";
-  const branches =
-    state.expenseDashboardData
-      ?.branches || [];
+  const branches = state.expenseDashboardData ?.branches || [];
 
   branches.forEach(b => {
     select.innerHTML += `
@@ -14405,55 +14131,34 @@ function initOtherIncomeEvents() {
 }
 
 function closeAddNewOtherIncome() {
-  document
-    .getElementById("addNewOtherIncomeWrapper")
-    ?.remove();
+  document .getElementById("addNewOtherIncomeWrapper") ?.remove();
 }
 
 function renderCategoryBreakdown(data = allExpenseData) {
   const map = {};
 
   data.forEach(item => {
-    const status =
-      item.status ||
-      item.Status;
+    const status = item.status || item.Status;
 
     if (
-      String(status)
-        .trim()
-        .toUpperCase() !== "PAID"
+      String(status) .trim() .toUpperCase() !== "PAID"
     ) return;
 
-    const amount = Number(
-      item.amount ||
-      item.Amount ||
-      0
-    );
-
-    const category =
-      item.category ||
-      item.Category ||
-      "Other";
-
-    map[category] =
-      (map[category] || 0) + amount;
+    const amount = Number( item.amount || item.Amount || 0 );
+    const category = item.category || item.Category || "Other";
+		
+    map[category] = (map[category] || 0) + amount;
   });
 
-  const total =
-    Object.values(map)
-      .reduce(
-        (a, b) => a + b,
-        0
-      );
+  const total = Object.values(map) .reduce( (a, b) => a + b, 0 );
 
   const result =
     Object.keys(map).map(cat => ({
       name: cat,
       amount: map[cat],
-      percent:
-        total > 0
-          ? (map[cat] / total) * 100
-          : 0
+      percent: total > 0
+				? (map[cat] / total) * 100
+				: 0
     }));
 
   drawCategory(result);
@@ -14484,9 +14189,9 @@ function drawCategory(data) {
           ${Number(item.percent).toFixed(1)}%
         </span>
       </div>
+			
       <div class="h-2 w-full bg-outline-variant rounded-md">
-        <div
-          class="h-full bg-primary rounded-md"
+        <div class="h-full bg-primary rounded-md"
           style="width:${item.percent}%">
         </div>
       </div>
@@ -14497,106 +14202,62 @@ function drawCategory(data) {
 
 function filterExpenseTable() {
   const f = getExpenseFilters();
-  const filtered =
-    allExpenseData.filter(item => {
-      // BRANCH
-      const itemBranch =
-        String(
-          item.branchId || ""
-        )
-        .trim()
-        .toUpperCase();
+  const filtered = allExpenseData.filter(item => {
+		const itemBranch = String( item.branchId || "" )
+			.trim()
+			.toUpperCase();
+		const filterBranch = String( f.branch || "" )
+			.trim()
+			.toUpperCase();
 
-      const filterBranch =
-        String(
-          f.branch || ""
-        )
-        .trim()
-        .toUpperCase();
+		const matchBranch =
+			filterBranch === "ALL" ||
+			!filterBranch ||
+			itemBranch === filterBranch;
+		const keyword = String( f.keyword || "" )
+			.trim()
+			.toLowerCase();
+		const text =
+			`${item.description || ""}
+			 ${item.category || ""}
+			 ${item.refId || ""}`
+			.toLowerCase();
+		const matchSearch = !keyword || text.includes(keyword);
+		const matchCategory = f.category === "All Categories" ||
+			String( item.category || "" ).trim() ===
+			String( f.category || "" ).trim();
+		const matchStatus = f.status === "All Status" ||
+			String( item.status || "" )
+			.trim()
+			.toUpperCase() === String( f.status || "" )
+			.trim()
+			.toUpperCase();
+		const itemDate = item.tanggal
+			? new Date(item.tanggal)
+			: null;
 
-      const matchBranch =
-        filterBranch === "ALL" ||
-        !filterBranch ||
-        itemBranch === filterBranch;
+		const matchStart = !f.startDate ||
+			(
+				itemDate &&
+				!isNaN(itemDate) &&
+				itemDate >= new Date( `${f.startDate}T00:00:00` )
+			);
+		const matchEnd = !f.endDate ||
+			(
+				itemDate &&
+				!isNaN(itemDate) &&
+				itemDate <= new Date( `${f.endDate}T23:59:59.999` )
+			);
 
-      // SEARCH
-      const keyword =
-        String(
-          f.keyword || ""
-        )
-        .trim()
-        .toLowerCase();
-
-      const text =
-        `${item.description || ""}
-         ${item.category || ""}
-         ${item.refId || ""}`
-        .toLowerCase();
-
-      const matchSearch =
-        !keyword ||
-        text.includes(keyword);
-
-      // CATEGORY
-      const matchCategory =
-        f.category === "All Categories" ||
-        String(
-          item.category || ""
-        ).trim() ===
-        String(
-          f.category || ""
-        ).trim();
-
-      // STATUS
-      const matchStatus =
-        f.status === "All Status" ||
-        String(
-          item.status || ""
-        )
-        .trim()
-        .toUpperCase() ===
-        String(
-          f.status || ""
-        )
-        .trim()
-        .toUpperCase();
-      // DATE
-      const itemDate =
-        item.tanggal
-          ? new Date(item.tanggal)
-          : null;
-
-      const matchStart =
-        !f.startDate ||
-        (
-          itemDate &&
-          !isNaN(itemDate) &&
-          itemDate >=
-            new Date(
-              `${f.startDate}T00:00:00`
-            )
-        );
-
-      const matchEnd =
-        !f.endDate ||
-        (
-          itemDate &&
-          !isNaN(itemDate) &&
-          itemDate <=
-            new Date(
-              `${f.endDate}T23:59:59.999`
-            )
-        );
-
-      return (
-        matchBranch &&
-        matchSearch &&
-        matchCategory &&
-        matchStatus &&
-        matchStart &&
-        matchEnd
-      );
-    });
+		return (
+			matchBranch &&
+			matchSearch &&
+			matchCategory &&
+			matchStatus &&
+			matchStart &&
+			matchEnd
+		);
+	});
 
   currentPage = 1;
   window.currentFilteredData = filtered;
@@ -15065,18 +14726,14 @@ async function submitOtherIncome() {
     state.expenseDashboardFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     await loadExpenseDashboard();
 
-    showToast(
-      "Other Income berhasil disimpan",
-      "success"
-    );
+    showToast( "Other Income berhasil disimpan", "success" );
 
   } catch (err) {
-    showToast( err?.message ||
-      "Gagal menyimpan Other Income",
-      "error"
-    );
+    showToast( err?.message || "Gagal menyimpan Other Income", "error" );
   }
 }
 
@@ -15091,23 +14748,14 @@ async function exportExpensePDF() {
   const branchId = state?.branchId || "";
 
   if (!branchId) {
-    showToast(
-      "Branch login tidak ditemukan",
-      "error"
-    );
-    return;
-  }
+    showToast( "Branch login tidak ditemukan", "error" );
+    return; }
   // OPEN WINDOW
   const pdfWindow =  window.open( "", "_blank" );
 
   if (!pdfWindow) {
-    showToast(
-      "Popup diblokir browser",
-      "error"
-    );
-    return;
-  }
-	
+    showToast( "Popup diblokir browser", "error" );
+    return; }
   // LOADING
   pdfWindow.document.write(`
     <!DOCTYPE html>
@@ -15123,11 +14771,9 @@ async function exportExpensePDF() {
 		          background: #0B0F14;
 		          color: white;
 		          font-family: Arial, sans-serif;
-		
 		          display: flex;
 		          align-items: center;
 		          justify-content: center;
-		
 		          height: 100vh;
 		        }
 		
@@ -15164,8 +14810,7 @@ async function exportExpensePDF() {
   `);
 
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const payload = {
       type: "expense",
       branchId: branchId,
@@ -15173,11 +14818,11 @@ async function exportExpensePDF() {
       start: f?.startDate || null,
       end: f?.endDate || null,
       status: f?.status === "All Status"
-          ? "ALL"
-          : f?.status || "ALL",
+				? "ALL"
+				: f?.status || "ALL",
       category: f?.category === "All Categories"
-          ? "ALL"
-          : f?.category || "ALL",
+				? "ALL"
+				: f?.category || "ALL",
 			tenantSlug: state.tenantSlug
 	};
 		
@@ -15333,19 +14978,11 @@ document.addEventListener("click", function (e) {
 });
 
 async function exportOtherIncomePDF() {
-  const f =
-    getOtherIncomeFilters();
-  const win =
-    window.open(
-      "",
-      "_blank"
-    );
+  const f = getOtherIncomeFilters();
+  const win = window.open( "", "_blank" );
   if (!win) {
-    alert(
-      "Popup diblokir browser"
-    );
-    return;
-  }
+    alert( "Popup diblokir browser" );
+    return; }
 
   // LOADING
   win.document.write(`
@@ -15364,8 +15001,7 @@ async function exportOtherIncomePDF() {
   `);
 
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
@@ -15393,18 +15029,13 @@ async function exportOtherIncomePDF() {
     // CHECK RESPONSE
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(
-        errorText ||
-        "Export Other Income gagal"
-      );
+      throw new Error( errorText || "Export Other Income gagal" );
     }
-
     // GET HTML
     const html = await response.text();
     if (!html) {
       throw new Error( "Response export kosong" );
     }
-
     // SHOW REPORT
     win.document.open();
     win.document.write(html);
@@ -15468,13 +15099,9 @@ async function loadLoyaltySettings() {
     const s =
       await getSettingsRPC();
     // CACHE / STATE
-    state.loyaltySettings =
-      s || {};
-
+    state.loyaltySettings = s || {};
     // RENDER
-    applyLoyaltySettings(
-      state.loyaltySettings
-    );
+    applyLoyaltySettings( state.loyaltySettings );
   }
   catch (err) {
     showToast(
@@ -15493,9 +15120,7 @@ async function loadCategorySettings() {
     if (!branchId) {  return; }
 
     const categories =
-      await getCategoriesRPC(
-        branchId
-      );
+      await getCategoriesRPC( branchId );
 
     // RESET UI
     for (let i = 1; i <= 5; i++) {
@@ -15633,28 +15258,27 @@ async function saveLoyaltySettings() {
     tier_3: parseNumber("tier_3"),
     tier_4: parseNumber("tier_4"),
     tier_5: parseNumber("tier_5"),
-
     // NAMA TIER
     tier_1_name: document
-        .getElementById("tier_1_name")
-        ?.value
-        ?.trim() || "",
+			.getElementById("tier_1_name")
+			?.value
+			?.trim() || "",
     tier_2_name: document
-        .getElementById("tier_2_name")
-        ?.value
-        ?.trim() || "",
+			.getElementById("tier_2_name")
+			?.value
+			?.trim() || "",
     tier_3_name: document
-        .getElementById("tier_3_name")
-        ?.value
-        ?.trim() || "",
+			.getElementById("tier_3_name")
+			?.value
+			?.trim() || "",
     tier_4_name: document
-        .getElementById("tier_4_name")
-        ?.value
-        ?.trim() || "",
+			.getElementById("tier_4_name")
+			?.value
+			?.trim() || "",
     tier_5_name: document
-        .getElementById("tier_5_name")
-        ?.value
-        ?.trim() || "",
+			.getElementById("tier_5_name")
+			?.value
+			?.trim() || "",
     // POINT SYSTEM
     point_ratio: parseNumber("point_ratio"),
     point_reward: parseNumber("point_amount"),
@@ -15668,9 +15292,9 @@ async function saveLoyaltySettings() {
   const categoryPayload = [];
   for (let i = 1; i <= 5; i++) {
     const name = document
-        .getElementById(`category_${i}_name`)
-        ?.value
-        ?.trim() || "";
+			.getElementById(`category_${i}_name`)
+			?.value
+			?.trim() || "";
 
     const discount = parseNumber(`category_${i}_discount`);
     const reward = parseNumber(`category_${i}_reward`);
@@ -15688,9 +15312,7 @@ async function saveLoyaltySettings() {
 
   try {
     const res =
-      await saveSettingsRPC(
-        payload
-      );
+      await saveSettingsRPC( payload );
     // SAVE CATEGORIES
     for (const category of categoryPayload) {
       await saveCategoryRPC(
@@ -15707,11 +15329,9 @@ async function saveLoyaltySettings() {
 		{ throw new Error( res.message ||
       "Gagal menyimpan Loyalty Settings" );
     }
-
     // SUCCESS
-    alert(
-      "Loyalty settings saved!"
-    );
+    alert( "Loyalty settings saved!" );
+		
 		state.rewardProducts = null;
 		state.rewardProductsBranchId = null;
     state.loyaltySettings = null;
@@ -15721,22 +15341,19 @@ async function saveLoyaltySettings() {
     await loadLoyaltySettings();
   }
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menyimpan Loyalty Settings"
-    );
+    alert( err?.message || "Gagal menyimpan Loyalty Settings" );
   }
 }
 
 function validateSettings(p) {
   if ( Number(p.tier_1) >= Number(p.tier_2) ) 
-			{ throw new Error( "Tier 1 harus lebih kecil dari Tier 2" ); }
+		{ throw new Error( "Tier 1 harus lebih kecil dari Tier 2" ); }
   if ( Number(p.tier_2) >= Number(p.tier_3) ) 
-			{ throw new Error( "Tier 2 harus lebih kecil dari Tier 3" ); }
+		{ throw new Error( "Tier 2 harus lebih kecil dari Tier 3" ); }
   if ( Number(p.tier_3) >= Number(p.tier_4) ) 
-			{ throw new Error( "Tier 3 harus lebih kecil dari Tier 4" ); }
+		{ throw new Error( "Tier 3 harus lebih kecil dari Tier 4" ); }
   if ( Number(p.tier_4) >=  Number(p.tier_5) ) 
-			{ throw new Error( "Tier 4 harus lebih kecil dari Tier 5" ); }
+		{ throw new Error( "Tier 4 harus lebih kecil dari Tier 5" ); }
 }
 	
 function parseNumber(id) {
@@ -15759,11 +15376,7 @@ async function loadSeasonStatus() {
     updateSeasonUI(state.seasonStatus);
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat Season Status",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat Season Status", "error" );
   }
 }
 
@@ -15787,45 +15400,27 @@ async function openSeason() {
   const endDate = document.getElementById( "season_end" )?.value;
   // VALIDASI
   if (!startDate) {
-    showToast(
-      "Start date wajib diisi",
-      "error"
-    );
-    return;
-  }
+    showToast( "Start date wajib diisi", "error" );
+    return; }
   if (!endDate) {
-    showToast(
-      "End date wajib diisi",
-      "error"
-    );
-    return;
-  }
+    showToast( "End date wajib diisi", "error" );
+    return; }
 
   try {
     const res =
-      await openSeasonRPC(
-        startDate,
-        endDate 
-			);
+      await openSeasonRPC( startDate, endDate  );
 		
     if ( res && res.success === false ) 
 				{ throw new Error( res.message || "Gagal membuka season" ); }
 
-		
     state.seasonStatus = null;
     await loadSeasonStatus();
-		
-    showToast(
-      "Season berhasil dibuka",
-      "success"
-    );
+	
+    showToast( "Season berhasil dibuka", "success" );
   }
 
   catch (err) {
-    showToast( err?.message ||
-      "Gagal membuka season",
-      "error"
-    );
+    showToast( err?.message || "Gagal membuka season", "error" );
   }
 }
 
@@ -15847,18 +15442,11 @@ async function closeSeason() {
     state.memberPageData = null;
     await loadSeasonStatus();
 
-    showToast(
-      `Season berhasil ditutup. ${ res?.members_processed || 0
-      } member diproses.`,
-      "success"
-    );
+    showToast( `Season berhasil ditutup. ${ res?.members_processed || 0 } member diproses.`, "success" );
   }
 
   catch (err) {
-    showToast( err?.message ||
-      "Gagal menutup season",
-      "error"
-    );
+    showToast( err?.message || "Gagal menutup season", "error" );
   }
 }
 
@@ -15866,26 +15454,13 @@ async function toggleAutoSeason() {
   try {
     const res = await toggleAutoSeasonRPC();
     if (!res?.success) {
-      throw new Error(
-        res?.message ||
-        "Gagal mengubah auto season"
-      );
-    }
+      throw new Error( res?.message || "Gagal mengubah auto season" ); }
 
     state.seasonStatus = null;
     await refreshSeasonStatus();
-    showToast(
-      res.message ||
-      "Auto Season berhasil diubah",
-      "success"
-    );
-  }
+    showToast( res.message || "Auto Season berhasil diubah", "success" ); }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal mengubah auto season",
-      "error"
-    );
+    showToast( err?.message || "Gagal mengubah auto season", "error" );
   }
 }
 
@@ -15900,8 +15475,7 @@ function updateSeasonUI(res) {
   if (status === "ON") status = "AUTO";
   badge.innerText = status;
   // RESET CLASS TOTAL (IMPORTANT)
-  badge.className =
-    "text-[10px] font-inter tracking-widest uppercase px-3 py-1 rounded-md";
+  badge.className = "text-[10px] font-inter tracking-widest uppercase px-3 py-1 rounded-md";
   // APPLY STYLE
   switch (status) {
     case "OPEN": badge.classList.add("bg-green-600/20", "text-green-700");
@@ -15915,23 +15489,12 @@ function updateSeasonUI(res) {
 }
 
 function initRewardPagination() {
-  document
-    .getElementById("rewardPrevBtn")
-    ?.addEventListener(
-      "click",
-      () => changeRewardPage(-1)
-    );
-  document
-    .getElementById("rewardNextBtn")
-    ?.addEventListener(
-      "click",
-      () => changeRewardPage(1)
-    );
+  document .getElementById("rewardPrevBtn") ?.addEventListener( "click", () => changeRewardPage(-1) );
+  document .getElementById("rewardNextBtn") ?.addEventListener( "click", () => changeRewardPage(1) );
 }
 
 async function loadRewardProducts() {
-  const branchId =
-    document.getElementById( "rewardBranchFilter" )?.value || state.branchId;
+  const branchId = document.getElementById( "rewardBranchFilter" )?.value || state.branchId;
 
   if (
     state.rewardProducts &&
@@ -15945,9 +15508,7 @@ async function loadRewardProducts() {
 
   try {
     const res =
-      await getRewardProductsRPC(
-        branchId
-      );
+      await getRewardProductsRPC( branchId );
     // AMBIL ARRAY REWARDS
     const data =
       Array.isArray(res)
@@ -15962,11 +15523,7 @@ async function loadRewardProducts() {
     renderRewardProductsTable();
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat reward.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat reward.", "error" );
   }
 }
 	
@@ -15980,7 +15537,7 @@ function renderRewardProductsTable() {
     tbody.innerHTML = `
       <tr>
         <td colspan="4"
-            class="py-12 text-center text-muted ">
+					class="py-12 text-center text-muted ">
           No reward products found
         </td>
       </tr>
@@ -16033,10 +15590,8 @@ function changeRewardPage(step) {
 function updateRewardPagination() {
   const totalPages = Math.ceil( rewardData.length / rewardLimit ) || 1;
 	
-  document.getElementById( "rewardPrevBtn" )
-		.disabled = rewardPage <= 1;
-  document.getElementById( "rewardNextBtn" )
-		.disabled = rewardPage >= totalPages;
+  document.getElementById( "rewardPrevBtn" ) .disabled = rewardPage <= 1;
+  document.getElementById( "rewardNextBtn" ) .disabled = rewardPage >= totalPages;
 }
 	
 async function deleteReward(id) {
@@ -16116,12 +15671,7 @@ async function loadRewardProductsForModal() {
 
   try {
 
-    const products =
-      await getProductsRPC(
-        branchId,
-        role
-      );
-
+    const products = await getProductsRPC( branchId, role );
     const select = document.getElementById( "rewardProduct" );
 		
     if (!select) return;
@@ -16145,11 +15695,7 @@ async function loadRewardProductsForModal() {
     onRewardProductChange();
   }
   catch (err) {
-    showToast(
-      err.message ||
-      "Terjadi kesalahan.",
-      "error"
-    );
+    showToast( err.message || "Terjadi kesalahan.", "error" );
   }
 }
 	
@@ -16165,11 +15711,8 @@ document.addEventListener("change", e => {
 async function saveRewardProduct() {
   const product = document .getElementById("rewardProduct") ?.selectedOptions[0];
   if (!product || !product.value) {
-    alert(
-      "Pilih produk terlebih dahulu."
-    );
-    return;
-  }
+    alert( "Pilih produk terlebih dahulu." );
+    return; }
   const branchId = document.getElementById( "rewardBranch" )?.value || state.branchId;
   const payload = {
     ID_Reward: "R" + Date.now(),
@@ -16183,10 +15726,7 @@ async function saveRewardProduct() {
   };
 
   try {
-    const result =
-      await saveRewardProductRPC(
-        payload
-      );
+    const result = await saveRewardProductRPC( payload );
     // VALIDATE RESULT
     if ( result && result.success === false ) 
 		{
@@ -17733,22 +17273,9 @@ function initCashFlowPage(){
 async function loadCashFlowPage() {
 	const filter = {
 	  loginUserId: state.user?.ID_User,
-
-    branchId:
-      document.getElementById(
-        "cf-branch"
-      )?.value ||
-      state.branchId,
-
-    startDate:
-      document.getElementById(
-        "cf-start-date"
-      )?.value || "",
-
-    endDate:
-      document.getElementById(
-        "cf-end-date"
-      )?.value || ""
+    branchId: document.getElementById( "cf-branch" )?.value || state.branchId,
+    startDate: document.getElementById( "cf-start-date" )?.value || "",
+    endDate: document.getElementById( "cf-end-date" )?.value || ""
   };
   const cacheKey = JSON.stringify(filter);
   // CACHE HIT
@@ -17768,9 +17295,7 @@ async function loadCashFlowPage() {
   try {
     const sessionId =
       localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const { data, error
     } =
       await supabaseClient.rpc(
         "get_cash_flow_page_data",
@@ -17783,20 +17308,13 @@ async function loadCashFlowPage() {
         }
       );
 
-    if (error) {
-      throw error;
-    }
-
+    if (error) { throw error; }
     // ACCESS CHECK
     if (
       data &&
       data.success === false
     ) {
-      showToast(
-        data.message ||
-        "Access denied.",
-        "error"
-      );
+      showToast( data.message || "Access denied.", "error" );
       return;
     }
     // CACHE
@@ -17810,28 +17328,20 @@ async function loadCashFlowPage() {
     renderOwnerHistory(data?.ownerTransactions || []);
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat Cash Flow.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat Cash Flow.", "error" );
   }
 }
 
 async function loadCashFlowBranchOptions() {
-
   // CACHE
   if (state.cashFlowBranches) {
     renderCashFlowBranchOptions(state.cashFlowBranches);
-    return;
-  }
+    return; }
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     const {
-      data,
-      error
+      data, error
     } = await supabaseClient.rpc(
       "get_expense_branches",
 			{
@@ -17839,20 +17349,14 @@ async function loadCashFlowBranchOptions() {
 			}
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     // NORMALIZE DATA
     state.cashFlowBranches = data || [];
     renderCashFlowBranchOptions(state.cashFlowBranches);
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat branch.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat branch.", "error" );
   }
 }
 	
@@ -17877,7 +17381,6 @@ function renderCashFlowBranchOptions(branches) {
 
 async function loadAccountBalance() {
   const branchId = document.getElementById("cf-branch")?.value || state.branchId;
-
   // Jika ALL
   if (branchId === "ALL") {
     document.getElementById("cf-cash").textContent = "-";
@@ -17889,23 +17392,14 @@ async function loadAccountBalance() {
   }
 
   try {
-    const data =
-      await getAccountBalanceRPC(branchId);
+    const data = await getAccountBalanceRPC(branchId);
 
-    if (!data) {
-      throw new Error(
-        "Data account balance tidak ditemukan."
-      );
-    }
+    if (!data) { throw new Error( "Data account balance tidak ditemukan." ); }
+		
     renderAccountBalance(data);
-
   }
   catch (err) {
-    showToast(
-      err.message ||
-      "Gagal memuat balance.",
-      "error"
-    );
+    showToast( err.message || "Gagal memuat balance.", "error" );
   }
 }
 
@@ -17916,12 +17410,9 @@ function renderAccountBalance(data) {
   document.getElementById("cf-inventory").textContent = formatRupiah(data?.Inventory || 0);
   document.getElementById("cf-asset").textContent = formatRupiah(data?.Asset || 0);
   // Total Balance = Cash + Bank
-  const totalBalance =
-    (data?.Cash || 0) +
-    (data?.Bank || 0);
+  const totalBalance = (data?.Cash || 0) + (data?.Bank || 0);
 
-  document.getElementById("cf-total").textContent =
-    formatRupiah(totalBalance);
+  document.getElementById("cf-total").textContent = formatRupiah(totalBalance);
 }
 
 function renderCashFlowSummary(data) {
@@ -17934,11 +17425,11 @@ function renderCashFlowSummary(data) {
   // INCOME SOURCES
   const total = data.income || 0;
   const salesPercent = total
-      ? (data.sales / total) * 100
-      : 0;
+		? (data.sales / total) * 100
+		: 0;
   const otherPercent = total
-      ? (data.otherIncome / total) * 100
-      : 0;
+		? (data.otherIncome / total) * 100
+		: 0;
   document.getElementById("cf-sales").textContent = formatRupiah(data.sales);
   document.getElementById("cf-income").textContent = formatRupiah(data.otherIncome);
   document.getElementById("cf-total-in").textContent = formatRupiah(total);
@@ -17949,11 +17440,11 @@ function renderCashFlowSummary(data) {
   // EXPENSE CATEGORIES
   const totalOut = data.expense || 0;
   const operationPercent = totalOut > 0
-      ? (data.operationExpense / totalOut) * 100
-      : 0;
+		? (data.operationExpense / totalOut) * 100
+		: 0;
   const purchasePercent = totalOut > 0
-      ? (data.ingredientPurchase / totalOut) * 100
-      : 0;
+		? (data.ingredientPurchase / totalOut) * 100
+		: 0;
   // Nominal
   document.getElementById("cf-expenses").textContent = formatRupiah(data.operationExpense);
   document.getElementById("cf-purchases").textContent = formatRupiah(data.ingredientPurchase);
@@ -17966,10 +17457,7 @@ function renderCashFlowSummary(data) {
 
 
 function renderCashFlowChart(data){
-  const container =
-    document.getElementById(
-      "cash-flow-chart"
-    );
+  const container = document.getElementById( "cash-flow-chart" );
 
   if(!container) return;
   container.innerHTML = "";
@@ -17980,49 +17468,30 @@ function renderCashFlowChart(data){
   );
 
   data.labels.forEach((label,index)=>{
-    const inHeight =
-      Math.round(
-        data.cashIn[index] /
-        max *
-        240
-      );
-    const outHeight =
-      Math.round(
-        data.cashOut[index] /
-        max *
-        240
-      );
+    const inHeight = Math.round( data.cashIn[index] / max * 240 );
+    const outHeight = Math.round( data.cashOut[index] / max * 240 );
     container.innerHTML += `
-<div class="flex flex-col items-center flex-1">
-  <div
-    class="h-[240px]
-    flex items-end gap-2">
-
-    <div
-      class="w-5 bg-primary"
-      style="height:${inHeight}px">
-    </div>
-
-    <div
-      class="w-5 bg-outline-variant"
-      style="height:${outHeight}px">
-    </div>
-  </div>
-  <span
-    class="mt-4
-    text-xs
-    text-on-surface-variant">
-    ${label}
-  </span>
-</div>
-`;
+			<div class="flex flex-col items-center flex-1">
+			  <div class="h-[240px] flex items-end gap-2">
+			    <div class="w-5 bg-primary"
+			      style="height:${inHeight}px">
+			    </div>
+			
+			    <div class="w-5 bg-outline-variant"
+			      style="height:${outHeight}px">
+			    </div>
+			  </div>
+			  <span class="mt-4 text-xs text-on-surface-variant">
+			    ${label}
+			  </span>
+			</div>
+			`;
   });
 }
 
 // OWNER TRANSACTION MODAL
 function renderTransferHistory(data) {
-  const container =
-    document.getElementById("cf-transfers");
+  const container = document.getElementById("cf-transfers");
   if (!container) return;
   container.innerHTML = "";
   if (!data || data.length === 0) {
@@ -18075,32 +17544,11 @@ function openTransferModal(){
 async function saveTransfer() {
   const data = {
     branchId: state.branchId,
-		
-    fromAccount:
-      document.getElementById(
-        "tf-from"
-      )?.value,
-
-    toAccount:
-      document.getElementById(
-        "tf-to"
-      )?.value,
-
-    amount:
-      Number(
-        document.getElementById(
-          "tf-amount"
-        )?.value || 0
-      ),
-
-    note:
-      document.getElementById(
-        "tf-note"
-      )?.value || "",
-
-    createdBy:
-      state.user?.username ||
-      "Admin"
+    fromAccount: document.getElementById( "tf-from" )?.value,
+    toAccount: document.getElementById( "tf-to" )?.value,
+    amount: Number( document.getElementById( "tf-amount" )?.value || 0 ),
+    note: document.getElementById( "tf-note" )?.value || "",
+    createdBy: state.user?.username || "Admin"
   };
 
   // VALIDASI
@@ -18108,29 +17556,15 @@ async function saveTransfer() {
     !data.amount ||
     data.amount <= 0
   ) {
-
-    showToast(
-      "Jumlah transfer harus diisi",
-      "warning"
-    );
-    return;
-  }
+    showToast( "Jumlah transfer harus diisi", "warning" );
+    return; }
 	
   try {
     // SUPABASE RPC
-    const res =
-      await transferFundsRPC(data);
+    const res = await transferFundsRPC(data);
     // RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-
-      throw new Error(
-        res.message ||
-        "Transfer gagal"
-      );
-    }
+    if ( res && res.success === false
+    ) { throw new Error( res.message || "Transfer gagal" ); }
 
     showToast(
       res?.message ||
@@ -18138,29 +17572,22 @@ async function saveTransfer() {
       "success"
     );
     // CLEAR CACHE
+		
     state.cashFlowData = null;
     state.cashFlowFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     closeTransferModal();
     await loadCashFlowPage();
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Transfer gagal",
-      "error"
-    );
+    showToast( err?.message || "Transfer gagal", "error" );
   }
 }
 
 function closeTransferModal(){
-  const modal =
-    document.querySelector(
-      "#transferFundModalTemplate"
-    );
-  const fixed =
-    document.querySelector(
-      ".fixed.inset-0.z-\\[9999\\]"
-    );
+  const modal = document.querySelector( "#transferFundModalTemplate" );
+  const fixed = document.querySelector( ".fixed.inset-0.z-\\[9999\\]" );
   if(fixed){
     fixed.remove();
   }
@@ -18168,25 +17595,12 @@ function closeTransferModal(){
 
 function renderOwnerSummary(data){
   if(!data) return;
-  document.getElementById(
-    "owner-capital-total"
-  ).textContent =
-    formatRupiah(
-      data.totalCapital || 0
-    );
-  document.getElementById(
-    "owner-withdraw-total"
-  ).textContent =
-    formatRupiah(
-      data.totalWithdraw || 0
-    );
+  document.getElementById( "owner-capital-total" ).textContent = formatRupiah( data.totalCapital || 0 );
+  document.getElementById( "owner-withdraw-total" ).textContent = formatRupiah( data.totalWithdraw || 0 );
 }
 
 function renderOwnerHistory(rows) {
-  const container =
-    document.getElementById(
-      "owner-equity-history"
-    );
+  const container = document.getElementById( "owner-equity-history" );
   if (!container) return;
   if (!rows.length) {
     container.innerHTML = `
@@ -18200,8 +17614,7 @@ function renderOwnerHistory(rows) {
     rows
     .slice(0, 10)
     .map(row => {
-      const isCapital =
-        row.Type === "CAPITAL";
+      const isCapital = row.Type === "CAPITAL";
       return `
         <div class="flex items-center justify-between p-4 px-4 rounded-md border border-outline-variant bg-background">
           <div class=px-4>
@@ -18252,17 +17665,16 @@ async function saveOwnerCapital() {
     note: document.getElementById("ownerNote").value,
     createdBy: state.user.username
   });
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
     loadCashFlowPage();
 }
 	
 async function addOwnerTransaction(data) {
-	const sessionId =
-		localStorage.getItem("pos_session_id");
-  const {
-    data: result,
-    error
+	const sessionId = localStorage.getItem("pos_session_id");
+  const { data: result, error
   } = await supabaseClient.rpc(
     "add_owner_transaction",
     {
@@ -18276,115 +17688,60 @@ async function addOwnerTransaction(data) {
     }
   );
 
-  if (error) {
-    throw error;
-  }
+  if (error) { throw error; }
   return result;
 }
 
 let ownerTransactionType = "CAPITAL";
 function openOwnerCapitalModal() {
   ownerTransactionType = "CAPITAL";
-  const template =
-    document.getElementById(
-      "ownerTransactionModalTemplate"
-    );
-  const clone =
-    template.content.cloneNode(true);
+  const template = document.getElementById( "ownerTransactionModalTemplate" );
+  const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
-  document.getElementById(
-    "ownerModalTitle"
-  ).innerText =
-    "Add Capital";
-  document.getElementById(
-    "ownerModalSubtitle"
-  ).innerText =
-    "Record owner capital transaction";
-  document.getElementById(
-    "ownerModalIconSymbol"
-  ).innerText =
-    "trending_up";
-  document.getElementById(
-    "saveOwnerBtn"
-  ).innerText =
-    "Save Capital";
-  document.getElementById(
-    "cancelOwnerBtn"
-  ).onclick =
-    closeOwnerTransactionModal;
-  document.getElementById(
-    "closeOwnerModalBtn"
-  ).onclick =
-    closeOwnerTransactionModal;
+  document.getElementById( "ownerModalTitle" ).innerText = "Add Capital";
+  document.getElementById( "ownerModalSubtitle" ).innerText = "Record owner capital transaction";
+  document.getElementById( "ownerModalIconSymbol" ).innerText = "trending_up";
+  document.getElementById( "saveOwnerBtn" ).innerText = "Save Capital";
+  document.getElementById( "cancelOwnerBtn" ).onclick = closeOwnerTransactionModal;
+  document.getElementById( "closeOwnerModalBtn"  ).onclick = closeOwnerTransactionModal;
 }
 
 function openOwnerWithdrawModal() {
   ownerTransactionType = "WITHDRAW";
-  const template =
-    document.getElementById(
-      "ownerTransactionModalTemplate"
-    );
-  const clone =
-    template.content.cloneNode(true);
+  const template = document.getElementById( "ownerTransactionModalTemplate" );
+  const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
-  document.getElementById(
-    "ownerModalTitle"
-  ).innerText =
-    "Withdraw Funds";
-  document.getElementById(
-    "ownerModalSubtitle"
-  ).innerText =
-    "Record owner withdraw transaction";
-  document.getElementById(
-    "ownerModalIconSymbol"
-  ).innerText =
-    "trending_down";
-  document.getElementById(
-    "saveOwnerBtn"
-  ).innerText =
-    "Save Withdraw";
-  document.getElementById(
-    "cancelOwnerBtn"
-  ).onclick =
-    closeOwnerTransactionModal;
-  document.getElementById(
-    "closeOwnerModalBtn"
-  ).onclick =
-    closeOwnerTransactionModal;
+  document.getElementById( "ownerModalTitle" ).innerText = "Withdraw Funds";
+  document.getElementById( "ownerModalSubtitle" ).innerText = "Record owner withdraw transaction";
+  document.getElementById( "ownerModalIconSymbol" ).innerText = "trending_down";
+  document.getElementById( "saveOwnerBtn" ).innerText = "Save Withdraw";
+  document.getElementById( "cancelOwnerBtn" ).onclick = closeOwnerTransactionModal;
+  document.getElementById( "closeOwnerModalBtn" ).onclick = closeOwnerTransactionModal;
 }
 
 function closeOwnerTransactionModal() {
-  document
-    .getElementById("ownerTransactionModal")
-    ?.remove();
+  document .getElementById("ownerTransactionModal") ?.remove();
 }
 
 async function saveOwnerTransaction() {
   try {
-    const account =
-      document.getElementById("ownerAccount").value;
-    const amount =
-      Number(
-        document.getElementById("ownerAmount").value
-      );
+    const account = document.getElementById("ownerAccount").value;
+    const amount = Number( document.getElementById("ownerAmount").value );
     const note =
       document.getElementById("ownerNote").value.trim();
     if (!amount || amount <= 0) {
       throw new Error("Masukkan nominal yang valid.");
     }
     await addOwnerTransaction({
-      branchId:
-        state.branchId,
-      type:
-        ownerTransactionType,
+      branchId: state.branchId,
+      type: ownerTransactionType,
       account,
       amount,
       note,
-      createdBy:
-        state.user.Username ||
-        state.user.username ||
-        ""
+      createdBy: state.user.Username || state.user.username || ""
     });
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     state.cashFlowData = null;
     state.cashFlowFilter = null;
     closeOwnerTransactionModal();
@@ -18397,8 +17754,7 @@ async function saveOwnerTransaction() {
 }
 
 function toggleCashFlowNotification(){
-  const dropdown = 
-    document.getElementById("cashFlowNotifDropdown");
+  const dropdown =  document.getElementById("cashFlowNotifDropdown");
   if(!dropdown) return;
   dropdown.classList.toggle("hidden");
   if(!dropdown.classList.contains("hidden")){
@@ -19957,67 +19313,33 @@ Lanjutkan?
       if (progress >= 90) {
         progress = 90;
       }
-      const bar =
-        document.getElementById(
-          progressId
-        );
-      const text =
-        document.getElementById(
-          progressId + "-text"
-        );
-      if (bar) {
-        bar.style.width =
-          progress + "%";
-      }
+      const bar = document.getElementById( progressId );
+      const text = document.getElementById( progressId + "-text" );
+      if (bar) { bar.style.width = progress + "%"; }
       if (text) {
-        if (progress < 20) {
-          text.innerHTML =
-            "Clear tabel Transaksi...";
-        }
-        else if (progress < 35) {
-          text.innerHTML =
-            "Clear tabel Member...";
-        }
-        else if (progress < 50) {
-          text.innerHTML =
-            "Clear tabel Ingredient...";
-        }
-        else if (progress < 80) {
-          text.innerHTML =
-            "Clear tabel History...";
-        }
-        else {
-          text.innerHTML =
-            "Clear database...";
-        }
+        if (progress < 20) { text.innerHTML = "Clear tabel Transaksi..."; }
+        else if (progress < 35) { text.innerHTML = "Clear tabel Member..."; }
+        else if (progress < 50) { text.innerHTML = "Clear tabel Ingredient..."; }
+        else if (progress < 80) { text.innerHTML = "Clear tabel History..."; }
+        else { text.innerHTML = "Clear database..."; }
       }
     }, 800);
 	
   try {
     // CLEAR DATABASE
-    const res =
-      await clearDatabaseRPC();
+    const res = await clearDatabaseRPC();
 
     if (
       res?.success === false
     ) {
-      throw new Error(
-        res.message ||
-        "Clear database gagal"
-      );
+      throw new Error( res.message || "Clear database gagal" );
     }
 
     clearInterval(interval);
     const bar = document.getElementById(progressId);
     const text = document.getElementById(progressId + "-text");
-    if (bar) {
-      bar.style.width =
-        "100%";
-    }
-    if (text) {
-      text.innerHTML =
-        "Database berhasil dikosongkan";
-    }
+    if (bar) { bar.style.width = "100%"; }
+    if (text) { text.innerHTML = "Database berhasil dikosongkan"; }
 
     addBackupChatMessage(
       "bot",
@@ -20052,10 +19374,7 @@ Lanjutkan?
 document.addEventListener(
   "click",
   function(e) {
-    const btn =
-      e.target.closest(
-        "#btnExportCashFlowPDF"
-      );
+    const btn = e.target.closest( "#btnExportCashFlowPDF" );
 
     if (!btn) return;
     exportCashFlowReport();
@@ -20064,61 +19383,26 @@ document.addEventListener(
 
 
 async function exportCashFlowReport() {
-  const startDate =
-    document.getElementById(
-      "cf-start-date"
-    )?.value || "";
-
-  const endDate =
-    document.getElementById(
-      "cf-end-date"
-    )?.value || "";
-
-  const branch =
-    document.getElementById(
-      "cf-branch"
-    )?.value ||
-    state?.branchId ||
-    "ALL";
-
-  // LOGIN USER
+  const startDate = document.getElementById( "cf-start-date" )?.value || "";
+  const endDate = document.getElementById( "cf-end-date" )?.value || "";
+  const branch = document.getElementById( "cf-branch" )?.value || state?.branchId || "ALL";
   const loginUserId = state?.user?.id || "";
   // VALIDASI
   if (!startDate || !endDate) {
-    alert(
-      "Pilih tanggal dulu"
-    );
-    return;
-  }
-
+    alert( "Pilih tanggal dulu" );
+    return; }
   if (!branch) {
-    alert(
-      "Branch tidak valid"
-    );
-    return;
-  }
-
+    alert( "Branch tidak valid" );
+    return; }
   if (!loginUserId) {
-    alert(
-      "User login tidak ditemukan."
-    );
-    return;
-  }
+    alert( "User login tidak ditemukan." );
+    return; }
 
-  // OPEN WINDOW
-  const pdfWindow =
-    window.open(
-      "",
-      "_blank"
-    );
+  const pdfWindow = window.open( "", "_blank" );
 
   if (!pdfWindow) {
-    alert(
-      "Popup diblokir browser."
-    );
-    return;
-  }
-
+    alert( "Popup diblokir browser." );
+    return; }
   // LOADING
   pdfWindow.document.write(`
     <html>
@@ -20171,8 +19455,7 @@ async function exportCashFlowReport() {
   `);
 
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const response =
 	  await fetch("/api/export-pdf", {
 		method: "POST",
@@ -20194,18 +19477,10 @@ async function exportCashFlowReport() {
     // HTTP ERROR
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(
-        errorText ||
-        `Export gagal (${response.status})`
-      );
-    }
+      throw new Error( errorText || `Export gagal (${response.status})` ); }
     // GET HTML REPORT
     const html = await response.text();
-    if (!html) {
-      throw new Error(
-        "Server mengembalikan HTML kosong"
-      );
-    }
+    if (!html) { throw new Error( "Server mengembalikan HTML kosong" ); }
     // RENDER REPORT
     pdfWindow.document.open();
     pdfWindow.document.write(html);
@@ -20258,9 +19533,7 @@ const ASSET_PAGE_SIZE = 10;
 const DEPRECIATION_PAGE_SIZE = 10;
 
 
-/* =========================================================
-   FORMAT
-   ========================================================= */
+/* ==== FORMAT ==== */
 
 function formatAssetCurrency(value) {
   return new Intl.NumberFormat("id-ID", {
@@ -20299,13 +19572,9 @@ function formatAssetPeriod(value) {
   });
 }
 
-
-/* =========================================================
-   LOAD ASSET DATA
-   ========================================================= */
+/* ==== LOAD ASSET DATA ==== */
 state.assetData = null;
 state.assetDataBranchId = null;
-
 state.depreciationHistoryData = null;
 state.depreciationHistoryBranchId = null;
 async function loadAssetPage() {
@@ -20322,9 +19591,7 @@ async function loadAssetPage() {
     ) {
       assetData = state.assetData;
     } else {
-      const {
-        data: assets,
-        error: assetError
+      const { data: assets, error: assetError
       } = await supabaseClient.rpc(
         "get_assets",
         {
@@ -20368,7 +19635,6 @@ async function loadAssetPage() {
     renderAssetTable();
     renderDepreciationHistory();
   } catch (error) {
-   
     assetData = [];
     depreciationHistoryData = [];
     renderAssetKPI();
@@ -20417,16 +19683,13 @@ async function runMonthlyDepreciation() {
       );
 
     if (error) { throw error; }
-    console.log(
-      "Monthly depreciation berhasil:",
-      data
-    );
-
     // CLEAR CACHE
     state.assetData = null;
     state.assetDataBranchId = null;
     state.depreciationHistoryData = null;
     state.depreciationHistoryBranchId = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     // RELOAD
     await loadAssetPage();
     alert(
@@ -20434,16 +19697,8 @@ async function runMonthlyDepreciation() {
     );
 
   } catch (error) {
-    console.error(
-      "runMonthlyDepreciation error:",
-      error
-    );
-    alert(
-      error?.message ||
-      "Gagal menjalankan monthly depreciation."
-    );
+    alert( error?.message || "Gagal menjalankan monthly depreciation." );
   } finally {
-
     // RESTORE BUTTON
     if (button) {
       button.disabled = false;
@@ -20506,108 +19761,73 @@ function clearAssetCache() {
   state.depreciationHistoryBranchId = null;
 }
 
-/* =========================================================
-   KPI
-   ========================================================= */
+/* === KPI === */
 
 function renderAssetKPI() {
-  const activeAssets = assetData.filter(
-    asset => String(asset.Status).toUpperCase() === "ACTIVE"
-  );
+  const activeAssets = assetData.filter( asset => String(asset.Status).toUpperCase() === "ACTIVE" );
   const totalAssets = activeAssets.length;
-  const purchaseCost = activeAssets.reduce(
-    (sum, asset) => sum + Number(asset.Purchase_Cost || 0),
-    0
-  );
-  const accumulatedDepreciation = activeAssets.reduce(
-    (sum, asset) => sum + Number(asset.Accumulated_Depreciation || 0),
-    0
-  );
-  const bookValue = activeAssets.reduce(
-    (sum, asset) => sum + Number(asset.Book_Value || 0),
-    0
-  );
-
+  const purchaseCost = activeAssets.reduce( (sum, asset) => sum + Number(asset.Purchase_Cost || 0), 0 );
+  const accumulatedDepreciation = activeAssets.reduce( (sum, asset) => sum + Number(asset.Accumulated_Depreciation || 0), 0 );
+  const bookValue = activeAssets.reduce( (sum, asset) => sum + Number(asset.Book_Value || 0), 0 );
   const monthlyDepreciation = activeAssets.reduce(
     (sum, asset) => {
       if (
         String(asset.Depreciation_Method).toUpperCase() ===
         "STRAIGHT LINE"
       ) {
-        const usefulLife = Number(
-          asset.Useful_Life_Months || 0
-        );
+        const usefulLife = Number( asset.Useful_Life_Months || 0 );
         if (usefulLife > 0) {
-          return sum +
-            (
-              Number(asset.Purchase_Cost || 0) /
-              usefulLife
-            );
+          return sum + ( Number(asset.Purchase_Cost || 0) / usefulLife );
         }
       }
-      return sum;
-    },
+      return sum; },
     0
   );
 
   const totalCountElement = document.getElementById("asset-total-count");
   const purchaseCostElement = document.getElementById("asset-purchase-cost");
-  const accumulatedElement =
-    document.getElementById(
-      "asset-accumulated-depreciation"
-    );
+  const accumulatedElement = document.getElementById( "asset-accumulated-depreciation" );
   const bookValueElement = document.getElementById("asset-book-value");
-  const monthlyElement =
-    document.getElementById(
-      "asset-monthly-depreciation"
-    );
+  const monthlyElement = document.getElementById( "asset-monthly-depreciation" );
 
   if (totalCountElement) {totalCountElement.textContent =
-      formatAssetNumber(totalAssets);
+		formatAssetNumber(totalAssets);
   }
   if (purchaseCostElement) {purchaseCostElement.textContent =
-      formatAssetCurrency(purchaseCost);
+		formatAssetCurrency(purchaseCost);
   }
   if (accumulatedElement) {accumulatedElement.textContent =
-      formatAssetCurrency(accumulatedDepreciation);
+		formatAssetCurrency(accumulatedDepreciation);
   }
   if (bookValueElement) {bookValueElement.textContent =
-      formatAssetCurrency(bookValue);
+		formatAssetCurrency(bookValue);
   }
   if (monthlyElement) {monthlyElement.textContent =
-      formatAssetCurrency(monthlyDepreciation);
+		formatAssetCurrency(monthlyDepreciation);
   }
 }
 
-/* =========================================================
-   ASSET TABLE
-   ========================================================= */
+/* === ASSET TABLE === */
 
 function renderAssetTable() {
   const tbody = document.getElementById("asset-table-body");
   if (!tbody) return;
   const searchInput = document.getElementById("assetSearchInput");
   const statusFilter = document.getElementById("assetStatusFilter");
-  const search =
-    searchInput?.value
-      ?.trim()
-      ?.toLowerCase() || "";
-
-  const status =
-    statusFilter?.value || "all";
+  const search = searchInput?.value
+		?.trim()
+		?.toLowerCase() || "";
+  const status = statusFilter?.value || "all";
 
   let filteredData = assetData.filter(asset => {
-    const matchesSearch =
-      !search ||
+    const matchesSearch = !search ||
       String(asset.Asset_ID)
         .toLowerCase()
         .includes(search) ||
       String(asset.Asset_Name)
         .toLowerCase()
         .includes(search);
-
-    const matchesStatus =
-      status === "all" ||
+    const matchesStatus = status === "all" ||
       String(asset.Status).toLowerCase() === status;
     return matchesSearch && matchesStatus;
   });
@@ -20625,15 +19845,8 @@ function renderAssetTable() {
     assetCurrentPage = totalPages;
   }
 
-  const start =
-    (assetCurrentPage - 1) *
-    ASSET_PAGE_SIZE;
-
-  const pageData =
-    filteredData.slice(
-      start,
-      start + ASSET_PAGE_SIZE
-    );
+  const start = (assetCurrentPage - 1) * ASSET_PAGE_SIZE;
+  const pageData = filteredData.slice( start, start + ASSET_PAGE_SIZE );
 
   if (!pageData.length) {
     tbody.innerHTML = `
@@ -20648,43 +19861,33 @@ function renderAssetTable() {
       filteredData.length,
       totalPages
     );
-    return;
-  }
+    return; }
 
   tbody.innerHTML =
     pageData.map(asset => {
       const usefulLife = Number(asset.Useful_Life_Months || 0);
-		
-      const depreciationPerMonth =
-        usefulLife > 0 &&
+      const depreciationPerMonth = usefulLife > 0 &&
         String(asset.Depreciation_Method)
           .toUpperCase() === "STRAIGHT LINE"
           ? Number(asset.Purchase_Cost || 0) /
             usefulLife
           : 0;
 
-      const status =
-        String(asset.Status || "")
-          .toUpperCase();
-
-      const statusClass =
-			  status === "ACTIVE"
-			    ? "text-emerald-400"
-			    : "text-muted";
+      const status = String(asset.Status || "") .toUpperCase();
+      const statusClass = status === "ACTIVE"
+				? "text-emerald-400"
+				: "text-muted";
 			
 			const actionHTML = `
 			  <div class="relative inline-block">
-			
-				<button
-				  type="button"
-				  onclick="openAssetActionModal('${escapeAssetHTML(asset.Asset_ID)}')"
-				  class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-outline-variant transition-colors"
-				  title="Action" >
-				  <span class="material-symbols-outlined text-[20px]">
-					more_vert
-				  </span>
-				</button>
-			
+					<button type="button"
+					  onclick="openAssetActionModal('${escapeAssetHTML(asset.Asset_ID)}')"
+					  class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-outline-variant transition-colors"
+					  title="Action" >
+					  <span class="material-symbols-outlined text-[20px]">
+						more_vert
+					  </span>
+					</button>
 			  </div>
 			`;
       return `
@@ -20767,93 +19970,53 @@ function renderAssetTable() {
 let currentAsset = null;
 function openAssetActionModal(assetId) {
   const asset = assetData.find(
-    item => String(item.Asset_ID) === String(assetId)
-  );
+    item => String(item.Asset_ID) === String(assetId) );
 
-  if (!asset) {
-    console.warn("Asset tidak ditemukan:", assetId);
-    return;
-  }
+  if (!asset) { return; }
 
   currentAsset = asset;
   const template = document.getElementById("assetActionModalTemplate");
-  if (!template) {
-    console.warn("assetActionModalTemplate tidak ditemukan");
-    return;
-  }
+  if (!template) { return; }
 
   // Hapus modal lama jika masih ada
-  document
-    .getElementById("assetActionModalOverlay")
-    ?.remove();
+  document .getElementById("assetActionModalOverlay") ?.remove();
   const modal = template.content.cloneNode(true);
   document.body.appendChild(modal);
 	
   // SET DATA
   const nameEl = document.getElementById("modalAssetName");
   const idEl = document.getElementById("modalAssetId");
-  const depreciationStatusEl =
-    document.getElementById(
-      "modalAssetDepreciationStatus"
-    );
+  const depreciationStatusEl = document.getElementById( "modalAssetDepreciationStatus" );
 
-  if (nameEl) {
-    nameEl.textContent =
-      asset.Asset_Name || "-";
-  }
-
-  if (idEl) {
-    idEl.textContent =
-      asset.Asset_ID || "-";
-  }
-
+  if (nameEl) { nameEl.textContent = asset.Asset_Name || "-"; }
+  if (idEl) { idEl.textContent = asset.Asset_ID || "-"; }
   if (depreciationStatusEl) {
-    const usefulLife =
-      Number(asset.Useful_Life_Months || 0);
-
+    const usefulLife = Number(asset.Useful_Life_Months || 0);
     if (usefulLife > 0) {
-      const depreciation =
-        String(asset.Depreciation_Method || "")
-          .toUpperCase() === "STRAIGHT LINE"
-          ? Number(asset.Purchase_Cost || 0) /
-            usefulLife
-          : 0;
-      depreciationStatusEl.textContent =
-        `${usefulLife} bulan • ${formatAssetCurrency(depreciation)} / bulan`;
-
+      const depreciation = String(asset.Depreciation_Method || "")
+				.toUpperCase() === "STRAIGHT LINE"
+				? Number(asset.Purchase_Cost || 0) / usefulLife
+				: 0;
+      depreciationStatusEl.textContent = `${usefulLife} bulan • ${formatAssetCurrency(depreciation)} / bulan`;
     } else {
-      depreciationStatusEl.textContent =
-        "Masa manfaat belum diatur";
+      depreciationStatusEl.textContent = "Masa manfaat belum diatur";
     }
   }
 }
 
 function closeAssetActionModal() {
-  const overlay =
-    document.getElementById(
-      "assetActionModalOverlay"
-    );
-  if (overlay) {
-    overlay.remove();
-  }
+  const overlay = document.getElementById( "assetActionModalOverlay" );
+  if (overlay) { overlay.remove(); }
   currentAsset = null;
 }
 
 function openAssetDepreciationModal(asset) {
-  if (!asset) {
-    console.warn("Asset tidak ditemukan");
-    return;
-  }
+  if (!asset) { return; }
 
   currentAsset = asset;
   const template = document.getElementById( "assetDepreciationModalTemplate" );
 
-  if (!template) {
-    console.warn(
-      "assetDepreciationModalTemplate tidak ditemukan"
-    );
-    return;
-  }
+  if (!template) { return; }
   // Tutup modal sebelumnya
   document .getElementById("assetActionModalOverlay") ?.remove();
   document .getElementById("assetDepreciationModalOverlay") ?.remove();
@@ -20879,8 +20042,8 @@ function openAssetDepreciationModal(asset) {
   if (usefulLifeEl) {
     const usefulLife = Number(asset.Useful_Life_Months || 0);
     usefulLifeEl.value =  usefulLife > 0
-        ? usefulLife
-        : "";
+			? usefulLife
+			: "";
   }
   if (methodEl) {
     methodEl.value = asset.Depreciation_Method || "Straight Line";
@@ -20971,9 +20134,7 @@ async function saveAssetDepreciationSetting() {
         }
       );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     // UPDATE DATA LOCAL
 	const assetIndex = assetData.findIndex( asset => String(asset.Asset_ID) === String(currentAsset.Asset_ID) );
@@ -20985,20 +20146,12 @@ async function saveAssetDepreciationSetting() {
 	  state.assetData = assetData;
 	  state.assetDataBranchId = state.branchId;
 	}
-
     closeAssetDepreciationModal();
     renderAssetKPI();
     renderAssetTable();
 
   } catch (error) {
-    console.error(
-      "saveAssetDepreciationSetting error:",
-      error
-    );
-    alert(
-      error?.message ||
-      "Gagal menyimpan pengaturan depresiasi."
-    );
+    alert( error?.message || "Gagal menyimpan pengaturan depresiasi." );
   }
 }
 
@@ -21086,7 +20239,6 @@ function updateAssetPagination(totalItems, totalPages) {
       info.textContent = `Showing ${start}-${end} of ${totalItems} assets`;
     }
   }
-
   if (prevBtn) { prevBtn.disabled = assetCurrentPage <= 1; }
   if (nextBtn) { nextBtn.disabled = assetCurrentPage >= totalPages; }
 }
@@ -21105,19 +20257,10 @@ function openAddAssetPurchaseModal() {
   const noteEl = document.getElementById("assetPurchaseNote");
 
   if (nameEl) nameEl.value = "";
-
-  if (dateEl) {
-    dateEl.value = new Date().toISOString().slice(0, 10);
-  }
-
+  if (dateEl) { dateEl.value = new Date().toISOString().slice(0, 10); }
   if (costEl) costEl.value = "";
-
   if (interestEl) interestEl.value = "0";
-
-  if (paymentTypeEl) {
-    paymentTypeEl.value = "CREDIT";
-  }
-
+  if (paymentTypeEl) { paymentTypeEl.value = "CREDIT"; }
   if (noteEl) noteEl.value = "";
 
   updateAssetPurchaseTotal();
@@ -21167,7 +20310,12 @@ document.addEventListener("input", function (event) {
 
 // ASSET PURCHASE
 let assetPurchaseRows = [];
-
+    state.assetData = null;
+    state.assetDataBranchId = null;
+    state.depreciationHistoryData = null;
+    state.depreciationHistoryBranchId = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
 async function loadAssetPurchases() {
   const tbody = document.getElementById("asset-purchase-table-body");
   const branchFilter = document.getElementById("assetPurchaseBranchFilter");
@@ -21188,6 +20336,18 @@ async function loadAssetPurchases() {
   }
 
   const branchId = branchFilter?.value || null;
+  const currentFilter = { branchId };
+
+  if (
+    state.assetPurchaseData &&
+    state.assetPurchaseFilter &&
+    JSON.stringify(state.assetPurchaseFilter) ===
+      JSON.stringify(currentFilter)
+  ) {
+    window.assetPurchaseRows = state.assetPurchaseData;
+    renderAssetPurchases( window.assetPurchaseRows );
+    updateAssetPurchasePaginationInfo( window.assetPurchaseRows.length );
+    return; }
   tbody.innerHTML = `
     <tr>
       <td colspan="9" class="px-4 py-8 text-center text-muted">
@@ -21206,7 +20366,6 @@ async function loadAssetPurchases() {
     );
 
     if (error) {
-      console.error("get_asset_purchases error:", error);
       tbody.innerHTML = `
         <tr>
           <td colspan="9" class="px-4 py-8 text-center text-error">
@@ -21216,13 +20375,17 @@ async function loadAssetPurchases() {
       `;
       return;
     }
-    // Simpan untuk popup Action
+    const rows = Array.isArray(data)
+			? data
+			: [];
+    // SAVE CACHE
+    state.assetPurchaseData = rows;
+    state.assetPurchaseFilter = currentFilter;
     window.assetPurchaseRows = Array.isArray(data) ? data : [];
     renderAssetPurchases(window.assetPurchaseRows);
     updateAssetPurchasePaginationInfo( window.assetPurchaseRows.length );
 
   } catch (err) {
-    console.error("loadAssetPurchases error:", err);
     tbody.innerHTML = `
       <tr>
         <td colspan="9" class="px-4 py-8 text-center text-error">
@@ -21339,15 +20502,9 @@ let activeAssetPurchaseAction = null;
 
 function openAssetPurchaseActionMenu(purchaseId) {
   const rows = window.assetPurchaseRows || [];
+  const row = rows.find( item => String(item.Purchase_ID) === String(purchaseId) );
 
-  const row = rows.find(
-    item => String(item.Purchase_ID) === String(purchaseId)
-  );
-
-  if (!row) {
-    console.error("Asset purchase tidak ditemukan:", purchaseId);
-    return;
-  }
+  if (!row) { return; }
 
   activeAssetPurchaseAction = row;
 
@@ -21469,11 +20626,7 @@ function updateAssetPurchasePaginationInfo(count) {
 
   const total = Number(count || 0);
 
-  if (total === 0) {
-    el.textContent = "0 data";
-    return;
-  }
-
+  if (total === 0) { el.textContent = "0 data"; return; }
   el.textContent = `${total} data`;
 }
 
@@ -21497,8 +20650,7 @@ async function recordAssetPurchaseFromAction() {
 
   if (!purchaseId) {
     alert("Purchase ID tidak ditemukan.");
-    return;
-  }
+    return; }
 
   const confirmed = confirm(
     "Record asset purchase ini?\n\n" +
@@ -21513,12 +20665,8 @@ async function recordAssetPurchaseFromAction() {
 
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
-
-    console.log("Record Asset Purchase:", purchaseId);
-
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
+		
     const { data, error } = await supabaseClient.rpc(
       "record_asset_purchase",
       {
@@ -21527,18 +20675,8 @@ async function recordAssetPurchaseFromAction() {
       }
     );
 
-    if (error) {
-      console.error("record_asset_purchase error:", error);
-      throw new Error(error.message || "Gagal record asset purchase.");
-    }
-
-    console.log("record_asset_purchase result:", data);
-
-    if (!data?.success) {
-      throw new Error(
-        data?.message || "Asset purchase gagal direcord."
-      );
-    }
+    if (error) { throw new Error(error.message || "Gagal record asset purchase."); }
+    if (!data?.success) { throw new Error( data?.message || "Asset purchase gagal direcord." ); }
 
     alert(
       "Asset purchase berhasil direcord.\n\n" +
@@ -21546,19 +20684,15 @@ async function recordAssetPurchaseFromAction() {
       "Journal: " + (data.journal_no || "-")
     );
 
-    // Refresh tabel Asset Purchase
+      state.assetPurchaseData = null;
+			state.assetPurchaseFilter = null;
+			state.accountingReportsData = null;
+			state.accountingReportsFilter = null;
     if (typeof loadAssetPurchases === "function") {
       await loadAssetPurchases();
     }
-
   } catch (err) {
-
-    console.error("Record Asset Purchase:", err);
-
-    alert(
-      "Gagal record asset purchase:\n" +
-      (err?.message || "Terjadi kesalahan.")
-    );
+    alert( "Gagal record asset purchase:\n" + (err?.message || "Terjadi kesalahan.") );
   }
 }
 
@@ -21595,19 +20729,14 @@ async function deleteAssetPurchaseFromAction() {
       }
     );
 
-    console.log("DELETE ASSET PURCHASE:", data);
-    console.log("DELETE ASSET PURCHASE ERROR:", error);
     if (error) { throw error; }
-    // Refresh tabel
-    await loadAssetPurchases();
-    console.log("Asset purchase berhasil dihapus:", purchaseId);
-
+	    // Refresh tabel
+	  state.assetPurchaseData = null;
+		state.assetPurchaseFilter = null;
+		
+		await loadAssetPurchases();
   } catch (error) {
-    console.error("❌ DELETE ASSET PURCHASE ERROR:", error);
-    alert(
-      error?.message ||
-      "Gagal menghapus asset purchase."
-    );
+    alert( error?.message || "Gagal menghapus asset purchase." );
   }
 }
 
@@ -21617,10 +20746,7 @@ function payAssetPurchaseFromAction() {
   const purchase = activeAssetPurchaseAction;
 
   const modal = document.getElementById("assetPurchasePaymentModal");
-  if (!modal) {
-    console.warn("assetPurchasePaymentModal tidak ditemukan");
-    return;
-  }
+  if (!modal) { return; }
   // SET DATA POPUP
   document.getElementById("assetPurchasePaymentId").value = purchase.Purchase_ID || "";
   document.getElementById("assetPurchasePaymentAsset").textContent = purchase.Asset_Name || "-";
@@ -21645,60 +20771,38 @@ function payAssetPurchaseFromAction() {
 
 async function saveAssetPurchasePayment() {
   try {
-    const purchaseId =
-      document.getElementById("assetPurchasePaymentId")?.value?.trim();
-
-    const paymentDate =
-      document.getElementById("assetPurchasePaymentDate")?.value;
-
-    const principal =
-      Number(document.getElementById("assetPurchasePaymentPrincipal")?.value || 0);
-
-    const interest =
-      Number(document.getElementById("assetPurchasePaymentInterest")?.value || 0);
-
-    const paymentMethod =
-      document.getElementById("assetPurchasePaymentMethod")?.value;
-
-    const referenceNo =
-      document.getElementById("assetPurchasePaymentReference")?.value?.trim() || null;
-
-    const note =
-      document.getElementById("assetPurchasePaymentNote")?.value?.trim() || null;
+    const purchaseId = document.getElementById("assetPurchasePaymentId")?.value?.trim();
+    const paymentDate = document.getElementById("assetPurchasePaymentDate")?.value;
+    const principal = Number(document.getElementById("assetPurchasePaymentPrincipal")?.value || 0);
+    const interest = Number(document.getElementById("assetPurchasePaymentInterest")?.value || 0);
+    const paymentMethod = document.getElementById("assetPurchasePaymentMethod")?.value;
+    const referenceNo = document.getElementById("assetPurchasePaymentReference")?.value?.trim() || null;
+    const note = document.getElementById("assetPurchasePaymentNote")?.value?.trim() || null;
 
     if (!purchaseId) {
       alert("Purchase ID tidak ditemukan.");
-      return;
-    }
-
+      return; }
     if (!paymentDate) {
       alert("Tanggal pembayaran wajib diisi.");
-      return;
-    }
-
+      return; }
     if (principal <= 0) {
       alert("Pokok pembayaran harus lebih dari 0.");
-      return;
-    }
-
+      return; }
     if (interest < 0) {
       alert("Bunga tidak valid.");
-      return;
-    }
-
+      return; }
+		
     const total = principal + interest;
 
     if (total <= 0) {
       alert("Total pembayaran harus lebih dari 0.");
-      return;
-    }
+      return; }
 
     const sessionId = localStorage.getItem("pos_session_id");
 
     if (!sessionId) {
       alert("Session tidak ditemukan.");
-      return;
-    }
+      return; }
 
     const btn = document.getElementById("saveAssetPurchasePaymentBtn");
 
@@ -21726,17 +20830,17 @@ async function saveAssetPurchasePayment() {
       throw new Error(error.message || "Gagal menyimpan pembayaran asset.");
     }
 
-    console.log("pay_asset_purchase result:", data);
-
     alert("Pembayaran asset berhasil disimpan.");
 
     closeAssetPurchasePaymentModal();
-
-    // Refresh tabel Asset Purchase
-    await loadAssetPurchases();
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+	  state.assetPurchaseData = null;
+		state.assetPurchaseFilter = null;
+		
+		await loadAssetPurchases();
 
   } catch (err) {
-    console.error("saveAssetPurchasePayment:", err);
     alert(err.message || "Gagal menyimpan pembayaran.");
   } finally {
     const btn = document.getElementById("saveAssetPurchasePaymentBtn");
@@ -21763,15 +20867,13 @@ async function saveAssetPurchaseDraft() {
 
   if (!sessionId) {
     alert("Session tidak ditemukan.");
-    return;
-  }
+    return; }
 
 	const branchId = state.branchId;
 
   if (!branchId) {
     alert("Branch belum dipilih.");
-    return;
-  }
+    return; }
 
   const assetName = document.getElementById("assetPurchaseName")?.value.trim();
   const purchaseDate = document.getElementById("assetPurchaseDate")?.value;
@@ -21782,23 +20884,16 @@ async function saveAssetPurchaseDraft() {
   // VALIDATION
   if (!assetName) {
     alert("Asset name wajib diisi.");
-    return;
-  }
-
+    return; }
   if (!purchaseDate) {
     alert("Purchase date wajib diisi.");
-    return;
-  }
-
+    return; }
   if (!purchaseCost || purchaseCost <= 0) {
     alert("Purchase cost harus lebih dari 0.");
-    return;
-  }
-
+    return; }
   if (interestAmount < 0) {
     alert("Interest tidak boleh negatif.");
-    return;
-  }
+    return; }
 
   const totalObligation = purchaseCost + interestAmount;
   const saveButton = document.querySelector( '#addAssetPurchaseModal button[onclick="saveAssetPurchaseDraft()"]' );
@@ -21825,36 +20920,19 @@ async function saveAssetPurchaseDraft() {
         }
       );
 
-    if (error) {
-      console.error(
-        "add_asset_purchase RPC error:",
-        error
-      );
-
-      throw error; }
-
-    console.log(
-      "Asset Purchase Draft Saved:",
-      data
-    );
+    if (error) { throw error; }
 
     closeAddAssetPurchaseModal();
-    // Refresh tabel purchase
+    state.assetPurchaseData = null;
+		state.assetPurchaseFilter = null;
+		
     if (typeof loadAssetPurchases === "function") {
       await loadAssetPurchases();
     }
 
     alert("Asset purchase draft berhasil disimpan.");
   } catch (error) {
-    console.error(
-      "SAVE ASSET PURCHASE ERROR:",
-      error
-    );
-
-    alert(
-      error?.message ||
-      "Gagal menyimpan asset purchase draft."
-    );
+    alert( error?.message || "Gagal menyimpan asset purchase draft." );
   } finally {
     if (saveButton) {
       saveButton.disabled = false;
@@ -21903,8 +20981,7 @@ function renderDepreciationHistory() {
       filteredData.length,
       totalPages
     );
-    return;
-  }
+    return; }
 
   tbody.innerHTML =
     pageData.map(item => {
@@ -22040,8 +21117,7 @@ async function loadAccountingOverview() {
   const { start, end } = getAccountingDateRange(period);
 
   try {
-		const sessionId = 
-			localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const { data, error } =
       await supabaseClient.rpc(
         "get_accounting_overview",
@@ -22061,26 +21137,14 @@ async function loadAccountingOverview() {
     }
     renderAccountingOverview(data);
   } catch (error) {
-	  console.error("GET ACCOUNTING OVERVIEW ERROR:", {
-	    message: error?.message,
-	    details: error?.details,
-	    hint: error?.hint,
-	    code: error?.code,
-	    error
-	  });
-	
-	  showToast(
-	    error?.message || "Gagal memuat Accounting Overview.",
-	    "error"
-	  );
+	  showToast( error?.message || "Gagal memuat Accounting Overview.", "error" );
 	}
 }
 
 async function loadAccountingBranchOptions() {
 	
   try {
-    const sessionId =
-  				localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     const { data, error } =
       await supabaseClient.rpc(
         "get_expense_branches",
@@ -27741,10 +26805,7 @@ function populateAccountingTaxYears() {
 }
 
 
-
-/* =========================================================
-   INIT PAGE
-========================================================= */
+/* ==== INIT PAGE TAX PPH ==== */
 
 async function initAccountingTaxPage() {
   if (accountingTaxLoading) return;
@@ -27755,9 +26816,8 @@ async function initAccountingTaxPage() {
 	changeTaxRegime();
     const yearEl = document.getElementById("taxObligationYear");
 
-    if (yearEl && !yearEl.value) {
-      yearEl.value = String(new Date().getFullYear());
-    }
+    if (yearEl && !yearEl.value) { yearEl.value = String(new Date().getFullYear()); }
+		
 	populateAccountingTaxYears();
 	await loadAccountingTaxBranchFilters();
 	await Promise.all([
@@ -27778,9 +26838,7 @@ async function initAccountingTaxPage() {
   }
 }
 
-/* =========================================================
-   TAX SETTINGS
-========================================================= */
+/* ==== TAX SETTINGS ==== */
 
 async function loadTaxObligasiSettings() {
 	if (state.accountingTaxSettingsData) {
@@ -27816,8 +26874,8 @@ function renderCurrentTaxSettings() {
   if (rateEl) {
     const rate = Number(setting.tax_rate);
     rateEl.textContent = Number.isFinite(rate)
-        ? `${rate.toFixed(4)}%`
-        : "0.0000%"; }
+			? `${rate.toFixed(4)}%`
+			: "0.0000%"; }
   if (fromEl) { fromEl.textContent = setting.effective_from || "-"; }
   if (statusEl) {
     statusEl.textContent =
@@ -27842,8 +26900,8 @@ async function loadAccountingTaxBranchFilters() {
     if (error) throw error;
 
     const branches = typeof data === "string"
-        ? JSON.parse(data)
-        : (data || []);
+			? JSON.parse(data)
+			: (data || []);
 
     const selects = [
       document.getElementById("taxObligationBranchFilter"),
@@ -27856,19 +26914,13 @@ async function loadAccountingTaxBranchFilters() {
 
       branches.forEach(branch => { const option = document.createElement("option");
         option.value = branch.id || "";
-        option.textContent =
-          branch.name || branch.id || "Unnamed Branch";
+        option.textContent = branch.name || branch.id || "Unnamed Branch";
 
         select.appendChild(option);
       });
     });
 
-  } catch (error) {
-    console.error(
-      "loadAccountingTaxBranchFilters error:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 /* ==== OPEN TAX SETTINGS MODAL ==== */
@@ -27921,13 +26973,11 @@ async function saveTaxObligasiSettings() {
 	  sessionId = localStorage.getItem("pos_session_id");
 			} catch (error) {
 			  alert(error.message);
-			  return;
-			}
+			  return; }
 			
 			if (!sessionId) {
 			  alert("Session tidak ditemukan. Silakan login ulang.");
-			  return;
-			}
+			  return; }
 	
   const nameEl = document.getElementById( "taxSettingName" );
   const rateEl = document.getElementById( "taxSettingRate" );
@@ -27982,8 +27032,10 @@ async function saveTaxObligasiSettings() {
       );
 
     if (error) { throw error; }
+		
 		state.accountingTaxSettingsData = null;
     currentTaxSettings = data || null;
+		
     renderCurrentTaxSettings();
     closeTaxSettingsModal();
     await loadTaxObligation();
@@ -28006,9 +27058,7 @@ async function saveTaxObligasiSettings() {
 }
 
 
-/* =========================================================
-   TAX OBLIGATION
-========================================================= */
+/* ==== TAX OBLIGATION ===== */
 
 async function loadTaxObligation() {
   const sessionId = localStorage.getItem("pos_session_id");
@@ -28066,9 +27116,7 @@ document.addEventListener("change", function(event) {
     });
 });
 
-/* =========================================================
-   RENDER TAX OBLIGATION
-========================================================= */
+/* === RENDER TAX OBLIGATION === */
 
 function renderTaxObligation(data) {
   const obligation = data || {};
@@ -28133,7 +27181,6 @@ document.addEventListener( "change",
 		});
   }
 );
-
 
 /* ==== RECORD TAX OBLIGATION ==== */
 
@@ -28249,54 +27296,32 @@ async function openTaxObligationPaymentModal() {
     const accountEl = document.getElementById( "taxObligationPaymentAccount" );
 		
     if (accountEl) { accountEl.textContent = "2210 · Tax Obligation Payable"; }
-    /* ==== DATE ===== */
+
     const dateEl = document.getElementById( "taxObligationPaymentDate" );
 		
     if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingTaxDate(); }
-    /* ==== GET PAYMENT AMOUNT ==== */
-		const paymentAmount = Number(
-		  currentTaxPayment?.amount || 0
-		);
+  
+		const paymentAmount = Number( currentTaxPayment?.amount || 0 );
 		
-		if (paymentAmount <= 0) {
-		  throw new Error(
-		    "Jumlah Tax Payment tidak valid."
-		  );
-		}
+		if (paymentAmount <= 0) { throw new Error( "Jumlah Tax Payment tidak valid." ); }
 		
-		/* ==== OUTSTANDING ==== */
-		const outstandingEl = document.getElementById(
-		  "taxObligationPaymentOutstanding"
-		);
+		const outstandingEl = document.getElementById( "taxObligationPaymentOutstanding" );
 		
-		if (outstandingEl) {
-		  outstandingEl.textContent =
-		    formatAccountingTaxCurrency(paymentAmount);
-		}
+		if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency(paymentAmount); }
 		
-		/* ==== AMOUNT DEFAULT ==== */
-		const amountEl = document.getElementById(
-		  "taxObligationPaymentAmount"
-		);
+		const amountEl = document.getElementById( "taxObligationPaymentAmount" );
 		
 		if (amountEl) {
 		  amountEl.value = paymentAmount;
-		  amountEl.max = String(paymentAmount);
-		}
-    /* ==== METHOD DEFAULT ==== */
+		  amountEl.max = String(paymentAmount); }
+
     const methodEl = document.getElementById( "taxObligationPaymentMethod" );
     if (methodEl && !methodEl.value) { methodEl.value = "CASH"; }
 
-
-    /* ==== SHOW MODAL ==== */
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   } catch (error) {
-    showToast(
-      error?.message ||
-        "Gagal membuka Tax Obligation Payment.",
-      "error"
-    );
+    showToast( error?.message || "Gagal membuka Tax Obligation Payment.", "error" );
   }
 }
 
@@ -28309,9 +27334,7 @@ function closeTaxObligationPaymentModal() {
 }
 
 
-/* =========================================================
-   SAVE TAX OBLIGATION PAYMENT
-========================================================= */
+/* ==== SAVE TAX OBLIGATION PAYMENT ==== */
 async function saveTaxObligationPayment() {
   const button = document.getElementById( "saveTaxObligationPaymentButton" );
 
@@ -28480,8 +27503,7 @@ async function saveTaxObligationPayment() {
           p_tax_year: taxYear
         }
       );
-console.error("STATUS ERROR:", statusError);
-console.error("STATUS DATA:", statusData);
+
     if (statusError) { throw statusError; }
 		state.accountingTaxData = null;
 		state.accountingTaxFilter = null;
@@ -28494,24 +27516,13 @@ console.error("STATUS DATA:", statusData);
 		const finalStatus = statusData?.status || "RECORDED";
 		const finalOutstanding = Number(statusData?.outstanding || 0);
 
-    if (finalStatus === "PAID") {
-      showToast(
-        `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil dan sudah lunas.`,
-        "success"
-      );
+    if (finalStatus === "PAID") { 
+			showToast( `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil dan sudah lunas.`, "success" );
     } else {
-      showToast(
-        `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil. Outstanding ${formatAccountingTaxCurrency(finalOutstanding)}.`,
-        "success"
-      );
-    }
+      showToast( `Pembayaran Tax Obligation ${taxYear} sebesar ${formatAccountingTaxCurrency(amount)} berhasil. Outstanding ${formatAccountingTaxCurrency(finalOutstanding)}.`, "success" ); }
 
   } catch (error) {
-    showToast(
-      error?.message ||
-        "Gagal menyimpan Tax Obligation Payment.",
-      "error"
-    );
+    showToast( error?.message || "Gagal menyimpan Tax Obligation Payment.", "error" );
   } finally {
     if (button) {
       button.disabled = false;
@@ -28577,18 +27588,17 @@ async function loadTaxPayments() {
 
     if (error) { throw error; }
     const result = typeof data === "string"
-        ? JSON.parse(data)
-        : data;
+			? JSON.parse(data)
+			: data;
 
     taxPaymentsData = Array.isArray(result)
-        ? result
-        : [];
+			? result
+			: [];
 
     taxPaymentsPage = 1;
     renderTaxPayments();
     return taxPaymentsData;
   } catch (error) {
-    console.error("loadTaxPayments error:", error);
     taxPaymentsData = [];
     renderTaxPayments();
     throw error;
@@ -28759,7 +27769,7 @@ function changeTaxRegime() {
 ========================================================= */
 
 let pphBadanCalculating = false;
-/* ===== GET PPH BADAN YEAR ===== */
+
 function getPphBadanYear() {
   const yearEl = document.getElementById("pphBadanYear");
   const year = Number(yearEl?.value);
@@ -28778,8 +27788,6 @@ function getPphBadanBranchId() {
 }
 
 /* ===== LOAD PPH BADAN CALCULATION ===== */
-
-
 async function calculatePphBadan() {
 	if (pphBadanCalculating) return;
 	
@@ -28797,7 +27805,6 @@ async function calculatePphBadan() {
 		const toDate = `${taxYear}-12-31`;
 	
 		/* ==== BUTTON STATE ==== */
-	
 		pphBadanCalculating = true;
 	
 		if (button) {
@@ -28810,7 +27817,6 @@ async function calculatePphBadan() {
 				Calculating...
 			`;
 		}
-	
 		/* ===== SINGLE BRANCH ===== */
 		if (branchId !== "ALL") {
 			const positiveInput = document.getElementById( "pphBadanPositiveAdjustmentInput" );
@@ -28833,10 +27839,6 @@ async function calculatePphBadan() {
 					);
 	
 				if (error) {
-						console.error(
-								"get_pph_badan_calculation error:",
-								error
-						);
 						throw error; }
 	
 				const result = typeof data === "string"
@@ -28848,16 +27850,9 @@ async function calculatePphBadan() {
 				renderPphBadanCalculationResult(result);
 				window.currentPphBadanCalculation = result;
 				window.pendingPphBadanBaseCalculation = null;
-
-				console.log(
-						"PPh Badan Calculation - Single Branch:",
-						result
-				);
 	
 				showToast( `PPh Badan ${taxYear} berhasil dihitung.`, "success" ); return; }
-	
-		/* ===== ALL BRANCH FIRST CALCULATION = BASE DATA ONLY ===== */
-	
+
 		const { data, error } 
 			= await supabaseClient.rpc(
 				"get_pph_badan_calculation",
@@ -28872,12 +27867,7 @@ async function calculatePphBadan() {
 				}
 			);
 	
-		if (error) {
-				console.error(
-						"get_pph_badan_calculation ALL error:",
-						error
-				);
-				throw error; }
+		if (error) { throw error; }
 	
 		const result = typeof data === "string"
 			? JSON.parse(data)
@@ -28891,19 +27881,9 @@ async function calculatePphBadan() {
 		window.currentPphBadanCalculation = null;
 		/* ===== OPEN FISCAL ADJUSTMENT POPUP ===== */
 		openPphBadanFiscalAdjustmentModal( result.branches, taxYear );
-		console.log(
-				"PPh Badan Base Calculation - ALL:",
-				result
-		);
-		showToast(
-				"Silakan masukkan fiscal adjustment untuk setiap outlet.",
-				"success"
-		);
+
+		showToast( "Silakan masukkan fiscal adjustment untuk setiap outlet.", "success" );
 	} catch (error) {
-		console.error(
-				"calculatePphBadan error:",
-				error
-		);
 		const statusEl = document.getElementById( "pphBadanStatus" );
 	
 		if (statusEl) { statusEl.textContent = "Calculation Failed"; }
@@ -28917,12 +27897,12 @@ async function calculatePphBadan() {
 		if (button) {
 			button.disabled = false;
 			button.innerHTML = button.dataset.originalText ||
-				`
-					<span class="material-symbols-outlined text-sm">
-						calculate
-					</span>
-					Calculate PPh Badan
-				`;
+			`
+				<span class="material-symbols-outlined text-sm">
+					calculate
+				</span>
+				Calculate PPh Badan
+			`;
 		}
 	}
 }
@@ -29256,30 +28236,21 @@ async function loadPphBadanRecords() {
       {
         p_branch_id: branchId,
         p_session_id: sessionId,
-        p_tax_year:
-          taxYear >= 2000 && taxYear <= 9999
-            ? taxYear
-            : null
+        p_tax_year: taxYear >= 2000 && taxYear <= 9999
+					? taxYear
+					: null
       }
     );
 
-    if (error) {
-      console.error(
-        "get_pph_badan_records error:",
-        error
-      );
-      throw error; }
+    if (error) { throw error; }
 		
     pphBadanRecords = typeof data === "string"
         ? JSON.parse(data)
         : (data || []);
     pphBadanRecordsPage = 1;
+		
     renderPphBadanRecords();
   } catch (error) {
-    console.error(
-      "loadPphBadanRecords error:",
-      error
-    );
     pphBadanRecords = [];
     renderPphBadanRecords();
   }
@@ -29310,10 +28281,9 @@ function renderPphBadanRecords() {
 if (!rows.length) {
 	tbody.innerHTML = `
 		<tr>
-			<td
-				colspan="6"
+			<td colspan="6"
 				class="px-5 py-10 text-center text-muted" >
-				No PPh Badan data
+					No PPh Badan data
 			</td>
 		</tr>
 	`;
@@ -29321,9 +28291,9 @@ if (!rows.length) {
 	tbody.innerHTML =
 		rows.map(row => {
 			const period =
-					`${formatPphBadanDate(row.fromDate)}
-					 - 
-					 ${formatPphBadanDate(row.toDate)}`;
+				`${formatPphBadanDate(row.fromDate)}
+				 - 
+				 ${formatPphBadanDate(row.toDate)}`;
 			const status = String(row.status || "DRAFT").toUpperCase();
 			const paidAmount = Number(row.paidAmount || 0);
 			const remainingAmount = Number(row.remainingAmount || 0);
@@ -29389,29 +28359,19 @@ function openPphBadanRecordMenu(recordId) {
 
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   const modal = document.getElementById("pphBadanActionModal");
   const info = document.getElementById("pphBadanActionInfo");
   const buttons = document.getElementById("pphBadanActionButtons");
 
-  if (!modal || !buttons) {
-    console.error("PPh Badan Action popup tidak ditemukan.");
-    return;
-  }
+  if (!modal || !buttons) { return; }
 
   selectedPphBadanRecordId = record.id;
 
-  const status = String(
-    record.status || "DRAFT"
-  ).toUpperCase();
+  const status = String( record.status || "DRAFT" ).toUpperCase();
 
-  if (info) {
-    info.textContent =
-      `PPh Badan ${record.taxYear} • ${formatAccountingTaxCurrency(record.taxAmount)}`;
-  }
-
+  if (info) { info.textContent = `PPh Badan ${record.taxYear} • ${formatAccountingTaxCurrency(record.taxAmount)}`; }
   let html = `
     <button type="button"
       onclick="viewPphBadanDetailFromAction()"
@@ -29433,7 +28393,6 @@ function openPphBadanRecordMenu(recordId) {
   `;
 
   if (status === "CALCULATED") {
-
     html += `
       <button type="button"
         onclick="recordPphBadanFromAction()"
@@ -29453,8 +28412,7 @@ function openPphBadanRecordMenu(recordId) {
         </div>
       </button>
 
-      <button
-        type="button"
+      <button type="button"
         onclick="deletePphBadanFromAction()"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-red-600/10 text-left text-red-1000" >
         <span class="material-symbols-outlined text-lg">
@@ -29477,10 +28435,8 @@ function openPphBadanRecordMenu(recordId) {
     status === "OUTSTANDING" ||
     status === "PARTIALLY_PAID"
   ) {
-
     html += `
-      <button
-        type="button"
+      <button type="button"
         onclick="payPphBadanFromAction()"
         class="w-full flex items-center gap-3 px-4 py-3 rounded-md hover:bg-outline-variant text-left" >
         <span class="material-symbols-outlined text-lg">
@@ -29498,9 +28454,7 @@ function openPphBadanRecordMenu(recordId) {
         </div>
       </button>
     `;
-
   } else if (status === "PAID") {
-
     html += `
       <div class="px-4 py-3 rounded-md bg-background border border-outline-variant">
         <div class="font-medium">
@@ -29515,7 +28469,6 @@ function openPphBadanRecordMenu(recordId) {
   }
 
   buttons.innerHTML = html;
-
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
@@ -29531,18 +28484,13 @@ async function recordPphBadanFromAction() {
 
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   const status = String(record.status || "").toUpperCase();
 
   if (status !== "CALCULATED") {
-    showToast(
-      "PPh Badan ini sudah tidak berstatus Calculated.",
-      "info"
-    );
-    return;
-  }
+    showToast( "PPh Badan ini sudah tidak berstatus Calculated.", "info" );
+    return; }
 
   const confirmed = confirm(
     `Record PPh Badan ${record.taxYear}?\n\n` +
@@ -29557,9 +28505,7 @@ async function recordPphBadanFromAction() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     pphBadanRecording = true;
 
@@ -29572,39 +28518,15 @@ async function recordPphBadanFromAction() {
         }
       );
 
-    if (error) {
-      console.error(
-        "record_pph_badan error:",
-        error
-      );
-      throw error;
-    }
-
-    console.log(
-      "PPh Badan recorded:",
-      data
-    );
-
+    if (error) { throw error; }
+		
     closePphBadanActionMenu();
-
-    showToast(
-      `PPh Badan ${record.taxYear} berhasil di-record.`,
-      "success"
-    );
+    showToast( `PPh Badan ${record.taxYear} berhasil di-record.`, "success" );
 
     await loadPphBadanRecords();
 
   } catch (error) {
-    console.error(
-      "recordPphBadanFromAction error:",
-      error
-    );
-
-    showToast(
-      error?.message || "Gagal melakukan Record PPh Badan.",
-      "error"
-    );
-
+    showToast( error?.message || "Gagal melakukan Record PPh Badan.", "error" );
   } finally {
     pphBadanRecording = false;
   }
@@ -29621,18 +28543,13 @@ async function deletePphBadanFromAction() {
 
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   const status = String(record.status || "").toUpperCase();
 
   if (status !== "CALCULATED") {
-    showToast(
-      "Hanya PPh Badan dengan status Calculated yang bisa dihapus.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Hanya PPh Badan dengan status Calculated yang bisa dihapus.", "error" );
+    return; }
 
   const confirmed = confirm(
     `Hapus perhitungan PPh Badan ${record.taxYear}?\n\n` +
@@ -29644,9 +28561,7 @@ async function deletePphBadanFromAction() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     pphBadanDeleting = true;
 
@@ -29659,39 +28574,15 @@ async function deletePphBadanFromAction() {
         }
       );
 
-    if (error) {
-      console.error(
-        "delete_pph_badan_calculation error:",
-        error
-      );
-      throw error;
-    }
-
-    console.log(
-      "PPh Badan deleted:",
-      data
-    );
-
+    if (error) { throw error; }
+		
     closePphBadanActionMenu();
-
-    showToast(
-      `PPh Badan ${record.taxYear} berhasil dihapus.`,
-      "success"
-    );
+    showToast( `PPh Badan ${record.taxYear} berhasil dihapus.`, "success" );
 
     await loadPphBadanRecords();
 
   } catch (error) {
-    console.error(
-      "deletePphBadanFromAction error:",
-      error
-    );
-
-    showToast(
-      error?.message || "Gagal menghapus PPh Badan.",
-      "error"
-    );
-
+    showToast( error?.message || "Gagal menghapus PPh Badan.", "error" );
   } finally {
     pphBadanDeleting = false;
   }
@@ -29795,15 +28686,12 @@ async function savePphBadanPayment() {
 
     if (error) { throw error; }
     closePphBadanPaymentModal();
-    showToast(
-      `PPh Badan ${record.taxYear} berhasil dibayar.`, "success"
-    );
+    showToast( `PPh Badan ${record.taxYear} berhasil dibayar.`, "success" );
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
     await loadPphBadanRecords();
   } catch (error) {
-    showToast(
-      error?.message || "Gagal melakukan pembayaran PPh Badan.", "error"
-    );
-
+    showToast( error?.message || "Gagal melakukan pembayaran PPh Badan.", "error" );
   } finally {
     pphBadanPaying = false;
     const button = document.getElementById( "savePphBadanPaymentButton" );
@@ -29831,13 +28719,11 @@ function closePphBadanPaymentModal() {
 
 function viewPphBadanDetailFromAction() {
   const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId)
-  );
+    row => String(row.id) === String(selectedPphBadanRecordId) );
 
   if (!record) {
     showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   closePphBadanActionMenu();
 
@@ -29845,72 +28731,60 @@ function viewPphBadanDetailFromAction() {
 
   if (!modal) {
     console.error("PPh Badan Detail modal tidak ditemukan.");
-    return;
-  }
+    return; }
 
   const setText = (id, value) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-  };
+    const el = document.getElementById(id); if (el) el.textContent = value; };
+	const money = value => formatAccountingTaxCurrency(Number(value || 0));
+	const date = value => value ? formatPphBadanDate(value) : "-";
+	const dateTime = value => {
+		if (!value) return "-";
 
-  const money = value =>
-    formatAccountingTaxCurrency(Number(value || 0));
+		const d = new Date(value);
 
-  const date = value =>
-    value ? formatPphBadanDate(value) : "-";
+		if (Number.isNaN(d.getTime())) {
+			return String(value);
+		}
 
-  const dateTime = value => {
-    if (!value) return "-";
+		return d.toLocaleString("id-ID", {
+			day: "2-digit",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit"
+		});
+	};
 
-    const d = new Date(value);
+	const status = String( record.status || "DRAFT" ).toUpperCase();
 
-    if (Number.isNaN(d.getTime())) {
-      return String(value);
-    }
+	setText( "pphBadanDetailSubtitle", `PPh Badan ${record.taxYear ?? "-"}` );
+	setText( "pphBadanDetailId", record.id ?? "-" );
 
-    return d.toLocaleString("id-ID", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
-    });
-  };
+	const statusEl = document.getElementById("pphBadanDetailStatus");
 
-  const status = String( record.status || "DRAFT" ).toUpperCase();
-
-  setText( "pphBadanDetailSubtitle", `PPh Badan ${record.taxYear ?? "-"}` );
-  setText( "pphBadanDetailId", record.id ?? "-" );
-
-  const statusEl = document.getElementById("pphBadanDetailStatus");
-
-  if (statusEl) { statusEl.innerHTML = getPphBadanStatusBadge(status); }
+	if (statusEl) { statusEl.innerHTML = getPphBadanStatusBadge(status); }
 	
-  setText( "pphBadanDetailTaxYear", record.taxYear ?? "-" );
-  setText( "pphBadanDetailFromDate", date(record.fromDate) );
-  setText( "pphBadanDetailToDate", date(record.toDate) );
-  setText( "pphBadanDetailRevenue", money(record.revenue) );
-  setText( "pphBadanDetailCogs", money(record.cogs) );
-  setText( "pphBadanDetailExpense", money(record.expense) );
-  setText( "pphBadanDetailCommercialProfit", money(record.commercialProfit) );
-  setText( "pphBadanDetailPositiveAdjustment", money(record.positiveAdjustment) );
-  setText( "pphBadanDetailNegativeAdjustment", money(record.negativeAdjustment) );
-  setText( "pphBadanDetailTaxableIncome", money(record.taxableIncome) );
-  setText( "pphBadanDetailBaseRate", `${Number(record.baseRate || 0)}%` );
-  setText( "pphBadanDetailFacilityRate", `${Number(record.facilityRate || 0)}%` );
-  setText( "pphBadanDetailTaxAmount", money(record.taxAmount) );
-  setText( "pphBadanDetailPaidAmount", money(record.paidAmount) );
-  setText( "pphBadanDetailRemainingAmount", money(record.remainingAmount) );
-  setText( "pphBadanDetailBranch", record.branchId ?? "-" );
-  setText( "pphBadanDetailNote", record.note ?? "-" );
-  setText( "pphBadanDetailJournalId", record.journalId ?? "-" );
-  setText( "pphBadanDetailCreatedAt", dateTime(record.createdAt) );
-  setText( "pphBadanDetailUpdatedAt", dateTime(record.updatedAt) );
-
-  console.log(
-    "PPh Badan Detail:",
-    record
-  );
+	setText( "pphBadanDetailTaxYear", record.taxYear ?? "-" );
+	setText( "pphBadanDetailFromDate", date(record.fromDate) );
+	setText( "pphBadanDetailToDate", date(record.toDate) );
+	setText( "pphBadanDetailRevenue", money(record.revenue) );
+	setText( "pphBadanDetailCogs", money(record.cogs) );
+	setText( "pphBadanDetailExpense", money(record.expense) );
+	setText( "pphBadanDetailCommercialProfit", money(record.commercialProfit) );
+	setText( "pphBadanDetailPositiveAdjustment", money(record.positiveAdjustment) );
+	setText( "pphBadanDetailNegativeAdjustment", money(record.negativeAdjustment) );
+	setText( "pphBadanDetailTaxableIncome", money(record.taxableIncome) );
+	setText( "pphBadanDetailBaseRate", `${Number(record.baseRate || 0)}%` );
+	setText( "pphBadanDetailFacilityRate", `${Number(record.facilityRate || 0)}%` );
+	setText( "pphBadanDetailTaxAmount", money(record.taxAmount) );
+	setText( "pphBadanDetailPaidAmount", money(record.paidAmount) );
+	setText( "pphBadanDetailRemainingAmount", money(record.remainingAmount) );
+	setText( "pphBadanDetailBranch", record.branchId ?? "-" );
+	setText( "pphBadanDetailNote", record.note ?? "-" );
+	setText( "pphBadanDetailJournalId", record.journalId ?? "-" );
+	setText( "pphBadanDetailCreatedAt", dateTime(record.createdAt) );
+	setText( "pphBadanDetailUpdatedAt", dateTime(record.updatedAt) );
+	
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
@@ -29993,10 +28867,7 @@ async function savePphBadanCalculation() {
   const result = window.currentPphBadanCalculation;
 
   if (!result) {
-    showToast(
-      "Silakan Calculate PPh Badan terlebih dahulu.",
-      "error"
-    );
+    showToast( "Silakan Calculate PPh Badan terlebih dahulu.", "error" );
     return; }
 
   try {
@@ -30072,28 +28943,12 @@ async function savePphBadanCalculation() {
         }
       );
 
-    if (error) {
-      console.error(
-        "save_pph_badan_calculation error:",
-        error
-      );
-      throw error; }
-
-    console.log(
-      "PPh Badan Save Result:",
-      data
-    );
+    if (error) { throw error; }
 
     showToast( `PPh Badan ${result.taxYear} berhasil disimpan.`, "success" );
     await loadPphBadanRecords();
   } catch (error) {
-    console.error(
-      "savePphBadanCalculation error:",
-      error
-    );
-
     showToast( error?.message || "Gagal menyimpan PPh Badan.",  "error" );
-
   } finally {
     pphBadanSaving = false;
     const button = document.getElementById( "savePphBadanButton" );
@@ -30268,28 +29123,13 @@ async function savePphBadanTaxRule() {
       }
     );
 
-    if (error) {
-      console.error(
-        "SAVE PPH BADAN TAX RULE ERROR:",
-        error
-      );
-      throw error; }
+    if (error) { throw error; }
 
-    console.log(
-      "PPh Badan Tax Rule saved:",
-      data
-    );
     closePphBadanTaxRuleModal();
     await loadPphBadanTaxRule();
-    showToast(
-      `PPh Badan Tax Rule ${taxYear} berhasil disimpan.`,
-      "success"
-    );
+    showToast( `PPh Badan Tax Rule ${taxYear} berhasil disimpan.`, "success" );
   } catch (error) {
-    showToast(
-      error?.message || "Gagal menyimpan PPh Badan Tax Rule.",
-      "error"
-    );
+    showToast( error?.message || "Gagal menyimpan PPh Badan Tax Rule.", "error" );
   } finally {
     if (button) {
       button.disabled = false;
@@ -30349,6 +29189,25 @@ async function loadAccountsReceivableRecords() {
     const arType = typeEl?.value || "ALL";
     const status = statusEl?.value || "ALL";
     const search = searchEl?.value?.trim() || null;
+		const currentFilter = { branchId, arType, status, search };
+    // USE CACHE
+    if (
+      state.accountsReceivableData &&
+      state.accountsReceivableFilter &&
+      JSON.stringify(state.accountsReceivableFilter) ===
+        JSON.stringify(currentFilter)
+    ) {
+
+      accountsReceivableRecords =
+        state.accountsReceivableData;
+
+      accountsReceivableRecordsPage = 1;
+
+      updateAccountsReceivableOverview();
+      renderAccountsReceivableRecords();
+
+      return accountsReceivableRecords;
+    }
 		
     const { data, error } =
       await supabaseClient.rpc(
@@ -30371,6 +29230,9 @@ async function loadAccountsReceivableRecords() {
     accountsReceivableRecords = Array.isArray(result)
 			? result
 			: [];
+
+		state.accountsReceivableData = accountsReceivableRecords;
+    state.accountsReceivableFilter = currentFilter;
 
     accountsReceivableRecordsPage = 1;
 		updateAccountsReceivableOverview();
@@ -30439,55 +29301,23 @@ function updateAccountsReceivableOverview() {
 
 function handleAccountsReceivableTypeChange() {
 
-  const typeEl = document.getElementById(
-    "accountsReceivableType"
-  );
+  const typeEl = document.getElementById( "accountsReceivableType" );
 
   if (!typeEl) return;
 
   const type = typeEl.value;
+  const partyEl = document.getElementById( "accountsReceivableParty" );
+  const referenceNoEl = document.getElementById( "accountsReceivableReferenceNo" );
+  const referenceIdEl = document.getElementById( "accountsReceivableReferenceId" );
 
-  const partyEl = document.getElementById(
-    "accountsReceivableParty"
-  );
-
-  const referenceNoEl = document.getElementById(
-    "accountsReceivableReferenceNo"
-  );
-
-  const referenceIdEl = document.getElementById(
-    "accountsReceivableReferenceId"
-  );
-
-
-  if (referenceNoEl) {
-    referenceNoEl.value = "";
-  }
-
-  if (referenceIdEl) {
-    referenceIdEl.value = "";
-  }
-
+  if (referenceNoEl) { referenceNoEl.value = ""; }
+  if (referenceIdEl) { referenceIdEl.value = ""; }
   if (partyEl) {
-    if (type === "EMPLOYEE") {
-      partyEl.placeholder =
-        "Nama karyawan";
-
-    } else if (type === "BUSINESS") {
-      partyEl.placeholder =
-        "Nama customer / usaha";
-
-    } else if (type === "TAX") {
-      partyEl.placeholder =
-        "Nama / jenis tax";
-
-    } else if (type === "OTHER") {
-      partyEl.placeholder =
-        "Nama pihak";
-
-    } else {
-      partyEl.placeholder =
-        "Nama pihak";
+    if (type === "EMPLOYEE") { partyEl.placeholder = "Nama karyawan";
+    } else if (type === "BUSINESS") { partyEl.placeholder = "Nama customer / usaha";
+    } else if (type === "TAX") { partyEl.placeholder = "Nama / jenis tax";
+    } else if (type === "OTHER") { partyEl.placeholder = "Nama pihak";
+    } else { partyEl.placeholder = "Nama pihak";
     }
   }
 }
@@ -30497,9 +29327,7 @@ function formatAccountsReceivableDate(value) {
 
   const date = new Date(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return "-";
-  }
+  if (Number.isNaN(date.getTime())) { return "-"; }
 
   return date.toLocaleDateString("id-ID", {
     day: "2-digit",
@@ -30510,7 +29338,6 @@ function formatAccountsReceivableDate(value) {
 
 function getAccountsReceivableStatusBadge(status) {
   const value = String(status || "DRAFT").toUpperCase();
-
   const config = {
     DRAFT: {
       label: "Draft",
@@ -30520,24 +29347,19 @@ function getAccountsReceivableStatusBadge(status) {
 
     OUTSTANDING: {
       label: "Outstanding",
-      className:
-        "bg-yellow-500/10 text-yellow-400"
+      className: "bg-yellow-500/10 text-yellow-400"
     },
 
     PAID: {
       label: "Paid",
-      className:
-        "bg-green-500/10 text-green-400"
+      className: "bg-green-500/10 text-green-400"
     }
   };
 
-  const item =
-    config[value] || config.DRAFT;
+  const item = config[value] || config.DRAFT;
 
   return `
-    <span
-      class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${item.className}"
-    >
+    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${item.className}" >
       ${item.label}
     </span>
   `;
@@ -30552,61 +29374,34 @@ function renderAccountsReceivableRecords() {
   if (!tbody) return;
 
   const total = accountsReceivableRecords.length;
-
-  const totalPages = Math.max(
-    Math.ceil(total / accountsReceivableRecordsPerPage),
-    1
-  );
+  const totalPages = Math.max( Math.ceil(total / accountsReceivableRecordsPerPage), 1 );
 
   if (accountsReceivableRecordsPage > totalPages) {
     accountsReceivableRecordsPage = totalPages;
   }
 
-  const start =
-    (accountsReceivableRecordsPage - 1) *
-    accountsReceivableRecordsPerPage;
-
-  const end = Math.min(
-    start + accountsReceivableRecordsPerPage,
-    total
-  );
-
+  const start = (accountsReceivableRecordsPage - 1) * accountsReceivableRecordsPerPage;
+  const end = Math.min( start + accountsReceivableRecordsPerPage, total );
   const rows = accountsReceivableRecords.slice(start, end);
 
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
-        <td
-          colspan="9"
-          class="px-5 py-10 text-center text-muted"
-        >
-          No Accounts Receivable data
+        <td colspan="9"
+          class="px-5 py-10 text-center text-muted" >
+          	No Accounts Receivable data
         </td>
       </tr>
     `;
   } else {
     tbody.innerHTML = rows.map(row => {
-		  const status = String(
-		    row.status || "DRAFT"
-		  ).toUpperCase();
-		
-		  const totalAmount = Number(
-		    row.totalAmount || 0
-		  );
-		
-		  const paidAmount = Number(
-		    row.paidAmount || 0
-		  );
-		
-		  const remainingAmount = Number(
-		    row.remainingAmount ?? (
-		      totalAmount - paidAmount
-		    )
-		  );
-		
+		  const status = String( row.status || "DRAFT" ).toUpperCase();
+		  const totalAmount = Number( row.totalAmount || 0 );
+		  const paidAmount = Number( row.paidAmount || 0 );
+		  const remainingAmount = Number( row.remainingAmount ?? ( totalAmount - paidAmount ) );
+	
 		  return `
 		    <tr class="hover:bg-surface-container transition-colors">
-		
 		      <!-- TYPE -->
 		      <td class="px-5 py-4 font-medium">
 		        ${row.arTypeLabel || row.arType || "-"}
@@ -30649,61 +29444,37 @@ function renderAccountsReceivableRecords() {
 		
 		      <!-- ACTION -->
 		      <td class="px-5 py-4 text-center">
-		        <button
-		          type="button"
+		        <button type="button"
 		          onclick="openAccountsReceivableRecordMenu('${row.id}')"
 		          class="w-9 h-9 inline-flex items-center justify-center text-on-surface-variant hover:text-on-surface"
-		          title="Action"
-		        >
+		          title="Action" >
 		          <span class="material-symbols-outlined text-lg">
 		            more_vert
 		          </span>
 		        </button>
 		      </td>
-		
 		    </tr>
 		  `;
 		}).join("");
   }
-
   if (paginationInfo) {
-    paginationInfo.textContent =
-      total === 0
-        ? "Showing 0–0 of 0"
-        : `Showing ${start + 1}–${end} of ${total}`;
-  }
-
-  if (prevButton) {
-    prevButton.disabled =
-      accountsReceivableRecordsPage <= 1;
-  }
-
-  if (nextButton) {
-    nextButton.disabled =
-      accountsReceivableRecordsPage >= totalPages;
-  }
+    paginationInfo.textContent = total === 0
+			? "Showing 0–0 of 0"
+			: `Showing ${start + 1}–${end} of ${total}`; }
+  if (prevButton) { prevButton.disabled = accountsReceivableRecordsPage <= 1; }
+  if (nextButton) { nextButton.disabled = accountsReceivableRecordsPage >= totalPages; }
 }
 
 function changeAccountsReceivablePage(direction) {
 
-  const total =
-    accountsReceivableRecords.length;
-
-  const totalPages = Math.max(
-    Math.ceil(
-      total / accountsReceivableRecordsPerPage
-    ),
-    1
-  );
-
-  const nextPage =
-    accountsReceivableRecordsPage + direction;
+  const total = accountsReceivableRecords.length;
+  const totalPages = Math.max( Math.ceil( total / accountsReceivableRecordsPerPage ), 1 );
+  const nextPage = accountsReceivableRecordsPage + direction;
 
   if (nextPage < 1) return;
   if (nextPage > totalPages) return;
 
   accountsReceivableRecordsPage = nextPage;
-
   renderAccountsReceivableRecords();
 }
 
@@ -30711,9 +29482,7 @@ function openAccountsReceivableRecordMenu(recordId) {
 
   const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
 
-  if (!record) {
-    showToast( "Data piutang tidak ditemukan.", "error" );
-    return; }
+  if (!record) { showToast( "Data piutang tidak ditemukan.", "error" ); return; }
 	
   const modal = document.getElementById( "accountsReceivableActionModal" );
   const info = document.getElementById( "accountsReceivableActionInfo" );
@@ -30757,11 +29526,7 @@ function openAccountsReceivableRecordMenu(recordId) {
     </button>
   `;
 
-  /*
-   * DRAFT
-   */
   if (status === "DRAFT") {
-
     html += `
       <button type="button"
         onclick="recordAccountsReceivableFromAction()"
@@ -30800,11 +29565,7 @@ function openAccountsReceivableRecordMenu(recordId) {
       </button>
     `;
 
-  /*
-   * OUTSTANDING
-   */
   } else if (status === "OUTSTANDING") {
-
     html += `
       <button type="button"
         onclick="receiveAccountsReceivablePaymentFromAction()"
@@ -30825,11 +29586,7 @@ function openAccountsReceivableRecordMenu(recordId) {
       </button>
     `;
 
-  /*
-   * PAID
-   */
   } else if (status === "PAID") {
-
     html += `
       <div class="px-4 py-3 rounded-md bg-background border border-outline-variant">
         <div class="font-medium">
@@ -30842,7 +29599,6 @@ function openAccountsReceivableRecordMenu(recordId) {
       </div>
     `;
   }
-
   buttons.innerHTML = html;
   modal.classList.remove("hidden");
   modal.classList.add("flex");
@@ -30910,7 +29666,6 @@ function closeAccountsReceivableModal() {
 /* ==== SAVE RECEIVABLE AS DRAFT ==== */
 
 async function saveAccountsReceivable() {
-
   const button = document.getElementById( "saveAccountsReceivableButton" );
 
   try {
@@ -30953,68 +29708,29 @@ async function saveAccountsReceivable() {
 	
 		/* --- VALIDATION --- */
 		if (!arType) {
-		  showToast(
-		    "Pilih tipe piutang.",
-		    "error"
-		  );
-		  return;
-		}
-		
+		  showToast( "Pilih tipe piutang.", "error" );
+		  return; }
 		if (!partyName) {
-		  showToast(
-		    "Nama pihak wajib diisi.",
-		    "error"
-		  );
-		  return;
-		}
-		
+		  showToast( "Nama pihak wajib diisi.", "error" );
+		  return; }
 		if (!arDate) {
-		  showToast(
-		    "Tanggal piutang wajib diisi.",
-		    "error"
-		  );
-		  return;
-		}
-		
+		  showToast( "Tanggal piutang wajib diisi.", "error" );
+		  return; }
 		if (!totalAmount || totalAmount <= 0) {
-		  showToast(
-		    "Nominal piutang harus lebih dari 0.",
-		    "error"
-		  );
-		  return;
-		}
-		
+		  showToast( "Nominal piutang harus lebih dari 0.", "error" );
+		  return; }
 		if (!sourceMethod) {
-		  showToast(
-		    "Pilih payment method.",
-		    "error"
-		  );
-		  return;
-		}
-		
-		if (
-		  !["CASH", "BANK", "QRIS"].includes(
-		    sourceMethod
-		  )
-		) {
-		  showToast(
-		    "Payment method tidak valid.",
-		    "error"
-		  );
-		  return;
-		}
+		  showToast( "Pilih payment method.", "error" );
+		  return; }
+		if ( !["CASH", "BANK", "QRIS"].includes( sourceMethod ) ) {
+		  showToast( "Payment method tidak valid.", "error" );
+		  return; }
 		
 		const branchId = state.branchId || null;
 		
 		if (!branchId) {
-		  showToast(
-		    "Branch belum dipilih.",
-		    "error"
-		  );
-		  return;
-		}
-
-    /* ----- RPC ----- */
+		  showToast( "Branch belum dipilih.", "error" );
+		  return; }
 
     const { data, error } =
       await supabaseClient.rpc(
@@ -31035,30 +29751,19 @@ async function saveAccountsReceivable() {
         }
       );
 
-    if (error) {
-      console.error(
-        "save_accounts_receivable error:",
-        error
-      );
-
-      throw new Error(
-        error.message ||
-        "Gagal menyimpan piutang."
-      );
-    }
+    if (error) { throw new Error( error.message || "Gagal menyimpan piutang." ); }
+		state.accountsReceivableData = null;
+		state.accountsReceivableFilter = null;
 		
+		await loadAccountsReceivableRecords();
     closeAccountsReceivableModal();
-    showToast(
-      "Piutang berhasil disimpan sebagai Draft.",
-      "success"
-    );
+		
+    showToast( "Piutang berhasil disimpan sebagai Draft.", "success" );
 
     if ( typeof loadAccountsReceivableRecords === "function" )
 			{ await loadAccountsReceivableRecords(); }
-
     if ( typeof renderAccountsReceivableRecords === "function" ) 
 			{ renderAccountsReceivableRecords(); }
-
   } catch (err) {
     showToast(
       err.message ||
@@ -31079,9 +29784,7 @@ async function saveAccountsReceivable() {
 /* ==== RECEIVABLE ACTIONS ==== */
 
 function closeAccountsReceivableActionMenu() {
-  const modal = document.getElementById(
-    "accountsReceivableActionModal"
-  );
+  const modal = document.getElementById( "accountsReceivableActionModal" );
 
   if (!modal) return;
 
@@ -31103,26 +29806,15 @@ function viewAccountsReceivableDetailFromAction() {
 
 
 function openAccountsReceivableDetail(recordId) {
-
 	const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
 	
 	if (!record) {
-		showToast(
-			"Data piutang tidak ditemukan.",
-			"error"
-		);
-		return;
-	}
+		showToast( "Data piutang tidak ditemukan.", "error" ); 
+		return; }
 
-	/* --- ELEMENT --- */
 	const modal = document.getElementById( "accountsReceivableDetailModal" );
 	
-	if (!modal) {
-		console.error(
-			"Accounts Receivable detail modal tidak ditemukan."
-		);
-		return;
-	}
+	if (!modal) { return; }
 	
 	const subtitle = document.getElementById( "accountsReceivableDetailSubtitle" );
 	const statusEl = document.getElementById( "accountsReceivableDetailStatus" );
@@ -31164,21 +29856,15 @@ function openAccountsReceivableDetail(recordId) {
 		  BANK: "Bank / Transfer",
 		  QRIS: "QRIS"
 		};
-	
 		sourceMethodEl.textContent = labels[sourceMethod] || "-";
 	}
-
-/* ---- AMOUNTS ---- */
 
 	if (totalEl) { totalEl.textContent = formatAccountingTaxCurrency( totalAmount ); }
 	if (paidEl) { paidEl.textContent = formatAccountingTaxCurrency( paidAmount ); }
 	if (remainingEl) { remainingEl.textContent = formatAccountingTaxCurrency( remainingAmount ); }
-	/* --- NOTE --- */
 	if (noteEl) { noteEl.textContent = record.note || "-"; }
-	/* --- JOURNAL --- */
 	if (journalIdEl) { journalIdEl.textContent = record.journalId || "-"; }
-	
-	/* --- OPEN MODAL --- */
+
 	modal.classList.remove("hidden");
 	modal.classList.add("flex");
 }
@@ -31214,8 +29900,7 @@ async function recordAccountsReceivable(recordId) {
 
   if (!record) {
     showToast("Data piutang tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   const status = String(record.status || "").toUpperCase();
 
@@ -31231,13 +29916,9 @@ async function recordAccountsReceivable(recordId) {
 
   if (amount <= 0) {
     showToast("Nominal piutang tidak valid.", "error");
-    return;
-  }
+    return; }
 
-  const sourceMethod = String(
-    record.sourceMethod || ""
-  ).toUpperCase();
-
+  const sourceMethod = String( record.sourceMethod || "" ).toUpperCase();
   const sourceLabels = {
     CASH: "Cash",
     BANK: "Bank / Transfer",
@@ -31245,12 +29926,8 @@ async function recordAccountsReceivable(recordId) {
   };
 
   if (!sourceLabels[sourceMethod]) {
-    showToast(
-      "Payment Method piutang belum valid.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Payment Method piutang belum valid.", "error" );
+    return; }
 
   const confirmed = confirm(
     `Record piutang "${record.partyName || "Piutang"}" sebesar ` +
@@ -31263,9 +29940,7 @@ async function recordAccountsReceivable(recordId) {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     const { data, error } =
       await supabaseClient.rpc(
@@ -31276,39 +29951,20 @@ async function recordAccountsReceivable(recordId) {
         }
       );
 
-    if (error) {
-      console.error(
-        "record_accounts_receivable error:",
-        error
-      );
-
-      throw new Error(
-        error.message || "Gagal melakukan Record piutang."
-      );
-    }
+    if (error) { throw new Error( error.message || "Gagal melakukan Record piutang." ); }
 
     const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
 
-    console.log(
-      "Accounts Receivable recorded:",
-      result
-    );
-
-    showToast(
-      "Piutang berhasil di-Record.",
-      "success"
-    );
-
-    await loadAccountsReceivableRecords();
-
+    showToast( "Piutang berhasil di-Record.", "success" );
+		state.accountsReceivableData = null;
+		state.accountsReceivableFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+		
+		await loadAccountsReceivableRecords();
   } catch (error) {
-    console.error(
-      "recordAccountsReceivable error:",
-      error
-    );
-
     showToast(
       error.message || "Gagal melakukan Record piutang.",
       "error"
@@ -31343,18 +29999,13 @@ function openAccountsReceivablePaymentModal(recordId) {
 
   if (!record) {
     showToast("Data piutang tidak ditemukan.", "error");
-    return;
-  }
+    return; }
 
   const status = String(record.status || "").toUpperCase();
 
   if (status !== "OUTSTANDING") {
-    showToast(
-      "Piutang ini belum dapat menerima pembayaran.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Piutang ini belum dapat menerima pembayaran.", "error" );
+    return; }
 	
   const totalAmount = Number(record.totalAmount || 0);
   const paidAmount = Number(record.paidAmount || 0);
@@ -31362,8 +30013,7 @@ function openAccountsReceivablePaymentModal(recordId) {
 
   if (outstanding <= 0) {
     showToast("Piutang sudah lunas.", "error");
-    return;
-  }
+    return; }
 
   selectedAccountsReceivableId = recordId;
 	
@@ -31404,24 +30054,16 @@ async function saveAccountsReceivablePayment() {
   const recordId = selectedAccountsReceivableId;
 
   if (!recordId) {
-    showToast(
-      "Piutang belum dipilih.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Piutang belum dipilih.", "error" );
+    return; }
 
   const record = accountsReceivableRecords.find(
     row => String(row.id) === String(recordId)
   );
 
   if (!record) {
-    showToast(
-      "Data piutang tidak ditemukan.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Data piutang tidak ditemukan.", "error" );
+    return; }
 
   const dateEl = document.getElementById( "accountsReceivablePaymentDate" );
   const amountEl = document.getElementById( "accountsReceivablePaymentAmount" );
@@ -31438,36 +30080,17 @@ async function saveAccountsReceivablePayment() {
   const outstanding = Number( record.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
 
   if (!date) {
-    showToast(
-      "Payment date wajib diisi.",
-      "error"
-    );
-    return;
-  }
-
+    showToast( "Payment date wajib diisi.", "error" );
+    return; }
   if (!Number.isInteger(amount) || amount <= 0) {
-    showToast(
-      "Payment amount harus lebih dari 0.",
-      "error"
-    );
-    return;
-  }
-
+    showToast( "Payment amount harus lebih dari 0.", "error" );
+    return; }
   if (amount > outstanding) {
-    showToast(
-      "Payment amount melebihi outstanding.",
-      "error"
-    );
-    return;
-  }
-
+    showToast( "Payment amount melebihi outstanding.", "error" );
+    return; }
   if (!["CASH", "BANK", "QRIS"].includes(paymentMethod)) {
-    showToast(
-      "Payment method wajib dipilih.",
-      "error"
-    );
-    return;
-  }
+    showToast( "Payment method wajib dipilih.", "error" );
+    return; }
 
   const methodLabels = {
     CASH: "Cash",
@@ -31516,26 +30139,11 @@ async function saveAccountsReceivablePayment() {
         }
       );
 
-    if (error) {
-      console.error(
-        "receive_accounts_receivable_payment error:",
-        error
-      );
-
-      throw new Error(
-        error.message ||
-        "Gagal menerima pembayaran piutang."
-      );
-    }
+    if (error) {  throw new Error( error.message || "Gagal menerima pembayaran piutang." ); }
 
     const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
-
-    console.log(
-      "Accounts Receivable payment recorded:",
-      result
-    );
 
     closeAccountsReceivablePaymentModal();
 
@@ -31545,21 +30153,15 @@ async function saveAccountsReceivablePayment() {
         : "Pembayaran piutang berhasil diterima.",
       "success"
     );
-
-    await loadAccountsReceivableRecords();
-
+		
+		state.accountsReceivableData = null;
+		state.accountsReceivableFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+		
+		await loadAccountsReceivableRecords();
   } catch (error) {
-    console.error(
-      "saveAccountsReceivablePayment error:",
-      error
-    );
-
-    showToast(
-      error.message ||
-      "Gagal menerima pembayaran piutang.",
-      "error"
-    );
-
+    showToast( error.message || "Gagal menerima pembayaran piutang.",  "error" );
   } finally {
     if (button) {
       button.disabled = false;
@@ -31585,33 +30187,21 @@ function closeAccountsReceivablePaymentModal() {
 async function deleteAccountsReceivable(recordId) {
 
 	if (!recordId) {
-			showToast(
-				"Data piutang belum dipilih.",
-				"error"
-			);
-		return;
-	}
+		showToast( "Data piutang belum dipilih.", "error" );
+		return; }
 
 	const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
 	
 	if (!record) {
-			showToast(
-				"Data piutang tidak ditemukan.",
-				"error"
-			);
-		return;
-	}
+		showToast( "Data piutang tidak ditemukan.", "error" );
+		return; }
 
 	const status = String(record.status || "").toUpperCase();
 
 // Hanya DRAFT yang boleh dihapus
 	if (status !== "DRAFT") {
-			showToast(
-				"Piutang hanya dapat dihapus sebelum Record.",
-				"error"
-			);
-		return;
-	}
+		showToast( "Piutang hanya dapat dihapus sebelum Record.", "error" );
+		return; }
 
 	const confirmed = confirm( `Hapus piutang "${record.partyName || "Piutang"}" sebesar ${formatAccountingTaxCurrency( record.totalAmount || 0 )}?` );
 
@@ -31633,33 +30223,16 @@ async function deleteAccountsReceivable(recordId) {
 		);
 	
 	if (error) {
-		console.error(
-			"delete_accounts_receivable error:",
-			error
-		);
-	
 		throw new Error( error.message || "Gagal menghapus piutang." ); }
-		
-		console.log(
-			"Accounts Receivable deleted:",
-			data
-		);
-		
-		showToast( "Piutang berhasil dihapus.", "success" );
 	
+		showToast( "Piutang berhasil dihapus.", "success" );
+		state.accountsReceivableData = null;
+		state.accountsReceivableFilter = null;
+		
 		await loadAccountsReceivableRecords();
 
-	} catch (error) {
-		console.error(
-		  "deleteAccountsReceivable error:",
-		  error
-		);
-		
-		showToast(
-		  error.message ||
-		  "Gagal menghapus piutang.",
-		  "error"
-		);
+	} catch (error) {	
+		showToast( error.message || "Gagal menghapus piutang.", "error" );
 	}
 }
 
