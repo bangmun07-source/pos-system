@@ -2033,45 +2033,45 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 	setTimeout(async () => {
 	
 	  try {
-	    const receiptCanvas = await html2canvas(canvas, {
-	      scale: 1,
-	      useCORS: true,
-	      backgroundColor: "#101715"
-	    });
+		const receiptCanvas = await html2canvas(canvas, {
+		  scale: 1,
+		  useCORS: true,
+		  backgroundColor: "#101715"
+		});
 	
-	    // CANVAS → BLOB
-	    const blob = await new Promise(resolve => {
-	      receiptCanvas.toBlob(
-	        resolve,
-	        "image/jpeg",
-	        0.65
-	      );
-	    });
+		// CANVAS → BLOB
+		const blob = await new Promise(resolve => {
+		  receiptCanvas.toBlob(
+			resolve,
+			"image/jpeg",
+			0.65
+		  );
+		});
 	
-	    if (!blob) {
-	      throw new Error("Gagal membuat gambar receipt");
-	    }
+		if (!blob) {
+		  throw new Error("Gagal membuat gambar receipt");
+		}
 	
-	    // UPLOAD LANGSUNG KE SUPABASE STORAGE
-	    const fileName = `${trx.id}.jpg`;
+		// UPLOAD LANGSUNG KE SUPABASE STORAGE
+		const fileName = `${trx.id}.jpg`;
 		const {
 		  error: uploadError
 		} = await supabaseClient
 		  .storage
 		  .from("Recipes_Digital")
-	      .upload(
-	        fileName,
-	        blob,
-	        {
-	          contentType: "image/jpeg",
-	          upsert: true
-	        }
-	      );
-	    if (uploadError) {
-	      throw uploadError;
-	    }
+		  .upload(
+			fileName,
+			blob,
+			{
+			  contentType: "image/jpeg",
+			  upsert: true
+			}
+		  );
+		if (uploadError) {
+		  throw uploadError;
+		}
 			
-	    // PUBLIC URL
+		// PUBLIC URL
 	   const {
 		  data: publicData
 		} = supabaseClient
@@ -2079,27 +2079,27 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 		  .from("Recipes_Digital")
 		  .getPublicUrl(fileName);
 	
-	    const url = publicData?.publicUrl;
-	    if (!url) {
-	      throw new Error(
-	        "Receipt URL tidak diterima"
-	      );
-	    }
+		const url = publicData?.publicUrl;
+		if (!url) {
+		  throw new Error(
+			"Receipt URL tidak diterima"
+		  );
+		}
 			const sessionId =
-  			localStorage.getItem("pos_session_id");
+			localStorage.getItem("pos_session_id");
 			if (!sessionId) {
 			  throw new Error("Session login tidak ditemukan");
 			}
-	    // UPDATE RECEIPT URL
-	    const {
+		// UPDATE RECEIPT URL
+		const {
 		  data: rpcResult,
 		  error: rpcError
 		} = await supabaseClient.rpc(
 		  "update_receipt_url",
 		  {
-		    p_trx_id: trx.id,
-		    p_receipt_url: url,
-		    p_session_id: sessionId
+			p_trx_id: trx.id,
+			p_receipt_url: url,
+			p_session_id: sessionId
 		  }
 		);
 			
@@ -2109,64 +2109,56 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 			
 			if (!rpcResult?.success) {
 			  throw new Error(
-			    rpcResult?.message ||
-			    "Gagal menyimpan receipt URL"
+				rpcResult?.message ||
+				"Gagal menyimpan receipt URL"
 			  );
 			}
 			
-	    // WHATSAPP
-	    let wa =
-	      String(phone || "")
-	        .replace(/\D/g, "");
+		// WHATSAPP
+		let wa =
+		  String(phone || "")
+			.replace(/\D/g, "");
 	
-	    if (wa.startsWith("0")) {
-	      wa =
-	        "62" +
-	        wa.slice(1);
-	    }
-	    else if (!wa.startsWith("62")) {
-	      wa =
-	        "62" +
-	        wa;
-	    }
+		if (wa.startsWith("0")) {
+		  wa =
+			"62" +
+			wa.slice(1);
+		}
+		else if (!wa.startsWith("62")) {
+		  wa =
+			"62" +
+			wa;
+		}
 	
-	    let finalMessage;
-	    if (customMessage) {
-	      finalMessage =
-	        customMessage +
-	        "\n\n📎 Digital Receipt\n" +
-	        url;
+		let finalMessage;
+		if (customMessage) {
+		  finalMessage =
+			customMessage +
+			"\n\n📎 Digital Receipt\n" +
+			url;
 	
-	    } else {
-	      finalMessage =
-	        "🧾 *Digital Receipt*\n\n" +
-	        "Thank you for visiting.\n" +
-	        "Enjoy the moment. Take it slow.\n\n" +
-	        "Have a nice day.\n\n" +
-	        "📎 Receipt:\n" +
-	        url;
-	    }
+		} else {
+		  finalMessage =
+			"🧾 *Digital Receipt*\n\n" +
+			"Thank you for visiting.\n" +
+			"Enjoy the moment. Take it slow.\n\n" +
+			"Have a nice day.\n\n" +
+			"📎 Receipt:\n" +
+			url;
+		}
 			
-	    window.open(
-	      "https://api.whatsapp.com/send?phone=" +
-	      wa +
-	      "&text=" +
-	      encodeURIComponent(finalMessage),
-	      "_blank"
-	    );
-	    wrapper.remove();
+		window.open(
+		  "https://api.whatsapp.com/send?phone=" +
+		  wa +
+		  "&text=" +
+		  encodeURIComponent(finalMessage),
+		  "_blank"
+		);
+		wrapper.remove();
 	  }
 	  catch (err) {
-	    console.error(
-	      "DIGITAL RECEIPT ERROR:",
-	      err
-	    );
-	    alert(
-	      err?.message ||
-	      "Gagal membuat digital receipt"
-	    );
-	    wrapper.remove();
-	  }
+		alert( err?.message || "Gagal membuat digital receipt" );
+		wrapper.remove(); }
 	}, 100);
 }
 
@@ -3006,7 +2998,6 @@ async function checkout() {
 	    return;
 	  }
 	} else {
-		console.log("CHECKOUT PAYLOAD:", JSON.stringify(payload, null, 2));
 	  await hitungHPPDanKirim(payload);
 	}
 }	
@@ -8646,11 +8637,8 @@ async function submitAdjust() {
       }
     );
 
-console.log("ADJUST STOCK RESULT:", data);
-console.log("ADJUST STOCK ERROR:", error);
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
+		
     state.inventoryData = null;
     state.inventoryBranchId = null;
     state.ingredients = null;
@@ -20825,10 +20813,7 @@ async function saveAssetPurchasePayment() {
       }
     );
 
-    if (error) {
-      console.error("pay_asset_purchase error:", error);
-      throw new Error(error.message || "Gagal menyimpan pembayaran asset.");
-    }
+    if (error) { throw new Error(error.message || "Gagal menyimpan pembayaran asset."); }
 
     alert("Pembayaran asset berhasil disimpan.");
 
@@ -21104,10 +21089,7 @@ function initAssetPage() {
 async function loadAccountingOverview() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
-  if (!periodEl || !branchEl) {
-    console.warn("Accounting filter belum tersedia.");
-    return;
-  }
+  if (!periodEl || !branchEl) { return; }
   // Pastikan branch selalu dimuat sebelum membaca branch
   if (branchEl.options.length <= 1) {
     await loadAccountingBranchOptions();
@@ -21156,9 +21138,7 @@ async function loadAccountingBranchOptions() {
     if (error) throw error;
     state.accountingBranches = Array.isArray(data) ? data : [];
     renderAccountingBranchOptions( state.accountingBranches );
-  } catch (err) {
-    console.error("Accounting branch error:", err);
-  }
+  } catch (err) { }
 }
 
 function renderAccountingBranchOptions(branches) {
@@ -21278,10 +21258,7 @@ function getAccountingDateRange(period) {
 async function initAccountingModule() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
-  if (!periodEl || !branchEl) {
-    console.warn("Accounting DOM belum tersedia");
-    return;
-  }
+  if (!periodEl || !branchEl) { return; }
   periodEl.onchange = loadAccountingOverview;
   branchEl.onchange = loadAccountingOverview;
   await loadAccountingBranchOptions();
@@ -21290,10 +21267,7 @@ async function initAccountingModule() {
 
 /* ======= RENDER ACCOUNTING OVERVIEW ======= */
 function renderAccountingOverview(data) {
-  if (!data) {
-    console.warn("Accounting overview data kosong");
-    return;
-  }
+  if (!data) { return; }
   const toNumber = (value) => {
     if (value === null || value === undefined || value === "") {
       return 0;
@@ -21751,17 +21725,12 @@ async function loadAccountingAccounts() {
               p_session_id: sessionId
             }
         );
-        if (error) {
-            console.error("Gagal mengambil Accounts:", error);
-            return;
-        }
+        if (error) { return; }
 			const accounts = Array.isArray(data) ? data : [];
 			window.accountingAccounts = accounts;
 			renderAccountingAccounts(accounts);
 			updateAccountingAccountSummary(accounts);
-    } catch (err) {
-        console.error("loadAccountingAccounts error:", err);
-    }
+    } catch (err) { }
 }
 
 function initAccountingAccountFilters() {
@@ -21781,10 +21750,7 @@ function initAccountingAccountFilters() {
 
 function renderAccountingAccounts(accounts) {
     const tbody = document.getElementById("accountsTableBody");
-    if (!tbody) {
-        console.warn("accountsTableBody tidak ditemukan");
-        return;
-    }
+    if (!tbody) { return; }
     const searchEl = document.getElementById("accountingAccountSearch");
     const typeFilterEl = document.getElementById("accountingAccountTypeFilter");
     const statusFilterEl = document.getElementById("accountingAccountStatusFilter");
@@ -22183,102 +22149,80 @@ async function saveAccountingAccount() {
     }
 
     try {
-        let data;
-        let error;
-        if (editingAccountingAccountId) {
-            ({ data, error } = await supabaseClient.rpc(
-                "update_account",
-                {
-                    p_account_id: editingAccountingAccountId,
-                    p_account_code: accountCode,
-                    p_account_name: accountName,
-                    p_account_type: accountType,
-                    p_normal_balance: normalBalance,
-                    p_parent_id: parentId,
-                    p_session_id: sessionId
-                }
-            ));
-        } else {
-            ({ data, error } = await supabaseClient.rpc(
-                "create_account",
-                {
-                    p_account_code: accountCode,
-                    p_account_name: accountName,
-                    p_account_type: accountType,
-                    p_normal_balance: normalBalance,
-                    p_parent_id: parentId,
-                    p_session_id: sessionId
-                }
-            ));
-        }
-        if (error) {
-            console.error(
-                "save accounting account error:",
-                error
-            );
-            alert(
-                error.message ||
-                "Gagal menyimpan account."
-            );
-            return;
-        }
-        console.log(
-            "Account saved:",
-            data
-        );
-        const wasEditing = !!editingAccountingAccountId;
-		closeAddAccountingAccountModal();
-		await loadAccountingAccounts();
-		editingAccountingAccountId = null;
-		alert(
-		    "Account berhasil " +
-		    (wasEditing ? "diubah." : "disimpan.")
-		);
-    } catch (err) {
-        console.error(
-            "saveAccountingAccount error:",
-            err
-        );
-        alert(
-            "Terjadi kesalahan saat menyimpan account."
-        );
-    }
+			let data;
+			let error;
+			if (editingAccountingAccountId) {
+				({ data, error } = await supabaseClient.rpc(
+					"update_account",
+					{
+						p_account_id: editingAccountingAccountId,
+						p_account_code: accountCode,
+						p_account_name: accountName,
+						p_account_type: accountType,
+						p_normal_balance: normalBalance,
+						p_parent_id: parentId,
+						p_session_id: sessionId
+					}
+				));
+			} else {
+				({ data, error } = await supabaseClient.rpc(
+					"create_account",
+					{
+						p_account_code: accountCode,
+						p_account_name: accountName,
+						p_account_type: accountType,
+						p_normal_balance: normalBalance,
+						p_parent_id: parentId,
+						p_session_id: sessionId
+					}
+				));
+			}
+		
+	if (error) {
+		alert( error.message || "Gagal menyimpan account." );
+		return;  }
+
+	const wasEditing = !!editingAccountingAccountId;
+	closeAddAccountingAccountModal();
+	await loadAccountingAccounts();
+	editingAccountingAccountId = null;
+	alert( "Account berhasil " + (wasEditing ? "diubah." : "disimpan.") );
+	} catch (err) {
+		alert( "Terjadi kesalahan saat menyimpan account." );
+	}
 }
 
 async function toggleAccountingAccountStatus(accountId) {
-    const account = (window.accountingAccounts || [])
-        .find(a => a.accountId === accountId);
-    if (!account) {
-        alert("Account tidak ditemukan.");
-        return;
-    }
-    const action = account.isActive
-        ? "menonaktifkan"
-        : "mengaktifkan";
-    const confirmed = confirm( `Yakin ingin ${action} account "${account.accountName}"?` );
-    if (!confirmed) return;
-    const sessionId = localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-        alert("Session tidak ditemukan.");
-        return;
-    }
-    try {
-			const { data, error } = await supabaseClient.rpc(
-				"toggle_account_status",
-				{
-					p_account_id: accountId,
-					p_session_id: sessionId
-				}
-			);
-			if (error) {
-				alert(
-					error.message || "Gagal mengubah status account." );
-				return; }
+	const account = (window.accountingAccounts || [])
+		.find(a => a.accountId === accountId);
+	if (!account) {
+		alert("Account tidak ditemukan.");
+		return; }
+	const action = account.isActive
+		? "menonaktifkan"
+		: "mengaktifkan";
+	const confirmed = confirm( `Yakin ingin ${action} account "${account.accountName}"?` );
+	if (!confirmed) return;
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) {
+			alert("Session tidak ditemukan.");
+			return;
+	}
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			"toggle_account_status",
+			{
+				p_account_id: accountId,
+				p_session_id: sessionId
+			}
+		);
+		if (error) {
+			alert( error.message || "Gagal mengubah status account." );
+			return; }
 
-        await loadAccountingAccounts();
-    } catch (err) {
-			alert(
-				"Terjadi kesalahan saat mengubah status account." );
+			await loadAccountingAccounts();
+	} catch (err) {
+		alert( "Terjadi kesalahan saat mengubah status account." );
 	}
 }
 
@@ -22288,30 +22232,21 @@ let editingAccountingMappingId = null;
 const ACCOUNTING_MAPPING_PAGE_SIZE = 10;
 let accountingMappingCurrentPage = 1;
 async function loadAccountingMappings() {
-    try {
-        const sessionId =
-            localStorage.getItem("pos_session_id");
-        if (!sessionId) {
-            return;
-        }
-        const { data, error } =
-            await supabaseClient.rpc(
-                "get_account_mappings",
-                {
-                    p_session_id: sessionId
-                }
-            );
-        if (error) {
-            console.error(
-                "Gagal mengambil Account Mappings:",
-                error
-            );
-            return;
-        }
-        const mappings = Array.isArray(data) ? data : [];
-        window.accountingMappings = mappings;
-        renderAccountingMappings();
-    } catch (err) { }
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
+		if (!sessionId) { return; }
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_account_mappings",
+				{
+					p_session_id: sessionId
+				}
+			);
+		if (error) { return; }
+		const mappings = Array.isArray(data) ? data : [];
+		window.accountingMappings = mappings;
+		renderAccountingMappings();
+	} catch (err) { }
 }
 
 /* ====== RENDER ACCOUNT MAPPINGS ====== */
@@ -22861,18 +22796,14 @@ let journalEntriesLoaded = false;
 async function loadJournalEntries() {
   try {
     if (journalEntriesLoaded) {
-      console.log("JOURNAL ENTRIES CACHE HIT");
       journalEntriesCurrentPage = 1;
       renderJournalEntries(journalEntriesData);
       updateJournalEntriesSummary(journalEntriesData);
-      return;
-    }
+      return; }
 
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      return;
-    }
+    if (!sessionId) { return; }
 
     const { data, error } =
       await supabaseClient.rpc(
@@ -22892,19 +22823,12 @@ async function loadJournalEntries() {
     renderJournalEntries(entries);
     updateJournalEntriesSummary(entries);
 
-  } catch (err) {
-		return;
-	}
+  } catch (err) { return; }
 }
 
 function renderJournalEntries(entries) {
 	const tbody = document.getElementById( "journalEntriesTableBody" );
-	if (!tbody) {
-		console.warn(
-				"journalEntriesTableBody tidak ditemukan"
-		);
-		return;
-	}
+	if (!tbody) { return; }
 	const filteredEntries = getFilteredJournalEntries(entries);
 	const total = filteredEntries.length;
 	const totalPages = Math.max( 1, Math.ceil( total / JOURNAL_ENTRIES_PAGE_SIZE ) );
@@ -23177,7 +23101,6 @@ function populateNewJournalBranches() {
 		window.branchList ||
 		window.outlets ||
 		[];
-	console.log("BRANCH DATA:", branches);
 	branchEl.innerHTML = "";
 	if (!Array.isArray(branches) || branches.length === 0) {
 		branchEl.innerHTML = `  <option value="">Select Branch</option> `;
@@ -23500,33 +23423,29 @@ async function saveNewJournalEntry() {
 
 async function openJournalEntryDetail(journalId) {
 	const modal = document.getElementById("journalEntryDetailModal");
-	if (!modal) { console.error("journalEntryDetailModal tidak ditemukan");
-			return; }
+	if (!modal) {  return; }
 	const sessionId = localStorage.getItem("pos_session_id");
-	if (!sessionId) { alert("Session tidak ditemukan");
-			return; }
+	if (!sessionId) { alert("Session tidak ditemukan"); return; }
 
 	try {
-			const { data, error } = await supabaseClient.rpc(
-					"get_journal_entry",
-					{
-						p_journal_id: journalId,
-						p_session_id: sessionId
-					}
-			);
+		const { data, error } = await supabaseClient.rpc(
+			"get_journal_entry",
+			{
+				p_journal_id: journalId,
+				p_session_id: sessionId
+			}
+		);
 
-			if (error) {
-				console.error("get_journal_entry error:", error);
-				alert(error.message || "Gagal memuat detail journal");
-					return; }
-			if (!data) { alert("Journal tidak ditemukan");
-					return; }
-			renderJournalEntryDetail(data);
-			modal.classList.remove("hidden");
-			modal.classList.add("flex");
+		if (error) {
+			alert(error.message || "Gagal memuat detail journal");
+			return; }
+		if (!data) { alert("Journal tidak ditemukan");
+			return; }
+		renderJournalEntryDetail(data);
+		modal.classList.remove("hidden");
+		modal.classList.add("flex");
 	} catch (err) {
-			console.error("openJournalEntryDetail error:", err);
-			alert("Gagal memuat detail journal");
+		alert("Gagal memuat detail journal");
 	}
 }
 
@@ -23691,23 +23610,17 @@ let generalLedgerLoaded = false;
 async function loadGeneralLedger() {
 	const sessionId = localStorage.getItem("pos_session_id"); 
 
-	if (!sessionId) { 
-		console.error("Session tidak ditemukan"); 
-		return; 
-	} 
+	if (!sessionId) { return; } 
 
 	try { 
 		// ===== CACHE HIT =====
 		if (generalLedgerLoaded) {
-			console.log("GENERAL LEDGER CACHE HIT");
 			generalLedgerCurrentPage = 1;
 			renderGeneralLedger();
 			populateGeneralLedgerAccounts();
 			return;
 		}
-
 		// ===== RPC LOAD =====
-		console.log("GENERAL LEDGER RPC LOAD");
 		const { data, error } = await supabaseClient.rpc(
 			"get_general_ledger",
 			{
@@ -23719,7 +23632,6 @@ async function loadGeneralLedger() {
 		);
 
 		if (error) {
-			console.error("get_general_ledger error:", error);
 			alert(error.message || "Gagal memuat General Ledger");
 			return;
 		}
@@ -23731,7 +23643,6 @@ async function loadGeneralLedger() {
 		renderGeneralLedger();
 		populateGeneralLedgerAccounts();
 	} catch (err) {
-		console.error("loadGeneralLedger error:", err);
 		alert(err.message || "Gagal memuat General Ledger");
 	}
 }
@@ -23892,10 +23803,7 @@ async function populateGeneralLedgerBranches() {
       }
     );
 
-    if (error) {
-      console.error("get_expense_branches error:", error);
-      return;
-    }
+    if (error) { return; }
 
     const branches = data || [];
     const currentValue = select.value;
@@ -23917,9 +23825,7 @@ async function populateGeneralLedgerBranches() {
       select.value = currentValue;
     }
 
-  } catch (err) {
-    console.error("populateGeneralLedgerBranches error:", err);
-  }
+  } catch (err) { }
 }
 
 function initGeneralLedgerFilters() {
@@ -24100,8 +24006,7 @@ async function populateAccountingReportsBranches() {
   const select = document.getElementById( "accountingReportsBranchFilter" );
   if (!select) return;
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { console.warn("Session ID tidak ditemukan.");
-    return; }
+  if (!sessionId) { return; }
   try {
     const { data, error } = await supabaseClient.rpc(
       "get_expense_branches",
@@ -24132,12 +24037,7 @@ async function populateAccountingReportsBranches() {
     ) {
       select.value = currentValue;
     }
-  } catch (error) {
-    console.error(
-      "populateAccountingReportsBranches error:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 /* ===== DEFAULT DATE ====== */
@@ -24163,10 +24063,7 @@ function initAccountingReportsDates() {
 
 async function loadTrialBalance() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) {
-    console.warn("Session ID tidak ditemukan.");
-    return [];
-  }
+  if (!sessionId) { return []; }
   const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
   const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
 
@@ -24232,10 +24129,7 @@ function renderTrialBalance(rows) {
 
 async function loadProfitLoss() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) {
-    console.warn("Session ID tidak ditemukan.");
-    return [];
-  }
+  if (!sessionId) { return []; }
   const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
   const fromDate = document.getElementById("accountingReportsPeriodFrom")?.value || null;
   const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
@@ -24391,10 +24285,7 @@ function renderProfitLoss(rows) {
 
 async function loadBalanceSheet() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) {
-    console.warn("Session ID tidak ditemukan.");
-    return {};
-  }
+  if (!sessionId) { return {}; }
   const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
   const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
   const { data, error } = await supabaseClient.rpc(
@@ -24419,11 +24310,6 @@ function renderBalanceSheet(result, profitLossResult) {
     result?.currentProfit ??
     0
   );
-	console.log("BALANCE SHEET PROFIT DEBUG", {
-  rpcCurrentProfit: result?.currentProfit,
-  profitLossNetProfit: profitLossResult?.netProfit,
-  finalCurrentProfit: currentProfit
-});
 
   /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
@@ -24815,12 +24701,7 @@ async function initAccountingReports() {
     await populateAccountingReportsBranches();
     await loadAccountingReports();
     accountingReportsInitialized = true;
-  } catch (error) {
-    console.error(
-      "initAccountingReports error:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 /* =========================================================
@@ -25297,10 +25178,6 @@ try {
 	);
 
 	if (error) {  throw error; }
-	console.log(
-		"Supplier payment result:",
-		data
-	);
 
 	state.accountingSupplierDebtData = null;
 	state.accountingSupplierDebtFilter = null;
@@ -25314,13 +25191,7 @@ try {
 	await loadSupplierDebt();
 
 } catch (error) {
-	console.error(
-			"saveSupplierPayment error:",
-			error
-	);
-	alert( error?.message ||
-			"Gagal menyimpan pembayaran supplier."
-	);
+	alert( error?.message || "Gagal menyimpan pembayaran supplier." );
 } finally {
 	if (button) {
 		button.disabled = false;
@@ -25469,10 +25340,6 @@ async function loadPpnPayments() {
     return ppnPaymentsData;
 
   } catch (error) {
-    console.error(
-      "loadPpnPayments error:",
-      error
-    );
     ppnPaymentsData = [];
     renderPpnPayments();
     throw error;
@@ -25736,8 +25603,6 @@ async function recordPpnPayment() {
     );
 
   } catch (error) {
-    console.error("recordPpnPayment error:", error);
-
     alert(
       error?.message ||
       "Gagal mencatat PPN."
@@ -26319,9 +26184,7 @@ async function saveNewLiability() {
 	        }
 	    );
 
-		if (error) {
-				console.error("create_liability:", error);
-				throw error; }  
+		if (error) { throw error; }  
 		if (!data?.success) {
 			throw new Error(
 				data?.message ||
@@ -26617,10 +26480,7 @@ try {
 			);
 
 
-		if (error) {
-			console.error( "create_liability_payment:", error );
-			throw error;
-		}
+		if (error) { throw error; }
 			
 		if (!data?.success) { throw new Error( 
 			data?.message || "Gagal menyimpan pembayaran" );
@@ -27220,9 +27080,7 @@ async function recordTaxObligation() {
       }
     );
 
-    if (error) {
-      console.error("record_tax_obligation error:", error);
-      throw error; }
+    if (error) { throw error; }
 		
     const result = typeof data === "string"
         ? JSON.parse(data)
@@ -28105,13 +27963,7 @@ async function applyPphBadanFiscalAdjustments() {
 				}
 			);
 
-		if (error) {
-			console.error(
-				"Final PPh Badan calculation error:",
-				error
-			);
-			throw error;
-		}
+		if (error) { throw error; }
 
 		const result = typeof data === "string"
 			? JSON.parse(data)
@@ -28130,17 +27982,9 @@ async function applyPphBadanFiscalAdjustments() {
 		
 		renderPphBadanCalculationResult( result );
 		closePphBadanFiscalAdjustmentModal();
-		console.log(
-				"PPh Badan FINAL Calculation:",
-				result
-		);
 		showToast( `PPh Badan ${taxYear} berhasil dihitung dengan fiscal adjustment.`, "success" );
 
 	} catch (error) {
-		console.error(
-			"applyPphBadanFiscalAdjustments error:",
-			error
-		);
 		showToast( error?.message || "Gagal menghitung ulang PPh Badan.", "error" );
 	} finally {
 		pphBadanCalculating = false;
@@ -28603,9 +28447,7 @@ function payPphBadanFromAction() {
   
   selectedPphBadanRecordId = paymentRecordId;
   const modal = document.getElementById("pphBadanPaymentModal");
-  if (!modal) {
-    console.error("PPh Badan Payment modal tidak ditemukan.");
-    return; }
+  if (!modal) { return; }
   const yearEl = document.getElementById("pphBadanPaymentYear");
   const outstandingEl = document.getElementById("pphBadanPaymentOutstanding");
   const amountEl = document.getElementById("pphBadanPaymentAmount");
@@ -28729,9 +28571,7 @@ function viewPphBadanDetailFromAction() {
 
   const modal = document.getElementById("pphBadanDetailModal");
 
-  if (!modal) {
-    console.error("PPh Badan Detail modal tidak ditemukan.");
-    return; }
+  if (!modal) { return; }
 
   const setText = (id, value) => {
     const el = document.getElementById(id); if (el) el.textContent = value; };
@@ -28985,10 +28825,8 @@ async function loadPphBadanTaxRule() {
   );
 
   if (error) {
-    console.error("LOAD PPH BADAN TAX RULE ERROR:", error);
     resetPphBadanTaxRuleDisplay();
     return; }
-
   if (!data || data.found !== true) {
     resetPphBadanTaxRuleDisplay();
     return; }
@@ -29168,12 +29006,7 @@ async function initAccountsReceivablePage() {
 
     await loadAccountsReceivableRecords();
 
-  } catch (error) {
-    console.error(
-      "initAccountsReceivablePage error:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 async function loadAccountsReceivableRecords() {
@@ -29240,10 +29073,6 @@ async function loadAccountsReceivableRecords() {
     return accountsReceivableRecords;
 
   } catch (error) {
-	  console.error(
-	    "loadAccountsReceivableRecords error:",
-	    error
-	  );
 	  accountsReceivableRecords = [];
 	  updateAccountsReceivableOverview();
 	  renderAccountsReceivableRecords();
@@ -29252,10 +29081,6 @@ async function loadAccountsReceivableRecords() {
 }
 
 function updateAccountsReceivableOverview() {
-	  console.log(
-    "UPDATE KPI AR DIPANGGIL",
-    accountsReceivableRecords
-  );
   const totalEl = document.getElementById( "accountsReceivableTotal" );
   const employeeEl = document.getElementById( "accountsReceivableEmployee" );
   const businessEl = document.getElementById( "accountsReceivableBusiness" );
@@ -29488,11 +29313,7 @@ function openAccountsReceivableRecordMenu(recordId) {
   const info = document.getElementById( "accountsReceivableActionInfo" );
   const buttons = document.getElementById( "accountsReceivableActionButtons" );
 
-  if (!modal || !buttons) {
-    console.error(
-      "Accounts Receivable Action popup tidak ditemukan."
-    );
-    return; }
+  if (!modal || !buttons) { return; }
 
   selectedAccountsReceivableId = record.id;
 
@@ -29612,12 +29433,7 @@ function openAccountsReceivableRecordMenu(recordId) {
 function openAccountsReceivableModal() {
   const modal = document.getElementById( "accountsReceivableModal" );
 
-  if (!modal) {
-    console.error(
-      "Accounts Receivable modal tidak ditemukan."
-    );
-    return;
-  }
+  if (!modal) { return; }
 
   // Reset form
 	const fields = [
@@ -30026,13 +29842,7 @@ function openAccountsReceivablePaymentModal(recordId) {
   const referenceEl = document.getElementById( "accountsReceivablePaymentReference" );
   const noteEl = document.getElementById( "accountsReceivablePaymentNote" );
 
-  if (!modal) {
-    console.error(
-      "Accounts Receivable payment modal tidak ditemukan."
-    );
-    return;
-  }
-	
+  if (!modal) { return; }
   if (partyEl) { partyEl.textContent = record.partyName || "Piutang"; }
   if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency(outstanding); }
   if (dateEl) { dateEl.value = new Date().toISOString().split("T")[0]; }
