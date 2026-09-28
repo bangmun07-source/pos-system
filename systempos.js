@@ -12987,7 +12987,7 @@ function updateExpenseAIInsight(filteredData) {
     el.innerHTML = "Belum ada data pengeluaran pada periode yang dipilih.";
     return; }
 
-  const totalExpense = data.reduce( (sum, item) => sum + Number(item.amount || 0), 0 ;
+  const totalExpense = data.reduce( (sum, item) => sum + Number(item.amount || 0), 0 );
   const transactionCount = data.length;
   const averageExpense = transactionCount > 0
 		? totalExpense / transactionCount
