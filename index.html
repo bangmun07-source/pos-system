@@ -3688,7 +3688,6 @@
 <!-- INVENTORY --> 
 
 <template id="inventoryPage" >
-
 	<aside id="sidebar"
 	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
 	  <div class="sidebar-menu flex flex-col h-full">
@@ -3714,7 +3713,7 @@
 					</span>
 				</a>
 				<!-- LOYALTY -->
-				<a onclick="navigate('loyaltysettingPage')">
+				<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						military_tech
 					</span>
@@ -3723,8 +3722,8 @@
 					</span>
 				</a>
 				<!-- TAX-->
-				<a onclick="navigate('taxservicesettingPage')">
-					 <span class="material-symbols-outlined sidebar-icon"> 					  
+				<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon"> 					  
 						 account_balance
 					</span>
 					<span class="sidebar-label">
@@ -3732,7 +3731,7 @@
 					</span>
 				</a>
 				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage')">
+				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						payments
 					</span>
@@ -3741,7 +3740,7 @@
 					</span>
 				</a>
 				<!-- ANALYTICS -->
-				<a onclick="navigate('analyticsPage')">
+				<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						analytics
 					</span>
@@ -3750,7 +3749,7 @@
 					</span>
 				</a>
 				<!-- INVENTORY -->
-				<a class="active" onclick="navigate('inventoryPage')">
+				<a class="active" onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						inventory_2
 					</span>
@@ -3758,13 +3757,13 @@
 						Inventory
 					</span>
 				</a>
-				<!-- DEBT & LIABILITIES -->
-				<a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
+				<!-- OVERVIEW -->
+				<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-						request_quote
+						insights
 					</span>
 					<span class="sidebar-label">
-						Debt & Liabilities
+						Overview
 					</span>
 				</a>
 				<!-- CASH FLOW -->
@@ -3777,7 +3776,6 @@
 					</span>
 				</a>
 			</nav>
-	
 		<!-- FOOTER -->
 			<div class="mt-auto p-2 pb-2">
 			  <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
@@ -5636,7 +5634,7 @@
 					</span>
 				</a>
 				<!-- LOYALTY -->
-				<a onclick="navigate('loyaltysettingPage')">
+				<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						military_tech
 					</span>
@@ -5645,8 +5643,8 @@
 					</span>
 				</a>
 				<!-- TAX-->
-				<a onclick="navigate('taxservicesettingPage')">
-					 <span class="material-symbols-outlined sidebar-icon"> 					  
+				<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon"> 					  
 						 account_balance
 					</span>
 					<span class="sidebar-label">
@@ -5654,7 +5652,7 @@
 					</span>
 				</a>
 				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage')">
+				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						payments
 					</span>
@@ -5663,7 +5661,7 @@
 					</span>
 				</a>
 				<!-- ANALYTICS -->
-				<a class="active" onclick="navigate('analyticsPage')">
+				<a class="active" onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						analytics
 					</span>
@@ -5672,7 +5670,7 @@
 					</span>
 				</a>
 				<!-- INVENTORY -->
-				<a onclick="navigate('inventoryPage')">
+				<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						inventory_2
 					</span>
@@ -5680,13 +5678,13 @@
 						Inventory
 					</span>
 				</a>
-				<!-- DEBT & LIABILITIES -->
-				<a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
+				<!-- OVERVIEW -->
+				<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-						request_quote
+						insights
 					</span>
 					<span class="sidebar-label">
-						Debt & Liabilities
+						Overview
 					</span>
 				</a>
 				<!-- CASH FLOW -->
@@ -5699,7 +5697,6 @@
 					</span>
 				</a>
 			</nav>
-	
 			<!-- FOOTER -->
 			<div class="mt-auto p-2 pb-2">
 			  <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
@@ -6017,101 +6014,91 @@
 	  class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
 	  <!-- SIDEBAR CONTENT -->
 	  <div class="sidebar-menu flex flex-col h-full">
-		<!-- MENU -->
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-			  <!-- DASHBOARD -->
-			  <a onclick="navigate('dashboardPage')">
+				<!-- DASHBOARD -->
+				<a onclick="navigate('dashboardPage')">
 					<span class="material-symbols-outlined sidebar-icon">
-					  home
+						home
 					</span>
-			
-					<span
-					  class="sidebar-label">
-					  Dashboard
+					<span class="sidebar-label">
+						Dashboard
 					</span>
-			  </a>
-		
-			<!-- SETTINGS -->
-			  <a class="active" onclick="navigate('settingsPage', { roles:['Owner','Admin'] })
+				</a>
+				<!-- SETTINGS -->
+				<a class="active" onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
 				 style="display:none"
 					 class="settingsMenu">
 					<span class="material-symbols-outlined sidebar-icon">
-					  settings
+						settings
 					</span>
-		
 					<span class="sidebar-label">
-					  Settings
+						Settings
 					</span>
-			  </a>
-		
-			  <!-- LOYALTY -->
-			  <a onclick="navigate('loyaltysettingPage')">
+				</a>
+				<!-- LOYALTY -->
+				<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-					  military_tech
+						military_tech
 					</span>
-		
 					<span class="sidebar-label">
-					  Loyalty &amp; Tiers
+						Loyalty &amp; Tiers
 					</span>
-			  </a>
-		
-			  <!-- TAX-->
-			  <a onclick="navigate('taxservicesettingPage')">
-					 <span class="material-symbols-outlined sidebar-icon"> 					  
+				</a>
+				<!-- TAX-->
+				<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon"> 					  
 						 account_balance
 					</span>
-			
 					<span class="sidebar-label">
-					   Taxes &amp; Fees
+						 Taxes &amp; Fees
 					</span>
-			  </a>
-		
-			  <!-- EXPENSES -->
-			  <a onclick="navigate('expensessettingPage')">
+				</a>
+				<!-- EXPENSES -->
+				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-					  payments
+						payments
 					</span>
-			
 					<span class="sidebar-label">
-					  Expenses
+						Expenses
 					</span>
-			  </a>
-			
-			  <!-- ANALYTICS -->
-			  <a onclick="navigate('analyticsPage')">
+				</a>
+				<!-- ANALYTICS -->
+				<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-					  analytics
+						analytics
 					</span>
-			
 					<span class="sidebar-label">
 						Analytics
 					</span>
-			  </a>
-			
-			<!-- ANALYTICS -->
-			  <a onclick="navigate('inventoryPage')">
+				</a>
+				<!-- INVENTORY -->
+				<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-					  inventory_2
+						inventory_2
 					</span>
-			
 					<span class="sidebar-label">
 						Inventory
 					</span>
-			  </a>
-		
+				</a>
+				<!-- OVERVIEW -->
+				<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						insights
+					</span>
+					<span class="sidebar-label">
+						Overview
+					</span>
+				</a>
 				<!-- CASH FLOW -->
 				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 					<span class="material-symbols-outlined sidebar-icon">
-					  account_balance_wallet
+						account_balance_wallet
 					</span>
-		
 					<span class="sidebar-label">
 						Cash Flow
 					</span>
-			  </a>
+				</a>
 			</nav>
-	
-	
 		<!-- FOOTER -->
 			<div class="mt-auto p-2 pb-2">
 			  <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
@@ -8591,7 +8578,7 @@
 						</span>
 					</a>
 					<!-- LOYALTY -->
-					<a onclick="navigate('loyaltysettingPage')">
+					<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							military_tech
 						</span>
@@ -8600,7 +8587,7 @@
 						</span>
 					</a>
 					<!-- TAX-->
-					<a onclick="navigate('taxservicesettingPage')">
+					<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon"> 					  
 							 account_balance
 						</span>
@@ -8609,7 +8596,7 @@
 						</span>
 					</a>
 					<!-- EXPENSES -->
-					<a class="active" onclick="navigate('expensessettingPage')">
+					<a class="active" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							payments
 						</span>
@@ -8618,7 +8605,7 @@
 						</span>
 					</a>
 					<!-- ANALYTICS -->
-					<a onclick="navigate('analyticsPage')">
+					<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							analytics
 						</span>
@@ -8627,7 +8614,7 @@
 						</span>
 					</a>
 					<!-- INVENTORY -->
-					<a onclick="navigate('inventoryPage')">
+					<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							inventory_2
 						</span>
@@ -8635,15 +8622,15 @@
 							Inventory
 						</span>
 					</a>
-					<!-- DEBT & LIABILITIES -->
-					<a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
-						<span class="material-symbols-outlined sidebar-icon">
-							request_quote
-						</span>
-						<span class="sidebar-label">
-							Debt & Liabilities
-						</span>
-					</a>
+					<!-- OVERVIEW -->
+	        <a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+	          <span class="material-symbols-outlined sidebar-icon">
+	            insights
+	          </span>
+	          <span class="sidebar-label">
+	            Overview
+	          </span>
+	        </a>
 					<!-- CASH FLOW -->
 					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 						<span class="material-symbols-outlined sidebar-icon">
@@ -9807,76 +9794,75 @@
 						<span class="material-symbols-outlined">close</span>
 					</button>
 				</div>
-<!-- Modal Content -->
-		<div class="px-8 py-8 space-y-6">
-			<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-				<!-- Branch -->
-				<div class="space-y-2 md:col-span-2">
-					<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
-						Branch Selection
-					</label>
-					
-					<div class="relative">
-						<div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-							<span class="material-symbols-outlined text-xl">store</span>
+				<!-- Modal Content -->
+				<div class="px-8 py-8 space-y-6">
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+						<!-- Branch -->
+						<div class="space-y-2 md:col-span-2">
+							<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
+								Branch Selection
+							</label>
+							
+							<div class="relative">
+								<div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+									<span class="material-symbols-outlined text-xl">store</span>
+								</div>
+							<select id="budgetBranch" class="w-full appearance-none bg-background border border-outline-variant rounded-md pl-12 pr-12 py-3 text-on-surface focus:ring-0 focus:bg-background cursor-pointer transition-all">
+							</select>
+								
+							<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+								<span class="material-symbols-outlined">expand_more</span>
+							</div>
 						</div>
-					<select id="budgetBranch" class="w-full appearance-none bg-background border border-outline-variant rounded-md pl-12 pr-12 py-3 text-on-surface focus:ring-0 focus:bg-background cursor-pointer transition-all">
-					</select>
-						
-					<div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-						<span class="material-symbols-outlined">expand_more</span>
+					</div>
+					<!-- Month -->
+					<div class="space-y-2">
+						<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
+							Budget Period
+						</label>
+						<div class="relative">
+							<div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
+								<span class="material-symbols-outlined text-xl">calendar_month</span>
+							</div>
+							<input id="budgetMonth" type="month" class="w-full bg-background border border-outline-variant rounded-md pl-12 pr-4 py-3 text-on-surface focus:ring-0 focus:bg-background transition-all [color-scheme:dark]"/>
+						</div>
+					</div>
+					<!-- Amount -->
+					<div class="space-y-2">
+						<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
+							Budget Amount
+						</label>
+						<div class="relative">
+							<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface font-bold">
+								Rp
+							</span>
+							<input id="budgetAmount" type="number" placeholder="15000000" class="w-full bg-background border border-outline-variant rounded-md pl-12 pr-4 py-3 text-on-surface focus:ring-0 focus:bg-background transition-all"/>
+						</div>
+					</div>
+				</div>
+				<!-- Preview -->
+				<div class="p-5 bg-background rounded-md border border-outline-variant">
+					<div class="flex items-center justify-between">
+						<div>
+							<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
+								Budget Preview
+							</p>
+							<p id="budgetPreviewText" class="text-lg font-bold text-on-surface mt-2">
+								BR001 • 2026-07
+							</p>
+						</div>
+						<div>
+							<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant text-right">
+								Amount
+							</p>
+							<p id="budgetPreviewAmount" class="text-xl font-extrabold text-on-surface mt-2">
+								Rp 0
+							</p>
 					</div>
 				</div>
 			</div>
-			<!-- Month -->
-			<div class="space-y-2">
-				<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
-					Budget Period
-				</label>
-			<div class="relative">
-				<div class="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-					<span class="material-symbols-outlined text-xl">calendar_month</span>
-				</div>
-				<input id="budgetMonth" type="month" class="w-full bg-background border border-outline-variant rounded-md pl-12 pr-4 py-3 text-on-surface focus:ring-0 focus:bg-background transition-all [color-scheme:dark]"/>
-			</div>
 		</div>
-		<!-- Amount -->
-		<div class="space-y-2">
-			<label class="block font-label text-sm font-semibold text-on-surface-variant uppercase tracking-wider">
-				Budget Amount
-			</label>
-			<div class="relative">
-				<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface font-bold">
-					Rp
-				</span>
-				<input id="budgetAmount" type="number" placeholder="15000000" class="w-full bg-background border border-outline-variant rounded-md pl-12 pr-4 py-3 text-on-surface focus:ring-0 focus:bg-background transition-all"/>
-			</div>
-		</div>
-	</div>
-	<!-- Preview -->
-	<div class="p-5 bg-background rounded-md border border-outline-variant">
-		<div class="flex items-center justify-between">
-			<div>
-				<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">
-					Budget Preview
-				</p>
-				<p id="budgetPreviewText" class="text-lg font-bold text-on-surface mt-2">
-					BR001 • 2026-07
-				</p>
-			</div>
-			<div>
-				<p class="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant text-right">
-					Amount
-				</p>
-				<p id="budgetPreviewAmount" class="text-xl font-extrabold text-on-surface mt-2">
-					Rp 0
-				</p>
-		</div>
-	</div>
-	</div>
-	</div>
 
-	<!-- Footer -->
 				<div class="px-8 py-6 bg-background border-t border-outline-variant flex items-center justify-end gap-4">
 					<button onclick="saveExpenseBudget()" class="px-8 py-3 rounded-md font-semibold text-on-surface-variant hover:text-on-surface transition-all">
 						Cancel
@@ -10213,200 +10199,137 @@
 <!-- POPPUP VIEW DETAIL OTHER INCOME -->
 
 <template id="otherIncomeDetailModalTemplate">
-
   <div id="other-income-detail-modal"
-  class="fixed inset-0 z-[80] hidden items-center justify-center p-6 bg-background backdrop-blur-md">
+  	class="fixed inset-0 z-[80] hidden items-center justify-center p-6 bg-background backdrop-blur-md">
+		<div onclick="event.stopPropagation()"
+			class="w-full max-w-md bg-background rounded-md overflow-hidden animate-in fade-in zoom-in duration-300">
+  		<!-- HEADER -->
+  		<div class="p-6 border border-outline-variant flex items-center justify-between">
+  			<div class="flex items-center gap-4">
+				  <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
+					  <span class="material-symbols-outlined text-on-surface text-2xl">
+					  		receipt_long
+					  </span>
+				  </div>
+		
+					<div>
+					  <h2 class="text-xl font-bold text-on-surface">
+					 		 Other Income Detail
+					  </h2>
+					
+					  <p class="text-xs uppercase tracking-wider text-on-surface">
+							Income Transaction
+					  </p>
+				  </div>
+			  </div>
+		
+			  <button onclick="closeOtherIncomeDetailModal()"
+			  class="w-10 h-10 rounded-md hover:bg-outline-variant">
+				  <span class="material-symbols-outlined">
+				  	close
+				  </span>
+			  </button>
+		  </div>
+		  <!-- BODY -->
+		  <div class="p-6 space-y-5">
+		    <div class="grid grid-cols-2 gap-4">
+		      <div>
+		        <p class="text-xs uppercase text-on-surface-variant">
+		          Reference ID
+		        </p>
+		
+		        <p id="otherIncomeDetailRef"
+		          class="mt-1 text-sm font-bold text-on-surface">
+		          -
+		        </p>
+		      </div>
+		
+		      <div>
+		        <p class="text-xs uppercase text-on-surface-variant">
+		          Date
+		        </p>
+		
+		        <p id="otherIncomeDetailDate"
+		          class="mt-1 text-sm font-semibold text-on-surface">
+		          -
+		        </p>
+		      </div>
+		
+		      <div>
+		        <p class="text-xs uppercase text-on-surface-variant">
+		          Category
+		        </p>
+		
+		        <p id="otherIncomeDetailCategory"
+		          class="mt-1 text-sm font-semibold text-on-surface">
+		          -
+		        </p>
+		      </div>
 
-
-  <div onclick="event.stopPropagation()"
-  class="w-full max-w-md bg-background rounded-md overflow-hidden animate-in fade-in zoom-in duration-300">
-
-
-  <!-- HEADER -->
-
-  <div class="p-6 border border-outline-variant flex items-center justify-between">
-
-
-  <div class="flex items-center gap-4">
-
-
-  <div class="w-12 h-12 rounded-md bg-background-high flex items-center justify-center">
-
-  <span class="material-symbols-outlined text-on-surface text-2xl">
-  receipt_long
-  </span>
-
+		      <div>
+		        <p class="text-xs uppercase text-on-surface-variant">
+		          Payment Method
+		        </p>
+		        <p id="otherIncomeDetailMethod"
+		          class="mt-1 text-sm font-semibold text-on-surface">
+		          -
+		        </p>
+		      </div>
+		    </div>
+    		<!-- DESCRIPTION -->
+		    <div>
+		      <p class="text-xs uppercase text-on-surface-variant mb-2">
+		        Description
+		      </p>
+		
+		      <div id="otherIncomeDetailDescription"
+		        class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
+		        -
+		      </div>
+		    </div>
+    		<!-- NOTES -->
+		    <div>
+		      <p class="text-xs uppercase text-on-surface-variant mb-2">
+		        Notes
+		      </p>
+		
+		      <div id="otherIncomeDetailNotes"
+		        class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
+		        -
+		      </div>
+		    </div>
+    		<!-- AMOUNT -->
+    		<div class="rounded-md bg-background-high p-5 flex items-center justify-between">
+		      <div>
+		        <p class="text-xs uppercase text-on-surface-variant">
+		          Total Income
+		        </p>
+		
+		        <h2 id="otherIncomeDetailAmount"
+		          class="mt-1 text-3xl font-black text-on-surface">
+		          Rp0
+		        </h2>
+		      </div>
+		    </div>
+		    <!-- STATUS -->
+		    <div class="flex items-center justify-between">
+		      <p class="text-xs uppercase text-on-surface-variant">
+		        Status
+		      </p>
+		
+		      <div id="otherIncomeDetailStatus">
+		      </div>
+		    </div>
+  		</div>
+  		<!-- FOOTER -->
+		  <div class="p-4 border-t border-outline-variant">
+			  <button onclick="closeOtherIncomeDetailModal()"
+				  class="w-full h-11 rounded-md bg-background-high text-on-surface">
+				  Close
+			  </button>
+		  </div>
+	  </div>
   </div>
-
-
-  <div>
-
-  <h2 class="text-xl font-bold text-on-surface">
-  Other Income Detail
-  </h2>
-
-  <p class="text-xs uppercase tracking-wider text-on-surface">
-  Income Transaction
-  </p>
-
-  </div>
-
-
-  </div>
-  <button
-  onclick="closeOtherIncomeDetailModal()"
-  class="w-10 h-10 rounded-md hover:bg-outline-variant">
-
-  <span class="material-symbols-outlined">
-  close
-  </span>
-  </button>
-  </div>
-
-  <!-- BODY -->
-  <div class="p-6 space-y-5">
-
-    <!-- INFO GRID -->
-    <div class="grid grid-cols-2 gap-4">
-
-      <div>
-
-        <p class="text-xs uppercase text-on-surface-variant">
-          Reference ID
-        </p>
-
-        <p id="otherIncomeDetailRef"
-          class="mt-1 text-sm font-bold text-on-surface">
-          -
-        </p>
-
-      </div>
-
-      <div>
-
-        <p class="text-xs uppercase text-on-surface-variant">
-          Date
-        </p>
-
-        <p id="otherIncomeDetailDate"
-          class="mt-1 text-sm font-semibold text-on-surface">
-          -
-        </p>
-
-      </div>
-
-      <div>
-
-        <p class="text-xs uppercase text-on-surface-variant">
-          Category
-        </p>
-
-        <p id="otherIncomeDetailCategory"
-          class="mt-1 text-sm font-semibold text-on-surface">
-          -
-        </p>
-
-      </div>
-
-      <div>
-        <p class="text-xs uppercase text-on-surface-variant">
-          Payment Method
-        </p>
-        <p id="otherIncomeDetailMethod"
-          class="mt-1 text-sm font-semibold text-on-surface">
-          -
-        </p>
-      </div>
-    </div>
-
-    <!-- DESCRIPTION -->
-
-    <div>
-      <p class="text-xs uppercase text-on-surface-variant mb-2">
-        Description
-      </p>
-
-      <div
-        id="otherIncomeDetailDescription"
-        class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
-        -
-      </div>
-    </div>
-
-    <!-- NOTES -->
-
-    <div>
-      <p class="text-xs uppercase text-on-surface-variant mb-2">
-        Notes
-      </p>
-
-      <div
-        id="otherIncomeDetailNotes"
-        class="rounded-md bg-background-high p-4 text-xs lg:text-sm text-on-surface">
-        -
-      </div>
-    </div>
-
-    <!-- AMOUNT -->
-
-    <div
-      class="rounded-md bg-background-high p-5 flex items-center justify-between">
-
-      <div>
-        <p class="text-xs uppercase text-on-surface-variant">
-          Total Income
-        </p>
-
-        <h2
-          id="otherIncomeDetailAmount"
-          class="mt-1 text-3xl font-black text-on-surface">
-
-          Rp0
-
-        </h2>
-
-      </div>
-    </div>
-
-    <!-- STATUS -->
-
-    <div class="flex items-center justify-between">
-
-
-      <p class="text-xs uppercase text-on-surface-variant">
-        Status
-      </p>
-
-
-      <div id="otherIncomeDetailStatus">
-
-      </div>
-
-
-    </div>
-
-
-  </div>
-
-  <!-- FOOTER -->
-
-  <div class="p-4 border-t border-outline-variant">
-
-  <button
-  onclick="closeOtherIncomeDetailModal()"
-  class="w-full h-11 rounded-md bg-background-high text-on-surface">
-
-  Close
-
-  </button>
-
-  </div>
-
-
-  </div>
-
-  </div>
-
 </template>
 
 
@@ -10502,7 +10425,7 @@
 						</span>
 					</a>
 					<!-- LOYALTY -->
-					<a class="active" onclick="navigate('loyaltysettingPage')">
+					<a class="active" onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							military_tech
 						</span>
@@ -10511,7 +10434,7 @@
 						</span>
 					</a>
 					<!-- TAX-->
-					<a onclick="navigate('taxservicesettingPage')">
+					<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon"> 					  
 							 account_balance
 						</span>
@@ -10520,7 +10443,7 @@
 						</span>
 					</a>
 					<!-- EXPENSES -->
-					<a onclick="navigate('expensessettingPage')">
+					<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							payments
 						</span>
@@ -10529,7 +10452,7 @@
 						</span>
 					</a>
 					<!-- ANALYTICS -->
-					<a onclick="navigate('analyticsPage')">
+					<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							analytics
 						</span>
@@ -10538,7 +10461,7 @@
 						</span>
 					</a>
 					<!-- INVENTORY -->
-					<a onclick="navigate('inventoryPage')">
+					<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							inventory_2
 						</span>
@@ -10546,15 +10469,15 @@
 							Inventory
 						</span>
 					</a>
-					<!-- DEBT & LIABILITIES -->
-					<a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
-						<span class="material-symbols-outlined sidebar-icon">
-							request_quote
-						</span>
-						<span class="sidebar-label">
-							Debt & Liabilities
-						</span>
-					</a>
+					<!-- OVERVIEW -->
+	        <a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+	          <span class="material-symbols-outlined sidebar-icon">
+	            insights
+	          </span>
+	          <span class="sidebar-label">
+	            Overview
+	          </span>
+	        </a>
 					<!-- CASH FLOW -->
 					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 						<span class="material-symbols-outlined sidebar-icon">
@@ -10565,8 +10488,7 @@
 						</span>
 					</a>
 				</nav>
-	
-		<!-- FOOTER -->
+			<!-- FOOTER -->
 			<div class="mt-auto p-2 pb-2">
 			  <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
 					<span class=" shrink-0 w-8 h-8 flex items-center justify-center">
@@ -11436,7 +11358,6 @@
             </span>
           </div>
         </div>
-
         <!-- Category -->
         <div class="space-y-2">
           <label class="text-sm font-semibold uppercase tracking-wider text-muted ">
@@ -11483,90 +11404,90 @@
 		class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
 		<div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-				<!-- DASHBOARD -->
-				<a onclick="navigate('dashboardPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-						home
-					</span>
-					<span class="sidebar-label">
-						Dashboard
-					</span>
-				</a>
-				<!-- SETTINGS -->
-				<a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
-				 style="display:none"
-					 class="settingsMenu">
-					<span class="material-symbols-outlined sidebar-icon">
-						settings
-					</span>
-					<span class="sidebar-label">
-						Settings
-					</span>
-				</a>
-				<!-- LOYALTY -->
-				<a onclick="navigate('loyaltysettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-						military_tech
-					</span>
-					<span class="sidebar-label">
-						Loyalty &amp; Tiers
-					</span>
-				</a>
-				<!-- TAX-->
-				<a class="active" onclick="navigate('taxservicesettingPage')">
-					<span class="material-symbols-outlined sidebar-icon"> 					  
-						 account_balance
-					</span>
-					<span class="sidebar-label">
-						 Taxes &amp; Fees
-					</span>
-				</a>
-				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-						payments
-					</span>
-					<span class="sidebar-label">
-						Expenses
-					</span>
-				</a>
-				<!-- ANALYTICS -->
-				<a onclick="navigate('analyticsPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-						analytics
-					</span>
-					<span class="sidebar-label">
-						Analytics
-					</span>
-				</a>
-				<!-- INVENTORY -->
-				<a onclick="navigate('inventoryPage')">
-					<span class="material-symbols-outlined sidebar-icon">
-						inventory_2
-					</span>
-					<span class="sidebar-label">
-						Inventory
-					</span>
-				</a>
-				<!-- DEBT & LIABILITIES -->
-				<a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
-					<span class="material-symbols-outlined sidebar-icon">
-						request_quote
-					</span>
-					<span class="sidebar-label">
-						Debt & Liabilities
-					</span>
-				</a>
-				<!-- CASH FLOW -->
-				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
-					<span class="material-symbols-outlined sidebar-icon">
-						account_balance_wallet
-					</span>
-					<span class="sidebar-label">
-						Cash Flow
-					</span>
-				</a>
-			</nav>	
+					<!-- DASHBOARD -->
+					<a onclick="navigate('dashboardPage')">
+						<span class="material-symbols-outlined sidebar-icon">
+							home
+						</span>
+						<span class="sidebar-label">
+							Dashboard
+						</span>
+					</a>
+					<!-- SETTINGS -->
+					<a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+					 style="display:none"
+						 class="settingsMenu">
+						<span class="material-symbols-outlined sidebar-icon">
+							settings
+						</span>
+						<span class="sidebar-label">
+							Settings
+						</span>
+					</a>
+					<!-- LOYALTY -->
+					<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							military_tech
+						</span>
+						<span class="sidebar-label">
+							Loyalty &amp; Tiers
+						</span>
+					</a>
+					<!-- TAX-->
+					<a class="active" onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon"> 					  
+							 account_balance
+						</span>
+						<span class="sidebar-label">
+							 Taxes &amp; Fees
+						</span>
+					</a>
+					<!-- EXPENSES -->
+					<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							payments
+						</span>
+						<span class="sidebar-label">
+							Expenses
+						</span>
+					</a>
+					<!-- ANALYTICS -->
+					<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							analytics
+						</span>
+						<span class="sidebar-label">
+							Analytics
+						</span>
+					</a>
+					<!-- INVENTORY -->
+					<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							inventory_2
+						</span>
+						<span class="sidebar-label">
+							Inventory
+						</span>
+					</a>
+					<!-- OVERVIEW -->
+					<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							insights
+						</span>
+						<span class="sidebar-label">
+							Overview
+						</span>
+					</a>
+					<!-- CASH FLOW -->
+					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							account_balance_wallet
+						</span>
+						<span class="sidebar-label">
+							Cash Flow
+						</span>
+					</a>
+				</nav>
 			<!-- FOOTER -->
 			<div class="mt-auto p-2 pb-2">
 			  <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
@@ -11835,13 +11756,31 @@
             Asset
           </span>
         </a>
-         <!-- OVERVIEW -->
-        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+				<!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            insights
+            request_quote
           </span>
           <span class="sidebar-label">
-            Overview
+            Debt &amp; Liabilities
+          </span>
+        </a>
+        <!-- ACCOUNTING TAX -->
+        <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
           </span>
         </a>
 				<!-- ACCOUNTING -->
@@ -12663,13 +12602,31 @@
             Asset
           </span>
         </a>
-         <!-- OVERVIEW -->
-        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+				<!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            insights
+            request_quote
           </span>
           <span class="sidebar-label">
-            Overview
+            Debt &amp; Liabilities
+          </span>
+        </a>
+        <!-- ACCOUNTING TAX -->
+        <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
           </span>
         </a>
 				<!-- ACCOUNTING -->
@@ -15156,81 +15113,90 @@
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-         <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            home
-          </span>
-          <span class="sidebar-label">
-            Dashboard
-          </span>
-        </a>
-        <!-- SETTINGS -->
-        <a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
-          style="display:none"
-          class="settingsMenu">
-          <span class="material-symbols-outlined sidebar-icon">
-            settings
-          </span>
-          <span class="sidebar-label">
-            Settings
-          </span>
-        </a>
-        <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_balance_wallet
-          </span>
-          <span class="sidebar-label">
-            Cash Flow
-          </span>
-        </a>
-        <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
-          <span class="material-symbols-outlined sidebar-icon">
-            inventory_2
-          </span>
-          <span class="sidebar-label">
-            Asset
-          </span>
-        </a>
-         <!-- OVERVIEW -->
-        <a class="active" onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            insights
-          </span>
-          <span class="sidebar-label">
-            Overview
-          </span>
-        </a>
-				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            account_tree
-          </span>
-          <span class="sidebar-label">
-            COA
-          </span>
-        </a>
-				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            menu_book
-          </span>
-          <span class="sidebar-label">
-            Journal Entries
-          </span>
-        </a>
-				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-            balance
-          </span>
-          <span class="sidebar-label">
-            Accounting Reports
-          </span>
-        </a>
-      </nav>
+					<!-- DASHBOARD -->
+					<a onclick="navigate('dashboardPage')">
+						<span class="material-symbols-outlined sidebar-icon">
+							home
+						</span>
+						<span class="sidebar-label">
+							Dashboard
+						</span>
+					</a>
+					<!-- SETTINGS -->
+					<a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+					 style="display:none"
+						 class="settingsMenu">
+						<span class="material-symbols-outlined sidebar-icon">
+							settings
+						</span>
+						<span class="sidebar-label">
+							Settings
+						</span>
+					</a>
+					<!-- LOYALTY -->
+					<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							military_tech
+						</span>
+						<span class="sidebar-label">
+							Loyalty &amp; Tiers
+						</span>
+					</a>
+					<!-- TAX-->
+					<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon"> 					  
+							 account_balance
+						</span>
+						<span class="sidebar-label">
+							 Taxes &amp; Fees
+						</span>
+					</a>
+					<!-- EXPENSES -->
+					<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							payments
+						</span>
+						<span class="sidebar-label">
+							Expenses
+						</span>
+					</a>
+					<!-- ANALYTICS -->
+					<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							analytics
+						</span>
+						<span class="sidebar-label">
+							Analytics
+						</span>
+					</a>
+					<!-- INVENTORY -->
+					<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							inventory_2
+						</span>
+						<span class="sidebar-label">
+							Inventory
+						</span>
+					</a>
+					<!-- OVERVIEW -->
+					<a class="active" onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							insights
+						</span>
+						<span class="sidebar-label">
+							Overview
+						</span>
+					</a>
+					<!-- CASH FLOW -->
+					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+						<span class="material-symbols-outlined sidebar-icon">
+							account_balance_wallet
+						</span>
+						<span class="sidebar-label">
+							Cash Flow
+						</span>
+					</a>
+				</nav>
       <!-- FOOTER -->
       <div class="mt-auto p-2 pb-2">
         <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
@@ -15723,13 +15689,31 @@
             Asset
           </span>
         </a>
-         <!-- OVERVIEW -->
-        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+				<!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            insights
+            request_quote
           </span>
           <span class="sidebar-label">
-            Overview
+            Debt &amp; Liabilities
+          </span>
+        </a>
+        <!-- ACCOUNTING TAX -->
+        <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
           </span>
         </a>
 				<!-- ACCOUNTING -->
@@ -16475,7 +16459,7 @@
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
-        <!-- DASHBOARD -->
+         <!-- DASHBOARD -->
         <a onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
@@ -16513,17 +16497,35 @@
             Asset
           </span>
         </a>
-         <!-- OVERVIEW -->
-        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+				<!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            insights
+            request_quote
           </span>
           <span class="sidebar-label">
-            Overview
+            Debt &amp; Liabilities
+          </span>
+        </a>
+        <!-- ACCOUNTING TAX -->
+        <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -16550,7 +16552,6 @@
           </span>
         </a>
       </nav>
-
       <!-- FOOTER -->
       <div class="mt-auto p-2 pb-2">
         <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
@@ -17334,7 +17335,7 @@
   <aside id="sidebar"
     class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
     <div class="sidebar-menu flex flex-col h-full">
-      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2 ">
+      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
         <a onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
@@ -17373,17 +17374,35 @@
             Asset
           </span>
         </a>
-         <!-- OVERVIEW -->
-        <a onclick="navigate('accountingOverviewPage', { roles:['Owner'] })">
+				<!-- DEBT & LIABILITIES -->
+        <a onclick="navigate('accountingDebtPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
-            insights
+            request_quote
           </span>
           <span class="sidebar-label">
-            Overview
+            Debt &amp; Liabilities
+          </span>
+        </a>
+        <!-- ACCOUNTING TAX -->
+        <a onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            Tax
+          </span>
+        </a>
+				<!-- ACCOUNTS RECEIVABLE -->
+        <a onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+            receipt_long
+          </span>
+          <span class="sidebar-label">
+            RECEIVABLE
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -21259,8 +21278,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active"
-          onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
