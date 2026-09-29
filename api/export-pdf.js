@@ -548,13 +548,13 @@ const logoSrc =
                     line-height: 1.7;        
                   }
           
-                  .kpi-grid {          
-                    display: grid;          
-                    grid-template-columns: repeat(5, 1fr);          
-                    gap: 16px;          
-                    margin: 30px 0;          
+                  .kpi-grid {
+                    display: grid;
+                    grid-template-columns: repeat(2, 1fr);
+                    gap: 16px;
+                    margin: 30px 0;
                   }
-          
+                  
                   .kpi-card {
                     border: 1px solid #e5e5e5;
                     border-radius: 14px;
@@ -7309,28 +7309,28 @@ else if (type === "asset") {
 
           .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
             margin: 30px 0;
           }
 
           .kpi-card {
             border: 1px solid #e5e5e5;
             border-radius: 14px;
-            padding: 22px;
+            padding: 16px 10px;
             background: #fafafa;
             text-align: center;
           }
-
+          
           .kpi-title {
-            font-size: 11px;
+            font-size: 10px;
             color: #666;
             font-weight: bold;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
           }
-
+          
           .kpi-value {
-            font-size: 22px;
+            font-size: 18px;
             font-weight: bold;
             color: #222;
           }
