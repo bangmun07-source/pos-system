@@ -6897,21 +6897,712 @@ else if (type === "recipe") {
     </body>
   </html>
 `;
-
   // RETURN HTML
   res.setHeader(
     "Content-Type",
     "text/html; charset=utf-8"
   );
-
   return res
     .status(200)
     .send(html);
 }
 
+// ==========================================
+// ASSET
+// ==========================================
+  
+else if (type === "asset") {
+  // RPC ASSETS
+  const {
+    data: assets,
+    error: assetError
+  } = await supabase.rpc(
+    "get_assets",
+    {
+      p_branch_id: branchId || null,
+      p_session_id: sessionId
+    }
+  );
 
+  if (assetError) { throw assetError; }
+
+  // RPC ASSET PURCHASES
+  const {
+    data: purchases,
+    error: purchaseError
+  } = await supabase.rpc(
+    "get_asset_purchases",
+    {
+      p_session_id: sessionId,
+      p_branch_id: branchId || null
+    }
+  );
+
+  if (purchaseError) { throw purchaseError; }
+  
+  // RPC DEPRECIATION HISTORY
+  const {
+    data: depreciation,
+    error: depreciationError
+  } = await supabase.rpc(
+    "get_asset_depreciation_history",
+    {
+      p_branch_id: branchId || null,
+      p_session_id: sessionId
+    }
+  );
+
+  if (depreciationError) { throw depreciationError; }
+
+  // NORMALIZE DATA
+  const assetRows = Array.isArray(assets)
+    ? assets
+    : [];
+  const purchaseRows = Array.isArray(purchases)
+    ? purchases
+    : [];
+  const depreciationRows = Array.isArray(depreciation)
+    ? depreciation
+    : [];
+
+  // DATE FILTER
+  const filteredAssets =
+    assetRows.filter(row => {
+      const rowDate =
+        row.Purchase_Date ??
+        row.purchase_date ??
+        "";
+      const matchStart =
+        !start ||
+        (
+          rowDate &&
+          new Date(rowDate) >=
+            new Date(`${start}T00:00:00`)
+        );
+      const matchEnd =
+        !end ||
+        (
+          rowDate &&
+          new Date(rowDate) <=
+            new Date(`${end}T23:59:59.999`)
+        );
+      return ( matchStart && matchEnd );
+    });
+
+  const filteredPurchases =
+    purchaseRows.filter(row => {
+      const rowDate =
+        row.Purchase_Date ??
+        row.purchase_date ??
+        "";
+      const matchStart =
+        !start ||
+        (
+          rowDate &&
+          new Date(rowDate) >=
+            new Date(`${start}T00:00:00`)
+        );
+      const matchEnd =
+        !end ||
+        (
+          rowDate &&
+          new Date(rowDate) <=
+            new Date(`${end}T23:59:59.999`)
+        );
+
+      return ( matchStart && matchEnd );
+    });
+
+  const filteredDepreciation =
+    depreciationRows.filter(row => {
+      const rowDate =
+        row.Period ??
+        row.period ??
+        "";
+      const matchStart =
+        !start ||
+        (
+          rowDate &&
+          new Date(rowDate) >=
+            new Date(`${start}T00:00:00`)
+        );
+      const matchEnd =
+        !end ||
+        (
+          rowDate &&
+          new Date(rowDate) <=
+            new Date(`${end}T23:59:59.999`)
+        );
+
+      return ( matchStart && matchEnd );
+    });
+
+  // BRANCH NAME
+  let branchName = "All Branch";
+  if (branchId) {
+    branchName = await getBranchName( supabase, branchId ); }
+
+  // KPI
+  const activeAssets = filteredAssets.filter(row => normalize(row.Status) === "ACTIVE" );
+  const totalAssets = activeAssets.length;
+  const purchaseCost =
+    activeAssets.reduce(
+      (sum, row) =>
+        sum +
+        Number(
+          row.Purchase_Cost || 0
+        ),
+      0
+    );
+  const accumulatedDepreciation =
+    activeAssets.reduce(
+      (sum, row) =>
+        sum +
+        Number(
+          row.Accumulated_Depreciation || 0
+        ),
+      0
+    );
+  const bookValue =
+    activeAssets.reduce(
+      (sum, row) =>
+        sum +
+        Number(
+          row.Book_Value || 0
+        ),
+      0
+    );
+
+  const monthlyDepreciation =
+    activeAssets.reduce(
+      (sum, row) => {
+        const method = normalize( row.Depreciation_Method );
+        const usefulLife = Number( row.Useful_Life_Months || 0 );
+
+        if (
+          method === "STRAIGHT LINE" &&
+          usefulLife > 0
+        ) {
+          return (
+            sum +
+            (
+              Number(
+                row.Purchase_Cost || 0
+              ) /
+              usefulLife
+            )
+          );
+        }
+        return sum;
+      },
+      0
+    );
+
+  // ASSET MANAGEMENT HTML
+  const assetManagementRows =
+    filteredAssets.length
+      ? filteredAssets
+          .map(row => {
+            const assetId = row.Asset_ID || "";
+            const assetName = row.Asset_Name || "";
+            const purchaseDate = row.Purchase_Date || "";
+            const cost = Number( row.Purchase_Cost || 0 );
+            const accumulated = Number( row.Accumulated_Depreciation || 0 );
+            const book = Number( row.Book_Value || 0 );
+            const status = row.Status || "";
+            const rowBranch = row.BranchId || "";
+            const usefulLife = row.Useful_Life_Months || "";
+            const method = row.Depreciation_Method || "";
+
+            return `
+              <tr>
+                <td> ${escapeHtml(purchaseDate)} </td>
+                <td> ${escapeHtml(assetId)} </td>
+                <td> ${escapeHtml(assetName)} </td>
+                <td> ${escapeHtml(rowBranch)} </td>
+                <td class="right"> Rp ${rupiah(cost)} </td>
+                <td class="right"> Rp ${rupiah(accumulated)} </td>
+                <td class="right"> Rp ${rupiah(book)} </td>
+                <td> ${escapeHtml(status)} </td>
+                <td class="right"> ${escapeHtml(String(usefulLife))} </td>
+                <td> ${escapeHtml(method)} </td>
+              </tr>
+            `;
+          })
+          .join("")
+      : `
+          <tr>
+            <td colspan="10"
+              class="empty" >
+              No asset data
+            </td>
+          </tr>
+        `;
+  
+  // ASSET PURCHASE HTML
+  const assetPurchaseRows =
+    filteredPurchases.length
+      ? filteredPurchases
+          .map(row => {
+            const purchaseId = row.Purchase_ID || "";
+            const assetName = row.Asset_Name || "";
+            const purchaseDate = row.Purchase_Date || "";
+            const cost = Number( row.Purchase_Cost || 0 );
+            const interest = Number( row.Interest_Amount || 0 );
+            const obligation = Number( row.Total_Obligation || 0 );
+            const paid = Number( row.Paid_Amount || 0 );
+            const outstanding = Number( row.Outstanding_Amount || 0 );
+            const status = row.Status || "";
+            const paymentType = row.Payment_Type || "";
+
+            return `
+              <tr>
+                <td> ${escapeHtml(purchaseDate)} </td>
+                <td> ${escapeHtml(purchaseId)} </td>
+                <td> ${escapeHtml(assetName)} </td>
+                <td> ${escapeHtml(paymentType)} </td>
+                <td class="right"> Rp ${rupiah(cost)} </td>
+                <td class="right"> Rp ${rupiah(interest)} </td>
+                <td class="right"> Rp ${rupiah(obligation)} </td>
+                <td class="right"> Rp ${rupiah(paid)} </td>
+                <td class="right"> Rp ${rupiah(outstanding)} </td>
+                <td> ${escapeHtml(status)} </td>
+              </tr>
+            `;
+          })
+          .join("")
+      : `
+          <tr>
+            <td colspan="10"
+              class="empty" >
+              No asset purchase data
+            </td>
+          </tr>
+        `;
+  
+  // DEPRECIATION HTML
+  const depreciationHistoryRows =
+    filteredDepreciation.length
+      ? filteredDepreciation
+          .map(row => {
+            const period = row.Period || "";
+            const assetId = row.Asset_ID || "";
+            const assetName = row.Asset_Name || "";
+            const rowBranch = row.BranchId || "";
+            const depreciationAmount = Number( row.Depreciation_Amount || 0 );
+            const before = Number( row.Book_Value_Before || 0 );
+            const after = Number( row.Book_Value_After || 0 );
+            const createdAt = row.Created_At || "";
+
+            return `
+              <tr>
+                <td> ${escapeHtml(period)} </td>
+                <td> ${escapeHtml(assetId)} </td>
+                <td> ${escapeHtml(assetName)} </td>
+                <td> ${escapeHtml(rowBranch)} </td>
+                <td class="right"> Rp ${rupiah(depreciationAmount)} </td>
+                <td class="right"> Rp ${rupiah(before)} </td>
+                <td class="right"> Rp ${rupiah(after)} </td>
+                <td> ${escapeHtml(createdAt)} </td>
+              </tr>
+            `;
+          })
+          .join("")
+      : `
+          <tr>
+            <td colspan="8"
+              class="empty" >
+                No depreciation data
+            </td>
+          </tr>
+        `;
+
+  // FILENAME
+  const filename = `Asset Report - ${branchName} (${start || "-"} - ${end || "-"}).pdf`;
+  
+  // HTML REPORT
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>
+          ${escapeHtml(filename)}
+        </title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #0B0F14;
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 40px 20px;
+          }
+
+          .export-toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+          }
+
+          .export-toolbar button {
+            border: 1px solid
+              rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 45px;
+            border-radius: 4px;
+            box-shadow:
+              20px 60px
+              rgba(0,0,0,.45);
+          }
+
+          .header {
+            text-align: center;
+            margin-bottom: 15px;
+          }
+
+          .logo {
+            width: 170px;
+            height: auto;
+            max-height: 90px;
+            object-fit: contain;
+            margin-bottom: 8px;
+          }
+
+          .title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 8px;
+          }
+
+          .subtitle {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 3px;
+          }
+
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 30px 0;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 22px;
+            background: #fafafa;
+            text-align: center;
+          }
+
+          .kpi-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 12px;
+          }
+
+          .kpi-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 20px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px 0;
+            font-size: 16px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+            margin-top: 10px;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 9px;
+            text-align: left;
+            font-weight: bold;
+          }
+
+          td {
+            padding: 9px;
+            border-bottom:
+              1px solid #eee;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          .page-break {
+            page-break-before: always;
+          }
+
+          @media print {
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .export-toolbar {
+              display: none;
+            }
+
+            .report {
+              max-width: none;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 25px;
+            }
+          }
+        </style>
+      </head>
     
+      <body>
+        <div class="export-toolbar">
+          <div>
+            Asset Report
+          </div>
 
+          <button onclick="window.print()" >
+            Download / Print PDF
+          </button>
+        </div>
+
+        <div class="report">
+          <div class="header">
+            ${
+              logoSrc
+                ? `
+                  <img src="${logoSrc}"
+                    class="logo"
+                    alt="Sistem POS" />
+                `
+                : ""
+            }
+            <div class="title">
+              Asset Report
+            </div>
+
+            <div class="subtitle">
+              <b>Periode:</b>
+              ${escapeHtml(start || "-")}
+              -
+              ${escapeHtml(end || "-")}
+            </div>
+
+            <div class="subtitle">
+              <b>Branch:</b>
+              ${escapeHtml(branchName)}
+            </div>
+          </div>
+
+          <!-- ================= KPI ================= -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">
+                TOTAL ASSETS
+              </div>
+
+              <div class="kpi-value">
+                ${totalAssets}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">
+                PURCHASE COST
+              </div>
+
+              <div class="kpi-value">
+                Rp ${rupiah(purchaseCost)}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">
+                ACCUMULATED DEPRECIATION
+              </div>
+
+              <div class="kpi-value">
+                Rp ${rupiah(accumulatedDepreciation)}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">
+                CURRENT BOOK VALUE
+              </div>
+
+              <div class="kpi-value">
+                Rp ${rupiah(bookValue)}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">
+                DEPRECIATION / MONTH
+              </div>
+              
+              <div class="kpi-value">
+                Rp ${rupiah(monthlyDepreciation)}
+              </div>
+            </div>
+          </div>
+          <!-- ================= ASSET MANAGEMENT ================= -->
+          <div class="card">
+            <h3>
+              Asset Management
+            </h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Asset ID</th>
+                  <th>Asset Name</th>
+                  <th>Branch</th>
+                  <th class="right"> Purchase Cost </th>
+                  <th class="right"> Accumulated Dep. </th>
+                  <th class="right"> Book Value </th>
+                  <th>Status</th>
+                  <th class="right"> Life (Months) </th>
+                  <th> Method </th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${assetManagementRows}
+              </tbody>
+            </table>
+          </div>
+          <!-- ================= PURCHASE ================= -->
+          <div class="page-break"></div>
+
+          <div class="card">
+            <h3>
+              Asset Purchase & Financing
+            </h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Purchase ID</th>
+                  <th>Asset Name</th>
+                  <th>Payment</th>
+                  <th class="right"> Purchase Cost </th>
+                  <th class="right"> Interest </th>
+                  <th class="right"> Total Obligation </th>
+                  <th class="right"> Paid </th>
+                  <th class="right"> Outstanding </th>
+                  <th> Status </th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                ${assetPurchaseRows}
+              </tbody>
+            </table>
+          </div>
+          <!-- ================= DEPRECIATION ================= -->
+          <div class="page-break"></div>
+          
+          <div class="card">
+            <h3>
+              Depreciation History
+            </h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Asset ID</th>
+                  <th>Asset Name</th>
+                  <th>Branch</th>
+                  <th class="right"> Depreciation </th>
+                  <th class="right"> Book Value Before </th>
+                  <th class="right"> Book Value After </th>
+                  <th> Created At </th>
+                </tr>
+              </thead>
+              
+              <tbody>
+                ${depreciationHistoryRows}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="footer">
+            Generated by Sistem POS
+            •
+            ${new Date().toLocaleString("id-ID")}
+          </div>
+        </div>
+      </body>
+    </html>
+  `;
+  // RETURN HTML
+  res.setHeader(
+    "Content-Type",
+    "text/html; charset=utf-8"
+  );
+  return res
+    .status(200)
+    .send(html);
+}
+    
     // =====================================================
     // UNKNOWN TYPE
     // =====================================================
