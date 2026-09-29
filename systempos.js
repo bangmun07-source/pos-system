@@ -24906,7 +24906,6 @@ async function loadAccountingReports() {
       JSON.stringify(currentFilter)
   ) {
     renderTrialBalance( state.accountingReportsData.trialBalance );
-    renderProfitLoss( state.accountingReportsData.profitLoss );
 		const calculatedProfitLoss = renderProfitLoss( state.accountingReportsData.profitLoss );
     renderBalanceSheet(
 		  state.accountingReportsData.balanceSheet,
@@ -24952,11 +24951,351 @@ async function initAccountingReports() {
   try {
     initAccountingReportsDates();
     initAccountingReportsFilters();
+		
+		const trialBalanceExportButton = document.getElementById("trialBalanceExportButton");
+    const profitLossExportButton = document.getElementById("profitLossExportButton");
+    const balanceSheetExportButton = document.getElementById("balanceSheetExportButton");
+
+    if (trialBalanceExportButton) { trialBalanceExportButton.onclick = exportTrialBalanceCSV; }
+    if (profitLossExportButton) { profitLossExportButton.onclick = exportProfitLossCSV; }
+    if (balanceSheetExportButton) { balanceSheetExportButton.onclick = exportBalanceSheetCSV; }
+		
     await populateAccountingReportsBranches();
     await loadAccountingReports();
     accountingReportsInitialized = true;
   } catch (error) { }
 }
+
+function getAccountingReportExportDate() {
+  return new Date()
+    .toISOString()
+    .slice(0, 10);
+}
+
+function downloadAccountingCSV(filename, headers, rows) {
+  const csv = [headers, ...rows]
+    .map(row =>
+      row.map(value =>
+        `"${String(value ?? "").replace(/"/g, '""')}"`
+      ).join(",")
+    )
+    .join("\n");
+
+  const blob = new Blob(
+    ["\uFEFF" + csv],
+    { type: "text/csv;charset=utf-8;" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function exportTrialBalanceCSV() {
+  const rows = state.accountingReportsData?.trialBalance || [];
+  if (!rows.length) {
+    alert("Tidak ada data Trial Balance untuk diekspor."); return; }
+  const headers = [
+    "Account Code",
+    "Account Name",
+    "Account Type",
+    "Debit",
+    "Credit"
+  ];
+
+  const csvRows = rows.map(row => [
+    row.accountCode || "",
+    row.accountName || "",
+    row.accountType || "",
+    Number(row.debit || 0),
+    Number(row.credit || 0)
+  ]);
+
+  const totalDebit = rows.reduce( (sum, row) => sum + Number(row.debit || 0), 0 );
+  const totalCredit = rows.reduce( (sum, row) => sum + Number(row.credit || 0), 0 );
+
+  csvRows.push([
+    "",
+    "",
+    "TOTAL",
+    totalDebit,
+    totalCredit
+  ]);
+
+  downloadAccountingCSV( `trial-balance-${getAccountingReportExportDate()}.csv`, headers, csvRows );
+}
+
+function exportProfitLossCSV() {
+  const data = state.accountingReportsData?.profitLoss || [];
+
+  if (!data.length) {
+    alert("Tidak ada data Profit & Loss untuk diekspor.");
+    return; }
+
+  let revenue = 0;
+  let cogs = 0;
+  let operatingExpenses = 0;
+  let otherExpenses = 0;
+
+  const rows = [];
+
+  data.forEach(row => {
+    const amount = Number(row.amount || 0);
+    if (!amount) return;
+
+    const accountType = row.accountType;
+    const accountCode = String(row.accountCode || "");
+    const accountName = row.accountName || "";
+
+    if (accountType === "REVENUE") {
+      revenue += amount;
+      rows.push([
+        "Revenue",
+        accountCode,
+        accountName,
+        amount
+      ]);
+      return;
+    }
+
+    if (accountType === "COGS") {
+      cogs += amount;
+      rows.push([
+        "Cost of Goods Sold",
+        accountCode,
+        accountName,
+        amount
+      ]);
+      return;
+    }
+
+    if (accountType === "EXPENSE") {
+      if (
+        accountCode === "6100" ||
+        accountCode.startsWith("61")
+      ) {
+        operatingExpenses += amount;
+        rows.push([
+          "Operating Expenses",
+          accountCode,
+          accountName,
+          amount
+        ]);
+      } else {
+        otherExpenses += amount;
+        rows.push([
+          "Other Expenses",
+          accountCode,
+          accountName,
+          amount
+        ]);
+      }
+    }
+  });
+
+  const grossProfit = revenue - cogs;
+  const totalExpenses = operatingExpenses + otherExpenses;
+  const netProfit = grossProfit - totalExpenses;
+
+  rows.push(
+    ["", "", "Total Revenue", revenue],
+    ["", "", "Total COGS", cogs],
+    ["", "", "Gross Profit", grossProfit],
+    ["", "", "Total Operating Expenses", operatingExpenses],
+    ["", "", "Total Other Expenses", otherExpenses],
+    ["", "", "Total Expenses", totalExpenses],
+    ["", "", "Net Profit", netProfit]
+  );
+
+  const headers = [
+    "Category",
+    "Account Code",
+    "Account Name",
+    "Amount"
+  ];
+  downloadAccountingCSV( `profit-loss-${getAccountingReportExportDate()}.csv`, headers, rows );
+}
+
+function exportBalanceSheetCSV() {
+  const result = state.accountingReportsData?.balanceSheet || {};
+  const profitLoss = state.accountingReportsData?.profitLoss || [];
+  const accounts = Array.isArray(result?.accounts)
+    ? result.accounts
+    : [];
+
+  if (!accounts.length) {
+    alert("Tidak ada data Balance Sheet untuk diekspor.");
+    return; }
+
+  const calculatedProfitLoss = renderProfitLoss(profitLoss);
+  const currentProfit = Number( calculatedProfitLoss?.netProfit ?? result?.currentProfit ?? 0 );
+  const currentAssets = [];
+  const nonCurrentAssets = [];
+  const currentLiabilities = [];
+  const nonCurrentLiabilities = [];
+  const equityAccounts = [];
+
+  accounts.forEach(account => {
+    const balance = Number(account.balance || 0);
+
+    if (balance === 0) return;
+
+    switch (account.balanceSheetCategory) {
+      case "CURRENT_ASSET":
+        currentAssets.push(account);
+        break;
+      case "NON_CURRENT_ASSET":
+        nonCurrentAssets.push(account);
+        break;
+      case "CURRENT_LIABILITY":
+        currentLiabilities.push(account);
+        break;
+      case "NON_CURRENT_LIABILITY":
+        nonCurrentLiabilities.push(account);
+        break;
+      case "EQUITY":
+        equityAccounts.push(account);
+        break;
+    }
+  });
+
+  const totalCurrentAssets = sumBalance(currentAssets);
+  const totalNonCurrentAssets =
+    nonCurrentAssets.reduce((sum, account) => {
+      const balance = Number(account.balance || 0);
+
+      if (
+        account.balanceSheetCategory ===
+          "NON_CURRENT_ASSET" &&
+        account.normalBalance === "CREDIT"
+      ) {
+        return sum - balance;
+      }
+      return sum + balance;
+    }, 0);
+
+  const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
+  const totalCurrentLiabilities = sumBalance(currentLiabilities);
+  const totalNonCurrentLiabilities = sumBalance(nonCurrentLiabilities);
+  const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
+  const totalEquityAccounts =
+    equityAccounts.reduce((sum, account) => {
+      const balance = Number(account.balance || 0);
+
+      if (account.normalBalance === "DEBIT") {
+        return sum - balance;
+      }
+      return sum + balance;
+    }, 0);
+
+  const totalEquity = totalEquityAccounts + currentProfit;
+  const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
+  const balanceCheck = totalAssets - totalLiabilitiesAndEquity;
+  const headers = [
+    "Section",
+    "Account",
+    "Debit",
+    "Credit"
+  ];
+
+  const rows = [];
+
+  function addAccounts(section, accounts) {
+    accounts.forEach(account => {
+      const balance = Number(account.balance || 0);
+
+      let debit = 0;
+      let credit = 0;
+
+      const isContraAsset =
+        account.balanceSheetCategory ===
+          "NON_CURRENT_ASSET" &&
+        account.normalBalance === "CREDIT";
+
+      if (isContraAsset) {
+        if (balance > 0) {
+          credit = balance;
+        } else if (balance < 0) {
+          debit = Math.abs(balance);
+        }
+
+      } else if (account.normalBalance === "DEBIT") {
+        if (balance >= 0) {
+          debit = balance;
+        } else {
+          credit = Math.abs(balance);
+        }
+
+      } else {
+        if (balance >= 0) {
+          credit = balance;
+        } else {
+          debit = Math.abs(balance);
+        }
+      }
+
+      rows.push([
+        section,
+        account.accountName || "-",
+        debit,
+        credit
+      ]);
+    });
+  }
+
+  addAccounts("Current Assets", currentAssets);
+  addAccounts("Non-Current Assets", nonCurrentAssets);
+  addAccounts("Current Liabilities", currentLiabilities);
+  addAccounts("Non-Current Liabilities", nonCurrentLiabilities);
+  addAccounts("Equity", equityAccounts);
+
+  rows.push(
+    ["", "Total Current Assets", totalCurrentAssets, ""],
+    ["", "Total Non-Current Assets", totalNonCurrentAssets, ""],
+    ["", "TOTAL ASSETS", totalAssets, ""],
+
+    ["", "Total Current Liabilities", "", totalCurrentLiabilities],
+    ["", "Total Non-Current Liabilities", "", totalNonCurrentLiabilities],
+    ["", "TOTAL LIABILITIES", "", totalLiabilities]
+  );
+
+  if (currentProfit < 0) {
+    rows.push([
+      "Equity",
+      "Current Year Earnings",
+      Math.abs(currentProfit),
+      ""
+    ]);
+  } else {
+    rows.push([
+      "Equity",
+      "Current Year Earnings",
+      "",
+      currentProfit
+    ]);
+  }
+
+  rows.push(
+    ["", "Total Equity", "", totalEquity],
+    ["", "NET EQUITY", "", totalEquity],
+    [
+      "",
+      "TOTAL LIABILITIES + EQUITY",
+      "",
+      totalLiabilitiesAndEquity
+    ],
+    ["", "Balance Check", "", balanceCheck]
+  );
+  downloadAccountingCSV( `balance-sheet-${getAccountingReportExportDate()}.csv`, headers, rows );
+}
+
+
 
 /* =========================================================
    ACCOUNTING - DEBT & LIABILITIES
