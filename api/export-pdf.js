@@ -550,30 +550,30 @@ const logoSrc =
           
                   .kpi-grid {          
                     display: grid;          
-                    grid-template-columns: repeat(2, 1fr);          
+                    grid-template-columns: repeat(5, 1fr);          
                     gap: 16px;          
                     margin: 30px 0;          
                   }
           
-                  .kpi-card {          
-                    border: 1px solid #e5e5e5;          
-                    border-radius: 14px;          
-                    padding: 22px;          
-                    background: #fafafa;          
-                    text-align: center;          
+                  .kpi-card {
+                    border: 1px solid #e5e5e5;
+                    border-radius: 14px;
+                    padding: 16px 10px;
+                    background: #fafafa;
+                    text-align: center;
                   }
-          
-                  .kpi-title {          
-                    font-size: 11px;          
-                    color: #666;          
-                    font-weight: bold;          
-                    margin-bottom: 12px;          
+                  
+                  .kpi-title {
+                    font-size: 10px;
+                    color: #666;
+                    font-weight: bold;
+                    margin-bottom: 10px;
                   }
-          
-                  .kpi-value {          
-                    font-size: 22px;          
-                    font-weight: bold;          
-                    color: #222;          
+                  
+                  .kpi-value {
+                    font-size: 18px;
+                    font-weight: bold;
+                    color: #222;
                   }
           
                   .card {          
