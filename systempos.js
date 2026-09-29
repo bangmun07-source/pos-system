@@ -21198,7 +21198,7 @@ function escapeAssetHTML(value) {
 }
 
 /* === INITIALIZE === */
-function initAssetPage() {
+async function initAssetPage() {
   assetCurrentPage = 1;
   depreciationCurrentPage = 1;
   initAssetPageEvents();
