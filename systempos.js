@@ -25878,6 +25878,7 @@ function exportBalanceSheetXLSX() {
     ["B", "C"]
   );
 
+	// RIGHT ALIGNMENT FOR DEBIT / CREDIT
 	for (let row = 6; row <= rows.length; row++) {
 	  ["B", "C"].forEach(column => {
 	    const cell = ws[`${column}${row}`];
