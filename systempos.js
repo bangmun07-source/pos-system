@@ -19658,7 +19658,7 @@ async function loadAssetPage() {
       } = await supabaseClient.rpc(
         "get_asset_depreciation_history",
         {
-          p_branch_id: branchId,
+          p_branch_id: null,
           p_session_id: sessionId
         }
       );
