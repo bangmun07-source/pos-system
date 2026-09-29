@@ -24963,7 +24963,12 @@ async function initAccountingReports() {
     await populateAccountingReportsBranches();
     await loadAccountingReports();
     accountingReportsInitialized = true;
-  } catch (error) { }
+  } catch (error) {
+		console.error(
+      "Accounting Reports init error:",
+      error
+    );
+	}
 }
 
 function getAccountingReportExportDate() {
@@ -24972,55 +24977,136 @@ function getAccountingReportExportDate() {
     .slice(0, 10);
 }
 
-function downloadAccountingCSV(filename, headers, rows) {
-  const csv = [headers, ...rows]
-    .map(row =>
-      row.map(value =>
-        `"${String(value ?? "").replace(/"/g, '""')}"`
-      ).join(",")
-    )
-    .join("\n");
+function getAccountingReportPeriod() {
+  const fromDate = document.getElementById( "accountingReportsPeriodFrom" )?.value || "";
+  const toDate = document.getElementById( "accountingReportsPeriodTo" )?.value || "";
 
-  const blob = new Blob(
-    ["\uFEFF" + csv],
-    { type: "text/csv;charset=utf-8;" }
-  );
+  if (fromDate && toDate) { return `${fromDate} to ${toDate}`; }
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
+  if (fromDate) return fromDate;
+  if (toDate) return toDate;
 
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  return "ALL";
 }
 
-function exportTrialBalanceCSV() {
-  const rows = state.accountingReportsData?.trialBalance || [];
-  if (!rows.length) {
-    alert("Tidak ada data Trial Balance untuk diekspor."); return; }
-  const headers = [
-    "Account Code",
-    "Account Name",
-    "Account Type",
-    "Debit",
-    "Credit"
+
+function getAccountingReportBranch() {
+  return (
+    document.getElementById(
+      "accountingReportsBranchFilter"
+    )?.value || "ALL"
+  );
+}
+
+function accountingNumberFormat() {
+  return '#,##0;(#,##0)';
+}
+
+function createAccountingWorkbook( sheetName, rows, merges, columnWidths ) {
+  const ws =  XLSX.utils.aoa_to_sheet(rows);
+  ws["!merges"] = merges.map(range => XLSX.utils.decode_range(range) );
+  ws["!cols"] = columnWidths.map(width => ({ wch: width }));
+
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet( wb, ws, sheetName );
+  return { wb, ws };
+}
+
+
+function setExcelStyle(ws, cell, style) {
+  if (!ws[cell]) return;
+  ws[cell].s = style;
+}
+
+function formatAccountingNumbers(
+  ws, startRow, endRow, columns
+) {
+  for (
+    let row = startRow;
+    row <= endRow;
+    row++
+  ) {
+    columns.forEach(column => {
+      const cell = ws[`${column}${row}`];
+
+      if (!cell) return;
+
+      cell.t = "n";
+      cell.s = {
+				numFmt: accountingNumberFormat(),
+				alignment: { horizontal: "right" }
+      };
+    });
+  }
+}
+
+function exportTrialBalanceXLSX() {
+  const data = state.accountingReportsData?.trialBalance || [];
+
+  if (!data.length) {
+    alert( "Tidak ada data Trial Balance untuk diekspor." );
+    return; }
+	
+  const rows = [
+    // TITLE
+    [
+      "TRIAL BALANCE",
+      "",
+      "",
+      "",
+      ""
+    ],
+    // PERIOD
+    [
+      `Period: ${getAccountingReportPeriod()}`,
+      "",
+      "",
+      "",
+      ""
+    ],
+    // BRANCH
+    [
+      `Branch: ${getAccountingReportBranch()}`,
+      "",
+      "",
+      "",
+      ""
+    ],
+    // SPACER
+    [
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    // HEADER
+    [
+      "Account Code",
+      "Account Name",
+      "Account Type",
+      "Debit",
+      "Credit"
+    ]
   ];
 
-  const csvRows = rows.map(row => [
-    row.accountCode || "",
-    row.accountName || "",
-    row.accountType || "",
-    Number(row.debit || 0),
-    Number(row.credit || 0)
-  ]);
+  // ACCOUNT DATA
+  data.forEach(row => {
+    rows.push([
+      row.accountCode || "",
+      row.accountName || "",
+      row.accountType || "",
+      Number(row.debit || 0),
+      Number(row.credit || 0)
+    ]);
+  });
 
-  const totalDebit = rows.reduce( (sum, row) => sum + Number(row.debit || 0), 0 );
-  const totalCredit = rows.reduce( (sum, row) => sum + Number(row.credit || 0), 0 );
-
-  csvRows.push([
+  // TOTAL
+  const totalDebit = data.reduce( (sum, row) => sum + Number(row.debit || 0), 0 );
+  const totalCredit = data.reduce( (sum, row) => sum + Number(row.credit || 0), 0 );
+	
+  rows.push([
     "",
     "",
     "TOTAL",
@@ -25028,68 +25114,183 @@ function exportTrialBalanceCSV() {
     totalCredit
   ]);
 
-  downloadAccountingCSV( `trial-balance-${getAccountingReportExportDate()}.csv`, headers, csvRows );
+  // CREATE WORKBOOK
+  const { wb, ws
+  } = createAccountingWorkbook(
+    "Trial Balance",
+    rows,
+    [
+      "A1:E1",
+      "A2:E2",
+      "A3:E3"
+    ],
+    [
+      18, // Account Code
+      42, // Account Name
+      20, // Account Type
+      20, // Debit
+      20  // Credit
+    ]
+  );
+
+  // TITLE
+  setExcelStyle(ws, "A1", {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  });
+  // PERIOD
+  setExcelStyle(ws, "A2", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+
+
+  // BRANCH
+  setExcelStyle(ws, "A3", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+	
+  // TABLE HEADER
+  [
+    "A5",
+    "B5",
+    "C5",
+    "D5",
+    "E5"
+  ].forEach(cell => {
+    setExcelStyle(ws, cell, {
+      font: {
+        bold: true
+      }
+    });
+  });
+
+  // NUMBER FORMAT
+  formatAccountingNumbers(
+    ws,
+    6,
+    rows.length,
+    [
+      "D",
+      "E"
+    ]
+  );
+
+  // TOTAL ROW
+  const totalRow = rows.length;
+  [
+    "C",
+    "D",
+    "E"
+  ].forEach(column => {
+    setExcelStyle(
+      ws,
+      `${column}${totalRow}`,
+      {
+        font: { bold: true },
+        numFmt: accountingNumberFormat(),
+        alignment: { horizontal: "right" }
+      }
+    );
+  });
+
+  setExcelStyle(
+    ws,
+    `C${totalRow}`,
+    {
+      font: { bold: true },
+      alignment: { horizontal: "left" }
+    }
+  );
+	
+  // DOWNLOAD
+  XLSX.writeFile( wb, `trial-balance-${getAccountingReportExportDate()}.xlsx` );
 }
 
-function exportProfitLossCSV() {
-  const data = state.accountingReportsData?.profitLoss || [];
+function exportProfitLossXLSX() {
+  const data =
+    state.accountingReportsData?.profitLoss || [];
 
   if (!data.length) {
-    alert("Tidak ada data Profit & Loss untuk diekspor.");
-    return; }
+    alert(
+      "Tidak ada data Profit & Loss untuk diekspor."
+    );
+    return;
+  }
 
   let revenue = 0;
   let cogs = 0;
   let operatingExpenses = 0;
   let otherExpenses = 0;
 
-  const rows = [];
+  const detail = [];
 
   data.forEach(row => {
-    const amount = Number(row.amount || 0);
+
+    const amount =
+      Number(row.amount || 0);
+
     if (!amount) return;
 
-    const accountType = row.accountType;
-    const accountCode = String(row.accountCode || "");
-    const accountName = row.accountName || "";
+    const accountType =
+      row.accountType;
+
+    const accountCode =
+      String(row.accountCode || "");
+
+    const accountName =
+      row.accountName || "";
 
     if (accountType === "REVENUE") {
+
       revenue += amount;
-      rows.push([
+
+      detail.push([
         "Revenue",
         accountCode,
         accountName,
         amount
       ]);
+
       return;
     }
 
     if (accountType === "COGS") {
+
       cogs += amount;
-      rows.push([
+
+      detail.push([
         "Cost of Goods Sold",
         accountCode,
         accountName,
         amount
       ]);
+
       return;
     }
 
     if (accountType === "EXPENSE") {
+
       if (
         accountCode === "6100" ||
         accountCode.startsWith("61")
       ) {
+
         operatingExpenses += amount;
-        rows.push([
+
+        detail.push([
           "Operating Expenses",
           accountCode,
           accountName,
           amount
         ]);
+
       } else {
+
         otherExpenses += amount;
-        rows.push([
+
+        detail.push([
           "Other Expenses",
           accountCode,
           accountName,
@@ -25099,40 +25300,228 @@ function exportProfitLossCSV() {
     }
   });
 
-  const grossProfit = revenue - cogs;
-  const totalExpenses = operatingExpenses + otherExpenses;
-  const netProfit = grossProfit - totalExpenses;
+  const grossProfit =
+    revenue - cogs;
 
-  rows.push(
-    ["", "", "Total Revenue", revenue],
-    ["", "", "Total COGS", cogs],
-    ["", "", "Gross Profit", grossProfit],
-    ["", "", "Total Operating Expenses", operatingExpenses],
-    ["", "", "Total Other Expenses", otherExpenses],
-    ["", "", "Total Expenses", totalExpenses],
-    ["", "", "Net Profit", netProfit]
+  const totalExpenses =
+    operatingExpenses +
+    otherExpenses;
+
+  const netProfit =
+    grossProfit -
+    totalExpenses;
+
+
+  const rows = [
+
+    // TITLE
+    ["PROFIT & LOSS", "", "", ""],
+
+    // PERIOD
+    [
+      `Period: ${getAccountingReportPeriod()}`,
+      "",
+      "",
+      ""
+    ],
+
+    // BRANCH
+    [
+      `Branch: ${getAccountingReportBranch()}`,
+      "",
+      "",
+      ""
+    ],
+
+    // SPACER
+    ["", "", "", ""],
+
+    // HEADER
+    [
+      "Category",
+      "Account Code",
+      "Account Name",
+      "Amount"
+    ]
+  ];
+
+
+  function addSection( category, totalLabel, total ) {
+    const items = detail.filter( row => row[0] === category );
+
+    if (!items.length) return;
+		
+    items.forEach(item => {
+      rows.push(item);
+    });
+    rows.push([
+      "",
+      "",
+      totalLabel,
+      total
+    ]);
+    rows.push([
+      "",
+      "",
+      "",
+      ""
+    ]);
+  }
+
+  addSection(
+    "Revenue",
+    "Total Revenue",
+    revenue
+  );
+  addSection(
+    "Cost of Goods Sold",
+    "Total COGS",
+    cogs
   );
 
-  const headers = [
-    "Category",
-    "Account Code",
-    "Account Name",
-    "Amount"
-  ];
-  downloadAccountingCSV( `profit-loss-${getAccountingReportExportDate()}.csv`, headers, rows );
+  rows.push([
+    "",
+    "",
+    "Gross Profit",
+    grossProfit
+  ]);
+  rows.push([
+    "",
+    "",
+    "",
+    ""
+  ]);
+
+  addSection(
+    "Operating Expenses",
+    "Total Operating Expenses",
+    operatingExpenses
+  );
+  addSection(
+    "Other Expenses",
+    "Total Other Expenses",
+    otherExpenses
+  );
+
+  rows.push([
+    "",
+    "",
+    "Total Expenses",
+    totalExpenses
+  ]);
+  rows.push([
+    "",
+    "",
+    "Net Profit",
+    netProfit
+  ]);
+
+  const { wb, ws
+  } = createAccountingWorkbook(
+    "Profit & Loss",
+    rows,
+
+    [
+      "A1:D1",
+      "A2:D2",
+      "A3:D3"
+    ],
+
+    [
+      24,
+      18,
+      42,
+      20
+    ]
+  );
+
+  // TITLE
+  setExcelStyle(ws, "A1", {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  });
+  setExcelStyle(ws, "A2", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+  setExcelStyle(ws, "A3", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+
+  // TABLE HEADER
+  ["A5", "B5", "C5", "D5"]
+    .forEach(cell => {
+      setExcelStyle(ws, cell, {
+        font: {
+          bold: true
+        }
+      });
+    });
+
+  // NUMBER FORMAT
+  formatAccountingNumbers(
+    ws,
+    6,
+    rows.length,
+    ["D"]
+  );
+	
+  // TOTALS
+  for (
+    let row = 6;
+    row <= rows.length;
+    row++
+  ) {
+    const label = ws[`C${row}`]?.v;
+
+    if (
+      [
+        "Total Revenue",
+        "Total COGS",
+        "Gross Profit",
+        "Total Operating Expenses",
+        "Total Other Expenses",
+        "Total Expenses",
+        "Net Profit"
+      ].includes(label)
+    ) {
+      setExcelStyle(
+        ws,
+        `C${row}`,
+        {
+          font: { bold: true }
+        }
+      );
+
+      setExcelStyle(
+        ws,
+        `D${row}`,
+        {
+          font: { bold: true },
+          numFmt: accountingNumberFormat(),
+          alignment: { horizontal: "right" }
+        }
+      );
+    }
+  }
+  XLSX.writeFile(
+    wb,
+    `profit-loss-${getAccountingReportExportDate()}.xlsx`
+  );
 }
 
-function exportBalanceSheetCSV() {
+function exportBalanceSheetXLSX() {
   const result = state.accountingReportsData?.balanceSheet || {};
   const profitLoss = state.accountingReportsData?.profitLoss || [];
   const accounts = Array.isArray(result?.accounts)
-    ? result.accounts
-    : [];
+		? result.accounts
+		: [];
 
   if (!accounts.length) {
-    alert("Tidak ada data Balance Sheet untuk diekspor.");
+    alert( "Tidak ada data Balance Sheet untuk diekspor." );
     return; }
-
+	
   const calculatedProfitLoss = renderProfitLoss(profitLoss);
   const currentProfit = Number( calculatedProfitLoss?.netProfit ?? result?.currentProfit ?? 0 );
   const currentAssets = [];
@@ -25140,13 +25529,13 @@ function exportBalanceSheetCSV() {
   const currentLiabilities = [];
   const nonCurrentLiabilities = [];
   const equityAccounts = [];
-
+	
   accounts.forEach(account => {
     const balance = Number(account.balance || 0);
 
     if (balance === 0) return;
-
-    switch (account.balanceSheetCategory) {
+		
+    switch ( account.balanceSheetCategory ) {
       case "CURRENT_ASSET":
         currentAssets.push(account);
         break;
@@ -25164,68 +25553,147 @@ function exportBalanceSheetCSV() {
         break;
     }
   });
-
+	
   const totalCurrentAssets = sumBalance(currentAssets);
   const totalNonCurrentAssets =
-    nonCurrentAssets.reduce((sum, account) => {
-      const balance = Number(account.balance || 0);
-
-      if (
-        account.balanceSheetCategory ===
-          "NON_CURRENT_ASSET" &&
-        account.normalBalance === "CREDIT"
-      ) {
-        return sum - balance;
-      }
-      return sum + balance;
-    }, 0);
-
+    nonCurrentAssets.reduce(
+      (sum, account) => {
+        const balance = Number(account.balance || 0);
+        if (
+          account.normalBalance ===
+          "CREDIT"
+        ) {
+          return sum - balance;
+        }
+        return sum + balance;
+      },
+      0
+    );
   const totalAssets = totalCurrentAssets + totalNonCurrentAssets;
   const totalCurrentLiabilities = sumBalance(currentLiabilities);
-  const totalNonCurrentLiabilities = sumBalance(nonCurrentLiabilities);
+  const totalNonCurrentLiabilities = sumBalance( nonCurrentLiabilities );
   const totalLiabilities = totalCurrentLiabilities + totalNonCurrentLiabilities;
   const totalEquityAccounts =
-    equityAccounts.reduce((sum, account) => {
-      const balance = Number(account.balance || 0);
-
-      if (account.normalBalance === "DEBIT") {
-        return sum - balance;
-      }
-      return sum + balance;
-    }, 0);
-
+    equityAccounts.reduce(
+      (sum, account) => {
+        const balance = Number(account.balance || 0);
+        if (
+          account.normalBalance ===
+          "DEBIT"
+        ) {
+          return sum - balance;
+        }
+        return sum + balance;
+      },
+      0
+    );
   const totalEquity = totalEquityAccounts + currentProfit;
   const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
   const balanceCheck = totalAssets - totalLiabilitiesAndEquity;
-  const headers = [
-    "Section",
-    "Account",
-    "Debit",
-    "Credit"
+  const rows = [
+    ["BALANCE SHEET", "", ""],
+    [
+      `Period: ${getAccountingReportPeriod()}`,
+      "",
+      ""
+    ],
+    [
+      `Branch: ${getAccountingReportBranch()}`,
+      "",
+      ""
+    ],
+    ["", "", ""],
+    ["ASSET", "Debit", "Credit"],
+    ["Current Assets", "", ""]
   ];
 
-  const rows = [];
+  // ASSETS
+  function addAssetAccounts(list) {
+    list.forEach(account => {
 
-  function addAccounts(section, accounts) {
-    accounts.forEach(account => {
       const balance = Number(account.balance || 0);
 
       let debit = 0;
       let credit = 0;
 
-      const isContraAsset =
-        account.balanceSheetCategory ===
-          "NON_CURRENT_ASSET" &&
-        account.normalBalance === "CREDIT";
+      const isContraAsset = account.normalBalance === "CREDIT";
 
       if (isContraAsset) {
         if (balance > 0) {
           credit = balance;
-        } else if (balance < 0) {
-          debit = Math.abs(balance);
         }
 
-      } else if (account.normalBalance === "DEBIT") {
+      } else {
+        if (balance >= 0) {
+          debit = balance;
+        } else {
+          credit = Math.abs(balance);
+        }
+      }
+      rows.push([
+        account.accountName || "-",
+        debit,
+        credit
+      ]);
+    });
+  }
+	
+  addAssetAccounts( currentAssets );
+
+  rows.push([
+    "Total Current Assets",
+    totalCurrentAssets,
+    ""
+  ]);
+  rows.push([
+    "",
+    "",
+    ""
+  ]);
+  rows.push([
+    "Non-Current Assets",
+    "",
+    ""
+  ]);
+	
+  addAssetAccounts( nonCurrentAssets );
+	
+  rows.push([
+    "Total Non-Current Assets",
+    totalNonCurrentAssets,
+    ""
+  ]);
+  rows.push([
+    "TOTAL ASSETS",
+    totalAssets,
+    ""
+  ]);
+  rows.push([
+    "",
+    "",
+    ""
+  ]);
+  rows.push([
+    "LIABILITIES",
+    "",
+    ""
+  ]);
+  rows.push([
+    "Current Liabilities",
+    "",
+    ""
+  ]);
+
+  function addLiabilityAccounts( list ) {
+    list.forEach(account => {
+      const balance = Number(account.balance || 0);
+      let debit = 0;
+      let credit = 0;
+
+      if (
+        account.normalBalance ===
+        "DEBIT"
+      ) {
         if (balance >= 0) {
           debit = balance;
         } else {
@@ -25239,9 +25707,7 @@ function exportBalanceSheetCSV() {
           debit = Math.abs(balance);
         }
       }
-
       rows.push([
-        section,
         account.accountName || "-",
         debit,
         credit
@@ -25249,50 +25715,220 @@ function exportBalanceSheetCSV() {
     });
   }
 
-  addAccounts("Current Assets", currentAssets);
-  addAccounts("Non-Current Assets", nonCurrentAssets);
-  addAccounts("Current Liabilities", currentLiabilities);
-  addAccounts("Non-Current Liabilities", nonCurrentLiabilities);
-  addAccounts("Equity", equityAccounts);
+  addLiabilityAccounts( currentLiabilities );
+	
+  rows.push([
+    "Total Current Liabilities",
+    "",
+    totalCurrentLiabilities
+  ]);
+  rows.push([
+    "",
+    "",
+    ""
+  ]);
+  rows.push([
+    "Non-Current Liabilities",
+    "",
+    ""
+  ]);
 
-  rows.push(
-    ["", "Total Current Assets", totalCurrentAssets, ""],
-    ["", "Total Non-Current Assets", totalNonCurrentAssets, ""],
-    ["", "TOTAL ASSETS", totalAssets, ""],
+  addLiabilityAccounts( nonCurrentLiabilities );
+	
+  rows.push([
+    "Total Non-Current Liabilities",
+    "",
+    totalNonCurrentLiabilities
+  ]);
+  rows.push([
+    "TOTAL LIABILITIES",
+    "",
+    totalLiabilities
+  ]);
+  rows.push([
+    "",
+    "",
+    ""
+  ]);
+  rows.push([
+    "EQUITY",
+    "",
+    ""
+  ]);
 
-    ["", "Total Current Liabilities", "", totalCurrentLiabilities],
-    ["", "Total Non-Current Liabilities", "", totalNonCurrentLiabilities],
-    ["", "TOTAL LIABILITIES", "", totalLiabilities]
-  );
+  equityAccounts.forEach(account => {
+    const balance = Number(account.balance || 0);
+    let debit = 0;
+    let credit = 0;
 
+    if (
+      account.normalBalance ===
+      "DEBIT"
+    ) {
+      if (balance > 0) {
+        debit = -balance;
+      }
+
+    } else {
+      if (balance > 0) {
+        credit = balance;
+      }
+    }
+
+    if (
+      account.accountName ===
+        "Owner Withdrawal" ||
+      account.accountName
+        ?.toLowerCase()
+        .includes("withdrawal")
+    ) {
+      debit = -Math.abs(balance);
+      credit = "";
+    }
+    rows.push([
+      account.accountName || "-",
+      debit,
+      credit
+    ]);
+  });
+
+  // CURRENT YEAR EARNINGS
   if (currentProfit < 0) {
     rows.push([
-      "Equity",
       "Current Year Earnings",
-      Math.abs(currentProfit),
+      currentProfit,
       ""
     ]);
+
   } else {
     rows.push([
-      "Equity",
       "Current Year Earnings",
       "",
       currentProfit
     ]);
   }
+  rows.push([
+    "Total Equity",
+    "",
+    totalEquity
+  ]);
+  rows.push([
+    "NET EQUITY",
+    "",
+    totalEquity
+  ]);
+  rows.push([
+    "TOTAL LIABILITIES + EQUITY",
+    "",
+    totalLiabilitiesAndEquity
+  ]);
+  rows.push([
+    "Balance Check",
+    "",
+    balanceCheck
+  ]);
 
-  rows.push(
-    ["", "Total Equity", "", totalEquity],
-    ["", "NET EQUITY", "", totalEquity],
+  const { wb, ws
+  } = createAccountingWorkbook(
+    "Balance Sheet",
+    rows,
     [
-      "",
-      "TOTAL LIABILITIES + EQUITY",
-      "",
-      totalLiabilitiesAndEquity
+      "A1:C1",
+      "A2:C2",
+      "A3:C3"
     ],
-    ["", "Balance Check", "", balanceCheck]
+
+    [
+      42,
+      20,
+      20
+    ]
   );
-  downloadAccountingCSV( `balance-sheet-${getAccountingReportExportDate()}.csv`, headers, rows );
+	
+  // TITLE
+  setExcelStyle(ws, "A1", {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  });
+  setExcelStyle(ws, "A2", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+  setExcelStyle(ws, "A3", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+
+  // HEADER
+  ["A5", "B5", "C5"]
+    .forEach(cell => {
+      setExcelStyle(ws, cell, {
+        font: { bold: true }
+      });
+    });
+	
+  // NUMBER FORMAT
+  formatAccountingNumbers(
+    ws,
+    6,
+    rows.length,
+    ["B", "C"]
+  );
+
+  // BOLD SECTIONS
+  const sections = [
+    "ASSET",
+    "Current Assets",
+    "Non-Current Assets",
+    "LIABILITIES",
+    "Current Liabilities",
+    "Non-Current Liabilities",
+    "EQUITY"
+  ];
+  const totals = [
+    "Total Current Assets",
+    "Total Non-Current Assets",
+    "TOTAL ASSETS",
+    "Total Current Liabilities",
+    "Total Non-Current Liabilities",
+    "TOTAL LIABILITIES",
+    "Total Equity",
+    "NET EQUITY",
+    "TOTAL LIABILITIES + EQUITY",
+    "Balance Check"
+  ];
+
+  for ( let row = 5; row <= rows.length; row++ ) {
+    const label = ws[`A${row}`]?.v;
+		
+    if ( sections.includes(label) ) {
+      setExcelStyle(
+        ws,
+        `A${row}`,
+        {
+          font: { bold: true }
+        }
+      );
+    }
+
+    if ( totals.includes(label) ) {
+      ["A", "B", "C"]
+        .forEach(column => {
+          setExcelStyle(
+            ws,
+            `${column}${row}`,
+            {
+              font: { bold: true },
+              numFmt: accountingNumberFormat() 
+						}
+          );
+        });
+    }
+  }
+  XLSX.writeFile(
+    wb,
+    `balance-sheet-${getAccountingReportExportDate()}.xlsx`
+  );
 }
 
 
