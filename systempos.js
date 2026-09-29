@@ -20337,14 +20337,12 @@ function updateAssetPurchaseTotal() {
 
 // INPUT LISTENER
 document.addEventListener("input", function (event) {
-
   if (
     event.target?.id === "assetPurchaseCost" ||
     event.target?.id === "assetPurchaseInterest"
   ) {
     updateAssetPurchaseTotal();
   }
-
 });
 
 // ASSET PURCHASE
@@ -21209,7 +21207,139 @@ async function initAssetPage() {
 }
 
 
-/* === OVERVIEW AKUNTANSI === */
+async function exportAssets() {
+  const filter = getAssetGlobalFilter();
+  const pdfWindow = window.open("", "_blank");
+
+  if (!pdfWindow) {
+    showToast("Popup diblokir browser", "error");
+    return; }
+
+  pdfWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Generating Asset Report</title>
+
+        <style>
+          body {
+            margin: 0;
+            background: #0B0F14;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+          }
+
+          .loading {
+            text-align: center;
+          }
+
+          .title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 8px;
+          }
+
+          .text {
+            font-size: 13px;
+            opacity: .7;
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="loading">
+          <div class="title">
+            Asset Report
+          </div>
+
+          <div class="text">
+            Generating report...
+          </div>
+        </div>
+      </body>
+    </html>
+  `);
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    const payload = {
+      type: "asset",
+      branchId: filter?.branchId || null,
+      start: filter?.dateFrom || null,
+      end: filter?.dateTo || null,
+      sessionId,
+      tenantSlug: state.tenantSlug
+    };
+
+    const response =
+      await fetch(
+        "/api/export-pdf",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+          body: JSON.stringify(payload)
+        }
+      );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error( errorText || `Export gagal (${response.status})` ); }
+    const html = await response.text();
+
+    if (!html) { throw new Error( "Server mengembalikan HTML kosong" ); }
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
+    pdfWindow.document.close();
+  } catch (err) {
+    pdfWindow.document.open();
+    pdfWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          padding:40px; ">
+
+          <h2>
+            Export Failed
+          </h2>
+
+          <p style="color:#aaa;">
+            Gagal membuat Asset Report.
+          </p>
+
+          <pre style="
+            white-space:pre-wrap;
+            background:#151A21;
+            padding:15px;
+            border-radius:10px;
+            color:#ff6b6b;
+          ">${String(
+            err?.message ||
+            err ||
+            "Unknown error"
+          )
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")}</pre>
+        </body>
+      </html>
+    `);
+    pdfWindow.document.close();
+  }
+}
+
+/* ==================================
+				OVERVIEW AKUNTANSI 
+	 ================================== */
 async function loadAccountingOverview() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
