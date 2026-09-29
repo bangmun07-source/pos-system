@@ -25609,34 +25609,34 @@ function exportBalanceSheetXLSX() {
 
   // ASSETS
   function addAssetAccounts(list) {
-    list.forEach(account => {
-
-      const balance = Number(account.balance || 0);
-
-      let debit = 0;
-      let credit = 0;
-
-      const isContraAsset = account.normalBalance === "CREDIT";
-
-      if (isContraAsset) {
-        if (balance > 0) {
-          credit = balance;
-        }
-
-      } else {
-        if (balance >= 0) {
-          debit = balance;
-        } else {
-          credit = Math.abs(balance);
-        }
-      }
-      rows.push([
-        account.accountName || "-",
-        debit,
-        credit
-      ]);
-    });
-  }
+	  list.forEach(account => {
+	
+	    const balance = Number(account.balance || 0);
+	
+	    let debit = 0;
+	    let credit = 0;
+	
+	    const isContraAsset = account.normalBalance === "CREDIT";
+	
+	    if (isContraAsset) {
+	      // Accumulated Depreciation
+	      if (balance > 0) {
+	        credit = `(${Math.abs(balance).toLocaleString("en-US")})`;
+	      }
+	    } else {
+	      if (balance >= 0) {
+	        debit = balance;
+	      } else {
+	        credit = Math.abs(balance);
+	      }
+	    }
+	    rows.push([
+	      account.accountName || "-",
+	      debit,
+	      credit
+	    ]);
+	  });
+	}
 	
   addAssetAccounts( currentAssets );
 
@@ -25782,7 +25782,7 @@ function exportBalanceSheetXLSX() {
         ?.toLowerCase()
         .includes("withdrawal")
     ) {
-      debit = -Math.abs(balance);
+      debit = `(${Math.abs(balance).toLocaleString("en-US")})`;
       credit = "";
     }
     rows.push([
@@ -25925,10 +25925,7 @@ function exportBalanceSheetXLSX() {
         });
     }
   }
-  XLSX.writeFile(
-    wb,
-    `balance-sheet-${getAccountingReportExportDate()}.xlsx`
-  );
+  XLSX.writeFile(  wb, `balance-sheet-${getAccountingReportExportDate()}.xlsx` );
 }
 
 
