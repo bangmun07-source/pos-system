@@ -25032,15 +25032,16 @@ function formatAccountingNumbers(
 
       if (!cell) return;
 
-      cell.t = "n";
       cell.s = {
-				numFmt: accountingNumberFormat(),
-				alignment: { horizontal: "right" }
+        ...(cell.s || {}),
+        numFmt: accountingNumberFormat(),
+        alignment: {
+          horizontal: "right"
+        }
       };
     });
   }
 }
-
 function exportTrialBalanceXLSX() {
   const data = state.accountingReportsData?.trialBalance || [];
 
@@ -25613,8 +25614,8 @@ function exportBalanceSheetXLSX() {
 	
 	    const balance = Number(account.balance || 0);
 	
-	    let debit = 0;
-	    let credit = 0;
+	    let debit = "";
+			let credit = "";
 	
 	    const isContraAsset = account.normalBalance === "CREDIT";
 	
@@ -25687,8 +25688,8 @@ function exportBalanceSheetXLSX() {
   function addLiabilityAccounts( list ) {
     list.forEach(account => {
       const balance = Number(account.balance || 0);
-      let debit = 0;
-      let credit = 0;
+			let debit = "";
+			let credit = "";
 
       if (
         account.normalBalance ===
@@ -25758,8 +25759,8 @@ function exportBalanceSheetXLSX() {
 
   equityAccounts.forEach(account => {
     const balance = Number(account.balance || 0);
-    let debit = 0;
-    let credit = 0;
+		let debit = "";
+		let credit = "";
 
     if (
       account.normalBalance ===
