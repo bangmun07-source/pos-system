@@ -12889,7 +12889,23 @@
         </div>
       </div>
     </div>
-
+		<!-- ASSET MANAGEMENT FILTER -->
+		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+		  <select id="assetBranchFilter"
+		    class="w-full sm:w-44 h-10 px-3 rounded-lg border border-border bg-background text-sm text-foreground">
+		    <option value="">All Branch</option>
+		  </select>
+		
+		  <button
+		    type="button"
+		    onclick="exportAssets()"
+		    class="h-10 px-4 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-background hover:bg-muted transition text-sm font-medium">
+		    <span class="material-symbols-outlined text-lg">
+		      download
+		    </span>
+		    Export
+		  </button>
+		</div>
     <!-- ================= ASSET TABLE ================= -->
     <section class="bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] mb-4 relative">
       <!-- HEADER -->
