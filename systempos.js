@@ -19513,13 +19513,42 @@ async function exportCashFlowReport() {
 
 let assetData = [];
 let depreciationHistoryData = [];
-
 let assetCurrentPage = 1;
 let depreciationCurrentPage = 1;
-
 const ASSET_PAGE_SIZE = 10;
 const DEPRECIATION_PAGE_SIZE = 10;
 
+/* === GLOBAL ASSET FILTER === */
+
+function getAssetGlobalFilter() {
+  return {
+    dateFrom: document.getElementById("assetDateFrom")?.value || "",
+    dateTo: document.getElementById("assetDateTo")?.value || "",
+    branchId: document.getElementById("assetBranchFilter")?.value || ""
+  };
+}
+
+function isAssetDateInRange(value, dateFrom, dateTo) {
+  if (!value) return false;
+
+  const date = String(value).slice(0, 10);
+
+  if (dateFrom && date < dateFrom) return false;
+  if (dateTo && date > dateTo) return false;
+  return true;
+}
+
+function isAssetBranchMatch(row, branchId) {
+  if (!branchId) return true;
+
+  const rowBranch =
+    row.Branch_ID ??
+    row.BranchId ??
+    row.branch_id ??
+    row.branchId ??
+    "";
+  return String(rowBranch) === String(branchId);
+}
 
 /* ==== FORMAT ==== */
 
@@ -19557,6 +19586,26 @@ function formatAssetPeriod(value) {
   return date.toLocaleDateString("id-ID", {
     month: "short",
     year: "numeric"
+  });
+}
+
+function getFilteredAssetData() {
+  const filter = getAssetGlobalFilter();
+
+  return assetData.filter(asset => {
+    const dateMatch = isAssetDateInRange( asset.Purchase_Date, filter.dateFrom, filter.dateTo );
+    const branchMatch = isAssetBranchMatch( asset, filter.branchId );
+
+    return dateMatch && branchMatch;
+  });
+}
+
+function getFilteredDepreciationData() {
+  const filter = getAssetGlobalFilter();
+  return depreciationHistoryData.filter(item => {
+    const dateMatch = isAssetDateInRange( item.Period, filter.dateFrom, filter.dateTo );
+    const branchMatch = isAssetBranchMatch( item, filter.branchId );
+    return dateMatch && branchMatch;
   });
 }
 
@@ -19752,7 +19801,8 @@ function clearAssetCache() {
 /* === KPI === */
 
 function renderAssetKPI() {
-  const activeAssets = assetData.filter( asset => String(asset.Status).toUpperCase() === "ACTIVE" );
+  const filteredAssets = getFilteredAssetData();
+	const activeAssets = filteredAssets.filter( asset => String(asset.Status).toUpperCase() === "ACTIVE" );
   const totalAssets = activeAssets.length;
   const purchaseCost = activeAssets.reduce( (sum, asset) => sum + Number(asset.Purchase_Cost || 0), 0 );
   const accumulatedDepreciation = activeAssets.reduce( (sum, asset) => sum + Number(asset.Accumulated_Depreciation || 0), 0 );
@@ -19807,7 +19857,7 @@ function renderAssetTable() {
 		?.toLowerCase() || "";
   const status = statusFilter?.value || "all";
 
-  let filteredData = assetData.filter(asset => {
+  let filteredData = getFilteredAssetData().filter(asset => {
     const matchesSearch = !search ||
       String(asset.Asset_ID)
         .toLowerCase()
@@ -20298,15 +20348,16 @@ document.addEventListener("input", function (event) {
 
 // ASSET PURCHASE
 let assetPurchaseRows = [];
-    state.assetData = null;
-    state.assetDataBranchId = null;
-    state.depreciationHistoryData = null;
-    state.depreciationHistoryBranchId = null;
-		state.accountingReportsData = null;
-		state.accountingReportsFilter = null;
+state.assetData = null;
+state.assetDataBranchId = null;
+state.depreciationHistoryData = null;
+state.depreciationHistoryBranchId = null;
+state.accountingReportsData = null;
+state.accountingReportsFilter = null;
+
 async function loadAssetPurchases() {
   const tbody = document.getElementById("asset-purchase-table-body");
-  const branchFilter = document.getElementById("assetPurchaseBranchFilter");
+  const globalFilter = getAssetGlobalFilter();
 
   if (!tbody) return;
 
@@ -20323,19 +20374,30 @@ async function loadAssetPurchases() {
     return;
   }
 
-  const branchId = branchFilter?.value || null;
-  const currentFilter = { branchId };
+	const branchId = globalFilter.branchId || null;
+	const currentFilter = { branchId };
 
   if (
-    state.assetPurchaseData &&
-    state.assetPurchaseFilter &&
-    JSON.stringify(state.assetPurchaseFilter) ===
-      JSON.stringify(currentFilter)
-  ) {
-    window.assetPurchaseRows = state.assetPurchaseData;
-    renderAssetPurchases( window.assetPurchaseRows );
-    updateAssetPurchasePaginationInfo( window.assetPurchaseRows.length );
-    return; }
+	  state.assetPurchaseData &&
+	  state.assetPurchaseFilter &&
+	  JSON.stringify(state.assetPurchaseFilter) ===
+	    JSON.stringify(currentFilter)
+	) {
+	  const globalFilter = getAssetGlobalFilter();
+	  window.assetPurchaseRows =
+	    state.assetPurchaseData.filter(row =>
+	      isAssetDateInRange(
+	        row.Purchase_Date,
+	        globalFilter.dateFrom,
+	        globalFilter.dateTo
+	      )
+	    );
+	  renderAssetPurchases(window.assetPurchaseRows);
+	  updateAssetPurchasePaginationInfo(
+	    window.assetPurchaseRows.length
+	  );
+	  return;
+	}
   tbody.innerHTML = `
     <tr>
       <td colspan="9" class="px-4 py-8 text-center text-muted">
@@ -20363,15 +20425,24 @@ async function loadAssetPurchases() {
       `;
       return;
     }
-    const rows = Array.isArray(data)
-			? data
-			: [];
+		const rows = Array.isArray(data)
+		  ? data
+		  : [];
+		const filteredRows = rows.filter(row => {
+		  const globalFilter = getAssetGlobalFilter();
+		  return isAssetDateInRange(
+		    row.Purchase_Date,
+		    globalFilter.dateFrom,
+		    globalFilter.dateTo
+		  );
+		});
     // SAVE CACHE
     state.assetPurchaseData = rows;
-    state.assetPurchaseFilter = currentFilter;
-    window.assetPurchaseRows = Array.isArray(data) ? data : [];
-    renderAssetPurchases(window.assetPurchaseRows);
-    updateAssetPurchasePaginationInfo( window.assetPurchaseRows.length );
+		state.assetPurchaseFilter = currentFilter;
+		window.assetPurchaseRows = filteredRows;
+		renderAssetPurchases(window.assetPurchaseRows);
+		updateAssetPurchasePaginationInfo(
+		  window.assetPurchaseRows.length );
 
   } catch (err) {
     tbody.innerHTML = `
@@ -20934,7 +21005,7 @@ function renderDepreciationHistory() {
   const search = searchInput?.value
       ?.trim()
       ?.toLowerCase() || "";
-  const filteredData = depreciationHistoryData.filter(item => {
+  const filteredData = getFilteredDepreciationData().filter(item => {
       return (
         !search ||
         String(item.Asset_ID)
@@ -21033,12 +21104,63 @@ function updateDepreciationPagination( totalItems, totalPages ) {
   if (nextBtn) { nextBtn.disabled = depreciationCurrentPage >= totalPages; }
 }
 
+async function loadAssetBranchFilter() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) return;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+
+    const branches = typeof data === "string"
+      ? JSON.parse(data)
+      : (data || []);
+    const select = document.getElementById("assetBranchFilter");
+		
+    if (!select) return;
+
+    select.innerHTML = `<option value="">All Branch</option>`;
+    branches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch.id || "";
+      option.textContent = branch.name || branch.id || "Unnamed Branch";
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error("Failed to load asset branch filter:", error);
+  }
+}
+
+function applyGlobalAssetFilter() {
+  assetCurrentPage = 1;
+  depreciationCurrentPage = 1;
+
+  renderAssetKPI();
+  renderAssetTable();
+  renderDepreciationHistory();
+  loadAssetPurchases();
+}
+
 /* ==== EVENT LISTENERS ==== */
 function initAssetPageEvents() {
   const searchInput = document.getElementById( "assetSearchInput" );
   const statusFilter = document.getElementById( "assetStatusFilter" );
   const depreciationSearch = document.getElementById( "depreciationSearchInput" );
+	const assetDateFrom = document.getElementById("assetDateFrom");
+	const assetDateTo = document.getElementById("assetDateTo");
+	const assetBranchFilter = document.getElementById("assetBranchFilter");
 
+	assetDateFrom?.addEventListener( "change", applyGlobalAssetFilter );
+  assetDateTo?.addEventListener( "change", applyGlobalAssetFilter );
+  assetBranchFilter?.addEventListener( "change", applyGlobalAssetFilter );
   searchInput?.addEventListener( "input", () => { assetCurrentPage = 1; renderAssetTable(); } );
   statusFilter?.addEventListener( "change", () => { assetCurrentPage = 1; renderAssetTable(); } );
   depreciationSearch?.addEventListener( "input", () => { depreciationCurrentPage = 1; renderDepreciationHistory(); } );
@@ -21080,6 +21202,7 @@ function initAssetPage() {
   assetCurrentPage = 1;
   depreciationCurrentPage = 1;
   initAssetPageEvents();
+	await loadAssetBranchFilter();
   loadAssetPage();
 	loadAssetPurchases();
 }
