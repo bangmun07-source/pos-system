@@ -25019,9 +25019,7 @@ function setExcelStyle(ws, cell, style) {
   ws[cell].s = style;
 }
 
-function formatAccountingNumbers(
-  ws, startRow, endRow, columns
-) {
+function formatAccountingNumbers( ws, startRow, endRow, columns ) {
   for (
     let row = startRow;
     row <= endRow;
@@ -25042,6 +25040,7 @@ function formatAccountingNumbers(
     });
   }
 }
+
 function exportTrialBalanceXLSX() {
   const data = state.accountingReportsData?.trialBalance || [];
 
@@ -25094,14 +25093,17 @@ function exportTrialBalanceXLSX() {
 
   // ACCOUNT DATA
   data.forEach(row => {
-    rows.push([
-      row.accountCode || "",
-      row.accountName || "",
-      row.accountType || "",
-      Number(row.debit || 0),
-      Number(row.credit || 0)
-    ]);
-  });
+	  const debit = Number(row.debit || 0);
+	  const credit = Number(row.credit || 0);
+	
+	  rows.push([
+	    row.accountCode || "",
+	    row.accountName || "",
+	    row.accountType || "",
+	    debit !== 0 ? debit : "",
+	    credit !== 0 ? credit : ""
+	  ]);
+	});
 
   // TOTAL
   const totalDebit = data.reduce( (sum, row) => sum + Number(row.debit || 0), 0 );
@@ -25875,6 +25877,22 @@ function exportBalanceSheetXLSX() {
     rows.length,
     ["B", "C"]
   );
+
+	for (let row = 6; row <= rows.length; row++) {
+	  ["B", "C"].forEach(column => {
+	    const cell = ws[`${column}${row}`];
+	
+	    if (!cell) return;
+	
+	    cell.s = {
+	      ...(cell.s || {}),
+	      alignment: {
+	        horizontal: "right",
+	        vertical: "center"
+	      }
+	    };
+	  });
+	}
 
   // BOLD SECTIONS
   const sections = [
