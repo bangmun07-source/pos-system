@@ -24956,9 +24956,9 @@ async function initAccountingReports() {
     const profitLossExportButton = document.getElementById("profitLossExportButton");
     const balanceSheetExportButton = document.getElementById("balanceSheetExportButton");
 
-    if (trialBalanceExportButton) { trialBalanceExportButton.onclick = exportTrialBalanceCSV; }
-    if (profitLossExportButton) { profitLossExportButton.onclick = exportProfitLossCSV; }
-    if (balanceSheetExportButton) { balanceSheetExportButton.onclick = exportBalanceSheetCSV; }
+    if (trialBalanceExportButton) { trialBalanceExportButton.onclick = exportTrialBalanceXLSX; }
+    if (profitLossExportButton) { profitLossExportButton.onclick = exportProfitLossXLSX; }
+    if (balanceSheetExportButton) { balanceSheetExportButton.onclick = exportBalanceSheetXLSX; }
 		
     await populateAccountingReportsBranches();
     await loadAccountingReports();
