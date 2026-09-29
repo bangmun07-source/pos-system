@@ -19617,10 +19617,11 @@ state.depreciationHistoryBranchId = null;
 async function loadAssetPage() {
 	
   try {
-    const sessionId = localStorage.getItem("pos_session_id");
-    if (!state.branchId) { return; }
-    if (!sessionId) { return; }
-    const branchId = state.branchId;
+		const sessionId = localStorage.getItem("pos_session_id");
+		if (!sessionId) return;
+		
+		const globalFilter = getAssetGlobalFilter();
+		const branchId = globalFilter.branchId || null;
     // CACHE ASSETS
     if (
       state.assetData &&
