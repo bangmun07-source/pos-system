@@ -24875,7 +24875,7 @@ function renderBalanceSheet(result, profitLossResult) {
     : [];
 
 	console.log("BS accounts:", accounts);
-	console.log("P&L selected-period netProfit:", profitLossResult?.netProfit););
+	console.log("P&L selected-period netProfit:", profitLossResult?.netProfit);
   /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
   const nonCurrentAssets = [];
