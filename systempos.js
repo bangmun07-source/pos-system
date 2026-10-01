@@ -21018,11 +21018,13 @@ async function saveAssetPurchaseDraft() {
     alert("Session tidak ditemukan.");
     return; }
 
-	const branchId = state.branchId;
-
-  if (!branchId) {
-    alert("Branch belum dipilih.");
-    return; }
+	const branchId =
+		document.getElementById("assetBranchFilter")?.value || "";
+	
+	if (!branchId) {
+		alert("Pilih branch terlebih dahulu. Asset Purchase tidak boleh menggunakan All Branch.");
+		return;
+	}
 
   const assetName = document.getElementById("assetPurchaseName")?.value.trim();
   const purchaseDate = document.getElementById("assetPurchaseDate")?.value;
