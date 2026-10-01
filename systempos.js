@@ -24633,11 +24633,89 @@ function renderProfitLoss(rows) {
 
 /* ======== BALANCE SHEET ======== */
 
+async function loadBalanceSheetCurrentProfit() {
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) return 0;
+
+  const branchId =
+    document.getElementById("accountingReportsBranchFilter")?.value || null;
+
+  const toDate =
+    document.getElementById("accountingReportsPeriodTo")?.value || null;
+
+  if (!toDate) return 0;
+
+  const year = new Date(toDate + "T00:00:00").getFullYear();
+
+  const fromDate = `${year}-01-01`;
+
+  const { data, error } = await supabaseClient.rpc(
+    "get_profit_loss",
+    {
+      p_branch_id: branchId,
+      p_from_date: fromDate,
+      p_to_date: toDate,
+      p_session_id: sessionId
+    }
+  );
+
+  if (error) throw error;
+
+  const rows = Array.isArray(data) ? data : [];
+
+  let revenue = 0;
+  let cogs = 0;
+  let operatingExpenses = 0;
+  let otherExpenses = 0;
+
+  rows.forEach(row => {
+    const amount = Number(row.amount || 0);
+    if (!amount) return;
+
+    const accountType = row.accountType;
+    const accountCode = String(row.accountCode || "");
+
+    if (accountType === "REVENUE") {
+      revenue += amount;
+      return;
+    }
+
+    if (accountType === "COGS") {
+      cogs += amount;
+      return;
+    }
+
+    if (accountType === "EXPENSE") {
+      if (
+        accountCode === "6100" ||
+        accountCode.startsWith("61")
+      ) {
+        operatingExpenses += amount;
+      } else {
+        otherExpenses += amount;
+      }
+    }
+  });
+
+  const grossProfit = revenue - cogs;
+  const totalExpenses =
+    operatingExpenses + otherExpenses;
+
+  return grossProfit - totalExpenses;
+}
+
 async function loadBalanceSheet() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { return {}; }
-  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
-  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
+  if (!sessionId) {
+    return {};
+  }
+
+  const branchId =
+    document.getElementById("accountingReportsBranchFilter")?.value || null;
+
+  const toDate =
+    document.getElementById("accountingReportsPeriodTo")?.value || null;
+
   const { data, error } = await supabaseClient.rpc(
     "get_balance_sheet",
     {
@@ -24646,20 +24724,30 @@ async function loadBalanceSheet() {
       p_session_id: sessionId
     }
   );
+
   if (error) throw error;
-  return data || {};
+
+  const currentProfit =
+    await loadBalanceSheetCurrentProfit();
+
+  return {
+    ...(data || {}),
+    currentProfit
+  };
 }
 
 function renderBalanceSheet(result, profitLossResult) {
   const accounts = Array.isArray(result?.accounts)
-      ? result.accounts
-      : [];
+    ? result.accounts
+    : [];
 
-	 const currentProfit = Number(
-		result?.currentProfit ?? 0
-	);
-console.log("BS result.currentProfit:", result?.currentProfit);
-console.log("P&L netProfit:", profitLossResult?.netProfit);
+  const currentProfit = Number(
+    result?.currentProfit ?? 0
+  );
+
+  console.log("BS currentProfit:", currentProfit);
+  console.log("BS result.currentProfit:", result?.currentProfit);
+  console.log("P&L selected-period netProfit:", profitLossResult?.netProfit);
   /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
   const nonCurrentAssets = [];
