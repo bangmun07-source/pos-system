@@ -17537,50 +17537,75 @@
       <!-- CONTENT -->
       <section class="mt-5 space-y-5">
         <section class="bg-background border border-outline-variant rounded-md p-5">
-          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-            <div>
-              <label class="block text-xs text-muted mb-2">
-                Branch
-              </label>
-
-              <select id="accountingReportsBranchFilter" class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option>All Branches</option>
-                <option>Main Branch</option>
-                <option>Branch 01</option>
-              </select>
-            </div>
-						
-            <div>
-              <label class="block text-xs text-muted mb-2">
-                Period From
-              </label>
-
-              <input id="accountingReportsPeriodFrom"
-								type="date"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-            </div>
-						
-            <div>
-              <label class="block text-xs text-muted mb-2">
-                Period To
-              </label>
-
-              <input id="accountingReportsPeriodTo"
-								type="date"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-            </div>
-						
-            <div>
-              <label class="block text-xs text-muted mb-2">
-                Accounting Basis
-              </label>
-
-              <select id="accountingReportsBasis" class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option>Accrual</option>
-                <option>Cash</option>
-              </select>
-            </div>
-          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+					  <div>
+					    <label class="block text-xs text-muted mb-2">
+					      Branch
+					    </label>
+					
+					    <select id="accountingReportsBranchFilter"
+					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					      <option>All Branches</option>
+					      <option>Main Branch</option>
+					      <option>Branch 01</option>
+					    </select>
+					  </div>
+					
+					  <div>
+					    <label class="block text-xs text-muted mb-2">
+					      Period From
+					    </label>
+					
+					    <input id="accountingReportsPeriodFrom"
+					      type="date"
+					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					  </div>
+					
+					  <div>
+					    <label class="block text-xs text-muted mb-2">
+					      Period To
+					    </label>
+					
+					    <input id="accountingReportsPeriodTo"
+					      type="date"
+					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					  </div>
+					
+					  <div>
+					    <label class="block text-xs text-muted mb-2">
+					      Accounting Basis
+					    </label>
+					
+					    <select id="accountingReportsBasis"
+					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					      <option>Accrual</option>
+					      <option>Cash</option>
+					    </select>
+					  </div>
+					  <!-- FISCAL YEAR CLOSING -->
+					  <div>
+					    <label class="block text-xs text-muted mb-2">
+					      Fiscal Year
+					    </label>
+					
+					    <div class="flex gap-2">
+					      <select id="accountingFiscalYear"
+					        class="flex-1 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					      </select>
+					
+					      <button
+					        id="closeFiscalYearButton"
+					        type="button"
+					        onclick="closeFiscalYear()"
+					        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2 whitespace-nowrap hover:bg-surface-variant transition-colors">
+					        <span class="material-symbols-outlined text-[18px]">
+					          lock
+					        </span>
+					        Close
+					      </button>
+					    </div>
+					  </div>
+					</div>
         </section>
         <!-- TRIAL BALANCE -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
