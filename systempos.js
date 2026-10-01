@@ -28387,7 +28387,15 @@ document.addEventListener( "change",
 /* ==== RECORD TAX OBLIGATION ==== */
 
 async function recordTaxObligation() {
-  if (accountingTaxRecording) return;
+	console.log("Record PPh Final clicked");
+	
+	if (accountingTaxRecording) {
+	console.log(
+	"BLOCKED: accountingTaxRecording =",
+	accountingTaxRecording
+	);
+	return;
+	}
 
   const sessionId = localStorage.getItem("pos_session_id");
 
