@@ -27939,7 +27939,6 @@ function formatAccountingTaxCurrency(value) {
   return "Rp " + amount.toLocaleString("id-ID");
 }
 
-
 function getAccountingTaxYear() {
   const yearEl = document.getElementById("taxObligationYear");
   const year = Number(yearEl?.value);
@@ -27954,16 +27953,41 @@ function getAccountingTaxYear() {
   return new Date().getFullYear();
 }
 
+function getAccountingTaxMonth() {
+  const monthEl = document.getElementById("taxObligationMonth");
+  const month = Number(monthEl?.value);
+
+  if (
+    Number.isInteger(month) &&
+    month >= 1 &&
+    month <= 12
+  ) {
+    return month;
+  }
+  return new Date().getMonth() + 1;
+}
+
 function getTaxObligationBranchId() {
   const el = document.getElementById("taxObligationBranchFilter");
   return el?.value || null;
+}
+
+function initializeAccountingTaxMonth() {
+  const monthEl =
+    document.getElementById("taxObligationMonth");
+
+  if (!monthEl) return;
+
+  if (!monthEl.value) {
+    monthEl.value =
+      String(new Date().getMonth() + 1);
+  }
 }
 
 function getPphBadanBranchId() {
   const el = document.getElementById("pphBadanBranchFilter");
   return el?.value || null;
 }
-
 
 function getTodayAccountingTaxDate() {
   const now = new Date();
@@ -28021,6 +28045,7 @@ async function initAccountingTaxPage() {
     if (yearEl && !yearEl.value) { yearEl.value = String(new Date().getFullYear()); }
 		
 	populateAccountingTaxYears();
+	initializeAccountingTaxMonth();
 	await loadAccountingTaxBranchFilters();
 	await Promise.all([
 		loadTaxObligasiSettings(),
@@ -28266,7 +28291,9 @@ async function loadTaxObligation() {
   const sessionId = localStorage.getItem("pos_session_id");
   const branchId = getTaxObligationBranchId();
   const taxYear = getAccountingTaxYear();
-	const currentFilter = { branchId, taxYear };
+  const taxMonth = getAccountingTaxMonth();
+  const currentFilter = { branchId, taxYear, taxMonth };
+
   // ===== CACHE HIT =====
   if (
     state.accountingTaxData &&
@@ -28286,23 +28313,29 @@ async function loadTaxObligation() {
       {
         p_session_id: sessionId,
         p_branch_id: branchId,
-        p_tax_year: taxYear
+        p_tax_year: taxYear,
+        p_tax_month: taxMonth
       }
     );
 
   if (error) { throw error; }
+	
   currentTaxObligation = data || null;
-	 // ===== SAVE CACHE =====
   state.accountingTaxData = currentTaxObligation;
   state.accountingTaxFilter = currentFilter;
-	
-  renderTaxObligation( currentTaxObligation );
-	await loadTaxObligationPaymentSummary();
+  renderTaxObligation(currentTaxObligation);
+  await loadTaxObligationPaymentSummary();
   return currentTaxObligation;
 }
 
 document.addEventListener("change", function(event) {
-  if (event.target?.id !== "taxObligationBranchFilter") {
+  const id = event.target?.id;
+
+  if (
+    id !== "taxObligationBranchFilter" &&
+    id !== "taxObligationYear" &&
+    id !== "taxObligationMonth"
+  ) {
     return;
   }
 
@@ -28370,20 +28403,6 @@ function renderTaxObligation(data) {
   }
 }
 
-document.addEventListener( "change",
-  function(event) {
-    if ( event.target?.id !== "taxObligationYear" ) { 
-			return; }
-
-    loadTaxObligation()
-		.catch(error => {
-			alert( error?.message ||
-				"Gagal memuat Tax Obligation."
-			);
-		});
-  }
-);
-
 /* ==== RECORD TAX OBLIGATION ==== */
 
 async function recordTaxObligation() {
@@ -28402,14 +28421,18 @@ async function recordTaxObligation() {
   if (!sessionId) { showToast("Session tidak ditemukan.", "error"); return; }
 
   // PERIODE PPh FINAL = BULAN SEBELUMNYA
-  const currentDate = new Date();
-  const previousMonthDate = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() - 1,
-    1
-  );
-  const taxYear = previousMonthDate.getFullYear();
-  const taxMonth = previousMonthDate.getMonth() + 1;
+ 	const taxYear = getAccountingTaxYear();
+	const taxMonth = getAccountingTaxMonth();
+	
+	if (!taxYear || taxYear < 2000 || taxYear > 9999) {
+	  showToast("Tax Year tidak valid.", "error");
+	  return;
+	}
+	
+	if (!taxMonth || taxMonth < 1 || taxMonth > 12) {
+	  showToast("Tax Month tidak valid.", "error");
+	  return;
+	}
   // BRANCH FILTER
   // "" = ALL BRANCH
   const selectedBranchId = document.getElementById("taxObligationBranchFilter")?.value || "";
@@ -28594,6 +28617,7 @@ async function saveTaxObligationPayment() {
 	  const sessionId = localStorage.getItem("pos_session_id");
 	  const branchId = state.branchId;
     const taxYear = getAccountingTaxYear();
+		const taxMonth = getAccountingTaxMonth();
 		
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
     if (!branchId) { throw new Error("Branch belum dipilih."); }
@@ -28608,7 +28632,7 @@ async function saveTaxObligationPayment() {
     const amount = Number(amountEl?.value || 0);
     const method = String( methodEl?.value || "CASH" ).toUpperCase();
     const userReference = referenceEl?.value?.trim() || "";
-    const reference = `TAX-OBL-PAY-${taxYear}-${Date.now()}`;
+    const reference = `TAX-OBL-PAY-${taxYear}-${String(taxMonth).padStart(2, "0")}-${Date.now()}`;
     const note = userReference
         ? `${noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}`} - Ref: ${userReference}`
         : ( noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}` );
@@ -28645,18 +28669,17 @@ async function saveTaxObligationPayment() {
     }
     /* ==== GET OUTSTANDING TAX YEAR TERPILIH ==== */
     const {
-      data: summaryData,
-      error: summaryError
-    } =
-      await supabaseClient.rpc(
-        "get_tax_obligation_payment_summary",
-        {
-          p_session_id: sessionId,
-          p_branch_id: branchId,
-          p_tax_year: taxYear
-        }
-      );
-
+		  data: summaryData,
+		  error: summaryError
+		} = await supabaseClient.rpc(
+		  "get_tax_obligation_payment_summary",
+		  {
+		    p_session_id: sessionId,
+		    p_branch_id: branchId,
+		    p_tax_year: taxYear,
+		    p_tax_month: taxMonth
+		  }
+		);
 
     if (summaryError) { throw summaryError; }
     const summary =
@@ -28752,7 +28775,8 @@ async function saveTaxObligationPayment() {
         {
           p_session_id: sessionId,
           p_branch_id: branchId,
-          p_tax_year: taxYear
+          p_tax_year: taxYear,
+    			p_tax_month: taxMonth
         }
       );
 
