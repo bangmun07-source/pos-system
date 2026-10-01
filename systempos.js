@@ -24883,11 +24883,9 @@ async function loadBalanceSheet() {
     return {};
   }
 
-  const branchId =
-    document.getElementById("accountingReportsBranchFilter")?.value || null;
-
-  const toDate =
-    document.getElementById("accountingReportsPeriodTo")?.value || null;
+  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
+	const branchId = rawBranchId === "ALL" ? null : rawBranchId;
+  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
 
   const { data, error } = await supabaseClient.rpc(
     "get_balance_sheet",
