@@ -24874,13 +24874,8 @@ function renderBalanceSheet(result, profitLossResult) {
     ? result.accounts
     : [];
 
-  const currentProfit = Number(
-    result?.currentProfit ?? 0
-  );
-
-  console.log("BS currentProfit:", currentProfit);
-  console.log("BS result.currentProfit:", result?.currentProfit);
-  console.log("P&L selected-period netProfit:", profitLossResult?.netProfit);
+	console.log("BS accounts:", accounts);
+	console.log("P&L selected-period netProfit:", profitLossResult?.netProfit););
   /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
   const nonCurrentAssets = [];
@@ -24943,9 +24938,9 @@ function renderBalanceSheet(result, profitLossResult) {
       },
       0
     );
-  const totalEquity = totalEquityAccounts + currentProfit;
-  const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
-  const balanceCheck = totalAssets - totalLiabilitiesAndEquity;
+	const totalEquity = totalEquityAccounts;
+	const totalLiabilitiesAndEquity = totalLiabilities + totalEquity;
+	const balanceCheck = totalAssets - totalLiabilitiesAndEquity;
 
   /* ===== RENDER ACCOUNT ROWS ===== */
   renderBalanceSheetAccounts( "balanceSheetCurrentAssets", currentAssets );
@@ -24997,66 +24992,91 @@ function renderBalanceSheet(result, profitLossResult) {
     "CREDIT"
   );
 	/* ==== CURRENT YEAR EARNINGS ==== */
-	if (currentProfit < 0) {
-	  setBalanceSheetAmount(
-	    "balanceSheetCurrentProfitDebit",
-	    currentProfit
-	  );
-	  setBalanceSheetAmount(
-	    "balanceSheetCurrentProfitCredit",
-	    0
-	  );
-	} else {
-	  setBalanceSheetAmount(
-	    "balanceSheetCurrentProfitDebit",
-	    0
-	  );
-	  setBalanceSheetAmount(
-	    "balanceSheetCurrentProfitCredit",
-	    currentProfit
-	  );
-	}
-  /* ==== TOTAL EQUITY ==== */
-  const equityDebit = -(
-	  equityAccounts.reduce(
-	    (sum, account) => {
-	      const balance = Number(account.balance || 0);
-	
-	      if (account.normalBalance === "DEBIT") {
-	        return sum + balance;
-	      }
-	
-	      return sum;
-	    },
-	    0
-	  )
-	  +
-	  (
-	    currentProfit < 0
-	      ? Math.abs(currentProfit)
-	      : 0
-	  )
-	);
-  const equityCredit = equityAccounts.reduce(
-      (sum, account) => {
-        const balance = Number(account.balance || 0);
-        if ( account.normalBalance === "CREDIT" ) 
-				{ return sum + balance; }
-        return sum;
-      },
-      0
-    )
-    +
-    ( 
-			currentProfit > 0
-        ? currentProfit
-        : 0
-    );
-  setBalanceSheetDebitCreditValues( "balanceSheetTotalEquityDebit", "balanceSheetTotalEquityCredit", equityDebit, equityCredit );
-  setBalanceSheetAmount( "balanceSheetNetEquity", totalEquity );
-  setBalanceSheetAmount( "balanceSheetTotalLiabilitiesEquityCredit", totalLiabilitiesAndEquity );
-  setBalanceSheetEmpty( "balanceSheetTotalLiabilitiesEquityDebit" );
-  setBalanceSheetAmount( "balanceSheetCheck", balanceCheck );
+
+const currentYearEarningsAccount = equityAccounts.find(
+  account => account.accountId === "ACC-FCCCF6938BE9"
+);
+
+const currentYearEarnings = Number(
+  currentYearEarningsAccount?.balance || 0
+);
+
+if (currentYearEarnings < 0) {
+  setBalanceSheetAmount(
+    "balanceSheetCurrentProfitDebit",
+    Math.abs(currentYearEarnings)
+  );
+
+  setBalanceSheetAmount(
+    "balanceSheetCurrentProfitCredit",
+    0
+  );
+} else {
+  setBalanceSheetAmount(
+    "balanceSheetCurrentProfitDebit",
+    0
+  );
+
+  setBalanceSheetAmount(
+    "balanceSheetCurrentProfitCredit",
+    currentYearEarnings
+  );
+}
+
+
+/* ==== TOTAL EQUITY ==== */
+
+const equityDebit = equityAccounts.reduce(
+  (sum, account) => {
+    const balance = Number(account.balance || 0);
+
+    if (account.normalBalance === "DEBIT") {
+      return sum + balance;
+    }
+
+    return sum;
+  },
+  0
+);
+
+const equityCredit = equityAccounts.reduce(
+  (sum, account) => {
+    const balance = Number(account.balance || 0);
+
+    if (account.normalBalance === "CREDIT") {
+      return sum + balance;
+    }
+
+    return sum;
+  },
+  0
+);
+
+setBalanceSheetDebitCreditValues(
+  "balanceSheetTotalEquityDebit",
+  "balanceSheetTotalEquityCredit",
+  equityDebit,
+  equityCredit
+);
+
+setBalanceSheetAmount(
+  "balanceSheetNetEquity",
+  totalEquity
+);
+
+setBalanceSheetAmount(
+  "balanceSheetTotalLiabilitiesEquityCredit",
+  totalLiabilitiesAndEquity
+);
+
+setBalanceSheetEmpty(
+  "balanceSheetTotalLiabilitiesEquityDebit"
+);
+
+setBalanceSheetAmount(
+  "balanceSheetCheck",
+  balanceCheck
+);
 }
 
 /* ===== SUM BALANCES ====== */
