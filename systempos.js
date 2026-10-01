@@ -28389,69 +28389,113 @@ document.addEventListener( "change",
 async function recordTaxObligation() {
   if (accountingTaxRecording) return;
 
-	const sessionId = localStorage.getItem("pos_session_id");
-  const branchId = state.branchId;
-  const taxYear = getAccountingTaxYear();
+  const sessionId = localStorage.getItem("pos_session_id");
 
-  if (!sessionId) {
-    showToast("Session tidak ditemukan.", "error");
-    return; }
-  if (!branchId) {
-    showToast("Branch belum dipilih.", "error");
-    return; }
-  if (!taxYear || Number.isNaN(Number(taxYear))) {
-    showToast("Tax Year tidak valid.", "error");
-    return; }
+  if (!sessionId) { showToast("Session tidak ditemukan.", "error"); return; }
 
+  // PERIODE PPh FINAL = BULAN SEBELUMNYA
+  const currentDate = new Date();
+  const previousMonthDate = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1,
+    1
+  );
+  const taxYear = previousMonthDate.getFullYear();
+  const taxMonth = previousMonthDate.getMonth() + 1;
+  // BRANCH FILTER
+  // "" = ALL BRANCH
+  const selectedBranchId = document.getElementById("taxObligationBranchFilter")?.value || "";
   const recordButton = document.getElementById("recordTaxObligationButton");
 
   try {
     accountingTaxRecording = true;
+
     if (recordButton) {
       recordButton.disabled = true;
-      recordButton.dataset.originalText = recordButton.textContent || "Record Tax Obligation";
+      recordButton.dataset.originalText =
+        recordButton.textContent || "Record Tax Obligation";
       recordButton.textContent = "Recording...";
     }
-
-    const { data, error } = await supabaseClient.rpc(
-      "record_tax_obligation",
-      {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_tax_year: Number(taxYear)
-      }
-    );
-
-    if (error) { throw error; }
 		
-    const result = typeof data === "string"
-        ? JSON.parse(data)
-        : data;
+    // TENTUKAN BRANCH YANG AKAN DIPROSES
+    let branchIds = [];
 
-    if (!result || result.success !== true) {
-      throw new Error(
-        result?.message ||
-        "Gagal mencatat tax obligation."
-      );
-    }
-    if (result.already_recorded) {
-      showToast(
-        `Tax obligation ${taxYear} sudah tercatat.`,
-        "info"
-      );
+    if (selectedBranchId) {
+      // Branch tertentu
+      branchIds = [selectedBranchId];
+
     } else {
-      showToast(
-        `Tax obligation ${taxYear} berhasil dicatat.`,
-        "success"
-      );
+      // All Branch → ambil semua branch aktual
+      const { data: branchData, error: branchError } =
+        await supabaseClient.rpc("get_expense_branches", {
+          p_session_id: sessionId
+        });
+
+      if (branchError) { throw branchError; }
+
+      const branches = typeof branchData === "string"
+				? JSON.parse(branchData)
+				: (branchData || []);
+
+      branchIds = branches
+        .map(branch => branch.id)
+        .filter(Boolean);
     }
+
+    if (!branchIds.length) {
+      throw new Error( "Tidak ada branch yang tersedia untuk mencatat PPh Final." );
+    }
+
+    // RECORD SATU PER SATU PER BRANCH
+    const results = [];
+
+    for (let i = 0; i < branchIds.length; i++) {
+      const branchId = branchIds[i];
+
+      if (recordButton) { recordButton.textContent = `Recording ${branchId} (${i + 1}/${branchIds.length})...`; }
+
+      const { data, error } =
+        await supabaseClient.rpc(
+          "record_tax_obligation",
+          {
+            p_session_id: sessionId,
+            p_branch_id: branchId,
+            p_tax_year: Number(taxYear),
+            p_tax_month: Number(taxMonth)
+          }
+        );
+
+      if (error) {
+        throw new Error( `Gagal mencatat PPh Final ${branchId}: ${error.message}` );
+      }
+
+      const result = typeof data === "string"
+				? JSON.parse(data)
+				: data;
+
+      if (!result || result.success !== true) {
+        throw new Error( result?.message || `Gagal mencatat PPh Final ${branchId}.` );
+      }
+
+      results.push({ branchId, result });
+    }
+    // REFRESH
     await loadTaxObligation();
+
+    const recordedCount = results.filter( item => !item.result.already_recorded ).length;
+    const alreadyRecordedCount = results.filter( item => item.result.already_recorded ).length;
+
+    if (selectedBranchId) {
+      if (alreadyRecordedCount) {
+        showToast( `PPh Final ${taxMonth}/${taxYear} untuk ${selectedBranchId} sudah tercatat.`, "info" );
+      } else {
+        showToast( `PPh Final ${taxMonth}/${taxYear} untuk ${selectedBranchId} berhasil dicatat.`, "success" );
+      }
+    } else {
+      showToast( `PPh Final ${taxMonth}/${taxYear}: ${recordedCount} branch berhasil dicatat, ${alreadyRecordedCount} branch sudah tercatat.`, "success" );
+    }
   } catch (error) {
-    showToast(
-      error?.message ||
-      "Gagal mencatat tax obligation.",
-      "error"
-    );
+    showToast( error?.message || "Gagal mencatat tax obligation.", "error" );
 
   } finally {
     accountingTaxRecording = false;
