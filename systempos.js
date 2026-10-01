@@ -24914,6 +24914,12 @@ function renderBalanceSheet(result, profitLossResult) {
     ? result.accounts
     : [];
 
+	console.log("BS ACCOUNTS AFTER CLOSING:", accounts);
+	console.log(
+		"RETAINED EARNINGS:",
+		accounts.filter(a => a.accountCode === "3400")
+	);
+
   const currentProfit = Number(
     result?.currentProfit ?? 0
   );
