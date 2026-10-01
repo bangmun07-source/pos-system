@@ -24770,11 +24770,8 @@ async function loadBalanceSheetCurrentProfit() {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) return 0;
 
-  const branchId =
-    document.getElementById("accountingReportsBranchFilter")?.value || null;
-
-  const toDate =
-    document.getElementById("accountingReportsPeriodTo")?.value || null;
+  const branchId = document.getElementById("accountingReportsBranchFilter")?.value || null;
+  const toDate = document.getElementById("accountingReportsPeriodTo")?.value || null;
 
   if (!toDate) return 0;
 
@@ -24784,27 +24781,36 @@ async function loadBalanceSheetCurrentProfit() {
      CEK APAKAH FISCAL YEAR SUDAH DITUTUP
      ===================================================== */
 
-  const { data: closingData, error: closingError } =
-    await supabaseClient
-      .from("Journal_Entries")
-      .select("Journal_ID")
-      .eq("Source", "YEAR_END_CLOSING")
-      .eq("Status", "POSTED")
-      .eq("Journal_Date", `${year}-12-31`)
-      .limit(1);
+  const { data: isClosed, error: closingError } =
+    await supabaseClient.rpc(
+      "is_fiscal_year_closed",
+      {
+        p_branch_id: branchId,
+        p_fiscal_year: year,
+        p_session_id: sessionId
+      }
+    );
 
   if (closingError) {
-    console.error("Check fiscal year closing error:", closingError);
+    console.error(
+      "Check fiscal year closing error:",
+      closingError
+    );
     throw closingError;
   }
 
-  /* Kalau sudah closing → Current Year Earnings = 0 */
-  if (closingData?.length) {
+  /* =====================================================
+     SUDAH CLOSING
+     Current Year Earnings = 0
+     ===================================================== */
+
+  if (isClosed === true) {
     return 0;
   }
 
   /* =====================================================
-     BELUM CLOSING → AMBIL PROFIT DARI P&L
+     BELUM CLOSING
+     Current Year Earnings = P&L
      ===================================================== */
 
   const fromDate = `${year}-01-01`;
@@ -24830,21 +24836,25 @@ async function loadBalanceSheetCurrentProfit() {
 
   rows.forEach(row => {
     const amount = Number(row.amount || 0);
+
     if (!amount) return;
 
     const accountType = row.accountType;
     const accountCode = String(row.accountCode || "");
 
+    /* REVENUE */
     if (accountType === "REVENUE") {
       revenue += amount;
       return;
     }
 
+    /* COGS */
     if (accountType === "COGS") {
       cogs += amount;
       return;
     }
 
+    /* EXPENSE */
     if (accountType === "EXPENSE") {
       if (
         accountCode === "6100" ||
@@ -24857,13 +24867,15 @@ async function loadBalanceSheetCurrentProfit() {
     }
   });
 
+  /* === HITUNG NET PROFIT === */
   const grossProfit = revenue - cogs;
+  const totalExpenses = operatingExpenses + otherExpenses;
+  const netProfit = grossProfit - totalExpenses;
 
-  const totalExpenses =
-    operatingExpenses + otherExpenses;
-
-  return grossProfit - totalExpenses;
+  return netProfit;
 }
+
+
 
 async function loadBalanceSheet() {
   const sessionId = localStorage.getItem("pos_session_id");
