@@ -19682,37 +19682,121 @@ async function loadAssetPage() {
 }
 
 // RUN MONTHLY DEPRECIATION
+// RUN MONTHLY DEPRECIATION
 async function runMonthlyDepreciation() {
-  const button = document.getElementById( "runMonthlyDepreciationBtn" );
+  const button = document.getElementById("runMonthlyDepreciationBtn");
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const branchId = state.branchId;
-    if (!branchId) { return; }
-    if (!sessionId) { return; }
+
+    if (!sessionId) {
+      return;
+    }
+
+    // =========================================================
+    // AMBIL FILTER ASSET
+    // =========================================================
+    const filter = getAssetGlobalFilter();
+    const selectedBranchId = filter.branchId || "";
+
+    // =========================================================
     // CONFIRM
+    // =========================================================
     const confirmed = confirm(
-      "Run monthly depreciation untuk semua asset aktif bulan ini?"
+      selectedBranchId
+        ? "Run monthly depreciation untuk semua asset aktif pada branch ini bulan ini?"
+        : "Run monthly depreciation untuk semua branch dan semua asset aktif bulan ini?"
     );
 
-    if (!confirmed) { return; }
+    if (!confirmed) {
+      return;
+    }
+
+    // =========================================================
     // LOADING
+    // =========================================================
     if (button) {
       button.disabled = true;
       button.innerHTML = `
         <span class="material-symbols-outlined text-lg animate-spin">
           progress_activity
         </span>
-
         <span>
           Processing...
         </span>
       `;
     }
-		
-    // CALL RPC
-    const { data, error } =
-      await supabaseClient.rpc(
+
+    // =========================================================
+    // TENTUKAN BRANCH YANG AKAN DIPROSES
+    // =========================================================
+    let branchIds = [];
+
+    if (selectedBranchId) {
+
+      // Branch tertentu
+      branchIds = [selectedBranchId];
+
+    } else {
+
+      // =======================================================
+      // ALL BRANCH
+      // Gunakan RPC branch yang memang sudah dipakai Asset
+      // =======================================================
+      const {
+        data: branchData,
+        error: branchError
+      } = await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
+
+      if (branchError) {
+        throw branchError;
+      }
+
+      const branches = typeof branchData === "string"
+        ? JSON.parse(branchData)
+        : (branchData || []);
+
+      branchIds = branches
+        .map(branch => branch.id)
+        .filter(Boolean);
+    }
+
+    // =========================================================
+    // VALIDASI
+    // =========================================================
+    if (!branchIds.length) {
+      throw new Error(
+        "Tidak ada branch yang tersedia untuk menjalankan depreciation."
+      );
+    }
+
+    // =========================================================
+    // RUN DEPRECIATION PER BRANCH
+    // =========================================================
+    for (let i = 0; i < branchIds.length; i++) {
+
+      const branchId = branchIds[i];
+
+      if (button) {
+        button.innerHTML = `
+          <span class="material-symbols-outlined text-lg animate-spin">
+            progress_activity
+          </span>
+          <span>
+            Processing ${branchId} (${i + 1}/${branchIds.length})...
+          </span>
+        `;
+      }
+
+      const {
+        data,
+        error
+      } = await supabaseClient.rpc(
         "run_monthly_depreciation",
         {
           p_branch_id: branchId,
@@ -19720,31 +19804,55 @@ async function runMonthlyDepreciation() {
         }
       );
 
-    if (error) { throw error; }
+      if (error) {
+        throw new Error(
+          `Gagal menjalankan depreciation untuk ${branchId}: ${error.message}`
+        );
+      }
+    }
+
+    // =========================================================
     // CLEAR CACHE
+    // =========================================================
     state.assetData = null;
     state.assetDataBranchId = null;
+
     state.depreciationHistoryData = null;
     state.depreciationHistoryBranchId = null;
-		state.accountingReportsData = null;
-		state.accountingReportsFilter = null;
+
+    state.accountingReportsData = null;
+    state.accountingReportsFilter = null;
+
+    // =========================================================
     // RELOAD
+    // =========================================================
     await loadAssetPage();
+
     alert(
-      "Monthly depreciation berhasil dijalankan."
+      selectedBranchId
+        ? `Monthly depreciation berhasil dijalankan untuk ${selectedBranchId}.`
+        : `Monthly depreciation berhasil dijalankan untuk ${branchIds.length} branch.`
     );
 
   } catch (error) {
-    alert( error?.message || "Gagal menjalankan monthly depreciation." );
+
+    alert(
+      error?.message ||
+      "Gagal menjalankan monthly depreciation."
+    );
+
   } finally {
+
+    // =========================================================
     // RESTORE BUTTON
+    // =========================================================
     if (button) {
       button.disabled = false;
+
       button.innerHTML = `
         <span class="material-symbols-outlined text-lg">
           calendar_month
         </span>
-
         <span>
           Run Depreciation
         </span>
@@ -19752,20 +19860,6 @@ async function runMonthlyDepreciation() {
     }
   }
 }
-// BUTTON EVENT
-document.addEventListener(
-  "click",
-  function (event) {
-    const button =
-      event.target.closest(
-        "#runMonthlyDepreciationBtn"
-      );
-    if (!button) {
-      return;
-    }
-    runMonthlyDepreciation();
-  }
-);
 
 function escapeHtmlAssetPurchase(value) {
   return String(value ?? "")
