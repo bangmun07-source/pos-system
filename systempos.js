@@ -24658,7 +24658,8 @@ function renderBalanceSheet(result, profitLossResult) {
 	 const currentProfit = Number(
 		result?.currentProfit ?? 0
 	);
-
+console.log("BS result.currentProfit:", result?.currentProfit);
+console.log("P&L netProfit:", profitLossResult?.netProfit);
   /* ==== GROUP ACCOUNTS ==== */
   const currentAssets = [];
   const nonCurrentAssets = [];
