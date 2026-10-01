@@ -24409,6 +24409,139 @@ function initAccountingReportsDates() {
   if (!toEl.value) { toEl.value = todayString; }
 }
 
+/* ===== FISCAL YEAR ===== */
+
+function initAccountingFiscalYear() {
+  const select = document.getElementById("accountingFiscalYear");
+
+  if (!select) return;
+
+  const currentYear = new Date().getFullYear();
+
+  select.innerHTML = "";
+
+  for (let i = 0; i < 10; i++) {
+    const year = currentYear - i;
+
+    const option = document.createElement("option");
+    option.value = year;
+    option.textContent = year;
+
+    select.appendChild(option);
+  }
+
+  select.value = currentYear;
+}
+
+async function closeFiscalYear() {
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    alert("Session tidak ditemukan. Silakan login kembali.");
+    return;
+  }
+
+  const fiscalYearEl =
+    document.getElementById("accountingFiscalYear");
+
+  const button =
+    document.getElementById("closeFiscalYearButton");
+
+  if (!fiscalYearEl) {
+    alert("Fiscal Year tidak ditemukan.");
+    return;
+  }
+
+  const fiscalYear = Number(fiscalYearEl.value);
+
+  if (!fiscalYear) {
+    alert("Fiscal Year tidak valid.");
+    return;
+  }
+
+  const confirmed = confirm(
+    `Tutup buku tahun ${fiscalYear} untuk SEMUA branch?\n\n` +
+    `Setiap branch akan dibuatkan jurnal closing masing-masing.`
+  );
+
+  if (!confirmed) return;
+
+  try {
+    if (button) {
+      button.disabled = true;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-[18px] animate-spin">
+          progress_activity
+        </span>
+        Closing...
+      `;
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      "close_fiscal_year",
+      {
+        p_session_id: sessionId,
+        p_fiscal_year: fiscalYear
+      }
+    );
+
+    if (error) {
+      console.error("Close fiscal year error:", error);
+      throw error;
+    }
+
+    console.log("Close fiscal year result:", data);
+
+    const results = Array.isArray(data?.results)
+      ? data.results
+      : [];
+
+    let message =
+      `Fiscal Year ${fiscalYear} berhasil ditutup.\n\n`;
+
+    results.forEach(item => {
+      message +=
+        `${item.branch_id}: ${item.result} ` +
+        `Rp ${Number(item.net_profit_loss || 0)
+          .toLocaleString("id-ID")}\n`;
+    });
+
+    alert(message);
+
+    /*
+     * Clear accounting report cache
+     * supaya report tidak menggunakan data lama.
+     */
+    state.accountingReportsData = null;
+    state.accountingReportsFilter = null;
+
+    /*
+     * Reload seluruh halaman.
+     * Ini memastikan Trial Balance,
+     * P&L, dan Balance Sheet membaca data terbaru.
+     */
+    location.reload();
+
+  } catch (error) {
+    console.error("Fiscal year closing error:", error);
+
+    alert(
+      error?.message ||
+      "Gagal melakukan fiscal year closing."
+    );
+
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-[18px]">
+          lock
+        </span>
+        Close
+      `;
+    }
+  }
+}
+
 /* ====== TRIAL BALANCE ====== */
 
 async function loadTrialBalance() {
@@ -25133,6 +25266,7 @@ function initAccountingReportsFilters() {
 async function initAccountingReports() {
   try {
     initAccountingReportsDates();
+    initAccountingFiscalYear();
     initAccountingReportsFilters();
 		
 		const trialBalanceExportButton = document.getElementById("trialBalanceExportButton");
