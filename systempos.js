@@ -27484,16 +27484,28 @@ try {
 		? null
 		: filter.branchId;
 
-	const { data, error } =
+const { data, error } =
     await supabaseClient.rpc(
-			"get_liabilities",
-			{
-				p_session_id: sessionId,
-				p_branch_id: branchId,
-				p_period_from: filter.periodFrom || null,
-				p_period_to: filter.periodTo || null
-			}
+        "get_liabilities",
+        {
+            p_session_id: sessionId,
+            p_branch_id: branchId,
+            p_period_from: filter.periodFrom || null,
+            p_period_to: filter.periodTo || null
+        }
     );
+
+if (error) {
+    console.error("get_liabilities ERROR:", error);
+    console.error("message:", error.message);
+    console.error("details:", error.details);
+    console.error("hint:", error.hint);
+    console.error("code:", error.code);
+
+    throw error;
+}
+
+console.log("get_liabilities DATA:", data);
 
 	if (error) { throw error; }
 	if (!data) {
