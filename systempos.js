@@ -26690,97 +26690,99 @@ function applySupplierDebtFilters() {
    ========================================================= */
 
 function renderSupplierDebtTable() {
-    const tbody =  document.getElementById( "supplierDebtTableBody" );
-    if (!tbody) return;
-    const total = supplierDebtFiltered.length;
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                total / supplierDebtPageSize
-            )
-        );
+    const tbody = document.getElementById("supplierDebtTableBody");
 
-    if ( supplierDebtCurrentPage > totalPages ) 
-		{ supplierDebtCurrentPage = totalPages; }
-	
+    if (!tbody) return;
+
+    const total = supplierDebtFiltered.length;
+    const totalPages =  Math.max( 1, Math.ceil( total / supplierDebtPageSize ) );
+
+    if (supplierDebtCurrentPage > totalPages) { supplierDebtCurrentPage = totalPages; }
+
     const start = (supplierDebtCurrentPage - 1) * supplierDebtPageSize;
     const end = start + supplierDebtPageSize;
-    const rows = supplierDebtFiltered.slice( start, end );
+    const rows = supplierDebtFiltered.slice(start, end);
 
     if (rows.length === 0) {
 			tbody.innerHTML = `
 				<tr>
-					<td colspan="8"
+					<td colspan="9"
 						class="text-center py-10 text-on-surface-variant">
 						Tidak ada hutang supplier
 					</td>
 				</tr>
-      `;
+			`;
     } else {
 			tbody.innerHTML =
 				rows.map(item => {
-					const statusClass =
-						item.status === "PAID"
-							? "text-green-700"
-							: "text-amber-700";
-					const action =
-						item.status === "PENDING"
-							? `
-								<button type="button"
-									onclick="openSupplierPaymentModal('${escapeHtml(item.id)}')"
-									class="px-3 py-1.5 text-on-surface-variant text-xs font-medium hover:text-on-surface">
-									Bayar
-								</button>
-							`
-						: `
-								<span class="text-xs text-on-surface-variant">
-									Lunas
-								</span>
-							`;
 
-          return `
+					const branchId =
+						item.branch_id ||
+						item.Branch_ID ||
+						item.branchId ||
+						"-";
+					const statusClass = item.status === "PAID"
+						? "text-green-700"
+						: "text-amber-700";
+					const action = item.status === "PENDING"
+						? `
+							<button type="button"
+								onclick="openSupplierPaymentModal('${escapeJs(item.id)}')"
+								class="px-3 py-1.5 text-on-surface-variant text-xs font-medium hover:text-on-surface">
+								Bayar
+							</button>
+						`
+						: `
+							<span class="text-xs text-on-surface-variant">
+								Lunas
+							</span>
+						`;
+
+					return `
 						<tr class="border-b border-outline-variant hover:bg-outline-variant">
 							<td class="px-4 py-3 text-sm font-medium">
-								${escapeHtml(item.id)}
+									${escapeHtml(item.id)}
 							</td>
 
 							<td class="px-4 py-3 text-sm">
-								${escapeHtml(item.supplier)}
+									${escapeHtml(branchId)}
 							</td>
 
 							<td class="px-4 py-3 text-sm">
-								${formatAccountingDate(item.date)}
+									${escapeHtml(item.supplier)}
+							</td>
+
+							<td class="px-4 py-3 text-sm">
+									${formatAccountingDate(item.date)}
 							</td>
 
 							<td class="px-4 py-3 text-sm text-right">
-								${formatAccountingCurrency(item.total)}
+									${formatAccountingCurrency(item.total)}
 							</td>
 
 							<td class="px-4 py-3 text-sm text-right">
-								${formatAccountingCurrency(item.paid)}
+									${formatAccountingCurrency(item.paid)}
 							</td>
 
 							<td class="px-4 py-3 text-sm text-right font-semibold">
-								${formatAccountingCurrency(item.outstanding)}
+									${formatAccountingCurrency(item.outstanding)}
 							</td>
 
 							<td class="px-4 py-3">
-								<span class=" inline-flex px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
-									${item.status}
-								</span>
+									<span class="inline-flex px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
+											${item.status}
+									</span>
 							</td>
 
 							<td class="px-4 py-3 text-center">
 									${action}
 							</td>
 						</tr>
-					`;
-				}).join("");
-    }
-  updateSupplierDebtPagination( total, totalPages );
+				`;
+			}).join("");
+		}
+	updateSupplierDebtPagination( total, totalPages );
 }
-
 
 /* =========================================================
    PAGINATION
@@ -27119,11 +27121,12 @@ function renderPpnPayments() {
     ? ppnPaymentsData
     : [];
   const total = data.length;
-  const totalPages = Math.max( 1, Math.ceil(total / ppnPaymentsPerPage) );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(total / ppnPaymentsPerPage)
+  );
 
-  if (ppnPaymentsPage > totalPages) {
-    ppnPaymentsPage = totalPages;
-  }
+  if (ppnPaymentsPage > totalPages) { ppnPaymentsPage = totalPages; }
 
   const startIndex = (ppnPaymentsPage - 1) * ppnPaymentsPerPage;
   const endIndex = Math.min( startIndex + ppnPaymentsPerPage, total );
@@ -27132,7 +27135,7 @@ function renderPpnPayments() {
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6"
+        <td colspan="7"
           class="px-5 py-10 text-center text-muted">
           No PPN payment data
         </td>
@@ -27140,18 +27143,25 @@ function renderPpnPayments() {
     `;
   } else {
     tbody.innerHTML = pageData.map(payment => {
+
       const paymentId = payment.payment_id || "";
       const paymentDate = payment.payment_date
-          ? new Date(payment.payment_date)
-              .toLocaleDateString("id-ID")
-          : "-";
-      const note = payment.note || "-";
+				? new Date(payment.payment_date)
+						.toLocaleDateString("id-ID")
+				: "-";
+      const branchId =
+        payment.branch_id ||
+        payment.Branch_ID ||
+        payment.branchId ||
+        "-";
+      const note =
+        payment.note || "-";
+
       const amount = Number(payment.amount) || 0;
       const method = payment.payment_method || "-";
-      const status = String(payment.status || "OUTSTANDING") .toUpperCase();
-			
-      let statusClass =
-        "bg-surface-container-high text-muted";
+      const status = String( payment.status || "OUTSTANDING" ).toUpperCase();
+
+      let statusClass = "bg-surface-container-high text-muted";
 
       if (status === "PAID") {
         statusClass =
@@ -27163,7 +27173,6 @@ function renderPpnPayments() {
         statusClass =
           "bg-yellow-600/10 text-yellow-700";
       }
-
       const action =
         status === "OUTSTANDING"
           ? `
@@ -27182,6 +27191,10 @@ function renderPpnPayments() {
           </td>
 
           <td class="px-5 py-3">
+            ${branchId}
+          </td>
+
+          <td class="px-5 py-3">
             ${note}
           </td>
 
@@ -27194,7 +27207,8 @@ function renderPpnPayments() {
           </td>
 
           <td class="px-5 py-3">
-            <span class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+            <span
+              class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
               ${status}
             </span>
           </td>
@@ -27206,43 +27220,27 @@ function renderPpnPayments() {
       `;
     }).join("");
   }
-  if (paginationInfo) {
-    paginationInfo.textContent =
-      total === 0
-        ? "Showing 0–0 of 0"
-        : `Showing ${startIndex + 1}–${endIndex} of ${total}`;
+
+  if (paginationInfo) { paginationInfo.textContent =
+		total === 0
+			? "Showing 0–0 of 0"
+			: `Showing ${startIndex + 1}–${endIndex} of ${total}`;
   }
-  if (prevButton) {
-    prevButton.disabled =
-      ppnPaymentsPage <= 1;
-  }
-  if (nextButton) {
-    nextButton.disabled =
-      ppnPaymentsPage >= totalPages;
-  }
+
+  if (prevButton) { prevButton.disabled = ppnPaymentsPage <= 1; }
+  if (nextButton) { nextButton.disabled = ppnPaymentsPage >= totalPages; }
 }
 
 function changePpnPaymentsPage(direction) {
-  const total =
-    Array.isArray(ppnPaymentsData)
-      ? ppnPaymentsData.length
-      : 0;
-
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(total / ppnPaymentsPerPage)
-    );
+  const total = Array.isArray(ppnPaymentsData)
+		? ppnPaymentsData.length
+		: 0;
+  const totalPages = Math.max( 1, Math.ceil(total / ppnPaymentsPerPage) );
 
   ppnPaymentsPage += direction;
 
-  if (ppnPaymentsPage < 1) {
-    ppnPaymentsPage = 1;
-  }
-
-  if (ppnPaymentsPage > totalPages) {
-    ppnPaymentsPage = totalPages;
-  }
+  if (ppnPaymentsPage < 1) {  ppnPaymentsPage = 1; }
+  if (ppnPaymentsPage > totalPages) { ppnPaymentsPage = totalPages; }
 
   renderPpnPayments();
 }
@@ -27371,16 +27369,7 @@ async function recordPpnPayment() {
     );
 
   } catch (error) {
-    console.error(
-      "recordPpnPayment error:",
-      error
-    );
-    showToast(
-      error?.message ||
-        "Gagal mencatat PPN.",
-      "error"
-    );
-
+    showToast( error?.message || "Gagal mencatat PPN.", "error" );
   } finally {
     ppnPaymentSaving = false;
     const button = document.getElementById( "recordPpnPaymentButton" );
@@ -27597,18 +27586,6 @@ const { data, error } =
         }
     );
 
-if (error) {
-    console.error("get_liabilities ERROR:", error);
-    console.error("message:", error.message);
-    console.error("details:", error.details);
-    console.error("hint:", error.hint);
-    console.error("code:", error.code);
-
-    throw error;
-}
-
-console.log("get_liabilities DATA:", data);
-
 	if (error) { throw error; }
 	if (!data) {
 		throw new Error( "Response get_liabilities kosong" ); }
@@ -27686,92 +27663,109 @@ function filterLiabilities() {
     renderLiabilities();
 }
 
+
 function renderLiabilities() {
 	const tbody = document.getElementById("otherLiabilitiesTableBody");
 	if (!tbody) return;
-	const totalPages = Math.max(
-		1,
-		Math.ceil(filteredLiabilities.length / liabilityPageSize) 
-	);
+
+	const totalPages = Math.max( 1, Math.ceil(filteredLiabilities.length / liabilityPageSize) );
+
 	if (liabilityCurrentPage > totalPages) { liabilityCurrentPage = totalPages; }
-  const start = (liabilityCurrentPage - 1) * liabilityPageSize;
-  const rows = filteredLiabilities.slice( start, start + liabilityPageSize );
+
+	const start = (liabilityCurrentPage - 1) * liabilityPageSize;
+	const rows = filteredLiabilities.slice(
+		start,
+		start + liabilityPageSize
+	);
 
 	if (!rows.length) {
 		tbody.innerHTML = `
 			<tr>
-				<td colspan="8" class="text-center py-10 text-on-surface-variant">
+				<td colspan="10"
+					class="text-center py-10 text-on-surface-variant">
 					Tidak ada data liability
 				</td>
 			</tr>
 		`;
 		renderLiabilityPagination(0, 0);
-		return; 
+		return;
 	}
 
-  tbody.innerHTML = rows.map(item => {
+	tbody.innerHTML = rows.map(item => {
 		const id = item.liability_id;
 		const type = getLiabilityTypeLabel(item.liability_type);
+		const branchId =
+			item.branch_id ||
+			item.Branch_ID ||
+			item.branchId ||
+			"-";
 		const creditor = escapeHtml(item.creditor || "-");
 		const startDate = formatLiabilityDate(item.start_date);
 		const dueDate = item.due_date
-					? formatLiabilityDate(item.due_date)
-					: "-";
+			? formatLiabilityDate(item.due_date)
+			: "-";
 		const original = formatRupiah(item.original_amount);
 		const paid = formatRupiah(item.paid_principal);
 		const outstanding = formatRupiah(item.outstanding_principal);
-		const status = String(item.status || "ACTIVE").toUpperCase();
+		const status = String( item.status || "ACTIVE" ).toUpperCase();
 
 		let statusClass = "bg-blue-500/10 text-blue-400";
+
 		if (status === "PAID") { statusClass = "bg-emerald-500/10 text-emerald-400"; }
 		if (status === "CANCELLED") { statusClass = "bg-red-500/10 text-red-400"; }
 
-    return `
+		return `
 			<tr class="border-b border-outline-variant hover:bg-outline-variant">
 				<td class="px-5 py-3">
 					<div class="font-medium text-on-surface">
 						${type}
 					</div>
-		
+
 					<div class="text-xs text-on-surface-variant">
 						${id}
 					</div>
 				</td>
-		
+
+				<td class="px-5 py-3 text-on-surface">
+					${escapeHtml(branchId)}
+				</td>
+
 				<td class="px-5 py-3 text-on-surface">
 					${creditor}
 				</td>
-		
+
 				<td class="px-5 py-3 text-on-surface-variant text-sm">
 					${startDate}
 				</td>
-		
+
 				<td class="px-5 py-3 text-on-surface-variant text-sm">
 					${dueDate}
 				</td>
-		
+
 				<td class="px-5 py-3 text-right text-on-surface">
 					${original}
 				</td>
-		
+
 				<td class="px-5 py-3 text-right text-on-surface">
 					${paid}
 				</td>
-		
-				<td class="px-5 py-3 text-center font-semibold text-on-surface">
+
+				<td class="px-5 py-3 text-right font-semibold text-on-surface">
 					${outstanding}
 				</td>
-		
-				<td class="px-5 py-3">
-					<span class="inline-flex text-center px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
+
+				<td class="px-5 py-3 text-center">
+					<span
+						class="inline-flex text-center px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
 						${status}
 					</span>
 				</td>
-		
-				<td class="px-5 py-3">
+					
+				<td class="px-5 py-3 text-center">
 					${status === "ACTIVE"
 						? `
-							<button type="button"
+							<button
+								type="button"
 								onclick="openLiabilityPaymentModal('${escapeJs(id)}')"
 								class="p-1.5 rounded-md hover:text-on-surface text-on-surface-variant"
 								title="Bayar">
@@ -27786,7 +27780,6 @@ function renderLiabilities() {
 			</tr>
 		`;
 	}).join("");
-
 	renderLiabilityPagination(
 		filteredLiabilities.length,
 		totalPages
