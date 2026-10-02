@@ -29237,11 +29237,11 @@ function renderTaxPayments() {
               ${method}
             </td>
 
-            <td class="px-5 py-3 whitespace-nowrap">
+            <td class="px-5 py-3 text-center whitespace-nowrap">
               ${statusHtml}
             </td>
 
-            <td class="px-5 py-3 text-right whitespace-nowrap">
+            <td class="px-5 py-3 text-center whitespace-nowrap">
               ${actionHtml}
             </td>
           </tr>
