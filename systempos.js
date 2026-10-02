@@ -26325,7 +26325,9 @@ async function initAccountingDebtPage() {
 	supplierDebtCurrentPage = 1;
 	supplierDebtData = [];
 	supplierDebtFiltered = [];
+	await loadDebtLiabilityBranchFilters();
 	initSupplierDebtFilters();
+	initDebtLiabilityFilters();
 	await loadSupplierDebt();
 	await initOtherLiability();
 	await loadTaxPayable();
@@ -26336,6 +26338,139 @@ async function initAccountingDebtPage() {
 /* =========================================================
    FILTER INITIALIZATION
    ========================================================= */
+function getDebtLiabilityRpcBranchId() {
+    const filter = getDebtLiabilityFilter();
+
+    return (
+        !filter.branchId ||
+        filter.branchId === "ALL"
+    )
+        ? null
+        : filter.branchId;
+}
+
+
+let debtLiabilityFilter = {
+    branchId: "",
+    periodFrom: "",
+    periodTo: ""
+};
+
+function getDebtLiabilityFilter() {
+    return {
+        branchId: document.getElementById("debtLiabilityBranchFilter")?.value || "",
+        periodFrom: document.getElementById("debtLiabilityPeriodFrom")?.value || "",
+        periodTo: document.getElementById("debtLiabilityPeriodTo")?.value || ""
+    };
+}
+
+async function loadDebtLiabilityBranchFilters() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) return;
+
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_branches",
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) throw error;
+
+    const branches = typeof data === "string"
+			? JSON.parse(data)
+			: (data || []);
+    const select = document.getElementById( "debtLiabilityBranchFilter" );
+
+    if (!select) return;
+
+    select.innerHTML = ` <option value="ALL">All Branch</option> `;
+    branches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch.id || "";
+      option.textContent =
+        branch.name ||
+        branch.id ||
+        "Unnamed Branch";
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error(
+      "loadDebtLiabilityBranchFilters:",
+      error
+    );
+  }
+}
+
+function initDebtLiabilityFilters() {
+    const branchEl = document.getElementById("debtLiabilityBranchFilter");
+    const fromEl = document.getElementById("debtLiabilityPeriodFrom");
+    const toEl = document.getElementById("debtLiabilityPeriodTo");
+
+    if (fromEl && !fromEl.value) {
+        const now = new Date();
+        fromEl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+    }
+
+    if (toEl && !toEl.value) { toEl.value = getTodayAccountingDate(); }
+    const handleChange = () => {
+        const filter = getDebtLiabilityFilter();
+        if (
+            filter.periodFrom &&
+            filter.periodTo &&
+            filter.periodFrom > filter.periodTo
+        ) {
+            showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" );
+            return; }
+        debtLiabilityFilter = filter;
+        reloadDebtLiabilityData();
+    };
+
+    if (branchEl) branchEl.onchange = handleChange;
+    if (fromEl) fromEl.onchange = handleChange;
+    if (toEl) toEl.onchange = handleChange;
+
+    debtLiabilityFilter = getDebtLiabilityFilter();
+}
+
+async function reloadDebtLiabilityData() {
+    try {
+        const filter = getDebtLiabilityFilter();
+
+        if (
+            filter.periodFrom &&
+            filter.periodTo &&
+            filter.periodFrom > filter.periodTo
+        ) {
+            showAccountingDebtMessage(
+                "Period From tidak boleh lebih besar dari Period To",
+                "error"
+            );
+            return;
+        }
+
+        debtLiabilityFilter = filter;
+        state.accountingSupplierDebtData = null;
+        state.accountingSupplierDebtFilter = null;
+        state.accountingTaxPayableData = null;
+        state.accountingTaxPayableFilter = null;
+        state.accountingLiabilitiesData = null;
+        state.accountingLiabilitiesFilter = null;
+
+        await loadSupplierDebt();
+        await loadLiabilities();
+        await loadTaxPayable();
+        await loadPpnPayments();
+
+    } catch (error) {
+        console.error(
+            "reloadDebtLiabilityData:",
+            error
+        );
+    }
+}
 
 function initSupplierDebtFilters() {
 	const statusEl = document.getElementById("supplierDebtStatusFilter");
@@ -26385,9 +26520,15 @@ async function loadSupplierDebt() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
 		if (!sessionId) { throw new Error("Session tidak ditemukan"); }
-    const branchId = state.branchId;
-    if (!branchId) { throw new Error("Branch belum tersedia"); }
-		const currentFilter = { branchId };
+		const filter = getDebtLiabilityFilter();
+		const branchId = !filter.branchId || filter.branchId === "ALL"
+			? null
+			: filter.branchId;
+		const currentFilter = {
+		    branchId,
+		    periodFrom: filter.periodFrom || null,
+		    periodTo: filter.periodTo || null
+		};
     // ===== CACHE HIT =====
     if (
       state.accountingSupplierDebtData &&
@@ -26406,7 +26547,9 @@ async function loadSupplierDebt() {
 				"get_supplier_debts",
 				{
 					p_session_id: sessionId,
-					p_branch_id: branchId
+					p_branch_id: branchId,
+					p_period_from: filter.periodFrom || null,
+					p_period_to: filter.periodTo || null
 				}
 			);
 
@@ -26860,10 +27003,16 @@ let taxPayableData = null;
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
   const sessionId = localStorage.getItem("pos_session_id");
-  const branchId = state.branchId;
-  if (!sessionId) { return; }
-  if (!branchId) { return; }
-	const currentFilter = {  branchId };
+	const filter = getDebtLiabilityFilter();
+	const branchId = !filter.branchId || filter.branchId === "ALL"
+		? null
+		: filter.branchId;
+	if (!sessionId) {  return; }
+	const currentFilter = {
+	    branchId,
+	    periodFrom: filter.periodFrom || null,
+	    periodTo: filter.periodTo || null
+	};
   if (
     state.accountingTaxPayableData &&
     state.accountingTaxPayableFilter &&
@@ -26917,27 +27066,31 @@ async function loadPpnPayments() {
     if (!sessionId) {
       throw new Error("Session tidak ditemukan.");
     }
-    const branchId = state.branchId || null;
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_ppn_payments",
-        {
-          p_session_id: sessionId,
-          p_branch_id: branchId
-        }
-      );
+		const filter = getDebtLiabilityFilter();
+		const branchId = ( !filter.branchId || filter.branchId === "ALL" )
+	    ? null
+	    : filter.branchId;
+		
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_ppn_payments",
+				{
+					p_session_id: sessionId,
+					p_branch_id: branchId,
+					p_period_from: filter.periodFrom || null,
+					p_period_to: filter.periodTo || null
+				}
+			);
 
-    if (error) {
-      throw error;
-    }
-    const result =
-      typeof data === "string"
-        ? JSON.parse(data)
-        : data;
-    ppnPaymentsData =
-      Array.isArray(result)
-        ? result
-        : [];
+    if (error) { throw error; }
+		
+    const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
+		
+    ppnPaymentsData = Array.isArray(result)
+			? result
+			: [];
 
     ppnPaymentsPage = 1;
     renderPpnPayments();
@@ -27337,10 +27490,10 @@ let liabilityCurrentPage = 1;
 const liabilityPageSize = 10;
 
 async function initOtherLiability() {
-	const dateEl = document.getElementById("newLiabilityDate");
-	if (dateEl && !dateEl.value) { dateEl.value = new Date().toISOString().split("T")[0]; }
-	bindOtherLiabilityEvents();
-	await loadLiabilities();
+    const dateEl = document.getElementById("newLiabilityDate");
+
+    if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingDate(); }
+    bindOtherLiabilityEvents();
 }
 
 function bindOtherLiabilityEvents() {
@@ -27369,17 +27522,21 @@ async function loadLiabilities() {
 try {
 	const sessionId = localStorage.getItem("pos_session_id");
 	if (!sessionId) { throw new Error("Session tidak ditemukan"); }
-	const branchId = state.branchId;
+	const filter = getDebtLiabilityFilter();
+	const branchId = !filter.branchId || filter.branchId === "ALL"
+		? null
+		: filter.branchId;
 
-	if (!branchId) { throw new Error("Branch belum tersedia"); }
 	const { data, error } =
-		await supabaseClient.rpc(
+    await supabaseClient.rpc(
 			"get_liabilities",
 			{
 				p_session_id: sessionId,
-				p_branch_id: branchId
+				p_branch_id: branchId,
+				p_period_from: filter.periodFrom || null,
+				p_period_to: filter.periodTo || null
 			}
-		);
+    );
 
 	if (error) { throw error; }
 	if (!data) {
@@ -27414,7 +27571,7 @@ try {
 
 	filteredLiabilities = [...liabilityData];
 	liabilityCurrentPage = 1;
-	updateDebtSummary();
+	updateSupplierDebtSummary();
 	renderLiabilities();
 
 } catch (error) {
