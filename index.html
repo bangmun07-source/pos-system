@@ -18435,6 +18435,42 @@
             </div>
           </div>
         </section>
+				<!-- DEBT & LIABILITY FILTER -->
+				<section class="bg-background border border-outline-variant rounded-md p-5">
+				  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				    <!-- BRANCH -->
+				    <div>
+				      <label class="block text-xs text-muted mb-2">
+				        Branch
+				      </label>
+				
+				      <select id="debtLiabilityBranchFilter"
+				        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				        <option value="ALL">All Branches</option>
+				      </select>
+				    </div>
+				    <!-- PERIOD FROM -->
+				    <div>
+				      <label class="block text-xs text-muted mb-2">
+				        Period From
+				      </label>
+				
+				      <input id="debtLiabilityPeriodFrom"
+				        type="date"
+				        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				    </div>
+				    <!-- PERIOD TO -->
+				    <div>
+				      <label class="block text-xs text-muted mb-2">
+				        Period To
+				      </label>
+				
+				      <input id="debtLiabilityPeriodTo"
+				        type="date"
+				        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				    </div>
+				  </div>
+				</section>
         <!-- SUPPLIER PAYABLES -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <div class="p-5 border-b border-outline-variant flex items-center justify-between">
