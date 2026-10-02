@@ -26558,6 +26558,7 @@ async function loadSupplierDebt() {
 					ingredient: item.ingredient || "-",
 					supplier: item.supplier || "-",
 					supplierId: item.supplier_id || "",
+					branchId: item.branch_id || "",
 					total: total,
 					paid: paid,
 					outstanding: outstanding,
@@ -26577,7 +26578,7 @@ async function loadSupplierDebt() {
 		if (tbody) {
 			tbody.innerHTML = `
 				<tr>
-					<td colspan="8"
+					<td colspan="9"
 							class="text-center py-8 text-red-500">
 							Gagal memuat data hutang supplier
 					</td>
@@ -26716,11 +26717,7 @@ function renderSupplierDebtTable() {
 			tbody.innerHTML =
 				rows.map(item => {
 
-					const branchId =
-						item.branch_id ||
-						item.Branch_ID ||
-						item.branchId ||
-						"-";
+					const branchId = item.branchId || "-";
 					const statusClass = item.status === "PAID"
 						? "text-green-700"
 						: "text-amber-700";
