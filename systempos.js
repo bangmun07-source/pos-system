@@ -27062,7 +27062,8 @@ let currentPpnPayment = null;
 let ppnPaymentsData = [];
 let ppnPaymentsPage = 1;
 const ppnPaymentsPerPage = 10;
-
+let ppnPaymentSaving = false;
+			
 async function loadPpnPayments() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
@@ -27322,8 +27323,7 @@ async function recordPpnPayment() {
       );
     }
 		
-    const button = document.getElementById( "recordPpnPaymentButton" );
-
+    const button = document.getElementById("ppnRecordButton");
     ppnPaymentSaving = true;
 		
     if (button) {
@@ -27369,7 +27369,7 @@ async function recordPpnPayment() {
     showToast( error?.message || "Gagal mencatat PPN.", "error" );
   } finally {
     ppnPaymentSaving = false;
-    const button = document.getElementById( "recordPpnPaymentButton" );
+    const button = document.getElementById("ppnRecordButton");
     if (button) {
       button.disabled = false;
       button.innerHTML = button.dataset.originalText ||
