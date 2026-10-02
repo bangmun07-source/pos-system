@@ -26545,9 +26545,9 @@ function applySupplierDebtFilters() {
 				{ return false; }
 		if ( search ) {
 				const searchable = [
-						item.id,
-						item.ingredient,
-						item.supplier ]
+					item.id,
+					item.ingredient,
+					item.supplier ]
 				.join(" ")
 				.toLowerCase();
 				if (!searchable.includes(search)) {
@@ -26557,7 +26557,6 @@ function applySupplierDebtFilters() {
 	});
   renderSupplierDebtTable();
 }
-
 
 /* =========================================================
    RENDER TABLE
@@ -26598,7 +26597,6 @@ function renderSupplierDebtTable() {
 						item.status === "PAID"
 							? "text-green-700"
 							: "text-amber-700";
-
 					const action =
 						item.status === "PENDING"
 							? `
@@ -26641,7 +26639,7 @@ function renderSupplierDebtTable() {
 							</td>
 
 							<td class="px-4 py-3">
-								<span class=" inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+								<span class=" inline-flex px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
 									${item.status}
 								</span>
 							</td>
@@ -26666,23 +26664,22 @@ function updateSupplierDebtPagination( total, totalPages ) {
 	const prev = document.getElementById( "supplierDebtPrevButton" );
 	const next = document.getElementById( "supplierDebtNextButton" );
 	const start = total === 0
-					? 0
-					: ( (supplierDebtCurrentPage - 1) * supplierDebtPageSize  ) + 1;
+			? 0
+			: ( (supplierDebtCurrentPage - 1) * supplierDebtPageSize  ) + 1;
 	const end =  Math.min( supplierDebtCurrentPage * supplierDebtPageSize, total );
-	if (info) { info.textContent = total === 0
-							? "0 data"
-							: `${start}-${end} dari ${total}`; }
-	if (prev) {
-		prev.disabled = supplierDebtCurrentPage <= 1;
-		prev.onclick = () => {
-		if ( supplierDebtCurrentPage > 1 ) {
-				supplierDebtCurrentPage--;
-				renderSupplierDebtTable();
-			}
-		};
-	}
-
-
+		if (info) { info.textContent = total === 0
+			? "0 data"
+			: `${start}-${end} dari ${total}`; }
+		if (prev) {
+			prev.disabled = supplierDebtCurrentPage <= 1;
+			prev.onclick = () => {
+			if ( supplierDebtCurrentPage > 1 ) {
+					supplierDebtCurrentPage--;
+					renderSupplierDebtTable();
+				}
+			};
+		}
+	
     if (next) { 
 			next.disabled = supplierDebtCurrentPage >= totalPages;
       next.onclick = () => {
@@ -26964,29 +26961,16 @@ function renderPpnPayments() {
   const data = Array.isArray(ppnPaymentsData)
     ? ppnPaymentsData
     : [];
-
   const total = data.length;
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(total / ppnPaymentsPerPage)
-  );
+  const totalPages = Math.max( 1, Math.ceil(total / ppnPaymentsPerPage) );
 
   if (ppnPaymentsPage > totalPages) {
     ppnPaymentsPage = totalPages;
   }
 
-  const startIndex =
-    (ppnPaymentsPage - 1) * ppnPaymentsPerPage;
-
-  const endIndex =
-    Math.min(
-      startIndex + ppnPaymentsPerPage,
-      total
-    );
-
-  const pageData =
-    data.slice(startIndex, endIndex);
+  const startIndex = (ppnPaymentsPage - 1) * ppnPaymentsPerPage;
+  const endIndex = Math.min( startIndex + ppnPaymentsPerPage, total );
+  const pageData = data.slice(startIndex, endIndex);
 
   if (pageData.length === 0) {
     tbody.innerHTML = `
@@ -26999,29 +26983,16 @@ function renderPpnPayments() {
     `;
   } else {
     tbody.innerHTML = pageData.map(payment => {
-
-      const paymentId =
-        payment.payment_id || "";
-
-      const paymentDate =
-        payment.payment_date
+      const paymentId = payment.payment_id || "";
+      const paymentDate = payment.payment_date
           ? new Date(payment.payment_date)
               .toLocaleDateString("id-ID")
           : "-";
-
-      const note =
-        payment.note || "-";
-
-      const amount =
-        Number(payment.amount) || 0;
-
-      const method =
-        payment.payment_method || "-";
-
-      const status =
-        String(payment.status || "OUTSTANDING")
-          .toUpperCase();
-
+      const note = payment.note || "-";
+      const amount = Number(payment.amount) || 0;
+      const method = payment.payment_method || "-";
+      const status = String(payment.status || "OUTSTANDING") .toUpperCase();
+			
       let statusClass =
         "bg-surface-container-high text-muted";
 
@@ -27049,7 +27020,6 @@ function renderPpnPayments() {
           : "-";
       return `
         <tr class="hover:bg-background/50">
-
           <td class="px-5 py-3">
             ${paymentDate}
           </td>
@@ -27067,15 +27037,14 @@ function renderPpnPayments() {
           </td>
 
           <td class="px-5 py-3">
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusClass}">
+            <span class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
               ${status}
             </span>
           </td>
 
-          <td class="px-5 py-3 text-right">
+          <td class="px-5 py-3 text-center">
             ${action}
           </td>
-
         </tr>
       `;
     }).join("");
@@ -27122,10 +27091,9 @@ function changePpnPaymentsPage(direction) {
 }
 
 function changePpnPaymentsPage(direction) {
-  const total =
-    Array.isArray(ppnPaymentsData)
-      ? ppnPaymentsData.length
-      : 0;
+  const total = Array.isArray(ppnPaymentsData)
+		? ppnPaymentsData.length
+		: 0;
 
   const totalPages =
     Math.max(
@@ -27224,13 +27192,10 @@ function openPpnPaymentFromRow(paymentId) {
 
   if (!payment) {
     showToast("PPN payment tidak ditemukan.", "error");
-    return;
-  }
-
+    return; }
   if (String(payment.status).toUpperCase() !== "OUTSTANDING") {
     showToast("PPN payment ini sudah tidak outstanding.", "info");
-    return;
-  }
+    return; }
   currentPpnPayment = payment;
   openTaxPaymentModal();
 }
@@ -27247,9 +27212,8 @@ async function openTaxPaymentModal() {
 
   if (outstanding <= 0) {
     alert("Tax Payable tidak memiliki saldo terutang.");
-    return;
-  }
-
+    return; }
+	
   document.getElementById("taxPaymentAccount").textContent = "2200 · Tax Payable";
   document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
   document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
@@ -27295,11 +27259,11 @@ async function saveTaxPayment() {
   const amount = Number( document.getElementById("taxPaymentAmount")?.value ) || 0;
   const method = document.getElementById("taxPaymentMethod")?.value || "CASH";
   const referenceNo = document .getElementById("taxPaymentReference")
-      ?.value
-      ?.trim() || null;
+		?.value
+		?.trim() || null;
   const note = document .getElementById("taxPaymentNote")
-      ?.value
-      ?.trim() || null;
+		?.value
+		?.trim() || null;
 	
   if (!paymentDate) {
     alert("Tanggal pembayaran wajib diisi.");
@@ -27347,21 +27311,13 @@ async function saveTaxPayment() {
 		state.accountingReportsFilter = null;	
 
     closeTaxPaymentModal();
-    alert(
-      data?.message ||
-      "Pembayaran Tax Payable berhasil."
-    );
+    alert( data?.message || "Pembayaran Tax Payable berhasil." );
 	
     await loadTaxPayable();
-	await loadPpnPayments();
+		await loadPpnPayments();
   } catch (error) {
-    alert(
-      error?.message ||
-      "Gagal menyimpan pembayaran Tax Payable."
-    );
-
+    alert( error?.message || "Gagal menyimpan pembayaran Tax Payable." );
   } finally {
-
     if (button) {
       button.disabled = false;
       button.textContent = "Pay Tax";
@@ -27574,12 +27530,12 @@ function renderLiabilities() {
 					${paid}
 				</td>
 		
-				<td class="px-5 py-3 text-right font-semibold text-on-surface">
+				<td class="px-5 py-3 text-center font-semibold text-on-surface">
 					${outstanding}
 				</td>
 		
 				<td class="px-5 py-3">
-					<span class="inline-flex px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
+					<span class="inline-flex text-center px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
 						${status}
 					</span>
 				</td>
