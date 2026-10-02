@@ -27019,7 +27019,7 @@ function renderPpnPayments() {
           `
           : "-";
       return `
-        <tr class="hover:bg-background/50">
+        <tr class="hover:bg-outline-variant">
           <td class="px-5 py-3">
             ${paymentDate}
           </td>
