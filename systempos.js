@@ -26330,6 +26330,7 @@ async function initAccountingDebtPage() {
 	initDebtLiabilityFilters();
 	await loadSupplierDebt();
 	await initOtherLiability();
+	await loadLiabilities();
 	await loadTaxPayable();
 	await loadPpnPayments();
 }
@@ -27025,10 +27026,15 @@ async function loadTaxPayable() {
   }
 
   try {
-    const { data, error } = await supabaseClient.rpc("get_tax_payable", {
-      p_session_id: sessionId,
-      p_branch_id: branchId
-    });
+		const { data, error } = 
+			await supabaseClient.rpc("get_tax_payable", 
+			{
+				p_session_id: sessionId,
+				p_branch_id: branchId,
+				p_period_from: filter.periodFrom || null,
+				p_period_to: filter.periodTo || null
+			}
+		);
 
     if (error) {
       throw error;
@@ -27240,29 +27246,6 @@ function changePpnPaymentsPage(direction) {
     ppnPaymentsPage = totalPages;
   }
 
-  renderPpnPayments();
-}
-
-function changePpnPaymentsPage(direction) {
-  const total = Array.isArray(ppnPaymentsData)
-		? ppnPaymentsData.length
-		: 0;
-
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(total / ppnPaymentsPerPage)
-    );
-
-  ppnPaymentsPage += direction;
-
-  if (ppnPaymentsPage < 1) {
-    ppnPaymentsPage = 1;
-  }
-
-  if (ppnPaymentsPage > totalPages) {
-    ppnPaymentsPage = totalPages;
-  }
   renderPpnPayments();
 }
 
