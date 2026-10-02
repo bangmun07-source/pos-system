@@ -23938,15 +23938,6 @@ function formatJournalCurrency(value) {
 	return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
 }
 
-function escapeHtml(value) {
-	return String(value ?? "")
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
-}
-
 // ============================================================
 // GENERAL LEDGER
 // ============================================================
@@ -24306,14 +24297,6 @@ function formatGeneralLedgerDate(value) {
   );
 }
 
-function escapeHtml(value) {
-	return String(value ?? "")
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
-}
 
 async function initGeneralLedger() {
   initGeneralLedgerFilters();
@@ -26986,15 +26969,6 @@ function getTodayAccountingDate() {
 	.split("T")[0];
 }
 
-function escapeHtml(value) {
-	return String(value ?? "")
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
-}
-
 
 /* =========================================================
    TAX PAYABLE
@@ -28235,15 +28209,6 @@ function formatLiabilityDate(value) {
 			year: "numeric"
 		}
 	);
-}
-
-function escapeHtml(value) {
-	return String(value ?? "")
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
 }
 
 function escapeJs(value) {
