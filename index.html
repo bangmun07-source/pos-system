@@ -21584,7 +21584,6 @@
 			<!-- ACCOUNTS RECEIVABLE FILTER -->
 			<section class="bg-background border border-outline-variant rounded-md p-5 mt-4">
 			  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-			
 			    <!-- BRANCH -->
 			    <div>
 			      <label class="block text-xs text-muted mb-2">
@@ -21592,6 +21591,7 @@
 			      </label>
 			
 			      <select id="accountsReceivableBranchFilter"
+							onchange="loadAccountsReceivableRecords()"
 			        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
 			        <option value="ALL">All Branches</option>
 			      </select>
@@ -21604,6 +21604,7 @@
 			      </label>
 			
 			      <input id="accountsReceivablePeriodFrom"
+							onchange="loadAccountsReceivableRecords()"
 			        type="date"
 			        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
 			    </div>
@@ -21615,6 +21616,7 @@
 			      </label>
 			
 			      <input id="accountsReceivablePeriodTo"
+							onchange="loadAccountsReceivableRecords()"
 			        type="date"
 			        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
 			    </div>
