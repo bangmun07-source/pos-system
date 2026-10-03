@@ -21581,62 +21581,44 @@
 					</div>
 				</div>
       </section>
-			<!-- RECEIVABLE FILTERS -->
-			<section class="bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-4">
-			  <div class="px-5 py-4">
-			    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-			      <div>
-			        <h2 class="font-semibold">
-			          Filters
-			        </h2>
+			<!-- ACCOUNTS RECEIVABLE FILTER -->
+			<section class="bg-background border border-outline-variant rounded-md p-5 mt-4">
+			  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 			
-			        <p class="text-sm text-muted mt-1">
-			          Filter receivables by branch and date.
-			        </p>
-			      </div>
+			    <!-- BRANCH -->
+			    <div>
+			      <label class="block text-xs text-muted mb-2">
+			        Branch
+			      </label>
 			
-			      <div class="flex flex-wrap items-end gap-3">
-			        <!-- BRANCH -->
-			        <div>
-			          <label for="accountsReceivableBranchFilter"
-			            class="block text-xs text-muted mb-1">
-			            Branch
-			          </label>
-			
-			          <select id="accountsReceivableBranchFilter"
-			            onchange="loadAccountsReceivableRecords()"
-			            class="h-10 min-w-[180px] px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary">
-			            <option value="ALL">
-			              All Branch
-			            </option>
-			          </select>
-			        </div>
-			        <!-- DATE FROM -->
-			        <div>
-			          <label for="accountsReceivableDateFrom"
-			            class="block text-xs text-muted mb-1">
-			            Date From
-			          </label>
-			
-			          <input id="accountsReceivableDateFrom"
-			            type="date"
-			            onchange="loadAccountsReceivableRecords()"
-			            class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary">
-			        </div>
-			        <!-- DATE TO -->
-			        <div>
-			          <label for="accountsReceivableDateTo"
-			            class="block text-xs text-muted mb-1">
-			            Date To
-			          </label>
-			
-			          <input id="accountsReceivableDateTo"
-			            type="date"
-			            onchange="loadAccountsReceivableRecords()"
-			            class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary">
-			        </div>
-			      </div>
+			      <select id="accountsReceivableBranchFilter"
+			        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+			        <option value="ALL">All Branches</option>
+			      </select>
 			    </div>
+			
+			    <!-- PERIOD FROM -->
+			    <div>
+			      <label class="block text-xs text-muted mb-2">
+			        Period From
+			      </label>
+			
+			      <input id="accountsReceivablePeriodFrom"
+			        type="date"
+			        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+			    </div>
+			
+			    <!-- PERIOD TO -->
+			    <div>
+			      <label class="block text-xs text-muted mb-2">
+			        Period To
+			      </label>
+			
+			      <input id="accountsReceivablePeriodTo"
+			        type="date"
+			        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+			    </div>
+			
 			  </div>
 			</section>
       <!-- RECEIVABLE TABLE -->
