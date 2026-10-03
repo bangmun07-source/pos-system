@@ -30861,40 +30861,39 @@ async function loadAccountsReceivableRecords() {
     const sessionId = localStorage.getItem("pos_session_id");
 
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
-
-    const branchId = state.branchId || null;
-    const typeEl = document.getElementById( "accountsReceivableTypeFilter" );
-    const statusEl = document.getElementById( "accountsReceivableStatusFilter" );
-    const searchEl = document.getElementById( "accountsReceivableSearch" );
+		
+    const branchId = document.getElementById("accountsReceivableBranchFilter")?.value || "ALL";
+    const periodFrom = document.getElementById("accountsReceivablePeriodFrom")?.value || null;
+    const periodTo = document.getElementById("accountsReceivablePeriodTo")?.value || null;
+    const typeEl = document.getElementById("accountsReceivableTypeFilter");
+    const statusEl = document.getElementById("accountsReceivableStatusFilter");
+    const searchEl = document.getElementById("accountsReceivableSearch");
     const arType = typeEl?.value || "ALL";
     const status = statusEl?.value || "ALL";
     const search = searchEl?.value?.trim() || null;
-		const currentFilter = { branchId, arType, status, search };
-    // USE CACHE
+    const currentFilter = { branchId, periodFrom, periodTo, arType, status, search };
+
     if (
       state.accountsReceivableData &&
       state.accountsReceivableFilter &&
       JSON.stringify(state.accountsReceivableFilter) ===
         JSON.stringify(currentFilter)
     ) {
-
-      accountsReceivableRecords =
-        state.accountsReceivableData;
-
+      accountsReceivableRecords = state.accountsReceivableData;
       accountsReceivableRecordsPage = 1;
-
       updateAccountsReceivableOverview();
       renderAccountsReceivableRecords();
-
       return accountsReceivableRecords;
     }
-		
+
     const { data, error } =
       await supabaseClient.rpc(
         "get_accounts_receivable",
         {
           p_session_id: sessionId,
           p_branch_id: branchId,
+          p_period_from: periodFrom,
+          p_period_to: periodTo,
           p_ar_type: arType,
           p_status: status,
           p_search: search
@@ -30902,7 +30901,7 @@ async function loadAccountsReceivableRecords() {
       );
 
     if (error) { throw error; }
-
+		
     const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
@@ -30911,20 +30910,20 @@ async function loadAccountsReceivableRecords() {
 			? result
 			: [];
 
-		state.accountsReceivableData = accountsReceivableRecords;
+    state.accountsReceivableData = accountsReceivableRecords;
     state.accountsReceivableFilter = currentFilter;
-
+		
     accountsReceivableRecordsPage = 1;
-		updateAccountsReceivableOverview();
+    updateAccountsReceivableOverview();
     renderAccountsReceivableRecords();
     return accountsReceivableRecords;
-
+		
   } catch (error) {
-	  accountsReceivableRecords = [];
-	  updateAccountsReceivableOverview();
-	  renderAccountsReceivableRecords();
-	  throw error;
-	}
+    accountsReceivableRecords = [];
+    updateAccountsReceivableOverview();
+    renderAccountsReceivableRecords();
+    throw error;
+  }
 }
 
 function updateAccountsReceivableOverview() {
