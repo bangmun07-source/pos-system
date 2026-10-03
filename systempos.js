@@ -31067,7 +31067,7 @@ function getAccountsReceivableStatusBadge(status) {
   const item = config[value] || config.DRAFT;
 
   return `
-    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${item.className}" >
+    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${item.className}" >
       ${item.label}
     </span>
   `;
