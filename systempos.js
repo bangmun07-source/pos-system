@@ -26563,8 +26563,8 @@ async function loadSupplierDebt() {
 					paid: paid,
 					outstanding: outstanding,
 					status: outstanding <= 0
-									? "PAID"
-									: "PENDING"
+						? "PAID"
+						: "PENDING"
 					};
 				});
 		
@@ -26765,7 +26765,7 @@ function renderSupplierDebtTable() {
 							</td>
 
 							<td class="px-4 py-3">
-								<span class="inline-flex px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
+								<span class="inline-flex px-2.5 py-1 text-xs font-medium ${statusClass}">
 									${item.status}
 								</span>
 							</td>
