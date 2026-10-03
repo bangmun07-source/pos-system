@@ -30850,10 +30850,49 @@ let selectedAccountsReceivableId = null;
 async function initAccountsReceivablePage() {
   try {
     accountsReceivableRecordsPage = 1;
-
+		await loadAccountsReceivableBranchFilters();
     await loadAccountsReceivableRecords();
 
   } catch (error) { }
+}
+
+async function loadAccountsReceivableBranchFilters() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    if (!sessionId) return;
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+
+    const branches = typeof data === "string"
+			? JSON.parse(data)
+			: (data || []);
+    const select = document.getElementById( "accountsReceivableBranchFilter" );
+
+    if (!select) return;
+
+    select.innerHTML = `<option value="ALL">All Branches</option>`;
+    branches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch.id || "";
+      option.textContent = branch.name || branch.id || "Unnamed Branch";
+      select.appendChild(option);
+    });
+
+  } catch (error) {
+    console.error(
+      "loadAccountsReceivableBranchFilters:",
+      error
+    );
+  }
 }
 
 async function loadAccountsReceivableRecords() {
@@ -30966,9 +31005,7 @@ function updateAccountsReceivableOverview() {
   if (overdueEl) { overdueEl.textContent = formatAccountingTaxCurrency( overdueOutstanding ); }
 }
 
-/* =========================================================
-   RECEIVABLE — TYPE CHANGE
-========================================================= */
+/* ==== RECEIVABLE — TYPE CHANGE ==== */
 
 function handleAccountsReceivableTypeChange() {
 
@@ -31272,9 +31309,7 @@ function openAccountsReceivableRecordMenu(recordId) {
 }
 
 
-/* =========================================================
-   RECEIVABLE — NEW / SAVE DRAFT
-========================================================= */
+/* ==== RECEIVABLE — NEW / SAVE DRAFT ===== */
 
 function openAccountsReceivableModal() {
   const modal = document.getElementById( "accountsReceivableModal" );
