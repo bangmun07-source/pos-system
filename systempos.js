@@ -30888,17 +30888,17 @@ async function loadAccountsReceivableRecords() {
 
     const { data, error } =
       await supabaseClient.rpc(
-        "get_accounts_receivable",
-        {
-          p_session_id: sessionId,
-          p_branch_id: branchId,
-          p_period_from: periodFrom,
-          p_period_to: periodTo,
-          p_ar_type: arType,
-          p_status: status,
-          p_search: search
-        }
-      );
+			  "get_accounts_receivable",
+			  {
+			    p_session_id: sessionId,
+			    p_branch_id: branchId,
+			    p_period_from: periodFrom,
+			    p_period_to: periodTo,
+			    p_ar_type: arType,
+			    p_status: status,
+			    p_search: search
+			  }
+			);
 
     if (error) { throw error; }
 		
