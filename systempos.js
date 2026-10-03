@@ -26734,41 +26734,40 @@ function renderSupplierDebtTable() {
 								Lunas
 							</span>
 						`;
-
 					return `
 						<tr class="border-b border-outline-variant hover:bg-outline-variant">
 							<td class="px-4 py-3 text-sm font-medium">
-									${escapeHtml(item.id)}
+								${escapeHtml(item.id)}
 							</td>
 
 							<td class="px-4 py-3 text-sm">
-									${escapeHtml(branchId)}
+								${escapeHtml(branchId)}
 							</td>
 
 							<td class="px-4 py-3 text-sm">
-									${escapeHtml(item.supplier)}
+								${escapeHtml(item.supplier)}
 							</td>
 
 							<td class="px-4 py-3 text-sm">
-									${formatAccountingDate(item.date)}
+								${formatAccountingDate(item.date)}
 							</td>
 
 							<td class="px-4 py-3 text-sm text-right">
-									${formatAccountingCurrency(item.total)}
+								${formatAccountingCurrency(item.total)}
 							</td>
 
 							<td class="px-4 py-3 text-sm text-right">
-									${formatAccountingCurrency(item.paid)}
+								${formatAccountingCurrency(item.paid)}
 							</td>
 
 							<td class="px-4 py-3 text-sm text-right font-semibold">
-									${formatAccountingCurrency(item.outstanding)}
+								${formatAccountingCurrency(item.outstanding)}
 							</td>
 
 							<td class="px-4 py-3">
-									<span class="inline-flex px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
-											${item.status}
-									</span>
+								<span class="inline-flex px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
+									${item.status}
+								</span>
 							</td>
 
 							<td class="px-4 py-3 text-center">
