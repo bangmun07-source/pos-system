@@ -23077,9 +23077,7 @@ async function saveAccountingMapping() {
 }
 
 
-/* =======================================================
-   ACTION MENU
-   ======================================================= */
+/* === ACTION MENU === */
 
 function toggleAccountingMappingMenu(mappingId) {
 	const menu = document.getElementById( `accountingMappingMenu-${mappingId}` );
@@ -23089,11 +23087,7 @@ function toggleAccountingMappingMenu(mappingId) {
 	menu.classList.toggle("hidden");
 }
 
-
-/* =======================================================
-   SEARCH + FILTER EVENT
-   ======================================================= */
-
+/* === SEARCH + FILTER EVENT === */
 function initAccountingMappingFilters() {
 	const search = document.getElementById( "accountingMappingSearch" );
 	const typeFilter = document.getElementById( "accountingMappingTypeFilter" );
@@ -23233,47 +23227,111 @@ function renderJournalEntryRow(journal) {
 		VOID: "text-red-700"
 	}[ journal.status ] || "text-muted";
 	
-		return `
-	    <tr class="border-b border-outline-variant hover:bg-outline-variant">
-				<td class="px-5 py-4 font-medium">
-						${escapeHtml( journal.journalNo || "-" )}
-				</td>
+	return `
+		<tr class="border-b border-outline-variant hover:bg-outline-variant">
+			<td class="px-5 py-4 font-medium">
+					${escapeHtml( journal.journalNo || "-" )}
+			</td>
 
-				<td class="px-5 py-4 text-muted">
-						${formatJournalDate( journal.journalDate )}
-				</td>
+			<td class="px-5 py-4 text-muted">
+					${formatJournalDate( journal.journalDate )}
+			</td>
 
-				<td class="px-5 py-4">
-						${escapeHtml( sourceLabel )}
-				</td>
+			<td class="px-5 py-4">
+					${escapeHtml( sourceLabel )}
+			</td>
 
-				<td class="px-5 py-4">
-						${escapeHtml( journal.description || "-" )}
-				</td>
+			<td class="px-5 py-4">
+					${escapeHtml( journal.description || "-" )}
+			</td>
 
-				<td class="px-5 py-4 text-right">
-						${formatJournalCurrency( journal.totalDebit )}
-				</td>
+			<td class="px-5 py-4 text-right">
+					${formatJournalCurrency( journal.totalDebit )}
+			</td>
 
-				<td class="px-5 py-4 text-right">
-						${formatJournalCurrency( journal.totalCredit )}
-				</td>
+			<td class="px-5 py-4 text-right">
+					${formatJournalCurrency( journal.totalCredit )}
+			</td>
 
-				<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}">
-						${escapeHtml( statusLabel )}
-				</td>
+			<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}">
+					${escapeHtml( statusLabel )}
+			</td>
 
-				<td class="px-5 py-4 text-right">
+			<td class="px-5 py-4 text-right">
+				<div class="relative inline-block">
 					<button type="button"
-						onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
+						onclick="toggleJournalEntryActionMenu('${escapeHtml(journal.journalId)}')"
 						class="text-muted hover:text-foreground">
 						<span class="material-symbols-outlined text-md">
-								more_horiz
+							more_horiz
 						</span>
 					</button>
-				</td>
+			
+					<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
+						class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-50">
+			
+						<button type="button"
+							onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
+							class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
+							View Detail
+						</button>
+			
+						${
+							journal.status === "DRAFT"
+								? `
+									<button type="button"
+										onclick="editManualJournalEntry('${escapeHtml(journal.journalId)}')"
+										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
+										Edit
+									</button>
+			
+									<button type="button"
+										onclick="postManualJournalEntry('${escapeHtml(journal.journalId)}')"
+										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant text-emerald-700">
+										Post
+									</button>
+								`
+								: ""
+						}
+					</div>
+				</div>
+			</td>
 		</tr>
 	`;
+}
+
+function toggleJournalEntryActionMenu(journalId) {
+	const menu = document.getElementById( `journalActionMenu-${journalId}` );
+
+	if (!menu) return;
+
+	document
+		.querySelectorAll('[id^="journalActionMenu-"]')
+		.forEach(el => {
+			if (el !== menu) {
+				el.classList.add("hidden");
+			}
+		});
+
+	menu.classList.toggle("hidden");
+}
+
+function postManualJournalEntry(journalId) {
+	const journal = journalEntriesData.find( item => item.journalId === journalId );
+
+	if (!journal) return;
+	if (journal.status !== "DRAFT") { return; }
+
+	console.log("POST MANUAL JOURNAL:", journalId);
+}
+
+function editManualJournalEntry(journalId) {
+	const journal = journalEntriesData.find( item => item.journalId === journalId );
+
+	if (!journal) return;
+	if (journal.status !== "DRAFT") { return; }
+
+	console.log("EDIT MANUAL JOURNAL:", journalId);
 }
 
 function getFilteredJournalEntries( entries ) {
@@ -23767,9 +23825,7 @@ async function saveNewJournalEntry() {
 	}
 }
 
-/* ============================================================
-   JOURNAL DETAIL
-   ============================================================ */
+/* === JOURNAL DETAIL ==== */
 
 async function openJournalEntryDetail(journalId) {
 	const modal = document.getElementById("journalEntryDetailModal");
@@ -24760,9 +24816,7 @@ async function loadBalanceSheetCurrentProfit() {
 
   const year = new Date(toDate + "T00:00:00").getFullYear();
 
-  /* =====================================================
-     CEK APAKAH FISCAL YEAR SUDAH DITUTUP
-     ===================================================== */
+  /* ==== CEK APAKAH FISCAL YEAR SUDAH DITUTUP ==== */
 
   const { data: isClosed, error: closingError } =
     await supabaseClient.rpc(
@@ -24782,19 +24836,15 @@ async function loadBalanceSheetCurrentProfit() {
     throw closingError;
   }
 
-  /* =====================================================
-     SUDAH CLOSING
-     Current Year Earnings = 0
-     ===================================================== */
+  /* === SUDAH CLOSING
+     Current Year Earnings = 0 ==== */
 
   if (isClosed === true) {
     return 0;
   }
 
-  /* =====================================================
-     BELUM CLOSING
-     Current Year Earnings = P&L
-     ===================================================== */
+  /* === BELUM CLOSING
+     Current Year Earnings = P&L ==== */
 
   const fromDate = `${year}-01-01`;
 
@@ -24830,13 +24880,11 @@ async function loadBalanceSheetCurrentProfit() {
       revenue += amount;
       return;
     }
-
     /* COGS */
     if (accountType === "COGS") {
       cogs += amount;
       return;
     }
-
     /* EXPENSE */
     if (accountType === "EXPENSE") {
       if (
@@ -24849,7 +24897,6 @@ async function loadBalanceSheetCurrentProfit() {
       }
     }
   });
-
   /* === HITUNG NET PROFIT === */
   const grossProfit = revenue - cogs;
   const totalExpenses = operatingExpenses + otherExpenses;
@@ -24857,8 +24904,6 @@ async function loadBalanceSheetCurrentProfit() {
 
   return netProfit;
 }
-
-
 
 async function loadBalanceSheet() {
   const sessionId = localStorage.getItem("pos_session_id");
