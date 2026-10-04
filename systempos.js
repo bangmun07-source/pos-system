@@ -23136,6 +23136,7 @@ const JOURNAL_ENTRIES_PAGE_SIZE = 10;
 let journalEntriesCurrentPage = 1;
 let journalEntriesData = [];
 let journalEntriesLoaded = false;
+let editingManualJournalId = null;
 
 async function loadJournalEntries() {
   try {
@@ -23288,7 +23289,7 @@ function renderJournalEntryRow(journal) {
 									<button type="button"
 										onclick="postManualJournalEntry('${escapeHtml(journal.journalId)}')"
 										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant text-emerald-700">
-										Post
+										POSTED
 									</button>
 								`
 								: ""
@@ -23329,42 +23330,169 @@ async function editManualJournalEntry(journalId) {
 	const journal = journalEntriesData.find(
 		item => item.journalId === journalId
 	);
-
+	
 	if (!journal) return;
-
-	if (journal.status !== "DRAFT") {
-		return;
-	}
-
+	if (journal.status !== "DRAFT") { alert("Hanya journal DRAFT yang dapat diedit."); return; }
+	
 	const sessionId = localStorage.getItem("pos_session_id");
-
-	if (!sessionId) {
-		alert("Session tidak ditemukan.");
-		return;
-	}
-
+	
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
+	
 	try {
-		const { data, error } = await supabaseClient.rpc(
-			"get_journal_entry",
-			{
-				p_journal_id: journalId,
-				p_session_id: sessionId
-			}
-		);
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_journal_entry",
+				{
+					p_journal_id: journalId,
+					p_session_id: sessionId
+				}
+			);
+	
+		if (error) { throw error; }
+		if (!data) { alert("Journal tidak ditemukan."); return; }
+	
+		const journalData = data;
+		editingManualJournalId = journalData.journalId;
+		/*
+		 * LOAD MASTER DATA
+		 */
+		await Promise.all([
+			loadJournalAccounts(),
+			loadJournalBranches()
+		]);
+	
+		/*
+		 * POPULATE HEADER
+		 */
+		const dateEl = document.getElementById("newJournalDate");
+		const sourceEl = document.getElementById("newJournalSource");
+		const branchEl = document.getElementById("newJournalBranch");
+		const referenceEl = document.getElementById("newJournalReference");
+		const descriptionEl = document.getElementById("newJournalDescription");
+		const statusEl = document.getElementById("newJournalStatus");
 
-		if (error) {
-			throw error;
+		if (dateEl) { dateEl.value = journalData.journalDate || ""; }
+		if (sourceEl) { sourceEl.value = "MANUAL"; }
+	
+		populateNewJournalBranches();
+	
+		if (branchEl) { branchEl.value = journalData.branchId || ""; }
+		if (referenceEl) { referenceEl.value = journalData.referenceId || ""; }
+		if (descriptionEl) { descriptionEl.value = journalData.description || ""; }
+		if (statusEl) { statusEl.value = "DRAFT"; }
+	
+		/*
+		 * POPULATE LINES
+		 */
+		const container = document.getElementById( "newJournalLinesContainer" );
+	
+		if (!container) return;
+	
+		container.innerHTML = "";
+		newJournalLineCounter = 0;
+	
+		const lines = Array.isArray(journalData.lines)
+			? journalData.lines
+			: [];
+	
+		lines.forEach(line => {
+	    newJournalLineCounter++;
+	
+	    const lineId = newJournalLineCounter;
+	    const row = document.createElement("tr");
+	
+	    row.id = `newJournalLine-${lineId}`;
+	    row.className = "border-b border-white/5 last:border-b-0";
+	    row.innerHTML = `
+				<!-- ACCOUNT -->
+				<td class="px-4 py-3">
+					<select id="newJournalAccount-${lineId}"
+						class="custom-scrollbar w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+						onchange="calculateNewJournalTotals()">
+						${buildNewJournalAccountOptions()}
+					</select>
+				</td>
+	
+				<!-- DESCRIPTION -->
+				<td class="px-4 py-3">
+					<input type="text"
+						id="newJournalLineDescription-${lineId}"
+						value="${escapeHtml(line.description || "")}"
+						class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface placeholder:text-muted outline-none focus:border-amber-500">
+				</td>
+	
+				<!-- DEBIT -->
+				<td class="px-4 py-3">
+					<input type="number"
+						id="newJournalDebit-${lineId}"
+						min="0"
+						step="1"
+						value="${Number(line.debit || 0)}"
+						class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+						oninput="calculateNewJournalTotals()">
+				</td>
+	
+				<!-- CREDIT -->
+				<td class="px-4 py-3">
+					<input type="number"
+						id="newJournalCredit-${lineId}"
+						min="0"
+						step="1"
+						value="${Number(line.credit || 0)}"
+						class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-sm text-on-surface outline-none focus:border-amber-500"
+						oninput="calculateNewJournalTotals()">
+				</td>
+	
+				<!-- DELETE -->
+				<td class="px-4 py-3 text-right">
+					<button type="button"
+						onclick="removeNewJournalLine(${lineId})"
+						class="text-red-500 hover:text-red-400">
+						<span class="material-symbols-outlined text-md">
+							delete
+						</span>
+					</button>
+				</td>
+	    `;
+	
+	    container.appendChild(row);
+	
+	    const accountEl = document.getElementById( `newJournalAccount-${lineId}` );
+	
+	    if (accountEl) { accountEl.value = line.accountId || ""; }
+		});
+	
+		calculateNewJournalTotals();
+	
+		const modal = document.getElementById( "newJournalModal" );
+		const titleEl = document.getElementById("newJournalModalTitle");
+		const subtitleEl = document.getElementById("newJournalModalSubtitle");
+		
+		if (titleEl) { titleEl.textContent = "Edit Journal Entry"; }
+		if (subtitleEl) { subtitleEl.textContent = "Edit a draft manual journal entry"; }
+	
+		const saveButton = document.getElementById( "saveNewJournalButton" );
+	
+		if (saveButton) {
+			saveButton.innerHTML = `
+				<span class="material-symbols-outlined text-md">
+					save
+				</span>
+				Save Changes
+			`;
 		}
-
-		if (!data) {
-			alert("Journal tidak ditemukan.");
-			return;
+	
+		if (modal) {
+			modal.classList.remove("hidden");
+			modal.classList.add("flex");
 		}
-
-		console.log("EDIT JOURNAL DATA:", data);
-
+	
 	} catch (error) {
-		alert(error?.message || "Gagal memuat journal.");
+		console.error(
+				"EDIT JOURNAL ERROR:",
+				error
+		);
+		alert( error?.message || "Gagal memuat journal." );
 	}
 }
 
@@ -23908,19 +24036,44 @@ async function saveNewJournalEntry() {
 							Saving...
 					`;
 			}
-			const { data, error } = await supabaseClient.rpc(
-					"create_journal_entry",
-					{
+			let data;
+			let error;
+			if (editingManualJournalId) {
+			    // EDIT DRAFT
+				const result =
+					await supabaseClient.rpc(
+						"update_manual_journal_entry",
+						{
+							p_journal_id: editingManualJournalId,
 							p_journal_date: journalDate,
 							p_branch_id: branchId,
-							p_source: source,
 							p_reference_id: referenceId,
 							p_description: description,
-							p_status: status,
 							p_lines: lines,
 							p_session_id: sessionId
-					}
-			);
+						}
+					);
+				data = result.data;
+				error = result.error;
+			} else {
+			    const result =
+						await supabaseClient.rpc(
+							"create_journal_entry",
+							{
+								p_journal_date: journalDate,
+								p_branch_id: branchId,
+								p_source: source,
+								p_reference_id: referenceId,
+								p_description: description,
+								p_status: status,
+								p_lines: lines,
+								p_session_id: sessionId
+							}
+						);
+				data = result.data;
+				error = result.error;
+			}
+			
 			if (error) { throw error; }
 		
 			closeNewJournalModal();
