@@ -23325,13 +23325,47 @@ function postManualJournalEntry(journalId) {
 	console.log("POST MANUAL JOURNAL:", journalId);
 }
 
-function editManualJournalEntry(journalId) {
-	const journal = journalEntriesData.find( item => item.journalId === journalId );
+async function editManualJournalEntry(journalId) {
+	const journal = journalEntriesData.find(
+		item => item.journalId === journalId
+	);
 
 	if (!journal) return;
-	if (journal.status !== "DRAFT") { return; }
 
-	console.log("EDIT MANUAL JOURNAL:", journalId);
+	if (journal.status !== "DRAFT") {
+		return;
+	}
+
+	const sessionId = localStorage.getItem("pos_session_id");
+
+	if (!sessionId) {
+		alert("Session tidak ditemukan.");
+		return;
+	}
+
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			"get_journal_entry",
+			{
+				p_journal_id: journalId,
+				p_session_id: sessionId
+			}
+		);
+
+		if (error) {
+			throw error;
+		}
+
+		if (!data) {
+			alert("Journal tidak ditemukan.");
+			return;
+		}
+
+		console.log("EDIT JOURNAL DATA:", data);
+
+	} catch (error) {
+		alert(error?.message || "Gagal memuat journal.");
+	}
 }
 
 function getFilteredJournalEntries( entries ) {
