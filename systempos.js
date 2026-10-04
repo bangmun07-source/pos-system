@@ -23497,10 +23497,85 @@ function formatJournalCurrency( value ) {
 	return `Rp ${amount.toLocaleString( "id-ID" )}`;
 }
 
+async function loadJournalAccounts() {
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
+
+		if (!sessionId) {
+			console.error("Session tidak ditemukan.");
+			return []; }
+
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_accounts",
+				{
+					p_session_id: sessionId
+				}
+			);
+
+		if (error) {
+				console.error("GET JOURNAL ACCOUNTS ERROR:", error);
+				return []; }
+
+		const accounts = Array.isArray(data)
+			? data
+			: [];
+
+		window.journalAccounts = accounts;
+		return accounts;
+		
+	} catch (err) {
+		console.error("LOAD JOURNAL ACCOUNTS ERROR:", err);
+		return [];
+	}
+}
+
+async function loadJournalBranches() {
+    try {
+        const sessionId =
+            localStorage.getItem("pos_session_id");
+
+        if (!sessionId) {
+            return [];
+        }
+
+        const { data, error } =
+            await supabaseClient.rpc(
+                "get_expense_branches",
+                {
+                    p_session_id: sessionId
+                }
+            );
+
+        if (error) {
+            console.error(
+                "GET JOURNAL BRANCHES ERROR:",
+                error
+            );
+            return [];
+        }
+
+        const branches =
+            Array.isArray(data) ? data : [];
+
+        window.journalBranches = branches;
+
+        return branches;
+
+    } catch (err) {
+        console.error(
+            "LOAD JOURNAL BRANCHES ERROR:",
+            err
+        );
+        return [];
+    }
+}
+
 let newJournalLineCounter = 0;
-function openNewJournalModal() {
+async function openNewJournalModal() {
 	const modal = document.getElementById("newJournalModal");
 	if (!modal) return;
+
 	const today = new Date().toISOString().split("T")[0];
 	const dateEl = document.getElementById("newJournalDate");
 	const sourceEl = document.getElementById("newJournalSource");
@@ -23509,20 +23584,30 @@ function openNewJournalModal() {
 	const descriptionEl = document.getElementById("newJournalDescription");
 	const statusEl = document.getElementById("newJournalStatus");
 
-	if (dateEl) dateEl.value = today;
-	if (sourceEl) sourceEl.value = "MANUAL";
-	if (referenceEl) referenceEl.value = "";
-	if (descriptionEl) descriptionEl.value = "";
-	if (statusEl) statusEl.value = "POSTED";
+	if (dateEl) { dateEl.value = today; }
+	if (sourceEl) { sourceEl.value = "MANUAL"; }
+	if (referenceEl) { referenceEl.value = ""; }
+	if (descriptionEl) { descriptionEl.value = ""; }
+	if (statusEl) { statusEl.value = "DRAFT"; }
 
+	// LOAD COA UNTUK PAGE JOURNAL ENTRIES
+	await loadJournalAccounts();
+	await Promise.all([
+	    loadJournalAccounts(),
+	    loadJournalBranches()
+	]);
 	populateNewJournalBranches();
+
 	const container = document.getElementById("newJournalLinesContainer");
 
 	if (container) { container.innerHTML = ""; }
+
 	newJournalLineCounter = 0;
+
 	addNewJournalLine();
 	addNewJournalLine();
 	calculateNewJournalTotals();
+
 	modal.classList.remove("hidden");
 	modal.classList.add("flex");
 }
@@ -23537,41 +23622,48 @@ function closeNewJournalModal() {
 
 function populateNewJournalBranches() {
 	const branchEl = document.getElementById("newJournalBranch");
+	
 	if (!branchEl) return;
-	const branches =
-		window.branches ||
-		window.branchList ||
-		window.outlets ||
-		[];
-	branchEl.innerHTML = "";
-	if (!Array.isArray(branches) || branches.length === 0) {
-		branchEl.innerHTML = `  <option value="">Select Branch</option> `;
-		return;
-	}
+	
+	const branches = window.journalBranches || [];
+	
+	branchEl.innerHTML = ` <option value="">Select Branch</option> `;
+	
+	if (!Array.isArray(branches)) { return; }
+	
 	branches.forEach(branch => {
 		const branchId =
 			branch.branchId ??
+			branch.Branch_ID ??
 			branch.id ??
 			branch.ID ??
 			"";
 		const branchName =
 			branch.branchName ??
+			branch.Branch_Name ??
 			branch.name ??
 			branch.Name ??
 			branch.outlet ??
 			branch.Outlet ??
 			branchId;
+	
 		if (!branchId) return;
+	
 		const option = document.createElement("option");
+	
 		option.value = branchId;
 		option.textContent = branchName;
+	
 		branchEl.appendChild(option);
 	});
 }
 
 function getNewJournalAccounts() {
-	const accounts = window.accountingAccounts || [];
-	return accounts.filter(account => account && account.isActive !== false );
+	const accounts = window.journalAccounts || [];
+
+	return accounts.filter(
+		account => account && account.isActive !== false
+	);
 }
 
 function buildNewJournalAccountOptions() {
