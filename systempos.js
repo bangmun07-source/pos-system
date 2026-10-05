@@ -23317,13 +23317,52 @@ function toggleJournalEntryActionMenu(journalId) {
 	menu.classList.toggle("hidden");
 }
 
-function postManualJournalEntry(journalId) {
+async function postManualJournalEntry(journalId) {
 	const journal = journalEntriesData.find( item => item.journalId === journalId );
 
-	if (!journal) return;
-	if (journal.status !== "DRAFT") { return; }
+	if (!journal) { alert("Journal tidak ditemukan."); return; }
+	if (journal.status !== "DRAFT") { alert("Hanya journal DRAFT yang dapat diposting."); return; }
 
-	console.log("POST MANUAL JOURNAL:", journalId);
+	const confirmed = confirm(
+		`Post journal ${journal.journalNo || journalId}?\n\n` +
+		`Setelah diposting, journal tidak dapat diedit lagi ` +
+		`dan akan mempengaruhi Account Balance.`
+	);
+
+	if (!confirmed) { return; }
+
+	const sessionId = localStorage.getItem("pos_session_id");
+
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
+
+	try {
+		const { data, error } =
+			await supabaseClient.rpc(
+				"post_manual_journal_entry",
+				{
+					p_journal_id: journalId,
+					p_session_id: sessionId
+				}
+			);
+
+		if (error) { throw error; }
+
+		journalEntriesLoaded = false;
+		journalEntriesData = [];
+		window.journalEntries = [];
+		generalLedgerLoaded = false;
+		generalLedgerData = [];
+
+		await loadJournalEntries();
+		alert( `Journal ${data?.journalNo || journal.journalNo || ""} ` + `berhasil diposting.` );
+
+	} catch (error) {
+		console.error(
+			"POST MANUAL JOURNAL ERROR:",
+			error
+		);
+		alert( error?.message || "Gagal memposting journal." );
+	}
 }
 
 async function editManualJournalEntry(journalId) {
