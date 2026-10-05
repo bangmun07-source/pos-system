@@ -26,29 +26,16 @@ self.addEventListener("install", (event) => {
 // 2. ACTIVATE
 // =====================================================
 self.addEventListener("activate", (event) => {
-
   event.waitUntil(
-
     caches.keys().then((cacheNames) => {
-
       return Promise.all(
-
         cacheNames.map((cache) => {
-
-          if (cache !== CACHE_NAME) {
-            return caches.delete(cache);
-          }
-
+          if (cache !== CACHE_NAME) { return caches.delete(cache); }
           return null;
-
         })
-
       );
-
     })
-
   );
-
   self.clients.claim();
 });
 
@@ -57,87 +44,65 @@ self.addEventListener("activate", (event) => {
 // 3. FETCH
 // =====================================================
 self.addEventListener("fetch", (event) => {
-
   const request = event.request;
   const url = new URL(request.url);
 
   // Hanya GET
-  if (request.method !== "GET") {
-    return;
-  }
-
+  if (request.method !== "GET") { return; }
   // Supabase → langsung network
-  if (url.hostname.includes("supabase.co")) {
-    return;
-  }
-
+  if (url.hostname.includes("supabase.co")) { return; }
   // Vercel API → langsung network
-  if (url.pathname.startsWith("/api/")) {
-    return;
-  }
+  if (url.pathname.startsWith("/api/")) { return; }
 
 
-  // ===================================================
+
   // NAVIGATION
   // NETWORK FIRST
-  // ===================================================
   if (request.mode === "navigate") {
-
     event.respondWith(
-
       fetch(request)
         .then((response) => {
-
           return response;
-
         })
         .catch(() => {
-
           return caches.match("/index.html");
-
         })
-
     );
-
     return;
   }
 
-
-  // ===================================================
   // JS / CSS / ASSET
   // NETWORK FIRST
-  // ===================================================
   event.respondWith(
-
     fetch(request)
-
       .then((response) => {
 
         // Simpan response terbaru
         if (response &&
-            response.status === 200 &&
-            response.type === "basic") {
+          response.status === 200 &&
+          response.type === "basic") {
 
-          const responseClone =
-            response.clone();
+          const responseClone = response.clone();
 
           caches.open(CACHE_NAME)
             .then((cache) => {
               cache.put(request, responseClone);
             });
-
         }
-
         return response;
-
       })
 
-      .catch(() => {
-
-        return caches.match(request);
-
-      })
-
+    .catch(async () => {
+      const cachedResponse = await caches.match(request);
+    
+      if (cachedResponse) { return cachedResponse; }
+    
+      return new Response("Resource unavailable", {
+        status: 503,
+        headers: {
+          "Content-Type": "text/plain"
+        }
+      });
+    })
   );
-
 });
