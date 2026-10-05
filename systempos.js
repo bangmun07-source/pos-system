@@ -26278,15 +26278,12 @@ function exportBalanceSheetXLSX() {
   const result = state.accountingReportsData?.balanceSheet || {};
   const profitLoss = state.accountingReportsData?.profitLoss || [];
   const accounts = Array.isArray(result?.accounts)
-		? result.accounts
-		: [];
+    ? result.accounts
+    : [];
 
-  if (!accounts.length) {
-    alert( "Tidak ada data Balance Sheet untuk diekspor." );
-    return; }
-	
-  const calculatedProfitLoss = renderProfitLoss(profitLoss);
-  const currentProfit = Number( calculatedProfitLoss?.netProfit ?? result?.currentProfit ?? 0 );
+  if (!accounts.length) { alert("Tidak ada data Balance Sheet untuk diekspor."); return; }
+
+  const currentProfit = Number( result?.currentProfit ?? 0 );
   const currentAssets = [];
   const nonCurrentAssets = [];
   const currentLiabilities = [];
