@@ -19682,39 +19682,26 @@ async function loadAssetPage() {
 }
 
 // RUN MONTHLY DEPRECIATION
-// RUN MONTHLY DEPRECIATION
 async function runMonthlyDepreciation() {
   const button = document.getElementById("runMonthlyDepreciationBtn");
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      return;
-    }
-
-    // =========================================================
+    if (!sessionId) { return; }
     // AMBIL FILTER ASSET
-    // =========================================================
     const filter = getAssetGlobalFilter();
     const selectedBranchId = filter.branchId || "";
-
-    // =========================================================
     // CONFIRM
-    // =========================================================
     const confirmed = confirm(
       selectedBranchId
         ? "Run monthly depreciation untuk semua asset aktif pada branch ini bulan ini?"
         : "Run monthly depreciation untuk semua branch dan semua asset aktif bulan ini?"
     );
 
-    if (!confirmed) {
-      return;
-    }
-
-    // =========================================================
+    if (!confirmed) { return; }
+		
     // LOADING
-    // =========================================================
     if (button) {
       button.disabled = true;
       button.innerHTML = `
@@ -19727,25 +19714,16 @@ async function runMonthlyDepreciation() {
       `;
     }
 
-    // =========================================================
     // TENTUKAN BRANCH YANG AKAN DIPROSES
-    // =========================================================
     let branchIds = [];
 
     if (selectedBranchId) {
-
       // Branch tertentu
       branchIds = [selectedBranchId];
-
     } else {
-
-      // =======================================================
       // ALL BRANCH
       // Gunakan RPC branch yang memang sudah dipakai Asset
-      // =======================================================
-      const {
-        data: branchData,
-        error: branchError
+      const { data: branchData, error: branchError
       } = await supabaseClient.rpc(
         "get_expense_branches",
         {
@@ -19753,9 +19731,7 @@ async function runMonthlyDepreciation() {
         }
       );
 
-      if (branchError) {
-        throw branchError;
-      }
+      if (branchError) { throw branchError; }
 
       const branches = typeof branchData === "string"
         ? JSON.parse(branchData)
@@ -19766,18 +19742,9 @@ async function runMonthlyDepreciation() {
         .filter(Boolean);
     }
 
-    // =========================================================
     // VALIDASI
-    // =========================================================
-    if (!branchIds.length) {
-      throw new Error(
-        "Tidak ada branch yang tersedia untuk menjalankan depreciation."
-      );
-    }
-
-    // =========================================================
+    if (!branchIds.length) { throw new Error( "Tidak ada branch yang tersedia untuk menjalankan depreciation." ); }
     // RUN DEPRECIATION PER BRANCH
-    // =========================================================
     for (let i = 0; i < branchIds.length; i++) {
 
       const branchId = branchIds[i];
@@ -19794,8 +19761,7 @@ async function runMonthlyDepreciation() {
       }
 
       const {
-        data,
-        error
+        data, error
       } = await supabaseClient.rpc(
         "run_monthly_depreciation",
         {
@@ -19811,21 +19777,14 @@ async function runMonthlyDepreciation() {
       }
     }
 
-    // =========================================================
     // CLEAR CACHE
-    // =========================================================
     state.assetData = null;
     state.assetDataBranchId = null;
-
     state.depreciationHistoryData = null;
     state.depreciationHistoryBranchId = null;
-
     state.accountingReportsData = null;
     state.accountingReportsFilter = null;
-
-    // =========================================================
     // RELOAD
-    // =========================================================
     await loadAssetPage();
 
     alert(
@@ -19835,17 +19794,9 @@ async function runMonthlyDepreciation() {
     );
 
   } catch (error) {
-
-    alert(
-      error?.message ||
-      "Gagal menjalankan monthly depreciation."
-    );
-
+    alert( error?.message || "Gagal menjalankan monthly depreciation." );
   } finally {
-
-    // =========================================================
     // RESTORE BUTTON
-    // =========================================================
     if (button) {
       button.disabled = false;
 
@@ -20800,9 +20751,7 @@ async function recordAssetPurchaseFromAction() {
 
   const purchaseId = activeAssetPurchaseAction.Purchase_ID;
 
-  if (!purchaseId) {
-    alert("Purchase ID tidak ditemukan.");
-    return; }
+  if (!purchaseId) { alert("Purchase ID tidak ditemukan."); return; }
 
   const confirmed = confirm(
     "Record asset purchase ini?\n\n" +
@@ -20857,8 +20806,7 @@ async function deleteAssetPurchaseFromAction() {
 
   if (status !== "DRAFT") {
     closeAssetPurchaseActionMenu();
-    alert("Asset purchase yang sudah RECORDED tidak dapat dihapus.");
-    return; }
+    alert("Asset purchase yang sudah RECORDED tidak dapat dihapus."); return; }
 
   const assetName = activeAssetPurchaseAction.Asset_Name || "asset";
   const confirmed = confirm( `Hapus asset purchase "${assetName}"?\n\nData DRAFT akan dihapus permanen.` );
@@ -20866,10 +20814,7 @@ async function deleteAssetPurchaseFromAction() {
   if (!confirmed) return;
   closeAssetPurchaseActionMenu();
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) {
-    alert("Session tidak ditemukan. Silakan login kembali.");
-    return;
-  }
+  if (!sessionId) { alert("Session tidak ditemukan. Silakan login kembali."); return; }
 
   try {
 
@@ -20931,30 +20876,18 @@ async function saveAssetPurchasePayment() {
     const referenceNo = document.getElementById("assetPurchasePaymentReference")?.value?.trim() || null;
     const note = document.getElementById("assetPurchasePaymentNote")?.value?.trim() || null;
 
-    if (!purchaseId) {
-      alert("Purchase ID tidak ditemukan.");
-      return; }
-    if (!paymentDate) {
-      alert("Tanggal pembayaran wajib diisi.");
-      return; }
-    if (principal <= 0) {
-      alert("Pokok pembayaran harus lebih dari 0.");
-      return; }
-    if (interest < 0) {
-      alert("Bunga tidak valid.");
-      return; }
+    if (!purchaseId) { alert("Purchase ID tidak ditemukan."); return; }
+    if (!paymentDate) { alert("Tanggal pembayaran wajib diisi."); return; }
+    if (principal <= 0) { alert("Pokok pembayaran harus lebih dari 0."); return; }
+    if (interest < 0) { alert("Bunga tidak valid."); return; }
 		
     const total = principal + interest;
 
-    if (total <= 0) {
-      alert("Total pembayaran harus lebih dari 0.");
-      return; }
+    if (total <= 0) { alert("Total pembayaran harus lebih dari 0."); return; }
 
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) {
-      alert("Session tidak ditemukan.");
-      return; }
+    if (!sessionId) { alert("Session tidak ditemukan."); return; }
 
     const btn = document.getElementById("saveAssetPurchasePaymentBtn");
 
@@ -21014,17 +20947,11 @@ function closeAssetPurchasePaymentModal() {
 async function saveAssetPurchaseDraft() {
   const sessionId = localStorage.getItem("pos_session_id");
 
-  if (!sessionId) {
-    alert("Session tidak ditemukan.");
-    return; }
+  if (!sessionId) { alert("Session tidak ditemukan."); return; }
 
-	const branchId =
-		document.getElementById("assetBranchFilter")?.value || "";
+	const branchId = document.getElementById("assetBranchFilter")?.value || "";
 	
-	if (!branchId) {
-		alert("Pilih branch terlebih dahulu. Asset Purchase tidak boleh menggunakan All Branch.");
-		return;
-	}
+	if (!branchId) { alert("Pilih branch terlebih dahulu. Asset Purchase tidak boleh menggunakan All Branch."); return; }
 
   const assetName = document.getElementById("assetPurchaseName")?.value.trim();
   const purchaseDate = document.getElementById("assetPurchaseDate")?.value;
@@ -21033,18 +20960,10 @@ async function saveAssetPurchaseDraft() {
   const paymentType = document.getElementById("assetPurchasePaymentType")?.value;
   const note = document.getElementById("assetPurchaseNote")?.value.trim() || null;
   // VALIDATION
-  if (!assetName) {
-    alert("Asset name wajib diisi.");
-    return; }
-  if (!purchaseDate) {
-    alert("Purchase date wajib diisi.");
-    return; }
-  if (!purchaseCost || purchaseCost <= 0) {
-    alert("Purchase cost harus lebih dari 0.");
-    return; }
-  if (interestAmount < 0) {
-    alert("Interest tidak boleh negatif.");
-    return; }
+  if (!assetName) { alert("Asset name wajib diisi."); return; }
+  if (!purchaseDate) { alert("Purchase date wajib diisi."); return; }
+  if (!purchaseCost || purchaseCost <= 0) { alert("Purchase cost harus lebih dari 0."); return; }
+  if (interestAmount < 0) { alert("Interest tidak boleh negatif."); return; }
 
   const totalObligation = purchaseCost + interestAmount;
   const saveButton = document.querySelector( '#addAssetPurchaseModal button[onclick="saveAssetPurchaseDraft()"]' );
@@ -21115,7 +21034,7 @@ function renderDepreciationHistory() {
   const totalPages = Math.max( 1, Math.ceil( filteredData.length / DEPRECIATION_PAGE_SIZE ) );
 
   if ( depreciationCurrentPage > totalPages ) 
-			{ depreciationCurrentPage = totalPages; }
+		{ depreciationCurrentPage = totalPages; }
 
   const start = (depreciationCurrentPage - 1) * DEPRECIATION_PAGE_SIZE;
   const pageData = filteredData.slice( start, start + DEPRECIATION_PAGE_SIZE );
@@ -21229,9 +21148,7 @@ async function loadAssetBranchFilter() {
       select.appendChild(option);
     });
 
-  } catch (error) {
-    console.error("Failed to load asset branch filter:", error);
-  }
+  } catch (error) { }
 }
 
 function applyGlobalAssetFilter() {
@@ -21307,9 +21224,7 @@ async function exportAssets() {
   const filter = getAssetGlobalFilter();
   const pdfWindow = window.open("", "_blank");
 
-  if (!pdfWindow) {
-    showToast("Popup diblokir browser", "error");
-    return; }
+  if (!pdfWindow) { showToast("Popup diblokir browser", "error"); return; }
 
   pdfWindow.document.write(`
     <!DOCTYPE html>
@@ -21385,8 +21300,9 @@ async function exportAssets() {
       );
 
     if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error( errorText || `Export gagal (${response.status})` ); }
+			const errorText = await response.text();
+			throw new Error( errorText || `Export gagal (${response.status})` ); }
+		
     const html = await response.text();
 
     if (!html) { throw new Error( "Server mengembalikan HTML kosong" ); }
@@ -21608,9 +21524,12 @@ function getAccountingDateRange(period) {
 async function initAccountingModule() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
+	
   if (!periodEl || !branchEl) { return; }
+	
   periodEl.onchange = loadAccountingOverview;
   branchEl.onchange = loadAccountingOverview;
+	
   await loadAccountingBranchOptions();
   await loadAccountingOverview();
 }
@@ -21699,14 +21618,9 @@ const totalAssets = assets.reduce((sum, account) => {
 const totalLiabilities = liabilities.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
 const totalEquity = equity.reduce((sum, account) => {
   const accountId = String(account.accountId || "");
-
-  // Owner Withdrawal = contra equity
-  if (accountId === "ACC-9302C84A9071") {
-    return sum - Math.abs(toNumber(account.balance));
-  }
-
-  return sum + toNumber(account.balance);
-}, currentProfit);
+	  if (accountId === "ACC-9302C84A9071") { return sum - Math.abs(toNumber(account.balance)); }
+	  return sum + toNumber(account.balance);
+	}, currentProfit);
 const totalLiabilitiesEquity = totalLiabilities + totalEquity;
 const difference = totalAssets - totalLiabilitiesEquity;
 
@@ -21910,13 +21824,14 @@ if (liabilitiesEquityContainer) {
         const supplier = escapeHTML(item.supplier || "-");
         const status = escapeHTML(item.status || "OUTSTANDING");
         const date = item.date
-            ? new Date(item.date).toLocaleDateString("id-ID", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric"
-              })
-            : "-";
+					? new Date(item.date).toLocaleDateString("id-ID", {
+						day: "2-digit",
+						month: "short",
+						year: "numeric"
+					})
+					: "-";
         const amount = toNumber(item.amount);
+				
         return `
           <div class="border border-outline-variant rounded-md p-4">
             <div class="flex items-start justify-between gap-4">
@@ -21949,10 +21864,7 @@ if (liabilitiesEquityContainer) {
    * Total AP menggunakan data dari financial position
    * supaya konsisten dengan KPI dan Balance Sheet.
    */
-  if (apTotal) {
-    apTotal.textContent =
-      formatIDR(financial.accountsPayable);
-  }
+  if (apTotal) { apTotal.textContent = formatIDR(financial.accountsPayable); }
 
   /* ===== RECENT JOURNAL ENTRIES ===== */
   const journalContainer = document.getElementById("accounting-recent-journals");
@@ -21976,15 +21888,13 @@ if (liabilitiesEquityContainer) {
     } else {
       journalContainer.innerHTML =
         recentJournals.map(journal => {
-          const date =
-            journal.date
-              ? new Date(journal.date).toLocaleDateString("id-ID", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric"
-                })
-              : "-";
-
+          const date = journal.date
+						? new Date(journal.date).toLocaleDateString("id-ID", {
+								day: "2-digit",
+								month: "short",
+								year: "numeric"
+							})
+						: "-";
           const description =
             escapeHTML(
               journal.description ||
@@ -21992,14 +21902,12 @@ if (liabilitiesEquityContainer) {
               journal.reference ||
               "Journal Entry"
             );
-
           const reference =
             escapeHTML(
               journal.reference ||
               journal.id ||
               ""
             );
-
           const amount =
             toNumber(
               journal.amount ??
@@ -22056,447 +21964,405 @@ if (liabilitiesEquityContainer) {
 }
 
 
-
   /* ============================= 
   			ACCOUNTING 
   ============================== */
 
 async function loadAccountingAccounts() {
-    try {
-        const sessionId =
-  				localStorage.getItem("pos_session_id");
-        if (!sessionId) {
-            return;
-        }
-        const { data, error } = 
-					await supabaseClient.rpc(
-            "get_accounts",
-            {
-              p_session_id: sessionId
-            }
-        );
-        if (error) { return; }
-			const accounts = Array.isArray(data) ? data : [];
-			window.accountingAccounts = accounts;
-			renderAccountingAccounts(accounts);
-			updateAccountingAccountSummary(accounts);
-    } catch (err) { }
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
+		
+		if (!sessionId) { return; }
+		
+		const { data, error } = 
+			await supabaseClient.rpc(
+				"get_accounts",
+				{
+					p_session_id: sessionId
+				}
+		);
+	if (error) { return; }
+	const accounts = Array.isArray(data) ? data : [];
+	window.accountingAccounts = accounts;
+	renderAccountingAccounts(accounts);
+	updateAccountingAccountSummary(accounts);
+	} catch (err) { }
 }
 
 function initAccountingAccountFilters() {
-    const search = document.getElementById( "accountingAccountSearch" );
-    const typeFilter = document.getElementById( "accountingAccountTypeFilter" );
-    const statusFilter = document.getElementById( "accountingAccountStatusFilter" );
-    const resetPage = () => {
-        accountingAccountCurrentPage = 1;
-        renderAccountingAccounts(
-            window.accountingAccounts || []
-        );
-    };
-    search?.addEventListener("input", resetPage);
-    typeFilter?.addEventListener("change", resetPage);
-    statusFilter?.addEventListener("change", resetPage);
+	const search = document.getElementById( "accountingAccountSearch" );
+	const typeFilter = document.getElementById( "accountingAccountTypeFilter" );
+	const statusFilter = document.getElementById( "accountingAccountStatusFilter" );
+	const resetPage = () => {
+		accountingAccountCurrentPage = 1;
+		renderAccountingAccounts(
+			window.accountingAccounts || []
+		);
+	};
+	search?.addEventListener("input", resetPage);
+	typeFilter?.addEventListener("change", resetPage);
+	statusFilter?.addEventListener("change", resetPage);
 }
 
 function renderAccountingAccounts(accounts) {
-    const tbody = document.getElementById("accountsTableBody");
-    if (!tbody) { return; }
-    const searchEl = document.getElementById("accountingAccountSearch");
-    const typeFilterEl = document.getElementById("accountingAccountTypeFilter");
-    const statusFilterEl = document.getElementById("accountingAccountStatusFilter");
+	const tbody = document.getElementById("accountsTableBody");
+	
+	if (!tbody) { return; }
+	
+	const searchEl = document.getElementById("accountingAccountSearch");
+	const typeFilterEl = document.getElementById("accountingAccountTypeFilter");
+	const statusFilterEl = document.getElementById("accountingAccountStatusFilter");
+	const search = (searchEl?.value || "").trim().toLowerCase();
+	const typeFilter = typeFilterEl?.value || "";
+	const statusFilter = statusFilterEl?.value || "";
+	// FILTER
+	let filteredAccounts = accounts.filter(account => {
+		const matchSearch =
+			!search ||
+			(account.accountCode || "").toLowerCase().includes(search) ||
+			(account.accountName || "").toLowerCase().includes(search);
+		const matchType =
+			!typeFilter ||
+			account.accountType === typeFilter;
+		const matchStatus =
+			!statusFilter ||
+			(statusFilter === "ACTIVE"
+				? account.isActive === true
+				: account.isActive === false);
+		return matchSearch && matchType && matchStatus;
+	});
+	// EMPTY
+	if (!filteredAccounts.length) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="7" class="px-6 py-10 text-center text-on-surface-variant">
+					Belum ada akun.
+				</td>
+			</tr>
+		`;
+		updateAccountingAccountPaginationInfo(0);
+		updateAccountingAccountPaginationButtons(1);
+		return;
+	}
+	// PAGINATION
+	const totalAccounts = filteredAccounts.length;
+	const totalPages = Math.max(
+		1,
+		Math.ceil(
+			totalAccounts / ACCOUNTING_ACCOUNT_PAGE_SIZE
+		)
+	);
 
-    const search = (searchEl?.value || "").trim().toLowerCase();
-    const typeFilter = typeFilterEl?.value || "";
-    const statusFilter = statusFilterEl?.value || "";
-    // FILTER
-    let filteredAccounts = accounts.filter(account => {
-        const matchSearch =
-            !search ||
-            (account.accountCode || "").toLowerCase().includes(search) ||
-            (account.accountName || "").toLowerCase().includes(search);
-        const matchType =
-            !typeFilter ||
-            account.accountType === typeFilter;
-        const matchStatus =
-            !statusFilter ||
-            (statusFilter === "ACTIVE"
-                ? account.isActive === true
-                : account.isActive === false);
-        return matchSearch && matchType && matchStatus;
-    });
-    // EMPTY
-    if (!filteredAccounts.length) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7" class="px-6 py-10 text-center text-on-surface-variant">
-                    Belum ada akun.
-                </td>
-            </tr>
-        `;
-        updateAccountingAccountPaginationInfo(0);
-        updateAccountingAccountPaginationButtons(1);
-        return;
-    }
-    // PAGINATION
-    const totalAccounts = filteredAccounts.length;
-    const totalPages = Math.max(
-        1,
-        Math.ceil(
-            totalAccounts / ACCOUNTING_ACCOUNT_PAGE_SIZE
-        )
-    );
+	if (accountingAccountCurrentPage > totalPages) { accountingAccountCurrentPage = totalPages; }
+	
+	const startIndex = (accountingAccountCurrentPage - 1) * ACCOUNTING_ACCOUNT_PAGE_SIZE;
+	const endIndex = startIndex + ACCOUNTING_ACCOUNT_PAGE_SIZE;
+	const pageAccounts = filteredAccounts.slice(startIndex, endIndex);
+	
+	// RENDER
+	tbody.innerHTML = pageAccounts.map(account => {
+		const typeLabel = {
+			ASSET: "Asset",
+			LIABILITY: "Liability",
+			EQUITY: "Equity",
+			REVENUE: "Revenue",
+			COGS: "COGS",
+			EXPENSE: "Expense"
+		}[account.accountType] || account.accountType;
+		const typeClass = {
+			ASSET: "bg-blue-600/10 text-blue-700",
+			LIABILITY: "bg-red-600/10 text-red-700",
+			EQUITY: "bg-purple-600/10 text-purple-700",
+			REVENUE: "bg-green-600/10 text-green-700",
+			COGS: "bg-orange-600/10 text-orange-700",
+			EXPENSE: "bg-yellow-600/10 text-yellow-700"
+		}[account.accountType] || "text-on-surface-variant";
+		const statusClass = account.isActive
+			? "bg-green-600/10 text-green-700"
+			: "bg-red-600/10 text-red-700";
+		const statusLabel = account.isActive
+			? "ACTIVE"
+			: "INACTIVE";
+		return `
+			<tr class="border-b border-outline-variant hover:bg-outline-variant">
+				<td class="px-6 py-4">
+					<span class="font-mono text-sm text-on-surface-variant">
+						${escapeHtml(account.accountCode || "-")}
+					</span>
+				</td>
 
-    if (accountingAccountCurrentPage > totalPages) {
-        accountingAccountCurrentPage = totalPages;
-    }
-    const startIndex =
-        (accountingAccountCurrentPage - 1) *
-        ACCOUNTING_ACCOUNT_PAGE_SIZE;
-    const endIndex = startIndex + ACCOUNTING_ACCOUNT_PAGE_SIZE;
-    const pageAccounts = filteredAccounts.slice(startIndex, endIndex);
-    // RENDER
-    tbody.innerHTML = pageAccounts.map(account => {
-        const typeLabel = {
-            ASSET: "Asset",
-            LIABILITY: "Liability",
-            EQUITY: "Equity",
-            REVENUE: "Revenue",
-            COGS: "COGS",
-            EXPENSE: "Expense"
-        }[account.accountType] || account.accountType;
-        const typeClass = {
-            ASSET: "bg-blue-600/10 text-blue-700",
-            LIABILITY: "bg-red-600/10 text-red-700",
-            EQUITY: "bg-purple-600/10 text-purple-700",
-            REVENUE: "bg-green-600/10 text-green-700",
-            COGS: "bg-orange-600/10 text-orange-700",
-            EXPENSE: "bg-yellow-600/10 text-yellow-700"
-        }[account.accountType] || "text-on-surface-variant";
-        const statusClass = account.isActive
-            ? "bg-green-600/10 text-green-700"
-            : "bg-red-600/10 text-red-700";
-        const statusLabel = account.isActive
-            ? "ACTIVE"
-            : "INACTIVE";
-        return `
-            <tr class="border-b border-outline-variant hover:bg-outline-variant">
-                <td class="px-6 py-4">
-                    <span class="font-mono text-sm text-on-surface-variant">
-                        ${escapeHtml(account.accountCode || "-")}
-                    </span>
-                </td>
+				<td class="px-6 py-4">
+					<div class="font-medium text-on-surface">
+						${escapeHtml(account.accountName || "-")}
+					</div>
+				</td>
 
-                <td class="px-6 py-4">
-                    <div class="font-medium text-on-surface">
-                        ${escapeHtml(account.accountName || "-")}
-                    </div>
-                </td>
+				<td class="px-6 py-4">
+					<span class="px-2.5 py-1 rounded-md text-xs font-medium ${typeClass}">
+						${typeLabel}
+					</span>
+				</td>
 
-                <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 rounded-md text-xs font-medium ${typeClass}">
-                        ${typeLabel}
-                    </span>
-                </td>
+				<td class="px-6 py-4 text-on-surface-variant">
+					${escapeHtml(account.parentName || "—")}
+				</td>
 
-                <td class="px-6 py-4 text-on-surface-variant">
-                    ${escapeHtml(account.parentName || "—")}
-                </td>
+				<td class="px-6 py-4 font-bold text-center">
+					<span class="text-sm ${
+						account.normalBalance === "DEBIT"
+							? "text-blue-700"
+							: "text-green-700" }">
+						${account.normalBalance || "-"}
+					</span>
+				</td>
 
-                <td class="px-6 py-4 font-bold text-center">
-                    <span class="text-sm ${
-                        account.normalBalance === "DEBIT"
-                            ? "text-blue-700"
-                            : "text-green-700"
-                    }">
-                        ${account.normalBalance || "-"}
-                    </span>
-                </td>
+				<td class="px-6 py-4">
+					<span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+						${statusLabel}
+					</span>
+				</td>
 
-                <td class="px-6 py-4">
-                    <span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
-                        ${statusLabel}
-                    </span>
-                </td>
+				<td class="px-6 py-4 text-right">
+					<div class="relative inline-block">
+						<button type="button"
+							onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
+							class="text-on-surface-variant hover:text-on-surface transition">
+							<span class="material-symbols-outlined text-[20px]">
+								more_vert
+							</span>
+						</button>
 
-                <td class="px-6 py-4 text-right">
-                    <div class="relative inline-block">
-                        <button type="button"
-                            onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
-                            class="text-on-surface-variant hover:text-on-surface transition">
-                            <span class="material-symbols-outlined text-[20px]">
-                                more_vert
-                            </span>
-                        </button>
+						<div id="accountMenu-${escapeHtml(account.accountId)}"
+							class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50">
+							<button type="button"
+								onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
+								class="w-full text-left px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-outline-variant">
+									Edit Account
+							</button>
 
-                        <div id="accountMenu-${escapeHtml(account.accountId)}"
-                            class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50">
-                            <button type="button"
-                                onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
-                                class="w-full text-left px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-outline-variant">
-                                Edit Account
-                            </button>
-
-                            <button type="button"
-                                onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
-                                class="w-full text-left px-4 py-2 text-sm ${
-                                    account.isActive
-                                        ? "text-red-700"
-                                        : "text-emerald-700"
-                                } hover: hover:bg-outline-variant">
-                                ${account.isActive ? "Set Inactive" : "Set Active"}
-                            </button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join("");
-    // PAGINATION INFO + BUTTON
-    updateAccountingAccountPaginationInfo(totalAccounts);
-    updateAccountingAccountPaginationButtons(totalPages);
+							<button type="button"
+								onclick="toggleAccountingAccountStatus('${escapeHtml(account.accountId)}')"
+								class="w-full text-left px-4 py-2 text-sm ${
+									account.isActive
+										? "text-red-700"
+										: "text-emerald-700"
+								} hover: hover:bg-outline-variant">
+								${account.isActive ? "Set Inactive" : "Set Active"}
+							</button>
+						</div>
+					</div>
+				</td>
+			</tr>
+		`;
+	}).join("");
+	// PAGINATION INFO + BUTTON
+	updateAccountingAccountPaginationInfo(totalAccounts);
+	updateAccountingAccountPaginationButtons(totalPages);
 }
 
 function updateAccountingAccountPaginationInfo(total) {
-    const info = document.getElementById( "accountingAccountPaginationInfo" );
-    if (!info) return;
-    if (!total) {
-        info.textContent = "Showing 0–0 of 0 Accounts";
-        return;
-    }
-    const start =
-        ((accountingAccountCurrentPage - 1) *
-            ACCOUNTING_ACCOUNT_PAGE_SIZE) + 1;
-    const end = Math.min(
-        accountingAccountCurrentPage *
-            ACCOUNTING_ACCOUNT_PAGE_SIZE,
-        total
-    );
-    info.textContent =
-        `Showing ${start}–${end} of ${total} Accounts`;
+	const info = document.getElementById( "accountingAccountPaginationInfo" );
+
+	if (!info) return;
+	if (!total) { info.textContent = "Showing 0–0 of 0 Accounts"; return; }
+
+	const start = ((accountingAccountCurrentPage - 1) * ACCOUNTING_ACCOUNT_PAGE_SIZE) + 1;
+	const end = Math.min( accountingAccountCurrentPage * ACCOUNTING_ACCOUNT_PAGE_SIZE, total );
+
+	info.textContent = `Showing ${start}–${end} of ${total} Accounts`;
 }
 
 function updateAccountingAccountPaginationButtons(totalPages) {
-    const prevButton = document.getElementById( "accountingAccountPrevButton" );
-    const nextButton = document.getElementById( "accountingAccountNextButton" );
-    if (prevButton) {
-        prevButton.disabled = accountingAccountCurrentPage <= 1;
-        prevButton.classList.toggle( "opacity-40", prevButton.disabled );
-        prevButton.classList.toggle( "cursor-not-allowed", prevButton.disabled );
-    }
-    if (nextButton) {
-        nextButton.disabled = accountingAccountCurrentPage >= totalPages;
-        nextButton.classList.toggle( "opacity-40", nextButton.disabled );
-        nextButton.classList.toggle( "cursor-not-allowed", nextButton.disabled );
-    }
+	const prevButton = document.getElementById( "accountingAccountPrevButton" );
+	const nextButton = document.getElementById( "accountingAccountNextButton" );
+	
+	if (prevButton) {
+		prevButton.disabled = accountingAccountCurrentPage <= 1;
+		prevButton.classList.toggle( "opacity-40", prevButton.disabled );
+		prevButton.classList.toggle( "cursor-not-allowed", prevButton.disabled );
+	}
+	if (nextButton) {
+		nextButton.disabled = accountingAccountCurrentPage >= totalPages;
+		nextButton.classList.toggle( "opacity-40", nextButton.disabled );
+		nextButton.classList.toggle( "cursor-not-allowed", nextButton.disabled );
+	}
 }
 
 function accountingAccountPrevPage() {
-    if (accountingAccountCurrentPage <= 1) return;
-    accountingAccountCurrentPage--;
-    renderAccountingAccounts( window.accountingAccounts || [] );
+	if (accountingAccountCurrentPage <= 1) return;
+	accountingAccountCurrentPage--;
+	renderAccountingAccounts( window.accountingAccounts || [] );
 }
 
 function accountingAccountNextPage() {
-    const accounts = Array.isArray(window.accountingAccounts)
-        ? window.accountingAccounts
-        : [];
-    const search = document.getElementById("accountingAccountSearch")
-            ?.value.trim().toLowerCase() || "";
-    const typeFilter = document.getElementById("accountingAccountTypeFilter")
-            ?.value || "";
-    const statusFilter = document.getElementById("accountingAccountStatusFilter")
-            ?.value || "";
-    const filteredAccounts = accounts.filter(account => {
-        const matchSearch =
-            !search ||
-            (account.accountCode || "")
-                .toLowerCase()
-                .includes(search) ||
-            (account.accountName || "")
-                .toLowerCase()
-                .includes(search);
-        const matchType =
-            !typeFilter ||
-            account.accountType === typeFilter;
-        const matchStatus =
-            !statusFilter ||
-            (statusFilter === "ACTIVE"
-                ? account.isActive === true
-                : account.isActive === false);
-        return matchSearch && matchType && matchStatus;
-    });
+	const accounts = Array.isArray(window.accountingAccounts)
+		? window.accountingAccounts
+		: [];
+	const search = document.getElementById("accountingAccountSearch") ?.value.trim().toLowerCase() || "";
+	const typeFilter = document.getElementById("accountingAccountTypeFilter") ?.value || "";
+	const statusFilter = document.getElementById("accountingAccountStatusFilter") ?.value || "";
+	const filteredAccounts = accounts.filter(account => {
+		const matchSearch =
+			!search ||
+			(account.accountCode || "")
+				.toLowerCase()
+				.includes(search) ||
+			(account.accountName || "")
+				.toLowerCase()
+				.includes(search);
+		const matchType =
+			!typeFilter ||
+			account.accountType === typeFilter;
+		const matchStatus =
+			!statusFilter ||
+			(statusFilter === "ACTIVE"
+				? account.isActive === true
+				: account.isActive === false);
+		return matchSearch && matchType && matchStatus;
+	});
 
-    const totalPages = Math.max(
-        1,
-        Math.ceil(
-            filteredAccounts.length /
-            ACCOUNTING_ACCOUNT_PAGE_SIZE
-        )
-    );
-    if (accountingAccountCurrentPage >= totalPages) {
-        return;
-    }
-    accountingAccountCurrentPage++;
-    renderAccountingAccounts(accounts);
+	const totalPages = Math.max(
+		1,
+		Math.ceil(
+			filteredAccounts.length /
+			ACCOUNTING_ACCOUNT_PAGE_SIZE
+		)
+	);
+	if (accountingAccountCurrentPage >= totalPages) { return; }
+
+	accountingAccountCurrentPage++;
+	renderAccountingAccounts(accounts);
 }
 
 function updateAccountingAccountSummary(accounts) {
-    const countByType = type =>
-        accounts.filter(account =>
-            account.accountType === type
-        ).length;
-    const assetEl = document.getElementById("accountingAssetCount");
-    const liabilityEl = document.getElementById("accountingLiabilityCount");
-    const equityEl = document.getElementById("accountingEquityCount");
-    const revenueEl = document.getElementById("accountingRevenueCount");
-    const expenseEl = document.getElementById("accountingExpenseCount");
-    if (assetEl) {
-        assetEl.textContent = countByType("ASSET");
-    }
-    if (liabilityEl) {
-        liabilityEl.textContent = countByType("LIABILITY");
-    }
-    if (equityEl) {
-        equityEl.textContent = countByType("EQUITY");
-    }
-    if (revenueEl) {
-        revenueEl.textContent = countByType("REVENUE");
-    }
-    if (expenseEl) {
-        expenseEl.textContent = countByType("EXPENSE");
-    }
+	const countByType = type => accounts.filter(account => account.accountType === type ).length;
+	const assetEl = document.getElementById("accountingAssetCount");
+	const liabilityEl = document.getElementById("accountingLiabilityCount");
+	const equityEl = document.getElementById("accountingEquityCount");
+	const revenueEl = document.getElementById("accountingRevenueCount");
+	const expenseEl = document.getElementById("accountingExpenseCount");
+
+	if (assetEl) { assetEl.textContent = countByType("ASSET"); }
+	if (liabilityEl) { liabilityEl.textContent = countByType("LIABILITY"); }
+	if (equityEl) { equityEl.textContent = countByType("EQUITY"); }
+	if (revenueEl) { revenueEl.textContent = countByType("REVENUE"); }
+	if (expenseEl) { expenseEl.textContent = countByType("EXPENSE"); }
 }
 
 function openAddAccountingAccountModal() {
-    const modal = document.getElementById("addAccountingAccountModal");
-    if (!modal) return;
-    document.getElementById("newAccountingAccountCode").value = "";
-    document.getElementById("newAccountingAccountName").value = "";
-    document.getElementById("newAccountingAccountType").value = "";
-    document.getElementById("newAccountingAccountParent").value = "";
-    document.getElementById("newAccountingAccountNormalBalance").value = "";
-    populateAccountingParentAccounts();
-    modal.classList.remove("hidden");
+	const modal = document.getElementById("addAccountingAccountModal");
+	
+	if (!modal) return;
+	
+	document.getElementById("newAccountingAccountCode").value = "";
+	document.getElementById("newAccountingAccountName").value = "";
+	document.getElementById("newAccountingAccountType").value = "";
+	document.getElementById("newAccountingAccountParent").value = "";
+	document.getElementById("newAccountingAccountNormalBalance").value = "";
+	
+	populateAccountingParentAccounts();
+	modal.classList.remove("hidden");
 }
 
 function closeAddAccountingAccountModal() {
-    const modal = document.getElementById("addAccountingAccountModal");
-    if (modal) {
-        modal.classList.add("hidden");
-    }
+	const modal = document.getElementById("addAccountingAccountModal");
+	
+	if (modal) { modal.classList.add("hidden"); }
 }
 
 function populateAccountingParentAccounts() {
-    const select = document.getElementById("newAccountingAccountParent");
-    if (!select) return;
-    select.innerHTML = `
-        <option value="">No Parent Account</option>
-    `;
-    if (!window.accountingAccounts) return;
-    window.accountingAccounts.forEach(account => {
-        const option = document.createElement("option");
-        option.value = account.accountId;
-        option.textContent =
-            `${account.accountCode} — ${account.accountName}`;
-        select.appendChild(option);
-    });
+	const select = document.getElementById("newAccountingAccountParent");
+	
+	if (!select) return;
+	
+	select.innerHTML = ` <option value="">No Parent Account</option> `;
+	
+	if (!window.accountingAccounts) return;
+	window.accountingAccounts.forEach(account => {
+		const option = document.createElement("option");
+		option.value = account.accountId;
+		option.textContent =
+			`${account.accountCode} — ${account.accountName}`;
+		select.appendChild(option);
+	});
 }
 
 function updateAccountingNormalBalance() {
-    const type = document.getElementById(
-        "newAccountingAccountType"
-    )?.value;
-    const balance = document.getElementById(
-        "newAccountingAccountNormalBalance"
-    );
-    if (!balance) return;
-    if (type === "ASSET" || type === "COGS" || type === "EXPENSE") {
-        balance.value = "DEBIT";
-    } else if (
-        type === "LIABILITY" ||
-        type === "EQUITY" ||
-        type === "REVENUE"
-    ) {
-        balance.value = "CREDIT";
-    } else {
-        balance.value = "";
-    }
+	const type = document.getElementById( "newAccountingAccountType" )?.value;
+	const balance = document.getElementById( "newAccountingAccountNormalBalance" );
+
+	if (!balance) return;
+	if (type === "ASSET" || type === "COGS" || type === "EXPENSE") {
+		balance.value = "DEBIT";
+	} else if (
+		type === "LIABILITY" ||
+		type === "EQUITY" ||
+		type === "REVENUE"
+	) {
+		balance.value = "CREDIT";
+	} else {
+		balance.value = "";
+	}
 }
 
 function toggleAccountingAccountMenu(accountId) {
-    const menu = document.getElementById(
-        `accountMenu-${accountId}`
-    );
+	const menu = document.getElementById( `accountMenu-${accountId}` );
 
-    if (!menu) return;
-    document.querySelectorAll(
-        '[id^="accountMenu-"]'
-    ).forEach(el => {
-
-        if (el !== menu) {
-            el.classList.add("hidden");
-        }
-    });
-    menu.classList.toggle("hidden");
+	if (!menu) return;
+	document.querySelectorAll(
+		'[id^="accountMenu-"]'
+	).forEach(el => {
+		if (el !== menu) {
+			el.classList.add("hidden");
+		}
+	});
+	menu.classList.toggle("hidden");
 }
 
 let editingAccountingAccountId = null;
 const ACCOUNTING_ACCOUNT_PAGE_SIZE = 10;
 let accountingAccountCurrentPage = 1;
 function editAccountingAccount(accountId) {
-    const account = (window.accountingAccounts || [])
-        .find(a => a.accountId === accountId);
-    if (!account) {
-        alert("Account tidak ditemukan.");
-        return;
-    }
-    editingAccountingAccountId = accountId;
-    const modal = document.getElementById( "addAccountingAccountModal" );
-    if (!modal) return;
-    document.getElementById( "newAccountingAccountCode"
-    ).value = account.accountCode || "";
-    document.getElementById( "newAccountingAccountName"
-    ).value = account.accountName || "";
-    document.getElementById( "newAccountingAccountType"
-    ).value = account.accountType || "";
-    document.getElementById( "newAccountingAccountNormalBalance"
-    ).value = account.normalBalance || "";
-    populateAccountingParentAccounts();
-    document.getElementById( "newAccountingAccountParent"
-    ).value = account.parentId || "";
-    const title = document.getElementById( "accountModalTitle" );
-    const saveButton = document.getElementById( "accountModalSaveButton" );
-    if (title) {
-        title.textContent = "Edit Account"; }
-    if (saveButton) {
-        saveButton.textContent = "Update Account"; }
-    modal.classList.remove("hidden");
+	const account = (window.accountingAccounts || [])
+		.find(a => a.accountId === accountId);
+	if (!account) { alert("Account tidak ditemukan."); return; }
+
+	editingAccountingAccountId = accountId;
+	const modal = document.getElementById( "addAccountingAccountModal" );
+
+	if (!modal) return;
+
+	document.getElementById( "newAccountingAccountCode" ).value = account.accountCode || "";
+	document.getElementById( "newAccountingAccountName" ).value = account.accountName || "";
+	document.getElementById( "newAccountingAccountType" ).value = account.accountType || "";
+	document.getElementById( "newAccountingAccountNormalBalance" ).value = account.normalBalance || "";
+
+	populateAccountingParentAccounts();
+
+	document.getElementById( "newAccountingAccountParent" ).value = account.parentId || "";
+	const title = document.getElementById( "accountModalTitle" );
+	const saveButton = document.getElementById( "accountModalSaveButton" );
+
+	if (title) { title.textContent = "Edit Account"; }
+	if (saveButton) { saveButton.textContent = "Update Account"; }
+	modal.classList.remove("hidden");
 }
 
 async function saveAccountingAccount() {
     const sessionId = localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-        alert("Session tidak ditemukan.");
-        return;
-    }
+	
+    if (!sessionId) { alert("Session tidak ditemukan."); return; }
+	
     const accountCode = document.getElementById( "newAccountingAccountCode" )?.value.trim();
     const accountName = document.getElementById( "newAccountingAccountName" )?.value.trim();
     const accountType = document.getElementById( "newAccountingAccountType" )?.value;
     const parentId = document.getElementById( "newAccountingAccountParent" )?.value || null;
     const normalBalance = document.getElementById( "newAccountingAccountNormalBalance" )?.value;
 	
-    if (!accountCode) { alert("Account Code wajib diisi.");
-        return;
-    }
-    if (!accountName) { alert("Account Name wajib diisi.");
-        return;
-    }
-    if (!accountType) { alert("Account Type wajib dipilih.");
-        return;
-    }
-    if (!normalBalance) { alert("Normal Balance wajib dipilih.");
-        return;
-    }
+    if (!accountCode) { alert("Account Code wajib diisi."); return; }
+    if (!accountName) { alert("Account Name wajib diisi."); return; }
+    if (!accountType) { alert("Account Type wajib dipilih."); return; }
+    if (!normalBalance) { alert("Normal Balance wajib dipilih."); return; }
 
     try {
 			let data;
@@ -22530,7 +22396,7 @@ async function saveAccountingAccount() {
 		
 	if (error) {
 		alert( error.message || "Gagal menyimpan account." );
-		return;  }
+		return; }
 
 	const wasEditing = !!editingAccountingAccountId;
 	closeAddAccountingAccountModal();
@@ -22555,9 +22421,9 @@ async function toggleAccountingAccountStatus(accountId) {
 	if (!confirmed) return;
 	const sessionId = localStorage.getItem("pos_session_id");
 	if (!sessionId) {
-			alert("Session tidak ditemukan.");
-			return;
-	}
+		alert("Session tidak ditemukan.");
+		return; }
+	
 	try {
 		const { data, error } = await supabaseClient.rpc(
 			"toggle_account_status",
@@ -22576,11 +22442,11 @@ async function toggleAccountingAccountStatus(accountId) {
 	}
 }
 
-
 /* ====== ACCOUNT MAPPING ====== */
 let editingAccountingMappingId = null;
 const ACCOUNTING_MAPPING_PAGE_SIZE = 10;
 let accountingMappingCurrentPage = 1;
+
 async function loadAccountingMappings() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
@@ -22601,407 +22467,360 @@ async function loadAccountingMappings() {
 
 /* ====== RENDER ACCOUNT MAPPINGS ====== */
 function renderAccountingMappings() {
-    const tbody = document.getElementById( "accountingMappingsTableBody" );
-    if (!tbody) { return; }
-    const search =
-        ( document.getElementById( "accountingMappingSearch" )?.value || "" )
-        .trim()
-        .toLowerCase();
-    const typeFilter = document.getElementById( "accountingMappingTypeFilter" )?.value || "";
-    let mappings = Array.isArray(window.accountingMappings)
-				? window.accountingMappings
-				: [];
-    /* SEARCH */
-    if (search) {
-			mappings = mappings.filter(mapping => {
-				const text = [
-					mapping.mappingName,
-					mapping.transactionType,
-					mapping.source,
-					mapping.debitAccountCode,
-					mapping.debitAccountName,
-					mapping.creditAccountCode,
-					mapping.creditAccountName
-				]
-					.filter(Boolean)
-					.join(" ")
-					.toLowerCase();
-				return text.includes(search);
-			});
-    }
-    /* FILTER TRANSACTION TYPE */
-    if (typeFilter &&
-        typeFilter !== "All Transaction Types"
-    ) {
-        mappings = mappings.filter(mapping =>
-            String(mapping.transactionType || "")
-                .toUpperCase() ===
-            typeFilter.toUpperCase()
-        );
-    }
+	const tbody = document.getElementById( "accountingMappingsTableBody" );
+	if (!tbody) { return; }
+	const search =
+		( document.getElementById( "accountingMappingSearch" )?.value || "" )
+		.trim()
+		.toLowerCase();
+	const typeFilter = document.getElementById( "accountingMappingTypeFilter" )?.value || "";
+	let mappings = Array.isArray(window.accountingMappings)
+		? window.accountingMappings
+		: [];
+	/* SEARCH */
+	if (search) {
+		mappings = mappings.filter(mapping => {
+			const text = [
+				mapping.mappingName,
+				mapping.transactionType,
+				mapping.source,
+				mapping.debitAccountCode,
+				mapping.debitAccountName,
+				mapping.creditAccountCode,
+				mapping.creditAccountName
+			]
+				.filter(Boolean)
+				.join(" ")
+				.toLowerCase();
+			return text.includes(search);
+		});
+	}
+	/* FILTER TRANSACTION TYPE */
+	if (typeFilter &&
+		typeFilter !== "All Transaction Types"
+	) {
+		mappings = mappings.filter(mapping =>
+			String(mapping.transactionType || "")
+				.toUpperCase() ===
+			typeFilter.toUpperCase()
+		);
+	}
 
-    /* ====== PAGINATION ====== */
-    const totalMappings = mappings.length;
-    const totalPages = Math.max(
-        1,
-        Math.ceil(
-            totalMappings /
-            ACCOUNTING_MAPPING_PAGE_SIZE
-        )
-    );
-    if (accountingMappingCurrentPage > totalPages) {
-        accountingMappingCurrentPage = totalPages; }
-    if (accountingMappingCurrentPage < 1) {
-        accountingMappingCurrentPage = 1; }
+	/* ====== PAGINATION ====== */
+	const totalMappings = mappings.length;
+	const totalPages = Math.max(
+		1,
+		Math.ceil(
+			totalMappings /
+			ACCOUNTING_MAPPING_PAGE_SIZE
+		)
+	);
 
-    const startIndex = (accountingMappingCurrentPage - 1) * ACCOUNTING_MAPPING_PAGE_SIZE;
-    const endIndex = startIndex + ACCOUNTING_MAPPING_PAGE_SIZE;
-    const pageMappings =  mappings.slice( startIndex, endIndex );
-    /* EMPTY */
-    if (!totalMappings) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6"
-                    class="px-6 py-10 text-center text-on-surface-variant">
-                    Belum ada account mapping.
-                </td>
-            </tr>
-        `;
-        updateAccountingMappingPaginationInfo(0);
-        return;
-    }
-    /* TABLE */
-    tbody.innerHTML = pageMappings.map(mapping => {
-        const statusClass =
-            mapping.isActive
-                ? "bg-green-600/10 text-green-700"
-                : "bg-read-600/10 text-read-700";
-        const statusLabel =
-            mapping.isActive
-                ? "ACTIVE"
-                : "INACTIVE";
-        const debitAccount =
-            mapping.debitAccountCode ||
-            mapping.debitAccountName
-                ? `
-									<div class="font-medium text-on-surface">
-											${escapeHtml( mapping.debitAccountName || "-" )}
-									</div>
-									<div class="text-xs text-muted mt-1 font-mono">
-											${escapeHtml( mapping.debitAccountCode || "-" )}
-									</div>
-                  `
-                : "—";
+	if (accountingMappingCurrentPage > totalPages) { accountingMappingCurrentPage = totalPages; }
+	if (accountingMappingCurrentPage < 1) { accountingMappingCurrentPage = 1; }
 
-        const creditAccount =
-            mapping.creditAccountCode ||
-            mapping.creditAccountName
-                ? `
-							<div class="font-medium text-on-surface">
-									${escapeHtml( mapping.creditAccountName || "-" )}
-							</div>
-							<div class="text-xs text-muted mt-1 font-mono">
-									${escapeHtml( mapping.creditAccountCode || "-" )}
-							</div>
+	const startIndex = (accountingMappingCurrentPage - 1) * ACCOUNTING_MAPPING_PAGE_SIZE;
+	const endIndex = startIndex + ACCOUNTING_MAPPING_PAGE_SIZE;
+	const pageMappings =  mappings.slice( startIndex, endIndex );
+	/* EMPTY */
+	if (!totalMappings) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="6"
+					class="px-6 py-10 text-center text-on-surface-variant">
+					Belum ada account mapping.
+				</td>
+			</tr>
+		`;
+		updateAccountingMappingPaginationInfo(0);
+		return; }
+	/* TABLE */
+	tbody.innerHTML = pageMappings.map(mapping => {
+		const statusClass = mapping.isActive
+			? "bg-green-600/10 text-green-700"
+			: "bg-read-600/10 text-read-700";
+		const statusLabel = mapping.isActive
+			? "ACTIVE"
+			: "INACTIVE";
+		const debitAccount =
+			mapping.debitAccountCode ||
+			mapping.debitAccountName
+					? `
+						<div class="font-medium text-on-surface">
+							${escapeHtml( mapping.debitAccountName || "-" )}
+						</div>
+						<div class="text-xs text-muted mt-1 font-mono">
+							${escapeHtml( mapping.debitAccountCode || "-" )}
+						</div>
 						`
 					: "—";
-      return `
-				<tr class="border-b border-outline-variant hover:bg-outline-variant">
-					<!-- TRANSACTION -->
-					<td class="px-6 py-4">
-						<div class="font-medium text-on-surface">
-								${escapeHtml( mapping.mappingName || "-" )}
-						</div>
-				
-						<div class="text-xs text-muted mt-1">
-								${escapeHtml( mapping.transactionType || "-" )}
-						</div>
-					</td>
-					<!-- SOURCE -->
-					<td class="px-6 py-4">
-						<span class="text-sm text-on-surface-variant">
-								${escapeHtml( mapping.source || "-" )}
-						</span>
-					</td>
-					<!-- DEBIT -->
-					<td class="px-6 py-4">
-							${debitAccount}
-					</td>
-					<!-- CREDIT -->
-					<td class="px-6 py-4">
-							${creditAccount}
-					</td>
-					<!-- STATUS -->
-					<td class="px-6 py-4">
-						<span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
-								${statusLabel}
-						</span>
-					</td>
-					<!-- ACTION -->
-					<td class="px-6 py-4">
-						<div class="relative">
+		const creditAccount =
+			mapping.creditAccountCode ||
+			mapping.creditAccountName
+					? `
+				<div class="font-medium text-on-surface">
+					${escapeHtml( mapping.creditAccountName || "-" )}
+				</div>
+				<div class="text-xs text-muted mt-1 font-mono">
+					${escapeHtml( mapping.creditAccountCode || "-" )}
+				</div>
+			`
+		: "—";
+		return `
+			<tr class="border-b border-outline-variant hover:bg-outline-variant">
+				<!-- TRANSACTION -->
+				<td class="px-6 py-4">
+					<div class="font-medium text-on-surface">
+						${escapeHtml( mapping.mappingName || "-" )}
+					</div>
+			
+					<div class="text-xs text-muted mt-1">
+						${escapeHtml( mapping.transactionType || "-" )}
+					</div>
+				</td>
+				<!-- SOURCE -->
+				<td class="px-6 py-4">
+					<span class="text-sm text-on-surface-variant">
+						${escapeHtml( mapping.source || "-" )}
+					</span>
+				</td>
+				<!-- DEBIT -->
+				<td class="px-6 py-4">
+					${debitAccount}
+				</td>
+				<!-- CREDIT -->
+				<td class="px-6 py-4">
+					${creditAccount}
+				</td>
+				<!-- STATUS -->
+				<td class="px-6 py-4">
+					<span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+						${statusLabel}
+					</span>
+				</td>
+				<!-- ACTION -->
+				<td class="px-6 py-4">
+					<div class="relative">
+						<button type="button"
+							onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
+							class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition">
+	
+							<span class="material-symbols-outlined text-lg">
+									more_vert
+							</span>
+						</button>
+	
+						<div id="accountingMappingMenu-${escapeHtml(mapping.mappingId)}"
+							 class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
 							<button type="button"
-								onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
-								class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition">
-	
-								<span class="material-symbols-outlined text-lg">
-										more_vert
-								</span>
+								onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
+								class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
+									Edit
 							</button>
-		
-							<div id="accountingMappingMenu-${escapeHtml(mapping.mappingId)}"
-								 class="hidden absolute right-0 top-10 z-20 w-40 bg-surface border border-outline-variant rounded-md shadow-xl overflow-hidden">
-								<button type="button"
-									onclick="editAccountingMapping('${escapeHtml(mapping.mappingId)}')"
-									class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
-										Edit
-								</button>
 	
-								<button type="button"
-										onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
-										class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
-										${mapping.isActive
-												? "Deactivate"
-												: "Activate"}
-								</button>
-							</div>
+							<button type="button"
+								onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
+								class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
+								${mapping.isActive
+									? "Deactivate"
+									: "Activate"}
+							</button>
 						</div>
-					</td>
-				</tr>
-			`;
-		}).join("");
+					</div>
+				</td>
+			</tr>
+		`;
+	}).join("");
 
 	updateAccountingMappingPaginationInfo( totalMappings );
 	updateAccountingMappingPaginationButtons( totalPages );
 }
 
 
-/* =======================================================
-   PAGINATION INFO
-   ======================================================= */
+/* === PAGINATION INFO === */
 
 function updateAccountingMappingPaginationInfo(total) {
-    const info = document.getElementById(
-            "accountingMappingPaginationInfo"
-        );
-    if (!info) return;
-    if (!total) {
-        info.textContent =
-            "Showing 0–0 of 0 Mappings";
-        return;
-    }
-    const start =
-        ((accountingMappingCurrentPage - 1) *
-            ACCOUNTING_MAPPING_PAGE_SIZE) + 1;
-    const end =
-        Math.min(
-            accountingMappingCurrentPage *
-                ACCOUNTING_MAPPING_PAGE_SIZE,
-            total
-        );
-    info.textContent =
-        `Showing ${start}–${end} of ${total} Mappings`;
+	const info = document.getElementById( "accountingMappingPaginationInfo" );
+
+	if (!info) return;
+	if (!total) { info.textContent = "Showing 0–0 of 0 Mappings"; return; }
+
+	const start =
+		((accountingMappingCurrentPage - 1) *
+			ACCOUNTING_MAPPING_PAGE_SIZE) + 1;
+	const end =
+		Math.min(
+			accountingMappingCurrentPage *
+				ACCOUNTING_MAPPING_PAGE_SIZE,
+			total
+		);
+	info.textContent = `Showing ${start}–${end} of ${total} Mappings`;
 }
 
 
-/* =======================================================
-   PAGINATION BUTTONS
-   ======================================================= */
+/* === PAGINATION BUTTONS === */
 
 function updateAccountingMappingPaginationButtons(totalPages) {
-    const prevButton = document.getElementById(
-            "accountingMappingPrevButton"
-        );
-    const nextButton = document.getElementById(
-            "accountingMappingNextButton"
-        );
-    if (prevButton) {
-        prevButton.disabled = accountingMappingCurrentPage <= 1;
-        prevButton.classList.toggle( "opacity-40", prevButton.disabled );
-        prevButton.classList.toggle( "cursor-not-allowed", prevButton.disabled );
-    }
-    if (nextButton) {
-        nextButton.disabled = accountingMappingCurrentPage >= totalPages;
-        nextButton.classList.toggle( "opacity-40", nextButton.disabled );
-        nextButton.classList.toggle( "cursor-not-allowed", nextButton.disabled );
-    }
+	const prevButton = document.getElementById( "accountingMappingPrevButton" );
+	const nextButton = document.getElementById( "accountingMappingNextButton" );
+
+	if (prevButton) {
+		prevButton.disabled = accountingMappingCurrentPage <= 1;
+		prevButton.classList.toggle( "opacity-40", prevButton.disabled );
+		prevButton.classList.toggle( "cursor-not-allowed", prevButton.disabled );
+	}
+	if (nextButton) {
+		nextButton.disabled = accountingMappingCurrentPage >= totalPages;
+		nextButton.classList.toggle( "opacity-40", nextButton.disabled );
+		nextButton.classList.toggle( "cursor-not-allowed", nextButton.disabled );
+	}
 }
 
-/* =======================================================
-   PAGINATION NAVIGATION
-   ======================================================= */
+/* === PAGINATION NAVIGATION === */
 
 function accountingMappingPrevPage() {
-    if (accountingMappingCurrentPage <= 1) {
-        return;
-    }
-    accountingMappingCurrentPage--;
-    renderAccountingMappings();
+	if (accountingMappingCurrentPage <= 1) { return; }
+	
+	accountingMappingCurrentPage--;
+	renderAccountingMappings();
 }
 
 
 function accountingMappingNextPage() {
-    const mappings =
-        Array.isArray(window.accountingMappings)
-            ? window.accountingMappings
-            : [];
-    const totalPages =
-        Math.max(
-            1,
-            Math.ceil(
-                mappings.length /
-                ACCOUNTING_MAPPING_PAGE_SIZE
-            )
-        );
-    if (
-        accountingMappingCurrentPage >=
-        totalPages
-    ) {
-        return;
-    }
-    accountingMappingCurrentPage++;
-    renderAccountingMappings();
+	const mappings = Array.isArray(window.accountingMappings)
+		? window.accountingMappings
+		: [];
+	const totalPages =
+		Math.max(
+			1,
+			Math.ceil(
+				mappings.length /
+				ACCOUNTING_MAPPING_PAGE_SIZE
+			)
+		);
+	if (
+		accountingMappingCurrentPage >=
+		totalPages
+	) { return; }
+	accountingMappingCurrentPage++;
+	renderAccountingMappings();
 }
 
 
-/* =======================================================
-   ACCOUNT DROPDOWN
-   ======================================================= */
+/* === ACCOUNT DROPDOWN === */
 
 function populateAccountingMappingAccounts() {
+	const debitSelect = document.getElementById( "newAccountingMappingDebitAccount" );
+	const creditSelect = document.getElementById( "newAccountingMappingCreditAccount" );
 
-    const debitSelect =
-        document.getElementById(
-            "newAccountingMappingDebitAccount"
-        );
+	if (!debitSelect || !creditSelect) { return; }
 
-    const creditSelect =
-        document.getElementById(
-            "newAccountingMappingCreditAccount"
-        );
+	const accounts = Array.isArray(window.accountingAccounts)
+		? window.accountingAccounts
+			.filter(account => account.isActive)
+			.sort((a, b) =>
+				String(a.accountCode || "")
+					.localeCompare(
+						String(b.accountCode || "")
+					)
+				)
+		: [];
 
-    if (!debitSelect || !creditSelect) {
-        return;
-    }
+	const options = accounts.map(account => `
+		<option value="${escapeHtml(account.accountId)}">
+			${escapeHtml(account.accountCode || "")}
+			— 
+			${escapeHtml(account.accountName || "")}
+		</option>
+	`).join("");
 
-    const accounts =
-        Array.isArray(window.accountingAccounts)
-            ? window.accountingAccounts
-                .filter(account => account.isActive)
-                .sort((a, b) =>
-                    String(a.accountCode || "")
-                        .localeCompare(
-                            String(b.accountCode || "")
-                        )
-                )
-            : [];
+	debitSelect.innerHTML = `
+		<option value="">Select Debit Account</option>
+		${options}
+	`;
 
-    const options = accounts.map(account => `
-        <option value="${escapeHtml(account.accountId)}">
-            ${escapeHtml(account.accountCode || "")}
-            — 
-            ${escapeHtml(account.accountName || "")}
-        </option>
-    `).join("");
-
-    debitSelect.innerHTML = `
-        <option value="">Select Debit Account</option>
-        ${options}
-    `;
-
-    creditSelect.innerHTML = `
-        <option value="">Select Credit Account</option>
-        ${options}
-    `;
+	creditSelect.innerHTML = `
+		<option value="">Select Credit Account</option>
+		${options}
+	`;
 }
 
 
-/* =======================================================
-   OPEN ADD MODAL
-   ======================================================= */
+/* === OPEN ADD MODAL === */
 
 function openAddAccountingMappingModal() {
-    editingAccountingMappingId = null;
-    const modal = document.getElementById( "addAccountingMappingModal" );
+	editingAccountingMappingId = null;
+	const modal = document.getElementById( "addAccountingMappingModal" );
 
-    if (!modal) return;
+	if (!modal) return;
 
-    document.getElementById( "newAccountingMappingName" ).value = "";
-    document.getElementById( "newAccountingMappingType" ).value = "";
-    document.getElementById( "newAccountingMappingSource" ).value = "";
+	document.getElementById( "newAccountingMappingName" ).value = "";
+	document.getElementById( "newAccountingMappingType" ).value = "";
+	document.getElementById( "newAccountingMappingSource" ).value = "";
 
-    populateAccountingMappingAccounts();
+	populateAccountingMappingAccounts();
 
-    document.getElementById( "newAccountingMappingDebitAccount" ).value = "";
-    document.getElementById( "newAccountingMappingCreditAccount" ).value = "";
+	document.getElementById( "newAccountingMappingDebitAccount" ).value = "";
+	document.getElementById( "newAccountingMappingCreditAccount" ).value = "";
 
-    const title = document.getElementById( "accountingMappingModalTitle" );
-    const saveButton = document.getElementById( "accountingMappingModalSaveButton" );
+	const title = document.getElementById( "accountingMappingModalTitle" );
+	const saveButton = document.getElementById( "accountingMappingModalSaveButton" );
 
-    if (title) { title.textContent = "Add Mapping"; }
-    if (saveButton) {  saveButton.textContent = "Save Mapping"; }
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	if (title) { title.textContent = "Add Mapping"; }
+	if (saveButton) {  saveButton.textContent = "Save Mapping"; }
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
-/* =======================================================
-   CLOSE MODAL
-   ======================================================= */
+/* === CLOSE MODAL === */
 
 function closeAddAccountingMappingModal() {
-    const modal = document.getElementById( "addAccountingMappingModal" );
-    if (!modal) return;
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-    editingAccountingMappingId = null;
+	const modal = document.getElementById( "addAccountingMappingModal" );
+	
+	if (!modal) return;
+	
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+	editingAccountingMappingId = null;
 }
 
 
-/* =======================================================
-   EDIT ACCOUNT MAPPING
-   ======================================================= */
+/* === EDIT ACCOUNT MAPPING === */
 
 function editAccountingMapping(mappingId) {
-    const mapping = (window.accountingMappings || []) .find( mapping => mapping.mappingId === mappingId );
+	const mapping = (window.accountingMappings || []) .find( mapping => mapping.mappingId === mappingId );
 
-    if (!mapping) {
-        alert("Account mapping tidak ditemukan.");
-        return;
-    }
+	if (!mapping) { alert("Account mapping tidak ditemukan."); return; }
 
-    editingAccountingMappingId = mappingId;
-    const modal = document.getElementById( "addAccountingMappingModal" );
-    if (!modal) return;
-
-    populateAccountingMappingAccounts();
+	editingAccountingMappingId = mappingId;
+	const modal = document.getElementById( "addAccountingMappingModal" );
 	
-    document.getElementById( "newAccountingMappingName" ).value = mapping.mappingName || "";
-    document.getElementById( "newAccountingMappingType" ).value = mapping.transactionType || "";
-    document.getElementById( "newAccountingMappingSource" ).value = mapping.source || "";
-    document.getElementById( "newAccountingMappingDebitAccount" ).value = mapping.debitAccountId || "";
-    document.getElementById( "newAccountingMappingCreditAccount" ).value = mapping.creditAccountId || "";
+	if (!modal) return;
 
-    const title = document.getElementById( "accountingMappingModalTitle" );
-    const saveButton = document.getElementById( "accountingMappingModalSaveButton" );
+	populateAccountingMappingAccounts();
 
-    if (title) { title.textContent = "Edit Mapping"; }
-    if (saveButton) { saveButton.textContent = "Update Mapping"; }
+	document.getElementById( "newAccountingMappingName" ).value = mapping.mappingName || "";
+	document.getElementById( "newAccountingMappingType" ).value = mapping.transactionType || "";
+	document.getElementById( "newAccountingMappingSource" ).value = mapping.source || "";
+	document.getElementById( "newAccountingMappingDebitAccount" ).value = mapping.debitAccountId || "";
+	document.getElementById( "newAccountingMappingCreditAccount" ).value = mapping.creditAccountId || "";
 
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	const title = document.getElementById( "accountingMappingModalTitle" );
+	const saveButton = document.getElementById( "accountingMappingModalSaveButton" );
+
+	if (title) { title.textContent = "Edit Mapping"; }
+	if (saveButton) { saveButton.textContent = "Update Mapping"; }
+
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
-/* =======================================================
-   SAVE ACCOUNT MAPPING
-   ======================================================= */
+/* ==== SAVE ACCOUNT MAPPING ==== */
 
 async function saveAccountingMapping() {
 	const sessionId = localStorage.getItem( "pos_session_id" );
 
-	if (!sessionId) {
-			alert("Session tidak ditemukan.");
-			return;
-	}
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 
 	const mappingName = document.getElementById( "newAccountingMappingName" )?.value.trim();
 	const transactionType = document.getElementById( "newAccountingMappingType" )?.value;
@@ -23009,66 +22828,55 @@ async function saveAccountingMapping() {
 	const debitAccountId = document.getElementById( "newAccountingMappingDebitAccount" )?.value || null;
 	const creditAccountId = document.getElementById( "newAccountingMappingCreditAccount" )?.value || null;
 	/* VALIDATION */
-	if (!mappingName) {
-			alert("Mapping Name wajib diisi.");
-			return; }
-	if (!transactionType) {
-			alert("Transaction Type wajib dipilih.");
-			return; }
-	if (!source) {
-			alert("Source wajib diisi.");
-			return; }
-	if ( !debitAccountId && !creditAccountId ) {
-			alert( "Debit atau Credit Account wajib dipilih." );
-			return; }
+	if (!mappingName) { alert("Mapping Name wajib diisi."); return; }
+	if (!transactionType) { alert("Transaction Type wajib dipilih."); return; }
+	if (!source) { alert("Source wajib diisi."); return; }
+	if ( !debitAccountId && !creditAccountId ) { alert( "Debit atau Credit Account wajib dipilih." ); return; }
 
 	try {
 		let data;
 		let error;
-		if (editingAccountingMappingId) {
+		if (editingAccountingMappingId) { ({ data, error } =
+			await supabaseClient.rpc(
+				"update_account_mapping",
+					{
+						p_mapping_id: editingAccountingMappingId,
+						p_mapping_name: mappingName,
+						p_transaction_type: transactionType,
+						p_source: source,
+						p_debit_account_id: debitAccountId,
+						p_credit_account_id: creditAccountId,
+						p_session_id: sessionId
+					}
+				)
+			);
+		}
+
+		else {
 			({ data, error } =
 				await supabaseClient.rpc(
-					"update_account_mapping",
-						{
-							p_mapping_id: editingAccountingMappingId,
-							p_mapping_name: mappingName,
-							p_transaction_type: transactionType,
-							p_source: source,
-							p_debit_account_id: debitAccountId,
-							p_credit_account_id: creditAccountId,
-							p_session_id: sessionId
-						}
-					)
-				);
-			}
+					"create_account_mapping",
+					{
+						p_mapping_name: mappingName,
+						p_transaction_type: transactionType,
+						p_source: source,
+						p_debit_account_id: debitAccountId,
+						p_credit_account_id: creditAccountId,
+						p_session_id: sessionId
+					}
+				)
+			);
+		}
 
-			else {
-				({ data, error } =
-					await supabaseClient.rpc(
-						"create_account_mapping",
-						{
-							p_mapping_name: mappingName,
-							p_transaction_type: transactionType,
-							p_source: source,
-							p_debit_account_id: debitAccountId,
-							p_credit_account_id: creditAccountId,
-							p_session_id: sessionId
-						}
-					)
-				);
-			}
+		if (error) { alert( error.message || "Gagal menyimpan account mapping." ); return; }
 
-			if (error) { alert( error.message || "Gagal menyimpan account mapping." );
-					return; }
-
-			const wasEditing = !!editingAccountingMappingId;
-			closeAddAccountingMappingModal();
-			await loadAccountingMappings();
-			editingAccountingMappingId = null;
-			alert( "Account Mapping berhasil " + (wasEditing
-							? "diubah."
-							: "disimpan.") );
-
+		const wasEditing = !!editingAccountingMappingId;
+		closeAddAccountingMappingModal();
+		await loadAccountingMappings();
+		editingAccountingMappingId = null;
+		alert( "Account Mapping berhasil " + (wasEditing
+			? "diubah."
+			: "disimpan.") );
 	} catch (err) {
 		alert(
 			"Terjadi kesalahan saat menyimpan account mapping."
@@ -23098,18 +22906,19 @@ function initAccountingMappingFilters() {
 
 async function toggleAccountingMappingStatus(mappingId) {
 	const sessionId = localStorage.getItem("pos_session_id");
-	if (!sessionId) { alert("Session tidak ditemukan.");
-			return; }
+	
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
+	
 	const mapping = (window.accountingMappings || [])
-			.find(m => m.mappingId === mappingId);
-	if (!mapping) {
-			alert("Account mapping tidak ditemukan.");
-			return; }
+		.find(m => m.mappingId === mappingId);
+	
+	if (!mapping) { alert("Account mapping tidak ditemukan."); return; }
+	
 	const action = mapping.isActive
-			? "menonaktifkan"
-			: "mengaktifkan";
-	if (!confirm( `Yakin ingin ${action} mapping "${mapping.mappingName}"?` )) {
-			return; }
+		? "menonaktifkan"
+		: "mengaktifkan";
+	
+	if (!confirm( `Yakin ingin ${action} mapping "${mapping.mappingName}"?` )) { return; }
 
 	try {
 		const { data, error } = await supabaseClient.rpc(
@@ -23120,8 +22929,7 @@ async function toggleAccountingMappingStatus(mappingId) {
 			}
 		);
 
-		if (error) { alert( error.message || "Gagal mengubah status account mapping." );
-			return; }
+		if (error) { alert( error.message || "Gagal mengubah status account mapping." ); return; }
 		await loadAccountingMappings();
 	} catch (err) {
 		alert( "Terjadi kesalahan saat mengubah status account mapping." );
@@ -23231,31 +23039,31 @@ function renderJournalEntryRow(journal) {
 	return `
 		<tr class="border-b border-outline-variant hover:bg-outline-variant">
 			<td class="px-5 py-4 font-medium">
-					${escapeHtml( journal.journalNo || "-" )}
+				${escapeHtml( journal.journalNo || "-" )}
 			</td>
 
 			<td class="px-5 py-4 text-muted">
-					${formatJournalDate( journal.journalDate )}
+				${formatJournalDate( journal.journalDate )}
 			</td>
 
 			<td class="px-5 py-4">
-					${escapeHtml( sourceLabel )}
+				${escapeHtml( sourceLabel )}
 			</td>
 
 			<td class="px-5 py-4">
-					${escapeHtml( journal.description || "-" )}
+				${escapeHtml( journal.description || "-" )}
 			</td>
 
 			<td class="px-5 py-4 text-right">
-					${formatJournalCurrency( journal.totalDebit )}
+				${formatJournalCurrency( journal.totalDebit )}
 			</td>
 
 			<td class="px-5 py-4 text-right">
-					${formatJournalCurrency( journal.totalCredit )}
+				${formatJournalCurrency( journal.totalCredit )}
 			</td>
 
 			<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}">
-					${escapeHtml( statusLabel )}
+				${escapeHtml( statusLabel )}
 			</td>
 
 			<td class="px-5 py-4 text-right">
@@ -23270,7 +23078,6 @@ function renderJournalEntryRow(journal) {
 			
 					<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
 						class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-50">
-			
 						<button type="button"
 							onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
 							class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
@@ -23292,7 +23099,7 @@ function renderJournalEntryRow(journal) {
 										POSTED
 									</button>
 								`
-								: ""
+							: ""
 						}
 					</div>
 				</div>
@@ -23313,7 +23120,6 @@ function toggleJournalEntryActionMenu(journalId) {
 				el.classList.add("hidden");
 			}
 		});
-
 	menu.classList.toggle("hidden");
 }
 
@@ -23351,28 +23157,24 @@ async function postManualJournalEntry(journalId) {
     state.cashFlowFilter = null;
 		state.expenseDashboardData = null;
     state.expenseDashboardFilter = null;
+		
 		journalEntriesLoaded = false;
 		journalEntriesData = [];
 		window.journalEntries = [];
 		generalLedgerLoaded = false;
 		generalLedgerData = [];
 		
+		await loadGeneralLedger();
 		await loadJournalEntries();
 		alert( `Journal ${data?.journalNo || journal.journalNo || ""} ` + `berhasil diposting.` );
 
 	} catch (error) {
-		console.error(
-			"POST MANUAL JOURNAL ERROR:",
-			error
-		);
 		alert( error?.message || "Gagal memposting journal." );
 	}
 }
 
 async function editManualJournalEntry(journalId) {
-	const journal = journalEntriesData.find(
-		item => item.journalId === journalId
-	);
+	const journal = journalEntriesData.find( item => item.journalId === journalId );
 	
 	if (!journal) return;
 	if (journal.status !== "DRAFT") { alert("Hanya journal DRAFT yang dapat diedit."); return; }
@@ -23423,7 +23225,6 @@ async function editManualJournalEntry(journalId) {
 		if (referenceEl) { referenceEl.value = journalData.referenceId || ""; }
 		if (descriptionEl) { descriptionEl.value = journalData.description || ""; }
 		if (statusEl) { statusEl.value = "DRAFT"; }
-	
 		/*
 		 * POPULATE LINES
 		 */
@@ -23497,7 +23298,6 @@ async function editManualJournalEntry(journalId) {
 					</button>
 				</td>
 	    `;
-	
 	    container.appendChild(row);
 	
 	    const accountEl = document.getElementById( `newJournalAccount-${lineId}` );
@@ -23529,12 +23329,7 @@ async function editManualJournalEntry(journalId) {
 			modal.classList.remove("hidden");
 			modal.classList.add("flex");
 		}
-	
 	} catch (error) {
-		console.error(
-				"EDIT JOURNAL ERROR:",
-				error
-		);
 		alert( error?.message || "Gagal memuat journal." );
 	}
 }
@@ -23549,19 +23344,16 @@ function getFilteredJournalEntries( entries ) {
 		.toLowerCase();
 	return entries.filter(journal => {
 		const journalDate = journal.journalDate || "";
-		if ( dateFrom && journalDate < dateFrom ) 
-				{ return false; }
-		if ( dateTo && journalDate > dateTo ) 	
-				{ return false; }
-		if ( source && journal.source !== source ) 
-				{ return false; }
-		if ( status && journal.status !== status ) 
-				{ return false; }
+		
+		if ( dateFrom && journalDate < dateFrom ) { return false; }
+		if ( dateTo && journalDate > dateTo ) { return false; }
+		if ( source && journal.source !== source ) { return false; }
+		if ( status && journal.status !== status ) { return false; }
 		if (search) {
-				const journalNo = String( journal.journalNo || "" ).toLowerCase();
-				const description = String( journal.description || "" ).toLowerCase();
-				if ( !journalNo.includes(search) &&  !description.includes(search) ) 
-				{ return false; }
+			const journalNo = String( journal.journalNo || "" ).toLowerCase();
+			const description = String( journal.description || "" ).toLowerCase();
+			
+			if ( !journalNo.includes(search) &&  !description.includes(search) ) { return false; }
 		}
 		return true;
 	});
@@ -23589,12 +23381,12 @@ function updateJournalEntriesPagination( total, totalPages ) {
 	const nextButton = document.getElementById( "journalEntriesNextButton" );
 	const start = 
 		total === 0
-	        ? 0
-	        :
-	        (
-						( journalEntriesCurrentPage - 1  ) 
-						* JOURNAL_ENTRIES_PAGE_SIZE
-	        ) + 1;
+			? 0
+			:
+			(
+				( journalEntriesCurrentPage - 1  ) 
+				* JOURNAL_ENTRIES_PAGE_SIZE
+			) + 1;
 	const end =
 		Math.min(
 			journalEntriesCurrentPage *
@@ -23617,15 +23409,15 @@ function journalEntriesNextPage() {
 	const filteredEntries = getFilteredJournalEntries( journalEntriesData );
 	const totalPages =
 		Math.max(
-				1,
-				Math.ceil(
-						filteredEntries.length /
-						JOURNAL_ENTRIES_PAGE_SIZE
-				)
+			1,
+			Math.ceil(
+				filteredEntries.length /
+				JOURNAL_ENTRIES_PAGE_SIZE
+			)
 		);
 
-	if ( journalEntriesCurrentPage >= totalPages ) 
-		{ return; }
+	if ( journalEntriesCurrentPage >= totalPages )  { return; }
+	
 	journalEntriesCurrentPage++;
 	renderJournalEntries( journalEntriesData );
 }
@@ -23638,10 +23430,10 @@ function initJournalEntriesFilters() {
 	const search = document.getElementById( "journalSearch" );
 	const resetPage =
 		() => {
-				journalEntriesCurrentPage = 1;
-				renderJournalEntries(
-						journalEntriesData
-				);
+			journalEntriesCurrentPage = 1;
+			renderJournalEntries(
+				journalEntriesData
+			);
 		};
 	dateFrom?.addEventListener( "change", resetPage );
 	dateTo?.addEventListener( "change", resetPage );
@@ -23652,8 +23444,11 @@ function initJournalEntriesFilters() {
 
 function formatJournalDate( dateValue ) {
 	if (!dateValue) { return "-"; }
+	
 	const date = new Date( `${dateValue}T00:00:00` );
+	
 	if ( Number.isNaN( date.getTime() ) ) { return escapeHtml(  String(dateValue) ); }
+	
 	return date.toLocaleDateString( "en-GB",
 		{
 			day: "2-digit",
@@ -23672,9 +23467,7 @@ async function loadJournalAccounts() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
 
-		if (!sessionId) {
-			console.error("Session tidak ditemukan.");
-			return []; }
+		if (!sessionId) { return []; }
 
 		const { data, error } =
 			await supabaseClient.rpc(
@@ -23684,9 +23477,7 @@ async function loadJournalAccounts() {
 				}
 			);
 
-		if (error) {
-				console.error("GET JOURNAL ACCOUNTS ERROR:", error);
-				return []; }
+		if (error) { return []; }
 
 		const accounts = Array.isArray(data)
 			? data
@@ -23694,52 +23485,29 @@ async function loadJournalAccounts() {
 
 		window.journalAccounts = accounts;
 		return accounts;
-		
-	} catch (err) {
-		console.error("LOAD JOURNAL ACCOUNTS ERROR:", err);
-		return [];
-	}
+	} catch (err) { return []; }
 }
 
 async function loadJournalBranches() {
-    try {
-        const sessionId =
-            localStorage.getItem("pos_session_id");
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
 
-        if (!sessionId) {
-            return [];
-        }
+		if (!sessionId) {  return []; }
 
-        const { data, error } =
-            await supabaseClient.rpc(
-                "get_expense_branches",
-                {
-                    p_session_id: sessionId
-                }
-            );
+		const { data, error } =
+			await supabaseClient.rpc(
+				"get_expense_branches",
+				{
+					p_session_id: sessionId
+				}
+			);
 
-        if (error) {
-            console.error(
-                "GET JOURNAL BRANCHES ERROR:",
-                error
-            );
-            return [];
-        }
+		if (error) { return []; }
 
-        const branches =
-            Array.isArray(data) ? data : [];
-
-        window.journalBranches = branches;
-
-        return branches;
-
-    } catch (err) {
-        console.error(
-            "LOAD JOURNAL BRANCHES ERROR:",
-            err
-        );
-        return [];
-    }
+		const branches = Array.isArray(data) ? data : [];
+		window.journalBranches = branches;
+		return branches;
+	} catch (err) { return []; }
 }
 
 let newJournalLineCounter = 0;
@@ -23762,10 +23530,9 @@ async function openNewJournalModal() {
 	if (statusEl) { statusEl.value = "DRAFT"; }
 
 	// LOAD COA UNTUK PAGE JOURNAL ENTRIES
-	await loadJournalAccounts();
 	await Promise.all([
-	    loadJournalAccounts(),
-	    loadJournalBranches()
+		loadJournalAccounts(),
+		loadJournalBranches()
 	]);
 	populateNewJournalBranches();
 
@@ -23821,10 +23588,8 @@ function populateNewJournalBranches() {
 		if (!branchId) return;
 	
 		const option = document.createElement("option");
-	
 		option.value = branchId;
 		option.textContent = branchName;
-	
 		branchEl.appendChild(option);
 	});
 }
@@ -23921,10 +23686,13 @@ function removeNewJournalLine(lineId) {
 function handleNewJournalDebitInput(lineId) {
 	const debitEl = document.getElementById(`newJournalDebit-${lineId}`);
 	const creditEl = document.getElementById(`newJournalCredit-${lineId}`);
+	
 	if (!debitEl || !creditEl) return;
+	
 	const debit = Number(debitEl.value || 0);
+	
 	if (debit > 0) {
-			creditEl.value = "0";
+		creditEl.value = "0";
 	}
 	calculateNewJournalTotals();
 }
@@ -23932,82 +23700,94 @@ function handleNewJournalDebitInput(lineId) {
 function handleNewJournalCreditInput(lineId) {
 	const debitEl = document.getElementById(`newJournalDebit-${lineId}`);
 	const creditEl = document.getElementById(`newJournalCredit-${lineId}`);
+	
 	if (!debitEl || !creditEl) return;
+	
 	const credit = Number(creditEl.value || 0);
+	
 	if (credit > 0) {
-			debitEl.value = "0";
+		debitEl.value = "0";
 	}
 	calculateNewJournalTotals();
 }
 
 function calculateNewJournalTotals() {
 	const container = document.getElementById("newJournalLinesContainer");
+	
 	if (!container) return;
+	
 	let totalDebit = 0;
 	let totalCredit = 0;
+	
 	const rows = container.querySelectorAll("tr");
+	
 	rows.forEach(row => {
-			const debitEl = row.querySelector('input[id^="newJournalDebit-"]');
-			const creditEl = row.querySelector('input[id^="newJournalCredit-"]');
-			totalDebit += Number(debitEl?.value || 0);
-			totalCredit += Number(creditEl?.value || 0);
+		const debitEl = row.querySelector('input[id^="newJournalDebit-"]');
+		const creditEl = row.querySelector('input[id^="newJournalCredit-"]');
+		totalDebit += Number(debitEl?.value || 0);
+		totalCredit += Number(creditEl?.value || 0);
 	});
 	const difference = totalDebit - totalCredit;
 	const debitDisplay = document.getElementById("newJournalTotalDebit");
 	const creditDisplay = document.getElementById("newJournalTotalCredit");
 	const differenceDisplay = document.getElementById("newJournalDifference");
+	
 	if (debitDisplay) { debitDisplay.textContent = formatJournalCurrency(totalDebit); }
 	if (creditDisplay) { creditDisplay.textContent = formatJournalCurrency(totalCredit); }
 	if (differenceDisplay) {
-			differenceDisplay.textContent =
-					formatJournalCurrency(Math.abs(difference));
-			differenceDisplay.classList.remove(
-					"text-green-700",
-					"text-red-700",
-					"text-gray-700"
-			);
-			if (difference === 0) {
-					differenceDisplay.classList.add("text-green-700");
-			} else {
-					differenceDisplay.classList.add("text-red-700");
-			}
+		differenceDisplay.textContent =
+			formatJournalCurrency(Math.abs(difference));
+		differenceDisplay.classList.remove(
+			"text-green-700",
+			"text-red-700",
+			"text-gray-700"
+		);
+		if (difference === 0) {
+				differenceDisplay.classList.add("text-green-700");
+		} else {
+				differenceDisplay.classList.add("text-red-700");
+		}
 	}
 
 	return {
-			totalDebit,
-			totalCredit,
-			difference
+		totalDebit,
+		totalCredit,
+		difference
 	};
 }
 
 function getNewJournalLines() {
 	const container = document.getElementById("newJournalLinesContainer");
+	
 	if (!container) return [];
+	
 	const rows = container.querySelectorAll("tr");
 	const lines = [];
+	
 	rows.forEach(row => {
-			const accountEl = row.querySelector('select[id^="newJournalAccount-"]');
-			const descriptionEl =  row.querySelector('input[id^="newJournalLineDescription-"]');
-			const debitEl = row.querySelector('input[id^="newJournalDebit-"]');
-			const creditEl = row.querySelector('input[id^="newJournalCredit-"]');
-			const accountId = accountEl?.value || null;
-			const description = descriptionEl?.value?.trim() || null;
-			const debit = Number(debitEl?.value || 0);
-			const credit = Number(creditEl?.value || 0);
-			lines.push({
-					accountId,
-					description,
-					debit,
-					credit
-			});
+		const accountEl = row.querySelector('select[id^="newJournalAccount-"]');
+		const descriptionEl =  row.querySelector('input[id^="newJournalLineDescription-"]');
+		const debitEl = row.querySelector('input[id^="newJournalDebit-"]');
+		const creditEl = row.querySelector('input[id^="newJournalCredit-"]');
+		const accountId = accountEl?.value || null;
+		const description = descriptionEl?.value?.trim() || null;
+		const debit = Number(debitEl?.value || 0);
+		const credit = Number(creditEl?.value || 0);
+		lines.push({
+			accountId,
+			description,
+			debit,
+			credit
+		});
 	});
 	return lines;
 }
 
 async function saveNewJournalEntry() {
 	const sessionId = localStorage.getItem("pos_session_id");
-	if (!sessionId) { alert("Session tidak ditemukan.");
-			return; }
+	
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
+	
 	const dateEl = document.getElementById("newJournalDate");
 	const sourceEl = document.getElementById("newJournalSource");
 	const branchEl = document.getElementById("newJournalBranch");
@@ -24022,52 +23802,49 @@ async function saveNewJournalEntry() {
 	const description = descriptionEl?.value?.trim() || "";
 	const status = statusEl?.value || "POSTED";
 
-	if (!journalDate) { alert("Journal date wajib diisi."); dateEl?.focus();
-			return; }
-	if (!source) { alert("Source wajib dipilih."); sourceEl?.focus();
-			return; }
-	if (!description) { alert("Description wajib diisi."); descriptionEl?.focus();
-			return; }
-	if (!branchId) { alert("Branch wajib dipilih."); branchEl?.focus();
-			return; }
+	if (!journalDate) { alert("Journal date wajib diisi."); dateEl?.focus(); return; }
+	if (!source) { alert("Source wajib dipilih."); sourceEl?.focus(); return; }
+	if (!description) { alert("Description wajib diisi."); descriptionEl?.focus(); return; }
+	if (!branchId) { alert("Branch wajib dipilih."); branchEl?.focus(); return; }
+	
 	const lines = getNewJournalLines();
-	if (lines.length < 2) { alert("Journal minimal harus memiliki 2 line.");
-			return; }
+	
+	if (lines.length < 2) { alert("Journal minimal harus memiliki 2 line."); return; }
 
 	for (let i = 0; i < lines.length; i++) {
-			const line = lines[i];
-		
-			if (!line.accountId) { alert(`Account pada line ${i + 1} wajib dipilih.`);
-					return; }
-		
-			const debit = Number(line.debit || 0);
-			const credit = Number(line.credit || 0);
-		
-			if (debit <= 0 && credit <= 0) { alert(`Debit atau Credit pada line ${i + 1} wajib diisi.`);
-					return; }
-			if (debit > 0 && credit > 0) { alert(`Line ${i + 1} tidak boleh memiliki Debit dan Credit sekaligus.`);
-					return; }
+		const line = lines[i];
+	
+		if (!line.accountId) { alert(`Account pada line ${i + 1} wajib dipilih.`); return; }
+	
+		const debit = Number(line.debit || 0);
+		const credit = Number(line.credit || 0);
+	
+		if (debit <= 0 && credit <= 0) { alert(`Debit atau Credit pada line ${i + 1} wajib diisi.`); return; }
+		if (debit > 0 && credit > 0) { alert(`Line ${i + 1} tidak boleh memiliki Debit dan Credit sekaligus.`); return; }
 	}
+	
 	const totalDebit = lines.reduce(
-			(sum, line) => sum + Number(line.debit || 0),
-			0
+		(sum, line) => sum + Number(line.debit || 0),
+		0
 	);
 	const totalCredit = lines.reduce(
-			(sum, line) => sum + Number(line.credit || 0),
-			0
+		(sum, line) => sum + Number(line.credit || 0),
+		0
 	);
+	
 	if (totalDebit <= 0 || totalCredit <= 0) {
-			alert("Total Debit dan Credit harus lebih dari 0.");
-			return;
+		alert("Total Debit dan Credit harus lebih dari 0.");
+		return;
 	}
 	if (totalDebit !== totalCredit) {
-			alert(
-					`Journal belum balance.\n\n` +
-					`Debit: ${formatJournalCurrency(totalDebit)}\n` +
-					`Credit: ${formatJournalCurrency(totalCredit)}`
-			);
-			return;
+		alert(
+				`Journal belum balance.\n\n` +
+				`Debit: ${formatJournalCurrency(totalDebit)}\n` +
+				`Credit: ${formatJournalCurrency(totalCredit)}`
+		);
+		return;
 	}
+	
 	const originalButtonHtml = saveButton?.innerHTML;
 	try {
 			if (saveButton) {
@@ -24213,9 +23990,11 @@ function renderJournalEntryDetail(journal) {
 
     const container = document.getElementById( "journalDetailLinesContainer" );
     if (!container) return;
+	
     const lines = Array.isArray(journal.lines)
-            ? journal.lines
-            : [];
+			? journal.lines
+			: [];
+	
     let totalDebit = 0;
     let totalCredit = 0;
     if (!lines.length) {
@@ -24237,30 +24016,30 @@ function renderJournalEntryDetail(journal) {
 								<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
 									<td class="px-4 py-4">
 										<div class="text-sm font-medium text-on-surface">
-												${escapeHtml( line.accountCode || "-" )}
+											${escapeHtml( line.accountCode || "-" )}
 										</div>
 
 										<div class="text-xs text-on-surface-variant mt-1">
-												${escapeHtml( line.accountName || "-" )}
+											${escapeHtml( line.accountName || "-" )}
 										</div>
 									</td>
 
 									<td class="px-4 py-4 text-sm text-on-surface-variant">
-											${escapeHtml( line.description || "-" )}
+										${escapeHtml( line.description || "-" )}
 									</td>
 
 									<td class="px-4 py-4 text-right text-sm text-on-surface">
-											${ debit > 0
-													? formatJournalCurrency(debit)
-													: "-"
-											}
+										${ debit > 0
+												? formatJournalCurrency(debit)
+												: "-"
+										}
 									</td>
 									
 									<td class="px-4 py-4 text-right text-sm text-on-surface">
-											${ credit > 0
-													? formatJournalCurrency(credit)
-													: "-"
-											}
+										${ credit > 0
+												? formatJournalCurrency(credit)
+												: "-"
+										}
 									</td>
 								</tr>
 						`;
@@ -24305,9 +24084,9 @@ function formatJournalDate(dateValue) {
 	return date.toLocaleDateString(
 		"en-GB",
 		{
-				day: "2-digit",
-				month: "short",
-				year: "numeric"
+			day: "2-digit",
+			month: "short",
+			year: "numeric"
 		}
 	);
 }
@@ -24350,10 +24129,7 @@ async function loadGeneralLedger() {
 			}
 		);
 
-		if (error) {
-			alert(error.message || "Gagal memuat General Ledger");
-			return;
-		}
+		if (error) { alert(error.message || "Gagal memuat General Ledger"); return; }
 		// ===== SAVE DATA TO CACHE =====
 		generalLedgerData = Array.isArray(data) ? data : [];
 		generalLedgerLoaded = true;
