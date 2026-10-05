@@ -24437,38 +24437,57 @@ function renderGeneralLedger() {
 }
 
 function getFilteredGeneralLedger() {
-	let accountId = document.getElementById("generalLedgerAccountFilter")?.value || ""; 
+	let accountId = document.getElementById("generalLedgerAccountFilter")?.value || "";
 	let branchId = document.getElementById("generalLedgerBranchFilter")?.value || "";
 	
-	if (accountId === "All Accounts") {
-		accountId = "";
-	}
-	
-	if (branchId === "All Branches") {
-		branchId = "";
-	}
+	const dateFrom = document.getElementById("journalDateFrom")?.value || "";
+	const dateTo = document.getElementById("journalDateTo")?.value || "";
+
+	if (accountId === "All Accounts") { accountId = ""; }
+	if (branchId === "All Branches") { branchId = ""; }
+
 	const search = document.getElementById("generalLedgerSearch")?.value
-					?.trim()
-					.toLowerCase() || "";
+			?.trim()
+			.toLowerCase() || "";
+
 	return generalLedgerData.filter(row => {
-		if ( accountId && String(row.accountId || "") !== String(accountId) ) { 
-			return false; }
-		if ( branchId && String(row.branchId || "") !== String(branchId) ) {
-			return false; }
+
+		// DATE FILTER
+		// Mengikuti filter Journal Entries
+		const journalDate = String(row.journalDate || "").substring(0, 10);
+
+		if (dateFrom && journalDate < dateFrom) { return false; }
+		if (dateTo && journalDate > dateTo) { return false; }
+		// ACCOUNT FILTER
+		if (
+			accountId &&
+			String(row.accountId || "") !== String(accountId)
+		) {
+			return false;
+		}
+		// BRANCH FILTER
+		if (
+			branchId &&
+			String(row.branchId || "") !== String(branchId)
+		) {
+			return false;
+		}
+		// SEARCH FILTER
 		if (search) {
-				const searchable = [
-					row.journalNo,
-					row.accountCode,
-					row.accountName,
-					row.description,
-					row.referenceId,
-					row.source
-				]
-					.filter(Boolean)
-					.join(" ")
-					.toLowerCase();
-		if (!searchable.includes(search)) { return false; }
-	}
+			const searchable = [
+				row.journalNo,
+				row.accountCode,
+				row.accountName,
+				row.description,
+				row.referenceId,
+				row.source
+			]
+				.filter(Boolean)
+				.join(" ")
+				.toLowerCase();
+
+			if (!searchable.includes(search)) { return false; }
+		}
 		return true;
 	});
 }
@@ -24551,16 +24570,46 @@ function initGeneralLedgerFilters() {
 	const accountFilter = document.getElementById("generalLedgerAccountFilter");
 	const branchFilter = document.getElementById("generalLedgerBranchFilter");
 	const searchInput = document.getElementById("generalLedgerSearch");
+	const journalDateFrom = document.getElementById("journalDateFrom");
+	const journalDateTo = document.getElementById("journalDateTo");
 
 	if (accountFilter) {
-			accountFilter.addEventListener("change", () => { generalLedgerCurrentPage = 1; renderGeneralLedger(); });
+		accountFilter.addEventListener("change", () => {
+			generalLedgerCurrentPage = 1;
+			renderGeneralLedger();
+		});
 	}
 	if (branchFilter) {
-			branchFilter.addEventListener("change", () => { generalLedgerCurrentPage = 1; renderGeneralLedger(); });
+		branchFilter.addEventListener("change", () => {
+			generalLedgerCurrentPage = 1;
+			renderGeneralLedger();
+		});
 	}
 	if (searchInput) {
-		searchInput.addEventListener("input", () => { generalLedgerCurrentPage = 1; renderGeneralLedger(); });
-  }
+		searchInput.addEventListener("input", () => {
+			generalLedgerCurrentPage = 1;
+			renderGeneralLedger();
+		});
+	}
+
+	// JOURNAL DATE → GENERAL LEDGER
+	const resetGeneralLedgerPage = () => {
+		generalLedgerCurrentPage = 1;
+		renderGeneralLedger();
+	};
+
+	if (journalDateFrom) {
+		journalDateFrom.addEventListener(
+			"change",
+			resetGeneralLedgerPage
+		);
+	}
+	if (journalDateTo) {
+		journalDateTo.addEventListener(
+			"change",
+			resetGeneralLedgerPage
+		);
+	}
 }
 
 function updateGeneralLedgerPagination( start, end, total ) {
