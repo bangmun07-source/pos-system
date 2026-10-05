@@ -22561,7 +22561,6 @@
         class="mt-5 space-y-5">
         <!-- === EMPLOYEE SUMMARY === -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-
           <div class="p-5 border-b border-outline-variant flex items-center justify-between">
             <div class="flex items-center gap-3">
               <div class="main-icon-box">
@@ -22582,15 +22581,27 @@
               </div>
             </div>
 						
-            <button type="button"
-              onclick="openEmployeeModal()"
-              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">
-                person_add
-              </span>
-              Add Employee
-            </button>
-
+						<div class="flex items-center gap-2">
+						  <!-- EXPORT -->
+						  <button type="button"
+						    onclick="exportEmployee()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      download
+						    </span>
+						    Export
+						  </button>
+	
+						  <!-- SET SCHEDULE -->
+						  <button type="button"
+						    onclick="openEmployeeModal()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      add
+						    </span>
+						    Set Schedule
+						  </button>
+						</div>
           </div>
           <!-- KPI -->
           <div class="grid grid-cols-2 md:grid-cols-4">
@@ -22729,7 +22740,7 @@
               <button id="employeePrevButton"
                 type="button"
                 onclick="changeEmployeePage(-1)"
-                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
                 <span class="material-symbols-outlined text-sm">
                   chevron_left
                 </span>
@@ -22738,7 +22749,7 @@
               <button id="employeeNextButton"
                 type="button"
                 onclick="changeEmployeePage(1)"
-                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
                 <span class="material-symbols-outlined text-sm">
                   chevron_right
                 </span>
@@ -22769,140 +22780,141 @@
 						</div>
 
 						<div class="flex items-center gap-2">
-					  <!-- EXPORT -->
-					  <button type="button"
-					    onclick="exportEmployeeSchedule()"
-					    class="h-10 px-4 rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-surface-container-high text-sm font-medium flex items-center gap-2">
-					    <span class="material-symbols-outlined text-sm">
-					      download
-					    </span>
-					    Export
-					  </button>
-
-					  <!-- SET SCHEDULE -->
-					  <button type="button"
-					    onclick="openScheduleModal()"
-					    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-					    <span class="material-symbols-outlined text-sm">
-					      add
-					    </span>
-					    Set Schedule
-					  </button>
+						  <!-- EXPORT -->
+						  <button type="button"
+						    onclick="exportEmployeeSchedule()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      download
+						    </span>
+						    Export
+						  </button>
+	
+						  <!-- SET SCHEDULE -->
+						  <button type="button"
+						    onclick="openScheduleModal()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      add
+						    </span>
+						    Set Schedule
+						  </button>
+						</div>
+	  			</div>
+				  <!-- FILTER -->
+				  <div class="p-5 border-b border-outline-variant">
+				    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+						  <!-- WEEK -->
+						  <div class="md:col-span-4">
+						    <label class="block text-xs text-muted mb-2">
+						      Schedule Week
+						    </label>
+						
+						    <select id="scheduleWeekFilter"
+						      onchange="filterSchedules()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value=""> Current Week </option>
+						    </select>
+						  </div>
+						  <!-- EMPLOYEE -->
+						  <div class="md:col-span-3">
+						    <label class="block text-xs text-muted mb-2">
+						      Employee
+						    </label>
+						
+						    <select id="scheduleEmployeeFilter"
+						      onchange="filterSchedules()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value=""> All Employees </option>
+						    </select>
+						  </div>
+						  <!-- OUTLET -->
+						  <div class="md:col-span-3">
+						    <label class="block text-xs text-muted mb-2">
+						      Outlet
+						    </label>
+						
+						    <select id="scheduleBranchFilter"
+						      onchange="filterSchedules()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value=""> All Branch </option>
+						    </select>
+						  </div>
+						  <!-- DAY -->
+						  <div class="md:col-span-2">
+						    <label class="block text-xs text-muted mb-2">
+						      Day
+						    </label>
+						
+						    <select id="scheduleDayFilter"
+						      onchange="filterSchedules()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value=""> All Days </option>
+						      <option value="MONDAY"> Monday </option>
+						      <option value="TUESDAY"> Tuesday </option>
+						      <option value="WEDNESDAY"> Wednesday </option>
+						      <option value="THURSDAY"> Thursday </option>
+						      <option value="FRIDAY"> Friday </option>
+						      <option value="SATURDAY"> Saturday </option>
+						      <option value="SUNDAY"> Sunday </option>
+						    </select>
+						  </div>
+						</div>
 					</div>
-  			</div>
-			  <!-- FILTER -->
-			  <div class="p-5 border-b border-outline-variant">
-			    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-					  <!-- WEEK -->
-					  <div class="md:col-span-4">
-					    <label class="block text-xs text-muted mb-2">
-					      Schedule Week
-					    </label>
-					
-					    <select id="scheduleWeekFilter"
-					      onchange="filterSchedules()"
-					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					      <option value=""> Current Week </option>
-					    </select>
-					  </div>
-					  <!-- EMPLOYEE -->
-					  <div class="md:col-span-3">
-					    <label class="block text-xs text-muted mb-2">
-					      Employee
-					    </label>
-					
-					    <select id="scheduleEmployeeFilter"
-					      onchange="filterSchedules()"
-					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					      <option value=""> All Employees </option>
-					    </select>
-					  </div>
-					  <!-- OUTLET -->
-					  <div class="md:col-span-3">
-					    <label class="block text-xs text-muted mb-2">
-					      Outlet
-					    </label>
-					
-					    <select id="scheduleBranchFilter"
-					      onchange="filterSchedules()"
-					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					      <option value=""> All Branch </option>
-					    </select>
-					  </div>
-					  <!-- DAY -->
-					  <div class="md:col-span-2">
-					    <label class="block text-xs text-muted mb-2">
-					      Day
-					    </label>
-					
-					    <select id="scheduleDayFilter"
-					      onchange="filterSchedules()"
-					      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					      <option value=""> All Days </option>
-					      <option value="MONDAY"> Monday </option>
-					      <option value="TUESDAY"> Tuesday </option>
-					      <option value="WEDNESDAY"> Wednesday </option>
-					      <option value="THURSDAY"> Thursday </option>
-					      <option value="FRIDAY"> Friday </option>
-					      <option value="SATURDAY"> Saturday </option>
-					      <option value="SUNDAY"> Sunday </option>
-					    </select>
-					  </div>
+				  <!-- SCHEDULE TABLE -->
+				  <div class="overflow-x-auto custom-scrollbar">
+				    <table class="w-full text-sm">
+						  <thead>
+						    <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+						      <th class="px-5 py-3 text-left"> Employee </th>
+						      <th class="px-5 py-3 text-left"> Day </th>
+						      <th class="px-5 py-3 text-left"> Start </th>
+						      <th class="px-5 py-3 text-left"> End </th>
+						      <th class="px-5 py-3 text-left"> Break </th>
+						      <th class="px-5 py-3 text-center"> Status </th>
+						      <th class="px-5 py-3 text-center"> Action </th>
+						    </tr>
+						  </thead>
+						
+						  <tbody id="scheduleTableBody"
+						    class="divide-y divide-outline-variant">
+						    <tr>
+						      <td colspan="7"
+						        class="px-5 py-10 text-center text-muted">
+						        No employee schedule data
+						      </td>
+						    </tr>
+						  </tbody>
+						</table>
 					</div>
-				</div>
-			  <!-- SCHEDULE TABLE -->
-			  <div class="overflow-x-auto custom-scrollbar">
-			    <table class="w-full text-sm">
-					  <thead>
-					    <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-					      <th class="px-5 py-3 text-left"> Employee </th>
-					      <th class="px-5 py-3 text-left"> Day </th>
-					      <th class="px-5 py-3 text-left"> Start </th>
-					      <th class="px-5 py-3 text-left"> End </th>
-					      <th class="px-5 py-3 text-left"> Break </th>
-					      <th class="px-5 py-3 text-center"> Status </th>
-					      <th class="px-5 py-3 text-center"> Action </th>
-					    </tr>
-					  </thead>
-					
-					  <tbody id="scheduleTableBody"
-					    class="divide-y divide-outline-variant">
-					    <tr>
-					      <td colspan="7"
-					        class="px-5 py-10 text-center text-muted">
-					        No employee schedule data
-					      </td>
-					    </tr>
-					  </tbody>
-					</table>
-				</div>
-  			<!-- PAGINATION -->
-  			<div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
-					<p id="schedulePaginationInfo"
-					  class="text-xs text-on-surface-variant font-medium">
-					  Showing 0–0 of 0
-					</p>
-
-					<div class="flex items-center gap-2">
-					  <button id="schedulePrevButton"
-					    type="button"
-					    onclick="changeSchedulePage(-1)"
-					    class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
-					    <span class="material-symbols-outlined text-sm">
-					      chevron_left
-					    </span>
-					  </button>
-					
-					  <button id="scheduleNextButton"
-					    type="button"
-					    onclick="changeSchedulePage(1)"
-					    class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
-					    <span class="material-symbols-outlined text-sm">
-					      chevron_right
-					    </span>
-					  </button>
+	  			<!-- PAGINATION -->
+	  			<div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+						<p id="schedulePaginationInfo"
+						  class="text-xs text-on-surface-variant font-medium">
+						  Showing 0–0 of 0
+						</p>
+	
+						<div class="flex items-center gap-2">
+						  <button id="schedulePrevButton"
+						    type="button"
+						    onclick="changeSchedulePage(-1)"
+						    class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+						    <span class="material-symbols-outlined text-sm">
+						      chevron_left
+						    </span>
+						  </button>
+						
+						  <button id="scheduleNextButton"
+						    type="button"
+						    onclick="changeSchedulePage(1)"
+						    class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+						    <span class="material-symbols-outlined text-sm">
+						      chevron_right
+						    </span>
+						  </button>
+						</div>
 					</div>
-				</div>
+				</section>
 			</section>
 			
       <section id="payrollAttendanceSection"
