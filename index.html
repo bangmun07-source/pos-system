@@ -3766,6 +3766,16 @@
 						Overview
 					</span>
 				</a>
+				<!-- EMPLOYEE -->
+        <a class="active" class="active" onclick="navigate('employeePage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            badge
+          </span>
+
+          <span class="sidebar-label">
+            Employees
+          </span>
+        </a>
 				<!-- CASH FLOW -->
 				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 					<span class="material-symbols-outlined sidebar-icon">
@@ -5687,6 +5697,16 @@
 						Overview
 					</span>
 				</a>
+				<!-- EMPLOYEE -->
+        <a class="active" class="active" onclick="navigate('employeePage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            badge
+          </span>
+
+          <span class="sidebar-label">
+            Employees
+          </span>
+        </a>
 				<!-- CASH FLOW -->
 				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 					<span class="material-symbols-outlined sidebar-icon">
@@ -8629,6 +8649,16 @@
 	            Overview
 	          </span>
 	        </a>
+					<!-- EMPLOYEE -->
+	        <a class="active" class="active" onclick="navigate('employeePage')">
+	          <span class="material-symbols-outlined sidebar-icon">
+	            badge
+	          </span>
+	
+	          <span class="sidebar-label">
+	            Employees
+	          </span>
+	        </a>
 					<!-- CASH FLOW -->
 					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 						<span class="material-symbols-outlined sidebar-icon">
@@ -10476,6 +10506,16 @@
 	            Overview
 	          </span>
 	        </a>
+					<!-- EMPLOYEE -->
+	        <a class="active" class="active" onclick="navigate('employeePage')">
+	          <span class="material-symbols-outlined sidebar-icon">
+	            badge
+	          </span>
+	
+	          <span class="sidebar-label">
+	            Employees
+	          </span>
+	        </a>
 					<!-- CASH FLOW -->
 					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 						<span class="material-symbols-outlined sidebar-icon">
@@ -11476,6 +11516,16 @@
 							Overview
 						</span>
 					</a>
+					<!-- EMPLOYEE -->
+	        <a class="active" class="active" onclick="navigate('employeePage')">
+	          <span class="material-symbols-outlined sidebar-icon">
+	            badge
+	          </span>
+	
+	          <span class="sidebar-label">
+	            Employees
+	          </span>
+	        </a>
 					<!-- CASH FLOW -->
 					<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
 						<span class="material-symbols-outlined sidebar-icon">
@@ -22272,7 +22322,1736 @@
   </div>
 </template>
 
-	
+
+  <!-- =========================================================
+		    				EMPLOYEE PAGE
+  ========================================================== -->
+
+
+<template id="employeePage">
+  <!-- ==== SIDEBAR ==== -->
+  <aside id="sidebar"
+    class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
+    <div class="sidebar-menu flex flex-col h-full">
+
+			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+				<!-- DASHBOARD -->
+				<a onclick="navigate('dashboardPage')">
+					<span class="material-symbols-outlined sidebar-icon">
+						home
+					</span>
+					<span class="sidebar-label">
+						Dashboard
+					</span>
+				</a>
+				<!-- SETTINGS -->
+				<a onclick="navigate('settingsPage', { roles:['Owner','Admin'] })"
+				 style="display:none"
+					 class="settingsMenu">
+					<span class="material-symbols-outlined sidebar-icon">
+						settings
+					</span>
+					<span class="sidebar-label">
+						Settings
+					</span>
+				</a>
+				<!-- LOYALTY -->
+				<a onclick="navigate('loyaltysettingPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						military_tech
+					</span>
+					<span class="sidebar-label">
+						Loyalty &amp; Tiers
+					</span>
+				</a>
+				<!-- TAX-->
+				<a onclick="navigate('taxservicesettingPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon"> 					  
+						 account_balance
+					</span>
+					<span class="sidebar-label">
+						 Taxes &amp; Fees
+					</span>
+				</a>
+				<!-- EXPENSES -->
+				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						payments
+					</span>
+					<span class="sidebar-label">
+						Expenses
+					</span>
+				</a>
+				<!-- ANALYTICS -->
+				<a onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						analytics
+					</span>
+					<span class="sidebar-label">
+						Analytics
+					</span>
+				</a>
+				<!-- INVENTORY -->
+				<a onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						inventory_2
+					</span>
+					<span class="sidebar-label">
+						Inventory
+					</span>
+				</a>
+				<!-- OVERVIEW -->
+				<a onclick="navigate('accountingOverviewPage', { roles:['Owner','Admin'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						insights
+					</span>
+					<span class="sidebar-label">
+						Overview
+					</span>
+				</a>
+				<!-- EMPLOYEE -->
+        <a class="active" class="active" onclick="navigate('employeePage')">
+          <span class="material-symbols-outlined sidebar-icon">
+            badge
+          </span>
+
+          <span class="sidebar-label">
+            Employees
+          </span>
+        </a>
+				<!-- CASH FLOW -->
+				<a onclick="navigate('cashFlowPage', { roles:['Owner'] })">
+					<span class="material-symbols-outlined sidebar-icon">
+						account_balance_wallet
+					</span>
+					<span class="sidebar-label">
+						Cash Flow
+					</span>
+				</a>
+			</nav>
+      <!-- FOOTER -->
+      <div class="mt-auto p-2 pb-2">
+        <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
+          <span class="shrink-0 w-8 h-8 flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          </span>
+					
+          <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <p class="text-[10px] text-muted">
+              SYSTEM STATUS
+            </p>
+						
+            <span class="sidebar-label">
+              SERVER ACTIVE
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+  <!-- === MAIN CONTENT === -->
+  <div id="mainContent" class="flex-1 flex flex-col h-screen">
+    <!-- === HEADER === -->
+    <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
+      <div class="flex items-center gap-5 flex-1">
+        <div class="w-[44px] h-[44px] flex items-center justify-center">
+          <img id="munoLogo"
+            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+            alt="MUNO"
+            class="w-12 h-12 object-contain">
+        </div>
+
+        <span class="h-7 w-px bg-outline-variant"></span>
+
+        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+          MUNO
+        </p>
+      </div>
+
+      <div class="ml-auto flex items-center gap-3">
+        <button onclick="logout()"
+          class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+          <span class="material-symbols-outlined">
+            logout
+          </span>
+        </button>
+      </div>
+    </header>
+    <!-- === PAGE CONTENT === -->
+    <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+      <!-- ==== HERO ==== -->
+      <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <img src="https://lh3.googleusercontent.com/d/1A6iAplqifTz16AS_szzuX1AQcwXxDuqG"
+            class="w-full h-full object-cover"
+            style="object-position:right 40%;"
+            alt="">
+        </div>
+
+        <div class="absolute inset-0 bg-gradient-to-r from-[#101715] via-[#101715]/70 to-[#101715]/40">
+        </div>
+
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+          <span class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
+            HR Management
+          </span>
+
+          <h2
+            class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
+            Employees
+          </h2>
+        </div>
+      </section>
+      <!-- === MODULE SWITCHER ==== -->
+      <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+        <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <p class="text-[11px] text-muted uppercase tracking-widest">
+              Human Resources
+            </p>
+
+            <h2
+              class="text-lg font-bold font-headline text-foreground mt-1">
+              Employee Management
+            </h2>
+
+            <p class="text-xs text-muted mt-1">
+              Manage employees, schedules, attendance and payroll.
+            </p>
+          </div>
+          <!-- MODULE TABS -->
+          <div class="flex items-center gap-1 p-1 rounded-md border border-outline-variant bg-background">
+            <button id="employeeManagementTab"
+              type="button"
+              onclick="switchEmployeeModule('management')"
+              class="h-9 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">
+                groups
+              </span>
+              Employee Management
+            </button>
+
+            <button id="payrollAttendanceTab"
+              type="button"
+              onclick="switchEmployeeModule('payroll')"
+              class="h-9 px-4 rounded-md text-muted hover:text-foreground hover:bg-surface-container-high text-sm font-medium flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">
+                payments
+              </span>
+              Payroll &amp; Attendance
+              <span class="material-symbols-outlined text-xs">
+                lock
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+      <!-- === EMPLOYEE MANAGEMENT === -->
+      <section id="employeeManagementSection"
+        class="mt-5 space-y-5">
+        <!-- === EMPLOYEE SUMMARY === -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  groups
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Employee Overview
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Current employee information and workforce status
+                </p>
+              </div>
+            </div>
+						
+            <button type="button"
+              onclick="openEmployeeModal()"
+              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">
+                person_add
+              </span>
+              Add Employee
+            </button>
+
+          </div>
+          <!-- KPI -->
+          <div class="grid grid-cols-2 md:grid-cols-4">
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Total Employees
+              </p>
+
+              <p id="employeeTotalCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Active
+              </p>
+
+              <p id="employeeActiveCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Inactive
+              </p>
+
+              <p id="employeeInactiveCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Scheduled
+              </p>
+
+              <p id="employeeScheduledCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+          </div>
+        </section>
+        <!-- ==== EMPLOYEE LIST ==== -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <!-- HEADER -->
+          <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  badge
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Employee List
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Employee biodata and account management
+                </p>
+              </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2">
+              <div class="relative">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">
+                  search
+                </span>
+
+                <input id="employeeSearch"
+                  type="text"
+                  placeholder="Search employee..."
+                  oninput="filterEmployees()"
+                  class="w-full sm:w-64 h-10 pl-9 pr-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+              </div>
+              <!-- STATUS -->
+              <select id="employeeStatusFilter"
+                onchange="filterEmployees()"
+                class="w-full sm:w-40 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                <option value=""> All Status </option>
+                <option value="ACTIVE"> Active </option>
+                <option value="INACTIVE"> Inactive </option>
+              </select>
+              <!-- BRANCH -->
+              <select id="employeeBranchFilter"
+                onchange="filterEmployees()"
+                class="w-full sm:w-40 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                <option value=""> All Outlet </option>
+              </select>
+            </div>
+          </div>
+          <!-- TABLE -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+                  <th class="px-5 py-3 text-left"> Employee </th>
+                  <th class="px-5 py-3 text-left"> Employee ID </th>
+                  <th class="px-5 py-3 text-left"> Position </th>
+                  <th class="px-5 py-3 text-left"> Outlet </th>
+                  <th class="px-5 py-3 text-left"> Attendance Account </th>
+                  <th class="px-5 py-3 text-center"> Status </th>
+                  <th class="px-5 py-3 text-center"> Action </th>
+                </tr>
+              </thead>
+
+              <tbody id="employeeTableBody"
+                class="divide-y divide-outline-variant">
+                <tr>
+                  <td colspan="7"
+                    class="px-5 py-10 text-center text-muted">
+                    No employee data
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- PAGINATION -->
+          <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+            <div>
+              <p id="employeePaginationInfo"
+                class="text-xs text-on-surface-variant font-medium">
+                Showing 0–0 of 0
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button id="employeePrevButton"
+                type="button"
+                onclick="changeEmployeePage(-1)"
+                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-sm">
+                  chevron_left
+                </span>
+              </button>
+
+              <button id="employeeNextButton"
+                type="button"
+                onclick="changeEmployeePage(1)"
+                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-sm">
+                  chevron_right
+                </span>
+              </button>
+            </div>
+          </div>
+        </section>
+        <!-- ==== EMPLOYEE SCHEDULE ===== -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  calendar_month
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Employee Schedule
+                </h2>
+								
+                <p class="text-xs text-muted mt-1">
+                  Manage employee working schedules
+                </p>
+              </div>
+            </div>
+						
+            <button type="button"
+              onclick="openScheduleModal()"
+              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">
+                add
+              </span>
+              Set Schedule
+            </button>
+          </div>
+          <!-- FILTER -->
+          <div class="p-5 border-b border-outline-variant">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Employee
+                </label>
+
+                <select id="scheduleEmployeeFilter"
+                  onchange="filterSchedules()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Employees </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Outlet
+                </label>
+
+                <select id="scheduleBranchFilter"
+                  onchange="filterSchedules()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Outlet </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Day
+                </label>
+
+                <select id="scheduleDayFilter"
+                  onchange="filterSchedules()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Days </option>
+                  <option value="MONDAY"> Monday </option>
+                  <option value="TUESDAY"> Tuesday </option>
+                  <option value="WEDNESDAY"> Wednesday </option>
+                  <option value="THURSDAY"> Thursday </option>
+                  <option value="FRIDAY"> Friday </option>
+                  <option value="SATURDAY"> Saturday </option>
+                  <option value="SUNDAY"> Sunday </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- SCHEDULE TABLE -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+                  <th class="px-5 py-3 text-left"> Employee </th>
+                  <th class="px-5 py-3 text-left"> Day </th>
+                  <th class="px-5 py-3 text-left"> Start </th>
+                  <th class="px-5 py-3 text-left"> End </th>
+                  <th class="px-5 py-3 text-left"> Break </th>
+                  <th class="px-5 py-3 text-center"> Status </th>
+                  <th class="px-5 py-3 text-center"> Action </th>
+                </tr>
+              </thead>
+							
+              <tbody id="scheduleTableBody"
+                class="divide-y divide-outline-variant">
+                <tr>
+                  <td colspan="7"
+                    class="px-5 py-10 text-center text-muted">
+                    No employee schedule data
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- PAGINATION -->
+          <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+            <p id="schedulePaginationInfo"
+              class="text-xs text-on-surface-variant font-medium">
+              Showing 0–0 of 0
+            </p>
+
+            <div class="flex items-center gap-2">
+              <button id="schedulePrevButton"
+                type="button"
+                onclick="changeSchedulePage(-1)"
+                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-sm">
+                  chevron_left
+                </span>
+              </button>
+
+              <button id="scheduleNextButton"
+                type="button"
+                onclick="changeSchedulePage(1)"
+                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-sm">
+                  chevron_right
+                </span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </section>
+      <!-- === PAYROLL & ATTENDANCE
+           OWNER ONLY === -->
+      <section id="payrollAttendanceSection"
+        class="mt-5 space-y-5 hidden">
+        <!-- OWNER NOTICE -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex items-center gap-3">
+            <div class="main-icon-box">
+              <span class="material-symbols-outlined text-3xl"
+                style="font-variation-settings:'FILL' 1;">
+                lock
+              </span>
+            </div>
+
+            <div>
+              <h2 class="text-lg font-bold font-headline text-foreground">
+                Payroll &amp; Attendance
+              </h2>
+
+              <p class="text-xs text-muted mt-1">
+                Owner-only payroll, attendance and salary information
+              </p>
+            </div>
+          </div>
+        </section>
+        <!-- === ATTENDANCE RECAP === -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  fact_check
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Attendance Recap
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Employee attendance summary for payroll processing
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- FILTER -->
+          <div class="p-5 border-b border-outline-variant">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Period
+                </label>
+
+                <input id="attendancePeriod"
+                  type="month"
+                  onchange="loadAttendanceRecap()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Employee
+                </label>
+
+                <select id="attendanceEmployeeFilter"
+                  onchange="loadAttendanceRecap()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Employees </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Outlet
+                </label>
+
+                <select id="attendanceBranchFilter"
+                  onchange="loadAttendanceRecap()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value="">
+                    All Outlet
+                  </option>
+                </select>
+              </div>
+
+              <div class="flex items-end">
+                <button type="button"
+                  onclick="loadAttendanceRecap()"
+                  class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm">
+                    refresh
+                  </span>
+                  Refresh
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- ATTENDANCE KPI -->
+          <div class="grid grid-cols-2 md:grid-cols-5">
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Present
+              </p>
+
+              <p id="attendancePresentCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Late
+              </p>
+
+              <p id="attendanceLateCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Absent
+              </p>
+
+              <p id="attendanceAbsentCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Leave
+              </p>
+
+              <p id="attendanceLeaveCount"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
+
+            <div class="p-5">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Overtime
+              </p>
+							
+              <p id="attendanceOvertimeHours"
+                class="text-xl font-headline mt-1">
+                0 H
+              </p>
+            </div>
+          </div>
+          <!-- ATTENDANCE TABLE -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+                  <th class="px-5 py-3 text-left"> Employee </th>
+                  <th class="px-5 py-3 text-center"> Working Days </th>
+                  <th class="px-5 py-3 text-center"> Present </th>
+                  <th class="px-5 py-3 text-center"> Late </th>
+                  <th class="px-5 py-3 text-center"> Absent </th>
+                  <th class="px-5 py-3 text-center"> Leave </th>
+                  <th class="px-5 py-3 text-right"> Overtime </th>
+                  <th class="px-5 py-3 text-center"> Action </th>
+                </tr>
+              </thead>
+							
+              <tbody id="attendanceTableBody"
+                class="divide-y divide-outline-variant">
+                <tr>
+                  <td colspan="8"
+                    class="px-5 py-10 text-center text-muted">
+                    No attendance data
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+        <!-- === PAYROLL === -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  payments
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Payroll / Salary
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Monthly salary calculation and payroll records
+                </p>
+              </div>
+            </div>
+
+            <button type="button"
+              onclick="calculatePayroll()"
+              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">
+                calculate
+              </span>
+              Calculate Payroll
+            </button>
+          </div>
+          <!-- PAYROLL FILTER -->
+          <div class="p-5 border-b border-outline-variant">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Payroll Period
+                </label>
+
+                <input id="payrollPeriod"
+                  type="month"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Outlet
+                </label>
+
+                <select id="payrollBranchFilter"
+                  onchange="loadPayroll()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Outlet </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Status
+                </label>
+
+                <select id="payrollStatusFilter"
+                  onchange="loadPayroll()"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Status </option>
+                  <option value="DRAFT"> Draft </option>
+                  <option value="CALCULATED"> Calculated </option>
+                  <option value="PAID"> Paid </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <!-- PAYROLL SUMMARY -->
+          <div class="grid grid-cols-2 md:grid-cols-4">
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Gross Salary
+              </p>
+
+              <p id="payrollGrossSalary"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Allowance
+              </p>
+
+              <p id="payrollAllowance"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+            </div>
+
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Deduction
+              </p>
+
+              <p id="payrollDeduction"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+            </div>
+						
+            <div class="p-5">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Net Salary
+              </p>
+
+              <p id="payrollNetSalary"
+                class="text-xl font-headline mt-1">
+                Rp 0
+              </p>
+            </div>
+          </div>
+          <!-- PAYROLL TABLE -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+                  <th class="px-5 py-3 text-left"> Employee </th>
+                  <th class="px-5 py-3 text-right"> Basic Salary </th>
+                  <th class="px-5 py-3 text-right"> Allowance </th>
+                  <th class="px-5 py-3 text-right"> Overtime </th>
+                  <th class="px-5 py-3 text-right"> Deduction </th>
+                  <th class="px-5 py-3 text-right"> Net Salary </th>
+                  <th class="px-5 py-3 text-center"> Status </th>
+                  <th class="px-5 py-3 text-center"> Action </th>
+                </tr>
+              </thead>
+
+              <tbody id="payrollTableBody"
+                class="divide-y divide-outline-variant">
+                <tr>
+                  <td colspan="8"
+                    class="px-5 py-10 text-center text-muted">
+                    No payroll data
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- PAGINATION -->
+          <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+            <p id="payrollPaginationInfo"
+              class="text-xs text-on-surface-variant font-medium">
+              Showing 0–0 of 0
+            </p>
+						
+            <div class="flex items-center gap-2">
+              <button id="payrollPrevButton"
+                type="button"
+                onclick="changePayrollPage(-1)"
+                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-sm">
+                  chevron_left
+                </span>
+              </button>
+
+              <button id="payrollNextButton"
+                type="button"
+                onclick="changePayrollPage(1)"
+                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                <span class="material-symbols-outlined text-sm">
+                  chevron_right
+                </span>
+              </button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <!-- === EMPLOYEE MODAL === -->
+  <div id="employeeModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+
+    <div class="w-full max-w-3xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+      <!-- HEADER -->
+      <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="main-icon-box">
+            <span class="material-symbols-outlined text-3xl">
+              badge
+            </span>
+          </div>
+				
+          <div>
+            <h2 id="employeeModalTitle"
+              class="text-lg font-bold font-headline text-foreground">
+              Add Employee
+            </h2>
+
+            <p class="text-xs text-muted mt-1">
+              Employee biodata and account information
+            </p>
+          </div>
+        </div>
+				
+        <button type="button"
+          onclick="closeEmployeeModal()"
+          class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+      <!-- BODY -->
+      <div class="p-5 space-y-5">
+        <input id="employeeId"
+          type="hidden">
+        <!-- BASIC INFORMATION -->
+        <div>
+          <div class="pb-3 border-b border-outline-variant mb-4">
+            <h3 class="text-sm font-semibold text-foreground">
+              Basic Information
+            </h3>
+
+            <p class="text-xs text-muted mt-1">
+              Employee personal and employment information
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Employee ID
+              </label>
+
+              <input id="employeeCode"
+                type="text"
+                placeholder="EMP001"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Full Name
+              </label>
+
+              <input id="employeeName"
+                type="text"
+                placeholder="Employee name"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Phone
+              </label>
+
+              <input id="employeePhone"
+                type="text"
+                placeholder="08xxxxxxxxxx"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Email
+              </label>
+
+              <input id="employeeEmail"
+                type="email"
+                placeholder="employee@email.com"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Position
+              </label>
+
+              <input id="employeePosition"
+                type="text"
+                placeholder="Cashier / Barista / Manager"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Outlet
+              </label>
+
+              <select id="employeeBranch"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+                <option value="">
+                  Select Outlet
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Join Date
+              </label>
+
+              <input id="employeeJoinDate"
+                type="date"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-2">
+                Status
+              </label>
+
+              <select id="employeeStatus"
+                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+                <option value="ACTIVE"> Active </option>
+                <option value="INACTIVE"> Inactive </option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <!-- ADDRESS -->
+        <div>
+          <div class="pb-3 border-b border-outline-variant mb-4">
+            <h3 class="text-sm font-semibold text-foreground">
+              Address
+            </h3>
+          </div>
+					
+          <textarea id="employeeAddress"
+            rows="3"
+            placeholder="Employee address"
+            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+        </div>
+      </div>
+      <!-- FOOTER -->
+      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+        <button type="button"
+          onclick="closeEmployeeModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+          Cancel
+        </button>
+				
+        <button id="saveEmployeeButton"
+          type="button"
+          onclick="saveEmployee()"
+          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+          Save Employee
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- === EMPLOYEE DETAIL MODAL === -->
+  <div id="employeeDetailModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+      <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="main-icon-box">
+            <span class="material-symbols-outlined text-3xl">
+              person
+            </span>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-bold font-headline text-foreground">
+              Employee Detail
+            </h2>
+
+            <p class="text-xs text-muted mt-1">
+              Employee profile information
+            </p>
+          </div>
+        </div>
+
+        <button type="button"
+          onclick="closeEmployeeDetailModal()"
+          class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <div class="p-5">
+        <div class="grid grid-cols-1 md:grid-cols-2">
+          <div class="p-4 border-b md:border-r border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Employee ID
+            </p>
+
+            <p id="detailEmployeeCode"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+          <div class="p-4 border-b border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Name
+            </p>
+
+            <p id="detailEmployeeName"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+          <div class="p-4 border-b md:border-r border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Position
+            </p>
+
+            <p id="detailEmployeePosition"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+          <div class="p-4 border-b border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Outlet
+            </p>
+
+            <p id="detailEmployeeBranch"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+
+          <div class="p-4 border-b md:border-r border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Phone
+            </p>
+
+            <p id="detailEmployeePhone"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+
+          <div class="p-4 border-b border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Email
+            </p>
+
+            <p id="detailEmployeeEmail"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+          <div class="p-4 border-b md:border-r border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Join Date
+            </p>
+
+            <p id="detailEmployeeJoinDate"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+
+          <div class="p-4 border-b border-outline-variant">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Status
+            </p>
+
+            <p id="detailEmployeeStatus"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+					
+          <div class="p-4 md:col-span-2">
+            <p class="text-[11px] text-muted uppercase tracking-wider">
+              Address
+            </p>
+
+            <p id="detailEmployeeAddress"
+              class="text-sm mt-1">
+              -
+            </p>
+          </div>
+        </div>
+      </div>
+			
+      <div class="p-5 border-t border-outline-variant flex justify-end">
+        <button type="button"
+          onclick="closeEmployeeDetailModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ==== ATTENDANCE ACCOUNT MODAL ==== -->
+  <div id="attendanceAccountModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+      <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="main-icon-box">
+            <span class="material-symbols-outlined text-3xl">
+              fingerprint
+            </span>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-bold font-headline text-foreground">
+              Attendance Account
+            </h2>
+
+            <p class="text-xs text-muted mt-1">
+              Configure employee attendance credentials
+            </p>
+          </div>
+        </div>
+
+        <button type="button"
+          onclick="closeAttendanceAccountModal()"
+          class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5">
+        <input id="attendanceAccountEmployeeId"
+          type="hidden">
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            Attendance ID
+          </label>
+
+          <input id="attendanceAccountId"
+            type="text"
+            placeholder="ATT001"
+            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            PIN
+          </label>
+
+          <input id="attendanceAccountPin"
+            type="password"
+            placeholder="Attendance PIN"
+            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+        </div>
+
+        <div class="border border-outline-variant rounded-md p-4 flex items-center justify-between gap-4">
+          <div>
+            <p class="text-sm font-medium text-foreground">
+              Attendance Active
+            </p>
+
+            <p class="text-xs text-muted mt-1">
+              Allow this employee to use attendance.
+            </p>
+          </div>
+					
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input id="attendanceAccountActive"
+              type="checkbox"
+              class="sr-only peer"
+              checked>
+
+            <div class="w-11 h-6 bg-outline-variant border border-outline-variant rounded-md peer
+              peer-checked:bg-white
+              after:content-['']
+              after:absolute
+              after:top-[2px]
+              after:left-[2px]
+              after:w-5
+              after:h-5
+              after:bg-background
+              after:border
+              after:border-outline-variant
+              after:rounded-md
+              after:transition-all
+              peer-checked:after:translate-x-full">
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+        <button type="button"
+          onclick="closeAttendanceAccountModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+          Cancel
+        </button>
+				
+        <button type="button"
+          onclick="saveAttendanceAccount()"
+          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+          Save Account
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- === SALARY MODAL - OWNER ONLY === -->
+  <div id="salaryModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+      <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="main-icon-box">
+            <span class="material-symbols-outlined text-3xl"
+              style="font-variation-settings:'FILL' 1;">
+              payments
+            </span>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-bold font-headline text-foreground">
+              Salary Setting
+            </h2>
+
+            <p class="text-xs text-muted mt-1">
+              Configure employee salary and compensation
+            </p>
+          </div>
+        </div>
+
+        <button type="button"
+          onclick="closeSalaryModal()"
+          class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5">
+        <input id="salaryEmployeeId"
+          type="hidden">
+        <!-- EMPLOYEE -->
+        <div class="border border-outline-variant rounded-md p-4">
+          <p class="text-[11px] text-muted uppercase tracking-wider">
+            Employee
+          </p>
+
+          <p id="salaryEmployeeName"
+            class="text-sm font-medium mt-1">
+            -
+          </p>
+        </div>
+        <!-- SALARY -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">
+              Basic Salary
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+                Rp
+              </span>
+
+              <input id="employeeBasicSalary"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="2500000"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">
+              Allowance
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+                Rp
+              </span>
+
+              <input id="employeeAllowance"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">
+              Deduction
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+                Rp
+              </span>
+
+              <input id="employeeDeduction"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">
+              Overtime Rate / Hour
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+                Rp
+              </span>
+
+              <input id="employeeOvertimeRate"
+                type="number"
+                min="0"
+                step="1"
+                value="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+        </div>
+        <!-- EFFECTIVE -->
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            Effective From
+          </label>
+
+          <input id="salaryEffectiveFrom"
+            type="date"
+            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+        </div>
+        <!-- NOTE -->
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            Note
+          </label>
+
+          <textarea id="salaryNote"
+            rows="3"
+            placeholder="Salary adjustment note..."
+            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+        </div>
+      </div>
+			
+      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+        <button type="button"
+          onclick="closeSalaryModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+          Cancel
+        </button>
+
+        <button type="button"
+          onclick="saveEmployeeSalary()"
+          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+          Save Salary
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ==== SCHEDULE MODAL ===== -->
+  <div id="scheduleModal"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-2xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+      <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="main-icon-box">
+            <span class="material-symbols-outlined text-3xl">
+              calendar_month
+            </span>
+          </div>
+
+          <div>
+            <h2 class="text-lg font-bold font-headline text-foreground">
+              Employee Schedule
+            </h2>
+            <p class="text-xs text-muted mt-1">
+              Set employee working schedule
+            </p>
+          </div>
+        </div>
+
+        <button type="button"
+          onclick="closeScheduleModal()"
+          class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+          <span class="material-symbols-outlined">
+            close
+          </span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-5">
+        <input id="scheduleId"
+          type="hidden">
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            Employee
+          </label>
+
+          <select id="scheduleEmployee"
+            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            <option value=""> Select Employee </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            Day
+          </label>
+
+          <select id="scheduleDay"
+            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            <option value="MONDAY"> Monday </option>
+            <option value="TUESDAY"> Tuesday </option>
+            <option value="WEDNESDAY"> Wednesday </option>
+            <option value="THURSDAY"> Thursday </option>
+            <option value="FRIDAY"> Friday </option>
+            <option value="SATURDAY"> Saturday </option>
+            <option value="SUNDAY"> Sunday </option>
+          </select>
+        </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">
+              Start Time
+            </label>
+
+            <input id="scheduleStartTime"
+              type="time"
+              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-2">
+              End Time
+            </label>
+
+            <input id="scheduleEndTime"
+              type="time"
+              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-2">
+            Break Duration
+          </label>
+
+          <div class="relative">
+            <input id="scheduleBreakMinutes"
+              type="number"
+              min="0"
+              step="1"
+              value="0"
+              class="w-full h-11 px-3 pr-14 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+              min
+            </span>
+          </div>
+        </div>
+
+        <div class="border border-outline-variant rounded-md p-4 flex items-center justify-between gap-4">
+          <div>
+            <p class="text-sm font-medium text-foreground">
+              Schedule Active
+            </p>
+
+            <p class="text-xs text-muted mt-1">
+              Use this schedule for attendance calculation.
+            </p>
+          </div>
+
+
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input id="scheduleActive"
+              type="checkbox"
+              class="sr-only peer" 
+							checked>
+
+            <div class="w-11 h-6 bg-outline-variant border border-outline-variant rounded-md peer
+              peer-checked:bg-white
+              after:content-['']
+              after:absolute
+              after:top-[2px]
+              after:left-[2px]
+              after:w-5
+              after:h-5
+              after:bg-background
+              after:border
+              after:border-outline-variant
+              after:rounded-md
+              after:transition-all
+              peer-checked:after:translate-x-full">
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+        <button type="button"
+          onclick="closeScheduleModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+          Cancel
+        </button>
+				
+        <button type="button"
+          onclick="saveSchedule()"
+          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">
+            save
+          </span>
+
+          Save Schedule
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- === DELETE CONFIRMATION MODAL === -->
+  <div id="deleteEmployeeModal"
+    class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+    <div class="w-full max-w-md bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+      <div class="p-5 border-b border-outline-variant flex items-center gap-3">
+        <div class="main-icon-box">
+          <span class="material-symbols-outlined text-3xl">
+            delete
+          </span>
+        </div>
+
+        <div>
+          <h2 class="text-lg font-bold font-headline text-foreground">
+            Delete Employee
+          </h2>
+
+          <p class="text-xs text-muted mt-1">
+            This action requires confirmation
+          </p>
+        </div>
+      </div>
+
+      <div class="p-5">
+        <input id="deleteEmployeeId"
+          type="hidden">
+				
+        <p class="text-sm text-foreground">
+          Are you sure you want to delete employee
+          <span id="deleteEmployeeName"
+            class="font-semibold">
+            -
+          </span>
+          ?
+        </p>
+
+        <p class="text-xs text-muted mt-2">
+          Employee historical records should be preserved whenever possible.
+        </p>
+      </div>
+
+      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+        <button type="button"
+          onclick="closeDeleteEmployeeModal()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+          Cancel
+        </button>
+				
+        <button type="button"
+          onclick="confirmDeleteEmployee()"
+          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">
+            delete
+          </span>
+          Delete Employee
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
+
+
 	
 <!-- 
   MUNO KASIR: MASTER SPA LOGIC (Script.html)
