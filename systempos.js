@@ -20113,15 +20113,9 @@ function openAssetDepreciationModal(asset) {
   const usefulLifeEl = document.getElementById( "assetUsefulLifeInput" );
   const methodEl = document.getElementById( "assetDepreciationMethod" );
 
-  if (nameEl) {
-    nameEl.textContent = asset.Asset_Name || "-";
-  }
-  if (idEl) {
-    idEl.textContent = asset.Asset_ID || "-";
-  }
-  if (purchaseCostEl) {
-    purchaseCostEl.textContent = formatAssetCurrency( Number(asset.Purchase_Cost || 0) );
-  }
+  if (nameEl) { nameEl.textContent = asset.Asset_Name || "-"; }
+  if (idEl) { idEl.textContent = asset.Asset_ID || "-"; }
+  if (purchaseCostEl) { purchaseCostEl.textContent = formatAssetCurrency( Number(asset.Purchase_Cost || 0) ); }
   // Isi nilai lama jika sudah pernah diatur
   if (usefulLifeEl) {
     const usefulLife = Number(asset.Useful_Life_Months || 0);
@@ -20129,9 +20123,7 @@ function openAssetDepreciationModal(asset) {
 			? usefulLife
 			: "";
   }
-  if (methodEl) {
-    methodEl.value = asset.Depreciation_Method || "Straight Line";
-  }
+  if (methodEl) { methodEl.value = asset.Depreciation_Method || "Straight Line"; }
   // Hitung preview awal
   updateAssetDepreciationPreview();
   // Update preview saat input berubah
@@ -20149,6 +20141,7 @@ function openAssetDepreciationModal(asset) {
 function updateAssetDepreciationPreview() {
   const usefulLifeEl = document.getElementById( "assetUsefulLifeInput" );
   const monthlyEl = document.getElementById( "depreciationModalMonthly" );
+	
   if (!usefulLifeEl || !monthlyEl) { return; }
 	
   const usefulLife = Number(usefulLifeEl.value || 0);
@@ -20157,7 +20150,7 @@ function updateAssetDepreciationPreview() {
 	
   let depreciation = 0;
   if ( usefulLife > 0 && method.toUpperCase() === "STRAIGHT LINE" ) 
-			{ depreciation = purchaseCost / usefulLife; }
+		{ depreciation = purchaseCost / usefulLife; }
   monthlyEl.textContent = formatAssetCurrency(depreciation);
 }
 
@@ -20180,32 +20173,20 @@ function closeAssetDepreciationModal() {
 async function saveAssetDepreciationSetting() {
 
   try {
-    if (!currentAsset) {
-      alert("Asset tidak ditemukan.");
-      return;
-    }
+    if (!currentAsset) { alert("Asset tidak ditemukan."); return; }
+		
     const usefulLifeEl = document.getElementById( "assetUsefulLifeInput" );
     const methodEl = document.getElementById( "assetDepreciationMethod" );
     const usefulLife = Number(usefulLifeEl?.value || 0);
     const method = methodEl?.value || "Straight Line";
     // VALIDASI
-    if ( !Number.isInteger(usefulLife) || usefulLife <= 0 ) {
-      alert( "Masa manfaat harus diisi lebih dari 0 bulan." );
-      usefulLifeEl?.focus();
-      return;
-    }
-    if ( method.toUpperCase() !== "STRAIGHT LINE" ) {
-      alert( "Metode depresiasi belum didukung." );
-      return;
-    }
+    if ( !Number.isInteger(usefulLife) || usefulLife <= 0 ) { alert( "Masa manfaat harus diisi lebih dari 0 bulan." ); usefulLifeEl?.focus(); return; }
+    if ( method.toUpperCase() !== "STRAIGHT LINE" ) { alert( "Metode depresiasi belum didukung." ); return; }
+		
     const sessionId = localStorage.getItem("pos_session_id");
 		
-    if (!sessionId) { alert("Session ID tidak ditemukan.");
-      return;
-    }
-    if (!state.branchId) { alert("Branch belum tersedia.");
-      return;
-    }
+    if (!sessionId) { alert("Session ID tidak ditemukan."); return; }
+    if (!state.branchId) { alert("Branch belum tersedia."); return; }
 		
     const { data, error } =
       await supabaseClient.rpc(
@@ -20555,7 +20536,7 @@ function renderAssetPurchases(rows) {
         </td>
 
         <!-- STATUS -->
-        <td class="px-4 py-3">
+        <td class="text-center px-4 py-3">
           ${renderAssetPurchaseStatus(status)}
         </td>
 
@@ -20595,7 +20576,7 @@ function renderAssetPurchaseStatus(status) {
   }
 
   return `
-    <span class="text-xs text-muted">
+    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-green-600/20 text-green-700">
       ${escapeHtmlAssetPurchase(s)}
     </span>
   `;
@@ -21962,7 +21943,6 @@ if (liabilitiesEquityContainer) {
   /* ====== OPTIONAL: SAVE CURRENT ACCOUNTING DATA ====== */
   window.currentAccountingOverview = data;
 }
-
 
   /* ============================= 
   			ACCOUNTING 
