@@ -23346,13 +23346,17 @@ async function postManualJournalEntry(journalId) {
 			);
 
 		if (error) { throw error; }
-
+		
+    state.cashFlowData = null;
+    state.cashFlowFilter = null;
+		state.expenseDashboardData = null;
+    state.expenseDashboardFilter = null;
 		journalEntriesLoaded = false;
 		journalEntriesData = [];
 		window.journalEntries = [];
 		generalLedgerLoaded = false;
 		generalLedgerData = [];
-
+		
 		await loadJournalEntries();
 		alert( `Journal ${data?.journalNo || journal.journalNo || ""} ` + `berhasil diposting.` );
 
