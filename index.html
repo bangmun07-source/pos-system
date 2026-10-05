@@ -22686,7 +22686,7 @@
               <select id="employeeBranchFilter"
                 onchange="filterEmployees()"
                 class="w-full sm:w-40 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option value=""> All Outlet </option>
+                <option value=""> All Branch </option>
               </select>
             </div>
           </div>
@@ -22800,7 +22800,7 @@
                 <select id="scheduleBranchFilter"
                   onchange="filterSchedules()"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Outlet </option>
+                  <option value=""> All Branch </option>
                 </select>
               </div>
 
@@ -22927,57 +22927,59 @@
             </div>
           </div>
           <!-- FILTER -->
-          <div class="p-5 border-b border-outline-variant">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Period
-                </label>
-
-                <input id="attendancePeriod"
-                  type="month"
-                  onchange="loadAttendanceRecap()"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
-              </div>
-
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Employee
-                </label>
-
-                <select id="attendanceEmployeeFilter"
-                  onchange="loadAttendanceRecap()"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Employees </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Outlet
-                </label>
-
-                <select id="attendanceBranchFilter"
-                  onchange="loadAttendanceRecap()"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value="">
-                    All Outlet
-                  </option>
-                </select>
-              </div>
-
-              <div class="flex items-end">
-                <button type="button"
-                  onclick="loadAttendanceRecap()"
-                  class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-                  <span class="material-symbols-outlined text-sm">
-                    refresh
-                  </span>
-                  Refresh
-                </button>
-              </div>
-            </div>
-          </div>
+					<div class="p-5 border-b border-outline-variant">
+					  <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+					    <!-- PERIOD -->
+					    <div class="md:col-span-3">
+					      <label class="block text-xs text-muted mb-2">
+					        Period
+					      </label>
+					
+					      <input id="attendancePeriod"
+					        type="month"
+					        onchange="loadAttendanceRecap()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+					    </div>
+					
+					    <!-- EMPLOYEE -->
+					    <div class="md:col-span-4">
+					      <label class="block text-xs text-muted mb-2">
+					        Employee
+					      </label>
+					
+					      <select id="attendanceEmployeeFilter"
+					        onchange="loadAttendanceRecap()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Employees</option>
+					      </select>
+					    </div>
+					
+					    <!-- OUTLET -->
+					    <div class="md:col-span-3">
+					      <label class="block text-xs text-muted mb-2">
+					        Outlet
+					      </label>
+					
+					      <select id="attendanceBranchFilter"
+					        onchange="loadAttendanceRecap()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Branch</option>
+					      </select>
+					    </div>
+					
+					    <!-- REFRESH -->
+					    <div class="md:col-span-2 flex items-end">
+					      <button type="button"
+					        onclick="loadAttendanceRecap()"
+					        class="w-full h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
+					        <span class="material-symbols-outlined text-sm">
+					          refresh
+					        </span>
+					        Refresh
+					      </button>
+					    </div>
+					  </div>
+					</div>
           <!-- ATTENDANCE KPI -->
           <div class="grid grid-cols-2 md:grid-cols-5">
             <div class="p-5 border-r border-outline-variant">
@@ -23115,7 +23117,7 @@
                 <select id="payrollBranchFilter"
                   onchange="loadPayroll()"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Outlet </option>
+                  <option value=""> All Branch </option>
                 </select>
               </div>
 
