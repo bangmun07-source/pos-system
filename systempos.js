@@ -1075,8 +1075,13 @@ function initModule(pageId) {
 		}
 			
 		case "accountingReportsPage":
-    		initAccountingReports();
-    break;
+		  initAccountingReports();
+		break;
+		
+		case "employeePage": {
+		  initEmployeePage();
+		  break;
+		}
   }
 }
 	
@@ -32097,12 +32102,34 @@ async function deleteAccountsReceivable(recordId) {
 }
 
 
+/* =========================================================
+   									EMPLOYEE PAGE
+========================================================= */
 
+function initEmployeePage() {
+  switchEmployeeModule('management');
+  loadEmployees();
+  loadSchedules();
+  loadEmployeeBranches();
+}
 
+window.switchEmployeeModule = function(module) {
+  const managementSection = document.getElementById('employeeManagementSection');
+  const payrollSection = document.getElementById('payrollAttendanceSection');
+  const managementTab = document.getElementById('employeeManagementTab');
+  const payrollTab = document.getElementById('payrollAttendanceTab');
 
+  if (!managementSection || !payrollSection) return;
 
+  const isManagement = module === 'management';
 
-
+  managementSection.classList.toggle('hidden', !isManagement);
+  payrollSection.classList.toggle('hidden', isManagement);
+  managementTab?.classList.toggle('bottom-theme', isManagement);
+  managementTab?.classList.toggle('text-muted', !isManagement);
+  payrollTab?.classList.toggle('bottom-theme', !isManagement);
+  payrollTab?.classList.toggle('text-muted', isManagement);
+};
 
 
 
