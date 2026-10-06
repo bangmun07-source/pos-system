@@ -32166,21 +32166,97 @@ async function loadEmployeeBranches() {
     const branches = typeof data === "string"
       ? JSON.parse(data)
       : (data || []);
-    const select = document.getElementById("employeeBranch");
 
-    if (!select) return;
+    const modalSelect =
+      document.getElementById("employeeBranch");
 
-    select.innerHTML = `<option value="">Select Outlet</option>`;
+    const filterSelect =
+      document.getElementById("employeeBranchFilter");
 
-    branches.forEach(branch => {
-      const option = document.createElement("option");
+    const role = state.user.role;
 
-      option.value = branch.id || "";
-      option.textContent =
-        branch.name || branch.id || "Unnamed Branch";
+    /* =========================================
+       OWNER
+    ========================================= */
+    if (role === "Owner") {
 
-      select.appendChild(option);
-    });
+      // Modal New Employee
+      if (modalSelect) {
+        modalSelect.innerHTML =
+          `<option value="">Select Outlet</option>`;
+
+        branches.forEach(branch => {
+          const option = document.createElement("option");
+
+          option.value = branch.id || "";
+          option.textContent =
+            branch.name || branch.id || "Unnamed Branch";
+
+          modalSelect.appendChild(option);
+        });
+
+        modalSelect.disabled = false;
+      }
+
+      // Filter Employee
+      if (filterSelect) {
+        filterSelect.innerHTML =
+          `<option value="">All Branch</option>`;
+
+        branches.forEach(branch => {
+          const option = document.createElement("option");
+
+          option.value = branch.id || "";
+          option.textContent =
+            branch.name || branch.id || "Unnamed Branch";
+
+          filterSelect.appendChild(option);
+        });
+
+        filterSelect.disabled = false;
+      }
+
+    }
+
+    /* =========================================
+       ADMIN / CASHIER
+    ========================================= */
+    else {
+
+      const userBranch = branches.find(
+        branch => branch.id === state.user.branchId
+      );
+
+      const branchId = state.user.branchId;
+      const branchName =
+        userBranch?.name || branchId || "Unnamed Branch";
+
+      // Modal New Employee
+      if (modalSelect) {
+        modalSelect.innerHTML = `
+          <option value="${branchId}">
+            ${branchName}
+          </option>
+        `;
+
+        modalSelect.value = branchId;
+        modalSelect.disabled = true;
+      }
+
+      // Filter Employee
+      if (filterSelect) {
+        filterSelect.innerHTML = `
+          <option value="${branchId}">
+            ${branchName}
+          </option>
+        `;
+
+        filterSelect.value = branchId;
+        filterSelect.disabled = true;
+      }
+      // Pastikan branch aktif mengikuti outlet user
+      state.branchId = branchId;
+    }
 
   } catch (error) {
     console.error(
@@ -32223,7 +32299,6 @@ window.closeEmployeeModal = function () {
 
 
 /* === SAVE EMPLOYEE === */
-
 window.saveEmployee = async function () {
   const employeeId = document.getElementById('employeeId').value.trim();
   const employeeCode = document.getElementById('employeeCode').value.trim();
@@ -32231,20 +32306,29 @@ window.saveEmployee = async function () {
   const phone = document.getElementById('employeePhone').value.trim();
   const email = document.getElementById('employeeEmail').value.trim();
   const position = document.getElementById('employeePosition').value.trim();
-  const branchId = document.getElementById('employeeBranch').value;
   const hireDate = document.getElementById('employeeJoinDate').value || null;
   const status = document.getElementById('employeeStatus').value;
   const address = document.getElementById('employeeAddress').value.trim();
 
+  /* === BRANCH === */
+  const role = state.user.role;
+  let branchId;
+  if (role === "Owner") {
+    branchId = document.getElementById('employeeBranch').value;
+  } else {
+    branchId = state.user.branchId;
+  }
+
+  /* === VALIDATION === */
+
   if (!employeeCode) { alert('Employee ID wajib diisi.'); return; }
   if (!fullName) { alert('Full Name wajib diisi.'); return; }
-  if (!branchId) { alert('Outlet wajib dipilih.'); return; }
-
+  if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
 
   try {
     const sessionId = localStorage.getItem('pos_session_id');
 
-    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
 
     const { data, error } =
       await supabaseClient.rpc('save_employee', {
@@ -32266,13 +32350,20 @@ window.saveEmployee = async function () {
         p_notes: null
       });
 
+    if (error) {
+      console.error(
+        'save_employee RPC error:',
+        error
+      );
+      throw error;
+    }
 
-    if (error) { console.error('save_employee RPC error:', error); throw error; }
-
-    console.log('Employee saved:', data);
+    console.log(
+      'Employee saved:',
+      data
+    );
 
     closeEmployeeModal();
-
     await loadEmployees();
 
     alert(
@@ -32282,7 +32373,11 @@ window.saveEmployee = async function () {
     );
 
   } catch (error) {
-    console.error('saveEmployee:', error);
+    console.error(
+      'saveEmployee:',
+      error
+    );
+
     alert(
       error?.message ||
       'Gagal menyimpan employee.'
@@ -32291,25 +32386,33 @@ window.saveEmployee = async function () {
 };
 
 
-/* =========================================================
-   LOAD EMPLOYEES
-========================================================= */
+/* ==== LOAD EMPLOYEES ==== */
 
 async function loadEmployees() {
-
   try {
     const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
     const { data, error } =
       await supabaseClient.rpc('get_employees', {
         p_session_id: sessionId,
-        p_branch_id: null,
+        p_branch_id: state.branchId,
         p_status: null,
         p_search: null
       });
 
-    if (error) { console.error('get_employees error:', error); throw error; }
+    if (error) {
+      console.error(
+        'get_employees error:',
+        error
+      );
+      throw error;
+    }
 
-    employeeData = data || [];
+    employeeData = Array.isArray(data)
+      ? data
+      : [];
     filteredEmployeeData = [...employeeData];
     employeeCurrentPage = 1;
 
@@ -32317,8 +32420,10 @@ async function loadEmployees() {
     updateEmployeeSummary();
 
   } catch (error) {
-
-    console.error('loadEmployees:', error);
+    console.error(
+      'loadEmployees:',
+      error
+    );
 
     employeeData = [];
     filteredEmployeeData = [];
@@ -32328,9 +32433,7 @@ async function loadEmployees() {
   }
 }
 
-
 /* === FILTER EMPLOYEES === */
-
 window.filterEmployees = function () {
   const search = document.getElementById('employeeSearch')
 		?.value
