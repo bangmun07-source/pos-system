@@ -32138,10 +32138,7 @@ window.switchEmployeeModule = function(module) {
 };
 
 
-/* =========================================================
-   EMPLOYEE MANAGEMENT
-========================================================= */
-
+/* === EMPLOYEE MANAGEMENT === */
 let employeeData = [];
 let filteredEmployeeData = [];
 let employeeCurrentPage = 1;
@@ -32166,70 +32163,41 @@ async function loadEmployeeBranches() {
     const branches = typeof data === "string"
       ? JSON.parse(data)
       : (data || []);
-
-    const modalSelect =
-      document.getElementById("employeeBranch");
-
-    const filterSelect =
-      document.getElementById("employeeBranchFilter");
-
+    const modalSelect = document.getElementById("employeeBranch");
+    const filterSelect = document.getElementById("employeeBranchFilter");
     const role = state.user.role;
 
-    /* =========================================
-       OWNER
-    ========================================= */
+ 
     if (role === "Owner") {
-
       // Modal New Employee
       if (modalSelect) {
-        modalSelect.innerHTML =
-          `<option value="">Select Outlet</option>`;
-
+        modalSelect.innerHTML = `<option value="">Select Outlet</option>`;
         branches.forEach(branch => {
           const option = document.createElement("option");
-
           option.value = branch.id || "";
-          option.textContent =
-            branch.name || branch.id || "Unnamed Branch";
-
+          option.textContent = branch.name || branch.id || "Unnamed Branch";
           modalSelect.appendChild(option);
         });
-
         modalSelect.disabled = false;
       }
-
       // Filter Employee
       if (filterSelect) {
-        filterSelect.innerHTML =
-          `<option value="">All Branch</option>`;
-
+        filterSelect.innerHTML = `<option value="">All Branch</option>`;
         branches.forEach(branch => {
           const option = document.createElement("option");
-
           option.value = branch.id || "";
-          option.textContent =
-            branch.name || branch.id || "Unnamed Branch";
-
+          option.textContent = branch.name || branch.id || "Unnamed Branch";
           filterSelect.appendChild(option);
         });
-
         filterSelect.disabled = false;
       }
-
     }
 
-    /* =========================================
-       ADMIN / CASHIER
-    ========================================= */
+    
     else {
-
-      const userBranch = branches.find(
-        branch => branch.id === state.user.branchId
-      );
-
+      const userBranch = branches.find( branch => branch.id === state.user.branchId );
       const branchId = state.user.branchId;
-      const branchName =
-        userBranch?.name || branchId || "Unnamed Branch";
+      const branchName = userBranch?.name || branchId || "Unnamed Branch";
 
       // Modal New Employee
       if (modalSelect) {
@@ -32238,11 +32206,9 @@ async function loadEmployeeBranches() {
             ${branchName}
           </option>
         `;
-
         modalSelect.value = branchId;
         modalSelect.disabled = true;
       }
-
       // Filter Employee
       if (filterSelect) {
         filterSelect.innerHTML = `
@@ -32250,14 +32216,11 @@ async function loadEmployeeBranches() {
             ${branchName}
           </option>
         `;
-
         filterSelect.value = branchId;
         filterSelect.disabled = true;
       }
-      // Pastikan branch aktif mengikuti outlet user
       state.branchId = branchId;
     }
-
   } catch (error) {
     console.error(
       "loadEmployeeBranches:",
@@ -32266,13 +32229,25 @@ async function loadEmployeeBranches() {
   }
 }
 
+window.toggleEmployeeActionMenu = function (employeeId) {
+  const menu = document.getElementById( `employeeActionMenu-${employeeId}` );
+
+  if (!menu) return;
+
+  document
+    .querySelectorAll('[id^="employeeActionMenu-"]')
+    .forEach(el => {
+      if (el !== menu) {
+        el.classList.add('hidden');
+      }
+    });
+  menu.classList.toggle('hidden');
+};
+
 /* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
-
   document.getElementById('employeeModalTitle').textContent = 'Add Employee';
-
   document.getElementById('employeeId').value = '';
-
   document.getElementById('employeeName').value = '';
   document.getElementById('employeePhone').value = '';
   document.getElementById('employeeEmail').value = '';
@@ -32287,8 +32262,7 @@ window.openEmployeeModal = function () {
   document.getElementById('employeeNotes').value = '';
   document.getElementById('employeeAddress').value = '';
 
-  const preview =
-    document.getElementById('employeePhotoPreview');
+  const preview = document.getElementById('employeePhotoPreview');
 
   if (preview) {
     preview.innerHTML = `
@@ -32298,16 +32272,13 @@ window.openEmployeeModal = function () {
     `;
   }
 
-  const modal =
-    document.getElementById('employeeModal');
+  const modal = document.getElementById('employeeModal');
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
 
-
 /* === CLOSE EMPLOYEE MODAL === */
-
 window.closeEmployeeModal = function () {
   const modal = document.getElementById('employeeModal');
 
@@ -32318,199 +32289,79 @@ window.closeEmployeeModal = function () {
 
 /* === SAVE EMPLOYEE === */
 window.saveEmployee = async function () {
-
-  const employeeId =
-    document.getElementById('employeeId').value.trim();
-
-  const fullName =
-    document.getElementById('employeeName').value.trim();
-
-  const phone =
-    document.getElementById('employeePhone').value.trim();
-
-  const email =
-    document.getElementById('employeeEmail').value.trim();
-
-  const position =
-    document.getElementById('employeePosition').value.trim();
-
-  const department =
-    document.getElementById('employeeDepartment').value.trim();
-
-  const gender =
-    document.getElementById('employeeGender').value;
-
-  const birthDate =
-    document.getElementById('employeeBirthDate').value || null;
-
-  const hireDate =
-    document.getElementById('employeeJoinDate').value || null;
-
-  const status =
-    document.getElementById('employeeStatus').value;
-
-  const notes =
-    document.getElementById('employeeNotes').value.trim();
-
-  const address =
-    document.getElementById('employeeAddress').value.trim();
-
-  const photoInput =
-    document.getElementById('employeePhoto');
-
-  const photoFile =
-    photoInput?.files?.[0] || null;
-
-
-  /* =========================================
-     BRANCH
-  ========================================= */
-
+  const employeeId = document.getElementById('employeeId').value.trim();
+  const fullName = document.getElementById('employeeName').value.trim();
+  const phone = document.getElementById('employeePhone').value.trim();
+  const email = document.getElementById('employeeEmail').value.trim();
+  const position = document.getElementById('employeePosition').value.trim();
+  const department = document.getElementById('employeeDepartment').value.trim();
+  const gender = document.getElementById('employeeGender').value;
+  const birthDate = document.getElementById('employeeBirthDate').value || null;
+  const hireDate = document.getElementById('employeeJoinDate').value || null;
+  const status = document.getElementById('employeeStatus').value;
+  const notes = document.getElementById('employeeNotes').value.trim();
+  const address = document.getElementById('employeeAddress').value.trim();
+  const photoInput = document.getElementById('employeePhoto');
+  const photoFile = photoInput?.files?.[0] || null;
   const role = state.user.role;
-
+	
   let branchId;
-
   if (role === "Owner") {
-
-    branchId =
-      document.getElementById('employeeBranch').value;
-
+    branchId = document.getElementById('employeeBranch').value;
   } else {
-
-    branchId =
-      state.user.branchId;
+    branchId = state.user.branchId;
   }
 
-
-  /* =========================================
-     VALIDATION
-  ========================================= */
-
-  if (!fullName) {
-    alert('Full Name wajib diisi.');
-    return;
-  }
-
-  if (!branchId) {
-    alert('Outlet tidak ditemukan.');
-    return;
-  }
-
-  if (!status) {
-    alert('Status employee wajib dipilih.');
-    return;
-  }
-
+  if (!fullName) { alert('Full Name wajib diisi.'); return; }
+  if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
+  if (!status) { alert('Status employee wajib dipilih.'); return; }
 
   try {
+    const sessionId = localStorage.getItem('pos_session_id');
 
-    const sessionId =
-      localStorage.getItem('pos_session_id');
-
-    if (!sessionId) {
-      throw new Error(
-        'Session POS tidak ditemukan.'
-      );
-    }
-
-
-    /* =========================================
-       UPLOAD PHOTO
-    ========================================= */
-
+    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
     let photoUrl = null;
-
     if (photoFile) {
-
-      photoUrl =
-        await uploadEmployeePhoto(photoFile);
+      photoUrl = await uploadEmployeePhoto(photoFile);
     }
-
-
-    /* =========================================
-       SAVE EMPLOYEE
-    ========================================= */
-
+		
     const { data, error } =
       await supabaseClient.rpc(
         'save_employee',
         {
           p_session_id: sessionId,
-
-          p_employee_id:
-            employeeId || null,
-
-          /*
-           * Employee Code sekarang
-           * dibuat otomatis oleh RPC.
-           */
+          p_employee_id: employeeId || null,
           p_employee_code: null,
-
-          p_full_name:
-            fullName,
-
-          p_phone:
-            phone || null,
-
-          p_email:
-            email || null,
-
-          p_address:
-            address || null,
-
-          p_gender:
-            gender || null,
-
-          p_birth_date:
-            birthDate,
-
-          p_position:
-            position || null,
-
-          p_department:
-            department || null,
-
-          p_branch_id:
-            branchId,
-
-          p_hire_date:
-            hireDate,
-
-          p_status:
-            status,
-
-          p_photo_url:
-            photoUrl,
-
-          p_notes:
-            notes || null
+          p_full_name: fullName,
+          p_phone: phone || null,
+          p_email: email || null,
+          p_address: address || null,
+          p_gender: gender || null,
+          p_birth_date: birthDate,
+          p_position: position || null,
+          p_department: department || null,
+          p_branch_id: branchId,
+          p_hire_date: hireDate,
+          p_status: status,
+          p_photo_url: photoUrl,
+          p_notes: notes || null
         }
       );
 
-
     if (error) {
-
       console.error(
         'save_employee RPC error:',
         error
       );
-
       throw error;
     }
-
-
     console.log(
       'Employee saved:',
       data
     );
 
 
-    /* =========================================
-       CLOSE + RELOAD
-    ========================================= */
-
     closeEmployeeModal();
-
     await loadEmployees();
 
     alert(
@@ -32520,7 +32371,6 @@ window.saveEmployee = async function () {
     );
 
   } catch (error) {
-
     console.error(
       'saveEmployee:',
       error
@@ -32543,28 +32393,16 @@ async function uploadEmployeePhoto(file) {
     'image/webp'
   ];
 
-  if (!allowedTypes.includes(file.type)) {
-    throw new Error('Foto harus JPG, PNG, atau WebP.');
-  }
+  if (!allowedTypes.includes(file.type)) { throw new Error('Foto harus JPG, PNG, atau WebP.'); }
+  if (file.size > 2 * 1024 * 1024) { throw new Error('Ukuran foto karyawan maksimal 2 MB.'); }
 
-  if (file.size > 2 * 1024 * 1024) {
-    throw new Error('Ukuran foto karyawan maksimal 2 MB.');
-  }
-
-  const compressedFile =
-    await compressEmployeePhoto(file);
-
+  const compressedFile = await compressEmployeePhoto(file);
   console.log(
     'Employee photo:',
     `${(file.size / 1024).toFixed(0)} KB → ${(compressedFile.size / 1024).toFixed(0)} KB`
   );
-
-  const fileName =
-    `${crypto.randomUUID()}.webp`;
-
-  const filePath =
-    `employees/${fileName}`;
-
+  const fileName = `${crypto.randomUUID()}.webp`;
+  const filePath = `employees/${fileName}`;
   const { error: uploadError } =
     await supabaseClient.storage
       .from('employee-photos')
@@ -32579,14 +32417,12 @@ async function uploadEmployeePhoto(file) {
       'Employee photo upload error:',
       uploadError
     );
-
     throw uploadError;
   }
 
-  const { data } =
-    supabaseClient.storage
-      .from('employee-photos')
-      .getPublicUrl(filePath);
+  const { data } = supabaseClient.storage
+	.from('employee-photos')
+	.getPublicUrl(filePath);
 
   return data?.publicUrl || null;
 }
@@ -32598,24 +32434,17 @@ async function compressEmployeePhoto(file) {
   const MAX_WIDTH = 600;
   const MAX_HEIGHT = 600;
   const MAX_SIZE = 100 * 1024; // 100 KB
-
-  const imageUrl =
-    URL.createObjectURL(file);
+  const imageUrl = URL.createObjectURL(file);
 
   try {
-
     const image = new Image();
-
     await new Promise((resolve, reject) => {
-
       image.onload = resolve;
-
       image.onerror = () => {
         reject(
           new Error('Foto tidak dapat diproses.')
         );
       };
-
       image.src = imageUrl;
     });
 
@@ -32632,20 +32461,12 @@ async function compressEmployeePhoto(file) {
     width = Math.round(width * scale);
     height = Math.round(height * scale);
 
-    const canvas =
-      document.createElement('canvas');
-
+    const canvas = document.createElement('canvas');
     canvas.width = width;
     canvas.height = height;
+    const ctx = canvas.getContext('2d');
 
-    const ctx =
-      canvas.getContext('2d');
-
-    if (!ctx) {
-      throw new Error(
-        'Browser tidak mendukung image compression.'
-      );
-    }
+    if (!ctx) { throw new Error( 'Browser tidak mendukung image compression.' ); }
 
     ctx.drawImage(
       image,
@@ -32657,44 +32478,25 @@ async function compressEmployeePhoto(file) {
 
     let quality = 0.85;
     let blob = null;
-
     while (quality >= 0.20) {
-
       blob = await new Promise(resolve => {
-
         canvas.toBlob(
           resolve,
           'image/webp',
           quality
         );
-
       });
 
-      if (!blob) {
-        throw new Error(
-          'Gagal melakukan compress foto.'
-        );
-      }
-
-      if (blob.size <= MAX_SIZE) {
-        break;
-      }
-
+      if (!blob) { throw new Error( 'Gagal melakukan compress foto.' ); }
+      if (blob.size <= MAX_SIZE) { break; }
       quality -= 0.05;
     }
 
-    /*
-     * Kalau masih > 100 KB,
-     * kecilkan resolusi lagi.
-     */
     if (blob && blob.size > MAX_SIZE) {
-
       width = Math.round(width * 0.8);
       height = Math.round(height * 0.8);
-
       canvas.width = width;
       canvas.height = height;
-
       ctx.drawImage(
         image,
         0,
@@ -32704,22 +32506,15 @@ async function compressEmployeePhoto(file) {
       );
 
       blob = await new Promise(resolve => {
-
         canvas.toBlob(
           resolve,
           'image/webp',
           0.70
         );
-
       });
     }
 
-    if (!blob) {
-      throw new Error(
-        'Gagal membuat foto.'
-      );
-    }
-
+    if (!blob) { throw new Error( 'Gagal membuat foto.' ); }
     return new File(
       [blob],
       'employee-photo.webp',
@@ -32728,15 +32523,12 @@ async function compressEmployeePhoto(file) {
         lastModified: Date.now()
       }
     );
-
   } finally {
-
     URL.revokeObjectURL(imageUrl);
-
   }
 }
-document.addEventListener('change', function (event) {
 
+document.addEventListener('change', function (event) {
   if (event.target.id !== 'employeePhoto') return;
 
   const file = event.target.files?.[0];
@@ -32744,7 +32536,6 @@ document.addEventListener('change', function (event) {
     document.getElementById('employeePhotoPreview');
 
   if (!preview) return;
-
   if (!file) {
     preview.innerHTML = `
       <span class="material-symbols-outlined text-3xl text-muted">
@@ -32759,7 +32550,6 @@ document.addEventListener('change', function (event) {
     event.target.value = '';
     return;
   }
-
   if (file.size > 2 * 1024 * 1024) {
     alert('Ukuran foto maksimal 2 MB.');
     event.target.value = '';
@@ -32769,22 +32559,17 @@ document.addEventListener('change', function (event) {
   const reader = new FileReader();
 
   reader.onload = function (e) {
-
     preview.innerHTML = `
-      <img
-        src="${e.target.result}"
+      <img src="${e.target.result}"
         alt="Employee Photo"
-        class="w-full h-full object-cover"
-      >
+        class="w-full h-full object-cover" >
     `;
   };
-
   reader.readAsDataURL(file);
 });
 
 
 /* ==== LOAD EMPLOYEES ==== */
-
 async function loadEmployees() {
   try {
     const sessionId = localStorage.getItem('pos_session_id');
@@ -32912,22 +32697,80 @@ function renderEmployeeTable() {
             </span>
           </td>
 
-          <td class="px-5 py-4 text-center">
-            <button
-              type="button"
-              onclick="viewEmployee('${employee.Employee_ID}')"
-              class="text-muted hover:text-foreground">
-              <span class="material-symbols-outlined text-lg">
-                visibility
-              </span>
-            </button>
-          </td>
+					<td class="px-5 py-4 text-center">
+					  <div class="relative inline-block">
+					    <button type="button"
+					      onclick="toggleEmployeeActionMenu('${employee.Employee_ID}')"
+					      class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
+					      <span class="material-symbols-outlined text-lg">
+					        more_vert
+					      </span>
+					    </button>
+					
+					    <div id="employeeActionMenu-${employee.Employee_ID}"
+					      class="hidden absolute right-0 top-full mt-1 w-52 bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] z-[200] text-left">
+					      <!-- DETAIL -->
+					      <button type="button"
+					        onclick="viewEmployee('${employee.Employee_ID}')"
+					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
+					        <span class="material-symbols-outlined text-lg">
+					          visibility
+					        </span>
+					        <span>Detail</span>
+					      </button>
+					
+					      <!-- EDIT BIODATA -->
+					      <button type="button"
+					        onclick="editEmployee('${employee.Employee_ID}')"
+					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
+					        <span class="material-symbols-outlined text-lg">
+					          edit
+					        </span>
+					        <span>Edit Biodata</span>
+					      </button>
+					
+					      <!-- EDIT ATTENDANCE ACCOUNT -->
+					      <button type="button"
+					        onclick="editEmployeeAttendanceAccount('${employee.Employee_ID}')"
+					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
+					        <span class="material-symbols-outlined text-lg">
+					          badge
+					        </span>
+					        <span>Edit Attendance Account</span>
+					      </button>
+					      <!-- SALARY - OWNER ONLY -->
+					      ${state.user.role === 'Owner' ? `
+					        <button type="button"
+					          onclick="openEmployeeSalarySetting('${employee.Employee_ID}')"
+					          class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
+					          <span class="material-symbols-outlined text-lg">
+					            payments
+					          </span>
+					          <span>Setting Salary</span>
+					        </button>
+					      ` : ''}
+					
+					      <div class="border-t border-outline-variant my-1"></div>
+					
+					      <!-- DELETE -->
+					      <button type="button"
+					        onclick="deleteEmployee('${employee.Employee_ID}')"
+					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-red-500 hover:bg-surface-container-high transition">
+					        <span class="material-symbols-outlined text-lg">
+					          delete
+					        </span>
+					        <span>Delete</span>
+					      </button>
+					    </div>
+					  </div>
+					</td>
         </tr>
       `;
     }).join('');
   }
   updateEmployeePagination(total, start, end);
 }
+
 
 /* === EMPLOYEE SUMMARY === */
 function updateEmployeeSummary() {
@@ -32980,9 +32823,7 @@ window.changeEmployeePage = function (direction) {
   renderEmployeeTable();
 };
 
-
 /* ==== HTML ESCAPE ==== */
-
 function escapeEmployeeHtml(value) {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
@@ -32992,9 +32833,7 @@ function escapeEmployeeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-
 /* ==== VIEW EMPLOYEE ==== */
-
 window.viewEmployee = function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
 
