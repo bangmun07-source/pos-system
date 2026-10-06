@@ -32267,10 +32267,13 @@ async function loadEmployeeBranches() {
 }
 
 /* === OPEN EMPLOYEE MODAL === */
+/* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
+
   document.getElementById('employeeModalTitle').textContent = 'Add Employee';
+
   document.getElementById('employeeId').value = '';
-  document.getElementById('employeeCode').value = '';
+
   document.getElementById('employeeName').value = '';
   document.getElementById('employeePhone').value = '';
   document.getElementById('employeeEmail').value = '';
@@ -32285,7 +32288,8 @@ window.openEmployeeModal = function () {
   document.getElementById('employeeNotes').value = '';
   document.getElementById('employeeAddress').value = '';
 
-  const preview = document.getElementById('employeePhotoPreview');
+  const preview =
+    document.getElementById('employeePhotoPreview');
 
   if (preview) {
     preview.innerHTML = `
@@ -32295,7 +32299,8 @@ window.openEmployeeModal = function () {
     `;
   }
 
-  const modal = document.getElementById('employeeModal');
+  const modal =
+    document.getElementById('employeeModal');
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -32312,7 +32317,6 @@ window.closeEmployeeModal = function () {
 };
 
 
-/* === SAVE EMPLOYEE === */
 /* === SAVE EMPLOYEE === */
 window.saveEmployee = async function () {
 
