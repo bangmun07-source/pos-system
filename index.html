@@ -23320,7 +23320,7 @@
   <!-- === EMPLOYEE MODAL === -->
 	<div id="employeeModal"
 	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4 overflow-y-auto">
-	  <div class="w-full max-w-3xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+	  <div class="w-full max-w-3xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
 	      <div class="flex items-center gap-3">
 	        <div class="main-icon-box">
@@ -23350,7 +23350,7 @@
 	      </button>
 	    </div>
 	    <!-- BODY -->
-	    <div class="p-5 space-y-6">
+	    <div class="p-5 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
 	      <input id="employeeId" type="hidden">
 	      <!-- EMPLOYMENT INFORMATION -->
 	      <div>
@@ -23551,6 +23551,7 @@
 					</div>
 				</div>
 	    </div>
+			</div>
 	    <!-- FOOTER -->
 	    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
 	      <button type="button"
