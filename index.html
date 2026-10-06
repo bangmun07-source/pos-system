@@ -23017,7 +23017,7 @@
 					  </div>
 					</div>
           <!-- ATTENDANCE KPI -->
-          <div class="grid grid-cols-2 md:grid-cols-5">
+          <div class="grid grid-cols-2 md:grid-cols-6">
             <div class="p-5 border-r border-outline-variant">
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Present
@@ -23061,6 +23061,17 @@
                 0
               </p>
             </div>
+						
+						<div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">
+                Late Minutes
+              </p>
+
+              <p id="attendanceLateMinutes"
+                class="text-xl font-headline mt-1">
+                0
+              </p>
+            </div>
 
             <div class="p-5">
               <p class="text-[11px] text-muted uppercase tracking-wider">
@@ -23084,6 +23095,7 @@
                   <th class="px-5 py-3 text-center"> Late </th>
                   <th class="px-5 py-3 text-center"> Absent </th>
                   <th class="px-5 py-3 text-center"> Leave </th>
+									<th class="px-5 py-3 text-right"> Late Minutes </th>
                   <th class="px-5 py-3 text-right"> Overtime </th>
                   <th class="px-5 py-3 text-center"> Action </th>
                 </tr>
@@ -23092,7 +23104,7 @@
               <tbody id="attendanceTableBody"
                 class="divide-y divide-outline-variant">
                 <tr>
-                  <td colspan="8"
+                  <td colspan="9"
                     class="px-5 py-10 text-center text-muted">
                     No attendance data
                   </td>
@@ -23100,6 +23112,33 @@
               </tbody>
             </table>
           </div>
+					<!-- PAGINATION -->
+	  			<div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+						<p id="AttendancePaginationInfo"
+						  class="text-xs text-on-surface-variant font-medium">
+						  Showing 0–0 of 0
+						</p>
+	
+						<div class="flex items-center gap-2">
+						  <button id="AttendancePrevButton"
+						    type="button"
+						    onclick="changeAttendancePage(-1)"
+						    class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+						    <span class="material-symbols-outlined text-sm">
+						      chevron_left
+						    </span>
+						  </button>
+						
+						  <button id="AttendanceNextButton"
+						    type="button"
+						    onclick="changeAttendancePage(1)"
+						    class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+						    <span class="material-symbols-outlined text-sm">
+						      chevron_right
+						    </span>
+						  </button>
+						</div>
+					</div>
         </section>
         <!-- === PAYROLL === -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
@@ -23227,6 +23266,7 @@
                   <th class="px-5 py-3 text-left"> Employee </th>
                   <th class="px-5 py-3 text-right"> Basic Salary </th>
                   <th class="px-5 py-3 text-right"> Allowance </th>
+									<th class="px-5 py-3 text-right"> Late Minutes </th>
                   <th class="px-5 py-3 text-right"> Overtime </th>
                   <th class="px-5 py-3 text-right"> Deduction </th>
                   <th class="px-5 py-3 text-right"> Net Salary </th>
@@ -23238,7 +23278,7 @@
               <tbody id="payrollTableBody"
                 class="divide-y divide-outline-variant">
                 <tr>
-                  <td colspan="8"
+                  <td colspan="9"
                     class="px-5 py-10 text-center text-muted">
                     No payroll data
                   </td>
@@ -23257,7 +23297,7 @@
               <button id="payrollPrevButton"
                 type="button"
                 onclick="changePayrollPage(-1)"
-                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
                 <span class="material-symbols-outlined text-sm">
                   chevron_left
                 </span>
@@ -23266,7 +23306,7 @@
               <button id="payrollNextButton"
                 type="button"
                 onclick="changePayrollPage(1)"
-                class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+                class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
                 <span class="material-symbols-outlined text-sm">
                   chevron_right
                 </span>
