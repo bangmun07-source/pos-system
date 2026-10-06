@@ -33044,11 +33044,9 @@ window.editEmployeeAttendanceAccount = async function (employeeId) {
       if (activeInput) { activeInput.checked = true; }
     }
     else {
-      if (accountIdInput) {
-        accountIdInput.value =
-          account.Attendance_Account_ID ||
-          account.Account_ID ||
-          ''; }
+			if (accountIdInput) {
+				accountIdInput.value =
+					account.Account_ID || ''; }
       if (pinInput) { pinInput.value = ''; }
       if (activeInput) { activeInput.checked = account.Is_Active !== false; }
     }
