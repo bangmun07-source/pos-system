@@ -32267,7 +32267,6 @@ async function loadEmployeeBranches() {
 }
 
 /* === OPEN EMPLOYEE MODAL === */
-/* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
 
   document.getElementById('employeeModalTitle').textContent = 'Add Employee';
@@ -32536,22 +32535,32 @@ window.saveEmployee = async function () {
 
 /* === UPLOAD EMPLOYEE PHOTO === */
 async function uploadEmployeePhoto(file) {
-
   if (!file) return null;
 
-  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
     throw new Error('Foto harus JPG, PNG, atau WebP.');
   }
 
   if (file.size > 2 * 1024 * 1024) {
-    throw new Error('Ukuran foto maksimal 2 MB.');
+    throw new Error('Ukuran foto karyawan maksimal 2 MB.');
   }
 
-  const extension =
-    file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const compressedFile =
+    await compressEmployeePhoto(file);
+
+  console.log(
+    'Employee photo:',
+    `${(file.size / 1024).toFixed(0)} KB → ${(compressedFile.size / 1024).toFixed(0)} KB`
+  );
 
   const fileName =
-    `${crypto.randomUUID()}.${extension}`;
+    `${crypto.randomUUID()}.webp`;
 
   const filePath =
     `employees/${fileName}`;
@@ -32559,10 +32568,10 @@ async function uploadEmployeePhoto(file) {
   const { error: uploadError } =
     await supabaseClient.storage
       .from('employee-photos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
+      .upload(filePath, compressedFile, {
+        cacheControl: '31536000',
         upsert: false,
-        contentType: file.type
+        contentType: 'image/webp'
       });
 
   if (uploadError) {
@@ -32582,6 +32591,150 @@ async function uploadEmployeePhoto(file) {
   return data?.publicUrl || null;
 }
 
+
+/* === COMPRESS EMPLOYEE PHOTO === */
+async function compressEmployeePhoto(file) {
+
+  const MAX_WIDTH = 600;
+  const MAX_HEIGHT = 600;
+  const MAX_SIZE = 100 * 1024; // 100 KB
+
+  const imageUrl =
+    URL.createObjectURL(file);
+
+  try {
+
+    const image = new Image();
+
+    await new Promise((resolve, reject) => {
+
+      image.onload = resolve;
+
+      image.onerror = () => {
+        reject(
+          new Error('Foto tidak dapat diproses.')
+        );
+      };
+
+      image.src = imageUrl;
+    });
+
+    let width = image.naturalWidth;
+    let height = image.naturalHeight;
+
+    const scale =
+      Math.min(
+        MAX_WIDTH / width,
+        MAX_HEIGHT / height,
+        1
+      );
+
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
+
+    const canvas =
+      document.createElement('canvas');
+
+    canvas.width = width;
+    canvas.height = height;
+
+    const ctx =
+      canvas.getContext('2d');
+
+    if (!ctx) {
+      throw new Error(
+        'Browser tidak mendukung image compression.'
+      );
+    }
+
+    ctx.drawImage(
+      image,
+      0,
+      0,
+      width,
+      height
+    );
+
+    let quality = 0.85;
+    let blob = null;
+
+    while (quality >= 0.20) {
+
+      blob = await new Promise(resolve => {
+
+        canvas.toBlob(
+          resolve,
+          'image/webp',
+          quality
+        );
+
+      });
+
+      if (!blob) {
+        throw new Error(
+          'Gagal melakukan compress foto.'
+        );
+      }
+
+      if (blob.size <= MAX_SIZE) {
+        break;
+      }
+
+      quality -= 0.05;
+    }
+
+    /*
+     * Kalau masih > 100 KB,
+     * kecilkan resolusi lagi.
+     */
+    if (blob && blob.size > MAX_SIZE) {
+
+      width = Math.round(width * 0.8);
+      height = Math.round(height * 0.8);
+
+      canvas.width = width;
+      canvas.height = height;
+
+      ctx.drawImage(
+        image,
+        0,
+        0,
+        width,
+        height
+      );
+
+      blob = await new Promise(resolve => {
+
+        canvas.toBlob(
+          resolve,
+          'image/webp',
+          0.70
+        );
+
+      });
+    }
+
+    if (!blob) {
+      throw new Error(
+        'Gagal membuat foto.'
+      );
+    }
+
+    return new File(
+      [blob],
+      'employee-photo.webp',
+      {
+        type: 'image/webp',
+        lastModified: Date.now()
+      }
+    );
+
+  } finally {
+
+    URL.revokeObjectURL(imageUrl);
+
+  }
+}
 document.addEventListener('change', function (event) {
 
   if (event.target.id !== 'employeePhoto') return;
