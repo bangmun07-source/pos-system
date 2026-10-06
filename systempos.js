@@ -32142,56 +32142,45 @@ let employeeCurrentPage = 1;
 const employeePageSize = 10;
 
 async function loadEmployeeBranches() {
-  const select = document.getElementById('employeeBranch');
-  const filter = document.getElementById('employeeBranchFilter');
-
-  if (!select && !filter) return;
-
   try {
-    const sessionId = localStorage.getItem('pos_session_id');
+    const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) { console.error('Session ID tidak ditemukan.'); return; }
+    if (!sessionId) return;
 
-    const { data, error } = await supabaseClient.rpc(
-      'get_expense_branches',
-      {
-        p_session_id: sessionId
-      }
-    );
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
 
-    if (error) { console.error('Gagal mengambil branch:', error); return; }
+    if (error) throw error;
 
-    console.log('EMPLOYEE BRANCH DATA:', data);
+    const branches = typeof data === "string"
+      ? JSON.parse(data)
+      : (data || []);
+    const select = document.getElementById("employeeBranch");
 
-    // Karena RPC return JSONB langsung
-    const branches = Array.isArray(data) ? data : [];
+    if (!select) return;
 
-    /* === EMPLOYEE FORM BRANCH === */
-    if (select) {
-      select.innerHTML = `
-        <option value="">Select Outlet</option>
-        ${branches.map(branch => `
-          <option value="${escapeEmployeeHtml(branch.id)}">
-            ${escapeEmployeeHtml(branch.name)}
-          </option>
-        `).join('')}
-      `;
-    }
+    select.innerHTML = `<option value="">Select Outlet</option>`;
 
-    /* ==== EMPLOYEE FILTER BRANCH ==== */
-    if (filter) {
-      filter.innerHTML = `
-        <option value="">All Outlets</option>
-        ${branches.map(branch => `
-          <option value="${escapeEmployeeHtml(branch.id)}">
-            ${escapeEmployeeHtml(branch.name)}
-          </option>
-        `).join('')}
-      `;
-    }
+    branches.forEach(branch => {
+      const option = document.createElement("option");
+
+      option.value = branch.id || "";
+      option.textContent =
+        branch.name || branch.id || "Unnamed Branch";
+
+      select.appendChild(option);
+    });
 
   } catch (error) {
-    console.error('loadEmployeeBranches error:', error);
+    console.error(
+      "loadEmployeeBranches:",
+      error
+    );
   }
 }
 
