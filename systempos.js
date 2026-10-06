@@ -32843,6 +32843,28 @@ window.viewEmployee = function (employeeId) {
 
   if (!employee) return;
 
+  /* === PHOTO === */
+  const photo = document.getElementById('detailEmployeePhoto');
+
+  if (photo) {
+    if (employee.Photo_URL) {
+      photo.innerHTML = `
+        <img
+          src="${escapeEmployeeHtml(employee.Photo_URL)}"
+          alt="Employee Photo"
+          class="w-full h-full object-cover"
+        >
+      `;
+    } else {
+      photo.innerHTML = `
+        <span class="material-symbols-outlined text-4xl text-muted">
+          person
+        </span>
+      `;
+    }
+  }
+
+  /* === EMPLOYEE DETAIL === */
   document.getElementById('detailEmployeeCode').textContent = employee.Employee_Code || '-';
   document.getElementById('detailEmployeeName').textContent = employee.Full_Name || '-';
   document.getElementById('detailEmployeePosition').textContent = employee.Position || '-';
@@ -32853,18 +32875,24 @@ window.viewEmployee = function (employeeId) {
   document.getElementById('detailEmployeeStatus').textContent = employee.Status || '-';
   document.getElementById('detailEmployeeAddress').textContent = employee.Address || '-';
 
+  /* === OPEN DETAIL MODAL === */
   const modal = document.getElementById('employeeDetailModal');
+
+  if (!modal) return;
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
 
 
+/* ==== CLOSE EMPLOYEE DETAIL MODAL ==== */
 window.closeEmployeeDetailModal = function () {
-
   const modal = document.getElementById('employeeDetailModal');
+
+  if (!modal) return;
 
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
+
 
