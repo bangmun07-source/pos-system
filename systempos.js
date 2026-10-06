@@ -32410,18 +32410,7 @@ window.saveEmployee = async function () {
         }
       );
 
-    if (error) {
-      console.error(
-        'save_employee RPC error:',
-        error
-      );
-      throw error;
-    }
-    console.log(
-      'Employee saved:',
-      data
-    );
-
+    if (error) { throw error; }
 
     closeEmployeeModal();
     await loadEmployees();
@@ -32433,15 +32422,7 @@ window.saveEmployee = async function () {
     );
 
   } catch (error) {
-    console.error(
-      'saveEmployee:',
-      error
-    );
-
-    alert(
-      error?.message ||
-      'Gagal menyimpan employee.'
-    );
+    alert( error?.message || 'Gagal menyimpan employee.' );
   }
 };
 
@@ -32657,6 +32638,26 @@ async function loadEmployees() {
     employeeData = Array.isArray(data)
       ? data
       : [];
+
+		console.log(
+		  'PHOTO:',
+		  employeeData.map(e => ({
+		    name: e.Full_Name,
+		    photo: e.Photo_URL
+		  }))
+		);
+
+    /* DEBUG PHOTO */
+    console.log('EMPLOYEE DATA:', employeeData);
+
+    employeeData.forEach(employee => {
+      console.log(
+        employee.Full_Name,
+        '=>',
+        employee.Photo_URL
+      );
+    });
+
     filteredEmployeeData = [...employeeData];
     employeeCurrentPage = 1;
 
@@ -32844,25 +32845,26 @@ window.viewEmployee = function (employeeId) {
   if (!employee) return;
 
   /* === PHOTO === */
-  const photo = document.getElementById('detailEmployeePhoto');
-
-  if (photo) {
-    if (employee.Photo_URL) {
-      photo.innerHTML = `
-        <img
-          src="${escapeEmployeeHtml(employee.Photo_URL)}"
-          alt="Employee Photo"
-          class="w-full h-full object-cover"
-        >
-      `;
-    } else {
-      photo.innerHTML = `
-        <span class="material-symbols-outlined text-4xl text-muted">
-          person
-        </span>
-      `;
-    }
-  }
+	const photo = document.getElementById('detailEmployeePhoto');
+	
+	if (photo) {
+	  if (employee.Photo_URL) {
+	    photo.innerHTML = `
+	      <img
+	        src="${escapeEmployeeHtml(employee.Photo_URL)}"
+	        alt="Employee Photo"
+	        class="w-full h-full object-cover"
+	        onerror="this.parentElement.innerHTML='<span class=&quot;material-symbols-outlined text-4xl text-muted&quot;>person</span>'"
+	      >
+	    `;
+	  } else {
+	    photo.innerHTML = `
+	      <span class="material-symbols-outlined text-4xl text-muted">
+	        person
+	      </span>
+	    `;
+	  }
+	}
 
   /* === EMPLOYEE DETAIL === */
   document.getElementById('detailEmployeeCode').textContent = employee.Employee_Code || '-';
