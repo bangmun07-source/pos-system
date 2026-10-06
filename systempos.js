@@ -32887,6 +32887,60 @@ function escapeEmployeeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
+window.editEmployee = function (employeeId) {
+  const employee = employeeData.find( e => e.Employee_ID === employeeId );
+
+  if (!employee) { alert('Employee tidak ditemukan.'); return; }
+
+  /* === MODE EDIT === */
+  document.getElementById('employeeModalTitle').textContent = 'Edit Employee';
+  document.getElementById('employeeId').value = employee.Employee_ID || '';
+  document.getElementById('employeeBranch').value = employee.Branch_ID || '';
+  document.getElementById('employeeName').value = employee.Full_Name || '';
+  document.getElementById('employeePosition').value = employee.Position || '';
+  document.getElementById('employeeDepartment').value = employee.Department || '';
+  document.getElementById('employeeJoinDate').value = employee.Hire_Date || '';
+  document.getElementById('employeeStatus').value = employee.Status || 'ACTIVE';
+  document.getElementById('employeePhone').value = employee.Phone || '';
+  document.getElementById('employeeEmail').value = employee.Email || '';
+  document.getElementById('employeeGender').value = employee.Gender || '';
+  document.getElementById('employeeBirthDate').value = employee.Birth_Date || '';
+  document.getElementById('employeeNotes').value = employee.Notes || '';
+  document.getElementById('employeeAddress').value = employee.Address || '';
+
+  /* === PHOTO PREVIEW === */
+  const preview = document.getElementById('employeePhotoPreview');
+  const photoInput = document.getElementById('employeePhoto');
+
+  if (photoInput) { photoInput.value = ''; }
+
+  if (preview) {
+    if (employee.Photo_URL) {
+      preview.innerHTML = `
+        <img
+          src="${escapeEmployeeHtml(employee.Photo_URL)}"
+          alt="Employee Photo"
+          class="w-full h-full object-cover"
+        >
+      `;
+    } else {
+      preview.innerHTML = `
+        <span class="material-symbols-outlined text-3xl text-muted">
+          person
+        </span>
+      `;
+    }
+  }
+
+  /* === OPEN MODAL === */
+  const modal = document.getElementById('employeeModal');
+
+  if (!modal) return;
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
 /* ==== VIEW EMPLOYEE ==== */
 window.viewEmployee = function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
