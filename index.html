@@ -24216,6 +24216,138 @@
       </div>
     </div>
   </div>
+	<!-- EMPLOYEE ACTION MODAL -->
+	<div id="employeeActionModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4">
+	  <div class="w-full max-w-md bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+	    <!-- HEADER -->
+	    <div class="px-5 py-4 border-b border-outline-variant flex items-center justify-between">
+	      <div>
+	        <h3 class="text-base font-semibold text-foreground">
+	          Employee Action
+	        </h3>
+	
+	        <p id="employeeActionName"
+	          class="text-sm text-muted mt-1">
+	          -
+	        </p>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeEmployeeActionModal()"
+	        class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
+	        <span class="material-symbols-outlined">
+	          close
+	        </span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-4 space-y-2">
+	      <!-- DETAIL -->
+	      <button type="button"
+	        id="employeeActionDetail"
+	        class="w-full px-4 py-3 rounded-md flex items-center gap-4 text-left text-foreground hover:bg-surface-container-high transition">
+	        <div class="w-10 h-10 rounded-md bg-surface-container-high flex items-center justify-center shrink-0">
+	          <span class="material-symbols-outlined text-lg">
+	            visibility
+	          </span>
+	        </div>
+	
+	        <div>
+	          <div class="text-sm font-medium">
+	            Detail
+	          </div>
+	
+	          <div class="text-xs text-muted mt-0.5">
+	            View employee information
+	          </div>
+	        </div>
+	      </button>
+	      <!-- EDIT BIODATA -->
+	      <button type="button"
+	        id="employeeActionEdit"
+	        class="w-full px-4 py-3 rounded-md flex items-center gap-4 text-left text-foreground hover:bg-surface-container-high transition">
+	        <div class="w-10 h-10 rounded-md bg-surface-container-high flex items-center justify-center shrink-0">
+	          <span class="material-symbols-outlined text-lg">
+	            edit
+	          </span>
+	        </div>
+	
+	        <div>
+	          <div class="text-sm font-medium">
+	            Edit Biodata
+	          </div>
+	
+	          <div class="text-xs text-muted mt-0.5">
+	            Edit employee personal data
+	          </div>
+	        </div>
+	      </button>
+	      <!-- ATTENDANCE ACCOUNT -->
+	      <button type="button"
+	        id="employeeActionAttendance"
+	        class="w-full px-4 py-3 rounded-md flex items-center gap-4 text-left text-foreground hover:bg-surface-container-high transition">
+	        <div class="w-10 h-10 rounded-md bg-surface-container-high flex items-center justify-center shrink-0">
+	          <span class="material-symbols-outlined text-lg">
+	            badge
+	          </span>
+	        </div>
+	
+	        <div>
+	          <div class="text-sm font-medium">
+	            Edit Attendance Account
+	          </div>
+	
+	          <div class="text-xs text-muted mt-0.5">
+	            Manage attendance account
+	          </div>
+	        </div>
+	      </button>
+	      <!-- SALARY -->
+	      <button type="button"
+	        id="employeeActionSalary"
+	        class="w-full px-4 py-3 rounded-md flex items-center gap-4 text-left text-foreground hover:bg-surface-container-high transition">
+	        <div class="w-10 h-10 rounded-md bg-surface-container-high flex items-center justify-center shrink-0">
+	          <span class="material-symbols-outlined text-lg">
+	            payments
+	          </span>
+	        </div>
+	
+	        <div>
+	          <div class="text-sm font-medium">
+	            Setting Salary
+	          </div>
+	
+	          <div class="text-xs text-muted mt-0.5">
+	            Configure employee salary
+	          </div>
+	        </div>
+	      </button>
+	      <!-- DIVIDER -->
+	      <div class="border-t border-outline-variant my-2"></div>
+	      <!-- DELETE -->
+	      <button type="button"
+	        id="employeeActionDelete"
+	        class="w-full px-4 py-3 rounded-md flex items-center gap-4 text-left text-red-500 hover:bg-surface-container-high transition">
+	        <div class="w-10 h-10 rounded-md bg-red-500/10 flex items-center justify-center shrink-0">
+	          <span class="material-symbols-outlined text-lg">
+	            delete
+	          </span>
+	        </div>
+	
+	        <div>
+	          <div class="text-sm font-medium">
+	            Delete Employee
+	          </div>
+	
+	          <div class="text-xs text-muted mt-0.5">
+	            Remove this employee
+	          </div>
+	        </div>
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 
