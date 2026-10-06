@@ -32106,11 +32106,17 @@ async function deleteAccountsReceivable(recordId) {
    									EMPLOYEE PAGE
 ========================================================= */
 
-function initEmployeePage() {
-  switchEmployeeModule('management');
-  loadEmployees();
-  loadSchedules();
-  loadEmployeeBranches();
+async function initEmployeePage() {
+  try {
+    switchEmployeeModule('management');
+
+    await loadEmployeeBranches();
+    await loadEmployees();
+
+    loadSchedules();
+  } catch (error) {
+    console.error("initEmployeePage:", error);
+  }
 }
 
 window.switchEmployeeModule = function(module) {
