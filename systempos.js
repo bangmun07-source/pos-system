@@ -32229,19 +32229,81 @@ async function loadEmployeeBranches() {
   }
 }
 
-window.toggleEmployeeActionMenu = function (employeeId) {
-  const menu = document.getElementById( `employeeActionMenu-${employeeId}` );
+/* ==== EMPLOYEE ACTION MODAL ==== */
+window.openEmployeeActionModal = function (employeeId) {
+  const employee = employeeData.find(e => e.Employee_ID === employeeId);
 
-  if (!menu) return;
+  if (!employee) return;
 
-  document
-    .querySelectorAll('[id^="employeeActionMenu-"]')
-    .forEach(el => {
-      if (el !== menu) {
-        el.classList.add('hidden');
-      }
-    });
-  menu.classList.toggle('hidden');
+  const modal = document.getElementById('employeeActionModal');
+  const name = document.getElementById('employeeActionName');
+
+  if (!modal) return;
+  if (name) { name.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
+
+  /* === DETAIL === */
+  const detailButton = document.getElementById('employeeActionDetail');
+
+  if (detailButton) {
+    detailButton.onclick = function () {
+      closeEmployeeActionModal();
+      viewEmployee(employeeId);
+    };
+  }
+  /* === EDIT BIODATA === */
+  const editButton = document.getElementById('employeeActionEdit');
+
+  if (editButton) {
+    editButton.onclick = function () {
+      closeEmployeeActionModal();
+      editEmployee(employeeId);
+    };
+  }
+  /* === ATTENDANCE ACCOUNT === */
+  const attendanceButton = document.getElementById('employeeActionAttendance');
+
+  if (attendanceButton) {
+    attendanceButton.onclick = function () {
+      closeEmployeeActionModal();
+      editEmployeeAttendanceAccount(employeeId);
+    };
+  }
+  /* === SALARY === */
+  const salaryButton = document.getElementById('employeeActionSalary');
+
+  if (salaryButton) {
+    salaryButton.classList.toggle(
+      'hidden',
+      state.user.role !== 'Owner'
+    );
+    salaryButton.onclick = function () {
+      closeEmployeeActionModal();
+      openEmployeeSalarySetting(employeeId);
+    };
+  }
+  /* === DELETE === */
+  const deleteButton = document.getElementById('employeeActionDelete');
+
+  if (deleteButton) {
+    deleteButton.onclick = function () {
+      closeEmployeeActionModal();
+      deleteEmployee(employeeId);
+    };
+  }
+  /* === OPEN MODAL === */
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+/* === CLOSE EMPLOYEE ACTION MODAL === */
+window.closeEmployeeActionModal = function () {
+  const modal = document.getElementById('employeeActionModal');
+
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 };
 
 /* === OPEN EMPLOYEE MODAL === */
@@ -32698,71 +32760,13 @@ function renderEmployeeTable() {
           </td>
 
 					<td class="px-5 py-4 text-center">
-					  <div class="relative inline-block">
-					    <button type="button"
-					      onclick="toggleEmployeeActionMenu('${employee.Employee_ID}')"
-					      class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
-					      <span class="material-symbols-outlined text-lg">
-					        more_vert
-					      </span>
-					    </button>
-					
-					    <div id="employeeActionMenu-${employee.Employee_ID}"
-					      class="hidden absolute right-0 top-full mt-1 w-52 bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] z-[200] text-left">
-					      <!-- DETAIL -->
-					      <button type="button"
-					        onclick="viewEmployee('${employee.Employee_ID}')"
-					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
-					        <span class="material-symbols-outlined text-lg">
-					          visibility
-					        </span>
-					        <span>Detail</span>
-					      </button>
-					
-					      <!-- EDIT BIODATA -->
-					      <button type="button"
-					        onclick="editEmployee('${employee.Employee_ID}')"
-					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
-					        <span class="material-symbols-outlined text-lg">
-					          edit
-					        </span>
-					        <span>Edit Biodata</span>
-					      </button>
-					
-					      <!-- EDIT ATTENDANCE ACCOUNT -->
-					      <button type="button"
-					        onclick="editEmployeeAttendanceAccount('${employee.Employee_ID}')"
-					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
-					        <span class="material-symbols-outlined text-lg">
-					          badge
-					        </span>
-					        <span>Edit Attendance Account</span>
-					      </button>
-					      <!-- SALARY - OWNER ONLY -->
-					      ${state.user.role === 'Owner' ? `
-					        <button type="button"
-					          onclick="openEmployeeSalarySetting('${employee.Employee_ID}')"
-					          class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-foreground hover:bg-surface-container-high transition">
-					          <span class="material-symbols-outlined text-lg">
-					            payments
-					          </span>
-					          <span>Setting Salary</span>
-					        </button>
-					      ` : ''}
-					
-					      <div class="border-t border-outline-variant my-1"></div>
-					
-					      <!-- DELETE -->
-					      <button type="button"
-					        onclick="deleteEmployee('${employee.Employee_ID}')"
-					        class="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-red-500 hover:bg-surface-container-high transition">
-					        <span class="material-symbols-outlined text-lg">
-					          delete
-					        </span>
-					        <span>Delete</span>
-					      </button>
-					    </div>
-					  </div>
+					  <button type="button"
+					    onclick="openEmployeeActionModal('${employee.Employee_ID}')"
+					    class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
+					    <span class="material-symbols-outlined text-lg">
+					      more_vert
+					    </span>
+					  </button>
 					</td>
         </tr>
       `;
