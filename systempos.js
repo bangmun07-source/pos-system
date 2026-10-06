@@ -32132,5 +32132,348 @@ window.switchEmployeeModule = function(module) {
 };
 
 
+/* =========================================================
+   EMPLOYEE MANAGEMENT
+========================================================= */
 
+let employeeData = [];
+let filteredEmployeeData = [];
+let employeeCurrentPage = 1;
+const employeePageSize = 10;
+
+
+/* === OPEN EMPLOYEE MODAL === */
+window.openEmployeeModal = function () {
+
+  document.getElementById('employeeModalTitle').textContent = 'Add Employee';
+  document.getElementById('employeeId').value = '';
+  document.getElementById('employeeCode').value = '';
+  document.getElementById('employeeName').value = '';
+  document.getElementById('employeePhone').value = '';
+  document.getElementById('employeeEmail').value = '';
+  document.getElementById('employeePosition').value = '';
+  document.getElementById('employeeBranch').value = '';
+  document.getElementById('employeeJoinDate').value = '';
+  document.getElementById('employeeStatus').value = 'ACTIVE';
+  document.getElementById('employeeAddress').value = '';
+
+  const modal = document.getElementById('employeeModal');
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+/* === CLOSE EMPLOYEE MODAL === */
+
+window.closeEmployeeModal = function () {
+  const modal = document.getElementById('employeeModal');
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+};
+
+
+/* === SAVE EMPLOYEE === */
+
+window.saveEmployee = async function () {
+  const employeeId = document.getElementById('employeeId').value.trim();
+  const employeeCode = document.getElementById('employeeCode').value.trim();
+  const fullName = document.getElementById('employeeName').value.trim();
+  const phone = document.getElementById('employeePhone').value.trim();
+  const email = document.getElementById('employeeEmail').value.trim();
+  const position = document.getElementById('employeePosition').value.trim();
+  const branchId = document.getElementById('employeeBranch').value;
+  const hireDate = document.getElementById('employeeJoinDate').value || null;
+  const status = document.getElementById('employeeStatus').value;
+  const address = document.getElementById('employeeAddress').value.trim();
+
+  if (!employeeCode) { alert('Employee ID wajib diisi.'); return; }
+  if (!fullName) { alert('Full Name wajib diisi.'); return; }
+  if (!branchId) { alert('Outlet wajib dipilih.'); return; }
+
+
+  try {
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
+    const { data, error } =
+      await supabaseClient.rpc('save_employee', {
+        p_session_id: sessionId,
+        p_employee_id: employeeId || null,
+        p_employee_code: employeeCode,
+        p_full_name: fullName,
+        p_phone: phone || null,
+        p_email: email || null,
+        p_address: address || null,
+        p_gender: null,
+        p_birth_date: null,
+        p_position: position || null,
+        p_department: null,
+        p_branch_id: branchId,
+        p_hire_date: hireDate,
+        p_status: status,
+        p_photo_url: null,
+        p_notes: null
+      });
+
+
+    if (error) { console.error('save_employee RPC error:', error); throw error; }
+
+    console.log('Employee saved:', data);
+
+    closeEmployeeModal();
+
+    await loadEmployees();
+
+    alert(
+      employeeId
+        ? 'Employee berhasil diperbarui.'
+        : 'Employee berhasil ditambahkan.'
+    );
+
+  } catch (error) {
+    console.error('saveEmployee:', error);
+    alert(
+      error?.message ||
+      'Gagal menyimpan employee.'
+    );
+  }
+};
+
+
+/* =========================================================
+   LOAD EMPLOYEES
+========================================================= */
+
+async function loadEmployees() {
+
+  try {
+    const sessionId = localStorage.getItem('pos_session_id');
+    const { data, error } =
+      await supabaseClient.rpc('get_employees', {
+        p_session_id: sessionId,
+        p_branch_id: null,
+        p_status: null,
+        p_search: null
+      });
+
+    if (error) { console.error('get_employees error:', error); throw error; }
+
+    employeeData = data || [];
+    filteredEmployeeData = [...employeeData];
+    employeeCurrentPage = 1;
+
+    renderEmployeeTable();
+    updateEmployeeSummary();
+
+  } catch (error) {
+
+    console.error('loadEmployees:', error);
+
+    employeeData = [];
+    filteredEmployeeData = [];
+
+    renderEmployeeTable();
+    updateEmployeeSummary();
+  }
+}
+
+
+/* === FILTER EMPLOYEES === */
+
+window.filterEmployees = function () {
+  const search = document.getElementById('employeeSearch')
+		?.value
+		?.trim()
+		.toLowerCase() || '';
+  const status = document.getElementById('employeeStatusFilter') ?.value || '';
+  const branch = document.getElementById('employeeBranchFilter') ?.value || '';
+
+  filteredEmployeeData = employeeData.filter(employee => {
+    const searchMatch =
+      !search ||
+      String(employee.Full_Name || '').toLowerCase().includes(search) ||
+      String(employee.Employee_Code || '').toLowerCase().includes(search) ||
+      String(employee.Position || '').toLowerCase().includes(search);
+
+    const statusMatch = !status || employee.Status === status;
+    const branchMatch = !branch || employee.Branch_ID === branch;
+    return searchMatch && statusMatch && branchMatch;
+  });
+
+  employeeCurrentPage = 1;
+  renderEmployeeTable();
+};
+
+/* === RENDER EMPLOYEE TABLE === */
+function renderEmployeeTable() {
+  const tbody = document.getElementById('employeeTableBody');
+
+  if (!tbody) return;
+
+  const total = filteredEmployeeData.length;
+  const start = (employeeCurrentPage - 1) * employeePageSize;
+  const end = Math.min(start + employeePageSize, total);
+  const rows = filteredEmployeeData.slice(start, end);
+
+  if (!rows.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="7"
+          class="px-5 py-10 text-center text-muted">
+          No employee data
+        </td>
+      </tr>
+    `;
+
+  } else {
+    tbody.innerHTML = rows.map(employee => {
+      const statusClass = employee.Status === 'ACTIVE'
+				? 'text-green-500'
+				: 'text-muted';
+
+      return `
+        <tr class="hover:bg-surface-container-high transition">
+          <td class="px-5 py-4">
+            <div class="font-medium text-foreground">
+              ${escapeEmployeeHtml(employee.Full_Name)}
+            </div>
+          </td>
+
+          <td class="px-5 py-4">
+            ${escapeEmployeeHtml(employee.Employee_Code)}
+          </td>
+
+          <td class="px-5 py-4">
+            ${escapeEmployeeHtml(employee.Position || '-')}
+          </td>
+
+          <td class="px-5 py-4">
+            ${escapeEmployeeHtml(employee.Branch_ID || '-')}
+          </td>
+
+          <td class="px-5 py-4 text-muted">
+            -
+          </td>
+
+          <td class="px-5 py-4 text-center">
+            <span class="${statusClass}">
+              ${escapeEmployeeHtml(employee.Status)}
+            </span>
+          </td>
+
+          <td class="px-5 py-4 text-center">
+            <button
+              type="button"
+              onclick="viewEmployee('${employee.Employee_ID}')"
+              class="text-muted hover:text-foreground">
+              <span class="material-symbols-outlined text-lg">
+                visibility
+              </span>
+            </button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+  updateEmployeePagination(total, start, end);
+}
+
+/* === EMPLOYEE SUMMARY === */
+function updateEmployeeSummary() {
+  const total = employeeData.length;
+  const active = employeeData.filter(e => e.Status === 'ACTIVE').length;
+  const inactive = employeeData.filter(e => e.Status === 'INACTIVE').length;
+  document.getElementById('employeeTotalCount').textContent = total;
+  document.getElementById('employeeActiveCount').textContent = active;
+  document.getElementById('employeeInactiveCount').textContent = inactive;
+  // Schedule belum dibuat, jadi sementara 0
+  document.getElementById('employeeScheduledCount').textContent = '0';
+}
+
+/* ==== PAGINATION ==== */
+function updateEmployeePagination(total, start, end) {
+  const info = document.getElementById('employeePaginationInfo');
+  const prev = document.getElementById('employeePrevButton');
+  const next = document.getElementById('employeeNextButton');
+
+  if (info) {
+    info.textContent =
+      total === 0
+        ? 'Showing 0–0 of 0'
+        : `Showing ${start + 1}–${end} of ${total}`;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(total / employeePageSize));
+
+  if (prev) { prev.disabled = employeeCurrentPage <= 1; }
+  if (next) { next.disabled = employeeCurrentPage >= totalPages; }
+}
+
+
+window.changeEmployeePage = function (direction) {
+  const totalPages =
+    Math.max(
+      1,
+      Math.ceil(
+        filteredEmployeeData.length / employeePageSize
+      )
+    );
+
+  employeeCurrentPage += direction;
+  employeeCurrentPage =
+    Math.max(
+      1,
+      Math.min(employeeCurrentPage, totalPages) 
+		);
+	
+  renderEmployeeTable();
+};
+
+
+/* ==== HTML ESCAPE ==== */
+
+function escapeEmployeeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+
+/* ==== VIEW EMPLOYEE ==== */
+
+window.viewEmployee = function (employeeId) {
+  const employee = employeeData.find( e => e.Employee_ID === employeeId );
+
+  if (!employee) return;
+
+  document.getElementById('detailEmployeeCode').textContent = employee.Employee_Code || '-';
+  document.getElementById('detailEmployeeName').textContent = employee.Full_Name || '-';
+  document.getElementById('detailEmployeePosition').textContent = employee.Position || '-';
+  document.getElementById('detailEmployeeBranch').textContent = employee.Branch_ID || '-';
+  document.getElementById('detailEmployeePhone').textContent = employee.Phone || '-';
+  document.getElementById('detailEmployeeEmail').textContent = employee.Email || '-';
+  document.getElementById('detailEmployeeJoinDate').textContent = employee.Hire_Date || '-';
+  document.getElementById('detailEmployeeStatus').textContent = employee.Status || '-';
+  document.getElementById('detailEmployeeAddress').textContent = employee.Address || '-';
+
+  const modal = document.getElementById('employeeDetailModal');
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+window.closeEmployeeDetailModal = function () {
+
+  const modal = document.getElementById('employeeDetailModal');
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+};
 
