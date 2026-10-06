@@ -32145,73 +32145,53 @@ async function loadEmployeeBranches() {
   const select = document.getElementById('employeeBranch');
   const filter = document.getElementById('employeeBranchFilter');
 
-  if (!select) return;
+  if (!select && !filter) return;
 
   try {
-
     const sessionId = localStorage.getItem('pos_session_id');
 
-    const { data, error } =
-      await supabaseClient.rpc('get_expense_branches', {
-        p_session_id: sessionId
-      });
+    if (!sessionId) { console.error('Session ID tidak ditemukan.'); return; }
 
-    if (error) {
-      console.error('get_expense_branches error:', error);
-      throw error;
+    const { data, error } = await supabaseClient.rpc(
+      'get_expense_branches',
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) { console.error('Gagal mengambil branch:', error); return; }
+
+    console.log('EMPLOYEE BRANCH DATA:', data);
+
+    // Karena RPC return JSONB langsung
+    const branches = Array.isArray(data) ? data : [];
+
+    /* === EMPLOYEE FORM BRANCH === */
+    if (select) {
+      select.innerHTML = `
+        <option value="">Select Outlet</option>
+        ${branches.map(branch => `
+          <option value="${escapeEmployeeHtml(branch.id)}">
+            ${escapeEmployeeHtml(branch.name)}
+          </option>
+        `).join('')}
+      `;
     }
 
-    const branches = data || [];
-
-    select.innerHTML = ` <option value="">Select Outlet</option> `;
-
-    branches.forEach(branch => {
-      const branchId =
-        branch.Branch_ID ??
-        branch.branch_id;
-      const branchName =
-        branch.Branch_Name ??
-        branch.branch_name;
-
-      if (!branchId) return;
-
-      select.insertAdjacentHTML(
-        'beforeend',
-        `
-          <option value="${escapeEmployeeHtml(branchId)}">
-            ${escapeEmployeeHtml(branchName || branchId)}
-          </option>
-        `
-      );
-    });
-
+    /* ==== EMPLOYEE FILTER BRANCH ==== */
     if (filter) {
-      filter.innerHTML = ` <option value="">All Branch</option> `;
-
-      branches.forEach(branch => {
-        const branchId =
-          branch.Branch_ID ??
-          branch.branch_id;
-        const branchName =
-          branch.Branch_Name ??
-          branch.branch_name;
-
-        if (!branchId) return;
-
-        filter.insertAdjacentHTML(
-          'beforeend',
-          `
-            <option value="${escapeEmployeeHtml(branchId)}">
-              ${escapeEmployeeHtml(branchName || branchId)}
-            </option>
-          `
-        );
-      });
+      filter.innerHTML = `
+        <option value="">All Outlets</option>
+        ${branches.map(branch => `
+          <option value="${escapeEmployeeHtml(branch.id)}">
+            ${escapeEmployeeHtml(branch.name)}
+          </option>
+        `).join('')}
+      `;
     }
 
   } catch (error) {
-    console.error('loadEmployeeBranches:', error);
-    select.innerHTML = ` <option value="">Failed to load outlet</option> `;
+    console.error('loadEmployeeBranches error:', error);
   }
 }
 
