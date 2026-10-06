@@ -33000,4 +33000,167 @@ window.closeEmployeeDetailModal = function () {
   modal.classList.remove('flex');
 };
 
+/* ==== ATTENDANCE ACCOUNT ==== */
 
+window.editEmployeeAttendanceAccount = async function (employeeId) {
+  try {
+    const employee = employeeData.find( e => e.Employee_ID === employeeId );
+
+    if (!employee) { alert('Employee tidak ditemukan.'); return; }
+
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        'get_employee_attendance_account',
+        {
+          p_session_id: sessionId,
+          p_employee_id: employeeId
+        }
+      );
+
+    if (error) {
+      console.error(
+        'get_employee_attendance_account error:',
+        error
+      );
+      throw error;
+    }
+		
+    const account = Array.isArray(data)
+			? data[0] || null
+			: data || null;
+    const employeeIdInput = document.getElementById( 'attendanceAccountEmployeeId' );
+    const accountIdInput = document.getElementById( 'attendanceAccountId' );
+    const pinInput = document.getElementById( 'attendanceAccountPin' );
+    const activeInput = document.getElementById( 'attendanceAccountActive' );
+
+    if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
+    if (!account) {
+      if (accountIdInput) { accountIdInput.value = ''; }
+      if (pinInput) { pinInput.value = ''; }
+      if (activeInput) { activeInput.checked = true; }
+    }
+    else {
+      if (accountIdInput) {
+        accountIdInput.value =
+          account.Attendance_Account_ID ||
+          account.Account_ID ||
+          ''; }
+      if (pinInput) { pinInput.value = ''; }
+      if (activeInput) { activeInput.checked = account.Is_Active !== false; }
+    }
+
+    const modal = document.getElementById( 'attendanceAccountModal' );
+
+    if (!modal) return;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    /*
+     * Fokus ke Account ID saat Add.
+     * Saat Edit juga tetap nyaman langsung edit Account ID.
+     */
+    if (accountIdInput) {
+      setTimeout(() => {
+        accountIdInput.focus();
+        accountIdInput.select();
+      }, 100);
+    }
+
+  } catch (error) {
+    console.error(
+      'editEmployeeAttendanceAccount:',
+      error
+    );
+
+    alert(
+      error?.message ||
+      'Gagal memuat attendance account.'
+    );
+  }
+};
+
+
+/* === CLOSE ATTENDANCE ACCOUNT MODAL === */
+window.closeAttendanceAccountModal = function () {
+  const modal = document.getElementById( 'attendanceAccountModal' );
+
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+
+  const employeeIdInput = document.getElementById( 'attendanceAccountEmployeeId' );
+  const accountIdInput = document.getElementById( 'attendanceAccountId' );
+  const pinInput = document.getElementById( 'attendanceAccountPin' );
+  const activeInput = document.getElementById( 'attendanceAccountActive' );
+
+  if (employeeIdInput) { employeeIdInput.value = ''; }
+  if (accountIdInput) { accountIdInput.value = ''; }
+  if (pinInput) { pinInput.value = ''; }
+  if (activeInput) { activeInput.checked = true; }
+};
+
+
+/* ==== SAVE ATTENDANCE ACCOUNT ==== */
+window.saveAttendanceAccount = async function () {
+  const employeeId = document.getElementById( 'attendanceAccountEmployeeId' )?.value ?.trim();
+  const accountId = document.getElementById( 'attendanceAccountId' )?.value ?.trim();
+  const pin = document.getElementById( 'attendanceAccountPin' )?.value ?.trim();
+  const isActive = document.getElementById( 'attendanceAccountActive' )?.checked ?? true;
+
+  if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
+  if (!accountId) { alert('Attendance ID wajib diisi.'); return; }
+  if (pin && !/^\d{4,8}$/.test(pin)) { alert('PIN harus berupa 4–8 digit angka.'); return; }
+
+  try {
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        'save_employee_attendance_account',
+        {
+          p_session_id: sessionId,
+          p_employee_id: employeeId,
+          p_account_id: accountId,
+          p_pin: pin || null,
+          p_is_active: isActive
+        }
+      );
+
+    if (error) {
+      console.error(
+        'save_employee_attendance_account error:',
+        error
+      );
+
+      throw error;
+    }
+
+    console.log(
+      'Attendance account saved:',
+      data
+    );
+
+    closeAttendanceAccountModal();
+
+    alert( 'Attendance account berhasil disimpan.' );
+
+  } catch (error) {
+    console.error(
+      'saveAttendanceAccount:',
+      error
+    );
+
+    alert(
+      error?.message ||
+      'Gagal menyimpan attendance account.'
+    );
+  }
+};
