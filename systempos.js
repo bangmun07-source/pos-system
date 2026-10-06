@@ -33137,7 +33137,6 @@ window.saveAttendanceAccount = async function () {
         'save_employee_attendance_account error:',
         error
       );
-
       throw error;
     }
 
@@ -33147,15 +33146,13 @@ window.saveAttendanceAccount = async function () {
     );
 
     closeAttendanceAccountModal();
-
     alert( 'Attendance account berhasil disimpan.' );
-
+	  
   } catch (error) {
     console.error(
       'saveAttendanceAccount:',
       error
     );
-
     alert(
       error?.message ||
       'Gagal menyimpan attendance account.'
@@ -33163,57 +33160,375 @@ window.saveAttendanceAccount = async function () {
   }
 };
 
-window.openEmployeeSalarySetting = function (employeeId) {
+/* === SALARY SETTING === */
+window.openEmployeeSalarySetting = async function (employeeId) {
+  /* === OWNER ONLY === */
   if (state.user.role !== 'Owner') { alert('Hanya Owner yang dapat mengatur salary employee.'); return; }
 
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
 
   if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
-  const modal =  document.getElementById('salaryModal');
+  const modal = document.getElementById('salaryModal');
 
   if (!modal) return;
 
   const employeeIdInput = document.getElementById('salaryEmployeeId');
-
-  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
-
   const employeeName = document.getElementById('salaryEmployeeName');
 
+  /* === SET EMPLOYEE === */
+  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
   if (employeeName) { employeeName.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
 
+  /* === RESET FORM === */
   const basicSalary = document.getElementById('employeeBasicSalary');
-  const allowance = document.getElementById('employeeAllowance');
-  const deduction = document.getElementById('employeeDeduction');
   const overtimeRate = document.getElementById('employeeOvertimeRate');
   const effectiveFrom = document.getElementById('salaryEffectiveFrom');
   const note = document.getElementById('salaryNote');
 
   if (basicSalary) { basicSalary.value = ''; }
-  if (allowance) { allowance.value = '0'; }
-  if (deduction) { deduction.value = '0'; }
   if (overtimeRate) { overtimeRate.value = '0'; }
   if (effectiveFrom) { effectiveFrom.value = ''; }
   if (note) { note.value = ''; }
 
-  // Open modal
+  /* === RESET COMPONENT LIST === */
+  renderSalaryComponents([]);
+
+  /* === OPEN MODAL === */
   modal.classList.remove('hidden');
   modal.classList.add('flex');
+
+  /*
+   * RPC load salary existing
+   * akan kita pasang setelah RPC database
+   * sudah dibuat.
+   */
+
 };
 
-
+/* === CLOSE SALARY MODAL === */
 window.closeSalaryModal = function () {
   const modal = document.getElementById('salaryModal');
 
   if (!modal) return;
-
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 
-  // Reset
+  /* === RESET EMPLOYEE === */
+
   const employeeIdInput = document.getElementById('salaryEmployeeId');
   const employeeName = document.getElementById('salaryEmployeeName');
 
   if (employeeIdInput) { employeeIdInput.value = ''; }
   if (employeeName) { employeeName.textContent = '-'; }
+
+  /* === RESET SALARY === */
+  const basicSalary = document.getElementById('employeeBasicSalary');
+  const overtimeRate = document.getElementById('employeeOvertimeRate');
+  const effectiveFrom = document.getElementById('salaryEffectiveFrom');
+  const note = document.getElementById('salaryNote');
+
+  if (basicSalary) { basicSalary.value = ''; }
+  if (overtimeRate) { overtimeRate.value = '0'; }
+  if (effectiveFrom) { effectiveFrom.value = ''; }
+  if (note) { note.value = ''; }
+  /* === RESET COMPONENT LIST === */
+  renderSalaryComponents([]);
 };
+
+
+/* === SALARY COMPONENT STATE ==== */
+
+let employeeSalaryComponents = [];
+
+function renderSalaryComponents(components = []) {
+  employeeSalaryComponents =
+    Array.isArray(components)
+      ? [...components]
+      : [];
+
+  const allowanceList = document.getElementById('salaryAllowanceList');
+  const deductionList = document.getElementById('salaryDeductionList');
+
+  if (!allowanceList || !deductionList) { return; }
+	
+  const allowances =
+    employeeSalaryComponents.filter(
+      component =>
+        component.Component_Type === 'ALLOWANCE' &&
+        component.Is_Active !== false
+    );
+  const deductions =
+    employeeSalaryComponents.filter(
+      component =>
+        component.Component_Type === 'DEDUCTION' &&
+        component.Is_Active !== false
+    );
+
+  /* === ALLOWANCES === */
+  if (!allowances.length) {
+    allowanceList.innerHTML = `
+      <div class="px-4 py-5 text-center">
+        <span class="material-symbols-outlined text-2xl text-muted">
+          payments
+        </span>
+
+        <p class="text-xs text-muted mt-2">
+          No allowance configured
+        </p>
+      </div>
+    `;
+
+  } else {
+    allowanceList.innerHTML =
+      allowances.map(
+        component =>
+          renderSalaryComponentRow(component)
+      ).join('');
+  }
+
+  /* === DEDUCTIONS === */
+  if (!deductions.length) {
+    deductionList.innerHTML = `
+      <div class="px-4 py-5 text-center">
+        <span class="material-symbols-outlined text-2xl text-muted">
+          remove_circle_outline
+        </span>
+
+        <p class="text-xs text-muted mt-2">
+          No deduction configured
+        </p>
+      </div>
+    `;
+  } else {
+    deductionList.innerHTML =
+      deductions.map(
+        component =>
+          renderSalaryComponentRow(component)
+      ).join('');
+  }
+}
+
+/* ==== COMPONENT ROW ==== */
+function renderSalaryComponentRow(component) {
+  const componentId = escapeEmployeeHtml( component.Component_ID || '' );
+  const componentName = escapeEmployeeHtml( component.Component_Name || '-' );
+  const amount = Number(component.Amount || 0);
+  const calculationType = escapeEmployeeHtml( component.Calculation_Type || 'FIXED' );
+  const formattedAmount = new Intl.NumberFormat('id-ID').format( amount );
+
+  return `
+    <div class="px-4 py-3 flex items-center justify-between gap-4 border-b border-outline-variant last:border-b-0">
+      <div class="min-w-0">
+        <p class="text-sm font-medium text-foreground truncate">
+          ${componentName}
+        </p>
+
+        <p class="text-[11px] text-muted mt-0.5">
+          ${calculationType}
+        </p>
+      </div>
+	  
+      <div class="flex items-center gap-3 shrink-0">
+        <span class="text-sm font-medium text-foreground">
+          Rp ${formattedAmount}
+        </span>
+
+        <button type="button"
+          onclick="editSalaryComponent('${componentId}')"
+          class="w-8 h-8 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
+          <span class="material-symbols-outlined text-base">
+            edit
+          </span>
+        </button>
+
+        <button type="button"
+          onclick="removeSalaryComponent('${componentId}')"
+          class="w-8 h-8 rounded-md flex items-center justify-center text-muted hover:text-red-500 hover:bg-surface-container-high transition">
+          <span class="material-symbols-outlined text-base">
+            delete
+          </span>
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+
+/* ==== OPEN SALARY COMPONENT MODAL ===== */
+
+window.openSalaryComponentModal = function (type) {
+  if (
+    type !== 'ALLOWANCE' &&
+    type !== 'DEDUCTION'
+  ) {
+    return;
+  }
+
+  const modal = document.getElementById('salaryComponentModal');
+
+  if (!modal) return;
+
+  const title = document.getElementById( 'salaryComponentModalTitle' );
+  const typeInput = document.getElementById( 'salaryComponentType' );
+  const componentIdInput = document.getElementById( 'salaryComponentId' );
+  const nameInput = document.getElementById( 'salaryComponentName' );
+  const amountInput = document.getElementById( 'salaryComponentAmount' );
+  const calculationInput = document.getElementById( 'salaryComponentCalculationType' );
+
+  if (typeInput) { typeInput.value = type; }
+  if (componentIdInput) { componentIdInput.value = ''; }
+  if (nameInput) { nameInput.value = ''; }
+  if (amountInput) { amountInput.value = ''; }
+  if (calculationInput) { calculationInput.value = 'FIXED'; }
+  if (title) {
+    title.textContent =
+      type === 'ALLOWANCE'
+        ? 'Add Allowance'
+        : 'Add Deduction';
+  }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  if (nameInput) {
+    setTimeout(() => {
+      nameInput.focus();
+    }, 100);
+  }
+};
+
+/* === CLOSE SALARY COMPONENT MODAL === */
+window.closeSalaryComponentModal = function () {
+  const modal = document.getElementById( 'salaryComponentModal' );
+
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  const typeInput = document.getElementById( 'salaryComponentType' );
+  const componentIdInput = document.getElementById( 'salaryComponentId' );
+  const nameInput = document.getElementById( 'salaryComponentName' );
+  const amountInput = document.getElementById( 'salaryComponentAmount' );
+	
+  if (typeInput) { typeInput.value = ''; }
+  if (componentIdInput) { componentIdInput.value = ''; }
+  if (nameInput) { nameInput.value = ''; }
+  if (amountInput) { amountInput.value = ''; }
+};
+
+/* === SAVE SALARY COMPONENT === */
+window.saveSalaryComponent = function () {
+  const type = document.getElementById( 'salaryComponentType' )?.value;
+  const componentId = document.getElementById( 'salaryComponentId' )?.value ?.trim();
+  const name = document.getElementById( 'salaryComponentName' )?.value ?.trim();
+  const amount = Number( document.getElementById( 'salaryComponentAmount' )?.value || 0 );
+  const calculationType = document.getElementById( 'salaryComponentCalculationType' )?.value || 'FIXED';
+
+  if (!type) { alert('Component type tidak ditemukan.'); return; }
+  if (!name) { alert('Component Name wajib diisi.'); return; }
+  if (amount < 0) { alert('Amount tidak boleh negatif.'); return; }
+
+  /* === EDIT EXISTING COMPONENT === */
+  if (componentId) {
+    const index =
+      employeeSalaryComponents.findIndex(
+        component =>
+          component.Component_ID === componentId
+      );
+    if (index !== -1) {
+      employeeSalaryComponents[index] = {
+        ...employeeSalaryComponents[index],
+        Component_Type: type,
+        Component_Name: name,
+        Amount: amount,
+        Calculation_Type: calculationType,
+        Is_Active: true
+      };
+    }
+  }
+
+  /* === ADD NEW COMPONENT === */
+  else {
+    employeeSalaryComponents.push({
+      Component_ID: `TEMP-${crypto.randomUUID()}`,
+      Salary_ID: null,
+      Employee_ID: document.getElementById( 'salaryEmployeeId' )?.value || null,
+      Component_Type: type,
+      Component_Name: name,
+      Amount: amount,
+      Calculation_Type: calculationType,
+      Is_Active: true
+    });
+  }
+  renderSalaryComponents( employeeSalaryComponents );
+  closeSalaryComponentModal();
+};
+
+
+/* === EDIT SALARY COMPONENT === */
+window.editSalaryComponent = function (componentId) {
+  const component =
+    employeeSalaryComponents.find(
+      item =>
+        item.Component_ID === componentId
+    );
+
+  if (!component) return;
+
+  const modal = document.getElementById( 'salaryComponentModal' );
+
+  if (!modal) return;
+	
+  const title = document.getElementById( 'salaryComponentModalTitle' );
+  const typeInput = document.getElementById( 'salaryComponentType' );
+  const componentIdInput = document.getElementById( 'salaryComponentId' );
+  const nameInput = document.getElementById( 'salaryComponentName' );
+  const amountInput = document.getElementById( 'salaryComponentAmount' );
+  const calculationInput = document.getElementById( 'salaryComponentCalculationType' );
+
+  if (title) {
+    title.textContent = component.Component_Type === 'ALLOWANCE'
+			? 'Edit Allowance'
+			: 'Edit Deduction';
+  }
+
+  if (typeInput) { typeInput.value = component.Component_Type || ''; }
+  if (componentIdInput) { componentIdInput.value = component.Component_ID || ''; }
+  if (nameInput) { nameInput.value = component.Component_Name || ''; }
+  if (amountInput) { amountInput.value = component.Amount ?? 0; }
+  if (calculationInput) { calculationInput.value = component.Calculation_Type || 'FIXED'; }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+
+  if (nameInput) {
+    setTimeout(() => {
+      nameInput.focus();
+      nameInput.select();
+    }, 100);
+  }
+};
+
+/* === REMOVE SALARY COMPONENT === */
+window.removeSalaryComponent = function (componentId) {
+  const component =
+    employeeSalaryComponents.find(
+      item =>
+        item.Component_ID === componentId
+    );
+
+  if (!component) return;
+
+  const confirmed = confirm( `Hapus component "${component.Component_Name}"?` );
+
+  if (!confirmed) return;
+
+  employeeSalaryComponents =
+    employeeSalaryComponents.filter(
+      item =>
+        item.Component_ID !== componentId
+    );
+  renderSalaryComponents( employeeSalaryComponents );
+};
+
