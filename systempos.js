@@ -33380,7 +33380,13 @@ window.openSalaryComponentModal = function (type) {
   if (componentIdInput) { componentIdInput.value = ''; }
   if (nameInput) { nameInput.value = ''; }
   if (amountInput) { amountInput.value = ''; }
-  if (calculationInput) { calculationInput.value = 'FIXED'; }
+	if (calculationInput) {
+	  calculationInput.value = 'FIXED';
+	  calculationInput.onchange = updateSalaryComponentAmountUnit;
+	}
+	
+	updateSalaryComponentAmountUnit();
+	
   if (title) {
     title.textContent =
       type === 'ALLOWANCE'
@@ -33531,4 +33537,33 @@ window.removeSalaryComponent = function (componentId) {
     );
   renderSalaryComponents( employeeSalaryComponents );
 };
+
+function updateSalaryComponentAmountUnit() {
+  const calculationType = document.getElementById('salaryComponentCalculationType')?.value;
+  const prefix = document.getElementById('salaryComponentAmountPrefix');
+  const suffix = document.getElementById('salaryComponentAmountSuffix');
+  const amountInput = document.getElementById('salaryComponentAmount');
+
+  if (!prefix || !suffix || !amountInput) return;
+  if (calculationType === 'PERCENTAGE') {
+    prefix.classList.add('hidden');
+    suffix.classList.remove('hidden');
+
+    amountInput.classList.remove('pl-10');
+    amountInput.classList.add('pl-3');
+    amountInput.max = '100';
+    amountInput.step = '0.01';
+    amountInput.placeholder = '5';
+  } else {
+    prefix.classList.remove('hidden');
+    suffix.classList.add('hidden');
+
+    amountInput.classList.remove('pl-3');
+    amountInput.classList.add('pl-10');
+    amountInput.removeAttribute('max');
+    amountInput.step = '1';
+    amountInput.placeholder = '300000';
+  }
+}
+
 
