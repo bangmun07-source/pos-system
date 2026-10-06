@@ -32141,6 +32141,79 @@ let filteredEmployeeData = [];
 let employeeCurrentPage = 1;
 const employeePageSize = 10;
 
+async function loadEmployeeBranches() {
+  const select = document.getElementById('employeeBranch');
+  const filter = document.getElementById('employeeBranchFilter');
+
+  if (!select) return;
+
+  try {
+
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    const { data, error } =
+      await supabaseClient.rpc('get_expense_branches', {
+        p_session_id: sessionId
+      });
+
+    if (error) {
+      console.error('get_expense_branches error:', error);
+      throw error;
+    }
+
+    const branches = data || [];
+
+    select.innerHTML = ` <option value="">Select Outlet</option> `;
+
+    branches.forEach(branch => {
+      const branchId =
+        branch.Branch_ID ??
+        branch.branch_id;
+      const branchName =
+        branch.Branch_Name ??
+        branch.branch_name;
+
+      if (!branchId) return;
+
+      select.insertAdjacentHTML(
+        'beforeend',
+        `
+          <option value="${escapeEmployeeHtml(branchId)}">
+            ${escapeEmployeeHtml(branchName || branchId)}
+          </option>
+        `
+      );
+    });
+
+    if (filter) {
+      filter.innerHTML = ` <option value="">All Branch</option> `;
+
+      branches.forEach(branch => {
+        const branchId =
+          branch.Branch_ID ??
+          branch.branch_id;
+        const branchName =
+          branch.Branch_Name ??
+          branch.branch_name;
+
+        if (!branchId) return;
+
+        filter.insertAdjacentHTML(
+          'beforeend',
+          `
+            <option value="${escapeEmployeeHtml(branchId)}">
+              ${escapeEmployeeHtml(branchName || branchId)}
+            </option>
+          `
+        );
+      });
+    }
+
+  } catch (error) {
+    console.error('loadEmployeeBranches:', error);
+    select.innerHTML = ` <option value="">Failed to load outlet</option> `;
+  }
+}
 
 /* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
