@@ -23318,181 +23318,258 @@
     </main>
   </div>
   <!-- === EMPLOYEE MODAL === -->
-  <div id="employeeModal"
-    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+	<div id="employeeModal"
+	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-3xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            badge
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 id="employeeModalTitle"
+	            class="text-lg font-bold font-headline text-foreground">
+	            Add Employee
+	          </h2>
+	
+	          <p class="text-xs text-muted mt-1">
+	            Employee biodata and employment information
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeEmployeeModal()"
+	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">
+	          close
+	        </span>
+	      </button>
+	    </div>
+	    <!-- BODY -->
+	    <div class="p-5 space-y-6">
+	      <input id="employeeId" type="hidden">
+	      <!-- EMPLOYMENT INFORMATION -->
+	      <div>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employment Information
+	          </h3>
+	
+	          <p class="text-xs text-muted mt-1">
+	            Employee outlet and employment details
+	          </p>
+	        </div>
 
-    <div class="w-full max-w-3xl bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
-      <!-- HEADER -->
-      <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="main-icon-box">
-            <span class="material-symbols-outlined text-3xl">
-              badge
-            </span>
-          </div>
-				
-          <div>
-            <h2 id="employeeModalTitle"
-              class="text-lg font-bold font-headline text-foreground">
-              Add Employee
-            </h2>
-
-            <p class="text-xs text-muted mt-1">
-              Employee biodata and account information
-            </p>
-          </div>
-        </div>
-				
-        <button type="button"
-          onclick="closeEmployeeModal()"
-          class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
-          <span class="material-symbols-outlined">
-            close
-          </span>
-        </button>
-      </div>
-      <!-- BODY -->
-      <div class="p-5 space-y-5">
-        <input id="employeeId"
-          type="hidden">
-        <!-- BASIC INFORMATION -->
-        <div>
-          <div class="pb-3 border-b border-outline-variant mb-4">
-            <h3 class="text-sm font-semibold text-foreground">
-              Basic Information
-            </h3>
-
-            <p class="text-xs text-muted mt-1">
-              Employee personal and employment information
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Employee ID
-              </label>
-
-              <input id="employeeCode"
-                type="text"
-                placeholder="EMP001"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Full Name
-              </label>
-
-              <input id="employeeName"
-                type="text"
-                placeholder="Employee name"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Phone
-              </label>
-
-              <input id="employeePhone"
-                type="text"
-                placeholder="08xxxxxxxxxx"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Email
-              </label>
-
-              <input id="employeeEmail"
-                type="email"
-                placeholder="employee@email.com"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Position
-              </label>
-
-              <input id="employeePosition"
-                type="text"
-                placeholder="Cashier / Barista / Manager"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Outlet
-              </label>
-
-              <select id="employeeBranch"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-                <option value="">
-                  Select Outlet
-                </option>
-              </select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Join Date
-              </label>
-
-              <input id="employeeJoinDate"
-                type="date"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-foreground mb-2">
-                Status
-              </label>
-
-              <select id="employeeStatus"
-                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-                <option value="ACTIVE"> Active </option>
-                <option value="INACTIVE"> Inactive </option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <!-- ADDRESS -->
-        <div>
-          <div class="pb-3 border-b border-outline-variant mb-4">
-            <h3 class="text-sm font-semibold text-foreground">
-              Address
-            </h3>
-          </div>
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	          <!-- OUTLET -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Branch
+	            </label>
+	
+	            <select id="employeeBranch"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	              <option value=""> Select Outlet </option>
+	            </select>
+	          </div>
+	          <!-- FULL NAME -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Full Name
+	            </label>
+	
+	            <input id="employeeName"
+	              type="text"
+	              placeholder="Employee Name"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- POSITION -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Position
+	            </label>
+	
+	            <input id="employeePosition"
+	              type="text"
+	              placeholder="Employee Position"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- DEPARTMENT -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Department
+	            </label>
+	
+	            <input id="employeeDepartment"
+	              type="text"
+	              placeholder="Employee Department"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- HIRE DATE -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Hire Date
+	            </label>
+	
+	            <input id="employeeJoinDate"
+	              type="date"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- STATUS -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Status
+	            </label>
+	
+	            <select id="employeeStatus"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	              <option value="ACTIVE"> Active </option>
+	              <option value="INACTIVE"> Inactive </option>
+	            </select>
+	          </div>
+	        </div>
+	      </div>
+	      <!-- PERSONAL INFORMATION -->
+	      <div>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Personal Information
+	          </h3>
+	
+	          <p class="text-xs text-muted mt-1">
+	            Employee contact and personal information
+	          </p>
+	        </div>
 					
-          <textarea id="employeeAddress"
-            rows="3"
-            placeholder="Employee address"
-            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
-        </div>
-      </div>
-      <!-- FOOTER -->
-      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
-        <button type="button"
-          onclick="closeEmployeeModal()"
-          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
-          Cancel
-        </button>
-				
-        <button id="saveEmployeeButton"
-          type="button"
-          onclick="saveEmployee()"
-          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-          <span class="material-symbols-outlined text-sm">
-            save
-          </span>
-          Save Employee
-        </button>
-      </div>
-    </div>
-  </div>
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	          <!-- PHONE -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Phone
+	            </label>
+	
+	            <input id="employeePhone"
+	              type="text"
+	              placeholder="08xxxxxxxxxx"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- EMAIL -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Email
+	            </label>
+	
+	            <input id="employeeEmail"
+	              type="email"
+	              placeholder="employee@email.com"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- GENDER -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Gender
+	            </label>
+	
+	            <select id="employeeGender"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	              <option value=""> Select Gender </option>
+	              <option value="MALE"> Male </option>
+	              <option value="FEMALE"> </option>
+	            </select>
+	          </div>
+	          <!-- BIRTH DATE -->
+	          <div>
+	            <label class="block text-sm font-medium text-foreground mb-2">
+	              Birth Date
+	            </label>
+	
+	            <input id="employeeBirthDate"
+	              type="date"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          </div>
+	          <!-- PHOTO URL -->
+						<div class="md:col-span-2">
+							<label class="block text-sm font-medium text-foreground mb-2">
+								Employee Photo
+							</label>
+			
+							<div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+								<!-- PREVIEW -->
+								<div id="employeePhotoPreview"
+									class="w-20 h-20 rounded-md border border-outline-variant overflow-hidden bg-surface-container-high flex items-center justify-center">
+									<span class="material-symbols-outlined text-3xl text-muted">
+										person
+									</span>
+								</div>
+						
+								<div class="flex-1">
+									<input id="employeePhoto"
+										type="file"
+										accept="image/jpeg,image/png,image/webp"
+										class="block w-full text-sm text-foreground">
+						
+									<p class="text-xs text-muted mt-2">
+										JPG, PNG, or WebP. Maximum 2 MB.
+									</p>
+								</div>
+						</div>
+					</div>
+	      <!--  NOTES -->
+	      <div>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Additional Information
+	          </h3>
+	        </div>
+	        <!-- NOTES -->
+	        <div class="mb-4">
+	          <label class="block text-sm font-medium text-foreground mb-2">
+	            Notes
+	          </label>
+	
+	          <textarea id="employeeNotes"
+	            rows="3"
+	            placeholder="Additional notes"
+	            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+	
+	        </div>
+	        <!-- ADDRESS -->
+	        <div>
+	          <label class="block text-sm font-medium text-foreground mb-2">
+	            Address
+	          </label>
+	
+	          <textarea id="employeeAddress"
+	            rows="3"
+	            placeholder="Employee address"
+	            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+	        </div>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
+	      <button type="button"
+	        onclick="closeEmployeeModal()"
+	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	        Cancel
+	      </button>
+	
+	      <button id="saveEmployeeButton"
+	        type="button"
+	        onclick="saveEmployee()"
+	        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	        <span class="material-symbols-outlined text-sm">
+	          save
+	        </span>
+	        Save Employee
+	      </button>
+	    </div>
+	  </div>
+	</div>
   <!-- === EMPLOYEE DETAIL MODAL === -->
   <div id="employeeDetailModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
