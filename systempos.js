@@ -33162,3 +33162,58 @@ window.saveAttendanceAccount = async function () {
     );
   }
 };
+
+window.openEmployeeSalarySetting = function (employeeId) {
+  if (state.user.role !== 'Owner') { alert('Hanya Owner yang dapat mengatur salary employee.'); return; }
+
+  const employee = employeeData.find( e => e.Employee_ID === employeeId );
+
+  if (!employee) { alert('Employee tidak ditemukan.'); return; }
+
+  const modal =  document.getElementById('salaryModal');
+
+  if (!modal) return;
+
+  const employeeIdInput = document.getElementById('salaryEmployeeId');
+
+  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
+
+  const employeeName = document.getElementById('salaryEmployeeName');
+
+  if (employeeName) { employeeName.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
+
+  const basicSalary = document.getElementById('employeeBasicSalary');
+  const allowance = document.getElementById('employeeAllowance');
+  const deduction = document.getElementById('employeeDeduction');
+  const overtimeRate = document.getElementById('employeeOvertimeRate');
+  const effectiveFrom = document.getElementById('salaryEffectiveFrom');
+  const note = document.getElementById('salaryNote');
+
+  if (basicSalary) { basicSalary.value = ''; }
+  if (allowance) { allowance.value = '0'; }
+  if (deduction) { deduction.value = '0'; }
+  if (overtimeRate) { overtimeRate.value = '0'; }
+  if (effectiveFrom) { effectiveFrom.value = ''; }
+  if (note) { note.value = ''; }
+
+  // Open modal
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+window.closeSalaryModal = function () {
+  const modal = document.getElementById('salaryModal');
+
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+
+  // Reset
+  const employeeIdInput = document.getElementById('salaryEmployeeId');
+  const employeeName = document.getElementById('salaryEmployeeName');
+
+  if (employeeIdInput) { employeeIdInput.value = ''; }
+  if (employeeName) { employeeName.textContent = '-'; }
+};
