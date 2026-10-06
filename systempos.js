@@ -32296,6 +32296,55 @@ window.openEmployeeActionModal = function (employeeId) {
 };
 
 
+window.deleteEmployee = async function (employeeId) {
+  const employee = employeeData.find(e => e.Employee_ID === employeeId);
+
+  if (!employee) { alert('Employee tidak ditemukan.'); return; }
+
+  const confirmed = confirm( `Hapus employee "${employee.Full_Name}"?\n\nData employee akan dihapus permanen.` );
+
+  if (!confirmed) return;
+
+  try {
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        'delete_employee',
+        {
+          p_session_id: sessionId,
+          p_employee_id: employeeId
+        }
+      );
+
+    if (error) {
+      console.error(
+        'delete_employee RPC error:',
+        error
+      );
+      throw error;
+    }
+
+    console.log('Employee deleted:', data);
+
+    await loadEmployees();
+    alert('Employee berhasil dihapus.');
+
+  } catch (error) {
+    console.error(
+      'deleteEmployee:',
+      error
+    );
+
+    alert(
+      error?.message ||
+      'Gagal menghapus employee.'
+    );
+  }
+};
+
 /* === CLOSE EMPLOYEE ACTION MODAL === */
 window.closeEmployeeActionModal = function () {
   const modal = document.getElementById('employeeActionModal');
