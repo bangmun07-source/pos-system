@@ -24091,24 +24091,32 @@
 	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
 	      </div>
 	      <!-- AMOUNT -->
-	      <div>
-	        <label class="block text-sm font-medium text-foreground mb-2">
-	          Amount
-	        </label>
-	
-	        <div class="relative">
-	          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-	            Rp
-	          </span>
-	
-	          <input id="salaryComponentAmount"
-	            type="number"
-	            min="0"
-	            step="1"
-	            placeholder="300000"
-	            class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-	        </div>
-	      </div>
+				<div>
+				  <label class="block text-sm font-medium text-foreground mb-2">
+				    Amount
+				  </label>
+				
+				  <div class="relative">
+				    <!-- Rupiah -->
+				    <span id="salaryComponentAmountPrefix"
+				      class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				      Rp
+				    </span>
+				
+				    <!-- Percentage -->
+				    <span id="salaryComponentAmountSuffix"
+				      class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				      %
+				    </span>
+				
+				    <input id="salaryComponentAmount"
+				      type="number"
+				      min="0"
+				      step="1"
+				      placeholder="300000"
+				      class="w-full h-11 pl-10 pr-10 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+				  </div>
+				</div>
 	      <!-- CALCULATION TYPE -->
 	      <div>
 	        <label class="block text-sm font-medium text-foreground mb-2">
