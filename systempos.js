@@ -32268,7 +32268,6 @@ async function loadEmployeeBranches() {
 
 /* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
-
   document.getElementById('employeeModalTitle').textContent = 'Add Employee';
   document.getElementById('employeeId').value = '';
   document.getElementById('employeeCode').value = '';
@@ -32276,10 +32275,25 @@ window.openEmployeeModal = function () {
   document.getElementById('employeePhone').value = '';
   document.getElementById('employeeEmail').value = '';
   document.getElementById('employeePosition').value = '';
+  document.getElementById('employeeDepartment').value = '';
+  document.getElementById('employeeGender').value = '';
+  document.getElementById('employeeBirthDate').value = '';
   document.getElementById('employeeBranch').value = '';
   document.getElementById('employeeJoinDate').value = '';
   document.getElementById('employeeStatus').value = 'ACTIVE';
+  document.getElementById('employeePhoto').value = '';
+  document.getElementById('employeeNotes').value = '';
   document.getElementById('employeeAddress').value = '';
+
+  const preview = document.getElementById('employeePhotoPreview');
+
+  if (preview) {
+    preview.innerHTML = `
+      <span class="material-symbols-outlined text-3xl text-muted">
+        person
+      </span>
+    `;
+  }
 
   const modal = document.getElementById('employeeModal');
 
@@ -32299,71 +32313,201 @@ window.closeEmployeeModal = function () {
 
 
 /* === SAVE EMPLOYEE === */
+/* === SAVE EMPLOYEE === */
 window.saveEmployee = async function () {
-  const employeeId = document.getElementById('employeeId').value.trim();
-  const employeeCode = document.getElementById('employeeCode').value.trim();
-  const fullName = document.getElementById('employeeName').value.trim();
-  const phone = document.getElementById('employeePhone').value.trim();
-  const email = document.getElementById('employeeEmail').value.trim();
-  const position = document.getElementById('employeePosition').value.trim();
-  const hireDate = document.getElementById('employeeJoinDate').value || null;
-  const status = document.getElementById('employeeStatus').value;
-  const address = document.getElementById('employeeAddress').value.trim();
 
-  /* === BRANCH === */
+  const employeeId =
+    document.getElementById('employeeId').value.trim();
+
+  const fullName =
+    document.getElementById('employeeName').value.trim();
+
+  const phone =
+    document.getElementById('employeePhone').value.trim();
+
+  const email =
+    document.getElementById('employeeEmail').value.trim();
+
+  const position =
+    document.getElementById('employeePosition').value.trim();
+
+  const department =
+    document.getElementById('employeeDepartment').value.trim();
+
+  const gender =
+    document.getElementById('employeeGender').value;
+
+  const birthDate =
+    document.getElementById('employeeBirthDate').value || null;
+
+  const hireDate =
+    document.getElementById('employeeJoinDate').value || null;
+
+  const status =
+    document.getElementById('employeeStatus').value;
+
+  const notes =
+    document.getElementById('employeeNotes').value.trim();
+
+  const address =
+    document.getElementById('employeeAddress').value.trim();
+
+  const photoInput =
+    document.getElementById('employeePhoto');
+
+  const photoFile =
+    photoInput?.files?.[0] || null;
+
+
+  /* =========================================
+     BRANCH
+  ========================================= */
+
   const role = state.user.role;
+
   let branchId;
+
   if (role === "Owner") {
-    branchId = document.getElementById('employeeBranch').value;
+
+    branchId =
+      document.getElementById('employeeBranch').value;
+
   } else {
-    branchId = state.user.branchId;
+
+    branchId =
+      state.user.branchId;
   }
 
-  /* === VALIDATION === */
 
-  if (!employeeCode) { alert('Employee ID wajib diisi.'); return; }
-  if (!fullName) { alert('Full Name wajib diisi.'); return; }
-  if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
+  /* =========================================
+     VALIDATION
+  ========================================= */
+
+  if (!fullName) {
+    alert('Full Name wajib diisi.');
+    return;
+  }
+
+  if (!branchId) {
+    alert('Outlet tidak ditemukan.');
+    return;
+  }
+
+  if (!status) {
+    alert('Status employee wajib dipilih.');
+    return;
+  }
+
 
   try {
-    const sessionId = localStorage.getItem('pos_session_id');
 
-    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
+    const sessionId =
+      localStorage.getItem('pos_session_id');
+
+    if (!sessionId) {
+      throw new Error(
+        'Session POS tidak ditemukan.'
+      );
+    }
+
+
+    /* =========================================
+       UPLOAD PHOTO
+    ========================================= */
+
+    let photoUrl = null;
+
+    if (photoFile) {
+
+      photoUrl =
+        await uploadEmployeePhoto(photoFile);
+    }
+
+
+    /* =========================================
+       SAVE EMPLOYEE
+    ========================================= */
 
     const { data, error } =
-      await supabaseClient.rpc('save_employee', {
-        p_session_id: sessionId,
-        p_employee_id: employeeId || null,
-        p_employee_code: employeeCode,
-        p_full_name: fullName,
-        p_phone: phone || null,
-        p_email: email || null,
-        p_address: address || null,
-        p_gender: null,
-        p_birth_date: null,
-        p_position: position || null,
-        p_department: null,
-        p_branch_id: branchId,
-        p_hire_date: hireDate,
-        p_status: status,
-        p_photo_url: null,
-        p_notes: null
-      });
+      await supabaseClient.rpc(
+        'save_employee',
+        {
+          p_session_id: sessionId,
+
+          p_employee_id:
+            employeeId || null,
+
+          /*
+           * Employee Code sekarang
+           * dibuat otomatis oleh RPC.
+           */
+          p_employee_code: null,
+
+          p_full_name:
+            fullName,
+
+          p_phone:
+            phone || null,
+
+          p_email:
+            email || null,
+
+          p_address:
+            address || null,
+
+          p_gender:
+            gender || null,
+
+          p_birth_date:
+            birthDate,
+
+          p_position:
+            position || null,
+
+          p_department:
+            department || null,
+
+          p_branch_id:
+            branchId,
+
+          p_hire_date:
+            hireDate,
+
+          p_status:
+            status,
+
+          p_photo_url:
+            photoUrl,
+
+          p_notes:
+            notes || null
+        }
+      );
+
 
     if (error) {
+
       console.error(
         'save_employee RPC error:',
         error
       );
+
       throw error;
     }
+
 
     console.log(
       'Employee saved:',
       data
     );
 
+
+    /* =========================================
+       CLOSE + RELOAD
+    ========================================= */
+
     closeEmployeeModal();
+
     await loadEmployees();
 
     alert(
@@ -32373,6 +32517,7 @@ window.saveEmployee = async function () {
     );
 
   } catch (error) {
+
     console.error(
       'saveEmployee:',
       error
@@ -32384,6 +32529,101 @@ window.saveEmployee = async function () {
     );
   }
 };
+
+/* === UPLOAD EMPLOYEE PHOTO === */
+async function uploadEmployeePhoto(file) {
+
+  if (!file) return null;
+
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    throw new Error('Foto harus JPG, PNG, atau WebP.');
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    throw new Error('Ukuran foto maksimal 2 MB.');
+  }
+
+  const extension =
+    file.name.split('.').pop()?.toLowerCase() || 'jpg';
+
+  const fileName =
+    `${crypto.randomUUID()}.${extension}`;
+
+  const filePath =
+    `employees/${fileName}`;
+
+  const { error: uploadError } =
+    await supabaseClient.storage
+      .from('employee-photos')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      });
+
+  if (uploadError) {
+    console.error(
+      'Employee photo upload error:',
+      uploadError
+    );
+
+    throw uploadError;
+  }
+
+  const { data } =
+    supabaseClient.storage
+      .from('employee-photos')
+      .getPublicUrl(filePath);
+
+  return data?.publicUrl || null;
+}
+
+document.addEventListener('change', function (event) {
+
+  if (event.target.id !== 'employeePhoto') return;
+
+  const file = event.target.files?.[0];
+  const preview =
+    document.getElementById('employeePhotoPreview');
+
+  if (!preview) return;
+
+  if (!file) {
+    preview.innerHTML = `
+      <span class="material-symbols-outlined text-3xl text-muted">
+        person
+      </span>
+    `;
+    return;
+  }
+
+  if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    alert('Foto harus JPG, PNG, atau WebP.');
+    event.target.value = '';
+    return;
+  }
+
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Ukuran foto maksimal 2 MB.');
+    event.target.value = '';
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+
+    preview.innerHTML = `
+      <img
+        src="${e.target.result}"
+        alt="Employee Photo"
+        class="w-full h-full object-cover"
+      >
+    `;
+  };
+
+  reader.readAsDataURL(file);
+});
 
 
 /* ==== LOAD EMPLOYEES ==== */
