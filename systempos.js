@@ -33315,7 +33315,10 @@ function renderSalaryComponentRow(component) {
   const componentName = escapeEmployeeHtml( component.Component_Name || '-' );
   const amount = Number(component.Amount || 0);
   const calculationType = escapeEmployeeHtml( component.Calculation_Type || 'FIXED' );
-  const formattedAmount = new Intl.NumberFormat('id-ID').format( amount );
+  const formattedAmount = new Intl.NumberFormat('id-ID').format(amount);
+  const amountDisplay = component.Calculation_Type === 'PERCENTAGE'
+		? `${formattedAmount} %`
+		: `Rp ${formattedAmount}`;
 
   return `
     <div class="px-4 py-3 flex items-center justify-between gap-4 border-b border-outline-variant last:border-b-0">
@@ -33329,9 +33332,9 @@ function renderSalaryComponentRow(component) {
         </p>
       </div>
 	  
-      <div class="flex items-center gap-3 shrink-0">
+    	<div class="flex items-center gap-3 shrink-0">
         <span class="text-sm font-medium text-foreground">
-          Rp ${formattedAmount}
+          ${amountDisplay}
         </span>
 
         <button type="button"
@@ -33356,7 +33359,6 @@ function renderSalaryComponentRow(component) {
 
 
 /* ==== OPEN SALARY COMPONENT MODAL ===== */
-
 window.openSalaryComponentModal = function (type) {
   if (
     type !== 'ALLOWANCE' &&
