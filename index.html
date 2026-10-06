@@ -23491,64 +23491,64 @@
 	              type="date"
 	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
 	          </div>
-	          <!-- PHOTO URL -->
-						<div class="md:col-span-2">
-							<label class="block text-sm font-medium text-foreground mb-2">
-								Employee Photo
-							</label>
-			
-							<div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-								<!-- PREVIEW -->
-								<div id="employeePhotoPreview"
-									class="w-20 h-20 rounded-md border border-outline-variant overflow-hidden bg-surface-container-high flex items-center justify-center">
-									<span class="material-symbols-outlined text-3xl text-muted">
-										person
-									</span>
-								</div>
-						
-								<div class="flex-1">
-									<input id="employeePhoto"
-										type="file"
-										accept="image/jpeg,image/png,image/webp"
-										class="block w-full text-sm text-foreground">
-						
-									<p class="text-xs text-muted mt-2">
-										JPG, PNG, or WebP. Maximum 2 MB.
-									</p>
-								</div>
-						</div>
+	         <!-- PHOTO -->
+					<div class="md:col-span-2">
+					  <label class="block text-sm font-medium text-foreground mb-2">
+					    Employee Photo
+					  </label>
+					
+					  <div class="w-full flex flex-col sm:flex-row items-start sm:items-center gap-4">
+					    <!-- PREVIEW -->
+					    <div id="employeePhotoPreview"
+					      class="w-20 h-20 shrink-0 rounded-md border border-outline-variant overflow-hidden bg-surface-container-high flex items-center justify-center">
+					
+					      <span class="material-symbols-outlined text-3xl text-muted">
+					        person
+					      </span>
+					    </div>
+							
+					    <div class="flex-1 w-full">
+					      <input id="employeePhoto"
+					        type="file"
+					        accept="image/jpeg,image/png,image/webp"
+					        class="block w-full text-sm text-foreground">
+					
+					      <p class="text-xs text-muted mt-2">
+					        JPG, PNG, or WebP. Maximum 2 MB.
+					      </p>
+					    </div>
+					  </div>
 					</div>
-	      <!--  NOTES -->
-	      <div>
-	        <div class="pb-3 border-b border-outline-variant mb-4">
-	          <h3 class="text-sm font-semibold text-foreground">
-	            Additional Information
-	          </h3>
-	        </div>
-	        <!-- NOTES -->
-	        <div class="mb-4">
-	          <label class="block text-sm font-medium text-foreground mb-2">
-	            Notes
-	          </label>
-	
-	          <textarea id="employeeNotes"
-	            rows="3"
-	            placeholder="Additional notes"
-	            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
-	
-	        </div>
-	        <!-- ADDRESS -->
-	        <div>
-	          <label class="block text-sm font-medium text-foreground mb-2">
-	            Address
-	          </label>
-	
-	          <textarea id="employeeAddress"
-	            rows="3"
-	            placeholder="Employee address"
-	            class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
-	        </div>
-	      </div>
+					<!-- ADDITIONAL INFORMATION -->
+					<div class="md:col-span-2">
+					  <div class="pb-3 border-b border-outline-variant mb-4">
+					    <h3 class="text-sm font-semibold text-foreground">
+					      Additional Information
+					    </h3>
+					  </div>
+					  <!-- NOTES -->
+					  <div class="mb-4">
+					    <label class="block text-sm font-medium text-foreground mb-2">
+					      Notes
+					    </label>
+					
+					    <textarea id="employeeNotes"
+					      rows="3"
+					      placeholder="Additional notes"
+					      class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+					  </div>
+					  <!-- ADDRESS -->
+					  <div>
+					    <label class="block text-sm font-medium text-foreground mb-2">
+					      Address
+					    </label>
+					
+					    <textarea id="employeeAddress"
+					      rows="3"
+					      placeholder="Employee address"
+					      class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+					  </div>
+				</div>
 	    </div>
 	    <!-- FOOTER -->
 	    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
