@@ -33692,7 +33692,8 @@ async function openScheduleModal(schedule = null) {
 
   if (!modal) {
     console.error('scheduleModal tidak ditemukan.');
-    return; }
+    return;
+  }
 
   const role = state.user.role;
   const scheduleId = document.getElementById('scheduleId');
@@ -33700,20 +33701,30 @@ async function openScheduleModal(schedule = null) {
   const employeeSelect = document.getElementById('scheduleEmployee');
   const active = document.getElementById('scheduleActive');
   const weekStart = document.getElementById('scheduleWeekStart');
+
   const isEdit =
     !!schedule &&
     !!schedule.Employee_ID &&
     !!schedule.Week_Start;
-	
+
   editingScheduleWeek = isEdit;
+
   resetScheduleWorkingDays();
-	
-  if (scheduleId) { scheduleId.value = ''; }
-  if (active) { active.checked = true; }
+
+  if (scheduleId) {
+    scheduleId.value = '';
+  }
+
+  if (active) {
+    active.checked = true;
+  }
+
   if (weekStart) {
     weekStart.value = schedule?.Week_Start || '';
+
     weekStart.onchange = async function () {
       updateScheduleWeekDates();
+
       if (
         employeeSelect?.value &&
         this.value
@@ -33726,6 +33737,11 @@ async function openScheduleModal(schedule = null) {
     };
   }
 
+  /*
+   * ================================
+   * BRANCH + EMPLOYEE
+   * ================================
+   */
   if (branchSelect) {
     if (role === 'Owner') {
       branchSelect.disabled = false;
@@ -33737,8 +33753,10 @@ async function openScheduleModal(schedule = null) {
       );
     } else {
       const branchId = state.user.branchId;
+
       branchSelect.value = branchId || '';
       branchSelect.disabled = true;
+
       await loadScheduleEmployees(
         branchId,
         schedule?.Employee_ID || ''
@@ -33752,7 +33770,7 @@ async function openScheduleModal(schedule = null) {
         resetScheduleWorkingDays();
         return;
       }
-			
+
       if (weekStart?.value) {
         await loadScheduleWeek(
           this.value,
@@ -33764,25 +33782,156 @@ async function openScheduleModal(schedule = null) {
 
   if (branchSelect) {
     branchSelect.onchange = async function () {
-      await loadScheduleEmployees(
-        this.value
-      );
-      if (employeeSelect) { employeeSelect.value = ''; }
+      await loadScheduleEmployees(this.value);
+
+      if (employeeSelect) {
+        employeeSelect.value = '';
+      }
+
       resetScheduleWorkingDays();
     };
   }
 
+  /*
+   * =====================================================
+   * EDIT SCHEDULE
+   * =====================================================
+   *
+   * schedule = 1 row yang diklik dari table.
+   *
+   * scheduleData = seluruh data schedule yang sudah
+   *               di-load dari database.
+   *
+   * Kita ambil SEMUA 7 hari berdasarkan:
+   * Employee_ID + Week_Start.
+   */
   if (isEdit) {
-	  if (weekStart) {
-	    weekStart.value = schedule.Week_Start;
-	  }
-	
-	  await loadScheduleWeek(
-	    schedule.Employee_ID,
-	    schedule.Week_Start
-	  );
-	
-	} else {
+
+    if (weekStart) {
+      weekStart.value = schedule.Week_Start;
+    }
+
+    const employeeId = schedule.Employee_ID;
+    const selectedWeek = schedule.Week_Start;
+
+    const savedWeekData = scheduleData.filter(row =>
+      String(row.Employee_ID || '').trim() ===
+        String(employeeId || '').trim()
+      &&
+      String(row.Week_Start || '').substring(0, 10) ===
+        String(selectedWeek || '').substring(0, 10)
+    );
+
+    console.log('================================');
+    console.log('EDIT SCHEDULE');
+    console.log('Employee:', employeeId);
+    console.log('Week:', selectedWeek);
+    console.log('7 DATA TERSIMPAN:', savedWeekData);
+    console.table(savedWeekData);
+    console.log('================================');
+
+    /*
+     * Pastikan tanggal Senin-Minggu tersedia
+     */
+    const monday = new Date(`${selectedWeek}T00:00:00`);
+
+    const days = [
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY'
+    ];
+
+    days.forEach((day, index) => {
+      const date = new Date(monday);
+
+      date.setDate(
+        monday.getDate() + index
+      );
+
+      const year = date.getFullYear();
+      const month = String(
+        date.getMonth() + 1
+      ).padStart(2, '0');
+
+      const dayNumber = String(
+        date.getDate()
+      ).padStart(2, '0');
+
+      scheduleDayData[day].date =
+        `${year}-${month}-${dayNumber}`;
+    });
+
+    /*
+     * ==============================================
+     * MASUKKAN SEMUA DATA YANG SUDAH TERSIMPAN
+     * KE scheduleDayData
+     * ==============================================
+     */
+    savedWeekData.forEach(row => {
+
+      const day = String(
+        row.Day_Of_Week || ''
+      )
+        .trim()
+        .toUpperCase();
+
+      if (!scheduleDayData[day]) {
+        console.warn(
+          'Hari tidak dikenali:',
+          row.Day_Of_Week
+        );
+        return;
+      }
+
+      scheduleDayData[day] = {
+        active: row.Is_Active === true,
+
+        date:
+          row.Schedule_Date
+          || scheduleDayData[day].date
+          || '',
+
+        start:
+          row.Is_Active === true
+            ? formatScheduleTime(row.Start_Time)
+            : '',
+
+        end:
+          row.Is_Active === true
+            ? formatScheduleTime(row.End_Time)
+            : '',
+
+        break:
+          Number(row.Break_Minutes || 0)
+      };
+    });
+
+    console.log(
+      'scheduleDayData SESUDAH EDIT LOAD:',
+      JSON.parse(
+        JSON.stringify(scheduleDayData)
+      )
+    );
+
+    /*
+     * ==============================================
+     * TAMPILKAN MONDAY
+     * ==============================================
+     */
+    selectedScheduleDay = 'MONDAY';
+
+    updateScheduleDayButtons();
+    loadSelectedScheduleDay();
+
+  } else {
+
+    /*
+     * NEW SCHEDULE
+     */
     if (weekStart?.value) {
       updateScheduleWeekDates();
     } else {
@@ -33790,6 +33939,11 @@ async function openScheduleModal(schedule = null) {
       loadSelectedScheduleDay();
     }
   }
+
+  /*
+   * Baru tampilkan modal setelah semua data
+   * schedule sudah masuk.
+   */
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }
@@ -33835,11 +33989,13 @@ async function loadScheduleWeek( employeeId, weekStart ) {
       );
       return;
     }
-		console.log('=== EDIT SCHEDULE LOAD ===');
-console.log('employeeId:', employeeId);
-console.log('weekStart:', weekStart);
+console.log('==============================');
+console.log('EDIT SCHEDULE - LOAD WEEK');
+console.log('Employee ID:', employeeId);
+console.log('Week Start:', weekStart);
 console.log('RPC DATA:', data);
 console.table(data || []);
+console.log('==============================');
 
    resetScheduleWorkingDays();
 
