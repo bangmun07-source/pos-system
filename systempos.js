@@ -33812,7 +33812,6 @@ function openScheduleModal(schedule = null) {
   const scheduleId = document.getElementById('scheduleId');
   const branchSelect = document.getElementById('scheduleBranch');
   const employeeSelect = document.getElementById('scheduleEmployee');
-  const daySelect = document.getElementById('scheduleDay');
   const startTime = document.getElementById('scheduleStartTime');
   const endTime = document.getElementById('scheduleEndTime');
   const breakMinutes = document.getElementById('scheduleBreakMinutes');
@@ -33821,7 +33820,6 @@ function openScheduleModal(schedule = null) {
   /* === RESET FORM === */
   if (scheduleId) { scheduleId.value = schedule?.Schedule_ID || ''; }
   if (employeeSelect) { employeeSelect.value = schedule?.Employee_ID || ''; }
-  if (daySelect) { daySelect.value = schedule?.Day_Of_Week || 'MONDAY'; }
   if (startTime) { startTime.value = schedule?.Start_Time || ''; }
   if (endTime) { endTime.value = schedule?.End_Time || ''; }
   if (breakMinutes) { breakMinutes.value = schedule?.Break_Minutes ?? 0; }
@@ -33853,4 +33851,55 @@ function closeScheduleModal() {
 
   modal.classList.add('hidden');
   modal.classList.remove('flex');
+}
+
+function toggleScheduleDay(button) {
+  if (!button) return;
+
+  const isActive = button.dataset.active === 'true';
+
+  if (isActive) {
+    // OFF
+    button.dataset.active = 'false';
+    button.classList.remove(
+      'bg-green-600',
+      'text-white',
+      'border-green-600'
+    );
+    button.classList.add(
+      'bg-red-600',
+      'text-white',
+      'border-red-600'
+    );
+
+  } else {
+    // ON
+    button.dataset.active = 'true';
+    button.classList.remove(
+      'bg-red-600',
+      'border-red-600'
+    );
+    button.classList.add(
+      'bg-green-600',
+      'text-white',
+      'border-green-600'
+    );
+  }
+}
+
+function resetScheduleWorkingDays() {
+  document
+    .querySelectorAll('#scheduleWorkingDays .schedule-day-btn')
+    .forEach(button => {
+      button.dataset.active = 'false';
+      button.classList.remove(
+        'bg-green-600',
+        'border-green-600'
+      );
+      button.classList.add(
+        'bg-red-600',
+        'text-white',
+        'border-red-600'
+      );
+    });
 }
