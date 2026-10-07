@@ -33853,7 +33853,7 @@ function closeScheduleModal() {
   modal.classList.remove('flex');
 }
 
-function toggleScheduleDay(button) {
+window.toggleScheduleDay = function(button) {
   if (!button) return;
 
   const isActive = button.dataset.active === 'true';
@@ -33887,7 +33887,7 @@ function toggleScheduleDay(button) {
   }
 }
 
-function resetScheduleWorkingDays() {
+window.resetScheduleWorkingDays = function() {
   document
     .querySelectorAll('#scheduleWorkingDays .schedule-day-btn')
     .forEach(button => {
@@ -33902,4 +33902,4 @@ function resetScheduleWorkingDays() {
         'border-red-600'
       );
     });
-}
+};
