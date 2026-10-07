@@ -33823,9 +33823,6 @@ function openScheduleModal(schedule = null) {
   const scheduleId = document.getElementById('scheduleId');
   const branchSelect = document.getElementById('scheduleBranch');
   const employeeSelect = document.getElementById('scheduleEmployee');
-  const startTime = document.getElementById('scheduleStartTime');
-  const endTime = document.getElementById('scheduleEndTime');
-  const breakMinutes = document.getElementById('scheduleBreakMinutes');
   const active = document.getElementById('scheduleActive');
 
   /* === RESET FORM === */
@@ -33867,7 +33864,6 @@ function openScheduleModal(schedule = null) {
       branchSelect.disabled = true;
     }
   }
-
   /* === SHOW MODAL === */
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -33889,19 +33885,8 @@ window.selectScheduleDay = function(button) {
 
   if (!day || !scheduleDayData[day]) return;
 
-  /*
-   * Simpan input hari yang sedang dibuka
-   * sebelum pindah ke hari berikutnya.
-   */
   saveCurrentScheduleDayData();
-
-  /*
-   * Jika hari yang diklik masih OFF,
-   * otomatis aktifkan hari tersebut.
-   *
-   * Kalau sudah aktif, hanya pindah/selected
-   * tanpa mematikannya.
-   */
+	
   if (!scheduleDayData[day].active) {
     scheduleDayData[day].active = true;
   }
@@ -33993,10 +33978,6 @@ function updateScheduleDayButtons() {
         );
       }
 
-      /*
-       * Ring hanya menunjukkan hari
-       * yang sedang diedit.
-       */
       if (isSelected) {
         button.classList.add(
           'ring-2',
@@ -34005,7 +33986,6 @@ function updateScheduleDayButtons() {
       }
     });
 }
-
 
 window.resetScheduleWorkingDays = function() {
   scheduleDayData = {
