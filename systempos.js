@@ -33773,17 +33773,16 @@ async function openScheduleModal(schedule = null) {
   }
 
   if (isEdit) {
-    if (weekStart) {
-      weekStart.value = schedule.Week_Start;
-      updateScheduleWeekDates();
-    }
-
-    await loadScheduleWeek(
-      schedule.Employee_ID,
-      schedule.Week_Start
-    );
-
-  } else {
+	  if (weekStart) {
+	    weekStart.value = schedule.Week_Start;
+	  }
+	
+	  await loadScheduleWeek(
+	    schedule.Employee_ID,
+	    schedule.Week_Start
+	  );
+	
+	} else {
     if (weekStart?.value) {
       updateScheduleWeekDates();
     } else {
