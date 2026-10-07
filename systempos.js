@@ -33163,47 +33163,159 @@ window.saveAttendanceAccount = async function () {
 /* === SALARY SETTING === */
 window.openEmployeeSalarySetting = async function (employeeId) {
   /* === OWNER ONLY === */
-  if (state.user.role !== 'Owner') { alert('Hanya Owner yang dapat mengatur salary employee.'); return; }
+  if (state.user.role !== 'Owner') {
+    alert('Hanya Owner yang dapat mengatur salary employee.');
+    return;
+  }
 
-  const employee = employeeData.find( e => e.Employee_ID === employeeId );
+  const employee =
+    employeeData.find(e => e.Employee_ID === employeeId);
 
-  if (!employee) { alert('Employee tidak ditemukan.'); return; }
+  if (!employee) {
+    alert('Employee tidak ditemukan.');
+    return;
+  }
 
-  const modal = document.getElementById('salaryModal');
+  const modal =
+    document.getElementById('salaryModal');
 
   if (!modal) return;
 
-  const employeeIdInput = document.getElementById('salaryEmployeeId');
-  const employeeName = document.getElementById('salaryEmployeeName');
+  const employeeIdInput =
+    document.getElementById('salaryEmployeeId');
+
+  const employeeName =
+    document.getElementById('salaryEmployeeName');
 
   /* === SET EMPLOYEE === */
-  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
-  if (employeeName) { employeeName.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
+  if (employeeIdInput) {
+    employeeIdInput.value =
+      employee.Employee_ID || '';
+  }
+
+  if (employeeName) {
+    employeeName.textContent =
+      `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`;
+  }
 
   /* === RESET FORM === */
-  const basicSalary = document.getElementById('employeeBasicSalary');
-  const overtimeRate = document.getElementById('employeeOvertimeRate');
-  const effectiveFrom = document.getElementById('salaryEffectiveFrom');
-  const note = document.getElementById('salaryNote');
 
-  if (basicSalary) { basicSalary.value = ''; }
-  if (overtimeRate) { overtimeRate.value = '0'; }
-  if (effectiveFrom) { effectiveFrom.value = ''; }
-  if (note) { note.value = ''; }
+  const basicSalary =
+    document.getElementById('employeeBasicSalary');
 
-  /* === RESET COMPONENT LIST === */
+  const overtimeRate =
+    document.getElementById('employeeOvertimeRate');
+
+  const effectiveFrom =
+    document.getElementById('salaryEffectiveFrom');
+
+  const note =
+    document.getElementById('salaryNote');
+
+  if (basicSalary) basicSalary.value = '';
+  if (overtimeRate) overtimeRate.value = '0';
+  if (effectiveFrom) effectiveFrom.value = '';
+  if (note) note.value = '';
+
   renderSalaryComponents([]);
 
   /* === OPEN MODAL === */
+
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
-  /*
-   * RPC load salary existing
-   * akan kita pasang setelah RPC database
-   * sudah dibuat.
-   */
+  /* =====================================================
+     LOAD EXISTING SALARY
+  ===================================================== */
 
+  try {
+    const sessionId =
+      localStorage.getItem('pos_session_id');
+
+    if (!sessionId) {
+      throw new Error(
+        'Session POS tidak ditemukan.'
+      );
+    }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        'get_employee_salary',
+        {
+          p_session_id: sessionId,
+          p_employee_id: employeeId
+        }
+      );
+
+    if (error) {
+      console.error(
+        'get_employee_salary error:',
+        error
+      );
+
+      throw error;
+    }
+
+    const result =
+      typeof data === 'string'
+        ? JSON.parse(data)
+        : (data || {});
+
+    const salary =
+      result.salary || null;
+
+    const components =
+      Array.isArray(result.components)
+        ? result.components
+        : [];
+
+    /* === NO EXISTING SALARY === */
+
+    if (!salary) {
+      return;
+    }
+
+    /* === LOAD SALARY === */
+
+    if (basicSalary) {
+      basicSalary.value =
+        salary.Basic_Salary ?? 0;
+    }
+
+    if (overtimeRate) {
+      overtimeRate.value =
+        salary.Overtime_Rate ?? 0;
+    }
+
+    if (effectiveFrom) {
+      effectiveFrom.value =
+        salary.Effective_From || '';
+    }
+
+    if (note) {
+      note.value =
+        salary.Note || '';
+    }
+
+    /* === LOAD COMPONENTS === */
+
+    renderSalaryComponents(components);
+
+  } catch (error) {
+    console.error(
+      'openEmployeeSalarySetting:',
+      error
+    );
+
+    /*
+     * Modal tetap dibuka.
+     * Kalau gagal load, user masih bisa menutupnya.
+     */
+    alert(
+      error?.message ||
+      'Gagal memuat salary employee.'
+    );
+  }
 };
 
 /* === CLOSE SALARY MODAL === */
@@ -33505,7 +33617,12 @@ window.editSalaryComponent = function (componentId) {
   if (componentIdInput) { componentIdInput.value = component.Component_ID || ''; }
   if (nameInput) { nameInput.value = component.Component_Name || ''; }
   if (amountInput) { amountInput.value = component.Amount ?? 0; }
-  if (calculationInput) { calculationInput.value = component.Calculation_Type || 'FIXED'; }
+  if (calculationInput) {
+	  calculationInput.value = component.Calculation_Type || 'FIXED';
+	  calculationInput.onchange = updateSalaryComponentAmountUnit;
+	}
+	
+	updateSalaryComponentAmountUnit();
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -33538,6 +33655,85 @@ window.removeSalaryComponent = function (componentId) {
         item.Component_ID !== componentId
     );
   renderSalaryComponents( employeeSalaryComponents );
+};
+
+/* === SAVE SALARY === */
+
+window.saveEmployeeSalary = async function () {
+  /* === OWNER ONLY === */
+  if (state.user.role !== 'Owner') { alert( 'Hanya Owner yang dapat mengatur salary employee.' ); return; }
+
+  /* === FORM === */
+  const employeeId = document.getElementById( 'salaryEmployeeId' )?.value?.trim();
+  const basicSalary = Number( document.getElementById( 'employeeBasicSalary' )?.value || 0 );
+  const overtimeRate = Number( document.getElementById( 'employeeOvertimeRate' )?.value || 0 );
+  const effectiveFrom = document.getElementById( 'salaryEffectiveFrom' )?.value || null;
+  const note = document.getElementById( 'salaryNote' )?.value?.trim() || null;
+
+  /* === VALIDATION === */
+  if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
+  if (basicSalary < 0) { alert('Basic Salary tidak boleh negatif.'); return; }
+  if (overtimeRate < 0) { alert('Overtime Rate tidak boleh negatif.'); return; }
+  if (!effectiveFrom) { alert('Effective From wajib diisi.'); return; }
+
+  /* === SESSION === */
+  try {
+    const sessionId = localStorage.getItem( 'pos_session_id' );
+
+    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
+
+    /* === PREPARE COMPONENTS === */
+    const components =
+      employeeSalaryComponents.map(
+        component => ({
+          Component_ID: component.Component_ID || null,
+          Salary_ID: component.Salary_ID || null,
+          Employee_ID: employeeId,
+          Component_Type: component.Component_Type,
+          Component_Name: component.Component_Name,
+          Amount: Number(component.Amount || 0),
+          Calculation_Type: component.Calculation_Type || 'FIXED',
+          Is_Active: component.Is_Active !== false
+        })
+      );
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        'save_employee_salary',
+        {
+          p_session_id: sessionId,
+          p_employee_id: employeeId,
+          p_basic_salary: basicSalary,
+          p_overtime_rate: overtimeRate,
+          p_effective_from: effectiveFrom,
+          p_note: note,
+          p_components: components
+        }
+      );
+		
+    if (error) {
+      console.error(
+        'save_employee_salary error:',
+        error
+      );
+      throw error;
+    }
+    console.log(
+      'Employee salary saved:',
+      data
+    );
+
+    closeSalaryModal();
+    alert( 'Salary employee berhasil disimpan.' );
+
+  } catch (error) {
+    console.error(
+      'saveEmployeeSalary:',
+      error
+    );
+
+    alert( error?.message || 'Gagal menyimpan salary employee.' );
+  }
 };
 
 function updateSalaryComponentAmountUnit() {
