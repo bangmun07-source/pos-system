@@ -33719,6 +33719,7 @@ async function openScheduleModal(schedule = null) {
   if (active) { active.checked = schedule?.Is_Active ?? true; }
 	if (weekStart) { weekStart.value = schedule?.Week_Start || ''; }
 	if (weekStart?.value) { updateScheduleWeekDates(); }
+	if (weekStart) { weekStart.onchange = updateScheduleWeekDates; }
 	if (schedule?.Day_Of_Week) {
 	  const day = schedule.Day_Of_Week;
 		
@@ -33821,7 +33822,18 @@ function loadSelectedScheduleDay() {
   const breakMinutes = document.getElementById('scheduleBreakMinutes');
   const status = document.getElementById('scheduleDayStatus');
 	
-  if (selectedDay) { selectedDay.textContent = day; }
+  if (selectedDay) {
+  const dateText = data.date
+    ? new Date(`${data.date}T00:00:00`).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      })
+    : '';
+
+  selectedDay.textContent =
+    dateText ? `${day} • ${dateText}` : day;
+}
   if (startTime) { startTime.value = data.start || ''; }
   if (endTime) { endTime.value = data.end || ''; }
   if (breakMinutes) { breakMinutes.value = data.break ?? 0; }
@@ -33932,9 +33944,6 @@ window.resetScheduleWorkingDays = function() {
 	};
 
   selectedScheduleDay = 'MONDAY';
-	const weekStart = document.getElementById('scheduleWeekStart');
-	
-	if (weekStart) { weekStart.value = ''; }
   updateScheduleDayButtons();
   loadSelectedScheduleDay();
 };
