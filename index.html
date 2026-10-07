@@ -24202,23 +24202,64 @@
             <option value=""> Select Employee </option>
           </select>
         </div>
-
-        <div>
-          <label class="block text-sm font-medium text-foreground mb-2">
-            Day
-          </label>
-
-          <select id="scheduleDay"
-            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            <option value="MONDAY"> Monday </option>
-            <option value="TUESDAY"> Tuesday </option>
-            <option value="WEDNESDAY"> Wednesday </option>
-            <option value="THURSDAY"> Thursday </option>
-            <option value="FRIDAY"> Friday </option>
-            <option value="SATURDAY"> Saturday </option>
-            <option value="SUNDAY"> Sunday </option>
-          </select>
-        </div>
+        <!-- WORKING DAYS -->
+				<div>
+				  <label class="block text-sm font-medium text-foreground mb-2">
+				    Working Days
+				  </label>
+				
+				  <div id="scheduleWorkingDays"
+				    class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+				    <button type="button"
+				      data-day="MONDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      MON
+				    </button>
+				
+				    <button type="button"
+				      data-day="TUESDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      TUE
+				    </button>
+				
+				    <button type="button"
+				      data-day="WEDNESDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      WED
+				    </button>
+				
+				    <button type="button"
+				      data-day="THURSDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      THU
+				    </button>
+				
+				    <button type="button"
+				      data-day="FRIDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      FRI
+				    </button>
+				
+				    <button type="button"
+				      data-day="SATURDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      SAT
+				    </button>
+				
+				    <button type="button"
+				      data-day="SUNDAY"
+				      onclick="toggleScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      SUN
+				    </button>
+				  </div>
+				</div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
