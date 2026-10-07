@@ -34067,6 +34067,262 @@ window.saveSchedule = async function() {
   }
 }
 
+async function loadSchedules() {
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    console.error('Session ID tidak ditemukan.');
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'get_employee_schedules',
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) {
+      console.error('get_employee_schedules:', error);
+      alert(error.message || 'Gagal mengambil employee schedule.');
+      return;
+    }
+
+    scheduleData = data || [];
+
+    console.log('Schedule data:', scheduleData);
+
+    populateScheduleFilters();
+    filterSchedules();
+
+  } catch (error) {
+    console.error('loadSchedules:', error);
+  }
+}
+
+function populateScheduleFilters() {
+  const employeeFilter =
+    document.getElementById('scheduleEmployeeFilter');
+
+  const branchFilter =
+    document.getElementById('scheduleBranchFilter');
+
+  const weekFilter =
+    document.getElementById('scheduleWeekFilter');
+
+  if (employeeFilter) {
+    const currentValue = employeeFilter.value;
+
+    employeeFilter.innerHTML =
+      `<option value="">All Employees</option>`;
+
+    const employees = [...new Map(
+      scheduleData.map(row => [
+        row.Employee_ID,
+        {
+          id: row.Employee_ID,
+          name: row.Full_Name,
+          code: row.Employee_Code
+        }
+      ])
+    ).values()];
+
+    employees.forEach(employee => {
+      const option = document.createElement('option');
+
+      option.value = employee.id;
+      option.textContent =
+        `${employee.name || '-'} • ${employee.code || '-'}`;
+
+      employeeFilter.appendChild(option);
+    });
+
+    employeeFilter.value = currentValue;
+  }
+
+  if (branchFilter) {
+    const currentValue = branchFilter.value;
+
+    branchFilter.innerHTML =
+      `<option value="">All Branch</option>`;
+
+    const branches = [
+      ...new Set(
+        scheduleData
+          .map(row => String(row.Branch_ID || '').trim())
+          .filter(Boolean)
+      )
+    ];
+
+    branches.forEach(branchId => {
+      const option = document.createElement('option');
+
+      option.value = branchId;
+      option.textContent = branchId;
+
+      branchFilter.appendChild(option);
+    });
+
+    branchFilter.value = currentValue;
+  }
+
+  if (weekFilter) {
+    const currentValue = weekFilter.value;
+
+    weekFilter.innerHTML =
+      `<option value="">Current Week</option>`;
+
+    const weeks = [
+      ...new Set(
+        scheduleData
+          .map(row => row.Week_Start)
+          .filter(Boolean)
+      )
+    ].sort().reverse();
+
+    weeks.forEach(week => {
+      const option = document.createElement('option');
+
+      option.value = week;
+      option.textContent = formatScheduleDate(week);
+
+      weekFilter.appendChild(option);
+    });
+
+    weekFilter.value = currentValue;
+  }
+}
+
+function renderSchedules(data = []) {
+  const tbody = document.getElementById('scheduleTableBody');
+
+  if (!tbody) return;
+
+  if (!data.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8"
+          class="px-5 py-10 text-center text-muted">
+          No employee schedule data
+        </td>
+      </tr>
+    `;
+    updateSchedulePaginationInfo(0, 0, 0);
+    return;
+  }
+
+  tbody.innerHTML = data.map(row => {
+    const isActive = row.Is_Active === true;
+    const start = isActive
+      ? formatScheduleTime(row.Start_Time)
+      : '-';
+    const end = isActive
+      ? formatScheduleTime(row.End_Time)
+      : '-';
+    const breakMinutes = isActive
+      ? `${Number(row.Break_Minutes || 0)} min`
+      : '-';
+    const statusClass = isActive
+      ? 'text-green-600'
+      : 'text-red-600';
+    const statusText = isActive
+      ? 'ON'
+      : 'OFF';
+
+    return `
+      <tr class="hover:bg-background/50">
+
+        <td class="px-5 py-3">
+          <div class="font-medium text-foreground">
+            ${escapeHtml(row.Full_Name || '-')}
+          </div>
+          <div class="text-xs text-muted">
+            ${escapeHtml(row.Employee_Code || '-')}
+          </div>
+        </td>
+
+        <td class="px-5 py-3 text-center">
+          ${escapeHtml(row.Branch_ID || '-')}
+        </td>
+
+        <td class="px-5 py-3">
+          <div class="font-medium">
+            ${escapeHtml(row.Day_Of_Week || '-')}
+          </div>
+          <div class="text-xs text-muted">
+            ${formatScheduleDate(row.Schedule_Date)}
+          </div>
+        </td>
+
+        <td class="px-5 py-3">
+          ${start}
+        </td>
+
+        <td class="px-5 py-3">
+          ${end}
+        </td>
+
+        <td class="px-5 py-3">
+          ${breakMinutes}
+        </td>
+
+        <td class="px-5 py-3 text-center">
+          <span class="font-semibold ${statusClass}">
+            ${statusText}
+          </span>
+        </td>
+
+        <td class="px-5 py-3 text-center">
+          <button
+            type="button"
+            onclick='openScheduleModal(${JSON.stringify(row).replace(/'/g, "&#39;")})'
+            class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background"
+            title="Edit Schedule">
+            <span class="material-symbols-outlined text-base">
+              edit
+            </span>
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  updateSchedulePaginationInfo(data.length, data.length, data.length);
+}
+
+function formatScheduleDate(date) {
+  if (!date) return '-';
+
+  return new Date(`${date}T00:00:00`).toLocaleDateString(
+    'en-GB',
+    {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    }
+  );
+}
+
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function updateSchedulePaginationInfo(from, to, total) {
+  const info = document.getElementById('schedulePaginationInfo');
+
+  if (!info) return;
+  if (!total) {
+    info.textContent = 'Showing 0–0 of 0';
+    return;
+  }
+  info.textContent = `Showing ${from}–${to} of ${total}`;
+}
+
 function loadSelectedScheduleDay() {
   const day = selectedScheduleDay;
   const data = scheduleDayData[day];
