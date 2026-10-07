@@ -32166,6 +32166,7 @@ async function loadEmployeeBranches() {
       : (data || []);
     const modalSelect = document.getElementById("employeeBranch");
     const filterSelect = document.getElementById("employeeBranchFilter");
+		const scheduleBranchSelect = document.getElementById("scheduleBranch");
     const role = state.user.role;
 
     if (role === "Owner") {
@@ -32203,6 +32204,25 @@ async function loadEmployeeBranches() {
         });
         filterSelect.disabled = false;
       }
+			// SCHEDULE BRANCH
+			if (scheduleBranchSelect) {
+			  scheduleBranchSelect.innerHTML =
+			    `<option value="">Select Outlet</option>`;
+			
+			  branches.forEach(branch => {
+			    const option = document.createElement("option");
+			
+			    option.value = branch.id || "";
+			    option.textContent =
+			      branch.name ||
+			      branch.id ||
+			      "Unnamed Branch";
+			
+			    scheduleBranchSelect.appendChild(option);
+			  });
+			
+			  scheduleBranchSelect.disabled = false;
+			}
     } else {
       const branchId = state.user.branchId;
       const userBranch = branches.find(branch =>
@@ -32227,7 +32247,6 @@ async function loadEmployeeBranches() {
         modalSelect.value = branchId || "";
         modalSelect.disabled = true;
       }
-
       // FILTER EMPLOYEE
       if (filterSelect) {
         filterSelect.innerHTML = '';
@@ -32240,6 +32259,19 @@ async function loadEmployeeBranches() {
         filterSelect.value = branchId || "";
         filterSelect.disabled = true;
       }
+			// SCHEDULE BRANCH
+			if (scheduleBranchSelect) {
+			  scheduleBranchSelect.innerHTML = '';
+			
+			  const option = document.createElement("option");
+			
+			  option.value = branchId || "";
+			  option.textContent = `Outlet: ${branchName}`;
+			
+			  scheduleBranchSelect.appendChild(option);
+			  scheduleBranchSelect.value = branchId || "";
+			  scheduleBranchSelect.disabled = true;
+			}
     }
   } catch (error) {
     console.error(
