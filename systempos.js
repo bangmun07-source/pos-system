@@ -34102,20 +34102,14 @@ async function loadSchedules() {
 }
 
 function populateScheduleFilters() {
-  const employeeFilter =
-    document.getElementById('scheduleEmployeeFilter');
-
-  const branchFilter =
-    document.getElementById('scheduleBranchFilter');
-
-  const weekFilter =
-    document.getElementById('scheduleWeekFilter');
+  const employeeFilter = document.getElementById('scheduleEmployeeFilter');
+  const branchFilter = document.getElementById('scheduleBranchFilter');
+  const weekFilter = document.getElementById('scheduleWeekFilter');
 
   if (employeeFilter) {
     const currentValue = employeeFilter.value;
 
-    employeeFilter.innerHTML =
-      `<option value="">All Employees</option>`;
+    employeeFilter.innerHTML = `<option value="">All Employees</option>`;
 
     const employees = [...new Map(
       scheduleData.map(row => [
@@ -34132,20 +34126,16 @@ function populateScheduleFilters() {
       const option = document.createElement('option');
 
       option.value = employee.id;
-      option.textContent =
-        `${employee.name || '-'} • ${employee.code || '-'}`;
-
+      option.textContent = `${employee.name || '-'} • ${employee.code || '-'}`;
       employeeFilter.appendChild(option);
     });
-
     employeeFilter.value = currentValue;
   }
 
   if (branchFilter) {
     const currentValue = branchFilter.value;
-
-    branchFilter.innerHTML =
-      `<option value="">All Branch</option>`;
+		
+    branchFilter.innerHTML = `<option value="">All Branch</option>`;
 
     const branches = [
       ...new Set(
@@ -34160,18 +34150,15 @@ function populateScheduleFilters() {
 
       option.value = branchId;
       option.textContent = branchId;
-
       branchFilter.appendChild(option);
     });
-
     branchFilter.value = currentValue;
   }
 
   if (weekFilter) {
     const currentValue = weekFilter.value;
-
-    weekFilter.innerHTML =
-      `<option value="">Current Week</option>`;
+		
+    weekFilter.innerHTML = `<option value="">Current Week</option>`;
 
     const weeks = [
       ...new Set(
@@ -34186,13 +34173,47 @@ function populateScheduleFilters() {
 
       option.value = week;
       option.textContent = formatScheduleDate(week);
-
       weekFilter.appendChild(option);
     });
 
     weekFilter.value = currentValue;
   }
 }
+
+window.filterSchedules = function() {
+  const week = document.getElementById('scheduleWeekFilter')?.value || '';
+  const employeeId = document.getElementById('scheduleEmployeeFilter')?.value || '';
+  const branchId = document.getElementById('scheduleBranchFilter')?.value || '';
+  const day = document.getElementById('scheduleDayFilter')?.value || '';
+
+  let filtered = [...scheduleData];
+
+  if (week) {
+    filtered = filtered.filter(row =>
+      String(row.Week_Start || '') === String(week)
+    );
+  }
+
+  if (employeeId) {
+    filtered = filtered.filter(row =>
+      String(row.Employee_ID || '') === String(employeeId)
+    );
+  }
+
+  if (branchId) {
+    filtered = filtered.filter(row =>
+      String(row.Branch_ID || '') === String(branchId)
+    );
+  }
+
+  if (day) {
+    filtered = filtered.filter(row =>
+      String(row.Day_Of_Week || '') === String(day)
+    );
+  }
+
+  renderSchedules(filtered);
+};
 
 function renderSchedules(data = []) {
   const tbody = document.getElementById('scheduleTableBody');
