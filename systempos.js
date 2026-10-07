@@ -32192,7 +32192,6 @@ async function loadEmployeeBranches() {
         filterSelect.disabled = false;
       }
     }
-
     
     else {
       const userBranch = branches.find( branch => branch.id === state.user.branchId );
@@ -32666,12 +32665,21 @@ async function loadEmployees() {
   try {
     const sessionId = localStorage.getItem('pos_session_id');
 
-    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+    if (!sessionId) {
+      throw new Error('Session POS tidak ditemukan.');
+    }
+
+    const role = state.user.role;
+
+    const branchFilter =
+      role === 'Owner'
+        ? (document.getElementById('employeeBranchFilter')?.value || null)
+        : state.user.branchId;
 
     const { data, error } =
       await supabaseClient.rpc('get_employees', {
         p_session_id: sessionId,
-        p_branch_id: state.branchId,
+        p_branch_id: branchFilter,
         p_status: null,
         p_search: null
       });
@@ -32688,25 +32696,6 @@ async function loadEmployees() {
       ? data
       : [];
 
-		console.log(
-		  'PHOTO:',
-		  employeeData.map(e => ({
-		    name: e.Full_Name,
-		    photo: e.Photo_URL
-		  }))
-		);
-
-    /* DEBUG PHOTO */
-    console.log('EMPLOYEE DATA:', employeeData);
-
-    employeeData.forEach(employee => {
-      console.log(
-        employee.Full_Name,
-        '=>',
-        employee.Photo_URL
-      );
-    });
-
     filteredEmployeeData = [...employeeData];
     employeeCurrentPage = 1;
 
@@ -32721,33 +32710,41 @@ async function loadEmployees() {
 
     employeeData = [];
     filteredEmployeeData = [];
-
     renderEmployeeTable();
     updateEmployeeSummary();
   }
 }
 
 /* === FILTER EMPLOYEES === */
-window.filterEmployees = function () {
+window.filterEmployees = async function () {
   const search = document.getElementById('employeeSearch')
 		?.value
 		?.trim()
 		.toLowerCase() || '';
   const status = document.getElementById('employeeStatusFilter') ?.value || '';
-  const branch = document.getElementById('employeeBranchFilter') ?.value || '';
-
+  /* === OWNER: LOAD ULANG SESUAI BRANCH DROPDOWN === */
+  if (state.user.role === 'Owner') {
+    await loadEmployees();
+  }
+  /* === SEARCH + STATUS FILTER === */
   filteredEmployeeData = employeeData.filter(employee => {
     const searchMatch =
       !search ||
-      String(employee.Full_Name || '').toLowerCase().includes(search) ||
-      String(employee.Employee_Code || '').toLowerCase().includes(search) ||
-      String(employee.Position || '').toLowerCase().includes(search);
+      String(employee.Full_Name || '')
+        .toLowerCase()
+        .includes(search) ||
+      String(employee.Employee_Code || '')
+        .toLowerCase()
+        .includes(search) ||
+      String(employee.Position || '')
+        .toLowerCase()
+        .includes(search);
+    const statusMatch =
+      !status ||
+      employee.Status === status;
 
-    const statusMatch = !status || employee.Status === status;
-    const branchMatch = !branch || employee.Branch_ID === branch;
-    return searchMatch && statusMatch && branchMatch;
+    return searchMatch && statusMatch;
   });
-
   employeeCurrentPage = 1;
   renderEmployeeTable();
 };
