@@ -34009,6 +34009,11 @@ window.saveSchedule = async function() {
   }
 
   try {
+		console.log('SAVE SCHEDULE PARAMS:', {
+		  branchId,
+		  employeeId,
+		  weekStart
+		});
     const { data, error } =
       await supabaseClient.rpc(
         'save_employee_schedule_week',
