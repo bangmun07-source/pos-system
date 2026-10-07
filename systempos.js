@@ -33837,41 +33837,64 @@ async function loadScheduleWeek( employeeId, weekStart ) {
       return;
     }
 
-    /*
-     * Reset dulu supaya hari yang tidak ada
-     * tidak membawa data lama.
-     */
-    resetScheduleWorkingDays();
-    /*
-     * Isi tanggal berdasarkan Week Start
-     */
-    const weekInput = document.getElementById( 'scheduleWeekStart' );
+   resetScheduleWorkingDays();
 
-    if (weekInput) { weekInput.value = weekStart; }
-
-    updateScheduleWeekDates();
-    /*
-     * Isi data dari database
-     */
-    (data || []).forEach(row => {
-
-      const day = row.Day_Of_Week;
-
-      if (!scheduleDayData[day]) { return; }
-
-      scheduleDayData[day] = {
-        active: row.Is_Active === true,
-        date: row.Schedule_Date || '',
-        start: row.Is_Active
-					? formatScheduleTime(row.Start_Time)
-					: '',
-        end: row.Is_Active
-					? formatScheduleTime(row.End_Time)
-					: '',
-        break: Number(row.Break_Minutes || 0)
-      };
-    });
-
+	const weekInput = document.getElementById('scheduleWeekStart');
+	
+	if (weekInput) {
+		weekInput.value = weekStart;
+	}
+	
+	/*
+	 * Isi tanggal minggu terlebih dahulu,
+	 * tanpa mengubah data schedule yang akan di-load.
+	 */
+	const monday = new Date(`${weekStart}T00:00:00`);
+	
+	const days = [
+		'MONDAY',
+		'TUESDAY',
+		'WEDNESDAY',
+		'THURSDAY',
+		'FRIDAY',
+		'SATURDAY',
+		'SUNDAY'
+	];
+	
+	days.forEach((day, index) => {
+		const date = new Date(monday);
+		date.setDate(monday.getDate() + index);
+	
+		const year = date.getFullYear();
+		const month = String(date.getMonth() + 1).padStart(2, '0');
+		const dayNumber = String(date.getDate()).padStart(2, '0');
+	
+		scheduleDayData[day].date =
+			`${year}-${month}-${dayNumber}`;
+	});
+	
+	/*
+	 * Isi data schedule dari database
+	 */
+	(data || []).forEach(row => {
+		const day = row.Day_Of_Week;
+	
+		if (!scheduleDayData[day]) {
+			return;
+		}
+	
+		scheduleDayData[day] = {
+			active: row.Is_Active === true,
+			date: row.Schedule_Date || '',
+			start: row.Is_Active
+				? formatScheduleTime(row.Start_Time)
+				: '',
+			end: row.Is_Active
+				? formatScheduleTime(row.End_Time)
+				: '',
+			break: Number(row.Break_Minutes || 0)
+		};
+	});
     /*
      * Tampilkan hari pertama
      */
