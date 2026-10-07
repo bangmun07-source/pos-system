@@ -24267,11 +24267,8 @@
 				  <div class="flex items-center justify-between mb-4">
 				    <div>
 				      <p class="text-sm font-semibold text-foreground">
-				        <span id="scheduleSelectedDay">
-				          MONDAY
-				        </span>
+				        <span id="scheduleSelectedDay">MONDAY</span>
 				      </p>
-				
 				      <p class="text-xs text-muted mt-1">
 				        Set working hours for this day
 				      </p>
@@ -24282,13 +24279,12 @@
 				      OFF
 				    </span>
 				  </div>
-				  <!-- START / END -->
-				  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				
+				  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 				    <div>
 				      <label class="block text-sm font-medium text-foreground mb-2">
 				        Start Time
 				      </label>
-				
 				      <input id="scheduleStartTime"
 				        type="time"
 				        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
@@ -24298,28 +24294,28 @@
 				      <label class="block text-sm font-medium text-foreground mb-2">
 				        End Time
 				      </label>
-				
 				      <input id="scheduleEndTime"
 				        type="time"
 				        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
 				    </div>
-				  </div>
-				  <!-- BREAK -->
-				  <div class="mt-4">
-				    <label class="block text-sm font-medium text-foreground mb-2">
-				      Break Duration
-				    </label>
 				
-				    <div class="relative">
-				      <input id="scheduleBreakMinutes"
-				        type="number"
-				        min="0"
-				        step="1"
-				        value="0"
-				        class="w-full h-11 px-3 pr-14 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-				      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-				        min
-				      </span>
+				    <div>
+				      <label class="block text-sm font-medium text-foreground mb-2">
+				        Break
+				      </label>
+				
+				      <div class="relative">
+				        <input id="scheduleBreakMinutes"
+				          type="number"
+				          min="0"
+				          step="1"
+				          value="0"
+				          class="w-full h-11 px-3 pr-14 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+			
+				        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				          min
+				        </span>
+				      </div>
 				    </div>
 				  </div>
 				</div>
