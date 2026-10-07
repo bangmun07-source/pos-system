@@ -33928,7 +33928,7 @@ function saveCurrentScheduleDayData() {
   scheduleDayData[day].break = Number(breakMinutes?.value || 0);
 }
 
-async function saveSchedule() {
+window.saveSchedule = async function() {
 
   const sessionId = localStorage.getItem('pos_session_id');
   const branchSelect = document.getElementById('scheduleBranch');
