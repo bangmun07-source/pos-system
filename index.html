@@ -24210,97 +24210,119 @@
 				
 				  <div id="scheduleWorkingDays"
 				    class="grid grid-cols-4 sm:grid-cols-7 gap-2">
+				
 				    <button type="button"
 				      data-day="MONDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      MON
 				    </button>
 				
 				    <button type="button"
 				      data-day="TUESDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      TUE
 				    </button>
 				
 				    <button type="button"
 				      data-day="WEDNESDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      WED
 				    </button>
 				
 				    <button type="button"
 				      data-day="THURSDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      THU
 				    </button>
 				
 				    <button type="button"
 				      data-day="FRIDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      FRI
 				    </button>
 				
 				    <button type="button"
 				      data-day="SATURDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      SAT
 				    </button>
 				
 				    <button type="button"
 				      data-day="SUNDAY"
-				      onclick="toggleScheduleDay(this)"
-				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-background text-muted text-sm font-medium transition">
+				      onclick="selectScheduleDay(this)"
+				      class="schedule-day-btn h-10 rounded-md border border-outline-variant bg-red-600 text-white text-sm font-medium transition">
 				      SUN
 				    </button>
 				  </div>
 				</div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-foreground mb-2">
-              Start Time
-            </label>
-
-            <input id="scheduleStartTime"
-              type="time"
-              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-foreground mb-2">
-              End Time
-            </label>
-
-            <input id="scheduleEndTime"
-              type="time"
-              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-foreground mb-2">
-            Break Duration
-          </label>
-
-          <div class="relative">
-            <input id="scheduleBreakMinutes"
-              type="number"
-              min="0"
-              step="1"
-              value="0"
-              class="w-full h-11 px-3 pr-14 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-              min
-            </span>
-          </div>
-        </div>
+				<!-- SELECTED DAY -->
+				<div id="scheduleDaySettings"
+				  class="border border-outline-variant rounded-md p-4">
+				  <div class="flex items-center justify-between mb-4">
+				    <div>
+				      <p class="text-sm font-semibold text-foreground">
+				        <span id="scheduleSelectedDay">
+				          MONDAY
+				        </span>
+				      </p>
+				
+				      <p class="text-xs text-muted mt-1">
+				        Set working hours for this day
+				      </p>
+				    </div>
+				
+				    <span id="scheduleDayStatus"
+				      class="text-xs font-medium text-red-600">
+				      OFF
+				    </span>
+				  </div>
+				  <!-- START / END -->
+				  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				    <div>
+				      <label class="block text-sm font-medium text-foreground mb-2">
+				        Start Time
+				      </label>
+				
+				      <input id="scheduleStartTime"
+				        type="time"
+				        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+				    </div>
+				
+				    <div>
+				      <label class="block text-sm font-medium text-foreground mb-2">
+				        End Time
+				      </label>
+				
+				      <input id="scheduleEndTime"
+				        type="time"
+				        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+				    </div>
+				  </div>
+				  <!-- BREAK -->
+				  <div class="mt-4">
+				    <label class="block text-sm font-medium text-foreground mb-2">
+				      Break Duration
+				    </label>
+				
+				    <div class="relative">
+				      <input id="scheduleBreakMinutes"
+				        type="number"
+				        min="0"
+				        step="1"
+				        value="0"
+				        class="w-full h-11 px-3 pr-14 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+				      <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				        min
+				      </span>
+				    </div>
+				  </div>
+				</div>
 
         <div class="border border-outline-variant rounded-md p-4 flex items-center justify-between gap-4">
           <div>
