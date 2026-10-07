@@ -32236,7 +32236,6 @@ async function loadEmployeeBranches() {
 
         option.value = branchId || "";
         option.textContent = `Outlet: ${branchName}`;
-
         filterSelect.appendChild(option);
         filterSelect.value = branchId || "";
         filterSelect.disabled = true;
@@ -32524,10 +32523,6 @@ async function uploadEmployeePhoto(file) {
   if (file.size > 2 * 1024 * 1024) { throw new Error('Ukuran foto karyawan maksimal 2 MB.'); }
 
   const compressedFile = await compressEmployeePhoto(file);
-  console.log(
-    'Employee photo:',
-    `${(file.size / 1024).toFixed(0)} KB → ${(compressedFile.size / 1024).toFixed(0)} KB`
-  );
   const fileName = `${crypto.randomUUID()}.webp`;
   const filePath = `employees/${fileName}`;
   const { error: uploadError } =
@@ -32539,13 +32534,7 @@ async function uploadEmployeePhoto(file) {
         contentType: 'image/webp'
       });
 
-  if (uploadError) {
-    console.error(
-      'Employee photo upload error:',
-      uploadError
-    );
-    throw uploadError;
-  }
+  if (uploadError) { throw uploadError; }
 
   const { data } = supabaseClient.storage
 	.from('employee-photos')
@@ -32706,12 +32695,9 @@ async function loadEmployees() {
     }
 
     const role = state.user.role;
-
-    const branchFilter =
-      role === 'Owner'
-        ? (document.getElementById('employeeBranchFilter')?.value || null)
-        : state.user.branchId;
-
+    const branchFilter = role === 'Owner'
+			? (document.getElementById('employeeBranchFilter')?.value || null)
+			: state.user.branchId;
     const { data, error } =
       await supabaseClient.rpc('get_employees', {
         p_session_id: sessionId,
@@ -32720,13 +32706,7 @@ async function loadEmployees() {
         p_search: null
       });
 
-    if (error) {
-      console.error(
-        'get_employees error:',
-        error
-      );
-      throw error;
-    }
+    if (error) { throw error; }
 
     employeeData = Array.isArray(data)
       ? data
@@ -32739,11 +32719,6 @@ async function loadEmployees() {
     updateEmployeeSummary();
 
   } catch (error) {
-    console.error(
-      'loadEmployees:',
-      error
-    );
-
     employeeData = [];
     filteredEmployeeData = [];
     renderEmployeeTable();
@@ -32811,7 +32786,6 @@ function renderEmployeeTable() {
       const statusClass = employee.Status === 'ACTIVE'
 				? 'text-green-500'
 				: 'text-muted';
-
       return `
         <tr class="hover:bg-surface-container-high transition">
           <td class="px-5 py-4">
@@ -32858,7 +32832,6 @@ function renderEmployeeTable() {
   updateEmployeePagination(total, start, end);
 }
 
-
 /* === EMPLOYEE SUMMARY === */
 function updateEmployeeSummary() {
   const total = employeeData.length;
@@ -32877,11 +32850,9 @@ function updateEmployeePagination(total, start, end) {
   const prev = document.getElementById('employeePrevButton');
   const next = document.getElementById('employeeNextButton');
 
-  if (info) {
-    info.textContent =
-      total === 0
-        ? 'Showing 0–0 of 0'
-        : `Showing ${start + 1}–${end} of ${total}`;
+  if (info) { info.textContent = total === 0
+		? 'Showing 0–0 of 0'
+		: `Showing ${start + 1}–${end} of ${total}`;
   }
 
   const totalPages = Math.max(1, Math.ceil(total / employeePageSize));
@@ -32964,12 +32935,10 @@ window.editEmployee = function (employeeId) {
       `;
     }
   }
-
   /* === OPEN MODAL === */
   const modal = document.getElementById('employeeModal');
 
   if (!modal) return;
-
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
@@ -32979,7 +32948,6 @@ window.viewEmployee = function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
 
   if (!employee) return;
-
   /* === PHOTO === */
 	const photo = document.getElementById('detailEmployeePhoto');
 	
@@ -33001,7 +32969,6 @@ window.viewEmployee = function (employeeId) {
 	    `;
 	  }
 	}
-
   /* === EMPLOYEE DETAIL === */
   document.getElementById('detailEmployeeCode').textContent = employee.Employee_Code || '-';
   document.getElementById('detailEmployeeName').textContent = employee.Full_Name || '-';
@@ -33012,12 +32979,10 @@ window.viewEmployee = function (employeeId) {
   document.getElementById('detailEmployeeJoinDate').textContent = employee.Hire_Date || '-';
   document.getElementById('detailEmployeeStatus').textContent = employee.Status || '-';
   document.getElementById('detailEmployeeAddress').textContent = employee.Address || '-';
-
   /* === OPEN DETAIL MODAL === */
   const modal = document.getElementById('employeeDetailModal');
 
   if (!modal) return;
-
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
@@ -33028,7 +32993,6 @@ window.closeEmployeeDetailModal = function () {
   const modal = document.getElementById('employeeDetailModal');
 
   if (!modal) return;
-
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
@@ -33054,13 +33018,7 @@ window.editEmployeeAttendanceAccount = async function (employeeId) {
         }
       );
 
-    if (error) {
-      console.error(
-        'get_employee_attendance_account error:',
-        error
-      );
-      throw error;
-    }
+    if (error) { throw error; }
 		
     const account = Array.isArray(data)
 			? data[0] || null
@@ -33090,28 +33048,14 @@ window.editEmployeeAttendanceAccount = async function (employeeId) {
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-
-    /*
-     * Fokus ke Account ID saat Add.
-     * Saat Edit juga tetap nyaman langsung edit Account ID.
-     */
     if (accountIdInput) {
       setTimeout(() => {
         accountIdInput.focus();
         accountIdInput.select();
-      }, 100);
+      }, 50);
     }
-
   } catch (error) {
-    console.error(
-      'editEmployeeAttendanceAccount:',
-      error
-    );
-
-    alert(
-      error?.message ||
-      'Gagal memuat attendance account.'
-    );
+    alert( error?.message || 'Gagal memuat attendance account.' );
   }
 };
 
@@ -33165,31 +33109,13 @@ window.saveAttendanceAccount = async function () {
         }
       );
 
-    if (error) {
-      console.error(
-        'save_employee_attendance_account error:',
-        error
-      );
-      throw error;
-    }
-
-    console.log(
-      'Attendance account saved:',
-      data
-    );
+    if (error) { throw error; }
 
     closeAttendanceAccountModal();
     alert( 'Attendance account berhasil disimpan.' );
 	  
   } catch (error) {
-    console.error(
-      'saveAttendanceAccount:',
-      error
-    );
-    alert(
-      error?.message ||
-      'Gagal menyimpan attendance account.'
-    );
+    alert( error?.message || 'Gagal menyimpan attendance account.' );
   }
 };
 
@@ -33201,49 +33127,24 @@ window.openEmployeeSalarySetting = async function (employeeId) {
     return;
   }
 
-  const employee =
-    employeeData.find(e => e.Employee_ID === employeeId);
+  const employee = employeeData.find(e => e.Employee_ID === employeeId);
 
-  if (!employee) {
-    alert('Employee tidak ditemukan.');
-    return;
-  }
+  if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
-  const modal =
-    document.getElementById('salaryModal');
+  const modal = document.getElementById('salaryModal');
 
   if (!modal) return;
 
-  const employeeIdInput =
-    document.getElementById('salaryEmployeeId');
-
-  const employeeName =
-    document.getElementById('salaryEmployeeName');
-
+  const employeeIdInput = document.getElementById('salaryEmployeeId');
+  const employeeName = document.getElementById('salaryEmployeeName');
   /* === SET EMPLOYEE === */
-  if (employeeIdInput) {
-    employeeIdInput.value =
-      employee.Employee_ID || '';
-  }
-
-  if (employeeName) {
-    employeeName.textContent =
-      `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`;
-  }
-
+  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
+  if (employeeName) { employeeName.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
   /* === RESET FORM === */
-
-  const basicSalary =
-    document.getElementById('employeeBasicSalary');
-
-  const overtimeRate =
-    document.getElementById('employeeOvertimeRate');
-
-  const effectiveFrom =
-    document.getElementById('salaryEffectiveFrom');
-
-  const note =
-    document.getElementById('salaryNote');
+  const basicSalary = document.getElementById('employeeBasicSalary');
+  const overtimeRate = document.getElementById('employeeOvertimeRate');
+  const effectiveFrom = document.getElementById('salaryEffectiveFrom');
+  const note = document.getElementById('salaryNote');
 
   if (basicSalary) basicSalary.value = '';
   if (overtimeRate) overtimeRate.value = '0';
@@ -33251,25 +33152,15 @@ window.openEmployeeSalarySetting = async function (employeeId) {
   if (note) note.value = '';
 
   renderSalaryComponents([]);
-
   /* === OPEN MODAL === */
-
   modal.classList.remove('hidden');
   modal.classList.add('flex');
-
-  /* =====================================================
-     LOAD EXISTING SALARY
-  ===================================================== */
-
+  /* ==== LOAD EXISTING SALARY ==== */
   try {
     const sessionId =
       localStorage.getItem('pos_session_id');
 
-    if (!sessionId) {
-      throw new Error(
-        'Session POS tidak ditemukan.'
-      );
-    }
+    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
 
     const { data, error } =
       await supabaseClient.rpc(
@@ -33280,74 +33171,26 @@ window.openEmployeeSalarySetting = async function (employeeId) {
         }
       );
 
-    if (error) {
-      console.error(
-        'get_employee_salary error:',
-        error
-      );
+    if (error) { throw error; }
 
-      throw error;
-    }
-
-    const result =
-      typeof data === 'string'
-        ? JSON.parse(data)
-        : (data || {});
-
-    const salary =
-      result.salary || null;
-
-    const components =
-      Array.isArray(result.components)
-        ? result.components
-        : [];
-
+    const result = typeof data === 'string'
+			? JSON.parse(data)
+			: (data || {});
+    const salary = result.salary || null;
+    const components = Array.isArray(result.components)
+			? result.components
+			: [];
     /* === NO EXISTING SALARY === */
-
-    if (!salary) {
-      return;
-    }
-
+    if (!salary) { return; }
     /* === LOAD SALARY === */
-
-    if (basicSalary) {
-      basicSalary.value =
-        salary.Basic_Salary ?? 0;
-    }
-
-    if (overtimeRate) {
-      overtimeRate.value =
-        salary.Overtime_Rate ?? 0;
-    }
-
-    if (effectiveFrom) {
-      effectiveFrom.value =
-        salary.Effective_From || '';
-    }
-
-    if (note) {
-      note.value =
-        salary.Note || '';
-    }
-
+    if (basicSalary) { basicSalary.value = salary.Basic_Salary ?? 0; }
+    if (overtimeRate) { overtimeRate.value = salary.Overtime_Rate ?? 0; }
+    if (effectiveFrom) { effectiveFrom.value = salary.Effective_From || ''; }
+    if (note) { note.value = salary.Note || ''; }
     /* === LOAD COMPONENTS === */
-
     renderSalaryComponents(components);
-
   } catch (error) {
-    console.error(
-      'openEmployeeSalarySetting:',
-      error
-    );
-
-    /*
-     * Modal tetap dibuka.
-     * Kalau gagal load, user masih bisa menutupnya.
-     */
-    alert(
-      error?.message ||
-      'Gagal memuat salary employee.'
-    );
+    alert( error?.message || 'Gagal memuat salary employee.' );
   }
 };
 
@@ -33358,15 +33201,12 @@ window.closeSalaryModal = function () {
   if (!modal) return;
   modal.classList.add('hidden');
   modal.classList.remove('flex');
-
   /* === RESET EMPLOYEE === */
-
   const employeeIdInput = document.getElementById('salaryEmployeeId');
   const employeeName = document.getElementById('salaryEmployeeName');
 
   if (employeeIdInput) { employeeIdInput.value = ''; }
   if (employeeName) { employeeName.textContent = '-'; }
-
   /* === RESET SALARY === */
   const basicSalary = document.getElementById('employeeBasicSalary');
   const overtimeRate = document.getElementById('employeeOvertimeRate');
@@ -33381,9 +33221,7 @@ window.closeSalaryModal = function () {
   renderSalaryComponents([]);
 };
 
-
 /* === SALARY COMPONENT STATE ==== */
-
 let employeeSalaryComponents = [];
 
 function renderSalaryComponents(components = []) {
@@ -33502,16 +33340,13 @@ function renderSalaryComponentRow(component) {
   `;
 }
 
-
 /* ==== OPEN SALARY COMPONENT MODAL ===== */
 window.openSalaryComponentModal = function (type) {
   if (
     type !== 'ALLOWANCE' &&
     type !== 'DEDUCTION'
-  ) {
-    return;
-  }
-
+  ) { return; }
+	
   const modal = document.getElementById('salaryComponentModal');
 
   if (!modal) return;
@@ -33547,7 +33382,7 @@ window.openSalaryComponentModal = function (type) {
   if (nameInput) {
     setTimeout(() => {
       nameInput.focus();
-    }, 100);
+    }, 50);
   }
 };
 
@@ -33664,7 +33499,7 @@ window.editSalaryComponent = function (componentId) {
     setTimeout(() => {
       nameInput.focus();
       nameInput.select();
-    }, 100);
+    }, 50);
   }
 };
 
@@ -33695,26 +33530,22 @@ window.removeSalaryComponent = function (componentId) {
 window.saveEmployeeSalary = async function () {
   /* === OWNER ONLY === */
   if (state.user.role !== 'Owner') { alert( 'Hanya Owner yang dapat mengatur salary employee.' ); return; }
-
   /* === FORM === */
   const employeeId = document.getElementById( 'salaryEmployeeId' )?.value?.trim();
   const basicSalary = Number( document.getElementById( 'employeeBasicSalary' )?.value || 0 );
   const overtimeRate = Number( document.getElementById( 'employeeOvertimeRate' )?.value || 0 );
   const effectiveFrom = document.getElementById( 'salaryEffectiveFrom' )?.value || null;
   const note = document.getElementById( 'salaryNote' )?.value?.trim() || null;
-
   /* === VALIDATION === */
   if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
   if (basicSalary < 0) { alert('Basic Salary tidak boleh negatif.'); return; }
   if (overtimeRate < 0) { alert('Overtime Rate tidak boleh negatif.'); return; }
   if (!effectiveFrom) { alert('Effective From wajib diisi.'); return; }
-
   /* === SESSION === */
   try {
     const sessionId = localStorage.getItem( 'pos_session_id' );
 
     if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
-
     /* === PREPARE COMPONENTS === */
     const components =
       employeeSalaryComponents.map(
@@ -33744,27 +33575,11 @@ window.saveEmployeeSalary = async function () {
         }
       );
 		
-    if (error) {
-      console.error(
-        'save_employee_salary error:',
-        error
-      );
-      throw error;
-    }
-    console.log(
-      'Employee salary saved:',
-      data
-    );
+    if (error) { throw error; }
 
     closeSalaryModal();
     alert( 'Salary employee berhasil disimpan.' );
-
   } catch (error) {
-    console.error(
-      'saveEmployeeSalary:',
-      error
-    );
-
     alert( error?.message || 'Gagal menyimpan salary employee.' );
   }
 };
@@ -33779,7 +33594,6 @@ function updateSalaryComponentAmountUnit() {
   if (calculationType === 'PERCENTAGE') {
     prefix.classList.add('hidden');
     suffix.classList.remove('hidden');
-
     amountInput.classList.remove('pl-10');
     amountInput.classList.add('pl-3');
     amountInput.max = '100';
@@ -33788,7 +33602,6 @@ function updateSalaryComponentAmountUnit() {
   } else {
     prefix.classList.remove('hidden');
     suffix.classList.add('hidden');
-
     amountInput.classList.remove('pl-3');
     amountInput.classList.add('pl-10');
     amountInput.removeAttribute('max');
@@ -33809,10 +33622,66 @@ let scheduleDayData = {
   SATURDAY:  { active: false, start: '', end: '', break: 0 },
   SUNDAY:    { active: false, start: '', end: '', break: 0 }
 };
-
 let selectedScheduleDay = 'MONDAY';
 
-function openScheduleModal(schedule = null) {
+async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
+  const employeeSelect = document.getElementById('scheduleEmployee');
+
+  if (!employeeSelect) return;
+
+  employeeSelect.innerHTML =
+    `<option value="">Select Employee</option>`;
+
+  if (!branchId) return;
+
+  const employees = employeeData.filter(employee =>
+    String(employee.Branch_ID || '').trim() ===
+    String(branchId || '').trim() &&
+    employee.Status === 'ACTIVE'
+  );
+
+  employees.forEach(employee => {
+    const option = document.createElement('option');
+
+    option.value = employee.Employee_ID;
+    option.textContent = `${employee.Full_Name} • ${employee.Employee_Code}`;
+    employeeSelect.appendChild(option);
+  });
+
+  if (selectedEmployeeId) {
+    employeeSelect.value = selectedEmployeeId;
+  }
+}
+
+async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
+  const employeeSelect = document.getElementById('scheduleEmployee');
+
+  if (!employeeSelect) return;
+
+  employeeSelect.innerHTML = ` <option value="">Select Employee</option> `;
+
+  if (!branchId) return;
+
+  const employees = employeeData.filter(employee =>
+    String(employee.Branch_ID || '').trim() ===
+    String(branchId || '').trim() &&
+    employee.Status === 'ACTIVE'
+  );
+
+  employees.forEach(employee => {
+    const option = document.createElement('option');
+
+    option.value = employee.Employee_ID;
+    option.textContent = `${employee.Full_Name} • ${employee.Employee_Code}`;
+    employeeSelect.appendChild(option);
+  });
+
+  if (selectedEmployeeId) {
+    employeeSelect.value = selectedEmployeeId;
+  }
+}
+
+async function openScheduleModal(schedule = null) {
   const modal = document.getElementById('scheduleModal');
 
   if (!modal) {
@@ -33851,19 +33720,33 @@ function openScheduleModal(schedule = null) {
 	  }
 	}
   /* === OUTLET ==== */
-  if (branchSelect) {
-    if (role === 'Owner') {
-      branchSelect.disabled = false;
-      branchSelect.value = schedule?.Branch_ID || '';
-    } else {
-      const branchId = state.user.branchId;
-      branchSelect.value =
-        schedule?.Branch_ID ||
-        branchId ||
-        '';
-      branchSelect.disabled = true;
-    }
-  }
+	if (branchSelect) {
+	  if (role === 'Owner') {
+	    branchSelect.disabled = false;
+	    branchSelect.value = schedule?.Branch_ID || '';
+	
+	    await loadScheduleEmployees(
+	      schedule?.Branch_ID || '',
+	      schedule?.Employee_ID || ''
+	    );
+	
+	  } else {
+	    const branchId = state.user.branchId;
+	
+	    branchSelect.value = branchId || '';
+	    branchSelect.disabled = true;
+	
+	    await loadScheduleEmployees(
+	      branchId,
+	      schedule?.Employee_ID || ''
+	    );
+	  }
+	}
+	if (branchSelect) {
+	  branchSelect.onchange = async function () {
+	    await loadScheduleEmployees(this.value);
+	  };
+	}
   /* === SHOW MODAL === */
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -33873,7 +33756,6 @@ function closeScheduleModal() {
   const modal = document.getElementById('scheduleModal');
 
   if (!modal) return;
-
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 }
