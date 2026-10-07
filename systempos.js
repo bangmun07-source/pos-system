@@ -33800,6 +33800,17 @@ function updateSalaryComponentAmountUnit() {
 /* =========================================================
    									EMPLOYEE SCHEDULE
 ========================================================= */
+let scheduleDayData = {
+  MONDAY:    { active: false, start: '', end: '', break: 0 },
+  TUESDAY:   { active: false, start: '', end: '', break: 0 },
+  WEDNESDAY: { active: false, start: '', end: '', break: 0 },
+  THURSDAY:  { active: false, start: '', end: '', break: 0 },
+  FRIDAY:    { active: false, start: '', end: '', break: 0 },
+  SATURDAY:  { active: false, start: '', end: '', break: 0 },
+  SUNDAY:    { active: false, start: '', end: '', break: 0 }
+};
+
+let selectedScheduleDay = 'MONDAY';
 
 function openScheduleModal(schedule = null) {
   const modal = document.getElementById('scheduleModal');
@@ -33820,10 +33831,28 @@ function openScheduleModal(schedule = null) {
   /* === RESET FORM === */
   if (scheduleId) { scheduleId.value = schedule?.Schedule_ID || ''; }
   if (employeeSelect) { employeeSelect.value = schedule?.Employee_ID || ''; }
-  if (startTime) { startTime.value = schedule?.Start_Time || ''; }
-  if (endTime) { endTime.value = schedule?.End_Time || ''; }
-  if (breakMinutes) { breakMinutes.value = schedule?.Break_Minutes ?? 0; }
   if (active) { active.checked = schedule?.Is_Active ?? true; }
+
+	/* === RESET / LOAD WORKING DAYS === */
+	resetScheduleWorkingDays();
+	
+	if (schedule?.Day_Of_Week) {
+	  const day = schedule.Day_Of_Week;
+		
+	  if (scheduleDayData[day]) {
+	    scheduleDayData[day] = {
+	      active: true,
+	      start: schedule.Start_Time || '',
+	      end: schedule.End_Time || '',
+	      break: Number(schedule.Break_Minutes || 0)
+	    };
+	
+	    selectedScheduleDay = day;
+	
+	    updateScheduleDayButtons();
+	    loadSelectedScheduleDay();
+	  }
+	}
   /* === OUTLET ==== */
   if (branchSelect) {
     if (role === 'Owner') {
@@ -33853,53 +33882,144 @@ function closeScheduleModal() {
   modal.classList.remove('flex');
 }
 
-window.toggleScheduleDay = function(button) {
+window.selectScheduleDay = function(button) {
   if (!button) return;
 
-  const isActive = button.dataset.active === 'true';
+  const day = button.dataset.day;
 
-  if (isActive) {
-    // OFF
-    button.dataset.active = 'false';
-    button.classList.remove(
-      'bg-green-600',
-      'text-white',
-      'border-green-600'
-    );
-    button.classList.add(
-      'bg-red-600',
-      'text-white',
-      'border-red-600'
+  if (!day || !scheduleDayData[day]) return;
+
+  /*
+   * Simpan input hari yang sedang dibuka
+   * sebelum pindah ke hari berikutnya.
+   */
+  saveCurrentScheduleDayData();
+
+  /*
+   * Jika hari yang diklik masih OFF,
+   * otomatis aktifkan hari tersebut.
+   *
+   * Kalau sudah aktif, hanya pindah/selected
+   * tanpa mematikannya.
+   */
+  if (!scheduleDayData[day].active) {
+    scheduleDayData[day].active = true;
+  }
+
+  selectedScheduleDay = day;
+
+  updateScheduleDayButtons();
+  loadSelectedScheduleDay();
+};
+
+
+function saveCurrentScheduleDayData() {
+  const day = selectedScheduleDay;
+
+  if (!day || !scheduleDayData[day]) return;
+
+  const startTime = document.getElementById('scheduleStartTime');
+  const endTime = document.getElementById('scheduleEndTime');
+  const breakMinutes = document.getElementById('scheduleBreakMinutes');
+
+  scheduleDayData[day].start = startTime?.value || '';
+  scheduleDayData[day].end = endTime?.value || '';
+  scheduleDayData[day].break = Number(breakMinutes?.value || 0);
+}
+
+
+function loadSelectedScheduleDay() {
+  const day = selectedScheduleDay;
+  const data = scheduleDayData[day];
+
+  if (!data) return;
+
+  const selectedDay = document.getElementById('scheduleSelectedDay');
+  const startTime = document.getElementById('scheduleStartTime');
+  const endTime = document.getElementById('scheduleEndTime');
+  const breakMinutes = document.getElementById('scheduleBreakMinutes');
+  const status = document.getElementById('scheduleDayStatus');
+	
+  if (selectedDay) { selectedDay.textContent = day; }
+  if (startTime) { startTime.value = data.start || ''; }
+  if (endTime) { endTime.value = data.end || ''; }
+  if (breakMinutes) { breakMinutes.value = data.break ?? 0; }
+  if (status) {
+    status.textContent = data.active ? 'ON' : 'OFF';
+    status.classList.remove(
+      'text-red-600',
+      'text-green-600'
     );
 
-  } else {
-    // ON
-    button.dataset.active = 'true';
-    button.classList.remove(
-      'bg-red-600',
-      'border-red-600'
-    );
-    button.classList.add(
-      'bg-green-600',
-      'text-white',
-      'border-green-600'
+    status.classList.add(
+      data.active
+        ? 'text-green-600'
+        : 'text-red-600'
     );
   }
 }
 
-window.resetScheduleWorkingDays = function() {
+
+function updateScheduleDayButtons() {
   document
-    .querySelectorAll('#scheduleWorkingDays .schedule-day-btn')
+    .querySelectorAll( '#scheduleWorkingDays .schedule-day-btn' )
     .forEach(button => {
-      button.dataset.active = 'false';
+      const day = button.dataset.day;
+      if (!scheduleDayData[day]) return;
+
+      const isActive = scheduleDayData[day].active;
+      const isSelected = day === selectedScheduleDay;
+
       button.classList.remove(
         'bg-green-600',
-        'border-green-600'
-      );
-      button.classList.add(
         'bg-red-600',
-        'text-white',
-        'border-red-600'
+        'border-green-600',
+        'border-red-600',
+        'ring-2',
+        'ring-primary'
       );
+
+      if (isActive) {
+        button.classList.add(
+          'bg-green-600',
+          'border-green-600',
+          'text-white'
+        );
+      } else {
+        button.classList.add(
+          'bg-red-600',
+          'border-red-600',
+          'text-white'
+        );
+      }
+
+      /*
+       * Ring hanya menunjukkan hari
+       * yang sedang diedit.
+       */
+      if (isSelected) {
+        button.classList.add(
+          'ring-2',
+          'ring-primary'
+        );
+      }
     });
+}
+
+
+window.resetScheduleWorkingDays = function() {
+  scheduleDayData = {
+    MONDAY:    { active: false, start: '', end: '', break: 0 },
+    TUESDAY:   { active: false, start: '', end: '', break: 0 },
+    WEDNESDAY: { active: false, start: '', end: '', break: 0 },
+    THURSDAY:  { active: false, start: '', end: '', break: 0 },
+    FRIDAY:    { active: false, start: '', end: '', break: 0 },
+    SATURDAY:  { active: false, start: '', end: '', break: 0 },
+    SUNDAY:    { active: false, start: '', end: '', break: 0 }
+  };
+
+  selectedScheduleDay = 'MONDAY';
+
+  updateScheduleDayButtons();
+  loadSelectedScheduleDay();
 };
