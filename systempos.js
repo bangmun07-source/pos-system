@@ -33627,52 +33627,37 @@ let selectedScheduleDay = 'MONDAY';
 async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
   const employeeSelect = document.getElementById('scheduleEmployee');
 
-  if (!employeeSelect) return;
+  if (!employeeSelect) {
+    console.error('scheduleEmployee tidak ditemukan');
+    return;
+  }
 
-  employeeSelect.innerHTML =
-    `<option value="">Select Employee</option>`;
+  console.log('Schedule Branch:', branchId);
+  console.log('employeeData:', employeeData);
 
-  if (!branchId) return;
+  employeeSelect.innerHTML = `
+    <option value="">Select Employee</option>
+  `;
 
-  const employees = employeeData.filter(employee =>
-    String(employee.Branch_ID || '').trim() ===
-    String(branchId || '').trim() &&
-    employee.Status === 'ACTIVE'
-  );
+  if (!branchId) {
+    console.log('Tidak ada Branch_ID');
+    return;
+  }
 
-  employees.forEach(employee => {
-    const option = document.createElement('option');
-
-    option.value = employee.Employee_ID;
-    option.textContent = `${employee.Full_Name} • ${employee.Employee_Code}`;
-    employeeSelect.appendChild(option);
+  const employees = employeeData.filter(employee => {
+    return String(employee.Branch_ID || '').trim() ===
+           String(branchId || '').trim();
   });
 
-  if (selectedEmployeeId) {
-    employeeSelect.value = selectedEmployeeId;
-  }
-}
-
-async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
-  const employeeSelect = document.getElementById('scheduleEmployee');
-
-  if (!employeeSelect) return;
-
-  employeeSelect.innerHTML = ` <option value="">Select Employee</option> `;
-
-  if (!branchId) return;
-
-  const employees = employeeData.filter(employee =>
-    String(employee.Branch_ID || '').trim() ===
-    String(branchId || '').trim() &&
-    employee.Status === 'ACTIVE'
-  );
+  console.log('Employee sesuai branch:', employees);
 
   employees.forEach(employee => {
     const option = document.createElement('option');
 
     option.value = employee.Employee_ID;
-    option.textContent = `${employee.Full_Name} • ${employee.Employee_Code}`;
+    option.textContent =
+      `${employee.Full_Name} • ${employee.Employee_Code}`;
+
     employeeSelect.appendChild(option);
   });
 
