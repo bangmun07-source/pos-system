@@ -32167,58 +32167,79 @@ async function loadEmployeeBranches() {
     const filterSelect = document.getElementById("employeeBranchFilter");
     const role = state.user.role;
 
- 
     if (role === "Owner") {
-      // Modal New Employee
+      // MODAL NEW EMPLOYEE
       if (modalSelect) {
         modalSelect.innerHTML = `<option value="">Select Outlet</option>`;
+
         branches.forEach(branch => {
           const option = document.createElement("option");
+
           option.value = branch.id || "";
-          option.textContent = branch.name || branch.id || "Unnamed Branch";
+          option.textContent =
+            branch.name ||
+            branch.id ||
+            "Unnamed Branch";
+					
           modalSelect.appendChild(option);
         });
         modalSelect.disabled = false;
       }
-      // Filter Employee
+
+      // FILTER EMPLOYEE
       if (filterSelect) {
         filterSelect.innerHTML = `<option value="">All Branch</option>`;
+
         branches.forEach(branch => {
           const option = document.createElement("option");
+
           option.value = branch.id || "";
-          option.textContent = branch.name || branch.id || "Unnamed Branch";
+          option.textContent =
+            branch.name ||
+            branch.id ||
+            "Unnamed Branch";
           filterSelect.appendChild(option);
         });
         filterSelect.disabled = false;
       }
-    }
-    
-    else {
-      const userBranch = branches.find( branch => branch.id === state.user.branchId );
+    } else {
       const branchId = state.user.branchId;
-      const branchName = userBranch?.name || branchId || "Unnamed Branch";
+      const userBranch = branches.find(branch =>
+        String(branch.id || '').trim() ===
+        String(branchId || '').trim()
+      );
+      const branchName =
+        userBranch?.name ||
+        branchId ||
+        "Unnamed Branch";
 
-      // Modal New Employee
+      // MODAL NEW EMPLOYEE
       if (modalSelect) {
-        modalSelect.innerHTML = `
-          <option value="${branchId}">
-            ${branchName}
-          </option>
-        `;
-        modalSelect.value = branchId;
+        modalSelect.innerHTML = '';
+
+        const option = document.createElement("option");
+
+        option.value = branchId || "";
+        option.textContent = `Outlet: ${branchName}`;
+
+        modalSelect.appendChild(option);
+        modalSelect.value = branchId || "";
         modalSelect.disabled = true;
       }
-      // Filter Employee
+
+      // FILTER EMPLOYEE
       if (filterSelect) {
-        filterSelect.innerHTML = `
-          <option value="${branchId}">
-            ${branchName}
-          </option>
-        `;
-        filterSelect.value = branchId;
+        filterSelect.innerHTML = '';
+
+        const option = document.createElement("option");
+
+        option.value = branchId || "";
+        option.textContent = `Outlet: ${branchName}`;
+
+        filterSelect.appendChild(option);
+        filterSelect.value = branchId || "";
         filterSelect.disabled = true;
       }
-      state.branchId = branchId;
     }
   } catch (error) {
     console.error(
