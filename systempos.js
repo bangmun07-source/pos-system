@@ -33885,11 +33885,9 @@ window.selectScheduleDay = function(button) {
 
   if (!day || !scheduleDayData[day]) return;
 
-  // Simpan input hari sebelumnya
   saveCurrentScheduleDayData();
 
-  // Hari yang diklik menjadi ON
-  scheduleDayData[day].active = true;
+  scheduleDayData[day].active = !scheduleDayData[day].active;
   selectedScheduleDay = day;
 
   updateScheduleDayButtons();
@@ -33910,7 +33908,6 @@ function saveCurrentScheduleDayData() {
   scheduleDayData[day].end = endTime?.value || '';
   scheduleDayData[day].break = Number(breakMinutes?.value || 0);
 }
-
 
 function loadSelectedScheduleDay() {
   const day = selectedScheduleDay;
@@ -33942,7 +33939,6 @@ function loadSelectedScheduleDay() {
     );
   }
 }
-
 
 function updateScheduleDayButtons() {
   document
