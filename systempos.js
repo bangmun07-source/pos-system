@@ -33646,13 +33646,13 @@ function updateSalaryComponentAmountUnit() {
    									EMPLOYEE SCHEDULE
 ========================================================= */
 let scheduleDayData = {
-  MONDAY:    { active: false, start: '', end: '', break: 0 },
-  TUESDAY:   { active: false, start: '', end: '', break: 0 },
-  WEDNESDAY: { active: false, start: '', end: '', break: 0 },
-  THURSDAY:  { active: false, start: '', end: '', break: 0 },
-  FRIDAY:    { active: false, start: '', end: '', break: 0 },
-  SATURDAY:  { active: false, start: '', end: '', break: 0 },
-  SUNDAY:    { active: false, start: '', end: '', break: 0 }
+  MONDAY:    { active: false, date: '', start: '', end: '', break: 0 },
+  TUESDAY:   { active: false, date: '', start: '', end: '', break: 0 },
+  WEDNESDAY: { active: false, date: '', start: '', end: '', break: 0 },
+  THURSDAY:  { active: false, date: '', start: '', end: '', break: 0 },
+  FRIDAY:    { active: false, date: '', start: '', end: '', break: 0 },
+  SATURDAY:  { active: false, date: '', start: '', end: '', break: 0 },
+  SUNDAY:    { active: false, date: '', start: '', end: '', break: 0 }
 };
 let selectedScheduleDay = 'MONDAY';
 
@@ -33710,25 +33710,26 @@ async function openScheduleModal(schedule = null) {
   const branchSelect = document.getElementById('scheduleBranch');
   const employeeSelect = document.getElementById('scheduleEmployee');
   const active = document.getElementById('scheduleActive');
-
+	const weekStart = document.getElementById('scheduleWeekStart');
+	/* === RESET / LOAD WORKING DAYS === */
+	resetScheduleWorkingDays();
   /* === RESET FORM === */
   if (scheduleId) { scheduleId.value = schedule?.Schedule_ID || ''; }
   if (employeeSelect) { employeeSelect.value = schedule?.Employee_ID || ''; }
   if (active) { active.checked = schedule?.Is_Active ?? true; }
-
-	/* === RESET / LOAD WORKING DAYS === */
-	resetScheduleWorkingDays();
-	
+	if (weekStart) { weekStart.value = schedule?.Week_Start || ''; }
+	if (weekStart?.value) { updateScheduleWeekDates(); }
 	if (schedule?.Day_Of_Week) {
 	  const day = schedule.Day_Of_Week;
 		
 	  if (scheduleDayData[day]) {
-	    scheduleDayData[day] = {
-	      active: true,
-	      start: schedule.Start_Time || '',
-	      end: schedule.End_Time || '',
-	      break: Number(schedule.Break_Minutes || 0)
-	    };
+			scheduleDayData[day] = {
+			  active: true,
+			  date: schedule.Schedule_Date || '',
+			  start: schedule.Start_Time || '',
+			  end: schedule.End_Time || '',
+			  break: Number(schedule.Break_Minutes || 0)
+			};
 	
 	    selectedScheduleDay = day;
 	
@@ -33881,19 +33882,59 @@ function updateScheduleDayButtons() {
     });
 }
 
+function updateScheduleWeekDates() {
+  const weekInput = document.getElementById('scheduleWeekStart');
+
+  if (!weekInput?.value) return;
+
+  const monday = new Date(`${weekInput.value}T00:00:00`);
+
+  // Pastikan tanggal yang dipilih adalah Monday
+  if (monday.getDay() !== 1) {
+    alert('Schedule Week harus memilih hari Senin.');
+    weekInput.value = '';
+    return;
+  }
+
+  const days = [
+    'MONDAY',
+    'TUESDAY',
+    'WEDNESDAY',
+    'THURSDAY',
+    'FRIDAY',
+    'SATURDAY',
+    'SUNDAY'
+  ];
+
+	days.forEach((day, index) => {
+	  const date = new Date(monday);
+	  date.setDate(monday.getDate() + index);
+	
+	  const year = date.getFullYear();
+	  const month = String(date.getMonth() + 1).padStart(2, '0');
+	  const dayNumber = String(date.getDate()).padStart(2, '0');
+	
+	  scheduleDayData[day].date =
+	    `${year}-${month}-${dayNumber}`;
+	});
+  loadSelectedScheduleDay();
+}
+
 window.resetScheduleWorkingDays = function() {
   scheduleDayData = {
-    MONDAY:    { active: false, start: '', end: '', break: 0 },
-    TUESDAY:   { active: false, start: '', end: '', break: 0 },
-    WEDNESDAY: { active: false, start: '', end: '', break: 0 },
-    THURSDAY:  { active: false, start: '', end: '', break: 0 },
-    FRIDAY:    { active: false, start: '', end: '', break: 0 },
-    SATURDAY:  { active: false, start: '', end: '', break: 0 },
-    SUNDAY:    { active: false, start: '', end: '', break: 0 }
-  };
+		MONDAY:    { active: false, date: '', start: '', end: '', break: 0 },
+		TUESDAY:   { active: false, date: '', start: '', end: '', break: 0 },
+		WEDNESDAY: { active: false, date: '', start: '', end: '', break: 0 },
+		THURSDAY:  { active: false, date: '', start: '', end: '', break: 0 },
+		FRIDAY:    { active: false, date: '', start: '', end: '', break: 0 },
+		SATURDAY:  { active: false, date: '', start: '', end: '', break: 0 },
+		SUNDAY:    { active: false, date: '', start: '', end: '', break: 0 }
+	};
 
   selectedScheduleDay = 'MONDAY';
-
+	const weekStart = document.getElementById('scheduleWeekStart');
+	
+	if (weekStart) { weekStart.value = ''; }
   updateScheduleDayButtons();
   loadSelectedScheduleDay();
 };
