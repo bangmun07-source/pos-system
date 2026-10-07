@@ -33835,6 +33835,11 @@ async function loadScheduleWeek( employeeId, weekStart ) {
       );
       return;
     }
+		console.log('=== EDIT SCHEDULE LOAD ===');
+console.log('employeeId:', employeeId);
+console.log('weekStart:', weekStart);
+console.log('RPC DATA:', data);
+console.table(data || []);
 
    resetScheduleWorkingDays();
 
@@ -33876,24 +33881,41 @@ async function loadScheduleWeek( employeeId, weekStart ) {
 	 * Isi data schedule dari database
 	 */
 	(data || []).forEach(row => {
-		const day = row.Day_Of_Week;
+	  const day = String(row.Day_Of_Week || '')
+	    .trim()
+	    .toUpperCase();
 	
-		if (!scheduleDayData[day]) {
-			return;
-		}
+	  console.log('Mapping schedule row:', {
+	    originalDay: row.Day_Of_Week,
+	    normalizedDay: day,
+	    row
+	  });
 	
-		scheduleDayData[day] = {
-			active: row.Is_Active === true,
-			date: row.Schedule_Date || '',
-			start: row.Is_Active
-				? formatScheduleTime(row.Start_Time)
-				: '',
-			end: row.Is_Active
-				? formatScheduleTime(row.End_Time)
-				: '',
-			break: Number(row.Break_Minutes || 0)
-		};
+	  if (!scheduleDayData[day]) {
+	    console.warn(
+	      'DAY TIDAK DITEMUKAN DI scheduleDayData:',
+	      day
+	    );
+	    return;
+	  }
+	
+	  scheduleDayData[day] = {
+	    active: row.Is_Active === true,
+	    date: row.Schedule_Date || '',
+	    start: row.Is_Active === true
+	      ? formatScheduleTime(row.Start_Time)
+	      : '',
+	    end: row.Is_Active === true
+	      ? formatScheduleTime(row.End_Time)
+	      : '',
+	    break: Number(row.Break_Minutes || 0)
+	  };
 	});
+	
+	console.log(
+	  'scheduleDayData SETELAH LOAD:',
+	  JSON.parse(JSON.stringify(scheduleDayData))
+	);
     /*
      * Tampilkan hari pertama
      */
