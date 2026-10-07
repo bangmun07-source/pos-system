@@ -32137,8 +32137,9 @@ window.switchEmployeeModule = function(module) {
   payrollTab?.classList.toggle('text-muted', isManagement);
 };
 
-
-/* === EMPLOYEE MANAGEMENT === */
+/* =========================================================
+   									EMPLOYEE MANAGEMENT
+========================================================= */
 let employeeData = [];
 let filteredEmployeeData = [];
 let employeeCurrentPage = 1;
@@ -33796,4 +33797,60 @@ function updateSalaryComponentAmountUnit() {
   }
 }
 
+/* =========================================================
+   									EMPLOYEE SCHEDULE
+========================================================= */
 
+function openScheduleModal(schedule = null) {
+  const modal = document.getElementById('scheduleModal');
+
+  if (!modal) {
+    console.error('scheduleModal tidak ditemukan.'); 
+		return; }
+
+  const role = state.user.role;
+  const scheduleId = document.getElementById('scheduleId');
+  const branchSelect = document.getElementById('scheduleBranch');
+  const employeeSelect = document.getElementById('scheduleEmployee');
+  const daySelect = document.getElementById('scheduleDay');
+  const startTime = document.getElementById('scheduleStartTime');
+  const endTime = document.getElementById('scheduleEndTime');
+  const breakMinutes = document.getElementById('scheduleBreakMinutes');
+  const active = document.getElementById('scheduleActive');
+
+  /* === RESET FORM === */
+  if (scheduleId) { scheduleId.value = schedule?.Schedule_ID || ''; }
+  if (employeeSelect) { employeeSelect.value = schedule?.Employee_ID || ''; }
+  if (daySelect) { daySelect.value = schedule?.Day_Of_Week || 'MONDAY'; }
+  if (startTime) { startTime.value = schedule?.Start_Time || ''; }
+  if (endTime) { endTime.value = schedule?.End_Time || ''; }
+  if (breakMinutes) { breakMinutes.value = schedule?.Break_Minutes ?? 0; }
+  if (active) { active.checked = schedule?.Is_Active ?? true; }
+  /* === OUTLET ==== */
+  if (branchSelect) {
+    if (role === 'Owner') {
+      branchSelect.disabled = false;
+      branchSelect.value = schedule?.Branch_ID || '';
+    } else {
+      const branchId = state.user.branchId;
+      branchSelect.value =
+        schedule?.Branch_ID ||
+        branchId ||
+        '';
+      branchSelect.disabled = true;
+    }
+  }
+
+  /* === SHOW MODAL === */
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeScheduleModal() {
+  const modal = document.getElementById('scheduleModal');
+
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
