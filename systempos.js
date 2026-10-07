@@ -33885,12 +33885,11 @@ window.selectScheduleDay = function(button) {
 
   if (!day || !scheduleDayData[day]) return;
 
+  // Simpan input hari sebelumnya
   saveCurrentScheduleDayData();
-	
-  if (!scheduleDayData[day].active) {
-    scheduleDayData[day].active = true;
-  }
 
+  // Hari yang diklik menjadi ON
+  scheduleDayData[day].active = true;
   selectedScheduleDay = day;
 
   updateScheduleDayButtons();
