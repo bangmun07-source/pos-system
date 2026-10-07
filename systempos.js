@@ -32386,7 +32386,21 @@ window.openEmployeeModal = function () {
   document.getElementById('employeeDepartment').value = '';
   document.getElementById('employeeGender').value = '';
   document.getElementById('employeeBirthDate').value = '';
-  document.getElementById('employeeBranch').value = '';
+	
+  const branchSelect = document.getElementById('employeeBranch');
+  const role = state.user.role;
+  if (branchSelect) {
+    if (role === 'Owner') {
+      // Owner boleh memilih outlet
+      branchSelect.value = '';
+      branchSelect.disabled = false;
+    } else {
+      // Admin / Cashier hanya menggunakan outlet miliknya
+      const branchId = state.user.branchId;
+      branchSelect.value = branchId || '';
+      branchSelect.disabled = true;
+    }
+  }
   document.getElementById('employeeJoinDate').value = '';
   document.getElementById('employeeStatus').value = 'ACTIVE';
   document.getElementById('employeePhoto').value = '';
