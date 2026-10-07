@@ -22867,6 +22867,7 @@
 						  <thead>
 						    <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
 						      <th class="px-5 py-3 text-left"> Employee </th>
+									<th class="px-5 py-3 text-center"> Outlet </th>
 						      <th class="px-5 py-3 text-left"> Day </th>
 						      <th class="px-5 py-3 text-left"> Start </th>
 						      <th class="px-5 py-3 text-left"> End </th>
@@ -22879,7 +22880,7 @@
 						  <tbody id="scheduleTableBody"
 						    class="divide-y divide-outline-variant">
 						    <tr>
-						      <td colspan="7"
+						      <td colspan="8"
 						        class="px-5 py-10 text-center text-muted">
 						        No employee schedule data
 						      </td>
@@ -23950,7 +23951,6 @@
 	            <span class="material-symbols-outlined text-base">
 	              add
 	            </span>
-	
 	            Add
 	          </button>
 	        </div>
@@ -23966,7 +23966,6 @@
 	            <p class="text-xs text-muted mt-2">
 	              No allowance configured
 	            </p>
-	
 	          </div>
 	        </div>
 	      </div>
@@ -24182,6 +24181,17 @@
       <div class="p-5 space-y-5">
         <input id="scheduleId"
           type="hidden">
+				<div>
+				  <label class="block text-sm font-medium text-foreground mb-2">
+				    Outlet
+				  </label>
+				
+				  <select id="scheduleBranch"
+				    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+				    <option value=""> Select Outlet </option>
+				  </select>
+				</div>
+				
         <div>
           <label class="block text-sm font-medium text-foreground mb-2">
             Employee
@@ -24300,7 +24310,6 @@
           <span class="material-symbols-outlined text-sm">
             save
           </span>
-
           Save Schedule
         </button>
       </div>
