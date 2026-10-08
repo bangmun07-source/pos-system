@@ -35025,10 +35025,7 @@ async function verifyAttendanceKiosk() {
 
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    alert('Session POS tidak ditemukan.');
-    return;
-  }
+  if (!sessionId) { alert('Session POS tidak ditemukan.'); return; }
 
   try {
     // LOADING
@@ -35050,10 +35047,9 @@ async function verifyAttendanceKiosk() {
 
     if (error) { throw error; }
 
-    const result =
-      typeof data === 'string'
-        ? JSON.parse(data)
-        : data;
+    const result = typeof data === 'string'
+			? JSON.parse(data)
+			: data;
 
     console.log(
       'Attendance PIN verification:',
@@ -35101,5 +35097,16 @@ async function verifyAttendanceKiosk() {
   }
 }
 
+function handleAttendancePinInput() {
+  const input = document.getElementById('attendanceKioskPin');
 
+  if (!input) return;
+  // Hanya izinkan angka
+  input.value = input.value.replace(/\D/g, '');
+  // Maksimal 8 digit
+  if (input.value.length > 8) {
+    input.value =
+      input.value.slice(0, 8);
+  }
+}
 
