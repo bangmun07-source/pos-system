@@ -12082,9 +12082,25 @@ function renderUsers() {
   let html = "";
   rows.forEach(user => {
     const userRole = user.role.toLowerCase();
-    const canManage =
-      role === "owner" ||
-      (role === "admin" && userRole === "cashier");
+    const currentUserId = String(state.user?.id || "");
+		const targetUserId = String(user.id || "");
+		const canEdit =
+	    role === "owner" ||
+	    (
+	      role === "admin" &&
+	      (
+	        userRole === "cashier" ||
+	        targetUserId === currentUserId
+	      )
+	    );
+	
+	  const canDelete =
+	    role === "owner" ||
+	    (
+	      role === "admin" &&
+	      userRole === "cashier" &&
+	      targetUserId !== currentUserId
+	    );
 
     html += `
       <tr class="hover:bg-outline-variant transition">
@@ -12117,21 +12133,19 @@ function renderUsers() {
         <td class="px-5 py-4">
           <div class="flex justify-end gap-2">
 
-            ${canManage ? `
-              <button onclick="openEditUserModal('${user.id}')"
-                class="w-9 h-9 hover:bottom-theme transition rounded-md">
-                <span class="material-symbols-outlined text-sm">
-                  edit
-                </span>
-              </button>
-
-              <button onclick="deleteUser('${user.id}')"
-                class="w-9 h-9 hover:bg-red-600/10 transition rounded-md">
-                <span class="material-symbols-outlined text-sm text-red-700">
-                  delete
-                </span>
-              </button>
-            ` : ""}
+            ${canEdit ? `
+						  <button onclick="openEditUserModal('${user.id}')"
+						    class="w-9 h-9 hover:bottom-theme transition rounded-md">
+						    <span class="material-symbols-outlined text-sm">edit</span>
+						  </button>
+						` : ""}
+						
+						${canDelete ? `
+						  <button onclick="deleteUser('${user.id}')"
+						    class="w-9 h-9 hover:bg-red-600/10 transition rounded-md">
+						    <span class="material-symbols-outlined text-sm text-red-700">delete</span>
+						  </button>
+						` : ""}
           </div>
         </td>
       </tr>
