@@ -1095,6 +1095,10 @@ function initModule(pageId) {
 		  initEmployeePage();
 		  break;
 		}
+
+		case "attendancePage":
+			initAttendancePage();
+		break;
   }
 }
 	
@@ -34827,3 +34831,17 @@ window.resetScheduleWorkingDays = function() {
   updateScheduleDayButtons();
   loadSelectedScheduleDay();
 };
+
+
+
+
+
+/* =========================================================
+   									ATTENDANCE PAGE
+========================================================= */
+
+function initAttendancePage() {
+  console.log("Attendance page initialized");
+}
+
+
