@@ -35065,6 +35065,15 @@ async function verifyAttendanceKiosk() {
       return;
     }
 
+		const todaySchedule = await getAttendanceEmployeeTodaySchedule( employeeId );
+		
+		if (!todaySchedule) { alert( `${result.employee_name} tidak memiliki schedule untuk hari ini.` ); return; }
+		if (!todaySchedule.Is_Active) { alert( `${result.employee_name} sedang OFF hari ini.` ); return; }
+		
+		console.log(
+		  'Today attendance schedule:',
+		  todaySchedule
+		);
     // SUCCESS
     console.log(
       'Employee verified:',
@@ -35109,4 +35118,49 @@ function handleAttendancePinInput() {
       input.value.slice(0, 8);
   }
 }
+
+function getAttendanceWeekStart(date = new Date()) {
+  const d = new Date(date);
+  const day = d.getDay(); // Sunday = 0
+
+  const diff = day === 0 ? -6 : 1 - day;
+
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+
+  return d.toISOString().slice(0, 10);
+}
+
+async function getAttendanceEmployeeTodaySchedule(employeeId) {
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+  if (!employeeId) { throw new Error('Employee belum dipilih.'); }
+
+  const today = new Date().toISOString().slice(0, 10);
+  const weekStart = getAttendanceWeekStart(new Date());
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      'get_employee_schedule_week',
+      {
+        p_session_id: sessionId,
+        p_employee_id: employeeId,
+        p_week_start: weekStart
+      }
+    );
+
+  if (error) { throw error; }
+
+  const schedules = Array.isArray(data)
+		? data
+		: [];
+  const todaySchedule = schedules.find(schedule => String(schedule.Schedule_Date) === today );
+
+  return todaySchedule || null;
+}
+
+
+
+
 
