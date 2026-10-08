@@ -34870,14 +34870,15 @@ window.resetScheduleWorkingDays = function() {
 ========================================================= */
 
 let attendanceKioskClockInterval = null;
+let attendanceKioskRealtimeChannel = null;
 
 async function initAttendancePage() {
   try {
     // CLOCK
     updateAttendanceKioskClock();
-
-    if (attendanceKioskClockInterval) { clearInterval(attendanceKioskClockInterval); }
-
+    if (attendanceKioskClockInterval) {
+      clearInterval(attendanceKioskClockInterval);
+    }
     attendanceKioskClockInterval = setInterval(() => {
       updateAttendanceKioskClock();
     }, 1000);
@@ -34885,14 +34886,207 @@ async function initAttendancePage() {
     await loadAttendanceKioskBranch();
     // EMPLOYEE
     await loadEmployees();
-
     loadAttendanceKioskEmployees();
-
+    // REALTIME ATTENDANCE
+    startAttendanceKioskRealtime();
   } catch (error) {
     console.error('initAttendancePage:', error);
   }
 }
 
+function startAttendanceKioskRealtime() {
+
+  if (!supabaseClient) {
+    console.warn(
+      'Attendance realtime: supabaseClient tidak tersedia.'
+    );
+    return;
+  }
+
+  const branchId =
+    String(state.user?.branchId || '').trim();
+
+  if (!branchId) {
+    console.warn(
+      'Attendance realtime: Branch_ID tidak ditemukan.'
+    );
+    return;
+  }
+
+  // Hapus channel lama jika masih ada
+  if (attendanceKioskRealtimeChannel) {
+    try {
+      supabaseClient.removeChannel(
+        attendanceKioskRealtimeChannel
+      );
+    } catch (error) {
+      console.warn(
+        'Remove old attendance realtime channel:',
+        error
+      );
+    }
+
+    attendanceKioskRealtimeChannel = null;
+  }
+
+  attendanceKioskRealtimeChannel =
+    supabaseClient
+      .channel(
+        `attendance-kiosk-${branchId}`
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'Employee_Attendance',
+          filter: `Branch_ID=eq.${branchId}`
+        },
+        payload => {
+
+          console.log(
+            'Attendance realtime received:',
+            payload
+          );
+
+          handleAttendanceKioskRealtime(
+            payload?.new
+          );
+        }
+      )
+      .subscribe(status => {
+
+        console.log(
+          'Attendance realtime status:',
+          status
+        );
+
+      });
+}
+
+function handleAttendanceKioskRealtime(attendance) {
+
+  if (!attendance) {
+    return;
+  }
+
+  const employeeId =
+    String(
+      attendance.Employee_ID || ''
+    ).trim();
+
+  if (!employeeId) {
+    return;
+  }
+
+  const employee =
+    employeeData.find(
+      item =>
+        String(item.Employee_ID || '').trim() ===
+        employeeId
+    );
+
+  const employeeName =
+    employee?.Full_Name ||
+    employeeId;
+
+  console.log(
+    'Attendance berhasil di kiosk:',
+    attendance
+  );
+
+  // Stop QR timer
+  if (attendanceKioskQrTimer) {
+    clearInterval(
+      attendanceKioskQrTimer
+    );
+
+    attendanceKioskQrTimer = null;
+  }
+
+  // Ambil panel
+  const qrEmpty =
+    document.getElementById(
+      'attendanceKioskQrEmpty'
+    );
+
+  const qrActive =
+    document.getElementById(
+      'attendanceKioskQrActive'
+    );
+
+  const qrSuccess =
+    document.getElementById(
+      'attendanceKioskQrSuccess'
+    );
+
+  // QR hilang
+  if (qrActive) {
+    qrActive.classList.add('hidden');
+  }
+
+  // Empty panel jangan langsung ditampilkan
+  if (qrEmpty) {
+    qrEmpty.classList.add('hidden');
+  }
+
+  // Success tampil
+  if (qrSuccess) {
+    qrSuccess.classList.remove('hidden');
+  }
+
+  // Jika elemen success punya nama employee
+  const successName =
+    document.getElementById(
+      'attendanceKioskQrSuccessName'
+    );
+
+  if (successName) {
+    successName.textContent =
+      employeeName;
+  }
+
+  // Jika elemen success punya message
+  const successMessage =
+    document.getElementById(
+      'attendanceKioskQrSuccessMessage'
+    );
+
+  if (successMessage) {
+
+    const checkIn =
+      attendance.Check_In
+        ? formatAttendanceDateTime(
+            attendance.Check_In
+          )
+        : '-';
+
+    successMessage.textContent =
+      `Check In berhasil pada ${checkIn}.`;
+  }
+
+  // Reset employee + PIN
+  const employeeSelect =
+    document.getElementById(
+      'attendanceKioskEmployee'
+    );
+
+  const pinInput =
+    document.getElementById(
+      'attendanceKioskPin'
+    );
+
+  if (employeeSelect) {
+    employeeSelect.value = '';
+  }
+
+  if (pinInput) {
+    pinInput.value = '';
+  }
+
+  handleAttendanceEmployeeSelect();
+}
+
 function updateAttendanceKioskClock() {
   const clock = document.getElementById('attendanceKioskClock');
 
@@ -34907,20 +35101,6 @@ function updateAttendanceKioskClock() {
   });
 }
 
-
-function updateAttendanceKioskClock() {
-  const clock = document.getElementById('attendanceKioskClock');
-
-  if (!clock) return;
-
-  const now = new Date();
-
-  clock.textContent = now.toLocaleTimeString('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  });
-}
 
 async function loadAttendanceKioskBranch() {
   const branchEl = document.getElementById('attendanceKioskBranch');
@@ -35434,6 +35614,19 @@ function startAttendanceQrTimer(seconds = 60) {
    									ATTENDANCE SCANNER PAGE
 ========================================================= */
 
+function formatAttendanceDateTime(value) {
+  if (!value) return '-';
+
+  return new Date(value).toLocaleString('id-ID', {
+    timeZone: 'Asia/Jakarta',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
 let attendanceScanner = null;
 let attendanceScannerRunning = false;
 let attendanceScannerProcessing = false;
@@ -35715,21 +35908,13 @@ function showAttendanceScanSuccess(result) {
   }
 
   if (message) {
-    message.textContent =
-      `Check In berhasil pada ${
-        result?.check_in
-          ? new Date(
-              result.check_in
-            ).toLocaleTimeString(
-              'id-ID',
-              {
-                hour: '2-digit',
-                minute: '2-digit'
-              }
-            )
-          : '-'
-      }.`;
-  }
+	  message.textContent =
+	    `Check In berhasil pada ${
+	      result?.check_in
+	        ? formatAttendanceDateTime(result.check_in)
+	        : '-'
+	    }.`;
+	}
 }
 
 function showAttendanceScanError(message) {
