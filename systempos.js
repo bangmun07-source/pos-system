@@ -11432,12 +11432,10 @@ function applySettingsPage(data) {
   window.userData = data.users || [];
 	allUsers = data.users || [];
 	
+	applyUserBranchAccess();
+	
 	loadBranchesTable(allBranches);
 	loadUserFilterOptions();
-	
-	filteredUsers = [...allUsers];
-	userCurrentPage = 1;
-	
 	renderUsers();
   const taxInput = document.getElementById("taxInput");
   const serviceInput = document.getElementById("serviceInput");
@@ -11446,6 +11444,24 @@ function applySettingsPage(data) {
   if (serviceInput) serviceInput.value = state.settings.service || 0;
   if (discountInput) discountInput.value = state.settings.discount || 0;
   loadBusinessProfile();
+}
+
+function applyUserBranchAccess() {
+  const role = String(state.user?.role || "").toLowerCase();
+  const userBranchId = String(state.user?.branchId || "").trim();
+
+  if (role === "owner") {
+    filteredUsers = [...allUsers];
+    return;
+  }
+
+  filteredUsers = (allUsers || []).filter(user => {
+    const userBranchIdData = String(
+      user.branchId ?? user.branch_id ?? ""
+    ).trim();
+
+    return userBranchIdData === userBranchId;
+  });
 }
 
 async function loadSettingsPage() {
@@ -11941,11 +11957,10 @@ function loadUsers(users) {
   window.userData = users || [];
   allUsers = users || [];
 
+  applyUserBranchAccess();
+
   loadUserFilterOptions();
-
-  filteredUsers = [...allUsers];
   userCurrentPage = 1;
-
   renderUsers();
 }
 
