@@ -33736,12 +33736,6 @@ async function openScheduleModal(schedule = null) {
       }
     };
   }
-
-  /*
-   * ================================
-   * BRANCH + EMPLOYEE
-   * ================================
-   */
   if (branchSelect) {
     if (role === 'Owner') {
       branchSelect.disabled = false;
@@ -33763,7 +33757,6 @@ async function openScheduleModal(schedule = null) {
       );
     }
   }
-
   if (employeeSelect) {
     employeeSelect.onchange = async function () {
       if (!this.value) {
@@ -33791,29 +33784,13 @@ async function openScheduleModal(schedule = null) {
       resetScheduleWorkingDays();
     };
   }
-
-  /*
-   * =====================================================
-   * EDIT SCHEDULE
-   * =====================================================
-   *
-   * schedule = 1 row yang diklik dari table.
-   *
-   * scheduleData = seluruh data schedule yang sudah
-   *               di-load dari database.
-   *
-   * Kita ambil SEMUA 7 hari berdasarkan:
-   * Employee_ID + Week_Start.
-   */
   if (isEdit) {
-
     if (weekStart) {
       weekStart.value = schedule.Week_Start;
     }
 
     const employeeId = schedule.Employee_ID;
     const selectedWeek = schedule.Week_Start;
-
     const savedWeekData = scheduleData.filter(row =>
       String(row.Employee_ID || '').trim() ===
         String(employeeId || '').trim()
@@ -33864,15 +33841,8 @@ async function openScheduleModal(schedule = null) {
       scheduleDayData[day].date =
         `${year}-${month}-${dayNumber}`;
     });
-
-    /*
-     * ==============================================
-     * MASUKKAN SEMUA DATA YANG SUDAH TERSIMPAN
-     * KE scheduleDayData
-     * ==============================================
-     */
+		
     savedWeekData.forEach(row => {
-
       const day = String(
         row.Day_Of_Week || ''
       )
@@ -33889,24 +33859,17 @@ async function openScheduleModal(schedule = null) {
 
       scheduleDayData[day] = {
         active: row.Is_Active === true,
-
-        date:
-          row.Schedule_Date
+        date: row.Schedule_Date
           || scheduleDayData[day].date
           || '',
+        start: row.Is_Active === true
+					? formatScheduleTime(row.Start_Time)
+					: '',
 
-        start:
-          row.Is_Active === true
-            ? formatScheduleTime(row.Start_Time)
-            : '',
-
-        end:
-          row.Is_Active === true
-            ? formatScheduleTime(row.End_Time)
-            : '',
-
-        break:
-          Number(row.Break_Minutes || 0)
+        end: row.Is_Active === true
+					? formatScheduleTime(row.End_Time)
+					: '',
+        break: Number(row.Break_Minutes || 0)
       };
     });
 
@@ -33916,22 +33879,12 @@ async function openScheduleModal(schedule = null) {
         JSON.stringify(scheduleDayData)
       )
     );
-
-    /*
-     * ==============================================
-     * TAMPILKAN MONDAY
-     * ==============================================
-     */
     selectedScheduleDay = 'MONDAY';
 
     updateScheduleDayButtons();
     loadSelectedScheduleDay();
 
   } else {
-
-    /*
-     * NEW SCHEDULE
-     */
     if (weekStart?.value) {
       updateScheduleWeekDates();
     } else {
@@ -33939,11 +33892,6 @@ async function openScheduleModal(schedule = null) {
       loadSelectedScheduleDay();
     }
   }
-
-  /*
-   * Baru tampilkan modal setelah semua data
-   * schedule sudah masuk.
-   */
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }
@@ -34001,16 +33949,9 @@ console.log('==============================');
 
 	const weekInput = document.getElementById('scheduleWeekStart');
 	
-	if (weekInput) {
-		weekInput.value = weekStart;
-	}
+	if (weekInput) { weekInput.value = weekStart; }
 	
-	/*
-	 * Isi tanggal minggu terlebih dahulu,
-	 * tanpa mengubah data schedule yang akan di-load.
-	 */
 	const monday = new Date(`${weekStart}T00:00:00`);
-	
 	const days = [
 		'MONDAY',
 		'TUESDAY',
@@ -34033,9 +33974,6 @@ console.log('==============================');
 			`${year}-${month}-${dayNumber}`;
 	});
 	
-	/*
-	 * Isi data schedule dari database
-	 */
 	(data || []).forEach(row => {
 	  const day = String(row.Day_Of_Week || '')
 	    .trim()
@@ -34072,9 +34010,7 @@ console.log('==============================');
 	  'scheduleDayData SETELAH LOAD:',
 	  JSON.parse(JSON.stringify(scheduleDayData))
 	);
-    /*
-     * Tampilkan hari pertama
-     */
+ 
     selectedScheduleDay = 'MONDAY';
     updateScheduleDayButtons();
     loadSelectedScheduleDay();
@@ -34156,11 +34092,7 @@ window.saveSchedule = async function() {
     );
     return;
   }
-
-  /*
-   * Simpan perubahan hari yang sedang aktif
-   * dari input popup ke scheduleDayData.
-   */
+	
   saveCurrentScheduleDayData();
   const days = [
     'MONDAY',
@@ -34249,7 +34181,6 @@ window.saveSchedule = async function() {
         : 'Schedule berhasil disimpan.'
     );
 
-
     if (
       typeof loadSchedules === 'function'
     ) { await loadSchedules(); }
@@ -34305,23 +34236,32 @@ function populateScheduleFilters() {
   const employeeFilter = document.getElementById('scheduleEmployeeFilter');
   const branchFilter = document.getElementById('scheduleBranchFilter');
   const weekFilter = document.getElementById('scheduleWeekFilter');
-
+  const role = state.user.role;
+  const userBranchId = String(state.user.branchId || '').trim();
+  const visibleScheduleData =
+    role === 'Owner'
+      ? scheduleData
+      : scheduleData.filter(row =>
+          String(row.Branch_ID || '').trim() === userBranchId
+        );
+	
   if (employeeFilter) {
     const currentValue = employeeFilter.value;
 
     employeeFilter.innerHTML = `<option value="">All Employees</option>`;
 
-    const employees = [...new Map(
-      scheduleData.map(row => [
-        row.Employee_ID,
-        {
-          id: row.Employee_ID,
-          name: row.Full_Name,
-          code: row.Employee_Code
-        }
-      ])
-    ).values()];
-
+    const employees = [
+      ...new Map(
+        visibleScheduleData.map(row => [
+          row.Employee_ID,
+          {
+            id: row.Employee_ID,
+            name: row.Full_Name,
+            code: row.Employee_Code
+          }
+        ])
+      ).values()
+    ];
     employees.forEach(employee => {
       const option = document.createElement('option');
 
@@ -34329,22 +34269,26 @@ function populateScheduleFilters() {
       option.textContent = `${employee.name || '-'} • ${employee.code || '-'}`;
       employeeFilter.appendChild(option);
     });
-    employeeFilter.value = currentValue;
+    employeeFilter.value =
+      [...employeeFilter.options].some(
+        option => option.value === currentValue
+      )
+        ? currentValue
+        : '';
   }
 
   if (branchFilter) {
     const currentValue = branchFilter.value;
-		
+
     branchFilter.innerHTML = `<option value="">All Branch</option>`;
 
     const branches = [
       ...new Set(
-        scheduleData
+        visibleScheduleData
           .map(row => String(row.Branch_ID || '').trim())
           .filter(Boolean)
       )
     ];
-
     branches.forEach(branchId => {
       const option = document.createElement('option');
 
@@ -34352,17 +34296,23 @@ function populateScheduleFilters() {
       option.textContent = branchId;
       branchFilter.appendChild(option);
     });
-    branchFilter.value = currentValue;
+
+    branchFilter.value =
+      [...branchFilter.options].some(
+        option => option.value === currentValue
+      )
+        ? currentValue
+        : '';
   }
 
   if (weekFilter) {
     const currentValue = weekFilter.value;
-		
+
     weekFilter.innerHTML = `<option value="">Current Week</option>`;
 
     const weeks = [
       ...new Set(
-        scheduleData
+        visibleScheduleData
           .map(row => row.Week_Start)
           .filter(Boolean)
       )
@@ -34375,8 +34325,12 @@ function populateScheduleFilters() {
       option.textContent = formatScheduleDate(week);
       weekFilter.appendChild(option);
     });
-
-    weekFilter.value = currentValue;
+    weekFilter.value =
+      [...weekFilter.options].some(
+        option => option.value === currentValue
+      )
+        ? currentValue
+        : '';
   }
 }
 
@@ -34385,33 +34339,41 @@ window.filterSchedules = function() {
   const employeeId = document.getElementById('scheduleEmployeeFilter')?.value || '';
   const branchId = document.getElementById('scheduleBranchFilter')?.value || '';
   const day = document.getElementById('scheduleDayFilter')?.value || '';
+  const role = state.user.role;
+  const userBranchId = String(state.user.branchId || '').trim();
 
-  let filtered = [...scheduleData];
+  let filtered =
+    role === 'Owner'
+      ? [...scheduleData]
+      : scheduleData.filter(row =>
+          String(row.Branch_ID || '').trim() ===
+          userBranchId
+        );
 
   if (week) {
     filtered = filtered.filter(row =>
-      String(row.Week_Start || '') === String(week)
+      String(row.Week_Start || '') ===
+      String(week)
     );
   }
-
   if (employeeId) {
     filtered = filtered.filter(row =>
-      String(row.Employee_ID || '') === String(employeeId)
+      String(row.Employee_ID || '') ===
+      String(employeeId)
     );
   }
-
   if (branchId) {
     filtered = filtered.filter(row =>
-      String(row.Branch_ID || '') === String(branchId)
+      String(row.Branch_ID || '') ===
+      String(branchId)
     );
   }
-
   if (day) {
     filtered = filtered.filter(row =>
-      String(row.Day_Of_Week || '') === String(day)
+      String(row.Day_Of_Week || '') ===
+      String(day)
     );
   }
-
   renderSchedules(filtered);
 };
 
