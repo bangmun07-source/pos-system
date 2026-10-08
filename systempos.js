@@ -11430,9 +11430,15 @@ function applySettingsPage(data) {
   allBranches = data.branches || [];
   // update users
   window.userData = data.users || [];
-  allUsers = data.users || [];
-  loadBranchesTable(allBranches);
-  renderUsers();
+	allUsers = data.users || [];
+	
+	loadBranchesTable(allBranches);
+	loadUserFilterOptions();
+	
+	filteredUsers = [...allUsers];
+	userCurrentPage = 1;
+	
+	renderUsers();
   const taxInput = document.getElementById("taxInput");
   const serviceInput = document.getElementById("serviceInput");
   const discountInput = document.getElementById("discountInput");
@@ -11809,7 +11815,6 @@ function openEditBranchModal(branchId){
 }
 
 async function saveEditBranch() {
-
   const data = {
     branchId:
       document
@@ -11833,26 +11838,9 @@ async function saveEditBranch() {
         ?.trim() || ""
   };
 
-  if (!data.branchName) {
-    alert(
-      "Branch Name wajib diisi."
-    );
-    return;
-  }
-
-  if (!data.manager) {
-    alert(
-      "Manager wajib diisi."
-    );
-    return;
-  }
-
-  if (!data.alamat) {
-    alert(
-      "Address wajib diisi."
-    );
-    return;
-  }
+  if (!data.branchName) { alert( "Branch Name wajib diisi." ); return; }
+  if (!data.manager) { alert( "Manager wajib diisi." ); return; }
+  if (!data.alamat) { alert( "Address wajib diisi." ); return; }
 
   try {
     // SUPABASE RPC
@@ -11952,9 +11940,119 @@ async function saveTaxSettings() {
 function loadUsers(users) {
   window.userData = users || [];
   allUsers = users || [];
+
+  loadUserFilterOptions();
+
+  filteredUsers = [...allUsers];
+  userCurrentPage = 1;
+
   renderUsers();
 }
 
+let filteredUsers = [];
+
+function loadUserFilterOptions() {
+  const branchSelect = document.getElementById("userBranchFilter");
+  const roleSelect = document.getElementById("userRoleFilter");
+
+  if (branchSelect) {
+    const currentBranch = branchSelect.value || "";
+    const currentRole = String(state.user?.role || "").toLowerCase();
+    const userBranchId = String(state.user?.branchId || "").trim();
+
+    branchSelect.innerHTML = "";
+
+    // OWNER → bisa pilih semua outlet
+    if (currentRole === "owner") {
+      branchSelect.innerHTML = `
+        <option value="">All Outlet</option>
+      `;
+
+      (allBranches || []).forEach(branch => {
+        branchSelect.innerHTML += `
+          <option value="${branch.branchId}">
+            ${branch.branchName}
+          </option>
+        `;
+      });
+
+    // ADMIN → hanya outlet miliknya
+    } else if (currentRole === "admin") {
+      const userBranch = (allBranches || []).find(
+        branch =>
+          String(branch.branchId).trim() === userBranchId
+      );
+
+      branchSelect.innerHTML = `
+        <option value="${userBranchId}">
+          ${userBranch ? userBranch.branchName : userBranchId}
+        </option>
+      `;
+
+      branchSelect.value = userBranchId;
+      branchSelect.disabled = true;
+
+    // ROLE LAIN → hanya outlet miliknya
+    } else {
+      branchSelect.innerHTML = `
+        <option value="${userBranchId}">
+          ${userBranchId}
+        </option>
+      `;
+
+      branchSelect.value = userBranchId;
+      branchSelect.disabled = true;
+    }
+
+    // Pertahankan pilihan outlet OWNER
+    if (
+      currentBranch &&
+      [...branchSelect.options].some(
+        option => option.value === currentBranch
+      )
+    ) {
+      branchSelect.value = currentBranch;
+    }
+  }
+
+  if (roleSelect) {
+    const currentRole = roleSelect.value || "";
+
+    roleSelect.innerHTML = `
+      <option value="">All Role</option>
+      <option value="Owner">Owner</option>
+      <option value="Admin">Admin</option>
+      <option value="Cashier">Cashier</option>
+      <option value="Accountant">Accountant</option>
+      <option value="Attendance">Attendance</option>
+    `;
+
+    if (
+      currentRole &&
+      [...roleSelect.options].some(
+        option => option.value === currentRole
+      )
+    ) {
+      roleSelect.value = currentRole;
+    }
+  }
+}
+
+function filterUsers() {
+  const branch = document.getElementById("userBranchFilter")?.value || "";
+  const role = document.getElementById("userRoleFilter")?.value || "";
+
+  filteredUsers = (allUsers || []).filter(user => {
+    const userBranch = String( user.branchId ?? user.branch_id ?? "" ).trim();
+    const userRole = String( user.role || "" ).trim().toLowerCase();
+    const branchMatch = !branch || userBranch === String(branch).trim();
+    const roleMatch = !role || userRole === role.toLowerCase();
+
+    return branchMatch && roleMatch;
+  });
+  userCurrentPage = 1;
+  renderUsers();
+}
 
 function renderUsers() {
   const tbody = document.getElementById("userTableBody");
@@ -11962,7 +12060,7 @@ function renderUsers() {
 
   const start = (userCurrentPage - 1) * userPerPage;
   const end = start + userPerPage;
-  const rows = (allUsers || []).slice(start, end);
+  const rows = (filteredUsers || []).slice(start, end);
 
   const role = state.user?.role?.toLowerCase();
 
@@ -12032,7 +12130,7 @@ function renderUsers() {
 function renderUserPagination() {
   const pagination = document.getElementById("userPagination");
   if (!pagination) return;
-  const total = allUsers.length;
+  const total = filteredUsers.length;
   const totalPages = Math.ceil(total / userPerPage);
   document.getElementById("userShowingStart").textContent = total ? (userCurrentPage - 1) * userPerPage + 1 : 0;
   document.getElementById("userShowingEnd").textContent = Math.min(userCurrentPage * userPerPage, total);
@@ -12239,28 +12337,26 @@ async function loadBranchOptions() {
   }
 }
 
-function loadUserRoleOptions(){
+function loadUserRoleOptions() {
   const select = document.getElementById("newUserRole");
-  if(!select) return;
-  const currentRole = state.user.role.toLowerCase();
-  select.innerHTML = `
-    <option value="">
-      Select Role
-    </option>
-  `;
+
+  if (!select) return;
+
+  const currentRole = String( state.user?.role || "" ).toLowerCase();
+
+  select.innerHTML = ` <option value=""> Select Role </option> `;
+	
   // OWNER
-  if(currentRole === "owner"){
+  if (currentRole === "owner") {
     select.innerHTML += `
-      <option value="Admin">
-        Admin
-      </option>
-      <option value="Cashier">
-        Cashier
-      </option>
+      <option value="Admin"> Admin </option>
+      <option value="Cashier"> Cashier </option>
+      <option value="Accountant"> Accountant </option>
+      <option value="Attendance"> Attendance </option>
     `;
   }
   // ADMIN
-  else if(currentRole === "admin"){
+  else if (currentRole === "admin") {
     select.innerHTML += `
       <option value="Cashier">
         Cashier
