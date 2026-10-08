@@ -35004,7 +35004,102 @@ function handleAttendanceEmployeeSelect() {
   info?.classList.remove('hidden');
 }
 
+async function verifyAttendanceKiosk() {
+  const employeeSelect = document.getElementById('attendanceKioskEmployee');
+  const pinInput = document.getElementById('attendanceKioskPin');
+  const button = document.getElementById('attendanceKioskVerifyButton');
+  const employeeId = employeeSelect?.value || '';
+  const pin = pinInput?.value.trim() || '';
 
+  // VALIDATION
+  if (!employeeId) {
+    alert('Please select an employee.');
+    employeeSelect?.focus();
+    return;
+  }
+  if (!/^\d{4,8}$/.test(pin)) {
+    alert('PIN must be 4-8 digits.');
+    pinInput?.focus();
+    return;
+  }
+
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    alert('Session POS tidak ditemukan.');
+    return;
+  }
+
+  try {
+    // LOADING
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Verifying...';
+    }
+		
+    // VERIFY PIN
+    const { data, error } =
+      await supabaseClient.rpc(
+        'verify_employee_attendance_pin',
+        {
+          p_session_id: sessionId,
+          p_employee_id: employeeId,
+          p_pin: pin
+        }
+      );
+
+    if (error) { throw error; }
+
+    const result =
+      typeof data === 'string'
+        ? JSON.parse(data)
+        : data;
+
+    console.log(
+      'Attendance PIN verification:',
+      result
+    );
+
+    // FAILED
+    if (!result?.success) {
+      alert(
+        result?.message ||
+        'PIN verification failed.'
+      );
+      return;
+    }
+
+    // SUCCESS
+    console.log(
+      'Employee verified:',
+      result.employee_name
+    );
+
+    alert( `PIN berhasil diverifikasi untuk ${result.employee_name}` );
+
+    // Untuk sementara kita belum generate QR.
+    // Step berikutnya:
+    // 1. Check schedule hari ini
+    // 2. Tentukan check-in / check-out
+    // 3. Generate attendance token
+    // 4. Generate QR
+
+  } catch (error) {
+    console.error(
+      'verifyAttendanceKiosk:',
+      error
+    );
+    alert(
+      error?.message ||
+      'Failed to verify attendance.'
+    );
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Verify & Generate QR';
+    }
+  }
+}
 
 
 
