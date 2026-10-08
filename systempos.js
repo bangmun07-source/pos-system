@@ -323,6 +323,7 @@ applyTheme();
 	
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
+
   // 1. CEK PERUBAHAN TENANT (Wajib Login Ulang Jika Tenant Berubah)
   const urlTenant = params.get("tenant") ? params.get("tenant").trim() : null;
   const savedTenant = localStorage.getItem("pos_tenantSlug");
@@ -365,6 +366,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   }
+
+	// PUBLIC ATTENDANCE SCANNER
+	const path = window.location.pathname.replace(/\/+$/, '');
+	if (path === '/attendance-scan') {
+		window.__ACTIVE_PAGE =
+			'attendanceScanPage';
+		navigate(
+			'attendanceScanPage'
+		);
+		return;
+	}
 	
   // 3. PAGE & BOOT APP
   const page = params.get("page") || window.__ACTIVE_PAGE || null;
@@ -1098,6 +1110,10 @@ function initModule(pageId) {
 
 		case "attendancePage":
 			initAttendancePage();
+		break;
+
+		case "attendanceScanPage":
+		  initAttendanceScanPage();
 		break;
   }
 }
@@ -35414,4 +35430,321 @@ function startAttendanceQrTimer(seconds = 60) {
 }
 
 
+/* =========================================================
+   									ATTENDANCE SCANNER PAGE
+========================================================= */
 
+let attendanceScanner = null;
+let attendanceScannerRunning = false;
+let attendanceScannerProcessing = false;
+
+async function initAttendanceScanPage() {
+  try {
+    resetAttendanceScannerUI();
+
+    if (typeof Html5Qrcode === 'undefined') {
+      throw new Error(
+        'QR scanner library belum tersedia.'
+      );
+    }
+
+    await startAttendanceScanner();
+
+  } catch (error) {
+    console.error(
+      'initAttendanceScanPage:',
+      error
+    );
+
+    showAttendanceScanError(
+      error?.message ||
+      'Tidak dapat membuka kamera.'
+    );
+  }
+}
+
+
+async function startAttendanceScanner() {
+
+  if (attendanceScannerRunning) {
+    return;
+  }
+
+  const reader =
+    document.getElementById(
+      'attendanceScanReader'
+    );
+
+  if (!reader) {
+    throw new Error(
+      'Scanner container tidak ditemukan.'
+    );
+  }
+
+  attendanceScannerProcessing = false;
+
+  attendanceScanner =
+    new Html5Qrcode(
+      'attendanceScanReader'
+    );
+
+  await attendanceScanner.start(
+    {
+      facingMode: 'environment'
+    },
+    {
+      fps: 10,
+      qrbox: {
+        width: 250,
+        height: 250
+      }
+    },
+
+    async decodedText => {
+
+      if (attendanceScannerProcessing) {
+        return;
+      }
+
+      attendanceScannerProcessing = true;
+
+      console.log(
+        'Attendance QR detected:',
+        decodedText
+      );
+
+      await stopAttendanceScanner();
+
+      await processScannedAttendanceToken(
+        decodedText
+      );
+    },
+
+    errorMessage => {
+      // Ignore continuous scan errors.
+    }
+  );
+
+  attendanceScannerRunning = true;
+
+  const status =
+    document.getElementById(
+      'attendanceScanStatus'
+    );
+
+  if (status) {
+    status.textContent =
+      'Arahkan kamera ke QR attendance.';
+  }
+}
+
+
+async function stopAttendanceScanner() {
+
+  if (!attendanceScanner) {
+    return;
+  }
+
+  try {
+
+    if (attendanceScannerRunning) {
+      await attendanceScanner.stop();
+    }
+
+  } catch (error) {
+    console.warn(
+      'stopAttendanceScanner:',
+      error
+    );
+  }
+
+  try {
+    attendanceScanner.clear();
+  } catch (error) {
+    // Ignore.
+  }
+
+  attendanceScannerRunning = false;
+  attendanceScanner = null;
+}
+
+async function processScannedAttendanceToken(token) {
+
+  try {
+
+    const status =
+      document.getElementById(
+        'attendanceScanStatus'
+      );
+
+    if (status) {
+      status.textContent =
+        'Verifying attendance...';
+    }
+
+    const cleanToken =
+      String(token || '').trim();
+
+    if (!cleanToken) {
+      throw new Error(
+        'Attendance QR tidak valid.'
+      );
+    }
+
+    const { data, error } =
+      await supabaseClient.rpc(
+        'process_employee_attendance_qr',
+        {
+          p_token: cleanToken
+        }
+      );
+
+    if (error) {
+      throw error;
+    }
+
+    const result =
+      typeof data === 'string'
+        ? JSON.parse(data)
+        : data;
+
+    console.log(
+      'Attendance QR result:',
+      result
+    );
+
+    if (!result?.success) {
+      throw new Error(
+        result?.message ||
+        'Attendance gagal.'
+      );
+    }
+
+    showAttendanceScanSuccess(
+      result
+    );
+
+  } catch (error) {
+
+    console.error(
+      'processScannedAttendanceToken:',
+      error
+    );
+
+    showAttendanceScanError(
+      error?.message ||
+      'Attendance gagal.'
+    );
+  }
+}
+
+function showAttendanceScanSuccess(result) {
+
+  const success =
+    document.getElementById(
+      'attendanceScanSuccess'
+    );
+
+  const error =
+    document.getElementById(
+      'attendanceScanError'
+    );
+
+  const status =
+    document.getElementById(
+      'attendanceScanStatus'
+    );
+
+  const name =
+    document.getElementById(
+      'attendanceScanSuccessName'
+    );
+
+  const message =
+    document.getElementById(
+      'attendanceScanSuccessMessage'
+    );
+
+  if (error) {
+    error.classList.add('hidden');
+  }
+
+  if (success) {
+    success.classList.remove('hidden');
+  }
+
+  if (status) {
+    status.textContent =
+      'Attendance berhasil.';
+  }
+
+  if (name) {
+    name.textContent =
+      result?.employee_name || '-';
+  }
+
+  if (message) {
+    message.textContent =
+      `Check In berhasil pada ${
+        result?.check_in
+          ? new Date(
+              result.check_in
+            ).toLocaleTimeString(
+              'id-ID',
+              {
+                hour: '2-digit',
+                minute: '2-digit'
+              }
+            )
+          : '-'
+      }.`;
+  }
+}
+
+function showAttendanceScanError(message) {
+
+  const success =
+    document.getElementById(
+      'attendanceScanSuccess'
+    );
+
+  const error =
+    document.getElementById(
+      'attendanceScanError'
+    );
+
+  const status =
+    document.getElementById(
+      'attendanceScanStatus'
+    );
+
+  const errorMessage =
+    document.getElementById(
+      'attendanceScanErrorMessage'
+    );
+
+  if (success) {
+    success.classList.add('hidden');
+  }
+
+  if (error) {
+    error.classList.remove('hidden');
+  }
+
+  if (status) {
+    status.textContent =
+      'Attendance gagal.';
+  }
+
+  if (errorMessage) {
+    errorMessage.textContent =
+      message ||
+      'Attendance gagal.';
+  }
+}
+
+async function restartAttendanceScanner() {
+  await stopAttendanceScanner();
+  resetAttendanceScannerUI();
+  await startAttendanceScanner();
+}
