@@ -34974,21 +34974,16 @@ function startAttendanceKioskAttendanceCheck(
         }
 
         console.log(
-          'Attendance ditemukan setelah scan.'
-        );
-
-        clearInterval(
-          attendanceKioskAttendanceCheckInterval
-        );
-
-        attendanceKioskAttendanceCheckInterval = null;
-
-        // ==========================================
-        // ATTENDANCE SUDAH BERHASIL
-        // RELOAD PAGE ATTENDANCE
-        // ==========================================
-
-        location.reload();
+				  'Attendance ditemukan setelah scan.'
+				);
+				
+				clearInterval(
+				  attendanceKioskAttendanceCheckInterval
+				);
+				
+				attendanceKioskAttendanceCheckInterval = null;
+				
+				await initAttendancePage();
 
       } catch (error) {
 
