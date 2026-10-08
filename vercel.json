@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/attendance-scan",
+      "destination": "/index.html"
+    }
+  ]
+}
