@@ -34970,3 +34970,41 @@ function loadAttendanceKioskEmployees() {
   });
 }
 
+function handleAttendanceEmployeeSelect() {
+  const select = document.getElementById('attendanceKioskEmployee');
+  const info = document.getElementById('attendanceKioskEmployeeInfo');
+  const nameEl = document.getElementById('attendanceKioskEmployeeName');
+  const idEl = document.getElementById('attendanceKioskEmployeeId');
+  const positionEl = document.getElementById('attendanceKioskEmployeePosition');
+  const branchEl = document.getElementById('attendanceKioskEmployeeBranch');
+
+  if (!select) return;
+
+  const employeeId = select.value;
+
+  if (!employeeId) {
+    info?.classList.add('hidden');
+
+    if (nameEl) nameEl.textContent = '-';
+    if (idEl) idEl.textContent = '-';
+    if (positionEl) positionEl.textContent = '-';
+    if (branchEl) branchEl.textContent = '-';
+
+    return;
+  }
+
+  const employee = employeeData.find(e => String(e.Employee_ID) === String(employeeId) );
+
+  if (!employee) { info?.classList.add('hidden'); return; }
+  if (nameEl) { nameEl.textContent = employee.Full_Name || '-'; }
+  if (idEl) { idEl.textContent = employee.Employee_Code || employee.Employee_ID || '-'; }
+  if (positionEl) { positionEl.textContent = employee.Position || '-'; }
+  if (branchEl) { branchEl.textContent = employee.Branch_ID || '-'; }
+
+  info?.classList.remove('hidden');
+}
+
+
+
+
+
