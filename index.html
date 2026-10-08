@@ -22916,171 +22916,169 @@
 						</div>
 					</div>
 				</section>
-			</section>
-
-			<!-- ==== EMPLOYEE ATTENDANCE ===== -->
-			<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-			  <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-4">
-			    <div class="flex items-center gap-3">
-			      <div class="main-icon-box">
-			        <span class="material-symbols-outlined text-3xl"
-			          style="font-variation-settings:'FILL' 1;">
-			          how_to_reg
-			        </span>
-			      </div>
+				<!-- ==== EMPLOYEE ATTENDANCE ===== -->
+				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-4">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined text-3xl"
+				          style="font-variation-settings:'FILL' 1;">
+				          how_to_reg
+				        </span>
+				      </div>
+							
+				      <div>
+				        <h2 class="text-lg font-bold font-headline text-foreground">
+				          Employee Attendance
+				        </h2>
+				
+				        <p class="text-xs text-muted mt-1">
+				          Manage employee attendance and attendance status
+				        </p>
+				      </div>
+				    </div>
 						
-			      <div>
-			        <h2 class="text-lg font-bold font-headline text-foreground">
-			          Employee Attendance
-			        </h2>
-			
-			        <p class="text-xs text-muted mt-1">
-			          Manage employee attendance and attendance status
-			        </p>
-			      </div>
-			    </div>
-					
-			    <div class="flex items-center gap-2">
-			      <!-- EXPORT -->
-			      <button type="button"
-			        onclick="exportEmployeeAttendance()"
-			        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-			        <span class="material-symbols-outlined text-sm">
-			          download
-			        </span>
-			        Export
-			      </button>
-			    </div>
-			  </div>
-			  <!-- FILTER -->
-			  <div class="p-5 border-b border-outline-variant">
-			    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
-			      <!-- DATE FROM -->
-			      <div class="md:col-span-3">
-			        <label class="block text-xs text-muted mb-2">
-			          Date From
-			        </label>
-			
-			        <input type="date"
-			          id="attendanceDateFrom"
-			          onchange="filterEmployeeAttendance()"
-			          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-			      </div>
-			      <!-- DATE TO -->
-			      <div class="md:col-span-3">
-			        <label class="block text-xs text-muted mb-2">
-			          Date To
-			        </label>
-			
-			        <input type="date"
-			          id="attendanceDateTo"
-			          onchange="filterEmployeeAttendance()"
-			          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-			      </div>
-			      <!-- EMPLOYEE -->
-			      <div class="md:col-span-3">
-			        <label class="block text-xs text-muted mb-2">
-			          Employee
-			        </label>
-			
-			        <select id="attendanceEmployeeFilter"
-			          onchange="filterEmployeeAttendance()"
-			          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-			          <option value="">
-			            All Employees
-			          </option>
-			        </select>
-			      </div>
-			      <!-- OUTLET -->
-			      <div class="md:col-span-3">
-			        <label class="block text-xs text-muted mb-2">
-			          Outlet
-			        </label>
-			
-			        <select id="attendanceBranchFilter"
-			          onchange="filterEmployeeAttendance()"
-			          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-			          <option value=""> All Branch </option>
-			        </select>
-			      </div>
-			    </div>
-			    <!-- SECOND FILTER ROW -->
-			    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mt-4">
-			      <div class="md:col-span-3">
-			        <label class="block text-xs text-muted mb-2"> 
-								Status
-							</label>
-			
-			        <select id="attendanceStatusFilter"
-			          onchange="filterEmployeeAttendance()"
-			          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-			          <option value=""> All Status </option>
-			          <option value="PRESENT"> Present </option>
-			          <option value="SICK"> Sick </option>
-			          <option value="LEAVE"> Leave </option>
-			          <option value="ABSENT"> Absent </option>
-			        </select>
-			      </div>
-			    </div>
-			  </div>
-			  <!-- ATTENDANCE TABLE -->
-			  <div class="overflow-x-auto custom-scrollbar">
-			    <table class="w-full text-sm">
-			      <thead>
-			        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-			          <th class="px-5 py-3 text-left"> Employee </th>
-			          <th class="px-5 py-3 text-center"> Outlet </th>
-			          <th class="px-5 py-3 text-left"> Date </th>
-			          <th class="px-5 py-3 text-left"> Schedule </th>
-			          <th class="px-5 py-3 text-left"> Check In </th>
-			          <th class="px-5 py-3 text-center"> Status </th>
-			          <th class="px-5 py-3 text-left"> Note </th>
-			          <th class="px-5 py-3 text-center"> Action </th>
-			        </tr>
-			      </thead>
-			
-			      <tbody id="employeeAttendanceTableBody"
-			        class="divide-y divide-outline-variant" >
-			        <tr>
-			          <td colspan="8"
-			            class="px-5 py-10 text-center text-muted">
-			            No employee attendance data
-			          </td>
-			        </tr>
-			      </tbody>
-			    </table>
-			  </div>
-			  <!-- PAGINATION -->
-			  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
-			    <div>
-			      <p id="attendancePaginationInfo"
-			        class="text-xs text-on-surface-variant font-medium">
-			        Showing 0–0 of 0
-			      </p>
-			    </div>
-			
-			    <div class="flex items-center gap-2">
-			      <button id="attendancePrevButton"
-			        type="button"
-			        onclick="changeEmployeeAttendancePage(-1)"
-			        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
-			        <span class="material-symbols-outlined text-sm">
-			          chevron_left
-			        </span>
-			      </button>
-						
-			      <button id="attendanceNextButton"
-			        type="button"
-			        onclick="changeEmployeeAttendancePage(1)"
-			        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
-			        <span class="material-symbols-outlined text-sm">
-			          chevron_right
-			        </span>
-			      </button>
-			    </div>
-			  </div>
+				    <div class="flex items-center gap-2">
+				      <!-- EXPORT -->
+				      <button type="button"
+				        onclick="exportEmployeeAttendance()"
+				        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				        <span class="material-symbols-outlined text-sm">
+				          download
+				        </span>
+				        Export
+				      </button>
+				    </div>
+				  </div>
+				  <!-- FILTER -->
+				  <div class="p-5 border-b border-outline-variant">
+				    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+				      <!-- DATE FROM -->
+				      <div class="md:col-span-3">
+				        <label class="block text-xs text-muted mb-2">
+				          Date From
+				        </label>
+				
+				        <input type="date"
+				          id="attendanceDateFrom"
+				          onchange="filterEmployeeAttendance()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				      </div>
+				      <!-- DATE TO -->
+				      <div class="md:col-span-3">
+				        <label class="block text-xs text-muted mb-2">
+				          Date To
+				        </label>
+				
+				        <input type="date"
+				          id="attendanceDateTo"
+				          onchange="filterEmployeeAttendance()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				      </div>
+				      <!-- EMPLOYEE -->
+				      <div class="md:col-span-3">
+				        <label class="block text-xs text-muted mb-2">
+				          Employee
+				        </label>
+				
+				        <select id="attendanceEmployeeFilter"
+				          onchange="filterEmployeeAttendance()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">
+				            All Employees
+				          </option>
+				        </select>
+				      </div>
+				      <!-- OUTLET -->
+				      <div class="md:col-span-3">
+				        <label class="block text-xs text-muted mb-2">
+				          Outlet
+				        </label>
+				
+				        <select id="attendanceBranchFilter"
+				          onchange="filterEmployeeAttendance()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value=""> All Branch </option>
+				        </select>
+				      </div>
+				    </div>
+				    <!-- SECOND FILTER ROW -->
+				    <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mt-4">
+				      <div class="md:col-span-3">
+				        <label class="block text-xs text-muted mb-2"> 
+									Status
+								</label>
+				
+				        <select id="attendanceStatusFilter"
+				          onchange="filterEmployeeAttendance()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value=""> All Status </option>
+				          <option value="PRESENT"> Present </option>
+				          <option value="SICK"> Sick </option>
+				          <option value="LEAVE"> Leave </option>
+				          <option value="ABSENT"> Absent </option>
+				        </select>
+				      </div>
+				    </div>
+				  </div>
+				  <!-- ATTENDANCE TABLE -->
+				  <div class="overflow-x-auto custom-scrollbar">
+				    <table class="w-full text-sm">
+				      <thead>
+				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+				          <th class="px-5 py-3 text-left"> Employee </th>
+				          <th class="px-5 py-3 text-center"> Outlet </th>
+				          <th class="px-5 py-3 text-left"> Date </th>
+				          <th class="px-5 py-3 text-left"> Schedule </th>
+				          <th class="px-5 py-3 text-left"> Check In </th>
+				          <th class="px-5 py-3 text-center"> Status </th>
+				          <th class="px-5 py-3 text-left"> Note </th>
+				          <th class="px-5 py-3 text-center"> Action </th>
+				        </tr>
+				      </thead>
+				
+				      <tbody id="employeeAttendanceTableBody"
+				        class="divide-y divide-outline-variant" >
+				        <tr>
+				          <td colspan="8"
+				            class="px-5 py-10 text-center text-muted">
+				            No employee attendance data
+				          </td>
+				        </tr>
+				      </tbody>
+				    </table>
+				  </div>
+				  <!-- PAGINATION -->
+				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+				    <div>
+				      <p id="attendancePaginationInfo"
+				        class="text-xs text-on-surface-variant font-medium">
+				        Showing 0–0 of 0
+				      </p>
+				    </div>
+				
+				    <div class="flex items-center gap-2">
+				      <button id="attendancePrevButton"
+				        type="button"
+				        onclick="changeEmployeeAttendancePage(-1)"
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">
+				          chevron_left
+				        </span>
+				      </button>
+							
+				      <button id="attendanceNextButton"
+				        type="button"
+				        onclick="changeEmployeeAttendancePage(1)"
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">
+				          chevron_right
+				        </span>
+				      </button>
+				    </div>
+				  </div>
+				</section>
 			</section>
-
 			<!-- ==== PAYROLL ATTENDANCE ===== -->
       <section id="payrollAttendanceSection"
         class="mt-5 space-y-5 hidden">
