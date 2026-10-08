@@ -34913,17 +34913,19 @@ function startAttendanceKioskRealtime() {
     return;
   }
 
-  // Hapus channel lama jika masih ada
   if (attendanceKioskRealtimeChannel) {
+
     try {
       supabaseClient.removeChannel(
         attendanceKioskRealtimeChannel
       );
     } catch (error) {
+
       console.warn(
         'Remove old attendance realtime channel:',
         error
       );
+
     }
 
     attendanceKioskRealtimeChannel = null;
@@ -34931,9 +34933,7 @@ function startAttendanceKioskRealtime() {
 
   attendanceKioskRealtimeChannel =
     supabaseClient
-      .channel(
-        `attendance-kiosk-${branchId}`
-      )
+      .channel(`attendance-kiosk-${branchId}`)
       .on(
         'postgres_changes',
         {
@@ -34949,9 +34949,14 @@ function startAttendanceKioskRealtime() {
             payload
           );
 
-          handleAttendanceKioskRealtime(
-            payload?.new
-          );
+          /*
+           * Attendance berhasil masuk.
+           * Reload halaman Attendance.
+           */
+          setTimeout(() => {
+            location.reload();
+          }, 1000);
+
         }
       )
       .subscribe(status => {
