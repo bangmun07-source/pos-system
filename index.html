@@ -6297,76 +6297,97 @@
 	</section>
 	
 	<!-- User Management -->
-	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] ">
-		<div class="flex items-center justify-between mb-8 border-b border-outline-variant pb-6">
-			<div class="flex items-center gap-4">
-				<div class="main-icon-box">		                
-					<span class="material-symbols-outlined text-3xl"
-							style="font-variation-settings:'FILL' 1;">
-						group
-					</span>
-				</div>
+	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	  <div class="flex items-center justify-between mb-8 border-b border-outline-variant pb-6">
+	    <!-- TITLE -->
+	    <div class="flex items-center gap-4">
+	      <div class="main-icon-box">
+	        <span class="material-symbols-outlined text-3xl"
+	              style="font-variation-settings:'FILL' 1;">
+	          group
+	        </span>
+	      </div>
 	
-				<div>
-					<h2 class="font-headline text-2xl font-bold tracking-tight">
-						User Management
-					</h2>
-					
-					<p class="text-xs lg:text-sm text-on-surface-variant mt-1">
-						Manage system users, roles, passwords and outlet access.
-					</p>
-				</div>
-			</div>
+	      <div>
+	        <h2 class="font-headline text-2xl font-bold tracking-tight">
+	          User Management
+	        </h2>
 	
-			<button onclick="openAddUserModal()"
-				class="flex items-center gap-2 px-5 py-2.5 rounded-md bottom-theme uppercase tracking-widest font-semibold tracking-[0.20em]">
-				<span class="material-symbols-outlined text-sm">
-					person_add
-				</span>
-				Add User
-			</button>
-		</div>
+	        <p class="text-xs lg:text-sm text-on-surface-variant mt-1">
+	          Manage system users, roles, passwords and outlet access.
+	        </p>
+	      </div>
+	    </div>
 	
-		<div class="overflow-x-auto custom-scrollbar">
-			<table class="w-full text-left">
-				<thead>
-					<tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant">
-						<th class="px-5 py-4">Full Name</th>
-						<th class="px-5 py-4">Username</th>
-						<th class="px-5 py-4">Role</th>
-						<th class="px-5 py-4">Password</th>
-						<th class="px-5 py-4">Outlet</th>
-						<th class="px-5 py-4 text-right">Actions</th>
-					</tr>
-				</thead>
-				<tbody id="userTableBody" class="divide-y divide-outline-variant">
-					<tr>
-						<td colspan="6" class="text-center text-muted ">
-							Loading...
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+	    <!-- FILTER + ADD USER -->
+	    <div class="flex items-center gap-3">
+	      <!-- ROLE -->
+	      <select id="userRoleFilter"
+	        onchange="filterUsers()"
+	        class="h-10 px-4 rounded-md bg-background border border-outline-variant outline-none focus:border-primary text-sm text-on-surface">
+	        <option value=""> All Role </option>
+	        <option value="Owner"> Owner </option>
+	        <option value="Admin"> Admin </option>
+	        <option value="Cashier"> Cashier </option>
+	        <option value="Accountant"> Accountant </option>
+	        <option value="Attendance"> Attendance </option>
+	      </select>
+	      <!-- OUTLET -->
+	      <select id="userBranchFilter"
+	        onchange="filterUsers()"
+	        class="h-10 px-4 rounded-md bg-background border border-outline-variant outline-none focus:border-primary text-sm text-on-surface">
+	        <option value="">
+	          All Outlet
+	        </option>
+	      </select>
+	      <!-- ADD USER -->
+	      <button onclick="openAddUserModal()"
+	        class="flex items-center gap-2 px-5 py-2.5 rounded-md bottom-theme uppercase tracking-widest font-semibold tracking-[0.20em]">
+	        <span class="material-symbols-outlined text-sm">
+	          person_add
+	        </span>
+	        Add User
+	      </button>
+	    </div>
+	  </div>
+	  <!-- TABLE -->
+	  <div class="overflow-x-auto custom-scrollbar">
+	    <table class="w-full text-left">
+	      <thead>
+	        <tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant">
+	          <th class="px-5 py-4">Full Name</th>
+	          <th class="px-5 py-4">Username</th>
+	          <th class="px-5 py-4">Role</th>
+	          <th class="px-5 py-4">Password</th>
+	          <th class="px-5 py-4">Outlet</th>
+	          <th class="px-5 py-4 text-right">Actions</th>
+	        </tr>
+	      </thead>
+	
+	      <tbody id="userTableBody" class="divide-y divide-outline-variant">
+	        <tr>
+	          <td colspan="6" class="text-center text-muted">
+	            Loading...
+	          </td>
+	        </tr>
+	      </tbody>
+	    </table>
+	  </div>
 		
-		<!-- Pagination -->
-		<div class="px-6 py-4 flex items-center justify-between
-				border-t border-outline-variant">
-			<div class="text-xs text-muted ">
-				Showing
-				<span id="userShowingStart" class="text-on-surface font-semibold">1</span>
-				to
-				<span id="userShowingEnd" class="text-on-surface font-semibold">10</span>
-				of
-				<span id="userTotalData" class="text-on-surface font-semibold">0</span>
-				outlets
-			</div>
+	  <!-- Pagination -->
+	  <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
+	    <div class="text-xs text-muted">
+	      Showing
+	      <span id="userShowingStart" class="text-on-surface font-semibold">1</span>
+	      to
+	      <span id="userShowingEnd" class="text-on-surface font-semibold">10</span>
+	      of
+	      <span id="userTotalData" class="text-on-surface font-semibold">0</span>
+	      users
+	    </div>
 	
-			<div
-				id="userPagination"
-				class="flex items-center gap-1">
-			</div>
-		</div>
+	    <div id="userPagination" class="flex items-center gap-1"></div>
+	  </div>
 	</section>
 </div>
 		
@@ -6781,17 +6802,11 @@
 	
 	        <select id="newUserRole"
 	          class="w-full h-11 px-4 rounded-md bg-background border border-outline-variant outline-none focus:border-primary">
-	          <option value="">
-	            Select Role
-	          </option>
-	
-	          <option value="Admin">
-	            Admin
-	          </option>
-	
-	          <option value="Cashier">
-	            Cashier
-	          </option>
+	          <option value=""> Select Role </option>
+	          <option value="Admin"> Admin </option>
+	          <option value="Cashier"> Cashier </option>
+						<option value="Accountant"> Accountant </option>
+						<option value="Attendance"> Attendance </option>
 	        </select>
 	      </div>
 		      <p class="text-xs text-on-surface-variant leading-6">
