@@ -35085,6 +35085,11 @@ function handleAttendanceKioskRealtime(attendance) {
   }
 
   handleAttendanceEmployeeSelect();
+
+  // Reload page setelah success tampil
+  setTimeout(() => {
+    location.reload();
+  }, 2000);
 }
 
 function updateAttendanceKioskClock() {
