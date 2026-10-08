@@ -35122,68 +35122,62 @@ async function verifyAttendanceKiosk() {
     );
 
     // =========================================
-    // SHOW QR PANEL
-    // =========================================
-    const qrEmpty =
-      document.getElementById(
-        'attendanceKioskQrEmpty'
-      );
-
-    const qrActive =
-      document.getElementById(
-        'attendanceKioskQrActive'
-      );
-
-    const qrSuccess =
-      document.getElementById(
-        'attendanceKioskQrSuccess'
-      );
-
-    const qrCode =
-      document.getElementById(
-        'attendanceKioskQrCode'
-      );
-
-    if (qrEmpty) {
-      qrEmpty.classList.add('hidden');
-    }
-
-    if (qrSuccess) {
-      qrSuccess.classList.add('hidden');
-    }
-
-    if (qrActive) {
-      qrActive.classList.remove('hidden');
-    }
-
-    if (qrCode) {
-      qrCode.innerHTML = `
-        <div class="p-6 text-center">
-          <div class="text-lg font-semibold">
-            QR Attendance Ready
-          </div>
-
-          <div class="text-sm opacity-70 mt-2">
-            ${result.employee_name}
-          </div>
-
-          <div class="text-sm opacity-70">
-            ${todaySchedule.Start_Time}
-            -
-            ${todaySchedule.End_Time}
-          </div>
-
-          <div class="mt-6 text-3xl font-bold">
-            TEST QR
-          </div>
-        </div>
-      `;
-    }
-
-    console.log(
-      'Attendance kiosk ready for:',
-      result.employee_name
-    );
+		// GENERATE ATTENDANCE QR
+		// =========================================
+		const qrResult =
+		  await generateAttendanceQr(
+		    employeeId,
+		    todaySchedule
+		  );
+		
+		console.log(
+		  'Attendance QR generated:',
+		  qrResult
+		);
+		
+		// =========================================
+		// SHOW QR PANEL
+		// =========================================
+		const qrEmpty =
+		  document.getElementById(
+		    'attendanceKioskQrEmpty'
+		  );
+		
+		const qrActive =
+		  document.getElementById(
+		    'attendanceKioskQrActive'
+		  );
+		
+		const qrSuccess =
+		  document.getElementById(
+		    'attendanceKioskQrSuccess'
+		  );
+		
+		if (qrEmpty) {
+		  qrEmpty.classList.add('hidden');
+		}
+		
+		if (qrSuccess) {
+		  qrSuccess.classList.add('hidden');
+		}
+		
+		if (qrActive) {
+		  qrActive.classList.remove('hidden');
+		}
+		
+		// =========================================
+		// RENDER QR
+		// =========================================
+		renderAttendanceQr(
+		  qrResult.token
+		);
+		
+		startAttendanceQrTimer(60);
+		
+		console.log(
+		  'Attendance kiosk ready for:',
+		  result.employee_name
+		);
 
   } catch (error) {
     console.error(
@@ -35203,6 +35197,61 @@ async function verifyAttendanceKiosk() {
         'Verify & Generate QR';
     }
   }
+}
+
+async function generateAttendanceQr(
+  employeeId,
+  todaySchedule
+) {
+  const sessionId =
+    localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    throw new Error('Session POS tidak ditemukan.');
+  }
+
+  const branchId =
+    String(state.user?.branchId || '').trim();
+
+  const now = new Date();
+
+  const attendanceDate =
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const { data, error } =
+    await supabaseClient.rpc(
+      'generate_employee_attendance_token',
+      {
+        p_session_id: sessionId,
+        p_employee_id: employeeId,
+        p_schedule_id: todaySchedule.Schedule_ID,
+        p_attendance_date: attendanceDate,
+        p_branch_id: branchId
+      }
+    );
+
+  if (error) {
+    throw error;
+  }
+
+  const result =
+    typeof data === 'string'
+      ? JSON.parse(data)
+      : data;
+
+  console.log(
+    'Attendance QR token:',
+    result
+  );
+
+  if (!result?.success) {
+    throw new Error(
+      result?.message ||
+      'Failed to generate attendance QR.'
+    );
+  }
+
+  return result;
 }
 
 function handleAttendancePinInput() {
@@ -35301,7 +35350,68 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
   return todaySchedule || null;
 }
 
+function renderAttendanceQr(token) {
+  const qrCode =
+    document.getElementById('attendanceKioskQrCode');
 
+  if (!qrCode) return;
+
+  qrCode.innerHTML = '';
+
+  new QRCode(qrCode, {
+    text: token,
+    width: 240,
+    height: 240
+  });
+}
+
+let attendanceKioskQrTimer = null;
+
+function startAttendanceQrTimer(seconds = 60) {
+  const timerEl =
+    document.getElementById('attendanceKioskQrTimer');
+
+  const qrCode =
+    document.getElementById('attendanceKioskQrCode');
+
+  if (attendanceKioskQrTimer) {
+    clearInterval(attendanceKioskQrTimer);
+  }
+
+  let remaining = seconds;
+
+  if (timerEl) {
+    timerEl.textContent = `${remaining}s`;
+  }
+
+  attendanceKioskQrTimer = setInterval(() => {
+    remaining--;
+
+    if (timerEl) {
+      timerEl.textContent =
+        `${Math.max(remaining, 0)}s`;
+    }
+
+    if (remaining <= 0) {
+      clearInterval(attendanceKioskQrTimer);
+      attendanceKioskQrTimer = null;
+
+      if (qrCode) {
+        qrCode.innerHTML = `
+          <div class="p-6 text-center">
+            <div class="text-lg font-semibold">
+              QR Expired
+            </div>
+
+            <div class="text-sm opacity-70 mt-2">
+              Generate a new QR to continue.
+            </div>
+          </div>
+        `;
+      }
+    }
+  }, 1000);
+}
 
 
 
