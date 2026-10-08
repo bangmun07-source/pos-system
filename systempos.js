@@ -376,15 +376,22 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     const role = state.user?.role?.toLowerCase();
-    // BRANCH CONTEXT
-    if (role === "owner") {
-      state.branchId = localStorage.getItem("pos_branchId") || "";
-    } else {
-      state.branchId = state.user?.branchId || localStorage.getItem("pos_branchId") || "";
-    }
-
-    window.__ACTIVE_PAGE = targetPage;
-    navigate(targetPage);
+		if (role === "owner") {
+		  state.branchId =
+		    localStorage.getItem("pos_branchId") || "";
+		} else {
+		  state.branchId =
+		    state.user?.branchId ||
+		    localStorage.getItem("pos_branchId") ||
+		    "";
+		}
+		
+		if (role === "attendance") {
+		  targetPage = "attendancePage";
+		}
+		
+		window.__ACTIVE_PAGE = targetPage;
+		navigate(targetPage);
     // Tunggu template masuk ke DOM
     setTimeout(() => {
       updateThemeIcon();
@@ -745,7 +752,13 @@ async function handleLogin() {
     if (state.branchId) {localStorage.setItem("pos_branchId", state.branchId);}
     localStorage.setItem("pos_login_tenant", state.tenantSlug || "master");
 
-    navigate("dashboardPage");
+    const loginRole = String(user.role || "").toLowerCase();
+
+		if (loginRole === "attendance") {
+		  navigate("attendancePage");
+		} else {
+		  navigate("dashboardPage");
+		}
 
   } catch (err) {
     alert(
