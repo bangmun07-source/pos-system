@@ -12385,11 +12385,10 @@ function loadUserRoleOptions() {
     `;
   }
   // ADMIN
-  else if (currentRole === "admin") {
+  else if(currentRole === "admin"){
     select.innerHTML += `
-      <option value="Cashier">
-        Cashier
-      </option>
+      <option value="Cashier"> Cashier </option>
+      <option value="Attendance"> Attendance </option>
     `;
   }
 }
