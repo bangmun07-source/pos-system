@@ -35264,13 +35264,38 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
       }
     );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
+
+  console.log('RAW schedule data:', data);
+  console.log('RAW schedule data type:', typeof data);
+  console.log('RAW schedule data isArray:', Array.isArray(data));
 
   const schedules =
     Array.isArray(data) ? data : [];
 
-  const todaySchedule = schedules.find(schedule =>
-    String(schedule.Schedule_Date) === today
+  console.log(
+    'Attendance schedules returned:',
+    schedules
+  );
+
+  const todaySchedule = schedules.find(schedule => {
+
+    console.log(
+      'COMPARE:',
+      schedule.Schedule_Date,
+      '===',
+      today,
+      String(schedule.Schedule_Date) === today
+    );
+
+    return String(schedule.Schedule_Date) === today;
+  });
+
+  console.log(
+    'Attendance today schedule:',
+    todaySchedule
   );
 
   return todaySchedule || null;
