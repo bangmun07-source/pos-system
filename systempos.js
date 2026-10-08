@@ -34840,8 +34840,120 @@ window.resetScheduleWorkingDays = function() {
    									ATTENDANCE PAGE
 ========================================================= */
 
-function initAttendancePage() {
-  console.log("Attendance page initialized");
+let attendanceKioskClockInterval = null;
+
+async function initAttendancePage() {
+  try {
+    // CLOCK
+    updateAttendanceKioskClock();
+
+    if (attendanceKioskClockInterval) { clearInterval(attendanceKioskClockInterval); }
+
+    attendanceKioskClockInterval = setInterval(() => {
+      updateAttendanceKioskClock();
+    }, 1000);
+    // OUTLET
+    await loadAttendanceKioskBranch();
+    // EMPLOYEE
+    await loadEmployees();
+
+    loadAttendanceKioskEmployees();
+
+  } catch (error) {
+    console.error('initAttendancePage:', error);
+  }
 }
 
+function updateAttendanceKioskClock() {
+  const clock = document.getElementById('attendanceKioskClock');
+
+  if (!clock) return;
+
+  const now = new Date();
+
+  clock.textContent = now.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}
+
+
+function updateAttendanceKioskClock() {
+  const clock = document.getElementById('attendanceKioskClock');
+
+  if (!clock) return;
+
+  const now = new Date();
+
+  clock.textContent = now.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+}
+
+async function loadAttendanceKioskBranch() {
+  const branchEl = document.getElementById('attendanceKioskBranch');
+
+  if (!branchEl) return;
+
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) { branchEl.textContent = '-'; return; }
+
+  try {
+    const { data, error } =
+      await supabaseClient.rpc(
+        'get_expense_branches',
+        {
+          p_session_id: sessionId
+        }
+      );
+
+    if (error) throw error;
+
+    const branches = typeof data === 'string'
+			? JSON.parse(data)
+			: (data || []);
+    const branchId = String(state.user?.branchId || '').trim();
+    const branch = branches.find(item => String(item.id || '').trim() === branchId );
+
+    branchEl.textContent =
+      branch?.name ||
+      branchId ||
+      '-';
+
+  } catch (error) {
+    console.error(
+      'loadAttendanceKioskBranch:',
+      error
+    );
+    branchEl.textContent = state.user?.branchId || '-';
+  }
+}
+
+function loadAttendanceKioskEmployees() {
+  const select = document.getElementById( 'attendanceKioskEmployee' );
+
+  if (!select) return;
+
+  select.innerHTML = `<option value="">Select Employee</option>`;
+
+  const branchId = String(state.user?.branchId || '').trim();
+  const employees =
+    employeeData.filter(employee =>
+      employee.Status === 'ACTIVE' &&
+      String(employee.Branch_ID || '').trim() ===
+        branchId
+    );
+
+  employees.forEach(employee => {
+    const option = document.createElement('option');
+
+    option.value = employee.Employee_ID;
+    option.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`;
+    select.appendChild(option);
+  });
+}
 
