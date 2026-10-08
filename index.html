@@ -25011,7 +25011,413 @@
 	</div>
 </template>
 
+<!-- =========================================================
+     ATTENDANCE KIOSK PAGE
+========================================================= -->
+<template id="attendancePage">
+  <!-- ================= HEADER ================= -->
+  <header class="h-20 flex-shrink-0 z-40 bg-background border-b border-outline-variant flex items-center px-5 overflow-visible">
+    <div class="flex items-center gap-5 flex-1">
+      <div class="w-[44px] h-[44px] flex items-center justify-center">
+        <img id="attendanceMunoLogo"
+          src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+          alt="MUNO"
+          class="w-12 h-12 object-contain">
+      </div>
 
+      <span class="h-7 w-px bg-outline-variant"></span>
+
+      <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">
+        MUNO
+      </p>
+
+      <span class="h-7 w-px bg-outline-variant"></span>
+
+      <div>
+        <p class="text-[10px] text-muted uppercase tracking-widest">
+          Human Resources
+        </p>
+
+        <p class="text-sm font-bold font-headline text-foreground">
+          Attendance
+        </p>
+      </div>
+    </div>
+    <!-- RIGHT -->
+    <div class="flex items-center gap-5">
+      <div class="text-right">
+        <p class="text-[10px] text-muted uppercase tracking-widest">
+          Outlet
+        </p>
+
+        <p id="attendanceKioskBranch"
+          class="text-sm font-medium text-foreground">
+          -
+        </p>
+      </div>
+
+      <span class="h-7 w-px bg-outline-variant"></span>
+
+      <div class="text-right">
+        <p class="text-[10px] text-muted uppercase tracking-widest">
+          Current Time
+        </p>
+
+        <p id="attendanceKioskClock"
+          class="text-sm font-headline font-bold text-foreground">
+          00:00:00
+        </p>
+      </div>
+
+      <button type="button"
+        onclick="logout()"
+        class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+        <span class="material-symbols-outlined">
+          logout
+        </span>
+      </button>
+    </div>
+  </header>
+  <!-- ================= MAIN ================= -->
+  <main class="min-h-[calc(100vh-5rem)] overflow-auto custom-scrollbar p-5 lg:p-8">
+    <!-- ================= PAGE HEADER ================= -->
+    <section class="bg-background border border-outline-variant rounded-md overflow-hidden mb-5">
+      <div class="p-5 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="main-icon-box">
+            <span class="material-symbols-outlined text-3xl"
+              style="font-variation-settings:'FILL' 1;">
+              how_to_reg
+            </span>
+          </div>
+
+          <div>
+            <h1 class="text-lg lg:text-xl font-bold font-headline text-foreground">
+              Attendance Kiosk
+            </h1>
+
+            <p class="text-xs text-muted mt-1">
+              Employee check-in and attendance verification
+            </p>
+          </div>
+        </div>
+
+        <div class="hidden sm:flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="text-[11px] text-muted uppercase tracking-widest">
+            Kiosk Active
+          </span>
+        </div>
+      </div>
+    </section>
+    <!-- ================= KIOSK ================= -->
+    <section class="grid grid-cols-1 xl:grid-cols-2 gap-5 items-stretch">
+      <!-- LEFT : EMPLOYEE VERIFICATION -->
+      <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+        <!-- HEADER -->
+        <div class="p-5 border-b border-outline-variant">
+          <div class="flex items-center gap-3">
+            <div class="main-icon-box">
+              <span class="material-symbols-outlined text-3xl"
+                style="font-variation-settings:'FILL' 1;">
+                person_search
+              </span>
+            </div>
+
+            <div>
+              <h2 class="text-lg font-bold font-headline text-foreground">
+                Employee Verification
+              </h2>
+
+              <p class="text-xs text-muted mt-1">
+                Select employee and enter attendance PIN
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- BODY -->
+        <div class="p-5 lg:p-8 space-y-6">
+          <!-- EMPLOYEE -->
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Employee
+            </label>
+
+            <select id="attendanceKioskEmployee"
+              onchange="handleAttendanceEmployeeSelect()"
+              class="w-full h-12 px-4 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+              <option value="">
+                Select Employee
+              </option>
+            </select>
+          </div>
+          <!-- EMPLOYEE INFORMATION -->
+          <div id="attendanceKioskEmployeeInfo"
+            class="hidden border border-outline-variant rounded-md overflow-hidden">
+            <div class="px-4 py-3 border-b border-outline-variant">
+              <p class="text-[10px] text-muted uppercase tracking-widest">
+                Employee Information
+              </p>
+            </div>
+
+            <div class="grid grid-cols-2">
+              <div class="p-4 border-r border-outline-variant">
+                <p class="text-[10px] text-muted uppercase tracking-wider">
+                  Employee
+                </p>
+
+                <p id="attendanceKioskEmployeeName"
+                  class="text-sm font-medium text-foreground mt-1">
+                  -
+                </p>
+              </div>
+
+              <div class="p-4">
+                <p class="text-[10px] text-muted uppercase tracking-wider">
+                  Employee ID
+                </p>
+
+                <p id="attendanceKioskEmployeeId"
+                  class="text-sm font-medium text-foreground mt-1">
+                  -
+                </p>
+              </div>
+
+              <div class="p-4 border-t border-r border-outline-variant">
+                <p class="text-[10px] text-muted uppercase tracking-wider">
+                  Position
+                </p>
+
+                <p id="attendanceKioskEmployeePosition"
+                  class="text-sm font-medium text-foreground mt-1">
+                  -
+                </p>
+              </div>
+
+              <div class="p-4 border-t border-outline-variant">
+                <p class="text-[10px] text-muted uppercase tracking-wider">
+                  Outlet
+                </p>
+
+                <p id="attendanceKioskEmployeeBranch"
+                  class="text-sm font-medium text-foreground mt-1">
+                  -
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- PIN -->
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Attendance PIN
+            </label>
+
+            <div class="relative">
+              <input id="attendanceKioskPin"
+                type="password"
+                inputmode="numeric"
+                maxlength="6"
+                autocomplete="off"
+                placeholder="Enter PIN"
+                oninput="handleAttendancePinInput()"
+                class="w-full h-12 px-4 pr-12 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+              <button type="button"
+                onclick="toggleAttendancePin()"
+                class="absolute right-0 top-0 w-12 h-12 flex items-center justify-center text-muted hover:text-foreground">
+                <span id="attendancePinVisibilityIcon"
+                  class="material-symbols-outlined text-lg">
+                  visibility
+                </span>
+              </button>
+            </div>
+            <p id="attendanceKioskPinMessage"
+              class="hidden text-xs mt-2">
+            </p>
+          </div>
+          <!-- STATUS -->
+          <div id="attendanceKioskStatus"
+            class="border border-outline-variant rounded-md p-4">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-xl text-muted">
+                info
+              </span>
+              <div>
+                <p class="text-xs font-medium text-foreground">
+                  Ready for attendance
+                </p>
+
+                <p class="text-[11px] text-muted mt-1">
+                  Select an employee and enter their PIN.
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- VERIFY BUTTON -->
+          <button id="attendanceKioskVerifyButton"
+            type="button"
+            onclick="verifyAttendanceKiosk()"
+            disabled
+            class="w-full h-12 px-5 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            <span class="material-symbols-outlined text-lg">
+              qr_code_2
+            </span>
+            Verify & Generate QR
+          </button>
+        </div>
+      </section>
+      <!-- RIGHT : QR ATTENDANCE -->
+      <section class="bg-background border border-outline-variant rounded-md overflow-hidden flex flex-col">
+        <!-- HEADER -->
+        <div class="p-5 border-b border-outline-variant">
+          <div class="flex items-center gap-3">
+            <div class="main-icon-box">
+              <span class="material-symbols-outlined text-3xl"
+                style="font-variation-settings:'FILL' 1;">
+                qr_code_2
+              </span>
+            </div>
+
+            <div>
+              <h2 class="text-lg font-bold font-headline text-foreground">
+                QR Attendance
+              </h2>
+
+              <p class="text-xs text-muted mt-1">
+                Scan this QR code using the employee's mobile phone
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- QR BODY -->
+        <div class="flex-1 flex flex-col items-center justify-center p-8 min-h-[520px]">
+          <!-- EMPTY STATE -->
+          <div id="attendanceKioskQrEmpty"
+            class="flex flex-col items-center justify-center text-center">
+            <div class="w-28 h-28 rounded-md border border-outline-variant flex items-center justify-center mb-5">
+              <span class="material-symbols-outlined text-6xl text-muted">
+                qr_code_2
+              </span>
+            </div>
+
+            <h3 class="text-sm font-bold font-headline text-foreground">
+              QR Code Not Ready
+            </h3>
+
+            <p class="text-xs text-muted mt-2 max-w-xs leading-relaxed">
+              Verify the employee on the left to generate a unique attendance QR code.
+            </p>
+          </div>
+          <!-- QR ACTIVE -->
+          <div id="attendanceKioskQrActive"
+            class="hidden flex-col items-center justify-center text-center w-full">
+            <!-- EMPLOYEE -->
+            <div class="mb-5">
+
+              <p class="text-[10px] text-muted uppercase tracking-widest">
+                Attendance For
+              </p>
+
+              <p id="attendanceKioskQrEmployeeName"
+                class="text-lg font-bold font-headline text-foreground mt-1">
+                -
+              </p>
+            </div>
+            <!-- QR -->
+            <div class="p-4 bg-white rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.10)]">
+              <div id="attendanceKioskQrCode"
+                class="w-64 h-64 flex items-center justify-center">
+
+                <!-- QR GENERATED HERE -->
+              </div>
+            </div>
+            <!-- TIMER -->
+            <div class="mt-6">
+              <div class="flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined text-lg text-muted">
+                  timer
+                </span>
+
+                <span class="text-xs text-muted uppercase tracking-widest">
+                  QR expires in
+                </span>
+
+                <span id="attendanceKioskQrTimer"
+                  class="text-sm font-headline font-bold text-foreground">
+                  60s
+                </span>
+              </div>
+            </div>
+
+            <p class="text-xs text-muted mt-3 max-w-sm leading-relaxed">
+              Ask the employee to scan this QR code using their own mobile phone.
+            </p>
+          </div>
+          <!-- SUCCESS -->
+          <div id="attendanceKioskQrSuccess"
+            class="hidden flex-col items-center justify-center text-center">
+            <div class="w-28 h-28 rounded-full border border-outline-variant flex items-center justify-center mb-5">
+              <span class="material-symbols-outlined text-6xl text-primary"
+                style="font-variation-settings:'FILL' 1;">
+                check_circle
+              </span>
+            </div>
+
+            <h3 class="text-lg font-bold font-headline text-foreground">
+              Attendance Recorded
+            </h3>
+
+            <p id="attendanceKioskSuccessEmployee"
+              class="text-sm text-foreground mt-2">
+              -
+            </p>
+
+            <p id="attendanceKioskSuccessTime"
+              class="text-xs text-muted mt-1">
+              -
+            </p>
+
+            <p class="text-xs text-muted mt-4">
+              Preparing kiosk for next employee...
+            </p>
+          </div>
+        </div>
+        <!-- FOOTER -->
+        <div class="px-5 py-4 border-t border-outline-variant">
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm text-muted">
+                security
+              </span>
+
+              <p class="text-[10px] text-muted uppercase tracking-wider">
+                Secure One-Time Verification
+              </p>
+            </div>
+
+            <span id="attendanceKioskConnectionStatus"
+              class="text-[10px] text-muted uppercase tracking-wider">
+              Ready
+            </span>
+          </div>
+        </div>
+      </section>
+    </section>
+    <!-- ================= BOTTOM STATUS ================= -->
+    <section class="mt-5 bg-background border border-outline-variant rounded-md overflow-hidden">
+      <div class="px-5 py-4 flex items-center justify-center">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-muted text-lg">
+            touch_app
+          </span>
+
+          <p class="text-xs text-muted">
+            Select employee → Enter PIN → Generate QR → Employee scans QR
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+</template>
 	
 <!-- 
   MUNO KASIR: MASTER SPA LOGIC (Script.html)
