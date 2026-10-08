@@ -24834,10 +24834,8 @@
 	
 	        <select id="attendanceStatus"
 	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-	          <option value="PRESENT"> Present </option>
 	          <option value="SICK"> Sick </option>
 	          <option value="LEAVE"> Leave </option>
-	          <option value="ABSENT"> Absent </option>
 	        </select>
 	      </div>
 	      <!-- NOTE -->
@@ -24863,6 +24861,135 @@
 	      <button type="button"
 	        id="saveEmployeeAttendance"
 	        onclick="saveEmployeeAttendance()"
+	        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium">
+	        Save
+	      </button>
+	    </div>
+	  </div>
+	</div>
+
+	<!-- EMPLOYEE OVERTIME MODAL -->
+	<div id="employeeOvertimeModal"
+	  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md overflow-hidden">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-2xl"
+	            style="font-variation-settings:'FILL' 1;">
+	            more_time
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h3 class="text-lg font-bold font-headline text-foreground">
+	            Employee Overtime
+	          </h3>
+	
+	          <p class="text-xs text-muted mt-1">
+	            Record employee overtime hours
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeEmployeeOvertimeModal()"
+	        class="w-9 h-9 flex items-center justify-center rounded-md text-muted hover:text-foreground hover:bg-background">
+	        <span class="material-symbols-outlined text-lg">
+	          close
+	        </span>
+	      </button>
+	    </div>
+	    <!-- BODY -->
+	    <div class="p-5 space-y-4">
+	      <!-- HIDDEN ID -->
+	      <input type="hidden"
+	        id="overtimeId" >
+	      <!-- EMPLOYEE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Employee
+	        </label>
+	
+	        <input type="text"
+	          id="overtimeEmployeeName"
+	          readonly
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-muted outline-none">
+	      </div>
+	      <!-- DATE -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Overtime Date
+	        </label>
+	
+	        <input type="date"
+	          id="overtimeDate"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	      <!-- SCHEDULE INFO -->
+	      <div>
+	        <label class="block text-xs text-muted mb-2">
+	          Schedule End
+	        </label>
+	
+	        <input type="text"
+	          id="overtimeScheduleEnd"
+	          readonly
+	          placeholder="-"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-muted outline-none">
+	
+	        <p class="text-[11px] text-muted mt-1">
+	          Overtime starts after the scheduled end time.
+	        </p>
+	      </div>
+	      <!-- START TIME -->
+	      <div>
+	        <label for="overtimeStartTime"
+	          class="block text-xs text-muted mb-2">
+	          Overtime Start
+	        </label>
+	
+	        <input type="time"
+	          id="overtimeStartTime"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	      <!-- END TIME -->
+	      <div>
+	        <label for="overtimeEndTime"
+	          class="block text-xs text-muted mb-2">
+	          Overtime End
+	        </label>
+	
+	        <input type="time"
+	          id="overtimeEndTime"
+	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	      </div>
+	      <!-- NOTE -->
+	      <div>
+	        <label for="overtimeNote"
+	          class="block text-xs text-muted mb-2" >
+	          Note
+	        </label>
+	
+	        <textarea id="overtimeNote"
+	          rows="3"
+	          placeholder="Optional note..."
+	          class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none resize-none">
+					</textarea>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-2">
+	      <button type="button"
+	        onclick="closeEmployeeOvertimeModal()"
+	        class="h-10 px-4 rounded-md bg-background border border-outline-variant text-sm font-medium text-muted hover:text-foreground">
+	        Cancel
+	      </button>
+				
+	      <button type="button"
+	        id="saveEmployeeOvertime"
+	        onclick="saveEmployeeOvertime()"
 	        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium">
 	        Save
 	      </button>
