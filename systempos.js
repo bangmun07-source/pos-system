@@ -35220,24 +35220,39 @@ function handleAttendancePinInput() {
 
 function getAttendanceWeekStart(date = new Date()) {
   const d = new Date(date);
-  const day = d.getDay(); // Sunday = 0
 
+  const day = d.getDay(); // Minggu=0, Senin=1, ..., Sabtu=6
   const diff = day === 0 ? -6 : 1 - day;
 
   d.setDate(d.getDate() + diff);
-  d.setHours(0, 0, 0, 0);
 
-  return d.toISOString().slice(0, 10);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const dayOfMonth = String(d.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${dayOfMonth}`;
 }
 
 async function getAttendanceEmployeeTodaySchedule(employeeId) {
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
-  if (!employeeId) { throw new Error('Employee belum dipilih.'); }
+  if (!sessionId) {
+    throw new Error('Session POS tidak ditemukan.');
+  }
 
-  const today = new Date().toISOString().slice(0, 10);
-  const weekStart = getAttendanceWeekStart(new Date());
+  if (!employeeId) {
+    throw new Error('Employee belum dipilih.');
+  }
+
+  const now = new Date();
+
+  const today =
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+
+  const weekStart = getAttendanceWeekStart(now);
+
+  console.log('Attendance today:', today);
+  console.log('Attendance week start:', weekStart);
 
   const { data, error } =
     await supabaseClient.rpc(
@@ -35249,12 +35264,14 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
       }
     );
 
-  if (error) { throw error; }
+  if (error) throw error;
 
-  const schedules = Array.isArray(data)
-		? data
-		: [];
-  const todaySchedule = schedules.find(schedule => String(schedule.Schedule_Date) === today );
+  const schedules =
+    Array.isArray(data) ? data : [];
+
+  const todaySchedule = schedules.find(schedule =>
+    String(schedule.Schedule_Date) === today
+  );
 
   return todaySchedule || null;
 }
