@@ -35463,6 +35463,37 @@ async function initAttendanceScanPage() {
   }
 }
 
+function resetAttendanceScannerUI() {
+
+  const success =
+    document.getElementById(
+      'attendanceScanSuccess'
+    );
+
+  const error =
+    document.getElementById(
+      'attendanceScanError'
+    );
+
+  const status =
+    document.getElementById(
+      'attendanceScanStatus'
+    );
+
+  if (success) {
+    success.classList.add('hidden');
+  }
+
+  if (error) {
+    error.classList.add('hidden');
+  }
+
+  if (status) {
+    status.textContent =
+      'Memulai kamera...';
+  }
+}
+
 
 async function startAttendanceScanner() {
 
