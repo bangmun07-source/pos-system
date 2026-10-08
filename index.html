@@ -25417,6 +25417,73 @@
     </section>
   </main>
 </template>
+
+
+<template id="attendanceScanPage">
+  <main class="min-h-screen bg-gray-100 flex items-center justify-center p-4" >
+    <section class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" >
+      <!-- HEADER -->
+      <div class="bg-gray-900 text-white px-6 py-5 text-center">
+        <div class="text-xl font-bold">
+          MUNO
+        </div>
+
+        <div class="text-sm opacity-70 mt-1">
+          Attendance Scanner
+        </div>
+      </div>
+      <!-- SCANNER -->
+      <div class="p-6">
+        <div id="attendanceScanReader"
+          class="w-full overflow-hidden rounded-xl bg-black" >
+					
+				</div>
+
+        <div id="attendanceScanStatus"
+          class="mt-5 text-center text-sm text-gray-500" >
+          Ready to scan attendance QR
+        </div>
+        <!-- SUCCESS -->
+        <div id="attendanceScanSuccess"
+          class="hidden mt-5 rounded-xl bg-green-50 border border-green-200 p-5 text-center" >
+          <div class="text-3xl mb-2">✓</div>
+
+          <div id="attendanceScanSuccessName"
+            class="font-bold text-lg" >
+            -
+          </div>
+
+          <div id="attendanceScanSuccessMessage"
+            class="text-sm text-gray-600 mt-1" >
+            Attendance berhasil.
+          </div>
+
+          <button type="button"
+            onclick="restartAttendanceScanner()"
+            class="mt-4 w-full rounded-lg bg-gray-900 text-white py-3 font-semibold" >
+            Scan Again
+          </button>
+        </div>
+        <!-- ERROR -->
+        <div id="attendanceScanError"
+          class="hidden mt-5 rounded-xl bg-red-50 border border-red-200 p-5 text-center" >
+          <div class="text-3xl mb-2">!</div>
+
+          <div id="attendanceScanErrorMessage"
+            class="text-sm text-red-700" >
+            Attendance gagal.
+          </div>
+
+          <button type="button"
+            onclick="restartAttendanceScanner()"
+            class="mt-4 w-full rounded-lg bg-gray-900 text-white py-3 font-semibold" >
+            Try Again
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+</template>
 	
 <!-- 
   MUNO KASIR: MASTER SPA LOGIC (Script.html)
@@ -25429,6 +25496,7 @@
 <script src="rpc.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style/dist/xlsx.bundle.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script src="systempos.js"></script>
 
 <script>
