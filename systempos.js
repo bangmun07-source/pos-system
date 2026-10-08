@@ -34278,32 +34278,77 @@ function populateScheduleFilters() {
   }
 
   if (branchFilter) {
-    const currentValue = branchFilter.value;
-
-    branchFilter.innerHTML = `<option value="">All Branch</option>`;
-
-    const branches = [
-      ...new Set(
-        visibleScheduleData
-          .map(row => String(row.Branch_ID || '').trim())
-          .filter(Boolean)
-      )
-    ];
-    branches.forEach(branchId => {
-      const option = document.createElement('option');
-
-      option.value = branchId;
-      option.textContent = branchId;
-      branchFilter.appendChild(option);
-    });
-
-    branchFilter.value =
-      [...branchFilter.options].some(
-        option => option.value === currentValue
-      )
-        ? currentValue
-        : '';
-  }
+	  const currentValue = branchFilter.value;
+	
+	  branchFilter.innerHTML = `<option value="">All Branch</option>`;
+	
+	  const branches = [
+	    ...new Set(
+	      visibleScheduleData
+	        .map(row => String(row.Branch_ID || '').trim())
+	        .filter(Boolean)
+	    )
+	  ];
+	
+	  branches.forEach(branchId => {
+	    const option = document.createElement('option');
+	
+	    option.value = branchId;
+	    option.textContent = branchId;
+	    branchFilter.appendChild(option);
+	  });
+	
+	  branchFilter.value =
+	    [...branchFilter.options].some(
+	      option => option.value === currentValue
+	    )
+	      ? currentValue
+	      : '';
+	  branchFilter.onchange = function() {
+	    const selectedBranch = String( this.value || '' ).trim();
+	    const employeeDataForFilter =
+	      selectedBranch
+	        ? scheduleData.filter(row =>
+	            String(row.Branch_ID || '').trim() ===
+	            selectedBranch
+	          )
+	        : (
+	            role === 'Owner'
+	              ? scheduleData
+	              : scheduleData.filter(row =>
+	                  String(row.Branch_ID || '').trim() ===
+	                  userBranchId
+	                )
+	          );
+	    const employees = [
+	      ...new Map(
+	        employeeDataForFilter.map(row => [
+	          row.Employee_ID,
+	          {
+	            id: row.Employee_ID,
+	            name: row.Full_Name,
+	            code: row.Employee_Code
+	          }
+	        ])
+	      ).values()
+	    ];
+	
+	    if (employeeFilter) {
+	      employeeFilter.innerHTML = `<option value="">All Employees</option>`;
+	
+	      employees.forEach(employee => {
+	        const option = document.createElement('option');
+	
+	        option.value = employee.id;
+	        option.textContent = `${employee.name || '-'} • ${employee.code || '-'}`;
+	        employeeFilter.appendChild(option);
+	      });
+	
+	      employeeFilter.value = '';
+	    }
+	    filterSchedules();
+	  };
+	}
 
   if (weekFilter) {
     const currentValue = weekFilter.value;
