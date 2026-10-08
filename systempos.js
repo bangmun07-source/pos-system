@@ -33007,16 +33007,27 @@ function renderEmployeeTable() {
 
 /* === EMPLOYEE SUMMARY === */
 function updateEmployeeSummary() {
-	if (!document.getElementById('employeePage')) { return; }
-	
+  const totalEl = document.getElementById('employeeTotalCount');
+  const activeEl = document.getElementById('employeeActiveCount');
+  const inactiveEl = document.getElementById('employeeInactiveCount');
+  const scheduledEl = document.getElementById('employeeScheduledCount');
+
+  // Jika halaman Employee tidak sedang aktif,
+  // jangan jalankan update summary.
+  if (!totalEl || !activeEl || !inactiveEl || !scheduledEl) {
+    return;
+  }
+
   const total = employeeData.length;
   const active = employeeData.filter(e => e.Status === 'ACTIVE').length;
   const inactive = employeeData.filter(e => e.Status === 'INACTIVE').length;
-  document.getElementById('employeeTotalCount').textContent = total;
-  document.getElementById('employeeActiveCount').textContent = active;
-  document.getElementById('employeeInactiveCount').textContent = inactive;
+
+  totalEl.textContent = total;
+  activeEl.textContent = active;
+  inactiveEl.textContent = inactive;
+
   // Schedule belum dibuat, jadi sementara 0
-  document.getElementById('employeeScheduledCount').textContent = '0';
+  scheduledEl.textContent = '0';
 }
 
 /* ==== PAGINATION ==== */
