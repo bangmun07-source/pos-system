@@ -35005,36 +35005,57 @@ function handleAttendanceEmployeeSelect() {
 }
 
 async function verifyAttendanceKiosk() {
-  const employeeSelect = document.getElementById('attendanceKioskEmployee');
-  const pinInput = document.getElementById('attendanceKioskPin');
-  const button = document.getElementById('attendanceKioskVerifyButton');
-  const employeeId = employeeSelect?.value || '';
-  const pin = pinInput?.value.trim() || '';
+  const employeeSelect =
+    document.getElementById('attendanceKioskEmployee');
 
+  const pinInput =
+    document.getElementById('attendanceKioskPin');
+
+  const button =
+    document.getElementById('attendanceKioskVerifyButton');
+
+  const employeeId =
+    employeeSelect?.value || '';
+
+  const pin =
+    pinInput?.value.trim() || '';
+
+  // =========================================
   // VALIDATION
+  // =========================================
   if (!employeeId) {
     alert('Please select an employee.');
     employeeSelect?.focus();
     return;
   }
+
   if (!/^\d{4,8}$/.test(pin)) {
     alert('PIN must be 4-8 digits.');
     pinInput?.focus();
     return;
   }
 
-  const sessionId = localStorage.getItem('pos_session_id');
+  const sessionId =
+    localStorage.getItem('pos_session_id');
 
-  if (!sessionId) { alert('Session POS tidak ditemukan.'); return; }
+  if (!sessionId) {
+    alert('Session POS tidak ditemukan.');
+    return;
+  }
 
   try {
+
+    // =========================================
     // LOADING
+    // =========================================
     if (button) {
       button.disabled = true;
       button.textContent = 'Verifying...';
     }
-		
+
+    // =========================================
     // VERIFY PIN
+    // =========================================
     const { data, error } =
       await supabaseClient.rpc(
         'verify_employee_attendance_pin',
@@ -35045,63 +35066,141 @@ async function verifyAttendanceKiosk() {
         }
       );
 
-    if (error) { throw error; }
+    if (error) {
+      throw error;
+    }
 
-    const result = typeof data === 'string'
-			? JSON.parse(data)
-			: data;
+    const result =
+      typeof data === 'string'
+        ? JSON.parse(data)
+        : data;
 
     console.log(
       'Attendance PIN verification:',
       result
     );
 
-    // FAILED
+    // =========================================
+    // PIN FAILED
+    // =========================================
     if (!result?.success) {
       alert(
         result?.message ||
         'PIN verification failed.'
       );
+
       return;
     }
 
-		const todaySchedule = await getAttendanceEmployeeTodaySchedule( employeeId );
-		
-		if (!todaySchedule) { alert( `${result.employee_name} tidak memiliki schedule untuk hari ini.` ); return; }
-		if (!todaySchedule.Is_Active) { alert( `${result.employee_name} sedang OFF hari ini.` ); return; }
-		
-		console.log(
-		  'Today attendance schedule:',
-		  todaySchedule
-		);
-    // SUCCESS
+    // =========================================
+    // CHECK TODAY SCHEDULE
+    // =========================================
+    const todaySchedule =
+      await getAttendanceEmployeeTodaySchedule(
+        employeeId
+      );
+
+    if (!todaySchedule) {
+      alert(
+        `${result.employee_name} tidak memiliki schedule untuk hari ini.`
+      );
+
+      return;
+    }
+
+    if (!todaySchedule.Is_Active) {
+      alert(
+        `${result.employee_name} sedang OFF hari ini.`
+      );
+
+      return;
+    }
+
     console.log(
-      'Employee verified:',
-      result.employee_name
+      'Today attendance schedule:',
+      todaySchedule
     );
 
-    alert( `PIN berhasil diverifikasi untuk ${result.employee_name}` );
+    // =========================================
+    // SHOW QR PANEL
+    // =========================================
+    const qrEmpty =
+      document.getElementById(
+        'attendanceKioskQrEmpty'
+      );
 
-    // Untuk sementara kita belum generate QR.
-    // Step berikutnya:
-    // 1. Check schedule hari ini
-    // 2. Tentukan check-in / check-out
-    // 3. Generate attendance token
-    // 4. Generate QR
+    const qrActive =
+      document.getElementById(
+        'attendanceKioskQrActive'
+      );
+
+    const qrSuccess =
+      document.getElementById(
+        'attendanceKioskQrSuccess'
+      );
+
+    const qrCode =
+      document.getElementById(
+        'attendanceKioskQrCode'
+      );
+
+    if (qrEmpty) {
+      qrEmpty.classList.add('hidden');
+    }
+
+    if (qrSuccess) {
+      qrSuccess.classList.add('hidden');
+    }
+
+    if (qrActive) {
+      qrActive.classList.remove('hidden');
+    }
+
+    if (qrCode) {
+      qrCode.innerHTML = `
+        <div class="p-6 text-center">
+          <div class="text-lg font-semibold">
+            QR Attendance Ready
+          </div>
+
+          <div class="text-sm opacity-70 mt-2">
+            ${result.employee_name}
+          </div>
+
+          <div class="text-sm opacity-70">
+            ${todaySchedule.Start_Time}
+            -
+            ${todaySchedule.End_Time}
+          </div>
+
+          <div class="mt-6 text-3xl font-bold">
+            TEST QR
+          </div>
+        </div>
+      `;
+    }
+
+    console.log(
+      'Attendance kiosk ready for:',
+      result.employee_name
+    );
 
   } catch (error) {
     console.error(
       'verifyAttendanceKiosk:',
       error
     );
+
     alert(
       error?.message ||
       'Failed to verify attendance.'
     );
+
   } finally {
     if (button) {
       button.disabled = false;
-      button.textContent = 'Verify & Generate QR';
+      button.textContent =
+        'Verify & Generate QR';
     }
   }
 }
