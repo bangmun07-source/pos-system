@@ -35095,6 +35095,7 @@ function updateAttendanceKioskClock() {
   const now = new Date();
 
   clock.textContent = now.toLocaleTimeString('en-GB', {
+    timeZone: 'Asia/Jakarta',
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit'
