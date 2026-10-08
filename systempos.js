@@ -33007,6 +33007,8 @@ function renderEmployeeTable() {
 
 /* === EMPLOYEE SUMMARY === */
 function updateEmployeeSummary() {
+	if (!document.getElementById('employeePage')) { return; }
+	
   const total = employeeData.length;
   const active = employeeData.filter(e => e.Status === 'ACTIVE').length;
   const inactive = employeeData.filter(e => e.Status === 'INACTIVE').length;
