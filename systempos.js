@@ -35048,7 +35048,6 @@ function populateEmployeeAttendanceFilters() {
 	}
 }
 
-
 /* FILTER ATTENDANCE  */
 function filterEmployeeAttendance() {
   const dateFrom = document.getElementById('attendanceDateFrom')?.value || '';
@@ -35077,18 +35076,29 @@ function filterEmployeeAttendance() {
 }
 
 /* RENDER TABLE */
+
 function renderEmployeeAttendanceTable() {
   const tbody = document.getElementById('employeeAttendanceTableBody');
-
   if (!tbody) return;
 
   const totalRows = filteredEmployeeAttendanceData.length;
-  const totalPages = Math.max( 1, Math.ceil(totalRows / employeeAttendancePageSize) );
+  const totalPages = Math.max(
+    1,
+    Math.ceil(totalRows / employeeAttendancePageSize)
+  );
 
-  employeeAttendanceCurrentPage = Math.min( employeeAttendanceCurrentPage, );
+  employeeAttendanceCurrentPage = Math.min(
+    employeeAttendanceCurrentPage,
+    totalPages
+  );
 
-  const startIndex = (employeeAttendanceCurrentPage - 1) * employeeAttendancePageSize;
-  const pageRows = filteredEmployeeAttendanceData.slice( startIndex, startIndex + employeeAttendancePageSize );
+  const startIndex =
+    (employeeAttendanceCurrentPage - 1) * employeeAttendancePageSize;
+
+  const pageRows = filteredEmployeeAttendanceData.slice(
+    startIndex,
+    startIndex + employeeAttendancePageSize
+  );
 
   if (!pageRows.length) {
     tbody.innerHTML = `
@@ -35099,32 +35109,66 @@ function renderEmployeeAttendanceTable() {
       </tr>
     `;
   } else {
-    tbody.innerHTML = pageRows.map(row => {
+    tbody.innerHTML = pageRows.map((row, index) => {
+      const rowIndex = startIndex + index;
+
       const attendanceDate = row.Attendance_Date
-        ? new Date(`${String(row.Attendance_Date).slice(0, 10)}T00:00:00`)
-            .toLocaleDateString('id-ID')
-        : '-';
-      const checkIn = row.Check_In
-        ? new Date(row.Check_In).toLocaleTimeString('id-ID', {
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-          })
-        : '-';
-      const statusClass = {
-        PRESENT: 'text-green-700',
-        ABSENT: 'text-red-700',
-        LEAVE: 'text-blue-700',
-        SICK: 'text-yellow-700'
-      }[row.Status] || 'text-on-surface-variant';
-      const schedule = row.Start_Time && row.End_Time
-        ? `${String(row.Start_Time).slice(0, 5)} - ${String(row.End_Time).slice(0, 5)}`
+        ? new Date(
+            `${String(row.Attendance_Date).slice(0, 10)}T00:00:00`
+          ).toLocaleDateString('id-ID')
         : '-';
 
+      const formatTime = value => {
+        if (!value) return '-';
+
+        // Waktu dari kolom TIME, misalnya 08:30:00.
+        if (/^\d{2}:\d{2}/.test(String(value))) {
+          return String(value).slice(0, 5);
+        }
+
+        const date = new Date(value);
+
+        return Number.isNaN(date.getTime())
+          ? '-'
+          : date.toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false
+            });
+      };
+
+      const checkIn = formatTime(row.Check_In);
+
+      const statusLabels = {
+        PRESENT: 'Present',
+        ABSENT: 'Absent',
+        SICK: 'Sick',
+        LEAVE: 'Leave',
+        NOT_RECORDED: 'Belum Dicatat'
+      };
+
+      const statusClass = {
+        PRESENT: 'text-green-700 bg-green-50',
+        ABSENT: 'text-red-700 bg-red-50',
+        LEAVE: 'text-blue-700 bg-blue-50',
+        SICK: 'text-yellow-700 bg-yellow-50',
+        NOT_RECORDED: 'text-on-surface-variant bg-surface-container'
+      }[row.Status] || 'text-on-surface-variant';
+
+      const schedule =
+        row.Start_Time && row.End_Time
+          ? `${formatTime(row.Start_Time)} - ${formatTime(row.End_Time)}`
+          : '-';
+
+      const alreadyCheckedIn = Boolean(row.Check_In);
+
       return `
-        <tr class="border-b border-outline-variant">
+        <tr class="border-b border-outline-variant hover:bg-surface-container/40">
+
           <td class="px-4 py-3">
-            <div class="font-medium">${escapeHtml(row.Full_Name || '-')}</div>
+            <div class="font-medium">
+              ${escapeHtml(row.Full_Name || '-')}
+            </div>
             <div class="text-xs text-on-surface-variant">
               ${escapeHtml(row.Employee_Code || row.Employee_ID || '')}
             </div>
@@ -35144,14 +35188,18 @@ function renderEmployeeAttendanceTable() {
 
           <td class="px-4 py-3 whitespace-nowrap">
             ${escapeHtml(checkIn)}
-            ${Number(row.Late_Minutes) > 0
-              ? `<div class="text-xs text-red-500">${Number(row.Late_Minutes)} min late</div>`
-              : ''}
+            ${
+              Number(row.Late_Minutes) > 0
+                ? `<div class="text-xs text-red-500">
+                     ${Number(row.Late_Minutes)} min late
+                   </div>`
+                : ''
+            }
           </td>
 
           <td class="px-4 py-3">
-            <span class="inline-flex rounded-md px-2 py-1 text-xs text-center font-medium ${statusClass}">
-              ${escapeHtml(row.Status || '-')}
+            <span class="inline-flex rounded-md px-2 py-1 text-xs font-medium ${statusClass}">
+              ${escapeHtml(statusLabels[row.Status] || row.Status || '-')}
             </span>
           </td>
 
@@ -35159,8 +35207,44 @@ function renderEmployeeAttendanceTable() {
             ${escapeHtml(row.Note || '-')}
           </td>
 
-          <td class="px-4 py-3 text-center">
-            <span class="text-on-surface-variant">-</span>
+          <td class="px-4 py-3">
+            <div class="flex items-center justify-center gap-1">
+
+              <button
+                type="button"
+                onclick="openAttendanceAction('detail', ${rowIndex})"
+                class="p-2 rounded-md hover:bg-surface-container"
+                title="View Detail">
+                <span class="material-symbols-outlined text-lg">visibility</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="openAttendanceAction('checkin', ${rowIndex})"
+                ${alreadyCheckedIn ? 'disabled' : ''}
+                class="p-2 rounded-md hover:bg-surface-container
+                  ${alreadyCheckedIn ? 'opacity-40 cursor-not-allowed' : ''}"
+                title="${alreadyCheckedIn ? 'Already checked in via QR' : 'Check In'}">
+                <span class="material-symbols-outlined text-lg">login</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="openAttendanceAction('overtime', ${rowIndex})"
+                class="p-2 rounded-md hover:bg-surface-container"
+                title="Overtime">
+                <span class="material-symbols-outlined text-lg">more_time</span>
+              </button>
+
+              <button
+                type="button"
+                onclick="openAttendanceAction('status', ${rowIndex})"
+                class="p-2 rounded-md hover:bg-surface-container"
+                title="Edit Status">
+                <span class="material-symbols-outlined text-lg">edit_note</span>
+              </button>
+
+            </div>
           </td>
         </tr>
       `;
@@ -35171,15 +35255,23 @@ function renderEmployeeAttendanceTable() {
 
   if (info) {
     info.textContent = totalRows
-      ? `Showing ${startIndex + 1}-${Math.min(startIndex + pageRows.length, totalRows)} of ${totalRows}`
+      ? `Showing ${startIndex + 1}-${Math.min(
+          startIndex + pageRows.length,
+          totalRows
+        )} of ${totalRows}`
       : 'Showing 0 of 0';
   }
 
   const prevButton = document.getElementById('attendancePrevButton');
   const nextButton = document.getElementById('attendanceNextButton');
 
-  if (prevButton) prevButton.disabled = employeeAttendanceCurrentPage <= 1;
-  if (nextButton) nextButton.disabled = employeeAttendanceCurrentPage >= totalPages;
+  if (prevButton) {
+    prevButton.disabled = employeeAttendanceCurrentPage <= 1;
+  }
+
+  if (nextButton) {
+    nextButton.disabled = employeeAttendanceCurrentPage >= totalPages;
+  }
 }
 
 
@@ -35196,6 +35288,201 @@ function changeEmployeeAttendancePage(direction) {
     Math.min(totalPages, employeeAttendanceCurrentPage + direction)
   );
   renderEmployeeAttendanceTable();
+}
+
+
+function openAttendanceAction(action, rowIndex) {
+  const row = filteredEmployeeAttendanceData[rowIndex];
+
+  if (!row) {
+    console.error('Attendance row tidak ditemukan:', rowIndex);
+    return;
+  }
+
+  // Helper untuk mengisi elemen berdasarkan ID.
+  const setValue = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.value = value ?? '';
+  };
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value || '-';
+  };
+
+  const date = String(row.Attendance_Date || '').slice(0, 10);
+
+  const formatTime = value => {
+    if (!value) return '-';
+
+    if (/^\d{2}:\d{2}/.test(String(value))) {
+      return String(value).slice(0, 5);
+    }
+
+    const parsed = new Date(value);
+
+    return Number.isNaN(parsed.getTime())
+      ? '-'
+      : parsed.toLocaleTimeString('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
+        });
+  };
+
+  const formatDate = value => {
+    if (!value) return '-';
+
+    const parsed = new Date(`${String(value).slice(0, 10)}T00:00:00`);
+
+    return Number.isNaN(parsed.getTime())
+      ? value
+      : parsed.toLocaleDateString('id-ID');
+  };
+
+  const showModal = modalId => {
+    const modal = document.getElementById(modalId);
+
+    if (!modal) {
+      console.error(`Modal tidak ditemukan: ${modalId}`);
+      return;
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  };
+
+  // CHECK IN
+  if (action === 'checkin') {
+    // Pengaman tambahan: check-in QR tidak boleh diedit.
+    if (row.Check_In) {
+      alert('Karyawan sudah check-in melalui QR. Check-in tidak bisa diedit.');
+      return;
+    }
+
+    setValue('checkInEmployeeId', row.Employee_ID);
+    setValue('checkInAttendanceDate', date);
+    setValue('checkInAttendanceId', row.Attendance_ID || '');
+
+    setText('checkInEmployeeName', row.Full_Name);
+    setText('checkInDate', formatDate(date));
+
+    const now = new Date();
+    const localTime =
+      `${String(now.getHours()).padStart(2, '0')}:` +
+      `${String(now.getMinutes()).padStart(2, '0')}`;
+
+    setValue('checkInTime', localTime);
+    setValue('checkInNote', row.Note || '');
+
+    showModal('attendanceCheckInModal');
+    return;
+  }
+
+  // OVERTIME
+  if (action === 'overtime') {
+    setValue('overtimeEmployeeId', row.Employee_ID);
+    setValue('overtimeAttendanceDate', date);
+    setValue('overtimeAttendanceId', row.Attendance_ID || '');
+
+    setText('overtimeEmployeeName', row.Full_Name);
+    setText('overtimeDate', formatDate(date));
+
+    setValue(
+      'overtimeStartTime',
+      row.Overtime_Start || row.Overtime_Start_Time || ''
+    );
+
+    setValue(
+      'overtimeEndTime',
+      row.Overtime_End || row.Overtime_End_Time || ''
+    );
+
+    setValue('overtimeNote', row.Overtime_Note || '');
+
+    showModal('attendanceOvertimeModal');
+    return;
+  }
+
+  // STATUS
+  if (action === 'status') {
+    setValue('statusEmployeeId', row.Employee_ID);
+    setValue('statusAttendanceDate', date);
+    setValue('statusAttendanceId', row.Attendance_ID || '');
+
+    setText('statusEmployeeName', row.Full_Name);
+    setText('statusDate', formatDate(date));
+
+    setValue(
+      'attendanceStatusValue',
+      ['PRESENT', 'ABSENT', 'SICK', 'LEAVE'].includes(row.Status)
+        ? row.Status
+        : 'PRESENT'
+    );
+
+    setValue('attendanceStatusNote', row.Note || '');
+
+    showModal('attendanceStatusModal');
+    return;
+  }
+
+  // DETAIL
+  if (action === 'detail') {
+    setText('detailAttendanceEmployeeName', row.Full_Name);
+    setText('detailAttendanceEmployeeCode', row.Employee_Code);
+    setText('detailAttendanceBranch', row.Branch_ID);
+    setText('detailAttendanceDate', formatDate(date));
+    setText('detailAttendanceScheduleStart', formatTime(row.Start_Time));
+    setText('detailAttendanceScheduleEnd', formatTime(row.End_Time));
+
+    setText('detailAttendanceCheckIn', formatTime(row.Check_In));
+    setText('detailAttendanceCheckOut', formatTime(row.Check_Out));
+    setText('detailAttendanceLateMinutes', `${Number(row.Late_Minutes) || 0} min`);
+    setText('detailAttendanceWorkMinutes', `${Number(row.Work_Minutes) || 0} min`);
+
+    const statusLabels = {
+      PRESENT: 'Present',
+      ABSENT: 'Absent',
+      SICK: 'Sick',
+      LEAVE: 'Leave',
+      NOT_RECORDED: 'Belum Dicatat'
+    };
+
+    setText(
+      'detailAttendanceStatus',
+      statusLabels[row.Status] || row.Status
+    );
+
+    // Nilai overtime ditampilkan jika tersedia di data.
+    setText(
+      'detailAttendanceOvertimeStart',
+      formatTime(row.Overtime_Start || row.Overtime_Start_Time)
+    );
+
+    setText(
+      'detailAttendanceOvertimeEnd',
+      formatTime(row.Overtime_End || row.Overtime_End_Time)
+    );
+
+    setText(
+      'detailAttendanceOvertimeDuration',
+      row.Overtime_Minutes != null
+        ? `${Number(row.Overtime_Minutes)} min`
+        : '-'
+    );
+
+    setText('detailAttendanceNote', row.Note);
+
+    showModal('attendanceDetailModal');
+  }
+}
+
+function closeAttendanceModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 }
 
 
