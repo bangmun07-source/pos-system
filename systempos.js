@@ -35367,29 +35367,32 @@ function openAttendanceAction(action, rowIndex) {
     showModal('attendanceCheckInModal');
     return;
   }
-
   // OVERTIME
   if (action === 'overtime') {
+    const modal = document.getElementById('attendanceOvertimeModal');
+
+    if (!modal) {
+      console.error('Modal attendanceOvertimeModal tidak ditemukan.');
+      return;
+    }
+
     setValue('overtimeEmployeeId', row.Employee_ID);
     setValue('overtimeAttendanceDate', date);
     setValue('overtimeAttendanceId', row.Attendance_ID || '');
-		
-    const employeeNameInput = document.getElementById('overtimeEmployeeName');
-    const overtimeDateInput = document.getElementById('overtimeDate');
-		
+
+    const employeeNameInput = modal.querySelector('#overtimeEmployeeName');
+    const overtimeDateInput = modal.querySelector('#overtimeDate');
+
     if (employeeNameInput) { employeeNameInput.value = row.Full_Name || ''; }
-    if (overtimeDateInput) { overtimeDateInput.value = String(row.Attendance_Date || date || '').slice(0, 10); }
-		
-		modal.querySelector('#overtimeStartHour').value = '';
-		modal.querySelector('#overtimeStartMinute').value = '';
-		modal.querySelector('#overtimeEndHour').value = '';
-		modal.querySelector('#overtimeEndMinute').value = '';
+    if (overtimeDateInput) { overtimeDateInput.value = date; }
+
+    modal.querySelector('#overtimeStartHour').value = '';
+    modal.querySelector('#overtimeStartMinute').value = '';
+    modal.querySelector('#overtimeEndHour').value = '';
+    modal.querySelector('#overtimeEndMinute').value = '';
+
     setValue('overtimeNote', '');
-    console.log('Overtime input:', {
-      name: employeeNameInput?.value,
-      date: overtimeDateInput?.value
-    });
-		initOvertimeTimePickers();
+    initOvertimeTimePickers();
     showModal('attendanceOvertimeModal');
     return;
   }
