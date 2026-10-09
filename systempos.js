@@ -35598,17 +35598,32 @@ async function handleSaveEmployeeOvertime(event) {
     alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.');
     return; }
 
-  // Input datetime-local dikonversi menjadi ISO timestamp.
+  
+  // Konversi waktu lembur, termasuk yang melewati tengah malam.
   const startDateTime = new Date(`${overtimeDate}T${startTime}`);
-  const endDateTime = new Date(`${overtimeDate}T${endTime}`);
+  let endDateTime = new Date(`${overtimeDate}T${endTime}`);
 
   if (
     Number.isNaN(startDateTime.getTime()) ||
-    Number.isNaN(endDateTime.getTime()) ||
-    endDateTime <= startDateTime
+    Number.isNaN(endDateTime.getTime())
   ) {
-    alert('Waktu selesai harus setelah waktu mulai.');
-    return; }
+    alert('Tanggal atau waktu overtime tidak valid.');
+    return;
+  }
+
+  // Jika waktu selesai <= mulai, anggap selesai pada hari berikutnya.
+  if (endDateTime <= startDateTime) {
+    endDateTime.setDate(endDateTime.getDate() + 1);
+  }
+
+  // Batasi durasi agar input yang keliru tidak dianggap lembur sehari penuh.
+  const durationMinutes =
+    (endDateTime.getTime() - startDateTime.getTime()) / 60000;
+
+  if (durationMinutes > 24 * 60) {
+    alert('Durasi overtime tidak boleh lebih dari 24 jam.');
+    return;
+  }
 
   const startTimestamp = startDateTime.toISOString();
   const endTimestamp = endDateTime.toISOString();
