@@ -25137,7 +25137,9 @@
 	      </button>
 	    </div>
 	    <!-- CONTENT -->
-	    <form id="attendanceStatusForm" class="p-5 space-y-5">
+	    <form id="attendanceStatusForm" 
+				onsubmit="handleSaveAttendanceStatus(event)"
+				class="p-5 space-y-5">
 	      <input id="statusEmployeeId" type="hidden">
 	      <input id="statusAttendanceDate" type="hidden">
 	      <input id="statusAttendanceId" type="hidden">
