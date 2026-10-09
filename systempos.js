@@ -35215,7 +35215,7 @@ function renderEmployeeAttendanceTable() {
 					    </button>
 					
 					    <div id="attendanceActionMenu-${rowIndex}"
-					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1 text-left"
+					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1 text-left">
 					      <button type="button"
 					        onclick="runAttendanceAction(event, 'detail', ${rowIndex})"
 					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian">
