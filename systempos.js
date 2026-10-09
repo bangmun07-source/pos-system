@@ -32269,8 +32269,9 @@ async function initEmployeePage() {
 
     await loadEmployeeBranches();
     await loadEmployees();
+    await loadSchedules();
+    await loadEmployeeAttendance();
 
-    loadSchedules();
   } catch (error) {
     console.error("initEmployeePage:", error);
   }
@@ -34862,8 +34863,362 @@ window.resetScheduleWorkingDays = function() {
 };
 
 
+/* =========================================================
+   									EMPLOYEE ATTENDANCE
+========================================================= */
+
+let employeeAttendanceData = [];
+let filteredEmployeeAttendanceData = [];
+let employeeAttendanceCurrentPage = 1;
+const employeeAttendancePageSize = 10;
+
+async function loadEmployeeAttendance() {
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    console.error('Session tidak ditemukan.');
+    return;
+  }
+
+  const role = state.user.role;
+  const userBranchId = String(state.user.branchId || '').trim();
+
+  const tbody = document.getElementById('employeeAttendanceTableBody');
+
+  if (tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-6">
+          Loading attendance...
+        </td>
+      </tr>
+    `;
+  }
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'get_employee_attendance',
+      {
+        p_session_id: sessionId,
+        // Owner dapat mengambil semua outlet.
+        // Role lain hanya meminta data outlet sendiri.
+        p_branch_id: role === 'Owner' ? null : userBranchId || '__NO_BRANCH__',
+        p_employee_id: null,
+        p_date_from: null,
+        p_date_to: null,
+        p_status: null
+      }
+    );
+
+    if (error) throw error;
+
+    const rows = Array.isArray(data) ? data : [];
+
+    // Pertahankan pola pembatasan outlet pada Employee Schedule.
+    employeeAttendanceData = role === 'Owner'
+      ? rows
+      : rows.filter(row =>
+          String(row.Branch_ID || '').trim() === userBranchId
+        );
+
+    populateEmployeeAttendanceFilters();
+    filterEmployeeAttendance();
+
+  } catch (error) {
+    console.error('loadEmployeeAttendance:', error);
+
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="text-center py-6 text-red-500">
+            Gagal memuat data attendance.
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+/* FILTER OPTIONS */
+function populateEmployeeAttendanceFilters() {
+  const employeeFilter = document.getElementById('attendanceEmployeeFilter');
+  const branchFilter = document.getElementById('attendanceBranchFilter');
+  const role = state.user.role;
+  const userBranchId = String(state.user.branchId || '').trim();
+
+  if (employeeFilter) {
+    const previousValue = employeeFilter.value;
+    const employeeMap = new Map();
+
+    employeeAttendanceData.forEach(row => {
+      if (row.Employee_ID) {
+        employeeMap.set(row.Employee_ID, {
+          id: row.Employee_ID,
+          name: row.Full_Name || row.Employee_ID,
+          branchId: row.Branch_ID
+        });
+      }
+    });
+
+    employeeFilter.innerHTML = `
+      <option value="">All Employees</option>
+      ${Array.from(employeeMap.values())
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(employee => `
+          <option value="${escapeHtml(employee.id)}">
+            ${escapeHtml(employee.name)}
+          </option>
+        `).join('')}
+    `;
+
+    if ([...employeeFilter.options].some(
+      option => option.value === previousValue
+    )) {
+      employeeFilter.value = previousValue;
+    }
+  }
+
+  if (branchFilter) {
+    if (role !== 'Owner') {
+      branchFilter.innerHTML = `
+        <option value="${escapeHtml(userBranchId)}">
+          My Outlet
+        </option>
+      `;
+      branchFilter.value = userBranchId;
+      branchFilter.disabled = true;
+    } else {
+      const previousValue = branchFilter.value;
+      const branches = [...new Set(
+        employeeAttendanceData
+          .map(row => String(row.Branch_ID || '').trim())
+          .filter(Boolean)
+      )].sort();
+
+      branchFilter.innerHTML = `
+        <option value="">All Outlets</option>
+        ${branches.map(branchId => `
+          <option value="${escapeHtml(branchId)}">
+            ${escapeHtml(branchId)}
+          </option>
+        `).join('')}
+      `;
+
+      branchFilter.disabled = false;
+
+      if ([...branchFilter.options].some(
+        option => option.value === previousValue
+      )) {
+        branchFilter.value = previousValue;
+      }
+    }
+  }
+}
+
+/* FILTER ATTENDANCE  */
+function filterEmployeeAttendance() {
+  const dateFrom = document.getElementById('attendanceDateFrom')?.value || '';
+  const dateTo = document.getElementById('attendanceDateTo')?.value || '';
+  const employeeId = document.getElementById('attendanceEmployeeFilter')?.value || '';
+  const selectedBranch = document.getElementById('attendanceBranchFilter')?.value || '';
+  const status = document.getElementById('attendanceStatusFilter')?.value || '';
+  const role = state.user.role;
+  const userBranchId = String(state.user.branchId || '').trim();
+
+  filteredEmployeeAttendanceData = employeeAttendanceData.filter(row => {
+    const attendanceDate = String(row.Attendance_Date || '').slice(0, 10);
+    const branchId = String(row.Branch_ID || '').trim();
+
+    // Pembatasan outlet tetap diterapkan untuk role non-Owner.
+    if (role !== 'Owner' && branchId !== userBranchId) { return false; }
+    if (dateFrom && attendanceDate < dateFrom) return false;
+    if (dateTo && attendanceDate > dateTo) return false;
+    if (employeeId && row.Employee_ID !== employeeId) return false;
+    if (selectedBranch && branchId !== selectedBranch) return false;
+    if (status && row.Status !== status) return false;
+    return true;
+  });
+  employeeAttendanceCurrentPage = 1;
+  renderEmployeeAttendanceTable();
+}
+
+/* RENDER TABLE */
+function renderEmployeeAttendanceTable() {
+  const tbody = document.getElementById('employeeAttendanceTableBody');
+
+  if (!tbody) return;
+
+  const totalRows = filteredEmployeeAttendanceData.length;
+  const totalPages = Math.max( 1, Math.ceil(totalRows / employeeAttendancePageSize) );
+
+  employeeAttendanceCurrentPage = Math.min( employeeAttendanceCurrentPage, );
+
+  const startIndex = (employeeAttendanceCurrentPage - 1) * employeeAttendancePageSize;
+  const pageRows = filteredEmployeeAttendanceData.slice( startIndex, startIndex + employeeAttendancePageSize );
+
+  if (!pageRows.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="text-center py-6 text-gray-500">
+          No employee attendance data
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML = pageRows.map(row => {
+      const attendanceDate = row.Attendance_Date
+        ? new Date(`${String(row.Attendance_Date).slice(0, 10)}T00:00:00`)
+            .toLocaleDateString('id-ID')
+        : '-';
+      const checkIn = row.Check_In
+        ? new Date(row.Check_In).toLocaleTimeString('id-ID', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+          })
+        : '-';
+      const statusClass = {
+        PRESENT: 'bg-green-100 text-green-700',
+        ABSENT: 'bg-red-100 text-red-700',
+        LEAVE: 'bg-blue-100 text-blue-700',
+        SICK: 'bg-yellow-100 text-yellow-700'
+      }[row.Status] || 'bg-gray-100 text-gray-700';
+      const schedule = row.Start_Time && row.End_Time
+        ? `${String(row.Start_Time).slice(0, 5)} - ${String(row.End_Time).slice(0, 5)}`
+        : '-';
+
+      return `
+        <tr class="border-b border-outline-variant">
+          <td class="px-4 py-3">
+            <div class="font-medium">${escapeHtml(row.Full_Name || '-')}</div>
+            <div class="text-xs text-gray-500">
+              ${escapeHtml(row.Employee_Code || row.Employee_ID || '')}
+            </div>
+          </td>
+
+          <td class="px-4 py-3">
+            ${escapeHtml(row.Branch_ID || '-')}
+          </td>
+
+          <td class="px-4 py-3 whitespace-nowrap">
+            ${escapeHtml(attendanceDate)}
+          </td>
+
+          <td class="px-4 py-3 whitespace-nowrap">
+            ${escapeHtml(schedule)}
+          </td>
+
+          <td class="px-4 py-3 whitespace-nowrap">
+            ${escapeHtml(checkIn)}
+            ${Number(row.Late_Minutes) > 0
+              ? `<div class="text-xs text-red-500">${Number(row.Late_Minutes)} min late</div>`
+              : ''}
+          </td>
+
+          <td class="px-4 py-3">
+            <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusClass}">
+              ${escapeHtml(row.Status || '-')}
+            </span>
+          </td>
+
+          <td class="px-4 py-3">
+            ${escapeHtml(row.Note || '-')}
+          </td>
+
+          <td class="px-4 py-3">
+            <span class="text-gray-400">-</span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  const info = document.getElementById('attendancePaginationInfo');
+
+  if (info) {
+    info.textContent = totalRows
+      ? `Showing ${startIndex + 1}-${Math.min(startIndex + pageRows.length, totalRows)} of ${totalRows}`
+      : 'Showing 0 of 0';
+  }
+
+  const prevButton = document.getElementById('attendancePrevButton');
+  const nextButton = document.getElementById('attendanceNextButton');
+
+  if (prevButton) prevButton.disabled = employeeAttendanceCurrentPage <= 1;
+  if (nextButton) nextButton.disabled = employeeAttendanceCurrentPage >= totalPages;
+}
 
 
+/*  PAGINATION  */
+function changeEmployeeAttendancePage(direction) {
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredEmployeeAttendanceData.length / employeeAttendancePageSize
+    )
+  );
+  employeeAttendanceCurrentPage = Math.max(
+    1,
+    Math.min(totalPages, employeeAttendanceCurrentPage + direction)
+  );
+  renderEmployeeAttendanceTable();
+}
+
+
+/* EXPORT CSV */
+
+function exportEmployeeAttendance() {
+  const rows = filteredEmployeeAttendanceData;
+
+  if (!rows.length) {
+    alert('Tidak ada data attendance untuk diekspor.');
+    return; }
+
+  const headers = [
+    'Employee Code',
+    'Employee Name',
+    'Branch',
+    'Attendance Date',
+    'Schedule Start',
+    'Schedule End',
+    'Check In',
+    'Check Out',
+    'Late Minutes',
+    'Work Minutes',
+    'Status',
+    'Note'
+  ];
+  const csvEscape = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
+  const csvRows = rows.map(row => [
+    row.Employee_Code,
+    row.Full_Name,
+    row.Branch_ID,
+    row.Attendance_Date,
+    row.Start_Time,
+    row.End_Time,
+    row.Check_In,
+    row.Check_Out,
+    row.Late_Minutes,
+    row.Work_Minutes,
+    row.Status,
+    row.Note
+  ]);
+  const csv = '\uFEFF' + [
+    headers,
+    ...csvRows
+  ].map(row => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `employee-attendance-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  URL.revokeObjectURL(url);
+}
 
 /* =========================================================
    									ATTENDANCE PAGE
