@@ -35298,31 +35298,24 @@ function openAttendanceAction(action, rowIndex) {
 
   if (!row) {
     console.error('Attendance row tidak ditemukan:', rowIndex);
-    return;
-  }
+    return; }
 
   // Helper untuk mengisi elemen berdasarkan ID.
   const setValue = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.value = value ?? '';
   };
-
   const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value || '-';
   };
-
   const date = String(row.Attendance_Date || '').slice(0, 10);
-
   const formatTime = value => {
     if (!value) return '-';
-
     if (/^\d{2}:\d{2}/.test(String(value))) {
       return String(value).slice(0, 5);
     }
-
     const parsed = new Date(value);
-
     return Number.isNaN(parsed.getTime())
       ? '-'
       : parsed.toLocaleTimeString('id-ID', {
@@ -35334,9 +35327,7 @@ function openAttendanceAction(action, rowIndex) {
 
   const formatDate = value => {
     if (!value) return '-';
-
     const parsed = new Date(`${String(value).slice(0, 10)}T00:00:00`);
-
     return Number.isNaN(parsed.getTime())
       ? value
       : parsed.toLocaleDateString('id-ID');
@@ -35344,12 +35335,9 @@ function openAttendanceAction(action, rowIndex) {
 
   const showModal = modalId => {
     const modal = document.getElementById(modalId);
-
     if (!modal) {
       console.error(`Modal tidak ditemukan: ${modalId}`);
-      return;
-    }
-
+      return; }
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   };
@@ -35361,14 +35349,11 @@ function openAttendanceAction(action, rowIndex) {
       alert('Karyawan sudah check-in melalui QR. Check-in tidak bisa diedit.');
       return;
     }
-
     setValue('checkInEmployeeId', row.Employee_ID);
     setValue('checkInAttendanceDate', date);
     setValue('checkInAttendanceId', row.Attendance_ID || '');
-
     setText('checkInEmployeeName', row.Full_Name);
     setText('checkInDate', formatDate(date));
-
     const now = new Date();
     const localTime =
       `${String(now.getHours()).padStart(2, '0')}:` +
@@ -35376,54 +35361,36 @@ function openAttendanceAction(action, rowIndex) {
 
     setValue('checkInTime', localTime);
     setValue('checkInNote', row.Note || '');
-
     showModal('attendanceCheckInModal');
     return;
   }
-
   // OVERTIME
   if (action === 'overtime') {
     setValue('overtimeEmployeeId', row.Employee_ID);
     setValue('overtimeAttendanceDate', date);
     setValue('overtimeAttendanceId', row.Attendance_ID || '');
-
     setText('overtimeEmployeeName', row.Full_Name);
     setText('overtimeDate', formatDate(date));
-
-    setValue(
-      'overtimeStartTime',
-      row.Overtime_Start || row.Overtime_Start_Time || ''
-    );
-
-    setValue(
-      'overtimeEndTime',
-      row.Overtime_End || row.Overtime_End_Time || ''
-    );
-
+    setValue( 'overtimeStartTime', row.Overtime_Start || row.Overtime_Start_Time || '' );
+    setValue( 'overtimeEndTime', row.Overtime_End || row.Overtime_End_Time || '' );
     setValue('overtimeNote', row.Overtime_Note || '');
-
     showModal('attendanceOvertimeModal');
     return;
   }
-
   // STATUS
   if (action === 'status') {
     setValue('statusEmployeeId', row.Employee_ID);
     setValue('statusAttendanceDate', date);
     setValue('statusAttendanceId', row.Attendance_ID || '');
-
     setText('statusEmployeeName', row.Full_Name);
     setText('statusDate', formatDate(date));
-
     setValue(
       'attendanceStatusValue',
       ['PRESENT', 'ABSENT', 'SICK', 'LEAVE'].includes(row.Status)
         ? row.Status
         : 'PRESENT'
     );
-
     setValue('attendanceStatusNote', row.Note || '');
-
     showModal('attendanceStatusModal');
     return;
   }
@@ -35436,12 +35403,10 @@ function openAttendanceAction(action, rowIndex) {
     setText('detailAttendanceDate', formatDate(date));
     setText('detailAttendanceScheduleStart', formatTime(row.Start_Time));
     setText('detailAttendanceScheduleEnd', formatTime(row.End_Time));
-
     setText('detailAttendanceCheckIn', formatTime(row.Check_In));
     setText('detailAttendanceCheckOut', formatTime(row.Check_Out));
     setText('detailAttendanceLateMinutes', `${Number(row.Late_Minutes) || 0} min`);
     setText('detailAttendanceWorkMinutes', `${Number(row.Work_Minutes) || 0} min`);
-
     const statusLabels = {
       PRESENT: 'Present',
       ABSENT: 'Absent',
@@ -35449,34 +35414,47 @@ function openAttendanceAction(action, rowIndex) {
       LEAVE: 'Leave',
       NOT_RECORDED: 'Belum Dicatat'
     };
-
-    setText(
-      'detailAttendanceStatus',
-      statusLabels[row.Status] || row.Status
-    );
-
-    // Nilai overtime ditampilkan jika tersedia di data.
-    setText(
-      'detailAttendanceOvertimeStart',
-      formatTime(row.Overtime_Start || row.Overtime_Start_Time)
-    );
-
-    setText(
-      'detailAttendanceOvertimeEnd',
-      formatTime(row.Overtime_End || row.Overtime_End_Time)
-    );
-
-    setText(
-      'detailAttendanceOvertimeDuration',
+    setText( 'detailAttendanceStatus', statusLabels[row.Status] || row.Status );
+    setText( 'detailAttendanceOvertimeStart', formatTime(row.Overtime_Start || row.Overtime_Start_Time) );
+    setText( 'detailAttendanceOvertimeEnd', formatTime(row.Overtime_End || row.Overtime_End_Time) );
+    setText( 'detailAttendanceOvertimeDuration',
       row.Overtime_Minutes != null
         ? `${Number(row.Overtime_Minutes)} min`
         : '-'
     );
-
     setText('detailAttendanceNote', row.Note);
-
     showModal('attendanceDetailModal');
   }
+}
+
+function toggleAttendanceActionMenu(event, rowIndex) {
+  event.stopPropagation();
+  const menuId = `attendanceActionMenu-${rowIndex}`;
+  const targetMenu = document.getElementById(menuId);
+  if (!targetMenu) return;
+  // Tutup menu lain yang sedang terbuka.
+  document.querySelectorAll('[id^="attendanceActionMenu-"]').forEach(menu => {
+    if (menu.id !== menuId) {
+      menu.classList.add('hidden');
+    }
+  });
+  targetMenu.classList.toggle('hidden');
+}
+
+function runAttendanceAction(event, action, rowIndex) {
+  event.stopPropagation();
+  document .getElementById(`attendanceActionMenu-${rowIndex}`) ?.classList.add('hidden');
+  openAttendanceAction(action, rowIndex);
+}
+
+// Tutup dropdown ketika klik di luar menu.
+if (!window.attendanceActionOutsideClickAttached) {
+  document.addEventListener('click', () => {
+    document
+      .querySelectorAll('[id^="attendanceActionMenu-"]')
+      .forEach(menu => menu.classList.add('hidden'));
+  });
+  window.attendanceActionOutsideClickAttached = true;
 }
 
 function closeAttendanceModal(modalId) {
@@ -35489,7 +35467,6 @@ function closeAttendanceModal(modalId) {
 
 
 /* EXPORT CSV */
-
 function exportEmployeeAttendance() {
   const rows = filteredEmployeeAttendanceData;
 
