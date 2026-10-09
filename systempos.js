@@ -35781,6 +35781,60 @@ async function handleSaveEmployeeOvertime(event) {
   }
 }
 
+async function handleSaveAttendanceStatus(event) {
+	event.preventDefault();
+	
+	const form = document.getElementById('attendanceStatusForm');
+	const modal = document.getElementById('attendanceStatusModal');
+	const submitButton = form?.querySelector('[type="submit"]');
+	const employeeId = document.getElementById('statusEmployeeId')?.value;
+	const attendanceDate = document.getElementById('statusAttendanceDate')?.value;
+	const status = document.getElementById('attendanceStatusValue')?.value;
+	const note = document.getElementById('attendanceStatusNote')?.value.trim() || null;
+	const sessionId = localStorage.getItem('pos_session_id');
+	
+	if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
+	if (!employeeId || !attendanceDate || !status) { alert('Karyawan, tanggal, dan status wajib diisi.'); return; }
+	
+	try {
+		if (submitButton) {
+			submitButton.disabled = true;
+			submitButton.dataset.originalText = submitButton.innerHTML;
+			submitButton.textContent = 'Saving...';
+		}
+	
+	const { data, error } = await supabaseClient.rpc(
+	  'save_employee_attendance_status',
+	  {
+	    p_session_id: sessionId,
+	    p_employee_id: employeeId,
+	    p_attendance_date: attendanceDate,
+	    p_status: status,
+	    p_note: note
+	  }
+	);
+	
+	if (error) throw error;
+	if (data?.success !== true) { throw new Error( data?.message || 'Gagal menyimpan status attendance.' ); }
+	
+	await loadEmployeeAttendance();
+	closeAttendanceModal('attendanceStatusModal');
+	
+	alert(data.message || 'Status attendance berhasil disimpan.');
+
+	} catch (error) {
+		console.error('handleSaveAttendanceStatus:', error);
+		alert(error.message || 'Gagal menyimpan status attendance.');
+	} finally {
+		if (submitButton) {
+			submitButton.disabled = false;
+			submitButton.innerHTML =
+			submitButton.dataset.originalText || 'Save Status';
+		}
+	}
+}
+
+
 function initCheckInTimePickers() {
   const hourSelect = document.getElementById('checkInHour');
   const minuteSelect = document.getElementById('checkInMinute');
