@@ -35386,12 +35386,15 @@ function openAttendanceAction(action, rowIndex) {
     if (employeeNameInput) { employeeNameInput.value = row.Full_Name || ''; }
     if (overtimeDateInput) { overtimeDateInput.value = date; }
 
-		modal.querySelector('#overtimeStartTime').value = '';
-		modal.querySelector('#overtimeEndTime').value = '';
-
-    setValue('overtimeNote', '');
-    showModal('attendanceOvertimeModal');
-    return;
+		modal.querySelector('#overtimeStartHour').value = '';
+		modal.querySelector('#overtimeStartMinute').value = '';
+		modal.querySelector('#overtimeEndHour').value = '';
+		modal.querySelector('#overtimeEndMinute').value = '';
+		
+		setValue('overtimeNote', '');
+		initOvertimeTimePickers();
+		showModal('attendanceOvertimeModal');
+		return;
   }
   // STATUS
   if (action === 'status') {
@@ -35591,9 +35594,18 @@ async function handleSaveEmployeeOvertime(event) {
   const submitButton = form?.querySelector('[type="submit"]');
   const employeeId = modal.querySelector('#overtimeEmployeeId')?.value;
   const overtimeDate = modal.querySelector('#overtimeAttendanceDate')?.value;
-  const startTime = modal.querySelector('#overtimeStartTime')?.value;
-	const endTime = modal.querySelector('#overtimeEndTime')?.value;
-
+	const startHour = modal.querySelector('#overtimeStartHour')?.value;
+	const startMinute = modal.querySelector('#overtimeStartMinute')?.value;
+	const endHour = modal.querySelector('#overtimeEndHour')?.value;
+	const endMinute = modal.querySelector('#overtimeEndMinute')?.value;
+	const startTime =
+	  startHour !== '' && startMinute !== ''
+	    ? `${startHour}:${startMinute}`
+	    : '';
+	const endTime =
+	  endHour !== '' && endMinute !== ''
+	    ? `${endHour}:${endMinute}`
+	    : '';
   const note = modal.querySelector('#overtimeNote')?.value.trim() || null;
   const sessionId = localStorage.getItem('pos_session_id');
 
@@ -35686,6 +35698,38 @@ async function handleSaveEmployeeOvertime(event) {
         submitButton.dataset.originalText || 'Save Overtime';
     }
   }
+}
+
+function initOvertimeTimePickers() {
+  const hourIds = [
+    'overtimeStartHour',
+    'overtimeEndHour'
+  ];
+
+  const minuteIds = [
+    'overtimeStartMinute',
+    'overtimeEndMinute'
+  ];
+
+  hourIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select || select.options.length > 1) return;
+
+    for (let hour = 0; hour < 24; hour++) {
+      const value = String(hour).padStart(2, '0');
+      select.add(new Option(value, value));
+    }
+  });
+
+  minuteIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select || select.options.length > 1) return;
+
+    for (let minute = 0; minute < 60; minute++) {
+      const value = String(minute).padStart(2, '0');
+      select.add(new Option(value, value));
+    }
+  });
 }
 
 
