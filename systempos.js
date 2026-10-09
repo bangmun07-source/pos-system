@@ -35214,9 +35214,8 @@ function renderEmployeeAttendanceTable() {
 					      <span class="material-symbols-outlined">more_vert</span>
 					    </button>
 					
-					    <div
-					      id="attendanceActionMenu-${rowIndex}"
-					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1 text-left">
+					    <div id="attendanceActionMenu-${rowIndex}"
+					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1 text-left"
 					      <button type="button"
 					        onclick="runAttendanceAction(event, 'detail', ${rowIndex})"
 					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian">
@@ -35429,16 +35428,39 @@ function openAttendanceAction(action, rowIndex) {
 
 function toggleAttendanceActionMenu(event, rowIndex) {
   event.stopPropagation();
+
   const menuId = `attendanceActionMenu-${rowIndex}`;
   const targetMenu = document.getElementById(menuId);
   if (!targetMenu) return;
-  // Tutup menu lain yang sedang terbuka.
+
   document.querySelectorAll('[id^="attendanceActionMenu-"]').forEach(menu => {
     if (menu.id !== menuId) {
       menu.classList.add('hidden');
+      menu.classList.remove('bottom-full', 'mb-1');
+      menu.classList.add('top-full', 'mt-1');
     }
   });
-  targetMenu.classList.toggle('hidden');
+
+  const isOpening = targetMenu.classList.contains('hidden');
+
+  if (!isOpening) { targetMenu.classList.add('hidden'); return; }
+
+  targetMenu.classList.remove('hidden');
+
+  // Ukur posisi setelah dropdown ditampilkan.
+  const button = event.currentTarget;
+  const buttonRect = button.getBoundingClientRect();
+  const menuHeight = targetMenu.offsetHeight;
+  const spaceBelow = window.innerHeight - buttonRect.bottom;
+  const spaceAbove = buttonRect.top;
+
+  if (spaceBelow < menuHeight + 12 && spaceAbove > spaceBelow) {
+    targetMenu.classList.remove('top-full', 'mt-1');
+    targetMenu.classList.add('bottom-full', 'mb-1');
+  } else {
+    targetMenu.classList.remove('bottom-full', 'mb-1');
+    targetMenu.classList.add('top-full', 'mt-1');
+  }
 }
 
 function runAttendanceAction(event, action, rowIndex) {
