@@ -35300,14 +35300,18 @@ function openAttendanceAction(action, rowIndex) {
     return; }
 
   // Helper untuk mengisi elemen berdasarkan ID.
-  const setValue = (id, value) => {
-    const element = document.getElementById(id);
-    if (element) element.value = value ?? '';
-  };
-  const setText = (id, value) => {
-    const element = document.getElementById(id);
-    if (element) element.textContent = value || '-';
-  };
+	const setValue = (id, value) => {
+	  const element = document.getElementById(id);
+	  if (element) element.value = value ?? '';
+	};
+	const setText = (id, value) => {
+	  const element = document.getElementById(id);
+	  if (element) element.textContent = value || '-';
+	};
+	const setInputValue = (id, value) => {
+	  const element = document.getElementById(id);
+	  if (element) element.value = value ?? '';
+	};
   const date = String(row.Attendance_Date || '').slice(0, 10);
   const formatTime = value => {
     if (!value) return '-';
@@ -35351,8 +35355,8 @@ function openAttendanceAction(action, rowIndex) {
     setValue('checkInEmployeeId', row.Employee_ID);
     setValue('checkInAttendanceDate', date);
     setValue('checkInAttendanceId', row.Attendance_ID || '');
-    setText('checkInEmployeeName', row.Full_Name);
-    setText('checkInDate', formatDate(date));
+		setInputValue('checkInEmployeeName', row.Full_Name);
+		setInputValue('checkInDate', date);
     const now = new Date();
     const localTime =
       `${String(now.getHours()).padStart(2, '0')}:` +
@@ -35368,8 +35372,8 @@ function openAttendanceAction(action, rowIndex) {
     setValue('overtimeEmployeeId', row.Employee_ID);
     setValue('overtimeAttendanceDate', date);
     setValue('overtimeAttendanceId', row.Attendance_ID || '');
-    setText('overtimeEmployeeName', row.Full_Name);
-    setText('overtimeDate', formatDate(date));
+		setInputValue('overtimeEmployeeName', row.Full_Name);
+		setInputValue('overtimeDate', date);
     setValue( 'overtimeStartTime', row.Overtime_Start || row.Overtime_Start_Time || '' );
     setValue( 'overtimeEndTime', row.Overtime_End || row.Overtime_End_Time || '' );
     setValue('overtimeNote', row.Overtime_Note || '');
@@ -35381,8 +35385,8 @@ function openAttendanceAction(action, rowIndex) {
     setValue('statusEmployeeId', row.Employee_ID);
     setValue('statusAttendanceDate', date);
     setValue('statusAttendanceId', row.Attendance_ID || '');
-    setText('statusEmployeeName', row.Full_Name);
-    setText('statusDate', formatDate(date));
+		setInputValue('statusEmployeeName', row.Full_Name);
+		setInputValue('statusDate', date);
     setValue(
       'attendanceStatusValue',
       ['PRESENT', 'ABSENT', 'SICK', 'LEAVE'].includes(row.Status)
