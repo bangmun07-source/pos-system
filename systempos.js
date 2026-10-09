@@ -34910,91 +34910,149 @@ function updateAttendanceKioskClock() {
 }
 
 
-function startAttendanceKioskAttendanceCheck(
-  employeeId,
-  attendanceDate
+function startAttendanceKioskAttendanceCheck( employeeId, attendanceDate ) {
+
+if (attendanceKioskAttendanceCheckInterval) {
+	clearInterval( attendanceKioskAttendanceCheckInterval );
+	attendanceKioskAttendanceCheckInterval = null;
+}
+
+const cleanEmployeeId = String(employeeId || '').trim();
+const cleanAttendanceDate = String(attendanceDate || '').trim();
+
+if (
+	!cleanEmployeeId ||
+	!cleanAttendanceDate
 ) {
+	return;
+}
 
-  if (attendanceKioskAttendanceCheckInterval) {
-    clearInterval(
-      attendanceKioskAttendanceCheckInterval
-    );
+const sessionId = localStorage.getItem('pos_session_id');
 
-    attendanceKioskAttendanceCheckInterval = null;
-  }
+if (!sessionId) { return; }
 
-  const cleanEmployeeId =
-    String(employeeId || '').trim();
-
-  const cleanAttendanceDate =
-    String(attendanceDate || '').trim();
-
-  if (
-    !cleanEmployeeId ||
-    !cleanAttendanceDate
-  ) {
-    return;
-  }
-
-  const sessionId =
-    localStorage.getItem('pos_session_id');
-
-  if (!sessionId) {
-    console.error(
-      'Attendance check: session tidak ditemukan.'
-    );
-    return;
-  }
-
-  attendanceKioskAttendanceCheckInterval =
-    setInterval(async () => {
-
-      try {
-
-        const { data, error } =
-          await supabaseClient.rpc(
-            'check_employee_attendance_exists',
-            {
-              p_session_id: sessionId,
-              p_employee_id: cleanEmployeeId,
-              p_attendance_date: cleanAttendanceDate
-            }
-          );
-
-        if (error) {
-          console.error(
-            'Check attendance after QR scan:',
-            error
-          );
-          return;
-        }
-
-        if (data !== true) {
-          return;
-        }
-
-        console.log(
-				  'Attendance ditemukan setelah scan.'
+attendanceKioskAttendanceCheckInterval =
+	setInterval(async () => {
+		try {
+			const { data, error } =
+				await supabaseClient.rpc(
+					'check_employee_attendance_exists',
+					{
+						p_session_id: sessionId,
+						p_employee_id: cleanEmployeeId,
+						p_attendance_date: cleanAttendanceDate
+					}
 				);
-				
-				clearInterval(
-				  attendanceKioskAttendanceCheckInterval
+
+			if (error) {
+				console.error(
+					'Check attendance after QR scan:',
+					error
 				);
-				
-				attendanceKioskAttendanceCheckInterval = null;
-				
-				await initAttendancePage();
+				return;
+			}
 
-      } catch (error) {
+			if (data !== true) { return; }
 
-        console.error(
-          'Attendance check interval:',
-          error
-        );
+			console.log(
+				'Attendance ditemukan setelah scan.'
+			);
+			
+			clearInterval( attendanceKioskAttendanceCheckInterval );
+			attendanceKioskAttendanceCheckInterval = null;
+			resetAttendanceKioskUI();
+			await loadEmployees();
+			loadAttendanceKioskEmployees();
 
-      }
+		} catch (error) {
+			console.error(
+				'Attendance check interval:',
+				error
+			);
+		}
+	}, 1000);
+}
 
-    }, 1000);
+function resetAttendanceKioskUI() {
+  // EMPLOYEE SELECT
+  const employee = document.getElementById('attendanceKioskEmployee');
+  if (employee) employee.value = '';
+
+  // EMPLOYEE INFORMATION
+  const employeeInfo = document.getElementById('attendanceKioskEmployeeInfo');
+  if (employeeInfo) employeeInfo.classList.add('hidden');
+
+  [
+    'attendanceKioskEmployeeName',
+    'attendanceKioskEmployeeId',
+    'attendanceKioskEmployeePosition',
+    'attendanceKioskEmployeeBranch',
+    'attendanceKioskQrEmployeeName',
+    'attendanceKioskSuccessEmployee',
+    'attendanceKioskSuccessTime'
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '-';
+  });
+
+  // PIN
+  const pin = document.getElementById('attendanceKioskPin');
+  if (pin) {
+    pin.value = '';
+    pin.type = 'password';
+  }
+
+  const pinMessage = document.getElementById('attendanceKioskPinMessage');
+  if (pinMessage) {
+    pinMessage.textContent = '';
+    pinMessage.classList.add('hidden');
+  }
+
+  const pinIcon = document.getElementById('attendancePinVisibilityIcon');
+  if (pinIcon) pinIcon.textContent = 'visibility';
+
+  // QR CODE
+  const qrCode = document.getElementById('attendanceKioskQrCode');
+  if (qrCode) qrCode.innerHTML = '';
+
+  const qrEmpty = document.getElementById('attendanceKioskQrEmpty');
+  const qrActive = document.getElementById('attendanceKioskQrActive');
+  const qrSuccess = document.getElementById('attendanceKioskQrSuccess');
+
+  if (qrEmpty) qrEmpty.classList.remove('hidden');
+  if (qrActive) {
+    qrActive.classList.add('hidden');
+    qrActive.classList.remove('flex');
+  }
+  if (qrSuccess) {
+    qrSuccess.classList.add('hidden');
+    qrSuccess.classList.remove('flex');
+  }
+
+  const timer = document.getElementById('attendanceKioskQrTimer');
+  if (timer) timer.textContent = '60s';
+
+  // STATUS
+  const status = document.getElementById('attendanceKioskStatus');
+  if (status) {
+    status.innerHTML = `
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-xl text-muted">info</span>
+        <div>
+          <p class="text-xs font-medium text-foreground">Ready for attendance</p>
+          <p class="text-[11px] text-muted mt-1">
+            Select an employee and enter their PIN.
+          </p>
+        </div>
+      </div>
+    `;
+  }
+
+  const connectionStatus = document.getElementById('attendanceKioskConnectionStatus');
+  if (connectionStatus) connectionStatus.textContent = 'Ready';
+
+  const verifyButton = document.getElementById('attendanceKioskVerifyButton');
+  if (verifyButton) verifyButton.disabled = false;
 }
 
 async function loadAttendanceKioskBranch() {
@@ -35096,38 +35154,25 @@ function handleAttendanceEmployeeSelect() {
 }
 
 async function verifyAttendanceKiosk() {
-  const employeeSelect =
-    document.getElementById('attendanceKioskEmployee');
-
-  const pinInput =
-    document.getElementById('attendanceKioskPin');
-
-  const button =
-    document.getElementById('attendanceKioskVerifyButton');
-
-  const employeeId =
-    employeeSelect?.value || '';
-
-  const pin =
-    pinInput?.value.trim() || '';
-
-  // =========================================
+  const employeeSelect = document.getElementById('attendanceKioskEmployee');
+  const pinInput = document.getElementById('attendanceKioskPin');
+  const button = document.getElementById('attendanceKioskVerifyButton');
+  const employeeId = employeeSelect?.value || '';
+  const pin = pinInput?.value.trim() || '';
+	
   // VALIDATION
-  // =========================================
   if (!employeeId) {
     alert('Please select an employee.');
     employeeSelect?.focus();
     return;
   }
-
   if (!/^\d{4,8}$/.test(pin)) {
     alert('PIN must be 4-8 digits.');
     pinInput?.focus();
     return;
   }
 
-  const sessionId =
-    localStorage.getItem('pos_session_id');
+  const sessionId = localStorage.getItem('pos_session_id');
 
   if (!sessionId) {
     alert('Session POS tidak ditemukan.');
@@ -35135,18 +35180,13 @@ async function verifyAttendanceKiosk() {
   }
 
   try {
-
-    // =========================================
     // LOADING
-    // =========================================
     if (button) {
       button.disabled = true;
       button.textContent = 'Verifying...';
     }
 
-    // =========================================
     // VERIFY PIN
-    // =========================================
     const { data, error } =
       await supabaseClient.rpc(
         'verify_employee_attendance_pin',
@@ -35157,130 +35197,66 @@ async function verifyAttendanceKiosk() {
         }
       );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
-    const result =
-      typeof data === 'string'
-        ? JSON.parse(data)
-        : data;
+    const result = typeof data === 'string'
+			? JSON.parse(data)
+			: data;
 
     console.log(
       'Attendance PIN verification:',
       result
     );
 
-    // =========================================
     // PIN FAILED
-    // =========================================
     if (!result?.success) {
-      alert(
-        result?.message ||
-        'PIN verification failed.'
-      );
+      alert( result?.message || 'PIN verification failed.' );
+      return; }
 
-      return;
-    }
-
-    // =========================================
     // CHECK TODAY SCHEDULE
-    // =========================================
-    const todaySchedule =
-      await getAttendanceEmployeeTodaySchedule(
-        employeeId
-      );
+    const todaySchedule = await getAttendanceEmployeeTodaySchedule( employeeId );
 
     if (!todaySchedule) {
-      alert(
-        `${result.employee_name} tidak memiliki schedule untuk hari ini.`
-      );
-
-      return;
-    }
-
+      alert( `${result.employee_name} tidak memiliki schedule untuk hari ini.` );
+      return; }
     if (!todaySchedule.Is_Active) {
-      alert(
-        `${result.employee_name} sedang OFF hari ini.`
-      );
-
-      return;
-    }
+      alert( `${result.employee_name} sedang OFF hari ini.` );
+      return; }
 
     console.log(
       'Today attendance schedule:',
       todaySchedule
     );
-
-    // =========================================
 		// GENERATE ATTENDANCE QR
-		// =========================================
-		const qrResult =
-		  await generateAttendanceQr(
-		    employeeId,
-		    todaySchedule
-		  );
-		
+		const qrResult = await generateAttendanceQr( employeeId, todaySchedule );
 		console.log(
 		  'Attendance QR generated:',
 		  qrResult
 		);
 		
-		// =========================================
 		// SHOW QR PANEL
-		// =========================================
-		const qrEmpty =
-		  document.getElementById(
-		    'attendanceKioskQrEmpty'
-		  );
+		const qrEmpty = document.getElementById( 'attendanceKioskQrEmpty' );
+		const qrActive = document.getElementById( 'attendanceKioskQrActive' );
+		const qrSuccess = document.getElementById( 'attendanceKioskQrSuccess' );
 		
-		const qrActive =
-		  document.getElementById(
-		    'attendanceKioskQrActive'
-		  );
+		if (qrEmpty) { qrEmpty.classList.add('hidden'); }
+		if (qrSuccess) { qrSuccess.classList.add('hidden'); }
+		if (qrActive) { qrActive.classList.remove('hidden'); }
 		
-		const qrSuccess =
-		  document.getElementById(
-		    'attendanceKioskQrSuccess'
-		  );
-		
-		if (qrEmpty) {
-		  qrEmpty.classList.add('hidden');
-		}
-		
-		if (qrSuccess) {
-		  qrSuccess.classList.add('hidden');
-		}
-		
-		if (qrActive) {
-		  qrActive.classList.remove('hidden');
-		}
-		
-		// =========================================
 		// RENDER QR
-		// =========================================
-		renderAttendanceQr(
-		  qrResult.token
-		);
-		
+		renderAttendanceQr( qrResult.token );
 		startAttendanceQrTimer(60);
 		
 		console.log(
 		  'Attendance kiosk ready for:',
 		  result.employee_name
 		);
-
   } catch (error) {
     console.error(
       'verifyAttendanceKiosk:',
       error
     );
-
-    alert(
-      error?.message ||
-      'Failed to verify attendance.'
-    );
-
+    alert( error?.message || 'Failed to verify attendance.' );
   } finally {
     if (button) {
       button.disabled = false;
@@ -35290,25 +35266,14 @@ async function verifyAttendanceKiosk() {
   }
 }
 
-async function generateAttendanceQr(
-  employeeId,
-  todaySchedule
-) {
-  const sessionId =
-    localStorage.getItem('pos_session_id');
+async function generateAttendanceQr( employeeId, todaySchedule ) {
+	const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    throw new Error('Session POS tidak ditemukan.');
-  }
+  if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
-  const branchId =
-    String(state.user?.branchId || '').trim();
-
+  const branchId = String(state.user?.branchId || '').trim();
   const now = new Date();
-
-  const attendanceDate =
-    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
+  const attendanceDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const { data, error } =
     await supabaseClient.rpc(
       'generate_employee_attendance_token',
@@ -35321,14 +35286,11 @@ async function generateAttendanceQr(
       }
     );
 
-  if (error) {
-    throw error;
-  }
+  if (error) { throw error; }
 
-  const result =
-    typeof data === 'string'
-      ? JSON.parse(data)
-      : data;
+  const result = typeof data === 'string'
+		? JSON.parse(data)
+		: data;
 
   console.log(
     'Attendance QR token:',
@@ -35341,7 +35303,6 @@ async function generateAttendanceQr(
       'Failed to generate attendance QR.'
     );
   }
-
 	startAttendanceKioskAttendanceCheck( employeeId, attendanceDate );
   return result;
 }
@@ -35361,7 +35322,6 @@ function handleAttendancePinInput() {
 
 function getAttendanceWeekStart(date = new Date()) {
   const d = new Date(date);
-
   const day = d.getDay(); // Minggu=0, Senin=1, ..., Sabtu=6
   const diff = day === 0 ? -6 : 1 - day;
 
@@ -35377,19 +35337,11 @@ function getAttendanceWeekStart(date = new Date()) {
 async function getAttendanceEmployeeTodaySchedule(employeeId) {
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    throw new Error('Session POS tidak ditemukan.');
-  }
-
-  if (!employeeId) {
-    throw new Error('Employee belum dipilih.');
-  }
+  if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+  if (!employeeId) { throw new Error('Employee belum dipilih.'); }
 
   const now = new Date();
-
-  const today =
-    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const weekStart = getAttendanceWeekStart(now);
 
   console.log('Attendance today:', today);
@@ -35405,16 +35357,13 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
       }
     );
 
-  if (error) {
-    throw error;
-  }
+  if (error) { throw error; }
 
   console.log('RAW schedule data:', data);
   console.log('RAW schedule data type:', typeof data);
   console.log('RAW schedule data isArray:', Array.isArray(data));
 
-  const schedules =
-    Array.isArray(data) ? data : [];
+  const schedules = Array.isArray(data) ? data : [];
 
   console.log(
     'Attendance schedules returned:',
@@ -35422,7 +35371,6 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
   );
 
   const todaySchedule = schedules.find(schedule => {
-
     console.log(
       'COMPARE:',
       schedule.Schedule_Date,
@@ -35430,7 +35378,6 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
       today,
       String(schedule.Schedule_Date) === today
     );
-
     return String(schedule.Schedule_Date) === today;
   });
 
@@ -35438,13 +35385,11 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
     'Attendance today schedule:',
     todaySchedule
   );
-
   return todaySchedule || null;
 }
 
 function renderAttendanceQr(token) {
-  const qrCode =
-    document.getElementById('attendanceKioskQrCode');
+  const qrCode = document.getElementById('attendanceKioskQrCode');
 
   if (!qrCode) return;
 
@@ -35460,25 +35405,17 @@ function renderAttendanceQr(token) {
 let attendanceKioskQrTimer = null;
 
 function startAttendanceQrTimer(seconds = 60) {
-  const timerEl =
-    document.getElementById('attendanceKioskQrTimer');
+  const timerEl = document.getElementById('attendanceKioskQrTimer');
+  const qrCode = document.getElementById('attendanceKioskQrCode');
 
-  const qrCode =
-    document.getElementById('attendanceKioskQrCode');
-
-  if (attendanceKioskQrTimer) {
-    clearInterval(attendanceKioskQrTimer);
-  }
+  if (attendanceKioskQrTimer) { clearInterval(attendanceKioskQrTimer); }
 
   let remaining = seconds;
 
-  if (timerEl) {
-    timerEl.textContent = `${remaining}s`;
-  }
+  if (timerEl) { timerEl.textContent = `${remaining}s`; }
 
   attendanceKioskQrTimer = setInterval(() => {
     remaining--;
-
     if (timerEl) {
       timerEl.textContent =
         `${Math.max(remaining, 0)}s`;
@@ -35487,7 +35424,6 @@ function startAttendanceQrTimer(seconds = 60) {
     if (remaining <= 0) {
       clearInterval(attendanceKioskQrTimer);
       attendanceKioskQrTimer = null;
-
       if (qrCode) {
         qrCode.innerHTML = `
           <div class="p-6 text-center">
@@ -35530,15 +35466,12 @@ let attendanceScannerProcessing = false;
 async function initAttendanceScanPage() {
   try {
     resetAttendanceScannerUI();
-
     if (typeof Html5Qrcode === 'undefined') {
       throw new Error(
         'QR scanner library belum tersedia.'
       );
     }
-
     await startAttendanceScanner();
-
   } catch (error) {
     console.error(
       'initAttendanceScanPage:',
@@ -35553,60 +35486,26 @@ async function initAttendanceScanPage() {
 }
 
 function resetAttendanceScannerUI() {
+  const success = document.getElementById( 'attendanceScanSuccess' );
+  const error = document.getElementById( 'attendanceScanError' );
+  const status = document.getElementById( 'attendanceScanStatus' );
 
-  const success =
-    document.getElementById(
-      'attendanceScanSuccess'
-    );
-
-  const error =
-    document.getElementById(
-      'attendanceScanError'
-    );
-
-  const status =
-    document.getElementById(
-      'attendanceScanStatus'
-    );
-
-  if (success) {
-    success.classList.add('hidden');
-  }
-
-  if (error) {
-    error.classList.add('hidden');
-  }
-
-  if (status) {
-    status.textContent =
-      'Memulai kamera...';
-  }
+  if (success) { success.classList.add('hidden'); }
+  if (error) { error.classList.add('hidden'); }
+  if (status) { status.textContent = 'Memulai kamera...'; }
 }
 
 
 async function startAttendanceScanner() {
 
-  if (attendanceScannerRunning) {
-    return;
-  }
+  if (attendanceScannerRunning) { return; }
 
-  const reader =
-    document.getElementById(
-      'attendanceScanReader'
-    );
+  const reader = document.getElementById( 'attendanceScanReader' );
 
-  if (!reader) {
-    throw new Error(
-      'Scanner container tidak ditemukan.'
-    );
-  }
+  if (!reader) { throw new Error( 'Scanner container tidak ditemukan.' ); }
 
   attendanceScannerProcessing = false;
-
-  attendanceScanner =
-    new Html5Qrcode(
-      'attendanceScanReader'
-    );
+  attendanceScanner = new Html5Qrcode( 'attendanceScanReader' );
 
   await attendanceScanner.start(
     {
@@ -35621,10 +35520,7 @@ async function startAttendanceScanner() {
     },
 
     async decodedText => {
-
-      if (attendanceScannerProcessing) {
-        return;
-      }
+      if (attendanceScannerProcessing) { return; }
 
       attendanceScannerProcessing = true;
 
@@ -35634,43 +35530,25 @@ async function startAttendanceScanner() {
       );
 
       await stopAttendanceScanner();
-
-      await processScannedAttendanceToken(
-        decodedText
-      );
+      await processScannedAttendanceToken( decodedText );
     },
-
     errorMessage => {
-      // Ignore continuous scan errors.
     }
   );
 
   attendanceScannerRunning = true;
-
-  const status =
-    document.getElementById(
-      'attendanceScanStatus'
-    );
-
-  if (status) {
-    status.textContent =
-      'Arahkan kamera ke QR attendance.';
-  }
+  const status = document.getElementById( 'attendanceScanStatus' );
+  if (status) { status.textContent = 'Arahkan kamera ke QR attendance.'; }
 }
 
 
 async function stopAttendanceScanner() {
-
-  if (!attendanceScanner) {
-    return;
-  }
+  if (!attendanceScanner) { return; }
 
   try {
-
-    if (attendanceScannerRunning) {
-      await attendanceScanner.stop();
-    }
-
+    if (attendanceScannerRunning) { 
+			await attendanceScanner.stop(); 
+		}
   } catch (error) {
     console.warn(
       'stopAttendanceScanner:',
@@ -35680,36 +35558,21 @@ async function stopAttendanceScanner() {
 
   try {
     attendanceScanner.clear();
-  } catch (error) {
-    // Ignore.
-  }
+  } catch (error) { }
 
   attendanceScannerRunning = false;
   attendanceScanner = null;
 }
 
 async function processScannedAttendanceToken(token) {
-
   try {
+    const status = document.getElementById( 'attendanceScanStatus' );
 
-    const status =
-      document.getElementById(
-        'attendanceScanStatus'
-      );
+    if (status) { status.textContent = 'Verifying attendance...'; }
 
-    if (status) {
-      status.textContent =
-        'Verifying attendance...';
-    }
+    const cleanToken = String(token || '').trim();
 
-    const cleanToken =
-      String(token || '').trim();
-
-    if (!cleanToken) {
-      throw new Error(
-        'Attendance QR tidak valid.'
-      );
-    }
+    if (!cleanToken) { throw new Error( 'Attendance QR tidak valid.' ); }
 
     const { data, error } =
       await supabaseClient.rpc(
@@ -35719,14 +35582,11 @@ async function processScannedAttendanceToken(token) {
         }
       );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
-    const result =
-      typeof data === 'string'
-        ? JSON.parse(data)
-        : data;
+    const result = typeof data === 'string'
+			? JSON.parse(data)
+			: data;
 
     console.log(
       'Attendance QR result:',
@@ -35740,10 +35600,7 @@ async function processScannedAttendanceToken(token) {
       );
     }
 
-    showAttendanceScanSuccess(
-      result
-    );
-
+    showAttendanceScanSuccess( result );
   } catch (error) {
 
     console.error(
@@ -35751,58 +35608,21 @@ async function processScannedAttendanceToken(token) {
       error
     );
 
-    showAttendanceScanError(
-      error?.message ||
-      'Attendance gagal.'
-    );
+    showAttendanceScanError( error?.message || 'Attendance gagal.' );
   }
 }
 
 function showAttendanceScanSuccess(result) {
+  const success = document.getElementById( 'attendanceScanSuccess' );
+  const error = document.getElementById( 'attendanceScanError' );
+  const status = document.getElementById( 'attendanceScanStatus' );
+  const name = document.getElementById( 'attendanceScanSuccessName' );
+  const message = document.getElementById( 'attendanceScanSuccessMessage' );
 
-  const success =
-    document.getElementById(
-      'attendanceScanSuccess'
-    );
-
-  const error =
-    document.getElementById(
-      'attendanceScanError'
-    );
-
-  const status =
-    document.getElementById(
-      'attendanceScanStatus'
-    );
-
-  const name =
-    document.getElementById(
-      'attendanceScanSuccessName'
-    );
-
-  const message =
-    document.getElementById(
-      'attendanceScanSuccessMessage'
-    );
-
-  if (error) {
-    error.classList.add('hidden');
-  }
-
-  if (success) {
-    success.classList.remove('hidden');
-  }
-
-  if (status) {
-    status.textContent =
-      'Attendance berhasil.';
-  }
-
-  if (name) {
-    name.textContent =
-      result?.employee_name || '-';
-  }
-
+  if (error) { error.classList.add('hidden'); }
+  if (success) { success.classList.remove('hidden'); }
+  if (status) { status.textContent = 'Attendance berhasil.'; }
+  if (name) { name.textContent = result?.employee_name || '-'; }
   if (message) {
 	  message.textContent =
 	    `Check In berhasil pada ${
@@ -35814,40 +35634,14 @@ function showAttendanceScanSuccess(result) {
 }
 
 function showAttendanceScanError(message) {
+  const success = document.getElementById( 'attendanceScanSuccess' );
+  const error = document.getElementById( 'attendanceScanError' );
+  const status = document.getElementById( 'attendanceScanStatus' );
+  const errorMessage = document.getElementById( 'attendanceScanErrorMessage' );
 
-  const success =
-    document.getElementById(
-      'attendanceScanSuccess'
-    );
-
-  const error =
-    document.getElementById(
-      'attendanceScanError'
-    );
-
-  const status =
-    document.getElementById(
-      'attendanceScanStatus'
-    );
-
-  const errorMessage =
-    document.getElementById(
-      'attendanceScanErrorMessage'
-    );
-
-  if (success) {
-    success.classList.add('hidden');
-  }
-
-  if (error) {
-    error.classList.remove('hidden');
-  }
-
-  if (status) {
-    status.textContent =
-      'Attendance gagal.';
-  }
-
+  if (success) { success.classList.add('hidden'); }
+  if (error) { error.classList.remove('hidden'); }
+  if (status) { status.textContent = 'Attendance gagal.'; }
   if (errorMessage) {
     errorMessage.textContent =
       message ||
