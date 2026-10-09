@@ -22818,7 +22818,7 @@
 	  			</div>
 				  <!-- FILTER -->
 				  <div class="p-5 border-b border-outline-variant">
-				    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+				    <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
 						  <!-- WEEK -->
 						  <div class="md:col-span-4">
 						    <label class="block text-xs text-muted mb-2">
@@ -22967,7 +22967,7 @@
 				  </div>
 				  <!-- FILTER -->
 				  <div class="p-5 border-b border-outline-variant">
-				    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+				    <div class="grid grid-cols-1 md:grid-cols-12 gap-2">
 				      <!-- DATE FROM -->
 				      <div class="md:col-span-3">
 				        <label class="block text-xs text-muted mb-2">
@@ -23004,6 +23004,23 @@
 				          </option>
 				        </select>
 				      </div>
+							<!-- STATUS -->
+							<div class="md:col-span-3">
+				        <label class="block text-xs text-muted mb-2"> 
+									Status
+								</label>
+				
+				        <select id="attendanceStatusFilter"
+				          onchange="filterEmployeeAttendance()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value=""> All Status </option>
+				          <option value="PRESENT">Present</option>
+				          <option value="SICK">Sick</option>
+				          <option value="LEAVE">Leave</option>
+									<option value="PERMISSION">Permission</option>
+				          <option value="ABSENT">Absent</option>
+				        </select>
+				      </div>
 				      <!-- OUTLET -->
 				      <div class="md:col-span-3">
 				        <label class="block text-xs text-muted mb-2">
@@ -23024,14 +23041,15 @@
 									Status
 								</label>
 				
-				        <select id="attendanceStatusFilter"
+				        <select id=""
 				          onchange="filterEmployeeAttendance()"
 				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
 				          <option value=""> All Status </option>
-				          <option value="PRESENT"> Present </option>
-				          <option value="SICK"> Sick </option>
-				          <option value="LEAVE"> Leave </option>
-				          <option value="ABSENT"> Absent </option>
+				          <option value="PRESENT">Present</option>
+				          <option value="SICK">Sick</option>
+				          <option value="LEAVE">Leave</option>
+									<option value="PERMISSION">Permission</option>
+				          <option value="ABSENT">Absent</option>
 				        </select>
 				      </div>
 				    </div>
@@ -23318,6 +23336,7 @@
 						</div>
 					</div>
         </section>
+				
         <!-- === PAYROLL === -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -23495,6 +23514,7 @@
       </section>
     </main>
   </div>
+	
   <!-- === EMPLOYEE MODAL === -->
 	<div id="employeeModal"
 	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4 overflow-y-auto">
@@ -23750,6 +23770,7 @@
 	    </div>
 	  </div>
 	</div>
+	
   <!-- === EMPLOYEE DETAIL MODAL === -->
   <div id="employeeDetailModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
@@ -23904,6 +23925,7 @@
       </div>
     </div>
   </div>
+	
   <!-- ==== ATTENDANCE ACCOUNT MODAL ==== -->
   <div id="attendanceAccountModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
@@ -24880,7 +24902,7 @@
 	    </div>
 	  </div>
 	</div>
-
+	
 	<!-- EMPLOYEE OVERTIME MODAL -->
 	<div id="employeeOvertimeModal"
 	  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
@@ -25007,6 +25029,309 @@
 	        Save
 	      </button>
 	    </div>
+	  </div>
+	</div>
+	<!-- ATTENDANCE CHECK IN MODAL -->
+	<div id="attendanceCheckInModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4">
+	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            login
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Manual Check In
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Record employee check-in time
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeAttendanceModal('attendanceCheckInModal')"
+	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <form id="attendanceCheckInForm" class="p-5 space-y-5">
+	      <input id="checkInEmployeeId" type="hidden">
+	      <input id="checkInAttendanceDate" type="hidden">
+	      <input id="checkInAttendanceId" type="hidden">
+	
+	      <div>
+	        <label class="block text-sm font-medium text-foreground mb-2">
+	          Employee
+	        </label>
+	        <input id="checkInEmployeeName"
+	          type="text"
+	          readonly
+	          placeholder="Employee name"
+	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	      </div>
+	
+	      <div>
+	        <label class="block text-sm font-medium text-foreground mb-2">
+	          Attendance Date
+	        </label>
+	        <input id="checkInDate"
+	          type="date"
+	          readonly
+	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	      </div>
+	
+	      <div>
+	        <label for="checkInTime"
+	          class="block text-sm font-medium text-foreground mb-2">
+	          Check In Time <span class="text-red-500">*</span>
+	        </label>
+	        <input id="checkInTime"
+	          type="time"
+	          required
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	      </div>
+	
+	      <div>
+	        <label for="checkInNote"
+	          class="block text-sm font-medium text-foreground mb-2">
+	          Note
+	        </label>
+	        <textarea id="checkInNote"
+	          rows="3"
+	          placeholder="Additional notes (optional)"
+	          class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+	      </div>
+	      <!-- FOOTER -->
+	      <div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
+	        <button type="button"
+	          onclick="closeAttendanceModal('attendanceCheckInModal')"
+	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	          Cancel
+	        </button>
+	
+	        <button type="submit"
+	          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	          <span class="material-symbols-outlined text-sm">save</span>
+	          Save Check In
+	        </button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+	
+	<!-- ATTENDANCE OVERTIME MODAL -->
+	<div id="attendanceOvertimeModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4">
+	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            more_time
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Employee Overtime
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Record employee overtime hours
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeAttendanceModal('attendanceOvertimeModal')"
+	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <form id="attendanceOvertimeForm" class="p-5 space-y-5">
+	      <input id="overtimeEmployeeId" type="hidden">
+	      <input id="overtimeAttendanceDate" type="hidden">
+	      <input id="overtimeAttendanceId" type="hidden">
+	
+	      <div>
+	        <label class="block text-sm font-medium text-foreground mb-2">
+	          Employee
+	        </label>
+	        <input id="overtimeEmployeeName"
+	          type="text"
+	          readonly
+	          placeholder="Employee name"
+	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	      </div>
+	
+	      <div>
+	        <label class="block text-sm font-medium text-foreground mb-2">
+	          Attendance Date
+	        </label>
+	        <input id="overtimeDate"
+	          type="date"
+	          readonly
+	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	      </div>
+	
+	      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+	        <div>
+	          <label for="overtimeStartTime"
+	            class="block text-sm font-medium text-foreground mb-2">
+	            Overtime Start <span class="text-red-500">*</span>
+	          </label>
+	          <input id="overtimeStartTime"
+	            type="time"
+	            required
+	            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	        </div>
+	
+	        <div>
+	          <label for="overtimeEndTime"
+	            class="block text-sm font-medium text-foreground mb-2">
+	            Overtime End <span class="text-red-500">*</span>
+	          </label>
+	          <input id="overtimeEndTime"
+	            type="time"
+	            required
+	            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	        </div>
+	      </div>
+	
+	      <div>
+	        <label for="overtimeNote"
+	          class="block text-sm font-medium text-foreground mb-2">
+	          Note
+	        </label>
+	        <textarea id="overtimeNote"
+	          rows="3"
+	          placeholder="Overtime notes (optional)"
+	          class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+	      </div>
+	      <!-- FOOTER -->
+	      <div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
+	        <button type="button"
+	          onclick="closeAttendanceModal('attendanceOvertimeModal')"
+	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	          Cancel
+	        </button>
+	
+	        <button type="submit"
+	          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	          <span class="material-symbols-outlined text-sm">save</span>
+	          Save Overtime
+	        </button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+	
+	<!-- ATTENDANCE STATUS MODAL -->
+	<div id="attendanceStatusModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4">
+	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            fact_check
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Attendance Status
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Set employee attendance status
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeAttendanceModal('attendanceStatusModal')"
+	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <form id="attendanceStatusForm" class="p-5 space-y-5">
+	      <input id="statusEmployeeId" type="hidden">
+	      <input id="statusAttendanceDate" type="hidden">
+	      <input id="statusAttendanceId" type="hidden">
+	
+	      <div>
+	        <label class="block text-sm font-medium text-foreground mb-2">
+	          Employee
+	        </label>
+	        <input id="statusEmployeeName"
+	          type="text"
+	          readonly
+	          placeholder="Employee name"
+	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	      </div>
+	
+	      <div>
+	        <label class="block text-sm font-medium text-foreground mb-2">
+	          Attendance Date
+	        </label>
+	        <input id="statusDate"
+	          type="date"
+	          readonly
+	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	      </div>
+	
+	      <div>
+	        <label for="attendanceStatusValue"
+	          class="block text-sm font-medium text-foreground mb-2">
+	          Status <span class="text-red-500">*</span>
+	        </label>
+	        <select id="attendanceStatusValue"
+	          required
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+	          <option value="">Select Status</option>
+	          <option value="PRESENT">Present</option>
+	          <option value="SICK">Sick</option>
+	          <option value="LEAVE">Leave</option>
+						<option value="PERMISSION">Permission</option>
+	          <option value="ABSENT">Absent</option>
+	        </select>
+	      </div>
+	
+	      <div>
+	        <label for="attendanceStatusNote"
+	          class="block text-sm font-medium text-foreground mb-2">
+	          Note
+	        </label>
+	        <textarea id="attendanceStatusNote"
+	          rows="3"
+	          placeholder="Additional notes (optional)"
+	          class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+	      </div>
+	      <!-- FOOTER -->
+	      <div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
+	        <button type="button"
+	          onclick="closeAttendanceModal('attendanceStatusModal')"
+	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	          Cancel
+	        </button>
+	
+	        <button type="submit"
+	          class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	          <span class="material-symbols-outlined text-sm">save</span>
+	          Save Status
+	        </button>
+	      </div>
+	    </form>
 	  </div>
 	</div>
 </template>
@@ -25436,7 +25761,6 @@
       <div class="p-6">
         <div id="attendanceScanReader"
           class="w-full overflow-hidden rounded-xl bg-black" >
-					
 				</div>
 
         <div id="attendanceScanStatus"
