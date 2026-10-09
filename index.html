@@ -24915,7 +24915,9 @@
 	      </button>
 	    </div>
 	    <!-- CONTENT -->
-	    <form id="attendanceCheckInForm" class="p-5 space-y-5">
+	    <form id="attendanceCheckInForm" 
+				onsubmit="handleSaveEmployeeCheckIn(event)"
+				class="p-5 space-y-5">
 	      <input id="checkInEmployeeId" type="hidden">
 	      <input id="checkInAttendanceDate" type="hidden">
 	      <input id="checkInAttendanceId" type="hidden">
