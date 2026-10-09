@@ -34980,13 +34980,22 @@ function populateEmployeeAttendanceFilters() {
 
   if (branchFilter) {
     if (role !== 'Owner') {
-      branchFilter.innerHTML = `
-        <option value="${escapeHtml(userBranchId)}">
-          My Outlet
-        </option>
-      `;
-      branchFilter.value = userBranchId;
-      branchFilter.disabled = true;
+		  const branch = (employeeBranches || []).find(
+		    row => String(row.Branch_ID || '').trim() === userBranchId
+		  );
+		
+		  const branchName = branch
+		    ? branch.Branch_Name
+		    : userBranchId;
+		
+		  branchFilter.innerHTML = `
+		    <option value="${escapeHtml(userBranchId)}">
+		      ${escapeHtml(branchName)}
+		    </option>
+		  `;
+		
+		  branchFilter.value = userBranchId;
+		  branchFilter.disabled = true;
     } else {
       const previousValue = branchFilter.value;
       const branches = [...new Set(
@@ -35059,7 +35068,7 @@ function renderEmployeeAttendanceTable() {
   if (!pageRows.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" class="text-center py-6 text-gray-500">
+        <td colspan="8" class="text-center py-6 text-on-surface-variant">
           No employee attendance data
         </td>
       </tr>
@@ -35078,11 +35087,11 @@ function renderEmployeeAttendanceTable() {
           })
         : '-';
       const statusClass = {
-        PRESENT: 'bg-green-100 text-green-700',
-        ABSENT: 'bg-red-100 text-red-700',
-        LEAVE: 'bg-blue-100 text-blue-700',
-        SICK: 'bg-yellow-100 text-yellow-700'
-      }[row.Status] || 'bg-gray-100 text-gray-700';
+        PRESENT: 'text-green-700',
+        ABSENT: 'text-red-700',
+        LEAVE: 'text-blue-700',
+        SICK: 'text-yellow-700'
+      }[row.Status] || 'text-on-surface-variant';
       const schedule = row.Start_Time && row.End_Time
         ? `${String(row.Start_Time).slice(0, 5)} - ${String(row.End_Time).slice(0, 5)}`
         : '-';
@@ -35091,12 +35100,12 @@ function renderEmployeeAttendanceTable() {
         <tr class="border-b border-outline-variant">
           <td class="px-4 py-3">
             <div class="font-medium">${escapeHtml(row.Full_Name || '-')}</div>
-            <div class="text-xs text-gray-500">
+            <div class="text-xs text-on-surface-variant">
               ${escapeHtml(row.Employee_Code || row.Employee_ID || '')}
             </div>
           </td>
 
-          <td class="px-4 py-3">
+          <td class="px-4 py-3 text-center">
             ${escapeHtml(row.Branch_ID || '-')}
           </td>
 
@@ -35104,7 +35113,7 @@ function renderEmployeeAttendanceTable() {
             ${escapeHtml(attendanceDate)}
           </td>
 
-          <td class="px-4 py-3 whitespace-nowrap">
+          <td class="px-4 py-3 text-center whitespace-nowrap">
             ${escapeHtml(schedule)}
           </td>
 
@@ -35116,7 +35125,7 @@ function renderEmployeeAttendanceTable() {
           </td>
 
           <td class="px-4 py-3">
-            <span class="inline-flex rounded-full px-2 py-1 text-xs font-medium ${statusClass}">
+            <span class="inline-flex rounded-md px-2 py-1 text-xs text-center font-medium ${statusClass}">
               ${escapeHtml(row.Status || '-')}
             </span>
           </td>
@@ -35125,8 +35134,8 @@ function renderEmployeeAttendanceTable() {
             ${escapeHtml(row.Note || '-')}
           </td>
 
-          <td class="px-4 py-3">
-            <span class="text-gray-400">-</span>
+          <td class="px-4 py-3 text-center">
+            <span class="text-on-surface-variant">-</span>
           </td>
         </tr>
       `;
