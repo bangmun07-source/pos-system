@@ -34910,14 +34910,56 @@ async function loadEmployeeAttendance() {
     if (error) throw error;
 
     const rows = Array.isArray(data) ? data : [];
-    // Pertahankan pola pembatasan outlet pada Employee Schedule.
-    employeeAttendanceData = role === 'Owner'
-      ? rows
-      : rows.filter(row => String(row.Branch_ID || '').trim() === userBranchId );
-
-    populateEmployeeAttendanceFilters();
-    filterEmployeeAttendance();
-
+		const attendanceRows = Array.isArray(data) ? data : [];
+		const schedules = Array.isArray(scheduleData) ? scheduleData : [];
+		const attendanceMap = new Map();
+		
+		attendanceRows.forEach(row => {
+		  const key = `${row.Employee_ID}|${String(row.Attendance_Date || '').slice(0, 10)}`;
+		  attendanceMap.set(key, row);
+		});
+		
+		// Tampilkan semua jadwal aktif, termasuk karyawan yang belum scan QR.
+		const scheduledRows = schedules
+		  .filter(schedule =>
+		    schedule.Schedule_Date &&
+		    schedule.Is_Active === true
+		  )
+		  .map(schedule => {
+		    const date = String(schedule.Schedule_Date).slice(0, 10);
+		    const key = `${schedule.Employee_ID}|${date}`;
+		    const attendance = attendanceMap.get(key);
+		
+		    return {
+		      ...schedule,
+		      ...(attendance || {}),
+		      Employee_ID: schedule.Employee_ID,
+		      Full_Name: schedule.Full_Name,
+		      Employee_Code: schedule.Employee_Code,
+		      Branch_ID: schedule.Branch_ID,
+		      Schedule_ID: attendance?.Schedule_ID || schedule.Schedule_ID,
+		      Attendance_Date: attendance?.Attendance_Date || date,
+		      Start_Time: schedule.Start_Time,
+		      End_Time: schedule.End_Time,
+		      Check_In: attendance?.Check_In || null,
+		      Check_Out: attendance?.Check_Out || null,
+		      Late_Minutes: attendance?.Late_Minutes ?? 0,
+		      Work_Minutes: attendance?.Work_Minutes ?? 0,
+		      Note: attendance?.Note || '',
+		      Status: attendance?.Status || 'NOT_RECORDED',
+		      Attendance_ID: attendance?.Attendance_ID || null
+		    };
+		  });
+		
+		// Pembatasan outlet tetap berlaku.
+		employeeAttendanceData = role === 'Owner'
+		  ? scheduledRows
+		  : scheduledRows.filter(row =>
+		      String(row.Branch_ID || '').trim() === userBranchId
+		    );
+		
+		populateEmployeeAttendanceFilters();
+		filterEmployeeAttendance();
   } catch (error) {
     console.error('loadEmployeeAttendance:', error);
     if (tbody) {
