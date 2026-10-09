@@ -35162,8 +35162,7 @@ function renderEmployeeAttendanceTable() {
       const alreadyCheckedIn = Boolean(row.Check_In);
 
       return `
-        <tr class="border-b border-outline-variant hover:bg-surface-container/40">
-
+        <tr class="border-b border-outline-variant hover:bg-outline-variant">
           <td class="px-4 py-3">
             <div class="font-medium">
               ${escapeHtml(row.Full_Name || '-')}
@@ -35206,45 +35205,49 @@ function renderEmployeeAttendanceTable() {
             ${escapeHtml(row.Note || '-')}
           </td>
 
-          <td class="px-4 py-3">
-            <div class="flex items-center justify-center gap-1">
-
-              <button
-                type="button"
-                onclick="openAttendanceAction('detail', ${rowIndex})"
-                class="p-2 rounded-md hover:bg-surface-container"
-                title="View Detail">
-                <span class="material-symbols-outlined text-lg">visibility</span>
-              </button>
-
-              <button
-                type="button"
-                onclick="openAttendanceAction('checkin', ${rowIndex})"
-                ${alreadyCheckedIn ? 'disabled' : ''}
-                class="p-2 rounded-md hover:bg-surface-container
-                  ${alreadyCheckedIn ? 'opacity-40 cursor-not-allowed' : ''}"
-                title="${alreadyCheckedIn ? 'Already checked in via QR' : 'Check In'}">
-                <span class="material-symbols-outlined text-lg">login</span>
-              </button>
-
-              <button
-                type="button"
-                onclick="openAttendanceAction('overtime', ${rowIndex})"
-                class="p-2 rounded-md hover:bg-surface-container"
-                title="Overtime">
-                <span class="material-symbols-outlined text-lg">more_time</span>
-              </button>
-
-              <button
-                type="button"
-                onclick="openAttendanceAction('status', ${rowIndex})"
-                class="p-2 rounded-md hover:bg-surface-container"
-                title="Edit Status">
-                <span class="material-symbols-outlined text-lg">edit_note</span>
-              </button>
-
-            </div>
-          </td>
+					<td class="px-4 py-3 text-center">
+					  <div class="relative inline-block text-center">
+					    <button type="button"
+					      onclick="toggleAttendanceActionMenu(event, ${rowIndex})"
+					      class="inline-flex items-center justify-center w-9 h-9 text-on-surface hover:text-on-surface-variant transition-colors"
+					      title="Attendance Actions">
+					      <span class="material-symbols-outlined">more_vert</span>
+					    </button>
+					
+					    <div
+					      id="attendanceActionMenu-${rowIndex}"
+					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1 text-left">
+					      <button type="button"
+					        onclick="runAttendanceAction(event, 'detail', ${rowIndex})"
+					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian">
+						        <span class="material-symbols-outlined text-lg">visibility</span>
+						     			 View Detail
+					      </button>
+					
+					      <button type="button"
+					        onclick="runAttendanceAction(event, 'checkin', ${rowIndex})"
+					        ${alreadyCheckedIn ? 'disabled' : ''}
+					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${alreadyCheckedIn ? 'opacity-40 cursor-not-allowed' : ''}">
+						        <span class="material-symbols-outlined text-lg">login</span>
+						        	Check In
+					      </button>
+					
+					      <button type="button"
+					        onclick="runAttendanceAction(event, 'overtime', ${rowIndex})"
+					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varianr">
+						        <span class="material-symbols-outlined text-lg">more_time</span>
+						        	Overtime
+					      </button>
+					
+					      <button type="button"
+					        onclick="runAttendanceAction(event, 'status', ${rowIndex})"
+					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian">
+						        <span class="material-symbols-outlined text-lg">edit_note</span>
+						        	Edit Status
+					      </button>
+					    </div>
+					  </div>
+					</td>
         </tr>
       `;
     }).join('');
