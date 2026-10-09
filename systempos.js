@@ -35142,6 +35142,7 @@ function renderEmployeeAttendanceTable() {
         PRESENT: 'Present',
         ABSENT: 'Absent',
         SICK: 'Sick',
+				PERMISSION: 'Permission',
         LEAVE: 'Leave',
         NOT_RECORDED: 'Belum Dicatat'
       };
@@ -35150,6 +35151,7 @@ function renderEmployeeAttendanceTable() {
         PRESENT: 'text-green-700 bg-green-50',
         ABSENT: 'text-red-700 bg-red-50',
         LEAVE: 'text-blue-700 bg-blue-50',
+				PERMISSION: 'text-orange-700 bg-orange-50',
         SICK: 'text-yellow-700 bg-yellow-50',
         NOT_RECORDED: 'text-on-surface-variant bg-surface-container'
       }[row.Status] || 'text-on-surface-variant';
@@ -35195,7 +35197,7 @@ function renderEmployeeAttendanceTable() {
             }
           </td>
 
-          <td class="px-4 py-3">
+          <td class="px-4 py-3 text-center">
             <span class="inline-flex rounded-md px-2 py-1 text-xs font-medium ${statusClass}">
               ${escapeHtml(statusLabels[row.Status] || row.Status || '-')}
             </span>
@@ -35291,13 +35293,10 @@ function changeEmployeeAttendancePage(direction) {
   renderEmployeeAttendanceTable();
 }
 
-
 function openAttendanceAction(action, rowIndex) {
   const row = filteredEmployeeAttendanceData[rowIndex];
 
-  if (!row) {
-    console.error('Attendance row tidak ditemukan:', rowIndex);
-    return; }
+  if (!row) { return; }
 
   // Helper untuk mengisi elemen berdasarkan ID.
 	const setValue = (id, value) => {
@@ -35431,6 +35430,7 @@ function openAttendanceAction(action, rowIndex) {
       ABSENT: 'Absent',
       SICK: 'Sick',
       LEAVE: 'Leave',
+			PERMISSION: 'Permission',
       NOT_RECORDED: 'Belum Dicatat'
     };
     setText( 'detailAttendanceStatus', statusLabels[row.Status] || row.Status );
