@@ -35367,8 +35367,7 @@ function openAttendanceAction(action, rowIndex) {
     showModal('attendanceCheckInModal');
     return;
   }
-	console.log('Overtime row:', row);
-console.log('Overtime date:', date);
+
   // OVERTIME
   if (action === 'overtime') {
     setValue('overtimeEmployeeId', row.Employee_ID);
@@ -35381,13 +35380,16 @@ console.log('Overtime date:', date);
     if (employeeNameInput) { employeeNameInput.value = row.Full_Name || ''; }
     if (overtimeDateInput) { overtimeDateInput.value = String(row.Attendance_Date || date || '').slice(0, 10); }
 		
-    setValue('overtimeStartTime', '');
-    setValue('overtimeEndTime', '');
+		modal.querySelector('#overtimeStartHour').value = '';
+		modal.querySelector('#overtimeStartMinute').value = '';
+		modal.querySelector('#overtimeEndHour').value = '';
+		modal.querySelector('#overtimeEndMinute').value = '';
     setValue('overtimeNote', '');
     console.log('Overtime input:', {
       name: employeeNameInput?.value,
       date: overtimeDateInput?.value
     });
+		initOvertimeTimePickers();
     showModal('attendanceOvertimeModal');
     return;
   }
@@ -35580,28 +35582,49 @@ async function loadEmployeeOvertime() {
   return employeeOvertimeData;
 }
 
+
 async function handleSaveEmployeeOvertime(event) {
   event.preventDefault();
+
   const form = document.getElementById('attendanceOvertimeForm');
+  const modal = document.getElementById('attendanceOvertimeModal');
   const submitButton = form?.querySelector('[type="submit"]');
-  const employeeId = document.getElementById('overtimeEmployeeId')?.value;
-  const overtimeDate = document.getElementById('overtimeAttendanceDate')?.value;
-  const startTime = document.getElementById('overtimeStartTime')?.value;
-  const endTime = document.getElementById('overtimeEndTime')?.value;
-  const note = document.getElementById('overtimeNote')?.value.trim() || null;
+  const employeeId = modal.querySelector('#overtimeEmployeeId')?.value;
+  const overtimeDate = modal.querySelector('#overtimeAttendanceDate')?.value;
+  const startHour = modal.querySelector('#overtimeStartHour')?.value;
+  const startMinute = modal.querySelector('#overtimeStartMinute')?.value;
+  const endHour = modal.querySelector('#overtimeEndHour')?.value;
+  const endMinute = modal.querySelector('#overtimeEndMinute')?.value;
+  const startTime =
+    startHour !== '' && startMinute !== ''
+      ? `${startHour}:${startMinute}`
+      : '';
+  const endTime =
+    endHour !== '' && endMinute !== ''
+      ? `${endHour}:${endMinute}`
+      : '';
+
+  const note = modal.querySelector('#overtimeNote')?.value.trim() || null;
   const sessionId = localStorage.getItem('pos_session_id');
 
   if (!sessionId) {
     alert('Session tidak ditemukan. Silakan login kembali.');
-    return; }
-  if (!employeeId || !overtimeDate || !startTime || !endTime) {
-    alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.');
-    return; }
+    return;
+  }
 
-  
-  // Konversi waktu lembur, termasuk yang melewati tengah malam.
-  const startDateTime = new Date(`${overtimeDate}T${startTime}`);
-  let endDateTime = new Date(`${overtimeDate}T${endTime}`);
+  if (
+    !employeeId ||
+    !overtimeDate ||
+    !startTime ||
+    !endTime
+  ) {
+    alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.');
+    return;
+  }
+
+  // Buat timestamp lokal berdasarkan tanggal dan jam pilihan.
+  const startDateTime = new Date(`${overtimeDate}T${startTime}:00`);
+  let endDateTime = new Date(`${overtimeDate}T${endTime}:00`);
 
   if (
     Number.isNaN(startDateTime.getTime()) ||
@@ -35611,12 +35634,11 @@ async function handleSaveEmployeeOvertime(event) {
     return;
   }
 
-  // Jika waktu selesai <= mulai, anggap selesai pada hari berikutnya.
+  // Jika selesai <= mulai, berarti selesai pada hari berikutnya.
   if (endDateTime <= startDateTime) {
     endDateTime.setDate(endDateTime.getDate() + 1);
   }
 
-  // Batasi durasi agar input yang keliru tidak dianggap lembur sehari penuh.
   const durationMinutes =
     (endDateTime.getTime() - startDateTime.getTime()) / 60000;
 
@@ -35648,7 +35670,12 @@ async function handleSaveEmployeeOvertime(event) {
     );
 
     if (error) throw error;
-    if (data?.success === false) { throw new Error(data.message || 'Gagal menyimpan overtime.'); }
+
+    if (data?.success === false) {
+      throw new Error(
+        data.message || 'Gagal menyimpan overtime.'
+      );
+    }
 
     await loadEmployeeOvertime();
     closeAttendanceModal('attendanceOvertimeModal');
@@ -35656,7 +35683,7 @@ async function handleSaveEmployeeOvertime(event) {
 
     alert(
       `Overtime berhasil disimpan. Durasi: ${
-        Number(data?.Overtime_Minutes || 0)
+        Number(data?.Overtime_Minutes || durationMinutes)
       } menit.`
     );
   } catch (error) {
@@ -35670,6 +35697,40 @@ async function handleSaveEmployeeOvertime(event) {
     }
   }
 }
+
+
+function initOvertimeTimePickers() {
+  const hourIds = [
+    'overtimeStartHour',
+    'overtimeEndHour'
+  ];
+
+  const minuteIds = [
+    'overtimeStartMinute',
+    'overtimeEndMinute'
+  ];
+
+  hourIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select || select.options.length > 1) return;
+
+    for (let hour = 0; hour < 24; hour++) {
+      const value = String(hour).padStart(2, '0');
+      select.add(new Option(value, value));
+    }
+  });
+
+  minuteIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select || select.options.length > 1) return;
+
+    for (let minute = 0; minute < 60; minute++) {
+      const value = String(minute).padStart(2, '0');
+      select.add(new Option(value, value));
+    }
+  });
+}
+
 
 /* =========================================================
    									ATTENDANCE PAGE
