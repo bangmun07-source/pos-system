@@ -32319,9 +32319,8 @@ async function loadEmployeeBranches() {
 
     if (error) throw error;
 
-    const branches = typeof data === "string"
-      ? JSON.parse(data)
-      : (data || []);
+		const branches = typeof data === "string" ? JSON.parse(data) : (data || []);
+		employeeAttendanceBranches = branches;
     const modalSelect = document.getElementById("employeeBranch");
     const filterSelect = document.getElementById("employeeBranchFilter");
 		const scheduleBranchSelect = document.getElementById("scheduleBranch");
@@ -34866,7 +34865,7 @@ window.resetScheduleWorkingDays = function() {
 /* =========================================================
    									EMPLOYEE ATTENDANCE
 ========================================================= */
-
+let employeeAttendanceBranches = [];
 let employeeAttendanceData = [];
 let filteredEmployeeAttendanceData = [];
 let employeeAttendanceCurrentPage = 1;
@@ -34900,8 +34899,6 @@ async function loadEmployeeAttendance() {
       'get_employee_attendance',
       {
         p_session_id: sessionId,
-        // Owner dapat mengambil semua outlet.
-        // Role lain hanya meminta data outlet sendiri.
         p_branch_id: role === 'Owner' ? null : userBranchId || '__NO_BRANCH__',
         p_employee_id: null,
         p_date_from: null,
@@ -34913,20 +34910,16 @@ async function loadEmployeeAttendance() {
     if (error) throw error;
 
     const rows = Array.isArray(data) ? data : [];
-
     // Pertahankan pola pembatasan outlet pada Employee Schedule.
     employeeAttendanceData = role === 'Owner'
       ? rows
-      : rows.filter(row =>
-          String(row.Branch_ID || '').trim() === userBranchId
-        );
+      : rows.filter(row => String(row.Branch_ID || '').trim() === userBranchId );
 
     populateEmployeeAttendanceFilters();
     filterEmployeeAttendance();
 
   } catch (error) {
     console.error('loadEmployeeAttendance:', error);
-
     if (tbody) {
       tbody.innerHTML = `
         <tr>
@@ -34941,88 +34934,78 @@ async function loadEmployeeAttendance() {
 
 /* FILTER OPTIONS */
 function populateEmployeeAttendanceFilters() {
-  const employeeFilter = document.getElementById('attendanceEmployeeFilter');
-  const branchFilter = document.getElementById('attendanceBranchFilter');
-  const role = state.user.role;
-  const userBranchId = String(state.user.branchId || '').trim();
-
-  if (employeeFilter) {
-    const previousValue = employeeFilter.value;
-    const employeeMap = new Map();
-
-    employeeAttendanceData.forEach(row => {
-      if (row.Employee_ID) {
-        employeeMap.set(row.Employee_ID, {
-          id: row.Employee_ID,
-          name: row.Full_Name || row.Employee_ID,
-          branchId: row.Branch_ID
-        });
-      }
-    });
-
-    employeeFilter.innerHTML = `
-      <option value="">All Employees</option>
-      ${Array.from(employeeMap.values())
-        .sort((a, b) => a.name.localeCompare(b.name))
-        .map(employee => `
-          <option value="${escapeHtml(employee.id)}">
-            ${escapeHtml(employee.name)}
-          </option>
-        `).join('')}
-    `;
-
-    if ([...employeeFilter.options].some(
-      option => option.value === previousValue
-    )) {
-      employeeFilter.value = previousValue;
-    }
-  }
-
-  if (branchFilter) {
-    if (role !== 'Owner') {
-		  const branch = (employeeBranches || []).find(
-		    row => String(row.Branch_ID || '').trim() === userBranchId
-		  );
-		
-		  const branchName = branch
-		    ? branch.Branch_Name
-		    : userBranchId;
-		
-		  branchFilter.innerHTML = `
-		    <option value="${escapeHtml(userBranchId)}">
-		      ${escapeHtml(branchName)}
-		    </option>
-		  `;
-		
-		  branchFilter.value = userBranchId;
-		  branchFilter.disabled = true;
-    } else {
-      const previousValue = branchFilter.value;
-      const branches = [...new Set(
-        employeeAttendanceData
-          .map(row => String(row.Branch_ID || '').trim())
-          .filter(Boolean)
-      )].sort();
-
-      branchFilter.innerHTML = `
-        <option value="">All Outlets</option>
-        ${branches.map(branchId => `
-          <option value="${escapeHtml(branchId)}">
-            ${escapeHtml(branchId)}
-          </option>
-        `).join('')}
-      `;
-
-      branchFilter.disabled = false;
-
-      if ([...branchFilter.options].some(
-        option => option.value === previousValue
-      )) {
-        branchFilter.value = previousValue;
-      }
-    }
-  }
+	const employeeFilter = document.getElementById('attendanceEmployeeFilter');
+	const branchFilter = document.getElementById('attendanceBranchFilter');
+	const role = state.user.role;
+	const userBranchId = String(state.user.branchId || '').trim();
+	// EMPLOYEE FILTER
+	if (employeeFilter) {
+	const previousValue = employeeFilter.value;
+	const employeeMap = new Map();
+	
+	employeeAttendanceData.forEach(row => {
+	  if (row.Employee_ID) {
+	    employeeMap.set(row.Employee_ID, {
+	      id: row.Employee_ID,
+	      name: row.Full_Name || row.Employee_ID
+	    });
+	  }
+	});
+	employeeFilter.innerHTML = `
+	  <option value="">All Employees</option>
+	  ${Array.from(employeeMap.values())
+	    .sort((a, b) => a.name.localeCompare(b.name))
+	    .map(employee => `
+	      <option value="${escapeHtml(employee.id)}">
+	        ${escapeHtml(employee.name)}
+	      </option>
+	    `).join('')}
+	`;
+	if ([...employeeFilter.options].some(
+	  option => option.value === previousValue
+	)) {
+	  employeeFilter.value = previousValue;
+	}
 }
+	
+	// OUTLET FILTER
+	if (branchFilter) {
+		const branches = employeeAttendanceBranches || [];
+	
+		if (role !== 'Owner') {
+		  const branch = branches.find(row =>
+		    String(row.id || '').trim() === userBranchId
+		  );
+	
+	  const branchName = branch?.name || userBranchId || 'Unnamed Branch';
+	
+	  branchFilter.innerHTML = `
+	    <option value="${escapeHtml(userBranchId)}">
+	      ${escapeHtml(branchName)}
+	    </option>
+	  `;
+	  branchFilter.value = userBranchId;
+	  branchFilter.disabled = true;
+	} else {
+	  const previousValue = branchFilter.value;
+	  branchFilter.innerHTML = `
+	    <option value="">All Outlets</option>
+	    ${branches.map(branch => `
+	      <option value="${escapeHtml(String(branch.id || ''))}">
+	        ${escapeHtml(branch.name || branch.id || 'Unnamed Branch')}
+	      </option>
+	    `).join('')}
+	  `;
+		  branchFilter.disabled = false;
+		  if ([...branchFilter.options].some(
+		    option => option.value === previousValue
+		  )) {
+		    branchFilter.value = previousValue;
+		  }
+		}
+	}
+}
+
 
 /* FILTER ATTENDANCE  */
 function filterEmployeeAttendance() {
