@@ -35344,25 +35344,25 @@ function openAttendanceAction(action, rowIndex) {
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   };
-
+	
   // CHECK IN
   if (action === 'checkin') {
-    // Pengaman tambahan: check-in QR tidak boleh diedit.
+    // Check-in QR tidak boleh diedit.
     if (row.Check_In) {
       alert('Karyawan sudah check-in melalui QR. Check-in tidak bisa diedit.');
-      return;
-    }
+      return; }
+
     setValue('checkInEmployeeId', row.Employee_ID);
     setValue('checkInAttendanceDate', date);
     setValue('checkInAttendanceId', row.Attendance_ID || '');
-		setInputValue('checkInEmployeeName', row.Full_Name);
-		setInputValue('checkInDate', date);
+    setInputValue('checkInEmployeeName', row.Full_Name);
+    setInputValue('checkInDate', date);
+    // Isi dropdown jam dan menit.
+    initCheckInTimePickers();
+    // Gunakan waktu sekarang sebagai nilai awal.
     const now = new Date();
-    const localTime =
-      `${String(now.getHours()).padStart(2, '0')}:` +
-      `${String(now.getMinutes()).padStart(2, '0')}`;
-
-    setValue('checkInTime', localTime);
+    setValue('checkInHour', String(now.getHours()).padStart(2, '0'));
+    setValue('checkInMinute', String(now.getMinutes()).padStart(2, '0'));
     setValue('checkInNote', row.Note || '');
     showModal('attendanceCheckInModal');
     return;
@@ -35585,6 +35585,87 @@ async function loadEmployeeOvertime() {
   return employeeOvertimeData;
 }
 
+async function handleSaveEmployeeCheckIn(event) {
+  event.preventDefault();
+
+  const form = document.getElementById('attendanceCheckInForm');
+  const modal = document.getElementById('attendanceCheckInModal');
+
+  if (!form || !modal) return;
+
+  const submitButton = form.querySelector('[type="submit"]');
+  const employeeId = modal.querySelector('#checkInEmployeeId')?.value;
+  const attendanceDate = modal.querySelector('#checkInAttendanceDate')?.value;
+  const hour = modal.querySelector('#checkInHour')?.value;
+  const minute = modal.querySelector('#checkInMinute')?.value;
+  const note = modal.querySelector('#checkInNote')?.value.trim() || null;
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    alert('Session tidak ditemukan. Silakan login kembali.');
+    return; }
+  if (!employeeId || !attendanceDate) {
+    alert('Data karyawan atau tanggal attendance tidak lengkap.');
+    return; }
+
+  if (
+    hour == null || hour === '' ||
+    minute == null || minute === ''
+  ) {
+    alert('Pilih jam dan menit Check In.');
+    return;
+  }
+
+  const checkInTime = `${hour}:${minute}`;
+  const checkInDateTime = new Date( `${attendanceDate}T${checkInTime}:00` );
+
+  if (Number.isNaN(checkInDateTime.getTime())) {
+    alert('Waktu check-in tidak valid.');
+    return; }
+
+  const checkInTimestamp = checkInDateTime.toISOString();
+
+  try {
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.dataset.originalText = submitButton.innerHTML;
+      submitButton.textContent = 'Saving...';
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      'save_employee_manual_check_in',
+      {
+        p_session_id: sessionId,
+        p_employee_id: employeeId,
+        p_attendance_date: attendanceDate,
+        p_check_in: checkInTimestamp,
+        p_note: note
+      }
+    );
+
+    if (error) throw error;
+
+    if (data?.success !== true) {
+      throw new Error(
+        data?.message || 'Gagal menyimpan check-in.'
+      );
+    }
+		
+		await loadEmployeeAttendance();
+    closeAttendanceModal('attendanceCheckInModal');
+    alert( `Check-in berhasil disimpan pada ${checkInTime}.` );
+
+  } catch (error) {
+    console.error('handleSaveEmployeeCheckIn:', error);
+    alert(error.message || 'Gagal menyimpan check-in.');
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.innerHTML =
+        submitButton.dataset.originalText || 'Save Check In';
+    }
+  }
+}
 
 async function handleSaveEmployeeOvertime(event) {
   event.preventDefault();
@@ -35696,6 +35777,27 @@ async function handleSaveEmployeeOvertime(event) {
       submitButton.disabled = false;
       submitButton.textContent =
         submitButton.dataset.originalText || 'Save Overtime';
+    }
+  }
+}
+
+function initCheckInTimePickers() {
+  const hourSelect = document.getElementById('checkInHour');
+  const minuteSelect = document.getElementById('checkInMinute');
+
+  if (!hourSelect || !minuteSelect) return;
+
+  if (hourSelect.options.length <= 1) {
+    for (let hour = 0; hour < 24; hour++) {
+      const value = String(hour).padStart(2, '0');
+      hourSelect.add(new Option(value, value));
+    }
+  }
+
+  if (minuteSelect.options.length <= 1) {
+    for (let minute = 0; minute < 60; minute++) {
+      const value = String(minute).padStart(2, '0');
+      minuteSelect.add(new Option(value, value));
     }
   }
 }
