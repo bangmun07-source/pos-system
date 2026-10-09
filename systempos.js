@@ -32278,8 +32278,19 @@ async function initEmployeePage() {
       attendanceOvertimeForm.addEventListener( 'submit', handleSaveEmployeeOvertime );
       attendanceOvertimeForm.dataset.handlerAttached = 'true';
     }
-    // Load data attendance dan overtime
+
     await loadEmployeeAttendance();
+    const attendanceBranchFilter = document.getElementById('attendanceBranchFilter');
+    if (
+      attendanceBranchFilter &&
+      !attendanceBranchFilter.dataset.handlerAttached
+    ) {
+      attendanceBranchFilter.addEventListener('change', () => {
+        populateEmployeeAttendanceFilters();
+        renderEmployeeAttendanceTable();
+      });
+      attendanceBranchFilter.dataset.handlerAttached = 'true';
+    }
     await loadEmployeeOvertime();
   } catch (error) {
     console.error("initEmployeePage:", error);
@@ -34975,76 +34986,93 @@ async function loadEmployeeAttendance() {
 
 /* FILTER OPTIONS */
 function populateEmployeeAttendanceFilters() {
-	const employeeFilter = document.getElementById('attendanceEmployeeFilter');
-	const branchFilter = document.getElementById('attendanceBranchFilter');
-	const role = state.user.role;
-	const userBranchId = String(state.user.branchId || '').trim();
-	// EMPLOYEE FILTER
-	if (employeeFilter) {
-	const previousValue = employeeFilter.value;
-	const employeeMap = new Map();
-	
-	employeeAttendanceData.forEach(row => {
-	  if (row.Employee_ID) {
-	    employeeMap.set(row.Employee_ID, {
-	      id: row.Employee_ID,
-	      name: row.Full_Name || row.Employee_ID
-	    });
-	  }
-	});
-	employeeFilter.innerHTML = `
-	  <option value="">All Employees</option>
-	  ${Array.from(employeeMap.values())
-	    .sort((a, b) => a.name.localeCompare(b.name))
-	    .map(employee => `
-	      <option value="${escapeHtml(employee.id)}">
-	        ${escapeHtml(employee.name)}
-	      </option>
-	    `).join('')}
-	`;
-	if ([...employeeFilter.options].some(
-	  option => option.value === previousValue
-	)) {
-	  employeeFilter.value = previousValue;
-	}
-}
-	
-	// OUTLET FILTER
-	if (branchFilter) {
-		const branches = employeeAttendanceBranches || [];
-	
-		if (role !== 'Owner') {
-		  const branch = branches.find(row =>
-		    String(row.id || '').trim() === userBranchId
-		  );
-	
-	  const branchName = branch?.name || userBranchId || 'Unnamed Branch';
-	
-	  branchFilter.innerHTML = `
-	    <option value="${escapeHtml(userBranchId)}">
-	      ${escapeHtml(branchName)}
-	    </option>
-	  `;
-	  branchFilter.value = userBranchId;
-	  branchFilter.disabled = true;
-	} else {
-	  const previousValue = branchFilter.value;
-	  branchFilter.innerHTML = `
-	    <option value="">All Outlets</option>
-	    ${branches.map(branch => `
-	      <option value="${escapeHtml(String(branch.id || ''))}">
-	        ${escapeHtml(branch.name || branch.id || 'Unnamed Branch')}
-	      </option>
-	    `).join('')}
-	  `;
-		  branchFilter.disabled = false;
-		  if ([...branchFilter.options].some(
-		    option => option.value === previousValue
-		  )) {
-		    branchFilter.value = previousValue;
-		  }
-		}
-	}
+  const employeeFilter = document.getElementById('attendanceEmployeeFilter');
+  const branchFilter = document.getElementById('attendanceBranchFilter');
+  const role = state.user.role;
+  const userBranchId = String(state.user.branchId || '').trim();
+
+  // OUTLET FILTER
+  if (branchFilter) {
+    const branches = employeeAttendanceBranches || [];
+    if (role !== 'Owner') {
+      const branch = branches.find(row =>
+        String(row.id || '').trim() === userBranchId
+      );
+
+      const branchName = branch?.name || userBranchId || 'Unnamed Branch';
+      branchFilter.innerHTML = `
+        <option value="${escapeHtml(userBranchId)}">
+          ${escapeHtml(branchName)}
+        </option>
+      `;
+      branchFilter.value = userBranchId;
+      branchFilter.disabled = true;
+    } else {
+      const previousValue = branchFilter.value;
+      branchFilter.innerHTML = `
+        <option value="">All Outlets</option>
+        ${branches.map(branch => `
+          <option value="${escapeHtml(String(branch.id || ''))}">
+            ${escapeHtml(branch.name || branch.id || 'Unnamed Branch')}
+          </option>
+        `).join('')}
+      `;
+
+      branchFilter.disabled = false;
+      if ([...branchFilter.options].some(
+        option => option.value === previousValue
+      )) {
+        branchFilter.value = previousValue;
+      }
+    }
+  }
+  // EMPLOYEE FILTER — SESUAI OUTLET TERPILIH
+  if (employeeFilter) {
+    const previousValue = employeeFilter.value;
+    const selectedBranchId = String(
+      branchFilter?.value || ''
+    ).trim();
+
+    const employeeMap = new Map();
+
+    employeeAttendanceData.forEach(row => {
+      const rowBranchId = String(row.Branch_ID || '').trim();
+      // Jika memilih outlet tertentu, abaikan karyawan outlet lain
+      if (
+        selectedBranchId &&
+        rowBranchId !== selectedBranchId
+      ) {
+        return;
+      }
+
+      if (row.Employee_ID) {
+        employeeMap.set(row.Employee_ID, {
+          id: row.Employee_ID,
+          name: row.Full_Name || row.Employee_ID
+        });
+      }
+    });
+
+    employeeFilter.innerHTML = `
+      <option value="">All Employees</option>
+      ${Array.from(employeeMap.values())
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .map(employee => `
+          <option value="${escapeHtml(employee.id)}">
+            ${escapeHtml(employee.name)}
+          </option>
+        `).join('')}
+    `;
+
+    // Pertahankan pilihan karyawan jika masih tersedia
+    if ([...employeeFilter.options].some(
+      option => option.value === previousValue
+    )) {
+      employeeFilter.value = previousValue;
+    } else {
+      employeeFilter.value = '';
+    }
+  }
 }
 
 /* FILTER ATTENDANCE  */
