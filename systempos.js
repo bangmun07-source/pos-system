@@ -35355,8 +35355,8 @@ function openAttendanceAction(action, rowIndex) {
     setValue('checkInEmployeeId', row.Employee_ID);
     setValue('checkInAttendanceDate', date);
     setValue('checkInAttendanceId', row.Attendance_ID || '');
-		setInputValue('checkInEmployeeName', row.Full_Name);
-		setInputValue('checkInDate', date);
+	setInputValue('checkInEmployeeName', row.Full_Name);
+	setInputValue('checkInDate', date);
     const now = new Date();
     const localTime =
       `${String(now.getHours()).padStart(2, '0')}:` +
@@ -35372,8 +35372,8 @@ function openAttendanceAction(action, rowIndex) {
     setValue('overtimeEmployeeId', row.Employee_ID);
     setValue('overtimeAttendanceDate', date);
     setValue('overtimeAttendanceId', row.Attendance_ID || '');
-		setInputValue('overtimeEmployeeName', row.Full_Name);
-		setInputValue('overtimeDate', date);
+	document.getElementById('overtimeEmployeeName').value = row.Full_Name || '';
+	document.getElementById('overtimeDate').value = date || '';
     setValue( 'overtimeStartTime', row.Overtime_Start || row.Overtime_Start_Time || '' );
     setValue( 'overtimeEndTime', row.Overtime_End || row.Overtime_End_Time || '' );
     setValue('overtimeNote', row.Overtime_Note || '');
@@ -35385,8 +35385,8 @@ function openAttendanceAction(action, rowIndex) {
     setValue('statusEmployeeId', row.Employee_ID);
     setValue('statusAttendanceDate', date);
     setValue('statusAttendanceId', row.Attendance_ID || '');
-		setInputValue('statusEmployeeName', row.Full_Name);
-		setInputValue('statusDate', date);
+	setInputValue('statusEmployeeName', row.Full_Name);
+	setInputValue('statusDate', date);
     setValue(
       'attendanceStatusValue',
       ['PRESENT', 'ABSENT', 'SICK', 'LEAVE'].includes(row.Status)
