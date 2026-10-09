@@ -35374,11 +35374,20 @@ console.log('Overtime date:', date);
     setValue('overtimeEmployeeId', row.Employee_ID);
     setValue('overtimeAttendanceDate', date);
     setValue('overtimeAttendanceId', row.Attendance_ID || '');
-		document.getElementById('overtimeEmployeeName').value = row.Full_Name || '';
-		document.getElementById('overtimeDate').value = date || '';
-    setValue( 'overtimeStartTime', row.Overtime_Start || row.Overtime_Start_Time || '' );
-    setValue( 'overtimeEndTime', row.Overtime_End || row.Overtime_End_Time || '' );
-    setValue('overtimeNote', row.Overtime_Note || '');
+		
+    const employeeNameInput = document.getElementById('overtimeEmployeeName');
+    const overtimeDateInput = document.getElementById('overtimeDate');
+		
+    if (employeeNameInput) { employeeNameInput.value = row.Full_Name || ''; }
+    if (overtimeDateInput) { overtimeDateInput.value = String(row.Attendance_Date || date || '').slice(0, 10); }
+		
+    setValue('overtimeStartTime', '');
+    setValue('overtimeEndTime', '');
+    setValue('overtimeNote', '');
+    console.log('Overtime input:', {
+      name: employeeNameInput?.value,
+      date: overtimeDateInput?.value
+    });
     showModal('attendanceOvertimeModal');
     return;
   }
