@@ -24941,16 +24941,23 @@
 	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
-	      <div>
-	        <label for="checkInTime"
-	          class="block text-sm font-medium text-foreground mb-2">
-	          Check In Time <span class="text-red-500">*</span>
-	        </label>
-	        <input id="checkInTime"
-	          type="time"
-	          required
-	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-	      </div>
+				<div>
+				  <label class="block text-sm font-medium text-foreground mb-2">
+				    Check In Time <span class="text-red-500">*</span>
+				  </label>
+				
+				  <div class="grid grid-cols-2 gap-2">
+				    <select id="checkInHour" required
+				      class="w-full h-11 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
+				      <option value="">Jam</option>
+				    </select>
+				
+				    <select id="checkInMinute" required
+				      class="w-full h-11 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
+				      <option value="">Menit</option>
+				    </select>
+				  </div>
+				</div>
 	
 	      <div>
 	        <label for="checkInNote"
@@ -25043,11 +25050,11 @@
 				    </label>
 				    <div class="grid grid-cols-2 gap-2">
 				      <select id="overtimeStartHour" required
-				        class="w-full h-5 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
+				        class="w-full h-11 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
 				        <option value="">Jam</option>
 				      </select>
 				      <select id="overtimeStartMinute" required
-				        class="w-full h-5 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
+				        class="w-full h-11 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
 				        <option value="">Menit</option>
 				      </select>
 				    </div>
@@ -25059,11 +25066,11 @@
 				    </label>
 				    <div class="grid grid-cols-2 gap-2">
 				      <select id="overtimeEndHour" required
-				        class="w-full h-5 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
+				        class="w-full h-11 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
 				        <option value="">Jam</option>
 				      </select>
 				      <select id="overtimeEndMinute" required
-				        class="w-full h-5 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
+				        class="w-full h-11 px-3 bg-background custom-scrollbar border border-outline-variant rounded-md text-sm text-foreground">
 				        <option value="">Menit</option>
 				      </select>
 				    </div>
