@@ -32266,12 +32266,21 @@ async function deleteAccountsReceivable(recordId) {
 async function initEmployeePage() {
   try {
     switchEmployeeModule('management');
-
     await loadEmployeeBranches();
     await loadEmployees();
     await loadSchedules();
-    await loadEmployeeAttendance();
+    const attendanceOvertimeForm = document.getElementById('attendanceOvertimeForm');
 
+    if (
+      attendanceOvertimeForm &&
+      !attendanceOvertimeForm.dataset.handlerAttached
+    ) {
+      attendanceOvertimeForm.addEventListener( 'submit', handleSaveEmployeeOvertime );
+      attendanceOvertimeForm.dataset.handlerAttached = 'true';
+    }
+    // Load data attendance dan overtime
+    await loadEmployeeAttendance();
+    await loadEmployeeOvertime();
   } catch (error) {
     console.error("initEmployeePage:", error);
   }
@@ -32731,7 +32740,6 @@ async function uploadEmployeePhoto(file) {
 
   return data?.publicUrl || null;
 }
-
 
 /* === COMPRESS EMPLOYEE PHOTO === */
 async function compressEmployeePhoto(file) {
@@ -33995,21 +34003,13 @@ async function openScheduleModal(schedule = null) {
     days.forEach((day, index) => {
       const date = new Date(monday);
 
-      date.setDate(
-        monday.getDate() + index
-      );
+      date.setDate( monday.getDate() + index );
 
       const year = date.getFullYear();
-      const month = String(
-        date.getMonth() + 1
-      ).padStart(2, '0');
+      const month = String( date.getMonth() + 1 ).padStart(2, '0');
+      const dayNumber = String( date.getDate() ).padStart(2, '0');
 
-      const dayNumber = String(
-        date.getDate()
-      ).padStart(2, '0');
-
-      scheduleDayData[day].date =
-        `${year}-${month}-${dayNumber}`;
+      scheduleDayData[day].date = `${year}-${month}-${dayNumber}`;
     });
 		
     savedWeekData.forEach(row => {
@@ -34035,7 +34035,6 @@ async function openScheduleModal(schedule = null) {
         start: row.Is_Active === true
 					? formatScheduleTime(row.Start_Time)
 					: '',
-
         end: row.Is_Active === true
 					? formatScheduleTime(row.End_Time)
 					: '',
@@ -35539,6 +35538,105 @@ function exportEmployeeAttendance() {
   link.remove();
 
   URL.revokeObjectURL(url);
+}
+
+let employeeOvertimeData = [];
+async function loadEmployeeOvertime() {
+  const sessionId = localStorage.getItem('pos_session_id');
+  if (!sessionId) { throw new Error('Session tidak ditemukan.'); }
+
+  const role = state.user.role;
+  const branchId = String(state.user.branchId || '').trim();
+  const { data, error } = await supabaseClient.rpc(
+    'get_employee_overtime',
+    {
+      p_session_id: sessionId,
+      p_branch_id: role === 'Owner' ? null : branchId,
+      p_employee_id: null,
+      p_date_from: null,
+      p_date_to: null,
+      p_status: 'RECORDED'
+    }
+  );
+  if (error) throw error;
+  employeeOvertimeData = Array.isArray(data) ? data : [];
+  return employeeOvertimeData;
+}
+
+async function handleSaveEmployeeOvertime(event) {
+  event.preventDefault();
+  const form = document.getElementById('attendanceOvertimeForm');
+  const submitButton = form?.querySelector('[type="submit"]');
+  const employeeId = document.getElementById('overtimeEmployeeId')?.value;
+  const overtimeDate = document.getElementById('overtimeAttendanceDate')?.value;
+  const startTime = document.getElementById('overtimeStartTime')?.value;
+  const endTime = document.getElementById('overtimeEndTime')?.value;
+  const note = document.getElementById('overtimeNote')?.value.trim() || null;
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    alert('Session tidak ditemukan. Silakan login kembali.');
+    return; }
+  if (!employeeId || !overtimeDate || !startTime || !endTime) {
+    alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.');
+    return; }
+
+  // Input datetime-local dikonversi menjadi ISO timestamp.
+  const startDateTime = new Date(`${overtimeDate}T${startTime}`);
+  const endDateTime = new Date(`${overtimeDate}T${endTime}`);
+
+  if (
+    Number.isNaN(startDateTime.getTime()) ||
+    Number.isNaN(endDateTime.getTime()) ||
+    endDateTime <= startDateTime
+  ) {
+    alert('Waktu selesai harus setelah waktu mulai.');
+    return; }
+
+  const startTimestamp = startDateTime.toISOString();
+  const endTimestamp = endDateTime.toISOString();
+
+  try {
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.dataset.originalText = submitButton.textContent;
+      submitButton.textContent = 'Saving...';
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      'save_employee_overtime',
+      {
+        p_session_id: sessionId,
+        p_employee_id: employeeId,
+        p_overtime_date: overtimeDate,
+        p_start_time: startTimestamp,
+        p_end_time: endTimestamp,
+        p_note: note
+      }
+    );
+
+    if (error) throw error;
+    if (data?.success === false) { throw new Error(data.message || 'Gagal menyimpan overtime.'); }
+
+    await loadEmployeeOvertime();
+    closeAttendanceModal('attendanceOvertimeModal');
+    renderEmployeeAttendanceTable();
+
+    alert(
+      `Overtime berhasil disimpan. Durasi: ${
+        Number(data?.Overtime_Minutes || 0)
+      } menit.`
+    );
+  } catch (error) {
+    console.error('handleSaveEmployeeOvertime:', error);
+    alert(error.message || 'Gagal menyimpan overtime.');
+  } finally {
+    if (submitButton) {
+      submitButton.disabled = false;
+      submitButton.textContent =
+        submitButton.dataset.originalText || 'Save Overtime';
+    }
+  }
 }
 
 /* =========================================================
