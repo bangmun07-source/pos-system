@@ -24888,7 +24888,7 @@
 	
 	<!-- EMPLOYEE OVERTIME MODAL -->
 	<div id="employeeOvertimeModal"
-	  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4">
+	  class="fixed inset-0 z-50 hidden items-center justify-center bg-background p-4">
 	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md overflow-hidden">
 	    <!-- HEADER -->
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
@@ -24913,7 +24913,7 @@
 	
 	      <button type="button"
 	        onclick="closeEmployeeOvertimeModal()"
-	        class="w-9 h-9 flex items-center justify-center rounded-md text-muted hover:text-foreground hover:bg-background">
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground">
 	        <span class="material-symbols-outlined text-lg">
 	          close
 	        </span>
@@ -24921,7 +24921,6 @@
 	    </div>
 	    <!-- BODY -->
 	    <div class="p-5 space-y-4">
-	      <!-- HIDDEN ID -->
 	      <input type="hidden"
 	        id="overtimeId" >
 	      <!-- EMPLOYEE -->
@@ -24956,7 +24955,6 @@
 	          readonly
 	          placeholder="-"
 	          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-muted outline-none">
-	
 	        <p class="text-[11px] text-muted mt-1">
 	          Overtime starts after the scheduled end time.
 	        </p>
@@ -25014,9 +25012,10 @@
 	    </div>
 	  </div>
 	</div>
+	
 	<!-- ATTENDANCE CHECK IN MODAL -->
 	<div id="attendanceCheckInModal"
-	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4">
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4">
 	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 	    <!-- HEADER -->
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
@@ -25039,7 +25038,7 @@
 	
 	      <button type="button"
 	        onclick="closeAttendanceModal('attendanceCheckInModal')"
-	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
 	        <span class="material-symbols-outlined">close</span>
 	      </button>
 	    </div>
@@ -25057,7 +25056,7 @@
 	          type="text"
 	          readonly
 	          placeholder="Employee name"
-	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
 	      <div>
@@ -25067,7 +25066,7 @@
 	        <input id="checkInDate"
 	          type="date"
 	          readonly
-	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
 	      <div>
@@ -25095,7 +25094,7 @@
 	      <div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
 	        <button type="button"
 	          onclick="closeAttendanceModal('attendanceCheckInModal')"
-	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-muted hover:text-foreground transition">
 	          Cancel
 	        </button>
 	
@@ -25111,7 +25110,7 @@
 	
 	<!-- ATTENDANCE OVERTIME MODAL -->
 	<div id="attendanceOvertimeModal"
-	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4">
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4">
 	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 	    <!-- HEADER -->
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
@@ -25134,7 +25133,7 @@
 	
 	      <button type="button"
 	        onclick="closeAttendanceModal('attendanceOvertimeModal')"
-	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
 	        <span class="material-symbols-outlined">close</span>
 	      </button>
 	    </div>
@@ -25152,7 +25151,7 @@
 	          type="text"
 	          readonly
 	          placeholder="Employee name"
-	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
 	      <div>
@@ -25162,7 +25161,7 @@
 	        <input id="overtimeDate"
 	          type="date"
 	          readonly
-	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
 	      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -25203,7 +25202,7 @@
 	      <div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
 	        <button type="button"
 	          onclick="closeAttendanceModal('attendanceOvertimeModal')"
-	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-muted hover:text-foreground transition">
 	          Cancel
 	        </button>
 	
@@ -25219,7 +25218,7 @@
 	
 	<!-- ATTENDANCE STATUS MODAL -->
 	<div id="attendanceStatusModal"
-	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4">
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4">
 	  <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 	    <!-- HEADER -->
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
@@ -25242,7 +25241,7 @@
 	
 	      <button type="button"
 	        onclick="closeAttendanceModal('attendanceStatusModal')"
-	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
 	        <span class="material-symbols-outlined">close</span>
 	      </button>
 	    </div>
@@ -25260,7 +25259,7 @@
 	          type="text"
 	          readonly
 	          placeholder="Employee name"
-	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	          class="w-full h-11 px-3 bg-backgroundh border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
 	      <div>
@@ -25270,7 +25269,7 @@
 	        <input id="statusDate"
 	          type="date"
 	          readonly
-	          class="w-full h-11 px-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground outline-none">
+	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none">
 	      </div>
 	
 	      <div>
@@ -25304,7 +25303,7 @@
 	      <div class="pt-4 border-t border-outline-variant flex items-center justify-end gap-3">
 	        <button type="button"
 	          onclick="closeAttendanceModal('attendanceStatusModal')"
-	          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	          class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
 	          Cancel
 	        </button>
 	
@@ -25320,7 +25319,7 @@
 
 	<!-- ATTENDANCE VIEW DETAIL MODAL  -->
 	<div id="attendanceDetailModal"
-	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/50 p-4 overflow-y-auto">
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
 	  <div class="w-full max-w-2xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
 	    <!-- HEADER -->
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
@@ -25343,7 +25342,7 @@
 	
 	      <button type="button"
 	        onclick="closeAttendanceModal('attendanceDetailModal')"
-	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
 	        <span class="material-symbols-outlined">close</span>
 	      </button>
 	    </div>
@@ -25364,7 +25363,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Employee Name</label>
 	            <div id="detailAttendanceEmployeeName"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground break-words">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">
 	              -
 	            </div>
 	          </div>
@@ -25372,7 +25371,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Employee Code</label>
 	            <div id="detailAttendanceEmployeeCode"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25380,7 +25379,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Outlet</label>
 	            <div id="detailAttendanceBranch"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25388,7 +25387,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Attendance Date</label>
 	            <div id="detailAttendanceDate"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25396,7 +25395,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Scheduled Start</label>
 	            <div id="detailAttendanceScheduleStart"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25404,7 +25403,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Scheduled End</label>
 	            <div id="detailAttendanceScheduleEnd"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25425,7 +25424,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Check In</label>
 	            <div id="detailAttendanceCheckIn"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25433,7 +25432,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Check Out</label>
 	            <div id="detailAttendanceCheckOut"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25441,7 +25440,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Late (Minutes)</label>
 	            <div id="detailAttendanceLateMinutes"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25449,7 +25448,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Work Duration</label>
 	            <div id="detailAttendanceWorkMinutes"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25457,7 +25456,7 @@
 	          <div class="md:col-span-2">
 	            <label class="block text-xs text-muted mb-2">Attendance Status</label>
 	            <div id="detailAttendanceStatus"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm font-medium text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm font-medium text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25478,7 +25477,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Overtime Start</label>
 	            <div id="detailAttendanceOvertimeStart"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25486,7 +25485,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Overtime End</label>
 	            <div id="detailAttendanceOvertimeEnd"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25494,7 +25493,7 @@
 	          <div>
 	            <label class="block text-xs text-muted mb-2">Overtime Duration</label>
 	            <div id="detailAttendanceOvertimeDuration"
-	              class="min-h-11 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground">
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 	              -
 	            </div>
 	          </div>
@@ -25507,7 +25506,7 @@
 	          Note
 	        </label>
 	        <div id="detailAttendanceNote"
-	          class="min-h-20 px-3 py-3 bg-surface-container-high border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap break-words">
+	          class="min-h-20 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap break-words">
 	          -
 	        </div>
 	      </div>
@@ -25516,7 +25515,7 @@
 	    <div class="p-5 border-t border-outline-variant flex items-center justify-end shrink-0">
 	      <button type="button"
 	        onclick="closeAttendanceModal('attendanceDetailModal')"
-	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
 	        Close
 	      </button>
 	    </div>
