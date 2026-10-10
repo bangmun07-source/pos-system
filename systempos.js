@@ -33010,9 +33010,14 @@ function renderEmployeeTable() {
             ${escapeEmployeeHtml(employee.Position || '-')}
           </td>
 
-          <td class="px-5 py-4">
-            ${escapeEmployeeHtml(employee.Branch_ID || '-')}
-          </td>
+					<td class="px-5 py-4">
+					  ${escapeEmployeeHtml(
+					    employeeAttendanceBranches.find(branch =>
+					      String(branch.id || '').trim() ===
+					      String(employee.Branch_ID || '').trim()
+					    )?.name || employee.Branch_ID || '-'
+					  )}
+					</td>
 
           <td class="px-5 py-4 text-muted">
             -
@@ -34650,9 +34655,14 @@ function renderSchedules(data = []) {
           </div>
         </td>
 
-        <td class="px-5 py-3 text-center">
-          ${escapeHtml(row.Branch_ID || '-')}
-        </td>
+				<td class="px-5 py-3 text-center">
+				  ${escapeHtml(
+				    employeeAttendanceBranches.find(branch =>
+				      String(branch.id || '').trim() ===
+				      String(row.Branch_ID || '').trim()
+				    )?.name || row.Branch_ID || '-'
+				  )}
+				</td>
 
         <td class="px-5 py-3">
           <div class="font-medium">
@@ -35203,7 +35213,12 @@ function renderEmployeeAttendanceTable() {
           </td>
 
           <td class="px-4 py-3 text-center">
-            ${escapeHtml(row.Branch_ID || '-')}
+					  ${escapeHtml(
+					    employeeAttendanceBranches.find(branch =>
+					      String(branch.id || '').trim() ===
+					      String(row.Branch_ID || '').trim()
+					    )?.name || row.Branch_ID || '-'
+					  )}
           </td>
 
           <td class="px-4 py-3 whitespace-nowrap">
@@ -35305,7 +35320,6 @@ function renderEmployeeAttendanceTable() {
   }
 }
 
-
 /*  PAGINATION  */
 function changeEmployeeAttendancePage(direction) {
   const totalPages = Math.max(
@@ -35325,7 +35339,6 @@ function openAttendanceAction(action, rowIndex) {
   const row = filteredEmployeeAttendanceData[rowIndex];
 
   if (!row) { return; }
-
   // Helper untuk mengisi elemen berdasarkan ID.
 	const setValue = (id, value) => {
 	  const element = document.getElementById(id);
@@ -35362,7 +35375,6 @@ function openAttendanceAction(action, rowIndex) {
       ? value
       : parsed.toLocaleDateString('id-ID');
   };
-
   const showModal = modalId => {
     const modal = document.getElementById(modalId);
     if (!modal) {
@@ -35375,9 +35387,7 @@ function openAttendanceAction(action, rowIndex) {
   // CHECK IN
   if (action === 'checkin') {
     // Check-in QR tidak boleh diedit.
-    if (row.Check_In) {
-      alert('Karyawan sudah check-in melalui QR. Check-in tidak bisa diedit.');
-      return; }
+    if (row.Check_In) { alert('Karyawan sudah check-in melalui QR. Check-in tidak bisa diedit.'); return; }
 
     setValue('checkInEmployeeId', row.Employee_ID);
     setValue('checkInAttendanceDate', date);
@@ -35397,11 +35407,8 @@ function openAttendanceAction(action, rowIndex) {
   // OVERTIME
   if (action === 'overtime') {
     const modal = document.getElementById('attendanceOvertimeModal');
-
-    if (!modal) {
-      console.error('Modal attendanceOvertimeModal tidak ditemukan.');
-      return;
-    }
+		
+    if (!modal) { return; }
 
     setValue('overtimeEmployeeId', row.Employee_ID);
     setValue('overtimeAttendanceDate', date);
@@ -35497,7 +35504,6 @@ function toggleAttendanceActionMenu(event, rowIndex) {
   if (!isOpening) { targetMenu.classList.add('hidden'); return; }
 
   targetMenu.classList.remove('hidden');
-
   // Ukur posisi setelah dropdown ditampilkan.
   const button = event.currentTarget;
   const buttonRect = button.getBoundingClientRect();
@@ -35543,9 +35549,7 @@ function closeAttendanceModal(modalId) {
 function exportEmployeeAttendance() {
   const rows = filteredEmployeeAttendanceData;
 
-  if (!rows.length) {
-    alert('Tidak ada data attendance untuk diekspor.');
-    return; }
+  if (!rows.length) { alert('Tidak ada data attendance untuk diekspor.'); return; }
 
   const headers = [
     'Employee Code',
@@ -35589,7 +35593,6 @@ function exportEmployeeAttendance() {
   document.body.appendChild(link);
   link.click();
   link.remove();
-
   URL.revokeObjectURL(url);
 }
 
@@ -35632,13 +35635,8 @@ async function handleSaveEmployeeCheckIn(event) {
   const note = modal.querySelector('#checkInNote')?.value.trim() || null;
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    alert('Session tidak ditemukan. Silakan login kembali.');
-    return; }
-  if (!employeeId || !attendanceDate) {
-    alert('Data karyawan atau tanggal attendance tidak lengkap.');
-    return; }
-
+  if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
+  if (!employeeId || !attendanceDate) { alert('Data karyawan atau tanggal attendance tidak lengkap.'); return; }
   if (
     hour == null || hour === '' ||
     minute == null || minute === ''
@@ -35650,9 +35648,7 @@ async function handleSaveEmployeeCheckIn(event) {
   const checkInTime = `${hour}:${minute}`;
   const checkInDateTime = new Date( `${attendanceDate}T${checkInTime}:00` );
 
-  if (Number.isNaN(checkInDateTime.getTime())) {
-    alert('Waktu check-in tidak valid.');
-    return; }
+  if (Number.isNaN(checkInDateTime.getTime())) { alert('Waktu check-in tidak valid.'); return; }
 
   const checkInTimestamp = checkInDateTime.toISOString();
 
@@ -35675,19 +35671,12 @@ async function handleSaveEmployeeCheckIn(event) {
     );
 
     if (error) throw error;
-
-    if (data?.success !== true) {
-      throw new Error(
-        data?.message || 'Gagal menyimpan check-in.'
-      );
-    }
+    if (data?.success !== true) { throw new Error( data?.message || 'Gagal menyimpan check-in.' ); }
 		
 		await loadEmployeeAttendance();
     closeAttendanceModal('attendanceCheckInModal');
     alert( `Check-in berhasil disimpan pada ${checkInTime}.` );
-
   } catch (error) {
-    console.error('handleSaveEmployeeCheckIn:', error);
     alert(error.message || 'Gagal menyimpan check-in.');
   } finally {
     if (submitButton) {
@@ -35710,31 +35699,22 @@ async function handleSaveEmployeeOvertime(event) {
 	const startMinute = modal.querySelector('#overtimeStartMinute')?.value;
 	const endHour = modal.querySelector('#overtimeEndHour')?.value;
 	const endMinute = modal.querySelector('#overtimeEndMinute')?.value;
-	const startTime =
-	  startHour !== '' && startMinute !== ''
-	    ? `${startHour}:${startMinute}`
-	    : '';
-	const endTime =
-	  endHour !== '' && endMinute !== ''
-	    ? `${endHour}:${endMinute}`
-	    : '';
+	const startTime = startHour !== '' && startMinute !== ''
+		? `${startHour}:${startMinute}`
+		: '';
+	const endTime = endHour !== '' && endMinute !== ''
+		? `${endHour}:${endMinute}`
+		: '';
   const note = modal.querySelector('#overtimeNote')?.value.trim() || null;
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    alert('Session tidak ditemukan. Silakan login kembali.');
-    return;
-  }
-
+  if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
   if (
     !employeeId ||
     !overtimeDate ||
     !startTime ||
     !endTime
-  ) {
-    alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.');
-    return;
-  }
+  ) { alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.'); return; }
 
   // Buat timestamp lokal berdasarkan tanggal dan jam pilihan.
   const startDateTime = new Date(`${overtimeDate}T${startTime}:00`);
@@ -35743,23 +35723,14 @@ async function handleSaveEmployeeOvertime(event) {
   if (
     Number.isNaN(startDateTime.getTime()) ||
     Number.isNaN(endDateTime.getTime())
-  ) {
-    alert('Tanggal atau waktu overtime tidak valid.');
-    return;
-  }
+  ) { alert('Tanggal atau waktu overtime tidak valid.'); return; }
 
   // Jika selesai <= mulai, berarti selesai pada hari berikutnya.
-  if (endDateTime <= startDateTime) {
-    endDateTime.setDate(endDateTime.getDate() + 1);
-  }
+  if (endDateTime <= startDateTime) { endDateTime.setDate(endDateTime.getDate() + 1); }
 
-  const durationMinutes =
-    (endDateTime.getTime() - startDateTime.getTime()) / 60000;
+  const durationMinutes = (endDateTime.getTime() - startDateTime.getTime()) / 60000;
 
-  if (durationMinutes > 24 * 60) {
-    alert('Durasi overtime tidak boleh lebih dari 24 jam.');
-    return;
-  }
+  if (durationMinutes > 24 * 60) { alert('Durasi overtime tidak boleh lebih dari 24 jam.'); return; }
 
   const startTimestamp = startDateTime.toISOString();
   const endTimestamp = endDateTime.toISOString();
@@ -35784,24 +35755,17 @@ async function handleSaveEmployeeOvertime(event) {
     );
 
     if (error) throw error;
-
-    if (data?.success === false) {
-      throw new Error(
-        data.message || 'Gagal menyimpan overtime.'
-      );
-    }
+    if (data?.success === false) { throw new Error( data.message || 'Gagal menyimpan overtime.' ); }
 
     await loadEmployeeOvertime();
     closeAttendanceModal('attendanceOvertimeModal');
     renderEmployeeAttendanceTable();
 
-    alert(
-      `Overtime berhasil disimpan. Durasi: ${
-        Number(data?.Overtime_Minutes || durationMinutes)
+    alert( `Overtime berhasil disimpan. Durasi: ${
+			Number(data?.Overtime_Minutes || durationMinutes)
       } menit.`
     );
   } catch (error) {
-    console.error('handleSaveEmployeeOvertime:', error);
     alert(error.message || 'Gagal menyimpan overtime.');
   } finally {
     if (submitButton) {
@@ -35854,7 +35818,6 @@ async function handleSaveAttendanceStatus(event) {
 	alert(data.message || 'Status attendance berhasil disimpan.');
 
 	} catch (error) {
-		console.error('handleSaveAttendanceStatus:', error);
 		alert(error.message || 'Gagal menyimpan status attendance.');
 	} finally {
 		if (submitButton) {
@@ -35892,7 +35855,6 @@ function initOvertimeTimePickers() {
     'overtimeStartHour',
     'overtimeEndHour'
   ];
-
   const minuteIds = [
     'overtimeStartMinute',
     'overtimeEndMinute'
@@ -35920,14 +35882,12 @@ function initOvertimeTimePickers() {
 }
 
 
-
 /* =========================================================
    									ATTENDANCE PAGE
 ========================================================= */
 
 let attendanceKioskClockInterval = null;
 let attendanceKioskAttendanceCheckInterval = null;
-
 
 async function initAttendancePage() {
   try {
@@ -35944,9 +35904,7 @@ async function initAttendancePage() {
     // EMPLOYEE
     await loadEmployees();
     loadAttendanceKioskEmployees();
-  } catch (error) {
-    console.error('initAttendancePage:', error);
-  }
+  } catch (error) { }
 }
 
 
@@ -35968,64 +35926,48 @@ function updateAttendanceKioskClock() {
 
 function startAttendanceKioskAttendanceCheck( employeeId, attendanceDate ) {
 
-if (attendanceKioskAttendanceCheckInterval) {
-	clearInterval( attendanceKioskAttendanceCheckInterval );
-	attendanceKioskAttendanceCheckInterval = null;
-}
+	if (attendanceKioskAttendanceCheckInterval) {
+		clearInterval( attendanceKioskAttendanceCheckInterval );
+		attendanceKioskAttendanceCheckInterval = null;
+	}
+	
+	const cleanEmployeeId = String(employeeId || '').trim();
+	const cleanAttendanceDate = String(attendanceDate || '').trim();
+	
+	if (
+		!cleanEmployeeId ||
+		!cleanAttendanceDate
+	) { return; }
+	
+	const sessionId = localStorage.getItem('pos_session_id');
+	
+	if (!sessionId) { return; }
+	
+	attendanceKioskAttendanceCheckInterval =
+		setInterval(async () => {
+			try {
+				const { data, error } =
+					await supabaseClient.rpc(
+						'check_employee_attendance_exists',
+						{
+							p_session_id: sessionId,
+							p_employee_id: cleanEmployeeId,
+							p_attendance_date: cleanAttendanceDate
+						}
+					);
 
-const cleanEmployeeId = String(employeeId || '').trim();
-const cleanAttendanceDate = String(attendanceDate || '').trim();
+				if (error) { return; }
+	
+				if (data !== true) { return; }
 
-if (
-	!cleanEmployeeId ||
-	!cleanAttendanceDate
-) {
-	return;
-}
-
-const sessionId = localStorage.getItem('pos_session_id');
-
-if (!sessionId) { return; }
-
-attendanceKioskAttendanceCheckInterval =
-	setInterval(async () => {
-		try {
-			const { data, error } =
-				await supabaseClient.rpc(
-					'check_employee_attendance_exists',
-					{
-						p_session_id: sessionId,
-						p_employee_id: cleanEmployeeId,
-						p_attendance_date: cleanAttendanceDate
-					}
-				);
-
-			if (error) {
-				console.error(
-					'Check attendance after QR scan:',
-					error
-				);
-				return;
-			}
-
-			if (data !== true) { return; }
-
-			console.log(
-				'Attendance ditemukan setelah scan.'
-			);
-			
+		
 			clearInterval( attendanceKioskAttendanceCheckInterval );
 			attendanceKioskAttendanceCheckInterval = null;
 			resetAttendanceKioskUI();
 			await loadEmployees();
 			loadAttendanceKioskEmployees();
 
-		} catch (error) {
-			console.error(
-				'Attendance check interval:',
-				error
-			);
-		}
+		} catch (error) { }
 	}, 1000);
 }
 
@@ -36143,10 +36085,6 @@ async function loadAttendanceKioskBranch() {
       '-';
 
   } catch (error) {
-    console.error(
-      'loadAttendanceKioskBranch:',
-      error
-    );
     branchEl.textContent = state.user?.branchId || '-';
   }
 }
@@ -36194,7 +36132,6 @@ function handleAttendanceEmployeeSelect() {
     if (idEl) idEl.textContent = '-';
     if (positionEl) positionEl.textContent = '-';
     if (branchEl) branchEl.textContent = '-';
-
     return;
   }
 
@@ -36220,20 +36157,15 @@ async function verifyAttendanceKiosk() {
   if (!employeeId) {
     alert('Please select an employee.');
     employeeSelect?.focus();
-    return;
-  }
+    return; }
   if (!/^\d{4,8}$/.test(pin)) {
     alert('PIN must be 4-8 digits.');
     pinInput?.focus();
-    return;
-  }
+    return; }
 
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    alert('Session POS tidak ditemukan.');
-    return;
-  }
+  if (!sessionId) { alert('Session POS tidak ditemukan.'); return; }
 
   try {
     // LOADING
@@ -36258,39 +36190,17 @@ async function verifyAttendanceKiosk() {
     const result = typeof data === 'string'
 			? JSON.parse(data)
 			: data;
-
-    console.log(
-      'Attendance PIN verification:',
-      result
-    );
-
     // PIN FAILED
     if (!result?.success) {
       alert( result?.message || 'PIN verification failed.' );
       return; }
-
     // CHECK TODAY SCHEDULE
     const todaySchedule = await getAttendanceEmployeeTodaySchedule( employeeId );
 
-    if (!todaySchedule) {
-      alert( `${result.employee_name} tidak memiliki schedule untuk hari ini.` );
-      return; }
-    if (!todaySchedule.Is_Active) {
-      alert( `${result.employee_name} sedang OFF hari ini.` );
-      return; }
-
-    console.log(
-      'Today attendance schedule:',
-      todaySchedule
-    );
+    if (!todaySchedule) { alert( `${result.employee_name} tidak memiliki schedule untuk hari ini.` ); return; }
+    if (!todaySchedule.Is_Active) { alert( `${result.employee_name} sedang OFF hari ini.` ); return; }
 		// GENERATE ATTENDANCE QR
 		const qrResult = await generateAttendanceQr( employeeId, todaySchedule );
-		console.log(
-		  'Attendance QR generated:',
-		  qrResult
-		);
-		
-		// SHOW QR PANEL
 		const qrEmpty = document.getElementById( 'attendanceKioskQrEmpty' );
 		const qrActive = document.getElementById( 'attendanceKioskQrActive' );
 		const qrSuccess = document.getElementById( 'attendanceKioskQrSuccess' );
@@ -36302,16 +36212,7 @@ async function verifyAttendanceKiosk() {
 		// RENDER QR
 		renderAttendanceQr( qrResult.token );
 		startAttendanceQrTimer(60);
-		
-		console.log(
-		  'Attendance kiosk ready for:',
-		  result.employee_name
-		);
   } catch (error) {
-    console.error(
-      'verifyAttendanceKiosk:',
-      error
-    );
     alert( error?.message || 'Failed to verify attendance.' );
   } finally {
     if (button) {
@@ -36347,12 +36248,7 @@ async function generateAttendanceQr( employeeId, todaySchedule ) {
   const result = typeof data === 'string'
 		? JSON.parse(data)
 		: data;
-
-  console.log(
-    'Attendance QR token:',
-    result
-  );
-
+	
   if (!result?.success) {
     throw new Error(
       result?.message ||
@@ -36399,10 +36295,6 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
   const now = new Date();
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const weekStart = getAttendanceWeekStart(now);
-
-  console.log('Attendance today:', today);
-  console.log('Attendance week start:', weekStart);
-
   const { data, error } =
     await supabaseClient.rpc(
       'get_employee_schedule_week',
@@ -36415,17 +36307,7 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
 
   if (error) { throw error; }
 
-  console.log('RAW schedule data:', data);
-  console.log('RAW schedule data type:', typeof data);
-  console.log('RAW schedule data isArray:', Array.isArray(data));
-
   const schedules = Array.isArray(data) ? data : [];
-
-  console.log(
-    'Attendance schedules returned:',
-    schedules
-  );
-
   const todaySchedule = schedules.find(schedule => {
     console.log(
       'COMPARE:',
@@ -36436,11 +36318,6 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
     );
     return String(schedule.Schedule_Date) === today;
   });
-
-  console.log(
-    'Attendance today schedule:',
-    todaySchedule
-  );
   return todaySchedule || null;
 }
 
@@ -36529,11 +36406,6 @@ async function initAttendanceScanPage() {
     }
     await startAttendanceScanner();
   } catch (error) {
-    console.error(
-      'initAttendanceScanPage:',
-      error
-    );
-
     showAttendanceScanError(
       error?.message ||
       'Tidak dapat membuka kamera.'
@@ -36580,11 +36452,6 @@ async function startAttendanceScanner() {
 
       attendanceScannerProcessing = true;
 
-      console.log(
-        'Attendance QR detected:',
-        decodedText
-      );
-
       await stopAttendanceScanner();
       await processScannedAttendanceToken( decodedText );
     },
@@ -36605,12 +36472,7 @@ async function stopAttendanceScanner() {
     if (attendanceScannerRunning) { 
 			await attendanceScanner.stop(); 
 		}
-  } catch (error) {
-    console.warn(
-      'stopAttendanceScanner:',
-      error
-    );
-  }
+  } catch (error) { }
 
   try {
     attendanceScanner.clear();
@@ -36644,11 +36506,6 @@ async function processScannedAttendanceToken(token) {
 			? JSON.parse(data)
 			: data;
 
-    console.log(
-      'Attendance QR result:',
-      result
-    );
-
     if (!result?.success) {
       throw new Error(
         result?.message ||
@@ -36658,12 +36515,6 @@ async function processScannedAttendanceToken(token) {
 
     showAttendanceScanSuccess( result );
   } catch (error) {
-
-    console.error(
-      'processScannedAttendanceToken:',
-      error
-    );
-
     showAttendanceScanError( error?.message || 'Attendance gagal.' );
   }
 }
