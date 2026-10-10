@@ -593,32 +593,29 @@ function navigate(pageId, params = {}) {
 	    "-";
 	}
 
-	// SETTINGS MENU
-	// Owner + Admin
-	const userRole =
-	  (
-	    state.user?.Role ||
-	    state.user?.role ||
-	    ""
-	  ).toLowerCase();
 	
-	document.querySelectorAll(".settingsMenu").forEach(menu => {
-	  menu.style.display =
-	    (
-	      userRole === "owner" ||
-	      userRole === "admin"
-	    )
-	      ? "flex"
-	      : "none";
-	});
+  // MENU BERDASARKAN ROLE
+  const userRole = String( state.user?.Role || state.user?.role || "" ).trim().toLowerCase();
 
-	// OWNER ONLY MENU
-	document.querySelectorAll(".ownerOnly").forEach(menu => {
-	  menu.style.display =
-	    userRole === "owner"
-	      ? "flex"
-	      : "none";
-	});
+  // Settings: Owner, Admin, Accountant
+  document.querySelectorAll(".settingsMenu").forEach(menu => {
+    menu.style.display =
+      ["owner", "admin", "accountant"].includes(userRole)
+        ? "flex"
+        : "none";
+  });
+
+  // Menu operasional: selain Accountant
+  document.querySelectorAll(".operationalMenu").forEach(menu => {
+    menu.style.display =
+      userRole === "accountant" ? "none" : "flex";
+  });
+
+  // Menu khusus Owner
+  document.querySelectorAll(".ownerOnly").forEach(menu => {
+    menu.style.display =
+      userRole === "owner" ? "flex" : "none";
+  });
 
   currentPage = pageId;
   if (window.dashboardInterval) {
