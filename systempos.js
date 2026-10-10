@@ -36268,7 +36268,13 @@ async function verifyAttendanceKiosk() {
 		
 		if (qrEmpty) { qrEmpty.classList.add('hidden'); }
 		if (qrSuccess) { qrSuccess.classList.add('hidden'); }
-		if (qrActive) { qrActive.classList.remove('hidden'); }
+		if (qrActive) {
+		  qrActive.classList.remove('hidden');
+		  qrActive.classList.add('flex');
+		}
+
+		const qrEmployeeName = document.getElementById('attendanceKioskQrEmployeeName');
+		if (qrEmployeeName) { qrEmployeeName.textContent = result.employee_name || '-'; }
 		
 		// RENDER QR
 		renderAttendanceQr( qrResult.token );
