@@ -35261,7 +35261,7 @@ function renderEmployeeAttendanceTable() {
 			  'LEAVE'
 			].includes(String(row.Status || '').toUpperCase());
 			const disableCheckIn = alreadyCheckedIn || statusManuallySet;
-			const disableEditStatus = alreadyCheckedIn;
+			const disableEditStatus = alreadyCheckedIn || statusManuallySet;
 
       return `
         <tr class="border-b border-outline-variant hover:bg-outline-variant">
