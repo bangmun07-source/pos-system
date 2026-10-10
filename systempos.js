@@ -32298,22 +32298,29 @@ async function initEmployeePage() {
 }
 
 window.switchEmployeeModule = function(module) {
-  const managementSection = document.getElementById('employeeManagementSection');
-  const payrollSection = document.getElementById('payrollAttendanceSection');
-  const managementTab = document.getElementById('employeeManagementTab');
-  const payrollTab = document.getElementById('payrollAttendanceTab');
-
-  if (!managementSection || !payrollSection) return;
-
-  const isManagement = module === 'management';
-
-  managementSection.classList.toggle('hidden', !isManagement);
-  payrollSection.classList.toggle('hidden', isManagement);
-  managementTab?.classList.toggle('bottom-theme', isManagement);
-  managementTab?.classList.toggle('text-muted', !isManagement);
-  payrollTab?.classList.toggle('bottom-theme', !isManagement);
-  payrollTab?.classList.toggle('text-muted', isManagement);
+	const managementSection = document.getElementById('employeeManagementSection');
+	const payrollSection = document.getElementById('payrollAttendanceSection');
+	const managementTab = document.getElementById('employeeManagementTab');
+	const payrollTab = document.getElementById('payrollAttendanceTab');
+	const role = String(state.user?.role || '').trim().toLowerCase();
+	const canAccessPayroll = ['owner', 'accounting'].includes(role);
+	
+	// Sembunyikan tab Payroll untuk role yang tidak diizinkan
+	payrollTab?.classList.toggle('hidden', !canAccessPayroll);
+	// Tolak akses Payroll & Attendance untuk role lain
+	if (module === 'payroll' && !canAccessPayroll) { module = 'management'; }
+	if (!managementSection || !payrollSection) return;
+	
+	const isManagement = module === 'management';
+	
+	managementSection.classList.toggle('hidden', !isManagement);
+	payrollSection.classList.toggle('hidden', isManagement);
+	managementTab?.classList.toggle('bottom-theme', isManagement);
+	managementTab?.classList.toggle('text-muted', !isManagement);
+	payrollTab?.classList.toggle('bottom-theme', !isManagement);
+	payrollTab?.classList.toggle('text-muted', isManagement);
 };
+
 
 /* =========================================================
    									EMPLOYEE MANAGEMENT
