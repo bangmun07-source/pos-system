@@ -549,19 +549,28 @@ function navigate(pageId, params = {}) {
     }
   }
   // OWNER ONLY PAGE
-  const ownerPages = [
-    "cashFlowPage"
-  ];
+  const ownerPages = [ "cashFlowPage" ];
 
   if (
     ownerPages.includes(pageId) &&
     role !== "owner"
-  ) {
-    showToast(
-      "Access denied"
-    );
-    return;
-  }
+  ) { showToast("Access denied"); return; }
+
+  // ACCOUNTING PAGES: OWNER + ACCOUNTANT
+  const accountantPages = [
+    "assetPage",
+    "accountingDebtPage",
+    "accountingTaxPage",
+    "accountingReceivablePage",
+    "accountingAccountsPage",
+    "accountingTransactionsPage",
+    "accountingReportsPage"
+  ];
+
+  if (
+    accountantPages.includes(pageId) &&
+    !["owner", "accountant"].includes(role)
+  ) { showToast("Access denied"); return; }
 
   const template = document.getElementById(pageId);
   const app = document.getElementById("app");
