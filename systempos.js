@@ -35167,21 +35167,21 @@ function renderEmployeeAttendanceTable() {
       const checkIn = formatTime(row.Check_In);
 
       const statusLabels = {
-        PRESENT: 'Present',
-        ABSENT: 'Absent',
-        SICK: 'Sick',
-				PERMISSION: 'Permission',
-        LEAVE: 'Leave',
-        NOT_RECORDED: 'Belum Dicatat'
+	      PRESENT: 'PRESENT',
+	      ABSENT: 'ABSENT',
+	      SICK: 'SICK',
+	      LEAVE: 'LEAVE',
+				PERMISSION: 'PERMISSION',
+	      NOT_RECORDED: 'BELUM DICATAT'
       };
 
       const statusClass = {
-        PRESENT: 'text-green-700 bg-green-50',
-        ABSENT: 'text-red-700 bg-red-50',
-        LEAVE: 'text-blue-700 bg-blue-50',
-				PERMISSION: 'text-orange-700 bg-orange-50',
-        SICK: 'text-yellow-700 bg-yellow-50',
-        NOT_RECORDED: 'text-on-surface-variant bg-surface-container'
+        PRESENT: 'text-green-700',
+        ABSENT: 'text-red-700',
+        LEAVE: 'text-blue-700',
+				PERMISSION: 'text-orange-700',
+        SICK: 'text-yellow-700',
+        NOT_RECORDED: 'text-on-surface-variant'
       }[row.Status] || 'text-on-surface-variant';
 
       const schedule =
@@ -35226,7 +35226,7 @@ function renderEmployeeAttendanceTable() {
           </td>
 
           <td class="px-4 py-3 text-center">
-            <span class="inline-flex rounded-md px-2 py-1 text-xs font-medium ${statusClass}">
+            <span class="inline-flex rounded-md px-2 py-1 text-xs font-semibold ${statusClass}">
               ${escapeHtml(statusLabels[row.Status] || row.Status || '-')}
             </span>
           </td>
@@ -35432,7 +35432,7 @@ function openAttendanceAction(action, rowIndex) {
 		setInputValue('statusDate', date);
     setValue(
       'attendanceStatusValue',
-      ['PRESENT', 'ABSENT', 'SICK', 'LEAVE'].includes(row.Status)
+      ['PRESENT', 'ABSENT', 'SICK', 'PERMISSION', 'LEAVE'].includes(row.Status)
         ? row.Status
         : 'PRESENT'
     );
@@ -35454,20 +35454,23 @@ function openAttendanceAction(action, rowIndex) {
     setText('detailAttendanceLateMinutes', `${Number(row.Late_Minutes) || 0} min`);
     setText('detailAttendanceWorkMinutes', `${Number(row.Work_Minutes) || 0} min`);
     const statusLabels = {
-      PRESENT: 'Present',
-      ABSENT: 'Absent',
-      SICK: 'Sick',
-      LEAVE: 'Leave',
-			PERMISSION: 'Permission',
-      NOT_RECORDED: 'Belum Dicatat'
+      PRESENT: 'PRESENT',
+      ABSENT: 'ABSENT',
+      SICK: 'SICK',
+      LEAVE: 'LEAVE',
+			PERMISSION: 'PERMISSION',
+      NOT_RECORDED: 'BELUM DICATAT'
     };
     setText( 'detailAttendanceStatus', statusLabels[row.Status] || row.Status );
-    setText( 'detailAttendanceOvertimeStart', formatTime(row.Overtime_Start || row.Overtime_Start_Time) );
-    setText( 'detailAttendanceOvertimeEnd', formatTime(row.Overtime_End || row.Overtime_End_Time) );
-    setText( 'detailAttendanceOvertimeDuration',
-      row.Overtime_Minutes != null
-        ? `${Number(row.Overtime_Minutes)} min`
-        : '-'
+    const overtime = (employeeOvertimeData || []).find(item =>
+      String(item.Employee_ID || '') === String(row.Employee_ID || '') &&
+      String(item.Overtime_Date || '').slice(0, 10) === date
+    );
+    setText( 'detailAttendanceOvertimeStart', formatTime(overtime?.Start_Time) );
+    setText( 'detailAttendanceOvertimeEnd', formatTime(overtime?.End_Time) );
+    setText( 'detailAttendanceOvertimeDuration', overtime?.Overtime_Minutes != null
+			? `${Number(overtime.Overtime_Minutes)} min`
+			: '-'
     );
     setText('detailAttendanceNote', row.Note);
     showModal('attendanceDetailModal');
