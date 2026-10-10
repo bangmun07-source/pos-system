@@ -35184,15 +35184,11 @@ function renderEmployeeAttendanceTable() {
     1,
     Math.ceil(totalRows / employeeAttendancePageSize)
   );
-
   employeeAttendanceCurrentPage = Math.min(
     employeeAttendanceCurrentPage,
     totalPages
   );
-
-  const startIndex =
-    (employeeAttendanceCurrentPage - 1) * employeeAttendancePageSize;
-
+  const startIndex = (employeeAttendanceCurrentPage - 1) * employeeAttendancePageSize;
   const pageRows = filteredEmployeeAttendanceData.slice(
     startIndex,
     startIndex + employeeAttendancePageSize
@@ -35218,7 +35214,6 @@ function renderEmployeeAttendanceTable() {
 
       const formatTime = value => {
         if (!value) return '-';
-
         // Waktu dari kolom TIME, misalnya 08:30:00.
         if (/^\d{2}:\d{2}/.test(String(value))) {
           return String(value).slice(0, 5);
@@ -35236,7 +35231,6 @@ function renderEmployeeAttendanceTable() {
       };
 
       const checkIn = formatTime(row.Check_In);
-
       const statusLabels = {
 	      PRESENT: 'PRESENT',
 	      ABSENT: 'ABSENT',
@@ -35245,7 +35239,6 @@ function renderEmployeeAttendanceTable() {
 				PERMISSION: 'PERMISSION',
 	      NOT_RECORDED: 'BELUM DICATAT'
       };
-
       const statusClass = {
         PRESENT: 'text-green-700',
         ABSENT: 'text-red-700',
@@ -35255,12 +35248,20 @@ function renderEmployeeAttendanceTable() {
         NOT_RECORDED: 'text-on-surface-variant'
       }[row.Status] || 'text-on-surface-variant';
 
-      const schedule =
-        row.Start_Time && row.End_Time
-          ? `${formatTime(row.Start_Time)} - ${formatTime(row.End_Time)}`
-          : '-';
+      const schedule = row.Start_Time && row.End_Time
+				? `${formatTime(row.Start_Time)} - ${formatTime(row.End_Time)}`
+				: '-';
 
       const alreadyCheckedIn = Boolean(row.Check_In);
+			const statusManuallySet = [
+			  'PRESENT',
+			  'ABSENT',
+			  'SICK',
+			  'PERMISSION',
+			  'LEAVE'
+			].includes(String(row.Status || '').toUpperCase());
+			const disableCheckIn = alreadyCheckedIn || statusManuallySet;
+			const disableEditStatus = alreadyCheckedIn;
 
       return `
         <tr class="border-b border-outline-variant hover:bg-outline-variant">
@@ -35331,8 +35332,8 @@ function renderEmployeeAttendanceTable() {
 					
 					      <button type="button"
 					        onclick="runAttendanceAction(event, 'checkin', ${rowIndex})"
-					        ${alreadyCheckedIn ? 'disabled' : ''}
-					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${alreadyCheckedIn ? 'opacity-40 cursor-not-allowed' : ''}">
+					        ${disableCheckIn ? 'disabled' : ''}
+					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${disableCheckIn ? 'opacity-40 cursor-not-allowed' : ''}">
 						        <span class="material-symbols-outlined text-lg">login</span>
 						        	Check In
 					      </button>
@@ -35346,7 +35347,8 @@ function renderEmployeeAttendanceTable() {
 					
 					      <button type="button"
 					        onclick="runAttendanceAction(event, 'status', ${rowIndex})"
-					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian">
+									${disableEditStatus ? 'disabled' : ''}
+					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${disableEditStatus ? 'opacity-40 cursor-not-allowed' : ''}">
 						        <span class="material-symbols-outlined text-lg">edit_note</span>
 						        	Edit Status
 					      </button>
@@ -35449,6 +35451,13 @@ function openAttendanceAction(action, rowIndex) {
   if (action === 'checkin') {
     // Check-in QR tidak boleh diedit.
     if (row.Check_In) { alert('Karyawan sudah check-in melalui QR. Check-in tidak bisa diedit.'); return; }
+		if ([
+		  'PRESENT',
+		  'ABSENT',
+		  'SICK',
+		  'PERMISSION',
+		  'LEAVE'
+		].includes(String(row.Status || '').toUpperCase())) { alert('Status kehadiran sudah ditentukan. Check-in tidak bisa dilakukan.'); return; }
 
     setValue('checkInEmployeeId', row.Employee_ID);
     setValue('checkInAttendanceDate', date);
@@ -35493,6 +35502,7 @@ function openAttendanceAction(action, rowIndex) {
   }
   // STATUS
   if (action === 'status') {
+		if (row.Check_In) { alert('Karyawan sudah check-in. Status kehadiran tidak bisa diedit.'); return; }
     setValue('statusEmployeeId', row.Employee_ID);
     setValue('statusAttendanceDate', date);
     setValue('statusAttendanceId', row.Attendance_ID || '');
