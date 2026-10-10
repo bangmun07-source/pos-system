@@ -760,15 +760,16 @@ async function handleLogin() {
     localStorage.setItem("pos_session_id", result.session_id);
     if (state.branchId) {localStorage.setItem("pos_branchId", state.branchId);}
     localStorage.setItem("pos_login_tenant", state.tenantSlug || "master");
-
-    const loginRole = String(user.role || "").toLowerCase();
-
-		if (loginRole === "attendance") {
-		  navigate("attendancePage");
-		} else {
-		  navigate("dashboardPage");
-		}
-
+    
+	const loginRole = String(user.role || "").trim().toLowerCase();
+	
+	if (loginRole === "attendance") {
+	  navigate("attendancePage");
+	} else if (loginRole === "accountant") {
+	  navigate("settingsPage");
+	} else {
+	  navigate("dashboardPage");
+	}
   } catch (err) {
     alert(
       err.message ||
