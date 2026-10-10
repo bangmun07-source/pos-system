@@ -663,7 +663,7 @@
 	  <div class="sidebar-menu flex flex-col h-full">
 	    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
 	      <!-- DASHBOARD -->
-	      <a class="active" onclick="navigate('dashboardPage')">
+	      <a class="active operationalMenu" onclick="navigate('dashboardPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          home
 	        </span>
@@ -672,7 +672,7 @@
 	        </span>
 	      </a>
 	      <!-- POS -->
-	      <a onclick="navigate('posPage')">
+	      <a class="operationalMenu" onclick="navigate('posPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          shopping_cart
 	        </span>
@@ -681,7 +681,7 @@
 	        </span>
 	      </a>
 	      <!-- TABLE -->
-	      <a onclick="navigate('tablePage')">
+	      <a class="operationalMenu" onclick="navigate('tablePage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          table_restaurant
 	        </span>
@@ -690,7 +690,7 @@
 	        </span>
 	      </a>
 	      <!-- MEMBER -->
-	      <a onclick="navigate('memberPage')">
+	      <a class="operationalMenu" onclick="navigate('memberPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          group
 	        </span>
@@ -699,7 +699,7 @@
 	        </span>
 	      </a>
 	      <!-- SETTINGS -->
-	      <a onclick="navigate('settingsPage')"
+	      <a class="operationalMenu" onclick="navigate('settingsPage')"
 	         style="display:none" class="settingsMenu">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          settings
@@ -1024,7 +1024,7 @@
 	  <div class="sidebar-menu flex flex-col h-full">
 	    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
 	      <!-- DASHBOARD -->
-	      <a onclick="navigate('dashboardPage')">
+	      <a class="operationalMenu" onclick="navigate('dashboardPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          home
 	        </span>
@@ -1033,7 +1033,7 @@
 	        </span>
 	      </a>
 	      <!-- RECENT TRANSAKSI -->
-	      <a onclick="goToRecentTransactions()"">
+	      <a class="operationalMenu" onclick="goToRecentTransactions()"">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          receipt_long
 	        </span>
@@ -1042,7 +1042,7 @@
 	        </span>
 	      </a>
 	      <!-- GROSS RAVENUE -->
-	      <a class="active" onclick="navigate('grossRevenuePage')">
+	      <a class="active operationalMenu" onclick="navigate('grossRevenuePage')">
 	         <span class="material-symbols-outlined sidebar-icon">
 	          Payment
 	        </span>
@@ -1415,21 +1415,19 @@
 
   <!-- SIDEBAR CONTENT -->
   <div class="sidebar-menu flex flex-col h-full">
-    <!-- MENU -->
     <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
       <!-- DASHBOARD -->
-      <a onclick="navigate('dashboardPage')">
+      <a class="operationalMenu" onclick="navigate('dashboardPage')">
         <span class="material-symbols-outlined sidebar-icon">
           home
         </span>
     
-        <span
-          class="sidebar-label">
+        <span class="sidebar-label">
           Dashboard
         </span>
       </a>
       <!-- RECENT TRANSAKSI -->
-      <a class="active" onclick="goToRecentTransactions()"">
+      <a class="active operationalMenu" onclick="goToRecentTransactions()"">
         <span class="material-symbols-outlined sidebar-icon">
           receipt_long
         </span>
@@ -1438,9 +1436,8 @@
           Transactions
         </span>
       </a>
-
       <!-- GROSS RAVENUE -->
-      <a onclick="navigate('grossRevenuePage')">
+      <a class="operationalMenu" onclick="navigate('grossRevenuePage')">
          <span class="material-symbols-outlined sidebar-icon">
           Payment
         </span>
@@ -1449,7 +1446,6 @@
           Gross Revenue
         </span>
       </a>
-
       <!-- LOGOUT -->
       <a onclick="logout()">
         <span class="material-symbols-outlined sidebar-icon">
@@ -2295,24 +2291,21 @@
 <aside
   id="sidebar"
   class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
-
   <!-- SIDEBAR CONTENT -->
   <div class="sidebar-menu flex flex-col h-full">
-    <!-- MENU -->
     <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
       <!-- DASHBOARD -->
-      <a onclick="navigate('dashboardPage')">
+      <a class="operationalMenu" onclick="navigate('dashboardPage')">
         <span class="material-symbols-outlined sidebar-icon">
           home
         </span>
     
-        <span
-          class="sidebar-label">
+        <span class="sidebar-label">
           Dashboard
         </span>
       </a>
       <!-- POS -->
-      <a class="active" onclick="navigate('posPage')">
+      <a class="active operationalMenu" onclick="navigate('posPage')">
         <span class="material-symbols-outlined sidebar-icon">
           shopping_cart
         </span>
@@ -2321,9 +2314,8 @@
           POS
         </span>
       </a>
-
       <!-- TABLE -->
-      <a onclick="navigate('tablePage')">
+      <a class="operationalMenu" onclick="navigate('tablePage')">
          <span class="material-symbols-outlined sidebar-icon">
           table_restaurant
         </span>
@@ -2332,9 +2324,8 @@
           Table
         </span>
       </a>
-
       <!-- MEMBER -->
-      <a onclick="navigate('memberPage')">
+      <a class="operationalMenu" onclick="navigate('memberPage')">
         <span class="material-symbols-outlined sidebar-icon">
           group
         </span>
@@ -2343,7 +2334,6 @@
           Member
         </span>
       </a>
-
       <!-- SETTINGS -->
       <a onclick="navigate('settingsPage')"
          style="display:none"
@@ -2356,7 +2346,6 @@
           Settings
         </span>
       </a>
-
       <!-- LOGOUT -->
       <a onclick="logout()">
         <span class="material-symbols-outlined sidebar-icon">
@@ -2731,18 +2720,17 @@
 	    <!-- MENU -->
 	    <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
 	      <!-- DASHBOARD -->
-	      <a onclick="navigate('dashboardPage')">
+	      <a class="operationalMenu" onclick="navigate('dashboardPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          home
 	        </span>
 	    
-	        <span
-	          class="sidebar-label">
+	        <span class="sidebar-label">
 	          Dashboard
 	        </span>
 	      </a>
 	      <!-- POS -->
-	      <a onclick="navigate('posPage')">
+	      <a class="operationalMenu" onclick="navigate('posPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          shopping_cart
 	        </span>
@@ -2751,9 +2739,8 @@
 	          POS
 	        </span>
 	      </a>
-	
 	      <!-- TABLE -->
-	      <a class="active" onclick="navigate('tablePage')">
+	      <a class="active operationalMenu" onclick="navigate('tablePage')">
 	         <span class="material-symbols-outlined sidebar-icon">
 	          table_restaurant
 	        </span>
@@ -2762,9 +2749,8 @@
 	          Table
 	        </span>
 	      </a>
-	
 	      <!-- MEMBER -->
-	      <a onclick="navigate('memberPage')">
+	      <a class="operationalMenu" onclick="navigate('memberPage')">
 	        <span class="material-symbols-outlined sidebar-icon">
 	          group
 	        </span>
@@ -2773,7 +2759,6 @@
 	          Member
 	        </span>
 	      </a>
-	
 	      <!-- SETTINGS -->
 	      <a onclick="navigate('settingsPage')"
 	         style="display:none"
@@ -2786,7 +2771,6 @@
 	          Settings
 	        </span>
 	      </a>
-	
 	      <!-- LOGOUT -->
 	      <a onclick="logout()">
 	        <span class="material-symbols-outlined sidebar-icon">
@@ -3090,7 +3074,7 @@
     <!-- MENU -->
     <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-3 gap-3">
       <!-- DASHBOARD -->
-      <a onclick="navigate('dashboardPage')">
+      <a class="operationalMenu" onclick="navigate('dashboardPage')">
         <span class="material-symbols-outlined sidebar-icon">
           home
         </span>
@@ -3693,7 +3677,7 @@
 	  <div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 				<!-- DASHBOARD -->
-				<a onclick="navigate('dashboardPage')">
+				<a class="operationalMenu" onclick="navigate('dashboardPage')">
 					<span class="material-symbols-outlined sidebar-icon">
 						home
 					</span>
@@ -5624,7 +5608,7 @@
 		<div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 				<!-- DASHBOARD -->
-				<a onclick="navigate('dashboardPage')">
+				<a class="operationalMenu" onclick="navigate('dashboardPage')">
 					<span class="material-symbols-outlined sidebar-icon">
 						home
 					</span>
@@ -6036,7 +6020,7 @@
 	  <div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 				<!-- DASHBOARD -->
-				<a onclick="navigate('dashboardPage')">
+				<a class="operationalMenu" onclick="navigate('dashboardPage')">
 					<span class="material-symbols-outlined sidebar-icon">
 						home
 					</span>
@@ -8601,7 +8585,7 @@
 			<div class="sidebar-menu flex flex-col h-full">
 				<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 					<!-- DASHBOARD -->
-					<a onclick="navigate('dashboardPage')">
+					<a class="operationalMenu" onclick="navigate('dashboardPage')">
 						<span class="material-symbols-outlined sidebar-icon">
 							home
 						</span>
@@ -10458,7 +10442,7 @@
 			<div class="sidebar-menu flex flex-col h-full">
 				<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 					<!-- DASHBOARD -->
-					<a onclick="navigate('dashboardPage')">
+					<a class="operationalMenu" onclick="navigate('dashboardPage')">
 						<span class="material-symbols-outlined sidebar-icon">
 							home
 						</span>
@@ -11468,7 +11452,7 @@
 		<div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 					<!-- DASHBOARD -->
-					<a onclick="navigate('dashboardPage')">
+					<a class="operationalMenu" onclick="navigate('dashboardPage')">
 						<span class="material-symbols-outlined sidebar-icon">
 							home
 						</span>
@@ -11792,7 +11776,7 @@
 	  <div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -12638,7 +12622,7 @@
 		<div class="sidebar-menu flex flex-col h-full">
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -15225,7 +15209,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 					<!-- DASHBOARD -->
-					<a onclick="navigate('dashboardPage')">
+					<a class="operationalMenu" onclick="navigate('dashboardPage')">
 						<span class="material-symbols-outlined sidebar-icon">
 							home
 						</span>
@@ -15773,7 +15757,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -16586,7 +16570,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -17465,7 +17449,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -18292,7 +18276,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -19348,7 +19332,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -21405,7 +21389,7 @@
     <div class="sidebar-menu flex flex-col h-full">
       <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
          <!-- DASHBOARD -->
-        <a onclick="navigate('dashboardPage')">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
           <span class="material-symbols-outlined sidebar-icon">
             home
           </span>
@@ -22371,7 +22355,7 @@
 
 			<nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
 				<!-- DASHBOARD -->
-				<a onclick="navigate('dashboardPage')">
+				<a class="operationalMenu" onclick="navigate('dashboardPage')">
 					<span class="material-symbols-outlined sidebar-icon">
 						home
 					</span>
