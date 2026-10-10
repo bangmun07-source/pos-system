@@ -33886,12 +33886,11 @@ async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
 
 async function openScheduleModal(schedule = null) {
   const modal = document.getElementById('scheduleModal');
-
   if (!modal) {
     console.error('scheduleModal tidak ditemukan.');
     return;
   }
-
+  initScheduleTimePickers();
   const role = state.user.role;
   const scheduleId = document.getElementById('scheduleId');
   const branchSelect = document.getElementById('scheduleBranch');
@@ -34239,18 +34238,29 @@ window.selectScheduleDay = function(button) {
 
 
 function saveCurrentScheduleDayData() {
-  const day = selectedScheduleDay;
-
-  if (!day || !scheduleDayData[day]) return;
-
-  const startTime = document.getElementById('scheduleStartTime');
-  const endTime = document.getElementById('scheduleEndTime');
-  const breakMinutes = document.getElementById('scheduleBreakMinutes');
-
-  scheduleDayData[day].start = startTime?.value || '';
-  scheduleDayData[day].end = endTime?.value || '';
-  scheduleDayData[day].break = Number(breakMinutes?.value || 0);
+	const day = selectedScheduleDay;
+	
+	if (!day || !scheduleDayData[day]) return;
+	
+	const startHour = document.getElementById('scheduleStartHour');
+	const startMinute = document.getElementById('scheduleStartMinute');
+	const endHour = document.getElementById('scheduleEndHour');
+	const endMinute = document.getElementById('scheduleEndMinute');
+	const breakMinutes = document.getElementById('scheduleBreakMinutes');
+	
+	scheduleDayData[day].start =
+		startHour?.value !== '' && startHour?.value != null &&
+		startMinute?.value !== '' && startMinute?.value != null
+		? `${startHour.value}:${startMinute.value}`
+		: '';
+	scheduleDayData[day].end =
+		endHour?.value !== '' && endHour?.value != null &&
+		endMinute?.value !== '' && endMinute?.value != null
+			? `${endHour.value}:${endMinute.value}`
+			: '';
+	scheduleDayData[day].break = Number(breakMinutes?.value || 0);
 }
+
 
 window.saveSchedule = async function() {
 
@@ -34765,45 +34775,45 @@ function updateSchedulePaginationInfo(from, to, total) {
 }
 
 function loadSelectedScheduleDay() {
-  const day = selectedScheduleDay;
-  const data = scheduleDayData[day];
-
-  if (!data) return;
-
-  const selectedDay = document.getElementById('scheduleSelectedDay');
-  const startTime = document.getElementById('scheduleStartTime');
-  const endTime = document.getElementById('scheduleEndTime');
-  const breakMinutes = document.getElementById('scheduleBreakMinutes');
-  const status = document.getElementById('scheduleDayStatus');
+	const day = selectedScheduleDay;
+	const data = scheduleDayData[day];
 	
-  if (selectedDay) {
-	  const dateText = data.date
-	    ? new Date(`${data.date}T00:00:00`).toLocaleDateString('en-GB', {
-	        day: '2-digit',
-	        month: 'short',
-	        year: 'numeric'
-	      })
-	    : '';
+	if (!data) return;
 	
-	  selectedDay.textContent = dateText ? `${day} • ${dateText}` : day;
+	const selectedDay = document.getElementById('scheduleSelectedDay');
+	const startHour = document.getElementById('scheduleStartHour');
+	const startMinute = document.getElementById('scheduleStartMinute');
+	const endHour = document.getElementById('scheduleEndHour');
+	const endMinute = document.getElementById('scheduleEndMinute');
+	const breakMinutes = document.getElementById('scheduleBreakMinutes');
+	const status = document.getElementById('scheduleDayStatus');
+	
+	if (selectedDay) {
+		const dateText = data.date
+			? new Date(`${data.date}T00:00:00`).toLocaleDateString('en-GB', {
+					day: '2-digit',
+					month: 'short',
+					year: 'numeric'
+				})
+			: '';
+		selectedDay.textContent = dateText ? `${day} • ${dateText}` : day;
 	}
-  if (startTime) { startTime.value = data.start || ''; }
-  if (endTime) { endTime.value = data.end || ''; }
-  if (breakMinutes) { breakMinutes.value = data.break ?? 0; }
-  if (status) {
-    status.textContent = data.active ? 'ON' : 'OFF';
-    status.classList.remove(
-      'text-red-600',
-      'text-green-600'
-    );
 
-    status.classList.add(
-      data.active
-        ? 'text-green-600'
-        : 'text-red-600'
-    );
-  }
+	const startParts = (data.start || '').split(':');
+	const endParts = (data.end || '').split(':');
+
+	if (startHour) startHour.value = startParts[0] || '';
+	if (startMinute) startMinute.value = startParts[1] || '';
+	if (endHour) endHour.value = endParts[0] || '';
+	if (endMinute) endMinute.value = endParts[1] || '';
+	if (breakMinutes) breakMinutes.value = data.break ?? 0;
+	if (status) {
+		status.textContent = data.active ? 'ON' : 'OFF';
+		status.classList.remove('text-red-600', 'text-green-600');
+		status.classList.add(data.active ? 'text-green-600' : 'text-red-600');
+	}
 }
+
 
 function updateScheduleDayButtons() {
   document
@@ -34899,6 +34909,38 @@ window.resetScheduleWorkingDays = function() {
   updateScheduleDayButtons();
   loadSelectedScheduleDay();
 };
+
+function initScheduleTimePickers() {
+  const hourIds = [
+    'scheduleStartHour',
+    'scheduleEndHour'
+  ];
+
+  const minuteIds = [
+    'scheduleStartMinute',
+    'scheduleEndMinute'
+  ];
+
+  hourIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select || select.options.length > 1) return;
+
+    for (let hour = 0; hour < 24; hour++) {
+      const value = String(hour).padStart(2, '0');
+      select.add(new Option(value, value));
+    }
+  });
+
+  minuteIds.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select || select.options.length > 1) return;
+
+    for (let minute = 0; minute < 60; minute++) {
+      const value = String(minute).padStart(2, '0');
+      select.add(new Option(value, value));
+    }
+  });
+}
 
 
 /* =========================================================
