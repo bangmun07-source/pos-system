@@ -33851,6 +33851,9 @@ let scheduleDayData = {
 let selectedScheduleDay = 'MONDAY';
 let scheduleData = [];
 let editingScheduleWeek = false;
+let scheduleCurrentPage = 1;
+const schedulePageSize = 14;
+let filteredScheduleData = [];
 
 async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
   const employeeSelect = document.getElementById('scheduleEmployee');
@@ -34576,43 +34579,53 @@ window.filterSchedules = function() {
     role === 'Owner'
       ? [...scheduleData]
       : scheduleData.filter(row =>
-          String(row.Branch_ID || '').trim() ===
-          userBranchId
+          String(row.Branch_ID || '').trim() === userBranchId
         );
 
   if (week) {
     filtered = filtered.filter(row =>
-      String(row.Week_Start || '') ===
-      String(week)
+      String(row.Week_Start || '') === String(week)
     );
   }
   if (employeeId) {
     filtered = filtered.filter(row =>
-      String(row.Employee_ID || '') ===
-      String(employeeId)
+      String(row.Employee_ID || '') === String(employeeId)
     );
   }
   if (branchId) {
     filtered = filtered.filter(row =>
-      String(row.Branch_ID || '') ===
-      String(branchId)
+      String(row.Branch_ID || '') === String(branchId)
     );
   }
   if (day) {
     filtered = filtered.filter(row =>
-      String(row.Day_Of_Week || '') ===
-      String(day)
+      String(row.Day_Of_Week || '') === String(day)
     );
   }
-  renderSchedules(filtered);
+
+  filteredScheduleData = filtered;
+  scheduleCurrentPage = 1;
+  renderSchedules(filteredScheduleData);
 };
 
-function renderSchedules(data = []) {
+
+function renderSchedules(data = filteredScheduleData) {
   const tbody = document.getElementById('scheduleTableBody');
 
   if (!tbody) return;
 
-  if (!data.length) {
+  // Simpan data hasil filter untuk pagination
+  filteredScheduleData = data;
+
+  const total = data.length;
+  const totalPages = Math.max(1, Math.ceil(total / schedulePageSize));
+
+  scheduleCurrentPage = Math.min(scheduleCurrentPage, totalPages);
+
+  const startIndex = (scheduleCurrentPage - 1) * schedulePageSize;
+  const pageData = data.slice(startIndex, startIndex + schedulePageSize);
+
+  if (!total) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8"
@@ -34621,31 +34634,31 @@ function renderSchedules(data = []) {
         </td>
       </tr>
     `;
+
     updateSchedulePaginationInfo(0, 0, 0);
+
+    const prevButton = document.getElementById('schedulePrevButton');
+    const nextButton = document.getElementById('scheduleNextButton');
+
+    if (prevButton) prevButton.disabled = true;
+    if (nextButton) nextButton.disabled = true;
+
     return;
   }
 
-  tbody.innerHTML = data.map(row => {
+  tbody.innerHTML = pageData.map(row => {
     const isActive = row.Is_Active === true;
-    const start = isActive
-      ? formatScheduleTime(row.Start_Time)
-      : '-';
-    const end = isActive
-      ? formatScheduleTime(row.End_Time)
-      : '-';
+    const start = isActive ? formatScheduleTime(row.Start_Time) : '-';
+    const end = isActive ? formatScheduleTime(row.End_Time) : '-';
     const breakMinutes = isActive
       ? `${Number(row.Break_Minutes || 0)} min`
       : '-';
-    const statusClass = isActive
-      ? 'text-green-600'
-      : 'text-red-600';
-    const statusText = isActive
-      ? 'ON'
-      : 'OFF';
+
+    const statusClass = isActive ? 'text-green-600' : 'text-red-600';
+    const statusText = isActive ? 'ON' : 'OFF';
 
     return `
       <tr class="hover:bg-background/50">
-
         <td class="px-5 py-3">
           <div class="font-medium text-foreground">
             ${escapeHtml(row.Full_Name || '-')}
@@ -34655,14 +34668,14 @@ function renderSchedules(data = []) {
           </div>
         </td>
 
-				<td class="px-5 py-3 text-center">
-				  ${escapeHtml(
-				    employeeAttendanceBranches.find(branch =>
-				      String(branch.id || '').trim() ===
-				      String(row.Branch_ID || '').trim()
-				    )?.name || row.Branch_ID || '-'
-				  )}
-				</td>
+        <td class="px-5 py-3 text-center">
+          ${escapeHtml(
+            employeeAttendanceBranches.find(branch =>
+              String(branch.id || '').trim() ===
+              String(row.Branch_ID || '').trim()
+            )?.name || row.Branch_ID || '-'
+          )}
+        </td>
 
         <td class="px-5 py-3">
           <div class="font-medium">
@@ -34673,17 +34686,9 @@ function renderSchedules(data = []) {
           </div>
         </td>
 
-        <td class="px-5 py-3">
-          ${start}
-        </td>
-
-        <td class="px-5 py-3">
-          ${end}
-        </td>
-
-        <td class="px-5 py-3">
-          ${breakMinutes}
-        </td>
+        <td class="px-5 py-3">${start}</td>
+        <td class="px-5 py-3">${end}</td>
+        <td class="px-5 py-3">${breakMinutes}</td>
 
         <td class="px-5 py-3 text-center">
           <span class="font-semibold ${statusClass}">
@@ -34705,8 +34710,29 @@ function renderSchedules(data = []) {
       </tr>
     `;
   }).join('');
-  updateSchedulePaginationInfo(data.length, data.length, data.length);
+
+  updateSchedulePaginationInfo(
+    startIndex + 1,
+    startIndex + pageData.length,
+    total
+  );
+
+  const prevButton = document.getElementById('schedulePrevButton');
+  const nextButton = document.getElementById('scheduleNextButton');
+
+  if (prevButton) { prevButton.disabled = scheduleCurrentPage <= 1; }
+  if (nextButton) { nextButton.disabled = scheduleCurrentPage >= totalPages; }
 }
+
+window.changeSchedulePage = function(direction) {
+  const totalPages = Math.ceil( filteredScheduleData.length / schedulePageSize );
+  const nextPage = scheduleCurrentPage + direction;
+
+  if (nextPage < 1 || nextPage > totalPages) return;
+
+  scheduleCurrentPage = nextPage;
+  renderSchedules(filteredScheduleData);
+};
 
 function formatScheduleDate(date) {
   if (!date) return '-';
@@ -34734,10 +34760,7 @@ function updateSchedulePaginationInfo(from, to, total) {
   const info = document.getElementById('schedulePaginationInfo');
 
   if (!info) return;
-  if (!total) {
-    info.textContent = 'Showing 0–0 of 0';
-    return;
-  }
+  if (!total) { info.textContent = 'Showing 0–0 of 0'; return; }
   info.textContent = `Showing ${from}–${to} of ${total}`;
 }
 
@@ -34754,17 +34777,16 @@ function loadSelectedScheduleDay() {
   const status = document.getElementById('scheduleDayStatus');
 	
   if (selectedDay) {
-  const dateText = data.date
-    ? new Date(`${data.date}T00:00:00`).toLocaleDateString('en-GB', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      })
-    : '';
-
-  selectedDay.textContent =
-    dateText ? `${day} • ${dateText}` : day;
-}
+	  const dateText = data.date
+	    ? new Date(`${data.date}T00:00:00`).toLocaleDateString('en-GB', {
+	        day: '2-digit',
+	        month: 'short',
+	        year: 'numeric'
+	      })
+	    : '';
+	
+	  selectedDay.textContent = dateText ? `${day} • ${dateText}` : day;
+	}
   if (startTime) { startTime.value = data.start || ''; }
   if (endTime) { endTime.value = data.end || ''; }
   if (breakMinutes) { breakMinutes.value = data.break ?? 0; }
@@ -34815,7 +34837,6 @@ function updateScheduleDayButtons() {
           'text-white'
         );
       }
-
       if (isSelected) {
         button.classList.add(
           'ring-2',
@@ -34857,8 +34878,7 @@ function updateScheduleWeekDates() {
 	  const month = String(date.getMonth() + 1).padStart(2, '0');
 	  const dayNumber = String(date.getDate()).padStart(2, '0');
 	
-	  scheduleDayData[day].date =
-	    `${year}-${month}-${dayNumber}`;
+	  scheduleDayData[day].date = `${year}-${month}-${dayNumber}`;
 	});
 	
 	updateScheduleDayButtons();
@@ -34875,7 +34895,6 @@ window.resetScheduleWorkingDays = function() {
 		SATURDAY:  { active: false, date: '', start: '', end: '', break: 0 },
 		SUNDAY:    { active: false, date: '', start: '', end: '', break: 0 }
 	};
-
   selectedScheduleDay = 'MONDAY';
   updateScheduleDayButtons();
   loadSelectedScheduleDay();
