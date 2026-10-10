@@ -11989,9 +11989,7 @@ async function saveTaxSettings() {
 function loadUsers(users) {
   window.userData = users || [];
   allUsers = users || [];
-  console.log("USER LOGIN:", state.user);
-  console.log("ALL USERS:", allUsers);
-  console.log("USER PERTAMA:", allUsers[0]);
+	
   applyUserBranchAccess();
 
   loadUserFilterOptions();
