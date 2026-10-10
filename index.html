@@ -24547,7 +24547,6 @@
               type="checkbox"
               class="sr-only peer" 
 							checked>
-						
             <div class="w-11 h-6 bg-outline-variant border border-outline-variant rounded-md peer
               peer-checked:bg-white
               after:content-['']
@@ -25732,7 +25731,7 @@
           </div>
           <!-- QR ACTIVE -->
           <div id="attendanceKioskQrActive"
-            class="hidden flex-col items-center justify-center text-center w-full">
+            class="hidden w-full flex-col items-center justify-center text-center">
             <!-- EMPLOYEE -->
             <div class="mb-5">
 
@@ -25842,10 +25841,13 @@
   </main>
 </template>
 
-
+<!-- =========================================================
+     ATTENDANCE SCAN FOR EMPLOYEE
+========================================================= -->
+	
 <template id="attendanceScanPage">
   <main class="min-h-screen bg-gray-100 flex items-center justify-center p-4" >
-    <section class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden" >
+    <section class="w-full max-w-md bg-white rounded-ms shadow-xl overflow-hidden" >
       <!-- HEADER -->
       <div class="bg-gray-900 text-white px-6 py-5 text-center">
         <div class="text-xl font-bold">
@@ -25859,7 +25861,7 @@
       <!-- SCANNER -->
       <div class="p-6">
         <div id="attendanceScanReader"
-          class="w-full overflow-hidden rounded-xl bg-black" >
+          class="w-full overflow-hidden rounded-md bg-black" >
 				</div>
 
         <div id="attendanceScanStatus"
@@ -25868,7 +25870,7 @@
         </div>
         <!-- SUCCESS -->
         <div id="attendanceScanSuccess"
-          class="hidden mt-5 rounded-xl bg-green-50 border border-green-200 p-5 text-center" >
+          class="hidden mt-5 rounded-md bg-green-50 border border-green-200 p-5 text-center" >
           <div class="text-3xl mb-2">✓</div>
 
           <div id="attendanceScanSuccessName"
@@ -25883,13 +25885,13 @@
 
           <button type="button"
             onclick="restartAttendanceScanner()"
-            class="mt-4 w-full rounded-lg bg-gray-900 text-white py-3 font-semibold" >
+            class="mt-4 w-full rounded-md bg-gray-900 text-white py-3 font-semibold" >
             Scan Again
           </button>
         </div>
         <!-- ERROR -->
         <div id="attendanceScanError"
-          class="hidden mt-5 rounded-xl bg-red-50 border border-red-200 p-5 text-center" >
+          class="hidden mt-5 rounded-md bg-red-50 border border-red-200 p-5 text-center" >
           <div class="text-3xl mb-2">!</div>
 
           <div id="attendanceScanErrorMessage"
@@ -25899,7 +25901,7 @@
 
           <button type="button"
             onclick="restartAttendanceScanner()"
-            class="mt-4 w-full rounded-lg bg-gray-900 text-white py-3 font-semibold" >
+            class="mt-4 w-full rounded-md bg-gray-900 text-white py-3 font-semibold" >
             Try Again
           </button>
         </div>
