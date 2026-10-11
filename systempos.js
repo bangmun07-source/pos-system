@@ -32202,7 +32202,9 @@ async function initEmployeePage() {
     }
     await loadEmployeeOvertime();
 		await initAttendanceRecap();
-  } catch (error) { }
+  } catch (error) {
+		console.error('initEmployeePage:', error);
+	}
 }
 
 window.switchEmployeeModule = function(module) {
