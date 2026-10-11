@@ -33478,49 +33478,47 @@ function renderSalaryComponentRow(component) {
   `;
 }
 
-/* ==== OPEN SALARY COMPONENT MODAL ===== */
+/* ==== OPEN SALARY COMPONENT MODAL ==== */
 window.openSalaryComponentModal = function (type) {
-  if (
-    type !== 'ALLOWANCE' &&
-    type !== 'DEDUCTION'
-  ) { return; }
-	
-  const modal = document.getElementById('salaryComponentModal');
+  if (type !== 'ALLOWANCE' && type !== 'DEDUCTION') return;
 
+  const modal = document.getElementById('salaryComponentModal');
   if (!modal) return;
 
-  const title = document.getElementById( 'salaryComponentModalTitle' );
-  const typeInput = document.getElementById( 'salaryComponentType' );
-  const componentIdInput = document.getElementById( 'salaryComponentId' );
-  const nameInput = document.getElementById( 'salaryComponentName' );
-  const amountInput = document.getElementById( 'salaryComponentAmount' );
-  const calculationInput = document.getElementById( 'salaryComponentCalculationType' );
+  const title = document.getElementById('salaryComponentModalTitle');
+  const typeInput = document.getElementById('salaryComponentType');
+  const componentIdInput = document.getElementById('salaryComponentId');
+  const nameInput = document.getElementById('salaryComponentName');
+  const amountInput = document.getElementById('salaryComponentAmount');
+  const calculationInput = document.getElementById('salaryComponentCalculationType');
+  const categoryInput = document.getElementById('salaryComponentAccountingCategory');
+  const calculationBase = document.getElementById('salaryComponentCalculationBase');
 
-  if (typeInput) { typeInput.value = type; }
-  if (componentIdInput) { componentIdInput.value = ''; }
-  if (nameInput) { nameInput.value = ''; }
-  if (amountInput) { amountInput.value = ''; }
-	if (calculationInput) {
-	  calculationInput.value = 'FIXED';
-	  calculationInput.onchange = updateSalaryComponentAmountUnit;
-	}
-	
-	updateSalaryComponentAmountUnit();
-	
+  if (typeInput) typeInput.value = type;
+  if (componentIdInput) componentIdInput.value = '';
+  if (nameInput) nameInput.value = '';
+  if (amountInput) amountInput.value = '';
+  if (categoryInput) categoryInput.value = '';
+  if (calculationBase) calculationBase.value = 'BASIC_SALARY';
+
+  if (calculationInput) {
+    calculationInput.value = 'FIXED';
+    calculationInput.onchange = updateSalaryComponentAmountUnit;
+  }
+
+  updateSalaryComponentAmountUnit();
+  updateSalaryComponentCalculationBase();
+
   if (title) {
     title.textContent =
-      type === 'ALLOWANCE'
-        ? 'Add Allowance'
-        : 'Add Deduction';
+      type === 'ALLOWANCE' ? 'Add Allowance' : 'Add Deduction';
   }
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
   if (nameInput) {
-    setTimeout(() => {
-      nameInput.focus();
-    }, 50);
+    setTimeout(() => nameInput.focus(), 50);
   }
 };
 
@@ -33545,31 +33543,57 @@ window.closeSalaryComponentModal = function () {
 
 /* === SAVE SALARY COMPONENT === */
 window.saveSalaryComponent = function () {
-  const type = document.getElementById( 'salaryComponentType' )?.value;
-  const componentId = document.getElementById( 'salaryComponentId' )?.value ?.trim();
-  const name = document.getElementById( 'salaryComponentName' )?.value ?.trim();
-  const amount = Number( document.getElementById( 'salaryComponentAmount' )?.value || 0 );
-  const calculationType = document.getElementById( 'salaryComponentCalculationType' )?.value || 'FIXED';
+  const type = document.getElementById('salaryComponentType')?.value;
+  const componentId = document.getElementById('salaryComponentId')?.value?.trim();
+  const name = document.getElementById('salaryComponentName')?.value?.trim();
+  const amount = Number(document.getElementById('salaryComponentAmount')?.value || 0);
+  const calculationType = document.getElementById('salaryComponentCalculationType')?.value || 'FIXED';
+  const accountingCategory = document.getElementById('salaryComponentAccountingCategory')?.value;
+  const calculationBase = document.getElementById('salaryComponentCalculationBase')?.value || 'BASIC_SALARY';
 
   if (!type) { alert('Component type tidak ditemukan.'); return; }
   if (!name) { alert('Component Name wajib diisi.'); return; }
-  if (amount < 0) { alert('Amount tidak boleh negatif.'); return; }
+  if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
+  if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
+  if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
+  /*
+   * Tipe komponen yang tersedia saat ini hanya ALLOWANCE
+   * dan DEDUCTION. Jangan izinkan kategori dengan perlakuan
+   * terpisah masuk ke dua daftar ini secara keliru.
+   */
+  const unsupportedCategories = [ 'EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT' ];
+
+  if (unsupportedCategories.includes(accountingCategory)) {
+    alert(
+      'Kategori ini memerlukan jenis komponen dan tampilan tersendiri. ' +
+      'Jangan simpan sebagai Allowance atau Deduction biasa.'
+    );
+    return;
+  }
+
+  const componentData = {
+    Component_Type: type,
+    Component_Name: name,
+    Amount: amount,
+    Calculation_Type: calculationType,
+    Accounting_Category: accountingCategory,
+    Calculation_Base:
+      calculationType === 'PERCENTAGE'
+        ? calculationBase
+        : null,
+    Is_Active: true
+  };
 
   /* === EDIT EXISTING COMPONENT === */
   if (componentId) {
-    const index =
-      employeeSalaryComponents.findIndex(
-        component =>
-          component.Component_ID === componentId
-      );
+    const index = employeeSalaryComponents.findIndex(
+      component => component.Component_ID === componentId
+    );
+
     if (index !== -1) {
       employeeSalaryComponents[index] = {
         ...employeeSalaryComponents[index],
-        Component_Type: type,
-        Component_Name: name,
-        Amount: amount,
-        Calculation_Type: calculationType,
-        Is_Active: true
+        ...componentData
       };
     }
   }
@@ -33579,56 +33603,72 @@ window.saveSalaryComponent = function () {
     employeeSalaryComponents.push({
       Component_ID: `TEMP-${crypto.randomUUID()}`,
       Salary_ID: null,
-      Employee_ID: document.getElementById( 'salaryEmployeeId' )?.value || null,
-      Component_Type: type,
-      Component_Name: name,
-      Amount: amount,
-      Calculation_Type: calculationType,
-      Is_Active: true
+      Employee_ID:
+        document.getElementById('salaryEmployeeId')?.value || null,
+      ...componentData
     });
   }
-  renderSalaryComponents( employeeSalaryComponents );
+
+  renderSalaryComponents(employeeSalaryComponents);
   closeSalaryComponentModal();
 };
 
+function updateSalaryComponentCalculationBase() {
+  const calculationType = document.getElementById('salaryComponentCalculationType')?.value;
+  const wrapper = document.getElementById('salaryComponentCalculationBaseWrapper');
+	
+  if (!wrapper) return;
+
+  wrapper.classList.toggle(
+    'hidden',
+    calculationType !== 'PERCENTAGE'
+  );
+}
 
 /* === EDIT SALARY COMPONENT === */
 window.editSalaryComponent = function (componentId) {
-  const component =
-    employeeSalaryComponents.find(
-      item =>
-        item.Component_ID === componentId
-    );
+  const component = employeeSalaryComponents.find( item => item.Component_ID === componentId );
 
   if (!component) return;
 
-  const modal = document.getElementById( 'salaryComponentModal' );
-
+  const modal = document.getElementById('salaryComponentModal');
   if (!modal) return;
-	
-  const title = document.getElementById( 'salaryComponentModalTitle' );
-  const typeInput = document.getElementById( 'salaryComponentType' );
-  const componentIdInput = document.getElementById( 'salaryComponentId' );
-  const nameInput = document.getElementById( 'salaryComponentName' );
-  const amountInput = document.getElementById( 'salaryComponentAmount' );
-  const calculationInput = document.getElementById( 'salaryComponentCalculationType' );
+
+  const title = document.getElementById('salaryComponentModalTitle');
+  const typeInput = document.getElementById('salaryComponentType');
+  const componentIdInput = document.getElementById('salaryComponentId');
+  const nameInput = document.getElementById('salaryComponentName');
+  const amountInput = document.getElementById('salaryComponentAmount');
+  const calculationInput = document.getElementById('salaryComponentCalculationType');
+  const categoryInput = document.getElementById('salaryComponentAccountingCategory');
+  const calculationBase = document.getElementById('salaryComponentCalculationBase');
 
   if (title) {
-    title.textContent = component.Component_Type === 'ALLOWANCE'
-			? 'Edit Allowance'
-			: 'Edit Deduction';
+    title.textContent =
+      component.Component_Type === 'ALLOWANCE'
+        ? 'Edit Allowance'
+        : 'Edit Deduction';
   }
 
-  if (typeInput) { typeInput.value = component.Component_Type || ''; }
-  if (componentIdInput) { componentIdInput.value = component.Component_ID || ''; }
-  if (nameInput) { nameInput.value = component.Component_Name || ''; }
-  if (amountInput) { amountInput.value = component.Amount ?? 0; }
+  if (typeInput) typeInput.value = component.Component_Type || '';
+  if (componentIdInput) componentIdInput.value = component.Component_ID || '';
+  if (nameInput) nameInput.value = component.Component_Name || '';
+  if (amountInput) amountInput.value = component.Amount ?? 0;
+
+  if (categoryInput) {
+    categoryInput.value = component.Accounting_Category || '';
+  }
+
   if (calculationInput) {
-	  calculationInput.value = component.Calculation_Type || 'FIXED';
-	  calculationInput.onchange = updateSalaryComponentAmountUnit;
-	}
-	
-	updateSalaryComponentAmountUnit();
+    calculationInput.value = component.Calculation_Type || 'FIXED';
+    calculationInput.onchange = updateSalaryComponentAmountUnit;
+  }
+
+  if (calculationBase) {
+    calculationBase.value = component.Calculation_Base || 'BASIC_SALARY';
+  }
+
+  updateSalaryComponentAmountUnit();
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -33695,6 +33735,10 @@ window.saveEmployeeSalary = async function () {
           Component_Name: component.Component_Name,
           Amount: Number(component.Amount || 0),
           Calculation_Type: component.Calculation_Type || 'FIXED',
+					Accounting_Category: component.Accounting_Category || null,
+					Calculation_Base: component.Calculation_Type === 'PERCENTAGE'
+						? (component.Calculation_Base || 'BASIC_SALARY')
+						: null,
           Is_Active: component.Is_Active !== false
         })
       );
@@ -33746,6 +33790,7 @@ function updateSalaryComponentAmountUnit() {
     amountInput.step = '1';
     amountInput.placeholder = '300000';
   }
+  updateSalaryComponentCalculationBase();
 }
 
 /* =========================================================
