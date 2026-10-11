@@ -34187,16 +34187,8 @@ async function loadScheduleWeek( employeeId, weekStart ) {
       );
       return;
     }
-console.log('==============================');
-console.log('EDIT SCHEDULE - LOAD WEEK');
-console.log('Employee ID:', employeeId);
-console.log('Week Start:', weekStart);
-console.log('RPC DATA:', data);
-console.table(data || []);
-console.log('==============================');
 
-   resetScheduleWorkingDays();
-
+  resetScheduleWorkingDays();
 	const weekInput = document.getElementById('scheduleWeekStart');
 	
 	if (weekInput) { weekInput.value = weekStart; }
@@ -35046,9 +35038,13 @@ async function loadEmployeeAttendance() {
     return;
   }
 
-  const role = state.user.role;
-  const userBranchId = String(state.user.branchId || '').trim();
-
+	const role = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	const userBranchId = String(
+	  state.user?.branchId || state.user?.Branch_ID || ''
+	).trim();
+	const canViewAllBranches = ['owner', 'accountant'].includes(role);
   const tbody = document.getElementById('employeeAttendanceTableBody');
 
   if (tbody) {
@@ -35066,7 +35062,7 @@ async function loadEmployeeAttendance() {
       'get_employee_attendance',
       {
         p_session_id: sessionId,
-        p_branch_id: role === 'Owner' ? null : userBranchId || '__NO_BRANCH__',
+        p_branch_id: canViewAllBranches ? null : userBranchId || '__NO_BRANCH__',
         p_employee_id: null,
         p_date_from: null,
         p_date_to: null,
@@ -35119,7 +35115,7 @@ async function loadEmployeeAttendance() {
 		  });
 		
 		// Pembatasan outlet tetap berlaku.
-		employeeAttendanceData = role === 'Owner'
+		employeeAttendanceData = canViewAllBranches
 		  ? scheduledRows
 		  : scheduledRows.filter(row =>
 		      String(row.Branch_ID || '').trim() === userBranchId
@@ -35145,13 +35141,18 @@ async function loadEmployeeAttendance() {
 function populateEmployeeAttendanceFilters() {
   const employeeFilter = document.getElementById('attendanceEmployeeFilter');
   const branchFilter = document.getElementById('attendanceBranchFilter');
-  const role = state.user.role;
-  const userBranchId = String(state.user.branchId || '').trim();
+	const role = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	const userBranchId = String(
+	  state.user?.branchId || state.user?.Branch_ID || ''
+	).trim();
+	const canViewAllBranches = ['owner', 'accountant'].includes(role);
 
   // OUTLET FILTER
   if (branchFilter) {
     const branches = employeeAttendanceBranches || [];
-    if (role !== 'Owner') {
+    if (!canViewAllBranches) {
       const branch = branches.find(row =>
         String(row.id || '').trim() === userBranchId
       );
@@ -35239,15 +35240,20 @@ function filterEmployeeAttendance() {
   const employeeId = document.getElementById('attendanceEmployeeFilter')?.value || '';
   const selectedBranch = document.getElementById('attendanceBranchFilter')?.value || '';
   const status = document.getElementById('attendanceStatusFilter')?.value || '';
-  const role = state.user.role;
-  const userBranchId = String(state.user.branchId || '').trim();
+	const role = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	const userBranchId = String(
+	  state.user?.branchId || state.user?.Branch_ID || ''
+	).trim();
+	const canViewAllBranches = ['owner', 'accountant'].includes(role);
 
   filteredEmployeeAttendanceData = employeeAttendanceData.filter(row => {
     const attendanceDate = String(row.Attendance_Date || '').slice(0, 10);
     const branchId = String(row.Branch_ID || '').trim();
 
     // Pembatasan outlet tetap diterapkan untuk role non-Owner.
-    if (role !== 'Owner' && branchId !== userBranchId) { return false; }
+    if (!canViewAllBranches && branchId !== userBranchId) { return false; }
     if (dateFrom && attendanceDate < dateFrom) return false;
     if (dateTo && attendanceDate > dateTo) return false;
     if (employeeId && row.Employee_ID !== employeeId) return false;
@@ -35264,7 +35270,10 @@ function filterEmployeeAttendance() {
 function renderEmployeeAttendanceTable() {
   const tbody = document.getElementById('employeeAttendanceTableBody');
   if (!tbody) return;
-
+	
+	const isAccountant = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase() === 'accountant';
   const totalRows = filteredEmployeeAttendanceData.length;
   const totalPages = Math.max(
     1,
@@ -35416,28 +35425,28 @@ function renderEmployeeAttendanceTable() {
 						     			 View Detail
 					      </button>
 					
-					      <button type="button"
-					        onclick="runAttendanceAction(event, 'checkin', ${rowIndex})"
-					        ${disableCheckIn ? 'disabled' : ''}
-					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${disableCheckIn ? 'opacity-40 cursor-not-allowed' : ''}">
-						        <span class="material-symbols-outlined text-lg">login</span>
-						        	Check In
-					      </button>
+								<button type="button"
+								  onclick="runAttendanceAction(event, 'checkin', ${rowIndex})"
+								  ${disableCheckIn || isAccountant ? 'disabled' : ''}
+								  class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${disableCheckIn ? 'opacity-40 cursor-not-allowed' : ''} ${isAccountant ? 'hidden' : ''}">
+								  <span class="material-symbols-outlined text-lg">login</span>
+								  Check In
+								</button>
+					
+								<button type="button"
+								  onclick="runAttendanceAction(event, 'overtime', ${rowIndex})"
+								  class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varianr ${isAccountant ? 'hidden' : ''}">
+								  <span class="material-symbols-outlined text-lg">more_time</span>
+								  Overtime
+								</button>
 					
 					      <button type="button"
-					        onclick="runAttendanceAction(event, 'overtime', ${rowIndex})"
-					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varianr">
-						        <span class="material-symbols-outlined text-lg">more_time</span>
-						        	Overtime
-					      </button>
-					
-					      <button type="button"
-					        onclick="runAttendanceAction(event, 'status', ${rowIndex})"
-									${disableEditStatus ? 'disabled' : ''}
-					        class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${disableEditStatus ? 'opacity-40 cursor-not-allowed' : ''}">
-						        <span class="material-symbols-outlined text-lg">edit_note</span>
-						        	Edit Status
-					      </button>
+								  onclick="runAttendanceAction(event, 'status', ${rowIndex})"
+								  ${disableEditStatus || isAccountant ? 'disabled' : ''}
+								  class="flex items-center gap-3 w-full px-3 py-2.5 text-sm text-on-surface hover:text-on-surface-varian ${disableEditStatus ? 'opacity-40 cursor-not-allowed' : ''} ${isAccountant ? 'hidden' : ''}">
+								  <span class="material-symbols-outlined text-lg">edit_note</span>
+								  Edit Status
+								</button>
 					    </div>
 					  </div>
 					</td>
@@ -35488,6 +35497,15 @@ function openAttendanceAction(action, rowIndex) {
   const row = filteredEmployeeAttendanceData[rowIndex];
 
   if (!row) { return; }
+
+	const role = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	
+	if (role === 'accountant' && action !== 'detail') {
+	  alert('Accountant hanya dapat membaca data Attendance.');
+	  return;
+	}
   // Helper untuk mengisi elemen berdasarkan ID.
 	const setValue = (id, value) => {
 	  const element = document.getElementById(id);
@@ -35777,6 +35795,16 @@ async function loadEmployeeOvertime() {
 }
 
 async function handleSaveEmployeeCheckIn(event) {
+  // ACCOUNTANT: READ ONLY
+  if (
+    String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase() === 'accountant'
+  ) {
+    event.preventDefault();
+    alert('Accountant hanya dapat membaca data Attendance.');
+    return;
+  }
   event.preventDefault();
 
   const form = document.getElementById('attendanceCheckInForm');
@@ -35845,6 +35873,17 @@ async function handleSaveEmployeeCheckIn(event) {
 }
 
 async function handleSaveEmployeeOvertime(event) {
+  // ACCOUNTANT: READ ONLY
+  if (
+    String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase() === 'accountant'
+  ) {
+    event.preventDefault();
+    alert('Accountant hanya dapat membaca data Attendance.');
+    return;
+  }
+
   event.preventDefault();
 
   const form = document.getElementById('attendanceOvertimeForm');
@@ -35934,6 +35973,17 @@ async function handleSaveEmployeeOvertime(event) {
 }
 
 async function handleSaveAttendanceStatus(event) {
+  // ACCOUNTANT: READ ONLY
+  if (
+    String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase() === 'accountant'
+  ) {
+    event.preventDefault();
+    alert('Accountant hanya dapat membaca data Attendance.');
+    return;
+  }
+
 	event.preventDefault();
 	
 	const form = document.getElementById('attendanceStatusForm');
