@@ -34219,6 +34219,7 @@ window.saveSchedule = async function() {
     closeScheduleModal();
 								
   } catch (error) {
+		console.error('saveSchedule:', error);
     alert( 'Terjadi kesalahan saat menyimpan schedule.' );
   }
 }
@@ -34250,20 +34251,12 @@ function populateScheduleFilters() {
   const employeeFilter = document.getElementById('scheduleEmployeeFilter');
   const branchFilter = document.getElementById('scheduleBranchFilter');
   const weekFilter = document.getElementById('scheduleWeekFilter');
-  const role = String(
-		state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase();
-	const userBranchId = String(
-		state.user?.branchId || state.user?.Branch_ID || ''
-	).trim();
-	const canViewAllBranches =
-		['owner', 'accountant'].includes(role) ||
-		userBranchId.toUpperCase() === 'ALL';
+  const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+	const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+	const canViewAllBranches = ['owner', 'accountant'].includes(role) || userBranchId.toUpperCase() === 'ALL';
 	const visibleScheduleData = canViewAllBranches
 		? scheduleData
-		: scheduleData.filter(row =>
-				String(row.Branch_ID || '').trim() === userBranchId
-			);
+		: scheduleData.filter(row => String(row.Branch_ID || '').trim() === userBranchId );
 	
   if (employeeFilter) {
     const currentValue = employeeFilter.value;
