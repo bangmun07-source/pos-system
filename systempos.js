@@ -34626,13 +34626,6 @@ window.filterSchedules = function() {
 	      String(row.Branch_ID || '').trim() === userBranchId
 	    );
 
-  let filtered =
-    role === 'Owner'
-      ? [...scheduleData]
-      : scheduleData.filter(row =>
-          String(row.Branch_ID || '').trim() === userBranchId
-        );
-
   if (week) {
     filtered = filtered.filter(row =>
       String(row.Week_Start || '') === String(week)
