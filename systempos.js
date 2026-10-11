@@ -620,6 +620,14 @@ function navigate(pageId, params = {}) {
       userRole === "accountant" ? "none" : "flex";
   });
 
+	// Menu accounting: hanya Owner dan Accountant
+	document.querySelectorAll(".accountingMenu").forEach(menu => {
+	  menu.style.display =
+	    ["owner", "accountant"].includes(userRole)
+	      ? "flex"
+	      : "none";
+	});
+
   // Menu khusus Owner
   document.querySelectorAll(".ownerOnly").forEach(menu => {
     menu.style.display =
