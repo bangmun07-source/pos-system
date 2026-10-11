@@ -3715,7 +3715,7 @@
 					</span>
 				</a>
 				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+				<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						payments
 					</span>
@@ -3761,7 +3761,7 @@
           </span>
         </a>
 				<!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -3770,7 +3770,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -3779,7 +3779,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -3788,7 +3788,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -3797,7 +3797,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a class="accountingMenu" class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -3806,7 +3806,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -3815,7 +3815,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -3824,7 +3824,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -5709,7 +5709,7 @@
 					</span>
 				</a>
 				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+				<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						payments
 					</span>
@@ -5755,7 +5755,7 @@
           </span>
         </a>
 				<!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -5764,7 +5764,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -5773,7 +5773,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -5782,7 +5782,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -5791,7 +5791,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -5800,7 +5800,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -5809,7 +5809,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -5818,7 +5818,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -6182,7 +6182,7 @@
 					</span>
 				</a>
 				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+				<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						payments
 					</span>
@@ -6228,8 +6228,7 @@
           </span>
         </a>
 				<!-- CASH FLOW -->
-				<!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -6238,7 +6237,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -6247,7 +6246,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -6256,7 +6255,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -6265,7 +6264,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -6274,7 +6273,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -6283,7 +6282,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -6292,7 +6291,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -8813,7 +8812,7 @@
 						</span>
 					</a>
 					<!-- EXPENSES -->
-					<a class="active" onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+					<a class="active operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							payments
 						</span>
@@ -8859,7 +8858,7 @@
 	          </span>
 	        </a>
 					<!-- CASH FLOW -->
-	        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_balance_wallet
 	          </span>
@@ -8868,7 +8867,7 @@
 	          </span>
 	        </a>
 	        <!-- ASSET -->
-	        <a onclick="navigate('assetPage')">
+	        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            inventory_2
 	          </span>
@@ -8877,7 +8876,7 @@
 	          </span>
 	        </a>
 					<!-- DEBT & LIABILITIES -->
-	        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            request_quote
 	          </span>
@@ -8886,7 +8885,7 @@
 	          </span>
 	        </a>
 	        <!-- ACCOUNTING TAX -->
-	        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -8895,7 +8894,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTS RECEIVABLE -->
-	        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+	        <a class="active accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -8904,7 +8903,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING -->
-					<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_tree
 	          </span>
@@ -8913,7 +8912,7 @@
 	          </span>
 	        </a>
 					<!-- JOURNAL ENTRIES -->
-					<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            menu_book
 	          </span>
@@ -8922,7 +8921,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING REPORTS -->
-					<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            balance
 	          </span>
@@ -10733,7 +10732,7 @@
 						</span>
 					</a>
 					<!-- EXPENSES -->
-					<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+					<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							payments
 						</span>
@@ -10779,7 +10778,7 @@
 	          </span>
 	        </a>
 					<!-- CASH FLOW -->
-	        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_balance_wallet
 	          </span>
@@ -10788,7 +10787,7 @@
 	          </span>
 	        </a>
 	        <!-- ASSET -->
-	        <a onclick="navigate('assetPage')">
+	        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            inventory_2
 	          </span>
@@ -10797,7 +10796,7 @@
 	          </span>
 	        </a>
 					<!-- DEBT & LIABILITIES -->
-	        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            request_quote
 	          </span>
@@ -10806,7 +10805,7 @@
 	          </span>
 	        </a>
 	        <!-- ACCOUNTING TAX -->
-	        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -10815,7 +10814,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTS RECEIVABLE -->
-	        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -10824,7 +10823,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING -->
-					<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_tree
 	          </span>
@@ -10833,7 +10832,7 @@
 	          </span>
 	        </a>
 					<!-- JOURNAL ENTRIES -->
-					<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            menu_book
 	          </span>
@@ -10842,7 +10841,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING REPORTS -->
-					<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            balance
 	          </span>
@@ -11806,7 +11805,7 @@
 						</span>
 					</a>
 					<!-- EXPENSES -->
-					<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+					<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							payments
 						</span>
@@ -11861,7 +11860,7 @@
 	          </span>
 	        </a>
 	        <!-- ASSET -->
-	        <a onclick="navigate('assetPage')">
+	        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            inventory_2
 	          </span>
@@ -11870,7 +11869,7 @@
 	          </span>
 	        </a>
 					<!-- DEBT & LIABILITIES -->
-	        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            request_quote
 	          </span>
@@ -11879,7 +11878,7 @@
 	          </span>
 	        </a>
 	        <!-- ACCOUNTING TAX -->
-	        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -11888,7 +11887,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTS RECEIVABLE -->
-	        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -11897,7 +11896,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING -->
-					<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_tree
 	          </span>
@@ -11906,7 +11905,7 @@
 	          </span>
 	        </a>
 					<!-- JOURNAL ENTRIES -->
-					<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            menu_book
 	          </span>
@@ -11915,7 +11914,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING REPORTS -->
-					<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            balance
 	          </span>
@@ -12184,7 +12183,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -13030,7 +13029,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a class="active" onclick="navigate('assetPage')">
+        <a class="active" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -15626,7 +15625,7 @@
 						</span>
 					</a>
 					<!-- EXPENSES -->
-					<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+					<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 						<span class="material-symbols-outlined sidebar-icon">
 							payments
 						</span>
@@ -15672,7 +15671,7 @@
 	          </span>
 	        </a>
 					<!-- CASH FLOW -->
-	        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_balance_wallet
 	          </span>
@@ -15681,7 +15680,7 @@
 	          </span>
 	        </a>
 	        <!-- ASSET -->
-	        <a onclick="navigate('assetPage')">
+	        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            inventory_2
 	          </span>
@@ -15690,7 +15689,7 @@
 	          </span>
 	        </a>
 					<!-- DEBT & LIABILITIES -->
-	        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            request_quote
 	          </span>
@@ -15699,7 +15698,7 @@
 	          </span>
 	        </a>
 	        <!-- ACCOUNTING TAX -->
-	        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -15708,7 +15707,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTS RECEIVABLE -->
-	        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+	        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            receipt_long
 	          </span>
@@ -15717,7 +15716,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING -->
-					<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            account_tree
 	          </span>
@@ -15726,7 +15725,7 @@
 	          </span>
 	        </a>
 					<!-- JOURNAL ENTRIES -->
-					<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            menu_book
 	          </span>
@@ -15735,7 +15734,7 @@
 	          </span>
 	        </a>
 					<!-- ACCOUNTING REPORTS -->
-					<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+					<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
 	          <span class="material-symbols-outlined sidebar-icon">
 	            balance
 	          </span>
@@ -16219,7 +16218,7 @@
           </span>
         </a>
         <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -16228,7 +16227,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -16237,7 +16236,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -16246,7 +16245,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -16255,7 +16254,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -16264,7 +16263,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a class="active" onclick="navigate('accountingAccountsPage', { roles:['Owner'] })">
+				<a class="active accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -16273,7 +16272,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -16282,7 +16281,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -17032,7 +17031,7 @@
           </span>
         </a>
         <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -17041,7 +17040,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -17050,7 +17049,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -17059,7 +17058,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -17068,7 +17067,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -17077,7 +17076,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -17086,7 +17085,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a class="active" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="active accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -17095,7 +17094,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -17911,7 +17910,7 @@
           </span>
         </a>
         <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -17920,7 +17919,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -17929,7 +17928,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -17938,7 +17937,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -17947,7 +17946,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -17956,7 +17955,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -17965,7 +17964,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -17974,7 +17973,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a class="active" onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
+				<a class="active accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -18738,7 +18737,7 @@
           </span>
         </a>
         <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -18747,7 +18746,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -18756,7 +18755,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a class="active" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="active accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -18765,7 +18764,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -18774,7 +18773,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -18783,7 +18782,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -18792,7 +18791,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -18801,7 +18800,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -19794,7 +19793,7 @@
           </span>
         </a>
         <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -19803,7 +19802,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -19812,7 +19811,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" nclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -19821,7 +19820,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a class="active" onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
+        <a class="active accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -19830,7 +19829,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -19839,7 +19838,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -19848,7 +19847,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -19857,7 +19856,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -21851,7 +21850,7 @@
           </span>
         </a>
         <!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -21860,7 +21859,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -21869,7 +21868,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -21878,7 +21877,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -21887,7 +21886,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a class="active accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -21896,7 +21895,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -21905,7 +21904,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -21914,7 +21913,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
@@ -22835,7 +22834,7 @@
 					</span>
 				</a>
 				<!-- EXPENSES -->
-				<a onclick="navigate('expensessettingPage', { roles:['Owner','Admin','Accountant'] })">
+				<a class="operationalMenu" onclick="navigate('expensessettingPage', { roles:['Owner','Admin'] })">
 					<span class="material-symbols-outlined sidebar-icon">
 						payments
 					</span>
@@ -22881,7 +22880,7 @@
           </span>
         </a>
 				<!-- CASH FLOW -->
-        <a onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_balance_wallet
           </span>
@@ -22890,7 +22889,7 @@
           </span>
         </a>
         <!-- ASSET -->
-        <a onclick="navigate('assetPage')">
+        <a class="accountingMenu" onclick="navigate('assetPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             inventory_2
           </span>
@@ -22899,7 +22898,7 @@
           </span>
         </a>
 				<!-- DEBT & LIABILITIES -->
-        <a onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingDebtPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             request_quote
           </span>
@@ -22908,7 +22907,7 @@
           </span>
         </a>
         <!-- ACCOUNTING TAX -->
-        <a onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
+        <a class="accountingMenu" onclick="navigate('accountingTaxPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -22917,7 +22916,7 @@
           </span>
         </a>
 				<!-- ACCOUNTS RECEIVABLE -->
-        <a class="active" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
+        <a class="accountingMenu" onclick="navigate('accountingReceivablePage', { roles:['Owner'] })">
           <span class="material-symbols-outlined sidebar-icon">
             receipt_long
           </span>
@@ -22926,7 +22925,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING -->
-				<a onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingAccountsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             account_tree
           </span>
@@ -22935,7 +22934,7 @@
           </span>
         </a>
 				<!-- JOURNAL ENTRIES -->
-				<a onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             menu_book
           </span>
@@ -22944,7 +22943,7 @@
           </span>
         </a>
 				<!-- ACCOUNTING REPORTS -->
-				<a onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
+				<a class="accountingMenu" onclick="navigate('accountingReportsPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
             balance
           </span>
