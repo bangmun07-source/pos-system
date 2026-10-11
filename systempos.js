@@ -31385,6 +31385,7 @@ function updateAccountsReceivableOverview() {
 
 async function loadAccountsReceivableEmployees() {
   const select = document.getElementById("accountsReceivableEmployee");
+
   if (!select) {
     console.error("Element accountsReceivableEmployee tidak ditemukan");
     return;
@@ -31408,14 +31409,8 @@ async function loadAccountsReceivableEmployees() {
 
     const branchId =
       role === "owner"
-        ? (
-            document.getElementById("accountsReceivableFormBranch")?.value || null
-          )
-        : (
-            state.user?.branchId ||
-            state.user?.Branch_ID ||
-            null
-          );
+        ? (document.getElementById("accountsReceivableFormBranch")?.value || null)
+        : (state.user?.branchId || state.user?.Branch_ID || null);
 
     const { data, error } = await supabaseClient.rpc("get_employees", {
       p_session_id: sessionId,
@@ -31427,26 +31422,23 @@ async function loadAccountsReceivableEmployees() {
     if (error) throw error;
 
     const employees = Array.isArray(data) ? data : [];
+    const options = employees
+      .map(employee => ({
+        id: employee.Employee_ID || employee.employee_id,
+        name: employee.Full_Name || employee.full_name
+      }))
+      .filter(employee => employee.id && employee.name);
 
     select.innerHTML = '<option value="">Pilih karyawan</option>';
 
-    employees.forEach(employee => {
-      const employeeId =
-        employee.Employee_ID || employee.employee_id;
-
-      const employeeName =
-        employee.Full_Name || employee.full_name;
-
-      if (!employeeId || !employeeName) return;
-
+    options.forEach(employee => {
       const option = document.createElement("option");
-      option.value = employeeId;
-      option.textContent = employeeName;
-
+      option.value = employee.id;
+      option.textContent = employee.name;
       select.appendChild(option);
     });
 
-    if (select.options.length === 1) {
+    if (options.length === 0) {
       select.innerHTML = '<option value="">Tidak ada karyawan</option>';
       select.disabled = true;
       return;
@@ -31460,7 +31452,6 @@ async function loadAccountsReceivableEmployees() {
     select.disabled = true;
   }
 }
-
 
 /* ==== RECEIVABLE — TYPE CHANGE ==== */
 async function handleAccountsReceivableTypeChange() {
