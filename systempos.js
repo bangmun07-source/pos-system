@@ -31455,10 +31455,7 @@ async function loadAccountsReceivableEmployees() {
 
 /* ==== RECEIVABLE — TYPE CHANGE ==== */
 async function handleAccountsReceivableTypeChange() {
-  const typeEl = document.getElementById("accountsReceivableType");
-  if (!typeEl) return;
-
-  const type = typeEl.value;
+  const type = document.getElementById("accountsReceivableType")?.value;
   const partyEl = document.getElementById("accountsReceivableParty");
   const employeeEl = document.getElementById("accountsReceivableEmployee");
   const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
@@ -31466,37 +31463,40 @@ async function handleAccountsReceivableTypeChange() {
 
   if (referenceNoEl) referenceNoEl.value = "";
   if (referenceIdEl) referenceIdEl.value = "";
-  if (type === "EMPLOYEE") {
-    if (partyEl) {
-      partyEl.classList.add("hidden");
-      partyEl.value = "";
-    }
 
-    if (employeeEl) {
-      employeeEl.classList.remove("hidden");
-      await loadAccountsReceivableEmployees();
-    }
+  if (!partyEl || !employeeEl) {
+    console.error("Input party atau dropdown employee tidak ditemukan", {
+      partyEl,
+      employeeEl
+    });
     return;
   }
 
-  if (partyEl) {
-    partyEl.classList.remove("hidden");
+  if (type === "EMPLOYEE") {
+    partyEl.classList.add("hidden");
+    employeeEl.classList.remove("hidden");
 
-    if (type === "BUSINESS") {
-      partyEl.placeholder = "Nama customer / usaha";
-    } else if (type === "TAX") {
-      partyEl.placeholder = "Nama / jenis tax";
-    } else {
-      partyEl.placeholder = "Nama pihak";
-    }
+    // Tampilkan dropdown terlebih dahulu.
+    employeeEl.disabled = true;
+    employeeEl.innerHTML = '<option value="">Memuat karyawan...</option>';
+
+    await loadAccountsReceivableEmployees();
+    return;
   }
 
-  if (employeeEl) {
-    employeeEl.classList.add("hidden");
-    employeeEl.value = "";
-  }
+  // Tipe selain EMPLOYEE menggunakan input teks.
+  employeeEl.classList.add("hidden");
+  employeeEl.value = "";
+  partyEl.classList.remove("hidden");
+
+  const placeholders = {
+    BUSINESS: "Nama customer / usaha",
+    TAX: "Nama / jenis tax",
+    OTHER: "Nama pihak"
+  };
+
+  partyEl.placeholder = placeholders[type] || "Nama pihak";
 }
-
 
 
 function formatAccountsReceivableDate(value) {
