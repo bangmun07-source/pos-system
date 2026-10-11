@@ -31157,14 +31157,20 @@ async function loadAccountsReceivableFormBranches() {
     select.innerHTML =
       `<option value="">Loading branches...</option>`;
 
-    const { data, error } = await supabaseClient.rpc(
-      "get_expense_branches",
-      {
-        p_session_id: sessionId
-      }
-    );
-
-    if (error) throw error;
+    
+		const { data, error } = await supabaseClient.rpc(
+		  "get_expense_branches",
+		  {
+		    p_session_id: sessionId
+		  }
+		);
+		
+		console.log("AR FORM BRANCH RPC DATA:", data);
+		console.log("AR FORM BRANCH RPC ERROR:", error);
+		console.log("AR FORM USER ROLE:", state.user?.role);
+		console.log("AR FORM ACTIVE BRANCH:", state.branchId);
+		
+		if (error) throw error;
 
     const branches = typeof data === "string"
       ? JSON.parse(data)
