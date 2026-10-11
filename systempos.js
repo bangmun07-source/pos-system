@@ -31382,6 +31382,86 @@ function updateAccountsReceivableOverview() {
   if (overdueEl) { overdueEl.textContent = formatAccountingTaxCurrency( overdueOutstanding ); }
 }
 
+
+async function loadAccountsReceivableEmployees() {
+  const select = document.getElementById("accountsReceivableEmployee");
+  if (!select) {
+    console.error("Element accountsReceivableEmployee tidak ditemukan");
+    return;
+  }
+
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    select.innerHTML = '<option value="">Session tidak ditemukan</option>';
+    select.disabled = true;
+    return;
+  }
+
+  try {
+    select.disabled = true;
+    select.innerHTML = '<option value="">Memuat karyawan...</option>';
+
+    const role = String(
+      state.user?.role || state.user?.Role || ""
+    ).trim().toLowerCase();
+
+    const branchId =
+      role === "owner"
+        ? (
+            document.getElementById("accountsReceivableFormBranch")?.value || null
+          )
+        : (
+            state.user?.branchId ||
+            state.user?.Branch_ID ||
+            null
+          );
+
+    const { data, error } = await supabaseClient.rpc("get_employees", {
+      p_session_id: sessionId,
+      p_branch_id: branchId,
+      p_status: null,
+      p_search: null
+    });
+
+    if (error) throw error;
+
+    const employees = Array.isArray(data) ? data : [];
+
+    select.innerHTML = '<option value="">Pilih karyawan</option>';
+
+    employees.forEach(employee => {
+      const employeeId =
+        employee.Employee_ID || employee.employee_id;
+
+      const employeeName =
+        employee.Full_Name || employee.full_name;
+
+      if (!employeeId || !employeeName) return;
+
+      const option = document.createElement("option");
+      option.value = employeeId;
+      option.textContent = employeeName;
+
+      select.appendChild(option);
+    });
+
+    if (select.options.length === 1) {
+      select.innerHTML = '<option value="">Tidak ada karyawan</option>';
+      select.disabled = true;
+      return;
+    }
+
+    select.disabled = false;
+
+  } catch (error) {
+    console.error("loadAccountsReceivableEmployees:", error);
+    select.innerHTML = '<option value="">Gagal memuat karyawan</option>';
+    select.disabled = true;
+  }
+}
+
+
 /* ==== RECEIVABLE — TYPE CHANGE ==== */
 async function handleAccountsReceivableTypeChange() {
   const typeEl = document.getElementById("accountsReceivableType");
@@ -31405,7 +31485,6 @@ async function handleAccountsReceivableTypeChange() {
       employeeEl.classList.remove("hidden");
       await loadAccountsReceivableEmployees();
     }
-
     return;
   }
 
