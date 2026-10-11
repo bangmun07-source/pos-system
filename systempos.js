@@ -32318,7 +32318,7 @@ window.switchEmployeeModule = function(module) {
 	const managementTab = document.getElementById('employeeManagementTab');
 	const payrollTab = document.getElementById('payrollAttendanceTab');
 	const role = String(state.user?.role || '').trim().toLowerCase();
-	const canAccessPayroll = ['owner', 'accounting'].includes(role);
+	const canAccessPayroll = ['owner', 'Accountant'].includes(role);
 	
 	// Sembunyikan tab Payroll untuk role yang tidak diizinkan
 	payrollTab?.classList.toggle('hidden', !canAccessPayroll);
