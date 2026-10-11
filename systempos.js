@@ -33949,7 +33949,6 @@ async function openScheduleModal(schedule = null) {
     return;
   }
   const modal = document.getElementById('scheduleModal');
-  const modal = document.getElementById('scheduleModal');
   if (!modal) {
     console.error('scheduleModal tidak ditemukan.');
     return;
