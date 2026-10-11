@@ -31777,7 +31777,7 @@ async function saveAccountsReceivable(
     /* --- GET FORM VALUE --- */
     const typeEl = document.getElementById("accountsReceivableType");
     const partyEl = document.getElementById("accountsReceivableParty");
-    const employeeEl = document.getElementById("accountsReceivableEmployee");
+    const employeeEl = document.getElementById("accountsReceivableEmployeeSelect");
     const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
     const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
     const dateEl = document.getElementById("accountsReceivableDate");
