@@ -31135,142 +31135,72 @@ async function loadAccountsReceivableBranchFilters() {
   } catch (error) { }
 }
 
-
 async function loadAccountsReceivableFormBranches() {
-  const select = document.getElementById(
-    "accountsReceivableFormBranch"
-  );
-
+  const select = document.getElementById("accountsReceivableFormBranch");
   if (!select) return;
 
   const sessionId = localStorage.getItem("pos_session_id");
 
   if (!sessionId) {
-    select.innerHTML =
-      `<option value="">Session tidak ditemukan</option>`;
+    select.innerHTML = '<option value="">Session tidak ditemukan</option>';
     select.disabled = true;
     return;
   }
 
   try {
     select.disabled = true;
-    select.innerHTML =
-      `<option value="">Loading branches...</option>`;
+    select.innerHTML = '<option value="">Memuat outlet...</option>';
 
-    
-		const { data, error } = await supabaseClient.rpc(
-		  "get_expense_branches",
-		  {
-		    p_session_id: sessionId
-		  }
-		);
-		
-		console.log("AR FORM BRANCH RPC DATA:", data);
-		console.log("AR FORM BRANCH RPC ERROR:", error);
-		console.log("AR FORM USER ROLE:", state.user?.role);
-		console.log("AR FORM ACTIVE BRANCH:", state.branchId);
-		
-		if (error) throw error;
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_branches",
+      { p_session_id: sessionId }
+    );
 
-    const branches = typeof data === "string"
-      ? JSON.parse(data)
-      : (data || []);
+    if (error) throw error;
 
-    const role = String(state.user?.role || "").trim();
-    const activeBranchId = String(state.branchId || "").trim();
+    const branches = typeof data === "string" ? JSON.parse(data) : data;
+    const role = String(
+      state.user?.role || state.user?.Role || ""
+    ).trim().toLowerCase();
 
-    select.innerHTML = "";
+    if (!["owner", "accountant"].includes(role)) {
+      select.innerHTML = '<option value="">Role tidak diizinkan</option>';
+      select.disabled = true;
+      showToast("Role tidak memiliki akses membuat piutang.", "error");
+      return;
+    }
 
     if (!Array.isArray(branches) || branches.length === 0) {
-      select.innerHTML =
-        `<option value="">Tidak ada outlet tersedia</option>`;
+      select.innerHTML = '<option value="">Tidak ada outlet tersedia</option>';
       select.disabled = true;
       return;
     }
 
-    if (role === "Owner") {
-      // Owner dapat memilih satu outlet untuk piutang ini.
-      select.innerHTML =
-        `<option value="">Pilih outlet</option>`;
+    select.innerHTML = '<option value="">Pilih outlet</option>';
 
-      branches.forEach(branch => {
-        const branchId = String(branch.id || "").trim();
-
-        if (!branchId) return;
-
-        const option = document.createElement("option");
-        option.value = branchId;
-        option.textContent =
-          branch.name || branchId;
-
-        select.appendChild(option);
-      });
-
-      // Pilih outlet aktif sebagai nilai awal jika tersedia.
-      const activeBranchExists = [...select.options].some(
-        option => option.value === activeBranchId
-      );
-
-      if (activeBranchExists) {
-        select.value = activeBranchId;
-      }
-
-      select.disabled = false;
-
-    } else if (role === "Accountant") {
-      // Accountant hanya menggunakan outlet aktif.
-      const activeBranch = branches.find(
-        branch =>
-          String(branch.id || "").trim() === activeBranchId
-      );
-
-      if (!activeBranch || !activeBranchId) {
-        select.innerHTML =
-          `<option value="">Outlet aktif tidak ditemukan</option>`;
-        select.disabled = true;
-        showToast(
-          "Outlet aktif tidak ditemukan dalam daftar outlet.",
-          "error"
-        );
-        return;
-      }
+    branches.forEach(branch => {
+      const branchId = String(branch.id || "").trim();
+      if (!branchId) return;
 
       const option = document.createElement("option");
-      option.value = activeBranchId;
-      option.textContent =
-        activeBranch.name || activeBranchId;
-
+      option.value = branchId;
+      option.textContent = branch.name || branchId;
       select.appendChild(option);
-      select.value = activeBranchId;
-      select.disabled = true;
+    });
 
-    } else {
-      select.innerHTML =
-        `<option value="">Role tidak diizinkan</option>`;
-      select.disabled = true;
-
-      showToast(
-        "Role tidak memiliki akses membuat piutang.",
-        "error"
-      );
-    }
+    // Owner dan Accountant memiliki branchId ALL.
+    // Jangan memilih outlet secara otomatis.
+    select.value = "";
+    select.disabled = false;
 
   } catch (error) {
-    console.error(
-      "loadAccountsReceivableFormBranches:",
-      error
-    );
-
-    select.innerHTML =
-      `<option value="">Gagal memuat outlet</option>`;
+    console.error("loadAccountsReceivableFormBranches:", error);
+    select.innerHTML = '<option value="">Gagal memuat outlet</option>';
     select.disabled = true;
-
-    showToast(
-      "Gagal memuat daftar outlet.",
-      "error"
-    );
+    showToast("Gagal memuat daftar outlet.", "error");
   }
 }
+
 
 async function loadAccountsReceivableRecords() {
   try {
@@ -31385,11 +31315,9 @@ function updateAccountsReceivableOverview() {
 
 async function loadAccountsReceivableEmployees() {
   const select = document.getElementById("accountsReceivableEmployee");
+  const branchSelect = document.getElementById("accountsReceivableFormBranch");
 
-  if (!select) {
-    console.error("Element accountsReceivableEmployee tidak ditemukan");
-    return;
-  }
+  if (!select || !branchSelect) return;
 
   const sessionId = localStorage.getItem("pos_session_id");
 
@@ -31399,18 +31327,17 @@ async function loadAccountsReceivableEmployees() {
     return;
   }
 
+  const branchId = String(branchSelect.value || "").trim();
+
+  if (!branchId) {
+    select.innerHTML = '<option value="">Pilih outlet terlebih dahulu</option>';
+    select.disabled = true;
+    return;
+  }
+
   try {
     select.disabled = true;
     select.innerHTML = '<option value="">Memuat karyawan...</option>';
-
-    const role = String(
-      state.user?.role || state.user?.Role || ""
-    ).trim().toLowerCase();
-
-    const branchId =
-      role === "owner"
-        ? (document.getElementById("accountsReceivableFormBranch")?.value || null)
-        : (state.user?.branchId || state.user?.Branch_ID || null);
 
     const { data, error } = await supabaseClient.rpc("get_employees", {
       p_session_id: sessionId,
@@ -31439,7 +31366,7 @@ async function loadAccountsReceivableEmployees() {
     });
 
     if (options.length === 0) {
-      select.innerHTML = '<option value="">Tidak ada karyawan</option>';
+      select.innerHTML = '<option value="">Tidak ada karyawan di outlet ini</option>';
       select.disabled = true;
       return;
     }
@@ -31461,30 +31388,19 @@ async function handleAccountsReceivableTypeChange() {
   const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
   const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
 
+  if (!partyEl || !employeeEl) return;
+
   if (referenceNoEl) referenceNoEl.value = "";
   if (referenceIdEl) referenceIdEl.value = "";
-
-  if (!partyEl || !employeeEl) {
-    console.error("Input party atau dropdown employee tidak ditemukan", {
-      partyEl,
-      employeeEl
-    });
-    return;
-  }
 
   if (type === "EMPLOYEE") {
     partyEl.classList.add("hidden");
     employeeEl.classList.remove("hidden");
 
-    // Tampilkan dropdown terlebih dahulu.
-    employeeEl.disabled = true;
-    employeeEl.innerHTML = '<option value="">Memuat karyawan...</option>';
-
     await loadAccountsReceivableEmployees();
     return;
   }
 
-  // Tipe selain EMPLOYEE menggunakan input teks.
   employeeEl.classList.add("hidden");
   employeeEl.value = "";
   partyEl.classList.remove("hidden");
