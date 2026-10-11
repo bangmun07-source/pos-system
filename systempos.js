@@ -32928,9 +32928,6 @@ document.addEventListener('change', function (event) {
   reader.readAsDataURL(file);
 });
 
-
-/* ==== LOAD EMPLOYEES ==== */
-
 /* ==== LOAD EMPLOYEES ==== */
 async function loadEmployees() {
   try {
@@ -32993,34 +32990,35 @@ async function loadEmployees() {
 
 /* === FILTER EMPLOYEES === */
 window.filterEmployees = async function () {
-  const search = document.getElementById('employeeSearch')
-		?.value
-		?.trim()
-		.toLowerCase() || '';
-  const status = document.getElementById('employeeStatusFilter') ?.value || '';
-  /* === OWNER: LOAD ULANG SESUAI BRANCH DROPDOWN === */
-  if (state.user.role === 'Owner') {
+  const role = String(
+    state.user?.role || state.user?.Role || ''
+  ).trim().toLowerCase();
+
+  const search = (
+    document.getElementById('employeeSearch')?.value || ''
+  ).trim().toLowerCase();
+
+  const status =
+    document.getElementById('employeeStatusFilter')?.value || '';
+
+  // Owner dan Accountant: muat ulang sesuai outlet yang dipilih
+  if (['owner', 'accountant'].includes(role)) {
     await loadEmployees();
   }
-  /* === SEARCH + STATUS FILTER === */
+
   filteredEmployeeData = employeeData.filter(employee => {
     const searchMatch =
       !search ||
-      String(employee.Full_Name || '')
-        .toLowerCase()
-        .includes(search) ||
-      String(employee.Employee_Code || '')
-        .toLowerCase()
-        .includes(search) ||
-      String(employee.Position || '')
-        .toLowerCase()
-        .includes(search);
+      String(employee.Full_Name || '').toLowerCase().includes(search) ||
+      String(employee.Employee_Code || '').toLowerCase().includes(search) ||
+      String(employee.Position || '').toLowerCase().includes(search);
+
     const statusMatch =
-      !status ||
-      employee.Status === status;
+      !status || employee.Status === status;
 
     return searchMatch && statusMatch;
   });
+
   employeeCurrentPage = 1;
   renderEmployeeTable();
 };
