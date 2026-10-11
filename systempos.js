@@ -32366,9 +32366,11 @@ async function loadEmployeeBranches() {
     const modalSelect = document.getElementById("employeeBranch");
     const filterSelect = document.getElementById("employeeBranchFilter");
 		const scheduleBranchSelect = document.getElementById("scheduleBranch");
-    const role = state.user.role;
+    const role = String(
+		  state.user?.role || state.user?.Role || ''
+		).trim().toLowerCase();
 
-    if (role === "Owner") {
+    if (role === "owner" || role === "accountant") {
       // MODAL NEW EMPLOYEE
       if (modalSelect) {
         modalSelect.innerHTML = `<option value="">Select Outlet</option>`;
@@ -32386,7 +32388,6 @@ async function loadEmployeeBranches() {
         });
         modalSelect.disabled = false;
       }
-
       // FILTER EMPLOYEE
       if (filterSelect) {
         filterSelect.innerHTML = `<option value="">All Branch</option>`;
@@ -32533,17 +32534,30 @@ window.openEmployeeActionModal = function (employeeId) {
     };
   }
   /* === DELETE === */
-  const deleteButton = document.getElementById('employeeActionDelete');
-
-  if (deleteButton) {
-    deleteButton.onclick = function () {
-      closeEmployeeActionModal();
-      deleteEmployee(employeeId);
-    };
-  }
-  /* === OPEN MODAL === */
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+	const deleteButton = document.getElementById('employeeActionDelete');
+	
+	if (deleteButton) {
+	  deleteButton.onclick = function () {
+	    closeEmployeeActionModal();
+	    deleteEmployee(employeeId);
+	  };
+	}
+	// === ROLE PERMISSION ===
+	const role = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	const isAccountant = role === 'accountant';
+	// Accountant hanya boleh melihat detail
+	[editButton, attendanceButton, deleteButton].forEach(button => {
+	  button?.classList.toggle('hidden', isAccountant);
+	});
+	
+	// Salary hanya untuk Owner
+	salaryButton?.classList.toggle('hidden', role !== 'owner');
+	
+	/* === OPEN MODAL === */
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
 };
 
 
@@ -32916,6 +32930,8 @@ document.addEventListener('change', function (event) {
 
 
 /* ==== LOAD EMPLOYEES ==== */
+
+/* ==== LOAD EMPLOYEES ==== */
 async function loadEmployees() {
   try {
     const sessionId = localStorage.getItem('pos_session_id');
@@ -32923,32 +32939,51 @@ async function loadEmployees() {
     if (!sessionId) {
       throw new Error('Session POS tidak ditemukan.');
     }
+		
+    const role = String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase();
+    const canViewAllBranches = [
+      'owner',
+      'accountant'
+    ].includes(role);
+    const selectedBranch = String(
+      document.getElementById('employeeBranchFilter')?.value || ''
+    ).trim();
+    const branchFilter = canViewAllBranches
+      ? (selectedBranch || null)
+      : (state.user?.branchId || state.user?.Branch_ID || null);
 
-    const role = state.user.role;
-    const branchFilter = role === 'Owner'
-			? (document.getElementById('employeeBranchFilter')?.value || null)
-			: state.user.branchId;
-    const { data, error } =
-      await supabaseClient.rpc('get_employees', {
+    console.log('LOAD EMPLOYEES:', {
+      role,
+      branchFilter
+    });
+
+    const { data, error } = await supabaseClient.rpc(
+      'get_employees',
+      {
         p_session_id: sessionId,
         p_branch_id: branchFilter,
         p_status: null,
         p_search: null
-      });
+      }
+    );
 
-    if (error) { throw error; }
+    if (error) throw error;
 
-    employeeData = Array.isArray(data)
-      ? data
-      : [];
-
+    employeeData = Array.isArray(data) ? data : [];
     filteredEmployeeData = [...employeeData];
     employeeCurrentPage = 1;
+
+    console.log('EMPLOYEE RPC ROWS:', employeeData.length);
+    console.table(employeeData);
 
     renderEmployeeTable();
     updateEmployeeSummary();
 
   } catch (error) {
+    console.error('loadEmployees:', error);
+
     employeeData = [];
     filteredEmployeeData = [];
     renderEmployeeTable();
