@@ -31685,30 +31685,27 @@ function openAccountsReceivableRecordMenu(recordId) {
   modal.classList.add("flex");
 }
 
-
 /* ==== RECEIVABLE — NEW / SAVE DRAFT ===== */
+async function openAccountsReceivableModal() {
+  const modal = document.getElementById("accountsReceivableModal");
 
-function openAccountsReceivableModal() {
-  const modal = document.getElementById( "accountsReceivableModal" );
-
-  if (!modal) { return; }
+  if (!modal) return;
 
   // Reset form
-	const fields = [
-	"accountsReceivableType",
-	"accountsReceivableParty",
-	"accountsReceivableReferenceNo",
-	"accountsReceivableReferenceId",
-	"accountsReceivableDate",
-	"accountsReceivableDueDate",
-	"accountsReceivableAmount",
-	"accountsReceivableSourceMethod",
-	"accountsReceivableNote"
-	];
+  const fields = [
+    "accountsReceivableType",
+    "accountsReceivableParty",
+    "accountsReceivableReferenceNo",
+    "accountsReceivableReferenceId",
+    "accountsReceivableDate",
+    "accountsReceivableDueDate",
+    "accountsReceivableAmount",
+    "accountsReceivableSourceMethod",
+    "accountsReceivableNote"
+  ];
 
   fields.forEach(id => {
     const el = document.getElementById(id);
-
     if (!el) return;
 
     if (el.tagName === "SELECT") {
@@ -31719,12 +31716,14 @@ function openAccountsReceivableModal() {
   });
 
   // Default tanggal piutang = hari ini
-  const dateEl = document.getElementById( "accountsReceivableDate" );
+  const dateEl = document.getElementById("accountsReceivableDate");
 
   if (dateEl) { dateEl.value = new Date().toISOString().split("T")[0]; }
-
+  // Tampilkan popup
   modal.classList.remove("hidden");
   modal.classList.add("flex");
+  // Muat outlet untuk dropdown popup
+  await loadAccountsReceivableFormBranches();
 }
 
 function closeAccountsReceivableModal() {
