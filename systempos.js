@@ -31160,38 +31160,29 @@ async function loadAccountsReceivableFormBranches() {
 
     const branches = typeof data === "string" ? JSON.parse(data) : data;
     const role = String(
-      state.user?.role || state.user?.Role || ""
-    ).trim().toLowerCase();
-
-    if (!["owner", "accountant"].includes(role)) {
-      select.innerHTML = '<option value="">Role tidak diizinkan</option>';
-      select.disabled = true;
-      showToast("Role tidak memiliki akses membuat piutang.", "error");
-      return;
-    }
-
-    if (!Array.isArray(branches) || branches.length === 0) {
-      select.innerHTML = '<option value="">Tidak ada outlet tersedia</option>';
-      select.disabled = true;
-      return;
-    }
-
-    select.innerHTML = '<option value="">Pilih outlet</option>';
-
-    branches.forEach(branch => {
-      const branchId = String(branch.id || "").trim();
-      if (!branchId) return;
-
-      const option = document.createElement("option");
-      option.value = branchId;
-      option.textContent = branch.name || branchId;
-      select.appendChild(option);
-    });
-
-    // Owner dan Accountant memiliki branchId ALL.
-    // Jangan memilih outlet secara otomatis.
-    select.value = "";
-    select.disabled = false;
+	  state.user?.role || state.user?.Role || ""
+	).trim().toLowerCase();
+	
+	if (role !== "owner" && role !== "accountant") {
+	  select.innerHTML = '<option value="">Role tidak diizinkan</option>';
+	  select.disabled = true;
+	  return;
+	}
+	
+	select.innerHTML = '<option value="">Pilih outlet</option>';
+	
+	branches.forEach(branch => {
+	  const branchId = String(branch.id || "").trim();
+	  if (!branchId) return;
+	
+	  const option = document.createElement("option");
+	  option.value = branchId;
+	  option.textContent = branch.name || branchId;
+	  select.appendChild(option);
+	});
+	
+	select.value = "";
+	select.disabled = false;
 
   } catch (error) {
     console.error("loadAccountsReceivableFormBranches:", error);
@@ -31385,25 +31376,32 @@ async function handleAccountsReceivableTypeChange() {
   const type = document.getElementById("accountsReceivableType")?.value;
   const partyEl = document.getElementById("accountsReceivableParty");
   const employeeEl = document.getElementById("accountsReceivableEmployee");
-  const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
-  const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
 
-  if (!partyEl || !employeeEl) return;
+  if (!partyEl || !employeeEl) {
+    console.error("Input Party atau Employee tidak ditemukan");
+    return;
+  }
 
-  if (referenceNoEl) referenceNoEl.value = "";
-  if (referenceIdEl) referenceIdEl.value = "";
+  document.getElementById("accountsReceivableReferenceNo").value = "";
+  document.getElementById("accountsReceivableReferenceId").value = "";
 
   if (type === "EMPLOYEE") {
     partyEl.classList.add("hidden");
+    partyEl.style.display = "none";
+
     employeeEl.classList.remove("hidden");
+    employeeEl.style.display = "block";
 
     await loadAccountsReceivableEmployees();
     return;
   }
 
   employeeEl.classList.add("hidden");
+  employeeEl.style.display = "none";
   employeeEl.value = "";
+
   partyEl.classList.remove("hidden");
+  partyEl.style.display = "";
 
   const placeholders = {
     BUSINESS: "Nama customer / usaha",
@@ -31755,11 +31753,10 @@ function closeAccountsReceivableModal() {
 
 /* ==== SAVE RECEIVABLE AS DRAFT ==== */
 
-async function saveAccountsReceivable() {
-  const button = document.getElementById( "saveAccountsReceivableButton" );
-
+async function saveAccountsReceivable(
+  button = document.getElementById("saveAccountsReceivableButton")
+) {
   try {
-
     if (button) {
       button.disabled = true;
       button.dataset.originalText = button.innerHTML;
@@ -31773,101 +31770,152 @@ async function saveAccountsReceivable() {
 
     const sessionId = localStorage.getItem("pos_session_id");
 
-    if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
 
     /* --- GET FORM VALUE --- */
-    const typeEl = document.getElementById( "accountsReceivableType" );
-    const partyEl = document.getElementById( "accountsReceivableParty" );
-    const referenceNoEl = document.getElementById( "accountsReceivableReferenceNo" );
-    const referenceIdEl = document.getElementById( "accountsReceivableReferenceId" );
-    const dateEl = document.getElementById( "accountsReceivableDate" );
-    const dueDateEl = document.getElementById( "accountsReceivableDueDate" );
-    const amountEl = document.getElementById( "accountsReceivableAmount" );
-		const sourceMethodEl = document.getElementById( "accountsReceivableSourceMethod" );
-    const noteEl = document.getElementById( "accountsReceivableNote" );
-    const arType = typeEl?.value?.trim();
-    const partyName = partyEl?.value?.trim();
+    const typeEl = document.getElementById("accountsReceivableType");
+    const partyEl = document.getElementById("accountsReceivableParty");
+    const employeeEl = document.getElementById("accountsReceivableEmployee");
+    const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
+    const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
+    const dateEl = document.getElementById("accountsReceivableDate");
+    const dueDateEl = document.getElementById("accountsReceivableDueDate");
+    const amountEl = document.getElementById("accountsReceivableAmount");
+    const sourceMethodEl = document.getElementById("accountsReceivableSourceMethod");
+    const noteEl = document.getElementById("accountsReceivableNote");
+
+    const arType = typeEl?.value?.trim() || "";
+
+    const employeeId =
+      arType === "EMPLOYEE"
+        ? employeeEl?.value?.trim() || null
+        : null;
+
+    const partyName =
+      arType === "EMPLOYEE"
+        ? employeeEl?.selectedOptions?.[0]?.textContent?.trim() || ""
+        : partyEl?.value?.trim() || "";
+
     const referenceNo = referenceNoEl?.value?.trim() || null;
     const referenceId = referenceIdEl?.value?.trim() || null;
     const arDate = dateEl?.value || null;
     const dueDate = dueDateEl?.value || null;
-    const totalAmount = Number( String(amountEl?.value || "") .replace(/[^\d]/g, "") );
-    const sourceMethod = sourceMethodEl?.value?.trim();
-		const note = noteEl?.value?.trim() || null;
-	
-		/* --- VALIDATION --- */
-		if (!arType) {
-		  showToast( "Pilih tipe piutang.", "error" );
-		  return; }
-		if (!partyName) {
-		  showToast( "Nama pihak wajib diisi.", "error" );
-		  return; }
-		if (!arDate) {
-		  showToast( "Tanggal piutang wajib diisi.", "error" );
-		  return; }
-		if (!totalAmount || totalAmount <= 0) {
-		  showToast( "Nominal piutang harus lebih dari 0.", "error" );
-		  return; }
-		if (!sourceMethod) {
-		  showToast( "Pilih payment method.", "error" );
-		  return; }
-		if ( !["CASH", "BANK", "QRIS"].includes( sourceMethod ) ) {
-		  showToast( "Payment method tidak valid.", "error" );
-		  return; }
-		
-		const branchId = document
-			.getElementById("accountsReceivableFormBranch")
-			?.value || null;
-		
-		if (!branchId) {
-			showToast("Pilih outlet terlebih dahulu.", "error");
-			return;
-		}
 
-    const { data, error } =
-      await supabaseClient.rpc(
-        "save_accounts_receivable",
-        {
-          p_session_id: sessionId,
-          p_branch_id: branchId,
-          p_ar_type: arType,
-          p_party_id: null,
-          p_party_name: partyName,
-          p_reference_id: referenceId,
-          p_reference_no: referenceNo,
-          p_ar_date: arDate,
-          p_due_date: dueDate,
-          p_total_amount: totalAmount,
-					p_source_method: sourceMethod,
-          p_note: note
-        }
+    const totalAmount = Number(
+      String(amountEl?.value || "").replace(/[^\d]/g, "")
+    );
+
+    const sourceMethod = sourceMethodEl?.value?.trim() || "";
+    const note = noteEl?.value?.trim() || null;
+
+    /* --- VALIDATION --- */
+    if (!arType || !["EMPLOYEE", "BUSINESS", "TAX", "OTHER"].includes(arType)) {
+      showToast("Pilih tipe piutang yang valid.", "error");
+      return;
+    }
+
+    if (arType === "EMPLOYEE" && !employeeId) {
+      showToast("Pilih karyawan terlebih dahulu.", "error");
+      return;
+    }
+
+    if (!partyName) {
+      showToast("Nama pihak wajib diisi.", "error");
+      return;
+    }
+
+    if (!arDate) {
+      showToast("Tanggal piutang wajib diisi.", "error");
+      return;
+    }
+
+    if (!totalAmount || totalAmount <= 0) {
+      showToast("Nominal piutang harus lebih dari 0.", "error");
+      return;
+    }
+
+    if (!sourceMethod) {
+      showToast("Pilih payment method.", "error");
+      return;
+    }
+
+    if (!["CASH", "BANK", "QRIS"].includes(sourceMethod)) {
+      showToast("Payment method tidak valid.", "error");
+      return;
+    }
+
+    /* --- BRANCH --- */
+    const branchId = document
+      .getElementById("accountsReceivableFormBranch")
+      ?.value || null;
+
+    if (!branchId) {
+      showToast("Pilih outlet terlebih dahulu.", "error");
+      return;
+    }
+
+    /* --- SAVE RPC --- */
+    const { data, error } = await supabaseClient.rpc(
+      "save_accounts_receivable",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_ar_type: arType,
+        p_party_id: employeeId,
+        p_party_name: partyName,
+        p_reference_id: referenceId,
+        p_reference_no: referenceNo,
+        p_ar_date: arDate,
+        p_due_date: dueDate,
+        p_total_amount: totalAmount,
+        p_source_method: sourceMethod,
+        p_note: note
+      }
+    );
+
+    if (error) {
+      throw new Error(
+        error.message || "Gagal menyimpan piutang."
       );
+    }
 
-    if (error) { throw new Error( error.message || "Gagal menyimpan piutang." ); }
-		state.accountsReceivableData = null;
-		state.accountsReceivableFilter = null;
-		
-		await loadAccountsReceivableRecords();
+    /* --- REFRESH DATA --- */
+    state.accountsReceivableData = null;
+    state.accountsReceivableFilter = null;
+
+    await loadAccountsReceivableRecords();
+
     closeAccountsReceivableModal();
-		
-    showToast( "Piutang berhasil disimpan sebagai Draft.", "success" );
 
-    if ( typeof loadAccountsReceivableRecords === "function" )
-			{ await loadAccountsReceivableRecords(); }
-    if ( typeof renderAccountsReceivableRecords === "function" ) 
-			{ renderAccountsReceivableRecords(); }
-  } catch (err) {
     showToast(
-      err.message ||
-      "Gagal menyimpan piutang.",
+      "Piutang berhasil disimpan sebagai Draft.",
+      "success"
+    );
+
+    if (typeof loadAccountsReceivableRecords === "function") {
+      await loadAccountsReceivableRecords();
+    }
+
+    if (typeof renderAccountsReceivableRecords === "function") {
+      renderAccountsReceivableRecords();
+    }
+
+  } catch (err) {
+    console.error("saveAccountsReceivable:", err);
+
+    showToast(
+      err.message || "Gagal menyimpan piutang.",
       "error"
     );
 
   } finally {
-    if (button) { button.disabled = false;
+    if (button) {
+      button.disabled = false;
+
       if (button.dataset.originalText) {
-        button.innerHTML =
-          button.dataset.originalText;
+        button.innerHTML = button.dataset.originalText;
       }
     }
   }
