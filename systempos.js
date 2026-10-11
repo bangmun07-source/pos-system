@@ -34110,14 +34110,9 @@ function saveCurrentScheduleDayData() {
 
 
 window.saveSchedule = async function() {
-  const currentRole = String(
-    state.user?.role || state.user?.Role || ''
-  ).trim().toLowerCase();
+  const currentRole = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
 
-  if (currentRole === 'accountant') {
-    alert('Accountant hanya dapat membaca data Schedule.');
-    return;
-  }
+  if (currentRole === 'accountant') { alert('Accountant hanya dapat membaca data Schedule.'); return; }
 
   const sessionId = localStorage.getItem('pos_session_id');
   const branchSelect = document.getElementById('scheduleBranch');
@@ -34207,7 +34202,7 @@ window.saveSchedule = async function() {
       );
 
 
-    if (error) { alert( error.message || 'Gagal menyimpan schedule.' ); return; 
+    if (error) { alert( error.message || 'Gagal menyimpan schedule.' ); return; }
 
     alert( editingScheduleWeek
 			? 'Schedule berhasil diperbarui.'
