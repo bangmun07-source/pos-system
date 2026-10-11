@@ -24769,7 +24769,6 @@ function initAccountingFiscalYear() {
     const option = document.createElement("option");
     option.value = year;
     option.textContent = year;
-
     select.appendChild(option);
   }
 
@@ -24784,23 +24783,14 @@ async function closeFiscalYear() {
     return;
   }
 
-  const fiscalYearEl =
-    document.getElementById("accountingFiscalYear");
+  const fiscalYearEl = document.getElementById("accountingFiscalYear");
+  const button = document.getElementById("closeFiscalYearButton");
 
-  const button =
-    document.getElementById("closeFiscalYearButton");
-
-  if (!fiscalYearEl) {
-    alert("Fiscal Year tidak ditemukan.");
-    return;
-  }
+  if (!fiscalYearEl) { alert("Fiscal Year tidak ditemukan."); return; }
 
   const fiscalYear = Number(fiscalYearEl.value);
 
-  if (!fiscalYear) {
-    alert("Fiscal Year tidak valid.");
-    return;
-  }
+  if (!fiscalYear) { alert("Fiscal Year tidak valid."); return; }
 
   const confirmed = confirm(
     `Tutup buku tahun ${fiscalYear} untuk SEMUA branch?\n\n` +
@@ -24828,19 +24818,13 @@ async function closeFiscalYear() {
       }
     );
 
-    if (error) {
-      console.error("Close fiscal year error:", error);
-      throw error;
-    }
-
-    console.log("Close fiscal year result:", data);
-
+    if (error) { throw error; }
+		
     const results = Array.isArray(data?.results)
       ? data.results
       : [];
 
-    let message =
-      `Fiscal Year ${fiscalYear} berhasil ditutup.\n\n`;
+    let message = `Fiscal Year ${fiscalYear} berhasil ditutup.\n\n`;
 
     results.forEach(item => {
       message +=
@@ -24850,28 +24834,12 @@ async function closeFiscalYear() {
     });
 
     alert(message);
-
-    /*
-     * Clear accounting report cache
-     * supaya report tidak menggunakan data lama.
-     */
     state.accountingReportsData = null;
     state.accountingReportsFilter = null;
-
-    /*
-     * Reload seluruh halaman.
-     * Ini memastikan Trial Balance,
-     * P&L, dan Balance Sheet membaca data terbaru.
-     */
     location.reload();
-
+		
   } catch (error) {
-    console.error("Fiscal year closing error:", error);
-
-    alert(
-      error?.message ||
-      "Gagal melakukan fiscal year closing."
-    );
+    alert( error?.message || "Gagal melakukan fiscal year closing." );
 
     if (button) {
       button.disabled = false;
@@ -25132,26 +25100,11 @@ async function loadBalanceSheetCurrentProfit() {
       }
     );
 
-  if (closingError) {
-    console.error(
-      "Check fiscal year closing error:",
-      closingError
-    );
-    throw closingError;
-  }
-
-  /* === SUDAH CLOSING
-     Current Year Earnings = 0 ==== */
-
-  if (isClosed === true) {
-    return 0;
-  }
-
-  /* === BELUM CLOSING
-     Current Year Earnings = P&L ==== */
-
+  if (closingError) { throw closingError; }
+  /* === SUDAH CLOSING Current Year Earnings = 0 ==== */
+  if (isClosed === true) { return 0; }
+  /* === BELUM CLOSING Current Year Earnings = P&L ==== */
   const fromDate = `${year}-01-01`;
-
   const { data, error } = await supabaseClient.rpc(
     "get_profit_loss",
     {
@@ -25179,17 +25132,8 @@ async function loadBalanceSheetCurrentProfit() {
     const accountType = row.accountType;
     const accountCode = String(row.accountCode || "");
 
-    /* REVENUE */
-    if (accountType === "REVENUE") {
-      revenue += amount;
-      return;
-    }
-    /* COGS */
-    if (accountType === "COGS") {
-      cogs += amount;
-      return;
-    }
-    /* EXPENSE */
+    if (accountType === "REVENUE") { revenue += amount; return; }
+    if (accountType === "COGS") { cogs += amount; return; }
     if (accountType === "EXPENSE") {
       if (
         accountCode === "6100" ||
@@ -25205,7 +25149,6 @@ async function loadBalanceSheetCurrentProfit() {
   const grossProfit = revenue - cogs;
   const totalExpenses = operatingExpenses + otherExpenses;
   const netProfit = grossProfit - totalExpenses;
-
   return netProfit;
 }
 
@@ -25243,21 +25186,7 @@ function renderBalanceSheet(result, profitLossResult) {
   const accounts = Array.isArray(result?.accounts)
     ? result.accounts
     : [];
-
-	console.log("BS ACCOUNTS AFTER CLOSING:", accounts);
-	console.log(
-		"RETAINED EARNINGS:",
-		accounts.filter(a => a.accountCode === "3400")
-	);
-
-  const currentProfit = Number(
-    result?.currentProfit ?? 0
-  );
-
-  console.log("BS currentProfit:", currentProfit);
-  console.log("BS result.currentProfit:", result?.currentProfit);
-  console.log("P&L selected-period netProfit:", profitLossResult?.netProfit);
-  /* ==== GROUP ACCOUNTS ==== */
+  const currentProfit = Number( result?.currentProfit ?? 0 );
   const currentAssets = [];
   const nonCurrentAssets = [];
   const currentLiabilities = [];
@@ -25656,12 +25585,7 @@ async function initAccountingReports() {
     await populateAccountingReportsBranches();
     await loadAccountingReports();
     accountingReportsInitialized = true;
-  } catch (error) {
-		console.error(
-      "Accounting Reports init error:",
-      error
-    );
-	}
+  } catch (error) { }
 }
 
 function getAccountingReportExportDate() {
@@ -26726,12 +26650,7 @@ async function loadDebtLiabilityBranchFilters() {
       select.appendChild(option);
     });
 
-  } catch (error) {
-    console.error(
-      "loadDebtLiabilityBranchFilters:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 function initDebtLiabilityFilters() {
@@ -26766,40 +26685,31 @@ function initDebtLiabilityFilters() {
 }
 
 async function reloadDebtLiabilityData() {
-    try {
-        const filter = getDebtLiabilityFilter();
+	try {
+		const filter = getDebtLiabilityFilter();
 
-        if (
-            filter.periodFrom &&
-            filter.periodTo &&
-            filter.periodFrom > filter.periodTo
-        ) {
-            showAccountingDebtMessage(
-                "Period From tidak boleh lebih besar dari Period To",
-                "error"
-            );
-            return;
-        }
+		if (
+			filter.periodFrom &&
+			filter.periodTo &&
+			filter.periodFrom > filter.periodTo
+		) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" );
+			return;
+		}
 
-        debtLiabilityFilter = filter;
-        state.accountingSupplierDebtData = null;
-        state.accountingSupplierDebtFilter = null;
-        state.accountingTaxPayableData = null;
-        state.accountingTaxPayableFilter = null;
-        state.accountingLiabilitiesData = null;
-        state.accountingLiabilitiesFilter = null;
+		debtLiabilityFilter = filter;
+		state.accountingSupplierDebtData = null;
+		state.accountingSupplierDebtFilter = null;
+		state.accountingTaxPayableData = null;
+		state.accountingTaxPayableFilter = null;
+		state.accountingLiabilitiesData = null;
+		state.accountingLiabilitiesFilter = null;
 
-        await loadSupplierDebt();
-        await loadLiabilities();
-        await loadTaxPayable();
-        await loadPpnPayments();
+		await loadSupplierDebt();
+		await loadLiabilities();
+		await loadTaxPayable();
+		await loadPpnPayments();
 
-    } catch (error) {
-        console.error(
-            "reloadDebtLiabilityData:",
-            error
-        );
-    }
+	} catch (error) { }
 }
 
 function initSupplierDebtFilters() {
@@ -27387,10 +27297,6 @@ async function loadTaxPayable() {
     updateTaxPayableUI();
 
   } catch (error) {
-    console.error(
-      "loadTaxPayable error:",
-      error
-    );
     taxPayableData = {
       accountId: "ACC-52FE300A7C2A",
       totalCredit: 0,
@@ -29181,15 +29087,8 @@ function renderTaxObligation(data) {
 /* ==== RECORD TAX OBLIGATION ==== */
 
 async function recordTaxObligation() {
-	console.log("Record PPh Final clicked");
 	
-	if (accountingTaxRecording) {
-	console.log(
-	"BLOCKED: accountingTaxRecording =",
-	accountingTaxRecording
-	);
-	return;
-	}
+	if (accountingTaxRecording) { return; }
 
   const sessionId = localStorage.getItem("pos_session_id");
 
@@ -31233,12 +31132,7 @@ async function loadAccountsReceivableBranchFilters() {
       select.appendChild(option);
     });
 
-  } catch (error) {
-    console.error(
-      "loadAccountsReceivableBranchFilters:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 async function loadAccountsReceivableRecords() {
@@ -32307,9 +32201,7 @@ async function initEmployeePage() {
       attendanceBranchFilter.dataset.handlerAttached = 'true';
     }
     await loadEmployeeOvertime();
-  } catch (error) {
-    console.error("initEmployeePage:", error);
-  }
+  } catch (error) { }
 }
 
 window.switchEmployeeModule = function(module) {
@@ -32473,12 +32365,7 @@ async function loadEmployeeBranches() {
 			  scheduleBranchSelect.disabled = true;
 			}
     }
-  } catch (error) {
-    console.error(
-      "loadEmployeeBranches:",
-      error
-    );
-  }
+  } catch (error) { }
 }
 
 /* ==== EMPLOYEE ACTION MODAL ==== */
@@ -32584,25 +32471,12 @@ window.deleteEmployee = async function (employeeId) {
         }
       );
 
-    if (error) {
-      console.error(
-        'delete_employee RPC error:',
-        error
-      );
-      throw error;
-    }
-
-    console.log('Employee deleted:', data);
-
+    if (error) { throw error; }
+		
     await loadEmployees();
     alert('Employee berhasil dihapus.');
 
   } catch (error) {
-    console.error(
-      'deleteEmployee:',
-      error
-    );
-
     alert(
       error?.message ||
       'Gagal menghapus employee.'
@@ -32933,29 +32807,14 @@ async function loadEmployees() {
   try {
     const sessionId = localStorage.getItem('pos_session_id');
 
-    if (!sessionId) {
-      throw new Error('Session POS tidak ditemukan.');
-    }
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 		
-    const role = String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase();
-    const canViewAllBranches = [
-      'owner',
-      'accountant'
-    ].includes(role);
-    const selectedBranch = String(
-      document.getElementById('employeeBranchFilter')?.value || ''
-    ).trim();
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const canViewAllBranches = [ 'owner', 'accountant' ].includes(role);
+    const selectedBranch = String( document.getElementById('employeeBranchFilter')?.value || '' ).trim();
     const branchFilter = canViewAllBranches
       ? (selectedBranch || null)
       : (state.user?.branchId || state.user?.Branch_ID || null);
-
-    console.log('LOAD EMPLOYEES:', {
-      role,
-      branchFilter
-    });
-
     const { data, error } = await supabaseClient.rpc(
       'get_employees',
       {
@@ -32972,15 +32831,10 @@ async function loadEmployees() {
     filteredEmployeeData = [...employeeData];
     employeeCurrentPage = 1;
 
-    console.log('EMPLOYEE RPC ROWS:', employeeData.length);
-    console.table(employeeData);
-
     renderEmployeeTable();
     updateEmployeeSummary();
 
   } catch (error) {
-    console.error('loadEmployees:', error);
-
     employeeData = [];
     filteredEmployeeData = [];
     renderEmployeeTable();
@@ -33924,8 +33778,6 @@ async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
            String(branchId || '').trim();
   });
 
-  console.log('Employee sesuai branch:', employees);
-
   employees.forEach(employee => {
     const option = document.createElement('option');
 
@@ -33949,10 +33801,7 @@ async function openScheduleModal(schedule = null) {
     return;
   }
   const modal = document.getElementById('scheduleModal');
-  if (!modal) {
-    console.error('scheduleModal tidak ditemukan.');
-    return;
-  }
+  if (!modal) { return; }
   initScheduleTimePickers();
   const role = state.user.role;
   const scheduleId = document.getElementById('scheduleId');
@@ -34057,15 +33906,6 @@ async function openScheduleModal(schedule = null) {
       String(row.Week_Start || '').substring(0, 10) ===
         String(selectedWeek || '').substring(0, 10)
     );
-
-    console.log('================================');
-    console.log('EDIT SCHEDULE');
-    console.log('Employee:', employeeId);
-    console.log('Week:', selectedWeek);
-    console.log('7 DATA TERSIMPAN:', savedWeekData);
-    console.table(savedWeekData);
-    console.log('================================');
-
     /*
      * Pastikan tanggal Senin-Minggu tersedia
      */
@@ -34100,13 +33940,7 @@ async function openScheduleModal(schedule = null) {
         .trim()
         .toUpperCase();
 
-      if (!scheduleDayData[day]) {
-        console.warn(
-          'Hari tidak dikenali:',
-          row.Day_Of_Week
-        );
-        return;
-      }
+      if (!scheduleDayData[day]) { return; }
 
       scheduleDayData[day] = {
         active: row.Is_Active === true,
@@ -34122,13 +33956,7 @@ async function openScheduleModal(schedule = null) {
         break: Number(row.Break_Minutes || 0)
       };
     });
-
-    console.log(
-      'scheduleDayData SESUDAH EDIT LOAD:',
-      JSON.parse(
-        JSON.stringify(scheduleDayData)
-      )
-    );
+		
     selectedScheduleDay = 'MONDAY';
 
     updateScheduleDayButtons();
@@ -34159,12 +33987,9 @@ async function loadScheduleWeek( employeeId, weekStart ) {
 
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    console.error('Session ID tidak ditemukan.');
-    return; }
+  if (!sessionId) { return; }
 
   try {
-
     const { data, error } =
       await supabaseClient.rpc(
         'get_employee_schedule_week',
@@ -34175,96 +34000,62 @@ async function loadScheduleWeek( employeeId, weekStart ) {
         }
       );
 
-    if (error) {
-      console.error(
-        'get_employee_schedule_week:',
-        error
-      );
+    if (error) { alert( error.message || 'Gagal mengambil schedule.' ); return; }
 
-      alert(
-        error.message ||
-        'Gagal mengambil schedule.'
-      );
-      return;
-    }
-
-  resetScheduleWorkingDays();
-	const weekInput = document.getElementById('scheduleWeekStart');
+	  resetScheduleWorkingDays();
+		const weekInput = document.getElementById('scheduleWeekStart');
+		
+		if (weekInput) { weekInput.value = weekStart; }
+		
+		const monday = new Date(`${weekStart}T00:00:00`);
+		const days = [
+			'MONDAY',
+			'TUESDAY',
+			'WEDNESDAY',
+			'THURSDAY',
+			'FRIDAY',
+			'SATURDAY',
+			'SUNDAY'
+		];
 	
-	if (weekInput) { weekInput.value = weekStart; }
+		days.forEach((day, index) => {
+			const date = new Date(monday);
+			date.setDate(monday.getDate() + index);
+		
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const dayNumber = String(date.getDate()).padStart(2, '0');
+		
+			scheduleDayData[day].date =
+				`${year}-${month}-${dayNumber}`;
+		});
+		
+		(data || []).forEach(row => {
+		  const day = String(row.Day_Of_Week || '')
+		    .trim()
+		    .toUpperCase();
 	
-	const monday = new Date(`${weekStart}T00:00:00`);
-	const days = [
-		'MONDAY',
-		'TUESDAY',
-		'WEDNESDAY',
-		'THURSDAY',
-		'FRIDAY',
-		'SATURDAY',
-		'SUNDAY'
-	];
+		  if (!scheduleDayData[day]) { return; }
+		
+		  scheduleDayData[day] = {
+		    active: row.Is_Active === true,
+		    date: row.Schedule_Date || '',
+		    start: row.Is_Active === true
+		      ? formatScheduleTime(row.Start_Time)
+		      : '',
+		    end: row.Is_Active === true
+		      ? formatScheduleTime(row.End_Time)
+		      : '',
+		    break: Number(row.Break_Minutes || 0)
+		  };
+		});
 	
-	days.forEach((day, index) => {
-		const date = new Date(monday);
-		date.setDate(monday.getDate() + index);
-	
-		const year = date.getFullYear();
-		const month = String(date.getMonth() + 1).padStart(2, '0');
-		const dayNumber = String(date.getDate()).padStart(2, '0');
-	
-		scheduleDayData[day].date =
-			`${year}-${month}-${dayNumber}`;
-	});
-	
-	(data || []).forEach(row => {
-	  const day = String(row.Day_Of_Week || '')
-	    .trim()
-	    .toUpperCase();
-	
-	  console.log('Mapping schedule row:', {
-	    originalDay: row.Day_Of_Week,
-	    normalizedDay: day,
-	    row
-	  });
-	
-	  if (!scheduleDayData[day]) {
-	    console.warn(
-	      'DAY TIDAK DITEMUKAN DI scheduleDayData:',
-	      day
-	    );
-	    return;
-	  }
-	
-	  scheduleDayData[day] = {
-	    active: row.Is_Active === true,
-	    date: row.Schedule_Date || '',
-	    start: row.Is_Active === true
-	      ? formatScheduleTime(row.Start_Time)
-	      : '',
-	    end: row.Is_Active === true
-	      ? formatScheduleTime(row.End_Time)
-	      : '',
-	    break: Number(row.Break_Minutes || 0)
-	  };
-	});
-	
-	console.log(
-	  'scheduleDayData SETELAH LOAD:',
-	  JSON.parse(JSON.stringify(scheduleDayData))
-	);
- 
     selectedScheduleDay = 'MONDAY';
     updateScheduleDayButtons();
     loadSelectedScheduleDay();
 
   } catch (error) {
-    console.error(
-      'loadScheduleWeek:',
-      error
-    );
-    alert(
-      'Terjadi kesalahan saat mengambil schedule.'
-    );
+    alert( 'Terjadi kesalahan saat mengambil schedule.' );
   }
 }
 
@@ -34402,11 +34193,6 @@ window.saveSchedule = async function() {
   }
 
   try {
-		console.log('SAVE SCHEDULE PARAMS:', {
-		  branchId,
-		  employeeId,
-		  weekStart
-		});
     const { data, error } =
       await supabaseClient.rpc(
         'save_employee_schedule_week',
@@ -34420,52 +34206,26 @@ window.saveSchedule = async function() {
       );
 
 
-    if (error) {
-      console.error(
-        'save_employee_schedule_week:',
-        error
-      );
-      alert(
-        error.message ||
-        'Gagal menyimpan schedule.'
-      );
-      return;
-    }
-    console.log(
-      'Schedule saved:',
-      data
+    if (error) { alert( error.message || 'Gagal menyimpan schedule.' ); return; 
+
+    alert( editingScheduleWeek
+			? 'Schedule berhasil diperbarui.'
+			: 'Schedule berhasil disimpan.'
     );
 
-    alert(
-      editingScheduleWeek
-        ? 'Schedule berhasil diperbarui.'
-        : 'Schedule berhasil disimpan.'
-    );
-
-    if (
-      typeof loadSchedules === 'function'
-    ) { await loadSchedules(); }
+    if ( typeof loadSchedules === 'function' ) { await loadSchedules(); }
 
     closeScheduleModal();
-
+								
   } catch (error) {
-    console.error(
-      'saveSchedule:',
-      error
-    );
-    alert(
-      'Terjadi kesalahan saat menyimpan schedule.'
-    );
+    alert( 'Terjadi kesalahan saat menyimpan schedule.' );
   }
 }
 
 async function loadSchedules() {
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    console.error('Session ID tidak ditemukan.');
-    return;
-  }
+  if (!sessionId) { return; }
 
   try {
     const { data, error } = await supabaseClient.rpc(
@@ -34475,22 +34235,14 @@ async function loadSchedules() {
       }
     );
 
-    if (error) {
-      console.error('get_employee_schedules:', error);
-      alert(error.message || 'Gagal mengambil employee schedule.');
-      return;
-    }
+    if (error) { alert(error.message || 'Gagal mengambil employee schedule.'); return; }
 
     scheduleData = data || [];
-
-    console.log('Schedule data:', scheduleData);
 
     populateScheduleFilters();
     filterSchedules();
 
-  } catch (error) {
-    console.error('loadSchedules:', error);
-  }
+  } catch (error) { }
 }
 
 function populateScheduleFilters() {
@@ -35033,17 +34785,10 @@ const employeeAttendancePageSize = 10;
 async function loadEmployeeAttendance() {
   const sessionId = localStorage.getItem('pos_session_id');
 
-  if (!sessionId) {
-    console.error('Session tidak ditemukan.');
-    return;
-  }
+  if (!sessionId) { return; }
 
-	const role = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase();
-	const userBranchId = String(
-	  state.user?.branchId || state.user?.Branch_ID || ''
-	).trim();
+	const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+	const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
 	const canViewAllBranches = ['owner', 'accountant'].includes(role);
   const tbody = document.getElementById('employeeAttendanceTableBody');
 
@@ -35124,7 +34869,6 @@ async function loadEmployeeAttendance() {
 		populateEmployeeAttendanceFilters();
 		filterEmployeeAttendance();
   } catch (error) {
-    console.error('loadEmployeeAttendance:', error);
     if (tbody) {
       tbody.innerHTML = `
         <tr>
@@ -35544,9 +35288,9 @@ function openAttendanceAction(action, rowIndex) {
   };
   const showModal = modalId => {
     const modal = document.getElementById(modalId);
-    if (!modal) {
-      console.error(`Modal tidak ditemukan: ${modalId}`);
-      return; }
+		
+    if (!modal) { return; }
+		
     modal.classList.remove('hidden');
     modal.classList.add('flex');
   };
@@ -35718,7 +35462,6 @@ function closeAttendanceModal(modalId) {
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 }
-
 
 /* EXPORT CSV */
 function exportEmployeeAttendance() {
@@ -36087,6 +35830,450 @@ function initOvertimeTimePickers() {
     }
   });
 }
+
+
+/* =========================================================
+   ATTENDANCE RECAP — READ DATA
+========================================================= */
+
+let attendanceRecapData = [];
+let filteredAttendanceRecapData = [];
+let attendanceRecapCurrentPage = 1;
+const attendanceRecapPageSize = 10;
+
+function getAttendanceRecapRole() {
+  return String(
+    state.user?.role || state.user?.Role || ''
+  ).trim().toLowerCase();
+}
+
+function initAttendanceRecap() {
+  const periodInput = document.getElementById('recapPeriod');
+  const branchFilter = document.getElementById('recapBranchFilter');
+  const employeeFilter = document.getElementById('recapEmployeeFilter');
+
+  if (!periodInput || !branchFilter || !employeeFilter) return;
+
+  if (!periodInput.value) {
+    const now = new Date();
+    periodInput.value =
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  populateAttendanceRecapBranchFilter();
+  populateAttendanceRecapEmployeeFilter();
+
+  // Outlet berubah: perbarui daftar karyawan dan rekap.
+  branchFilter.onchange = async function () {
+    populateAttendanceRecapEmployeeFilter();
+    await loadAttendanceRecap();
+  };
+
+  employeeFilter.onchange = loadAttendanceRecap;
+  periodInput.onchange = loadAttendanceRecap;
+
+  return loadAttendanceRecap();
+}
+
+function populateAttendanceRecapBranchFilter() {
+  const branchFilter = document.getElementById('recapBranchFilter');
+  if (!branchFilter) return;
+
+  const role = getAttendanceRecapRole();
+  const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+  const canChooseBranch = ['owner', 'accountant'].includes(role);
+  const previousValue = branchFilter.value;
+  const branches = Array.isArray(employeeAttendanceBranches)
+    ? employeeAttendanceBranches
+    : [];
+
+  if (canChooseBranch) {
+    branchFilter.innerHTML = `
+      <option value="">All Outlets</option>
+      ${branches.map(branch => `
+        <option value="${escapeEmployeeHtml(branch.id || '')}">
+          ${escapeEmployeeHtml(branch.name || branch.id || 'Unnamed Branch')}
+        </option>
+      `).join('')}
+    `;
+
+    branchFilter.disabled = false;
+
+    branchFilter.value = [...branchFilter.options].some(
+      option => option.value === previousValue
+    ) ? previousValue : '';
+  } else {
+    const branch = branches.find(item => String(item.id || '').trim() === userBranchId );
+
+    branchFilter.innerHTML = `
+      <option value="${escapeEmployeeHtml(userBranchId)}">
+        ${escapeEmployeeHtml(branch?.name || userBranchId || 'Unnamed Branch')}
+      </option>
+    `;
+
+    branchFilter.value = userBranchId;
+    branchFilter.disabled = true;
+  }
+}
+
+function populateAttendanceRecapEmployeeFilter() {
+  const employeeFilter = document.getElementById('recapEmployeeFilter');
+  const branchFilter = document.getElementById('recapBranchFilter');
+
+  if (!employeeFilter) return;
+
+  const role = getAttendanceRecapRole();
+  const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+  const selectedBranch = String( branchFilter?.value || '' ).trim();
+  const canChooseBranch = ['owner', 'accountant'].includes(role);
+  const previousValue = employeeFilter.value;
+  const employees = new Map();
+
+  // Gunakan data Employee Management dan Schedule yang sudah dimuat.
+  const sourceRows = [
+    ...(Array.isArray(employeeData) ? employeeData : []),
+    ...(Array.isArray(scheduleData) ? scheduleData : [])
+  ];
+
+  sourceRows.forEach(row => {
+    const employeeId = String(row.Employee_ID || '').trim();
+    const rowBranch = String(row.Branch_ID || '').trim();
+
+    if (!employeeId) return;
+
+    if (canChooseBranch) {
+      if (selectedBranch && rowBranch !== selectedBranch) return;
+    } else if (rowBranch !== userBranchId) {
+      return;
+    }
+
+    employees.set(employeeId, {
+      id: employeeId,
+      name: row.Full_Name || employeeId,
+      code: row.Employee_Code || ''
+    });
+  });
+
+  employeeFilter.innerHTML = `
+    <option value="">All Employees</option>
+    ${[...employees.values()]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .map(employee => `
+        <option value="${escapeEmployeeHtml(employee.id)}">
+          ${escapeEmployeeHtml(
+            employee.code
+              ? `${employee.name} • ${employee.code}`
+              : employee.name
+          )}
+        </option>
+      `).join('')}
+  `;
+
+  employeeFilter.value = [...employeeFilter.options].some(
+    option => option.value === previousValue
+  ) ? previousValue : '';
+}
+
+async function loadAttendanceRecap() {
+  const sessionId = localStorage.getItem('pos_session_id');
+  const period = document.getElementById('recapPeriod')?.value || '';
+
+  if (!sessionId) {
+    console.error('Attendance Recap: session tidak ditemukan.');
+    return;
+  }
+
+  if (!/^\d{4}-\d{2}$/.test(period)) { return; }
+
+  const role = getAttendanceRecapRole();
+  const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+  const canChooseBranch = ['owner', 'accountant'].includes(role);
+  const selectedBranch = String( document.getElementById('recapBranchFilter')?.value || '' ).trim();
+  const selectedEmployee = String( document.getElementById('recapEmployeeFilter')?.value || '' ).trim();
+  const branchId = canChooseBranch
+    ? (selectedBranch || null)
+    : userBranchId || '__NO_BRANCH__';
+
+  const [year, month] = period.split('-').map(Number);
+  const dateFrom = `${period}-01`;
+  const dateTo = `${period}-${String( new Date(year, month, 0).getDate() ).padStart(2, '0')}`;
+
+  try {
+    const [attendanceResult, overtimeResult] = await Promise.all([
+      supabaseClient.rpc('get_employee_attendance', {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_employee_id: selectedEmployee || null,
+        p_date_from: dateFrom,
+        p_date_to: dateTo,
+        p_status: null
+      }),
+
+      supabaseClient.rpc('get_employee_overtime', {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_employee_id: selectedEmployee || null,
+        p_date_from: dateFrom,
+        p_date_to: dateTo,
+        p_status: 'RECORDED'
+      })
+    ]);
+
+    if (attendanceResult.error) throw attendanceResult.error;
+    if (overtimeResult.error) throw overtimeResult.error;
+
+    const attendanceRows = Array.isArray(attendanceResult.data)
+      ? attendanceResult.data
+      : [];
+    const overtimeRows = Array.isArray(overtimeResult.data)
+      ? overtimeResult.data
+      : [];
+
+    const employeeMap = new Map();
+
+    function ensureEmployee(row) {
+      const employeeId = String(row.Employee_ID || '').trim();
+
+      if (!employeeId) return null;
+      if (
+        selectedEmployee &&
+        employeeId !== selectedEmployee
+      ) {
+        return null;
+      }
+
+      const existingEmployee = employeeData.find(item => String(item.Employee_ID || '').trim() === employeeId );
+      const existingSchedule = scheduleData.find(item => String(item.Employee_ID || '').trim() === employeeId );
+      const branch = String(
+        row.Branch_ID ||
+        existingEmployee?.Branch_ID ||
+        existingSchedule?.Branch_ID ||
+        ''
+      ).trim();
+
+      if (branchId && branch && branch !== branchId) return null;
+      if (!canChooseBranch && branch !== userBranchId) return null;
+
+      if (!employeeMap.has(employeeId)) {
+        employeeMap.set(employeeId, {
+          Employee_ID: employeeId,
+          Full_Name:
+            row.Full_Name ||
+            existingEmployee?.Full_Name ||
+            existingSchedule?.Full_Name ||
+            employeeId,
+          Employee_Code:
+            row.Employee_Code ||
+            existingEmployee?.Employee_Code ||
+            existingSchedule?.Employee_Code ||
+            '',
+          Branch_ID: branch,
+          Working_Days: 0,
+          Present: 0,
+          Late: 0,
+          Absent: 0,
+          Leave: 0,
+          Late_Minutes: 0,
+          Overtime_Minutes: 0,
+          _scheduledDates: new Set(),
+          _attendanceDates: new Set()
+        });
+      }
+
+      return employeeMap.get(employeeId);
+    }
+
+    // Siapkan karyawan yang mempunyai jadwal pada periode tersebut.
+    const monthlySchedules = (Array.isArray(scheduleData) ? scheduleData : [])
+      .filter(row => {
+        const date = String(row.Schedule_Date || '').slice(0, 10);
+
+        return (
+          date >= dateFrom &&
+          date <= dateTo &&
+          row.Is_Active === true &&
+          (!selectedEmployee || row.Employee_ID === selectedEmployee) &&
+          (!branchId || row.Branch_ID === branchId) &&
+          (canChooseBranch || row.Branch_ID === userBranchId)
+        );
+      });
+
+    monthlySchedules.forEach(row => {
+      const employee = ensureEmployee(row);
+      if (!employee) return;
+
+      const date = String(row.Schedule_Date).slice(0, 10);
+      if (!employee._scheduledDates.has(date)) {
+        employee._scheduledDates.add(date);
+        employee.Working_Days++;
+      }
+    });
+
+    // Hitung kehadiran yang tercatat.
+    attendanceRows.forEach(row => {
+      const date = String(row.Attendance_Date || '').slice(0, 10);
+
+      if (date < dateFrom || date > dateTo) return;
+
+      const employee = ensureEmployee(row);
+      if (!employee) return;
+
+      const key = date;
+      if (employee._attendanceDates.has(key)) return;
+      employee._attendanceDates.add(key);
+
+      const status = String(row.Status || '').trim().toUpperCase();
+      const lateMinutes = Number(row.Late_Minutes || 0);
+
+      if (status === 'PRESENT') employee.Present++;
+      if (status === 'ABSENT') employee.Absent++;
+      // Kelompok izin/cuti yang tersedia pada tabel Attendance.
+      if (['LEAVE', 'SICK', 'PERMISSION'].includes(status)) { employee.Leave++; }
+      if (lateMinutes > 0) employee.Late++;
+      employee.Late_Minutes += lateMinutes;
+    });
+
+    // Hitung overtime tercatat.
+    overtimeRows.forEach(row => {
+      const date = String(row.Overtime_Date || '').slice(0, 10);
+
+      if (date < dateFrom || date > dateTo) return;
+
+      const employee = ensureEmployee(row);
+      if (!employee) return;
+
+      employee.Overtime_Minutes += Number(row.Overtime_Minutes || 0);
+    });
+
+    attendanceRecapData = [...employeeMap.values()]
+      .map(row => ({
+        ...row,
+        Overtime_Hours: row.Overtime_Minutes / 60
+      }))
+      .sort((a, b) => a.Full_Name.localeCompare(b.Full_Name));
+
+    filteredAttendanceRecapData = [...attendanceRecapData];
+    attendanceRecapCurrentPage = 1;
+
+    renderAttendanceRecapTable();
+
+    console.log('ATTENDANCE RECAP:', {
+      role,
+      branchId,
+      period,
+      attendanceRows: attendanceRows.length,
+      overtimeRows: overtimeRows.length,
+      employees: attendanceRecapData.length
+    });
+  } catch (error) {
+    console.error('loadAttendanceRecap:', error);
+
+    const tbody = document.getElementById('attendanceTableBody');
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="9" class="px-5 py-10 text-center text-red-500">
+            Gagal memuat Attendance Recap.
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+function renderAttendanceRecapTable() {
+  const tbody = document.getElementById('attendanceTableBody');
+  if (!tbody) return;
+
+  const total = filteredAttendanceRecapData.length;
+  const totalPages = Math.max( 1, Math.ceil(total / attendanceRecapPageSize) );
+
+  attendanceRecapCurrentPage = Math.min( attendanceRecapCurrentPage, totalPages );
+
+  const start = (attendanceRecapCurrentPage - 1) * attendanceRecapPageSize;
+  const rows = filteredAttendanceRecapData.slice( start, start + attendanceRecapPageSize );
+  const sum = field => filteredAttendanceRecapData.reduce( (total, row) => total + Number(row[field] || 0), 0 );
+
+  document.getElementById('attendancePresentCount').textContent = sum('Present');
+  document.getElementById('attendanceLateCount').textContent = sum('Late');
+  document.getElementById('attendanceAbsentCount').textContent = sum('Absent');
+  document.getElementById('attendanceLeaveCount').textContent = sum('Leave');
+  document.getElementById('attendanceLateMinutes').textContent = sum('Late_Minutes').toLocaleString('id-ID');
+  document.getElementById('attendanceOvertimeHours').textContent = `${sum('Overtime_Hours').toLocaleString('id-ID', { maximumFractionDigits: 1 })} H`;
+
+  if (!rows.length) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-5 py-10 text-center text-muted">
+          No attendance recap data
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML = rows.map(row => `
+      <tr class="border-b border-outline-variant hover:bg-outline-variant">
+        <td class="px-5 py-3">
+          <div class="font-medium text-foreground">
+            ${escapeEmployeeHtml(row.Full_Name)}
+          </div>
+          <div class="text-xs text-muted">
+            ${escapeEmployeeHtml(row.Employee_Code || row.Employee_ID)}
+          </div>
+        </td>
+
+        <td class="px-5 py-3 text-center">${row.Working_Days}</td>
+        <td class="px-5 py-3 text-center">${row.Present}</td>
+        <td class="px-5 py-3 text-center">${row.Late}</td>
+        <td class="px-5 py-3 text-center">${row.Absent}</td>
+        <td class="px-5 py-3 text-center">${row.Leave}</td>
+        <td class="px-5 py-3 text-right">
+          ${row.Late_Minutes.toLocaleString('id-ID')}
+        </td>
+        <td class="px-5 py-3 text-right">
+          ${row.Overtime_Hours.toLocaleString('id-ID', {
+            maximumFractionDigits: 1
+          })} H
+        </td>
+        <td class="px-5 py-3 text-center text-muted">Read only</td>
+      </tr>
+    `).join('');
+  }
+
+  const info = document.getElementById('AttendancePaginationInfo');
+  if (info) {
+    info.textContent = total
+      ? `Showing ${start + 1}–${Math.min(
+          start + rows.length,
+          total
+        )} of ${total}`
+      : 'Showing 0–0 of 0';
+  }
+
+  const prev = document.getElementById('AttendancePrevButton');
+  const next = document.getElementById('AttendanceNextButton');
+
+  if (prev) prev.disabled = attendanceRecapCurrentPage <= 1;
+  if (next) next.disabled = attendanceRecapCurrentPage >= totalPages;
+}
+
+window.changeAttendancePage = function(direction) {
+  const totalPages = Math.max(
+    1,
+    Math.ceil(
+      filteredAttendanceRecapData.length / attendanceRecapPageSize
+    )
+  );
+
+  attendanceRecapCurrentPage = Math.max(
+    1,
+    Math.min(
+      totalPages,
+      attendanceRecapCurrentPage + direction
+    )
+  );
+  renderAttendanceRecapTable();
+};
+
 
 
 /* =========================================================
@@ -36522,13 +36709,6 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
 
   const schedules = Array.isArray(data) ? data : [];
   const todaySchedule = schedules.find(schedule => {
-    console.log(
-      'COMPARE:',
-      schedule.Schedule_Date,
-      '===',
-      today,
-      String(schedule.Schedule_Date) === today
-    );
     return String(schedule.Schedule_Date) === today;
   });
   return todaySchedule || null;
