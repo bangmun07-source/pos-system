@@ -31135,6 +31135,137 @@ async function loadAccountsReceivableBranchFilters() {
   } catch (error) { }
 }
 
+
+async function loadAccountsReceivableFormBranches() {
+  const select = document.getElementById(
+    "accountsReceivableFormBranch"
+  );
+
+  if (!select) return;
+
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  if (!sessionId) {
+    select.innerHTML =
+      `<option value="">Session tidak ditemukan</option>`;
+    select.disabled = true;
+    return;
+  }
+
+  try {
+    select.disabled = true;
+    select.innerHTML =
+      `<option value="">Loading branches...</option>`;
+
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_branches",
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) throw error;
+
+    const branches = typeof data === "string"
+      ? JSON.parse(data)
+      : (data || []);
+
+    const role = String(state.user?.role || "").trim();
+    const activeBranchId = String(state.branchId || "").trim();
+
+    select.innerHTML = "";
+
+    if (!Array.isArray(branches) || branches.length === 0) {
+      select.innerHTML =
+        `<option value="">Tidak ada outlet tersedia</option>`;
+      select.disabled = true;
+      return;
+    }
+
+    if (role === "Owner") {
+      // Owner dapat memilih satu outlet untuk piutang ini.
+      select.innerHTML =
+        `<option value="">Pilih outlet</option>`;
+
+      branches.forEach(branch => {
+        const branchId = String(branch.id || "").trim();
+
+        if (!branchId) return;
+
+        const option = document.createElement("option");
+        option.value = branchId;
+        option.textContent =
+          branch.name || branchId;
+
+        select.appendChild(option);
+      });
+
+      // Pilih outlet aktif sebagai nilai awal jika tersedia.
+      const activeBranchExists = [...select.options].some(
+        option => option.value === activeBranchId
+      );
+
+      if (activeBranchExists) {
+        select.value = activeBranchId;
+      }
+
+      select.disabled = false;
+
+    } else if (role === "Accountant") {
+      // Accountant hanya menggunakan outlet aktif.
+      const activeBranch = branches.find(
+        branch =>
+          String(branch.id || "").trim() === activeBranchId
+      );
+
+      if (!activeBranch || !activeBranchId) {
+        select.innerHTML =
+          `<option value="">Outlet aktif tidak ditemukan</option>`;
+        select.disabled = true;
+        showToast(
+          "Outlet aktif tidak ditemukan dalam daftar outlet.",
+          "error"
+        );
+        return;
+      }
+
+      const option = document.createElement("option");
+      option.value = activeBranchId;
+      option.textContent =
+        activeBranch.name || activeBranchId;
+
+      select.appendChild(option);
+      select.value = activeBranchId;
+      select.disabled = true;
+
+    } else {
+      select.innerHTML =
+        `<option value="">Role tidak diizinkan</option>`;
+      select.disabled = true;
+
+      showToast(
+        "Role tidak memiliki akses membuat piutang.",
+        "error"
+      );
+    }
+
+  } catch (error) {
+    console.error(
+      "loadAccountsReceivableFormBranches:",
+      error
+    );
+
+    select.innerHTML =
+      `<option value="">Gagal memuat outlet</option>`;
+    select.disabled = true;
+
+    showToast(
+      "Gagal memuat daftar outlet.",
+      "error"
+    );
+  }
+}
+
 async function loadAccountsReceivableRecords() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
@@ -31609,8 +31740,7 @@ async function saveAccountsReceivable() {
 
     if (button) {
       button.disabled = true;
-      button.dataset.originalText =
-      	button.innerHTML;
+      button.dataset.originalText = button.innerHTML;
       button.innerHTML = `
         <span class="material-symbols-outlined animate-spin text-base">
           progress_activity
@@ -31663,11 +31793,14 @@ async function saveAccountsReceivable() {
 		  showToast( "Payment method tidak valid.", "error" );
 		  return; }
 		
-		const branchId = state.branchId || null;
+		const branchId = document
+			.getElementById("accountsReceivableFormBranch")
+			?.value || null;
 		
 		if (!branchId) {
-		  showToast( "Branch belum dipilih.", "error" );
-		  return; }
+			showToast("Pilih outlet terlebih dahulu.", "error");
+			return;
+		}
 
     const { data, error } =
       await supabaseClient.rpc(
