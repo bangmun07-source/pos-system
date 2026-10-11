@@ -31376,32 +31376,32 @@ async function handleAccountsReceivableTypeChange() {
   const type = document.getElementById("accountsReceivableType")?.value;
   const partyEl = document.getElementById("accountsReceivableParty");
   const employeeEl = document.getElementById("accountsReceivableEmployee");
+  const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
+  const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
+
+  if (referenceNoEl) referenceNoEl.value = "";
+  if (referenceIdEl) referenceIdEl.value = "";
 
   if (!partyEl || !employeeEl) {
-    console.error("Input Party atau Employee tidak ditemukan");
+    console.error("Party/Employee element tidak ditemukan");
     return;
   }
 
-  document.getElementById("accountsReceivableReferenceNo").value = "";
-  document.getElementById("accountsReceivableReferenceId").value = "";
-
   if (type === "EMPLOYEE") {
     partyEl.classList.add("hidden");
-    partyEl.style.display = "none";
-
     employeeEl.classList.remove("hidden");
-    employeeEl.style.display = "block";
+
+    // Jangan sembunyikan dropdown ketika daftar sedang dimuat.
+    employeeEl.disabled = true;
+    employeeEl.innerHTML = '<option value="">Memuat karyawan...</option>';
 
     await loadAccountsReceivableEmployees();
     return;
   }
 
   employeeEl.classList.add("hidden");
-  employeeEl.style.display = "none";
   employeeEl.value = "";
-
   partyEl.classList.remove("hidden");
-  partyEl.style.display = "";
 
   const placeholders = {
     BUSINESS: "Nama customer / usaha",
