@@ -25236,106 +25236,168 @@
 	    </div>
 	  </div>
 	</div>
-	<!-- === SALARY COMPONENT MODAL === -->
-	<div id="salaryComponentModal"
-	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-	  <div class="w-full max-w-md bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
-	    <!-- HEADER -->
-	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-	      <div>
-	        <h3 id="salaryComponentModalTitle"
-	          class="text-base font-bold font-headline text-foreground">
-	          Add Allowance
-	        </h3>
-	
-	        <p class="text-xs text-muted mt-1">
-	          Add salary component
-	        </p>
-	      </div>
-	
-	      <button type="button"
-	        onclick="closeSalaryComponentModal()"
-	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
-	        <span class="material-symbols-outlined">
-	          close
-	        </span>
-	      </button>
-	    </div>
-	    <!-- CONTENT -->
-	    <div class="p-5 space-y-4">
-	      <input id="salaryComponentType"
-	        type="hidden">
-	      <input id="salaryComponentId"
-	        type="hidden">
-	      <!-- NAME -->
-	      <div>
-	        <label class="block text-sm font-medium text-foreground mb-2">
-	          Component Name
-	        </label>
-	
-	        <input id="salaryComponentName"
-	          type="text"
-	          placeholder="Makan"
-	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-	      </div>
-	      <!-- AMOUNT -->
-				<div>
-				  <label class="block text-sm font-medium text-foreground mb-2">
-				    Amount
-				  </label>
-				
-				  <div class="relative">
-				    <!-- Rupiah -->
-				    <span id="salaryComponentAmountPrefix"
-				      class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-				      Rp
-				    </span>
-				
-				    <!-- Percentage -->
-				    <span id="salaryComponentAmountSuffix"
-				      class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
-				      %
-				    </span>
-				
-				    <input id="salaryComponentAmount"
-				      type="number"
-				      min="0"
-				      step="1"
-				      placeholder="300000"
-				      class="w-full h-11 pl-10 pr-10 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-				  </div>
-				</div>
-	      <!-- CALCULATION TYPE -->
-	      <div>
-	        <label class="block text-sm font-medium text-foreground mb-2">
-	          Calculation Type
-	        </label>
-	
-	        <select id="salaryComponentCalculationType"
-	          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-	          <option value="FIXED"> Fixed </option>
-	          <option value="PER_DAY"> Per Day </option>
-	          <option value="PER_HOUR"> Per Hour </option>
-	          <option value="PERCENTAGE"> Percentage </option>
-	        </select>
-	      </div>
-	    </div>
-	    <!-- FOOTER -->
-	    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3">
-	      <button type="button"
-	        onclick="closeSalaryComponentModal()"
-	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
-	        Cancel
-	      </button>
-	
-	      <button type="button"
-	        onclick="saveSalaryComponent()"
-	        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium">
-	        Add Component
-	      </button>
-	    </div>
-	  </div>
-	</div>
+<!-- === SALARY COMPONENT MODAL === -->
+<div id="salaryComponentModal"
+  class="fixed inset-0 z-[110] hidden items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+  <div class="w-full max-w-md max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+    <!-- HEADER -->
+    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+      <div>
+        <h3 id="salaryComponentModalTitle"
+          class="text-base font-bold font-headline text-foreground">
+          Add Salary Component
+        </h3>
+
+        <p class="text-xs text-muted mt-1">
+          Configure component and accounting category
+        </p>
+      </div>
+
+      <button type="button"
+        onclick="closeSalaryComponentModal()"
+        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <!-- CONTENT -->
+    <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar">
+      <input id="salaryComponentType" type="hidden">
+      <input id="salaryComponentId" type="hidden">
+      <!-- COMPONENT NAME -->
+      <div>
+        <label for="salaryComponentName"
+          class="block text-sm font-medium text-foreground mb-2">
+          Component Name
+        </label>
+
+        <input id="salaryComponentName"
+          type="text"
+          placeholder="Example: Uang Makan"
+          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+      </div>
+      <!-- ACCOUNTING CATEGORY -->
+      <div>
+        <label for="salaryComponentAccountingCategory"
+          class="block text-sm font-medium text-foreground mb-2">
+          Accounting Category
+        </label>
+
+        <select id="salaryComponentAccountingCategory"
+          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+					
+          <option value="">Select accounting category</option>
+
+          <optgroup label="Earnings">
+            <option value="ALLOWANCE">Allowance</option>
+            <option value="BONUS_INCENTIVE">Bonus / Incentive</option>
+            <option value="OVERTIME">Overtime</option>
+            <option value="OTHER_BENEFIT">Other Benefit</option>
+          </optgroup>
+
+          <optgroup label="Deductions">
+            <option value="LATE_DEDUCTION">Late Deduction</option>
+            <option value="OTHER_DEDUCTION">Other Deduction</option>
+            <option value="EMPLOYEE_HEALTH_CONTRIBUTION">
+              Employee Health Contribution
+            </option>
+            <option value="EMPLOYEE_TAX">Employee Tax</option>
+            <option value="EMPLOYEE_LOAN">Employee Loan</option>
+          </optgroup>
+
+          <optgroup label="Employer Expenses">
+            <option value="EMPLOYER_HEALTH_CONTRIBUTION">
+              Employer Health Contribution
+            </option>
+          </optgroup>
+
+          <optgroup label="Reimbursement">
+            <option value="REIMBURSEMENT">Reimbursement</option>
+          </optgroup>
+
+        </select>
+
+        <p class="text-xs text-muted mt-1.5">
+          Determines the accounting treatment of this component.
+        </p>
+      </div>
+
+      <!-- AMOUNT -->
+      <div>
+        <label for="salaryComponentAmount"
+          class="block text-sm font-medium text-foreground mb-2">
+          Amount
+        </label>
+
+        <div class="relative">
+          <span id="salaryComponentAmountPrefix"
+            class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+            Rp
+          </span>
+
+          <span id="salaryComponentAmountSuffix"
+            class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+            %
+          </span>
+
+          <input id="salaryComponentAmount"
+            type="number"
+            min="0"
+            step="any"
+            placeholder="300000"
+            class="w-full h-11 pl-10 pr-10 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+        </div>
+      </div>
+      <!-- CALCULATION TYPE -->
+      <div>
+        <label for="salaryComponentCalculationType"
+          class="block text-sm font-medium text-foreground mb-2">
+          Calculation Type
+        </label>
+
+        <select id="salaryComponentCalculationType"
+          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          <option value="FIXED">Fixed Amount</option>
+          <option value="PER_DAY">Per Day</option>
+          <option value="PER_HOUR">Per Hour</option>
+          <option value="PERCENTAGE">Percentage</option>
+        </select>
+      </div>
+      <!-- PERCENTAGE CALCULATION BASE -->
+      <div id="salaryComponentCalculationBaseWrapper" class="hidden">
+        <label for="salaryComponentCalculationBase"
+          class="block text-sm font-medium text-foreground mb-2">
+          Percentage Calculation Base
+        </label>
+
+        <select id="salaryComponentCalculationBase"
+          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          <option value="">Select calculation base</option>
+          <option value="BASIC_SALARY">Basic Salary</option>
+          <option value="GROSS_SALARY">Gross Salary</option>
+
+        </select>
+
+        <p class="text-xs text-muted mt-1.5">
+          Select the salary amount used to calculate the percentage.
+        </p>
+      </div>
+    </div>
+    <!-- FOOTER -->
+    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3 shrink-0">
+      <button type="button"
+        onclick="closeSalaryComponentModal()"
+        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+        Cancel
+      </button>
+
+      <button type="button"
+        onclick="saveSalaryComponent()"
+        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium">
+        Save Component
+      </button>
+    </div>
+  </div>
+</div>
   <!-- ==== SCHEDULE MODAL ===== -->
   <div id="scheduleModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
