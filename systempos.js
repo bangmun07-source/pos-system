@@ -31305,7 +31305,7 @@ function updateAccountsReceivableOverview() {
 
 
 async function loadAccountsReceivableEmployees() {
-  const select = document.getElementById("accountsReceivableEmployee");
+  const select = document.getElementById("accountsReceivableEmployeeSelect");
   const branchSelect = document.getElementById("accountsReceivableFormBranch");
 
   if (!select || !branchSelect) return;
@@ -31375,7 +31375,7 @@ async function loadAccountsReceivableEmployees() {
 async function handleAccountsReceivableTypeChange() {
   const type = document.getElementById("accountsReceivableType")?.value;
   const partyEl = document.getElementById("accountsReceivableParty");
-  const employeeEl = document.getElementById("accountsReceivableEmployee");
+  const employeeEl = document.getElementById("accountsReceivableEmployeeSelect");
   const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
   const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
 
