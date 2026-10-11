@@ -32201,6 +32201,7 @@ async function initEmployeePage() {
       attendanceBranchFilter.dataset.handlerAttached = 'true';
     }
     await loadEmployeeOvertime();
+		await initAttendanceRecap();
   } catch (error) { }
 }
 
