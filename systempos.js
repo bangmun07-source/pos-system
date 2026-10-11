@@ -31383,29 +31383,51 @@ function updateAccountsReceivableOverview() {
 }
 
 /* ==== RECEIVABLE — TYPE CHANGE ==== */
-
-function handleAccountsReceivableTypeChange() {
-
-  const typeEl = document.getElementById( "accountsReceivableType" );
-
+async function handleAccountsReceivableTypeChange() {
+  const typeEl = document.getElementById("accountsReceivableType");
   if (!typeEl) return;
 
   const type = typeEl.value;
-  const partyEl = document.getElementById( "accountsReceivableParty" );
-  const referenceNoEl = document.getElementById( "accountsReceivableReferenceNo" );
-  const referenceIdEl = document.getElementById( "accountsReceivableReferenceId" );
+  const partyEl = document.getElementById("accountsReceivableParty");
+  const employeeEl = document.getElementById("accountsReceivableEmployee");
+  const referenceNoEl = document.getElementById("accountsReceivableReferenceNo");
+  const referenceIdEl = document.getElementById("accountsReceivableReferenceId");
 
-  if (referenceNoEl) { referenceNoEl.value = ""; }
-  if (referenceIdEl) { referenceIdEl.value = ""; }
+  if (referenceNoEl) referenceNoEl.value = "";
+  if (referenceIdEl) referenceIdEl.value = "";
+  if (type === "EMPLOYEE") {
+    if (partyEl) {
+      partyEl.classList.add("hidden");
+      partyEl.value = "";
+    }
+
+    if (employeeEl) {
+      employeeEl.classList.remove("hidden");
+      await loadAccountsReceivableEmployees();
+    }
+
+    return;
+  }
+
   if (partyEl) {
-    if (type === "EMPLOYEE") { partyEl.placeholder = "Nama karyawan";
-    } else if (type === "BUSINESS") { partyEl.placeholder = "Nama customer / usaha";
-    } else if (type === "TAX") { partyEl.placeholder = "Nama / jenis tax";
-    } else if (type === "OTHER") { partyEl.placeholder = "Nama pihak";
-    } else { partyEl.placeholder = "Nama pihak";
+    partyEl.classList.remove("hidden");
+
+    if (type === "BUSINESS") {
+      partyEl.placeholder = "Nama customer / usaha";
+    } else if (type === "TAX") {
+      partyEl.placeholder = "Nama / jenis tax";
+    } else {
+      partyEl.placeholder = "Nama pihak";
     }
   }
+
+  if (employeeEl) {
+    employeeEl.classList.add("hidden");
+    employeeEl.value = "";
+  }
 }
+
+
 
 function formatAccountsReceivableDate(value) {
   if (!value) return "-";
