@@ -31414,6 +31414,15 @@ async function handleAccountsReceivableTypeChange() {
   partyEl.placeholder = placeholders[type] || "Nama pihak";
 }
 
+document.getElementById("accountsReceivableFormBranch")
+  ?.addEventListener("change", async function () {
+    const type = document.getElementById("accountsReceivableType")?.value;
+
+    if (type === "EMPLOYEE") {
+      await loadAccountsReceivableEmployees();
+    }
+  });
+
 
 function formatAccountsReceivableDate(value) {
   if (!value) return "-";
