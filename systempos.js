@@ -34456,14 +34456,20 @@ function populateScheduleFilters() {
   const employeeFilter = document.getElementById('scheduleEmployeeFilter');
   const branchFilter = document.getElementById('scheduleBranchFilter');
   const weekFilter = document.getElementById('scheduleWeekFilter');
-  const role = state.user.role;
-  const userBranchId = String(state.user.branchId || '').trim();
-  const visibleScheduleData =
-    role === 'Owner'
-      ? scheduleData
-      : scheduleData.filter(row =>
-          String(row.Branch_ID || '').trim() === userBranchId
-        );
+  const role = String(
+		state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	const userBranchId = String(
+		state.user?.branchId || state.user?.Branch_ID || ''
+	).trim();
+	const canViewAllBranches =
+		['owner', 'accountant'].includes(role) ||
+		userBranchId.toUpperCase() === 'ALL';
+	const visibleScheduleData = canViewAllBranches
+		? scheduleData
+		: scheduleData.filter(row =>
+				String(row.Branch_ID || '').trim() === userBranchId
+			);
 	
   if (employeeFilter) {
     const currentValue = employeeFilter.value;
@@ -34527,19 +34533,19 @@ function populateScheduleFilters() {
 	  branchFilter.onchange = function() {
 	    const selectedBranch = String( this.value || '' ).trim();
 	    const employeeDataForFilter =
-	      selectedBranch
-	        ? scheduleData.filter(row =>
-	            String(row.Branch_ID || '').trim() ===
-	            selectedBranch
-	          )
-	        : (
-	            role === 'Owner'
-	              ? scheduleData
-	              : scheduleData.filter(row =>
-	                  String(row.Branch_ID || '').trim() ===
-	                  userBranchId
-	                )
-	          );
+			  selectedBranch
+			    ? scheduleData.filter(row =>
+			        String(row.Branch_ID || '').trim() ===
+			        selectedBranch
+			      )
+			    : (
+			        canViewAllBranches
+			          ? scheduleData
+			          : scheduleData.filter(row =>
+			              String(row.Branch_ID || '').trim() ===
+			              userBranchId
+			            )
+			      );
 	    const employees = [
 	      ...new Map(
 	        employeeDataForFilter.map(row => [
@@ -34604,8 +34610,21 @@ window.filterSchedules = function() {
   const employeeId = document.getElementById('scheduleEmployeeFilter')?.value || '';
   const branchId = document.getElementById('scheduleBranchFilter')?.value || '';
   const day = document.getElementById('scheduleDayFilter')?.value || '';
-  const role = state.user.role;
-  const userBranchId = String(state.user.branchId || '').trim();
+  const role = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase();
+	const userBranchId = String(
+	  state.user?.branchId || state.user?.Branch_ID || ''
+	).trim();
+	const canViewAllBranches =
+	  ['owner', 'accountant'].includes(role) ||
+	  userBranchId.toUpperCase() === 'ALL';
+	
+	let filtered = canViewAllBranches
+	  ? [...scheduleData]
+	  : scheduleData.filter(row =>
+	      String(row.Branch_ID || '').trim() === userBranchId
+	    );
 
   let filtered =
     role === 'Owner'
