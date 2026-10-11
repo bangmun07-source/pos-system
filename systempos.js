@@ -33940,6 +33940,15 @@ async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
 }
 
 async function openScheduleModal(schedule = null) {
+  const currentRole = String(
+    state.user?.role || state.user?.Role || ''
+  ).trim().toLowerCase();
+
+  if (currentRole === 'accountant') {
+    alert('Accountant hanya dapat membaca data Schedule.');
+    return;
+  }
+  const modal = document.getElementById('scheduleModal');
   const modal = document.getElementById('scheduleModal');
   if (!modal) {
     console.error('scheduleModal tidak ditemukan.');
@@ -34318,6 +34327,14 @@ function saveCurrentScheduleDayData() {
 
 
 window.saveSchedule = async function() {
+  const currentRole = String(
+    state.user?.role || state.user?.Role || ''
+  ).trim().toLowerCase();
+
+  if (currentRole === 'accountant') {
+    alert('Accountant hanya dapat membaca data Schedule.');
+    return;
+  }
 
   const sessionId = localStorage.getItem('pos_session_id');
   const branchSelect = document.getElementById('scheduleBranch');
@@ -34690,7 +34707,10 @@ function renderSchedules(data = filteredScheduleData) {
   const tbody = document.getElementById('scheduleTableBody');
 
   if (!tbody) return;
-
+	
+	const isAccountant = String(
+	  state.user?.role || state.user?.Role || ''
+	).trim().toLowerCase() === 'accountant';
   // Simpan data hasil filter untuk pagination
   filteredScheduleData = data;
 
@@ -34774,11 +34794,11 @@ function renderSchedules(data = filteredScheduleData) {
         </td>
 
         <td class="px-5 py-3 text-center">
-          <button
-            type="button"
-            onclick='openScheduleModal(${JSON.stringify(row).replace(/'/g, "&#39;")})'
-            class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background"
-            title="Edit Schedule">
+					<button type="button"
+					  onclick='openScheduleModal(${JSON.stringify(row).replace(/'/g, "&#39;")})'
+					  class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background ${isAccountant ? 'hidden' : ''}"
+					  ${isAccountant ? 'disabled' : ''}
+					  title="Edit Schedule">
             <span class="material-symbols-outlined text-base">
               edit
             </span>
