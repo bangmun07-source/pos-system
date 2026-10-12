@@ -36435,17 +36435,28 @@ function renderAttendanceRecapTable() {
   const rows = filteredAttendanceRecapData.slice( start, start + attendanceRecapPageSize );
   const sum = field => filteredAttendanceRecapData.reduce( (total, row) => total + Number(row[field] || 0), 0 );
 
-  document.getElementById('attendancePresentCount').textContent = sum('Present');
-  document.getElementById('attendanceLateCount').textContent = sum('Late');
-  document.getElementById('attendanceAbsentCount').textContent = sum('Absent');
-  document.getElementById('attendanceLeaveCount').textContent = sum('Leave');
-  document.getElementById('attendanceLateMinutes').textContent = sum('Late_Minutes').toLocaleString('id-ID');
-  document.getElementById('attendanceOvertimeHours').textContent = `${sum('Overtime_Hours').toLocaleString('id-ID', { maximumFractionDigits: 1 })} H`;
-	console.table(rows.map(row => ({
-	  Employee: row.Full_Name,
-	  Sick: row.Sick,
-	  Permission: row.Permission
-	})));
+  const presentEl = document.getElementById('attendancePresentCount');
+	const lateEl = document.getElementById('attendanceLateCount');
+	const absentEl = document.getElementById('attendanceAbsentCount');
+	const leaveEl = document.getElementById('attendanceLeaveCount');
+	const lateMinutesEl = document.getElementById('attendanceLateMinutes');
+	const overtimeEl = document.getElementById('attendanceOvertimeHours');
+	
+	if (presentEl) presentEl.textContent = sum('Present');
+	if (lateEl) lateEl.textContent = sum('Late');
+	if (absentEl) absentEl.textContent = sum('Absent');
+	if (leaveEl) leaveEl.textContent = sum('Leave');
+	
+	if (lateMinutesEl) {
+	  lateMinutesEl.textContent = sum('Late_Minutes').toLocaleString('id-ID');
+	}
+	
+	if (overtimeEl) {
+	  overtimeEl.textContent =
+	    `${sum('Overtime_Hours').toLocaleString('id-ID', {
+	      maximumFractionDigits: 1
+	    })} H`;
+	}
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
@@ -36455,6 +36466,13 @@ function renderAttendanceRecapTable() {
       </tr>
     `;
   } else {
+		console.table(rows.map(row => ({
+	  Employee: row.Full_Name,
+	  Sick: row.Sick,
+	  Permission: row.Permission,
+	  Late_Minutes: row.Late_Minutes,
+	  Overtime_Hours: row.Overtime_Hours
+	})));
     tbody.innerHTML = rows.map(row => `
       <tr class="border-b border-outline-variant hover:bg-outline-variant">
         <td class="px-5 py-3">
