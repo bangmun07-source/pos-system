@@ -36267,7 +36267,6 @@ async function loadAttendanceRecap() {
     const overtimeRows = Array.isArray(overtimeResult.data)
       ? overtimeResult.data
       : [];
-
     const employeeMap = new Map();
 
     function ensureEmployee(row) {
@@ -36292,7 +36291,6 @@ async function loadAttendanceRecap() {
 
       if (branchId && branch && branch !== branchId) return null;
       if (!canChooseBranch && branch !== userBranchId) return null;
-
       if (!employeeMap.has(employeeId)) {
         employeeMap.set(employeeId, {
           Employee_ID: employeeId,
@@ -36312,6 +36310,8 @@ async function loadAttendanceRecap() {
           Late: 0,
           Absent: 0,
           Leave: 0,
+					Sick: 0,
+          Permission: 0,
           Late_Minutes: 0,
           Overtime_Minutes: 0,
           _scheduledDates: new Set(),
