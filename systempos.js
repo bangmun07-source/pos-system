@@ -36439,6 +36439,8 @@ function renderAttendanceRecapTable() {
   document.getElementById('attendanceLateCount').textContent = sum('Late');
   document.getElementById('attendanceAbsentCount').textContent = sum('Absent');
   document.getElementById('attendanceLeaveCount').textContent = sum('Leave');
+	document.getElementById('attendanceSickCount').textContent = sum('Sick');
+	document.getElementById('attendancePermissionCount').textContent = sum('Permission');
   document.getElementById('attendanceLateMinutes').textContent = sum('Late_Minutes').toLocaleString('id-ID');
   document.getElementById('attendanceOvertimeHours').textContent = `${sum('Overtime_Hours').toLocaleString('id-ID', { maximumFractionDigits: 1 })} H`;
 
