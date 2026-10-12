@@ -36361,15 +36361,17 @@ async function loadAttendanceRecap() {
       if (employee._attendanceDates.has(key)) return;
       employee._attendanceDates.add(key);
 
-      const status = String(row.Status || '').trim().toUpperCase();
-      const lateMinutes = Number(row.Late_Minutes || 0);
-
-      if (status === 'PRESENT') employee.Present++;
-      if (status === 'ABSENT') employee.Absent++;
-      // Kelompok izin/cuti yang tersedia pada tabel Attendance.
-      if (['LEAVE', 'SICK', 'PERMISSION'].includes(status)) { employee.Leave++; }
-      if (lateMinutes > 0) employee.Late++;
-      employee.Late_Minutes += lateMinutes;
+			const status = String(row.Status || '').trim().toUpperCase();
+			const lateMinutes = Number(row.Late_Minutes || 0);
+			
+			if (status === 'PRESENT') employee.Present++;
+			if (status === 'ABSENT') employee.Absent++;
+			if (status === 'LEAVE') employee.Leave++;
+			if (status === 'SICK') employee.Sick++;
+			if (status === 'PERMISSION') employee.Permission++;
+			
+			if (lateMinutes > 0) employee.Late++;
+			employee.Late_Minutes += lateMinutes;
     });
 
     // Hitung overtime tercatat.
@@ -36443,7 +36445,7 @@ function renderAttendanceRecapTable() {
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="9" class="px-5 py-10 text-center text-muted">
+        <td colspan="11" class="px-5 py-10 text-center text-muted">
           No attendance recap data
         </td>
       </tr>
@@ -36465,6 +36467,8 @@ function renderAttendanceRecapTable() {
         <td class="px-5 py-3 text-center">${row.Late}</td>
         <td class="px-5 py-3 text-center">${row.Absent}</td>
         <td class="px-5 py-3 text-center">${row.Leave}</td>
+				<td class="px-5 py-3 text-center">${row.Sick}</td>
+				<td class="px-5 py-3 text-center">${row.Permission}</td>
         <td class="px-5 py-3 text-right">
           ${row.Late_Minutes.toLocaleString('id-ID')}
         </td>
