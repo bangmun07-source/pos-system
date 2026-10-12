@@ -36441,7 +36441,11 @@ function renderAttendanceRecapTable() {
   document.getElementById('attendanceLeaveCount').textContent = sum('Leave');
   document.getElementById('attendanceLateMinutes').textContent = sum('Late_Minutes').toLocaleString('id-ID');
   document.getElementById('attendanceOvertimeHours').textContent = `${sum('Overtime_Hours').toLocaleString('id-ID', { maximumFractionDigits: 1 })} H`;
-
+	console.table(rows.map(row => ({
+	  Employee: row.Full_Name,
+	  Sick: row.Sick,
+	  Permission: row.Permission
+	})));
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
@@ -36467,8 +36471,8 @@ function renderAttendanceRecapTable() {
         <td class="px-5 py-3 text-center">${row.Late}</td>
         <td class="px-5 py-3 text-center">${row.Absent}</td>
         <td class="px-5 py-3 text-center">${row.Leave}</td>
-				<td class="px-5 py-3 text-center">${Number(row.Sick) || 0}</td>
-				<td class="px-5 py-3 text-center">${Number(row.Permission) || 0}</td>
+				<td class="px-5 py-3 text-center">${Number.isFinite(Number(row?.Sick)) ? Number(row.Sick) : 0}</td>
+				<td class="px-5 py-3 text-center">${Number.isFinite(Number(row?.Permission)) ? Number(row.Permission) : 0}</td>
         <td class="px-5 py-3 text-right">
           ${row.Late_Minutes.toLocaleString('id-ID')}
         </td>
