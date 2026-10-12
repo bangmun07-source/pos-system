@@ -33460,78 +33460,87 @@ window.saveAttendanceAccount = async function () {
   }
 };
 
+
 /* === SALARY SETTING === */
 window.openEmployeeSalarySetting = async function (employeeId) {
-  /* === OWNER ONLY === */
-  if (state.user.role !== 'Owner') {
-    alert('Hanya Owner yang dapat mengatur salary employee.');
-    return;
-  }
+  if (state.user.role !== 'Owner') { alert('Hanya Owner yang dapat mengatur salary employee.'); return; }
 
-  const employee = employeeData.find(e => e.Employee_ID === employeeId);
+  const employee = employeeData.find( e => e.Employee_ID === employeeId );
 
   if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
   const modal = document.getElementById('salaryModal');
-
   if (!modal) return;
 
   const employeeIdInput = document.getElementById('salaryEmployeeId');
   const employeeName = document.getElementById('salaryEmployeeName');
-  /* === SET EMPLOYEE === */
-  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID || ''; }
+
+  if (employeeIdInput) employeeIdInput.value = employee.Employee_ID || '';
   if (employeeName) { employeeName.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
+
   /* === RESET FORM === */
   const basicSalary = document.getElementById('employeeBasicSalary');
   const overtimeRate = document.getElementById('employeeOvertimeRate');
+  const employerContribution = document.getElementById( 'employeeEmployerHealthContribution' );
   const effectiveFrom = document.getElementById('salaryEffectiveFrom');
   const note = document.getElementById('salaryNote');
 
   if (basicSalary) basicSalary.value = '';
   if (overtimeRate) overtimeRate.value = '0';
+  if (employerContribution) employerContribution.value = '0';
   if (effectiveFrom) effectiveFrom.value = '';
   if (note) note.value = '';
 
   renderSalaryComponents([]);
-  /* === OPEN MODAL === */
+
   modal.classList.remove('hidden');
   modal.classList.add('flex');
-  /* ==== LOAD EXISTING SALARY ==== */
+  /* === LOAD EXISTING SALARY === */
   try {
-    const sessionId =
-      localStorage.getItem('pos_session_id');
+    const sessionId = localStorage.getItem('pos_session_id');
 
-    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
-    const { data, error } =
-      await supabaseClient.rpc(
-        'get_employee_salary',
-        {
-          p_session_id: sessionId,
-          p_employee_id: employeeId
-        }
-      );
+    const { data, error } = await supabaseClient.rpc(
+      'get_employee_salary',
+      {
+        p_session_id: sessionId,
+        p_employee_id: employeeId
+      }
+    );
 
-    if (error) { throw error; }
+    if (error) throw error;
 
     const result = typeof data === 'string'
-			? JSON.parse(data)
-			: (data || {});
+      ? JSON.parse(data)
+      : (data || {});
     const salary = result.salary || null;
     const components = Array.isArray(result.components)
-			? result.components
-			: [];
-    /* === NO EXISTING SALARY === */
-    if (!salary) { return; }
-    /* === LOAD SALARY === */
-    if (basicSalary) { basicSalary.value = salary.Basic_Salary ?? 0; }
-    if (overtimeRate) { overtimeRate.value = salary.Overtime_Rate ?? 0; }
-    if (effectiveFrom) { effectiveFrom.value = salary.Effective_From || ''; }
-    if (note) { note.value = salary.Note || ''; }
-    /* === LOAD COMPONENTS === */
+      ? result.components
+      : [];
+
+    if (!salary) return;
+    if (basicSalary) basicSalary.value = salary.Basic_Salary ?? 0;
+    if (overtimeRate) overtimeRate.value = salary.Overtime_Rate ?? 0;
+    if (effectiveFrom) effectiveFrom.value = salary.Effective_From || '';
+    if (note) note.value = salary.Note || '';
+
+    /* === LOAD EMPLOYER CONTRIBUTION === */
+    const employerComponent = components.find(component =>
+      component.Component_Type === 'EMPLOYER_CONTRIBUTION' &&
+      component.Is_Active !== false
+    );
+
+    if (employerContribution) {
+      employerContribution.value = employerComponent
+        ? Number(employerComponent.Amount || 0)
+        : 0;
+    }
+		
     renderSalaryComponents(components);
+
   } catch (error) {
-    alert( error?.message || 'Gagal memuat salary employee.' );
+    alert(error?.message || 'Gagal memuat salary employee.');
   }
 };
 
@@ -33551,11 +33560,13 @@ window.closeSalaryModal = function () {
   /* === RESET SALARY === */
   const basicSalary = document.getElementById('employeeBasicSalary');
   const overtimeRate = document.getElementById('employeeOvertimeRate');
+	const employerContribution = document.getElementById('employeeEmployerHealthContribution' );
   const effectiveFrom = document.getElementById('salaryEffectiveFrom');
   const note = document.getElementById('salaryNote');
 
   if (basicSalary) { basicSalary.value = ''; }
   if (overtimeRate) { overtimeRate.value = '0'; }
+	if (employerContribution) { employerContribution.value = '0'; }
   if (effectiveFrom) { effectiveFrom.value = ''; }
   if (note) { note.value = ''; }
   /* === RESET COMPONENT LIST === */
@@ -33683,7 +33694,7 @@ function renderSalaryComponentRow(component) {
 
 /* ==== OPEN SALARY COMPONENT MODAL ==== */
 window.openSalaryComponentModal = function (type) {
-  if (type !== 'ALLOWANCE' && type !== 'DEDUCTION') return;
+  if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) { return; }
 
   const modal = document.getElementById('salaryComponentModal');
   if (!modal) return;
@@ -33712,10 +33723,13 @@ window.openSalaryComponentModal = function (type) {
   updateSalaryComponentAmountUnit();
   updateSalaryComponentCalculationBase();
 
-  if (title) {
-    title.textContent =
-      type === 'ALLOWANCE' ? 'Add Allowance' : 'Add Deduction';
-  }
+	if (title) {
+		title.textContent = {
+			ALLOWANCE: 'Add Allowance',
+			DEDUCTION: 'Add Deduction',
+			EMPLOYER_CONTRIBUTION: 'Add Employer Contribution'
+		}[type];
+	}
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -33915,36 +33929,67 @@ window.saveEmployeeSalary = async function () {
   const employeeId = document.getElementById( 'salaryEmployeeId' )?.value?.trim();
   const basicSalary = Number( document.getElementById( 'employeeBasicSalary' )?.value || 0 );
   const overtimeRate = Number( document.getElementById( 'employeeOvertimeRate' )?.value || 0 );
+	const employerHealthContribution = Number( document.getElementById('employeeEmployerHealthContribution')?.value || 0 );
   const effectiveFrom = document.getElementById( 'salaryEffectiveFrom' )?.value || null;
   const note = document.getElementById( 'salaryNote' )?.value?.trim() || null;
-  /* === VALIDATION === */
-  if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
-  if (basicSalary < 0) { alert('Basic Salary tidak boleh negatif.'); return; }
-  if (overtimeRate < 0) { alert('Overtime Rate tidak boleh negatif.'); return; }
-  if (!effectiveFrom) { alert('Effective From wajib diisi.'); return; }
-  /* === SESSION === */
-  try {
-    const sessionId = localStorage.getItem( 'pos_session_id' );
-
-    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
-    /* === PREPARE COMPONENTS === */
-    const components =
-      employeeSalaryComponents.map(
-        component => ({
-          Component_ID: component.Component_ID || null,
-          Salary_ID: component.Salary_ID || null,
-          Employee_ID: employeeId,
-          Component_Type: component.Component_Type,
-          Component_Name: component.Component_Name,
-          Amount: Number(component.Amount || 0),
-          Calculation_Type: component.Calculation_Type || 'FIXED',
-					Accounting_Category: component.Accounting_Category || null,
-					Calculation_Base: component.Calculation_Type === 'PERCENTAGE'
-						? (component.Calculation_Base || 'BASIC_SALARY')
-						: null,
-          Is_Active: component.Is_Active !== false
-        })
-      );
+	/* === VALIDATION === */
+	if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
+	if (basicSalary < 0) { alert('Basic Salary tidak boleh negatif.'); return; }
+	if (overtimeRate < 0) { alert('Overtime Rate tidak boleh negatif.'); return; }
+	if (!effectiveFrom) { alert('Effective From wajib diisi.'); return; }
+	
+	try {
+	  const sessionId = localStorage.getItem('pos_session_id');
+	
+	  if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+		/* === VALIDATE EMPLOYER CONTRIBUTION === */
+		if (
+			!Number.isFinite(employerHealthContribution) ||
+			employerHealthContribution < 0 ||
+			employerHealthContribution > 100
+		) { alert('Employer Health Contribution harus antara 0 sampai 100%.'); return; }
+		
+		/* === EMPLOYER CONTRIBUTION === */
+		const existingEmployerComponent = employeeSalaryComponents.find(
+			component =>
+				component.Component_Type === 'EMPLOYER_CONTRIBUTION' ||
+				component.Accounting_Category === 'EMPLOYER_HEALTH_CONTRIBUTION'
+		);
+		const components = employeeSalaryComponents
+			.filter(component =>
+				component.Component_Type !== 'EMPLOYER_CONTRIBUTION' &&
+				component.Accounting_Category !== 'EMPLOYER_HEALTH_CONTRIBUTION'
+			)
+			.map(component => ({
+				Component_ID: component.Component_ID || null,
+				Salary_ID: component.Salary_ID || null,
+				Employee_ID: employeeId,
+				Component_Type: component.Component_Type,
+				Component_Name: component.Component_Name,
+				Amount: Number(component.Amount || 0),
+				Calculation_Type: component.Calculation_Type || 'FIXED',
+				Accounting_Category: component.Accounting_Category || null,
+				Calculation_Base:
+				component.Calculation_Type === 'PERCENTAGE'
+				? (component.Calculation_Base || 'BASIC_SALARY')
+				: null,
+				Is_Active: component.Is_Active !== false
+			}));
+			
+			if (employerHealthContribution > 0) {
+				components.push({
+					Component_ID: existingEmployerComponent?.Component_ID || null,
+					Salary_ID: existingEmployerComponent?.Salary_ID || null,
+					Employee_ID: employeeId,
+					Component_Type: 'EMPLOYER_CONTRIBUTION',
+					Component_Name: 'BPJS Perusahaan',
+					Amount: employerHealthContribution,
+					Calculation_Type: 'PERCENTAGE',
+					Accounting_Category: 'EMPLOYER_HEALTH_CONTRIBUTION',
+					Calculation_Base: 'BASIC_SALARY',
+					Is_Active: true
+					});
+			}
 
     const { data, error } =
       await supabaseClient.rpc(
