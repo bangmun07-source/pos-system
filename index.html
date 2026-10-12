@@ -26554,6 +26554,180 @@
 	    </div>
 	  </div>
 	</div>
+	
+	<!-- ATTENDANCE RECAP DETAIL MODAL -->
+	<div id="attendanceRecapDetailModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">fact_check</span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Attendance Detail
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Monthly employee attendance recap
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeAttendanceRecapDetail()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- EMPLOYEE INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Employee identity and selected reporting period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Name</label>
+	            <div id="recapDetailEmployeeName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Code</label>
+	            <div id="recapDetailEmployeeCode"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Outlet</label>
+	            <div id="recapDetailBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Period</label>
+	            <div id="recapDetailPeriod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Working Days</label>
+	            <div id="recapDetailWorkingDays"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">0</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Attendance Summary
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Summary for the selected month
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Present</p>
+	            <p id="recapDetailPresent" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Late</p>
+	            <p id="recapDetailLate" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Absent</p>
+	            <p id="recapDetailAbsent" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Leave</p>
+	            <p id="recapDetailLeave" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Sick</p>
+	            <p id="recapDetailSick" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Permission</p>
+	            <p id="recapDetailPermission" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Late Minutes</p>
+	            <p id="recapDetailLateMinutes" class="text-xl font-semibold text-foreground mt-1">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Overtime</p>
+	            <p id="recapDetailOvertime" class="text-xl font-semibold text-foreground mt-1">0 H</p>
+	          </div>
+	        </div>
+	      </section>
+	
+	      <!-- HISTORY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Attendance History
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Daily attendance and overtime records
+	          </p>
+	        </div>
+	
+	        <div class="overflow-x-auto custom-scrollbar border border-outline-variant rounded-md">
+	          <table class="w-full text-sm whitespace-nowrap">
+	            <thead>
+	              <tr class="border-b border-outline-variant uppercase tracking-wider text-muted text-xs">
+	                <th class="px-4 py-3 text-left">Date</th>
+	                <th class="px-4 py-3 text-left">Schedule</th>
+	                <th class="px-4 py-3 text-left">Check In</th>
+	                <th class="px-4 py-3 text-left">Check Out</th>
+	                <th class="px-4 py-3 text-left">Status</th>
+	                <th class="px-4 py-3 text-right">Late</th>
+	                <th class="px-4 py-3 text-right">Overtime</th>
+	                <th class="px-4 py-3 text-left">Note</th>
+	              </tr>
+	            </thead>
+	
+	            <tbody id="recapDetailHistoryBody"
+	              class="divide-y divide-outline-variant">
+	              <tr>
+	                <td colspan="8" class="px-4 py-8 text-center text-muted">
+	                  No attendance history
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end shrink-0">
+	      <button type="button"
+	        onclick="closeAttendanceRecapDetail()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 <!-- =========================================================
