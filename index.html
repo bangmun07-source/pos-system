@@ -24406,10 +24406,11 @@
                 <select id="payrollStatusFilter"
                   onchange="loadPayroll()"
                   class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Status </option>
-                  <option value="DRAFT"> Draft </option>
-                  <option value="CALCULATED"> Calculated </option>
-                  <option value="PAID"> Paid </option>
+									<option value="">All Status</option>
+									<option value="DRAFT">Draft</option>
+									<option value="CALCULATED">Calculated</option>
+									<option value="PAID">Paid</option>
+									<option value="CANCELLED">Cancelled</option>
                 </select>
               </div>
             </div>
@@ -24468,9 +24469,12 @@
                   <th class="px-5 py-3 text-left"> Employee </th>
                   <th class="px-5 py-3 text-right"> Basic Salary </th>
                   <th class="px-5 py-3 text-right"> Allowance </th>
+                  <th class="px-5 py-3 text-right"> Deduction </th>
 									<th class="px-5 py-3 text-right"> Late Minutes </th>
                   <th class="px-5 py-3 text-right"> Overtime </th>
-                  <th class="px-5 py-3 text-right"> Deduction </th>
+									<th class="px-5 py-3 text-right"> Health </th>
+									<th class="px-5 py-3 text-right"> Tax </th>
+									<th class="px-5 py-3 text-right"> Reimburse </th>
                   <th class="px-5 py-3 text-right"> Net Salary </th>
                   <th class="px-5 py-3 text-center"> Status </th>
                   <th class="px-5 py-3 text-center"> Action </th>
@@ -24480,7 +24484,7 @@
               <tbody id="payrollTableBody"
                 class="divide-y divide-outline-variant">
                 <tr>
-                  <td colspan="9"
+                  <td colspan="12"
                     class="px-5 py-10 text-center text-muted">
                     No payroll data
                   </td>
