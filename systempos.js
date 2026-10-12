@@ -36305,10 +36305,6 @@ async function loadAttendanceRecap() {
       })
     ]);
 
-		// Simpan data mentah untuk popup View Detail
-		attendanceRecapAttendanceRows = attendanceRows || [];
-		attendanceRecapOvertimeRows = overtimeRows || [];
-
     if (attendanceResult.error) throw attendanceResult.error;
     if (overtimeResult.error) throw overtimeResult.error;
 
@@ -36318,6 +36314,8 @@ async function loadAttendanceRecap() {
     const overtimeRows = Array.isArray(overtimeResult.data)
       ? overtimeResult.data
       : [];
+		attendanceRecapAttendanceRows = attendanceRows || [];
+		attendanceRecapOvertimeRows = overtimeRows || [];
     const employeeMap = new Map();
 
     function ensureEmployee(row) {
