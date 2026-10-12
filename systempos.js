@@ -36124,6 +36124,8 @@ let attendanceRecapData = [];
 let filteredAttendanceRecapData = [];
 let attendanceRecapCurrentPage = 1;
 const attendanceRecapPageSize = 10;
+let attendanceRecapAttendanceRows = [];
+let attendanceRecapOvertimeRows = [];
 
 function getAttendanceRecapRole() {
   return String(
@@ -36302,6 +36304,10 @@ async function loadAttendanceRecap() {
         p_status: 'RECORDED'
       })
     ]);
+
+		// Simpan data mentah untuk popup View Detail
+		attendanceRecapAttendanceRows = attendanceRows || [];
+		attendanceRecapOvertimeRows = overtimeRows || [];
 
     if (attendanceResult.error) throw attendanceResult.error;
     if (overtimeResult.error) throw overtimeResult.error;
@@ -36544,7 +36550,16 @@ function renderAttendanceRecapTable() {
             maximumFractionDigits: 1
           })} H
         </td>
-        <td class="px-5 py-3 text-center text-muted">Read only</td>
+        <td class="px-5 py-3 text-center">
+				  <button type="button"
+				    data-employee-id="${escapeEmployeeHtml(row.Employee_ID)}"
+				    onclick="viewAttendanceRecapDetail(this.dataset.employeeId)"
+				    title="View Detail"
+				    aria-label="View Detail"
+				    class="w-9 h-9 inline-flex items-center justify-center rounded-md text-muted hover:text-foreground hover:bg-outline-variant transition">
+				    <span class="material-symbols-outlined">more_vert</span>
+				  </button>
+				</td>
       </tr>
     `).join('');
   }
@@ -36584,7 +36599,171 @@ window.changeAttendancePage = function(direction) {
   renderAttendanceRecapTable();
 };
 
+window.viewAttendanceRecapDetail = function(employeeId) {
+  const modal = document.getElementById('attendanceRecapDetailModal');
+  const summary = attendanceRecapData.find(
+    row => String(row.Employee_ID) === String(employeeId)
+  );
 
+  if (!modal || !summary) {
+    console.warn('Attendance recap employee not found:', employeeId);
+    return; }
+	
+  const period = document.getElementById('recapPeriod')?.value || '';
+	
+  if (!/^\d{4}-\d{2}$/.test(period)) {
+    console.warn('Invalid attendance recap period:', period);
+    return; }
+
+  const [year, month] = period.split('-').map(Number);
+  const startDate = `${period}-01`;
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(
+    new Date(year, month, 0).getDate()
+  ).padStart(2, '0')}`;
+  const sameEmployee = row => String(row.Employee_ID) === String(employeeId);
+  const inSelectedMonth = date => {
+    const key = String(date || '').slice(0, 10);
+    return key >= startDate && key <= endDate;
+  };
+  const attendance = attendanceRecapAttendanceRows.filter( row => sameEmployee(row) && inSelectedMonth(row.Attendance_Date) );
+  const overtime = attendanceRecapOvertimeRows.filter( row => sameEmployee(row) && inSelectedMonth(row.Overtime_Date) );
+  const setValue = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value ?? '-';
+  };
+  const number = value => Number(value || 0);
+  const formatNumber = value => number(value).toLocaleString('id-ID');
+  const formatTime = value => {
+    if (!value) return '-';
+    const match = String(value).match(/(?:T|\s)?(\d{2}:\d{2})/);
+    return match ? match[1] : String(value);
+  };
+  const formatDate = value => {
+    const key = String(value || '').slice(0, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return key || '-';
+		
+    const [y, m, d] = key.split('-').map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  };
+  const formatDuration = minutes => {
+    const total = number(minutes);
+    const hours = Math.floor(total / 60);
+    const mins = total % 60;
+    return hours ? `${hours}h ${mins}m` : `${mins}m`;
+  };
+
+  setValue('recapDetailEmployeeName', summary.Full_Name);
+  setValue('recapDetailEmployeeCode', summary.Employee_Code || summary.Employee_ID);
+  setValue('recapDetailBranch', summary.Branch_ID || '-');
+  setValue('recapDetailPeriod',
+    new Date(year, month - 1, 1).toLocaleDateString('en-US', {
+      month: 'long',
+      year: 'numeric'
+    })
+  );
+  setValue('recapDetailWorkingDays', formatNumber(summary.Working_Days));
+  setValue('recapDetailPresent', formatNumber(summary.Present));
+  setValue('recapDetailLate', formatNumber(summary.Late));
+  setValue('recapDetailAbsent', formatNumber(summary.Absent));
+  setValue('recapDetailLeave', formatNumber(summary.Leave));
+  setValue('recapDetailSick', formatNumber(summary.Sick));
+  setValue('recapDetailPermission', formatNumber(summary.Permission));
+  setValue('recapDetailLateMinutes', formatNumber(summary.Late_Minutes));
+  setValue('recapDetailOvertime',
+    `${number(summary.Overtime_Hours).toLocaleString('id-ID', {
+      maximumFractionDigits: 1
+    })} H`
+  );
+
+  const overtimeByDate = new Map();
+
+  overtime.forEach(row => {
+    const date = String(row.Overtime_Date || '').slice(0, 10);
+    if (!date) return;
+    if (!overtimeByDate.has(date)) {
+      overtimeByDate.set(date, {
+        minutes: 0,
+        start: [],
+        end: [],
+        notes: []
+      });
+    }
+
+    const item = overtimeByDate.get(date);
+    item.minutes += number(row.Overtime_Minutes);
+
+    if (row.Start_Time) item.start.push(formatTime(row.Start_Time));
+    if (row.End_Time) item.end.push(formatTime(row.End_Time));
+    if (row.Note) item.notes.push(row.Note);
+  });
+
+  const historyBody = document.getElementById('recapDetailHistoryBody');
+
+  if (historyBody) {
+    const history = [...attendance].sort((a, b) =>
+      String(a.Attendance_Date || '').localeCompare(
+        String(b.Attendance_Date || '')
+      )
+    );
+
+    historyBody.innerHTML = history.length
+      ? history.map(row => {
+          const date = String(row.Attendance_Date || '').slice(0, 10);
+          const ot = overtimeByDate.get(date);
+          const status = String(row.Status || 'NOT_RECORDED')
+            .trim()
+            .toUpperCase();
+
+          const statusClass = {
+            PRESENT: 'text-green-600',
+            LATE: 'text-amber-600',
+            ABSENT: 'text-red-600',
+            LEAVE: 'text-blue-600',
+            SICK: 'text-blue-600',
+            PERMISSION: 'text-blue-600'
+          }[status] || 'text-muted';
+
+          const schedule = `${formatTime(row.Start_Time)} – ${formatTime(row.End_Time)}`;
+          const overtimeText = ot ? formatDuration(ot.minutes) : '-';
+          const overtimeNote = ot?.notes.join('; ') || '';
+          const note = [row.Note, overtimeNote].filter(Boolean).join(' | ');
+
+          return `
+            <tr class="hover:bg-outline-variant">
+              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatDate(date))}</td>
+              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(schedule)}</td>
+              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatTime(row.Check_In))}</td>
+              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatTime(row.Check_Out))}</td>
+              <td class="px-4 py-3 font-medium ${statusClass}">${escapeEmployeeHtml(status.replace(/_/g, ' '))}</td>
+              <td class="px-4 py-3 text-right text-foreground">${formatNumber(row.Late_Minutes)}</td>
+              <td class="px-4 py-3 text-right text-foreground">${escapeEmployeeHtml(overtimeText)}</td>
+              <td class="px-4 py-3 text-foreground whitespace-normal min-w-40">${escapeEmployeeHtml(note || '-')}</td>
+            </tr>
+          `;
+        }).join('')
+      : `
+        <tr>
+          <td colspan="8" class="px-4 py-8 text-center text-muted">
+            No attendance history for this period
+          </td>
+        </tr>
+      `;
+  }
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+window.closeAttendanceRecapDetail = function() {
+  const modal = document.getElementById('attendanceRecapDetailModal');
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+};
 
 /* =========================================================
    									ATTENDANCE PAGE
