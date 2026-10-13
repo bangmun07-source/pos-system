@@ -25212,39 +25212,39 @@
 	          </div>
 	        </div>
 	      </div>
-				<!-- EMPLOYER HEALTH CONTRIBUTION -->
-				<div class="space-y-3 border-t border-outline-variant pt-4">
-				  <div>
-				    <h3 class="text-sm font-semibold">
-				      Employer Health Contribution
-				    </h3>
-				    <p class="text-xs text-on-surface-variant">
-				      Iuran BPJS Kesehatan yang ditanggung perusahaan, dihitung dari gaji karyawan.
-				    </p>
-				  </div>
-				
-				  <div class="flex items-center gap-3">
-				    <div class="flex-1">
-				      <label for="employeeEmployerHealthContribution"
-				        class="mb-1 block text-xs font-medium">
-				        Company Contribution (%)
-				      </label>
-							
-						  <div class="relative">
-						    <input id="employeeEmployerHealthContribution"
-						      type="number"
-						      min="0"
-						      max="100"
-						      step="0.01"
-						      value="4"
-						      placeholder="4"
-						      class="w-full rounded-md border border-outline-variant bg-background px-3 py-2 pr-10 text-sm">
-						
-						    <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">%</span>
-						  </div>
-						</div>
-				  </div>
-				</div>
+			<!-- EMPLOYER CONTRIBUTIONS -->
+			<div class="space-y-3 border-t border-outline-variant pt-4">
+			  <div class="flex items-center justify-between">
+			    <div>
+			      <h3 class="text-sm font-semibold">
+			        Employer Contributions
+			      </h3>
+			      <p class="text-xs text-on-surface-variant">
+			        Iuran yang ditanggung perusahaan.
+			      </p>
+			    </div>
+			
+			    <button
+			      type="button"
+			      onclick="openSalaryComponentModal('EMPLOYER_CONTRIBUTION')"
+			      class="h-9 px-3 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-1.5">
+			      <span class="material-symbols-outlined text-base">add</span>
+			      Add
+			    </button>
+			  </div>
+			
+			  <div
+			    id="salaryEmployerContributionList"
+			    class="border border-outline-variant rounded-md overflow-hidden">
+			    <div
+			      id="salaryEmployerContributionEmpty"
+			      class="px-4 py-5 text-center">
+			      <p class="text-xs text-on-surface-variant">
+			        No employer contributions configured
+			      </p>
+			    </div>
+			  </div>
+			</div>
 	      <!-- EFFECTIVE -->
 	      <div>
 	        <label class="block text-sm font-medium text-foreground mb-2">
