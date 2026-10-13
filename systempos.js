@@ -36929,8 +36929,7 @@ window.calculatePayroll = async function () {
 window.payrollRows = window.payrollRows || [];
 window.payrollCurrentPage = window.payrollCurrentPage || 1;
 window.payrollPageSize = 10;
-window.payrollHandlersAttached =
-    window.payrollHandlersAttached || false;
+window.payrollHandlersAttached = window.payrollHandlersAttached || false;
 
 window.loadPayroll = async function () {
 	const tableBody = document.getElementById('payrollTableBody');
@@ -37035,9 +37034,7 @@ window.loadPayroll = async function () {
 };
 
 
-/* =========================================================
-   PAYROLL - RENDER TABLE, KPI, PAGINATION
-========================================================= */
+/* ==== PAYROLL - RENDER TABLE, KPI, PAGINATION ===== */
 
 window.renderPayrollTable = function () {
     const tableBody = document.getElementById('payrollTableBody');
@@ -37116,7 +37113,16 @@ window.renderPayrollTable = function () {
                     </td>
                     <td class="px-4 py-3 whitespace-nowrap">${money(row.Basic_Salary)}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Allowance)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Deduction)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${
+												money(
+													Math.max(
+														0,
+														(Number(row.Total_Deduction) || 0) -
+														(Number(row.Tax_Amount) || 0)
+													)
+												)
+											}
+										</td>
                     <td class="px-4 py-3 whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
                     <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Overtime)}</td>
                     <td class="px-4 py-3 whitespace-nowrap">${money(row.Health_Amount)}</td>
