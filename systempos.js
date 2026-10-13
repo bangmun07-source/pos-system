@@ -32405,6 +32405,9 @@ async function initEmployeePage() {
     }
     await loadEmployeeOvertime();
 		await initAttendanceRecap();
+		if (document.getElementById('payrollTableBody')) {
+		    await loadPayroll();
+		}
   } catch (error) {
 		console.error('initEmployeePage:', error);
 	}
@@ -36762,6 +36765,402 @@ window.closeAttendanceRecapDetail = function() {
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
+
+
+/* =========================================================
+   									EMPLOYEE SALARY / PAYROLL
+========================================================= */
+
+
+/* =========================================================
+   PAYROLL - CALCULATE
+   Calculate dan simpan hasil Payroll, tanpa membuat jurnal
+========================================================= */
+
+window.calculatePayroll = async function () {
+    const periodInput = document.getElementById('payrollPeriod');
+    const branchFilter = document.getElementById('payrollBranchFilter');
+
+    const calculateButton = document.querySelector(
+        'button[onclick="calculatePayroll()"]'
+    );
+
+    try {
+        // 1. Validasi session
+        const sessionId = localStorage.getItem('pos_session_id');
+
+        if (!sessionId) {
+            throw new Error('Session tidak ditemukan. Silakan login kembali.');
+        }
+
+        // 2. Validasi periode Payroll
+        const period = periodInput?.value?.trim();
+
+        if (!period || !/^\d{4}-\d{2}$/.test(period)) {
+            throw new Error('Pilih periode Payroll terlebih dahulu.');
+        }
+
+        // 3. Validasi Supabase client
+        if (
+            typeof supabaseClient === 'undefined' ||
+            !supabaseClient
+        ) {
+            throw new Error('Supabase client belum tersedia.');
+        }
+
+        // 4. Tentukan outlet
+        let branchId = branchFilter?.value?.trim() || null;
+
+        const currentUser =
+            typeof state !== 'undefined' ? state.user : null;
+
+        const role = String(currentUser?.role || '')
+            .trim()
+            .toUpperCase();
+
+        // Admin dan Cashier hanya dapat memproses outlet sendiri.
+        // Owner dapat memilih outlet tertentu atau ALL.
+        if (role !== 'OWNER') {
+            const userBranchId = String(
+                currentUser?.branchId || ''
+            ).trim();
+
+            if (!userBranchId) {
+                throw new Error(
+                    'Outlet pengguna tidak ditemukan.'
+                );
+            }
+
+            branchId = userBranchId;
+        } else if (
+            !branchId ||
+            branchId.toUpperCase() === 'ALL'
+        ) {
+            branchId = null;
+        }
+
+        // 5. Cegah klik Calculate berulang
+        if (calculateButton?.disabled) return;
+
+        if (calculateButton) {
+            calculateButton.disabled = true;
+            calculateButton.setAttribute('aria-busy', 'true');
+        }
+
+        console.log('CALCULATE PAYROLL', {
+            period,
+            branchId: branchId || 'ALL'
+        });
+
+        // 6. Panggil RPC Supabase
+        const { data, error } = await supabaseClient.rpc(
+            'calculate_employee_payroll',
+            {
+                p_session_id: sessionId,
+                p_payroll_period: `${period}-01`,
+                p_branch_id: branchId
+            }
+        );
+
+        if (error) {
+            throw error;
+        }
+
+        // RPC RETURNS JSONB
+        const result = Array.isArray(data) ? data[0] : data;
+
+        if (!result || result.success !== true) {
+            throw new Error(
+                result?.message ||
+                'Calculate Payroll gagal diproses.'
+            );
+        }
+
+        console.log('PAYROLL CALCULATED', result);
+
+        // 7. Refresh tabel jika fungsi loadPayroll sudah tersedia.
+        // Jika belum dibuat, hasil tetap sudah tersimpan di database.
+        if (typeof window.loadPayroll === 'function') {
+            try {
+                await window.loadPayroll();
+            } catch (refreshError) {
+                console.error(
+                    'Payroll tersimpan, tetapi tabel gagal dimuat ulang:',
+                    refreshError
+                );
+            }
+        }
+
+        // 8. Tampilkan hasil
+        alert(
+            'Calculate Payroll berhasil.\n\n' +
+            `Periode: ${period}\n` +
+            `Outlet: ${result.branch_id || 'ALL'}\n` +
+            `Karyawan diproses: ${result.processed ?? 0}\n` +
+            `Tanpa Salary Setting: ${result.skipped_no_salary ?? 0}\n` +
+            `Dilewati karena status: ${result.skipped_existing_status ?? 0}\n\n` +
+            'Hasil disimpan ke Employee_Payroll dan ' +
+            'Employee_Payroll_Details.\n' +
+            'Jurnal belum dibuat.'
+        );
+
+    } catch (error) {
+        console.error('calculatePayroll:', error);
+
+        alert(
+            'Calculate Payroll gagal.\n\n' +
+            (error.message || 'Terjadi kesalahan saat menghitung Payroll.')
+        );
+
+    } finally {
+        if (calculateButton) {
+            calculateButton.disabled = false;
+            calculateButton.removeAttribute('aria-busy');
+        }
+    }
+};
+
+
+
+/* =========================================================
+   PAYROLL - LOAD DATA
+========================================================= */
+
+window.payrollRows = window.payrollRows || [];
+window.payrollCurrentPage = window.payrollCurrentPage || 1;
+window.payrollPageSize = 10;
+window.payrollHandlersAttached =
+    window.payrollHandlersAttached || false;
+
+window.loadPayroll = async function () {
+	const tableBody = document.getElementById('payrollTableBody');
+
+	if (!tableBody) return;
+
+	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+
+		if (!sessionId) {
+			throw new Error('Session tidak ditemukan. Silakan login kembali.');
+		}
+
+		const periodInput = document.getElementById('payrollPeriod');
+		const branchFilter = document.getElementById('payrollBranchFilter');
+		const statusFilter = document.getElementById('payrollStatusFilter');
+		const period = periodInput?.value?.trim() || null;
+		const user = typeof state !== 'undefined' ? state.user : null;
+		const role = String(user?.role || '').trim().toUpperCase();
+
+		if (!role) {
+			throw new Error('Role pengguna tidak ditemukan.');
+		}
+
+		let branchId = branchFilter?.value?.trim() || null;
+
+		// Owner dapat memilih outlet tertentu atau semua outlet.
+		// Admin dan Cashier dibatasi pada outlet miliknya di UI.
+		if (role !== 'OWNER') {
+			branchId = String(user?.branchId || '').trim();
+
+			if (!branchId) {
+				throw new Error('Outlet pengguna tidak ditemukan.');
+			}
+		} else if (!branchId || branchId.toUpperCase() === 'ALL') {
+			branchId = null;
+		}
+
+		if (!window.payrollHandlersAttached) {
+			periodInput?.addEventListener('change', () => {
+				window.payrollCurrentPage = 1;
+				window.loadPayroll();
+			});
+
+			statusFilter?.addEventListener('change', () => {
+				window.payrollCurrentPage = 1;
+				window.renderPayrollTable();
+			});
+
+			window.payrollHandlersAttached = true;
+		}
+
+		tableBody.innerHTML = `
+			<tr>
+				<td colspan="13" class="px-4 py-8 text-center">
+					Loading Payroll...
+				</td>
+			</tr>
+		`;
+
+		const { data, error } = await supabaseClient.rpc(
+			'get_employee_payrolls',
+			{
+				p_session_id: sessionId,
+				p_payroll_period: period ? `${period}-01` : null,
+				p_branch_id: branchId
+			}
+		);
+
+		if (error) throw error;
+
+		const result = Array.isArray(data) ? data[0] : data;
+
+		if (!result || result.success !== true) {
+			throw new Error('Gagal mengambil data Payroll.');
+		}
+
+		window.payrollRows = Array.isArray(result.rows)
+			? result.rows
+			: [];
+
+		window.payrollCurrentPage = 1;
+		window.renderPayrollTable();
+		console.log('PAYROLL LOADED:', window.payrollRows.length);
+	} catch (error) {
+		console.error('loadPayroll:', error);
+		tableBody.innerHTML = `
+			<tr>
+				<td colspan="13" class="px-4 py-8 text-center text-red-500">
+					Gagal memuat data Payroll.
+					${String(error.message || '').replace(/[&<>"']/g, char => ({
+							'&': '&amp;',
+							'<': '&lt;',
+							'>': '&gt;',
+							'"': '&quot;',
+							"'": '&#39;'
+					})[char])}
+				</td>
+			</tr>
+		`;
+	}
+};
+
+
+/* =========================================================
+   PAYROLL - RENDER TABLE, KPI, PAGINATION
+========================================================= */
+
+window.renderPayrollTable = function () {
+    const tableBody = document.getElementById('payrollTableBody');
+    if (!tableBody) return;
+
+    const statusFilter = document.getElementById('payrollStatusFilter')?.value || '';
+    const rows = window.payrollRows.filter(row => { return !statusFilter || row.Status === statusFilter; });
+    const money = value => new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        maximumFractionDigits: 0
+    }).format(Number(value) || 0);
+    const escapeHtml = value => String(value ?? '').replace(
+        /[&<>"']/g,
+        char => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#39;'
+        })[char]
+    );
+    const sum = key => rows.reduce( (total, row) => total + (Number(row[key]) || 0), 0 );
+    // KPI mengikuti periode, outlet, dan status filter.
+    const kpiValues = {
+        payrollGrossSalary: sum('Gross_Salary'),
+        payrollAllowance: sum('Total_Allowance'),
+        payrollDeduction: sum('Total_Deduction'),
+        payrollNetSalary: sum('Net_Salary')
+    };
+
+    Object.entries(kpiValues).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = money(value);
+    });
+
+    // Pagination
+    const pageSize = window.payrollPageSize;
+    const totalRows = rows.length;
+    const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+
+    window.payrollCurrentPage = Math.min(
+        Math.max(1, window.payrollCurrentPage),
+        totalPages
+    );
+
+    const startIndex = (window.payrollCurrentPage - 1) * pageSize;
+    const pageRows = rows.slice(startIndex, startIndex + pageSize);
+
+    if (pageRows.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="13" class="px-4 py-8 text-center text-gray-500">
+                    Belum ada data Payroll.
+                </td>
+            </tr>
+        `;
+    } else {
+        tableBody.innerHTML = pageRows.map(row => {
+            const status = String(row.Status || '').toUpperCase();
+
+            const statusClass = {
+                DRAFT: 'bg-gray-100 text-gray-700',
+                CALCULATED: 'bg-blue-100 text-blue-700',
+                PAID: 'bg-green-100 text-green-700',
+                CANCELLED: 'bg-red-100 text-red-700'
+            }[status] || 'bg-gray-100 text-gray-700';
+
+            return `
+                <tr class="border-b border-outline-variant">
+                    <td class="px-4 py-3">
+                        <div class="font-medium">${escapeHtml(row.Full_Name)}</div>
+                        <div class="text-xs text-gray-500">
+                            ${escapeHtml(row.Employee_Code)}
+                        </div>
+                    </td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Basic_Salary)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Allowance)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Deduction)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Overtime)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Health_Amount)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Tax_Amount)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Receivable_Amount)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
+                    <td class="px-4 py-3 whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-1 rounded text-xs ${statusClass}">
+                            ${escapeHtml(status)}
+                        </span>
+                    </td>
+                    <td class="px-4 py-3">—</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    const paginationInfo = document.getElementById('payrollPaginationInfo');
+
+    if (paginationInfo) {
+        paginationInfo.textContent = totalRows
+            ? `Menampilkan ${startIndex + 1}–${Math.min(startIndex + pageSize, totalRows)} dari ${totalRows} data`
+            : '0 data';
+    }
+
+    const prevButton = document.getElementById('payrollPrevButton');
+    const nextButton = document.getElementById('payrollNextButton');
+
+    if (prevButton) prevButton.disabled = window.payrollCurrentPage <= 1;
+    if (nextButton) nextButton.disabled = window.payrollCurrentPage >= totalPages;
+};
+
+
+/* =========================================================
+   PAYROLL - CHANGE PAGE
+========================================================= */
+
+window.changePayrollPage = function (direction) {
+    window.payrollCurrentPage += Number(direction) || 0;
+    window.renderPayrollTable();
+};
+
+
 
 /* =========================================================
    									ATTENDANCE PAGE
