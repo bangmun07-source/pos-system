@@ -33954,11 +33954,9 @@ window.saveEmployeeSalary = async function () {
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
     const components = employeeSalaryComponents.map(component => ({
-      Component_ID:
-        String(component.Component_ID || '').startsWith('TEMP-')
-          ? null
-          : component.Component_ID || null,
-
+      Component_ID: String(component.Component_ID || '').startsWith('TEMP-')
+				? null
+				: component.Component_ID || null,
       Salary_ID: component.Salary_ID || null,
       Employee_ID: employeeId,
       Component_Type: component.Component_Type,
@@ -33966,10 +33964,9 @@ window.saveEmployeeSalary = async function () {
       Amount: Number(component.Amount || 0),
       Calculation_Type: component.Calculation_Type || 'FIXED',
       Accounting_Category: component.Accounting_Category || null,
-      Calculation_Base:
-        component.Calculation_Type === 'PERCENTAGE'
-          ? component.Calculation_Base || 'BASIC_SALARY'
-          : null,
+      Calculation_Base: component.Calculation_Type === 'PERCENTAGE'
+				? component.Calculation_Base || 'BASIC_SALARY'
+				: null,
       Is_Active: component.Is_Active !== false
     }));
 
@@ -33987,11 +33984,7 @@ window.saveEmployeeSalary = async function () {
     );
 
     if (error) throw error;
-    const result = typeof data === 'string'
-      ? JSON.parse(data)
-      : data;
-
-    if (result?.success === false) { throw new Error(result.message || 'Gagal menyimpan salary employee.'); }
+		if (!data) { throw new Error('Gagal menyimpan salary employee.'); }
 
     closeSalaryModal();
     alert('Salary employee berhasil disimpan.');
