@@ -33484,13 +33484,11 @@ window.openEmployeeSalarySetting = async function (employeeId) {
   /* === RESET FORM === */
   const basicSalary = document.getElementById('employeeBasicSalary');
   const overtimeRate = document.getElementById('employeeOvertimeRate');
-  const employerContribution = document.getElementById( 'employeeEmployerHealthContribution' );
   const effectiveFrom = document.getElementById('salaryEffectiveFrom');
   const note = document.getElementById('salaryNote');
 
   if (basicSalary) basicSalary.value = '';
   if (overtimeRate) overtimeRate.value = '0';
-  if (employerContribution) employerContribution.value = '0';
   if (effectiveFrom) effectiveFrom.value = '';
   if (note) note.value = '';
 
@@ -33527,18 +33525,6 @@ window.openEmployeeSalarySetting = async function (employeeId) {
     if (overtimeRate) overtimeRate.value = salary.Overtime_Rate ?? 0;
     if (effectiveFrom) effectiveFrom.value = salary.Effective_From || '';
     if (note) note.value = salary.Note || '';
-
-    /* === LOAD EMPLOYER CONTRIBUTION === */
-    const employerComponent = components.find(component =>
-      component.Component_Type === 'EMPLOYER_CONTRIBUTION' &&
-      component.Is_Active !== false
-    );
-
-    if (employerContribution) {
-      employerContribution.value = employerComponent
-        ? Number(employerComponent.Amount || 0)
-        : 0;
-    }
 		
     renderSalaryComponents(components);
 
@@ -33563,13 +33549,11 @@ window.closeSalaryModal = function () {
   /* === RESET SALARY === */
   const basicSalary = document.getElementById('employeeBasicSalary');
   const overtimeRate = document.getElementById('employeeOvertimeRate');
-	const employerContribution = document.getElementById('employeeEmployerHealthContribution' );
   const effectiveFrom = document.getElementById('salaryEffectiveFrom');
   const note = document.getElementById('salaryNote');
 
   if (basicSalary) { basicSalary.value = ''; }
   if (overtimeRate) { overtimeRate.value = '0'; }
-	if (employerContribution) { employerContribution.value = '0'; }
   if (effectiveFrom) { effectiveFrom.value = ''; }
   if (note) { note.value = ''; }
   /* === RESET COMPONENT LIST === */
@@ -33580,72 +33564,66 @@ window.closeSalaryModal = function () {
 let employeeSalaryComponents = [];
 
 function renderSalaryComponents(components = []) {
-  employeeSalaryComponents =
-    Array.isArray(components)
-      ? [...components]
-      : [];
+  employeeSalaryComponents = Array.isArray(components)
+    ? [...components]
+    : [];
 
   const allowanceList = document.getElementById('salaryAllowanceList');
   const deductionList = document.getElementById('salaryDeductionList');
+  const employerList = document.getElementById('salaryEmployerContributionList');
 
-  if (!allowanceList || !deductionList) { return; }
-	
-  const allowances =
-    employeeSalaryComponents.filter(
-      component =>
-        component.Component_Type === 'ALLOWANCE' &&
-        component.Is_Active !== false
-    );
-  const deductions =
-    employeeSalaryComponents.filter(
-      component =>
-        component.Component_Type === 'DEDUCTION' &&
-        component.Is_Active !== false
-    );
+  const renderList = (element, items, emptyMessage, iconName) => {
+    if (!element) return;
 
-  /* === ALLOWANCES === */
-  if (!allowances.length) {
-    allowanceList.innerHTML = `
-      <div class="px-4 py-5 text-center">
-        <span class="material-symbols-outlined text-2xl text-muted">
-          payments
-        </span>
+    if (!items.length) {
+      element.innerHTML = `
+        <div class="px-4 py-5 text-center">
+          <span class="material-symbols-outlined text-2xl text-muted">
+            ${iconName}
+          </span>
+          <p class="text-xs text-muted mt-2">${emptyMessage}</p>
+        </div>
+      `;
+      return;
+    }
 
-        <p class="text-xs text-muted mt-2">
-          No allowance configured
-        </p>
-      </div>
-    `;
+    element.innerHTML = items
+      .map(component => renderSalaryComponentRow(component))
+      .join('');
+  };
 
-  } else {
-    allowanceList.innerHTML =
-      allowances.map(
-        component =>
-          renderSalaryComponentRow(component)
-      ).join('');
-  }
+  const activeComponents = employeeSalaryComponents.filter(
+    component => component.Is_Active !== false
+  );
 
-  /* === DEDUCTIONS === */
-  if (!deductions.length) {
-    deductionList.innerHTML = `
-      <div class="px-4 py-5 text-center">
-        <span class="material-symbols-outlined text-2xl text-muted">
-          remove_circle_outline
-        </span>
+  renderList(
+    allowanceList,
+    activeComponents.filter(component =>
+      component.Component_Type === 'ALLOWANCE'
+    ),
+    'No allowance configured',
+    'payments'
+  );
 
-        <p class="text-xs text-muted mt-2">
-          No deduction configured
-        </p>
-      </div>
-    `;
-  } else {
-    deductionList.innerHTML =
-      deductions.map(
-        component =>
-          renderSalaryComponentRow(component)
-      ).join('');
-  }
+  renderList(
+    deductionList,
+    activeComponents.filter(component =>
+      component.Component_Type === 'DEDUCTION'
+    ),
+    'No deduction configured',
+    'remove_circle_outline'
+  );
+
+  renderList(
+    employerList,
+    activeComponents.filter(component =>
+      component.Component_Type === 'EMPLOYER_CONTRIBUTION'
+    ),
+    'No employer contributions configured',
+    'health_and_safety'
+  );
 }
+
 
 /* ==== COMPONENT ROW ==== */
 function renderSalaryComponentRow(component) {
@@ -33761,33 +33739,69 @@ window.closeSalaryComponentModal = function () {
   if (amountInput) { amountInput.value = ''; }
 };
 
+
 /* === SAVE SALARY COMPONENT === */
 window.saveSalaryComponent = function () {
   const type = document.getElementById('salaryComponentType')?.value;
   const componentId = document.getElementById('salaryComponentId')?.value?.trim();
   const name = document.getElementById('salaryComponentName')?.value?.trim();
-  const amount = Number(document.getElementById('salaryComponentAmount')?.value || 0);
-  const calculationType = document.getElementById('salaryComponentCalculationType')?.value || 'FIXED';
-  const accountingCategory = document.getElementById('salaryComponentAccountingCategory')?.value;
-  const calculationBase = document.getElementById('salaryComponentCalculationBase')?.value || 'BASIC_SALARY';
+  const amount = Number(
+    document.getElementById('salaryComponentAmount')?.value || 0
+  );
+  const calculationType =
+    document.getElementById('salaryComponentCalculationType')?.value || 'FIXED';
+  const accountingCategory =
+    document.getElementById('salaryComponentAccountingCategory')?.value;
+  const calculationBase =
+    document.getElementById('salaryComponentCalculationBase')?.value ||
+    'BASIC_SALARY';
 
-  if (!type) { alert('Component type tidak ditemukan.'); return; }
-  if (!name) { alert('Component Name wajib diisi.'); return; }
-  if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
-  if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
-  if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
-  /*
-   * Tipe komponen yang tersedia saat ini hanya ALLOWANCE
-   * dan DEDUCTION. Jangan izinkan kategori dengan perlakuan
-   * terpisah masuk ke dua daftar ini secara keliru.
-   */
-  const unsupportedCategories = [ 'EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT' ];
+  if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) {
+    alert('Component type tidak valid.');
+    return;
+  }
 
-  if (unsupportedCategories.includes(accountingCategory)) {
-    alert(
-      'Kategori ini memerlukan jenis komponen dan tampilan tersendiri. ' +
-      'Jangan simpan sebagai Allowance atau Deduction biasa.'
-    );
+  if (!name) {
+    alert('Component Name wajib diisi.');
+    return;
+  }
+
+  if (!accountingCategory) {
+    alert('Accounting Category wajib dipilih.');
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount < 0) {
+    alert('Amount tidak boleh negatif atau tidak valid.');
+    return;
+  }
+
+  if (calculationType === 'PERCENTAGE' && amount > 100) {
+    alert('Persentase tidak boleh lebih dari 100%.');
+    return;
+  }
+
+  if (
+    type === 'EMPLOYER_CONTRIBUTION' &&
+    accountingCategory !== 'EMPLOYER_HEALTH_CONTRIBUTION'
+  ) {
+    alert('Pilih kategori Employer Contribution yang sesuai.');
+    return;
+  }
+
+  if (
+    type === 'ALLOWANCE' &&
+    ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
+  ) {
+    alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.');
+    return;
+  }
+
+  if (
+    type === 'DEDUCTION' &&
+    ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
+  ) {
+    alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.');
     return;
   }
 
@@ -33798,28 +33812,25 @@ window.saveSalaryComponent = function () {
     Calculation_Type: calculationType,
     Accounting_Category: accountingCategory,
     Calculation_Base:
-      calculationType === 'PERCENTAGE'
-        ? calculationBase
-        : null,
+      calculationType === 'PERCENTAGE' ? calculationBase : null,
     Is_Active: true
   };
 
-  /* === EDIT EXISTING COMPONENT === */
   if (componentId) {
     const index = employeeSalaryComponents.findIndex(
       component => component.Component_ID === componentId
     );
 
-    if (index !== -1) {
-      employeeSalaryComponents[index] = {
-        ...employeeSalaryComponents[index],
-        ...componentData
-      };
+    if (index === -1) {
+      alert('Komponen yang akan diedit tidak ditemukan.');
+      return;
     }
-  }
 
-  /* === ADD NEW COMPONENT === */
-  else {
+    employeeSalaryComponents[index] = {
+      ...employeeSalaryComponents[index],
+      ...componentData
+    };
+  } else {
     employeeSalaryComponents.push({
       Component_ID: `TEMP-${crypto.randomUUID()}`,
       Salary_ID: null,
@@ -33832,6 +33843,7 @@ window.saveSalaryComponent = function () {
   renderSalaryComponents(employeeSalaryComponents);
   closeSalaryComponentModal();
 };
+
 
 function updateSalaryComponentCalculationBase() {
   const calculationType = document.getElementById('salaryComponentCalculationType')?.value;
@@ -33863,30 +33875,25 @@ window.editSalaryComponent = function (componentId) {
   const categoryInput = document.getElementById('salaryComponentAccountingCategory');
   const calculationBase = document.getElementById('salaryComponentCalculationBase');
 
-  if (title) {
-    title.textContent =
-      component.Component_Type === 'ALLOWANCE'
-        ? 'Edit Allowance'
-        : 'Edit Deduction';
-  }
-
+	if (title) {
+	  title.textContent = {
+	    ALLOWANCE: 'Edit Allowance',
+	    DEDUCTION: 'Edit Deduction',
+	    EMPLOYER_CONTRIBUTION: 'Edit Employer Contribution'
+	  }[component.Component_Type] || 'Edit Salary Component';
+	}
   if (typeInput) typeInput.value = component.Component_Type || '';
   if (componentIdInput) componentIdInput.value = component.Component_ID || '';
   if (nameInput) nameInput.value = component.Component_Name || '';
   if (amountInput) amountInput.value = component.Amount ?? 0;
-
   if (categoryInput) {
     categoryInput.value = component.Accounting_Category || '';
   }
-
   if (calculationInput) {
     calculationInput.value = component.Calculation_Type || 'FIXED';
     calculationInput.onchange = updateSalaryComponentAmountUnit;
   }
-
-  if (calculationBase) {
-    calculationBase.value = component.Calculation_Base || 'BASIC_SALARY';
-  }
+  if (calculationBase) { calculationBase.value = component.Calculation_Base || 'BASIC_SALARY'; }
 
   updateSalaryComponentAmountUnit();
 
@@ -33925,97 +33932,74 @@ window.removeSalaryComponent = function (componentId) {
 
 /* === SAVE SALARY === */
 
-window.saveEmployeeSalary = async function () {
-  /* === OWNER ONLY === */
-  if (state.user.role !== 'Owner') { alert( 'Hanya Owner yang dapat mengatur salary employee.' ); return; }
-  /* === FORM === */
-  const employeeId = document.getElementById( 'salaryEmployeeId' )?.value?.trim();
-  const basicSalary = Number( document.getElementById( 'employeeBasicSalary' )?.value || 0 );
-  const overtimeRate = Number( document.getElementById( 'employeeOvertimeRate' )?.value || 0 );
-	const employerHealthContribution = Number( document.getElementById('employeeEmployerHealthContribution')?.value || 0 );
-  const effectiveFrom = document.getElementById( 'salaryEffectiveFrom' )?.value || null;
-  const note = document.getElementById( 'salaryNote' )?.value?.trim() || null;
-	/* === VALIDATION === */
-	if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
-	if (basicSalary < 0) { alert('Basic Salary tidak boleh negatif.'); return; }
-	if (overtimeRate < 0) { alert('Overtime Rate tidak boleh negatif.'); return; }
-	if (!effectiveFrom) { alert('Effective From wajib diisi.'); return; }
-	
-	try {
-	  const sessionId = localStorage.getItem('pos_session_id');
-	
-	  if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
-		/* === VALIDATE EMPLOYER CONTRIBUTION === */
-		if (
-			!Number.isFinite(employerHealthContribution) ||
-			employerHealthContribution < 0 ||
-			employerHealthContribution > 100
-		) { alert('Employer Health Contribution harus antara 0 sampai 100%.'); return; }
-		
-		/* === EMPLOYER CONTRIBUTION === */
-		const existingEmployerComponent = employeeSalaryComponents.find(
-			component =>
-				component.Component_Type === 'EMPLOYER_CONTRIBUTION' ||
-				component.Accounting_Category === 'EMPLOYER_HEALTH_CONTRIBUTION'
-		);
-		const components = employeeSalaryComponents
-			.filter(component =>
-				component.Component_Type !== 'EMPLOYER_CONTRIBUTION' &&
-				component.Accounting_Category !== 'EMPLOYER_HEALTH_CONTRIBUTION'
-			)
-			.map(component => ({
-				Component_ID: component.Component_ID || null,
-				Salary_ID: component.Salary_ID || null,
-				Employee_ID: employeeId,
-				Component_Type: component.Component_Type,
-				Component_Name: component.Component_Name,
-				Amount: Number(component.Amount || 0),
-				Calculation_Type: component.Calculation_Type || 'FIXED',
-				Accounting_Category: component.Accounting_Category || null,
-				Calculation_Base:
-				component.Calculation_Type === 'PERCENTAGE'
-				? (component.Calculation_Base || 'BASIC_SALARY')
-				: null,
-				Is_Active: component.Is_Active !== false
-			}));
-			
-			if (employerHealthContribution > 0) {
-				components.push({
-					Component_ID: existingEmployerComponent?.Component_ID || null,
-					Salary_ID: existingEmployerComponent?.Salary_ID || null,
-					Employee_ID: employeeId,
-					Component_Type: 'EMPLOYER_CONTRIBUTION',
-					Component_Name: 'BPJS Perusahaan',
-					Amount: employerHealthContribution,
-					Calculation_Type: 'PERCENTAGE',
-					Accounting_Category: 'EMPLOYER_HEALTH_CONTRIBUTION',
-					Calculation_Base: 'BASIC_SALARY',
-					Is_Active: true
-					});
-			}
 
-    const { data, error } =
-      await supabaseClient.rpc(
-        'save_employee_salary',
-        {
-          p_session_id: sessionId,
-          p_employee_id: employeeId,
-          p_basic_salary: basicSalary,
-          p_overtime_rate: overtimeRate,
-          p_effective_from: effectiveFrom,
-          p_note: note,
-          p_components: components
-        }
-      );
-		
-    if (error) { throw error; }
+/* === SAVE SALARY === */
+window.saveEmployeeSalary = async function () {
+  if (state.user.role !== 'Owner') { alert('Hanya Owner yang dapat mengatur salary employee.'); return; }
+
+  const employeeId = document.getElementById('salaryEmployeeId')?.value?.trim();
+  const basicSalary = Number( document.getElementById('employeeBasicSalary')?.value || 0 );
+  const overtimeRate = Number( document.getElementById('employeeOvertimeRate')?.value || 0 );
+  const effectiveFrom = document.getElementById('salaryEffectiveFrom')?.value || null;
+  const note = document.getElementById('salaryNote')?.value?.trim() || null;
+
+  if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
+  if (!Number.isFinite(basicSalary) || basicSalary < 0) { alert('Basic Salary tidak boleh negatif atau tidak valid.'); return; }
+  if (!Number.isFinite(overtimeRate) || overtimeRate < 0) { alert('Overtime Rate tidak boleh negatif atau tidak valid.'); return; }
+  if (!effectiveFrom) { alert('Effective From wajib diisi.'); return; }
+
+  try {
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
+    const components = employeeSalaryComponents.map(component => ({
+      Component_ID:
+        String(component.Component_ID || '').startsWith('TEMP-')
+          ? null
+          : component.Component_ID || null,
+
+      Salary_ID: component.Salary_ID || null,
+      Employee_ID: employeeId,
+      Component_Type: component.Component_Type,
+      Component_Name: component.Component_Name,
+      Amount: Number(component.Amount || 0),
+      Calculation_Type: component.Calculation_Type || 'FIXED',
+      Accounting_Category: component.Accounting_Category || null,
+      Calculation_Base:
+        component.Calculation_Type === 'PERCENTAGE'
+          ? component.Calculation_Base || 'BASIC_SALARY'
+          : null,
+      Is_Active: component.Is_Active !== false
+    }));
+
+    const { data, error } = await supabaseClient.rpc(
+      'save_employee_salary',
+      {
+        p_session_id: sessionId,
+        p_employee_id: employeeId,
+        p_basic_salary: basicSalary,
+        p_overtime_rate: overtimeRate,
+        p_effective_from: effectiveFrom,
+        p_note: note,
+        p_components: components
+      }
+    );
+
+    if (error) throw error;
+    const result = typeof data === 'string'
+      ? JSON.parse(data)
+      : data;
+
+    if (result?.success === false) { throw new Error(result.message || 'Gagal menyimpan salary employee.'); }
 
     closeSalaryModal();
-    alert( 'Salary employee berhasil disimpan.' );
+    alert('Salary employee berhasil disimpan.');
   } catch (error) {
-    alert( error?.message || 'Gagal menyimpan salary employee.' );
+    alert(error?.message || 'Gagal menyimpan salary employee.');
   }
 };
+
 
 function updateSalaryComponentAmountUnit() {
   const calculationType = document.getElementById('salaryComponentCalculationType')?.value;
