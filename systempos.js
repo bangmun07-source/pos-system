@@ -36978,32 +36978,32 @@ window.renderPayrollTable = function () {
     const statusFilter = document.getElementById('payrollStatusFilter')?.value || '';
     const rows = window.payrollRows.filter(row => { return !statusFilter || row.Status === statusFilter; });
     const money = value => new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-        maximumFractionDigits: 0
+			style: 'currency',
+			currency: 'IDR',
+			maximumFractionDigits: 0
     }).format(Number(value) || 0);
     const escapeHtml = value => String(value ?? '').replace(
-        /[&<>"']/g,
-        char => ({
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-            '"': '&quot;',
-            "'": '&#39;'
-        })[char]
+			/[&<>"']/g,
+			char => ({
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				'"': '&quot;',
+				"'": '&#39;'
+			})[char]
     );
     const sum = key => rows.reduce( (total, row) => total + (Number(row[key]) || 0), 0 );
     // KPI mengikuti periode, outlet, dan status filter.
     const kpiValues = {
-        payrollGrossSalary: sum('Gross_Salary'),
-        payrollAllowance: sum('Total_Allowance'),
-        payrollDeduction: sum('Total_Deduction'),
-        payrollNetSalary: sum('Net_Salary')
+			payrollGrossSalary: sum('Gross_Salary'),
+			payrollAllowance: sum('Total_Allowance'),
+			payrollDeduction: sum('Total_Deduction'),
+			payrollNetSalary: sum('Net_Salary')
     };
 
     Object.entries(kpiValues).forEach(([id, value]) => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = money(value);
+			const element = document.getElementById(id);
+			if (element) element.textContent = money(value);
     });
 
     // Pagination
@@ -37012,67 +37012,103 @@ window.renderPayrollTable = function () {
     const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
 
     window.payrollCurrentPage = Math.min(
-        Math.max(1, window.payrollCurrentPage),
-        totalPages
+			Math.max(1, window.payrollCurrentPage),
+			totalPages
     );
 
     const startIndex = (window.payrollCurrentPage - 1) * pageSize;
     const pageRows = rows.slice(startIndex, startIndex + pageSize);
 
     if (pageRows.length === 0) {
-        tableBody.innerHTML = `
-            <tr>
-                <td colspan="13" class="px-4 py-8 text-center text-gray-500">
-                    Belum ada data Payroll.
-                </td>
-            </tr>
-        `;
+			tableBody.innerHTML = `
+				<tr>
+					<td colspan="13" class="px-4 py-8 text-center text-gray-500">
+						Belum ada data Payroll.
+					</td>
+				</tr>
+			`;
     } else {
-        tableBody.innerHTML = pageRows.map(row => {
-            const status = String(row.Status || '').toUpperCase();
+			tableBody.innerHTML = pageRows.map(row => {
+				const status = String(row.Status || '').toUpperCase();
 
-            const statusClass = {
-                DRAFT: 'bg-gray-100 text-gray-700',
-                CALCULATED: 'bg-blue-100 text-blue-700',
-                PAID: 'bg-green-100 text-green-700',
-                CANCELLED: 'bg-red-100 text-red-700'
-            }[status] || 'bg-gray-100 text-gray-700';
+				const statusClass = {
+					DRAFT: 'bg-gray-100 text-gray-700',
+					CALCULATED: 'bg-blue-100 text-blue-700',
+					PAID: 'bg-green-100 text-green-700',
+					CANCELLED: 'bg-red-100 text-red-700'
+				}[status] || 'bg-gray-100 text-gray-700';
 
-            return `
-                <tr class="border-b border-outline-variant">
-                    <td class="px-4 py-3">
-                        <div class="font-medium">${escapeHtml(row.Full_Name)}</div>
-                        <div class="text-xs text-gray-500">
-                            ${escapeHtml(row.Employee_Code)}
-                        </div>
-                    </td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Basic_Salary)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Allowance)}</td>
-										<td class="px-4 py-3 whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
-                    <td class="px-4 py-3 whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Overtime)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Health_Amount)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Tax_Amount)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Receivable_Amount)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
-                    <td class="px-4 py-3 whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
-                    <td class="px-4 py-3">
-                        <span class="px-2 py-1 rounded text-xs ${statusClass}">
-                            ${escapeHtml(status)}
-                        </span>
-                    </td>
-                    <td class="px-4 py-3">—</td>
-                </tr>
-            `;
-        }).join('');
+				return `
+					<tr class="border-b border-outline-variant">
+						<td class="px-4 py-3">
+							<div class="font-medium">${escapeHtml(row.Full_Name)}</div>
+							<div class="text-xs text-gray-500">
+								${escapeHtml(row.Employee_Code)}
+							</div>
+						</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Basic_Salary)}</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Allowance)}</td>
+						<td class="px-4 py-3 whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
+						<td class="px-4 py-3 whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Overtime)}</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Health_Amount)}</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Tax_Amount)}</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Receivable_Amount)}</td>
+						<td class="px-4 py-3 whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
+						<td class="px-4 py-3 whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
+						<td class="px-4 py-3">
+							<span class="px-2 py-1 rounded text-xs ${statusClass}">
+								${escapeHtml(status)}
+							</span>
+						</td>
+						<td class="px-4 py-3 text-right">
+							<div class="relative inline-block text-left">
+								<button type="button"
+									onclick="togglePayrollActionMenu('${escapeHtml(row.Payroll_ID)}')"
+									class="inline-flex items-center justify-center w-9 h-9 rounded-md border border-outline-variant hover:bg-surface-secondary"
+									title="Payroll Actions"
+									aria-label="Payroll Actions" >
+										<span class="material-symbols-outlined">more_vert</span>
+								</button>
+					
+								<div id="payrollActionMenu_${escapeHtml(row.Payroll_ID)}"
+									class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 text-left">
+									<button type="button"
+										onclick="closePayrollActionMenus(); viewPayrollDetail('${escapeHtml(row.Payroll_ID)}')"
+										class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-surface-secondary flex items-center gap-2" >
+										<span class="material-symbols-outlined text-base">visibility</span>
+											View Detail
+									</button>
+					
+									<button type="button"
+										onclick="closePayrollActionMenus(); editPayrollSalary('${escapeHtml(row.Payroll_ID)}')"
+										class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-surface-secondary flex items-center gap-2" >
+										<span class="material-symbols-outlined text-base">edit</span>
+											Edit Salary
+									</button>
+					
+									<div class="border-t border-outline-variant"></div>
+					
+									<button type="button"
+										onclick="closePayrollActionMenus(); cancelEmployeePayroll('${escapeHtml(row.Payroll_ID)}')"
+										class="w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2" >
+										<span class="material-symbols-outlined text-base">cancel</span>
+											Cancel Payroll
+									</button>
+								</div>
+							</div>
+						</td>
+					</tr>
+				`;
+			}).join('');
     }
 
     const paginationInfo = document.getElementById('payrollPaginationInfo');
 
     if (paginationInfo) {
-        paginationInfo.textContent = totalRows
-            ? `Menampilkan ${startIndex + 1}–${Math.min(startIndex + pageSize, totalRows)} dari ${totalRows} data`
-            : '0 data';
+			paginationInfo.textContent = totalRows
+				? `Menampilkan ${startIndex + 1}–${Math.min(startIndex + pageSize, totalRows)} dari ${totalRows} data`
+				: '0 data';
     }
 
     const prevButton = document.getElementById('payrollPrevButton');
@@ -37080,6 +37116,34 @@ window.renderPayrollTable = function () {
 
     if (prevButton) prevButton.disabled = window.payrollCurrentPage <= 1;
     if (nextButton) nextButton.disabled = window.payrollCurrentPage >= totalPages;
+};
+
+
+/* ==== PAYROLL - ACTION MENU ==== */
+
+window.togglePayrollActionMenu = function (payrollId) {
+    const menu = document.getElementById(
+        `payrollActionMenu_${payrollId}`
+    );
+
+    if (!menu) return;
+
+    const isHidden = menu.classList.contains('hidden');
+
+    // Tutup semua menu action lainnya.
+    document.querySelectorAll('[id^="payrollActionMenu_"]').forEach(item => {
+        item.classList.add('hidden');
+    });
+
+    if (isHidden) {
+        menu.classList.remove('hidden');
+    }
+};
+
+window.closePayrollActionMenus = function () {
+    document.querySelectorAll('[id^="payrollActionMenu_"]').forEach(menu => {
+        menu.classList.add('hidden');
+    });
 };
 
 
