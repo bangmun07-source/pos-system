@@ -33745,42 +33745,16 @@ window.saveSalaryComponent = function () {
   const type = document.getElementById('salaryComponentType')?.value;
   const componentId = document.getElementById('salaryComponentId')?.value?.trim();
   const name = document.getElementById('salaryComponentName')?.value?.trim();
-  const amount = Number(
-    document.getElementById('salaryComponentAmount')?.value || 0
-  );
-  const calculationType =
-    document.getElementById('salaryComponentCalculationType')?.value || 'FIXED';
-  const accountingCategory =
-    document.getElementById('salaryComponentAccountingCategory')?.value;
-  const calculationBase =
-    document.getElementById('salaryComponentCalculationBase')?.value ||
-    'BASIC_SALARY';
+  const amount = Number( document.getElementById('salaryComponentAmount')?.value || 0 );
+  const calculationType = document.getElementById('salaryComponentCalculationType')?.value || 'FIXED';
+  const accountingCategory = document.getElementById('salaryComponentAccountingCategory')?.value;
+  const calculationBase = document.getElementById('salaryComponentCalculationBase')?.value || 'BASIC_SALARY';
 
-  if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) {
-    alert('Component type tidak valid.');
-    return;
-  }
-
-  if (!name) {
-    alert('Component Name wajib diisi.');
-    return;
-  }
-
-  if (!accountingCategory) {
-    alert('Accounting Category wajib dipilih.');
-    return;
-  }
-
-  if (!Number.isFinite(amount) || amount < 0) {
-    alert('Amount tidak boleh negatif atau tidak valid.');
-    return;
-  }
-
-  if (calculationType === 'PERCENTAGE' && amount > 100) {
-    alert('Persentase tidak boleh lebih dari 100%.');
-    return;
-  }
-
+  if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) { alert('Component type tidak valid.'); return; }
+  if (!name) { alert('Component Name wajib diisi.'); return; }
+  if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
+  if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
+  if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
   if (
     type === 'EMPLOYER_CONTRIBUTION' &&
     accountingCategory !== 'EMPLOYER_HEALTH_CONTRIBUTION'
@@ -33811,8 +33785,7 @@ window.saveSalaryComponent = function () {
     Amount: amount,
     Calculation_Type: calculationType,
     Accounting_Category: accountingCategory,
-    Calculation_Base:
-      calculationType === 'PERCENTAGE' ? calculationBase : null,
+    Calculation_Base: calculationType === 'PERCENTAGE' ? calculationBase : null,
     Is_Active: true
   };
 
@@ -33821,10 +33794,7 @@ window.saveSalaryComponent = function () {
       component => component.Component_ID === componentId
     );
 
-    if (index === -1) {
-      alert('Komponen yang akan diedit tidak ditemukan.');
-      return;
-    }
+    if (index === -1) { alert('Komponen yang akan diedit tidak ditemukan.'); return; }
 
     employeeSalaryComponents[index] = {
       ...employeeSalaryComponents[index],
@@ -33886,9 +33856,7 @@ window.editSalaryComponent = function (componentId) {
   if (componentIdInput) componentIdInput.value = component.Component_ID || '';
   if (nameInput) nameInput.value = component.Component_Name || '';
   if (amountInput) amountInput.value = component.Amount ?? 0;
-  if (categoryInput) {
-    categoryInput.value = component.Accounting_Category || '';
-  }
+  if (categoryInput) { categoryInput.value = component.Accounting_Category || ''; }
   if (calculationInput) {
     calculationInput.value = component.Calculation_Type || 'FIXED';
     calculationInput.onchange = updateSalaryComponentAmountUnit;
@@ -33929,9 +33897,6 @@ window.removeSalaryComponent = function (componentId) {
     );
   renderSalaryComponents( employeeSalaryComponents );
 };
-
-/* === SAVE SALARY === */
-
 
 /* === SAVE SALARY === */
 window.saveEmployeeSalary = async function () {
