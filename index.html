@@ -26801,72 +26801,35 @@
 	          </div>
 	        </div>
 	      </section>
-	      <!-- EARNINGS -->
-	      <section>
-	        <div class="pb-3 border-b border-outline-variant mb-4">
-	          <h3 class="text-sm font-semibold text-foreground">
-	            Earnings
-	          </h3>
-	          <p class="text-xs text-muted mt-1">
-	            Salary, allowances and overtime
-	          </p>
-	        </div>
-	
-	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm text-muted">Basic Salary</span>
-	            <span id="payrollDetailBasicSalary" class="text-sm font-medium text-foreground">Rp0</span>
-	          </div>
-	
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm text-muted">Total Allowance</span>
-	            <span id="payrollDetailAllowance" class="text-sm font-medium text-foreground">Rp0</span>
-	          </div>
-	
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm text-muted">Overtime</span>
-	            <span id="payrollDetailOvertime" class="text-sm font-medium text-foreground">Rp0</span>
-	          </div>
-	
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm font-semibold text-foreground">Gross Salary</span>
-	            <span id="payrollDetailGrossSalary" class="text-sm font-bold text-foreground">Rp0</span>
-	          </div>
-	        </div>
-	      </section>
-	      <!-- DEDUCTIONS -->
-	      <section>
-	        <div class="pb-3 border-b border-outline-variant mb-4">
-	          <h3 class="text-sm font-semibold text-foreground">
-	            Employee Deductions
-	          </h3>
-	          <p class="text-xs text-muted mt-1">
-	            Tax, receivables and other employee deductions
-	          </p>
-	        </div>
-	
-	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm text-muted">Other Deductions</span>
-	            <span id="payrollDetailOtherDeduction" class="text-sm font-medium text-foreground">Rp0</span>
-	          </div>
-	
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm text-muted">Employee Receivable</span>
-	            <span id="payrollDetailReceivable" class="text-sm font-medium text-foreground">Rp0</span>
-	          </div>
-	
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm text-muted">Employee Tax</span>
-	            <span id="payrollDetailTax" class="text-sm font-medium text-foreground">Rp0</span>
-	          </div>
-	
-	          <div class="p-3 flex items-center justify-between gap-4">
-	            <span class="text-sm font-semibold text-foreground">Total Deductions</span>
-	            <span id="payrollDetailTotalDeduction" class="text-sm font-bold text-foreground">Rp0</span>
-	          </div>
-	        </div>
-	      </section>
+				<!-- PAYROLL COMPONENTS: DYNAMIC -->
+				<section>
+				  <div class="pb-3 border-b border-outline-variant mb-4">
+				    <h3 class="text-sm font-semibold text-foreground">
+				      Payroll Components
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Earnings, deductions, tax, reimbursements and employee receivables
+				    </p>
+				  </div>
+				
+				  <div id="payrollDetailComponentsContainer" class="space-y-5">
+				    <!-- Diisi otomatis dari data payroll -->
+				  </div>
+				</section>
+				<!-- PAYROLL SUMMARY -->
+				<section class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+				  <div class="p-3 flex items-center justify-between gap-4">
+				    <span class="text-sm font-semibold text-foreground">Gross Salary</span>
+				    <span id="payrollDetailGrossSalary"
+				      class="text-sm font-bold text-foreground">Rp0</span>
+				  </div>
+				
+				  <div class="p-3 flex items-center justify-between gap-4">
+				    <span class="text-sm font-semibold text-foreground">Total Deductions</span>
+				    <span id="payrollDetailTotalDeduction"
+				      class="text-sm font-bold text-foreground">Rp0</span>
+				  </div>
+				</section>
 	      <!-- NET SALARY -->
 	      <section class="border border-outline-variant rounded-md p-4">
 	        <p class="text-xs text-muted mb-2">NET SALARY</p>
@@ -26888,7 +26851,7 @@
 	      <button type="button"
 	        id="sendPayrollSlipBtn"
 	        onclick="sendPayrollSlip()"
-	        class="h-10 px-4 flex items-center gap-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition">
+	        class="h-10 px-4 flex items-center gap-2 rounded-md bottom-theme text-sm font-medium transition">
 	        <span class="material-symbols-outlined text-lg">send</span>
 	        Send Struk Gaji
 	      </button>
