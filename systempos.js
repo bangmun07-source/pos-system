@@ -32462,23 +32462,19 @@ async function loadEmployeeBranches() {
 
     if (error) throw error;
 
-		const branches = typeof data === "string" ? JSON.parse(data) : (data || []);
-		employeeAttendanceBranches = branches;
-    const modalSelect = document.getElementById("employeeBranch");
-    const filterSelect = document.getElementById("employeeBranchFilter");
+		const branches = typeof data === "string" ? JSON.parse(data) : (data || []); employeeAttendanceBranches = branches;
+		const modalSelect = document.getElementById("employeeBranch");
+		const filterSelect = document.getElementById("employeeBranchFilter");
 		const scheduleBranchSelect = document.getElementById("scheduleBranch");
-    const role = String(
-		  state.user?.role || state.user?.Role || ''
-		).trim().toLowerCase();
+		const payrollBranchSelect = document.getElementById("payrollBranchFilter");
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
 
     if (role === "owner" || role === "accountant") {
       // MODAL NEW EMPLOYEE
       if (modalSelect) {
         modalSelect.innerHTML = `<option value="">Select Outlet</option>`;
-
         branches.forEach(branch => {
           const option = document.createElement("option");
-
           option.value = branch.id || "";
           option.textContent =
             branch.name ||
@@ -32492,10 +32488,8 @@ async function loadEmployeeBranches() {
       // FILTER EMPLOYEE
       if (filterSelect) {
         filterSelect.innerHTML = `<option value="">All Branch</option>`;
-
         branches.forEach(branch => {
           const option = document.createElement("option");
-
           option.value = branch.id || "";
           option.textContent =
             branch.name ||
@@ -32507,22 +32501,31 @@ async function loadEmployeeBranches() {
       }
 			// SCHEDULE BRANCH
 			if (scheduleBranchSelect) {
-			  scheduleBranchSelect.innerHTML =
-			    `<option value="">Select Outlet</option>`;
-			
+			  scheduleBranchSelect.innerHTML = `<option value="">Select Outlet</option>`;
 			  branches.forEach(branch => {
 			    const option = document.createElement("option");
-			
 			    option.value = branch.id || "";
 			    option.textContent =
 			      branch.name ||
 			      branch.id ||
 			      "Unnamed Branch";
-			
 			    scheduleBranchSelect.appendChild(option);
 			  });
-			
 			  scheduleBranchSelect.disabled = false;
+			}
+			// FILTER OUTLET PAYROLL
+			if (payrollBranchSelect) {
+			  payrollBranchSelect.innerHTML = `<option value="">All Branch</option>`;
+			  branches.forEach(branch => {
+			    const option = document.createElement("option");
+			    option.value = branch.id || "";
+			    option.textContent =
+			      branch.name ||
+			      branch.id ||
+			      "Unnamed Branch";
+			    payrollBranchSelect.appendChild(option);
+			  });
+			  payrollBranchSelect.disabled = false;
 			}
     } else {
       const branchId = state.user.branchId;
