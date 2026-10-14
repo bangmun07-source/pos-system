@@ -37217,7 +37217,9 @@ window.viewPayrollDetail = async function (payrollId) {
 
 		// Simpan detail untuk tahap render komponen.
 		window.activePayrollDetail = { payroll, details };
+		
 		window.renderPayrollDetailContent(payroll, details);
+		
 		console.log('PAYROLL DETAIL:', payroll);
 		console.log('PAYROLL COMPONENTS:', details);
 		console.log(
@@ -37237,99 +37239,177 @@ window.viewPayrollDetail = async function (payrollId) {
 };
 
 /* ==== PAYROLL - RENDER DETAIL POPUP ==== */
-
-/* ==== PAYROLL - RENDER DETAIL CONTENT ==== */
-
 window.renderPayrollDetailContent = function (payroll, details) {
-	const money = value => new Intl.NumberFormat('id-ID', {
-		style: 'currency',
-		currency: 'IDR',
-		maximumFractionDigits: 2
-	}).format(Number(value) || 0);
+  const container = document.getElementById(
+    'payrollDetailComponentsContainer'
+  );
 
-	const setText = (id, value) => {
-		const element = document.getElementById(id);
-		if (element) element.textContent = value ?? '-';
-	};
+  if (!container) {
+    console.error('payrollDetailComponentsContainer tidak ditemukan');
+    return;
+  }
 
-	const escapeHtml = value => String(value ?? '').replace(
-		/[&<>"']/g,
-		char => ({
-			'&': '&amp;',
-			'<': '&lt;',
-			'>': '&gt;',
-			'"': '&quot;',
-			"'": '&#39;'
-		})[char]
-	);
+  const money = value =>
+    new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 2
+    }).format(Number(value) || 0);
 
-	const category = detail => String(detail.Accounting_Category || '').trim().toUpperCase();
-	const type = detail => String(detail.Component_Type || '').trim().toUpperCase();
-	// Informasi karyawan
-	setText('payrollDetailEmployeeName', payroll.Full_Name);
-	setText('payrollDetailEmployeeCode', payroll.Employee_Code);
-	setText( 'payrollDetailBranch', payroll.Branch_Name || payroll.Branch_ID );
-	setText('payrollDetailPeriod', payroll.Payroll_Period);
-	setText('payrollDetailStatus', payroll.Status);
-	// Pisahkan iuran perusahaan agar tidak masuk ke rincian karyawan.
-	const employeeDetails = details.filter(detail =>
-			type(detail) !== 'EMPLOYER_CONTRIBUTION' &&
-			category(detail) !== 'EMPLOYER_HEALTH_CONTRIBUTION'
-	);
-	const earnings = employeeDetails.filter(detail => type(detail) === 'EARNING' );
-	const tax = employeeDetails.filter(detail => category(detail) === 'EMPLOYEE_TAX' );
-	const reimbursements = employeeDetails.filter(detail => category(detail) === 'REIMBURSEMENT' );
-	const receivables = employeeDetails.filter(detail =>
-		category(detail) === 'EMPLOYEE_LOAN' &&
-		detail.Component_Name === 'Potongan Piutang Karyawan'
-	);
-	const otherDeductions = employeeDetails.filter(detail =>
-		type(detail) === 'DEDUCTION' &&
-		category(detail) !== 'EMPLOYEE_TAX' &&
-		category(detail) !== 'EMPLOYEE_LOAN'
-	);
-	const renderRows = items => {
-		if (!items.length) {
-			return `
-				<tr>
-					<td colspan="2"
-						class="px-3 py-3 text-center text-sm text-muted">
-						Tidak ada data
-					</td>
-				</tr>
-			`;
-		}
+  const escapeHtml = value =>
+    String(value ?? '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[char]);
 
-		return items.map(detail => `
-			<tr class="border-b border-outline-variant">
-				<td class="px-3 py-2">
-					${escapeHtml(detail.Component_Name)}
-				</td>
-				<td class="px-3 py-2 text-right whitespace-nowrap">
-					${money(detail.Amount)}
-				</td>
-			</tr>
-		`).join('');
-	};
+  const rows = Array.isArray(details) ? details : [];
 
-	const renderGroup = (bodyId, items) => {
-		const body = document.getElementById(bodyId);
-		if (body) body.innerHTML = renderRows(items);
-	};
+  // Iuran perusahaan tidak ditampilkan sebagai komponen gaji karyawan.
+  const employeeRows = rows.filter(row =>
+    String(row.Component_Type || '').trim().toUpperCase()
+      !== 'EMPLOYER_CONTRIBUTION'
+    && String(row.Accounting_Category || '').trim().toUpperCase()
+      !== 'EMPLOYER_HEALTH_CONTRIBUTION'
+  );
 
-	// Masing-masing kelompok menggunakan tbody terpisah.
-	renderGroup('payrollDetailEarningsBody', earnings);
-	renderGroup('payrollDetailTaxBody', tax);
-	renderGroup('payrollDetailReimbursementsBody', reimbursements);
-	renderGroup('payrollDetailReceivableBody', receivables);
-	renderGroup('payrollDetailOtherDeductionsBody', otherDeductions);
-	// Ringkasan resmi dari Employee_Payroll.
-	setText('payrollDetailBasicSalary', money(payroll.Basic_Salary));
-	setText('payrollDetailAllowance', money(payroll.Total_Allowance));
-	setText('payrollDetailOvertime', money(payroll.Total_Overtime));
-	setText('payrollDetailGrossSalary', money(payroll.Gross_Salary));
-	setText('payrollDetailTotalDeduction', money(payroll.Total_Deduction));
-	setText('payrollDetailNetSalary', money(payroll.Net_Salary));
+  // Kelompokkan berdasarkan data aktual, bukan nama komponen yang di-hardcode.
+  const groups = new Map();
+
+  employeeRows.forEach(row => {
+    const type = String(row.Component_Type || '')
+      .trim().toUpperCase();
+
+    const category = String(row.Accounting_Category || '')
+      .trim().toUpperCase();
+
+    let groupKey;
+    let groupLabel;
+
+    if (type === 'EARNING') {
+      groupKey = 'EARNING';
+      groupLabel = 'Earnings';
+    } else if (category === 'EMPLOYEE_TAX') {
+      groupKey = 'TAX';
+      groupLabel = 'Employee Tax';
+    } else if (category === 'REIMBURSEMENT') {
+      groupKey = 'REIMBURSEMENT';
+      groupLabel = 'Reimbursements';
+    } else if (
+      category === 'EMPLOYEE_LOAN' &&
+      String(row.Component_Name || '').trim()
+        === 'Potongan Piutang Karyawan'
+    ) {
+      groupKey = 'RECEIVABLE';
+      groupLabel = 'Employee Receivable';
+    } else if (type === 'DEDUCTION') {
+      groupKey = 'DEDUCTION';
+      groupLabel = 'Other Deductions';
+    } else {
+      // Jenis baru yang belum dikenal tetap ditampilkan.
+      groupKey = type || category || 'OTHER';
+      groupLabel = type
+        ? type.replace(/_/g, ' ')
+        : category
+          ? category.replace(/_/g, ' ')
+          : 'Other Components';
+    }
+
+    if (!groups.has(groupKey)) {
+      groups.set(groupKey, {
+        label: groupLabel,
+        rows: []
+      });
+    }
+
+    groups.get(groupKey).rows.push(row);
+  });
+
+  // Susunan kategori utama. Kategori baru tetap ikut dirender.
+  const preferredOrder = [
+    'EARNING',
+    'TAX',
+    'REIMBURSEMENT',
+    'RECEIVABLE',
+    'DEDUCTION'
+  ];
+
+  const orderedGroups = [...groups.entries()].sort((a, b) => {
+    const indexA = preferredOrder.indexOf(a[0]);
+    const indexB = preferredOrder.indexOf(b[0]);
+
+    const rankA = indexA === -1 ? 999 : indexA;
+    const rankB = indexB === -1 ? 999 : indexB;
+
+    return rankA - rankB || a[1].label.localeCompare(b[1].label);
+  });
+
+  container.innerHTML = orderedGroups
+    .filter(([, group]) => group.rows.length > 0)
+    .map(([key, group]) => {
+      const rowsHtml = group.rows.map(row => `
+        <tr class="border-b border-outline-variant last:border-b-0">
+          <td class="px-3 py-3 text-sm text-foreground">
+            ${escapeHtml(row.Component_Name || 'Unnamed Component')}
+          </td>
+          <td class="px-3 py-3 text-sm text-foreground text-right whitespace-nowrap">
+            ${money(row.Amount)}
+          </td>
+        </tr>
+      `).join('');
+
+      const total = group.rows.reduce(
+        (sum, row) => sum + (Number(row.Amount) || 0),
+        0
+      );
+
+      return `
+        <section class="border border-outline-variant rounded-md overflow-hidden">
+          <div class="px-3 py-3 bg-surface border-b border-outline-variant">
+            <h4 class="text-sm font-semibold text-foreground">
+              ${escapeHtml(group.label)}
+            </h4>
+          </div>
+
+          <table class="w-full">
+            <tbody>${rowsHtml}</tbody>
+            <tfoot>
+              <tr class="border-t border-outline-variant">
+                <td class="px-3 py-3 text-sm font-semibold text-foreground">
+                  Total ${escapeHtml(group.label)}
+                </td>
+                <td class="px-3 py-3 text-sm font-bold text-foreground text-right whitespace-nowrap">
+                  ${money(total)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </section>
+      `;
+    }).join('');
+
+  if (orderedGroups.length === 0) {
+    container.innerHTML = `
+      <p class="text-sm text-muted py-3">
+        Belum ada komponen payroll.
+      </p>
+    `;
+  }
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+
+  setText('payrollDetailGrossSalary', money(payroll.Gross_Salary));
+  setText('payrollDetailNetSalary', money(payroll.Net_Salary));
+
+  // Total potongan yang benar-benar mengurangi gaji bersih.
+  const totalDeductions = (Number(payroll.Gross_Salary) || 0) - (Number(payroll.Net_Salary) || 0);
+
+  setText('payrollDetailTotalDeduction', money(totalDeductions));
 };
 
 
