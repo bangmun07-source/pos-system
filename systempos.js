@@ -37224,6 +37224,23 @@ window.closePayrollActionMenus = function () {
 	});
 };
 
+// Tutup Payroll Action Menu saat klik di luar menu
+document.addEventListener('click', function (event) {
+	const clickedMenu = event.target.closest( '[id^="payrollActionMenu_"]' );
+	const clickedToggle = event.target.closest( 'button[onclick*="togglePayrollActionMenu"]' );
+	// Klik di dalam menu atau tombol titik tiga:
+	// biarkan handler yang sudah ada bekerja.
+	if (clickedMenu || clickedToggle) return;
+	window.closePayrollActionMenus();
+});
+
+// Tutup menu saat menekan Escape
+document.addEventListener('keydown', function (event) {
+	if (event.key === 'Escape') {
+		window.closePayrollActionMenus();
+	}
+});
+
 /* ==== PAYROLL - OPEN & CLOSE MODALS ==== */
 window.getPayrollRow = function (payrollId) {
 	return (window.payrollRows || []).find(row =>
