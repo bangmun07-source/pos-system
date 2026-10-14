@@ -36721,148 +36721,139 @@ window.closeAttendanceRecapDetail = function() {
 
 
 window.calculatePayroll = async function () {
-    const periodInput = document.getElementById('payrollPeriod');
-    const branchFilter = document.getElementById('payrollBranchFilter');
+	const periodInput = document.getElementById('payrollPeriod');
+	const branchFilter = document.getElementById('payrollBranchFilter');
+	const employeeFilter = document.getElementById('payrollEmployeeFilter');
+	const calculateButton = document.querySelector( 'button[onclick="calculatePayroll()"]' );
+	
+	try {
+		// 1. Validasi session
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
+		// 2. Validasi periode
+		const period = periodInput?.value?.trim();
+	
+	if (!period || !/^\d{4}-\d{2}$/.test(period)) { throw new Error('Pilih periode Payroll terlebih dahulu.'); }
+		// 3. Validasi Supabase
+	if (
+		typeof supabaseClient === 'undefined' ||
+		!supabaseClient
+	) {
+		throw new Error('Supabase client belum tersedia.');
+	}
+		// 4. Tentukan outlet sesuai hak akses
+	let branchId = branchFilter?.value?.trim() || null;
+	
+	const currentUser = typeof state !== 'undefined' ? state.user : null;
+	const role = String( currentUser?.role || currentUser?.Role || '' ).trim().toUpperCase();
 
-    const calculateButton = document.querySelector(
-        'button[onclick="calculatePayroll()"]'
-    );
+	if (role !== 'OWNER' && role !== 'ACCOUNTANT') {
+		const userBranchId = String(
+			currentUser?.branchId ||
+			currentUser?.Branch_ID ||
+			''
+		).trim();
 
-    try {
-        // 1. Validasi session
-        const sessionId = localStorage.getItem('pos_session_id');
+		if (!userBranchId) { throw new Error('Outlet pengguna tidak ditemukan.'); }
 
-        if (!sessionId) {
-            throw new Error('Session tidak ditemukan. Silakan login kembali.');
-        }
+		branchId = userBranchId;
+	} else if (
+		!branchId ||
+		branchId.toUpperCase() === 'ALL'
+	) {
+		branchId = null;
+	}
+		// 5. Tentukan Employee
+	const employeeId = employeeFilter?.value?.trim() || null;
+		// Validasi tambahan: Employee yang dipilih harus sesuai outlet.
+	if (employeeId && employeeFilter) {
+		const selectedOption = employeeFilter.options[employeeFilter.selectedIndex];
 
-        // 2. Validasi periode Payroll
-        const period = periodInput?.value?.trim();
+		if (!selectedOption) { throw new Error('Employee yang dipilih tidak valid.'); }
 
-        if (!period || !/^\d{4}-\d{2}$/.test(period)) {
-            throw new Error('Pilih periode Payroll terlebih dahulu.');
-        }
+		const selectedBranchId = String( selectedOption.dataset.branchId || '' ).trim();
 
-        // 3. Validasi Supabase client
-        if (
-            typeof supabaseClient === 'undefined' ||
-            !supabaseClient
-        ) {
-            throw new Error('Supabase client belum tersedia.');
-        }
+		if (
+			branchId &&
+			selectedBranchId &&
+			selectedBranchId !== branchId
+		) {
+			throw new Error(
+				'Employee yang dipilih tidak sesuai dengan outlet.'
+			);
+		}
+	}
 
-        // 4. Tentukan outlet
-        let branchId = branchFilter?.value?.trim() || null;
+	// 6. Cegah klik berulang
+	if (calculateButton?.disabled) return;
+	if (calculateButton) {
+		calculateButton.disabled = true;
+		calculateButton.setAttribute('aria-busy', 'true');
+	}
 
-        const currentUser =
-            typeof state !== 'undefined' ? state.user : null;
+	console.log('CALCULATE PAYROLL', {
+		period,
+		branchId: branchId || 'ALL',
+		employeeId: employeeId || 'ALL EMPLOYEES'
+	});
 
-        const role = String(currentUser?.role || '')
-            .trim()
-            .toUpperCase();
+	// 7. Panggil RPC dengan filter periode, outlet, Employee
+	const { data, error } = await supabaseClient.rpc(
+		'calculate_employee_payroll',
+		{
+			p_session_id: sessionId,
+			p_payroll_period: `${period}-01`,
+			p_branch_id: branchId,
+			p_employee_id: employeeId
+		}
+	);
+	
+	if (error) throw error;
 
-        // Admin dan Cashier hanya dapat memproses outlet sendiri.
-        // Owner dapat memilih outlet tertentu atau ALL.
-        if (role !== 'OWNER') {
-            const userBranchId = String(
-                currentUser?.branchId || ''
-            ).trim();
+	const result = Array.isArray(data) ? data[0] : data;
 
-            if (!userBranchId) {
-                throw new Error(
-                    'Outlet pengguna tidak ditemukan.'
-                );
-            }
+	if (!result || result.success !== true) {
+		throw new Error(
+			result?.message ||
+			'Calculate Payroll gagal diproses.'
+		);
+	}
 
-            branchId = userBranchId;
-        } else if (
-            !branchId ||
-            branchId.toUpperCase() === 'ALL'
-        ) {
-            branchId = null;
-        }
+	console.log('PAYROLL CALCULATED', result);
 
-        // 5. Cegah klik Calculate berulang
-        if (calculateButton?.disabled) return;
-
-        if (calculateButton) {
-            calculateButton.disabled = true;
-            calculateButton.setAttribute('aria-busy', 'true');
-        }
-
-        console.log('CALCULATE PAYROLL', {
-            period,
-            branchId: branchId || 'ALL'
-        });
-
-        // 6. Panggil RPC Supabase
-        const { data, error } = await supabaseClient.rpc(
-            'calculate_employee_payroll',
-            {
-                p_session_id: sessionId,
-                p_payroll_period: `${period}-01`,
-                p_branch_id: branchId
-            }
-        );
-
-        if (error) {
-            throw error;
-        }
-
-        // RPC RETURNS JSONB
-        const result = Array.isArray(data) ? data[0] : data;
-
-        if (!result || result.success !== true) {
-            throw new Error(
-                result?.message ||
-                'Calculate Payroll gagal diproses.'
-            );
-        }
-
-        console.log('PAYROLL CALCULATED', result);
-
-        // 7. Refresh tabel jika fungsi loadPayroll sudah tersedia.
-        // Jika belum dibuat, hasil tetap sudah tersimpan di database.
-        if (typeof window.loadPayroll === 'function') {
-            try {
-                await window.loadPayroll();
-            } catch (refreshError) {
-                console.error(
-                    'Payroll tersimpan, tetapi tabel gagal dimuat ulang:',
-                    refreshError
-                );
-            }
-        }
-
-        // 8. Tampilkan hasil
-        alert(
-            'Calculate Payroll berhasil.\n\n' +
-            `Periode: ${period}\n` +
-            `Outlet: ${result.branch_id || 'ALL'}\n` +
-            `Karyawan diproses: ${result.processed ?? 0}\n` +
-            `Tanpa Salary Setting: ${result.skipped_no_salary ?? 0}\n` +
-            `Dilewati karena status: ${result.skipped_existing_status ?? 0}\n\n` +
-            'Hasil disimpan ke Employee_Payroll dan ' +
-            'Employee_Payroll_Details.\n' +
-            'Jurnal belum dibuat.'
-        );
-
-    } catch (error) {
-        console.error('calculatePayroll:', error);
-
-        alert(
-            'Calculate Payroll gagal.\n\n' +
-            (error.message || 'Terjadi kesalahan saat menghitung Payroll.')
-        );
-
-    } finally {
-        if (calculateButton) {
-            calculateButton.disabled = false;
-            calculateButton.removeAttribute('aria-busy');
-        }
-    }
+	// 8. Refresh tabel
+	if (typeof window.loadPayroll === 'function') {
+		try {
+			await window.loadPayroll();
+		} catch (refreshError) {
+			console.error(
+				'Payroll tersimpan, tetapi tabel gagal dimuat ulang:',
+				refreshError
+			);
+		}
+	}
+	// 9. Tampilkan hasil
+		alert(
+			'Calculate Payroll berhasil.\n\n' +
+			`Periode: ${period}\n` +
+			`Outlet: ${result.branch_id || 'ALL'}\n` +
+			`Employee: ${employeeId ? (employeeFilter.selectedOptions[0]?.textContent || employeeId) : 'All Employees'}\n` +
+			`Karyawan diproses: ${result.processed ?? 0}\n` +
+			`Tanpa Salary Setting: ${result.skipped_no_salary ?? 0}\n` +
+			`Dilewati karena status: ${result.skipped_existing_status ?? 0}\n\n` +
+			'Jurnal belum dibuat.'
+		);
+	} catch (error) {
+		console.error('calculatePayroll:', error);
+	
+		alert( 'Calculate Payroll gagal.\n\n' + (error.message || 'Terjadi kesalahan saat menghitung Payroll.') );
+	} finally {
+		if (calculateButton) {
+			calculateButton.disabled = false;
+			calculateButton.removeAttribute('aria-busy');
+		}
+	}
 };
-
 
 
 /* ==== PAYROLL - LOAD DATA ==== */
