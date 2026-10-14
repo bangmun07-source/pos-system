@@ -26728,6 +26728,359 @@
 	    </div>
 	  </div>
 	</div>
+
+	<!-- PAYROLL DETAIL MODAL -->
+	<div id="payrollDetailModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">payments</span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Payroll Detail
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Employee salary and deduction details
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closePayrollDetail()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- EMPLOYEE INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Employee identity and payroll period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Name</label>
+	            <div id="payrollDetailEmployeeName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Code</label>
+	            <div id="payrollDetailEmployeeCode"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Outlet</label>
+	            <div id="payrollDetailBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Payroll Period</label>
+	            <div id="payrollDetailPeriod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Payroll Status</label>
+	            <div id="payrollDetailStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- EARNINGS -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Earnings
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Salary, allowances and overtime
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Basic Salary</span>
+	            <span id="payrollDetailBasicSalary" class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Total Allowance</span>
+	            <span id="payrollDetailAllowance" class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Overtime</span>
+	            <span id="payrollDetailOvertime" class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm font-semibold text-foreground">Gross Salary</span>
+	            <span id="payrollDetailGrossSalary" class="text-sm font-bold text-foreground">Rp0</span>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- DEDUCTIONS -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Deductions
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Tax, receivables and other employee deductions
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Other Deductions</span>
+	            <span id="payrollDetailOtherDeduction" class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Employee Receivable</span>
+	            <span id="payrollDetailReceivable" class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Employee Tax</span>
+	            <span id="payrollDetailTax" class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm font-semibold text-foreground">Total Deductions</span>
+	            <span id="payrollDetailTotalDeduction" class="text-sm font-bold text-foreground">Rp0</span>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- NET SALARY -->
+	      <section class="border border-outline-variant rounded-md p-4">
+	        <p class="text-xs text-muted mb-2">NET SALARY</p>
+	        <p id="payrollDetailNetSalary"
+	          class="text-2xl font-bold font-headline text-foreground">Rp0</p>
+	        <p class="text-xs text-muted mt-2">
+	          Final salary after employee deductions and tax
+	        </p>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex flex-wrap items-center justify-between gap-3 shrink-0">
+	      <button type="button"
+	        onclick="closePayrollDetail()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	
+	      <button type="button"
+	        id="sendPayrollSlipBtn"
+	        onclick="sendPayrollSlip()"
+	        class="h-10 px-4 flex items-center gap-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 transition">
+	        <span class="material-symbols-outlined text-lg">send</span>
+	        Send Struk Gaji
+	      </button>
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- === EDIT PAYROLL SALARY MODAL === -->
+	<div id="editPayrollSalaryModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-4xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">edit_note</span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Edit Salary
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Edit employee payroll components and deductions
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeEditPayrollSalary()"
+	        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <input id="editPayrollId" type="hidden">
+	      <!-- EMPLOYEE INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Employee identity and payroll period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Name</label>
+	            <div id="editPayrollEmployeeName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Code</label>
+	            <div id="editPayrollEmployeeCode"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Outlet</label>
+	            <div id="editPayrollBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Payroll Period</label>
+	            <div id="editPayrollPeriod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Status</label>
+	            <div id="editPayrollStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- EARNINGS -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Earnings
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Edit the amounts included in employee gross salary
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md overflow-hidden">
+	          <table class="w-full text-sm">
+	            <thead>
+	              <tr class="border-b border-outline-variant text-xs text-muted uppercase tracking-wider">
+	                <th class="px-4 py-3 text-left">Component</th>
+	                <th class="px-4 py-3 text-left">Type</th>
+	                <th class="px-4 py-3 text-right">Amount (Rp)</th>
+	              </tr>
+	            </thead>
+	            <tbody id="editPayrollEarningsBody"
+	              class="divide-y divide-outline-variant">
+	              <tr>
+	                <td colspan="3" class="px-4 py-6 text-center text-muted">
+	                  Payroll components will appear here
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	      </section>
+	      <!-- DEDUCTIONS -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Deductions
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Review and edit deductions applied to employee salary
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md overflow-hidden">
+	          <table class="w-full text-sm">
+	            <thead>
+	              <tr class="border-b border-outline-variant text-xs text-muted uppercase tracking-wider">
+	                <th class="px-4 py-3 text-left">Component</th>
+	                <th class="px-4 py-3 text-left">Type</th>
+	                <th class="px-4 py-3 text-right">Amount (Rp)</th>
+	              </tr>
+	            </thead>
+	            <tbody id="editPayrollDeductionsBody"
+	              class="divide-y divide-outline-variant">
+	              <tr>
+	                <td colspan="3" class="px-4 py-6 text-center text-muted">
+	                  Payroll deductions will appear here
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	      </section>
+	      <!-- SALARY SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Salary Summary
+	          </h3>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Gross Salary</span>
+	            <span id="editPayrollGrossSalary"
+	              class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-3 flex items-center justify-between gap-4">
+	            <span class="text-sm text-muted">Total Deductions</span>
+	            <span id="editPayrollTotalDeductions"
+	              class="text-sm font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="p-4 bg-surface-container-low">
+	            <p class="text-xs text-muted mb-1">NET SALARY</p>
+	            <p id="editPayrollNetSalary"
+	              class="text-2xl font-bold font-headline text-foreground">Rp0</p>
+	          </div>
+	        </div>
+	      </section>
+	
+	      <p class="text-xs text-muted">
+	        Employer contributions are excluded from employee deductions and net salary slip.
+	      </p>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3 shrink-0">
+	      <button type="button"
+	        onclick="closeEditPayrollSalary()"
+	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+	        Cancel
+	      </button>
+	
+	      <button type="button"
+	        id="saveEditPayrollSalaryBtn"
+	        onclick="saveEditPayrollSalary()"
+	        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	        <span class="material-symbols-outlined text-sm">save</span>
+	        Save Changes
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 <!-- =========================================================
