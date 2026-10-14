@@ -37187,7 +37187,8 @@ window.setPayrollModalText = function (elementId, value) {
 
 /* ==== 1. VIEW DETAIL ==== */
 
-window.viewPayrollDetail = function (payrollId) {
+
+window.viewPayrollDetail = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
 
 	if (!row) {
@@ -37195,18 +37196,50 @@ window.viewPayrollDetail = function (payrollId) {
 		return;
 	}
 
-	// Isi informasi karyawan terlebih dahulu.
-	setPayrollModalText('payrollDetailEmployeeName', row.Full_Name);
-	setPayrollModalText('payrollDetailEmployeeCode', row.Employee_Code);
-	setPayrollModalText( 'payrollDetailBranch', row.Branch_Name || row.Branch_ID );
-	setPayrollModalText('payrollDetailPeriod', row.Payroll_Period);
-	setPayrollModalText('payrollDetailStatus', row.Status);
+	const sessionId = localStorage.getItem('pos_session_id');
 
-	// Simpan ID untuk proses detail berikutnya.
+	if (!sessionId) { alert('Sesi login tidak ditemukan. Silakan login kembali.'); return; }
+
 	window.activePayrollId = row.Payroll_ID;
 
 	showPayrollModal('payrollDetailModal');
+
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			'get_employee_payroll_detail',
+			{
+				p_session_id: sessionId,
+				p_payroll_id: row.Payroll_ID
+			}
+		);
+
+		if (error) throw error;
+		if (!data?.success) { throw new Error( data?.message || 'Gagal mengambil detail payroll.' ); }
+
+		const payroll = data.payroll;
+		const details = data.details || [];
+
+		setPayrollModalText( 'payrollDetailEmployeeName', payroll.Full_Name );
+		setPayrollModalText( 'payrollDetailEmployeeCode', payroll.Employee_Code );
+		setPayrollModalText( 'payrollDetailBranch', payroll.Branch_Name || payroll.Branch_ID );
+		setPayrollModalText( 'payrollDetailPeriod', payroll.Payroll_Period );
+		setPayrollModalText( 'payrollDetailStatus', payroll.Status );
+
+		// Simpan detail untuk tahap render komponen.
+		window.activePayrollDetail = {
+			payroll,
+			details
+		};
+
+		console.log('PAYROLL DETAIL:', payroll);
+		console.log('PAYROLL COMPONENTS:', details);
+
+	} catch (error) {
+		console.error('viewPayrollDetail:', error);
+		alert('Gagal memuat detail payroll: ' + error.message);
+	}
 };
+
 
 
 /* ==== 2. EDIT SALARY ==== */
