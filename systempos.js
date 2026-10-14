@@ -37120,11 +37120,8 @@ window.renderPayrollTable = function () {
 
 
 /* ==== PAYROLL - ACTION MENU ==== */
-
 window.togglePayrollActionMenu = function (payrollId) {
-	const menu = document.getElementById(
-		`payrollActionMenu_${payrollId}`
-	);
+	const menu = document.getElementById( `payrollActionMenu_${payrollId}` );
 
 	if (!menu) return;
 
@@ -37135,9 +37132,7 @@ window.togglePayrollActionMenu = function (payrollId) {
 		item.classList.add('hidden');
 	});
 
-	if (isHidden) {
-		menu.classList.remove('hidden');
-	}
+	if (isHidden) { menu.classList.remove('hidden'); }
 };
 
 window.closePayrollActionMenus = function () {
@@ -37146,9 +37141,7 @@ window.closePayrollActionMenus = function () {
 	});
 };
 
-
 /* ==== PAYROLL - OPEN & CLOSE MODALS ==== */
-
 window.getPayrollRow = function (payrollId) {
 	return (window.payrollRows || []).find(row =>
 		String(row.Payroll_ID) === String(payrollId)
@@ -37184,10 +37177,7 @@ window.setPayrollModalText = function (elementId, value) {
 	if (element) { element.textContent = value ?? '-'; }
 };
 
-
 /* ==== 1. VIEW DETAIL ==== */
-
-
 window.viewPayrollDetail = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
 
@@ -37226,11 +37216,8 @@ window.viewPayrollDetail = async function (payrollId) {
 		setPayrollModalText( 'payrollDetailStatus', payroll.Status );
 
 		// Simpan detail untuk tahap render komponen.
-		window.activePayrollDetail = {
-			payroll,
-			details
-		};
-
+		window.activePayrollDetail = { payroll, details };
+		window.renderPayrollDetailContent(payroll, details);
 		console.log('PAYROLL DETAIL:', payroll);
 		console.log('PAYROLL COMPONENTS:', details);
 
@@ -37240,9 +37227,7 @@ window.viewPayrollDetail = async function (payrollId) {
 	}
 };
 
-
 /* ==== PAYROLL - RENDER DETAIL POPUP ==== */
-
 window.renderPayrollDetailContent = function (payroll, details) {
 	const money = value => new Intl.NumberFormat('id-ID', {
 		style: 'currency',
