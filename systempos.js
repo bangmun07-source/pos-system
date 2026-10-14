@@ -33046,8 +33046,10 @@ async function loadEmployees() {
   } catch (error) {
     employeeData = [];
     filteredEmployeeData = [];
+		
     renderEmployeeTable();
     updateEmployeeSummary();
+		window.populatePayrollEmployeeFilter?.();
   }
 }
 
@@ -36969,6 +36971,80 @@ window.loadPayroll = async function () {
 };
 
 
+
+window.populatePayrollEmployeeFilter = function () {
+  const employeeFilter = document.getElementById('payrollEmployeeFilter');
+  const branchFilter = document.getElementById('payrollBranchFilter');
+
+  if (!employeeFilter) return;
+
+  const previousEmployeeId = employeeFilter.value;
+  const role = String(
+    state.user?.role || state.user?.Role || ''
+  ).trim().toUpperCase();
+
+  const userBranchId = String(
+    state.user?.branchId || state.user?.Branch_ID || ''
+  ).trim();
+
+  let branchId = String(branchFilter?.value || '').trim();
+
+  // Admin/Cashier hanya boleh melihat karyawan outlet sendiri.
+  if (!['OWNER', 'ACCOUNTANT'].includes(role)) {
+    branchId = userBranchId;
+  }
+
+  const employees = Array.isArray(employeeData)
+    ? employeeData
+    : [];
+
+  const visibleEmployees = employees.filter(employee => {
+    const employeeBranchId = String(
+      employee.Branch_ID || employee.branch_id || ''
+    ).trim();
+
+    return !branchId || branchId.toUpperCase() === 'ALL'
+      || employeeBranchId === branchId;
+  });
+
+  employeeFilter.innerHTML =
+    '<option value="">All Employees</option>';
+
+  visibleEmployees
+    .sort((a, b) =>
+      String(a.Full_Name || '').localeCompare(
+        String(b.Full_Name || '')
+      )
+    )
+    .forEach(employee => {
+      const employeeId = String(employee.Employee_ID || '').trim();
+      const employeeName = String(employee.Full_Name || '').trim();
+
+      if (!employeeId) return;
+
+      const option = document.createElement('option');
+      option.value = employeeId;
+      option.textContent = employeeName || employeeId;
+      employeeFilter.appendChild(option);
+    });
+
+  if (
+    previousEmployeeId &&
+    visibleEmployees.some(
+      employee =>
+        String(employee.Employee_ID || '').trim() === previousEmployeeId
+    )
+  ) {
+    employeeFilter.value = previousEmployeeId;
+  }
+};
+
+window.onPayrollBranchFilterChange = function () {
+  window.payrollCurrentPage = 1;
+  window.populatePayrollEmployeeFilter();
+  window.loadPayroll();
+};
+
 /* ==== PAYROLL - RENDER TABLE, KPI, PAGINATION ===== */
 
 window.renderPayrollTable = function () {
@@ -36976,7 +37052,12 @@ window.renderPayrollTable = function () {
 	if (!tableBody) return;
 
 	const statusFilter = document.getElementById('payrollStatusFilter')?.value || '';
-	const rows = window.payrollRows.filter(row => { return !statusFilter || row.Status === statusFilter; });
+	const employeeFilter = document.getElementById('payrollEmployeeFilter')?.value || '';
+	const rows = window.payrollRows.filter(row => {
+	  const matchStatus = !statusFilter || row.Status === statusFilter;
+	  const matchEmployee = !employeeFilter || String(row.Employee_ID || '').trim() === employeeFilter;
+	  return matchStatus && matchEmployee;
+	});
 	const money = value => new Intl.NumberFormat('id-ID', {
 		style: 'currency',
 		currency: 'IDR',
