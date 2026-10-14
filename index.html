@@ -24373,48 +24373,57 @@
               Calculate Payroll
             </button>
           </div>
-          <!-- PAYROLL FILTER -->
-          <div class="p-5 border-b border-outline-variant">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Payroll Period
-                </label>
-
-                <input id="payrollPeriod"
-                  type="month"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
-              </div>
-
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Outlet
-                </label>
-
-                <select id="payrollBranchFilter"
-                  onchange="loadPayroll()"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Branch </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Status
-                </label>
-
-                <select id="payrollStatusFilter"
-                  onchange="loadPayroll()"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-									<option value="">All Status</option>
-									<option value="DRAFT">Draft</option>
-									<option value="CALCULATED">Calculated</option>
-									<option value="PAID">Paid</option>
-									<option value="CANCELLED">Cancelled</option>
-                </select>
-              </div>
-            </div>
-          </div>
+					<!-- PAYROLL FILTER -->
+					<div class="p-5 border-b border-outline-variant">
+					  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+					    <!-- PERIOD -->
+					    <div>
+					      <label class="block text-xs text-muted mb-2">
+					        Payroll Period
+					      </label>
+					      <input id="payrollPeriod"
+					        type="month"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+					    </div>
+					    <!-- OUTLET -->
+					    <div>
+					      <label class="block text-xs text-muted mb-2">
+					        Outlet
+					      </label>
+					      <select id="payrollBranchFilter"
+					        onchange="onPayrollBranchFilterChange()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Branch</option>
+					      </select>
+					    </div>
+					    <!-- EMPLOYEE -->
+					    <div>
+					      <label class="block text-xs text-muted mb-2">
+					        Employee
+					      </label>
+					      <select id="payrollEmployeeFilter"
+					        onchange="loadPayroll()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Employees</option>
+					      </select>
+					    </div>
+					    <!-- STATUS -->
+					    <div>
+					      <label class="block text-xs text-muted mb-2">
+					        Status
+					      </label>
+					      <select id="payrollStatusFilter"
+					        onchange="loadPayroll()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Status</option>
+					        <option value="DRAFT">Draft</option>
+					        <option value="CALCULATED">Calculated</option>
+					        <option value="PAID">Paid</option>
+					        <option value="CANCELLED">Cancelled</option>
+					      </select>
+					    </div>
+					  </div>
+					</div>
           <!-- PAYROLL SUMMARY -->
           <div class="grid grid-cols-2 md:grid-cols-4">
             <div class="p-5 border-r border-outline-variant">
