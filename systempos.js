@@ -37220,6 +37220,15 @@ window.viewPayrollDetail = async function (payrollId) {
 		window.renderPayrollDetailContent(payroll, details);
 		console.log('PAYROLL DETAIL:', payroll);
 		console.log('PAYROLL COMPONENTS:', details);
+		console.log(
+	    'PAYROLL COMPONENT FIELDS:',
+	    details.map(d => ({
+	        Component_Name: d.Component_Name,
+	        Component_Type: d.Component_Type,
+	        Accounting_Category: d.Accounting_Category,
+	        Amount: d.Amount
+	    }))
+	);
 
 	} catch (error) {
 		console.error('viewPayrollDetail:', error);
