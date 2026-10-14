@@ -32380,6 +32380,7 @@ async function initEmployeePage() {
     switchEmployeeModule('management');
     await loadEmployeeBranches();
     await loadEmployees();
+		window.populatePayrollEmployeeFilter?.();
     await loadSchedules();
     const attendanceOvertimeForm = document.getElementById('attendanceOvertimeForm');
 
