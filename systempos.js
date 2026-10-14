@@ -37241,6 +37241,98 @@ window.viewPayrollDetail = async function (payrollId) {
 };
 
 
+/* ==== PAYROLL - RENDER DETAIL POPUP ==== */
+
+window.renderPayrollDetailContent = function (payroll, details) {
+	const money = value => new Intl.NumberFormat('id-ID', {
+		style: 'currency',
+		currency: 'IDR',
+		maximumFractionDigits: 2
+	}).format(Number(value) || 0);
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) element.textContent = value ?? '-';
+	};
+	const escapeHtml = value => String(value ?? '').replace(
+		/[&<>"']/g,
+		char => ({
+			'&': '&amp;',
+			'<': '&lt;',
+			'>': '&gt;',
+			'"': '&quot;',
+			"'": '&#39;'
+		})[char]
+	);
+
+	const normalize = value => String(value || '').trim().toUpperCase();
+
+	// Informasi karyawan
+	setText('payrollDetailEmployeeName', payroll.Full_Name);
+	setText('payrollDetailEmployeeCode', payroll.Employee_Code);
+	setText( 'payrollDetailBranch', payroll.Branch_Name || payroll.Branch_ID );
+	setText('payrollDetailPeriod', payroll.Payroll_Period);
+	setText('payrollDetailStatus', payroll.Status);
+
+	// Jangan tampilkan iuran perusahaan sebagai pendapatan
+	// atau potongan karyawan.
+	const employerCategories = [
+		'EMPLOYER_HEALTH_CONTRIBUTION',
+		'EMPLOYER_TAX',
+		'EMPLOYER_CONTRIBUTION'
+	];
+	const employeeDetails = details.filter(detail =>
+		!employerCategories.includes(
+			normalize(detail.Accounting_Category)
+		)
+	);
+
+	// Kelompokkan menggunakan Component_Type.
+	// Pastikan nilai yang tersimpan di database sesuai.
+	const earnings = employeeDetails.filter(detail =>
+		['EARNING', 'ALLOWANCE', 'OVERTIME', 'BONUS', 'REIMBURSEMENT']
+			.includes(normalize(detail.Component_Type))
+	);
+
+	const deductions = employeeDetails.filter(detail =>
+		['DEDUCTION', 'TAX'].includes(
+			normalize(detail.Component_Type)
+		) ||
+		normalize(detail.Accounting_Category) === 'EMPLOYEE_TAX' ||
+		normalize(detail.Accounting_Category) === 'EMPLOYEE_LOAN'
+	);
+
+	const renderRows = items => items.map(detail => `
+		<tr class="border-b border-outline-variant">
+			<td class="px-3 py-2">
+				${escapeHtml(detail.Component_Name || detail.Component_Type || 'Komponen')}
+			</td>
+			<td class="px-3 py-2 text-right whitespace-nowrap">
+				${money(detail.Amount)}
+			</td>
+		</tr>
+	`).join('');
+
+	const earningsBody = document.getElementById( 'payrollDetailEarningsBody' );
+	const deductionsBody = document.getElementById( 'payrollDetailDeductionsBody' );
+
+	if (earningsBody) {
+		earningsBody.innerHTML = renderRows(earnings) ||
+			'<tr><td colspan="2" class="px-3 py-4 text-center text-muted">Tidak ada rincian pendapatan.</td></tr>';
+	}
+	if (deductionsBody) {
+		deductionsBody.innerHTML = renderRows(deductions) ||
+			'<tr><td colspan="2" class="px-3 py-4 text-center text-muted">Tidak ada rincian potongan.</td></tr>';
+	}
+
+	// Gunakan nilai payroll sebagai sumber total resmi.
+	setText('payrollDetailBasicSalary', money(payroll.Basic_Salary));
+	setText('payrollDetailAllowance', money(payroll.Total_Allowance));
+	setText('payrollDetailOvertime', money(payroll.Total_Overtime));
+	setText('payrollDetailGrossSalary', money(payroll.Gross_Salary));
+	setText('payrollDetailTotalDeduction', money(payroll.Total_Deduction));
+	setText('payrollDetailNetSalary', money(payroll.Net_Salary));
+};
+
 
 /* ==== 2. EDIT SALARY ==== */
 
