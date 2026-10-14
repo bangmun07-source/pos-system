@@ -37065,7 +37065,7 @@ window.renderPayrollTable = function () {
 						<div class="relative inline-block text-left">
 							<button type="button"
 								onclick="togglePayrollActionMenu('${escapeHtml(row.Payroll_ID)}')"
-								class="inline-flex items-center justify-center w-9 h-9 border border-outline-variant text-muted hover:text-foreground"
+								class="inline-flex items-center justify-center w-9 h-9 text-muted hover:text-foreground"
 								title="Payroll Actions"
 								aria-label="Payroll Actions" >
 									<span class="material-symbols-outlined">more_vert</span>
@@ -37086,7 +37086,14 @@ window.renderPayrollTable = function () {
 									<span class="material-symbols-outlined text-base">edit</span>
 										Edit Salary
 								</button>
-				
+
+								<button type="button"
+								  onclick="closePayrollActionMenus(); payEmployeePayroll('${escapeHtml(row.Payroll_ID)}')"
+								  class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
+								  <span class="material-symbols-outlined text-base">payments</span>
+								  Pay
+								</button>
+
 								<div class="border-t border-outline-variant"></div>
 				
 								<button type="button"
@@ -37281,7 +37288,6 @@ window.renderPayrollDetailContent = function (payroll, details) {
   employeeRows.forEach(row => {
     const type = String(row.Component_Type || '')
       .trim().toUpperCase();
-
     const category = String(row.Accounting_Category || '')
       .trim().toUpperCase();
 
@@ -37290,7 +37296,7 @@ window.renderPayrollDetailContent = function (payroll, details) {
 
     if (type === 'EARNING') {
       groupKey = 'EARNING';
-      groupLabel = 'Earnings';
+      groupLabel = 'EARNING';
     } else if (category === 'EMPLOYEE_TAX') {
       groupKey = 'TAX';
       groupLabel = 'Employee Tax';
@@ -37306,7 +37312,7 @@ window.renderPayrollDetailContent = function (payroll, details) {
       groupLabel = 'Employee Receivable';
     } else if (type === 'DEDUCTION') {
       groupKey = 'DEDUCTION';
-      groupLabel = 'Other Deductions';
+      groupLabel = 'DEDUCTION';
     } else {
       // Jenis baru yang belum dikenal tetap ditampilkan.
       groupKey = type || category || 'OTHER';
@@ -37330,16 +37336,15 @@ window.renderPayrollDetailContent = function (payroll, details) {
   // Susunan kategori utama. Kategori baru tetap ikut dirender.
   const preferredOrder = [
     'EARNING',
+    'DEDUCTION',
     'TAX',
-    'REIMBURSEMENT',
     'RECEIVABLE',
-    'DEDUCTION'
+		'REIMBURSEMENT'
   ];
 
   const orderedGroups = [...groups.entries()].sort((a, b) => {
     const indexA = preferredOrder.indexOf(a[0]);
     const indexB = preferredOrder.indexOf(b[0]);
-
     const rankA = indexA === -1 ? 999 : indexA;
     const rankB = indexB === -1 ? 999 : indexB;
 
