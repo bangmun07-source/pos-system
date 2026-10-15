@@ -37053,21 +37053,21 @@ window.renderPayrollTable = function () {
 						</div>
 					</td>
 					<td class="px-4 py-3 whitespace-nowrap">${money(row.Basic_Salary)}</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Allowance)}</td>
-					<td class="px-4 py-3 whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
-					<td class="px-4 py-3 whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Total_Overtime)}</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Health_Amount)}</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Tax_Amount)}</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Receivable_Amount)}</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
-					<td class="px-4 py-3 whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Total_Allowance)}</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
+					<td class="px-4 py-3 text-center whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Total_Overtime)}</td>
+					<td class="px-4 py-3 text-right text-right whitespace-nowrap">${money(row.Health_Amount)}</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Tax_Amount)}</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Receivable_Amount)}</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
+					<td class="px-4 py-3 text-right whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
 					<td class="px-4 py-3">
-						<span class="px-2 py-1 rounded-md font-semibold text-xs ${statusClass}">
+						<span class="px-2 py-1 text-center rounded-md font-semibold text-xs ${statusClass}">
 							${escapeHtml(status)}
 						</span>
 					</td>
-					<td class="px-4 py-3 text-right">
+					<td class="px-4 py-3 text-center">
 						<div class="relative inline-block text-left">
 							<button type="button"
 								onclick="togglePayrollActionMenu('${escapeHtml(row.Payroll_ID)}', this)"
