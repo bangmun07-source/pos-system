@@ -37993,8 +37993,6 @@ window.saveEditPayrollSalary = async function () {
   }
 };
 
-
-
 /* ==== CLOSE MODALS ==== */
 window.closePayrollDetail = function () {
 	hidePayrollModal('payrollDetailModal');
@@ -38971,6 +38969,420 @@ window.syncReimbursementFormBranch = function () {
       )
     : '';
 };
+
+
+/* ==== OPEN PAY REIMBURSEMENT MODAL ==== */
+window.payReimbursement = function (id) {
+  const row = (window.reimbursementRows || []).find(
+    item => String(item.Reimbursement_ID) === String(id)
+  );
+
+  if (!row) {
+    alert('Data reimbursement tidak ditemukan.');
+    return;
+  }
+  if (String(row.Status || '').toUpperCase() !== 'APPROVED') {
+    alert('Hanya reimbursement berstatus APPROVED yang dapat dibayar.');
+    return;
+  }
+
+  window.ensurePayReimbursementModal();
+
+  const modal = document.getElementById('payReimbursementModal');
+  const amount = Number(row.Amount || 0);
+  const paidAmount = Number(row.Paid_Amount || 0);
+  const remainingAmount = Math.max(
+    0,
+    Number(row.Remaining_Amount ?? (amount - paidAmount))
+  );
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value ?? '-';
+  };
+
+  document.getElementById('payReimbursementId').value =
+    row.Reimbursement_ID;
+
+  setText(
+    'payReimbursementEmployee',
+    row.Full_Name || row.Employee_ID || '-'
+  );
+
+  setText(
+    'payReimbursementBranch',
+    window.getReimbursementBranchName(row.Branch_ID)
+  );
+
+  setText(
+    'payReimbursementClaimAmount',
+    window.formatReimbursementCurrency(amount)
+  );
+
+  setText(
+    'payReimbursementPaidAmount',
+    window.formatReimbursementCurrency(paidAmount)
+  );
+
+  setText(
+    'payReimbursementRemaining',
+    window.formatReimbursementCurrency(remainingAmount)
+  );
+
+  const paymentAmount = document.getElementById('payReimbursementAmount');
+  paymentAmount.max = String(remainingAmount);
+  paymentAmount.value = String(remainingAmount);
+
+  // Gunakan tanggal lokal, bukan UTC.
+  const now = new Date();
+  const localDate = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0')
+  ].join('-');
+
+  document.getElementById('payReimbursementDate').value = localDate;
+  document.getElementById('payReimbursementMethod').value = 'CASH';
+  document.getElementById('payReimbursementReference').value = '';
+  document.getElementById('payReimbursementNote').value = '';
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+/* ==== PAY REIMBURSEMENT MODAL ==== */
+window.ensurePayReimbursementModal = function () {
+  if (document.getElementById('payReimbursementModal')) return;
+
+  const modal = document.createElement('div');
+
+  modal.id = 'payReimbursementModal';
+  modal.className =
+    'fixed inset-0 z-[160] hidden items-center justify-center bg-background/70 p-4';
+
+  modal.innerHTML = `
+    <div class="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-md
+      bg-background border border-outline-variant
+      shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+
+      <!-- HEADER -->
+      <div class="sticky top-0 z-10 flex items-center justify-between
+        gap-3 border-b border-outline-variant bg-background p-5">
+
+        <div>
+          <h3 class="text-lg font-bold text-on-surface">
+            Pay Reimbursement
+          </h3>
+          <p class="text-xs text-on-surface-variant mt-1">
+            Record employee reimbursement payment
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="window.closePayReimbursementModal()"
+          class="w-9 h-9 flex items-center justify-center
+            text-on-surface-variant hover:text-on-surface">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="payReimbursementForm" class="p-5 space-y-4">
+
+        <input type="hidden" id="payReimbursementId">
+
+        <!-- REIMBURSEMENT SUMMARY -->
+        <div class="rounded-md border border-outline-variant p-4 space-y-3">
+
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-xs text-on-surface-variant">Employee</span>
+            <span id="payReimbursementEmployee"
+              class="text-sm font-medium text-on-surface text-right">
+              -
+            </span>
+          </div>
+
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-xs text-on-surface-variant">Outlet</span>
+            <span id="payReimbursementBranch"
+              class="text-sm text-on-surface text-right">
+              -
+            </span>
+          </div>
+
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-xs text-on-surface-variant">Claim Amount</span>
+            <span id="payReimbursementClaimAmount"
+              class="text-sm font-medium text-on-surface">
+              Rp0
+            </span>
+          </div>
+
+          <div class="flex items-start justify-between gap-3">
+            <span class="text-xs text-on-surface-variant">Already Paid</span>
+            <span id="payReimbursementPaidAmount"
+              class="text-sm text-on-surface">
+              Rp0
+            </span>
+          </div>
+
+          <div class="border-t border-outline-variant pt-3
+            flex items-start justify-between gap-3">
+            <span class="text-sm font-medium text-on-surface">
+              Remaining Amount
+            </span>
+            <span id="payReimbursementRemaining"
+              class="text-base font-bold text-on-surface">
+              Rp0
+            </span>
+          </div>
+        </div>
+
+        <!-- PAYMENT DETAILS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div>
+            <label for="payReimbursementAmount"
+              class="block text-xs text-on-surface-variant mb-2">
+              Payment Amount *
+            </label>
+            <input id="payReimbursementAmount"
+              type="number"
+              min="1"
+              step="1"
+              required
+              placeholder="Enter amount"
+              class="w-full h-10 px-3 rounded-md bg-background
+                border border-outline-variant text-on-surface text-sm">
+          </div>
+
+          <div>
+            <label for="payReimbursementDate"
+              class="block text-xs text-on-surface-variant mb-2">
+              Payment Date *
+            </label>
+            <input id="payReimbursementDate"
+              type="date"
+              required
+              class="w-full h-10 px-3 rounded-md bg-background
+                border border-outline-variant text-on-surface text-sm">
+          </div>
+
+          <div>
+            <label for="payReimbursementMethod"
+              class="block text-xs text-on-surface-variant mb-2">
+              Payment Method *
+            </label>
+            <select id="payReimbursementMethod"
+              required
+              class="w-full h-10 px-3 rounded-md bg-background
+                border border-outline-variant text-on-surface text-sm">
+              <option value="CASH">Cash</option>
+              <option value="BANK">Bank Transfer</option>
+              <option value="QRIS">QRIS</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="payReimbursementReference"
+              class="block text-xs text-on-surface-variant mb-2">
+              Reference No.
+            </label>
+            <input id="payReimbursementReference"
+              type="text"
+              placeholder="Optional"
+              class="w-full h-10 px-3 rounded-md bg-background
+                border border-outline-variant text-on-surface text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label for="payReimbursementNote"
+            class="block text-xs text-on-surface-variant mb-2">
+            Note
+          </label>
+          <textarea id="payReimbursementNote"
+            rows="2"
+            placeholder="Optional payment note"
+            class="w-full px-3 py-2 rounded-md bg-background
+              border border-outline-variant text-on-surface text-sm"></textarea>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="flex justify-end gap-2
+          border-t border-outline-variant pt-4">
+
+          <button type="button"
+            onclick="window.closePayReimbursementModal()"
+            class="h-10 px-4 text-sm text-on-surface-variant
+              hover:text-on-surface">
+            Cancel
+          </button>
+
+          <button id="payReimbursementSubmit"
+            type="submit"
+            class="h-10 px-5 rounded-md bottom-theme
+              text-sm font-medium">
+            Confirm Payment
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  document.getElementById('payReimbursementForm') .addEventListener('submit', window.handlePayReimbursement);
+};
+
+/* ==== HANDLE PAY REIMBURSEMENT ==== */
+window.handlePayReimbursement = async function (event) {
+  event.preventDefault();
+
+  const form = document.getElementById('payReimbursementForm');
+  const submitButton = document.getElementById('payReimbursementSubmit');
+
+  if (!form || !submitButton || submitButton.disabled) return;
+
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    alert('Session tidak ditemukan. Silakan login kembali.');
+    return;
+  }
+
+  const reimbursementId =
+    document.getElementById('payReimbursementId')?.value;
+
+  const paymentDate =
+    document.getElementById('payReimbursementDate')?.value;
+
+  const amount =
+    Number(document.getElementById('payReimbursementAmount')?.value || 0);
+
+  const paymentMethod =
+    document.getElementById('payReimbursementMethod')?.value;
+
+  const referenceNo =
+    document.getElementById('payReimbursementReference')?.value?.trim() || '';
+
+  const note =
+    document.getElementById('payReimbursementNote')?.value?.trim() || '';
+
+  const row = (window.reimbursementRows || []).find(
+    item => String(item.Reimbursement_ID) === String(reimbursementId)
+  );
+
+  if (!row) {
+    alert('Data reimbursement tidak ditemukan. Muat ulang tabel.');
+    return;
+  }
+
+  if (String(row.Status || '').toUpperCase() !== 'APPROVED') {
+    alert('Hanya reimbursement berstatus APPROVED yang dapat dibayar.');
+    return;
+  }
+
+  if (row.Payroll_ID) {
+    alert('Reimbursement ini sudah dialokasikan ke Payroll dan tidak dapat dibayar langsung.');
+    return;
+  }
+
+  const claimAmount = Number(row.Amount || 0);
+  const alreadyPaid = Number(row.Paid_Amount || 0);
+  const remainingAmount = Math.max(
+    0,
+    Number(row.Remaining_Amount ?? (claimAmount - alreadyPaid))
+  );
+
+  if (!paymentDate) {
+    alert('Payment Date wajib diisi.');
+    return;
+  }
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    alert('Payment Amount harus lebih besar dari 0.');
+    return;
+  }
+
+  if (amount > remainingAmount) {
+    alert('Payment Amount tidak boleh melebihi sisa reimbursement.');
+    return;
+  }
+
+  if (!['CASH', 'BANK', 'QRIS'].includes(paymentMethod)) {
+    alert('Payment Method tidak valid.');
+    return;
+  }
+
+  const confirmed = confirm(
+    'Konfirmasi pembayaran reimbursement?\n\n' +
+    `Karyawan: ${row.Full_Name || row.Employee_ID}\n` +
+    `Nominal: ${window.formatReimbursementCurrency(amount)}\n` +
+    `Metode: ${paymentMethod}\n` +
+    `Tanggal: ${paymentDate}\n\n` +
+    'Pembayaran akan dicatat beserta jurnalnya.'
+  );
+
+  if (!confirmed) return;
+
+  try {
+    submitButton.disabled = true;
+    submitButton.classList.add('opacity-50');
+    submitButton.setAttribute('aria-busy', 'true');
+    const { data, error } = await supabaseClient.rpc(
+      'pay_employee_reimbursement',
+      {
+        p_session_id: sessionId,
+        p_reimbursement_id: reimbursementId,
+        p_payment_date: paymentDate,
+        p_amount: amount,
+        p_payment_method: paymentMethod,
+        p_reference_no: referenceNo || null,
+        p_note: note || null
+      }
+    );
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+
+    if (!result?.success) {
+      throw new Error(
+        result?.message || 'Pembayaran reimbursement gagal diproses.'
+      );
+    }
+
+    window.closePayReimbursementModal();
+
+    alert(
+      'Pembayaran reimbursement berhasil dicatat.\n\n' +
+      `Nominal pembayaran: ${window.formatReimbursementCurrency(amount)}\n` +
+      `Sisa sebelum pembayaran: ${window.formatReimbursementCurrency(remainingAmount)}`
+    );
+
+    await window.loadReimbursements();
+
+  } catch (error) {
+    console.error('handlePayReimbursement:', error);
+    alert(
+      'Gagal membayar reimbursement.\n\n' +
+      (error?.message || 'Terjadi kesalahan.')
+    );
+  } finally {
+    submitButton.disabled = false;
+    submitButton.classList.remove('opacity-50');
+    submitButton.removeAttribute('aria-busy');
+  }
+};
+
+window.closePayReimbursementModal = function () {
+  const modal = document.getElementById('payReimbursementModal');
+
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+};
+
 
 
 /* === EDIT MODAL === */
