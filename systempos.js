@@ -36972,7 +36972,6 @@ window.onPayrollBranchFilterChange = function () {
 };
 
 /* ==== PAYROLL - RENDER TABLE, KPI, PAGINATION ===== */
-
 window.renderPayrollTable = function () {
 	const tableBody = document.getElementById('payrollTableBody');
 	if (!tableBody) return;
@@ -37511,35 +37510,338 @@ window.renderPayrollDetailContent = function (payroll, details) {
 
 
 
+
 /* ==== 2. EDIT SALARY ==== */
 
-window.editPayrollSalary = function (payrollId) {
+window.editPayrollSalary = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
 
 	if (!row) {
 		console.error('Data payroll tidak ditemukan:', payrollId);
+		alert('Data payroll tidak ditemukan.');
 		return;
 	}
 
-	// Isi informasi payroll pada modal Edit Salary.
-	const payrollIdInput = document.getElementById('editPayrollId');
+	const status = String(row.Status || '').trim().toUpperCase();
 
-	if (payrollIdInput) { payrollIdInput.value = row.Payroll_ID; }
+	if (status === 'PAID' || status === 'CANCELLED') {
+		alert('Payroll berstatus ' + status + ' tidak dapat diedit.');
+		return;
+	}
 
-	setPayrollModalText('editPayrollEmployeeName', row.Full_Name);
-	setPayrollModalText('editPayrollEmployeeCode', row.Employee_Code);
-	setPayrollModalText( 'editPayrollBranch', row.Branch_Name || row.Branch_ID );
-	setPayrollModalText('editPayrollPeriod', row.Payroll_Period);
-	setPayrollModalText('editPayrollStatus', row.Status);
+	const sessionId = localStorage.getItem('pos_session_id');
 
-	window.activePayrollId = row.Payroll_ID;
+	if (!sessionId) {
+		alert('Sesi login tidak ditemukan. Silakan login kembali.');
+		return;
+	}
 
-	showPayrollModal('editPayrollSalaryModal');
+	const modal = document.getElementById('editPayrollSalaryModal');
+	const saveButton = document.getElementById('saveEditPayrollSalaryBtn');
+
+	try {
+		if (saveButton) saveButton.disabled = true;
+
+		// Kosongkan data lama agar tidak tampil saat memuat payroll lain.
+		window.activeEditPayroll = null;
+
+		const earningsBody = document.getElementById('editPayrollEarningsBody');
+		const deductionsBody = document.getElementById('editPayrollDeductionsBody');
+
+		if (earningsBody) {
+			earningsBody.innerHTML = `
+				<tr><td colspan="3" class="px-4 py-6 text-center text-muted">
+					Memuat komponen gaji...
+				</td></tr>`;
+		}
+
+		if (deductionsBody) {
+			deductionsBody.innerHTML = `
+				<tr><td colspan="3" class="px-4 py-6 text-center text-muted">
+					Memuat potongan...
+				</td></tr>`;
+		}
+
+		// Gunakan RPC yang sudah tersedia.
+		const { data, error } = await supabaseClient.rpc(
+			'get_employee_payroll_detail',
+			{
+				p_session_id: sessionId,
+				p_payroll_id: row.Payroll_ID
+			}
+		);
+
+		if (error) throw error;
+
+		if (!data?.success) {
+			throw new Error(data?.message || 'Gagal memuat detail payroll.');
+		}
+
+		const payroll = data.payroll;
+		const details = Array.isArray(data.details) ? data.details : [];
+		const money = value =>
+			new Intl.NumberFormat('id-ID', {
+				style: 'currency',
+				currency: 'IDR',
+				maximumFractionDigits: 2
+			}).format(Number(value) || 0);
+		// Escape teks sebelum dimasukkan ke HTML.
+		const escapeHtml = value =>
+			String(value ?? '').replace(/[&<>"']/g, char => ({
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				'"': '&quot;',
+				"'": '&#39;'
+			})[char]);
+		const setText = (id, value) => {
+			const element = document.getElementById(id);
+			if (element) element.textContent = value ?? '-';
+		};
+
+		// Isi identitas dari hasil RPC, bukan hanya dari tabel.
+		const payrollIdInput = document.getElementById('editPayrollId');
+		if (payrollIdInput) payrollIdInput.value = payroll.Payroll_ID;
+
+		setText('editPayrollEmployeeName', payroll.Full_Name);
+		setText('editPayrollEmployeeCode', payroll.Employee_Code);
+		setText('editPayrollBranch', payroll.Branch_Name || payroll.Branch_ID);
+		setText('editPayrollPeriod', payroll.Payroll_Period);
+		setText('editPayrollStatus', payroll.Status);
+
+		// Hanya komponen yang mengubah gaji karyawan yang dapat diedit.
+		const employeeDetails = details.filter(detail => {
+			const type = String(detail.Component_Type || '') .trim().toUpperCase();
+			const category = String(detail.Accounting_Category || '') .trim().toUpperCase();
+
+			return type !== 'EMPLOYER_CONTRIBUTION'
+				&& category !== 'EMPLOYER_HEALTH_CONTRIBUTION'
+				&& (type === 'EARNING' || type === 'DEDUCTION');
+		});
+
+		window.activeEditPayroll = {
+			payroll,
+			details: employeeDetails.map(detail => ({
+				...detail,
+				Amount: Number(detail.Amount) || 0
+			}))
+		};
+
+		const renderRows = (componentType, emptyMessage) => {
+			const targetId = componentType === 'EARNING'
+				? 'editPayrollEarningsBody'
+				: 'editPayrollDeductionsBody';
+			const target = document.getElementById(targetId);
+			if (!target) return;
+			const filtered = window.activeEditPayroll.details.filter(
+				detail => String(detail.Component_Type || '')
+					.trim().toUpperCase() === componentType );
+
+			if (!filtered.length) {
+				target.innerHTML = `
+					<tr>
+						<td colspan="3" class="px-4 py-6 text-center text-muted">
+							${emptyMessage}
+						</td>
+					</tr>`;
+				return;
+			}
+
+			target.innerHTML = filtered.map(detail => {
+				const id = escapeHtml(detail.Payroll_Detail_ID);
+				const name = escapeHtml(detail.Component_Name);
+				const calculationType = escapeHtml(detail.Calculation_Type || '-');
+
+				return `
+					<tr class="border-b border-outline-variant last:border-b-0">
+						<td class="px-4 py-3 text-sm text-foreground">
+							${name}
+						</td>
+						<td class="px-4 py-3 text-sm text-muted">
+							${calculationType}
+						</td>
+						<td class="px-4 py-3 text-right">
+							<input
+								type="number"
+								min="0"
+								step="0.01"
+								inputmode="decimal"
+								data-payroll-detail-id="${id}"
+								value="${Number(detail.Amount) || 0}"
+								aria-label="Nominal ${name}"
+								class="edit-payroll-component-amount w-full min-w-28 max-w-44 ml-auto rounded-md border border-outline-variant bg-background px-3 py-2 text-right text-sm text-foreground"
+							/>
+						</td>
+					</tr>`;
+			}).join('');
+		};
+		renderRows('EARNING', 'Belum ada komponen pendapatan.');
+		renderRows('DEDUCTION', 'Belum ada potongan karyawan.');
+
+		// Hitung ulang ringkasan setiap kali nominal diubah.
+		window.recalculateEditPayrollSalary();
+		// Buka modal setelah data selesai dimuat.
+		window.showPayrollModal('editPayrollSalaryModal');
+		console.log('EDIT PAYROLL LOADED:', window.activeEditPayroll);
+	} catch (error) {
+		console.error('editPayrollSalary:', error);
+		alert('Gagal memuat Edit Salary: ' + error.message);
+	} finally {
+		if (saveButton) saveButton.disabled = false;
+	}
+};
+
+/* ==== EDIT SALARY - RECALCULATE SUMMARY ==== */
+window.recalculateEditPayrollSalary = function () {
+	const active = window.activeEditPayroll;
+	if (!active) return;
+
+	const money = value =>
+		new Intl.NumberFormat('id-ID', {
+			style: 'currency',
+			currency: 'IDR',
+			maximumFractionDigits: 2
+		}).format(Number(value) || 0);
+
+	// Ambil nominal terbaru dari input di kedua tabel.
+	document.querySelectorAll(
+		'#editPayrollSalaryModal .edit-payroll-component-amount'
+	).forEach(input => {
+		const detail = active.details.find(item =>
+			String(item.Payroll_Detail_ID) ===
+			String(input.dataset.payrollDetailId)
+		);
+
+		if (detail) {
+			detail.Amount = input.value === ''
+				? 0
+				: Math.max(0, Number(input.value) || 0);
+		}
+	});
+
+	const earnings = active.details.filter(detail => String(detail.Component_Type).toUpperCase() === 'EARNING' );
+	const deductions = active.details.filter(detail => String(detail.Component_Type).toUpperCase() === 'DEDUCTION' );
+	const grossSalary = earnings.reduce( (total, detail) => total + detail.Amount, 0 );
+	const totalDeductions = deductions.reduce( (total, detail) => total + detail.Amount, 0 );
+	const netSalary = grossSalary - totalDeductions;
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) element.textContent = value;
+	};
+
+	setText('editPayrollGrossSalary', money(grossSalary));
+	setText('editPayrollTotalDeductions', money(totalDeductions));
+	setText('editPayrollNetSalary', money(netSalary));
+
+	active.summary = {
+		Gross_Salary: grossSalary,
+		Total_Deduction: totalDeductions,
+		Net_Salary: netSalary
+	};
+};
+
+// Dengarkan perubahan nominal selama popup Edit Salary digunakan.
+if (!window.editPayrollSalaryInputHandlerAttached) {
+	document.addEventListener('input', function (event) {
+		if (
+			event.target.matches(
+				'#editPayrollSalaryModal .edit-payroll-component-amount'
+			)
+		) {
+			window.recalculateEditPayrollSalary();
+		}
+	});
+	window.editPayrollSalaryInputHandlerAttached = true;
+}
+
+/* ==== EDIT SALARY - SAVE CHANGES ==== */
+window.saveEditPayrollSalary = async function () {
+	const active = window.activeEditPayroll;
+	if (!active) { alert('Detail payroll belum dimuat.'); return; }
+
+	const saveButton = document.getElementById('saveEditPayrollSalaryBtn');
+	const sessionId = localStorage.getItem('pos_session_id');
+
+	if (!sessionId) { alert('Sesi login tidak ditemukan.'); return; }
+
+	// Pastikan nominal yang dikirim adalah nilai input terbaru.
+	window.recalculateEditPayrollSalary();
+
+	const details = active.details.map(detail => ({
+		Payroll_Detail_ID: detail.Payroll_Detail_ID,
+		Amount: Number(detail.Amount)
+	}));
+
+	if (details.some(detail =>
+		!Number.isFinite(detail.Amount) || detail.Amount < 0
+	)) {
+		alert('Periksa kembali nominal komponen payroll.');
+		return;
+	}
+
+	try {
+		if (saveButton) {
+			saveButton.disabled = true;
+			saveButton.classList.add('opacity-50');
+		}
+
+		const { data, error } = await supabaseClient.rpc(
+			'save_employee_payroll_edit',
+			{
+				p_session_id: sessionId,
+				p_payroll_id: active.payroll.Payroll_ID,
+				p_details: details
+			}
+		);
+
+		if (error) throw error;
+		if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan payroll.'); }
+		// Perbarui ringkasan pada tabel yang sedang ditampilkan.
+		const row = window.getPayrollRow(active.payroll.Payroll_ID);
+
+		if (row) {
+			row.Basic_Salary = Number(
+				active.details.find(detail =>
+					detail.Component_Type === 'EARNING' &&
+					detail.Component_ID == null &&
+					detail.Calculation_Type === 'FIXED' &&
+					detail.Calculation_Base === 'BASIC_SALARY'
+				)?.Amount ?? row.Basic_Salary
+			);
+
+			row.Gross_Salary = Number(data.Gross_Salary);
+			row.Total_Deduction = Number(data.Total_Deduction);
+			row.Net_Salary = Number(data.Net_Salary);
+
+			const earnings = active.details.filter(detail => detail.Component_Type === 'EARNING' );
+
+			row.Total_Overtime = earnings
+				.filter(detail => detail.Accounting_Category === 'OVERTIME')
+				.reduce((sum, detail) => sum + Number(detail.Amount || 0), 0);
+			row.Total_Allowance = Math.max(
+				0,
+				row.Gross_Salary - row.Basic_Salary - row.Total_Overtime
+			);
+		}
+
+		window.renderPayrollTable();
+		window.closeEditPayrollSalary();
+		window.activeEditPayroll = null;
+
+		alert('Perubahan gaji berhasil disimpan.');
+	} catch (error) {
+		console.error('saveEditPayrollSalary:', error);
+		alert('Gagal menyimpan perubahan: ' + error.message);
+	} finally {
+		if (saveButton) {
+			saveButton.disabled = false;
+			saveButton.classList.remove('opacity-50');
+		}
+	}
 };
 
 
 /* ==== CLOSE MODALS ==== */
-
 window.closePayrollDetail = function () {
 	hidePayrollModal('payrollDetailModal');
 };
@@ -37547,9 +37849,6 @@ window.closePayrollDetail = function () {
 window.closeEditPayrollSalary = function () {
 	hidePayrollModal('editPayrollSalaryModal');
 };
-
-
-
 
 
 /* ==== PAYROLL - CHANGE PAGE ==== */
