@@ -32409,6 +32409,9 @@ async function initEmployeePage() {
 		if (document.getElementById('payrollTableBody')) {
 		    await loadPayroll();
 		}
+		if (document.getElementById('reimbursementTableBody')) {
+      await initEmployeeReimbursement();
+    }
   } catch (error) {
 		console.error('initEmployeePage:', error);
 	}
@@ -38001,12 +38004,1192 @@ window.closeEditPayrollSalary = function () {
 	hidePayrollModal('editPayrollSalaryModal');
 };
 
-
 /* ==== PAYROLL - CHANGE PAGE ==== */
-
 window.changePayrollPage = function (direction) {
     window.payrollCurrentPage += Number(direction) || 0;
     window.renderPayrollTable();
+};
+
+
+/* =========================================================
+   EMPLOYEE REIMBURSEMENT
+   ========================================================= */
+window.reimbursementRows = [];
+window.reimbursementCurrentPage = 1;
+window.reimbursementPageSize = 10;
+window.reimbursementModalElement = null;
+const REIMBURSEMENT_SESSION_KEY = 'pos_session_id';
+
+/* ==== HELPERS === */
+window.escapeReimbursementHTML = function (value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+};
+
+window.formatReimbursementCurrency = function (value) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0
+  }).format(Number(value || 0));
+};
+
+window.formatReimbursementDate = function (value) {
+  if (!value) return '-';
+
+  const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
+
+  if (Number.isNaN(date.getTime())) return '-';
+	
+  return date.toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+
+window.getReimbursementUser = function () {
+  return typeof state !== 'undefined' ? state.user : null;
+};
+
+window.getReimbursementRole = function () {
+  return String(
+    window.getReimbursementUser()?.role || ''
+  ).trim().toLowerCase();
+};
+
+window.getReimbursementSession = function () {
+  const sessionId = localStorage.getItem( REIMBURSEMENT_SESSION_KEY );
+  if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
+  return sessionId;
+};
+
+window.getReimbursementEmployeeList = function () {
+  if (Array.isArray(window.employeeData)) { return window.employeeData; }
+  if (typeof employeeData !== 'undefined' && Array.isArray(employeeData)) { return employeeData; }
+  return [];
+};
+
+window.getReimbursementEmployee = function (employeeId) {
+  return window.getReimbursementEmployeeList().find(employee =>
+    String(employee.Employee_ID || '') === String(employeeId || '')
+  ) || null;
+};
+
+window.getReimbursementBranchId = function (employee) {
+  return String(
+    employee?.Branch_ID ||
+    employee?.branchId ||
+    ''
+  ).trim();
+};
+
+window.getReimbursementBranchName = function (branchId) {
+  const id = String(branchId || '').trim();
+  if (!id) return '-';
+
+  /*
+   * Gunakan nama outlet jika tersedia dari data cabang
+   * yang sudah dimuat oleh halaman Employee.
+   */
+  const possibleLists = [
+    window.employeeBranchData,
+    window.branchData,
+    window.branches
+  ];
+
+  for (const list of possibleLists) {
+    if (!Array.isArray(list)) continue;
+
+    const branch = list.find(item =>
+      String(
+        item.Branch_ID ||
+        item.branch_id ||
+        item.id ||
+        ''
+      ).trim() === id
+    );
+
+    if (branch) {
+      return String(
+        branch.Branch_Name ||
+        branch.Branch_Name ||
+        branch.branch_name ||
+        branch.name ||
+        id
+      );
+    }
+  }
+  return id;
+};
+
+window.getReimbursementVisibleRows = function () {
+  const period = document.getElementById( 'reimbursementPeriodFilter' )?.value || '';
+  const branchId = document.getElementById( 'reimbursementBranchFilter' )?.value || '';
+  const employeeId = document.getElementById( 'reimbursementEmployeeFilter' )?.value || '';
+  const status = document.getElementById( 'reimbursementStatusFilter' )?.value || '';
+
+  return window.reimbursementRows.filter(row => {
+    if (
+      period &&
+      String(row.Reimbursement_Date || '').slice(0, 7) !== period
+    ) {
+      return false;
+    }
+    if (
+      branchId &&
+      branchId !== 'ALL' &&
+      String(row.Branch_ID || '') !== branchId
+    ) {
+      return false;
+    }
+
+    if (
+      employeeId &&
+      String(row.Employee_ID || '') !== employeeId
+    ) {
+      return false;
+    }
+    if (
+      status &&
+      String(row.Status || '').toUpperCase() !== status
+    ) {
+      return false;
+    }
+    return true;
+  });
+};
+
+
+/* ==== FILTER OPTIONS ==== */
+window.populateReimbursementFilters = function () {
+  const branchFilter = document.getElementById( 'reimbursementBranchFilter' );
+  const employeeFilter = document.getElementById( 'reimbursementEmployeeFilter' );
+
+  if (!branchFilter || !employeeFilter) return;
+
+  const role = window.getReimbursementRole();
+  const user = window.getReimbursementUser();
+  const currentBranch = String( user?.branchId || '' ).trim();
+  const previousBranch = branchFilter.value;
+  const previousEmployee = employeeFilter.value;
+  const employees = window.getReimbursementEmployeeList();
+  const branchMap = new Map();
+
+  employees.forEach(employee => {
+    const branchId = window.getReimbursementBranchId(employee);
+
+    if (branchId && !branchMap.has(branchId)) {
+      branchMap.set(
+        branchId,
+        window.getReimbursementBranchName(branchId)
+      );
+    }
+  });
+
+  branchFilter.innerHTML = '';
+
+  if (role === 'owner' || role === 'accountant') {
+    branchFilter.add(
+      new Option('All Branch', '')
+    );
+
+    [...branchMap.entries()]
+      .sort((a, b) => a[1].localeCompare(b[1]))
+      .forEach(([branchId, branchName]) => {
+        branchFilter.add(
+          new Option(branchName, branchId)
+        );
+      });
+
+    branchFilter.disabled = false;
+
+    if (
+      previousBranch &&
+      [...branchFilter.options].some(
+        option => option.value === previousBranch
+      )
+    ) {
+      branchFilter.value = previousBranch;
+    } else {
+      branchFilter.value = '';
+    }
+  } else {
+    /*
+     * Admin hanya melihat outlet sendiri.
+     */
+    branchFilter.add(
+      new Option(
+        window.getReimbursementBranchName(currentBranch),
+        currentBranch
+      )
+    );
+    branchFilter.value = currentBranch;
+    branchFilter.disabled = true;
+  }
+
+  const selectedBranch = branchFilter.value;
+  const visibleEmployees = employees.filter(employee => {
+    const employeeBranch = window.getReimbursementBranchId(employee);
+
+    if (role !== 'owner' && role !== 'accountant') { return employeeBranch === currentBranch; }
+    if (selectedBranch) { return employeeBranch === selectedBranch; }
+
+    return true;
+  });
+
+  employeeFilter.innerHTML = '';
+  employeeFilter.add(
+    new Option('All Employees', '')
+  );
+
+  visibleEmployees
+    .slice()
+    .sort((a, b) =>
+      String(a.Full_Name || '').localeCompare(
+        String(b.Full_Name || '')
+      )
+    )
+    .forEach(employee => {
+      employeeFilter.add(
+        new Option(
+          employee.Full_Name || employee.Employee_ID,
+          employee.Employee_ID
+        )
+      );
+    });
+
+  if (
+    previousEmployee &&
+    [...employeeFilter.options].some(
+      option => option.value === previousEmployee
+    )
+  ) {
+    employeeFilter.value = previousEmployee;
+  }
+};
+
+
+/* ==== LOAD REIMBURSEMENTS
+   RPC: get_employee_reimbursements ==== */
+window.loadReimbursements = async function () {
+  const tableBody = document.getElementById( 'reimbursementTableBody' );
+  if (!tableBody) return;
+
+  try {
+    const sessionId = window.getReimbursementSession();
+    const role = window.getReimbursementRole();
+    const user = window.getReimbursementUser();
+
+    if (!['owner', 'accountant', 'admin'].includes(role)) {
+      throw new Error(
+        'Role tidak memiliki akses ke Reimbursement.'
+      );
+    }
+		
+    const period = document.getElementById( 'reimbursementPeriodFilter' )?.value || '';
+    const branchFilter = document.getElementById( 'reimbursementBranchFilter' );
+    const employeeFilter = document.getElementById( 'reimbursementEmployeeFilter' );
+    const statusFilter = document.getElementById( 'reimbursementStatusFilter' );
+
+    let branchId = branchFilter?.value || null;
+
+    if (role === 'admin') {
+      branchId = String(user?.branchId || '').trim();
+      if (!branchId) { throw new Error('Outlet Admin tidak ditemukan.'); }
+    } else if (!branchId || branchId === 'ALL') {
+      branchId = null;
+    }
+
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-5 py-10 text-center text-muted">
+          Loading reimbursement...
+        </td>
+      </tr>
+    `;
+
+    const { data, error } = await supabaseClient.rpc(
+      'get_employee_reimbursements',
+      {
+        p_session_id: sessionId,
+        p_reimbursement_period: period
+          ? `${period}-01`
+          : null,
+        p_branch_id: branchId,
+        p_employee_id: employeeFilter?.value || null,
+        p_status: statusFilter?.value || null
+      }
+    );
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+
+    if (!result || result.success !== true) {
+      throw new Error(
+        result?.message || 'Gagal memuat reimbursement.'
+      );
+    }
+    window.reimbursementRows = Array.isArray(result.rows)
+      ? result.rows
+      : [];
+    /*
+     * Simpan summary dari RPC.
+     */
+    window.reimbursementSummary = result.summary || {};
+    window.reimbursementCurrentPage = 1;
+    window.renderReimbursementTable();
+  } catch (error) {
+    console.error('loadReimbursements:', error);
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-5 py-10 text-center text-red-500">
+          ${window.escapeReimbursementHTML(
+            error.message || 'Gagal memuat reimbursement.'
+          )}
+        </td>
+      </tr>
+    `;
+    window.updateReimbursementSummary([]);
+    window.updateReimbursementPagination(0);
+  }
+};
+
+
+/* ==== SUMMARY / KPI ==== */
+window.updateReimbursementSummary = function (rows) {
+  const totalCount = document.getElementById( 'reimbursementTotalCount' );
+  const draftCount = document.getElementById( 'reimbursementDraftCount' );
+  const approvedCount = document.getElementById( 'reimbursementApprovedCount' );
+  const unpaidAmount = document.getElementById( 'reimbursementUnpaidAmount' );
+  const summary = window.reimbursementSummary || {};
+
+  if (totalCount) {
+    totalCount.textContent = Number(
+      summary.totalCount ?? rows.length
+    ).toLocaleString('id-ID');
+  }
+
+  if (draftCount) {
+    draftCount.textContent = Number(
+      summary.draftCount ??
+      rows.filter(row => row.Status === 'DRAFT').length
+    ).toLocaleString('id-ID');
+  }
+
+  if (approvedCount) {
+    approvedCount.textContent = Number(
+      summary.approvedCount ??
+      rows.filter(row => row.Status === 'APPROVED').length
+    ).toLocaleString('id-ID');
+  }
+
+  if (unpaidAmount) {
+    unpaidAmount.textContent =
+      window.formatReimbursementCurrency(
+        summary.unpaidAmount ??
+        rows.reduce((total, row) => {
+          if (['DRAFT', 'APPROVED'].includes(row.Status)) {
+            return total + Number(row.Amount || 0);
+          }
+
+          return total;
+        }, 0)
+      );
+  }
+};
+
+
+/* ==== STATUS BADGE ===== */
+window.getReimbursementStatusBadge = function (status) {
+  const normalized = String(status || 'DRAFT').toUpperCase();
+  const styles = {
+    DRAFT: 'bg-surface-container text-muted',
+    APPROVED: 'bg-blue-100 text-blue-800',
+    IN_PAYROLL: 'bg-purple-100 text-purple-800',
+    PAID: 'bg-green-100 text-green-800',
+    CANCELLED: 'bg-red-100 text-red-800'
+  };
+  const labels = {
+    DRAFT: 'Draft',
+    APPROVED: 'Approved',
+    IN_PAYROLL: 'In Payroll',
+    PAID: 'Paid',
+    CANCELLED: 'Cancelled'
+  };
+  return `
+    <span class="inline-flex items-center rounded-full px-3 py-1
+      text-xs font-semibold whitespace-nowrap
+      ${styles[normalized] || styles.DRAFT}">
+      ${labels[normalized] || window.escapeReimbursementHTML(normalized)}
+    </span>
+  `;
+};
+
+/* ==== RENDER TABLE ==== */
+window.renderReimbursementTable = function () {
+  const tableBody = document.getElementById( 'reimbursementTableBody' );
+
+  if (!tableBody) return;
+
+  const rows = window.getReimbursementVisibleRows();
+  const pageSize = window.reimbursementPageSize;
+  const total = rows.length;
+  const maxPage = Math.max(1, Math.ceil(total / pageSize));
+
+  window.reimbursementCurrentPage = Math.min(
+    Math.max(1, window.reimbursementCurrentPage),
+    maxPage
+  );
+  const startIndex = (window.reimbursementCurrentPage - 1) * pageSize;
+  const pageRows = rows.slice( startIndex, startIndex + pageSize );
+
+  if (!pageRows.length) {
+    tableBody.innerHTML = `
+      <tr>
+        <td colspan="9" class="px-5 py-10 text-center text-muted">
+          No reimbursement data
+        </td>
+      </tr>
+    `;
+  } else {
+    tableBody.innerHTML = pageRows.map(row => {
+      const id = window.escapeReimbursementHTML( row.Reimbursement_ID );
+      const employeeName = window.escapeReimbursementHTML( row.Full_Name || row.Employee_ID || '-' );
+      const branchName = window.escapeReimbursementHTML( window.getReimbursementBranchName(row.Branch_ID) );
+      const category = window.escapeReimbursementHTML( row.Category || '-' );
+      const description = window.escapeReimbursementHTML( row.Description || '-' );
+      const payrollPeriod = row.Payroll_Period
+        ? window.escapeReimbursementHTML( String(row.Payroll_Period).slice(0, 7) )
+        : '-';
+      const status = String(row.Status || 'DRAFT').toUpperCase();
+      const canEdit = status === 'DRAFT';
+      const canApprove = status === 'DRAFT';
+      const canCancel = ['DRAFT', 'APPROVED'].includes(status);
+
+      return `
+        <tr class="hover:bg-surface-container-low">
+          <td class="px-5 py-4 whitespace-nowrap">
+            ${window.escapeReimbursementHTML( window.formatReimbursementDate(row.Reimbursement_Date) )}
+          </td>
+          <td class="px-5 py-4 whitespace-nowrap">
+            <div class="font-medium text-foreground"> ${employeeName} </div>
+            <div class="text-xs text-muted"> ${window.escapeReimbursementHTML(row.Employee_ID || '')} </div>
+          </td>
+          <td class="px-5 py-4 whitespace-nowrap"> ${branchName} </td>
+          <td class="px-5 py-4 whitespace-nowrap"> ${category} </td>
+          <td class="px-5 py-4 min-w-[180px]"> ${description} </td>
+          <td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${window.formatReimbursementCurrency(row.Amount)} </td>
+          <td class="px-5 py-4 whitespace-nowrap"> ${payrollPeriod} </td>
+          <td class="px-5 py-4 text-center"> ${window.getReimbursementStatusBadge(status)} </td>
+          <td class="px-5 py-4 text-center whitespace-nowrap">
+            <div class="inline-flex items-center gap-1">
+              <button type="button"
+                onclick="viewReimbursement('${id}')"
+                title="Detail"
+                class="w-8 h-8 rounded hover:bg-background">
+                <span class="material-symbols-outlined text-lg">visibility</span>
+              </button>
+              ${
+                canEdit
+                  ? `
+                    <button type="button"
+                      onclick="editReimbursement('${id}')"
+                      title="Edit"
+                      class="w-8 h-8 rounded hover:bg-background">
+                      <span class="material-symbols-outlined text-lg">edit</span>
+                    </button>
+                  `
+                  : ''
+              }
+              ${
+                canApprove
+                  ? `
+                    <button type="button"
+                      onclick="approveReimbursement('${id}')"
+                      title="Approve"
+                      class="w-8 h-8 rounded hover:bg-background text-blue-600">
+                      <span class="material-symbols-outlined text-lg">check_circle</span>
+                    </button>
+                  `
+                  : ''
+              }
+              ${
+                canCancel
+                  ? `
+                    <button type="button"
+                      onclick="cancelReimbursement('${id}')"
+                      title="Cancel"
+                      class="w-8 h-8 rounded hover:bg-background text-red-600">
+                      <span class="material-symbols-outlined text-lg">cancel</span>
+                    </button>
+                  `
+                  : ''
+              }
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+  window.updateReimbursementSummary(rows);
+  window.updateReimbursementPagination(total);
+};
+
+/* ==== PAGINATION ==== */
+window.updateReimbursementPagination = function (total) {
+  const info = document.getElementById( 'reimbursementTableInfo' );
+  const prevButton = document.getElementById( 'reimbursementPrevButton' );
+  const nextButton = document.getElementById( 'reimbursementNextButton' );
+  const pageSize = window.reimbursementPageSize;
+  const page = window.reimbursementCurrentPage;
+  const start = total ? ((page - 1) * pageSize) + 1 : 0;
+  const end = Math.min(page * pageSize, total);
+
+  if (info) { info.textContent = `Showing ${start}–${end} of ${total}`; }
+  if (prevButton) { prevButton.disabled = page <= 1; }
+  if (nextButton) { nextButton.disabled = end >= total; }
+};
+
+window.changeReimbursementPage = function (direction) {
+  window.reimbursementCurrentPage += Number(direction || 0);
+  window.renderReimbursementTable();
+};
+
+
+/* ==== CREATE MODAL
+   Modal dibuat dari JS karena HTML yang dikirim
+   belum berisi modal Add/Edit/Detail. ==== */
+
+window.ensureReimbursementModal = function () {
+  if (document.getElementById('reimbursementModal')) return;
+
+  const modal = document.createElement('div');
+
+  modal.id = 'reimbursementModal';
+  modal.className = 'fixed inset-0 z-[150] hidden items-center justify-center bg-black/50 p-4';
+  modal.innerHTML = `
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto
+      rounded-lg bg-background border border-outline-variant shadow-xl">
+
+      <div class="sticky top-0 z-10 flex items-center justify-between
+        gap-3 border-b border-outline-variant bg-background p-5">
+        <div>
+          <h3 id="reimbursementModalTitle"
+            class="text-lg font-bold text-foreground">
+            Add Reimbursement
+          </h3>
+          <p class="text-xs text-muted mt-1">
+            Employee reimbursement claim
+          </p>
+        </div>
+
+        <button type="button"
+          onclick="closeReimbursementModal()"
+          class="w-9 h-9 rounded hover:bg-surface-container">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <form id="reimbursementForm" class="p-5 space-y-4">
+        <input type="hidden" id="reimbursementId">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Employee *
+            </label>
+            <select id="reimbursementFormEmployee"
+              required
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
+              <option value="">Select employee</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Outlet
+            </label>
+            <input id="reimbursementFormBranch"
+              readonly
+              class="w-full h-10 px-3 rounded-md bg-surface-container border border-outline-variant text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Reimbursement Date *
+            </label>
+            <input id="reimbursementFormDate"
+              type="date"
+              required
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Payroll Period
+            </label>
+            <input id="reimbursementFormPeriod"
+              type="month"
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
+          </div>
+
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Category *
+            </label>
+            <select id="reimbursementFormCategory"
+              required
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
+              <option value="">Select category</option>
+              <option value="TRANSPORT">Transport</option>
+              <option value="MEAL">Meal</option>
+              <option value="ACCOMMODATION">Accommodation</option>
+              <option value="SUPPLIES">Supplies</option>
+              <option value="MEDICAL">Medical</option>
+              <option value="COMMUNICATION">Communication</option>
+              <option value="OTHER">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs text-muted mb-2">
+              Amount *
+            </label>
+            <input id="reimbursementFormAmount"
+              type="number"
+              min="1"
+              step="1"
+              required
+              placeholder="0"
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs text-muted mb-2">
+            Description *
+          </label>
+          <textarea id="reimbursementFormDescription"
+            rows="3"
+            required
+            class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm"
+            placeholder="Explain the reimbursement claim"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs text-muted mb-2">
+            Note
+          </label>
+          <textarea id="reimbursementFormNote"
+            rows="2"
+            class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm"
+            placeholder="Optional note"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-2 border-t border-outline-variant pt-4">
+          <button type="button"
+            onclick="closeReimbursementModal()"
+            class="h-10 px-4 rounded-md border border-outline-variant text-sm">
+            Cancel
+          </button>
+
+          <button id="reimbursementSaveButton"
+            type="submit"
+            class="h-10 px-5 rounded-md bottom-theme text-sm font-medium">
+            Save Reimbursement
+          </button>
+        </div>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  const form = document.getElementById('reimbursementForm');
+  form.addEventListener('submit', window.handleSaveReimbursement);
+  document.getElementById( 'reimbursementFormEmployee' ).addEventListener('change', window.syncReimbursementFormBranch);
+};
+
+window.closeReimbursementModal = function () {
+  const modal = document.getElementById('reimbursementModal');
+
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+};
+
+
+/* === OPEN ADD MODAL === */
+window.openReimbursementModal = function () {
+  window.ensureReimbursementModal();
+  window.populateReimbursementFilters();
+	
+  const role = window.getReimbursementRole();
+  const user = window.getReimbursementUser();
+  const form = document.getElementById('reimbursementForm');
+
+  form.reset();
+  document.getElementById('reimbursementId').value = '';
+  document.getElementById( 'reimbursementModalTitle' ).textContent = 'Add Reimbursement';
+  document.getElementById( 'reimbursementSaveButton' ).textContent = 'Save Reimbursement';
+
+  const dateInput = document.getElementById( 'reimbursementFormDate' );
+  dateInput.value = new Date().toISOString().slice(0, 10);
+  const periodInput = document.getElementById( 'reimbursementFormPeriod' );
+  periodInput.value = dateInput.value.slice(0, 7);
+  const employeeSelect = document.getElementById( 'reimbursementFormEmployee' );
+  employeeSelect.innerHTML = '<option value="">Select employee</option>';
+  const employees = window.getReimbursementEmployeeList();
+  const selectedBranch = role === 'admin'
+    ? String(user?.branchId || '').trim()
+    : String( document.getElementById('reimbursementBranchFilter')?.value || '' ).trim();
+
+  employees
+    .filter(employee => {
+      const branchId = window.getReimbursementBranchId(employee);
+
+      if (role === 'admin') { return branchId === selectedBranch; }
+      if (selectedBranch) { return branchId === selectedBranch; }
+      return true;
+    })
+    .forEach(employee => {
+      employeeSelect.add(
+        new Option(
+          employee.Full_Name || employee.Employee_ID,
+          employee.Employee_ID
+        )
+      );
+    });
+
+  document.getElementById( 'reimbursementFormBranch' ).value = '';
+  window.syncReimbursementFormBranch();
+
+  const modal = document.getElementById('reimbursementModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+/* === SYNC EMPLOYEE / BRANCH === */
+window.syncReimbursementFormBranch = function () {
+  const employeeId = document.getElementById( 'reimbursementFormEmployee' )?.value;
+  const employee = window.getReimbursementEmployee(employeeId);
+  const branchInput = document.getElementById( 'reimbursementFormBranch' );
+
+  if (!branchInput) return;
+
+  branchInput.value = employee
+    ? window.getReimbursementBranchName(
+        window.getReimbursementBranchId(employee)
+      )
+    : '';
+};
+
+
+/* === EDIT MODAL === */
+window.editReimbursement = function (reimbursementId) {
+  const row = window.reimbursementRows.find(item => String(item.Reimbursement_ID) === String(reimbursementId) );
+
+  if (!row) { alert('Data reimbursement tidak ditemukan.'); return; }
+  if (String(row.Status).toUpperCase() !== 'DRAFT') { alert('Hanya reimbursement berstatus Draft yang bisa diedit.'); return; }
+
+  window.openReimbursementModal();
+  document.getElementById('reimbursementModalTitle').textContent = 'Edit Reimbursement';
+  document.getElementById('reimbursementSaveButton').textContent = 'Update Reimbursement';
+  document.getElementById('reimbursementId').value = row.Reimbursement_ID;
+
+  const employeeSelect = document.getElementById( 'reimbursementFormEmployee' );
+  const branchId = String(row.Branch_ID || '');
+
+  /*
+   * Pastikan employee yang tersimpan tetap bisa dipilih
+   * saat mengedit record lama.
+   */
+  if (
+    ![...employeeSelect.options].some(
+      option => option.value === String(row.Employee_ID)
+    )
+  ) {
+    employeeSelect.add(
+      new Option(
+        row.Full_Name || row.Employee_ID,
+        row.Employee_ID
+      )
+    );
+  }
+
+  employeeSelect.value = row.Employee_ID;
+  document.getElementById( 'reimbursementFormBranch' ).value = window.getReimbursementBranchName(branchId);
+  document.getElementById( 'reimbursementFormDate' ).value = String(row.Reimbursement_Date || '').slice(0, 10);
+  document.getElementById( 'reimbursementFormPeriod' ).value = row.Payroll_Period
+    ? String(row.Payroll_Period).slice(0, 7)
+    : '';
+
+  const categorySelect = document.getElementById( 'reimbursementFormCategory' );
+
+  if (
+    row.Category &&
+    ![...categorySelect.options].some(
+      option => option.value === row.Category
+    )
+  ) {
+    categorySelect.add(new Option(row.Category, row.Category));
+  }
+  categorySelect.value = row.Category || '';
+  document.getElementById( 'reimbursementFormAmount' ).value = Number(row.Amount || 0);
+  document.getElementById( 'reimbursementFormDescription' ).value = row.Description || '';
+  document.getElementById( 'reimbursementFormNote' ).value = row.Note || '';
+};
+
+
+/* ==== SAVE ADD / EDIT
+   RPC yang dibutuhkan:
+   save_employee_reimbursement ==== */
+
+window.handleSaveReimbursement = async function (event) {
+  event.preventDefault();
+  const saveButton = document.getElementById( 'reimbursementSaveButton' );
+
+  try {
+    const sessionId = window.getReimbursementSession();
+    const reimbursementId = document.getElementById( 'reimbursementId' ).value.trim() || null;
+    const employeeId = document.getElementById( 'reimbursementFormEmployee' ).value;
+    const employee = window.getReimbursementEmployee(employeeId);
+
+    if (!employee) { throw new Error('Pilih karyawan yang valid.'); }
+
+    const branchId = window.getReimbursementBranchId(employee);
+    const role = window.getReimbursementRole();
+    const user = window.getReimbursementUser();
+
+    if (
+      role === 'admin' &&
+      branchId !== String(user?.branchId || '').trim()
+    ) {
+      throw new Error('Admin hanya dapat membuat klaim untuk outlet sendiri.');
+    }
+
+    const date = document.getElementById( 'reimbursementFormDate' ).value;
+    const payrollPeriod = document.getElementById( 'reimbursementFormPeriod' ).value;
+    const category = document.getElementById( 'reimbursementFormCategory' ).value.trim();
+    const description = document.getElementById( 'reimbursementFormDescription' ).value.trim();
+    const amount = Number(document.getElementById( 'reimbursementFormAmount' ).value);
+    const note = document.getElementById( 'reimbursementFormNote' ).value.trim() || null;
+
+    if (!date) throw new Error('Tanggal reimbursement wajib diisi.');
+    if (!category) throw new Error('Kategori wajib dipilih.');
+    if (!description) throw new Error('Deskripsi wajib diisi.');
+    if (!Number.isFinite(amount) || amount <= 0) { throw new Error('Amount harus lebih besar dari 0.'); }
+
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+
+    const { data, error } = await supabaseClient.rpc(
+      'save_employee_reimbursement',
+      {
+        p_session_id: sessionId,
+        p_reimbursement_id: reimbursementId,
+        p_employee_id: employeeId,
+        p_branch_id: branchId,
+        p_reimbursement_date: date,
+        p_payroll_period: payrollPeriod
+          ? `${payrollPeriod}-01`
+          : null,
+        p_category: category,
+        p_description: description,
+        p_amount: amount,
+        p_note: note
+      }
+    );
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+
+    if (result && result.success === false) { throw new Error(result.message || 'Gagal menyimpan reimbursement.'); }
+
+    window.closeReimbursementModal();
+    await window.loadReimbursements();
+
+    alert(
+      result?.message ||
+      (reimbursementId
+        ? 'Reimbursement berhasil diperbarui.'
+        : 'Reimbursement berhasil dibuat.')
+    );
+  } catch (error) {
+    console.error('handleSaveReimbursement:', error);
+    alert(error.message || 'Gagal menyimpan reimbursement.');
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent =
+        document.getElementById('reimbursementId')?.value
+          ? 'Update Reimbursement'
+          : 'Save Reimbursement';
+    }
+  }
+};
+
+/* ==== DETAIL MODAL ==== */
+window.viewReimbursement = function (reimbursementId) {
+  const row = window.reimbursementRows.find(item => String(item.Reimbursement_ID) === String(reimbursementId) );
+  if (!row) { alert('Data reimbursement tidak ditemukan.'); return; }
+
+  const oldModal = document.getElementById( 'reimbursementDetailModal' );
+
+  if (oldModal) oldModal.remove();
+
+  const fields = [
+    ['Reimbursement ID', row.Reimbursement_ID],
+    ['Employee', row.Full_Name || row.Employee_ID],
+    ['Employee ID', row.Employee_ID],
+    ['Outlet', window.getReimbursementBranchName(row.Branch_ID)],
+    ['Date', window.formatReimbursementDate(row.Reimbursement_Date)],
+    ['Payroll Period', row.Payroll_Period
+      ? String(row.Payroll_Period).slice(0, 7)
+      : '-'],
+    ['Category', row.Category],
+    ['Description', row.Description],
+    ['Amount', window.formatReimbursementCurrency(row.Amount)],
+    ['Status', row.Status],
+    ['Payment Method', row.Payment_Method || '-'],
+    ['Payment Date', window.formatReimbursementDate(row.Payment_Date)],
+    ['Payroll ID', row.Payroll_ID || '-'],
+    ['Note', row.Note || '-']
+  ];
+
+  const modal = document.createElement('div');
+	
+  modal.id = 'reimbursementDetailModal';
+  modal.className = 'fixed inset-0 z-[160] flex items-center justify-center bg-background p-4';
+  modal.innerHTML = `
+    <div class="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-md bg-background border border-outline-variant shadow-xl">
+      <div class="flex items-center justify-between border-b
+        border-outline-variant p-5">
+        <h3 class="text-lg font-bold">Reimbursement Detail</h3>
+
+        <button type="button"
+          onclick="document.getElementById('reimbursementDetailModal').remove()"
+          class="w-9 h-9 rounded-md hover:bg-surface-container">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+
+      <div class="p-5 space-y-4">
+        ${fields.map(([label, value]) => `
+          <div class="grid grid-cols-[140px_1fr] gap-3">
+            <div class="text-xs text-muted">${window.escapeReimbursementHTML(label)}</div>
+            <div class="text-sm text-foreground break-words">${window.escapeReimbursementHTML(value ?? '-')}</div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="flex justify-end border-t border-outline-variant p-5">
+        <button type="button"
+          onclick="document.getElementById('reimbursementDetailModal').remove()"
+          class="h-10 px-4 rounded-md border border-outline-variant text-sm">
+          Close
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+};
+
+
+/* === UPDATE STATUS
+   RPC yang dibutuhkan:
+   update_employee_reimbursement_status === */
+window.updateReimbursementStatus = async function (
+  reimbursementId,
+  nextStatus,
+  paymentMethod = null,
+  paymentDate = null
+) {
+  try {
+    const sessionId = window.getReimbursementSession();
+    const { data, error } = await supabaseClient.rpc(
+      'update_employee_reimbursement_status',
+      {
+        p_session_id: sessionId,
+        p_reimbursement_id: reimbursementId,
+        p_status: nextStatus,
+        p_payment_method: paymentMethod,
+        p_payment_date: paymentDate
+      }
+    );
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+
+    if (result && result.success === false) { throw new Error(result.message || 'Gagal mengubah status.'); }
+
+    await window.loadReimbursements();
+    alert(result?.message || 'Status reimbursement berhasil diperbarui.');
+  } catch (error) {
+    console.error('updateReimbursementStatus:', error);
+    alert(error.message || 'Gagal mengubah status reimbursement.');
+  }
+};
+
+window.approveReimbursement = async function (reimbursementId) {
+  const row = window.reimbursementRows.find(item => String(item.Reimbursement_ID) === String(reimbursementId) );
+  if (!row || row.Status !== 'DRAFT') { alert('Hanya reimbursement Draft yang dapat disetujui.'); return; }
+	
+  if (!confirm(
+    `Setujui reimbursement sebesar ${window.formatReimbursementCurrency(row.Amount)}?`
+  )) {
+    return;
+  }
+  await window.updateReimbursementStatus(
+    reimbursementId,
+    'APPROVED'
+  );
+};
+
+window.cancelReimbursement = async function (reimbursementId) {
+  const row = window.reimbursementRows.find(item => String(item.Reimbursement_ID) === String(reimbursementId) );
+
+  if (!row || !['DRAFT', 'APPROVED'].includes(row.Status)) { alert('Reimbursement ini tidak dapat dibatalkan.'); return; }
+  if (!confirm('Batalkan reimbursement ini?')) return;
+  await window.updateReimbursementStatus(
+    reimbursementId,
+    'CANCELLED'
+  );
+};
+
+/* === EXPORT CSV === */
+window.exportReimbursement = function () {
+  const rows = window.getReimbursementVisibleRows();
+
+  if (!rows.length) { alert('Tidak ada data reimbursement untuk diexport.'); return; }
+
+  const headers = [
+    'Reimbursement ID',
+    'Employee ID',
+    'Employee',
+    'Branch ID',
+    'Outlet',
+    'Date',
+    'Payroll Period',
+    'Category',
+    'Description',
+    'Amount',
+    'Status',
+    'Payment Method',
+    'Payment Date',
+    'Payroll ID',
+    'Note'
+  ];
+  const csvEscape = value => {
+    let text = String(value ?? '');
+    if (/^[=+\-@]/.test(text)) { text = `'${text}`; }
+    return `"${text.replace(/"/g, '""')}"`;
+  };
+  const csvRows = rows.map(row => [
+    row.Reimbursement_ID,
+    row.Employee_ID,
+    row.Full_Name,
+    row.Branch_ID,
+    window.getReimbursementBranchName(row.Branch_ID),
+    row.Reimbursement_Date,
+    row.Payroll_Period,
+    row.Category,
+    row.Description,
+    row.Amount,
+    row.Status,
+    row.Payment_Method,
+    row.Payment_Date,
+    row.Payroll_ID,
+    row.Note
+  ]);
+  const csv = [
+    headers,
+    ...csvRows
+  ].map(row => row.map(csvEscape).join(',')).join('\r\n');
+  const blob = new Blob(
+    ['\uFEFF', csv],
+    { type: 'text/csv;charset=utf-8;' }
+  );
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  const period = document.getElementById( 'reimbursementPeriodFilter' )?.value || 'all-periods';
+
+  link.href = url;
+  link.download = `reimbursements-${period}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+};
+
+
+/* ==== INITIALIZE ==== */
+window.initEmployeeReimbursement = async function () {
+  window.ensureReimbursementModal();
+  window.populateReimbursementFilters();
+
+  const periodInput = document.getElementById( 'reimbursementPeriodFilter' );
+  if (periodInput && !periodInput.value) { periodInput.value = new Date().toISOString().slice(0, 7); }
+
+  const branchFilter = document.getElementById( 'reimbursementBranchFilter' );
+  const employeeFilter = document.getElementById( 'reimbursementEmployeeFilter' );
+
+  if (
+    branchFilter &&
+    !branchFilter.dataset.reimbursementHandlerAttached
+  ) {
+    branchFilter.addEventListener('change', () => {
+      window.populateReimbursementFilters();
+      window.reimbursementCurrentPage = 1;
+      window.loadReimbursements();
+    });
+    branchFilter.dataset.reimbursementHandlerAttached = 'true';
+  }
+
+  if (
+    employeeFilter &&
+    !employeeFilter.dataset.reimbursementHandlerAttached
+  ) {
+    employeeFilter.addEventListener('change', () => {
+      window.reimbursementCurrentPage = 1;
+      window.loadReimbursements();
+    });
+    employeeFilter.dataset.reimbursementHandlerAttached = 'true';
+  }
+
+  const statusFilter = document.getElementById( 'reimbursementStatusFilter' );
+
+  if (
+    statusFilter &&
+    !statusFilter.dataset.reimbursementHandlerAttached
+  ) {
+    statusFilter.addEventListener('change', () => {
+      window.reimbursementCurrentPage = 1;
+      window.loadReimbursements();
+    });
+    statusFilter.dataset.reimbursementHandlerAttached = 'true';
+  }
+  if (
+    periodInput &&
+    !periodInput.dataset.reimbursementHandlerAttached
+  ) {
+    periodInput.addEventListener('change', () => {
+      window.reimbursementCurrentPage = 1;
+      window.loadReimbursements();
+    });
+    periodInput.dataset.reimbursementHandlerAttached = 'true';
+  }
+  await window.loadReimbursements();
 };
 
 
