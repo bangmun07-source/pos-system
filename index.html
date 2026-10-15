@@ -23876,16 +23876,15 @@
 				          class="block text-xs text-muted mb-2">
 				          Status
 				        </label>
-				        <select id="reimbursementStatusFilter"
-				          onchange="loadReimbursements()"
-				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-				          <option value="">All Status</option>
-				          <option value="DRAFT">Draft</option>
-				          <option value="APPROVED">Approved</option>
-				          <option value="IN_PAYROLL">In Payroll</option>
-				          <option value="PAID">Paid</option>
-				          <option value="CANCELLED">Cancelled</option>
-				        </select>
+								<select id="reimbursementStatusFilter"
+								  onchange="loadReimbursements()"
+								  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+								  <option value="">All Status</option>
+								  <option value="DRAFT">Draft</option>
+								  <option value="APPROVED">Approved</option>
+								  <option value="PAID">Paid</option>
+								  <option value="CANCELLED">Cancelled</option>
+								</select>
 				      </div>
 				    </div>
 				  </div>
@@ -23934,29 +23933,31 @@
 				  <!-- REIMBURSEMENT TABLE -->
 				  <div class="overflow-x-auto custom-scrollbar">
 				    <table class="w-full text-sm">
-				      <thead>
-				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-				          <th class="px-5 py-3 text-left whitespace-nowrap"> Date </th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap"> Employee </th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap"> Outlet </th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap"> Category </th>
-				          <th class="px-5 py-3 text-left"> Description </th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap"> Amount </th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap"> Payroll Period </th>
-				          <th class="px-5 py-3 text-center"> Status </th>
-				          <th class="px-5 py-3 text-center"> Action </th>
-				        </tr>
-				      </thead>
-				
-				      <tbody id="reimbursementTableBody"
-				        class="divide-y divide-outline-variant">
-				        <tr>
-				          <td colspan="9"
-				            class="px-5 py-10 text-center text-muted">
-				            No reimbursement data
-				          </td>
-				        </tr>
-				      </tbody>
+							<thead>
+							  <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Date</th>
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Category</th>
+							    <th class="px-5 py-3 text-left">Description</th>
+							    <th class="px-5 py-3 text-right whitespace-nowrap">Amount</th>
+							    <th class="px-5 py-3 text-right whitespace-nowrap">Paid Amount</th>
+							    <th class="px-5 py-3 text-right whitespace-nowrap">Remaining</th>
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Payroll Period</th>
+							    <th class="px-5 py-3 text-center">Status</th>
+							    <th class="px-5 py-3 text-center">Action</th>
+							  </tr>
+							</thead>
+							
+							<tbody id="reimbursementTableBody"
+							  class="divide-y divide-outline-variant">
+							  <tr>
+							    <td colspan="11"
+							      class="px-5 py-10 text-center text-muted">
+							      No reimbursement data
+							    </td>
+							  </tr>
+							</tbody>
 				    </table>
 				  </div>
 				  <!-- PAGINATION -->
