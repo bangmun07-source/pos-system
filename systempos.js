@@ -38308,7 +38308,7 @@ window.loadReimbursements = async function () {
 
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="px-5 py-10 text-center text-muted">
+        <td colspan="9" class="px-5 py-10 text-center text-on-surface-variant">
           Loading reimbursement...
         </td>
       </tr>
@@ -38349,7 +38349,7 @@ window.loadReimbursements = async function () {
     console.error('loadReimbursements:', error);
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="px-5 py-10 text-center text-red-500">
+        <td colspan="9" class="px-5 py-10 text-center text-red-600">
           ${window.escapeReimbursementHTML(
             error.message || 'Gagal memuat reimbursement.'
           )}
@@ -38360,7 +38360,6 @@ window.loadReimbursements = async function () {
     window.updateReimbursementPagination(0);
   }
 };
-
 
 /* ==== SUMMARY / KPI ==== */
 window.updateReimbursementSummary = function (rows) {
@@ -38375,21 +38374,18 @@ window.updateReimbursementSummary = function (rows) {
       summary.totalCount ?? rows.length
     ).toLocaleString('id-ID');
   }
-
   if (draftCount) {
     draftCount.textContent = Number(
       summary.draftCount ??
       rows.filter(row => row.Status === 'DRAFT').length
     ).toLocaleString('id-ID');
   }
-
   if (approvedCount) {
     approvedCount.textContent = Number(
       summary.approvedCount ??
       rows.filter(row => row.Status === 'APPROVED').length
     ).toLocaleString('id-ID');
   }
-
   if (unpaidAmount) {
     unpaidAmount.textContent =
       window.formatReimbursementCurrency(
@@ -38405,16 +38401,15 @@ window.updateReimbursementSummary = function (rows) {
   }
 };
 
-
 /* ==== STATUS BADGE ===== */
 window.getReimbursementStatusBadge = function (status) {
   const normalized = String(status || 'DRAFT').toUpperCase();
   const styles = {
-    DRAFT: 'bg-surface-container text-muted',
-    APPROVED: 'bg-blue-100 text-blue-800',
-    IN_PAYROLL: 'bg-purple-100 text-purple-800',
-    PAID: 'bg-green-100 text-green-800',
-    CANCELLED: 'bg-red-100 text-red-800'
+    DRAFT: 'text-on-surface-variant',
+    APPROVED: 'text-blue-700',
+    IN_PAYROLL: 'text-purple-700',
+    PAID: 'text-green-700',
+    CANCELLED: 'text-red-700'
   };
   const labels = {
     DRAFT: 'Draft',
@@ -38424,7 +38419,7 @@ window.getReimbursementStatusBadge = function (status) {
     CANCELLED: 'Cancelled'
   };
   return `
-    <span class="inline-flex items-center rounded-full px-3 py-1
+    <span class="inline-flex items-center rounded-md px-3 py-1
       text-xs font-semibold whitespace-nowrap
       ${styles[normalized] || styles.DRAFT}">
       ${labels[normalized] || window.escapeReimbursementHTML(normalized)}
@@ -38453,7 +38448,7 @@ window.renderReimbursementTable = function () {
   if (!pageRows.length) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9" class="px-5 py-10 text-center text-muted">
+        <td colspan="9" class="px-5 py-10 text-center text-on-surface-variant">
           No reimbursement data
         </td>
       </tr>
@@ -38474,13 +38469,11 @@ window.renderReimbursementTable = function () {
       const canCancel = ['DRAFT', 'APPROVED'].includes(status);
 
       return `
-        <tr class="hover:bg-surface-container-low">
+        <tr class="hover:bg-outline-variant">
+          <td class="px-5 py-4 whitespace-nowrap"> ${window.escapeReimbursementHTML( window.formatReimbursementDate(row.Reimbursement_Date) )} </td>
           <td class="px-5 py-4 whitespace-nowrap">
-            ${window.escapeReimbursementHTML( window.formatReimbursementDate(row.Reimbursement_Date) )}
-          </td>
-          <td class="px-5 py-4 whitespace-nowrap">
-            <div class="font-medium text-foreground"> ${employeeName} </div>
-            <div class="text-xs text-muted"> ${window.escapeReimbursementHTML(row.Employee_ID || '')} </div>
+            <div class="font-medium text-on-surface"> ${employeeName} </div>
+            <div class="text-xs text-on-surface-variant"> ${window.escapeReimbursementHTML(row.Employee_ID || '')} </div>
           </td>
           <td class="px-5 py-4 whitespace-nowrap"> ${branchName} </td>
           <td class="px-5 py-4 whitespace-nowrap"> ${category} </td>
@@ -38489,11 +38482,11 @@ window.renderReimbursementTable = function () {
           <td class="px-5 py-4 whitespace-nowrap"> ${payrollPeriod} </td>
           <td class="px-5 py-4 text-center"> ${window.getReimbursementStatusBadge(status)} </td>
           <td class="px-5 py-4 text-center whitespace-nowrap">
-            <div class="inline-flex items-center gap-1">
+            <div class="inline-flex items-center gap-1 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
               <button type="button"
                 onclick="viewReimbursement('${id}')"
                 title="Detail"
-                class="w-8 h-8 rounded hover:bg-background">
+                class="w-8 h-8 rounded-md hover:bg-outline-variant">
                 <span class="material-symbols-outlined text-lg">visibility</span>
               </button>
               ${
@@ -38502,7 +38495,7 @@ window.renderReimbursementTable = function () {
                     <button type="button"
                       onclick="editReimbursement('${id}')"
                       title="Edit"
-                      class="w-8 h-8 rounded hover:bg-background">
+                      class="w-8 h-8 rounded-md hover:bg-outline-variant">
                       <span class="material-symbols-outlined text-lg">edit</span>
                     </button>
                   `
@@ -38514,7 +38507,7 @@ window.renderReimbursementTable = function () {
                     <button type="button"
                       onclick="approveReimbursement('${id}')"
                       title="Approve"
-                      class="w-8 h-8 rounded hover:bg-background text-blue-600">
+                      class="w-8 h-8 rounded-md hover:bg-outline-variant text-blue-600">
                       <span class="material-symbols-outlined text-lg">check_circle</span>
                     </button>
                   `
@@ -38526,7 +38519,7 @@ window.renderReimbursementTable = function () {
                     <button type="button"
                       onclick="cancelReimbursement('${id}')"
                       title="Cancel"
-                      class="w-8 h-8 rounded hover:bg-background text-red-600">
+                      class="w-8 h-8 rounded-md hover:bg-outline-variant text-red-600">
                       <span class="material-symbols-outlined text-lg">cancel</span>
                     </button>
                   `
@@ -38573,26 +38566,24 @@ window.ensureReimbursementModal = function () {
   const modal = document.createElement('div');
 
   modal.id = 'reimbursementModal';
-  modal.className = 'fixed inset-0 z-[150] hidden items-center justify-center bg-black/50 p-4';
+  modal.className = 'fixed inset-0 z-[150] hidden items-center justify-center bg-background p-4';
   modal.innerHTML = `
-    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto
-      rounded-lg bg-background border border-outline-variant shadow-xl">
-
+    <div class="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
       <div class="sticky top-0 z-10 flex items-center justify-between
         gap-3 border-b border-outline-variant bg-background p-5">
         <div>
           <h3 id="reimbursementModalTitle"
-            class="text-lg font-bold text-foreground">
+            class="text-lg font-bold text-on-surface">
             Add Reimbursement
           </h3>
-          <p class="text-xs text-muted mt-1">
+          <p class="text-xs text-on-surface-variant mt-1">
             Employee reimbursement claim
           </p>
         </div>
 
         <button type="button"
           onclick="closeReimbursementModal()"
-          class="w-9 h-9 rounded hover:bg-surface-container">
+          class="w-9 h-9 text-on-surface-variant hover:text-on-surface">
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
@@ -38602,9 +38593,7 @@ window.ensureReimbursementModal = function () {
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs text-muted mb-2">
-              Employee *
-            </label>
+            <label class="block text-xs text-on-surface-variant mb-2"> Employee * </label>
             <select id="reimbursementFormEmployee"
               required
               class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
@@ -38613,16 +38602,16 @@ window.ensureReimbursementModal = function () {
           </div>
 
           <div>
-            <label class="block text-xs text-muted mb-2">
+            <label class="block text-xs text-on-surface-variant mb-2">
               Outlet
             </label>
             <input id="reimbursementFormBranch"
               readonly
-              class="w-full h-10 px-3 rounded-md bg-surface-container border border-outline-variant text-sm">
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
           </div>
 
           <div>
-            <label class="block text-xs text-muted mb-2">
+            <label class="block text-xs text-on-surface-variant mb-2">
               Reimbursement Date *
             </label>
             <input id="reimbursementFormDate"
@@ -38632,7 +38621,7 @@ window.ensureReimbursementModal = function () {
           </div>
 
           <div>
-            <label class="block text-xs text-muted mb-2">
+            <label class="block text-xs text-on-surface-variant mb-2">
               Payroll Period
             </label>
             <input id="reimbursementFormPeriod"
@@ -38641,9 +38630,7 @@ window.ensureReimbursementModal = function () {
           </div>
 
           <div>
-            <label class="block text-xs text-muted mb-2">
-              Category *
-            </label>
+            <label class="block text-xs text-on-surface-variant mb-2"> Category * </label>
             <select id="reimbursementFormCategory"
               required
               class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm">
@@ -38659,9 +38646,7 @@ window.ensureReimbursementModal = function () {
           </div>
 
           <div>
-            <label class="block text-xs text-muted mb-2">
-              Amount *
-            </label>
+            <label class="block text-xs text-on-surface-variant mb-2"> Amount * </label>
             <input id="reimbursementFormAmount"
               type="number"
               min="1"
@@ -38673,9 +38658,7 @@ window.ensureReimbursementModal = function () {
         </div>
 
         <div>
-          <label class="block text-xs text-muted mb-2">
-            Description *
-          </label>
+          <label class="block text-xs text-on-surface-variant mb-2"> Description * </label>
           <textarea id="reimbursementFormDescription"
             rows="3"
             required
@@ -38684,9 +38667,7 @@ window.ensureReimbursementModal = function () {
         </div>
 
         <div>
-          <label class="block text-xs text-muted mb-2">
-            Note
-          </label>
+          <label class="block text-xs text-muted mb-2"> Note </label>
           <textarea id="reimbursementFormNote"
             rows="2"
             class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-sm"
@@ -38696,7 +38677,7 @@ window.ensureReimbursementModal = function () {
         <div class="flex justify-end gap-2 border-t border-outline-variant pt-4">
           <button type="button"
             onclick="closeReimbursementModal()"
-            class="h-10 px-4 rounded-md border border-outline-variant text-sm">
+            class="h-10 px-4 text-sm text-on-surface-variant hover-on-surface">
             Cancel
           </button>
 
