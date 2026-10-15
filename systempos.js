@@ -39193,23 +39193,33 @@ window.viewReimbursement = function (reimbursementId) {
 };
 
 
-/* === UPDATE STATUS
-   RPC yang dibutuhkan:
-   update_employee_reimbursement_status === */
-window.updateReimbursementStatus = async function ( reimbursementId, nextStatus, paymentMethod = null, paymentDate = null ) {
+/* === UPDATE REIMBURSEMENT STATUS === */
+window.updateReimbursementStatus = async function (
+  reimbursementId,
+  nextStatus,
+  paymentMethod = null,
+  paymentDate = null,
+  paymentAmount = null
+) {
   try {
     const sessionId = window.getReimbursementSession();
-    if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
+
+    if (!sessionId) {
+      throw new Error('Session tidak ditemukan. Silakan login kembali.');
+    }
+
+    const rpcParams = {
+      p_session_id: sessionId,
+      p_reimbursement_id: reimbursementId,
+      p_status: nextStatus,
+      p_payment_method: paymentMethod,
+      p_payment_date: paymentDate,
+      p_payment_amount: paymentAmount
+    };
 
     const { data, error } = await supabaseClient.rpc(
       'update_employee_reimbursement_status',
-      {
-        p_session_id: sessionId,
-        p_reimbursement_id: reimbursementId,
-        p_status: nextStatus,
-        p_payment_method: paymentMethod,
-        p_payment_date: paymentDate
-      }
+      rpcParams
     );
 
     if (error) throw error;
@@ -39221,31 +39231,50 @@ window.updateReimbursementStatus = async function ( reimbursementId, nextStatus,
         result?.message || 'Gagal mengubah status reimbursement.'
       );
     }
-
     await window.loadReimbursements();
-    alert( result.message || 'Status reimbursement berhasil diperbarui.' );
+    alert(result.message || 'Status reimbursement berhasil diperbarui.');
+    return result;
   } catch (error) {
     console.error('updateReimbursementStatus:', error);
-    alert( error.message || 'Gagal mengubah status reimbursement.' );
+    alert(error.message || 'Gagal mengubah status reimbursement.');
+    return null;
   }
 };
 
-
 /* === APPROVE REIMBURSEMENT === */
 window.approveReimbursement = async function (reimbursementId) {
-  const row = (window.reimbursementRows || []).find( item => String(item.Reimbursement_ID) === String(reimbursementId) );
+  const row = (window.reimbursementRows || []).find(
+    item => String(item.Reimbursement_ID) === String(reimbursementId)
+  );
 
-  if ( !row || String(row.Status || '').trim().toUpperCase() !== 'DRAFT' 
-	) { alert('Hanya reimbursement Draft yang dapat disetujui.'); return; }
-  if ( !confirm( `Setujui reimbursement sebesar ${ window.formatReimbursementCurrency(row.Amount) }?` )
-  ) { return; }
-  await window.updateReimbursementStatus(  reimbursementId, 'APPROVED' );
+  if (
+    !row ||
+    String(row.Status || '').trim().toUpperCase() !== 'DRAFT'
+  ) {
+    alert('Hanya reimbursement Draft yang dapat disetujui.');
+    return;
+  }
+  if (
+    !confirm(
+      `Setujui reimbursement sebesar ${
+        window.formatReimbursementCurrency(row.Amount)
+      }?`
+    )
+  ) {
+    return;
+  }
+  await window.updateReimbursementStatus(
+    reimbursementId,
+    'APPROVED'
+  );
 };
 
 /* === CANCEL REIMBURSEMENT === */
 window.cancelReimbursement = async function (reimbursementId) {
-  const row = (window.reimbursementRows || []).find( item => String(item.Reimbursement_ID) === String(reimbursementId) );
-
+  const row = (window.reimbursementRows || []).find(
+    item => String(item.Reimbursement_ID) === String(reimbursementId)
+  );
+	
   if (
     !row ||
     String(row.Status || '').trim().toUpperCase() !== 'DRAFT'
@@ -39253,10 +39282,15 @@ window.cancelReimbursement = async function (reimbursementId) {
     alert('Hanya reimbursement Draft yang dapat dibatalkan.');
     return;
   }
-  if (!confirm('Batalkan reimbursement ini?')) { return; }
-
-  await window.updateReimbursementStatus( reimbursementId, 'CANCELLED' );
+  if (!confirm('Batalkan reimbursement ini?')) {
+    return;
+  }
+  await window.updateReimbursementStatus(
+    reimbursementId,
+    'CANCELLED'
+  );
 };
+
 
 /* === EXPORT CSV === */
 window.exportReimbursement = function () {
