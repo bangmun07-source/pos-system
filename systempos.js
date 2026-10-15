@@ -38465,9 +38465,8 @@ window.renderReimbursementTable = function () {
         : '-';
       const status = String(row.Status || 'DRAFT').toUpperCase();
       const canEdit = status === 'DRAFT';
-      const canApprove = status === 'DRAFT';
-      const canCancel = ['DRAFT', 'APPROVED'].includes(status);
-
+			const canApprove = status === 'DRAFT';
+			const canCancel = status === 'DRAFT';
       return `
         <tr class="hover:bg-outline-variant">
           <td class="px-5 py-4 whitespace-nowrap"> ${window.escapeReimbursementHTML( window.formatReimbursementDate(row.Reimbursement_Date) )} </td>
@@ -38481,52 +38480,55 @@ window.renderReimbursementTable = function () {
           <td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${window.formatReimbursementCurrency(row.Amount)} </td>
           <td class="px-5 py-4 whitespace-nowrap"> ${payrollPeriod} </td>
           <td class="px-5 py-4 text-center"> ${window.getReimbursementStatusBadge(status)} </td>
-          <td class="px-5 py-4 text-center whitespace-nowrap">
-            <div class="inline-flex items-center gap-1 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-              <button type="button"
-                onclick="viewReimbursement('${id}')"
-                title="Detail"
-                class="w-8 h-8 rounded-md hover:bg-outline-variant">
-                <span class="material-symbols-outlined text-lg">visibility</span>
-              </button>
-              ${
-                canEdit
-                  ? `
-                    <button type="button"
-                      onclick="editReimbursement('${id}')"
-                      title="Edit"
-                      class="w-8 h-8 rounded-md hover:bg-outline-variant">
-                      <span class="material-symbols-outlined text-lg">edit</span>
-                    </button>
-                  `
-                  : ''
-              }
-              ${
-                canApprove
-                  ? `
-                    <button type="button"
-                      onclick="approveReimbursement('${id}')"
-                      title="Approve"
-                      class="w-8 h-8 rounded-md hover:bg-outline-variant text-blue-600">
-                      <span class="material-symbols-outlined text-lg">check_circle</span>
-                    </button>
-                  `
-                  : ''
-              }
-              ${
-                canCancel
-                  ? `
-                    <button type="button"
-                      onclick="cancelReimbursement('${id}')"
-                      title="Cancel"
-                      class="w-8 h-8 rounded-md hover:bg-outline-variant text-red-600">
-                      <span class="material-symbols-outlined text-lg">cancel</span>
-                    </button>
-                  `
-                  : ''
-              }
-            </div>
-          </td>
+					<td class="px-4 py-3 text-center">
+					  <div class="relative inline-block text-left">
+					    <button type="button"
+					      onclick="closeReimbursementActionMenus(); viewReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
+					      class="inline-flex items-center justify-center w-9 h-9 text-muted hover:text-foreground rounded-md hover:bg-outline-variant"
+					      title="Reimbursement Actions"
+					      aria-label="Reimbursement Actions">
+					      <span class="material-symbols-outlined">more_vert</span>
+					    </button>
+					
+					    <div id="reimbursementActionMenu_${escapeReimbursementHTML(row.Reimbursement_ID)}"
+					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-[100] text-left">
+					      <button type="button"
+					        onclick="closeReimbursementActionMenus(); viewReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
+					        class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
+					        <span class="material-symbols-outlined text-base">visibility</span>
+					        	View Detail
+					      </button>
+					      ${
+					        String(row.Status || '').toUpperCase() === 'DRAFT'
+					          ? `
+					            <button type="button"
+					              onclick="closeReimbursementActionMenus(); editReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
+					              class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
+					              <span class="material-symbols-outlined text-base">edit</span>
+					              	Edit
+					            </button>
+					
+					            <button type="button"
+					              onclick="closeReimbursementActionMenus(); approveReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
+					              class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
+					              <span class="material-symbols-outlined text-base">check_circle</span>
+					             	 	Approve
+					            </button>
+					
+					            <div class="border-t border-outline-variant"></div>
+					
+					            <button type="button"
+					              onclick="closeReimbursementActionMenus(); cancelReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
+					              class="w-full px-4 py-2.5 text-sm text-red-700 hover:bg-red-600/10 flex items-center gap-2">
+					              <span class="material-symbols-outlined text-base">cancel</span>
+					              	Cancel
+					            </button>
+					          `
+					          : ''
+					      }
+					    </div>
+					  </div>
+					</td>
         </tr>
       `;
     }).join('');
@@ -38559,6 +38561,135 @@ window.changeReimbursementPage = function (direction) {
 /* ==== CREATE MODAL
    Modal dibuat dari JS karena HTML yang dikirim
    belum berisi modal Add/Edit/Detail. ==== */
+/* ==== REIMBURSEMENT - ACTION MENU DI LUAR TABEL ==== */
+
+window.toggleReimbursementActionMenu = function (reimbursementId, button) {
+  const menu = document.getElementById(
+    `reimbursementActionMenu_${reimbursementId}`
+  );
+
+  if (!menu || !button) return;
+
+  const isHidden = menu.classList.contains('hidden');
+
+  // Tutup menu lain terlebih dahulu.
+  window.closeReimbursementActionMenus();
+
+  if (!isHidden) return;
+
+  // Simpan posisi asli menu di dalam tabel.
+  if (!menu._reimbursementPlaceholder) {
+    const placeholder = document.createComment(
+      'reimbursement-action-menu-placeholder'
+    );
+
+    menu.parentNode.insertBefore(placeholder, menu);
+    menu._reimbursementPlaceholder = placeholder;
+  }
+
+  // Pindahkan popup ke BODY agar tidak terpotong tabel.
+  document.body.appendChild(menu);
+  menu.classList.remove('hidden');
+
+  // Gunakan fixed agar posisi relatif terhadap layar.
+  menu.style.position = 'fixed';
+  menu.style.left = '0px';
+  menu.style.right = 'auto';
+  menu.style.top = '0px';
+  menu.style.bottom = 'auto';
+  menu.style.margin = '0';
+  menu.style.zIndex = '9999';
+
+  // Hitung posisi tombol.
+  const rect = button.getBoundingClientRect();
+  const menuHeight = menu.offsetHeight;
+  const menuWidth = menu.offsetWidth;
+  const gap = 4;
+
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
+
+  let top;
+
+  if (
+    spaceBelow >= menuHeight + gap ||
+    spaceBelow >= spaceAbove
+  ) {
+    top = rect.bottom + gap;
+  } else {
+    top = rect.top - menuHeight - gap;
+  }
+
+  // Jaga popup tetap di dalam area layar.
+  top = Math.max(
+    8,
+    Math.min(top, window.innerHeight - menuHeight - 8)
+  );
+
+  let left = rect.right - menuWidth;
+
+  left = Math.max(
+    8,
+    Math.min(left, window.innerWidth - menuWidth - 8)
+  );
+
+  menu.style.top = `${top}px`;
+  menu.style.left = `${left}px`;
+};
+
+
+window.closeReimbursementActionMenus = function () {
+  document
+    .querySelectorAll('[id^="reimbursementActionMenu_"]')
+    .forEach(menu => {
+      menu.classList.add('hidden');
+
+      // Kembalikan menu ke tempat asalnya di tabel.
+      const placeholder = menu._reimbursementPlaceholder;
+
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.insertBefore(menu, placeholder);
+        placeholder.remove();
+      }
+
+      delete menu._reimbursementPlaceholder;
+
+      // Bersihkan posisi popup.
+      menu.style.position = '';
+      menu.style.left = '';
+      menu.style.right = '';
+      menu.style.top = '';
+      menu.style.bottom = '';
+      menu.style.margin = '';
+      menu.style.zIndex = '';
+    });
+};
+
+
+// Tutup Reimbursement Action Menu saat klik di luar menu.
+document.addEventListener('click', function (event) {
+  const clickedMenu = event.target.closest(
+    '[id^="reimbursementActionMenu_"]'
+  );
+
+  const clickedToggle = event.target.closest(
+    'button[onclick*="toggleReimbursementActionMenu"]'
+  );
+
+  // Biarkan handler tombol/menu yang sudah ada bekerja.
+  if (clickedMenu || clickedToggle) return;
+
+  window.closeReimbursementActionMenus();
+});
+
+
+// Tutup menu saat menekan Escape.
+document.addEventListener('keydown', function (event) {
+  if (event.key === 'Escape') {
+    window.closeReimbursementActionMenus();
+  }
+});
+
 
 window.ensureReimbursementModal = function () {
   if (document.getElementById('reimbursementModal')) return;
