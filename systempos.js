@@ -38512,6 +38512,21 @@ window.renderReimbursementTable = function () {
                   <span class="material-symbols-outlined text-base">visibility</span>
                   View Detail
                 </button>
+								
+								<!-- PAY: PEMBAYARAN LANGSUNG -->
+								<button type="button"
+								  ${status === 'APPROVED' ? '' : 'disabled'}
+								  ${status === 'APPROVED'
+								    ? `onclick="closeReimbursementActionMenus(); payReimbursement('${id}')"`
+								    : 'title="Hanya reimbursement APPROVED yang dapat dibayar langsung"'}
+								  class="w-full px-4 py-2.5 text-sm flex items-center gap-2 ${
+								    status === 'APPROVED'
+								      ? 'text-foreground hover:bg-outline-variant'
+								      : 'text-muted opacity-50 cursor-not-allowed'
+								  }">
+								  <span class="material-symbols-outlined text-base">payments</span>
+								  Pay
+								</button>
 
                 <!-- EDIT: SELALU TAMPIL -->
                 <button type="button"
@@ -39153,14 +39168,11 @@ window.viewReimbursement = function (reimbursementId) {
 /* === UPDATE STATUS
    RPC yang dibutuhkan:
    update_employee_reimbursement_status === */
-window.updateReimbursementStatus = async function (
-  reimbursementId,
-  nextStatus,
-  paymentMethod = null,
-  paymentDate = null
-) {
+window.updateReimbursementStatus = async function ( reimbursementId, nextStatus, paymentMethod = null, paymentDate = null ) {
   try {
     const sessionId = window.getReimbursementSession();
+    if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
+
     const { data, error } = await supabaseClient.rpc(
       'update_employee_reimbursement_status',
       {
@@ -39176,40 +39188,46 @@ window.updateReimbursementStatus = async function (
 
     const result = Array.isArray(data) ? data[0] : data;
 
-    if (result && result.success === false) { throw new Error(result.message || 'Gagal mengubah status.'); }
+    if (!result || result.success === false) {
+      throw new Error(
+        result?.message || 'Gagal mengubah status reimbursement.'
+      );
+    }
 
     await window.loadReimbursements();
-    alert(result?.message || 'Status reimbursement berhasil diperbarui.');
+    alert( result.message || 'Status reimbursement berhasil diperbarui.' );
   } catch (error) {
     console.error('updateReimbursementStatus:', error);
-    alert(error.message || 'Gagal mengubah status reimbursement.');
+    alert( error.message || 'Gagal mengubah status reimbursement.' );
   }
 };
 
+
+/* === APPROVE REIMBURSEMENT === */
 window.approveReimbursement = async function (reimbursementId) {
-  const row = window.reimbursementRows.find(item => String(item.Reimbursement_ID) === String(reimbursementId) );
-  if (!row || row.Status !== 'DRAFT') { alert('Hanya reimbursement Draft yang dapat disetujui.'); return; }
-	
-  if (!confirm(
-    `Setujui reimbursement sebesar ${window.formatReimbursementCurrency(row.Amount)}?`
-  )) {
+  const row = (window.reimbursementRows || []).find( item => String(item.Reimbursement_ID) === String(reimbursementId) );
+
+  if ( !row || String(row.Status || '').trim().toUpperCase() !== 'DRAFT' 
+	) { alert('Hanya reimbursement Draft yang dapat disetujui.'); return; }
+  if ( !confirm( `Setujui reimbursement sebesar ${ window.formatReimbursementCurrency(row.Amount) }?` )
+  ) { return; }
+  await window.updateReimbursementStatus(  reimbursementId, 'APPROVED' );
+};
+
+/* === CANCEL REIMBURSEMENT === */
+window.cancelReimbursement = async function (reimbursementId) {
+  const row = (window.reimbursementRows || []).find( item => String(item.Reimbursement_ID) === String(reimbursementId) );
+
+  if (
+    !row ||
+    String(row.Status || '').trim().toUpperCase() !== 'DRAFT'
+  ) {
+    alert('Hanya reimbursement Draft yang dapat dibatalkan.');
     return;
   }
-  await window.updateReimbursementStatus(
-    reimbursementId,
-    'APPROVED'
-  );
-};
+  if (!confirm('Batalkan reimbursement ini?')) { return; }
 
-window.cancelReimbursement = async function (reimbursementId) {
-  const row = window.reimbursementRows.find(item => String(item.Reimbursement_ID) === String(reimbursementId) );
-
-  if (!row || !['DRAFT', 'APPROVED'].includes(row.Status)) { alert('Reimbursement ini tidak dapat dibatalkan.'); return; }
-  if (!confirm('Batalkan reimbursement ini?')) return;
-  await window.updateReimbursementStatus(
-    reimbursementId,
-    'CANCELLED'
-  );
+  await window.updateReimbursementStatus( reimbursementId, 'CANCELLED' );
 };
 
 /* === EXPORT CSV === */
