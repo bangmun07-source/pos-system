@@ -38275,8 +38275,7 @@ window.populateReimbursementFilters = function () {
 };
 
 
-/* ==== LOAD REIMBURSEMENTS
-   RPC: get_employee_reimbursements ==== */
+/* ==== LOAD REIMBURSEMENTS RPC: get_employee_reimbursements ==== */
 window.loadReimbursements = async function () {
   const tableBody = document.getElementById( 'reimbursementTableBody' );
   if (!tableBody) return;
@@ -38363,11 +38362,19 @@ window.loadReimbursements = async function () {
 
 /* ==== SUMMARY / KPI ==== */
 window.updateReimbursementSummary = function (rows) {
-  const totalCount = document.getElementById( 'reimbursementTotalCount' );
-  const draftCount = document.getElementById( 'reimbursementDraftCount' );
-  const approvedCount = document.getElementById( 'reimbursementApprovedCount' );
-  const unpaidAmount = document.getElementById( 'reimbursementUnpaidAmount' );
+  const totalCount = document.getElementById('reimbursementTotalCount');
+  const draftCount = document.getElementById('reimbursementDraftCount');
+  const approvedCount = document.getElementById('reimbursementApprovedCount');
+  const unpaidAmount = document.getElementById('reimbursementUnpaidAmount');
   const summary = window.reimbursementSummary || {};
+  const getRemaining = row => {
+    const amount = Number(row.Amount || 0);
+    const paid = Number(row.Paid_Amount || 0);
+    return Math.max(
+      0,
+      Number(row.Remaining_Amount ?? (amount - paid))
+    );
+  };
 
   if (totalCount) {
     totalCount.textContent = Number(
@@ -38387,34 +38394,35 @@ window.updateReimbursementSummary = function (rows) {
     ).toLocaleString('id-ID');
   }
   if (unpaidAmount) {
+    const calculatedUnpaid = rows.reduce((total, row) => {
+      if (!['DRAFT', 'APPROVED'].includes(
+        String(row.Status || '').toUpperCase()
+      )) {
+        return total;
+      }
+      return total + getRemaining(row);
+    }, 0);
     unpaidAmount.textContent =
       window.formatReimbursementCurrency(
-        summary.unpaidAmount ??
-        rows.reduce((total, row) => {
-          if (['DRAFT', 'APPROVED'].includes(row.Status)) {
-            return total + Number(row.Amount || 0);
-          }
-
-          return total;
-        }, 0)
+        summary.unpaidAmount ?? calculatedUnpaid
       );
   }
 };
 
-/* ==== STATUS BADGE ===== */
+/* ==== STATUS BADGE ==== */
 window.getReimbursementStatusBadge = function (status) {
-  const normalized = String(status || 'DRAFT').toUpperCase();
+  const normalized = String(status || 'DRAFT')
+    .trim()
+    .toUpperCase();
   const styles = {
     DRAFT: 'text-on-surface-variant',
     APPROVED: 'text-blue-700',
-    IN_PAYROLL: 'text-purple-700',
     PAID: 'text-green-700',
     CANCELLED: 'text-red-700'
   };
   const labels = {
     DRAFT: 'Draft',
     APPROVED: 'Approved',
-    IN_PAYROLL: 'In Payroll',
     PAID: 'Paid',
     CANCELLED: 'Cancelled'
   };
@@ -38422,10 +38430,12 @@ window.getReimbursementStatusBadge = function (status) {
     <span class="inline-flex items-center rounded-md px-3 py-1
       text-xs font-semibold whitespace-nowrap
       ${styles[normalized] || styles.DRAFT}">
-      ${labels[normalized] || window.escapeReimbursementHTML(normalized)}
+      ${labels[normalized] ||
+        window.escapeReimbursementHTML(normalized)}
     </span>
   `;
 };
+
 
 /* ==== RENDER TABLE ==== */
 window.renderReimbursementTable = function () {
@@ -38467,6 +38477,12 @@ window.renderReimbursementTable = function () {
       const status = String(row.Status || 'DRAFT')
         .trim()
         .toUpperCase();
+			const amount = Number(row.Amount || 0);
+			const paidAmount = Number(row.Paid_Amount || 0);
+			const remainingAmount = Math.max(
+			  0,
+			  Number(row.Remaining_Amount ?? (amount - paidAmount))
+			);
       // Semua action tetap ditampilkan.
       // Action selain View Detail hanya aktif saat DRAFT.
       const canEdit = status === 'DRAFT';
@@ -38487,8 +38503,12 @@ window.renderReimbursementTable = function () {
           <td class="px-5 py-4 whitespace-nowrap"> ${branchName} </td>
           <td class="px-5 py-4 whitespace-nowrap"> ${category} </td>
           <td class="px-5 py-4 min-w-[180px]"> ${description} </td>
-          <td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${window.formatReimbursementCurrency(row.Amount)} </td>
-          <td class="px-5 py-4 whitespace-nowrap"> ${payrollPeriod} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${window.formatReimbursementCurrency(amount)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${window.formatReimbursementCurrency(paidAmount)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap font-medium ${ remainingAmount > 0 ? 'text-amber-700' : 'text-green-700' }">
+						  ${window.formatReimbursementCurrency(remainingAmount)}
+					</td>
+					<td class="px-5 py-4 whitespace-nowrap"> ${payrollPeriod} </td>
           <td class="px-5 py-4 text-center"> ${window.getReimbursementStatusBadge(status)} </td>
           <!-- ACTION MENU -->
           <td class="px-4 py-3 text-center">
@@ -39106,7 +39126,13 @@ window.viewReimbursement = function (reimbursementId) {
   const oldModal = document.getElementById( 'reimbursementDetailModal' );
 
   if (oldModal) oldModal.remove();
-
+	
+	const amount = Number(row.Amount || 0);
+	const paidAmount = Number(row.Paid_Amount || 0);
+	const remainingAmount = Math.max(
+	  0,
+	  Number(row.Remaining_Amount ?? (amount - paidAmount))
+	);
   const fields = [
     ['Reimbursement ID', row.Reimbursement_ID],
     ['Employee', row.Full_Name || row.Employee_ID],
@@ -39118,8 +39144,10 @@ window.viewReimbursement = function (reimbursementId) {
       : '-'],
     ['Category', row.Category],
     ['Description', row.Description],
-    ['Amount', window.formatReimbursementCurrency(row.Amount)],
-    ['Status', row.Status],
+		['Amount', window.formatReimbursementCurrency(amount)],
+		['Paid Amount', window.formatReimbursementCurrency(paidAmount)],
+		['Remaining Amount', window.formatReimbursementCurrency(remainingAmount)],
+		['Status', row.Status],
     ['Payment Method', row.Payment_Method || '-'],
     ['Payment Date', window.formatReimbursementDate(row.Payment_Date)],
     ['Payroll ID', row.Payroll_ID || '-'],
@@ -39247,6 +39275,8 @@ window.exportReimbursement = function () {
     'Category',
     'Description',
     'Amount',
+		'Paid Amount',
+		'Remaining Amount',
     'Status',
     'Payment Method',
     'Payment Date',
@@ -39269,6 +39299,9 @@ window.exportReimbursement = function () {
     row.Category,
     row.Description,
     row.Amount,
+		row.Paid_Amount ?? 0,
+		row.Remaining_Amount ??
+		  Math.max(0, Number(row.Amount || 0) - Number(row.Paid_Amount || 0)),
     row.Status,
     row.Payment_Method,
     row.Payment_Date,
