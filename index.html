@@ -23955,109 +23955,197 @@
 				<section id="employeeReimbursementSection"
 				  class="bg-background border border-outline-variant rounded-md overflow-hidden">
 				  <!-- HEADER -->
-				  <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-3">
-				    <div>
-				      <h2 class="text-lg font-semibold">Reimbursement</h2>
-				      <p class="text-sm text-on-surface-variant">
-				        Pengajuan dan pembayaran reimbursement karyawan
-				      </p>
+				  <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined text-3xl"
+				          style="font-variation-settings:'FILL' 1;">
+				          receipt_long
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-bold font-headline text-foreground">
+				          Reimbursement
+				        </h2>
+				        <p class="text-xs text-muted mt-1">
+				          Employee claims and reimbursement records
+				        </p>
+				      </div>
 				    </div>
 				
-				    <button type="button"
-				      onclick="openReimbursementModal()"
-				      class="px-4 py-2 rounded-md bg-primary text-on-primary">
-				      + Reimbursement
-				    </button>
-				  </div>
-				  <!-- SUMMARY -->
-				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-5">
-				    <div class="border border-outline-variant rounded-md p-4">
-				      <p class="text-sm text-on-surface-variant">Total Pengajuan</p>
-				      <p id="reimbursementTotalCount" class="text-xl font-semibold">0</p>
-				    </div>
+				    <div class="flex flex-wrap items-center gap-2">
+				      <button type="button"
+				        onclick="exportReimbursement()"
+				        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				        <span class="material-symbols-outlined text-sm">download</span>
+				        Export
+				      </button>
 				
-				    <div class="border border-outline-variant rounded-md p-4">
-				      <p class="text-sm text-on-surface-variant">Draft</p>
-				      <p id="reimbursementDraftCount" class="text-xl font-semibold">0</p>
-				    </div>
-				
-				    <div class="border border-outline-variant rounded-md p-4">
-				      <p class="text-sm text-on-surface-variant">Approved</p>
-				      <p id="reimbursementApprovedCount" class="text-xl font-semibold">0</p>
-				    </div>
-				
-				    <div class="border border-outline-variant rounded-md p-4">
-				      <p class="text-sm text-on-surface-variant">Belum Dibayar</p>
-				      <p id="reimbursementUnpaidAmount" class="text-xl font-semibold">
-				        Rp0
-				      </p>
+				      <button type="button"
+				        onclick="openReimbursementModal()"
+				        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				        <span class="material-symbols-outlined text-sm">add</span>
+				        Reimbursement
+				      </button>
 				    </div>
 				  </div>
 				  <!-- FILTER -->
-				  <div class="px-5 pb-5 grid grid-cols-1 md:grid-cols-3 gap-3">
-				    <div>
-				      <label for="reimbursementPeriodFilter"
-				        class="block text-sm mb-1">Periode</label>
-				      <input id="reimbursementPeriodFilter"
-				        type="month"
-				        class="w-full border border-outline rounded-md px-3 py-2">
-				    </div>
+				  <div class="p-5 border-b border-outline-variant">
+				    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+				      <!-- PERIOD -->
+				      <div>
+				        <label for="reimbursementPeriodFilter"
+				          class="block text-xs text-muted mb-2">
+				          Reimbursement Period
+				        </label>
+				        <input id="reimbursementPeriodFilter"
+				          type="month"
+				          onchange="loadReimbursements()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+				      </div>
+				      <!-- OUTLET -->
+				      <div>
+				        <label for="reimbursementBranchFilter"
+				          class="block text-xs text-muted mb-2">
+				          Outlet
+				        </label>
+				        <select id="reimbursementBranchFilter"
+				          onchange="loadReimbursements()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Branch</option>
+				        </select>
+				      </div>
+				      <!-- EMPLOYEE -->
+				      <div>
+				        <label for="reimbursementEmployeeFilter"
+				          class="block text-xs text-muted mb-2">
+				          Employee
+				        </label>
+				        <select id="reimbursementEmployeeFilter"
+				          onchange="loadReimbursements()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Employees</option>
+				        </select>
+				      </div>
 				
-				    <div>
-				      <label for="reimbursementEmployeeFilter"
-				        class="block text-sm mb-1">Employee</label>
-				      <select id="reimbursementEmployeeFilter"
-				        class="w-full border border-outline rounded-md px-3 py-2">
-				        <option value="">All Employee</option>
-				      </select>
-				    </div>
-				
-				    <div>
-				      <label for="reimbursementStatusFilter"
-				        class="block text-sm mb-1">Status</label>
-				      <select id="reimbursementStatusFilter"
-				        class="w-full border border-outline rounded-md px-3 py-2">
-				        <option value="">Semua Status</option>
-				        <option value="DRAFT">Draft</option>
-				        <option value="APPROVED">Approved</option>
-				        <option value="IN_PAYROLL">In Payroll</option>
-				        <option value="PAID">Paid</option>
-				        <option value="CANCELLED">Cancelled</option>
-				      </select>
+				      <!-- STATUS -->
+				      <div>
+				        <label for="reimbursementStatusFilter"
+				          class="block text-xs text-muted mb-2">
+				          Status
+				        </label>
+				        <select id="reimbursementStatusFilter"
+				          onchange="loadReimbursements()"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Status</option>
+				          <option value="DRAFT">Draft</option>
+				          <option value="APPROVED">Approved</option>
+				          <option value="IN_PAYROLL">In Payroll</option>
+				          <option value="PAID">Paid</option>
+				          <option value="CANCELLED">Cancelled</option>
+				        </select>
+				      </div>
 				    </div>
 				  </div>
-				  <!-- TABLE -->
-				  <div class="overflow-x-auto">
+				  <!-- SUMMARY -->
+				  <div class="grid grid-cols-2 md:grid-cols-4">
+				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Total Claims
+				      </p>
+				      <p id="reimbursementTotalCount"
+				        class="text-xl font-headline mt-1">
+				        0
+				      </p>
+				    </div>
+				
+				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Draft
+				      </p>
+				      <p id="reimbursementDraftCount"
+				        class="text-xl font-headline mt-1">
+				        0
+				      </p>
+				    </div>
+				
+				    <div class="p-5 border-r border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Approved
+				      </p>
+				      <p id="reimbursementApprovedCount"
+				        class="text-xl font-headline mt-1">
+				        0
+				      </p>
+				    </div>
+				
+				    <div class="p-5">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Unpaid Amount
+				      </p>
+				      <p id="reimbursementUnpaidAmount"
+				        class="text-xl font-headline mt-1">
+				        Rp 0
+				      </p>
+				    </div>
+				  </div>
+				  <!-- REIMBURSEMENT TABLE -->
+				  <div class="overflow-x-auto custom-scrollbar">
 				    <table class="w-full text-sm">
-				      <thead class="bg-surface-container-low">
-				        <tr>
-				          <th class="px-4 py-3 text-left whitespace-nowrap">Tanggal</th>
-				          <th class="px-4 py-3 text-left whitespace-nowrap">Karyawan</th>
-				          <th class="px-4 py-3 text-left whitespace-nowrap">Outlet</th>
-				          <th class="px-4 py-3 text-left whitespace-nowrap">Kategori</th>
-				          <th class="px-4 py-3 text-left">Deskripsi</th>
-				          <th class="px-4 py-3 text-right whitespace-nowrap">Nominal</th>
-				          <th class="px-4 py-3 text-left whitespace-nowrap">Periode Payroll</th>
-				          <th class="px-4 py-3 text-left">Status</th>
-				          <th class="px-4 py-3 text-center">Action</th>
+				      <thead>
+				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+				          <th class="px-5 py-3 text-left whitespace-nowrap"> Date </th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap"> Employee </th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap"> Outlet </th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap"> Category </th>
+				          <th class="px-5 py-3 text-left"> Description </th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap"> Amount </th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap"> Payroll Period </th>
+				          <th class="px-5 py-3 text-center"> Status </th>
+				          <th class="px-5 py-3 text-center"> Action </th>
 				        </tr>
 				      </thead>
 				
-				      <tbody id="reimbursementTableBody">
+				      <tbody id="reimbursementTableBody"
+				        class="divide-y divide-outline-variant">
 				        <tr>
-				          <td colspan="9" class="px-4 py-8 text-center text-on-surface-variant">
-				            Data reimbursement belum dimuat.
+				          <td colspan="9"
+				            class="px-5 py-10 text-center text-muted">
+				            No reimbursement data
 				          </td>
 				        </tr>
 				      </tbody>
 				    </table>
 				  </div>
-				  <!-- PAGINATION / FOOTER -->
-				  <div class="p-4 border-t border-outline-variant flex items-center justify-between">
-				    <span id="reimbursementTableInfo"
-				      class="text-sm text-on-surface-variant">
-				      0 data
-				    </span>
+				  <!-- PAGINATION -->
+				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+				    <p id="reimbursementTableInfo"
+				      class="text-xs text-on-surface-variant font-medium">
+				      Showing 0–0 of 0
+				    </p>
+				
+				    <div class="flex items-center gap-2">
+				      <button id="reimbursementPrevButton"
+				        type="button"
+				        onclick="changeReimbursementPage(-1)"
+				        disabled
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">
+				          chevron_left
+				        </span>
+				      </button>
+				
+				      <button id="reimbursementNextButton"
+				        type="button"
+				        onclick="changeReimbursementPage(1)"
+				        disabled
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">
+				          chevron_right
+				        </span>
+				      </button>
+				    </div>
 				  </div>
 				</section>
 				<!-- ==== EMPLOYEE ATTENDANCE ===== -->
@@ -24450,7 +24538,6 @@
 						</div>
 					</div>
         </section>
-				
         <!-- === PAYROLL === -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
