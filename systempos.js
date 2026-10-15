@@ -38429,8 +38429,7 @@ window.getReimbursementStatusBadge = function (status) {
 
 /* ==== RENDER TABLE ==== */
 window.renderReimbursementTable = function () {
-  const tableBody = document.getElementById( 'reimbursementTableBody' );
-
+  const tableBody = document.getElementById('reimbursementTableBody');
   if (!tableBody) return;
 
   const rows = window.getReimbursementVisibleRows();
@@ -38442,9 +38441,9 @@ window.renderReimbursementTable = function () {
     Math.max(1, window.reimbursementCurrentPage),
     maxPage
   );
-  const startIndex = (window.reimbursementCurrentPage - 1) * pageSize;
-  const pageRows = rows.slice( startIndex, startIndex + pageSize );
 
+  const startIndex = (window.reimbursementCurrentPage - 1) * pageSize;
+  const pageRows = rows.slice(startIndex, startIndex + pageSize);
   if (!pageRows.length) {
     tableBody.innerHTML = `
       <tr>
@@ -38461,15 +38460,26 @@ window.renderReimbursementTable = function () {
       const category = window.escapeReimbursementHTML( row.Category || '-' );
       const description = window.escapeReimbursementHTML( row.Description || '-' );
       const payrollPeriod = row.Payroll_Period
-        ? window.escapeReimbursementHTML( String(row.Payroll_Period).slice(0, 7) )
+        ? window.escapeReimbursementHTML(
+            String(row.Payroll_Period).slice(0, 7)
+          )
         : '-';
-      const status = String(row.Status || 'DRAFT').toUpperCase();
+      const status = String(row.Status || 'DRAFT')
+        .trim()
+        .toUpperCase();
+      // Semua action tetap ditampilkan.
+      // Action selain View Detail hanya aktif saat DRAFT.
       const canEdit = status === 'DRAFT';
-			const canApprove = status === 'DRAFT';
-			const canCancel = status === 'DRAFT';
+      const canApprove = status === 'DRAFT';
+      const canCancel = status === 'DRAFT';
+
       return `
         <tr class="hover:bg-outline-variant">
-          <td class="px-5 py-4 whitespace-nowrap"> ${window.escapeReimbursementHTML( window.formatReimbursementDate(row.Reimbursement_Date) )} </td>
+          <td class="px-5 py-4 whitespace-nowrap">
+            ${window.escapeReimbursementHTML(
+              window.formatReimbursementDate(row.Reimbursement_Date)
+            )}
+          </td>
           <td class="px-5 py-4 whitespace-nowrap">
             <div class="font-medium text-on-surface"> ${employeeName} </div>
             <div class="text-xs text-on-surface-variant"> ${window.escapeReimbursementHTML(row.Employee_ID || '')} </div>
@@ -38480,55 +38490,78 @@ window.renderReimbursementTable = function () {
           <td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${window.formatReimbursementCurrency(row.Amount)} </td>
           <td class="px-5 py-4 whitespace-nowrap"> ${payrollPeriod} </td>
           <td class="px-5 py-4 text-center"> ${window.getReimbursementStatusBadge(status)} </td>
-					<td class="px-4 py-3 text-center">
-					  <div class="relative inline-block text-left">
-					    <button type="button"
-					      onclick="closeReimbursementActionMenus(); viewReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
-					      class="inline-flex items-center justify-center w-9 h-9 text-muted hover:text-foreground rounded-md hover:bg-outline-variant"
-					      title="Reimbursement Actions"
-					      aria-label="Reimbursement Actions">
-					      <span class="material-symbols-outlined">more_vert</span>
-					    </button>
-					
-					    <div id="reimbursementActionMenu_${escapeReimbursementHTML(row.Reimbursement_ID)}"
-					      class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-[100] text-left">
-					      <button type="button"
-					        onclick="closeReimbursementActionMenus(); viewReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
-					        class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
-					        <span class="material-symbols-outlined text-base">visibility</span>
-					        	View Detail
-					      </button>
-					      ${
-					        String(row.Status || '').toUpperCase() === 'DRAFT'
-					          ? `
-					            <button type="button"
-					              onclick="closeReimbursementActionMenus(); editReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
-					              class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
-					              <span class="material-symbols-outlined text-base">edit</span>
-					              	Edit
-					            </button>
-					
-					            <button type="button"
-					              onclick="closeReimbursementActionMenus(); approveReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
-					              class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
-					              <span class="material-symbols-outlined text-base">check_circle</span>
-					             	 	Approve
-					            </button>
-					
-					            <div class="border-t border-outline-variant"></div>
-					
-					            <button type="button"
-					              onclick="closeReimbursementActionMenus(); cancelReimbursement('${escapeReimbursementHTML(row.Reimbursement_ID)}')"
-					              class="w-full px-4 py-2.5 text-sm text-red-700 hover:bg-red-600/10 flex items-center gap-2">
-					              <span class="material-symbols-outlined text-base">cancel</span>
-					              	Cancel
-					            </button>
-					          `
-					          : ''
-					      }
-					    </div>
-					  </div>
-					</td>
+          <!-- ACTION MENU -->
+          <td class="px-4 py-3 text-center">
+            <div class="relative inline-block text-left">
+              <!-- Tombol titik tiga: buka popup -->
+              <button type="button"
+                onclick="toggleReimbursementActionMenu('${id}', this)"
+                class="inline-flex items-center justify-center w-9 h-9 text-muted hover:text-foreground rounded-md hover:bg-outline-variant"
+                title="Reimbursement Actions"
+                aria-label="Reimbursement Actions">
+                <span class="material-symbols-outlined">more_vert</span>
+              </button>
+
+              <!-- Popup dipindahkan ke BODY oleh fungsi toggle -->
+              <div id="reimbursementActionMenu_${id}"
+                class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-[100] text-left">
+                <!-- VIEW DETAIL: SELALU AKTIF -->
+                <button type="button"
+                  onclick="closeReimbursementActionMenus(); viewReimbursement('${id}')"
+                  class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
+                  <span class="material-symbols-outlined text-base">visibility</span>
+                  View Detail
+                </button>
+
+                <!-- EDIT: SELALU TAMPIL -->
+                <button type="button"
+                  ${canEdit ? '' : 'disabled'}
+                  ${canEdit
+                    ? `onclick="closeReimbursementActionMenus(); editReimbursement('${id}')"`
+                    : 'title="Hanya status DRAFT yang dapat diedit"'}
+                  class="w-full px-4 py-2.5 text-sm flex items-center gap-2 ${
+                    canEdit
+                      ? 'text-foreground hover:bg-outline-variant'
+                      : 'text-muted opacity-50 cursor-not-allowed'
+                  }">
+                  <span class="material-symbols-outlined text-base">edit</span>
+                  Edit
+                </button>
+
+                <!-- APPROVE: SELALU TAMPIL -->
+                <button type="button"
+                  ${canApprove ? '' : 'disabled'}
+                  ${canApprove
+                    ? `onclick="closeReimbursementActionMenus(); approveReimbursement('${id}')"`
+                    : 'title="Hanya status DRAFT yang dapat di-approve"'}
+                  class="w-full px-4 py-2.5 text-sm flex items-center gap-2 ${
+                    canApprove
+                      ? 'text-foreground hover:bg-outline-variant'
+                      : 'text-muted opacity-50 cursor-not-allowed'
+                  }">
+                  <span class="material-symbols-outlined text-base">check_circle</span>
+                  Approve
+                </button>
+
+                <div class="border-t border-outline-variant"></div>
+
+                <!-- CANCEL: SELALU TAMPIL -->
+                <button type="button"
+                  ${canCancel ? '' : 'disabled'}
+                  ${canCancel
+                    ? `onclick="closeReimbursementActionMenus(); cancelReimbursement('${id}')"`
+                    : 'title="Reimbursement yang sudah di-approve tidak dapat dibatalkan"'}
+                  class="w-full px-4 py-2.5 text-sm flex items-center gap-2 ${
+                    canCancel
+                      ? 'text-red-700 hover:bg-red-600/10'
+                      : 'text-muted opacity-50 cursor-not-allowed'
+                  }">
+                  <span class="material-symbols-outlined text-base">cancel</span>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </td>
         </tr>
       `;
     }).join('');
