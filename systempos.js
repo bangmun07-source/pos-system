@@ -36090,7 +36090,6 @@ function initAttendanceRecap() {
   const employeeFilter = document.getElementById('recapEmployeeFilter');
 
   if (!periodInput || !branchFilter || !employeeFilter) return;
-
   if (!periodInput.value) {
     const now = new Date();
     periodInput.value =
@@ -36099,7 +36098,6 @@ function initAttendanceRecap() {
 
   populateAttendanceRecapBranchFilter();
   populateAttendanceRecapEmployeeFilter();
-
   // Outlet berubah: perbarui daftar karyawan dan rekap.
   branchFilter.onchange = async function () {
     populateAttendanceRecapEmployeeFilter();
@@ -36108,7 +36106,6 @@ function initAttendanceRecap() {
 
   employeeFilter.onchange = loadAttendanceRecap;
   periodInput.onchange = loadAttendanceRecap;
-
   return loadAttendanceRecap();
 }
 
@@ -36135,7 +36132,6 @@ function populateAttendanceRecapBranchFilter() {
     `;
 
     branchFilter.disabled = false;
-
     branchFilter.value = [...branchFilter.options].some(
       option => option.value === previousValue
     ) ? previousValue : '';
@@ -36147,7 +36143,6 @@ function populateAttendanceRecapBranchFilter() {
         ${escapeEmployeeHtml(branch?.name || userBranchId || 'Unnamed Branch')}
       </option>
     `;
-
     branchFilter.value = userBranchId;
     branchFilter.disabled = true;
   }
@@ -36165,7 +36160,6 @@ function populateAttendanceRecapEmployeeFilter() {
   const canChooseBranch = ['owner', 'accountant'].includes(role);
   const previousValue = employeeFilter.value;
   const employees = new Map();
-
   // Gunakan data Employee Management dan Schedule yang sudah dimuat.
   const sourceRows = [
     ...(Array.isArray(employeeData) ? employeeData : []),
@@ -36177,7 +36171,6 @@ function populateAttendanceRecapEmployeeFilter() {
     const rowBranch = String(row.Branch_ID || '').trim();
 
     if (!employeeId) return;
-
     if (canChooseBranch) {
       if (selectedBranch && rowBranch !== selectedBranch) return;
     } else if (rowBranch !== userBranchId) {
@@ -36204,8 +36197,7 @@ function populateAttendanceRecapEmployeeFilter() {
           )}
         </option>
       `).join('')}
-  `;
-
+  	`;
   employeeFilter.value = [...employeeFilter.options].some(
     option => option.value === previousValue
   ) ? previousValue : '';
@@ -36215,11 +36207,7 @@ async function loadAttendanceRecap() {
   const sessionId = localStorage.getItem('pos_session_id');
   const period = document.getElementById('recapPeriod')?.value || '';
 
-  if (!sessionId) {
-    console.error('Attendance Recap: session tidak ditemukan.');
-    return;
-  }
-
+  if (!sessionId) { return; }
   if (!/^\d{4}-\d{2}$/.test(period)) { return; }
 
   const role = getAttendanceRecapRole();
@@ -36230,7 +36218,6 @@ async function loadAttendanceRecap() {
   const branchId = canChooseBranch
     ? (selectedBranch || null)
     : userBranchId || '__NO_BRANCH__';
-
   const [year, month] = period.split('-').map(Number);
   const dateFrom = `${period}-01`;
   const dateTo = `${period}-${String( new Date(year, month, 0).getDate() ).padStart(2, '0')}`;
@@ -36318,7 +36305,6 @@ async function loadAttendanceRecap() {
           _attendanceDates: new Set()
         });
       }
-
       return employeeMap.get(employeeId);
     }
 
@@ -36369,7 +36355,6 @@ async function loadAttendanceRecap() {
 			if (status === 'LEAVE') employee.Leave++;
 			if (status === 'SICK') employee.Sick++;
 			if (status === 'PERMISSION') employee.Permission++;
-			
 			if (lateMinutes > 0) employee.Late++;
 			employee.Late_Minutes += lateMinutes;
     });
@@ -36377,7 +36362,6 @@ async function loadAttendanceRecap() {
     // Hitung overtime tercatat.
     overtimeRows.forEach(row => {
       const date = String(row.Overtime_Date || '').slice(0, 10);
-
       if (date < dateFrom || date > dateTo) return;
 
       const employee = ensureEmployee(row);
@@ -36398,17 +36382,7 @@ async function loadAttendanceRecap() {
 
     renderAttendanceRecapTable();
 
-    console.log('ATTENDANCE RECAP:', {
-      role,
-      branchId,
-      period,
-      attendanceRows: attendanceRows.length,
-      overtimeRows: overtimeRows.length,
-      employees: attendanceRecapData.length
-    });
   } catch (error) {
-    console.error('loadAttendanceRecap:', error);
-
     const tbody = document.getElementById('attendanceTableBody');
     if (tbody) {
       tbody.innerHTML = `
@@ -36428,13 +36402,10 @@ function renderAttendanceRecapTable() {
 
   const total = filteredAttendanceRecapData.length;
   const totalPages = Math.max( 1, Math.ceil(total / attendanceRecapPageSize) );
-
   attendanceRecapCurrentPage = Math.min( attendanceRecapCurrentPage, totalPages );
-
   const start = (attendanceRecapCurrentPage - 1) * attendanceRecapPageSize;
   const rows = filteredAttendanceRecapData.slice( start, start + attendanceRecapPageSize );
   const sum = field => filteredAttendanceRecapData.reduce( (total, row) => total + Number(row[field] || 0), 0 );
-
   const presentEl = document.getElementById('attendancePresentCount');
 	const lateEl = document.getElementById('attendanceLateCount');
 	const absentEl = document.getElementById('attendanceAbsentCount');
@@ -36446,11 +36417,7 @@ function renderAttendanceRecapTable() {
 	if (lateEl) lateEl.textContent = sum('Late');
 	if (absentEl) absentEl.textContent = sum('Absent');
 	if (leaveEl) leaveEl.textContent = sum('Leave');
-	
-	if (lateMinutesEl) {
-	  lateMinutesEl.textContent = sum('Late_Minutes').toLocaleString('id-ID');
-	}
-	
+	if (lateMinutesEl) { lateMinutesEl.textContent = sum('Late_Minutes').toLocaleString('id-ID'); }
 	if (overtimeEl) {
 	  overtimeEl.textContent =
 	    `${sum('Overtime_Hours').toLocaleString('id-ID', {
@@ -36483,7 +36450,6 @@ function renderAttendanceRecapTable() {
             ${escapeEmployeeHtml(row.Employee_Code || row.Employee_ID)}
           </div>
         </td>
-
         <td class="px-5 py-3 text-center">${row.Working_Days}</td>
         <td class="px-5 py-3 text-center">${row.Present}</td>
         <td class="px-5 py-3 text-center">${row.Late}</td>
@@ -36550,25 +36516,17 @@ window.changeAttendancePage = function(direction) {
 
 window.viewAttendanceRecapDetail = function(employeeId) {
   const modal = document.getElementById('attendanceRecapDetailModal');
-  const summary = attendanceRecapData.find(
-    row => String(row.Employee_ID) === String(employeeId)
-  );
+  const summary = attendanceRecapData.find( row => String(row.Employee_ID) === String(employeeId) );
 
-  if (!modal || !summary) {
-    console.warn('Attendance recap employee not found:', employeeId);
-    return; }
+  if (!modal || !summary) { return; }
 	
   const period = document.getElementById('recapPeriod')?.value || '';
 	
-  if (!/^\d{4}-\d{2}$/.test(period)) {
-    console.warn('Invalid attendance recap period:', period);
-    return; }
+  if (!/^\d{4}-\d{2}$/.test(period)) { return; }
 
   const [year, month] = period.split('-').map(Number);
   const startDate = `${period}-01`;
-  const endDate = `${year}-${String(month).padStart(2, '0')}-${String(
-    new Date(year, month, 0).getDate()
-  ).padStart(2, '0')}`;
+  const endDate = `${year}-${String(month).padStart(2, '0')}-${String( new Date(year, month, 0).getDate() ).padStart(2, '0')}`;
   const sameEmployee = row => String(row.Employee_ID) === String(employeeId);
   const inSelectedMonth = date => {
     const key = String(date || '').slice(0, 10);
@@ -36590,7 +36548,7 @@ window.viewAttendanceRecapDetail = function(employeeId) {
   const formatDate = value => {
     const key = String(value || '').slice(0, 10);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(key)) return key || '-';
-		
+
     const [y, m, d] = key.split('-').map(Number);
     return new Date(y, m - 1, d).toLocaleDateString('id-ID', {
       day: '2-digit',
@@ -36661,46 +36619,46 @@ window.viewAttendanceRecapDetail = function(employeeId) {
 
     historyBody.innerHTML = history.length
       ? history.map(row => {
-          const date = String(row.Attendance_Date || '').slice(0, 10);
-          const ot = overtimeByDate.get(date);
-          const status = String(row.Status || 'NOT_RECORDED')
-            .trim()
-            .toUpperCase();
+				const date = String(row.Attendance_Date || '').slice(0, 10);
+				const ot = overtimeByDate.get(date);
+				const status = String(row.Status || 'NOT_RECORDED')
+					.trim()
+					.toUpperCase();
 
-          const statusClass = {
-            PRESENT: 'text-green-600',
-            LATE: 'text-amber-600',
-            ABSENT: 'text-red-600',
-            LEAVE: 'text-blue-600',
-            SICK: 'text-blue-600',
-            PERMISSION: 'text-blue-600'
-          }[status] || 'text-muted';
+				const statusClass = {
+					PRESENT: 'text-green-600',
+					LATE: 'text-amber-600',
+					ABSENT: 'text-red-600',
+					LEAVE: 'text-blue-600',
+					SICK: 'text-blue-600',
+					PERMISSION: 'text-blue-600'
+				}[status] || 'text-muted';
 
-          const schedule = `${formatTime(row.Start_Time)} – ${formatTime(row.End_Time)}`;
-          const overtimeText = ot ? formatDuration(ot.minutes) : '-';
-          const overtimeNote = ot?.notes.join('; ') || '';
-          const note = [row.Note, overtimeNote].filter(Boolean).join(' | ');
+				const schedule = `${formatTime(row.Start_Time)} – ${formatTime(row.End_Time)}`;
+				const overtimeText = ot ? formatDuration(ot.minutes) : '-';
+				const overtimeNote = ot?.notes.join('; ') || '';
+				const note = [row.Note, overtimeNote].filter(Boolean).join(' | ');
 
-          return `
-            <tr class="hover:bg-outline-variant">
-              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatDate(date))}</td>
-              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(schedule)}</td>
-              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatTime(row.Check_In))}</td>
-              <td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatTime(row.Check_Out))}</td>
-              <td class="px-4 py-3 font-medium ${statusClass}">${escapeEmployeeHtml(status.replace(/_/g, ' '))}</td>
-              <td class="px-4 py-3 text-right text-foreground">${formatNumber(row.Late_Minutes)}</td>
-              <td class="px-4 py-3 text-right text-foreground">${escapeEmployeeHtml(overtimeText)}</td>
-              <td class="px-4 py-3 text-foreground whitespace-normal min-w-40">${escapeEmployeeHtml(note || '-')}</td>
-            </tr>
-          `;
-        }).join('')
-      : `
-        <tr>
-          <td colspan="8" class="px-4 py-8 text-center text-muted">
-            No attendance history for this period
-          </td>
-        </tr>
-      `;
+				return `
+					<tr class="hover:bg-outline-variant">
+						<td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatDate(date))}</td>
+						<td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(schedule)}</td>
+						<td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatTime(row.Check_In))}</td>
+						<td class="px-4 py-3 text-foreground">${escapeEmployeeHtml(formatTime(row.Check_Out))}</td>
+						<td class="px-4 py-3 font-medium ${statusClass}">${escapeEmployeeHtml(status.replace(/_/g, ' '))}</td>
+						<td class="px-4 py-3 text-right text-foreground">${formatNumber(row.Late_Minutes)}</td>
+						<td class="px-4 py-3 text-right text-foreground">${escapeEmployeeHtml(overtimeText)}</td>
+						<td class="px-4 py-3 text-foreground whitespace-normal min-w-40">${escapeEmployeeHtml(note || '-')}</td>
+					</tr>
+				`;
+			}).join('')
+		: `
+			<tr>
+				<td colspan="8" class="px-4 py-8 text-center text-muted">
+					No attendance history for this period
+				</td>
+			</tr>
+		`;
   }
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -36813,10 +36771,7 @@ window.calculatePayroll = async function () {
 	const result = Array.isArray(data) ? data[0] : data;
 
 	if (!result || result.success !== true) {
-		throw new Error(
-			result?.message ||
-			'Calculate Payroll gagal diproses.'
-		);
+		throw new Error( result?.message || 'Calculate Payroll gagal diproses.' );
 	}
 
 	console.log('PAYROLL CALCULATED', result);
@@ -36871,9 +36826,7 @@ window.loadPayroll = async function () {
 	try {
 		const sessionId = localStorage.getItem('pos_session_id');
 
-		if (!sessionId) {
-			throw new Error('Session tidak ditemukan. Silakan login kembali.');
-		}
+		if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
 		const periodInput = document.getElementById('payrollPeriod');
 		const branchFilter = document.getElementById('payrollBranchFilter');
@@ -36882,12 +36835,8 @@ window.loadPayroll = async function () {
 		const user = typeof state !== 'undefined' ? state.user : null;
 		const role = String(user?.role || '').trim().toUpperCase();
 
-		if (!role) {
-			throw new Error('Role pengguna tidak ditemukan.');
-		}
-
+		if (!role) { throw new Error('Role pengguna tidak ditemukan.'); }
 		let branchId = branchFilter?.value?.trim() || null;
-
 		// Owner dapat memilih outlet tertentu atau semua outlet.
 		// Admin dan Cashier dibatasi pada outlet miliknya di UI.
 		if (role !== 'OWNER') {
@@ -36905,12 +36854,10 @@ window.loadPayroll = async function () {
 				window.payrollCurrentPage = 1;
 				window.loadPayroll();
 			});
-
 			statusFilter?.addEventListener('change', () => {
 				window.payrollCurrentPage = 1;
 				window.renderPayrollTable();
 			});
-
 			window.payrollHandlersAttached = true;
 		}
 
@@ -36935,14 +36882,11 @@ window.loadPayroll = async function () {
 
 		const result = Array.isArray(data) ? data[0] : data;
 
-		if (!result || result.success !== true) {
-			throw new Error('Gagal mengambil data Payroll.');
-		}
+		if (!result || result.success !== true) { throw new Error('Gagal mengambil data Payroll.'); }
 
 		window.payrollRows = Array.isArray(result.rows)
 			? result.rows
 			: [];
-
 		window.payrollCurrentPage = 1;
 		window.renderPayrollTable();
 		console.log('PAYROLL LOADED:', window.payrollRows.length);
@@ -36974,37 +36918,24 @@ window.populatePayrollEmployeeFilter = function () {
   if (!employeeFilter) return;
 
   const previousEmployeeId = employeeFilter.value;
-  const role = String(
-    state.user?.role || state.user?.Role || ''
-  ).trim().toUpperCase();
-
-  const userBranchId = String(
-    state.user?.branchId || state.user?.Branch_ID || ''
-  ).trim();
+  const role = String( state.user?.role || state.user?.Role || '' ).trim().toUpperCase();
+  const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
 
   let branchId = String(branchFilter?.value || '').trim();
-
   // Admin/Cashier hanya boleh melihat karyawan outlet sendiri.
-  if (!['OWNER', 'ACCOUNTANT'].includes(role)) {
-    branchId = userBranchId;
-  }
+  if (!['OWNER', 'ACCOUNTANT'].includes(role)) { branchId = userBranchId; }
 
   const employees = Array.isArray(employeeData)
     ? employeeData
     : [];
-
   const visibleEmployees = employees.filter(employee => {
-    const employeeBranchId = String(
-      employee.Branch_ID || employee.branch_id || ''
-    ).trim();
+    const employeeBranchId = String( employee.Branch_ID || employee.branch_id || '' ).trim();
 
     return !branchId || branchId.toUpperCase() === 'ALL'
       || employeeBranchId === branchId;
   });
 
-  employeeFilter.innerHTML =
-    '<option value="">All Employees</option>';
-
+  employeeFilter.innerHTML = '<option value="">All Employees</option>';
   visibleEmployees
     .sort((a, b) =>
       String(a.Full_Name || '').localeCompare(
@@ -37098,7 +37029,7 @@ window.renderPayrollTable = function () {
 	if (pageRows.length === 0) {
 		tableBody.innerHTML = `
 			<tr>
-				<td colspan="13" class="px-4 py-8 text-center text-gray-500">
+				<td colspan="13" class="px-4 py-8 text-center text-muted">
 					Belum ada data Payroll.
 				</td>
 			</tr>
@@ -37108,17 +37039,17 @@ window.renderPayrollTable = function () {
 			const status = String(row.Status || '').toUpperCase();
 
 			const statusClass = {
-				DRAFT: 'bg-gray-100 text-gray-700',
-				CALCULATED: 'bg-blue-100 text-blue-700',
-				PAID: 'bg-green-100 text-green-700',
-				CANCELLED: 'bg-red-100 text-red-700'
-			}[status] || 'bg-gray-100 text-gray-700';
+				DRAFT: 'text-gray-700',
+				CALCULATED: 'text-blue-700',
+				PAID: 'text-green-700',
+				CANCELLED: 'text-red-700'
+			}[status] || 'text-gray-700';
 
 			return `
 				<tr class="border-b border-outline-variant">
 					<td class="px-4 py-3">
 						<div class="font-medium">${escapeHtml(row.Full_Name)}</div>
-						<div class="text-xs text-gray-500">
+						<div class="text-xs text-muted">
 							${escapeHtml(row.Employee_Code)}
 						</div>
 					</td>
@@ -37133,7 +37064,7 @@ window.renderPayrollTable = function () {
 					<td class="px-4 py-3 whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
 					<td class="px-4 py-3 whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
 					<td class="px-4 py-3">
-						<span class="px-2 py-1 rounded text-xs ${statusClass}">
+						<span class="px-2 py-1 rounded-md font-semibold text-xs ${statusClass}">
 							${escapeHtml(status)}
 						</span>
 					</td>
@@ -37148,7 +37079,7 @@ window.renderPayrollTable = function () {
 							</button>
 				
 							<div id="payrollActionMenu_${escapeHtml(row.Payroll_ID)}"
-								class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-50 text-left">
+								class="hidden absolute right-0 bottom-full mb-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-[100] text-left">
 								<button type="button"
 									onclick="closePayrollActionMenus(); viewPayrollDetail('${escapeHtml(row.Payroll_ID)}')"
 									class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2" >
