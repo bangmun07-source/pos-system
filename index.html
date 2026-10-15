@@ -23951,6 +23951,115 @@
 						</div>
 					</div>
 				</section>
+				<!-- ===== EMPLOYEE REIMBURSEMENT ===== -->
+				<section id="employeeReimbursementSection"
+				  class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <!-- HEADER -->
+				  <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-3">
+				    <div>
+				      <h2 class="text-lg font-semibold">Reimbursement</h2>
+				      <p class="text-sm text-on-surface-variant">
+				        Pengajuan dan pembayaran reimbursement karyawan
+				      </p>
+				    </div>
+				
+				    <button type="button"
+				      onclick="openReimbursementModal()"
+				      class="px-4 py-2 rounded-md bg-primary text-on-primary">
+				      + Reimbursement
+				    </button>
+				  </div>
+				  <!-- SUMMARY -->
+				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-5">
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-sm text-on-surface-variant">Total Pengajuan</p>
+				      <p id="reimbursementTotalCount" class="text-xl font-semibold">0</p>
+				    </div>
+				
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-sm text-on-surface-variant">Draft</p>
+				      <p id="reimbursementDraftCount" class="text-xl font-semibold">0</p>
+				    </div>
+				
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-sm text-on-surface-variant">Approved</p>
+				      <p id="reimbursementApprovedCount" class="text-xl font-semibold">0</p>
+				    </div>
+				
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-sm text-on-surface-variant">Belum Dibayar</p>
+				      <p id="reimbursementUnpaidAmount" class="text-xl font-semibold">
+				        Rp0
+				      </p>
+				    </div>
+				  </div>
+				  <!-- FILTER -->
+				  <div class="px-5 pb-5 grid grid-cols-1 md:grid-cols-3 gap-3">
+				    <div>
+				      <label for="reimbursementPeriodFilter"
+				        class="block text-sm mb-1">Periode</label>
+				      <input id="reimbursementPeriodFilter"
+				        type="month"
+				        class="w-full border border-outline rounded-md px-3 py-2">
+				    </div>
+				
+				    <div>
+				      <label for="reimbursementEmployeeFilter"
+				        class="block text-sm mb-1">Employee</label>
+				      <select id="reimbursementEmployeeFilter"
+				        class="w-full border border-outline rounded-md px-3 py-2">
+				        <option value="">All Employee</option>
+				      </select>
+				    </div>
+				
+				    <div>
+				      <label for="reimbursementStatusFilter"
+				        class="block text-sm mb-1">Status</label>
+				      <select id="reimbursementStatusFilter"
+				        class="w-full border border-outline rounded-md px-3 py-2">
+				        <option value="">Semua Status</option>
+				        <option value="DRAFT">Draft</option>
+				        <option value="APPROVED">Approved</option>
+				        <option value="IN_PAYROLL">In Payroll</option>
+				        <option value="PAID">Paid</option>
+				        <option value="CANCELLED">Cancelled</option>
+				      </select>
+				    </div>
+				  </div>
+				  <!-- TABLE -->
+				  <div class="overflow-x-auto">
+				    <table class="w-full text-sm">
+				      <thead class="bg-surface-container-low">
+				        <tr>
+				          <th class="px-4 py-3 text-left whitespace-nowrap">Tanggal</th>
+				          <th class="px-4 py-3 text-left whitespace-nowrap">Karyawan</th>
+				          <th class="px-4 py-3 text-left whitespace-nowrap">Outlet</th>
+				          <th class="px-4 py-3 text-left whitespace-nowrap">Kategori</th>
+				          <th class="px-4 py-3 text-left">Deskripsi</th>
+				          <th class="px-4 py-3 text-right whitespace-nowrap">Nominal</th>
+				          <th class="px-4 py-3 text-left whitespace-nowrap">Periode Payroll</th>
+				          <th class="px-4 py-3 text-left">Status</th>
+				          <th class="px-4 py-3 text-center">Action</th>
+				        </tr>
+				      </thead>
+				
+				      <tbody id="reimbursementTableBody">
+				        <tr>
+				          <td colspan="9" class="px-4 py-8 text-center text-on-surface-variant">
+				            Data reimbursement belum dimuat.
+				          </td>
+				        </tr>
+				      </tbody>
+				    </table>
+				  </div>
+				  <!-- PAGINATION / FOOTER -->
+				  <div class="p-4 border-t border-outline-variant flex items-center justify-between">
+				    <span id="reimbursementTableInfo"
+				      class="text-sm text-on-surface-variant">
+				      0 data
+				    </span>
+				  </div>
+				</section>
 				<!-- ==== EMPLOYEE ATTENDANCE ===== -->
 				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
 				  <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-4">
