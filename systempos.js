@@ -37071,7 +37071,7 @@ window.renderPayrollTable = function () {
 					<td class="px-4 py-3 text-right">
 						<div class="relative inline-block text-left">
 							<button type="button"
-								onclick="togglePayrollActionMenu('${escapeHtml(row.Payroll_ID)}')"
+								onclick="togglePayrollActionMenu('${escapeHtml(row.Payroll_ID)}', this)"
 								class="inline-flex items-center justify-center w-9 h-9 text-muted hover:text-foreground"
 								title="Payroll Actions"
 								aria-label="Payroll Actions" >
@@ -37132,42 +37132,96 @@ window.renderPayrollTable = function () {
 	if (nextButton) nextButton.disabled = window.payrollCurrentPage >= totalPages;
 };
 
+/* ==== PAYROLL - ACTION MENU DI LUAR TABEL ==== */
+window.togglePayrollActionMenu = function (payrollId, button) {
+	const menu = document.getElementById( `payrollActionMenu_${payrollId}` );
 
-/* ==== PAYROLL - ACTION MENU ==== */
-window.togglePayrollActionMenu = function (payrollId) {
-    const menu = document.getElementById(`payrollActionMenu_${payrollId}`);
-    if (!menu) return;
+	if (!menu || !button) return;
 
-    const isHidden = menu.classList.contains('hidden');
+	const isHidden = menu.classList.contains('hidden');
+	// Tutup menu lain terlebih dahulu.
+	window.closePayrollActionMenus();
+	if (!isHidden) return;
+	// Simpan posisi asli menu di dalam tabel.
+	if (!menu._payrollPlaceholder) {
+		const placeholder = document.createComment(
+			'payroll-action-menu-placeholder'
+		);
+		menu.parentNode.insertBefore(placeholder, menu);
+		menu._payrollPlaceholder = placeholder;
+	}
+	// Pindahkan popup ke BODY agar tidak terpotong tabel.
+	document.body.appendChild(menu);
+	menu.classList.remove('hidden');
+	// Gunakan fixed agar posisi relatif terhadap layar.
+	menu.style.position = 'fixed';
+	menu.style.left = '0px';
+	menu.style.right = 'auto';
+	menu.style.top = '0px';
+	menu.style.bottom = 'auto';
+	menu.style.margin = '0';
+	menu.style.zIndex = '9999';
 
-    window.closePayrollActionMenus();
+	// Hitung posisi tombol.
+	const rect = button.getBoundingClientRect();
+	const menuHeight = menu.offsetHeight;
+	const menuWidth = menu.offsetWidth;
+	const gap = 4;
+	const spaceBelow = window.innerHeight - rect.bottom;
+	const spaceAbove = rect.top;
 
-    if (!isHidden) return;
+	let top;
 
-    const button = menu.parentElement.querySelector( `button[onclick*="togglePayrollActionMenu"]` );
+	if (
+		spaceBelow >= menuHeight + gap ||
+		spaceBelow >= spaceAbove
+	) {
+		top = rect.bottom + gap;
+	} else {
+		top = rect.top - menuHeight - gap;
+	}
 
-    if (!button) return;
+	// Jaga popup tetap di dalam area layar.
+	top = Math.max(
+		8,
+		Math.min(top, window.innerHeight - menuHeight - 8)
+	);
 
-    const rect = button.getBoundingClientRect();
-    const menuHeight = menu.offsetHeight || 200;
-    const spaceBelow = window.innerHeight - rect.bottom;
-    const spaceAbove = rect.top;
+	let left = rect.right - menuWidth;
 
-    if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
-        menu.classList.remove('top-full', 'mt-1');
-        menu.classList.add('bottom-full', 'mb-1');
-    } else {
-        menu.classList.remove('bottom-full', 'mb-1');
-        menu.classList.add('top-full', 'mt-1');
-    }
-    menu.classList.remove('hidden');
+	left = Math.max(
+		8,
+		Math.min(left, window.innerWidth - menuWidth - 8)
+	);
+	menu.style.top = `${top}px`;
+	menu.style.left = `${left}px`;
 };
 
 window.closePayrollActionMenus = function () {
-	document.querySelectorAll('[id^="payrollActionMenu_"]').forEach(menu => {
+	document.querySelectorAll( '[id^="payrollActionMenu_"]' ).forEach(menu => {
 		menu.classList.add('hidden');
+		// Kembalikan menu ke tempat asalnya di tabel.
+		const placeholder = menu._payrollPlaceholder;
+
+		if (placeholder && placeholder.parentNode) {
+			placeholder.parentNode.insertBefore(
+				menu,
+				placeholder
+			);
+			placeholder.remove();
+		}
+		delete menu._payrollPlaceholder;
+		// Bersihkan posisi popup.
+		menu.style.position = '';
+		menu.style.left = '';
+		menu.style.right = '';
+		menu.style.top = '';
+		menu.style.bottom = '';
+		menu.style.margin = '';
+		menu.style.zIndex = '';
 	});
 };
+
 
 // Tutup Payroll Action Menu saat klik di luar menu
 document.addEventListener('click', function (event) {
