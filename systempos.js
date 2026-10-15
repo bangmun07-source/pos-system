@@ -37079,7 +37079,7 @@ window.renderPayrollTable = function () {
 							</button>
 				
 							<div id="payrollActionMenu_${escapeHtml(row.Payroll_ID)}"
-								class="hidden absolute right-0 bottom-full mb-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-[100] text-left">
+								class="hidden absolute right-0 top-full mt-1 w-48 bg-background border border-outline-variant rounded-md shadow-lg z-[100] text-left">
 								<button type="button"
 									onclick="closePayrollActionMenus(); viewPayrollDetail('${escapeHtml(row.Payroll_ID)}')"
 									class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2" >
@@ -37135,18 +37135,32 @@ window.renderPayrollTable = function () {
 
 /* ==== PAYROLL - ACTION MENU ==== */
 window.togglePayrollActionMenu = function (payrollId) {
-	const menu = document.getElementById( `payrollActionMenu_${payrollId}` );
+    const menu = document.getElementById(`payrollActionMenu_${payrollId}`);
+    if (!menu) return;
 
-	if (!menu) return;
+    const isHidden = menu.classList.contains('hidden');
 
-	const isHidden = menu.classList.contains('hidden');
+    window.closePayrollActionMenus();
 
-	// Tutup semua menu action lainnya.
-	document.querySelectorAll('[id^="payrollActionMenu_"]').forEach(item => {
-		item.classList.add('hidden');
-	});
+    if (!isHidden) return;
 
-	if (isHidden) { menu.classList.remove('hidden'); }
+    const button = menu.parentElement.querySelector( `button[onclick*="togglePayrollActionMenu"]` );
+
+    if (!button) return;
+
+    const rect = button.getBoundingClientRect();
+    const menuHeight = menu.offsetHeight || 200;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    if (spaceBelow < menuHeight && spaceAbove > spaceBelow) {
+        menu.classList.remove('top-full', 'mt-1');
+        menu.classList.add('bottom-full', 'mb-1');
+    } else {
+        menu.classList.remove('bottom-full', 'mb-1');
+        menu.classList.add('top-full', 'mt-1');
+    }
+    menu.classList.remove('hidden');
 };
 
 window.closePayrollActionMenus = function () {
