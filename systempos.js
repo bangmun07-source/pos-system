@@ -36676,11 +36676,7 @@ window.closeAttendanceRecapDetail = function() {
 };
 
 
-/* =========================================================
-   									EMPLOYEE SALARY / PAYROLL
-========================================================= */
-
-
+/* === EMPLOYEE SALARY / PAYROLL === */
 window.calculatePayroll = async function () {
 	const periodInput = document.getElementById('payrollPeriod');
 	const branchFilter = document.getElementById('payrollBranchFilter');
@@ -36752,12 +36748,6 @@ window.calculatePayroll = async function () {
 		calculateButton.setAttribute('aria-busy', 'true');
 	}
 
-	console.log('CALCULATE PAYROLL', {
-		period,
-		branchId: branchId || 'ALL',
-		employeeId: employeeId || 'ALL EMPLOYEES'
-	});
-
 	// 7. Panggil RPC dengan filter periode, outlet, Employee
 	const { data, error } = await supabaseClient.rpc(
 		'calculate_employee_payroll',
@@ -36773,12 +36763,7 @@ window.calculatePayroll = async function () {
 
 	const result = Array.isArray(data) ? data[0] : data;
 
-	if (!result || result.success !== true) {
-		throw new Error( result?.message || 'Calculate Payroll gagal diproses.' );
-	}
-
-	console.log('PAYROLL CALCULATED', result);
-
+	if (!result || result.success !== true) { throw new Error( result?.message || 'Calculate Payroll gagal diproses.' ); }
 	// 8. Refresh tabel
 	if (typeof window.loadPayroll === 'function') {
 		try {
@@ -36813,9 +36798,78 @@ window.calculatePayroll = async function () {
 	}
 };
 
+/* ==== RECORD PAYROLL ==== */
+window.recordPayroll = async function () {
+  const period = document.getElementById('payrollPeriod')?.value;
+  const branchFilter = document.getElementById('payrollBranchFilter');
+  const employeeFilter = document.getElementById('payrollEmployeeFilter');
+
+  if (!period) {
+    alert('Pilih periode payroll terlebih dahulu.');
+    return;
+  }
+
+  const role = String(state.user?.role || '').toUpperCase();
+  const isOwner = role === 'OWNER';
+  const isAccountant = role === 'ACCOUNTANT';
+
+  const branchId = isOwner || isAccountant
+    ? (branchFilter?.value || null)
+    : (state.user?.branchId || null);
+
+  const employeeId = employeeFilter?.value || null;
+
+  if (!isOwner && !isAccountant && !branchId) {
+    alert('Outlet pengguna tidak ditemukan.');
+    return;
+  }
+
+  const button = document.querySelector(
+    'button[onclick="recordPayroll()"]'
+  );
+
+  try {
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Recording...';
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      'record_employee_payroll',
+      {
+        p_session_id: localStorage.getItem('pos_session_id'),
+        p_payroll_period: `${period}-01`,
+        p_branch_id: branchId,
+        p_employee_id: employeeId
+      }
+    );
+
+    if (error) throw error;
+
+    if (!data?.success) {
+      throw new Error(data?.message || 'Gagal mencatat payroll.');
+    }
+
+    await window.loadPayroll();
+
+    alert(
+      data.message ||
+      `Record Payroll selesai.\n` +
+      `Berhasil: ${data.processed ?? 0}\n` +
+      `Dilewati: ${data.skipped ?? 0}`
+    );
+  } catch (error) {
+    console.error('recordPayroll:', error);
+    alert(error.message || 'Terjadi kesalahan saat Record Payroll.');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Record Payroll';
+    }
+  }
+};
 
 /* ==== PAYROLL - LOAD DATA ==== */
-
 window.payrollRows = window.payrollRows || [];
 window.payrollCurrentPage = window.payrollCurrentPage || 1;
 window.payrollPageSize = 10;
