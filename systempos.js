@@ -33122,7 +33122,7 @@ function renderEmployeeTable() {
 				? 'text-green-500'
 				: 'text-muted';
       return `
-        <tr class="hover:bg-surface-container-high transition">
+        <tr class="hover:bg-outline-variant transition">
           <td class="px-5 py-4">
             <div class="font-medium text-foreground">
               ${escapeEmployeeHtml(employee.Full_Name)}
@@ -34736,7 +34736,7 @@ function renderSchedules(data = filteredScheduleData) {
     const statusText = isActive ? 'ON' : 'OFF';
 
     return `
-      <tr class="hover:bg-background/50">
+      <tr class="hover:bg-outline-variant">
         <td class="px-5 py-3">
           <div class="font-medium text-foreground">
             ${escapeHtml(row.Full_Name || '-')}
