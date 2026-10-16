@@ -4,7 +4,6 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-
 <!-- PWA -->
 <link rel="manifest" href="/manifest.json"> 
 
@@ -13,30 +12,25 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-
 <!-- Favicon -->
 <link rel="icon"
       type="image/png"
       sizes="512x512"
       href="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20FULL%20512.png">
-
 <link rel="apple-touch-icon"
       sizes="180x180"
       href="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20ROUND%20FULL%20192.png">
 
-
 <!-- Title -->
 <title>MUNO</title>
-
-
+	
 <script>
   window.__PAGE_FROM_GAS = "<?= page ?>";
   window.__ID_FROM_GAS = "<?= id ?>";
 </script>
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
+	
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
@@ -19601,6 +19595,314 @@
 				        <span class="material-symbols-outlined text-sm">
 				          chevron_right
 				        </span>
+				      </button>
+				    </div>
+				  </div>
+				</section>
+				<!-- ===== EMPLOYEE TAX PAYABLE ===== -->
+				<section id="employeeTaxSection"
+				  class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <!-- HEADER -->
+				  <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined text-3xl"
+				          style="font-variation-settings:'FILL' 1;">
+				          receipt_long
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-bold font-headline text-foreground">
+				          Employee Tax Payable
+				        </h2>
+				        <p class="text-xs text-muted mt-1">
+				          Employee PPh 21 obligations and payment records
+				        </p>
+				      </div>
+				    </div>
+				  </div>
+				  <!-- FILTER -->
+				  <div class="p-5 border-b border-outline-variant">
+				    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+				      <div>
+				        <label for="employeeTaxPeriodFilter"
+				          class="block text-xs text-muted mb-2">
+				          Tax Period
+				        </label>
+				        <input id="employeeTaxPeriodFilter"
+				          type="month"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				      </div>
+				
+				      <div>
+				        <label for="employeeTaxBranchFilter"
+				          class="block text-xs text-muted mb-2">
+				          Outlet
+				        </label>
+				        <select id="employeeTaxBranchFilter"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Branches</option>
+				        </select>
+				      </div>
+				
+				      <div>
+				        <label for="employeeTaxEmployeeFilter"
+				          class="block text-xs text-muted mb-2">
+				          Employee
+				        </label>
+				        <select id="employeeTaxEmployeeFilter"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Employees</option>
+				        </select>
+				      </div>
+				
+				      <div>
+				        <label for="employeeTaxStatusFilter"
+				          class="block text-xs text-muted mb-2">
+				          Status
+				        </label>
+				        <select id="employeeTaxStatusFilter"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Status</option>
+				          <option value="DRAFT">Draft</option>
+				          <option value="CALCULATED">Calculated</option>
+				          <option value="IN_PAYROLL">In Payroll</option>
+				          <option value="PAID">Paid</option>
+				          <option value="CANCELLED">Cancelled</option>
+				        </select>
+				      </div>
+				    </div>
+				  </div>
+				  <!-- SUMMARY -->
+				  <div class="grid grid-cols-2 md:grid-cols-4">
+				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Total Records
+				      </p>
+				      <p id="employeeTaxTotalCount" class="text-xl font-headline mt-1">0</p>
+				    </div>
+				
+				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Draft
+				      </p>
+				      <p id="employeeTaxDraftCount" class="text-xl font-headline mt-1">0</p>
+				    </div>
+				
+				    <div class="p-5 border-r border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Paid
+				      </p>
+				      <p id="employeeTaxPaidCount" class="text-xl font-headline mt-1">0</p>
+				    </div>
+				
+				    <div class="p-5">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Outstanding Tax
+				      </p>
+				      <p id="employeeTaxOutstandingAmount" class="text-xl font-headline mt-1">
+				        Rp 0
+				      </p>
+				    </div>
+				  </div>
+				  <!-- TABLE -->
+				  <div class="overflow-x-auto custom-scrollbar">
+				    <table class="w-full text-sm">
+				      <thead>
+				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Period</th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Taxable Income</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Paid Amount</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Remaining</th>
+				          <th class="px-5 py-3 text-center">Status</th>
+				          <th class="px-5 py-3 text-center">Action</th>
+				        </tr>
+				      </thead>
+				
+				      <tbody id="employeeTaxTableBody"
+				        class="divide-y divide-outline-variant">
+				        <tr>
+				          <td colspan="9" class="px-5 py-10 text-center text-muted">
+				            No employee tax data
+				          </td>
+				        </tr>
+				      </tbody>
+				    </table>
+				  </div>
+				  <!-- PAGINATION -->
+				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+				    <p id="employeeTaxTableInfo"
+				      class="text-xs text-on-surface-variant font-medium">
+				      Showing 0–0 of 0
+				    </p>
+				
+				    <div class="flex items-center gap-2">
+				      <button id="employeeTaxPrevButton" type="button" disabled
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">chevron_left</span>
+				      </button>
+				
+				      <button id="employeeTaxNextButton" type="button" disabled
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">chevron_right</span>
+				      </button>
+				    </div>
+				  </div>
+				</section>
+				<!-- ===== EMPLOYEE HEALTH PAYABLE ===== -->
+				<section id="employeeHealthSection"
+				  class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <!-- HEADER -->
+				  <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined text-3xl"
+				          style="font-variation-settings:'FILL' 1;">
+				          health_and_safety
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-bold font-headline text-foreground">
+				          Employee Health Payable
+				        </h2>
+				        <p class="text-xs text-muted mt-1">
+				          Employee and employer BPJS contribution obligations
+				        </p>
+				      </div>
+				    </div>
+				  </div>
+				  <!-- FILTER -->
+				  <div class="p-5 border-b border-outline-variant">
+				    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+				      <div>
+				        <label for="employeeHealthPeriodFilter"
+				          class="block text-xs text-muted mb-2">
+				          Contribution Period
+				        </label>
+				        <input id="employeeHealthPeriodFilter"
+				          type="month"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				      </div>
+				
+				      <div>
+				        <label for="employeeHealthBranchFilter"
+				          class="block text-xs text-muted mb-2">
+				          Outlet
+				        </label>
+				        <select id="employeeHealthBranchFilter"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Branches</option>
+				        </select>
+				      </div>
+				
+				      <div>
+				        <label for="employeeHealthEmployeeFilter"
+				          class="block text-xs text-muted mb-2">
+				          Employee
+				        </label>
+				        <select id="employeeHealthEmployeeFilter"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Employees</option>
+				        </select>
+				      </div>
+				
+				      <div>
+				        <label for="employeeHealthStatusFilter"
+				          class="block text-xs text-muted mb-2">
+				          Status
+				        </label>
+				        <select id="employeeHealthStatusFilter"
+				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				          <option value="">All Status</option>
+				          <option value="DRAFT">Draft</option>
+				          <option value="APPROVED">Approved</option>
+				          <option value="IN_PAYROLL">In Payroll</option>
+				          <option value="PAID">Paid</option>
+				          <option value="CANCELLED">Cancelled</option>
+				        </select>
+				      </div>
+				    </div>
+				  </div>
+				  <!-- SUMMARY -->
+				  <div class="grid grid-cols-2 md:grid-cols-4">
+				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Total Records
+				      </p>
+				      <p id="employeeHealthTotalCount" class="text-xl font-headline mt-1">0</p>
+				    </div>
+				
+				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Draft
+				      </p>
+				      <p id="employeeHealthDraftCount" class="text-xl font-headline mt-1">0</p>
+				    </div>
+				
+				    <div class="p-5 border-r border-outline-variant">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Paid
+				      </p>
+				      <p id="employeeHealthPaidCount" class="text-xl font-headline mt-1">0</p>
+				    </div>
+				
+				    <div class="p-5">
+				      <p class="text-[11px] text-muted uppercase tracking-wider">
+				        Outstanding Contributions
+				      </p>
+				      <p id="employeeHealthOutstandingAmount" class="text-xl font-headline mt-1">
+				        Rp 0
+				      </p>
+				    </div>
+				  </div>
+				  <!-- TABLE -->
+				  <div class="overflow-x-auto custom-scrollbar">
+				    <table class="w-full text-sm">
+				      <thead>
+				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Period</th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
+				          <th class="px-5 py-3 text-left whitespace-nowrap">Contribution Type</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Employee Amount</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Employer Amount</th>
+				          <th class="px-5 py-3 text-right whitespace-nowrap">Total</th>
+				          <th class="px-5 py-3 text-center">Status</th>
+				          <th class="px-5 py-3 text-center">Action</th>
+				        </tr>
+				      </thead>
+				
+				      <tbody id="employeeHealthTableBody"
+				        class="divide-y divide-outline-variant">
+				        <tr>
+				          <td colspan="9" class="px-5 py-10 text-center text-muted">
+				            No employee health data
+				          </td>
+				        </tr>
+				      </tbody>
+				    </table>
+				  </div>
+				  <!-- PAGINATION -->
+				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+				    <p id="employeeHealthTableInfo"
+				      class="text-xs text-on-surface-variant font-medium">
+				      Showing 0–0 of 0
+				    </p>
+				
+				    <div class="flex items-center gap-2">
+				      <button id="employeeHealthPrevButton" type="button" disabled
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">chevron_left</span>
+				      </button>
+				
+				      <button id="employeeHealthNextButton" type="button" disabled
+				        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed">
+				        <span class="material-symbols-outlined text-sm">chevron_right</span>
 				      </button>
 				    </div>
 				  </div>
