@@ -24862,15 +24862,26 @@
                 </p>
               </div>
             </div>
-
-            <button type="button"
-              onclick="calculatePayroll()"
-              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">
-                calculate
-              </span>
-              Calculate Payroll
-            </button>
+						
+						<div class="flex items-center gap-2">
+						  <button type="button"
+						    onclick="calculatePayroll()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      calculate
+						    </span>
+						    Calculate Payroll
+						  </button>
+						
+						  <button type="button"
+						    onclick="recordPayroll()"
+						    class="h-10 px-4 rounded-md bg-primary text-white text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      save
+						    </span>
+						    Record Payroll
+						  </button>
+						</div>
           </div>
 					<!-- PAYROLL FILTER -->
 					<div class="p-5 border-b border-outline-variant">
