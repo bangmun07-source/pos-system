@@ -36869,6 +36869,150 @@ window.recordPayroll = async function () {
   }
 };
 
+
+/* ==== CANCEL RECORD PAYROLL ==== */
+window.cancelRecordPayroll = async function () {
+  const period = document.getElementById('payrollPeriod')?.value;
+  const branchFilter = document.getElementById('payrollBranchFilter');
+  const employeeFilter = document.getElementById('payrollEmployeeFilter');
+
+  if (!period) {
+    alert('Pilih periode payroll terlebih dahulu.');
+    return;
+  }
+
+  const confirmed = confirm(
+    'Batalkan Record Payroll untuk filter yang dipilih?\n\n' +
+    'Payroll berstatus RECORDED akan dikembalikan ke CALCULATED. ' +
+    'Catatan Tax dan BPJS yang terkait juga akan dipulihkan atau dihapus sesuai RPC.'
+  );
+
+  if (!confirmed) return;
+
+  const role = String(state.user?.role || '').toUpperCase();
+  const isOwner = role === 'OWNER';
+  const isAccountant = role === 'ACCOUNTANT';
+
+  const branchId = (isOwner || isAccountant)
+    ? (branchFilter?.value || null)
+    : (state.user?.branchId || null);
+
+  const employeeId = employeeFilter?.value || null;
+
+  if (!isOwner && !isAccountant && !branchId) {
+    alert('Outlet pengguna tidak ditemukan.');
+    return;
+  }
+
+  const button = document.querySelector(
+    'button[onclick="cancelRecordPayroll()"]'
+  );
+
+  try {
+    if (button) {
+      button.disabled = true;
+      button.textContent = 'Cancelling...';
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      'cancel_record_employee_payroll',
+      {
+        p_session_id: localStorage.getItem('pos_session_id'),
+        p_payroll_period: `${period}-01`,
+        p_branch_id: branchId,
+        p_employee_id: employeeId
+      }
+    );
+
+    if (error) throw error;
+
+    if (!data?.success) {
+      throw new Error(
+        data?.message || 'Gagal membatalkan Record Payroll.'
+      );
+    }
+
+    await window.loadPayroll();
+
+    alert(
+      `${data.message || 'Cancel Record Payroll selesai.'}\n\n` +
+      `Payroll dikembalikan: ${data.processed ?? 0}\n` +
+      `Tax dipulihkan: ${data.tax_reset ?? 0}\n` +
+      `Catatan BPJS dihapus: ${data.bpjs_deleted ?? 0}`
+    );
+
+  } catch (error) {
+    console.error('cancelRecordPayroll:', error);
+    alert(error.message || 'Terjadi kesalahan saat Cancel Record Payroll.');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Cancel Record Payroll';
+    }
+  }
+};
+
+/* ==== CANCEL RECORD PAYROLL PER EMPLOYEE ==== */
+window.cancelRecordEmployeePayroll = async function (
+  payrollId,
+  payrollPeriod,
+  branchId,
+  employeeId
+) {
+  if (!payrollId || !payrollPeriod || !branchId || !employeeId) {
+    alert('Data payroll tidak lengkap.');
+    return;
+  }
+
+  const confirmed = confirm(
+    'Batalkan Record untuk payroll karyawan ini?\n\n' +
+    'Status akan dikembalikan dari RECORDED ke CALCULATED.'
+  );
+
+  if (!confirmed) return;
+
+  try {
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) {
+      throw new Error('Session tidak ditemukan. Silakan login kembali.');
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      'cancel_record_employee_payroll',
+      {
+        p_session_id: sessionId,
+        p_payroll_period: String(payrollPeriod).slice(0, 10),
+        p_branch_id: branchId,
+        p_employee_id: employeeId
+      }
+    );
+
+    if (error) throw error;
+
+    if (!data?.success) {
+      throw new Error(
+        data?.message || 'Gagal membatalkan Record Payroll.'
+      );
+    }
+
+    alert(
+      'Cancel Record berhasil.\n' +
+      'Payroll diproses: ' + (data.processed ?? 0) + '\n' +
+      'Tax dipulihkan: ' + (data.tax_reset ?? 0) + '\n' +
+      'Catatan BPJS dihapus: ' + (data.bpjs_deleted ?? 0)
+    );
+
+    // Muat ulang tabel payroll
+    await window.loadPayroll();
+
+  } catch (error) {
+    console.error('cancelRecordEmployeePayroll:', error);
+    alert(error.message || 'Terjadi kesalahan saat Cancel Record.');
+  }
+};
+
+
 /* ==== PAYROLL - LOAD DATA ==== */
 window.payrollRows = window.payrollRows || [];
 window.payrollCurrentPage = window.payrollCurrentPage || 1;
@@ -36965,7 +37109,6 @@ window.loadPayroll = async function () {
 		`;
 	}
 };
-
 
 
 window.populatePayrollEmployeeFilter = function () {
@@ -37159,11 +37302,25 @@ window.renderPayrollTable = function () {
 
 								<div class="border-t border-outline-variant"></div>
 				
+								${String(row.Status || '').toUpperCase() === 'RECORDED' ? `
+								  <button type="button"
+								    onclick="closePayrollActionMenus(); cancelRecordEmployeePayroll(
+								      '${escapeHtml(row.Payroll_ID)}',
+								      '${escapeHtml(row.Payroll_Period)}',
+								      '${escapeHtml(row.Branch_ID)}',
+								      '${escapeHtml(row.Employee_ID)}'
+								    )"
+								    class="w-full px-4 py-2.5 text-sm text-amber-700 hover:bg-outline-variant flex items-center gap-2">
+								    <span class="material-symbols-outlined text-base">undo</span>
+								    Cancel Record
+								  </button>
+								` : ''}
+								
 								<button type="button"
-									onclick="closePayrollActionMenus(); cancelEmployeePayroll('${escapeHtml(row.Payroll_ID)}')"
-									class="w-full px-4 py-2.5 text-sm text-red-700 hover:bg-red-600 items-center gap-2" >
-									<span class="material-symbols-outlined text-base">cancel</span>
-										Cancel Payroll
+								  onclick="closePayrollActionMenus(); cancelEmployeePayroll('${escapeHtml(row.Payroll_ID)}')"
+								  class="w-full px-4 py-2.5 text-sm text-red-700 hover:bg-outline-variant flex items-center gap-2">
+								  <span class="material-symbols-outlined text-base">cancel</span>
+								  Cancel Payroll
 								</button>
 							</div>
 						</div>
@@ -37277,7 +37434,6 @@ window.closePayrollActionMenus = function () {
 		menu.style.zIndex = '';
 	});
 };
-
 
 // Tutup Payroll Action Menu saat klik di luar menu
 document.addEventListener('click', function (event) {
