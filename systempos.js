@@ -38441,16 +38441,26 @@ window.editPayrollSalary = async function (payrollId) {
 							${calculationType}
 						</td>
 						<td class="px-4 py-3 text-right">
-							<input
-								type="number"
-								min="0"
-								step="0.01"
-								inputmode="decimal"
-								data-payroll-detail-id="${id}"
-								value="${Number(detail.Amount) || 0}"
-								aria-label="Nominal ${name}"
-								class="edit-payroll-component-amount w-full min-w-28 max-w-44 ml-auto rounded-md border border-outline-variant bg-background px-3 py-2 text-right text-sm text-foreground"
-							/>
+							<div class="flex items-center justify-end gap-2">
+								<input
+									type="number"
+									min="0"
+									step="0.01"
+									inputmode="decimal"
+									data-payroll-detail-id="${id}"
+									value="${Number(detail.Amount) || 0}"
+									aria-label="Nominal ${name}"
+									class="edit-payroll-component-amount w-full min-w-28 max-w-44 rounded-md border border-outline-variant bg-background px-3 py-2 text-right text-sm text-foreground"
+								/>
+				
+								<button
+									type="button"
+									onclick="markEditPayrollComponentDeleted('${id}')"
+									class="px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+									title="Hapus komponen">
+									<span class="material-symbols-outlined text-base">delete</span>
+								</button>
+							</div>
 						</td>
 					</tr>`;
 			}).join('');
@@ -38475,22 +38485,13 @@ window.editPayrollSalary = async function (payrollId) {
 /* ==== EDIT PAYROLL - ADD ONE-TIME COMPONENT ==== */
 window.addEditPayrollComponent = function (type) {
   const componentType = String(type || '').toUpperCase();
-  if (!['EARNING', 'DEDUCTION'].includes(componentType)) {
-    alert('Invalid payroll component type.');
-    return;
-  }
+  if (!['EARNING', 'DEDUCTION'].includes(componentType)) { alert('Invalid payroll component type.'); return; }
 
   const active = window.activeEditPayroll;
-  if (!active || !active.payroll) {
-    alert('Please open a payroll record first.');
-    return;
-  }
+  if (!active || !active.payroll) { alert('Please open a payroll record first.'); return; }
 
   const status = String(active.payroll.Status || '').toUpperCase();
-  if (['PAID', 'CANCELLED'].includes(status)) {
-    alert('Paid or cancelled payroll cannot be edited.');
-    return;
-  }
+  if (['PAID', 'CANCELLED'].includes(status)) { alert('Paid or cancelled payroll cannot be edited.'); return; }
 
   const tbody = document.getElementById(
     componentType === 'EARNING'
@@ -38498,10 +38499,7 @@ window.addEditPayrollComponent = function (type) {
       : 'editPayrollDeductionsBody'
   );
 
-  if (!tbody) {
-    console.error('Payroll component table was not found.');
-    return;
-  }
+  if (!tbody) { return; }
   // Hapus pesan tabel kosong jika masih ada.
   const emptyRow = tbody.querySelector('td[colspan]');
   if (emptyRow) { tbody.innerHTML = ''; }
@@ -38564,7 +38562,22 @@ window.addEditPayrollComponent = function (type) {
   }
 };
 
+window.markEditPayrollComponentDeleted = function (detailId) {
+  const active = window.activeEditPayroll;
+  if (!active) return;
 
+  const detail = active.details.find(item => String(item.Payroll_Detail_ID) === String(detailId) );
+  if (!detail) return;
+
+  // Tandai untuk dihapus saat tombol Save ditekan.
+  detail._deleted = true;
+
+  const input = document.querySelector( `#editPayrollSalaryModal [data-payroll-detail-id="${CSS.escape(String(detailId))}"]` );
+
+  const row = input?.closest('tr');
+  if (row) row.remove();
+  window.recalculateEditPayrollSalary();
+};
 
 /* ==== EDIT SALARY - RECALCULATE SUMMARY ==== */
 window.recalculateEditPayrollSalary = function () {
@@ -38609,8 +38622,8 @@ window.recalculateEditPayrollSalary = function () {
     });
   });
 
-  const earnings = active.details.filter(detail => String(detail.Component_Type || '').toUpperCase() === 'EARNING' );
-  const deductions = active.details.filter(detail => String(detail.Component_Type || '').toUpperCase() === 'DEDUCTION' );
+	const earnings = active.details.filter(detail => !detail._deleted && String(detail.Component_Type || '').toUpperCase() === 'EARNING' );
+	const deductions = active.details.filter(detail => !detail._deleted && String(detail.Component_Type || '').toUpperCase() === 'DEDUCTION' );
   const newEarnings = newComponents.filter(item => item.Component_Type === 'EARNING' );
   const newDeductions = newComponents.filter(item => item.Component_Type === 'DEDUCTION' );
   const grossSalary =
@@ -38637,8 +38650,6 @@ window.recalculateEditPayrollSalary = function () {
   active.newComponents = newComponents;
 };
 
-
-
 /* ==== EDIT SALARY - SAVE CHANGES ==== */
 window.saveEditPayrollSalary = async function () {
   const active = window.activeEditPayroll;
@@ -38650,7 +38661,6 @@ window.saveEditPayrollSalary = async function () {
 
   const status = String(active.payroll.Status || '').toUpperCase();
   if (['PAID', 'CANCELLED'].includes(status)) { alert('Payroll berstatus ' + status + ' tidak dapat diedit.'); return; }
-
   // Pastikan ringkasan dan nilai input terbaru sudah terbaca.
   window.recalculateEditPayrollSalary();
 
@@ -38672,39 +38682,34 @@ window.saveEditPayrollSalary = async function () {
 
   // Validasi komponen baru.
   for (const component of newComponents) {
-    if (!component.Component_Name) {
-      alert('Nama komponen tambahan wajib diisi.');
-      return;
-    }
-
-    if (
-      !['EARNING', 'DEDUCTION'].includes(component.Component_Type) ||
+    if (!component.Component_Name) { alert('Nama komponen tambahan wajib diisi.'); return; }
+    if ( !['EARNING', 'DEDUCTION'].includes(component.Component_Type) ||
       !Number.isFinite(component.Amount) ||
       component.Amount < 0
-    ) {
-      alert('Periksa kembali jenis dan nominal komponen tambahan.');
-      return;
-    }
+    ) { alert('Periksa kembali jenis dan nominal komponen tambahan.'); return; }
   }
 
-  const details = active.details.map(detail => ({
-    Payroll_Detail_ID: detail.Payroll_Detail_ID,
-    Amount: Number(detail.Amount)
-  }));
+	const details = active.details
+	  .filter(detail => !detail._deleted)
+	  .map(detail => ({
+	    Payroll_Detail_ID: detail.Payroll_Detail_ID,
+	    Amount: Number(detail.Amount)
+	  }));
+	const deletedDetails = active.details
+	  .filter(detail => detail._deleted)
+	  .map(detail => detail.Payroll_Detail_ID);
 
   if (details.some(item =>
     !Number.isFinite(item.Amount) || item.Amount < 0
-  )) {
-    alert('Periksa kembali nominal komponen payroll.');
-    return;
-  }
-  if (active.summary.Net_Salary < 0) {
-    alert('Total potongan tidak boleh melebihi gross salary.');
-    return;
-  }
+  )) { alert('Periksa kembali nominal komponen payroll.'); return; }
+  if (active.summary.Net_Salary < 0) { alert('Total potongan tidak boleh melebihi gross salary.'); return; }
 
   // RPC harus menerima Existing details dan New components.
-  const payload = { details, new_components: newComponents };
+  const payload = {
+	  details,
+	  deleted_details: deletedDetails,
+	  new_components: newComponents
+	};
 
   try {
     if (saveButton) {
@@ -38723,7 +38728,6 @@ window.saveEditPayrollSalary = async function () {
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan payroll.'); }
-
     // Perbarui data payroll di tabel setelah server berhasil menyimpan.
     const row = window.getPayrollRow(active.payroll.Payroll_ID);
 
