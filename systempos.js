@@ -32886,7 +32886,6 @@ async function initEmployeePage() {
 		window.populatePayrollEmployeeFilter?.();
     await loadSchedules();
     const attendanceOvertimeForm = document.getElementById('attendanceOvertimeForm');
-
     if (
       attendanceOvertimeForm &&
       !attendanceOvertimeForm.dataset.handlerAttached
@@ -32895,6 +32894,9 @@ async function initEmployeePage() {
       attendanceOvertimeForm.dataset.handlerAttached = 'true';
     }
 
+		if (document.getElementById('reimbursementTableBody')) {
+      await initEmployeeReimbursement();
+    }
     await loadEmployeeAttendance();
     const attendanceBranchFilter = document.getElementById('attendanceBranchFilter');
     if (
@@ -32912,9 +32914,6 @@ async function initEmployeePage() {
 		if (document.getElementById('payrollTableBody')) {
 		    await loadPayroll();
 		}
-		if (document.getElementById('reimbursementTableBody')) {
-      await initEmployeeReimbursement();
-    }
   } catch (error) {
 		console.error('initEmployeePage:', error);
 	}
@@ -38878,10 +38877,6 @@ window.getReimbursementBranchName = function (branchId) {
   const id = String(branchId || '').trim();
   if (!id) return '-';
 
-  /*
-   * Gunakan nama outlet jika tersedia dari data cabang
-   * yang sudah dimuat oleh halaman Employee.
-   */
   const possibleLists = [
     window.employeeBranchData,
     window.branchData,
@@ -38892,22 +38887,24 @@ window.getReimbursementBranchName = function (branchId) {
     if (!Array.isArray(list)) continue;
 
     const branch = list.find(item =>
-      String(
-        item.Branch_ID ||
-        item.branch_id ||
-        item.id ||
-        ''
-      ).trim() === id
+			String(
+			  item.Branch_ID ||
+			  item.branch_id ||
+			  item.branchId ||
+			  item.id ||
+			  ''
+			).trim() === id
     );
 
     if (branch) {
-      return String(
-        branch.Branch_Name ||
-        branch.Branch_Name ||
-        branch.branch_name ||
-        branch.name ||
-        id
-      );
+			return String(
+			  branch.Branch_Name ||
+			  branch.branch_name ||
+			  branch.branchName ||
+			  branch.name ||
+			  branch.nama ||
+			  id
+			);
     }
   }
   return id;
@@ -39410,40 +39407,25 @@ window.changeReimbursementPage = function (direction) {
   window.renderReimbursementTable();
 };
 
-
-/* ==== CREATE MODAL
-   Modal dibuat dari JS karena HTML yang dikirim
-   belum berisi modal Add/Edit/Detail. ==== */
 /* ==== REIMBURSEMENT - ACTION MENU DI LUAR TABEL ==== */
-
 window.toggleReimbursementActionMenu = function (reimbursementId, button) {
-  const menu = document.getElementById(
-    `reimbursementActionMenu_${reimbursementId}`
-  );
-
+  const menu = document.getElementById( `reimbursementActionMenu_${reimbursementId}` );
   if (!menu || !button) return;
 
   const isHidden = menu.classList.contains('hidden');
-
   // Tutup menu lain terlebih dahulu.
   window.closeReimbursementActionMenus();
 
   if (!isHidden) return;
-
   // Simpan posisi asli menu di dalam tabel.
   if (!menu._reimbursementPlaceholder) {
-    const placeholder = document.createComment(
-      'reimbursement-action-menu-placeholder'
-    );
-
+    const placeholder = document.createComment( 'reimbursement-action-menu-placeholder' );
     menu.parentNode.insertBefore(placeholder, menu);
     menu._reimbursementPlaceholder = placeholder;
   }
-
   // Pindahkan popup ke BODY agar tidak terpotong tabel.
   document.body.appendChild(menu);
   menu.classList.remove('hidden');
-
   // Gunakan fixed agar posisi relatif terhadap layar.
   menu.style.position = 'fixed';
   menu.style.left = '0px';
@@ -39452,13 +39434,11 @@ window.toggleReimbursementActionMenu = function (reimbursementId, button) {
   menu.style.bottom = 'auto';
   menu.style.margin = '0';
   menu.style.zIndex = '9999';
-
   // Hitung posisi tombol.
   const rect = button.getBoundingClientRect();
   const menuHeight = menu.offsetHeight;
   const menuWidth = menu.offsetWidth;
   const gap = 4;
-
   const spaceBelow = window.innerHeight - rect.bottom;
   const spaceAbove = rect.top;
 
@@ -39474,39 +39454,28 @@ window.toggleReimbursementActionMenu = function (reimbursementId, button) {
   }
 
   // Jaga popup tetap di dalam area layar.
-  top = Math.max(
-    8,
-    Math.min(top, window.innerHeight - menuHeight - 8)
-  );
+  top = Math.max( 8, Math.min(top, window.innerHeight - menuHeight - 8) );
 
   let left = rect.right - menuWidth;
-
-  left = Math.max(
-    8,
-    Math.min(left, window.innerWidth - menuWidth - 8)
-  );
+  left = Math.max( 8, Math.min(left, window.innerWidth - menuWidth - 8) );
 
   menu.style.top = `${top}px`;
   menu.style.left = `${left}px`;
 };
-
 
 window.closeReimbursementActionMenus = function () {
   document
     .querySelectorAll('[id^="reimbursementActionMenu_"]')
     .forEach(menu => {
       menu.classList.add('hidden');
-
       // Kembalikan menu ke tempat asalnya di tabel.
       const placeholder = menu._reimbursementPlaceholder;
-
       if (placeholder && placeholder.parentNode) {
         placeholder.parentNode.insertBefore(menu, placeholder);
         placeholder.remove();
       }
 
       delete menu._reimbursementPlaceholder;
-
       // Bersihkan posisi popup.
       menu.style.position = '';
       menu.style.left = '';
@@ -39518,17 +39487,10 @@ window.closeReimbursementActionMenus = function () {
     });
 };
 
-
 // Tutup Reimbursement Action Menu saat klik di luar menu.
 document.addEventListener('click', function (event) {
-  const clickedMenu = event.target.closest(
-    '[id^="reimbursementActionMenu_"]'
-  );
-
-  const clickedToggle = event.target.closest(
-    'button[onclick*="toggleReimbursementActionMenu"]'
-  );
-
+  const clickedMenu = event.target.closest( '[id^="reimbursementActionMenu_"]' );
+  const clickedToggle = event.target.closest( 'button[onclick*="toggleReimbursementActionMenu"]' );
   // Biarkan handler tombol/menu yang sudah ada bekerja.
   if (clickedMenu || clickedToggle) return;
 
