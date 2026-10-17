@@ -34040,11 +34040,16 @@ window.openEmployeeSalarySetting = async function (employeeId) {
   const overtimeRate = document.getElementById('employeeOvertimeRate');
   const effectiveFrom = document.getElementById('salaryEffectiveFrom');
   const note = document.getElementById('salaryNote');
+	const pph21Enabled = document.getElementById('employeePPh21Enabled');
+	const pph21PTKP = document.getElementById('employeePPh21PTKP');
 
   if (basicSalary) basicSalary.value = '';
   if (overtimeRate) overtimeRate.value = '0';
   if (effectiveFrom) effectiveFrom.value = '';
   if (note) note.value = '';
+	if (pph21Enabled) pph21Enabled.checked = true;
+	if (pph21PTKP) pph21PTKP.value = employee.PTKP_Status || 'TK/0';
+	
 
   renderSalaryComponents([]);
 
@@ -34080,6 +34085,20 @@ window.openEmployeeSalarySetting = async function (employeeId) {
     if (effectiveFrom) effectiveFrom.value = salary.Effective_From || '';
     if (note) note.value = salary.Note || '';
 		
+		const { data: taxSettings, error: taxError } =
+		  await supabaseClient.rpc('get_employee_pph21_settings', {
+		    p_session_id: sessionId,
+		    p_employee_id: employeeId
+		  });
+		
+		if (taxError) throw taxError;
+		
+		const enabledInput = document.getElementById('employeePPh21Enabled');
+		const ptkpInput = document.getElementById('employeePPh21PTKP');
+		
+		if (enabledInput) { enabledInput.checked = taxSettings?.Is_Enabled ?? true; }
+		if (ptkpInput) { ptkpInput.value = taxSettings?.PTKP_Status || 'TK/0'; }
+
     renderSalaryComponents(components);
 
   } catch (error) {
@@ -34498,13 +34517,27 @@ window.saveEmployeeSalary = async function () {
         p_overtime_rate: overtimeRate,
         p_effective_from: effectiveFrom,
         p_note: note,
-        p_components: components
+				p_components: components,
+				p_pph21_enabled: document.getElementById('employeePPh21Enabled')?.checked ?? true,
+				p_ptkp_status: document.getElementById('employeePPh21PTKP')?.value || 'TK/0'
       }
     );
 
     if (error) throw error;
 		if (!data) { throw new Error('Gagal menyimpan salary employee.'); }
-
+		
+		const { data: taxData, error: taxError } =
+		  await supabaseClient.rpc('save_employee_pph21_settings', {
+		    p_session_id: sessionId,
+		    p_employee_id: employeeId,
+		    p_is_enabled: document.getElementById('employeePPh21Enabled')?.checked ?? true,
+		    p_ptkp_status: document.getElementById('employeePPh21PTKP')?.value || 'TK/0'
+		  });
+		
+		if (taxError) throw taxError;
+		if (!taxData?.success) {
+		  throw new Error('Gagal menyimpan pengaturan PPh 21.');
+		}
     closeSalaryModal();
     alert('Salary employee berhasil disimpan.');
   } catch (error) {
