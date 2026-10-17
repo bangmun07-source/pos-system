@@ -1,7 +1,6 @@
-
-/**
-   * 1. GLOBAL STATE
-*/
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
 
 let state = {
   user: null,
@@ -26585,9 +26584,10 @@ async function initAccountingDebtPage() {
 	await initOtherLiability();
 	await loadLiabilities();
 	await loadTaxPayable();
+	if (document.getElementById("employeeHealthTableBody")) {
+    await initEmployeeHealthSection(); }
 	if (document.getElementById("employeeTaxTableBody")) {
-    await initEmployeeTaxSection();
-	}
+    await initEmployeeTaxSection(); }
 	await loadPpnPayments();
 	
 }
@@ -27665,7 +27665,9 @@ async function saveTaxPayment() {
   }
 }
 
-/* ==== EMPLOYEE TAX PAYABLE ==== */
+/* =============================
+			EMPLOYEE TAX PAYABLE 
+============================= */
 let employeeTaxData = [];
 let employeeTaxCurrentPage = 1;
 const employeeTaxPageSize = 10;
@@ -28013,6 +28015,401 @@ function changeEmployeeTaxPage(direction) {
 	);
 	renderEmployeeTaxTable();
 }
+
+/* ==== EMPLOYEE HEALTH PAYABLE ==== */
+let employeeHealthData = [];
+let employeeHealthCurrentPage = 1;
+const employeeHealthPageSize = 10;
+
+
+/* ==== INITIALIZE ==== */
+async function initEmployeeHealthSection() {
+	const periodEl = document.getElementById( "employeeHealthPeriodFilter" );
+	const branchEl = document.getElementById( "employeeHealthBranchFilter" );
+	const employeeEl = document.getElementById( "employeeHealthEmployeeFilter" );
+	const statusEl = document.getElementById( "employeeHealthStatusFilter" );
+
+	// Default periode: bulan sekarang.
+	if (periodEl && !periodEl.value) {
+		const now = new Date();
+		periodEl.value = `${now.getFullYear()}-${String( now.getMonth() + 1 ).padStart(2, "0")}`;
+	}
+
+	populateEmployeeHealthBranchFilter();
+
+	if (branchEl) {
+		branchEl.onchange = async () => {
+			employeeHealthCurrentPage = 1;
+			await loadEmployeeHealthEmployees();
+			await loadEmployeeHealthRecords();
+		};
+	}
+	if (periodEl) {
+		periodEl.onchange = () => {
+			employeeHealthCurrentPage = 1;
+			loadEmployeeHealthRecords();
+		};
+	}
+	if (employeeEl) {
+		employeeEl.onchange = () => {
+			employeeHealthCurrentPage = 1;
+			loadEmployeeHealthRecords();
+		};
+	}
+	if (statusEl) {
+		statusEl.onchange = () => {
+			employeeHealthCurrentPage = 1;
+			loadEmployeeHealthRecords();
+		};
+	}
+
+	const prevButton = document.getElementById( "employeeHealthPrevButton" );
+	const nextButton = document.getElementById( "employeeHealthNextButton" );
+	if (prevButton) { prevButton.onclick = () => changeEmployeeHealthPage(-1); }
+	if (nextButton) { nextButton.onclick = () => changeEmployeeHealthPage(1); }
+
+	await loadEmployeeHealthEmployees();
+	await loadEmployeeHealthRecords();
+}
+
+/* ==== BRANCH FILTER ==== */
+function populateEmployeeHealthBranchFilter() {
+	const select = document.getElementById( "employeeHealthBranchFilter" );
+	if (!select) return;
+
+	const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+	const canViewAllBranches = ["owner", "accountant"].includes(role);
+	const userBranchId = String(
+		state.user?.branchId ||
+		state.user?.Branch_ID ||
+		"" ).trim();
+	const branches = Array.isArray(accountingDebtBranches)
+		? accountingDebtBranches
+		: [];
+
+	select.innerHTML = "";
+	if (canViewAllBranches) { select.add(new Option("All Branches", "ALL")); }
+
+	let foundUserBranch = false;
+	branches.forEach(branch => {
+		const branchId = String(branch.id || "").trim();
+		if (!branchId) return;
+		if (
+			!canViewAllBranches &&
+			branchId !== userBranchId
+		) { return; }
+		const option = new Option( branch.name || branch.id || "Unnamed Branch", branchId );
+		select.add(option);
+		if (branchId === userBranchId) { foundUserBranch = true; }
+});
+
+	// Tetap tampilkan outlet user jika tidak ditemukan di daftar.
+	if (!canViewAllBranches && userBranchId && !foundUserBranch) {
+		select.add( new Option(`Outlet: ${userBranchId}`, userBranchId) );
+	}
+	if (canViewAllBranches) {
+		select.value = "ALL";
+		select.disabled = false;
+	} else {
+		select.value = userBranchId;
+		select.disabled = true;
+	}
+}
+
+function getEmployeeHealthBranchId() {
+	const branchId = String( document.getElementById( "employeeHealthBranchFilter" )?.value || "" ).trim();
+	return !branchId || branchId === "ALL"
+		? null
+		: branchId;
+}
+
+/* ==== LOAD EMPLOYEE FILTER ==== */
+async function loadEmployeeHealthEmployees() {
+	const select = document.getElementById( "employeeHealthEmployeeFilter" );
+	if (!select) return;
+
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { select.innerHTML = '<option value="">All Employees</option>'; return; }
+
+	const previousEmployeeId = select.value;
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			"get_employees",
+			{
+				p_session_id: sessionId,
+				p_branch_id: getEmployeeHealthBranchId(),
+				p_status: null,
+				p_search: null
+			}
+		);
+
+		if (error) throw error;
+
+		const employees = Array.isArray(data)
+			? data
+			: typeof data === "string"
+				? JSON.parse(data)
+				: [];
+		const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+		const canViewAllBranches = ["owner", "accountant"].includes(role);
+		const userBranchId = String(
+			state.user?.branchId ||
+			state.user?.Branch_ID ||
+			"" ).trim();
+		const selectedBranchId = getEmployeeHealthBranchId();
+		const visibleEmployees = employees.filter(employee => {
+			const employeeBranchId = String( employee.Branch_ID || "" ).trim();
+			
+			if (
+					!canViewAllBranches &&
+					employeeBranchId !== userBranchId
+			) { return false; }
+			if (
+				selectedBranchId &&
+				employeeBranchId !== selectedBranchId
+			) { return false; }
+			return true;
+		});
+
+		select.innerHTML = '<option value="">All Employees</option>';
+		visibleEmployees.forEach(employee => {
+			const option = new Option(
+				[
+					employee.Full_Name || "Unnamed Employee",
+					employee.Employee_Code
+				].filter(Boolean).join(" · "),
+				employee.Employee_ID || ""
+			);
+			select.add(option);
+		});
+		select.value = visibleEmployees.some( employee => String(employee.Employee_ID) === previousEmployeeId )
+			? previousEmployeeId
+			: "";
+		
+	} catch (error) {
+		console.error("loadEmployeeHealthEmployees:", error);
+		select.innerHTML = '<option value="">All Employees</option>';
+	}
+}
+
+/* ==== LOAD HEALTH CONTRIBUTIONS ==== */
+async function loadEmployeeHealthRecords() {
+	const tbody = document.getElementById( "employeeHealthTableBody" );
+	if (!tbody) return;
+
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { employeeHealthData = []; renderEmployeeHealthTable("Session tidak ditemukan."); return; }
+
+	const periodValue = document.getElementById( "employeeHealthPeriodFilter" )?.value || "";
+	const employeeId = document.getElementById( "employeeHealthEmployeeFilter" )?.value || null;
+	const status = document.getElementById( "employeeHealthStatusFilter" )?.value || null;
+
+	let periodFrom = null;
+	let periodTo = null;
+
+	// Filter month menjadi rentang tanggal satu bulan.
+	if (/^\d{4}-\d{2}$/.test(periodValue)) {
+		const [year, month] = periodValue
+			.split("-")
+			.map(Number);
+		const lastDay = new Date(year, month, 0).getDate();
+
+		periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
+		periodTo = `${year}-${String(month).padStart(2, "0")}-${String( lastDay ).padStart(2, "0")}`;
+	}
+
+	tbody.innerHTML = `
+		<tr>
+			<td colspan="9"
+				class="px-5 py-10 text-center text-muted">
+					Loading employee health data...
+			</td>
+		</tr>
+	`;
+
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			"get_employee_health_contributions",
+			{
+				p_session_id: sessionId,
+				p_branch_id: getEmployeeHealthBranchId(),
+				p_period_from: periodFrom,
+				p_period_to: periodTo,
+				p_employee_id: employeeId,
+				p_status: status
+			}
+		);
+
+		if (error) throw error;
+
+		const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
+		if (result?.success === false) { throw new Error( result.message || "Gagal memuat data iuran kesehatan." ); }
+
+		employeeHealthData = Array.isArray(result)
+			? result
+			: Array.isArray(result?.data)
+				? result.data
+				: [];
+
+		employeeHealthCurrentPage = 1;
+		renderEmployeeHealthTable();
+
+	} catch (error) {
+		console.error("loadEmployeeHealthRecords:", error);
+		employeeHealthData = [];
+		renderEmployeeHealthTable( error?.message || "Gagal memuat data iuran kesehatan." );
+	}
+}
+
+/* ==== RENDER TABLE ==== */
+function renderEmployeeHealthTable(errorMessage = "") {
+	const tbody = document.getElementById( "employeeHealthTableBody" );
+	if (!tbody) return;
+
+	const data = Array.isArray(employeeHealthData)
+		? employeeHealthData
+		: [];
+	const totalRecords = data.length;
+	const totalPages = Math.max( 1, Math.ceil(totalRecords / employeeHealthPageSize) );
+	employeeHealthCurrentPage = Math.max( 1, Math.min(employeeHealthCurrentPage, totalPages) );
+	const startIndex = (employeeHealthCurrentPage - 1) * employeeHealthPageSize;
+	const endIndex = Math.min( startIndex + employeeHealthPageSize, totalRecords );
+	const pageData = data.slice(startIndex, endIndex);
+
+	if (!pageData.length) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="9"
+					class="px-5 py-10 text-center text-muted">
+					${escapeHtml( errorMessage || "No employee health data" )}
+				</td>
+			</tr>
+		`;
+	} else {
+		tbody.innerHTML = pageData.map(row => {
+			const status = String( row.status || "DRAFT" ).trim().toUpperCase();
+			const employeeAmount = Number(row.employee_amount) || 0;
+			const employerAmount = Number(row.employer_amount) || 0;
+			const totalAmount = employeeAmount + employerAmount;
+			const branchId = String( row.branch_id || "" ).trim();
+			const branchName = accountingDebtBranches.find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+			const employeeName = row.employee_name || "-";
+			const employeeCode = row.employee_code
+				? ` (${row.employee_code})`
+				: "";
+			const period = row.contribution_period
+				? new Date( `${String(row.contribution_period).slice(0, 10)}T00:00:00` ).toLocaleDateString("id-ID", {
+					month: "short",
+					year: "numeric"
+				}) : "-";
+			const contributionType = String( row.contribution_type || "" ).trim().toUpperCase();
+			let contributionLabel = contributionType || "-";
+
+			if (
+				contributionType === "EMPLOYEE_HEALTH_CONTRIBUTION"
+			) {
+				contributionLabel = "Employee Contribution";
+			} else if (
+				contributionType === "EMPLOYER_HEALTH_CONTRIBUTION"
+			) {
+				contributionLabel = "Employer Contribution";
+			}
+					
+			const note = String(row.note || "").trim();
+			if (note) { contributionLabel += ` · ${note}`; }
+
+			const statusClass = {
+				DRAFT: "bg-surface-container-high text-muted",
+				APPROVED: "bg-blue-600/10 text-blue-700",
+				IN_PAYROLL: "bg-yellow-600/10 text-yellow-700",
+				PAID: "bg-green-600/10 text-green-700",
+				CANCELLED: "bg-red-600/10 text-red-700"
+			}[status] || "bg-surface-container-high text-muted";
+
+				return `
+					<tr class="hover:bg-outline-variant transition">
+						<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
+						<td class="px-5 py-4">
+							<div class="font-medium text-foreground"> ${escapeHtml(employeeName)} </div>
+							<div class="text-xs text-muted"> ${escapeHtml(employeeCode)} </div>
+						</td>
+						<td class="px-5 py-4"> ${escapeHtml(branchName)} </td>
+						<td class="px-5 py-4"> ${escapeHtml(contributionLabel)} </td>
+						<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(employeeAmount)} </td>
+						<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(employerAmount)} </td>
+						<td class="px-5 py-4 text-right font-medium whitespace-nowrap"> ${formatAccountingCurrency(totalAmount)} </td>
+						<td class="px-5 py-4 text-center">
+							<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+								${escapeHtml(status)}
+							</span>
+						</td>
+						<td class="px-5 py-4 text-center">—</td>
+					</tr>
+				`;
+			}).join("");
+    }
+	updateEmployeeHealthSummary(data);
+	updateEmployeeHealthPagination( totalRecords, startIndex, endIndex );
+}
+
+/* ==== SUMMARY ==== */
+function updateEmployeeHealthSummary(data) {
+	const rows = Array.isArray(data) ? data : [];
+	const totalCount = rows.length;
+	const draftCount = rows.filter( row => String(row.status || "").toUpperCase() === "DRAFT" ).length;
+	const paidCount = rows.filter( row => String(row.status || "").toUpperCase() === "PAID" ).length;
+	const outstanding = rows.reduce((sum, row) => {
+		const status = String( row.status || "" ).toUpperCase();
+		if (["PAID", "CANCELLED"].includes(status)) { return sum; }
+
+		return sum
+			+ (Number(row.employee_amount) || 0)
+			+ (Number(row.employer_amount) || 0);
+	}, 0);
+	const totalEl = document.getElementById( "employeeHealthTotalCount" );
+	const draftEl = document.getElementById( "employeeHealthDraftCount" );
+	const paidEl = document.getElementById( "employeeHealthPaidCount" );
+	const outstandingEl = document.getElementById( "employeeHealthOutstandingAmount" );
+
+	if (totalEl) totalEl.textContent = totalCount;
+	if (draftEl) draftEl.textContent = draftCount;
+	if (paidEl) paidEl.textContent = paidCount;
+	if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+}
+
+/* ==== PAGINATION ==== */
+function updateEmployeeHealthPagination(total, start, end) {
+	const info = document.getElementById( "employeeHealthTableInfo" );
+	const prev = document.getElementById( "employeeHealthPrevButton" );
+	const next = document.getElementById( "employeeHealthNextButton" );
+	const totalPages = Math.max( 1, Math.ceil(total / employeeHealthPageSize) );
+
+	if (info) { info.textContent = total === 0
+		? "Showing 0–0 of 0"
+		: `Showing ${start + 1}–${end} of ${total}`;
+	}
+	if (prev) { prev.disabled = employeeHealthCurrentPage <= 1; }
+	if (next) { next.disabled = employeeHealthCurrentPage >= totalPages; }
+}
+
+function changeEmployeeHealthPage(direction) {
+	const totalPages = Math.max( 1,
+		Math.ceil(
+			employeeHealthData.length / employeeHealthPageSize
+		)
+	);
+
+	employeeHealthCurrentPage = Math.max( 1,
+		Math.min(
+			employeeHealthCurrentPage + direction,
+			totalPages
+		)
+	);
+	renderEmployeeHealthTable();
+}
+
 
 /* === OTHER LIABILITY === */
 let liabilityData = [];
