@@ -27964,27 +27964,25 @@ function renderEmployeeTaxTable(errorMessage = "") {
 
 /* ==== UPDATE SUMMARY ==== */
 function updateEmployeeTaxSummary(data) {
-	const rows = Array.isArray(data) ? data : [];
-	const totalCount = rows.length;
-	const draftCount = rows.filter( row => String(row.status || "").toUpperCase() === "DRAFT" ).length;
-	const paidCount = rows.filter( row => String(row.status || "").toUpperCase() === "PAID" ).length;
-	const outstanding = rows.reduce((sum, row) => {
-		const status = String( row.status || "" ).toUpperCase();
+  const rows = Array.isArray(data) ? data : [];
+  const totalCount = rows.length;
+  const paidCount = rows.filter( row => String(row.status || "").toUpperCase() === "PAID" ).length;
+  const outstanding = rows.reduce((sum, row) => {
+    const status = String(row.status || "").toUpperCase();
+    if (["PAID", "CANCELLED"].includes(status)) { return sum; }
+		
+    return sum + (Number(row.tax_amount) || 0);
+  }, 0);
 
-		if (["PAID", "CANCELLED"].includes(status)) { return sum; }
-		return sum + (Number(row.tax_amount) || 0);
-	}, 0);
+  const totalEl = document.getElementById("employeeTaxTotalCount");
+  const paidEl = document.getElementById("employeeTaxPaidCount");
+  const outstandingEl = document.getElementById("employeeTaxOutstandingAmount");
 
-	const totalEl = document.getElementById("employeeTaxTotalCount");
-	const draftEl = document.getElementById("employeeTaxDraftCount");
-	const paidEl = document.getElementById("employeeTaxPaidCount");
-	const outstandingEl = document.getElementById("employeeTaxOutstandingAmount");
-
-	if (totalEl) totalEl.textContent = totalCount;
-	if (draftEl) draftEl.textContent = draftCount;
-	if (paidEl) paidEl.textContent = paidCount;
-	if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+  if (totalEl) totalEl.textContent = totalCount;
+  if (paidEl) paidEl.textContent = paidCount;
+  if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
 }
+
 
 /* ==== PAGINATION ==== */
 function updateEmployeeTaxPagination(total, start, end) {
