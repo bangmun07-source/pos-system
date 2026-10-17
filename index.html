@@ -19745,6 +19745,13 @@
 				        </p>
 				      </div>
 				    </div>
+					  
+					<button type="button"
+					  onclick="exportEmployeeTaxData()"
+					  class="h-10 px-4 rounded-md bottom-theme text-sm font-medium inline-flex items-center justify-center gap-2 whitespace-nowrap">
+					  <span class="material-symbols-outlined text-lg">download</span>
+					  Export
+					</button>
 				  </div>
 				  <!-- FILTER -->
 				  <div class="p-5 border-b border-outline-variant">
@@ -19789,7 +19796,6 @@
 				        <select id="employeeTaxStatusFilter"
 				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
 				          <option value="">All Status</option>
-				          <option value="DRAFT">Draft</option>
 				          <option value="CALCULATED">Calculated</option>
 				          <option value="IN_PAYROLL">In Payroll</option>
 				          <option value="PAID">Paid</option>
@@ -19799,19 +19805,12 @@
 				    </div>
 				  </div>
 				  <!-- SUMMARY -->
-				  <div class="grid grid-cols-2 md:grid-cols-4">
+				  <div class="grid grid-cols-3 md:grid-cols-3">
 				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
 				      <p class="text-[11px] text-muted uppercase tracking-wider">
 				        Total Records
 				      </p>
 				      <p id="employeeTaxTotalCount" class="text-xl font-headline mt-1">0</p>
-				    </div>
-				
-				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
-				      <p class="text-[11px] text-muted uppercase tracking-wider">
-				        Draft
-				      </p>
-				      <p id="employeeTaxDraftCount" class="text-xl font-headline mt-1">0</p>
 				    </div>
 				
 				    <div class="p-5 border-r border-outline-variant">
@@ -19950,7 +19949,6 @@
 				        <select id="employeeHealthStatusFilter"
 				          class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
 				          <option value="">All Status</option>
-				          <option value="DRAFT">Draft</option>
 				          <option value="APPROVED">Approved</option>
 				          <option value="IN_PAYROLL">In Payroll</option>
 				          <option value="PAID">Paid</option>
