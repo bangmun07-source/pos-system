@@ -643,120 +643,39 @@ function navigate(pageId, params = {}) {
   }, 50);
 }
 	
+
 async function handleLogin() {
   const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const password = document.getElementById("password").value;
 
   try {
+    // LOGIN ONLINE MELALUI API
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        tenantSlug: state.tenantSlug || "master",
+        username,
+        password
+      })
+    });
+
     let result;
+
     try {
-      const response =
-        await fetch("/api/auth/login", {
-          method: "POST",
+      result = await response.json();
+    } catch { throw new Error("Respons server tidak valid."); }
 
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            tenantSlug: state.tenantSlug || "master",
-            username,
-            password
-          })
-        });
-
-		result = await response.json();
-		if (!response.ok) {
-		  const error = new Error(
-			result.error ||
-			"Login gagal"
-		  );
-		  error.status = response.status;
-		  throw error;
-		}
-
-    } catch (networkError) {
-			
-		if (networkError.status) {
-		  throw networkError;
-		}
-			
-      // MASTER TIDAK BOLEH OFFLINE FALLBACK
-    	if (
-        !state.tenantSlug ||
-        state.tenantSlug === "master"
-      ) {
-        throw networkError;
-      }
-
-      // CUSTOMER OFFLINE
-      if (!supabaseClient) {
-        throw new Error(
-          "Tenant offline tidak tersedia."
-        );
-      }
-
-      const {
-        data: dbUser,
-        error: dbError
-      } =
-        await supabaseClient
-          .from("Users")
-          .select(
-            "ID_User, Username, Password, Role, branchId"
-          )
-          .eq(
-            "Username", 
-			  username
-          )
-          .maybeSingle();
-
-      if (
-        dbError ||
-        !dbUser
-      ) {
-        throw new Error(
-          "Login offline gagal: Username tidak ditemukan."
-        );
-      }
-
-      if (
-        dbUser.Password !== password
-      ) {
-        throw new Error(
-          "Login offline gagal: Password salah."
-        );
-      }
-
-      result = {
-        success: true,
-        session_id:
-          "offline_session_" +
-          Date.now(),
-        user: {
-          ID_User: dbUser.ID_User,
-          Username: dbUser.Username,
-          Role: dbUser.Role,
-          branchId: dbUser.branchId
-        }
-      };
-    }
-
-    // VALIDASI
-    if (
-      !result ||
-      !result.success
-    ) {
-      alert(
-        "Username atau password salah"
-      );
-      return;
-    }
+    if (!response.ok) { throw new Error(result.error || "Login gagal."); }
+    // VALIDASI HASIL LOGIN
+    if (!result || !result.success || !result.user) { throw new Error("Username atau password salah."); }
+    if (!result.session_id) { throw new Error("Session login tidak dibuat."); }
 
     // USER
     const user = {
       ...result.user,
-
       id: result.user.id || result.user.ID_User,
       username: result.user.username || result.user.Username,
       role: result.user.role || result.user.Role,
@@ -764,35 +683,51 @@ async function handleLogin() {
     };
     state.user = user;
     state.branchId = user.branchId || "";
-    localStorage.setItem("pos_user", JSON.stringify(user));
+    localStorage.setItem( "pos_user", JSON.stringify(user) );
+    localStorage.setItem( "pos_session_id", result.session_id );
 
-    // SESSION
-    if (!result.session_id) {
-      throw new Error(
-        "Session login tidak dibuat."
-      );
+    if (state.branchId) { localStorage.setItem( "pos_branchId", state.branchId );
+    } else { localStorage.removeItem("pos_branchId"); }
+
+    localStorage.setItem( "pos_login_tenant", state.tenantSlug || "master" );
+
+    // ==========================================
+    // NAVIGASI BERDASARKAN ROLE
+    // ==========================================
+    const loginRole = String(user.role || "")
+      .trim()
+      .toLowerCase();
+
+    if (loginRole === "attendance") {
+      navigate("attendancePage");
+    } else if (loginRole === "accountant") {
+      navigate("settingsPage");
+    } else {
+      navigate("dashboardPage");
     }
 
-    localStorage.setItem("pos_session_id", result.session_id);
-    if (state.branchId) {localStorage.setItem("pos_branchId", state.branchId);}
-    localStorage.setItem("pos_login_tenant", state.tenantSlug || "master");
-    
-	const loginRole = String(user.role || "").trim().toLowerCase();
-	
-	if (loginRole === "attendance") {
-	  navigate("attendancePage");
-	} else if (loginRole === "accountant") {
-	  navigate("settingsPage");
-	} else {
-	  navigate("dashboardPage");
-	}
   } catch (err) {
-    alert(
-      err.message ||
-      "Login gagal"
-    );
+    console.error("handleLogin:", err);
+
+    if (
+      err instanceof TypeError &&
+      !navigator.onLine
+    ) {
+      alert(
+        "Tidak ada koneksi internet. Login offline belum tersedia."
+      );
+    } else if (
+      err instanceof TypeError
+    ) {
+      alert(
+        "Tidak dapat terhubung ke server. Periksa koneksi dan coba lagi."
+      );
+    } else {
+      alert(err.message || "Login gagal.");
+    }
   }
 }
+
 	
 function logout() {
   localStorage.removeItem("pos_user");
