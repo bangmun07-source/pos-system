@@ -33220,7 +33220,6 @@ window.openEmployeeModal = function () {
   document.getElementById('employeeEmail').value = '';
 	document.getElementById('employeeNIK').value = '';
 	document.getElementById('employeeNPWP').value = '';
-	document.getElementById('employeePTKPStatus').value = 'TK/0';
   document.getElementById('employeePosition').value = '';
   document.getElementById('employeeDepartment').value = '';
   document.getElementById('employeeGender').value = '';
@@ -33279,7 +33278,6 @@ window.saveEmployee = async function () {
   const email = document.getElementById('employeeEmail').value.trim();
 	const nik = document.getElementById('employeeNIK').value.trim();
 	const npwp = document.getElementById('employeeNPWP').value.trim();
-	const ptkpStatus = document.getElementById('employeePTKPStatus').value;
   const position = document.getElementById('employeePosition').value.trim();
   const department = document.getElementById('employeeDepartment').value.trim();
   const gender = document.getElementById('employeeGender').value;
@@ -33333,8 +33331,7 @@ window.saveEmployee = async function () {
           p_photo_url: photoUrl,
 					p_notes: notes || null,
 					p_nik: nik || null,
-					p_npwp: npwp || null,
-					p_ptkp_status: ptkpStatus
+					p_npwp: npwp || null
         }
       );
 
