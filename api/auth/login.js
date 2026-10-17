@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import bcrypt from "bcryptjs";
+import { createHmac } from "crypto";
 export default async function handler(req, res) {
 
   try {
@@ -44,10 +45,43 @@ export default async function handler(req, res) {
         });
       }
 
-      // ==========================================
-      // AMBIL CONFIG TENANT
-      // ==========================================
+      // LOGIN RATE LIMIT - MASTER DATABASE
+      const rateLimitSecret = process.env.LOGIN_RATE_LIMIT_SECRET;
+      
+      if (!rateLimitSecret) { throw new Error("LOGIN_RATE_LIMIT_SECRET belum diatur"); }
+      
+      const normalizedTenant = String(tenantSlug).trim().toLowerCase();
+      const normalizedUsername = String(username).trim().toLowerCase();
+      const createSecurityHash = (value) =>
+        createHmac("sha256", rateLimitSecret)
+          .update(value)
+          .digest("hex");
+      // Hash identitas akun: tidak menyimpan username asli.
+      const accountHash = createSecurityHash( `account:${normalizedTenant}:${normalizedUsername}` );
+      // IP hanya untuk audit, BUKAN untuk memblokir login.
+      const forwardedFor = req.headers["x-forwarded-for"];
+      const clientIp = (
+        Array.isArray(forwardedFor)
+          ? forwardedFor[0]
+          : forwardedFor?.split(",")[0]
+      )?.trim() || req.socket?.remoteAddress || "unknown";
+      const ipHash = createSecurityHash(`ip:${clientIp}`);
+      // Helper untuk mencatat login gagal di Master.
+      const recordLoginFailure = async () => {
+        const { error } = await centralSupabase.rpc(
+          "record_login_failure",
+          {
+            p_tenant_slug: normalizedTenant,
+            p_account_hash: accountHash,
+            p_ip_hash: ipHash
+          }
+        );
+      
+        if (error) { throw error; }
+      };
 
+
+      // AMBIL CONFIG TENANT
       const {
         data: tenantResult,
         error: tenantError
@@ -55,14 +89,11 @@ export default async function handler(req, res) {
         await centralSupabase.rpc(
           "get_tenant_config",
           {
-            p_slug: tenantSlug
+            p_slug: normalizedTenant
           }
         );
 
-      if (tenantError) {
-        throw tenantError;
-      }
-
+      if (tenantError) { throw tenantError; }
       if (
         !tenantResult?.success ||
         !tenantResult?.data
@@ -73,8 +104,7 @@ export default async function handler(req, res) {
         });
       }
 
-      const config =
-        tenantResult.data;
+      const config = tenantResult.data;
 
       // ==========================================
       // CEK TENANT AKTIF
@@ -87,14 +117,35 @@ export default async function handler(req, res) {
         });
       }
 
-      // ==========================================
+      // CEK JEDA LOGIN BERTAHAP
+      const {
+        data: rateLimitResult,
+        error: rateLimitError
+      } = await centralSupabase.rpc(
+        "check_login_rate_limit",
+        {
+          p_tenant_slug: normalizedTenant,
+          p_account_hash: accountHash,
+          p_ip_hash: ipHash
+        }
+      );
+      
+      if (rateLimitError) { throw rateLimitError; }
+      if (rateLimitResult?.allowed === false) {
+        const retryAfter = Math.max( 1, Number(rateLimitResult.retry_after_seconds) || 1 );
+      
+        res.setHeader("Retry-After", String(retryAfter));
+    
+        return res.status(429).json({
+          success: false,
+          error: `Terlalu banyak percobaan login. Coba lagi dalam ${retryAfter} detik.`,
+          retry_after_seconds: retryAfter
+        });
+      }
+      
       // TENANT SUPABASE
-      // ==========================================
-      
       let tenantSupabase;
-
-      if (tenantSlug === "master") {
-      
+      if (normalizedTenant === "master") {
         tenantSupabase =
           createClient(
             process.env.SUPABASE_URL,
@@ -110,16 +161,10 @@ export default async function handler(req, res) {
           await centralSupabase
             .from("tenant_credentials")
             .select("service_role_key")
-            .eq(
-              "tenant_id",
-              config.tenant_id
-            )
+            .eq( "tenant_id", config.tenant_id )
             .single();
       
-        if (credentialError) {
-          throw credentialError;
-        }
-      
+        if (credentialError) { throw credentialError; }
         if (!credential?.service_role_key) {
           throw new Error(
             "Service Role Customer tidak ditemukan"
@@ -133,10 +178,7 @@ export default async function handler(req, res) {
           );
       }
 
-      // ==========================================
-      // CEK USER
-      // ==========================================
-      
+      // CEK USER 
       const {
         data: user,
         error: userError
@@ -146,21 +188,16 @@ export default async function handler(req, res) {
         .eq("Username", username.trim())
         .maybeSingle();
       
-      if (userError) {
-        throw userError;
-      }
+        if (userError) { throw userError; }
+        if (!user || !user.Password) {
+          await recordLoginFailure();
+          return res.status(401).json({
+            success: false,
+            error: "Username atau password salah"
+          });
+        }
       
-      if (!user || !user.Password) {
-        return res.status(401).json({
-          success: false,
-          error: "Username atau password salah"
-        });
-      }
-      
-      // ==========================================
       // VERIFIKASI PASSWORD + MIGRASI USER LAMA
-      // ==========================================
-      
       const storedPassword = user.Password;
       const isBcryptHash = /^\$2[aby]\$\d{2}\$/.test(storedPassword);
       
@@ -179,7 +216,6 @@ export default async function handler(req, res) {
         if (passwordValid) {
           // Hash password lama setelah login berhasil
           const newHash = await bcrypt.hash(password, 12);
-      
           const { error: upgradeError } = await tenantSupabase
             .from("Users")
             .update({ Password: newHash })
@@ -194,12 +230,33 @@ export default async function handler(req, res) {
           }
         }
       }
-      
+            
       if (!passwordValid) {
+        await recordLoginFailure();
+      
         return res.status(401).json({
           success: false,
           error: "Username atau password salah"
         });
+      }
+
+      // RESET PENGHITUNG SETELAH PASSWORD VALID
+      const {
+        error: resetLimitError
+      } = await centralSupabase.rpc(
+        "reset_login_account_limit",
+        {
+          p_tenant_slug: normalizedTenant,
+          p_account_hash: accountHash
+        }
+      );
+      
+      if (resetLimitError) {
+        // Catat error, tetapi jangan menggagalkan login yang valid.
+        console.error(
+          "Login rate limit reset failed:",
+          resetLimitError.message
+        );
       }
 
       // BUAT SESSION
@@ -255,6 +312,7 @@ export default async function handler(req, res) {
         });
       }
       
+      const normalizedTenant = String(tenantSlug).trim().toLowerCase();
       // AMBIL TENANT
       const {
         data: tenantResult,
@@ -263,7 +321,7 @@ export default async function handler(req, res) {
         await centralSupabase.rpc(
           "get_tenant_config",
           {
-            p_slug: tenantSlug
+            p_slug: normalizedTenant
           }
         );
 
@@ -289,7 +347,7 @@ export default async function handler(req, res) {
 
       // TENTUKAN DATABASE TENANT
       let tenantSupabase;
-      if (tenantSlug === "master") {
+      if (normalizedTenant === "master") {
         // MASTER → langsung gunakan MASTER DB
         tenantSupabase =
           createClient(
@@ -306,10 +364,7 @@ export default async function handler(req, res) {
           await centralSupabase
             .from("tenant_credentials")
             .select("service_role_key")
-            .eq(
-              "tenant_id",
-              config.tenant_id
-            )
+            .eq( "tenant_id", config.tenant_id )
             .single();
         
         if (credentialError) { throw credentialError; }
@@ -388,9 +443,11 @@ export default async function handler(req, res) {
     });
   }
   catch (error) {
+    console.error("Authentication error:", error);
+  
     return res.status(500).json({
       success: false,
-      error: error.message || "Authentication gagal"
+      error: "Authentication gagal. Silakan coba lagi."
     });
   }
 }
