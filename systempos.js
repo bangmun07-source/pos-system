@@ -34517,9 +34517,7 @@ window.saveEmployeeSalary = async function () {
         p_overtime_rate: overtimeRate,
         p_effective_from: effectiveFrom,
         p_note: note,
-				p_components: components,
-				p_pph21_enabled: document.getElementById('employeePPh21Enabled')?.checked ?? true,
-				p_ptkp_status: document.getElementById('employeePPh21PTKP')?.value || 'TK/0'
+				p_components: components
       }
     );
 
