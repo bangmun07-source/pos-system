@@ -33754,7 +33754,7 @@ function escapeEmployeeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-window.editEmployee = function (employeeId) {
+window.editEmployee = async function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
 
   if (!employee) { alert('Employee tidak ditemukan.'); return; }
@@ -33771,12 +33771,44 @@ window.editEmployee = function (employeeId) {
   document.getElementById('employeePhone').value = employee.Phone || '';
   document.getElementById('employeeEmail').value = employee.Email || '';
   document.getElementById('employeeGender').value = employee.Gender || '';
-	document.getElementById('employeeNIK').value = '';
-	document.getElementById('employeeNPWP').value = '';
-	document.getElementById('employeePTKPStatus').value = 'TK/0';
   document.getElementById('employeeBirthDate').value = employee.Birth_Date || '';
   document.getElementById('employeeNotes').value = employee.Notes || '';
   document.getElementById('employeeAddress').value = employee.Address || '';
+
+	const nikInput = document.getElementById('employeeNIK');
+	const npwpInput = document.getElementById('employeeNPWP');
+	const ptkpInput = document.getElementById('employeePTKPStatus');
+	
+	if (nikInput) nikInput.value = '';
+	if (npwpInput) npwpInput.value = '';
+	if (ptkpInput) ptkpInput.value = 'TK/0';
+	
+	const role = String(state.user.role || '').trim().toLowerCase();
+	
+	if (role === 'owner' || role === 'accountant') {
+	  const sessionId = localStorage.getItem('pos_session_id');
+	  const { data, error } = await supabaseClient.rpc(
+	    'get_employee_sensitive_data',
+	    {
+	      p_session_id: sessionId,
+	      p_employee_id: employee.Employee_ID
+	    }
+	  );
+	
+	  if (error) {
+	    console.error('Gagal membaca data sensitif employee:', error);
+	    alert('Data NIK, NPWP, dan PTKP gagal dimuat.');
+	    return;
+	  }
+	
+	  const sensitive = Array.isArray(data) ? data[0] : data;
+	
+	  if (sensitive) {
+	    if (nikInput) nikInput.value = sensitive.NIK || '';
+	    if (npwpInput) npwpInput.value = sensitive.NPWP || '';
+	    if (ptkpInput) ptkpInput.value = sensitive.PTKP_Status || 'TK/0';
+	  }
+	}
 
   /* === PHOTO PREVIEW === */
   const preview = document.getElementById('employeePhotoPreview');
