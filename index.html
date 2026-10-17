@@ -25207,21 +25207,42 @@
 	              placeholder="employee@email.com"
 	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
 	          </div>
-						<!-- NPWP / NIK KTP -->
+						<!-- NIK -->
 						<div>
 						  <label class="block text-sm font-medium text-foreground mb-2">
-						    NPWP / KTP
+						    NIK (KTP)
 						  </label>
 						
-						  <input id="employeeTaxIdNumber"
+						  <input id="employeeNIK"
 						    type="text"
 						    inputmode="numeric"
 						    maxlength="16"
-						    placeholder="16 digit NIK / NPWP"
+						    pattern="[0-9]{16}"
+						    placeholder="16 digit NIK"
+						    autocomplete="off"
 						    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-					
+						
 						  <p class="text-xs text-muted mt-1">
-						    Masukkan satu nomor identitas pajak karyawan.
+						    Masukkan 16 digit NIK karyawan.
+						  </p>
+						</div>
+						
+						<!-- NPWP -->
+						<div>
+						  <label class="block text-sm font-medium text-foreground mb-2">
+						    NPWP
+						  </label>
+						
+						  <input id="employeeNPWP"
+						    type="text"
+						    inputmode="numeric"
+						    maxlength="16"
+						    placeholder="Nomor NPWP"
+						    autocomplete="off"
+						    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+						
+						  <p class="text-xs text-muted mt-1">
+						    Masukkan NPWP jika tersedia. NIK dan NPWP dapat menggunakan nomor yang sama sesuai status perpajakan karyawan.
 						  </p>
 						</div>
 						<!-- PTKP STATUS -->
