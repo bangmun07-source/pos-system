@@ -33149,9 +33149,7 @@ window.openEmployeeActionModal = function (employeeId) {
 	  };
 	}
 	// === ROLE PERMISSION ===
-	const role = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase();
+	const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
 	const isAccountant = role === 'accountant';
 	// Accountant hanya boleh melihat detail
 	[editButton, attendanceButton, deleteButton].forEach(button => {
@@ -33220,6 +33218,9 @@ window.openEmployeeModal = function () {
   document.getElementById('employeeName').value = '';
   document.getElementById('employeePhone').value = '';
   document.getElementById('employeeEmail').value = '';
+	document.getElementById('employeeNIK').value = '';
+	document.getElementById('employeeNPWP').value = '';
+	document.getElementById('employeePTKPStatus').value = 'TK/0';
   document.getElementById('employeePosition').value = '';
   document.getElementById('employeeDepartment').value = '';
   document.getElementById('employeeGender').value = '';
@@ -33276,6 +33277,9 @@ window.saveEmployee = async function () {
   const fullName = document.getElementById('employeeName').value.trim();
   const phone = document.getElementById('employeePhone').value.trim();
   const email = document.getElementById('employeeEmail').value.trim();
+	const nik = document.getElementById('employeeNIK').value.trim();
+	const npwp = document.getElementById('employeeNPWP').value.trim();
+	const ptkpStatus = document.getElementById('employeePTKPStatus').value;
   const position = document.getElementById('employeePosition').value.trim();
   const department = document.getElementById('employeeDepartment').value.trim();
   const gender = document.getElementById('employeeGender').value;
@@ -33327,7 +33331,10 @@ window.saveEmployee = async function () {
           p_hire_date: hireDate,
           p_status: status,
           p_photo_url: photoUrl,
-          p_notes: notes || null
+					p_notes: notes || null,
+					p_nik: nik || null,
+					p_npwp: npwp || null,
+					p_ptkp_status: ptkpStatus
         }
       );
 
@@ -33764,6 +33771,9 @@ window.editEmployee = function (employeeId) {
   document.getElementById('employeePhone').value = employee.Phone || '';
   document.getElementById('employeeEmail').value = employee.Email || '';
   document.getElementById('employeeGender').value = employee.Gender || '';
+	document.getElementById('employeeNIK').value = '';
+	document.getElementById('employeeNPWP').value = '';
+	document.getElementById('employeePTKPStatus').value = 'TK/0';
   document.getElementById('employeeBirthDate').value = employee.Birth_Date || '';
   document.getElementById('employeeNotes').value = employee.Notes || '';
   document.getElementById('employeeAddress').value = employee.Address || '';
