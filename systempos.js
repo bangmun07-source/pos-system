@@ -26585,13 +26585,14 @@ async function initAccountingDebtPage() {
 	await initOtherLiability();
 	await loadLiabilities();
 	await loadTaxPayable();
+	if (document.getElementById("employeeTaxTableBody")) {
+    await initEmployeeTaxSection();
+	}
 	await loadPpnPayments();
+	
 }
 
-
-/* =========================================================
-   FILTER INITIALIZATION
-   ========================================================= */
+/* === FILTER INITIALIZATION === */
 function getDebtLiabilityRpcBranchId() {
     const filter = getDebtLiabilityFilter();
 
@@ -26618,6 +26619,7 @@ function getDebtLiabilityFilter() {
     };
 }
 
+let accountingDebtBranches = [];
 async function loadDebtLiabilityBranchFilters() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
@@ -26635,6 +26637,7 @@ async function loadDebtLiabilityBranchFilters() {
     const branches = typeof data === "string"
 			? JSON.parse(data)
 			: (data || []);
+		accountingDebtBranches = branches;
     const select = document.getElementById( "debtLiabilityBranchFilter" );
 
     if (!select) return;
@@ -26739,11 +26742,7 @@ function initSupplierDebtFilters() {
 	}
 }
 
-
-/* =========================================================
-   LOAD SUPPLIER DEBT
-   ========================================================= */
-
+/* ==== LOAD SUPPLIER DEBT ==== */
 async function loadSupplierDebt() {
 	const tbody = document.getElementById("supplierDebtTableBody");
 	if (tbody) {
@@ -26845,7 +26844,6 @@ async function loadSupplierDebt() {
 }
 
 /* ==== SUMMARY ==== */
-
 function updateSupplierDebtSummary() {
 	const supplierPayables = supplierDebtData.reduce(
 		(sum, item) => sum + Number(item.outstanding || 0),
@@ -26883,12 +26881,9 @@ function updateSupplierDebtSummary() {
 	if (totalLiabilitiesEl) { totalLiabilitiesEl.textContent = formatAccountingCurrency(totalLiabilities); }
 }
 
-
 /* ===== SUPPLIER FILTER OPTIONS ===== */
-
 function populateSupplierDebtFilter() {
 	const select = document.getElementById("supplierDebtSupplierFilter");
-
 	if (!select) return;
 
 	const currentValue = select.value;
@@ -26912,9 +26907,7 @@ function populateSupplierDebtFilter() {
 			{ select.value = currentValue; }
 }
 
-
 /* ==== APPLY FILTER ==== */
-
 function applySupplierDebtFilters() {
 	const status = document.getElementById( "supplierDebtStatusFilter" )?.value || "";
 	const supplierId =  document.getElementById( "supplierDebtSupplierFilter" )?.value || "";
@@ -26923,10 +26916,8 @@ function applySupplierDebtFilters() {
 		?.toLowerCase() || "";
 
 	supplierDebtFiltered = supplierDebtData.filter(item => {
-		if ( status && item.status !== status ) 
-				{ return false; }
-		if ( supplierId && item.supplierId !== supplierId ) 
-				{ return false; }
+		if ( status && item.status !== status )  { return false; }
+		if ( supplierId && item.supplierId !== supplierId )  { return false; }
 		if ( search ) {
 				const searchable = [
 					item.id,
@@ -26942,10 +26933,7 @@ function applySupplierDebtFilters() {
   renderSupplierDebtTable();
 }
 
-/* =========================================================
-   RENDER TABLE
-   ========================================================= */
-
+/* === RENDER TABLE === */
 function renderSupplierDebtTable() {
     const tbody = document.getElementById("supplierDebtTableBody");
 
@@ -26972,7 +26960,6 @@ function renderSupplierDebtTable() {
     } else {
 			tbody.innerHTML =
 				rows.map(item => {
-
 					const branchId = item.branchId || "-";
 					const statusClass = item.status === "PAID"
 						? "text-green-700"
@@ -26992,34 +26979,13 @@ function renderSupplierDebtTable() {
 						`;
 					return `
 						<tr class="border-b border-outline-variant hover:bg-outline-variant">
-							<td class="px-4 py-3 text-sm font-medium">
-								${escapeHtml(item.id)}
-							</td>
-
-							<td class="px-4 py-3 text-sm">
-								${escapeHtml(branchId)}
-							</td>
-
-							<td class="px-4 py-3 text-sm">
-								${escapeHtml(item.supplier)}
-							</td>
-
-							<td class="px-4 py-3 text-sm">
-								${formatAccountingDate(item.date)}
-							</td>
-
-							<td class="px-4 py-3 text-sm text-right">
-								${formatAccountingCurrency(item.total)}
-							</td>
-
-							<td class="px-4 py-3 text-sm text-right">
-								${formatAccountingCurrency(item.paid)}
-							</td>
-
-							<td class="px-4 py-3 text-sm text-right font-semibold">
-								${formatAccountingCurrency(item.outstanding)}
-							</td>
-
+							<td class="px-4 py-3 text-sm font-medium"> ${escapeHtml(item.id)} </td>
+							<td class="px-4 py-3 text-sm"> ${escapeHtml(branchId)} </td>
+							<td class="px-4 py-3 text-sm"> ${escapeHtml(item.supplier)} </td>
+							<td class="px-4 py-3 text-sm"> ${formatAccountingDate(item.date)} </td>
+							<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.total)} </td>
+							<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.paid)} </td>
+							<td class="px-4 py-3 text-sm text-right font-semibold"> ${formatAccountingCurrency(item.outstanding)} </td>
 							<td class="px-4 py-3">
 								<span class="inline-flex px-2.5 py-1 text-xs font-medium ${statusClass}">
 									${item.status}
@@ -27036,10 +27002,7 @@ function renderSupplierDebtTable() {
 	updateSupplierDebtPagination( total, totalPages );
 }
 
-/* =========================================================
-   PAGINATION
-   ========================================================= */
-
+/* === PAGINATION === */
 function updateSupplierDebtPagination( total, totalPages ) {
 	const info = document.getElementById( "supplierDebtPaginationInfo" );
 	const prev = document.getElementById( "supplierDebtPrevButton" );
@@ -27099,7 +27062,6 @@ function openSupplierPaymentModal(purchaseId) {
 }
 
 /* ====== CLOSE PAYMENT MODAL ======= */
-
 function closeSupplierPaymentModal() {
 	currentSupplierPaymentPurchase = null;
 	const modal = document.getElementById("supplierPaymentModal");
@@ -27223,11 +27185,7 @@ function getTodayAccountingDate() {
 	.split("T")[0];
 }
 
-
-/* =========================================================
-   TAX PAYABLE
-   ========================================================= */
-
+/* ==== TAX PAYABLE ==== */
 let taxPayableData = null;
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
@@ -27293,9 +27251,7 @@ async function loadTaxPayable() {
 
     state.accountingTaxPayableData = taxPayableData;
     state.accountingTaxPayableFilter = currentFilter;
-
     updateTaxPayableUI();
-
   } catch (error) {
     taxPayableData = {
       accountId: "ACC-52FE300A7C2A",
@@ -27403,9 +27359,7 @@ function renderPpnPayments() {
         payment.Branch_ID ||
         payment.branchId ||
         "-";
-      const note =
-        payment.note || "-";
-
+      const note = payment.note || "-";
       const amount = Number(payment.amount) || 0;
       const method = payment.payment_method || "-";
       const status = String( payment.status || "OUTSTANDING" ).toUpperCase();
@@ -27435,47 +27389,26 @@ function renderPpnPayments() {
           : "-";
       return `
         <tr class="hover:bg-outline-variant">
+          <td class="px-5 py-3"> ${paymentDate} </td>
+          <td class="px-5 py-3"> ${branchId} </td>
+          <td class="px-5 py-3"> ${note} </td>
+          <td class="px-5 py-3 text-right font-medium"> ${formatAccountingCurrency(amount)} </td>
+          <td class="px-5 py-3"> ${method} </td>
           <td class="px-5 py-3">
-            ${paymentDate}
-          </td>
-
-          <td class="px-5 py-3">
-            ${branchId}
-          </td>
-
-          <td class="px-5 py-3">
-            ${note}
-          </td>
-
-          <td class="px-5 py-3 text-right font-medium">
-            ${formatAccountingCurrency(amount)}
-          </td>
-
-          <td class="px-5 py-3">
-            ${method}
-          </td>
-
-          <td class="px-5 py-3">
-            <span
-              class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+            <span class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
               ${status}
             </span>
           </td>
-
-          <td class="px-5 py-3 text-center">
-            ${action}
-          </td>
+          <td class="px-5 py-3 text-center"> ${action} </td>
         </tr>
       `;
     }).join("");
   }
 
-  if (paginationInfo) { paginationInfo.textContent =
-		total === 0
-			? "Showing 0–0 of 0"
-			: `Showing ${startIndex + 1}–${endIndex} of ${total}`;
+  if (paginationInfo) { paginationInfo.textContent = total === 0
+		? "Showing 0–0 of 0"
+		: `Showing ${startIndex + 1}–${endIndex} of ${total}`;
   }
-
   if (prevButton) { prevButton.disabled = ppnPaymentsPage <= 1; }
   if (nextButton) { nextButton.disabled = ppnPaymentsPage >= totalPages; }
 }
@@ -27515,7 +27448,6 @@ async function recordPpnPayment() {
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-
     if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
 		
     const selectedBranchId = getDebtLiabilityFilter().branchId;
@@ -27531,9 +27463,7 @@ async function recordPpnPayment() {
         ) ||
         taxPayableData.branches.length === 0
       ) {
-        throw new Error(
-          "Hasil PPN per outlet tidak ditemukan."
-        );
+        throw new Error( "Hasil PPN per outlet tidak ditemukan." );
       }
 
       branchAllocations = taxPayableData.branches.map(
@@ -27548,16 +27478,10 @@ async function recordPpnPayment() {
           })
         );
 
-      const invalidBranch = branchAllocations.some(
-				branch =>
-					!branch.branchId ||
-					branch.branchId.toUpperCase() === "ALL"
-			);
-
+      const invalidBranch = branchAllocations.some( branch => !branch.branchId || branch.branchId.toUpperCase() === "ALL" );
       if (invalidBranch) { throw new Error( "Terdapat branch ID yang tidak valid pada hasil PPN." ); }
 
       branchAllocations = branchAllocations.filter( branch => branch.amount > 0 );
-
       if ( branchAllocations.length === 0 ) { throw new Error( "Tidak ada PPN outstanding yang dapat dicatat." ); }
     }
 		
@@ -27569,9 +27493,7 @@ async function recordPpnPayment() {
       branchId !== "ALL" &&
       amount <= 0
     ) {
-      throw new Error(
-        "Tax Payable tidak memiliki saldo terutang."
-      );
+      throw new Error( "Tax Payable tidak memiliki saldo terutang." );
     }
 		
     const button = document.getElementById("ppnRecordButton");
@@ -27601,12 +27523,10 @@ async function recordPpnPayment() {
         }
       );
 
-
     if (error) { throw error; }
 		
     state.accountingTaxPayableData = null;
     state.accountingTaxPayableFilter = null;
-
     await loadTaxPayable();
     await loadPpnPayments();
     showToast(
@@ -27639,12 +27559,8 @@ function openPpnPaymentFromRow(paymentId) {
     item => String(item.payment_id) === String(paymentId)
   );
 
-  if (!payment) {
-    showToast("PPN payment tidak ditemukan.", "error");
-    return; }
-  if (String(payment.status).toUpperCase() !== "OUTSTANDING") {
-    showToast("PPN payment ini sudah tidak outstanding.", "info");
-    return; }
+  if (!payment) { showToast("PPN payment tidak ditemukan.", "error"); return; }
+  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { showToast("PPN payment ini sudah tidak outstanding.", "info"); return; }
   currentPpnPayment = payment;
   openTaxPaymentModal();
 }
@@ -27652,16 +27568,11 @@ function openPpnPaymentFromRow(paymentId) {
 /* ===== OPEN TAX PAYMENT MODAL ===== */
 async function openTaxPaymentModal() {
   const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) {
-    alert("Session tidak ditemukan.");
-    return;
-  }
+  if (!sessionId) { alert("Session tidak ditemukan."); return; }
+	
   await loadTaxPayable();
   const outstanding = Number(taxPayableData?.outstanding) || 0;
-
-  if (outstanding <= 0) {
-    alert("Tax Payable tidak memiliki saldo terutang.");
-    return; }
+  if (outstanding <= 0) { alert("Tax Payable tidak memiliki saldo terutang."); return; }
 	
   document.getElementById("taxPaymentAccount").textContent = "2200 · Tax Payable";
   document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
@@ -27673,7 +27584,6 @@ async function openTaxPaymentModal() {
   document.getElementById("taxPaymentNote").value = "";
 	
   const modal = document.getElementById("taxPaymentModal");
-
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
@@ -27692,19 +27602,11 @@ function closeTaxPaymentModal() {
 /* ==== SAVE TAX PAYMENT ==== */
 async function saveTaxPayment() {
   const sessionId = localStorage.getItem("pos_session_id");
-
-  if (!sessionId) {
-    alert("Session tidak ditemukan.");
-    return;
-  }
+  if (!sessionId) { alert("Session tidak ditemukan."); return; }
   const branchId = state.branchId;
-  if (!branchId) {
-    alert("Branch tidak ditemukan.");
-    return;
-  }
+  if (!branchId) { alert("Branch tidak ditemukan."); return; }
 
   const paymentDate = document.getElementById("taxPaymentDate")?.value;
-
   const amount = Number( document.getElementById("taxPaymentAmount")?.value ) || 0;
   const method = document.getElementById("taxPaymentMethod")?.value || "CASH";
   const referenceNo = document .getElementById("taxPaymentReference")
@@ -27714,24 +27616,13 @@ async function saveTaxPayment() {
 		?.value
 		?.trim() || null;
 	
-  if (!paymentDate) {
-    alert("Tanggal pembayaran wajib diisi.");
-    return; }
-  if (amount <= 0) {
-    alert("Jumlah pembayaran harus lebih dari 0.");
-    return; }
+  if (!paymentDate) { alert("Tanggal pembayaran wajib diisi."); return; }
+  if (amount <= 0) { alert("Jumlah pembayaran harus lebih dari 0."); return; }
 
   const outstanding = Number(taxPayableData?.outstanding) || 0;
-
-  if (outstanding <= 0) {
-    alert("Tax Payable tidak memiliki saldo terutang.");
-    return; }
-  if (amount > outstanding) {
-    alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}` );
-    return; }
-  if (!["CASH", "BANK", "QRIS"].includes(method)) {
-    alert("Metode pembayaran tidak valid.");
-    return; }
+  if (outstanding <= 0) { alert("Tax Payable tidak memiliki saldo terutang."); return; }
+  if (amount > outstanding) { alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}` ); return; }
+  if (!["CASH", "BANK", "QRIS"].includes(method)) { alert("Metode pembayaran tidak valid."); return; }
 
   const button = document.getElementById("saveTaxPaymentButton");
 
@@ -27771,25 +27662,369 @@ async function saveTaxPayment() {
       button.disabled = false;
       button.textContent = "Pay Tax";
     }
-
   }
 }
 
+/* ==== EMPLOYEE TAX PAYABLE ==== */
+let employeeTaxData = [];
+let employeeTaxCurrentPage = 1;
+const employeeTaxPageSize = 10;
 
-/* =========================================================
-   OTHER LIABILITY
-   ========================================================= */
+/* ==== INITIALIZE EMPLOYEE TAX SECTION ==== */
+async function initEmployeeTaxSection() {
+	const periodFilter = document.getElementById("employeeTaxPeriodFilter");
+	const branchFilter = document.getElementById("employeeTaxBranchFilter");
+	const employeeFilter = document.getElementById("employeeTaxEmployeeFilter");
+	const statusFilter = document.getElementById("employeeTaxStatusFilter");
+	const now = new Date();
 
+	if (periodFilter && !periodFilter.value) { periodFilter.value = `${now.getFullYear()}-${String( now.getMonth() + 1 ).padStart(2, "0")}`; }
+
+	populateEmployeeTaxBranchFilter();
+
+	if (branchFilter) {
+		branchFilter.onchange = async () => {
+			employeeTaxCurrentPage = 1;
+			await loadEmployeeTaxEmployees();
+			await loadEmployeeTaxRecords(); 
+		}; 
+	}
+	if (periodFilter) { periodFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
+	if (employeeFilter) { employeeFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
+	if (statusFilter) { statusFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
+
+	const prevButton = document.getElementById("employeeTaxPrevButton");
+	const nextButton = document.getElementById("employeeTaxNextButton");
+
+	if (prevButton) { prevButton.onclick = () => { changeEmployeeTaxPage(-1); }; }
+	if (nextButton) { nextButton.onclick = () => { changeEmployeeTaxPage(1); }; }
+
+	await loadEmployeeTaxEmployees();
+	await loadEmployeeTaxRecords();
+}
+
+/* ==== BRANCH FILTER ==== */
+function populateEmployeeTaxBranchFilter() {
+	const select = document.getElementById("employeeTaxBranchFilter");
+	if (!select) return;
+
+	const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+	const canViewAllBranches = ["owner", "accountant"].includes(role);
+	const userBranchId = String(
+		state.user?.branchId ||
+		state.user?.Branch_ID ||
+		"" ).trim();
+	select.innerHTML = canViewAllBranches
+		? '<option value="ALL">All Branches</option>'
+		: "";
+	accountingDebtBranches.forEach(branch => {
+		const branchId = String(branch.id || "").trim();
+		// Role selain Owner/Accountant hanya melihat outletnya.
+		if (
+			!canViewAllBranches &&
+			branchId !== userBranchId
+		) { return; }
+
+		const option = document.createElement("option");
+		option.value = branchId;
+		option.textContent = branch.name || branch.id || "Unnamed Branch";
+		select.appendChild(option);
+	});
+
+	if (canViewAllBranches) {
+		select.value = "ALL";
+	} else {
+		select.value = userBranchId;
+		select.disabled = true;
+	}
+}
+
+/* ==== GET SELECTED BRANCH ==== */
+function getEmployeeTaxBranchId() {
+	const select = document.getElementById("employeeTaxBranchFilter");
+	const branchId = String(select?.value || "").trim();
+	return !branchId || branchId === "ALL"
+		? null
+		: branchId;
+}
+
+/* ==== LOAD EMPLOYEE FILTER OPTIONS ==== */
+async function loadEmployeeTaxEmployees() {
+	const select = document.getElementById("employeeTaxEmployeeFilter");
+	if (!select) return;
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) return;
+	const previousEmployeeId = select.value;
+
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			"get_employees",
+			{
+				p_session_id: sessionId,
+				p_branch_id: getEmployeeTaxBranchId(),
+				p_status: null,
+				p_search: null
+			}
+		);
+
+		if (error) throw error;
+		const employees = Array.isArray(data)
+			? data
+			: typeof data === "string"
+				? JSON.parse(data)
+				: [];
+		const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+		const canViewAllBranches =
+			["owner", "accountant"].includes(role);
+		const userBranchId = String(
+			state.user?.branchId ||
+			state.user?.Branch_ID || "" ).trim();
+		const visibleEmployees = employees.filter(employee => {
+			if (canViewAllBranches) return true;
+
+			return String(employee.Branch_ID || "").trim() === userBranchId;
+		});
+
+		select.innerHTML = '<option value="">All Employees</option>';
+		visibleEmployees.forEach(employee => {
+			const option = document.createElement("option");
+
+			option.value = employee.Employee_ID;
+			option.textContent = [
+				employee.Full_Name || "Unnamed Employee",
+				employee.Employee_Code ].filter(Boolean).join(" · ");
+			select.appendChild(option);
+		});
+		// Pertahankan pilihan jika employee masih tersedia.
+		if (
+			previousEmployeeId &&
+			visibleEmployees.some(
+				employee =>
+					String(employee.Employee_ID) ===
+					previousEmployeeId
+			)
+		) { select.value = previousEmployeeId;
+		} else { select.value = ""; }
+		
+	} catch (error) {
+		console.error( "loadEmployeeTaxEmployees:", error );
+		select.innerHTML = '<option value="">All Employees</option>';
+	}
+}
+
+/* ==== LOAD EMPLOYEE TAX RECORDS ==== */
+async function loadEmployeeTaxRecords() {
+	const tbody = document.getElementById("employeeTaxTableBody");
+	if (!tbody) return;
+
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { employeeTaxData = []; renderEmployeeTaxTable(); return; }
+	
+	const periodValue = document.getElementById( "employeeTaxPeriodFilter" )?.value || "";
+	const employeeId = document.getElementById( "employeeTaxEmployeeFilter" )?.value || null;
+	const status = document.getElementById( "employeeTaxStatusFilter" )?.value || null;
+	// Input type="month" dikirim sebagai rentang satu bulan.
+	let periodFrom = null;
+	let periodTo = null;
+	
+	if (/^\d{4}-\d{2}$/.test(periodValue)) {
+		const [year, month] = periodValue
+			.split("-")
+			.map(Number);
+		const lastDay = new Date( year, month, 0 ).getDate();
+		periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
+		periodTo = `${year}-${String(month).padStart(2, "0")}-${String( lastDay ).padStart(2, "0")}`;
+	}
+	tbody.innerHTML = `
+		<tr>
+			<td colspan="9"
+				class="px-5 py-10 text-center text-muted">
+					Loading employee tax data...
+			</td>
+		</tr>
+	`;
+	
+	try {
+		const { data, error } = await supabaseClient.rpc(
+			"get_employee_tax_records",
+			{
+				p_session_id: sessionId,
+				p_branch_id: getEmployeeTaxBranchId(),
+				p_period_from: periodFrom,
+				p_period_to: periodTo,
+				p_employee_id: employeeId,
+				p_status: status
+			}
+		);
+	
+		if (error) throw error;
+
+		const result = typeof data === "string"
+			? JSON.parse(data)
+			: data;
+		if (result?.success === false) { throw new Error( result.message || "Gagal memuat data PPh 21." ); }
+
+		employeeTaxData = Array.isArray(result)
+			? result
+			: Array.isArray(result?.data)
+				? result.data
+				: [];
+
+		employeeTaxCurrentPage = 1;
+		renderEmployeeTaxTable();
+	} catch (error) {
+		console.error("loadEmployeeTaxRecords:", error);
+
+		employeeTaxData = [];
+		renderEmployeeTaxTable( "Failed to load employee tax data" );
+	}
+}
+
+/* ==== RENDER EMPLOYEE TAX TABLE ==== */
+function renderEmployeeTaxTable(errorMessage = "") {
+	const tbody = document.getElementById("employeeTaxTableBody");
+	if (!tbody) return;
+
+	const data = Array.isArray(employeeTaxData)
+		? employeeTaxData
+		: [];
+	const total = data.length;
+	const totalPages = Math.max( 1, Math.ceil(total / employeeTaxPageSize) );
+	employeeTaxCurrentPage = Math.max( 1, Math.min(employeeTaxCurrentPage, totalPages) );
+	const startIndex = (employeeTaxCurrentPage - 1) * employeeTaxPageSize;
+	const endIndex = Math.min( startIndex + employeeTaxPageSize, total );
+	const pageData = data.slice(startIndex, endIndex);
+
+	if (!pageData.length) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="9"
+					class="px-5 py-10 text-center text-muted">
+						${escapeHtml( errorMessage || "No employee tax data" )}
+				</td>
+			</tr>
+		`;
+	} else {
+		tbody.innerHTML = pageData.map(row => {
+			const status = String( row.status || "DRAFT" ).trim().toUpperCase();
+			const taxAmount = Number(row.tax_amount) || 0;
+			const statusClass = {
+				DRAFT: "bg-surface-container-high text-muted",
+				CALCULATED: "bg-blue-600/10 text-blue-700",
+				IN_PAYROLL: "bg-yellow-600/10 text-yellow-700",
+				PAID: "bg-green-600/10 text-green-700",
+				CANCELLED: "bg-red-600/10 text-red-700"
+			}[status] ||
+				"bg-surface-container-high text-muted";
+			const branchId = row.branch_id || "";
+			const branchName = accountingDebtBranches.find(branch =>
+				String(branch.id || "").trim() ===
+				String(branchId).trim() )?.name || branchId || "-";
+			const employeeName = row.employee_name || "-";
+			const employeeCode = row.employee_code
+				? ` (${row.employee_code})`
+				: "";
+			const period = row.tax_period
+				? new Date( `${String(row.tax_period).slice(0, 10)}T00:00:00`
+					).toLocaleDateString("id-ID", {
+						month: "short",
+						year: "numeric"
+					})
+				: "-";
+			const remaining = ["PAID", "CANCELLED"].includes(status)
+				? 0
+				: taxAmount;
+			return `
+				<tr class="hover:bg-outline-variant transition">
+					<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
+					<td class="px-5 py-4">
+						<div class="font-medium text-foreground">  ${escapeHtml(employeeName)} </div>
+						<div class="text-xs text-muted"> ${escapeHtml(employeeCode)} </div>
+					</td>
+					<td class="px-5 py-4"> ${escapeHtml(branchName)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency( Number(row.gross_taxable_income) || 0 )} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(taxAmount)} </td>
+					<td class="px-5 py-4 text-right"> — </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(remaining)} </td>
+					<td class="px-5 py-4 text-center">
+						<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+							${escapeHtml(status)}
+						</span>
+					</td>
+					<td class="px-5 py-4 text-center"> — </td>
+				</tr>
+			`;
+		}).join("");
+	}
+	updateEmployeeTaxSummary(data);
+	updateEmployeeTaxPagination(total, startIndex, endIndex);
+}
+
+/* ==== UPDATE SUMMARY ==== */
+function updateEmployeeTaxSummary(data) {
+	const rows = Array.isArray(data) ? data : [];
+	const totalCount = rows.length;
+	const draftCount = rows.filter( row => String(row.status || "").toUpperCase() === "DRAFT" ).length;
+	const paidCount = rows.filter( row => String(row.status || "").toUpperCase() === "PAID" ).length;
+	const outstanding = rows.reduce((sum, row) => {
+		const status = String( row.status || "" ).toUpperCase();
+
+		if (["PAID", "CANCELLED"].includes(status)) { return sum; }
+		return sum + (Number(row.tax_amount) || 0);
+	}, 0);
+
+	const totalEl = document.getElementById("employeeTaxTotalCount");
+	const draftEl = document.getElementById("employeeTaxDraftCount");
+	const paidEl = document.getElementById("employeeTaxPaidCount");
+	const outstandingEl = document.getElementById("employeeTaxOutstandingAmount");
+
+	if (totalEl) totalEl.textContent = totalCount;
+	if (draftEl) draftEl.textContent = draftCount;
+	if (paidEl) paidEl.textContent = paidCount;
+	if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+}
+
+/* ==== PAGINATION ==== */
+function updateEmployeeTaxPagination(total, start, end) {
+	const info =document.getElementById("employeeTaxTableInfo");
+	const prev = document.getElementById("employeeTaxPrevButton");
+	const next = document.getElementById("employeeTaxNextButton");
+	const totalPages = Math.max(  1, Math.ceil(total / employeeTaxPageSize) );
+
+	if (info) { info.textContent = total === 0
+		? "Showing 0–0 of 0"
+		: `Showing ${start + 1}–${end} of ${total}`;
+	}
+	if (prev) { prev.disabled = employeeTaxCurrentPage <= 1; }
+	if (next) { next.disabled = employeeTaxCurrentPage >= totalPages; }
+}
+
+function changeEmployeeTaxPage(direction) {
+	const totalPages = Math.max( 1,
+		Math.ceil(
+			employeeTaxData.length / employeeTaxPageSize
+		)
+	);
+	employeeTaxCurrentPage = Math.max( 1,
+		Math.min(
+			employeeTaxCurrentPage + direction,
+			totalPages
+		)
+	);
+	renderEmployeeTaxTable();
+}
+
+/* === OTHER LIABILITY === */
 let liabilityData = [];
 let filteredLiabilities = [];
 let liabilityCurrentPage = 1;
 const liabilityPageSize = 10;
 
 async function initOtherLiability() {
-    const dateEl = document.getElementById("newLiabilityDate");
+	const dateEl = document.getElementById("newLiabilityDate");
 
-    if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingDate(); }
-    bindOtherLiabilityEvents();
+	if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingDate(); }
+	bindOtherLiabilityEvents();
 }
 
 function bindOtherLiabilityEvents() {
@@ -27803,7 +28038,6 @@ function bindOtherLiabilityEvents() {
 
 async function loadLiabilities() {
 	const tbody = document.getElementById("otherLiabilitiesTableBody");
-	
 	if (tbody) {
 		tbody.innerHTML = `
 			<tr>
@@ -27814,7 +28048,6 @@ async function loadLiabilities() {
 			</tr>
 		`;
 	}
-	
 try {
 	const sessionId = localStorage.getItem("pos_session_id");
 	if (!sessionId) { throw new Error("Session tidak ditemukan"); }
@@ -27822,47 +28055,44 @@ try {
 	const branchId = !filter.branchId || filter.branchId === "ALL"
 		? null
 		: filter.branchId;
-
-const { data, error } =
-    await supabaseClient.rpc(
-        "get_liabilities",
-        {
-            p_session_id: sessionId,
-            p_branch_id: branchId,
-            p_period_from: filter.periodFrom || null,
-            p_period_to: filter.periodTo || null
-        }
-    );
+	const { data, error } =
+		await supabaseClient.rpc(
+			"get_liabilities",
+			{
+				p_session_id: sessionId,
+				p_branch_id: branchId,
+				p_period_from: filter.periodFrom || null,
+				p_period_to: filter.periodTo || null
+			}
+		);
 
 	if (error) { throw error; }
-	if (!data) {
-		throw new Error( "Response get_liabilities kosong" ); }
-	if (data.success !== true) {
-		throw new Error( data.message || "Gagal mengambil data liability" ); }
+	if (!data) { throw new Error( "Response get_liabilities kosong" ); }
+	if (data.success !== true) { throw new Error( data.message || "Gagal mengambil data liability" ); }
 
 	let rows = data.data || [];
 	if (!Array.isArray(rows)) { rows = []; }
 
 	liabilityData = rows.map(item => {
-			return {
-					liability_id: item.liability_id || "",
-					liability_type: item.liability_type || "",
-					creditor: item.creditor || "-",
-					description: item.description || "",
-					start_date: item.start_date || null,
-					due_date: item.due_date || null,
-					original_amount: Number(item.original_amount) || 0,
-					paid_principal: Number(item.paid_principal) || 0,
-					paid_interest: Number(item.paid_interest) || 0,
-					outstanding_principal: Math.max( 0, Number(item.outstanding_principal) || 0 ),
-					interest_type: item.interest_type || null,
-					interest_rate: Number(item.interest_rate) || 0,
-					interest_amount: Number(item.interest_amount) || 0,
-					liability_account_id: item.liability_account_id || "",
-					status: String( item.status || "ACTIVE" ).toUpperCase(),
-					branch_id: item.branch_id || branchId,
-					created_at: item.created_at || null
-			};
+		return {
+			liability_id: item.liability_id || "",
+			liability_type: item.liability_type || "",
+			creditor: item.creditor || "-",
+			description: item.description || "",
+			start_date: item.start_date || null,
+			due_date: item.due_date || null,
+			original_amount: Number(item.original_amount) || 0,
+			paid_principal: Number(item.paid_principal) || 0,
+			paid_interest: Number(item.paid_interest) || 0,
+			outstanding_principal: Math.max( 0, Number(item.outstanding_principal) || 0 ),
+			interest_type: item.interest_type || null,
+			interest_rate: Number(item.interest_rate) || 0,
+			interest_amount: Number(item.interest_amount) || 0,
+			liability_account_id: item.liability_account_id || "",
+			status: String( item.status || "ACTIVE" ).toUpperCase(),
+			branch_id: item.branch_id || branchId,
+			created_at: item.created_at || null
+		};
 	});
 
 	filteredLiabilities = [...liabilityData];
@@ -27897,7 +28127,6 @@ function filterLiabilities() {
 		
 		if (type && itemType !== type.toUpperCase()) { return false; }
 		if (status && itemStatus !== status.toUpperCase()) { return false; }
-
 		if ( search &&
 			!creditor.includes(search) &&
 			!description.includes(search) &&
@@ -27911,7 +28140,6 @@ function filterLiabilities() {
     renderLiabilities();
 }
 
-
 function renderLiabilities() {
 	const tbody = document.getElementById("otherLiabilitiesTableBody");
 	if (!tbody) return;
@@ -27921,10 +28149,7 @@ function renderLiabilities() {
 	if (liabilityCurrentPage > totalPages) { liabilityCurrentPage = totalPages; }
 
 	const start = (liabilityCurrentPage - 1) * liabilityPageSize;
-	const rows = filteredLiabilities.slice(
-		start,
-		start + liabilityPageSize
-	);
+	const rows = filteredLiabilities.slice( start, start + liabilityPageSize );
 
 	if (!rows.length) {
 		tbody.innerHTML = `
@@ -27965,55 +28190,25 @@ function renderLiabilities() {
 		return `
 			<tr class="border-b border-outline-variant hover:bg-outline-variant">
 				<td class="px-5 py-3">
-					<div class="font-medium text-on-surface">
-						${type}
-					</div>
-
-					<div class="text-xs text-on-surface-variant">
-						${id}
-					</div>
+					<div class="font-medium text-on-surface"> ${type} </div>
+					<div class="text-xs text-on-surface-variant"> ${id} </div>
 				</td>
-
-				<td class="px-5 py-3 text-on-surface">
-					${escapeHtml(branchId)}
-				</td>
-
-				<td class="px-5 py-3 text-on-surface">
-					${creditor}
-				</td>
-
-				<td class="px-5 py-3 text-on-surface-variant text-sm">
-					${startDate}
-				</td>
-
-				<td class="px-5 py-3 text-on-surface-variant text-sm">
-					${dueDate}
-				</td>
-
-				<td class="px-5 py-3 text-right text-on-surface">
-					${original}
-				</td>
-
-				<td class="px-5 py-3 text-right text-on-surface">
-					${paid}
-				</td>
-
-				<td class="px-5 py-3 text-right font-semibold text-on-surface">
-					${outstanding}
-				</td>
-
+				<td class="px-5 py-3 text-on-surface"> ${escapeHtml(branchId)} </td>
+				<td class="px-5 py-3 text-on-surface"> ${creditor} </td>
+				<td class="px-5 py-3 text-on-surface-variant text-sm"> ${startDate} </td>
+				<td class="px-5 py-3 text-on-surface-variant text-sm"> ${dueDate} </td>
+				<td class="px-5 py-3 text-right text-on-surface"> ${original} </td>
+				<td class="px-5 py-3 text-right text-on-surface"> ${paid} </td>
+				<td class="px-5 py-3 text-right font-semibold text-on-surface"> ${outstanding} </td>
 				<td class="px-5 py-3 text-center">
-					<span
-						class="inline-flex text-center px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
+					<span class="inline-flex text-center px-2.5 py-1 bottom-theme text-xs font-medium ${statusClass}">
 						${status}
 					</span>
 				</td>
-					
 				<td class="px-5 py-3 text-center">
 					${status === "ACTIVE"
 						? `
-							<button
-								type="button"
+							<button type="button"
 								onclick="openLiabilityPaymentModal('${escapeJs(id)}')"
 								class="p-1.5 rounded-md hover:text-on-surface text-on-surface-variant"
 								title="Bayar">
@@ -28074,7 +28269,7 @@ function renderLiabilityPagination(total, totalPages) {
 					${liabilityCurrentPage >= totalPages ? "disabled" : ""}
 					class="px-2.5 py-1.5 rounded-md border border-outline-variant text-on-surface-variant disabled:opacity-30 hover:text-on-surface">
 					<span class="material-symbols-outlined text-[18px]">
-							chevron_right
+						chevron_right
 					</span>
 				</button>
 			</div>
@@ -28083,15 +28278,12 @@ function renderLiabilityPagination(total, totalPages) {
 }
 
 function changeLiabilityPage(page) {
-	const totalPages =
-		Math.max(
-			1,
+	const totalPages = Math.max( 1,
 			Math.ceil(
 				filteredLiabilities.length /
 				liabilityPageSize
 			)
 		);
-
 	if (page < 1 || page > totalPages) return;
 	liabilityCurrentPage = page;
 	renderLiabilities();
@@ -28131,13 +28323,11 @@ function openNewLiabilityModal() {
 			<option value="BANK">Bank</option>
 			<option value="CASH">Cash</option>
 		`;
-
 		accountEl.value = "BANK";
 	}
 	modal.classList.remove("hidden");
 	modal.classList.add("flex");
 }
-
 
 function closeNewLiabilityModal() {
 	const modal = document.getElementById("newLiabilityModal");
@@ -28157,36 +28347,12 @@ async function saveNewLiability() {
 	const fundingMethod = document.getElementById("newLiabilityAccount")?.value;
 	const note = document.getElementById("newLiabilityNote")?.value.trim() || null;
 
-	if (!sessionId || !branchId) {
-		showAccountingDebtMessage(
-			"Session tidak ditemukan",
-			"error" );
-		return; }
-	if (!type) {
-		showAccountingDebtMessage(
-			"Jenis liability wajib dipilih",
-			"error" );
-		return; }
-	if (!creditor) {
-		showAccountingDebtMessage(
-			"Creditor wajib diisi",
-			"error" );
-		return;}
-	if (!date) {
-		showAccountingDebtMessage(
-			"Tanggal wajib diisi",
-			"error" );
-		return; }
-	if (!amount || amount <= 0) {
-		showAccountingDebtMessage(
-			"Jumlah liability harus lebih dari 0",
-			"error" );
-		return; }
-	if (!["BANK", "CASH"].includes(fundingMethod)) {
-		showAccountingDebtMessage(
-			"Sumber dana wajib dipilih",
-			"error" );
-		return; }
+	if (!sessionId || !branchId) { showAccountingDebtMessage( "Session tidak ditemukan", "error" ); return; }
+	if (!type) { showAccountingDebtMessage( "Jenis liability wajib dipilih", "error" ); return; }
+	if (!creditor) { showAccountingDebtMessage( "Creditor wajib diisi", "error" ); return;}
+	if (!date) { showAccountingDebtMessage( "Tanggal wajib diisi", "error" ); return; }
+	if (!amount || amount <= 0) { showAccountingDebtMessage( "Jumlah liability harus lebih dari 0", "error" ); return; }
+	if (!["BANK", "CASH"].includes(fundingMethod)) { showAccountingDebtMessage( "Sumber dana wajib dipilih", "error" ); return; }
 	
   const saveBtn = document.querySelector( '#newLiabilityModal button[onclick*="saveNewLiability"]' );
 	
@@ -28199,54 +28365,42 @@ async function saveNewLiability() {
 		}
 		const { data, error } =
 	    await supabaseClient.rpc(
-	        "create_liability",
-	        {
-	            p_session_id: sessionId,
-	            p_branch_id: branchId,
-	            p_liability_type: type,
-	            p_creditor: creditor,
-	            p_description: note,
-	            p_start_date: date,
-	            p_due_date: dueDate,
-	            p_original_amount: amount,
-	            p_funding_method: fundingMethod,
-	            p_interest_type: null,
-	            p_interest_rate: null,
-	            p_interest_amount: 0
-	        }
+				"create_liability",
+				{
+					p_session_id: sessionId,
+					p_branch_id: branchId,
+					p_liability_type: type,
+					p_creditor: creditor,
+					p_description: note,
+					p_start_date: date,
+					p_due_date: dueDate,
+					p_original_amount: amount,
+					p_funding_method: fundingMethod,
+					p_interest_type: null,
+					p_interest_rate: null,
+					p_interest_amount: 0
+				}
 	    );
 
 		if (error) { throw error; }  
-		if (!data?.success) {
-			throw new Error(
-				data?.message ||
-				"Gagal membuat liability"
-			);
-		}
-			state.accountingLiabilitiesData = null;
-			state.accountingLiabilitiesFilter = null;
-			state.accountingReportsData = null;
-			state.accountingReportsFilter = null;
-			closeNewLiabilityModal();
-			resetNewLiabilityForm();
-			await loadLiabilities();
-			showAccountingDebtMessage(
-					"Liability berhasil ditambahkan",
-					"success" );
-
+		if (!data?.success) { throw new Error( data?.message || "Gagal membuat liability" ); }
+		
+		state.accountingLiabilitiesData = null;
+		state.accountingLiabilitiesFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+		closeNewLiabilityModal();
+		resetNewLiabilityForm();
+		await loadLiabilities();
+		showAccountingDebtMessage(
+			"Liability berhasil ditambahkan",
+			"success" );
 	} catch (err) {
-			showAccountingDebtMessage(
-					err.message ||
-					"Gagal menyimpan liability",
-					"error" 
-			);
-			
+		showAccountingDebtMessage( err.message || "Gagal menyimpan liability", "error" );
 	} finally {
-		if (saveBtn) {
-			saveBtn.disabled = false;
+		if (saveBtn) { saveBtn.disabled = false;
 		if (saveBtn.dataset.originalText) {
-			saveBtn.innerHTML =
-				saveBtn.dataset.originalText;
+			saveBtn.innerHTML = saveBtn.dataset.originalText;
 			}
 		}
 	}
@@ -28269,156 +28423,148 @@ function resetNewLiabilityForm() {
 }
 
 function openLiabilityPaymentModal(liabilityId) {
-    const liability = liabilityData.find( x => String(x.liability_id) === String(liabilityId) );
+	const liability = liabilityData.find( x => String(x.liability_id) === String(liabilityId) );
 
-    if (!liability) {
-			showAccountingDebtMessage(
-				"Data liability tidak ditemukan",
-				"error"
-			); return; }
-
-    if (
-        String(liability.status).toUpperCase() !== "ACTIVE"
-    ) { showAccountingDebtMessage(
-				"Liability ini sudah tidak aktif",
-				"error" );
-			return; }
-    const outstanding = Number(liability.outstanding_principal || 0);
-    let modal = document.getElementById("liabilityPaymentModal");
-    if (!modal) {
-			modal = document.createElement("div");
-			modal.id = "liabilityPaymentModal";
-			modal.className = "fixed inset-0 z-[9999] hidden items-center justify-center bg-background p-4";
-			 modal.innerHTML = `
-					<div class=" w-full max-w-lg rounded-md border border-outline-variant bg-background shadow-2xl">
-						<div class=" flex items-center justify-between px-5 py-4 border-b border-outline-variant">
-							<div>
-								<h3 class="text-on-surface font-semibold">
-									Pembayaran Liability
-								</h3>
-
-								<p id="liabilityPaymentCreditor"
-									class="text-sm text-on-surface-variant mt-1">
-								</p>
-							</div>
-								
-							<button type="button"
-								onclick="closeLiabilityPaymentModal()"
-								class="text-on-surface-variant hover:text-on-surface">
-								<span class="material-symbols-outlined">
-									close
-								</span>
-							</button>
-						</div>
-
-						<div class="p-5 space-y-4">
-							<input type="hidden" id="liabilityPaymentId" >
-								<div class=" rounded-md bg-background border border-outline-variant p-4">
-									<div class="text-sm text-on-surface-variant">
-										Outstanding Principal
-									</div>
-
-									<div id="liabilityPaymentOutstanding"
-										class="text-xl font-bold text-on-surface mt-1">
-									</div>
-								</div>
-
-								<div>
-									<label class="block text-xs text-on-surface-variant mb-2">
-										Tanggal Pembayaran
-									</label>
-
-									<input type="date"
-										id="liabilityPaymentDate"
-										class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
-								</div>
-
-								<div>
-									<label class="block text-xs text-on-surface-variant mb-2">
-										Pokok
-									</label>
-
-									<input type="number"
-										min="0"
-										id="liabilityPaymentPrincipal"
-										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
-								</div>
-
-								<div>
-									<label class="block text-xs text-on-surface-variant mb-2">
-										Bunga
-									</label>
-									
-									<input type="number"
-										min="0"
-										value="0"
-										id="liabilityPaymentInterest"
-										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
-								</div>
-								
-								<div>
-									<label class="block text-xs text-on-surface-variant mb-2">
-										Metode Pembayaran
-									</label>
-										
-									<select id="liabilityPaymentMethod"
-										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
-										<option value="BANK"> Bank </option>
-										<option value="CASH"> Cash </option>
-										<option value="QRIS"> QRIS </option>
-									</select>
-								</div>
-
-								<div>
-									<label class="block text-xs text-on-surface-variant mb-2">
-											No. Referensi
-									</label>
-
-									<input type="text" 
-										id="liabilityPaymentReference" 
-										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
-								</div>
-
-								<div>
-									<label class="block text-xs text-on-surface-variant mb-2">
-										Catatan
-									</label>
-		
-									<textarea id="liabilityPaymentNote" rows="2"
-										class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
-									</textarea>
-								</div>
-										
-								<div class=" flex items-center justify-end gap-2 pt-3">
-								
-								<button type="button"
-									onclick="closeLiabilityPaymentModal()"
-									class=" px-4 py-2 text-on-surface-variant hover:text-on-surface ">
-										Cancel
-								</button>
-								
-								<button type="button"
-									id="saveLiabilityPaymentBtn"
-									onclick="saveLiabilityPayment()"
-									class="px-4 py-2 bottom-theme text-on-surface font-medium ">
-									Simpan Pembayaran
-								</button>
-							</div>
-						</div>
+	if (!liability) { showAccountingDebtMessage( "Data liability tidak ditemukan", "error" ); return; }
+	if ( String(liability.status).toUpperCase() !== "ACTIVE"
+	) { showAccountingDebtMessage( "Liability ini sudah tidak aktif", "error" ); return; }
+	
+	const outstanding = Number(liability.outstanding_principal || 0);
+	let modal = document.getElementById("liabilityPaymentModal");
+	if (!modal) {
+		modal = document.createElement("div");
+		modal.id = "liabilityPaymentModal";
+		modal.className = "fixed inset-0 z-[9999] hidden items-center justify-center bg-background p-4";
+	 	modal.innerHTML = `
+			<div class=" w-full max-w-lg rounded-md border border-outline-variant bg-background shadow-2xl">
+				<div class=" flex items-center justify-between px-5 py-4 border-b border-outline-variant">
+					<div>
+						<h3 class="text-on-surface font-semibold">
+							Pembayaran Liability
+						</h3>
+	
+						<p id="liabilityPaymentCreditor"
+							class="text-sm text-on-surface-variant mt-1">
+						</p>
 					</div>
-				`;
-    document.body.appendChild(modal); }
-    document.getElementById( "liabilityPaymentId" ).value = liabilityId;
-    document.getElementById( "liabilityPaymentCreditor" ).textContent = `${getLiabilityTypeLabel(liability.liability_type)} • ${liability.creditor}`;
-    document.getElementById( "liabilityPaymentOutstanding" ).textContent = formatRupiah(outstanding);
-    document.getElementById( "liabilityPaymentDate" ).value = new Date().toISOString().split("T")[0];
-    document.getElementById( "liabilityPaymentPrincipal" ).value = outstanding;
-    document.getElementById( "liabilityPaymentInterest" ).value = 0;
-    document.getElementById( "liabilityPaymentMethod" ).value = "BANK";
-    document.getElementById( "liabilityPaymentReference" ).value = "";
-    document.getElementById( "liabilityPaymentNote" ).value = "";
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+						
+					<button type="button"
+						onclick="closeLiabilityPaymentModal()"
+						class="text-on-surface-variant hover:text-on-surface">
+						<span class="material-symbols-outlined">
+							close
+						</span>
+					</button>
+				</div>
+	
+				<div class="p-5 space-y-4">
+					<input type="hidden" id="liabilityPaymentId" >
+						<div class=" rounded-md bg-background border border-outline-variant p-4">
+							<div class="text-sm text-on-surface-variant">
+								Outstanding Principal
+							</div>
+	
+							<div id="liabilityPaymentOutstanding"
+								class="text-xl font-bold text-on-surface mt-1">
+							</div>
+						</div>
+	
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								Tanggal Pembayaran
+							</label>
+	
+							<input type="date"
+								id="liabilityPaymentDate"
+								class="w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+						</div>
+	
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								Pokok
+							</label>
+	
+							<input type="number"
+								min="0"
+								id="liabilityPaymentPrincipal"
+								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+						</div>
+	
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								Bunga
+							</label>
+							
+							<input type="number"
+								min="0"
+								value="0"
+								id="liabilityPaymentInterest"
+								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+						</div>
+						
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								Metode Pembayaran
+							</label>
+								
+							<select id="liabilityPaymentMethod"
+								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+								<option value="BANK"> Bank </option>
+								<option value="CASH"> Cash </option>
+								<option value="QRIS"> QRIS </option>
+							</select>
+						</div>
+	
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								No. Referensi
+							</label>
+	
+							<input type="text" 
+								id="liabilityPaymentReference" 
+								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface" >
+						</div>
+	
+						<div>
+							<label class="block text-xs text-on-surface-variant mb-2">
+								Catatan
+							</label>
+	
+							<textarea id="liabilityPaymentNote" rows="2"
+								class=" w-full rounded-md bg-background border border-outline-variant px-3 py-2 text-on-surface">
+							</textarea>
+						</div>
+								
+						<div class=" flex items-center justify-end gap-2 pt-3">
+						
+						<button type="button"
+							onclick="closeLiabilityPaymentModal()"
+							class=" px-4 py-2 text-on-surface-variant hover:text-on-surface ">
+								Cancel
+						</button>
+						
+						<button type="button"
+							id="saveLiabilityPaymentBtn"
+							onclick="saveLiabilityPayment()"
+							class="px-4 py-2 bottom-theme text-on-surface font-medium ">
+								Simpan Pembayaran
+						</button>
+					</div>
+				</div>
+			</div>
+		`;
+	document.body.appendChild(modal); }
+	document.getElementById( "liabilityPaymentId" ).value = liabilityId;
+	document.getElementById( "liabilityPaymentCreditor" ).textContent = `${getLiabilityTypeLabel(liability.liability_type)} • ${liability.creditor}`;
+	document.getElementById( "liabilityPaymentOutstanding" ).textContent = formatRupiah(outstanding);
+	document.getElementById( "liabilityPaymentDate" ).value = new Date().toISOString().split("T")[0];
+	document.getElementById( "liabilityPaymentPrincipal" ).value = outstanding;
+	document.getElementById( "liabilityPaymentInterest" ).value = 0;
+	document.getElementById( "liabilityPaymentMethod" ).value = "BANK";
+	document.getElementById( "liabilityPaymentReference" ).value = "";
+	document.getElementById( "liabilityPaymentNote" ).value = "";
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 function closeLiabilityPaymentModal() {
@@ -28439,61 +28585,26 @@ async function saveLiabilityPayment() {
 	const referenceNo = document.getElementById( "liabilityPaymentReference" )?.value.trim() || null;
 	const note = document.getElementById( "liabilityPaymentNote" )?.value.trim() || null;
 
-	if (!sessionId) {
-		showAccountingDebtMessage(
-			"Session tidak ditemukan",
-			"error" );
-		return; }
-	if (!branchId) {
-    showAccountingDebtMessage(
-			"Branch belum tersedia",
-			"error" );
-    return; }
-	if (!liabilityId) {
-		showAccountingDebtMessage(
-			"Liability tidak ditemukan",
-			"error" );
-		return; }
-	if (!paymentDate) {
-		showAccountingDebtMessage(
-			"Tanggal pembayaran wajib diisi",
-			"error" );
-		return; }
-	if (principal <= 0 && interest <= 0) {
-		showAccountingDebtMessage(
-			"Masukkan pokok atau bunga",
-			"error" );
-		return; }
-	if (principal < 0 || interest < 0) {
-		showAccountingDebtMessage(
-			"Nominal tidak valid",
-			"error" );
-		return; }
-	const liability = liabilityData.find(
-		x =>
-			String(x.liability_id) ===
-			String(liabilityId)
-		);
+	if (!sessionId) { showAccountingDebtMessage( "Session tidak ditemukan", "error" ); return; }
+	if (!branchId) { showAccountingDebtMessage( "Branch belum tersedia", "error" ); return; }
+	if (!liabilityId) { showAccountingDebtMessage( "Liability tidak ditemukan", "error" ); return; }
+	if (!paymentDate) { showAccountingDebtMessage( "Tanggal pembayaran wajib diisi", "error" ); return; }
+	if (principal <= 0 && interest <= 0) { showAccountingDebtMessage( "Masukkan pokok atau bunga", "error" ); return; }
+	if (principal < 0 || interest < 0) { showAccountingDebtMessage( "Nominal tidak valid", "error" ); return; }
 	
-	if (!liability) {
-		showAccountingDebtMessage(
-			"Data liability tidak ditemukan",
-			"error" );
-		return; }
+	const liability = liabilityData.find(
+		x => String(x.liability_id) === String(liabilityId) );
+	
+	if (!liability) { showAccountingDebtMessage( "Data liability tidak ditemukan", "error" ); return; }
 	
 	const outstanding = Number( liability.outstanding_principal || 0 );
-		
-	if (principal > outstanding) {
-		showAccountingDebtMessage(
-			"Pembayaran pokok melebihi outstanding",
-			"error" );
-		return; }
+	if (principal > outstanding) { showAccountingDebtMessage( "Pembayaran pokok melebihi outstanding", "error" ); return; }
+	
 	const btn = document.getElementById( "saveLiabilityPaymentBtn" );
 	
 try {
-		if (btn) { btn.disabled = true;
-				btn.textContent = "Menyimpan..."; 
-		}
+		if (btn) { btn.disabled = true; btn.textContent = "Menyimpan..."; }
+	
 		const { data, error } =
 			await supabaseClient.rpc(
 				"create_liability_payment",
@@ -28513,25 +28624,17 @@ try {
 
 
 		if (error) { throw error; }
-			
-		if (!data?.success) { throw new Error( 
-			data?.message || "Gagal menyimpan pembayaran" );
-		}
+		if (!data?.success) { throw new Error( data?.message || "Gagal menyimpan pembayaran" ); }
+	
 		state.accountingLiabilitiesData = null;
 		state.accountingLiabilitiesFilter = null;
 		state.accountingReportsData = null;
 		state.accountingReportsFilter = null;
 		closeLiabilityPaymentModal();
 		await loadLiabilities();
-		showAccountingDebtMessage(
-				"Pembayaran liability berhasil",
-				"success"
-		);
+		showAccountingDebtMessage( "Pembayaran liability berhasil", "success" );
 	} catch (err) {
-		showAccountingDebtMessage(
-			err.message || "Gagal menyimpan pembayaran",
-			"error"
-		);
+		showAccountingDebtMessage( err.message || "Gagal menyimpan pembayaran", "error" );
 	} finally {
 		if (btn) {
 			btn.disabled = false;
@@ -28585,14 +28688,13 @@ function showAccountingDebtMessage( message, type = "success" ) {
 	item.className = `
 		mb-2 px-4 py-3 rounded-xl border shadow-xl text-sm
 		${isError
-				? "bg-red-950 border-red-800 text-red-300"
-				: "bg-emerald-950 border-emerald-800 text-emerald-300"
+			? "bg-red-950 border-red-800 text-red-300"
+			: "bg-emerald-950 border-emerald-800 text-emerald-300"
 		}
 	`;
 	item.textContent = message;
 	container.appendChild(item);
-	setTimeout(() => {
-		item.remove();
+	setTimeout(() => { item.remove();
 	}, 3500);
 }
 
