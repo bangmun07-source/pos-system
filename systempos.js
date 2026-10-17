@@ -28265,60 +28265,64 @@ async function loadEmployeeHealthRecords() {
 
 /* ==== RENDER TABLE ==== */
 function renderEmployeeHealthTable(errorMessage = "") {
-	const tbody = document.getElementById( "employeeHealthTableBody" );
+	const tbody = document.getElementById("employeeHealthTableBody");
 	if (!tbody) return;
 
 	const data = Array.isArray(employeeHealthData)
 		? employeeHealthData
 		: [];
-	const totalRecords = data.length;
-	const totalPages = Math.max( 1, Math.ceil(totalRecords / employeeHealthPageSize) );
+	const total = data.length;
+	const totalPages = Math.max( 1, Math.ceil(total / employeeHealthPageSize) );
 	employeeHealthCurrentPage = Math.max( 1, Math.min(employeeHealthCurrentPage, totalPages) );
 	const startIndex = (employeeHealthCurrentPage - 1) * employeeHealthPageSize;
-	const endIndex = Math.min( startIndex + employeeHealthPageSize, totalRecords );
+	const endIndex = Math.min( startIndex + employeeHealthPageSize, total );
 	const pageData = data.slice(startIndex, endIndex);
 
 	if (!pageData.length) {
 		tbody.innerHTML = `
 			<tr>
-				<td colspan="9"
+				<td colspan="10"
 					class="px-5 py-10 text-center text-muted">
-					${escapeHtml( errorMessage || "No employee health data" )}
+						${escapeHtml(errorMessage || "No employee health data")}
 				</td>
 			</tr>
 		`;
 	} else {
 		tbody.innerHTML = pageData.map(row => {
-			const status = String( row.status || "DRAFT" ).trim().toUpperCase();
+			const status = String(row.status || "DRAFT")
+				.trim()
+				.toUpperCase();
 			const employeeAmount = Number(row.employee_amount) || 0;
 			const employerAmount = Number(row.employer_amount) || 0;
 			const totalAmount = employeeAmount + employerAmount;
-			const branchId = String( row.branch_id || "" ).trim();
-			const branchName = accountingDebtBranches.find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
-			const employeeName = row.employee_name || "-";
-			const employeeCode = row.employee_code
-				? ` (${row.employee_code})`
-				: "";
+			// Status PAID dianggap lunas untuk sementara.
+			const paidAmount = status === "PAID" ? totalAmount : 0;
+			const remainingAmount = ["PAID", "CANCELLED"].includes(status)
+				? 0
+				: totalAmount;
+			const branchId = String(row.branch_id || "").trim();
+			const branchName = (typeof accountingDebtBranches !== "undefined"
+				? accountingDebtBranches
+				: []
+			).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
 			const period = row.contribution_period
 				? new Date( `${String(row.contribution_period).slice(0, 10)}T00:00:00` ).toLocaleDateString("id-ID", {
-					month: "short",
-					year: "numeric"
-				}) : "-";
+						month: "short",
+						year: "numeric"
+					})
+				: "-";
 			const contributionType = String( row.contribution_type || "" ).trim().toUpperCase();
+
 			let contributionLabel = contributionType || "-";
 
-			if (
-				contributionType === "EMPLOYEE_HEALTH_CONTRIBUTION"
-			) {
+			if (contributionType === "EMPLOYEE_HEALTH_CONTRIBUTION") {
 				contributionLabel = "Employee Contribution";
 			} else if (
 				contributionType === "EMPLOYER_HEALTH_CONTRIBUTION"
 			) {
 				contributionLabel = "Employer Contribution";
 			}
-					
-			const note = String(row.note || "").trim();
-			if (note) { contributionLabel += ` · ${note}`; }
+			if (row.note) { contributionLabel += ` · ${row.note}`; }
 
 			const statusClass = {
 				DRAFT: "bg-surface-container-high text-muted",
@@ -28328,56 +28332,58 @@ function renderEmployeeHealthTable(errorMessage = "") {
 				CANCELLED: "bg-red-600/10 text-red-700"
 			}[status] || "bg-surface-container-high text-muted";
 
-				return `
-					<tr class="hover:bg-outline-variant transition">
-						<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
-						<td class="px-5 py-4">
-							<div class="font-medium text-foreground"> ${escapeHtml(employeeName)} </div>
-							<div class="text-xs text-muted"> ${escapeHtml(employeeCode)} </div>
-						</td>
-						<td class="px-5 py-4"> ${escapeHtml(branchName)} </td>
-						<td class="px-5 py-4"> ${escapeHtml(contributionLabel)} </td>
-						<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(employeeAmount)} </td>
-						<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(employerAmount)} </td>
-						<td class="px-5 py-4 text-right font-medium whitespace-nowrap"> ${formatAccountingCurrency(totalAmount)} </td>
-						<td class="px-5 py-4 text-center">
-							<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
-								${escapeHtml(status)}
-							</span>
-						</td>
-						<td class="px-5 py-4 text-center">—</td>
-					</tr>
-				`;
-			}).join("");
-    }
+			return `
+				<tr class="hover:bg-outline-variant transition">
+					<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
+					<td class="px-5 py-4">
+						<div class="font-medium text-foreground"> ${escapeHtml(row.employee_name || "-")} </div>
+						<div class="text-xs text-muted"> ${escapeHtml(row.employee_code || "")} </div>
+					</td>
+					<td class="px-5 py-4"> ${escapeHtml(branchName)} </td>
+					<td class="px-5 py-4"> ${escapeHtml(contributionLabel)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(employeeAmount)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(employerAmount)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(paidAmount)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(remainingAmount)} </td>
+					<td class="px-5 py-4 text-center">
+						<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}"> ${escapeHtml(status)} </span>
+					</td>
+					<td class="px-5 py-4 text-center">—</td>
+				</tr>
+			`;
+		}).join("");
+	}
 	updateEmployeeHealthSummary(data);
-	updateEmployeeHealthPagination( totalRecords, startIndex, endIndex );
+	updateEmployeeHealthPagination(total, startIndex, endIndex);
 }
 
 /* ==== SUMMARY ==== */
 function updateEmployeeHealthSummary(data) {
 	const rows = Array.isArray(data) ? data : [];
-	const totalCount = rows.length;
-	const draftCount = rows.filter( row => String(row.status || "").toUpperCase() === "DRAFT" ).length;
-	const paidCount = rows.filter( row => String(row.status || "").toUpperCase() === "PAID" ).length;
+	const paidRows = rows.filter( row => String(row.status || "").trim().toUpperCase() === "PAID" );
+	const totalRecords = rows.length;
+	const employeePaid = paidRows.reduce( (sum, row) => sum + (Number(row.employee_amount) || 0), 0 );
+	const employerPaid = paidRows.reduce( (sum, row) => sum + (Number(row.employer_amount) || 0), 0 );
 	const outstanding = rows.reduce((sum, row) => {
-		const status = String( row.status || "" ).toUpperCase();
+		const status = String(row.status || "").trim().toUpperCase();
+
 		if (["PAID", "CANCELLED"].includes(status)) { return sum; }
 
 		return sum
 			+ (Number(row.employee_amount) || 0)
 			+ (Number(row.employer_amount) || 0);
 	}, 0);
-	const totalEl = document.getElementById( "employeeHealthTotalCount" );
-	const draftEl = document.getElementById( "employeeHealthDraftCount" );
-	const paidEl = document.getElementById( "employeeHealthPaidCount" );
-	const outstandingEl = document.getElementById( "employeeHealthOutstandingAmount" );
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) element.textContent = value;
+	};
 
-	if (totalEl) totalEl.textContent = totalCount;
-	if (draftEl) draftEl.textContent = draftCount;
-	if (paidEl) paidEl.textContent = paidCount;
-	if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+	setText("employeeHealthTotalCount", totalRecords);
+	setText( "employeeHealthEmployeePaid", formatAccountingCurrency(employeePaid) );
+	setText( "employeeHealthEmployerPaid", formatAccountingCurrency(employerPaid) );
+	setText( "employeeHealthOutstandingAmount", formatAccountingCurrency(outstanding) );
 }
+
 
 /* ==== PAGINATION ==== */
 function updateEmployeeHealthPagination(total, start, end) {
