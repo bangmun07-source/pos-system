@@ -19462,6 +19462,131 @@
             </div>
           </div>
         </section>
+				<!-- OTHER LIABILITIES -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl"
+                  style="font-variation-settings:'FILL' 1;">
+                  request_quote
+                </span>
+              </div>
+
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Other Liabilities
+                </h2>
+
+                <p class="text-xs text-muted mt-1">
+                  Bank loans, long-term debt and other obligations
+                </p>
+              </div>
+            </div>
+
+            <button id="newLiabilityButton"
+              type="button"
+              onclick="openNewLiabilityModal()"
+              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+              <span class="material-symbols-outlined text-sm">
+                add
+              </span>
+              New Liability
+            </button>
+          </div>
+          <!-- FILTER -->
+          <div class="p-5 border-b border-outline-variant">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Liability Type
+                </label>
+
+                <select id="liabilityTypeFilter"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Types </option>
+                  <option value="BANK_LOAN"> Bank Loan </option>
+                  <option value="LONG_TERM_DEBT"> Long Term Debt </option>
+                  <option value="OTHER_PAYABLE"> Other Payable </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Status
+                </label>
+
+                <select id="liabilityStatusFilter"
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                  <option value=""> All Status </option>
+                  <option value="ACTIVE"> Active </option>
+                  <option value="PAID"> Paid </option>
+                  <option value="CANCELLED">  Cancelled </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs text-muted mb-2">
+                  Search
+                </label>
+
+                <input id="liabilitySearch"
+                  type="text"
+                  placeholder="Creditor or liability..."
+                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+              </div>
+            </div>
+          </div>
+          <!-- TABLE -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+                  <th class="px-5 py-3"> Type </th>
+									<th class="px-5 py-3"> Branch </th>
+                  <th class="px-5 py-3"> Creditor </th>
+                  <th class="px-5 py-3"> Date </th>
+                  <th class="px-5 py-3"> Due Date </th>
+                  <th class="px-5 py-3 text-right"> Total </th>
+                  <th class="px-5 py-3 text-right"> Paid </th>
+                  <th class="px-5 py-3 text-right"> Outstanding </th>
+                  <th class="px-5 py-3 text-center"> Status </th>
+                  <th class="px-5 py-3 text-center"> Action </th>
+                </tr>
+              </thead>
+
+              <tbody id="otherLiabilitiesTableBody" class="divide-y divide-outline-variant">
+              </tbody>
+            </table>
+          </div>
+          <!-- FOOTER -->
+          <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
+            <p id="otherLiabilitiesPaginationInfo"
+              class="text-xs text-on-surface-variant font-medium">
+              Showing 0–0 of 0
+            </p>
+
+            <div class="flex items-center gap-2">
+              <button id="otherLiabilitiesPrevButton"
+                type="button"
+                onclick="otherLiabilitiesPrevPage()"
+                class="px-3 py-2 text-muted font-medium headline-font transition">
+                <span class="material-symbols-outlined text-sm lg:text-base">
+                  chevron_left
+                </span>
+              </button>
+
+              <button id="otherLiabilitiesNextButton"
+                type="button"
+                onclick="otherLiabilitiesNextPage()"
+                class="px-3 py-2 text-muted font-medium headline-font transition">
+                <span class="material-symbols-outlined text-sm lg:text-base">
+                  chevron_right
+                </span>
+              </button>
+            </div>
+          </div>
+        </section>
 				<!-- TAX PAYABLE -->
 				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
 				  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
@@ -19774,6 +19899,13 @@
 				        </p>
 				      </div>
 				    </div>
+						
+						<button type="button"
+						  onclick="exportEmployeeHealthData()"
+						  class="h-10 px-4 rounded-md bottom-theme text-sm font-medium inline-flex items-center justify-center gap-2 whitespace-nowrap">
+						  <span class="material-symbols-outlined text-lg">download</span>
+						  Export
+						</button>
 				  </div>
 				  <!-- FILTER -->
 				  <div class="p-5 border-b border-outline-variant">
@@ -19827,38 +19959,48 @@
 				      </div>
 				    </div>
 				  </div>
-				  <!-- SUMMARY -->
-				  <div class="grid grid-cols-2 md:grid-cols-4">
-				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
+					<!-- SUMMARY -->
+					<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
+				 		<div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
 				      <p class="text-[11px] text-muted uppercase tracking-wider">
 				        Total Records
 				      </p>
 				      <p id="employeeHealthTotalCount" class="text-xl font-headline mt-1">0</p>
 				    </div>
-				
-				    <div class="p-5 border-r border-b md:border-b-0 border-outline-variant">
-				      <p class="text-[11px] text-muted uppercase tracking-wider">
-				        Draft
-				      </p>
-				      <p id="employeeHealthDraftCount" class="text-xl font-headline mt-1">0</p>
-				    </div>
-				
-				    <div class="p-5 border-r border-outline-variant">
-				      <p class="text-[11px] text-muted uppercase tracking-wider">
-				        Paid
-				      </p>
-				      <p id="employeeHealthPaidCount" class="text-xl font-headline mt-1">0</p>
-				    </div>
-				
-				    <div class="p-5">
-				      <p class="text-[11px] text-muted uppercase tracking-wider">
-				        Outstanding Contributions
-				      </p>
-				      <p id="employeeHealthOutstandingAmount" class="text-xl font-headline mt-1">
-				        Rp 0
-				      </p>
-				    </div>
-				  </div>
+						
+					  <!-- EMPLOYEE PAID -->
+					  <div class="p-5 border-r border-b xl:border-b-0 border-outline-variant">
+					    <p class="text-[11px] text-muted uppercase tracking-wider">
+					      Employee Paid
+					    </p>
+					    <p id="employeeHealthEmployeePaid"
+					      class="text-xl font-headline mt-1">
+					      Rp 0
+					    </p>
+					  </div>
+					
+					  <!-- EMPLOYER PAID -->
+					  <div class="p-5 border-r border-b xl:border-b-0 border-outline-variant">
+					    <p class="text-[11px] text-muted uppercase tracking-wider">
+					      Employer Paid
+					    </p>
+					    <p id="employeeHealthEmployerPaid"
+					      class="text-xl font-headline mt-1">
+					      Rp 0
+					    </p>
+					  </div>
+					
+					  <!-- OUTSTANDING -->
+					  <div class="p-5">
+					    <p class="text-[11px] text-muted uppercase tracking-wider">
+					      Outstanding Contributions
+					    </p>
+					    <p id="employeeHealthOutstandingAmount"
+					      class="text-xl font-headline mt-1">
+					      Rp 0
+					    </p>
+					  </div>
+					</div>
 				  <!-- TABLE -->
 				  <div class="overflow-x-auto custom-scrollbar">
 				    <table class="w-full text-sm">
@@ -19868,9 +20010,10 @@
 				          <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
 				          <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
 				          <th class="px-5 py-3 text-left whitespace-nowrap">Contribution Type</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Employee Amount</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Employer Amount</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Total</th>
+									<th class="px-5 py-3 text-right whitespace-nowrap">Employee Amount</th>
+									<th class="px-5 py-3 text-right whitespace-nowrap">Employer Amount</th>
+									<th class="px-5 py-3 text-right whitespace-nowrap">Paid Amount</th>
+									<th class="px-5 py-3 text-right whitespace-nowrap">Remaining</th>
 				          <th class="px-5 py-3 text-center">Status</th>
 				          <th class="px-5 py-3 text-center">Action</th>
 				        </tr>
@@ -19906,131 +20049,6 @@
 				    </div>
 				  </div>
 				</section>
-        <!-- OTHER LIABILITIES -->
-        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="main-icon-box">
-                <span class="material-symbols-outlined text-3xl"
-                  style="font-variation-settings:'FILL' 1;">
-                  request_quote
-                </span>
-              </div>
-
-              <div>
-                <h2 class="text-lg font-bold font-headline text-foreground">
-                  Other Liabilities
-                </h2>
-
-                <p class="text-xs text-muted mt-1">
-                  Bank loans, long-term debt and other obligations
-                </p>
-              </div>
-            </div>
-
-            <button id="newLiabilityButton"
-              type="button"
-              onclick="openNewLiabilityModal()"
-              class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">
-                add
-              </span>
-              New Liability
-            </button>
-          </div>
-          <!-- FILTER -->
-          <div class="p-5 border-b border-outline-variant">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Liability Type
-                </label>
-
-                <select id="liabilityTypeFilter"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Types </option>
-                  <option value="BANK_LOAN"> Bank Loan </option>
-                  <option value="LONG_TERM_DEBT"> Long Term Debt </option>
-                  <option value="OTHER_PAYABLE"> Other Payable </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Status
-                </label>
-
-                <select id="liabilityStatusFilter"
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                  <option value=""> All Status </option>
-                  <option value="ACTIVE"> Active </option>
-                  <option value="PAID"> Paid </option>
-                  <option value="CANCELLED">  Cancelled </option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs text-muted mb-2">
-                  Search
-                </label>
-
-                <input id="liabilitySearch"
-                  type="text"
-                  placeholder="Creditor or liability..."
-                  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
-              </div>
-            </div>
-          </div>
-          <!-- TABLE -->
-          <div class="overflow-x-auto custom-scrollbar">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-                  <th class="px-5 py-3"> Type </th>
-									<th class="px-5 py-3"> Branch </th>
-                  <th class="px-5 py-3"> Creditor </th>
-                  <th class="px-5 py-3"> Date </th>
-                  <th class="px-5 py-3"> Due Date </th>
-                  <th class="px-5 py-3 text-right"> Total </th>
-                  <th class="px-5 py-3 text-right"> Paid </th>
-                  <th class="px-5 py-3 text-right"> Outstanding </th>
-                  <th class="px-5 py-3 text-center"> Status </th>
-                  <th class="px-5 py-3 text-center"> Action </th>
-                </tr>
-              </thead>
-
-              <tbody id="otherLiabilitiesTableBody" class="divide-y divide-outline-variant">
-              </tbody>
-            </table>
-          </div>
-          <!-- FOOTER -->
-          <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
-            <p id="otherLiabilitiesPaginationInfo"
-              class="text-xs text-on-surface-variant font-medium">
-              Showing 0–0 of 0
-            </p>
-
-            <div class="flex items-center gap-2">
-              <button id="otherLiabilitiesPrevButton"
-                type="button"
-                onclick="otherLiabilitiesPrevPage()"
-                class="px-3 py-2 text-muted font-medium headline-font transition">
-                <span class="material-symbols-outlined text-sm lg:text-base">
-                  chevron_left
-                </span>
-              </button>
-
-              <button id="otherLiabilitiesNextButton"
-                type="button"
-                onclick="otherLiabilitiesNextPage()"
-                class="px-3 py-2 text-muted font-medium headline-font transition">
-                <span class="material-symbols-outlined text-sm lg:text-base">
-                  chevron_right
-                </span>
-              </button>
-            </div>
-          </div>
-        </section>
       </section>
     </main>
   </div>
