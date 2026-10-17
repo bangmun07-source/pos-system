@@ -25725,6 +25725,52 @@
 	          </div>
 	        </div>
 	      </div>
+				<!-- PPH 21 TAX SETTING -->
+				<div class="border border-outline-variant rounded-md p-4 space-y-3">
+				  <div>
+				    <h3 class="text-sm font-semibold text-foreground">
+				      PPh 21 Tax
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Automatic tax calculation based on employee PTKP status.
+				    </p>
+				  </div>
+				
+				  <label class="flex items-center justify-between gap-3">
+				    <span class="text-sm text-foreground">
+				      Enable PPh 21
+				    </span>
+				    <input
+				      id="employeePPh21Enabled"
+				      type="checkbox"
+				      checked
+				      class="w-4 h-4"
+				    >
+				  </label>
+				
+				  <div>
+				    <label
+				      for="employeePPh21PTKP"
+				      class="block text-sm font-medium text-foreground mb-2"
+				    >
+				      PTKP Status
+				    </label>
+				
+				    <select
+				      id="employeePPh21PTKP"
+				      class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
+				    >
+				      <option value="TK/0">TK/0 — Tidak Kawin, 0 tanggungan</option>
+				      <option value="TK/1">TK/1 — Tidak Kawin, 1 tanggungan</option>
+				      <option value="TK/2">TK/2 — Tidak Kawin, 2 tanggungan</option>
+				      <option value="TK/3">TK/3 — Tidak Kawin, 3 tanggungan</option>
+				      <option value="K/0">K/0 — Kawin, 0 tanggungan</option>
+				      <option value="K/1">K/1 — Kawin, 1 tanggungan</option>
+				      <option value="K/2">K/2 — Kawin, 2 tanggungan</option>
+				      <option value="K/3">K/3 — Kawin, 3 tanggungan</option>
+				    </select>
+				  </div>
+				</div>
 	      <!-- ALLOWANCES -->
 	      <div>
 	        <div class="flex items-center justify-between mb-2">
