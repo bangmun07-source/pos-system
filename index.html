@@ -4016,7 +4016,7 @@
 			</div>
 			<!-- FILTER: BARIS DI BAWAH HEADER -->
 			<div class="p-5 border-b border-outline-variant">
-			  <div class="flex flex-row items-center gap-2 sm:gap-3 flex-wrap">
+			  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 w-full">
 			    <!-- SEARCH -->
 			    <div class="relative">
 			      <span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-muted text-sm">
@@ -4111,8 +4111,10 @@
 						</h2>
     		</div>
 				
-      	<button onclick="openSupplierModal()" class="rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs hover:text-on-surface px-5 py-2.5 transition-all flex items-center gap-2 h-[30px]">
-      		<span class="material-symbols-outlined text-sm lg:text-base">person_add</span>
+      	<button onclick="openSupplierModal()" class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
+      		<span class="material-symbols-outlined text-sm">
+						person_add
+					</span>
           Register Supplier
       </button>
   	</div>
@@ -4167,16 +4169,16 @@
 			
       <div class="flex gap-2">
         <button onclick="exportRecipeReport()"
-          class="rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs px-5 py-2.5 h-[30px] flex items-center gap-2 active:scale-95 transition">
-          <span class="material-symbols-outlined text-sm lg:text-base">
+          class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">
             file_download
           </span>
           	Export
         </button>
 
         <button onclick="openAddProductModal()"
-          class="rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs hover:text-on-surface px-5 py-2.5 h-[30px] flex items-center gap-2 active:scale-95 transition">
-          <span class="material-symbols-outlined text-sm lg:text-base">
+          class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined text-sm">
             add
           </span>
           Add Product
