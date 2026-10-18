@@ -3367,16 +3367,14 @@
       <table class="w-full text-left border-collapse">
 
         <thead>
-          <tr class="sticky top-0 border border-outline-variant text-[11px] text-muted uppercase tracking-widest">
-
+          <tr class="sticky top-0 border border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
             <th class="px-6 py-4">Member ID</th>
             <th class="px-6 py-4">Name</th>
             <th class="px-6 py-4">Tier Status</th>
             <th class="px-6 py-4 text-right">Total Spend</th>
             <th class="px-6 py-4 text-right">Points</th>
             <th class="px-6 py-4 text-center">WhatsApp</th>
-            <th class="px-6 py-4">Action</th>
-
+            <th class="px-6 py-4 text-center">Action</th>
           </tr>
         </thead>
 
@@ -13558,44 +13556,16 @@
       <div class="overflow-x-auto custom-scrollbar">
         <table class="w-full text-left border-collapse">
           <thead>
-            <tr class="sticky top-0 border border-outline-variant
-              text-[11px] text-muted uppercase tracking-widest">
-
-              <th class="px-6 py-4">
-                Asset
-              </th>
-
-              <th class="px-6 py-4">
-                Purchase Date
-              </th>
-
-              <th class="px-6 py-4 text-right">
-                Purchase Cost
-              </th>
-
-              <th class="px-6 py-4 text-center">
-                Useful Life
-              </th>
-
-              <th class="px-6 py-4 text-right">
-                Depreciation / Month
-              </th>
-
-              <th class="px-6 py-4 text-right">
-                Acc. Depreciation
-              </th>
-
-              <th class="px-6 py-4 text-right">
-                Book Value
-              </th>
-
-              <th class="px-6 py-4 text-center">
-                Status
-              </th>
-
-							<th class="px-4 py-3 text-center">
-							  Action
-							</th>
+            <tr class="sticky top-0 border border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+              <th class="px-6 py-4"> Asset </th>
+              <th class="px-6 py-4"> Purchase Date </th>
+              <th class="px-6 py-4 text-right"> Purchase Cost </th>
+              <th class="px-6 py-4 text-center"> Useful Life </th>
+              <th class="px-6 py-4 text-right"> Depreciation / Month </th>
+              <th class="px-6 py-4 text-right"> Acc. Depreciation </th>
+              <th class="px-6 py-4 text-right"> Book Value </th>
+              <th class="px-6 py-4 text-center"> Status </th>
+							<th class="px-4 py-3 text-center"> Action </th>
             </tr>
           </thead>
 
@@ -13671,11 +13641,11 @@
 			
 			    <button type="button"
 			      onclick="openAddAssetPurchaseModal()"
-			      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bottom-theme text-on-surface text-sm font-semibold transition-all">
-			      <span class="material-symbols-outlined text-lg">
+			      class="inline-flex items-center justify-center gap-2 px-4 py-2.5 h-10 px-4 rounded-md bottom-theme text-sm font-medium">
+			      <span class="material-symbols-outlined text-sm">
 			        add
 			      </span>
-			      Add New Asset
+			      New Asset
 			    </button>
 			  </div>
 			</div>
@@ -13683,44 +13653,16 @@
 		  <div class="overflow-x-auto custom-scrollbar">
 		    <table class="w-full text-left border-collapse">
 		      <thead>
-		        <tr class="sticky top-0 border border-outline-variant
-		          text-[11px] text-muted uppercase tracking-widest">
-		
-		          <th class="px-6 py-4">
-		            Asset
-		          </th>
-		
-		          <th class="px-6 py-4">
-		            Purchase Date
-		          </th>
-		
-		          <th class="px-6 py-4 text-right">
-		            Purchase Cost
-		          </th>
-		
-		          <th class="px-6 py-4 text-right">
-		            Interest
-		          </th>
-		
-		          <th class="px-6 py-4 text-right">
-		            Total Obligation
-		          </th>
-		
-		          <th class="px-6 py-4 text-right">
-		            Paid
-		          </th>
-		
-		          <th class="px-6 py-4 text-right">
-		            Outstanding
-		          </th>
-		
-		          <th class="px-6 py-4 text-center">
-		            Status
-		          </th>
-		
-		          <th class="px-4 py-4 text-center">
-		            Action
-		          </th>
+		        <tr class="sticky top-0 border border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+		          <th class="px-6 py-4"> Asset </th>
+		          <th class="px-6 py-4"> Purchase Date </th>
+		          <th class="px-6 py-4 text-right"> Purchase Cost </th>
+		          <th class="px-6 py-4 text-right"> Interest </th>
+		          <th class="px-6 py-4 text-right"> Total Obligation </th>
+		          <th class="px-6 py-4 text-right"> Paid </th>
+		          <th class="px-6 py-4 text-right"> Outstanding </th>
+		          <th class="px-6 py-4 text-center"> Status </th>
+		          <th class="px-4 py-4 text-center"> Action </th>
 		        </tr>
 		      </thead>
 		
@@ -13734,7 +13676,6 @@
 		      </tbody>
 		    </table>
 		  </div>
-		
 		  <!-- FOOTER -->
 		  <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
 		    <p id="asset-purchase-pagination-info"
@@ -13797,9 +13738,9 @@
 		      <!-- RUN DEPRECIATION -->
 		      <button id="runMonthlyDepreciationBtn"
 		        type="button"
-				onclick="runMonthlyDepreciation()"
-		        class="shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 bottom-theme text-on-surface text-sm font-semibold transition-all">
-		        <span class="material-symbols-outlined text-lg">
+						onclick="runMonthlyDepreciation()"
+		        class="shrink-0 justify-center py-2.5 h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+		        <span class="material-symbols-outlined text-sm">
 		          calendar_month
 		        </span>
 		        <span>
@@ -13812,7 +13753,7 @@
 		  <div class="overflow-x-auto custom-scrollbar">
 		    <table class="w-full text-left border-collapse">
 		      <thead>
-		        <tr class="sticky top-0 border border-outline-variant text-[11px] text-muted uppercase tracking-widest">
+		        <tr class="sticky top-0 border border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
 		          <th class="px-6 py-4"> Period </th>
 		          <th class="px-6 py-4"> Asset </th>
 		          <th class="px-6 py-4 text-right"> Depreciation </th>
