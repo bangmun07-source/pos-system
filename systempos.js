@@ -669,7 +669,6 @@ async function handleLogin() {
     } catch { throw new Error("Respons server tidak valid."); }
 
     if (!response.ok) { throw new Error(result.error || "Login gagal."); }
-    // VALIDASI HASIL LOGIN
     if (!result || !result.success || !result.user) { throw new Error("Username atau password salah."); }
     if (!result.session_id) { throw new Error("Session login tidak dibuat."); }
 
@@ -691,9 +690,7 @@ async function handleLogin() {
 
     localStorage.setItem( "pos_login_tenant", state.tenantSlug || "master" );
 
-    // ==========================================
     // NAVIGASI BERDASARKAN ROLE
-    // ==========================================
     const loginRole = String(user.role || "")
       .trim()
       .toLowerCase();
@@ -707,8 +704,6 @@ async function handleLogin() {
     }
 
   } catch (err) {
-    console.error("handleLogin:", err);
-
     if (
       err instanceof TypeError &&
       !navigator.onLine
@@ -27744,7 +27739,6 @@ async function loadEmployeeTaxEmployees() {
 		} else { select.value = ""; }
 		
 	} catch (error) {
-		console.error( "loadEmployeeTaxEmployees:", error );
 		select.innerHTML = '<option value="">All Employees</option>';
 	}
 }
@@ -27810,8 +27804,6 @@ async function loadEmployeeTaxRecords() {
 		employeeTaxCurrentPage = 1;
 		renderEmployeeTaxTable();
 	} catch (error) {
-		console.error("loadEmployeeTaxRecords:", error);
-
 		employeeTaxData = [];
 		renderEmployeeTaxTable( "Failed to load employee tax data" );
 	}
@@ -27888,7 +27880,18 @@ function renderEmployeeTaxTable(errorMessage = "") {
 							${escapeHtml(status)}
 						</span>
 					</td>
-					<td class="px-5 py-4 text-center"> — </td>
+					<td class="px-5 py-4 text-center">
+						<div class="relative inline-block">
+							<button type="button"
+								onclick="toggleEmployeeTaxActionMenu(this, '${escapeHtml(String(row.tax_id || row.id || ""))}')"
+								class="h-9 w-9 inline-flex items-center justify-center text-muted hover:text-foreground"
+								title="Actions">
+									<span class="material-symbols-outlined">
+										more_vert
+									</span>
+							</button>
+						</div>
+					</td>
 				</tr>
 			`;
 		}).join("");
@@ -27947,6 +27950,43 @@ function changeEmployeeTaxPage(direction) {
 		)
 	);
 	renderEmployeeTaxTable();
+}
+
+/* ==== EMPLOYEE TAX ACTION MENU ==== */
+function toggleEmployeeTaxActionMenu(button, taxId) {
+	const menuId = `employeeTaxActionMenu-${taxId}`;
+	const existingMenu = document.getElementById(menuId);
+
+	// Tutup menu yang sedang terbuka
+	document.querySelectorAll('[id^="employeeTaxActionMenu-"]')
+			.forEach(menu => menu.remove());
+
+	if (existingMenu) return;
+
+	const menu = document.createElement("div");
+	menu.id = menuId;
+	menu.className = "absolute right-0 top-full mt-1 w-40 bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] z-50 py-1";
+
+	menu.innerHTML = `
+		<button type="button"
+			onclick="viewEmployeeTaxDetail('${escapeHtml(String(taxId))}'); document.getElementById('${menuId}')?.remove();"
+			class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
+			<span class="material-symbols-outlined text-base">visibility</span>
+				View Detail
+		</button>
+
+		<button type="button"
+			onclick="payEmployeeTax('${escapeHtml(String(taxId))}'); document.getElementById('${menuId}')?.remove();"
+			class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
+			<span class="material-symbols-outlined text-base">payments</span>
+				Pay
+		</button>
+	`;
+
+	const wrapper = document.createElement("div");
+	wrapper.className = "relative inline-block";
+	button.parentElement.appendChild(wrapper);
+	wrapper.appendChild(menu);
 }
 
 /* ==== EMPLOYEE HEALTH PAYABLE ==== */
@@ -28034,7 +28074,7 @@ function populateEmployeeHealthBranchFilter() {
 		const option = new Option( branch.name || branch.id || "Unnamed Branch", branchId );
 		select.add(option);
 		if (branchId === userBranchId) { foundUserBranch = true; }
-});
+	});
 
 	// Tetap tampilkan outlet user jika tidak ditemukan di daftar.
 	if (!canViewAllBranches && userBranchId && !foundUserBranch) {
@@ -28120,7 +28160,6 @@ async function loadEmployeeHealthEmployees() {
 			: "";
 		
 	} catch (error) {
-		console.error("loadEmployeeHealthEmployees:", error);
 		select.innerHTML = '<option value="">All Employees</option>';
 	}
 }
@@ -28190,7 +28229,6 @@ async function loadEmployeeHealthRecords() {
 		renderEmployeeHealthTable();
 
 	} catch (error) {
-		console.error("loadEmployeeHealthRecords:", error);
 		employeeHealthData = [];
 		renderEmployeeHealthTable( error?.message || "Gagal memuat data iuran kesehatan." );
 	}
@@ -28281,7 +28319,18 @@ function renderEmployeeHealthTable(errorMessage = "") {
 					<td class="px-5 py-4 text-center">
 						<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}"> ${escapeHtml(status)} </span>
 					</td>
-					<td class="px-5 py-4 text-center">—</td>
+					<td class="px-5 py-4 text-center">
+					  <div class="relative inline-block">
+					    <button type="button"
+					      onclick="toggleEmployeeHealthActionMenu(this, '${escapeHtml(String(row.contribution_id || row.id || ""))}')"
+					      class="h-9 w-9 inline-flex items-center justify-center text-muted hover:text-foreground"
+					      title="Actions">
+						      <span class="material-symbols-outlined">
+										more_vert
+									</span>
+					    </button>
+					  </div>
+					</td>
 				</tr>
 			`;
 		}).join("");
@@ -28317,7 +28366,6 @@ function updateEmployeeHealthSummary(data) {
 	setText( "employeeHealthOutstandingAmount", formatAccountingCurrency(outstanding) );
 }
 
-
 /* ==== PAGINATION ==== */
 function updateEmployeeHealthPagination(total, start, end) {
 	const info = document.getElementById( "employeeHealthTableInfo" );
@@ -28349,6 +28397,40 @@ function changeEmployeeHealthPage(direction) {
 	renderEmployeeHealthTable();
 }
 
+/* ==== EMPLOYEE HEALTH ACTION MENU ==== */
+function toggleEmployeeHealthActionMenu(button, contributionId) {
+  const menuId = `employeeHealthActionMenu-${contributionId}`;
+  const existingMenu = document.getElementById(menuId);
+
+  document.querySelectorAll('[id^="employeeHealthActionMenu-"]')
+    .forEach(menu => menu.remove());
+
+  if (existingMenu) return;
+
+  const menu = document.createElement("div");
+  menu.id = menuId;
+  menu.className = "absolute right-0 top-full mt-1 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1";
+  menu.innerHTML = `
+    <button type="button"
+      class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2"
+      onclick="viewEmployeeHealthDetail('${escapeHtml(String(contributionId))}')">
+      	<span class="material-symbols-outlined text-base">
+					visibility
+				</span>
+	    View Detail
+    </button>
+
+    <button type="button"
+      class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2"
+      onclick="payEmployeeHealth('${escapeHtml(String(contributionId))}')">
+	      <span class="material-symbols-outlined text-base">
+					payments
+				</span>
+     	 Pay
+    </button>
+  `;
+  button.parentElement.appendChild(menu);
+}
 
 /* === OTHER LIABILITY === */
 let liabilityData = [];
@@ -31623,7 +31705,6 @@ async function loadAccountsReceivableFormBranches() {
 	select.disabled = false;
 
   } catch (error) {
-    console.error("loadAccountsReceivableFormBranches:", error);
     select.innerHTML = '<option value="">Gagal memuat outlet</option>';
     select.disabled = true;
     showToast("Gagal memuat daftar outlet.", "error");
@@ -31803,7 +31884,6 @@ async function loadAccountsReceivableEmployees() {
     select.disabled = false;
 
   } catch (error) {
-    console.error("loadAccountsReceivableEmployees:", error);
     select.innerHTML = '<option value="">Gagal memuat karyawan</option>';
     select.disabled = true;
   }
@@ -31820,15 +31900,11 @@ async function handleAccountsReceivableTypeChange() {
   if (referenceNoEl) referenceNoEl.value = "";
   if (referenceIdEl) referenceIdEl.value = "";
 
-  if (!partyEl || !employeeEl) {
-    console.error("Party/Employee element tidak ditemukan");
-    return;
-  }
+  if (!partyEl || !employeeEl) { return; }
 
   if (type === "EMPLOYEE") {
     partyEl.classList.add("hidden");
     employeeEl.classList.remove("hidden");
-
     // Jangan sembunyikan dropdown ketika daftar sedang dimuat.
     employeeEl.disabled = true;
     employeeEl.innerHTML = '<option value="">Memuat karyawan...</option>';
@@ -31879,8 +31955,7 @@ function getAccountsReceivableStatusBadge(status) {
   const config = {
     DRAFT: {
       label: "Draft",
-      className:
-        "bg-surface-container-high text-on-surface-variant"
+      className: "bg-surface-container-high text-on-surface-variant"
     },
 
     OUTSTANDING: {
@@ -32341,17 +32416,10 @@ async function saveAccountsReceivable(
     }
 
   } catch (err) {
-    console.error("saveAccountsReceivable:", err);
-
-    showToast(
-      err.message || "Gagal menyimpan piutang.",
-      "error"
-    );
-
+    showToast(  err.message || "Gagal menyimpan piutang.", "error" );
   } finally {
     if (button) {
       button.disabled = false;
-
       if (button.dataset.originalText) {
         button.innerHTML = button.dataset.originalText;
       }
@@ -33726,11 +33794,7 @@ window.editEmployee = async function (employeeId) {
 	    }
 	  );
 	
-	  if (error) {
-	    console.error('Gagal membaca data sensitif employee:', error);
-	    alert('Data NIK, NPWP, dan PTKP gagal dimuat.');
-	    return;
-	  }
+	  if (error) { alert('Data NIK, NPWP, dan PTKP gagal dimuat.'); return; }
 	
 	  const sensitive = Array.isArray(data) ? data[0] : data;
 	
@@ -34970,7 +35034,6 @@ window.saveSchedule = async function() {
     closeScheduleModal();
 								
   } catch (error) {
-		console.error('saveSchedule:', error);
     alert( 'Terjadi kesalahan saat menyimpan schedule.' );
   }
 }
@@ -36943,13 +37006,6 @@ function renderAttendanceRecapTable() {
       </tr>
     `;
   } else {
-		console.table(rows.map(row => ({
-	  Employee: row.Full_Name,
-	  Sick: row.Sick,
-	  Permission: row.Permission,
-	  Late_Minutes: row.Late_Minutes,
-	  Overtime_Hours: row.Overtime_Hours
-	})));
     tbody.innerHTML = rows.map(row => `
       <tr class="border-b border-outline-variant hover:bg-outline-variant">
         <td class="px-5 py-3">
@@ -37275,12 +37331,7 @@ window.calculatePayroll = async function () {
 	if (typeof window.loadPayroll === 'function') {
 		try {
 			await window.loadPayroll();
-		} catch (refreshError) {
-			console.error(
-				'Payroll tersimpan, tetapi tabel gagal dimuat ulang:',
-				refreshError
-			);
-		}
+		} catch (refreshError) { }
 	}
 	// 9. Tampilkan hasil
 		alert(
@@ -37294,8 +37345,6 @@ window.calculatePayroll = async function () {
 			'Jurnal belum dibuat.'
 		);
 	} catch (error) {
-		console.error('calculatePayroll:', error);
-	
 		alert( 'Calculate Payroll gagal.\n\n' + (error.message || 'Terjadi kesalahan saat menghitung Payroll.') );
 	} finally {
 		if (calculateButton) {
@@ -37311,29 +37360,19 @@ window.recordPayroll = async function () {
   const branchFilter = document.getElementById('payrollBranchFilter');
   const employeeFilter = document.getElementById('payrollEmployeeFilter');
 
-  if (!period) {
-    alert('Pilih periode payroll terlebih dahulu.');
-    return;
-  }
+  if (!period) { alert('Pilih periode payroll terlebih dahulu.'); return; }
 
   const role = String(state.user?.role || '').toUpperCase();
   const isOwner = role === 'OWNER';
   const isAccountant = role === 'ACCOUNTANT';
-
   const branchId = isOwner || isAccountant
     ? (branchFilter?.value || null)
     : (state.user?.branchId || null);
-
   const employeeId = employeeFilter?.value || null;
 
-  if (!isOwner && !isAccountant && !branchId) {
-    alert('Outlet pengguna tidak ditemukan.');
-    return;
-  }
+  if (!isOwner && !isAccountant && !branchId) { alert('Outlet pengguna tidak ditemukan.'); return; }
 
-  const button = document.querySelector(
-    'button[onclick="recordPayroll()"]'
-  );
+  const button = document.querySelector( 'button[onclick="recordPayroll()"]' );
 
   try {
     if (button) {
@@ -37352,10 +37391,7 @@ window.recordPayroll = async function () {
     );
 
     if (error) throw error;
-
-    if (!data?.success) {
-      throw new Error(data?.message || 'Gagal mencatat payroll.');
-    }
+    if (!data?.success) { throw new Error(data?.message || 'Gagal mencatat payroll.'); }
 
     await window.loadPayroll();
 
@@ -37366,7 +37402,6 @@ window.recordPayroll = async function () {
       `Dilewati: ${data.skipped ?? 0}`
     );
   } catch (error) {
-    console.error('recordPayroll:', error);
     alert(error.message || 'Terjadi kesalahan saat Record Payroll.');
   } finally {
     if (button) {
@@ -37449,7 +37484,6 @@ window.cancelRecordPayroll = async function () {
     );
 
   } catch (error) {
-    console.error('cancelRecordPayroll:', error);
     alert(error.message || 'Terjadi kesalahan saat Cancel Record Payroll.');
   } finally {
     if (button) {
@@ -37514,7 +37548,6 @@ window.cancelRecordEmployeePayroll = async function (
     await window.loadPayroll();
 
   } catch (error) {
-    console.error('cancelRecordEmployeePayroll:', error);
     alert(error.message || 'Terjadi kesalahan saat Cancel Record.');
   }
 };
@@ -37597,9 +37630,7 @@ window.loadPayroll = async function () {
 			: [];
 		window.payrollCurrentPage = 1;
 		window.renderPayrollTable();
-		console.log('PAYROLL LOADED:', window.payrollRows.length);
 	} catch (error) {
-		console.error('loadPayroll:', error);
 		tableBody.innerHTML = `
 			<tr>
 				<td colspan="13" class="px-4 py-8 text-center text-red-500">
@@ -37900,19 +37931,12 @@ window.togglePayrollActionMenu = function (payrollId, button) {
 	} else {
 		top = rect.top - menuHeight - gap;
 	}
-
 	// Jaga popup tetap di dalam area layar.
-	top = Math.max(
-		8,
-		Math.min(top, window.innerHeight - menuHeight - 8)
-	);
+	top = Math.max( 8, Math.min(top, window.innerHeight - menuHeight - 8) );
 
 	let left = rect.right - menuWidth;
-
-	left = Math.max(
-		8,
-		Math.min(left, window.innerWidth - menuWidth - 8)
-	);
+	left = Math.max( 8, Math.min(left, window.innerWidth - menuWidth - 8) );
+	
 	menu.style.top = `${top}px`;
 	menu.style.left = `${left}px`;
 };
@@ -37968,15 +37992,10 @@ window.getPayrollRow = function (payrollId) {
 
 window.showPayrollModal = function (modalId) {
     const modal = document.getElementById(modalId);
-
-    if (!modal) {
-			console.error(`Modal tidak ditemukan: ${modalId}`);
-			return false;
-    }
+    if (!modal) { return false; }
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-
     return true;
 };
 
@@ -37998,18 +38017,12 @@ window.setPayrollModalText = function (elementId, value) {
 /* ==== 1. VIEW DETAIL ==== */
 window.viewPayrollDetail = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
-
-	if (!row) {
-		console.error('Data payroll tidak ditemukan:', payrollId);
-		return;
-	}
+	if (!row) { return; }
 
 	const sessionId = localStorage.getItem('pos_session_id');
-
 	if (!sessionId) { alert('Sesi login tidak ditemukan. Silakan login kembali.'); return; }
 
 	window.activePayrollId = row.Payroll_ID;
-
 	showPayrollModal('payrollDetailModal');
 
 	try {
@@ -38032,40 +38045,19 @@ window.viewPayrollDetail = async function (payrollId) {
 		setPayrollModalText( 'payrollDetailBranch', payroll.Branch_Name || payroll.Branch_ID );
 		setPayrollModalText( 'payrollDetailPeriod', payroll.Payroll_Period );
 		setPayrollModalText( 'payrollDetailStatus', payroll.Status );
-
 		// Simpan detail untuk tahap render komponen.
 		window.activePayrollDetail = { payroll, details };
-		
 		window.renderPayrollDetailContent(payroll, details);
-		
-		console.log('PAYROLL DETAIL:', payroll);
-		console.log('PAYROLL COMPONENTS:', details);
-		console.log(
-	    'PAYROLL COMPONENT FIELDS:',
-	    details.map(d => ({
-	        Component_Name: d.Component_Name,
-	        Component_Type: d.Component_Type,
-	        Accounting_Category: d.Accounting_Category,
-	        Amount: d.Amount
-	    }))
-	);
-
 	} catch (error) {
-		console.error('viewPayrollDetail:', error);
 		alert('Gagal memuat detail payroll: ' + error.message);
 	}
 };
 
 /* ==== PAYROLL - RENDER DETAIL POPUP ==== */
 window.renderPayrollDetailContent = function (payroll, details) {
-  const container = document.getElementById(
-    'payrollDetailComponentsContainer'
-  );
+  const container = document.getElementById( 'payrollDetailComponentsContainer' );
 
-  if (!container) {
-    console.error('payrollDetailComponentsContainer tidak ditemukan');
-    return;
-  }
+  if (!container) { return; }
 
   const money = value =>
     new Intl.NumberFormat('id-ID', {
@@ -38097,10 +38089,8 @@ window.renderPayrollDetailContent = function (payroll, details) {
   const groups = new Map();
 
   employeeRows.forEach(row => {
-    const type = String(row.Component_Type || '')
-      .trim().toUpperCase();
-    const category = String(row.Accounting_Category || '')
-      .trim().toUpperCase();
+    const type = String(row.Component_Type || '') .trim().toUpperCase();
+    const category = String(row.Accounting_Category || '') .trim().toUpperCase();
 
     let groupKey;
     let groupLabel;
@@ -38234,11 +38224,7 @@ window.renderPayrollDetailContent = function (payroll, details) {
 window.editPayrollSalary = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
 
-	if (!row) {
-		console.error('Data payroll tidak ditemukan:', payrollId);
-		alert('Data payroll tidak ditemukan.');
-		return;
-	}
+	if (!row) { alert('Data payroll tidak ditemukan.'); return; }
 
 	const status = String(row.Status || '').trim().toUpperCase();
 	if (status === 'PAID' || status === 'CANCELLED') {
@@ -38404,11 +38390,9 @@ window.editPayrollSalary = async function (payrollId) {
 
 		// Hitung ulang ringkasan setiap kali nominal diubah.
 		window.recalculateEditPayrollSalary();
-		// Buka modal setelah data selesai dimuat.
 		window.showPayrollModal('editPayrollSalaryModal');
-		console.log('EDIT PAYROLL LOADED:', window.activeEditPayroll);
+
 	} catch (error) {
-		console.error('editPayrollSalary:', error);
 		alert('Gagal memuat Edit Salary: ' + error.message);
 	} finally {
 		if (saveButton) saveButton.disabled = false;
@@ -38704,7 +38688,6 @@ window.saveEditPayrollSalary = async function () {
 
     alert('Perubahan payroll berhasil disimpan.');
   } catch (error) {
-    console.error('saveEditPayrollSalary:', error);
     alert('Gagal menyimpan perubahan: ' + error.message);
   } finally {
     if (saveButton) {
@@ -39062,7 +39045,6 @@ window.loadReimbursements = async function () {
     window.reimbursementCurrentPage = 1;
     window.renderReimbursementTable();
   } catch (error) {
-    console.error('loadReimbursements:', error);
     tableBody.innerHTML = `
       <tr>
         <td colspan="9" class="px-5 py-10 text-center text-red-600">
@@ -40046,7 +40028,6 @@ window.handlePayReimbursement = async function (event) {
     await window.loadReimbursements();
 
   } catch (error) {
-    console.error('handlePayReimbursement:', error);
     alert(
       'Gagal membayar reimbursement.\n\n' +
       (error?.message || 'Terjadi kesalahan.')
@@ -40201,7 +40182,6 @@ window.handleSaveReimbursement = async function (event) {
         : 'Reimbursement berhasil dibuat.')
     );
   } catch (error) {
-    console.error('handleSaveReimbursement:', error);
     alert(error.message || 'Gagal menyimpan reimbursement.');
   } finally {
     if (saveButton) {
@@ -40331,7 +40311,6 @@ window.updateReimbursementStatus = async function (
     alert(result.message || 'Status reimbursement berhasil diperbarui.');
     return result;
   } catch (error) {
-    console.error('updateReimbursementStatus:', error);
     alert(error.message || 'Gagal mengubah status reimbursement.');
     return null;
   }
