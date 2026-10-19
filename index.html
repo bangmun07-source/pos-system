@@ -23810,31 +23810,35 @@
               Manage employees, schedules, attendance and payroll.
             </p>
           </div>
-          <!-- MODULE TABS -->
-          <div class="flex items-center gap-1 p-1 rounded-md border border-outline-variant bg-background">
-            <button id="employeeManagementTab"
-              type="button"
-              onclick="switchEmployeeModule('management')"
-              class="h-9 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">
-                groups
-              </span>
-              Employee Management
-            </button>
-
-            <button id="payrollAttendanceTab"
-              type="button"
-              onclick="switchEmployeeModule('payroll')"
-              class="h-9 px-4 rounded-md text-muted hover:text-foreground hover:bg-surface-container-high text-sm font-medium flex items-center gap-2">
-              <span class="material-symbols-outlined text-sm">
-                payments
-              </span>
-              Payroll &amp; Attendance
-              <span class="material-symbols-outlined text-xs">
-                lock
-              </span>
-            </button>
-          </div>
+					<!-- MODULE TABS -->
+					<div class="flex w-full items-stretch gap-1 p-1 rounded-md border border-outline-variant bg-background">
+					  <button id="employeeManagementTab"
+					    type="button"
+					    onclick="switchEmployeeModule('management')"
+					    class="flex-1 min-w-0 h-10 px-1 sm:px-4 rounded-md bottom-theme text-xs sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2 text-center">
+					    <span class="material-symbols-outlined text-sm shrink-0">
+					      groups
+					    </span>
+					    <span class="leading-tight">
+					      Employee Management
+					    </span>
+					  </button>
+					
+					  <button id="payrollAttendanceTab"
+					    type="button"
+					    onclick="switchEmployeeModule('payroll')"
+					    class="flex-1 min-w-0 h-10 px-1 sm:px-4 rounded-md text-muted hover:text-foreground hover:bg-surface-container-high text-xs sm:text-sm font-medium flex items-center justify-center gap-1 sm:gap-2 text-center">
+					    <span class="material-symbols-outlined text-sm shrink-0">
+					      payments
+					    </span>
+					    <span class="leading-tight">
+					      Payroll &amp; Attendance
+					    </span>
+					    <span class="material-symbols-outlined text-xs shrink-0">
+					      lock
+					    </span>
+					  </button>
+					</div>
         </div>
       </section>
       <!-- === EMPLOYEE MANAGEMENT === -->
