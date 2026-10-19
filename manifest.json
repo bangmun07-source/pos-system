@@ -4,8 +4,8 @@
   "short_name": "MUNO",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#101715",
-  "theme_color": "#101715",
+  "background_color": "#000000",
+  "theme_color": "#000000",
   "icons": [
     {
       "src": "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png",
