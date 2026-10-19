@@ -27965,29 +27965,45 @@ function toggleEmployeeTaxActionMenu(button, taxId) {
 
 	const menu = document.createElement("div");
 	menu.id = menuId;
-	menu.className = "absolute right-0 top-full mt-1 w-40 bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] z-50 py-1";
+	menu.className = "w-40 bg-background border border-outline-variant rounded-md shadow-lg py-1";
 
 	menu.innerHTML = `
 		<button type="button"
 			onclick="viewEmployeeTaxDetail('${escapeHtml(String(taxId))}'); document.getElementById('${menuId}')?.remove();"
 			class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
-			<span class="material-symbols-outlined text-base">visibility</span>
-				View Detail
+				<span class="material-symbols-outlined text-base">
+					visibility
+				</span>
+			View Detail
 		</button>
 
 		<button type="button"
 			onclick="payEmployeeTax('${escapeHtml(String(taxId))}'); document.getElementById('${menuId}')?.remove();"
 			class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
-			<span class="material-symbols-outlined text-base">payments</span>
-				Pay
+				<span class="material-symbols-outlined text-base">
+					payments
+				</span>
+			Pay
 		</button>
 	`;
+	// Tampilkan di luar tabel agar tidak tertutup footer
+	const rect = button.getBoundingClientRect();
 
-	const wrapper = document.createElement("div");
-	wrapper.className = "relative inline-block";
-	button.parentElement.appendChild(wrapper);
-	wrapper.appendChild(menu);
+	menu.style.position = "fixed";
+	menu.style.zIndex = "99999";
+	menu.style.right = "auto";
+	menu.style.left = `${Math.max( 8, Math.min(rect.right - 160, window.innerWidth - 168))}px`;
+
+	const menuHeight = 88;
+	const spaceBelow = window.innerHeight - rect.bottom;
+
+	menu.style.top = spaceBelow >= menuHeight
+		? `${rect.bottom + 4}px`
+		: `${Math.max(8, rect.top - menuHeight - 4)}px`;
+
+	document.body.appendChild(menu);
 }
+
 
 /* ==== EMPLOYEE HEALTH PAYABLE ==== */
 let employeeHealthData = [];
@@ -28409,7 +28425,7 @@ function toggleEmployeeHealthActionMenu(button, contributionId) {
 
   const menu = document.createElement("div");
   menu.id = menuId;
-  menu.className = "absolute right-0 top-full mt-1 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-50 py-1";
+  menu.className = "w-40 bg-background border border-outline-variant rounded-md shadow-lg py-1";
   menu.innerHTML = `
     <button type="button"
       class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2"
@@ -28429,7 +28445,25 @@ function toggleEmployeeHealthActionMenu(button, contributionId) {
      	 Pay
     </button>
   `;
-  button.parentElement.appendChild(menu);
+  // Tampilkan menu di luar tabel agar tidak tertutup footer
+	const rect = button.getBoundingClientRect();
+	
+	menu.style.position = "fixed";
+	menu.style.zIndex = "99999";
+	menu.style.right = "auto";
+	menu.style.left = `${Math.min(
+	  rect.right - 160,
+	  window.innerWidth - 168
+	)}px`;
+	
+	const menuHeight = 88;
+	const spaceBelow = window.innerHeight - rect.bottom;
+	
+	menu.style.top = spaceBelow >= menuHeight
+	  ? `${rect.bottom + 4}px`
+	  : `${Math.max(8, rect.top - menuHeight - 4)}px`;
+	
+	document.body.appendChild(menu);
 }
 
 /* === OTHER LIABILITY === */
