@@ -27852,7 +27852,7 @@ function renderEmployeeTaxTable(errorMessage = "") {
 				PAID: "bg-green-600/10 text-green-700",
 				CANCELLED: "bg-red-600/10 text-red-700"
 			}[status] ||
-				"bg-surface-container-high text-muted";
+				"text-muted";
 			const branchId = row.branch_id || "";
 			const branchName = accountingDebtBranches.find(branch =>
 				String(branch.id || "").trim() ===
@@ -28259,11 +28259,11 @@ function renderEmployeeHealthTable(errorMessage = "") {
 
 			const statusClass = {
 				DRAFT: "bg-surface-container-high text-muted",
-				APPROVED: "bg-blue-600/10 text-blue-700",
+				CALCULATED: "bg-blue-600/10 text-blue-700",
 				IN_PAYROLL: "bg-yellow-600/10 text-yellow-700",
 				PAID: "bg-green-600/10 text-green-700",
 				CANCELLED: "bg-red-600/10 text-red-700"
-			}[status] || "bg-surface-container-high text-muted";
+			}[status] || "text-muted";
 
 			return `
 				<tr class="hover:bg-outline-variant transition">
