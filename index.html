@@ -750,22 +750,37 @@
 							MUNO
 					</p>
 				</div>
-		
+	
 				<div class="flex items-center gap-4">
 					<div class="flex items-center gap-3">
 						<div class="hidden sm:block text-right">
-							<p id="appBrandName" class="text-sm font-bold text-muted leading-none">	          
+							<p id="appBrandName" class="text-sm font-bold text-muted leading-none">
 							</p>
-		
-							<p class="text-[10px] text-muted ont-semibold tracking-[0.2em] uppercase mt-1">
-								 <span id="headerUsername"></span>
-							</p>	
+	
+							<p class="text-[10px] text-muted font-semibold tracking-[0.2em] uppercase mt-1">
+									<span id="headerUsername"></span>
+							</p>
 						</div>
-					</div>	     
-		
+					</div>
+			
+					<!-- TOGGLE THEME -->
+					<button type="button"
+						onclick="toggleTheme()"
+						class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
+						title="Ganti Tema"
+						aria-label="Ganti Tema" >
+						<span id="themeIcon" class="material-symbols-outlined">
+							dark_mode
+						</span>
+					</button>
+				
 					<div class="h-8 w-px bg-outline-variant"></div>
-					<button class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
-									onclick="navigate('settingsPage')">
+					<!-- SETTINGS -->
+					<button type="button"
+						class="settingsMenu w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200"
+						onclick="navigate('settingsPage')"
+						title="Settings"
+						aria-label="Settings">
 						<span class="material-symbols-outlined">
 							settings
 						</span>
