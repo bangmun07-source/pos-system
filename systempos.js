@@ -26656,14 +26656,12 @@ function initSupplierDebtFilters() {
 			applySupplierDebtFilters();
 		};
 	}
-
 	if (supplierEl) {
 		supplierEl.onchange = () => {
 			supplierDebtCurrentPage = 1;
 			applySupplierDebtFilters();
 		};
 	}
-
 	if (searchEl) {
 		searchEl.oninput = () => {
 			supplierDebtCurrentPage = 1;
@@ -26694,9 +26692,9 @@ async function loadSupplierDebt() {
 			? null
 			: filter.branchId;
 		const currentFilter = {
-		    branchId,
-		    periodFrom: filter.periodFrom || null,
-		    periodTo: filter.periodTo || null
+			branchId,
+			periodFrom: filter.periodFrom || null,
+			periodTo: filter.periodTo || null
 		};
     // ===== CACHE HIT =====
     if (
@@ -26723,10 +26721,8 @@ async function loadSupplierDebt() {
 			);
 
     if (error) { throw error; }
-		if (!data) { throw new Error(
-				"Response get_supplier_debts kosong" ); }
-		if (data.success !== true) { throw new Error( data.message ||
-				"Gagal mengambil hutang supplier" ); }
+		if (!data) { throw new Error( "Response get_supplier_debts kosong" ); }
+		if (data.success !== true) { throw new Error( data.message || "Gagal mengambil hutang supplier" ); }
 
 		let rows = data.data || [];
 		if (!Array.isArray(rows)) { rows = []; }
@@ -26753,11 +26749,11 @@ async function loadSupplierDebt() {
 					};
 				});
 		
-		  	state.accountingSupplierDebtData = supplierDebtData;
-		    state.accountingSupplierDebtFilter = currentFilter;
-        updateSupplierDebtSummary();
-        populateSupplierDebtFilter();
-        applySupplierDebtFilters();
+		state.accountingSupplierDebtData = supplierDebtData;
+		state.accountingSupplierDebtFilter = currentFilter;
+		updateSupplierDebtSummary();
+		populateSupplierDebtFilter();
+		applySupplierDebtFilters();
 
 	} catch (error) {
 		if (tbody) {
@@ -26820,17 +26816,17 @@ function populateSupplierDebtFilter() {
 	const suppliers = new Map();
 	supplierDebtData.forEach(item => {
 		if ( item.supplierId && item.supplier !== "-" ) 
-				{ suppliers.set( item.supplierId, item.supplier ); }
+			{ suppliers.set( item.supplierId, item.supplier ); }
 	});
 
 	select.innerHTML = `<option value="">Semua Supplier</option> `;
 	[...suppliers.entries()]
 		.sort((a, b) => a[1].localeCompare(b[1]) )
 		.forEach(([id, name]) => {
-				const option = document.createElement("option");
-				option.value = id;
-				option.textContent = name;
-				select.appendChild(option);
+			const option = document.createElement("option");
+			option.value = id;
+			option.textContent = name;
+			select.appendChild(option);
 			});
 
 	if ( [...select.options] .some(option => option.value === currentValue) ) 
@@ -26849,15 +26845,14 @@ function applySupplierDebtFilters() {
 		if ( status && item.status !== status )  { return false; }
 		if ( supplierId && item.supplierId !== supplierId )  { return false; }
 		if ( search ) {
-				const searchable = [
-					item.id,
-					item.ingredient,
-					item.supplier ]
-				.join(" ")
-				.toLowerCase();
-				if (!searchable.includes(search)) {
-						return false; }
-			}
+			const searchable = [
+				item.id,
+				item.ingredient,
+				item.supplier ]
+			.join(" ")
+			.toLowerCase();
+			if (!searchable.includes(search)) { return false; }
+		}
 		 return true;
 	});
   renderSupplierDebtTable();
@@ -26865,70 +26860,72 @@ function applySupplierDebtFilters() {
 
 /* === RENDER TABLE === */
 function renderSupplierDebtTable() {
-    const tbody = document.getElementById("supplierDebtTableBody");
+	const tbody = document.getElementById("supplierDebtTableBody");
+	if (!tbody) return;
 
-    if (!tbody) return;
+	const total = supplierDebtFiltered.length;
+	const totalPages =  Math.max( 1, Math.ceil( total / supplierDebtPageSize ) );
 
-    const total = supplierDebtFiltered.length;
-    const totalPages =  Math.max( 1, Math.ceil( total / supplierDebtPageSize ) );
+	if (supplierDebtCurrentPage > totalPages) { supplierDebtCurrentPage = totalPages; }
 
-    if (supplierDebtCurrentPage > totalPages) { supplierDebtCurrentPage = totalPages; }
+	const start = (supplierDebtCurrentPage - 1) * supplierDebtPageSize;
+	const end = start + supplierDebtPageSize;
+	const rows = supplierDebtFiltered.slice(start, end);
 
-    const start = (supplierDebtCurrentPage - 1) * supplierDebtPageSize;
-    const end = start + supplierDebtPageSize;
-    const rows = supplierDebtFiltered.slice(start, end);
-
-    if (rows.length === 0) {
-			tbody.innerHTML = `
-				<tr>
-					<td colspan="9"
-						class="text-center py-10 text-on-surface-variant">
-						Tidak ada hutang supplier
-					</td>
-				</tr>
-			`;
-    } else {
-			tbody.innerHTML =
-				rows.map(item => {
-					const branchId = item.branchId || "-";
-					const statusClass = item.status === "PAID"
-						? "text-green-700"
-						: "text-amber-700";
-					const action = item.status === "PENDING"
-						? `
-							<button type="button"
-								onclick="openSupplierPaymentModal('${escapeJs(item.id)}')"
-								class="px-3 py-1.5 text-on-surface-variant text-xs font-medium hover:text-on-surface">
-								Bayar
-							</button>
-						`
-						: `
-							<span class="text-xs text-on-surface-variant">
-								Lunas
+	if (rows.length === 0) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="9"
+					class="text-center py-10 text-on-surface-variant">
+					Tidak ada hutang supplier
+				</td>
+			</tr>
+		`;
+	} else {
+		tbody.innerHTML =
+			rows.map(item => {
+				const branchId = String(item.branchId || "").trim();
+				const branchName = (typeof accountingDebtBranches !== "undefined"
+					? accountingDebtBranches
+					: []
+				).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+				const statusClass = item.status === "PAID"
+					? "text-green-700"
+					: "text-amber-700";
+				const action = item.status === "PENDING"
+					? `
+						<button type="button"
+							onclick="openSupplierPaymentModal('${escapeJs(item.id)}')"
+							class="px-3 py-1.5 text-on-surface-variant text-xs font-medium hover:text-on-surface">
+							Bayar
+						</button>
+					`
+					: `
+						<span class="text-xs text-on-surface-variant">
+							Lunas
+						</span>
+					`;
+				return `
+					<tr class="border-b border-outline-variant hover:bg-outline-variant">
+						<td class="px-4 py-3 text-sm font-medium"> ${escapeHtml(item.id)} </td>
+						<td class="px-4 py-3 text-sm"> ${escapeHtml(branchName)} </td>
+						<td class="px-4 py-3 text-sm"> ${escapeHtml(item.supplier)} </td>
+						<td class="px-4 py-3 text-sm"> ${formatAccountingDate(item.date)} </td>
+						<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.total)} </td>
+						<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.paid)} </td>
+						<td class="px-4 py-3 text-sm text-right font-semibold"> ${formatAccountingCurrency(item.outstanding)} </td>
+						<td class="px-4 py-3">
+							<span class="inline-flex px-2.5 py-1 text-xs font-medium ${statusClass}">
+								${item.status}
 							</span>
-						`;
-					return `
-						<tr class="border-b border-outline-variant hover:bg-outline-variant">
-							<td class="px-4 py-3 text-sm font-medium"> ${escapeHtml(item.id)} </td>
-							<td class="px-4 py-3 text-sm"> ${escapeHtml(branchId)} </td>
-							<td class="px-4 py-3 text-sm"> ${escapeHtml(item.supplier)} </td>
-							<td class="px-4 py-3 text-sm"> ${formatAccountingDate(item.date)} </td>
-							<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.total)} </td>
-							<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.paid)} </td>
-							<td class="px-4 py-3 text-sm text-right font-semibold"> ${formatAccountingCurrency(item.outstanding)} </td>
-							<td class="px-4 py-3">
-								<span class="inline-flex px-2.5 py-1 text-xs font-medium ${statusClass}">
-									${item.status}
-								</span>
-							</td>
-
-							<td class="px-4 py-3 text-center">
-									${action}
-							</td>
-						</tr>
-				`;
-			}).join("");
-		}
+						</td>
+						<td class="px-4 py-3 text-center">
+							${action}
+						</td>
+					</tr>
+			`;
+		}).join("");
+	}
 	updateSupplierDebtPagination( total, totalPages );
 }
 
@@ -26938,8 +26935,8 @@ function updateSupplierDebtPagination( total, totalPages ) {
 	const prev = document.getElementById( "supplierDebtPrevButton" );
 	const next = document.getElementById( "supplierDebtNextButton" );
 	const start = total === 0
-			? 0
-			: ( (supplierDebtCurrentPage - 1) * supplierDebtPageSize  ) + 1;
+		? 0
+		: ( (supplierDebtCurrentPage - 1) * supplierDebtPageSize  ) + 1;
 	const end =  Math.min( supplierDebtCurrentPage * supplierDebtPageSize, total );
 		if (info) { info.textContent = total === 0
 			? "0 data"
@@ -26953,7 +26950,6 @@ function updateSupplierDebtPagination( total, totalPages ) {
 				}
 			};
 		}
-	
     if (next) { 
 			next.disabled = supplierDebtCurrentPage >= totalPages;
       next.onclick = () => {
@@ -26968,10 +26964,8 @@ function updateSupplierDebtPagination( total, totalPages ) {
 /* ===== OPEN SUPPLIER PAYMENT MODAL ====== */
 function openSupplierPaymentModal(purchaseId) {
 	const purchase = supplierDebtData.find(item => item.id === purchaseId);
-	if (!purchase) {
-		alert("Data purchase tidak ditemukan.");
-		return;
-	}
+	if (!purchase) { alert("Data purchase tidak ditemukan."); return; }
+	
 	currentSupplierPaymentPurchase = purchase;
 	document.getElementById("supplierPaymentPurchase").textContent = purchase.id || "-";
 	document.getElementById("supplierPaymentSupplier").textContent = purchase.supplier || "-";
@@ -27011,69 +27005,59 @@ async function saveSupplierPayment() {
 	}
 
 	const sessionId =  localStorage.getItem( "pos_session_id" );
-
-	if (!sessionId) {
-		alert("Session tidak ditemukan.");
-		return;
-	}
-const paymentDate = document.getElementById( "supplierPaymentDate" )?.value;
-const amount = Number( document.getElementById( "supplierPaymentAmount" )?.value ) || 0;
-const method = document.getElementById( "supplierPaymentMethod" )?.value || "CASH";
-const referenceNo = document.getElementById( "supplierPaymentReference" )?.value ?.trim() || null;
-const note = document.getElementById( "supplierPaymentNote" )?.value ?.trim() || null;
-
-if (!paymentDate) {
-	alert("Tanggal pembayaran wajib diisi.");
-	return;
-}
-if (amount <= 0) {
-	alert("Jumlah pembayaran harus lebih dari 0.");
-	return;
-}
-if ( amount > purchase.outstanding )  {
-	alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(purchase.outstanding)}`
-	); return;
-}
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 	
-const button = document.getElementById( "saveSupplierPaymentButton" );
+	const paymentDate = document.getElementById( "supplierPaymentDate" )?.value;
+	const amount = Number( document.getElementById( "supplierPaymentAmount" )?.value ) || 0;
+	const method = document.getElementById( "supplierPaymentMethod" )?.value || "CASH";
+	const referenceNo = document.getElementById( "supplierPaymentReference" )?.value ?.trim() || null;
+	const note = document.getElementById( "supplierPaymentNote" )?.value ?.trim() || null;
 
-try {
-	if (button) { button.disabled = true; button.textContent = "Menyimpan..."; }
+	if (!paymentDate) {
+		alert("Tanggal pembayaran wajib diisi.");
+		return; }
+	if (amount <= 0) {
+		alert("Jumlah pembayaran harus lebih dari 0.");
+		return; }
+	if ( amount > purchase.outstanding )  {
+		alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(purchase.outstanding)}` ); 
+		return; }
+		
+	const button = document.getElementById( "saveSupplierPaymentButton" );
+
+	try {
+		if (button) { button.disabled = true; button.textContent = "Menyimpan..."; }
 	
-  const { data, error } =
-	await supabaseClient.rpc(
-		"create_supplier_payment",
-		{
-			p_session_id: sessionId,
-			p_purchase_id: purchase.id,
-			p_payment_date: paymentDate,
-			p_amount: amount,
-			p_payment_method: method,
-			p_reference_no: referenceNo,
-			p_note: note
-		}
-	);
+	  const { data, error } =
+		await supabaseClient.rpc(
+			"create_supplier_payment",
+			{
+				p_session_id: sessionId,
+				p_purchase_id: purchase.id,
+				p_payment_date: paymentDate,
+				p_amount: amount,
+				p_payment_method: method,
+				p_reference_no: referenceNo,
+				p_note: note
+			}
+		);
 
-	if (error) {  throw error; }
-
-	state.accountingSupplierDebtData = null;
-	state.accountingSupplierDebtFilter = null;
-	state.accountingReportsData = null;
-	state.accountingReportsFilter = null;
-	closeSupplierPaymentModal();
-	alert(
-		data?.message ||
-		"Pembayaran supplier berhasil."
-	);
-	await loadSupplierDebt();
-
+		if (error) {  throw error; }
+	
+		state.accountingSupplierDebtData = null;
+		state.accountingSupplierDebtFilter = null;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+		closeSupplierPaymentModal();
+		alert( data?.message || "Pembayaran supplier berhasil." );
+		await loadSupplierDebt();
+		
 } catch (error) {
 	alert( error?.message || "Gagal menyimpan pembayaran supplier." );
 } finally {
 	if (button) {
 		button.disabled = false;
-		button.textContent =
-				"Simpan Pembayaran";
+		button.textContent = "Simpan Pembayaran";
 		}
 	}
 }
@@ -27086,9 +27070,7 @@ function formatAccountingCurrency(value) {
 			currency: "IDR",
 			maximumFractionDigits: 0
 		}
-	).format(
-			Number(value) || 0
-	);
+	).format( Number(value) || 0 );
 }
 
 function formatAccountingDate(value) {
@@ -27167,14 +27149,12 @@ async function loadTaxPayable() {
       outstanding:  Math.max( 0, Number(result.outstanding) || 0 ),
       branches: Array.isArray(result.branches)
 				? result.branches.map(branch => ({
-						branchId:
-							branch.branchId ??
-							branch.branch_id ??
-							branch.Branch_ID ??
-							"",
-
-						amount:
-							Number(branch.amount) || 0
+					branchId:
+						branch.branchId ??
+						branch.branch_id ??
+						branch.Branch_ID ??
+						"",
+					amount: Number(branch.amount) || 0
 					}))
 				: []
     };
@@ -27194,7 +27174,6 @@ async function loadTaxPayable() {
   }
 }
 
-
 let currentPpnPayment = null;
 let ppnPaymentsData = [];
 let ppnPaymentsPage = 1;
@@ -27204,9 +27183,7 @@ let ppnPaymentSaving = false;
 async function loadPpnPayments() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 		const filter = getDebtLiabilityFilter();
 		const branchId = ( !filter.branchId || filter.branchId === "ALL" )
 	    ? null
@@ -27224,7 +27201,6 @@ async function loadPpnPayments() {
 			);
 
     if (error) { throw error; }
-		
     const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
@@ -27232,7 +27208,6 @@ async function loadPpnPayments() {
     ppnPaymentsData = Array.isArray(result)
 			? result
 			: [];
-
     ppnPaymentsPage = 1;
     renderPpnPayments();
     return ppnPaymentsData;
@@ -27256,10 +27231,7 @@ function renderPpnPayments() {
     ? ppnPaymentsData
     : [];
   const total = data.length;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(total / ppnPaymentsPerPage)
-  );
+  const totalPages = Math.max( 1, Math.ceil(total / ppnPaymentsPerPage) );
 
   if (ppnPaymentsPage > totalPages) { ppnPaymentsPage = totalPages; }
 
@@ -27278,17 +27250,18 @@ function renderPpnPayments() {
     `;
   } else {
     tbody.innerHTML = pageData.map(payment => {
-
       const paymentId = payment.payment_id || "";
       const paymentDate = payment.payment_date
-				? new Date(payment.payment_date)
-						.toLocaleDateString("id-ID")
+				? new Date(payment.payment_date) .toLocaleDateString("id-ID")
 				: "-";
-      const branchId =
-        payment.branch_id ||
-        payment.Branch_ID ||
-        payment.branchId ||
-        "-";
+			const branchId = String(
+			  payment.branch_id ||
+			  payment.Branch_ID ||
+			  payment.branchId ||
+			  ""
+			).trim();
+			const branchName = (accountingDebtBranches || []).find(branch => 
+				String(branch.id || "").trim() === branchId )?.name || branchId || "-";
       const note = payment.note || "-";
       const amount = Number(payment.amount) || 0;
       const method = payment.payment_method || "-";
@@ -27297,30 +27270,26 @@ function renderPpnPayments() {
       let statusClass = "bg-surface-container-high text-muted";
 
       if (status === "PAID") {
-        statusClass =
-          "bg-green-600/10 text-green-700";
+        statusClass = "bg-green-600/10 text-green-700";
       } else if (status === "VOID") {
-        statusClass =
-          "bg-red-600/10 text-red-700";
+        statusClass = "bg-red-600/10 text-red-700";
       } else if (status === "OUTSTANDING") {
-        statusClass =
-          "bg-yellow-600/10 text-yellow-700";
+        statusClass = "bg-yellow-600/10 text-yellow-700";
       }
       const action =
         status === "OUTSTANDING"
           ? `
-            <button
-              type="button"
+            <button type="button"
               onclick="openPpnPaymentFromRow('${paymentId}')"
               class="px-3 py-1.5 rounded-md bottom-theme text-xs font-medium">
-              Pay
+              	Pay
             </button>
           `
           : "-";
       return `
         <tr class="hover:bg-outline-variant">
           <td class="px-5 py-3"> ${paymentDate} </td>
-          <td class="px-5 py-3"> ${branchId} </td>
+          <td class="px-5 py-3"> ${escapeHtml(branchName)} </td>
           <td class="px-5 py-3"> ${note} </td>
           <td class="px-5 py-3 text-right font-medium"> ${formatAccountingCurrency(amount)} </td>
           <td class="px-5 py-3"> ${method} </td>
@@ -28619,11 +28588,14 @@ function renderLiabilities() {
 	tbody.innerHTML = rows.map(item => {
 		const id = item.liability_id;
 		const type = getLiabilityTypeLabel(item.liability_type);
-		const branchId =
+		const branchId = String(
 			item.branch_id ||
 			item.Branch_ID ||
 			item.branchId ||
-			"-";
+			""
+		).trim();
+		const branchName = (accountingDebtBranches || []).find(branch =>
+			String(branch.id || "").trim() === branchId )?.name || branchId || "-";
 		const creditor = escapeHtml(item.creditor || "-");
 		const startDate = formatLiabilityDate(item.start_date);
 		const dueDate = item.due_date
@@ -28645,7 +28617,7 @@ function renderLiabilities() {
 					<div class="font-medium text-on-surface"> ${type} </div>
 					<div class="text-xs text-on-surface-variant"> ${id} </div>
 				</td>
-				<td class="px-5 py-3 text-on-surface"> ${escapeHtml(branchId)} </td>
+				<td class="px-5 py-3 text-on-surface"> ${escapeHtml(branchName)} </td>
 				<td class="px-5 py-3 text-on-surface"> ${creditor} </td>
 				<td class="px-5 py-3 text-on-surface-variant text-sm"> ${startDate} </td>
 				<td class="px-5 py-3 text-on-surface-variant text-sm"> ${dueDate} </td>
