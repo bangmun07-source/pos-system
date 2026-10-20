@@ -3165,20 +3165,15 @@
 						MUNO
 					</p>
 				</div>
-
+				
       <!-- RIGHT -->
       <div class="flex items-center gap-4">
-
         <!-- NOTIFICATION -->
         <div class="relative">
-
-          <button
-            onclick="toggleNotification()"
+          <button onclick="toggleNotification()"
             class="w-10 h-10 rounded-md flex items-center justify-center
             text-on-surface-variant hover:text-on-surface transition-all">
-
             <span class="material-symbols-outlined">notifications</span>
-
             <!-- BADGE -->
             <div
               id="notificationBadge"
@@ -3187,13 +3182,10 @@
               text-sx font-bold flex items-center justify-center">
               0
             </div>
-
           </button>
-
           <!-- DROPDOWN -->
           <div id="notificationDropdown"
             class="hidden absolute right-0 top-12 w-80 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden z-50">
-
             <div class="p-4 border border-outline-variant">
               <h3 class="font-bold text-xs lg:text-sm text-on-surface">
               Notifications
@@ -3206,22 +3198,17 @@
               </div>
             </div>
           </div>
-
         </div>
-
         <!-- ADD BUTTON -->
-        <button
-          onclick="openAddMemberModal()"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-md bg-background border border-outline-variant text-on-surface font-medium headline-font active:scale-95 transition">
-          <span class="material-symbols-outlined text-lg">person_add</span>
+        <button onclick="openAddMemberModal()"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs transition">
+          <span class="material-symbols-outlined text-lg">
+						person_add
+					</span>
           Add Member
-
         </button>
-
       </div>
-
     </div>
-
   </header>
   <!-- Main Content (Independently Scrollable) -->
   <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
@@ -3355,7 +3342,7 @@
 					<option value="all">All Tier</option>
 			  </select>
 			
-			  <button id="btnExportMembersPDF" class="w-full sm:w-auto flex items-center justify-center whitespace-nowrap px-4 py-2 rounded-md bg-background border border-outline-variant text-on-surface font-semibold text-sm gap-2 hover:bg-outline-variant transition-all">
+			  <button id="btnExportMembersPDF" class="w-full sm:w-auto flex items-center justify-center whitespace-nowrap px-4 py-2 rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs transition-all">
 					<span class="material-symbols-outlined text-lg">download</span>
 						Export
 			  </button>
@@ -4071,7 +4058,7 @@
 	            <th class="px-8 py-4 font-bold">QTY</th>
 	            <th class="px-8 py-4 font-bold">TOTAL</th>
 	            <th class="px-8 py-4 font-bold">PAYMENT</th>
-	            <th class="px-8 py-4 font-bold">STATUS</th>
+	            <th class="px-8 py-4 font-bold text-center">STATUS</th>
 	            <th class="px-8 py-4 font-bold text-right">ACTIONS</th>
 	          </tr>
 	        </thead>
@@ -6039,7 +6026,7 @@
 								<div class="overflow-x-auto custom-scrollbar">
 									<table class="w-full text-left border-collapse min-w-[1000px]">
 										<thead>
-											<tr class="text-muted  text-[11px] border border-outline-variant">
+											<tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
 												<th class="px-8 py-4 font-bold uppercase tracking-widest">Material</th>
 												<th class="px-8 py-4 font-bold uppercase tracking-widest">Current Stock</th>
 												<th class="px-8 py-4 font-bold uppercase tracking-widest">Daily Usage</th>
@@ -9137,7 +9124,7 @@
 			<div class="custom-scrollbar overflow-x-auto">
 				<table class="w-full text-left border-collapse min-w-[900px]">
 					<thead>
-						<tr class="text-[11px] uppercase tracking-[0.1em] font-bold text-muted border-b border-outline-variant">
+						<tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
 							<th class="px-8 py-4">Date &amp; Ref#</th>
 							<th class="px-4 py-4">Description</th>
 							<th class="px-4 py-4">Category</th>
@@ -9198,7 +9185,7 @@
 						Export
 					</button>
 	
-					<button  onclick="openAddNewOtherIncome()" class="flex items-center gap-2 px-4 py-2 rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs hover:text-on-surface transition-colors">
+					<button  onclick="openAddNewOtherIncome()" class="flex items-center gap-2 px-4 py-2 rounded-md bottom-theme border border-outline-variant text-on-surface font-semibold text-xs">
 						<span class="material-symbols-outlined">add</span>
 						New Income
 					</button>
@@ -9221,7 +9208,8 @@
 				</div>
 				
 				<div class="col-span-2">
-					<select id="otherIncomeStatusFilter" class="w-full bg-background border border-outline-variant rounded-md px-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary">
+					<select id="otherIncomeStatusFilter" 
+						class="w-full bg-background border border-outline-variant rounded-md px-4 py-2 text-xs focus:ring-1 focus:ring-primary focus:border-primary">
 						<option value="ALL">All Status</option>
 						<option value="Paid">Paid</option>
 						<option value="Pending">Pending</option>
@@ -9242,7 +9230,7 @@
 			<div class="custom-scrollbar overflow-x-auto">
 				<table class="w-full text-left border-collapse min-w-[900px]">
 					<thead>
-						<tr class="text-[11px] uppercase tracking-[0.1em] font-bold text-muted  border border-outline-variant">
+						<tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
 							<th class="px-8 py-4">Date &amp; Ref#</th>
 							<th class="px-4 py-4">Description</th>
 							<th class="px-4 py-4">Category</th>
@@ -16636,9 +16624,9 @@
                 <th class="text-left px-6 py-4"> Account Name </th>
                 <th class="text-left px-6 py-4"> Type </th>
                 <th class="text-left px-6 py-4"> Parent Account </th>
-                <th class="text-left px-6 py-4"> Normal Balance </th>
-                <th class="text-left px-6 py-4"> Status </th>
-                <th class="text-right px-6 py-4"> Action </th>
+                <th class="text-left px-6 py-4 text-center"> Normal Balance </th>
+                <th class="text-left px-6 py-4 text-center"> Status </th>
+                <th class="text-right px-6 py-4 text-center"> Action </th>
               </tr>
             </thead>
 
@@ -16745,7 +16733,7 @@
                 <th class="text-left px-6 py-4"> Debit Account </th>
                 <th class="text-left px-6 py-4"> Credit Account </th>
                 <th class="text-left px-6 py-4"> Status </th>
-                <th class="text-left px-6 py-4"> Action </th>
+                <th class="text-left px-6 py-4 text-center"> Action </th>
               </tr>
             </thead>
 						
@@ -19330,7 +19318,7 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-                  <th class="px-5 py-3"> Purchase </th>
+                  <th class="px-5 py-3 text-right"> Purchase </th>
 									<th class="px-5 py-3"> Branch </th>
                   <th class="px-5 py-3"> Supplier </th>
                   <th class="px-5 py-3"> Date </th>
@@ -22908,7 +22896,7 @@
         <!-- TABLE -->
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-sm">
-            <thead class="bg-background border-b border-outline-variant">
+            <thead class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
               <tr>
                 <th class="px-5 py-3 text-left font-medium text-muted whitespace-nowrap" > Type </th>
                 <th class="px-5 py-3 text-left font-medium text-muted whitespace-nowrap"> Party </th>
