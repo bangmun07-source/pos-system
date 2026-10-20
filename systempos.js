@@ -37599,12 +37599,14 @@ window.renderPayrollTable = function () {
 										Edit Salary
 								</button>
 
-								<button type="button"
-								  onclick="closePayrollActionMenus(); payEmployeePayroll('${escapeHtml(row.Payroll_ID)}')"
-								  class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
-								  <span class="material-symbols-outlined text-base">payments</span>
-								  Pay
-								</button>
+								${status === 'RECORDED' ? `
+								  <button type="button"
+								    onclick="closePayrollActionMenus(); payEmployeePayroll('${escapeHtml(row.Payroll_ID)}')"
+								    class="w-full px-4 py-2.5 text-sm text-foreground hover:bg-outline-variant flex items-center gap-2">
+								    <span class="material-symbols-outlined text-base">payments</span>
+								    Pay
+								  </button>
+								` : ''}
 
 								<div class="border-t border-outline-variant"></div>
 				
@@ -38464,6 +38466,234 @@ window.saveEditPayrollSalary = async function () {
     }
   }
 };
+
+
+/* =========================================================
+   PAYROLL - PAY SALARY MODAL
+========================================================= */
+
+window.activePayEmployeePayroll = null;
+window.payEmployeePayrollSubmitting = false;
+
+window.payEmployeePayrollMoney = function (value) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0
+  }).format(Number(value) || 0);
+};
+
+
+/* OPEN PAY SALARY POPUP */
+window.payEmployeePayroll = function (payrollId) {
+  const row = window.getPayrollRow(payrollId);
+
+  if (!row) {
+    alert('Data payroll tidak ditemukan.');
+    return;
+  }
+
+  const status = String(row.Status || '').trim().toUpperCase();
+
+  if (status !== 'RECORDED') {
+    alert('Pay Salary hanya tersedia untuk payroll berstatus RECORDED.');
+    return;
+  }
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value ?? '-';
+  };
+
+  const money = window.payEmployeePayrollMoney;
+
+  window.activePayEmployeePayroll = row;
+
+  setText('payEmployeePayrollName', row.Full_Name || '-');
+  setText('payEmployeePayrollCode', row.Employee_Code || '-');
+  setText(
+    'payEmployeePayrollBranch',
+    row.Branch_Name || row.Branch_ID || '-'
+  );
+
+  const period = String(row.Payroll_Period || '');
+  setText(
+    'payEmployeePayrollPeriod',
+    /^\d{4}-\d{2}/.test(period)
+      ? period.substring(0, 7)
+      : period || '-'
+  );
+
+  setText(
+    'payEmployeePayrollReimbursement',
+    money(row.Reimburse_Amount)
+  );
+
+  setText(
+    'payEmployeePayrollReceivable',
+    money(row.Receivable_Amount)
+  );
+
+  setText(
+    'payEmployeePayrollAmount',
+    money(row.Net_Salary)
+  );
+
+  const methodInput = document.getElementById(
+    'payEmployeePayrollMethod'
+  );
+
+  if (methodInput) methodInput.value = 'CASH';
+
+  const button = document.getElementById(
+    'confirmPayEmployeePayrollButton'
+  );
+
+  if (button) {
+    button.disabled = false;
+    button.textContent = 'Confirm Payment';
+  }
+
+  window.showPayrollModal('payEmployeePayrollModal');
+};
+
+
+/* CLOSE PAY SALARY POPUP */
+window.closePayEmployeePayrollModal = function () {
+  if (window.payEmployeePayrollSubmitting) return;
+
+  window.hidePayrollModal('payEmployeePayrollModal');
+  window.activePayEmployeePayroll = null;
+};
+
+
+/* CONFIRM PAYMENT AND CALL RPC */
+window.submitPayEmployeePayroll = async function () {
+  if (window.payEmployeePayrollSubmitting) return;
+
+  const row = window.activePayEmployeePayroll;
+
+  if (!row) {
+    alert('Data payroll tidak ditemukan.');
+    return;
+  }
+
+  if (String(row.Status || '').trim().toUpperCase() !== 'RECORDED') {
+    alert('Status payroll sudah berubah. Muat ulang tabel Payroll.');
+    return;
+  }
+
+  const sessionId = localStorage.getItem('pos_session_id');
+
+  if (!sessionId) {
+    alert('Session tidak ditemukan. Silakan login kembali.');
+    return;
+  }
+
+  const methodInput = document.getElementById(
+    'payEmployeePayrollMethod'
+  );
+
+  const paymentMethod = String(methodInput?.value || '')
+    .trim()
+    .toUpperCase();
+
+  if (!['CASH', 'BANK'].includes(paymentMethod)) {
+    alert('Pilih metode pembayaran Cash atau Bank.');
+    return;
+  }
+
+  const amount = Math.round(Number(row.Net_Salary) || 0);
+
+  if (amount <= 0) {
+    alert('Net Salary harus lebih besar dari nol.');
+    return;
+  }
+
+  const confirmed = confirm(
+    'Konfirmasi pembayaran gaji?\n\n' +
+    'Karyawan: ' + (row.Full_Name || '-') + '\n' +
+    'Periode: ' + String(row.Payroll_Period || '').substring(0, 7) + '\n' +
+    'Metode: ' + paymentMethod + '\n' +
+    'Nominal: ' + window.payEmployeePayrollMoney(amount) + '\n\n' +
+    'Jurnal dan saldo akan diperbarui jika pembayaran berhasil.'
+  );
+
+  if (!confirmed) return;
+
+  const button = document.getElementById(
+    'confirmPayEmployeePayrollButton'
+  );
+
+  window.payEmployeePayrollSubmitting = true;
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Processing...';
+  }
+
+  try {
+    const currentUser = typeof state !== 'undefined' ? state.user : null;
+
+    const createdBy =
+      currentUser?.Full_Name ||
+      currentUser?.full_name ||
+      currentUser?.username ||
+      currentUser?.Username ||
+      'Payroll';
+
+    const { data, error } = await supabaseClient.rpc(
+      'pay_employee_payroll',
+      {
+        p_session_id: sessionId,
+        p_payroll_id: row.Payroll_ID,
+        p_payment_method: paymentMethod,
+        p_created_by: createdBy
+      }
+    );
+
+    if (error) throw error;
+
+    const result = Array.isArray(data) ? data[0] : data;
+
+    if (!result || result.success !== true) {
+      throw new Error(
+        result?.message || 'Pay Salary gagal diproses.'
+      );
+    }
+
+    window.hidePayrollModal('payEmployeePayrollModal');
+    window.activePayEmployeePayroll = null;
+
+    alert(
+      'Pay Salary berhasil.\n\n' +
+      'Karyawan: ' + (result.employee_name || row.Full_Name) + '\n' +
+      'Nominal: ' + window.payEmployeePayrollMoney(
+        result.amount_paid ?? amount
+      ) + '\n' +
+      'Metode: ' + paymentMethod
+    );
+
+    await window.loadPayroll();
+
+  } catch (error) {
+    console.error('submitPayEmployeePayroll:', error);
+
+    alert(
+      'Pay Salary gagal.\n\n' +
+      (error?.message || 'Terjadi kesalahan saat pembayaran.')
+    );
+
+  } finally {
+    window.payEmployeePayrollSubmitting = false;
+
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Confirm Payment';
+    }
+  }
+};
+
 
 /* ==== CLOSE MODALS ==== */
 window.closePayrollDetail = function () {
