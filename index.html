@@ -3935,7 +3935,7 @@
 			
 			<div class="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full sm:w-auto">
 			  <button onclick="exportInventoryPDF()" 
-					class="class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
+					class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
 					<span class="material-symbols-outlined text-sm">
 						file_download
 					</span>
@@ -3943,7 +3943,7 @@
 			  </button>
 			
 			  <button  onclick="openStockInModal()" 
-					class="class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
+					class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
 			    <span class="material-symbols-outlined text-sm">
 						move_to_inbox
 					</span>
@@ -3951,7 +3951,7 @@
 			  </button>
 			
 			  <button onclick="openAddMaterialModal()" 
-			  	class="class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
+			  	class="h-10 px-4 rounded-md bottom-theme text-foreground text-xs font-medium flex items-center justify-center gap-2">
 			    <span class="material-symbols-outlined text-sm">
 						add
 					</span>
@@ -4038,6 +4038,7 @@
 			        class="h-10 w-full rounded-md border border-outline-variant bg-background text-foreground text-xs px-3 outline-none">
 			        <option value="ALL">All Status</option>
 			        <option value="PENDING">Pending</option>
+							<option value="DRAFT">Draft</option>
 			        <option value="PAID">Paid</option>
 			        <option value="CANCELLED">Cancelled</option>
 			      </select>
@@ -4091,8 +4092,7 @@
 	    <div class="px-6 py-4 flex items-center justify-between border-t border-outline-variant">
 	      <div class="text-xs text-muted">
 	        Showing
-	        <span
-	          id="purchaseShowing"
+	        <span id="purchaseShowing"
 	          class="text-on-surface font-semibold">
 	          10
 	        </span>
@@ -5122,35 +5122,6 @@
         <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant px-2 mb-2">
           Select New Status
         </p>
-
-        <!-- PAID -->
-        <button type="button"
-          onclick="selectPurchaseStatus('PAID')"
-          data-status="PAID"
-          class="purchase-status-option w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
-          <div class="flex items-center gap-4">
-            <div class="w-10 h-10 flex items-center justify-center text-on-surface">
-              <span class="material-symbols-outlined text-lg"
-                style="font-variation-settings:'FILL' 1;">
-                payments
-              </span>
-            </div>
-						
-            <div class="text-left">
-              <p class="text-sm font-medium text-on-surface">
-                Paid
-              </p>
-
-              <p class="text-xs text-on-surface-variant">
-                Purchase has been fully paid
-              </p>
-            </div>
-          </div>
-					
-          <span class="purchase-status-check material-symbols-outlined opacity-0">
-            check
-          </span>
-        </button>
 
         <!-- PENDING -->
         <button type="button"
@@ -14954,18 +14925,15 @@
 	              <option value="BANK">Bank Transfer</option>
 	            </select>
 	          </div>
-						<!-- Payment Status -->
+						<!-- Purchase Status -->
 						<div>
 						  <label class="text-[10px] uppercase text-on-surface-variant">
-						    Payment Status
+						    Purchase Status
 						  </label>
 						
 						  <select id="purchasePaymentStatus"
 						    class="mt-2 w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant">
-						
-						    <option value="PAID">Paid</option>
-						    <option value="PENDING">Pending</option>
-						
+						    <option value="DRAFT" selected>Draft</option>
 						  </select>
 						</div>
 	          <!-- Arrival Date -->
