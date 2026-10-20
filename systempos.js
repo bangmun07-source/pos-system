@@ -6725,11 +6725,8 @@ async function loadIngredientPurchases(branchId, start = null, end = null) {
   `;
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+		const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_ingredient_purchases",
       {
@@ -6761,42 +6758,27 @@ async function loadIngredientPurchases(branchId, start = null, end = null) {
 }
 
 function applyPurchaseFilters() {
-  const searchInput =
-    document.getElementById("purchaseSearch");
-
-  const statusSelect =
-    document.getElementById("purchaseStatusFilter");
-
-  const search = (
-    searchInput?.value || ""
-  ).trim().toLowerCase();
-
-	const status =
-	  String(statusSelect?.value || "ALL")
-		.trim()
-		.toUpperCase();
+  const searchInput = document.getElementById("purchaseSearch");
+  const statusSelect = document.getElementById("purchaseStatusFilter");
+  const search = ( searchInput?.value || "" ).trim().toLowerCase();
+	const status = String(statusSelect?.value || "ALL")
+	.trim()
+	.toUpperCase();
 	
   purchaseFilteredData = purchaseData.filter(purchase => {
-    const matchesSearch =
-      !search ||
+    const matchesSearch = !search ||
       String(purchase.ID || "")
         .toLowerCase()
         .includes(search) ||
-
       String(purchase.Name_Supplier || "")
         .toLowerCase()
         .includes(search) ||
-
       String(purchase.Ingredient || "")
         .toLowerCase()
         .includes(search);
-
-    const purchaseStatus =
-      String(purchase.Status || "")
-        .toUpperCase();
-    const matchesStatus =
-      status === "ALL" ||
-      purchaseStatus === status;
+		
+    const purchaseStatus = String(purchase.Status || "") .toUpperCase();
+    const matchesStatus = status === "ALL" || purchaseStatus === status;
     return matchesSearch && matchesStatus;
   });
   purchaseCurrentPage = 1;
@@ -6818,44 +6800,18 @@ function renderIngredientPurchases(purchases) {
   }
 
   tbody.innerHTML = purchases.map(purchase => {
-    const status = String(
-      purchase.Status || ""
-    ).toUpperCase();
+    const status = String( purchase.Status || "" ).toUpperCase();
 
     return `
       <tr class="hover:bg-outline-variant transition">
-        <td class="px-8 py-4 text-sm font-semibold">
-          ${escapeHtml(purchase.ID || "-")}
-        </td>
-
-        <td class="px-8 py-4 text-sm">
-          ${escapeHtml(purchase.Date || "-")}
-        </td>
-
-        <td class="px-8 py-4 text-sm">
-          ${escapeHtml(purchase.Name_Supplier || "-")}
-        </td>
-
-        <td class="px-8 py-4 text-sm">
-          ${escapeHtml(purchase.Ingredient || "-")}
-        </td>
-
-        <td class="px-8 py-4 text-sm">
-          ${Number(purchase.Qty || 0).toLocaleString("id-ID")}
-        </td>
-
-        <td class="px-8 py-4 text-sm font-semibold">
-          Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")}
-        </td>
-
-        <td class="px-8 py-4 text-sm">
-          ${escapeHtml(purchase.Payment_Method || "-")}
-        </td>
-
-        <td class="px-8 py-4 text-sm">
-          ${renderPurchaseStatus(status)}
-        </td>
-
+        <td class="px-8 py-4 text-sm font-semibold"> ${escapeHtml(purchase.ID || "-")} </td>
+        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Date || "-")} </td>
+        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Name_Supplier || "-")} </td>
+        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Ingredient || "-")} </td>
+        <td class="px-8 py-4 text-sm"> ${Number(purchase.Qty || 0).toLocaleString("id-ID")} </td>
+        <td class="px-8 py-4 text-sm font-semibold"> Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")} </td>
+        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Payment_Method || "-")} </td>
+        <td class="px-8 py-4 text-sm text-center"> ${renderPurchaseStatus(status)} </td>
         <td class="px-8 py-4 text-right">
           <button onclick="openPurchaseAction('${escapeHtml(purchase.ID)}')"
             class="p-2 rounded-md text-on-surface-variant hover:text-on-surface transition">
@@ -6870,67 +6826,33 @@ function renderIngredientPurchases(purchases) {
 }
 	
 function renderPurchasePage() {
-  const totalItems =
-    purchaseFilteredData.length;
+  const totalItems = purchaseFilteredData.length;
+  const totalPages = Math.max( 1, Math.ceil(totalItems / purchasePageSize) );
 
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(totalItems / purchasePageSize)
-    );
-
-  if (purchaseCurrentPage > totalPages) {
-    purchaseCurrentPage = totalPages;
-  }
-  const start =
-    (purchaseCurrentPage - 1)
-    * purchasePageSize;
-
-  const end =
-    start + purchasePageSize;
-
-  const pageData =
-    purchaseFilteredData.slice(
-      start,
-      end
-    );
+  if (purchaseCurrentPage > totalPages) { purchaseCurrentPage = totalPages; }
+	
+  const start = (purchaseCurrentPage - 1) * purchasePageSize;
+  const end = start + purchasePageSize;
+  const pageData = purchaseFilteredData.slice( start, end );
 
   renderIngredientPurchases(pageData);
-  renderPurchasePagination(
-    totalPages
-  );
+  renderPurchasePagination( totalPages );
 
-  const showing =
-    document.getElementById(
-      "purchaseShowing"
-    );
-
-  if (showing) {
-    showing.textContent =
-      pageData.length;
-  }
+  const showing = document.getElementById( "purchaseShowing" );
+  if (showing) { showing.textContent = pageData.length; }
 }
 
 function renderPurchasePagination(totalPages) {
-  const container =
-    document.getElementById(
-      "ingredientPurchasePagination"
-    );
+  const container = document.getElementById( "ingredientPurchasePagination"  );
 
   if (!container) return;
-  if (totalPages <= 1) {
-    container.innerHTML = "";
-    return;
-  }
+  if (totalPages <= 1) { container.innerHTML = ""; return; }
 
-  let html = `
-    <div class="flex items-center gap-1">
-  `;
+  let html = ` <div class="flex items-center gap-1"> `;
 
   // Previous
   html += `
-    <button
-      onclick="changePurchasePage(${purchaseCurrentPage - 1})"
+    <button onclick="changePurchasePage(${purchaseCurrentPage - 1})"
       ${purchaseCurrentPage === 1 ? "disabled" : ""}
       class="px-3 py-1 text-xs disabled:opacity-40">
       ‹
@@ -6943,8 +6865,7 @@ function renderPurchasePagination(totalPages) {
     i++
   ) {
     html += `
-      <button
-        onclick="changePurchasePage(${i})"
+      <button onclick="changePurchasePage(${i})"
         class="px-3 py-1 text-xs ${
           i === purchaseCurrentPage
             ? "bg-surface-container-high font-bold"
@@ -6957,8 +6878,7 @@ function renderPurchasePagination(totalPages) {
 
   // Next
   html += `
-    <button
-      onclick="changePurchasePage(${purchaseCurrentPage + 1})"
+    <button onclick="changePurchasePage(${purchaseCurrentPage + 1})"
       ${purchaseCurrentPage === totalPages ? "disabled" : ""}
       class="px-3 py-1 rounded-md border border-outline-variant text-xs disabled:opacity-40">
       ›
@@ -6990,12 +6910,12 @@ function changePurchasePage(page) {
 	
 function renderPurchaseStatus(status) {
   let className = "bg-surface-container-high text-muted";
-  if (status === "DRAFT") { className = "bg-surface-container-high text-muted"; }
+  if (status === "DRAFT") { className = "text-muted"; }
   if (status === "PAID") { className = "bg-success-container/20 text-success"; }
   if (status === "PENDING") { className = "bg-warning-container/20 text-warning"; }
   if (status === "CANCELLED") { className = "bg-error-container/20 text-error"; }
   return `
-    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${className}">
+    <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold ${className}">
       ${status || "UNKNOWN"}
     </span>
   `;
@@ -22045,7 +21965,7 @@ function renderAccountingAccounts(accounts) {
 				</td>
 
 				<td class="px-6 py-4">
-					<span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+					<span class="px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
 						${statusLabel}
 					</span>
 				</td>
@@ -22054,7 +21974,7 @@ function renderAccountingAccounts(accounts) {
 					<div class="relative inline-block">
 						<button type="button"
 							onclick="toggleAccountingAccountMenu('${escapeHtml(account.accountId)}')"
-							class="text-on-surface-variant hover:text-on-surface transition">
+							class="text-on-surface-variant text-center hover:text-on-surface transition">
 							<span class="material-symbols-outlined text-[20px]">
 								more_vert
 							</span>
@@ -22548,7 +22468,7 @@ function renderAccountingMappings() {
 	
 							<button type="button"
 								onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
-								class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
+								class="w-full px-4 py-3 text-center text-sm text-on-surface hover:bg-outline-variant">
 								${mapping.isActive
 									? "Deactivate"
 									: "Activate"}
