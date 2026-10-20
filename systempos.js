@@ -6990,15 +6990,10 @@ function changePurchasePage(page) {
 	
 function renderPurchaseStatus(status) {
   let className = "bg-surface-container-high text-muted";
-  if (status === "PAID") {
-    className = "bg-success-container/20 text-success";
-  }
-  if (status === "PENDING") {
-    className = "bg-warning-container/20 text-warning";
-  }
-  if (status === "CANCELLED") {
-    className = "bg-error-container/20 text-error";
-  }
+  if (status === "DRAFT") { className = "bg-surface-container-high text-muted"; }
+  if (status === "PAID") { className = "bg-success-container/20 text-success"; }
+  if (status === "PENDING") { className = "bg-warning-container/20 text-warning"; }
+  if (status === "CANCELLED") { className = "bg-error-container/20 text-error"; }
   return `
     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${className}">
       ${status || "UNKNOWN"}
@@ -7011,70 +7006,42 @@ window.openPurchaseAction = function (purchaseId) {
     item => String(item.ID) === String(purchaseId)
   );
 
-  if (!purchase) {
-    return;
-  }
+  if (!purchase) { return; }
 	
 	window.currentPurchaseAction = purchase;
-  const template =
-    document.getElementById(
-      "ingredientPurchaseActionModal"
-    );
+  const template = document.getElementById( "ingredientPurchaseActionModal" );
 
-  if (!template) {
-    return;
-  }
+  if (!template) { return; }
   // Hapus popup lama
   document
     .querySelectorAll(".purchase-action-modal")
     .forEach(el => el.remove());
 
   // Clone template
-  const clone =
-    template.content.cloneNode(true);
-  const wrapper =
-    document.createElement("div");
-  wrapper.className =
-    "purchase-action-modal";
+  const clone = template.content.cloneNode(true);
+  const wrapper = document.createElement("div");
+	
+  wrapper.className = "purchase-action-modal";
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
-  window.purchaseActionModalEl =
-    wrapper;
-  document.body.style.overflow =
-    "hidden";
+  window.purchaseActionModalEl = wrapper;
+  document.body.style.overflow = "hidden";
 
   // ISI DATA
   const setText = (id, value) => {
-    const el =
-      wrapper.querySelector("#" + id);
+    const el = wrapper.querySelector("#" + id);
     if (el) {
       el.textContent =
         value ?? "-";
     }
   };
 
-  setText(
-    "purchaseModalIngredient",
-    purchase.Ingredient
-  );
-  setText(
-    "purchaseModalId",
-    purchase.ID
-  );
-  setText(
-    "purchaseModalDate",
-    purchase.Date
-  );
-  setText(
-    "purchaseModalSupplier",
-    purchase.Name_Supplier
-  );
-  setText(
-    "purchaseModalQty",
-    purchase.Qty
-  );
-  setText(
-    "purchaseModalTotal",
+  setText( "purchaseModalIngredient", purchase.Ingredient );
+  setText( "purchaseModalId", purchase.ID );
+  setText( "purchaseModalDate", purchase.Date );
+  setText( "purchaseModalSupplier", purchase.Name_Supplier );
+  setText( "purchaseModalQty", purchase.Qty );
+  setText( "purchaseModalTotal",
     new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
@@ -7083,54 +7050,40 @@ window.openPurchaseAction = function (purchaseId) {
       Number(purchase.Total_Price || 0)
     )
   );
-  setText(
-    "purchaseModalPayment",
-    purchase.Payment_Method
-  );
-  setText(
-    "purchaseModalStatus",
-    purchase.Status
-  );
+  setText( "purchaseModalPayment", purchase.Payment_Method );
+  setText( "purchaseModalStatus", purchase.Status );
 };
 
 window.closePurchaseAction = function () {
   if (window.purchaseActionModalEl) {
     window.purchaseActionModalEl.remove();
-    window.purchaseActionModalEl =
-      null;
+    window.purchaseActionModalEl = null;
   }
   document.body.style.overflow = "";
 };
 
 window.viewPurchaseNote = function () {
   const purchase = window.currentPurchaseAction;
-  if (!purchase) {
-    return;
-  }
-  const template =
-    document.getElementById("purchaseNoteModal");
-  if (!template) {
-    return;
-  }
+  if (!purchase) { return; }
+	
+  const template = document.getElementById("purchaseNoteModal");
+  if (!template) { return; }
+	
   document
     .querySelectorAll(".purchase-note-modal")
     .forEach(el => el.remove());
-  const clone =
-    template.content.cloneNode(true);
-  const wrapper =
-    document.createElement("div");
-  wrapper.className =
-    "purchase-note-modal";
+	
+  const clone = template.content.cloneNode(true);
+  const wrapper = document.createElement("div");
+	
+  wrapper.className = "purchase-note-modal";
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
   window.purchaseNoteModalEl = wrapper;
   document.body.style.overflow = "hidden";
-  const note =
-    wrapper.querySelector("#purchaseNoteText");
-  if (note) {
-    note.textContent =
-      purchase.Note || "Tidak ada catatan.";
-  }
+	
+  const note = wrapper.querySelector("#purchaseNoteText");
+  if (note) { note.textContent = purchase.Note || "Tidak ada catatan."; }
 };
 
 window.closePurchaseNote = function () {
@@ -7143,93 +7096,57 @@ window.closePurchaseNote = function () {
 
 
 window.openPurchaseStatusAction = function () {
-  const purchase =
-    window.currentPurchaseAction;
-  if (!purchase) {
-    return;
-  }
+  const purchase = window.currentPurchaseAction;
+  if (!purchase) return;
 
-  const template =
-    document.getElementById(
-      "purchaseStatusModal"
-    );
+  const template = document.getElementById("purchaseStatusModal");
+  if (!template) return;
 
-  if (!template) {
-    return;
-  }
-
-  document
-    .querySelectorAll(".purchase-status-modal")
+  document.querySelectorAll(".purchase-status-modal")
     .forEach(el => el.remove());
-  const clone =
-    template.content.cloneNode(true);
-  const wrapper =
-    document.createElement("div");
-  wrapper.className =
-    "purchase-status-modal";
+
+  const clone = template.content.cloneNode(true);
+  const wrapper = document.createElement("div");
+
+  wrapper.className = "purchase-status-modal";
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
-  window.purchaseStatusModalEl =
-    wrapper;
-  window.selectedPurchaseStatus =
-    purchase.Status || "PAID";
-  document.body.style.overflow =
-    "hidden";
+  window.purchaseStatusModalEl = wrapper;
+  document.body.style.overflow = "hidden";
 
   // Current status
-  const current =
-    wrapper.querySelector(
-      "#purchaseCurrentStatus"
-    );
+  const currentStatus = purchase.Status || "DRAFT";
+  const current = wrapper.querySelector("#purchaseCurrentStatus");
+  if (current) { current.textContent = currentStatus; }
+  // Pilih status hanya jika tersedia di popup
+  const availableStatuses = ["PENDING", "CANCELLED"];
 
-  if (current) {
-    current.textContent =
-      purchase.Status || "-";
+  window.selectedPurchaseStatus = availableStatuses.includes(currentStatus)
+    ? currentStatus
+    : "";
+  if (window.selectedPurchaseStatus) {
+    selectPurchaseStatus(window.selectedPurchaseStatus);
   }
-  // Tandai status aktif
-  selectPurchaseStatus(
-    purchase.Status || "PAID"
-  );
 };
 
 window.selectPurchaseStatus = function (status) {
-  window.selectedPurchaseStatus =
-    status;
-  const modal =
-    window.purchaseStatusModalEl;
+  window.selectedPurchaseStatus = status;
+  const modal = window.purchaseStatusModalEl;
 
   if (!modal) return;
   modal
-    .querySelectorAll(
-      ".purchase-status-option"
-    )
+    .querySelectorAll( ".purchase-status-option" )
     .forEach(button => {
-      const isSelected =
-        button.dataset.status === status;
-      const check =
-        button.querySelector(
-          ".purchase-status-check"
-        );
+      const isSelected = button.dataset.status === status;
+      const check = button.querySelector( ".purchase-status-check" );
 
       if (isSelected) {
-        button.classList.add(
-          "bg-background-high"
-        );
-
-        if (check) {
-          check.classList.remove(
-            "opacity-0"
-          );
+        button.classList.add( "bg-background-high" );
+        if (check) { check.classList.remove( "opacity-0" );
         }
       } else {
-        button.classList.remove(
-          "bg-background-high"
-        );
-
-        if (check) {
-          check.classList.add(
-            "opacity-0"
-          );
+        button.classList.remove( "bg-background-high" );
+        if (check) { check.classList.add( "opacity-0" );
         }
       }
     });
@@ -7245,33 +7162,15 @@ window.closePurchaseStatus = function () {
 };
 
 window.confirmPurchaseStatus = async function () {
-  const purchase =
-    window.currentPurchaseAction;
-  const status =
-    window.selectedPurchaseStatus;
+  const purchase = window.currentPurchaseAction;
+  const status = window.selectedPurchaseStatus;
 
-  if (!purchase) {
-    showToast(
-      "Purchase tidak ditemukan",
-      "error"
-    );
-    return;
-  }
-
-  if (!status) {
-    showToast(
-      "Pilih status terlebih dahulu",
-      "error"
-    );
-    return;
-  }
+  if (!purchase) { showToast( "Purchase tidak ditemukan", "error" ); return; }
+  if (!status) { showToast( "Pilih status terlebih dahulu", "error" ); return; }
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+		const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "update_ingredient_purchase_status",
       {
@@ -7283,9 +7182,7 @@ window.confirmPurchaseStatus = async function () {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     if (
       data &&
@@ -7321,9 +7218,7 @@ window.confirmPurchaseStatus = async function () {
 };
 	
 function openInventoryPage() {
-  if (!state.branchId) {
-    return;
-  }
+  if (!state.branchId) { return; }
   loadInventoryPage(state.branchId);
 }
 
@@ -7339,14 +7234,10 @@ async function loadSuppliers() {
   }
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
-    const branchId =
-      state.branchId;
+		const sessionId = localStorage.getItem("pos_session_id");
+    const branchId = state.branchId;
 
-    if (!branchId) {
-      return;
-    }
+    if (!branchId) { return; }
     // SUPABASE RPC
     const { data, error } =
       await supabaseClient.rpc(
@@ -7357,17 +7248,12 @@ async function loadSuppliers() {
         }
       );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     // CACHE
-    allSupplierData =
-      data || [];
-    state.supplierData =
-      data || [];
-    state.supplierBranchId =
-      branchId;
+    allSupplierData = data || [];
+    state.supplierData = data || [];
+    state.supplierBranchId = branchId;
 
     // RENDER
     renderSuppliers();
@@ -7381,10 +7267,7 @@ async function loadSuppliers() {
 }
 
 function renderSuppliers() {
-  const tbody =
-    document.getElementById(
-      "suppliersTable"
-    );
+  const tbody = document.getElementById( "suppliersTable" );
 
   if (!tbody) return;
   if (
@@ -7403,16 +7286,9 @@ function renderSuppliers() {
     return;
   }
 
-  const start =
-    (supplierCurrentPage - 1) *
-    supplierItemsPerPage;
-  const end =
-    start + supplierItemsPerPage;
-  const paginatedData =
-    allSupplierData.slice(
-      start,
-      end
-    );
+  const start = (supplierCurrentPage - 1) * supplierItemsPerPage;
+  const end = start + supplierItemsPerPage;
+  const paginatedData = allSupplierData.slice( start, end );
 
   tbody.innerHTML =
     paginatedData.map(
@@ -7425,19 +7301,10 @@ function renderSuppliers() {
             .substring(0, 2)
             .toUpperCase();
 
-        const isActive =
-          item.status === "Active";
-
+        const isActive = item.status === "Active";
         // FINANCIAL DATA
-        const totalSpend =
-          Number(
-            item.total_spend
-          ) || 0;
-
-        const totalDebt =
-          Number(
-            item.total_debt
-          ) || 0;
+        const totalSpend = Number( item.total_spend ) || 0;
+        const totalDebt =  Number( item.total_debt ) || 0;
 
         return `
           <tr class="${
@@ -9534,9 +9401,7 @@ window.loadIngredientSummary = async function(name) {
 
   try {
 		const sessionId = localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const { data, error
     } = await supabaseClient.rpc(
       "get_ingredient_summary",
       {
@@ -9648,15 +9513,12 @@ window.loadStockInData = async function () {
       branchId
   ) {
     renderSupplierOptions(
-      supplierSelect,
-      state.supplierData
-    );
+      supplierSelect, state.supplierData );
     return;
   }
 	
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     const {
       data,
       error
@@ -9667,9 +9529,7 @@ window.loadStockInData = async function () {
 				p_session_id: sessionId
       }
     );
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
     const suppliers = data || [];
     // CACHE
     state.supplierData = suppliers;
@@ -9686,10 +9546,7 @@ async function loadStockInIngredients( modal, branchId ) {
   branchId = branchId || state.branchId;
   if (!branchId) return;
 
-  const select =
-    modal.querySelector(
-      "#ingredientName"
-    );
+  const select = modal.querySelector( "#ingredientName" );
   if (!select) return;
 
   // CACHE
@@ -9705,15 +9562,11 @@ async function loadStockInIngredients( modal, branchId ) {
     return;
   }
 
-  select.innerHTML =
-    `<option>Loading...</option>`;
+  select.innerHTML = `<option>Loading...</option>`;
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_ingredients",
       {
@@ -9761,20 +9614,16 @@ window.saveStockIn = async function () {
   const supplierSelect = modal.querySelector( "#supplierSelect" );
   const supplier = supplierSelect?.value || "";
   const supplierId = supplierSelect
-      ?.options[ supplierSelect.selectedIndex ]
-      ?.dataset.id || null;
+		?.options[ supplierSelect.selectedIndex ]
+		?.dataset.id || null;
   const note = modal.querySelector( "textarea" )?.value;
   const paymentMethod = modal.querySelector( "#purchasePaymentMethod" )?.value || "CASH";
-  const status = modal.querySelector( "#purchasePaymentStatus" )?.value || "PAID";
+  const status = modal.querySelector("#purchasePaymentStatus")?.value || "DRAFT";
   const branchSelect = modal.querySelector( "#branchSelect" );
   const branchId = state.branchId;
   const outletName = branchSelect ? branchSelect.options[ branchSelect.selectedIndex ]?.text || "" : "";
   if (!branchId) {
-    alert(
-      "Branch belum dipilih!"
-    );
-    return;
-  }
+    alert( "Branch belum dipilih!" ); return; }
 	
   const wibDate =
     new Intl.DateTimeFormat(
@@ -9799,9 +9648,7 @@ window.saveStockIn = async function () {
   try {
     const totalPrice = Number(price) || 0;
     const sessionId = localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const { data, error
     } = await supabaseClient.rpc(
       "add_ingredient_purchase",
       {
@@ -9816,13 +9663,11 @@ window.saveStockIn = async function () {
         p_branch_id: branchId,
         p_outlet: outletName || "",
         p_payment_method: paymentMethod || "CASH",
-        p_status: status || "PAID"
+        p_status: status || "DRAFT"
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     // CLEAR CACHE
     state.inventoryData = null;
@@ -9840,10 +9685,7 @@ window.saveStockIn = async function () {
     // CLOSE MODAL
     closeModal();
 		await loadInventoryPage(state.branchId);
-    showToast(
-      "Purchase berhasil disimpan",
-      "success"
-    );
+    showToast( "Purchase berhasil disimpan", "success" );
 
   } catch (error) {
     const err = error?.message || error?.details || "";
