@@ -29424,7 +29424,7 @@ async function recordTaxObligation() {
       const result = typeof data === "string"
 				? JSON.parse(data)
 				: data;
-      if (!result || result.success !== true) { hrow new Error( result?.message || `Gagal mencatat PPh Final ${branchId}.` ); }
+      if (!result || result.success !== true) { throw new Error( result?.message || `Gagal mencatat PPh Final ${branchId}.` ); }
       results.push({ branchId, result });
     }
     // REFRESH
