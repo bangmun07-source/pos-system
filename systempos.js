@@ -29067,17 +29067,14 @@ function renderCurrentTaxSettings() {
   const statusEl = document.getElementById( "currentTaxSettingStatus" );
 
   if (nameEl) { nameEl.textContent = setting.tax_name || "-";}
-  if (rateEl) {
-    const rate = Number(setting.tax_rate);
+  if (rateEl) { const rate = Number(setting.tax_rate);
     rateEl.textContent = Number.isFinite(rate)
 			? `${rate.toFixed(4)}%`
 			: "0.0000%"; }
   if (fromEl) { fromEl.textContent = setting.effective_from || "-"; }
-  if (statusEl) {
-    statusEl.textContent =
-      setting.is_active === false
-        ? "Inactive"
-        : "Active"; }
+  if (statusEl) { statusEl.textContent = setting.is_active === false
+		? "Inactive"
+		: "Active"; }
 }
 
 async function loadAccountingTaxBranchFilters() {
@@ -29098,7 +29095,6 @@ async function loadAccountingTaxBranchFilters() {
     const branches = typeof data === "string"
 			? JSON.parse(data)
 			: (data || []);
-
     const selects = [
       document.getElementById("taxObligationBranchFilter"),
       document.getElementById("pphBadanBranchFilter")
@@ -29111,7 +29107,6 @@ async function loadAccountingTaxBranchFilters() {
       branches.forEach(branch => { const option = document.createElement("option");
         option.value = branch.id || "";
         option.textContent = branch.name || branch.id || "Unnamed Branch";
-
         select.appendChild(option);
       });
     });
@@ -29137,8 +29132,8 @@ async function openTaxSettingsModal() {
     if (nameEl) { nameEl.value = setting.tax_name || "Annual Revenue Tax"; }
     if (rateEl) { const rate = Number(setting.tax_rate);
       rateEl.value = Number.isFinite(rate)
-          ? rate
-          : 0.5; }
+				? rate
+				: 0.5; }
     if (fromEl) { fromEl.value = setting.effective_from || getTodayAccountingTaxDate(); }
     if (toEl) { toEl.value = setting.effective_to || ""; }
     if (activeEl) { activeEl.checked = setting.is_active !== false; }
@@ -29167,13 +29162,8 @@ async function saveTaxObligasiSettings() {
 
 	try {
 	  sessionId = localStorage.getItem("pos_session_id");
-			} catch (error) {
-			  alert(error.message);
-			  return; }
-			
-			if (!sessionId) {
-			  alert("Session tidak ditemukan. Silakan login ulang.");
-			  return; }
+			} catch (error) { alert(error.message); return; }
+	if (!sessionId) { alert("Session tidak ditemukan. Silakan login ulang."); return; }
 	
   const nameEl = document.getElementById( "taxSettingName" );
   const rateEl = document.getElementById( "taxSettingRate" );
@@ -29188,20 +29178,11 @@ async function saveTaxObligasiSettings() {
   const effectiveTo = toEl?.value || null;
   const isActive = activeEl?.checked ?? true;
   const note = noteEl?.value?.trim() || null;
-
   /* ===== VALIDATION ===== */
-  if (!taxName) {
-    alert( "Tax Name wajib diisi." );
-    return; }
-  if ( !Number.isFinite(taxRate) || taxRate < 0 ) {
-    alert( "Tax Rate tidak valid." );
-    return; }
-  if (!effectiveFrom) {
-    alert( "Effective From wajib diisi." );
-    return; }
-  if ( effectiveTo && effectiveTo < effectiveFrom ) {
-    alert( "Effective To tidak boleh lebih kecil dari Effective From." );
-    return; }
+  if (!taxName) { alert( "Tax Name wajib diisi." ); return; }
+  if ( !Number.isFinite(taxRate) || taxRate < 0 ) { alert( "Tax Rate tidak valid." ); return; }
+  if (!effectiveFrom) { alert( "Effective From wajib diisi." ); return; }
+  if ( effectiveTo && effectiveTo < effectiveFrom ) { alert( "Effective To tidak boleh lebih kecil dari Effective From." ); return; }
 
   try {
 	    if (button) {
@@ -29253,9 +29234,7 @@ async function saveTaxObligasiSettings() {
   }
 }
 
-
 /* ==== TAX OBLIGATION ===== */
-
 async function loadTaxObligation() {
   const sessionId = localStorage.getItem("pos_session_id");
   const branchId = getTaxObligationBranchId();
@@ -29321,7 +29300,6 @@ document.addEventListener("change", function(event) {
 });
 
 /* === RENDER TAX OBLIGATION === */
-
 function renderTaxObligation(data) {
   const obligation = data || {};
   const revenueEl = document.getElementById( "taxObligationRevenue" );
@@ -29333,8 +29311,8 @@ function renderTaxObligation(data) {
   if (revenueEl) { revenueEl.textContent = formatAccountingTaxCurrency( obligation.revenue_amount ); }
   if (rateEl) { const rate = Number(obligation.tax_rate);
     rateEl.textContent = Number.isFinite(rate)
-        ? `${rate.toFixed(4)}%`
-        : "0.0000%"; }
+			? `${rate.toFixed(4)}%`
+			: "0.0000%"; }
   if (taxableEl) { taxableEl.textContent =  formatAccountingTaxCurrency( obligation.taxable_amount ); }
   if (amountEl) { amountEl.textContent = formatAccountingTaxCurrency( obligation.tax_amount ); }
   if (statusEl) { const status = String( obligation.status || "" ).toUpperCase();
@@ -29375,26 +29353,16 @@ function renderTaxObligation(data) {
 /* ==== RECORD TAX OBLIGATION ==== */
 
 async function recordTaxObligation() {
-	
 	if (accountingTaxRecording) { return; }
 
   const sessionId = localStorage.getItem("pos_session_id");
-
   if (!sessionId) { showToast("Session tidak ditemukan.", "error"); return; }
 
   // PERIODE PPh FINAL = BULAN SEBELUMNYA
  	const taxYear = getAccountingTaxYear();
 	const taxMonth = getAccountingTaxMonth();
-	
-	if (!taxYear || taxYear < 2000 || taxYear > 9999) {
-	  showToast("Tax Year tidak valid.", "error");
-	  return;
-	}
-	
-	if (!taxMonth || taxMonth < 1 || taxMonth > 12) {
-	  showToast("Tax Month tidak valid.", "error");
-	  return;
-	}
+	if (!taxYear || taxYear < 2000 || taxYear > 9999) { showToast("Tax Year tidak valid.", "error"); return; }
+	if (!taxMonth || taxMonth < 1 || taxMonth > 12) { showToast("Tax Month tidak valid.", "error"); return; }
   // BRANCH FILTER
   // "" = ALL BRANCH
   const selectedBranchId = document.getElementById("taxObligationBranchFilter")?.value || "";
@@ -29405,8 +29373,7 @@ async function recordTaxObligation() {
 
     if (recordButton) {
       recordButton.disabled = true;
-      recordButton.dataset.originalText =
-        recordButton.textContent || "Record Tax Obligation";
+      recordButton.dataset.originalText = recordButton.textContent || "Record Tax Obligation";
       recordButton.textContent = "Recording...";
     }
 		
@@ -29414,30 +29381,24 @@ async function recordTaxObligation() {
     let branchIds = [];
 
     if (selectedBranchId) {
-      // Branch tertentu
       branchIds = [selectedBranchId];
-
     } else {
       // All Branch → ambil semua branch aktual
       const { data: branchData, error: branchError } =
         await supabaseClient.rpc("get_expense_branches", {
           p_session_id: sessionId
         });
-
+			
       if (branchError) { throw branchError; }
 
       const branches = typeof branchData === "string"
 				? JSON.parse(branchData)
-				: (branchData || []);
-
+				: (branchData || [])
       branchIds = branches
         .map(branch => branch.id)
         .filter(Boolean);
     }
-
-    if (!branchIds.length) {
-      throw new Error( "Tidak ada branch yang tersedia untuk mencatat PPh Final." );
-    }
+    if (!branchIds.length) { throw new Error( "Tidak ada branch yang tersedia untuk mencatat PPh Final." ); }
 
     // RECORD SATU PER SATU PER BRANCH
     const results = [];
@@ -29458,18 +29419,12 @@ async function recordTaxObligation() {
           }
         );
 
-      if (error) {
-        throw new Error( `Gagal mencatat PPh Final ${branchId}: ${error.message}` );
-      }
+      if (error) { throw new Error( `Gagal mencatat PPh Final ${branchId}: ${error.message}` ); }
 
       const result = typeof data === "string"
 				? JSON.parse(data)
 				: data;
-
-      if (!result || result.success !== true) {
-        throw new Error( result?.message || `Gagal mencatat PPh Final ${branchId}.` );
-      }
-
+      if (!result || result.success !== true) { hrow new Error( result?.message || `Gagal mencatat PPh Final ${branchId}.` ); }
       results.push({ branchId, result });
     }
     // REFRESH
@@ -29502,17 +29457,10 @@ async function recordTaxObligation() {
 }
 
 
-const TAX_OBLIGATION_PAYABLE_ACCOUNT_ID =
-  "ACC-4DC408145FCA";
-
-const TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE =
-  "2210";
-
-const TAX_OBLIGATION_CASH_ACCOUNT_ID =
-  "ACC-84AE6A4B9528";
-
-const TAX_OBLIGATION_BANK_ACCOUNT_ID =
-  "ACC-1CE751522EEC";
+const TAX_OBLIGATION_PAYABLE_ACCOUNT_ID = "ACC-4DC408145FCA";
+const TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE = "2210";
+const TAX_OBLIGATION_CASH_ACCOUNT_ID = "ACC-84AE6A4B9528";
+const TAX_OBLIGATION_BANK_ACCOUNT_ID = "ACC-1CE751522EEC";
 
 
 /* ===== OPEN TAX OBLIGATION PAYMENT MODAL ===== */
@@ -29531,26 +29479,19 @@ async function openTaxObligationPaymentModal() {
     if (!taxYear) { throw new Error("Tax Year tidak valid."); }
     /* ====== ACCOUNT WAJIB 2210 ======= */
     const accountEl = document.getElementById( "taxObligationPaymentAccount" );
-		
     if (accountEl) { accountEl.textContent = "2210 · Tax Obligation Payable"; }
 
     const dateEl = document.getElementById( "taxObligationPaymentDate" );
-		
     if (dateEl && !dateEl.value) { dateEl.value = getTodayAccountingTaxDate(); }
   
 		const paymentAmount = Number( currentTaxPayment?.amount || 0 );
-		
 		if (paymentAmount <= 0) { throw new Error( "Jumlah Tax Payment tidak valid." ); }
 		
 		const outstandingEl = document.getElementById( "taxObligationPaymentOutstanding" );
-		
 		if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency(paymentAmount); }
 		
 		const amountEl = document.getElementById( "taxObligationPaymentAmount" );
-		
-		if (amountEl) {
-		  amountEl.value = paymentAmount;
-		  amountEl.max = String(paymentAmount); }
+		if (amountEl) { amountEl.value = paymentAmount; amountEl.max = String(paymentAmount); }
 
     const methodEl = document.getElementById( "taxObligationPaymentMethod" );
     if (methodEl && !methodEl.value) { methodEl.value = "CASH"; }
@@ -29564,8 +29505,8 @@ async function openTaxObligationPaymentModal() {
 
 function closeTaxObligationPaymentModal() {
   const modal = document.getElementById( "taxObligationPaymentModal" );
-
   if (!modal) return;
+	
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
@@ -29596,26 +29537,13 @@ async function saveTaxObligationPayment() {
     const userReference = referenceEl?.value?.trim() || "";
     const reference = `TAX-OBL-PAY-${taxYear}-${String(taxMonth).padStart(2, "0")}-${Date.now()}`;
     const note = userReference
-        ? `${noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}`} - Ref: ${userReference}`
-        : ( noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}` );
+			? `${noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}`} - Ref: ${userReference}`
+			: ( noteEl?.value?.trim() || `Pembayaran Tax Obligation ${taxYear}` );
     /* ==== VALIDATION ==== */
-    if (!paymentDate) {
-      throw new Error(
-        "Tanggal pembayaran wajib diisi."
-      );
-    }
-    if (!Number.isFinite(amount) || amount <= 0) {
-      throw new Error(
-        "Jumlah pembayaran tidak valid."
-      );
-    }
-    if (!["CASH", "BANK", "QRIS"].includes(method)) {
-      throw new Error(
-        "Metode pembayaran tidak valid."
-      );
-    }
+    if (!paymentDate) { throw new Error( "Tanggal pembayaran wajib diisi." ); }
+    if (!Number.isFinite(amount) || amount <= 0) { throw new Error( "Jumlah pembayaran tidak valid." ); }
+    if (!["CASH", "BANK", "QRIS"].includes(method)) { throw new Error( "Metode pembayaran tidak valid." ); }
     /* ==== GET OBLIGATION ==== */
-
     const obligation = await loadTaxObligation();
     const taxAmount =
       Number(
@@ -29624,11 +29552,7 @@ async function saveTaxObligationPayment() {
         0
       );
 
-    if (taxAmount <= 0) {
-      throw new Error(
-        "Tax Obligation tidak memiliki tagihan."
-      );
-    }
+    if (taxAmount <= 0) { throw new Error( "Tax Obligation tidak memiliki tagihan." ); }
     /* ==== GET OUTSTANDING TAX YEAR TERPILIH ==== */
     const {
 		  data: summaryData,
@@ -29644,10 +29568,9 @@ async function saveTaxObligationPayment() {
 		);
 
     if (summaryError) { throw summaryError; }
-    const summary =
-      typeof summaryData === "string"
-        ? JSON.parse(summaryData)
-        : summaryData;
+    const summary = typeof summaryData === "string"
+			? JSON.parse(summaryData)
+			: summaryData;
     const outstanding =
       Math.max(
         Number(
@@ -29659,11 +29582,9 @@ async function saveTaxObligationPayment() {
     if (outstanding <= 0) { throw new Error( `Tax Obligation ${taxYear} sudah lunas.` );}
     if (amount > outstanding) { throw new Error( `Pembayaran tidak boleh lebih dari outstanding ${formatAccountingTaxCurrency(outstanding)}.` );}
 
-    const paymentAccountId =
-      method === "CASH"
-        ? TAX_OBLIGATION_CASH_ACCOUNT_ID
-        : TAX_OBLIGATION_BANK_ACCOUNT_ID;
-
+    const paymentAccountId = method === "CASH"
+			? TAX_OBLIGATION_CASH_ACCOUNT_ID
+			: TAX_OBLIGATION_BANK_ACCOUNT_ID;
     if (!paymentAccountId) { throw new Error( `Account pembayaran untuk ${method} tidak ditemukan.` );}
     /* ==== BUTTON STATE ==== */
     if (button) {
@@ -29802,12 +29723,12 @@ async function loadTaxObligationPaymentSummary() {
     if (payableEl) { payableEl.textContent = formatAccountingCurrency(payable); }
     if (paidEl) { paidEl.textContent = formatAccountingCurrency(paid); }
     if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+		
     return summary;
   } catch (error) {
     throw error;
   }
 }
-
 
 /* ===== TAX PAYMENTS ===== */
 async function loadTaxPayments() {
@@ -29828,7 +29749,6 @@ async function loadTaxPayments() {
     const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
-
     taxPaymentsData = Array.isArray(result)
 			? result
 			: [];
@@ -29836,6 +29756,7 @@ async function loadTaxPayments() {
     taxPaymentsPage = 1;
     renderTaxPayments();
     return taxPaymentsData;
+		
   } catch (error) {
     taxPaymentsData = [];
     renderTaxPayments();
@@ -29848,18 +29769,18 @@ function renderTaxPayments() {
   const paginationInfo = document.getElementById("taxPaymentsPaginationInfo");
   const prevButton = document.getElementById("taxPaymentsPrevButton");
   const nextButton = document.getElementById("taxPaymentsNextButton");
+	
   if (!tbody) return;
 
   const total = Array.isArray(taxPaymentsData)
-      ? taxPaymentsData.length
-      : 0;
+		? taxPaymentsData.length
+		: 0;
   const totalPages = Math.max( Math.ceil(total / taxPaymentsPerPage), 1 );
-	
   if (taxPaymentsPage > totalPages) { taxPaymentsPage = totalPages; }
+	
   const startIndex = (taxPaymentsPage - 1) * taxPaymentsPerPage;
   const endIndex = Math.min( startIndex + taxPaymentsPerPage, total );
   const pageData = taxPaymentsData.slice( startIndex, endIndex );
-
   if (!pageData.length) {
     tbody.innerHTML = `
       <tr>
@@ -29877,10 +29798,9 @@ function renderTaxPayments() {
         const note = payment.note || payment.reference_no || "-";
         const amount = formatAccountingTaxCurrency( payment.amount );
         const method = payment.payment_method
-            ? String(payment.payment_method).toUpperCase()
-            : "—";
+					? String(payment.payment_method).toUpperCase()
+					: "—";
         const status = String( payment.status || "OUTSTANDING" ).toUpperCase();
-				
         const statusHtml =
           status === "PAID"
             ? `
@@ -29918,29 +29838,12 @@ function renderTaxPayments() {
             `;
         return `
           <tr class="hover:bg-background transition-colors">
-            <td class="px-5 py-3 whitespace-nowrap">
-              ${paymentDate}
-            </td>
-
-            <td class="px-5 py-3">
-              ${note}
-            </td>
-
-            <td class="px-5 py-3 text-right whitespace-nowrap">
-              ${amount}
-            </td>
-
-            <td class="px-5 py-3 whitespace-nowrap">
-              ${method}
-            </td>
-
-            <td class="px-5 py-3 text-center whitespace-nowrap">
-              ${statusHtml}
-            </td>
-
-            <td class="px-5 py-3 text-center whitespace-nowrap">
-              ${actionHtml}
-            </td>
+            <td class="px-5 py-3 whitespace-nowrap"> ${paymentDate} </td>
+            <td class="px-5 py-3"> ${note} </td>
+            <td class="px-5 py-3 text-right whitespace-nowrap"> ${amount} </td>
+            <td class="px-5 py-3 whitespace-nowrap"> ${method} </td>
+            <td class="px-5 py-3 text-center whitespace-nowrap"> ${statusHtml} </td>
+            <td class="px-5 py-3 text-center whitespace-nowrap"> ${actionHtml} </td>
           </tr>
         `;
       }).join("");
@@ -29958,8 +29861,8 @@ function renderTaxPayments() {
 
 function changeTaxPaymentsPage(direction) {
   const total = Array.isArray(taxPaymentsData)
-      ? taxPaymentsData.length
-      : 0;
+		? taxPaymentsData.length
+		: 0;
   const totalPages = Math.max( Math.ceil(total / taxPaymentsPerPage), 1 );
   const nextPage = taxPaymentsPage + Number(direction);
 
@@ -29969,30 +29872,22 @@ function changeTaxPaymentsPage(direction) {
 }
 
 function openTaxPaymentFromRow(paymentId) {
-  const payment = taxPaymentsData.find(
-    item => String(item.payment_id) === String(paymentId)
-  );
-  if (!payment) {
-    showToast("Tax payment tidak ditemukan.", "error");
-    return;
-  }
-  if (String(payment.status).toUpperCase() !== "OUTSTANDING") {
-    showToast("Tax payment ini sudah tidak outstanding.", "info");
-    return;
-  }
-  currentTaxPayment = payment;
+  const payment = taxPaymentsData.find( item => String(item.payment_id) === String(paymentId) );
+	
+  if (!payment) { showToast("Tax payment tidak ditemukan.", "error"); return; }
+  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { showToast("Tax payment ini sudah tidak outstanding.", "info"); return; }
+  
+	currentTaxPayment = payment;
   openTaxObligationPaymentModal();
 }
 
 
 function changeTaxRegime() {
   const regime = document.getElementById("taxRegime")?.value;
-
   const finalSection = document.getElementById("pphFinalSection");
   const badanSection = document.getElementById("pphBadanNormalSection");
 
   if (!finalSection || !badanSection) return;
-
   if (regime === "BADAN_NORMAL") {
     finalSection.classList.add("hidden");
     badanSection.classList.remove("hidden");
@@ -30005,9 +29900,7 @@ function changeTaxRegime() {
 /* =========================================================
    PPH BADAN NORMAL
 ========================================================= */
-
 let pphBadanCalculating = false;
-
 function getPphBadanYear() {
   const yearEl = document.getElementById("pphBadanYear");
   const year = Number(yearEl?.value);
@@ -30061,7 +29954,6 @@ async function calculatePphBadan() {
 			const negativeInput = document.getElementById( "pphBadanNegativeAdjustmentInput" );
 			const positiveAdjustment = Math.max( Number(positiveInput?.value || 0), 0 );
 			const negativeAdjustment = Math.max( Number(negativeInput?.value || 0), 0 );
-		
 			const { data, error } 
 				= await supabaseClient.rpc(
 					"get_pph_badan_calculation",
@@ -30076,20 +29968,19 @@ async function calculatePphBadan() {
 						}
 					);
 	
-				if (error) {
-						throw error; }
-	
-				const result = typeof data === "string"
-						? JSON.parse(data)
-						: data;
-	
-				if (!result) { throw new Error( "Data perhitungan PPh Badan tidak ditemukan." );	}
-	
-				renderPphBadanCalculationResult(result);
-				window.currentPphBadanCalculation = result;
-				window.pendingPphBadanBaseCalculation = null;
-	
-				showToast( `PPh Badan ${taxYear} berhasil dihitung.`, "success" ); return; }
+			if (error) { throw error; }
+
+			const result = typeof data === "string"
+				? JSON.parse(data)
+				: data;
+
+			if (!result) { throw new Error( "Data perhitungan PPh Badan tidak ditemukan." );	}
+
+			renderPphBadanCalculationResult(result);
+			window.currentPphBadanCalculation = result;
+			window.pendingPphBadanBaseCalculation = null;
+
+			showToast( `PPh Badan ${taxYear} berhasil dihitung.`, "success" ); return; }
 
 		const { data, error } 
 			= await supabaseClient.rpc(
@@ -30110,7 +30001,6 @@ async function calculatePphBadan() {
 		const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
-	
 		if (!result) { throw new Error( "Data perhitungan PPh Badan tidak ditemukan." ); }
 		if ( !Array.isArray(result.branches) || result.branches.length === 0 ) 
 			{ throw new Error( "Data outlet untuk fiscal adjustment tidak ditemukan." ); }
@@ -30145,28 +30035,26 @@ async function calculatePphBadan() {
 	}
 }
 
-
 /* ===== PPH BADAN - RENDER RESULT ===== */
-
 function renderPphBadanCalculationResult(result) {
-    const commercialProfit = Number( result.commercialProfit || 0 );
-    const positive = Number( result.positiveAdjustment || 0 );
-    const negative = Number( result.negativeAdjustment || 0 );
-    const taxableIncome = Number( result.taxableIncome || 0 );
-    const taxAmount = Number( result.taxAmount || 0 );
-    const commercialProfitEl = document.getElementById( "pphBadanCommercialProfit" );
-    const positiveEl = document.getElementById( "pphBadanPositiveAdjustment" );
-    const negativeEl = document.getElementById( "pphBadanNegativeAdjustment" );
-    const taxableIncomeEl = document.getElementById( "pphBadanTaxableIncome" );
-    const taxAmountEl = document.getElementById( "pphBadanTaxAmount" );
-    const statusEl = document.getElementById( "pphBadanStatus" );
+	const commercialProfit = Number( result.commercialProfit || 0 );
+	const positive = Number( result.positiveAdjustment || 0 );
+	const negative = Number( result.negativeAdjustment || 0 );
+	const taxableIncome = Number( result.taxableIncome || 0 );
+	const taxAmount = Number( result.taxAmount || 0 );
+	const commercialProfitEl = document.getElementById( "pphBadanCommercialProfit" );
+	const positiveEl = document.getElementById( "pphBadanPositiveAdjustment" );
+	const negativeEl = document.getElementById( "pphBadanNegativeAdjustment" );
+	const taxableIncomeEl = document.getElementById( "pphBadanTaxableIncome" );
+	const taxAmountEl = document.getElementById( "pphBadanTaxAmount" );
+	const statusEl = document.getElementById( "pphBadanStatus" );
 
-    if (commercialProfitEl) { commercialProfitEl.textContent = formatAccountingTaxCurrency(commercialProfit); }
-    if (positiveEl) { positiveEl.textContent = formatAccountingTaxCurrency(positive); }
-    if (negativeEl) { negativeEl.textContent = formatAccountingTaxCurrency(negative);  }
-    if (taxableIncomeEl) { taxableIncomeEl.textContent = formatAccountingTaxCurrency(taxableIncome); }
-    if (taxAmountEl) { taxAmountEl.textContent = formatAccountingTaxCurrency(taxAmount); }
-    if (statusEl) { statusEl.textContent = "Calculated"; }
+	if (commercialProfitEl) { commercialProfitEl.textContent = formatAccountingTaxCurrency(commercialProfit); }
+	if (positiveEl) { positiveEl.textContent = formatAccountingTaxCurrency(positive); }
+	if (negativeEl) { negativeEl.textContent = formatAccountingTaxCurrency(negative);  }
+	if (taxableIncomeEl) { taxableIncomeEl.textContent = formatAccountingTaxCurrency(taxableIncome); }
+	if (taxAmountEl) { taxAmountEl.textContent = formatAccountingTaxCurrency(taxAmount); }
+	if (statusEl) { statusEl.textContent = "Calculated"; }
 }
 
 /* ==== PPH BADAN - OPEN FISCAL ADJUSTMENT MODAL ==== */
@@ -30201,13 +30089,13 @@ function openPphBadanFiscalAdjustmentModal( branches, taxYear ) {
 	tbody.innerHTML = safeBranches.map(
 		(branch, index) => {
 			const branchId =
-					branch.branchId ??
-					branch.Branch_ID ??
-					"";
+				branch.branchId ??
+				branch.Branch_ID ??
+				"";
 			const branchName =
-					branch.branchName ??
-					branch.Branch_Name ??
-					branchId;
+				branch.branchName ??
+				branch.Branch_Name ??
+				branchId;
 			const commercialProfit =  Number( branch.commercialProfit || 0 );
 
 			return `
@@ -30272,13 +30160,12 @@ async function applyPphBadanFiscalAdjustments() {
 	try {
 		const sessionId = localStorage.getItem( "pos_session_id" );
 		const taxYear = getPphBadanYear();
-
 		if (!sessionId) { throw new Error( "Session tidak ditemukan. Silakan login ulang." ); }
 		if (!taxYear) { throw new Error( "Tax Year tidak valid." ); }
 		
 		const tbody = document.getElementById( "pphBadanFiscalAdjustmentTableBody" );
-
 		if (!tbody) { throw new Error( "Fiscal Adjustment table tidak ditemukan." ); }
+		
 		const rows = Array.from( tbody.querySelectorAll("tr") );
 		const branchAdjustments = [];
 	
@@ -30292,7 +30179,6 @@ async function applyPphBadanFiscalAdjustments() {
 			const branchId = branchIdInput.value;
 			const positiveAdjustment = Math.max( Number( positiveInput?.value || 0 ), 0 );
 			const negativeAdjustment = Math.max( Number( negativeInput?.value || 0 ), 0 );
-	
 				branchAdjustments.push({
 					branchId,
 					positiveAdjustment,
@@ -30302,10 +30188,8 @@ async function applyPphBadanFiscalAdjustments() {
 	
 		if (branchAdjustments.length === 0) { throw new Error( "Tidak ada outlet untuk dihitung." ); }
 	
-		const totalPositiveAdjustment = branchAdjustments.reduce( 
-			(sum, item) => sum + Number(item.positiveAdjustment || 0), 0 );
-		const totalNegativeAdjustment = branchAdjustments.reduce(
-			(sum, item) => sum + Number(item.negativeAdjustment || 0), 0 );
+		const totalPositiveAdjustment = branchAdjustments.reduce(  (sum, item) => sum + Number(item.positiveAdjustment || 0), 0 );
+		const totalNegativeAdjustment = branchAdjustments.reduce( (sum, item) => sum + Number(item.negativeAdjustment || 0), 0 );
 		const positiveAdjustmentInput = document.getElementById("pphBadanPositiveAdjustmentInput");
 		const negativeAdjustmentInput = document.getElementById("pphBadanNegativeAdjustmentInput");
 		
@@ -30348,7 +30232,6 @@ async function applyPphBadanFiscalAdjustments() {
 		const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
-
 		if (!result) { throw new Error( "Hasil final PPh Badan tidak ditemukan." ); }
 
 		window.currentPphBadanCalculation = result;
@@ -30388,8 +30271,7 @@ async function applyPphBadanFiscalAdjustments() {
 document.addEventListener(
   "change",
   function(event) {
-    if ( event.target?.id !== "pphBadanYear" ) 
-				{ return; }
+    if ( event.target?.id !== "pphBadanYear" )  { return; }
 
     const ids = [
       "pphBadanCommercialProfit",
@@ -30413,9 +30295,7 @@ document.addEventListener(
 
 document.addEventListener(
   "change",
-  function(event) {
-    if (event.target?.id !== "pphBadanBranchFilter") {
-      return; }
+  function(event) { if (event.target?.id !== "pphBadanBranchFilter") { return; }
     const ids = [
       "pphBadanCommercialProfit",
       "pphBadanPositiveAdjustment",
@@ -30432,8 +30312,8 @@ document.addEventListener(
     });
 		
     const statusEl = document.getElementById("pphBadanStatus");
-		
     if (statusEl) { statusEl.textContent = "Not Calculated"; }
+		
     window.currentPphBadanCalculation = null;
     loadPphBadanRecords();
   }
@@ -30447,7 +30327,6 @@ async function loadPphBadanRecords() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
     const branchId = getPphBadanBranchId();
-
     if (!sessionId) { return; }
 			  
 
@@ -30487,6 +30366,7 @@ function renderPphBadanRecords() {
   const nextButton = document.getElementById( "pphBadanNextButton" );
 
   if (!tbody) return;
+	
   const total = pphBadanRecords.length;
   const totalPages =
     Math.max(
@@ -30497,7 +30377,7 @@ function renderPphBadanRecords() {
     );
 
   if ( pphBadanRecordsPage > totalPages ) 
-			{ pphBadanRecordsPage = totalPages; }
+		{ pphBadanRecordsPage = totalPages; }
   const start = (pphBadanRecordsPage - 1) * pphBadanRecordsPerPage;
   const end = Math.min( start + pphBadanRecordsPerPage, total );
   const rows = pphBadanRecords.slice(start, end);
@@ -30524,34 +30404,13 @@ if (!rows.length) {
 	
 			return `
 				<tr class="hover:bg-surface-container transition-colors" >
-					<td class="px-5 py-4 font-medium">
-						${row.taxYear ?? "-"}
-					</td>
-
-					<td class="px-5 py-4 text-muted whitespace-nowrap">
-						${period}
-					</td>
-
-					<td class="px-5 py-4 text-right whitespace-nowrap">
-						${formatAccountingTaxCurrency( row.taxableIncome )}
-					</td>
-
-					<td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
-						${formatAccountingTaxCurrency( row.taxAmount )}
-					</td>
-
-					<td class="px-5 py-4 text-right whitespace-nowrap">
-					    ${formatAccountingTaxCurrency(paidAmount)}
-					</td>
-					
-					<td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
-					    ${formatAccountingTaxCurrency(remainingAmount)}
-					</td>
-
-					<td class="px-5 py-4 text-center">
-						${getPphBadanStatusBadge(status)}
-					</td>
-
+					<td class="px-5 py-4 font-medium"> ${row.taxYear ?? "-"} </td> 
+					<td class="px-5 py-4 text-muted whitespace-nowrap"> ${period} </td> 
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingTaxCurrency( row.taxableIncome )} </td> 
+					<td class="px-5 py-4 text-right font-semibold whitespace-nowrap"> ${formatAccountingTaxCurrency( row.taxAmount )} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingTaxCurrency(paidAmount)} </td>
+					<td class="px-5 py-4 text-right font-semibold whitespace-nowrap"> ${formatAccountingTaxCurrency(remainingAmount)} </td>
+					<td class="px-5 py-4 text-center"> ${getPphBadanStatusBadge(status)} </td>
 					<td class="px-5 py-4 text-center">
 						<button type="button"
 							onclick="openPphBadanRecordMenu('${row.id}')"
@@ -30577,13 +30436,8 @@ if (!rows.length) {
 let selectedPphBadanRecordId = null;
 
 function openPphBadanRecordMenu(recordId) {
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(recordId)
-  );
-
-  if (!record) {
-    showToast("Data PPh Badan tidak ditemukan.", "error");
-    return; }
+  const record = pphBadanRecords.find( row => String(row.id) === String(recordId) );
+  if (!record) { showToast("Data PPh Badan tidak ditemukan.", "error"); return; }
 
   const modal = document.getElementById("pphBadanActionModal");
   const info = document.getElementById("pphBadanActionInfo");
@@ -30615,7 +30469,6 @@ function openPphBadanRecordMenu(recordId) {
       </div>
     </button>
   `;
-
   if (status === "CALCULATED") {
     html += `
       <button type="button"
@@ -30654,7 +30507,6 @@ function openPphBadanRecordMenu(recordId) {
         </div>
       </button>
     `;
-
   } else if (
     status === "OUTSTANDING" ||
     status === "PARTIALLY_PAID"
@@ -30702,19 +30554,11 @@ let pphBadanRecording = false;
 async function recordPphBadanFromAction() {
   if (pphBadanRecording) return;
 
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId)
-  );
-
-  if (!record) {
-    showToast("Data PPh Badan tidak ditemukan.", "error");
-    return; }
+  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
+  if (!record) { showToast("Data PPh Badan tidak ditemukan.", "error"); return; }
 
   const status = String(record.status || "").toUpperCase();
-
-  if (status !== "CALCULATED") {
-    showToast( "PPh Badan ini sudah tidak berstatus Calculated.", "info" );
-    return; }
+  if (status !== "CALCULATED") { showToast( "PPh Badan ini sudah tidak berstatus Calculated.", "info" ); return; }
 
   const confirmed = confirm(
     `Record PPh Badan ${record.taxYear}?\n\n` +
@@ -30728,7 +30572,6 @@ async function recordPphBadanFromAction() {
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     pphBadanRecording = true;
@@ -30761,19 +30604,11 @@ let pphBadanDeleting = false;
 async function deletePphBadanFromAction() {
   if (pphBadanDeleting) return;
 
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId)
-  );
-
-  if (!record) {
-    showToast("Data PPh Badan tidak ditemukan.", "error");
-    return; }
+  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
+  if (!record) { showToast("Data PPh Badan tidak ditemukan.", "error"); return; }
 
   const status = String(record.status || "").toUpperCase();
-
-  if (status !== "CALCULATED") {
-    showToast( "Hanya PPh Badan dengan status Calculated yang bisa dihapus.", "error" );
-    return; }
+  if (status !== "CALCULATED") { showToast( "Hanya PPh Badan dengan status Calculated yang bisa dihapus.", "error" ); return; }
 
   const confirmed = confirm(
     `Hapus perhitungan PPh Badan ${record.taxYear}?\n\n` +
@@ -30784,7 +30619,6 @@ async function deletePphBadanFromAction() {
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     pphBadanDeleting = true;
@@ -30813,14 +30647,8 @@ async function deletePphBadanFromAction() {
 }
 
 function payPphBadanFromAction() {
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId)
-  );
-
-  if (!record) {
-    showToast("Data PPh Badan tidak ditemukan.", "error");
-    return;
-  }
+  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
+  if (!record) { showToast("Data PPh Badan tidak ditemukan.", "error"); return; }
 
   const paymentRecordId = record.id;
   closePphBadanActionMenu();
@@ -30828,6 +30656,7 @@ function payPphBadanFromAction() {
   selectedPphBadanRecordId = paymentRecordId;
   const modal = document.getElementById("pphBadanPaymentModal");
   if (!modal) { return; }
+	
   const yearEl = document.getElementById("pphBadanPaymentYear");
   const outstandingEl = document.getElementById("pphBadanPaymentOutstanding");
   const amountEl = document.getElementById("pphBadanPaymentAmount");
@@ -30837,6 +30666,7 @@ function payPphBadanFromAction() {
   if (outstandingEl) { outstandingEl.textContent = formatAccountingTaxCurrency(record.taxAmount); }
   if (amountEl) { amountEl.value = Number(record.taxAmount || 0); }
   if (dateEl) { dateEl.value = new Date().toISOString().slice(0, 10); }
+	
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 }
@@ -30848,36 +30678,24 @@ async function savePphBadanPayment() {
   if (pphBadanPaying) return;
 
   const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
-
-  if (!record) {
-    showToast("Data PPh Badan tidak ditemukan.", "error");
-    return; }
+  if (!record) { showToast("Data PPh Badan tidak ditemukan.", "error"); return; }
 
   const status = String(record.status || "").toUpperCase();
-
   if (status !== "OUTSTANDING") {
-    showToast(
-      "PPh Badan hanya dapat dibayar saat status OUTSTANDING.",
-      "error" );
-    return; }
+    showToast( "PPh Badan hanya dapat dibayar saat status OUTSTANDING.", "error" );  return; }
 
   const sessionId = localStorage.getItem("pos_session_id");
-
-  if (!sessionId) {
-    showToast("Session tidak ditemukan.", "error");
-    return; }
+  if (!sessionId) { showToast("Session tidak ditemukan.", "error"); return; }
+	
   const paymentDate = document.getElementById("pphBadanPaymentDate")?.value || "";
   const amount = Number( document.getElementById("pphBadanPaymentAmount")?.value || 0 );
   const paymentMethod = document.getElementById("pphBadanPaymentMethod")?.value || "";
   const reference = document.getElementById("pphBadanPaymentReference")?.value?.trim() || "";
   const note = document.getElementById("pphBadanPaymentNote")?.value?.trim() || "";
 
-  if (!paymentDate) { showToast("Payment Date wajib diisi.", "error");
-    	return; }
-  if (amount <= 0) { showToast("Payment Amount harus lebih besar dari 0.", "error");
-    	return; }
-  if (!paymentMethod) { showToast("Payment Method wajib dipilih.", "error");
-    	return; }
+  if (!paymentDate) { showToast("Payment Date wajib diisi.", "error"); return; }
+  if (amount <= 0) { showToast("Payment Amount harus lebih besar dari 0.", "error"); return; }
+  if (!paymentMethod) { showToast("Payment Method wajib dipilih.", "error"); return; }
 
   const confirmed = confirm(
     `Bayar PPh Badan ${record.taxYear}?\n\n` +
@@ -30885,7 +30703,6 @@ async function savePphBadanPayment() {
     `Method: ${paymentMethod}\n` +
     `Date: ${paymentDate}`
   );
-
   if (!confirmed) return;
 
   try {
@@ -30907,11 +30724,13 @@ async function savePphBadanPayment() {
     );
 
     if (error) { throw error; }
+		
     closePphBadanPaymentModal();
     showToast( `PPh Badan ${record.taxYear} berhasil dibayar.`, "success" );
 		state.accountingReportsData = null;
 		state.accountingReportsFilter = null;
     await loadPphBadanRecords();
+		
   } catch (error) {
     showToast( error?.message || "Gagal melakukan pembayaran PPh Badan.", "error" );
   } finally {
@@ -30926,6 +30745,7 @@ async function savePphBadanPayment() {
 function closePphBadanActionMenu() {
   const modal = document.getElementById("pphBadanActionModal");
   if (!modal) return;
+	
   modal.classList.add("hidden");
   modal.classList.remove("flex");
   selectedPphBadanRecordId = null;
@@ -30934,23 +30754,19 @@ function closePphBadanActionMenu() {
 function closePphBadanPaymentModal() {
   const modal = document.getElementById("pphBadanPaymentModal");
   if (!modal) return;
+	
   modal.classList.add("hidden");
   modal.classList.remove("flex");
   selectedPphBadanRecordId = null;
 }
 
 function viewPphBadanDetailFromAction() {
-  const record = pphBadanRecords.find(
-    row => String(row.id) === String(selectedPphBadanRecordId) );
-
-  if (!record) {
-    showToast("Data PPh Badan tidak ditemukan.", "error");
-    return; }
+  const record = pphBadanRecords.find( row => String(row.id) === String(selectedPphBadanRecordId) );
+  if (!record) { showToast("Data PPh Badan tidak ditemukan.", "error"); return; }
 
   closePphBadanActionMenu();
 
   const modal = document.getElementById("pphBadanDetailModal");
-
   if (!modal) { return; }
 
   const setText = (id, value) => {
@@ -30962,9 +30778,7 @@ function viewPphBadanDetailFromAction() {
 
 		const d = new Date(value);
 
-		if (Number.isNaN(d.getTime())) {
-			return String(value);
-		}
+		if (Number.isNaN(d.getTime())) { return String(value); }
 
 		return d.toLocaleString("id-ID", {
 			day: "2-digit",
@@ -30981,7 +30795,6 @@ function viewPphBadanDetailFromAction() {
 	setText( "pphBadanDetailId", record.id ?? "-" );
 
 	const statusEl = document.getElementById("pphBadanDetailStatus");
-
 	if (statusEl) { statusEl.innerHTML = getPphBadanStatusBadge(status); }
 	
 	setText( "pphBadanDetailTaxYear", record.taxYear ?? "-" );
@@ -31011,7 +30824,6 @@ function viewPphBadanDetailFromAction() {
 
 function closePphBadanDetailModal() {
   const modal = document.getElementById("pphBadanDetailModal");
-
   if (!modal) return;
 
   modal.classList.add("hidden");
@@ -31021,20 +30833,9 @@ function closePphBadanDetailModal() {
 function getPphBadanStatusBadge(status) {
   const normalized = String(status || "") .toUpperCase();
   const config = {
-	  CALCULATED: {
-	    label: "Calculated",
-	    className: "bg-blue-600/10 text-blue-700"
-	  },
-	
-	  OUTSTANDING: {
-	    label: "Outstanding",
-	    className: "bg-yellow-600/10 text-yellow-700"
-	  },
-	
-	  PAID: {
-	    label: "Paid",
-	    className: "bg-green-600/10 text-green-700"
-	  }
+	  CALCULATED: { label: "Calculated", className: "bg-blue-600/10 text-blue-700" },
+	  OUTSTANDING: { label: "Outstanding", className: "bg-yellow-600/10 text-yellow-700" },
+	  PAID: { label: "Paid", className: "bg-green-600/10 text-green-700" }
 	};
 
   const item = config[normalized] || {
@@ -31085,15 +30886,11 @@ async function savePphBadanCalculation() {
   if (pphBadanSaving) return;
 
   const result = window.currentPphBadanCalculation;
-
-  if (!result) {
-    showToast( "Silakan Calculate PPh Badan terlebih dahulu.", "error" );
-    return; }
+  if (!result) { showToast( "Silakan Calculate PPh Badan terlebih dahulu.", "error" ); return; }
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
     const selectedBranchId = getPphBadanBranchId();
-
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     const branchId = selectedBranchId || "ALL";
@@ -31192,6 +30989,7 @@ async function loadPphBadanTaxRule() {
   const sessionId = localStorage.getItem("pos_session_id");
 	
   if (!yearEl || !sessionId) return;
+	
   const taxYear = Number(yearEl.value);
   if (!Number.isInteger(taxYear)) return;
 
@@ -31204,12 +31002,8 @@ async function loadPphBadanTaxRule() {
     }
   );
 
-  if (error) {
-    resetPphBadanTaxRuleDisplay();
-    return; }
-  if (!data || data.found !== true) {
-    resetPphBadanTaxRuleDisplay();
-    return; }
+  if (error) { resetPphBadanTaxRuleDisplay(); return; }
+  if (!data || data.found !== true) { resetPphBadanTaxRuleDisplay(); return; }
 
   const baseRate = Number(data.baseRate || 0);
   const facilityRate = Number(data.facilityRate || 0);
@@ -31245,9 +31039,9 @@ function resetPphBadanTaxRuleDisplay() {
 
 function formatPphBadanTaxRuleDate(value) {
   if (!value) return "—";
+	
   const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) {
-    return value; }
+  if (Number.isNaN(date.getTime())) { return value; }
   return date.toLocaleDateString("id-ID", {
     day: "2-digit",
     month: "2-digit",
@@ -31261,15 +31055,12 @@ function openPphBadanTaxRuleModal() {
   if (!modal) return;
 
   const rule = window.currentPphBadanTaxRule;
-
   const yearEl = document.getElementById("pphBadanYear");
   const modalYearEl = document.getElementById("pphBadanTaxRuleYear");
-
-  if (modalYearEl) {
-    modalYearEl.value =
-      rule?.taxYear ??
-      yearEl?.value ??
-      new Date().getFullYear();
+  if (modalYearEl) { modalYearEl.value =
+		rule?.taxYear ??
+		yearEl?.value ??
+		new Date().getFullYear();
   }
 
   if (rule) {
@@ -31290,9 +31081,8 @@ async function savePphBadanTaxRule() {
   const button = document.getElementById("savePphBadanTaxRuleButton");
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan. Silakan login ulang.");
-    }
+    if (!sessionId) { throw new Error("Session tidak ditemukan. Silakan login ulang."); }
+		
     const rule = window.currentPphBadanTaxRule;
     const taxYear = Number( document.getElementById("pphBadanTaxRuleYear")?.value );
     const baseRate = Number( document.getElementById("pphBadanTaxRuleBaseRate")?.value || 0 );
@@ -31304,14 +31094,10 @@ async function savePphBadanTaxRule() {
     const isActive = document.getElementById("pphBadanTaxRuleIsActive")?.checked === true;
     const note = document.getElementById("pphBadanTaxRuleNote")?.value?.trim() || null;
 
-    if (!Number.isInteger(taxYear)) {
-      throw new Error("Tax Year tidak valid."); }
-    if (!effectiveFrom) {
-      throw new Error("Effective From wajib diisi."); }
-    if (effectiveTo && effectiveTo < effectiveFrom) {
-      throw new Error("Effective To tidak boleh lebih kecil dari Effective From."); }
-    if (facilityTurnoverLimit > maximumTurnoverLimit) {
-      throw new Error( "Facility Turnover Limit tidak boleh lebih besar dari Maximum Turnover Limit." ); }
+    if (!Number.isInteger(taxYear)) { throw new Error("Tax Year tidak valid."); }
+    if (!effectiveFrom) { throw new Error("Effective From wajib diisi."); }
+    if (effectiveTo && effectiveTo < effectiveFrom) { throw new Error("Effective To tidak boleh lebih kecil dari Effective From."); }
+    if (facilityTurnoverLimit > maximumTurnoverLimit) { throw new Error( "Facility Turnover Limit tidak boleh lebih besar dari Maximum Turnover Limit." ); }
 
     if (button) {
       button.disabled = true;
@@ -31392,7 +31178,6 @@ async function initAccountsReceivablePage() {
 async function loadAccountsReceivableBranchFilters() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-
     if (!sessionId) return;
 
     const { data, error } =
@@ -31409,7 +31194,6 @@ async function loadAccountsReceivableBranchFilters() {
 			? JSON.parse(data)
 			: (data || []);
     const select = document.getElementById( "accountsReceivableBranchFilter" );
-
     if (!select) return;
 
     select.innerHTML = `<option value="ALL">All Branches</option>`;
@@ -31428,12 +31212,10 @@ async function loadAccountsReceivableFormBranches() {
   if (!select) return;
 
   const sessionId = localStorage.getItem("pos_session_id");
-
   if (!sessionId) {
     select.innerHTML = '<option value="">Session tidak ditemukan</option>';
     select.disabled = true;
-    return;
-  }
+    return; }
 
   try {
     select.disabled = true;
@@ -31444,33 +31226,30 @@ async function loadAccountsReceivableFormBranches() {
       { p_session_id: sessionId }
     );
 
-    if (error) throw error;
-
-    const branches = typeof data === "string" ? JSON.parse(data) : data;
-    const role = String(
-	  state.user?.role || state.user?.Role || ""
-	).trim().toLowerCase();
+		if (error) throw error;
 	
-	if (role !== "owner" && role !== "accountant") {
-	  select.innerHTML = '<option value="">Role tidak diizinkan</option>';
-	  select.disabled = true;
-	  return;
-	}
+		const branches = typeof data === "string" ? JSON.parse(data) : data;
+		const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+		
+		if (role !== "owner" && role !== "accountant") {
+		  select.innerHTML = '<option value="">Role tidak diizinkan</option>';
+		  select.disabled = true;
+		  return; }
 	
-	select.innerHTML = '<option value="">Pilih outlet</option>';
-	
-	branches.forEach(branch => {
-	  const branchId = String(branch.id || "").trim();
-	  if (!branchId) return;
-	
-	  const option = document.createElement("option");
-	  option.value = branchId;
-	  option.textContent = branch.name || branchId;
-	  select.appendChild(option);
-	});
-	
-	select.value = "";
-	select.disabled = false;
+		select.innerHTML = '<option value="">Pilih outlet</option>';
+		
+		branches.forEach(branch => {
+		  const branchId = String(branch.id || "").trim();
+		  if (!branchId) return;
+		
+		  const option = document.createElement("option");
+		  option.value = branchId;
+		  option.textContent = branch.name || branchId;
+		  select.appendChild(option);
+		});
+		
+		select.value = "";
+		select.disabled = false;
 
   } catch (error) {
     select.innerHTML = '<option value="">Gagal memuat outlet</option>';
@@ -31483,7 +31262,6 @@ async function loadAccountsReceivableFormBranches() {
 async function loadAccountsReceivableRecords() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 		
     const branchId = document.getElementById("accountsReceivableBranchFilter")?.value || "ALL";
@@ -31529,7 +31307,6 @@ async function loadAccountsReceivableRecords() {
     const result = typeof data === "string"
 			? JSON.parse(data)
 			: data;
-
     accountsReceivableRecords = Array.isArray(result)
 			? result
 			: [];
@@ -31565,17 +31342,13 @@ function updateAccountsReceivableOverview() {
 
   accountsReceivableRecords.forEach(row => {
     const status = String(row.status || "") .toUpperCase();
-
-    // Hanya piutang yang masih outstanding
     if (status !== "OUTSTANDING") { return; }
 
     const remainingAmount = Number(row.remainingAmount || 0);
-
     if (remainingAmount <= 0) { return; }
 
     // TOTAL OUTSTANDING
     totalOutstanding += remainingAmount;
-
     // BERDASARKAN TIPE
     const arType = String(row.arType || "") .toUpperCase();
 
@@ -31594,24 +31367,19 @@ function updateAccountsReceivableOverview() {
 async function loadAccountsReceivableEmployees() {
   const select = document.getElementById("accountsReceivableEmployeeSelect");
   const branchSelect = document.getElementById("accountsReceivableFormBranch");
-
   if (!select || !branchSelect) return;
 
   const sessionId = localStorage.getItem("pos_session_id");
-
   if (!sessionId) {
     select.innerHTML = '<option value="">Session tidak ditemukan</option>';
     select.disabled = true;
-    return;
-  }
+    return; }
 
   const branchId = String(branchSelect.value || "").trim();
-
   if (!branchId) {
     select.innerHTML = '<option value="">Pilih outlet terlebih dahulu</option>';
     select.disabled = true;
-    return;
-  }
+    return; }
 
   try {
     select.disabled = true;
@@ -31631,8 +31399,7 @@ async function loadAccountsReceivableEmployees() {
       .map(employee => ({
         id: employee.Employee_ID || employee.employee_id,
         name: employee.Full_Name || employee.full_name
-      }))
-      .filter(employee => employee.id && employee.name);
+      })) .filter(employee => employee.id && employee.name);
 
     select.innerHTML = '<option value="">Pilih karyawan</option>';
 
@@ -31646,9 +31413,7 @@ async function loadAccountsReceivableEmployees() {
     if (options.length === 0) {
       select.innerHTML = '<option value="">Tidak ada karyawan di outlet ini</option>';
       select.disabled = true;
-      return;
-    }
-
+      return; }
     select.disabled = false;
 
   } catch (error) {
@@ -31667,13 +31432,10 @@ async function handleAccountsReceivableTypeChange() {
 
   if (referenceNoEl) referenceNoEl.value = "";
   if (referenceIdEl) referenceIdEl.value = "";
-
   if (!partyEl || !employeeEl) { return; }
-
   if (type === "EMPLOYEE") {
     partyEl.classList.add("hidden");
     employeeEl.classList.remove("hidden");
-    // Jangan sembunyikan dropdown ketika daftar sedang dimuat.
     employeeEl.disabled = true;
     employeeEl.innerHTML = '<option value="">Memuat karyawan...</option>';
 
@@ -31697,10 +31459,7 @@ async function handleAccountsReceivableTypeChange() {
 document.getElementById("accountsReceivableFormBranch")
   ?.addEventListener("change", async function () {
     const type = document.getElementById("accountsReceivableType")?.value;
-
-    if (type === "EMPLOYEE") {
-      await loadAccountsReceivableEmployees();
-    }
+    if (type === "EMPLOYEE") { await loadAccountsReceivableEmployees(); }
   });
 
 
@@ -31721,20 +31480,9 @@ function formatAccountsReceivableDate(value) {
 function getAccountsReceivableStatusBadge(status) {
   const value = String(status || "DRAFT").toUpperCase();
   const config = {
-    DRAFT: {
-      label: "Draft",
-      className: "bg-surface-container-high text-on-surface-variant"
-    },
-
-    OUTSTANDING: {
-      label: "Outstanding",
-      className: "bg-yellow-500/10 text-yellow-400"
-    },
-
-    PAID: {
-      label: "Paid",
-      className: "bg-green-500/10 text-green-400"
-    }
+    DRAFT: { label: "Draft", className: "bg-surface-container-high text-on-surface-variant" },
+    OUTSTANDING: { label: "Outstanding", className: "bg-yellow-500/10 text-yellow-400" },
+    PAID: { label: "Paid", className: "bg-green-500/10 text-green-400" }
   };
 
   const item = config[value] || config.DRAFT;
@@ -31756,10 +31504,7 @@ function renderAccountsReceivableRecords() {
 
   const total = accountsReceivableRecords.length;
   const totalPages = Math.max( Math.ceil(total / accountsReceivableRecordsPerPage), 1 );
-
-  if (accountsReceivableRecordsPage > totalPages) {
-    accountsReceivableRecordsPage = totalPages;
-  }
+  if (accountsReceivableRecordsPage > totalPages) { accountsReceivableRecordsPage = totalPages; }
 
   const start = (accountsReceivableRecordsPage - 1) * accountsReceivableRecordsPerPage;
   const end = Math.min( start + accountsReceivableRecordsPerPage, total );
@@ -31780,49 +31525,24 @@ function renderAccountsReceivableRecords() {
 		  const totalAmount = Number( row.totalAmount || 0 );
 		  const paidAmount = Number( row.paidAmount || 0 );
 		  const remainingAmount = Number( row.remainingAmount ?? ( totalAmount - paidAmount ) );
-	
 		  return `
 		    <tr class="hover:bg-surface-container transition-colors">
 		      <!-- TYPE -->
-		      <td class="px-5 py-4 font-medium">
-		        ${row.arTypeLabel || row.arType || "-"}
-		      </td>
-		
+		      <td class="px-5 py-4 font-medium"> ${row.arTypeLabel || row.arType || "-"} </td>
 		      <!-- PARTY -->
-		      <td class="px-5 py-4">
-		        ${row.partyName || "-"}
-		      </td>
-		
+		      <td class="px-5 py-4"> ${row.partyName || "-"} </td>
 		      <!-- DATE -->
-		      <td class="px-5 py-4 text-muted whitespace-nowrap">
-		        ${formatAccountsReceivableDate(row.arDate)}
-		      </td>
-		
+		      <td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatAccountsReceivableDate(row.arDate)} </td>
 		      <!-- DUE DATE -->
-		      <td class="px-5 py-4 text-muted whitespace-nowrap">
-		        ${formatAccountsReceivableDate(row.dueDate)}
-		      </td>
-		
+		      <td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatAccountsReceivableDate(row.dueDate)} </td>
 		      <!-- TOTAL -->
-		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
-		        ${formatAccountingTaxCurrency(totalAmount)}
-		      </td>
-		
+		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap"> ${formatAccountingTaxCurrency(totalAmount)} </td>
 		      <!-- PAID -->
-		      <td class="px-5 py-4 text-right whitespace-nowrap">
-		        ${formatAccountingTaxCurrency(paidAmount)}
-		      </td>
-		
+		      <td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingTaxCurrency(paidAmount)} </td>
 		      <!-- OUTSTANDING -->
-		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap">
-		        ${formatAccountingTaxCurrency(remainingAmount)}
-		      </td>
-		
+		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap"> ${formatAccountingTaxCurrency(remainingAmount)} </td>
 		      <!-- STATUS -->
-		      <td class="px-5 py-4 text-center">
-		        ${getAccountsReceivableStatusBadge(status)}
-		      </td>
-		
+		      <td class="px-5 py-4 text-center"> ${getAccountsReceivableStatusBadge(status)} </td>
 		      <!-- ACTION -->
 		      <td class="px-5 py-4 text-center">
 		        <button type="button"
@@ -31838,20 +31558,17 @@ function renderAccountsReceivableRecords() {
 		  `;
 		}).join("");
   }
-  if (paginationInfo) {
-    paginationInfo.textContent = total === 0
-			? "Showing 0–0 of 0"
-			: `Showing ${start + 1}–${end} of ${total}`; }
+  if (paginationInfo) { paginationInfo.textContent = total === 0
+		? "Showing 0–0 of 0"
+		: `Showing ${start + 1}–${end} of ${total}`; }
   if (prevButton) { prevButton.disabled = accountsReceivableRecordsPage <= 1; }
   if (nextButton) { nextButton.disabled = accountsReceivableRecordsPage >= totalPages; }
 }
 
 function changeAccountsReceivablePage(direction) {
-
   const total = accountsReceivableRecords.length;
   const totalPages = Math.max( Math.ceil( total / accountsReceivableRecordsPerPage ), 1 );
   const nextPage = accountsReceivableRecordsPage + direction;
-
   if (nextPage < 1) return;
   if (nextPage > totalPages) return;
 
@@ -31862,7 +31579,6 @@ function changeAccountsReceivablePage(direction) {
 function openAccountsReceivableRecordMenu(recordId) {
 
   const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
-
   if (!record) { showToast( "Data piutang tidak ditemukan.", "error" ); return; }
 	
   const modal = document.getElementById( "accountsReceivableActionModal" );
@@ -31902,7 +31618,6 @@ function openAccountsReceivableRecordMenu(recordId) {
       </div>
     </button>
   `;
-
   if (status === "DRAFT") {
     html += `
       <button type="button"
@@ -31941,7 +31656,6 @@ function openAccountsReceivableRecordMenu(recordId) {
         </div>
       </button>
     `;
-
   } else if (status === "OUTSTANDING") {
     html += `
       <button type="button"
@@ -31962,7 +31676,6 @@ function openAccountsReceivableRecordMenu(recordId) {
         </div>
       </button>
     `;
-
   } else if (status === "PAID") {
     html += `
       <div class="px-4 py-3 rounded-md bg-background border border-outline-variant">
@@ -31984,9 +31697,7 @@ function openAccountsReceivableRecordMenu(recordId) {
 /* ==== RECEIVABLE — NEW / SAVE DRAFT ===== */
 async function openAccountsReceivableModal() {
   const modal = document.getElementById("accountsReceivableModal");
-
   if (!modal) return;
-
   // Reset form
   const fields = [
     "accountsReceivableType",
@@ -32003,7 +31714,6 @@ async function openAccountsReceivableModal() {
   fields.forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
-
     if (el.tagName === "SELECT") {
       el.value = "BUSINESS";
     } else {
@@ -32013,7 +31723,6 @@ async function openAccountsReceivableModal() {
 
   // Default tanggal piutang = hari ini
   const dateEl = document.getElementById("accountsReceivableDate");
-
   if (dateEl) { dateEl.value = new Date().toISOString().split("T")[0]; }
   // Tampilkan popup
   modal.classList.remove("hidden");
@@ -32031,9 +31740,7 @@ function closeAccountsReceivableModal() {
   modal.classList.remove("flex");
 }
 
-
 /* ==== SAVE RECEIVABLE AS DRAFT ==== */
-
 async function saveAccountsReceivable(
   button = document.getElementById("saveAccountsReceivableButton")
 ) {
@@ -32050,11 +31757,7 @@ async function saveAccountsReceivable(
     }
 
     const sessionId = localStorage.getItem("pos_session_id");
-
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
-
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
     /* --- GET FORM VALUE --- */
     const typeEl = document.getElementById("accountsReceivableType");
     const partyEl = document.getElementById("accountsReceivableParty");
@@ -32066,76 +31769,35 @@ async function saveAccountsReceivable(
     const amountEl = document.getElementById("accountsReceivableAmount");
     const sourceMethodEl = document.getElementById("accountsReceivableSourceMethod");
     const noteEl = document.getElementById("accountsReceivableNote");
-
     const arType = typeEl?.value?.trim() || "";
-
-    const employeeId =
-      arType === "EMPLOYEE"
-        ? employeeEl?.value?.trim() || null
-        : null;
-
-    const partyName =
-      arType === "EMPLOYEE"
-        ? employeeEl?.selectedOptions?.[0]?.textContent?.trim() || ""
-        : partyEl?.value?.trim() || "";
-
+    const employeeId =  arType === "EMPLOYEE"
+			? employeeEl?.value?.trim() || null
+			: null;
+    const partyName = arType === "EMPLOYEE"
+			? employeeEl?.selectedOptions?.[0]?.textContent?.trim() || ""
+			: partyEl?.value?.trim() || "";
     const referenceNo = referenceNoEl?.value?.trim() || null;
     const referenceId = referenceIdEl?.value?.trim() || null;
     const arDate = dateEl?.value || null;
     const dueDate = dueDateEl?.value || null;
-
-    const totalAmount = Number(
-      String(amountEl?.value || "").replace(/[^\d]/g, "")
-    );
-
+    const totalAmount = Number( String(amountEl?.value || "").replace(/[^\d]/g, "") );
     const sourceMethod = sourceMethodEl?.value?.trim() || "";
     const note = noteEl?.value?.trim() || null;
 
     /* --- VALIDATION --- */
-    if (!arType || !["EMPLOYEE", "BUSINESS", "TAX", "OTHER"].includes(arType)) {
-      showToast("Pilih tipe piutang yang valid.", "error");
-      return;
-    }
-
-    if (arType === "EMPLOYEE" && !employeeId) {
-      showToast("Pilih karyawan terlebih dahulu.", "error");
-      return;
-    }
-
-    if (!partyName) {
-      showToast("Nama pihak wajib diisi.", "error");
-      return;
-    }
-
-    if (!arDate) {
-      showToast("Tanggal piutang wajib diisi.", "error");
-      return;
-    }
-
-    if (!totalAmount || totalAmount <= 0) {
-      showToast("Nominal piutang harus lebih dari 0.", "error");
-      return;
-    }
-
-    if (!sourceMethod) {
-      showToast("Pilih payment method.", "error");
-      return;
-    }
-
-    if (!["CASH", "BANK", "QRIS"].includes(sourceMethod)) {
-      showToast("Payment method tidak valid.", "error");
-      return;
-    }
+    if (!arType || !["EMPLOYEE", "BUSINESS", "TAX", "OTHER"].includes(arType)) { showToast("Pilih tipe piutang yang valid.", "error"); return; }
+    if (arType === "EMPLOYEE" && !employeeId) { showToast("Pilih karyawan terlebih dahulu.", "error"); return; }
+    if (!partyName) { showToast("Nama pihak wajib diisi.", "error"); return; }
+    if (!arDate) { showToast("Tanggal piutang wajib diisi.", "error"); return; }
+    if (!totalAmount || totalAmount <= 0) { showToast("Nominal piutang harus lebih dari 0.", "error"); return; }
+    if (!sourceMethod) { showToast("Pilih payment method.", "error"); return; }
+    if (!["CASH", "BANK", "QRIS"].includes(sourceMethod)) { showToast("Payment method tidak valid.", "error"); return; }
 
     /* --- BRANCH --- */
     const branchId = document
       .getElementById("accountsReceivableFormBranch")
       ?.value || null;
-
-    if (!branchId) {
-      showToast("Pilih outlet terlebih dahulu.", "error");
-      return;
-    }
+    if (!branchId) { showToast("Pilih outlet terlebih dahulu.", "error"); return; }
 
     /* --- SAVE RPC --- */
     const { data, error } = await supabaseClient.rpc(
@@ -32156,11 +31818,7 @@ async function saveAccountsReceivable(
       }
     );
 
-    if (error) {
-      throw new Error(
-        error.message || "Gagal menyimpan piutang."
-      );
-    }
+    if (error) { throw new Error( error.message || "Gagal menyimpan piutang." ); }
 
     /* --- REFRESH DATA --- */
     state.accountsReceivableData = null;
@@ -32169,19 +31827,10 @@ async function saveAccountsReceivable(
     await loadAccountsReceivableRecords();
 
     closeAccountsReceivableModal();
+    showToast( "Piutang berhasil disimpan sebagai Draft.", "success" );
 
-    showToast(
-      "Piutang berhasil disimpan sebagai Draft.",
-      "success"
-    );
-
-    if (typeof loadAccountsReceivableRecords === "function") {
-      await loadAccountsReceivableRecords();
-    }
-
-    if (typeof renderAccountsReceivableRecords === "function") {
-      renderAccountsReceivableRecords();
-    }
+    if (typeof loadAccountsReceivableRecords === "function") { await loadAccountsReceivableRecords(); }
+    if (typeof renderAccountsReceivableRecords === "function") { renderAccountsReceivableRecords(); }
 
   } catch (err) {
     showToast(  err.message || "Gagal menyimpan piutang.", "error" );
@@ -32196,7 +31845,6 @@ async function saveAccountsReceivable(
 }
 
 /* ==== RECEIVABLE ACTIONS ==== */
-
 function closeAccountsReceivableActionMenu() {
   const modal = document.getElementById( "accountsReceivableActionModal" );
 
@@ -32206,7 +31854,6 @@ function closeAccountsReceivableActionMenu() {
   modal.classList.remove("flex");
   selectedAccountsReceivableId = null;
 }
-
 
 function viewAccountsReceivableDetailFromAction() {
   const recordId = selectedAccountsReceivableId;
@@ -32218,16 +31865,11 @@ function viewAccountsReceivableDetailFromAction() {
 		{ openAccountsReceivableDetail(recordId); }
 }
 
-
 function openAccountsReceivableDetail(recordId) {
 	const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
-	
-	if (!record) {
-		showToast( "Data piutang tidak ditemukan.", "error" ); 
-		return; }
+	if (!record) { showToast( "Data piutang tidak ditemukan.", "error" );  return; }
 
 	const modal = document.getElementById( "accountsReceivableDetailModal" );
-	
 	if (!modal) { return; }
 	
 	const subtitle = document.getElementById( "accountsReceivableDetailSubtitle" );
@@ -32245,7 +31887,6 @@ function openAccountsReceivableDetail(recordId) {
 	const remainingEl = document.getElementById( "accountsReceivableDetailRemaining" );
 	const noteEl = document.getElementById( "accountsReceivableDetailNote" );
 	const journalIdEl = document.getElementById( "accountsReceivableDetailJournalId" );
-	/* --- DATA --- */
 	const status = String(record.status || "DRAFT") .toUpperCase();
 	const totalAmount = Number(record.totalAmount || 0);
 	const paidAmount = Number(record.paidAmount || 0);
@@ -32253,7 +31894,6 @@ function openAccountsReceivableDetail(recordId) {
 	
 	/* ---- STATUS ---- */
 	if (statusEl) { statusEl.innerHTML = getAccountsReceivableStatusBadge(status); }
-	/* --- BASIC INFORMATION --- */
 	if (subtitle) { subtitle.textContent = record.partyName || "Receivable"; }
 	if (idEl) { idEl.textContent = record.id || "-"; }
 	if (typeEl) { typeEl.textContent = record.arTypeLabel || record.arType || "-"; }
@@ -32264,14 +31904,11 @@ function openAccountsReceivableDetail(recordId) {
 	if (branchEl) { branchEl.textContent = state.branchId || "-"; }
 	if (sourceMethodEl) { 
 		const sourceMethod = String( record.sourceMethod || "" ).toUpperCase();
-	
 		const labels = {
 		  CASH: "Cash",
 		  BANK: "Bank / Transfer",
 		  QRIS: "QRIS"
-		};
-		sourceMethodEl.textContent = labels[sourceMethod] || "-";
-	}
+		}; sourceMethodEl.textContent = labels[sourceMethod] || "-"; }
 
 	if (totalEl) { totalEl.textContent = formatAccountingTaxCurrency( totalAmount ); }
 	if (paidEl) { paidEl.textContent = formatAccountingTaxCurrency( paidAmount ); }
@@ -32303,34 +31940,16 @@ function recordAccountsReceivableFromAction() {
 }
 
 async function recordAccountsReceivable(recordId) {
-  if (!recordId) {
-    showToast("ID piutang tidak ditemukan.", "error");
-    return;
-  }
+  if (!recordId) { showToast("ID piutang tidak ditemukan.", "error"); return; }
 
-  const record = accountsReceivableRecords.find(
-    row => String(row.id) === String(recordId)
-  );
-
-  if (!record) {
-    showToast("Data piutang tidak ditemukan.", "error");
-    return; }
+  const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
+  if (!record) { howToast("Data piutang tidak ditemukan.", "error"); return; }
 
   const status = String(record.status || "").toUpperCase();
-
-  if (status !== "DRAFT") {
-    showToast(
-      "Piutang hanya dapat di-Record saat status masih DRAFT.",
-      "error"
-    );
-    return;
-  }
+  if (status !== "DRAFT") { showToast( "Piutang hanya dapat di-Record saat status masih DRAFT.", "error" ); return; }
 
   const amount = Number(record.totalAmount || 0);
-
-  if (amount <= 0) {
-    showToast("Nominal piutang tidak valid.", "error");
-    return; }
+  if (amount <= 0) { showToast("Nominal piutang tidak valid.", "error"); return; }
 
   const sourceMethod = String( record.sourceMethod || "" ).toUpperCase();
   const sourceLabels = {
@@ -32338,22 +31957,17 @@ async function recordAccountsReceivable(recordId) {
     BANK: "Bank / Transfer",
     QRIS: "QRIS"
   };
-
-  if (!sourceLabels[sourceMethod]) {
-    showToast( "Payment Method piutang belum valid.", "error" );
-    return; }
+  if (!sourceLabels[sourceMethod]) { showToast( "Payment Method piutang belum valid.", "error" ); return; }
 
   const confirmed = confirm(
     `Record piutang "${record.partyName || "Piutang"}" sebesar ` +
     `${formatAccountingTaxCurrency(amount)} melalui ` +
     `${sourceLabels[sourceMethod]}?`
   );
-
   if (!confirmed) return;
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
     const { data, error } =
@@ -32407,27 +32021,16 @@ function receiveAccountsReceivablePaymentFromAction() {
 }
 
 function openAccountsReceivablePaymentModal(recordId) {
-  const record = accountsReceivableRecords.find(
-    row => String(row.id) === String(recordId)
-  );
-
-  if (!record) {
-    showToast("Data piutang tidak ditemukan.", "error");
-    return; }
+  const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
+  if (!record) { showToast("Data piutang tidak ditemukan.", "error"); return; }
 
   const status = String(record.status || "").toUpperCase();
-
-  if (status !== "OUTSTANDING") {
-    showToast( "Piutang ini belum dapat menerima pembayaran.", "error" );
-    return; }
+  if (status !== "OUTSTANDING") { showToast( "Piutang ini belum dapat menerima pembayaran.", "error" ); return; }
 	
   const totalAmount = Number(record.totalAmount || 0);
   const paidAmount = Number(record.paidAmount || 0);
   const outstanding = Number( record.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
-
-  if (outstanding <= 0) {
-    showToast("Piutang sudah lunas.", "error");
-    return; }
+  if (outstanding <= 0) { showToast("Piutang sudah lunas.", "error"); return; }
 
   selectedAccountsReceivableId = recordId;
 	
@@ -32460,18 +32063,10 @@ function openAccountsReceivablePaymentModal(recordId) {
 
 async function saveAccountsReceivablePayment() {
   const recordId = selectedAccountsReceivableId;
+  if (!recordId) { showToast( "Piutang belum dipilih.", "error" ); return; }
 
-  if (!recordId) {
-    showToast( "Piutang belum dipilih.", "error" );
-    return; }
-
-  const record = accountsReceivableRecords.find(
-    row => String(row.id) === String(recordId)
-  );
-
-  if (!record) {
-    showToast( "Data piutang tidak ditemukan.", "error" );
-    return; }
+  const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
+  if (!record) { showToast( "Data piutang tidak ditemukan.", "error" ); return; }
 
   const dateEl = document.getElementById( "accountsReceivablePaymentDate" );
   const amountEl = document.getElementById( "accountsReceivablePaymentAmount" );
@@ -32487,31 +32082,21 @@ async function saveAccountsReceivablePayment() {
   const paidAmount = Number(record.paidAmount || 0);
   const outstanding = Number( record.remainingAmount ?? Math.max(totalAmount - paidAmount, 0) );
 
-  if (!date) {
-    showToast( "Payment date wajib diisi.", "error" );
-    return; }
-  if (!Number.isInteger(amount) || amount <= 0) {
-    showToast( "Payment amount harus lebih dari 0.", "error" );
-    return; }
-  if (amount > outstanding) {
-    showToast( "Payment amount melebihi outstanding.", "error" );
-    return; }
-  if (!["CASH", "BANK", "QRIS"].includes(paymentMethod)) {
-    showToast( "Payment method wajib dipilih.", "error" );
-    return; }
+  if (!date) { showToast( "Payment date wajib diisi.", "error" ); return; }
+  if (!Number.isInteger(amount) || amount <= 0) { showToast( "Payment amount harus lebih dari 0.", "error" ); return; }
+  if (amount > outstanding) { showToast( "Payment amount melebihi outstanding.", "error" ); return; }
+  if (!["CASH", "BANK", "QRIS"].includes(paymentMethod)) { showToast( "Payment method wajib dipilih.", "error" ); return; }
 
   const methodLabels = {
     CASH: "Cash",
     BANK: "Bank",
     QRIS: "QRIS"
   };
-
   const confirmed = confirm(
     `Terima pembayaran piutang "${record.partyName || "Piutang"}" ` +
     `sebesar ${formatAccountingTaxCurrency(amount)} ` +
     `melalui ${methodLabels[paymentMethod]}?`
   );
-
   if (!confirmed) return;
 
   const button = document.getElementById( "saveAccountsReceivablePaymentButton" );
@@ -32583,7 +32168,6 @@ async function saveAccountsReceivablePayment() {
 
 function closeAccountsReceivablePaymentModal() {
   const modal = document.getElementById( "accountsReceivablePaymentModal" );
-
   if (!modal) return;
 
   modal.classList.add("hidden");
@@ -32593,32 +32177,20 @@ function closeAccountsReceivablePaymentModal() {
 }
 
 async function deleteAccountsReceivable(recordId) {
-
-	if (!recordId) {
-		showToast( "Data piutang belum dipilih.", "error" );
-		return; }
+	if (!recordId) { showToast( "Data piutang belum dipilih.", "error" ); return; }
 
 	const record = accountsReceivableRecords.find( row => String(row.id) === String(recordId) );
-	
-	if (!record) {
-		showToast( "Data piutang tidak ditemukan.", "error" );
-		return; }
+	if (!record) { showToast( "Data piutang tidak ditemukan.", "error" ); return; }
 
 	const status = String(record.status || "").toUpperCase();
-
-// Hanya DRAFT yang boleh dihapus
-	if (status !== "DRAFT") {
-		showToast( "Piutang hanya dapat dihapus sebelum Record.", "error" );
-		return; }
+	if (status !== "DRAFT") { showToast( "Piutang hanya dapat dihapus sebelum Record.", "error" ); return; }
 
 	const confirmed = confirm( `Hapus piutang "${record.partyName || "Piutang"}" sebesar ${formatAccountingTaxCurrency( record.totalAmount || 0 )}?` );
-
 	if (!confirmed) { return; }
 
 	try {
 	
 	const sessionId = localStorage.getItem("pos_session_id");
-	
 	if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
 	
 	const { data, error } =
@@ -32928,7 +32500,6 @@ window.openEmployeeActionModal = function (employeeId) {
 	
 	// Salary hanya untuk Owner
 	salaryButton?.classList.toggle('hidden', role !== 'owner');
-	
 	/* === OPEN MODAL === */
 	modal.classList.remove('hidden');
 	modal.classList.add('flex');
@@ -32937,16 +32508,13 @@ window.openEmployeeActionModal = function (employeeId) {
 
 window.deleteEmployee = async function (employeeId) {
   const employee = employeeData.find(e => e.Employee_ID === employeeId);
-
   if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
   const confirmed = confirm( `Hapus employee "${employee.Full_Name}"?\n\nData employee akan dihapus permanen.` );
-
   if (!confirmed) return;
 
   try {
     const sessionId = localStorage.getItem('pos_session_id');
-
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
     const { data, error } =
@@ -32964,10 +32532,7 @@ window.deleteEmployee = async function (employeeId) {
     alert('Employee berhasil dihapus.');
 
   } catch (error) {
-    alert(
-      error?.message ||
-      'Gagal menghapus employee.'
-    );
+    alert( error?.message || 'Gagal menghapus employee.' );
   }
 };
 
@@ -33061,12 +32626,12 @@ window.saveEmployee = async function () {
   const role = state.user.role;
 	
   let branchId;
+	
   if (role === "Owner") {
     branchId = document.getElementById('employeeBranch').value;
   } else {
     branchId = state.user.branchId;
   }
-
   if (!fullName) { alert('Full Name wajib diisi.'); return; }
   if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
   if (!status) { alert('Status employee wajib dipilih.'); return; }
@@ -38053,11 +37618,14 @@ window.editPayrollSalary = async function (payrollId) {
 		const payroll = data.payroll;
 		const details = Array.isArray(data.details) ? data.details : [];
 		const money = value =>
-			new Intl.NumberFormat('id-ID', {
-				style: 'currency',
-				currency: 'IDR',
-				maximumFractionDigits: 2
-			}).format(Number(value) || 0);
+		  new Intl.NumberFormat('id-ID', {
+		    style: 'currency',
+		    currency: 'IDR',
+		    minimumFractionDigits: 0,
+		    maximumFractionDigits: 0
+		  })
+		    .format(Math.round(Number(value) || 0))
+		    .replace(/\s/g, '');
 		// Escape teks sebelum dimasukkan ke HTML.
 		const escapeHtml = value =>
 			String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -38274,12 +37842,16 @@ window.markEditPayrollComponentDeleted = function (detailId) {
 window.recalculateEditPayrollSalary = function () {
   const active = window.activeEditPayroll;
   if (!active) return;
-  const money = value =>
-    new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 2
-    }).format(Number(value) || 0);
+	
+	const money = value =>
+	  new Intl.NumberFormat('id-ID', {
+	    style: 'currency',
+	    currency: 'IDR',
+	    minimumFractionDigits: 0,
+	    maximumFractionDigits: 0
+	  })
+	    .format(Math.round(Number(value) || 0))
+	    .replace(/\s/g, '');
 
   // Perbarui nominal komponen yang sudah tersimpan.
   document.querySelectorAll(
@@ -38289,10 +37861,9 @@ window.recalculateEditPayrollSalary = function () {
       String(item.Payroll_Detail_ID) ===
       String(input.dataset.payrollDetailId)
     );
-    if (detail) {
-      detail.Amount = input.value === ''
-        ? 0
-        : Math.max(0, Number(input.value) || 0);
+    if (detail) {  detail.Amount = input.value === ''
+			? 0
+			: Math.max(0, Number(input.value) || 0);
     }
   });
 
@@ -38445,14 +38016,9 @@ window.saveEditPayrollSalary = async function () {
       ];
 
       row.Total_Overtime = allEarnings
-        .filter(detail =>
-          String(detail.Accounting_Category || '').toUpperCase() === 'OVERTIME'
-        )
+        .filter(detail =>  String(detail.Accounting_Category || '').toUpperCase() === 'OVERTIME' )
         .reduce((sum, detail) => sum + Number(detail.Amount || 0), 0);
-      row.Total_Allowance = Math.max(
-        0,
-        row.Gross_Salary - row.Basic_Salary - row.Total_Overtime
-      );
+      row.Total_Allowance = Math.max( 0, row.Gross_Salary - row.Basic_Salary - row.Total_Overtime );
     }
 		
     window.renderPayrollTable();
@@ -38471,9 +38037,7 @@ window.saveEditPayrollSalary = async function () {
 };
 
 
-/* =========================================================
-   PAYROLL - PAY SALARY MODAL
-========================================================= */
+/* ==== PAYROLL - PAY SALARY MODAL ===== */
 
 window.activePayEmployeePayroll = null;
 window.payEmployeePayrollSubmitting = false;
@@ -38490,34 +38054,22 @@ window.payEmployeePayrollMoney = function (value) {
 /* OPEN PAY SALARY POPUP */
 window.payEmployeePayroll = function (payrollId) {
   const row = window.getPayrollRow(payrollId);
-
-  if (!row) {
-    alert('Data payroll tidak ditemukan.');
-    return;
-  }
+  if (!row) { alert('Data payroll tidak ditemukan.'); return; }
 
   const status = String(row.Status || '').trim().toUpperCase();
-
-  if (status !== 'RECORDED') {
-    alert('Pay Salary hanya tersedia untuk payroll berstatus RECORDED.');
-    return;
-  }
+  if (status !== 'RECORDED') { alert('Pay Salary hanya tersedia untuk payroll berstatus RECORDED.'); return; }
 
   const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value ?? '-';
   };
-
   const money = window.payEmployeePayrollMoney;
 
   window.activePayEmployeePayroll = row;
 
   setText('payEmployeePayrollName', row.Full_Name || '-');
   setText('payEmployeePayrollCode', row.Employee_Code || '-');
-  setText(
-    'payEmployeePayrollBranch',
-    row.Branch_Name || row.Branch_ID || '-'
-  );
+  setText( 'payEmployeePayrollBranch', row.Branch_Name || row.Branch_ID || '-' );
 
   const period = String(row.Payroll_Period || '');
   setText(
@@ -38527,31 +38079,14 @@ window.payEmployeePayroll = function (payrollId) {
       : period || '-'
   );
 
-  setText(
-    'payEmployeePayrollReimbursement',
-    money(row.Reimburse_Amount)
-  );
+  setText( 'payEmployeePayrollReimbursement', money(row.Reimburse_Amount) );
+  setText( 'payEmployeePayrollReceivable', money(row.Receivable_Amount) );
+  setText( 'payEmployeePayrollAmount', money(row.Net_Salary) );
 
-  setText(
-    'payEmployeePayrollReceivable',
-    money(row.Receivable_Amount)
-  );
-
-  setText(
-    'payEmployeePayrollAmount',
-    money(row.Net_Salary)
-  );
-
-  const methodInput = document.getElementById(
-    'payEmployeePayrollMethod'
-  );
-
+  const methodInput = document.getElementById( 'payEmployeePayrollMethod' );
   if (methodInput) methodInput.value = 'CASH';
 
-  const button = document.getElementById(
-    'confirmPayEmployeePayrollButton'
-  );
-
+  const button = document.getElementById( 'confirmPayEmployeePayrollButton' );
   if (button) {
     button.disabled = false;
     button.textContent = 'Confirm Payment';
@@ -38575,11 +38110,7 @@ window.submitPayEmployeePayroll = async function () {
   if (window.payEmployeePayrollSubmitting) return;
 
   const row = window.activePayEmployeePayroll;
-
-  if (!row) {
-    alert('Data payroll tidak ditemukan.');
-    return;
-  }
+  if (!row) { alert('Data payroll tidak ditemukan.'); return; }
 
   if (String(row.Status || '').trim().toUpperCase() !== 'RECORDED') {
     alert('Status payroll sudah berubah. Muat ulang tabel Payroll.');
@@ -38587,31 +38118,16 @@ window.submitPayEmployeePayroll = async function () {
   }
 
   const sessionId = localStorage.getItem('pos_session_id');
+  if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
 
-  if (!sessionId) {
-    alert('Session tidak ditemukan. Silakan login kembali.');
-    return;
-  }
-
-  const methodInput = document.getElementById(
-    'payEmployeePayrollMethod'
-  );
-
+  const methodInput = document.getElementById( 'payEmployeePayrollMethod' );
   const paymentMethod = String(methodInput?.value || '')
     .trim()
     .toUpperCase();
-
-  if (!['CASH', 'BANK'].includes(paymentMethod)) {
-    alert('Pilih metode pembayaran Cash atau Bank.');
-    return;
-  }
+  if (!['CASH', 'BANK'].includes(paymentMethod)) { alert('Pilih metode pembayaran Cash atau Bank.'); return; }
 
   const amount = Math.round(Number(row.Net_Salary) || 0);
-
-  if (amount <= 0) {
-    alert('Net Salary harus lebih besar dari nol.');
-    return;
-  }
+  if (amount <= 0) { alert('Net Salary harus lebih besar dari nol.'); return; }
 
   const confirmed = confirm(
     'Konfirmasi pembayaran gaji?\n\n' +
@@ -38621,12 +38137,9 @@ window.submitPayEmployeePayroll = async function () {
     'Nominal: ' + window.payEmployeePayrollMoney(amount) + '\n\n' +
     'Jurnal dan saldo akan diperbarui jika pembayaran berhasil.'
   );
-
   if (!confirmed) return;
 
-  const button = document.getElementById(
-    'confirmPayEmployeePayrollButton'
-  );
+  const button = document.getElementById( 'confirmPayEmployeePayrollButton' );
 
   window.payEmployeePayrollSubmitting = true;
 
@@ -38637,14 +38150,12 @@ window.submitPayEmployeePayroll = async function () {
 
   try {
     const currentUser = typeof state !== 'undefined' ? state.user : null;
-
     const createdBy =
       currentUser?.Full_Name ||
       currentUser?.full_name ||
       currentUser?.username ||
       currentUser?.Username ||
       'Payroll';
-
     const { data, error } = await supabaseClient.rpc(
       'pay_employee_payroll',
       {
@@ -38658,12 +38169,7 @@ window.submitPayEmployeePayroll = async function () {
     if (error) throw error;
 
     const result = Array.isArray(data) ? data[0] : data;
-
-    if (!result || result.success !== true) {
-      throw new Error(
-        result?.message || 'Pay Salary gagal diproses.'
-      );
-    }
+    if (!result || result.success !== true) { throw new Error( result?.message || 'Pay Salary gagal diproses.' ); }
 
     window.hidePayrollModal('payEmployeePayrollModal');
     window.activePayEmployeePayroll = null;
@@ -38681,22 +38187,16 @@ window.submitPayEmployeePayroll = async function () {
 
   } catch (error) {
     console.error('submitPayEmployeePayroll:', error);
-
-    alert(
-      'Pay Salary gagal.\n\n' +
-      (error?.message || 'Terjadi kesalahan saat pembayaran.')
-    );
+    alert( 'Pay Salary gagal.\n\n' + (error?.message || 'Terjadi kesalahan saat pembayaran.') );
 
   } finally {
     window.payEmployeePayrollSubmitting = false;
-
     if (button) {
       button.disabled = false;
       button.textContent = 'Confirm Payment';
     }
   }
 };
-
 
 /* ==== CLOSE MODALS ==== */
 window.closePayrollDetail = function () {
@@ -38814,7 +38314,6 @@ window.getReimbursementBranchName = function (branchId) {
 			  ''
 			).trim() === id
     );
-
     if (branch) {
 			return String(
 			  branch.Branch_Name ||
@@ -38836,32 +38335,10 @@ window.getReimbursementVisibleRows = function () {
   const status = document.getElementById( 'reimbursementStatusFilter' )?.value || '';
 
   return window.reimbursementRows.filter(row => {
-    if (
-      period &&
-      String(row.Reimbursement_Date || '').slice(0, 7) !== period
-    ) {
-      return false;
-    }
-    if (
-      branchId &&
-      branchId !== 'ALL' &&
-      String(row.Branch_ID || '') !== branchId
-    ) {
-      return false;
-    }
-
-    if (
-      employeeId &&
-      String(row.Employee_ID || '') !== employeeId
-    ) {
-      return false;
-    }
-    if (
-      status &&
-      String(row.Status || '').toUpperCase() !== status
-    ) {
-      return false;
-    }
+    if ( period && String(row.Reimbursement_Date || '').slice(0, 7) !== period ) { return false; }
+    if ( branchId && branchId !== 'ALL' && String(row.Branch_ID || '') !== branchId ) { return false; }
+    if ( employeeId && String(row.Employee_ID || '') !== employeeId ) { return false; }
+    if ( status && String(row.Status || '').toUpperCase() !== status ) { return false; }
     return true;
   });
 };
@@ -38884,7 +38361,6 @@ window.populateReimbursementFilters = function () {
 
   employees.forEach(employee => {
     const branchId = window.getReimbursementBranchId(employee);
-
     if (branchId && !branchMap.has(branchId)) {
       branchMap.set(
         branchId,
@@ -39030,7 +38506,6 @@ window.loadReimbursements = async function () {
     if (error) throw error;
 
     const result = Array.isArray(data) ? data[0] : data;
-
     if (!result || result.success !== true) {
       throw new Error(
         result?.message || 'Gagal memuat reimbursement.'
@@ -39079,33 +38554,25 @@ window.updateReimbursementSummary = function (rows) {
   if (totalCount) {
     totalCount.textContent = Number(
       summary.totalCount ?? rows.length
-    ).toLocaleString('id-ID');
-  }
+    ).toLocaleString('id-ID'); }
   if (draftCount) {
     draftCount.textContent = Number(
       summary.draftCount ??
       rows.filter(row => row.Status === 'DRAFT').length
-    ).toLocaleString('id-ID');
-  }
+    ).toLocaleString('id-ID'); }
   if (approvedCount) {
     approvedCount.textContent = Number(
       summary.approvedCount ??
       rows.filter(row => row.Status === 'APPROVED').length
-    ).toLocaleString('id-ID');
-  }
+    ).toLocaleString('id-ID'); }
   if (unpaidAmount) {
     const calculatedUnpaid = rows.reduce((total, row) => {
       if (!['DRAFT', 'APPROVED'].includes(
         String(row.Status || '').toUpperCase()
-      )) {
-        return total;
-      }
+      )) { return total; }
       return total + getRemaining(row);
     }, 0);
-    unpaidAmount.textContent =
-      window.formatReimbursementCurrency(
-        summary.unpaidAmount ?? calculatedUnpaid
-      );
+    unpaidAmount.textContent = window.formatReimbursementCurrency( summary.unpaidAmount ?? calculatedUnpaid );
   }
 };
 
@@ -39135,7 +38602,6 @@ window.getReimbursementStatusBadge = function (status) {
     </span>
   `;
 };
-
 
 /* ==== RENDER TABLE ==== */
 window.renderReimbursementTable = function () {
@@ -39170,19 +38636,14 @@ window.renderReimbursementTable = function () {
       const category = window.escapeReimbursementHTML( row.Category || '-' );
       const description = window.escapeReimbursementHTML( row.Description || '-' );
       const payrollPeriod = row.Payroll_Period
-        ? window.escapeReimbursementHTML(
-            String(row.Payroll_Period).slice(0, 7)
-          )
+        ? window.escapeReimbursementHTML( String(row.Payroll_Period).slice(0, 7) )
         : '-';
       const status = String(row.Status || 'DRAFT')
         .trim()
         .toUpperCase();
 			const amount = Number(row.Amount || 0);
 			const paidAmount = Number(row.Paid_Amount || 0);
-			const remainingAmount = Math.max(
-			  0,
-			  Number(row.Remaining_Amount ?? (amount - paidAmount))
-			);
+			const remainingAmount = Math.max( 0, Number(row.Remaining_Amount ?? (amount - paidAmount)) );
       // Semua action tetap ditampilkan.
       // Action selain View Detail hanya aktif saat DRAFT.
       const canEdit = status === 'DRAFT';
@@ -39621,13 +39082,11 @@ window.openReimbursementModal = function () {
   modal.classList.add('flex');
 };
 
-
 /* === SYNC EMPLOYEE / BRANCH === */
 window.syncReimbursementFormBranch = function () {
   const employeeId = document.getElementById( 'reimbursementFormEmployee' )?.value;
   const employee = window.getReimbursementEmployee(employeeId);
   const branchInput = document.getElementById( 'reimbursementFormBranch' );
-
   if (!branchInput) return;
 
   branchInput.value = employee
@@ -39640,61 +39099,28 @@ window.syncReimbursementFormBranch = function () {
 
 /* ==== OPEN PAY REIMBURSEMENT MODAL ==== */
 window.payReimbursement = function (id) {
-  const row = (window.reimbursementRows || []).find(
-    item => String(item.Reimbursement_ID) === String(id)
-  );
-
-  if (!row) {
-    alert('Data reimbursement tidak ditemukan.');
-    return;
-  }
-  if (String(row.Status || '').toUpperCase() !== 'APPROVED') {
-    alert('Hanya reimbursement berstatus APPROVED yang dapat dibayar.');
-    return;
-  }
+  const row = (window.reimbursementRows || []).find( item => String(item.Reimbursement_ID) === String(id) );
+  if (!row) { alert('Data reimbursement tidak ditemukan.'); return; }
+  if (String(row.Status || '').toUpperCase() !== 'APPROVED') { alert('Hanya reimbursement berstatus APPROVED yang dapat dibayar.'); return; }
 
   window.ensurePayReimbursementModal();
 
   const modal = document.getElementById('payReimbursementModal');
   const amount = Number(row.Amount || 0);
   const paidAmount = Number(row.Paid_Amount || 0);
-  const remainingAmount = Math.max(
-    0,
-    Number(row.Remaining_Amount ?? (amount - paidAmount))
-  );
-
+  const remainingAmount = Math.max( 0, Number(row.Remaining_Amount ?? (amount - paidAmount)) );
   const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value ?? '-';
   };
 
-  document.getElementById('payReimbursementId').value =
-    row.Reimbursement_ID;
+  document.getElementById('payReimbursementId').value = row.Reimbursement_ID;
 
-  setText(
-    'payReimbursementEmployee',
-    row.Full_Name || row.Employee_ID || '-'
-  );
-
-  setText(
-    'payReimbursementBranch',
-    window.getReimbursementBranchName(row.Branch_ID)
-  );
-
-  setText(
-    'payReimbursementClaimAmount',
-    window.formatReimbursementCurrency(amount)
-  );
-
-  setText(
-    'payReimbursementPaidAmount',
-    window.formatReimbursementCurrency(paidAmount)
-  );
-
-  setText(
-    'payReimbursementRemaining',
-    window.formatReimbursementCurrency(remainingAmount)
-  );
+  setText( 'payReimbursementEmployee', row.Full_Name || row.Employee_ID || '-' );
+  setText( 'payReimbursementBranch', window.getReimbursementBranchName(row.Branch_ID) );
+  setText( 'payReimbursementClaimAmount', window.formatReimbursementCurrency(amount) );
+  setText( 'payReimbursementPaidAmount', window.formatReimbursementCurrency(paidAmount) );
+  setText( 'payReimbursementRemaining', window.formatReimbursementCurrency(remainingAmount) );
 
   const paymentAmount = document.getElementById('payReimbursementAmount');
   paymentAmount.max = String(remainingAmount);
@@ -39724,18 +39150,14 @@ window.ensurePayReimbursementModal = function () {
   const modal = document.createElement('div');
 
   modal.id = 'payReimbursementModal';
-  modal.className =
-    'fixed inset-0 z-[160] hidden items-center justify-center bg-background/70 p-4';
-
+  modal.className = 'fixed inset-0 z-[160] hidden items-center justify-center bg-background/70 p-4';
   modal.innerHTML = `
     <div class="w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-md
       bg-background border border-outline-variant
       shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 
       <!-- HEADER -->
-      <div class="sticky top-0 z-10 flex items-center justify-between
-        gap-3 border-b border-outline-variant bg-background p-5">
-
+      <div class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-outline-variant bg-background p-5">
         <div>
           <h3 class="text-lg font-bold text-on-surface">
             Pay Reimbursement
@@ -39754,12 +39176,10 @@ window.ensurePayReimbursementModal = function () {
       </div>
 
       <form id="payReimbursementForm" class="p-5 space-y-4">
-
         <input type="hidden" id="payReimbursementId">
 
         <!-- REIMBURSEMENT SUMMARY -->
         <div class="rounded-md border border-outline-variant p-4 space-y-3">
-
           <div class="flex items-start justify-between gap-3">
             <span class="text-xs text-on-surface-variant">Employee</span>
             <span id="payReimbursementEmployee"
@@ -39806,7 +39226,6 @@ window.ensurePayReimbursementModal = function () {
 
         <!-- PAYMENT DETAILS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
           <div>
             <label for="payReimbursementAmount"
               class="block text-xs text-on-surface-variant mb-2">
@@ -39818,8 +39237,7 @@ window.ensurePayReimbursementModal = function () {
               step="1"
               required
               placeholder="Enter amount"
-              class="w-full h-10 px-3 rounded-md bg-background
-                border border-outline-variant text-on-surface text-sm">
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-on-surface text-sm">
           </div>
 
           <div>
@@ -39830,8 +39248,7 @@ window.ensurePayReimbursementModal = function () {
             <input id="payReimbursementDate"
               type="date"
               required
-              class="w-full h-10 px-3 rounded-md bg-background
-                border border-outline-variant text-on-surface text-sm">
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-on-surface text-sm">
           </div>
 
           <div>
@@ -39841,8 +39258,7 @@ window.ensurePayReimbursementModal = function () {
             </label>
             <select id="payReimbursementMethod"
               required
-              class="w-full h-10 px-3 rounded-md bg-background
-                border border-outline-variant text-on-surface text-sm">
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-on-surface text-sm">
               <option value="CASH">Cash</option>
               <option value="BANK">Bank Transfer</option>
               <option value="QRIS">QRIS</option>
@@ -39857,45 +39273,38 @@ window.ensurePayReimbursementModal = function () {
             <input id="payReimbursementReference"
               type="text"
               placeholder="Optional"
-              class="w-full h-10 px-3 rounded-md bg-background
-                border border-outline-variant text-on-surface text-sm">
+              class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-on-surface text-sm">
           </div>
         </div>
 
         <div>
           <label for="payReimbursementNote"
             class="block text-xs text-on-surface-variant mb-2">
-            Note
+						Note
           </label>
           <textarea id="payReimbursementNote"
             rows="2"
             placeholder="Optional payment note"
-            class="w-full px-3 py-2 rounded-md bg-background
-              border border-outline-variant text-on-surface text-sm"></textarea>
+            class="w-full px-3 py-2 rounded-md bg-background border border-outline-variant text-on-surface text-sm"></textarea>
         </div>
 
         <!-- FOOTER -->
-        <div class="flex justify-end gap-2
-          border-t border-outline-variant pt-4">
-
+        <div class="flex justify-end gap-2 border-t border-outline-variant pt-4">
           <button type="button"
             onclick="window.closePayReimbursementModal()"
-            class="h-10 px-4 text-sm text-on-surface-variant
-              hover:text-on-surface">
+            class="h-10 px-4 text-sm text-on-surface-variant hover:text-on-surface">
             Cancel
           </button>
 
           <button id="payReimbursementSubmit"
             type="submit"
-            class="h-10 px-5 rounded-md bottom-theme
-              text-sm font-medium">
+            class="h-10 px-5 rounded-md bottom-theme text-sm font-medium">
             Confirm Payment
           </button>
         </div>
       </form>
     </div>
   `;
-
   document.body.appendChild(modal);
   document.getElementById('payReimbursementForm') .addEventListener('submit', window.handlePayReimbursement);
 };
@@ -39910,75 +39319,28 @@ window.handlePayReimbursement = async function (event) {
   if (!form || !submitButton || submitButton.disabled) return;
 
   const sessionId = localStorage.getItem('pos_session_id');
+  if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
 
-  if (!sessionId) {
-    alert('Session tidak ditemukan. Silakan login kembali.');
-    return;
-  }
+  const reimbursementId = document.getElementById('payReimbursementId')?.value;
+  const paymentDate = document.getElementById('payReimbursementDate')?.value;
+  const amount = Number(document.getElementById('payReimbursementAmount')?.value || 0);
+  const paymentMethod = document.getElementById('payReimbursementMethod')?.value;
+  const referenceNo = document.getElementById('payReimbursementReference')?.value?.trim() || '';
+  const note = document.getElementById('payReimbursementNote')?.value?.trim() || '';
+  const row = (window.reimbursementRows || []).find( item => String(item.Reimbursement_ID) === String(reimbursementId) );
 
-  const reimbursementId =
-    document.getElementById('payReimbursementId')?.value;
-
-  const paymentDate =
-    document.getElementById('payReimbursementDate')?.value;
-
-  const amount =
-    Number(document.getElementById('payReimbursementAmount')?.value || 0);
-
-  const paymentMethod =
-    document.getElementById('payReimbursementMethod')?.value;
-
-  const referenceNo =
-    document.getElementById('payReimbursementReference')?.value?.trim() || '';
-
-  const note =
-    document.getElementById('payReimbursementNote')?.value?.trim() || '';
-
-  const row = (window.reimbursementRows || []).find(
-    item => String(item.Reimbursement_ID) === String(reimbursementId)
-  );
-
-  if (!row) {
-    alert('Data reimbursement tidak ditemukan. Muat ulang tabel.');
-    return;
-  }
-
-  if (String(row.Status || '').toUpperCase() !== 'APPROVED') {
-    alert('Hanya reimbursement berstatus APPROVED yang dapat dibayar.');
-    return;
-  }
-
-  if (row.Payroll_ID) {
-    alert('Reimbursement ini sudah dialokasikan ke Payroll dan tidak dapat dibayar langsung.');
-    return;
-  }
+  if (!row) { alert('Data reimbursement tidak ditemukan. Muat ulang tabel.'); return; }
+  if (String(row.Status || '').toUpperCase() !== 'APPROVED') { alert('Hanya reimbursement berstatus APPROVED yang dapat dibayar.'); return; }
+  if (row.Payroll_ID) { alert('Reimbursement ini sudah dialokasikan ke Payroll dan tidak dapat dibayar langsung.'); return; }
 
   const claimAmount = Number(row.Amount || 0);
   const alreadyPaid = Number(row.Paid_Amount || 0);
-  const remainingAmount = Math.max(
-    0,
-    Number(row.Remaining_Amount ?? (claimAmount - alreadyPaid))
-  );
+  const remainingAmount = Math.max( 0, Number(row.Remaining_Amount ?? (claimAmount - alreadyPaid)) );
 
-  if (!paymentDate) {
-    alert('Payment Date wajib diisi.');
-    return;
-  }
-
-  if (!Number.isFinite(amount) || amount <= 0) {
-    alert('Payment Amount harus lebih besar dari 0.');
-    return;
-  }
-
-  if (amount > remainingAmount) {
-    alert('Payment Amount tidak boleh melebihi sisa reimbursement.');
-    return;
-  }
-
-  if (!['CASH', 'BANK', 'QRIS'].includes(paymentMethod)) {
-    alert('Payment Method tidak valid.');
-    return;
-  }
+  if (!paymentDate) { alert('Payment Date wajib diisi.'); return; }
+  if (!Number.isFinite(amount) || amount <= 0) { alert('Payment Amount harus lebih besar dari 0.'); return; }
+  if (amount > remainingAmount) { alert('Payment Amount tidak boleh melebihi sisa reimbursement.'); return; }
+  if (!['CASH', 'BANK', 'QRIS'].includes(paymentMethod)) { alert('Payment Method tidak valid.'); return; }
 
   const confirmed = confirm(
     'Konfirmasi pembayaran reimbursement?\n\n' +
@@ -39988,7 +39350,6 @@ window.handlePayReimbursement = async function (event) {
     `Tanggal: ${paymentDate}\n\n` +
     'Pembayaran akan dicatat beserta jurnalnya.'
   );
-
   if (!confirmed) return;
 
   try {
@@ -40011,15 +39372,9 @@ window.handlePayReimbursement = async function (event) {
     if (error) throw error;
 
     const result = Array.isArray(data) ? data[0] : data;
-
-    if (!result?.success) {
-      throw new Error(
-        result?.message || 'Pembayaran reimbursement gagal diproses.'
-      );
-    }
+    if (!result?.success) { throw new Error( result?.message || 'Pembayaran reimbursement gagal diproses.' ); }
 
     window.closePayReimbursementModal();
-
     alert(
       'Pembayaran reimbursement berhasil dicatat.\n\n' +
       `Nominal pembayaran: ${window.formatReimbursementCurrency(amount)}\n` +
@@ -40029,10 +39384,7 @@ window.handlePayReimbursement = async function (event) {
     await window.loadReimbursements();
 
   } catch (error) {
-    alert(
-      'Gagal membayar reimbursement.\n\n' +
-      (error?.message || 'Terjadi kesalahan.')
-    );
+    alert( 'Gagal membayar reimbursement.\n\n' + (error?.message || 'Terjadi kesalahan.') );
   } finally {
     submitButton.disabled = false;
     submitButton.classList.remove('opacity-50');
@@ -40042,14 +39394,11 @@ window.handlePayReimbursement = async function (event) {
 
 window.closePayReimbursementModal = function () {
   const modal = document.getElementById('payReimbursementModal');
-
   if (modal) {
     modal.classList.add('hidden');
     modal.classList.remove('flex');
   }
 };
-
-
 
 /* === EDIT MODAL === */
 window.editReimbursement = function (reimbursementId) {
@@ -40106,11 +39455,9 @@ window.editReimbursement = function (reimbursementId) {
   document.getElementById( 'reimbursementFormNote' ).value = row.Note || '';
 };
 
-
 /* ==== SAVE ADD / EDIT
    RPC yang dibutuhkan:
    save_employee_reimbursement ==== */
-
 window.handleSaveReimbursement = async function (event) {
   event.preventDefault();
   const saveButton = document.getElementById( 'reimbursementSaveButton' );
@@ -40201,15 +39548,11 @@ window.viewReimbursement = function (reimbursementId) {
   if (!row) { alert('Data reimbursement tidak ditemukan.'); return; }
 
   const oldModal = document.getElementById( 'reimbursementDetailModal' );
-
   if (oldModal) oldModal.remove();
 	
 	const amount = Number(row.Amount || 0);
 	const paidAmount = Number(row.Paid_Amount || 0);
-	const remainingAmount = Math.max(
-	  0,
-	  Number(row.Remaining_Amount ?? (amount - paidAmount))
-	);
+	const remainingAmount = Math.max( 0, Number(row.Remaining_Amount ?? (amount - paidAmount)) );
   const fields = [
     ['Reimbursement ID', row.Reimbursement_ID],
     ['Employee', row.Full_Name || row.Employee_ID],
@@ -40232,7 +39575,6 @@ window.viewReimbursement = function (reimbursementId) {
   ];
 
   const modal = document.createElement('div');
-	
   modal.id = 'reimbursementDetailModal';
   modal.className = 'fixed inset-0 z-[160] flex items-center justify-center bg-background p-4';
   modal.innerHTML = `
@@ -40280,10 +39622,7 @@ window.updateReimbursementStatus = async function (
 ) {
   try {
     const sessionId = window.getReimbursementSession();
-
-    if (!sessionId) {
-      throw new Error('Session tidak ditemukan. Silakan login kembali.');
-    }
+    if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
     const rpcParams = {
       p_session_id: sessionId,
@@ -40302,12 +39641,8 @@ window.updateReimbursementStatus = async function (
     if (error) throw error;
 
     const result = Array.isArray(data) ? data[0] : data;
-
-    if (!result || result.success === false) {
-      throw new Error(
-        result?.message || 'Gagal mengubah status reimbursement.'
-      );
-    }
+    if (!result || result.success === false) { throw new Error( result?.message || 'Gagal mengubah status reimbursement.' ); }
+		
     await window.loadReimbursements();
     alert(result.message || 'Status reimbursement berhasil diperbarui.');
     return result;
@@ -40323,25 +39658,13 @@ window.approveReimbursement = async function (reimbursementId) {
     item => String(item.Reimbursement_ID) === String(reimbursementId)
   );
 
-  if (
-    !row ||
+  if ( !row ||
     String(row.Status || '').trim().toUpperCase() !== 'DRAFT'
-  ) {
-    alert('Hanya reimbursement Draft yang dapat disetujui.');
-    return;
-  }
-  if (
-    !confirm(
-      `Setujui reimbursement sebesar ${
-        window.formatReimbursementCurrency(row.Amount)
-      }?`
-    )
-  ) {
-    return;
-  }
+  ) { alert('Hanya reimbursement Draft yang dapat disetujui.'); return; }
+  if ( !confirm( `Setujui reimbursement sebesar ${
+		window.formatReimbursementCurrency(row.Amount) }?` ) ) { return; }
   await window.updateReimbursementStatus(
-    reimbursementId,
-    'APPROVED'
+    reimbursementId, 'APPROVED'
   );
 };
 
@@ -40351,19 +39674,13 @@ window.cancelReimbursement = async function (reimbursementId) {
     item => String(item.Reimbursement_ID) === String(reimbursementId)
   );
 	
-  if (
-    !row ||
+  if ( !row ||
     String(row.Status || '').trim().toUpperCase() !== 'DRAFT'
-  ) {
-    alert('Hanya reimbursement Draft yang dapat dibatalkan.');
-    return;
-  }
-  if (!confirm('Batalkan reimbursement ini?')) {
-    return;
-  }
+  ) { alert('Hanya reimbursement Draft yang dapat dibatalkan.'); return; }
+  if (!confirm('Batalkan reimbursement ini?')) { return; }
+	
   await window.updateReimbursementStatus(
-    reimbursementId,
-    'CANCELLED'
+    reimbursementId, 'CANCELLED'
   );
 };
 
@@ -40371,7 +39688,6 @@ window.cancelReimbursement = async function (reimbursementId) {
 /* === EXPORT CSV === */
 window.exportReimbursement = function () {
   const rows = window.getReimbursementVisibleRows();
-
   if (!rows.length) { alert('Tidak ada data reimbursement untuk diexport.'); return; }
 
   const headers = [
@@ -40410,8 +39726,7 @@ window.exportReimbursement = function () {
     row.Description,
     row.Amount,
 		row.Paid_Amount ?? 0,
-		row.Remaining_Amount ??
-		  Math.max(0, Number(row.Amount || 0) - Number(row.Paid_Amount || 0)),
+		row.Remaining_Amount ?? Math.max(0, Number(row.Amount || 0) - Number(row.Paid_Amount || 0)),
     row.Status,
     row.Payment_Method,
     row.Payment_Date,
@@ -40458,10 +39773,7 @@ window.initEmployeeReimbursement = async function () {
       window.populateReimbursementFilters();
       window.reimbursementCurrentPage = 1;
       window.loadReimbursements();
-    });
-    branchFilter.dataset.reimbursementHandlerAttached = 'true';
-  }
-
+    }); branchFilter.dataset.reimbursementHandlerAttached = 'true'; }
   if (
     employeeFilter &&
     !employeeFilter.dataset.reimbursementHandlerAttached
@@ -40469,12 +39781,9 @@ window.initEmployeeReimbursement = async function () {
     employeeFilter.addEventListener('change', () => {
       window.reimbursementCurrentPage = 1;
       window.loadReimbursements();
-    });
-    employeeFilter.dataset.reimbursementHandlerAttached = 'true';
-  }
+    }); employeeFilter.dataset.reimbursementHandlerAttached = 'true'; }
 
   const statusFilter = document.getElementById( 'reimbursementStatusFilter' );
-
   if (
     statusFilter &&
     !statusFilter.dataset.reimbursementHandlerAttached
@@ -40482,9 +39791,7 @@ window.initEmployeeReimbursement = async function () {
     statusFilter.addEventListener('change', () => {
       window.reimbursementCurrentPage = 1;
       window.loadReimbursements();
-    });
-    statusFilter.dataset.reimbursementHandlerAttached = 'true';
-  }
+    }); statusFilter.dataset.reimbursementHandlerAttached = 'true'; }
   if (
     periodInput &&
     !periodInput.dataset.reimbursementHandlerAttached
@@ -40492,12 +39799,9 @@ window.initEmployeeReimbursement = async function () {
     periodInput.addEventListener('change', () => {
       window.reimbursementCurrentPage = 1;
       window.loadReimbursements();
-    });
-    periodInput.dataset.reimbursementHandlerAttached = 'true';
-  }
+    }); periodInput.dataset.reimbursementHandlerAttached = 'true'; }
   await window.loadReimbursements();
 };
-
 
 
 /* =========================================================
@@ -40511,28 +39815,21 @@ async function initAttendancePage() {
   try {
     // CLOCK
     updateAttendanceKioskClock();
-    if (attendanceKioskClockInterval) {
-      clearInterval(attendanceKioskClockInterval);
-    }
-    attendanceKioskClockInterval = setInterval(() => {
-      updateAttendanceKioskClock();
-    }, 1000);
-    // OUTLET
+    if (attendanceKioskClockInterval) { clearInterval(attendanceKioskClockInterval); }
+    attendanceKioskClockInterval = setInterval(() => { updateAttendanceKioskClock(); }, 1000);
+		
     await loadAttendanceKioskBranch();
-    // EMPLOYEE
     await loadEmployees();
     loadAttendanceKioskEmployees();
   } catch (error) { }
 }
 
-
 function updateAttendanceKioskClock() {
   const clock = document.getElementById('attendanceKioskClock');
-
   if (!clock) return;
-
+	
   const now = new Date();
-
+	
   clock.textContent = now.toLocaleTimeString('en-GB', {
     timeZone: 'Asia/Jakarta',
     hour: '2-digit',
@@ -40543,7 +39840,6 @@ function updateAttendanceKioskClock() {
 
 
 function startAttendanceKioskAttendanceCheck( employeeId, attendanceDate ) {
-
 	if (attendanceKioskAttendanceCheckInterval) {
 		clearInterval( attendanceKioskAttendanceCheckInterval );
 		attendanceKioskAttendanceCheckInterval = null;
@@ -40551,14 +39847,9 @@ function startAttendanceKioskAttendanceCheck( employeeId, attendanceDate ) {
 	
 	const cleanEmployeeId = String(employeeId || '').trim();
 	const cleanAttendanceDate = String(attendanceDate || '').trim();
-	
-	if (
-		!cleanEmployeeId ||
-		!cleanAttendanceDate
-	) { return; }
+	if ( !cleanEmployeeId || !cleanAttendanceDate ) { return; }
 	
 	const sessionId = localStorage.getItem('pos_session_id');
-	
 	if (!sessionId) { return; }
 	
 	attendanceKioskAttendanceCheckInterval =
@@ -40575,16 +39866,13 @@ function startAttendanceKioskAttendanceCheck( employeeId, attendanceDate ) {
 					);
 
 				if (error) { return; }
-	
 				if (data !== true) { return; }
 
-		
 			clearInterval( attendanceKioskAttendanceCheckInterval );
 			attendanceKioskAttendanceCheckInterval = null;
 			resetAttendanceKioskUI();
 			await loadEmployees();
 			loadAttendanceKioskEmployees();
-
 		} catch (error) { }
 	}, 1000);
 }
@@ -40593,7 +39881,6 @@ function resetAttendanceKioskUI() {
   // EMPLOYEE SELECT
   const employee = document.getElementById('attendanceKioskEmployee');
   if (employee) employee.value = '';
-
   // EMPLOYEE INFORMATION
   const employeeInfo = document.getElementById('attendanceKioskEmployeeInfo');
   if (employeeInfo) employeeInfo.classList.add('hidden');
@@ -40617,16 +39904,13 @@ function resetAttendanceKioskUI() {
     pin.value = '';
     pin.type = 'password';
   }
-
   const pinMessage = document.getElementById('attendanceKioskPinMessage');
   if (pinMessage) {
     pinMessage.textContent = '';
     pinMessage.classList.add('hidden');
   }
-
   const pinIcon = document.getElementById('attendancePinVisibilityIcon');
   if (pinIcon) pinIcon.textContent = 'visibility';
-
   // QR CODE
   const qrCode = document.getElementById('attendanceKioskQrCode');
   if (qrCode) qrCode.innerHTML = '';
@@ -40634,7 +39918,7 @@ function resetAttendanceKioskUI() {
   const qrEmpty = document.getElementById('attendanceKioskQrEmpty');
   const qrActive = document.getElementById('attendanceKioskQrActive');
   const qrSuccess = document.getElementById('attendanceKioskQrSuccess');
-
+	
   if (qrEmpty) qrEmpty.classList.remove('hidden');
   if (qrActive) {
     qrActive.classList.add('hidden');
@@ -40673,11 +39957,9 @@ function resetAttendanceKioskUI() {
 
 async function loadAttendanceKioskBranch() {
   const branchEl = document.getElementById('attendanceKioskBranch');
-
   if (!branchEl) return;
 
   const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { branchEl.textContent = '-'; return; }
 
   try {
@@ -40709,7 +39991,6 @@ async function loadAttendanceKioskBranch() {
 
 function loadAttendanceKioskEmployees() {
   const select = document.getElementById( 'attendanceKioskEmployee' );
-
   if (!select) return;
 
   select.innerHTML = `<option value="">Select Employee</option>`;
@@ -40742,10 +40023,7 @@ function handleAttendanceEmployeeSelect() {
   if (!select) return;
 
   const employeeId = select.value;
-
-  if (!employeeId) {
-    info?.classList.add('hidden');
-
+  if (!employeeId) { info?.classList.add('hidden');
     if (nameEl) nameEl.textContent = '-';
     if (idEl) idEl.textContent = '-';
     if (positionEl) positionEl.textContent = '-';
@@ -40754,7 +40032,6 @@ function handleAttendanceEmployeeSelect() {
   }
 
   const employee = employeeData.find(e => String(e.Employee_ID) === String(employeeId) );
-
   if (!employee) { info?.classList.add('hidden'); return; }
   if (nameEl) { nameEl.textContent = employee.Full_Name || '-'; }
   if (idEl) { idEl.textContent = employee.Employee_Code || employee.Employee_ID || '-'; }
@@ -40782,7 +40059,6 @@ async function verifyAttendanceKiosk() {
     return; }
 
   const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { alert('Session POS tidak ditemukan.'); return; }
 
   try {
@@ -40808,13 +40084,9 @@ async function verifyAttendanceKiosk() {
     const result = typeof data === 'string'
 			? JSON.parse(data)
 			: data;
-    // PIN FAILED
-    if (!result?.success) {
-      alert( result?.message || 'PIN verification failed.' );
-      return; }
+    if (!result?.success) { alert( result?.message || 'PIN verification failed.' ); return; }
     // CHECK TODAY SCHEDULE
     const todaySchedule = await getAttendanceEmployeeTodaySchedule( employeeId );
-
     if (!todaySchedule) { alert( `${result.employee_name} tidak memiliki schedule untuk hari ini.` ); return; }
     if (!todaySchedule.Is_Active) { alert( `${result.employee_name} sedang OFF hari ini.` ); return; }
 		// GENERATE ATTENDANCE QR
@@ -40849,7 +40121,6 @@ async function verifyAttendanceKiosk() {
 
 async function generateAttendanceQr( employeeId, todaySchedule ) {
 	const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
   const branchId = String(state.user?.branchId || '').trim();
@@ -40872,7 +40143,6 @@ async function generateAttendanceQr( employeeId, todaySchedule ) {
   const result = typeof data === 'string'
 		? JSON.parse(data)
 		: data;
-	
   if (!result?.success) {
     throw new Error(
       result?.message ||
@@ -40885,7 +40155,6 @@ async function generateAttendanceQr( employeeId, todaySchedule ) {
 
 function handleAttendancePinInput() {
   const input = document.getElementById('attendanceKioskPin');
-
   if (!input) return;
   // Hanya izinkan angka
   input.value = input.value.replace(/\D/g, '');
@@ -40912,7 +40181,6 @@ function getAttendanceWeekStart(date = new Date()) {
 
 async function getAttendanceEmployeeTodaySchedule(employeeId) {
   const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
   if (!employeeId) { throw new Error('Employee belum dipilih.'); }
 
@@ -40932,9 +40200,8 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
   if (error) { throw error; }
 
   const schedules = Array.isArray(data) ? data : [];
-  const todaySchedule = schedules.find(schedule => {
-    return String(schedule.Schedule_Date) === today;
-  });
+  const todaySchedule = schedules.find(schedule => { return String(schedule.Schedule_Date) === today; });
+	
   return todaySchedule || null;
 }
 
@@ -41046,7 +40313,6 @@ async function startAttendanceScanner() {
   if (attendanceScannerRunning) { return; }
 
   const reader = document.getElementById( 'attendanceScanReader' );
-
   if (!reader) { throw new Error( 'Scanner container tidak ditemukan.' ); }
 
   attendanceScannerProcessing = false;
@@ -41085,15 +40351,8 @@ async function startAttendanceScanner() {
 async function stopAttendanceScanner() {
   if (!attendanceScanner) { return; }
 
-  try {
-    if (attendanceScannerRunning) { 
-			await attendanceScanner.stop(); 
-		}
-  } catch (error) { }
-
-  try {
-    attendanceScanner.clear();
-  } catch (error) { }
+  try { if (attendanceScannerRunning) {  await attendanceScanner.stop();  } } catch (error) { }
+  try { attendanceScanner.clear(); } catch (error) { }
 
   attendanceScannerRunning = false;
   attendanceScanner = null;
@@ -41102,11 +40361,9 @@ async function stopAttendanceScanner() {
 async function processScannedAttendanceToken(token) {
   try {
     const status = document.getElementById( 'attendanceScanStatus' );
-
     if (status) { status.textContent = 'Verifying attendance...'; }
 
     const cleanToken = String(token || '').trim();
-
     if (!cleanToken) { throw new Error( 'Attendance QR tidak valid.' ); }
 
     const { data, error } =
@@ -41122,13 +40379,7 @@ async function processScannedAttendanceToken(token) {
     const result = typeof data === 'string'
 			? JSON.parse(data)
 			: data;
-
-    if (!result?.success) {
-      throw new Error(
-        result?.message ||
-        'Attendance gagal.'
-      );
-    }
+    if (!result?.success) { throw new Error( result?.message || 'Attendance gagal.' ); }
 
     showAttendanceScanSuccess( result );
   } catch (error) {
