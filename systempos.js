@@ -37829,12 +37829,15 @@ window.renderPayrollDetailContent = function (payroll, details) {
 
   if (!container) { return; }
 
-  const money = value =>
-    new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 2
-    }).format(Number(value) || 0);
+	const money = value =>
+	  new Intl.NumberFormat('id-ID', {
+	    style: 'currency',
+	    currency: 'IDR',
+	    minimumFractionDigits: 0,
+	    maximumFractionDigits: 0
+	  })
+	  .format(Math.round(Number(value) || 0))
+	  .replace(/\s/g, '');
 
   const escapeHtml = value =>
     String(value ?? '').replace(/[&<>"']/g, char => ({
