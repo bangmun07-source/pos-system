@@ -36850,6 +36850,8 @@ window.calculatePayroll = async function () {
 
 	const result = Array.isArray(data) ? data[0] : data;
 	if (!result || result.success !== true) { throw new Error( result?.message || 'Calculate Payroll gagal diproses.' ); }
+		
+	window.invalidatePayrollCache();
 	// 8. Refresh tabel
 	if (typeof window.loadPayroll === 'function') {
 		try {
@@ -37081,6 +37083,13 @@ window.payrollCurrentPage = window.payrollCurrentPage || 1;
 window.payrollPageSize = 10;
 window.payrollHandlersAttached = window.payrollHandlersAttached || false;
 
+/* ==== PAYROLL RAM CACHE ==== */
+state.payrollCache ??= Object.create(null);
+
+window.invalidatePayrollCache = function () {
+  state.payrollCache = Object.create(null);
+};
+
 window.loadPayroll = async function () {
 	const tableBody = document.getElementById('payrollTableBody');
 
@@ -37102,14 +37111,36 @@ window.loadPayroll = async function () {
 		let branchId = branchFilter?.value?.trim() || null;
 		// Owner dapat memilih outlet tertentu atau semua outlet.
 		// Admin dan Cashier dibatasi pada outlet miliknya di UI.
-		if (role !== 'OWNER') {
-			branchId = String(user?.branchId || '').trim();
 
-			if (!branchId) {
-				throw new Error('Outlet pengguna tidak ditemukan.');
-			}
+		if (!['OWNER', 'ACCOUNTANT'].includes(role)) {
+		  branchId = String(user?.branchId || '').trim();
+		
+		  if (!branchId) {
+		    throw new Error('Outlet pengguna tidak ditemukan.');
+		  }
 		} else if (!branchId || branchId.toUpperCase() === 'ALL') {
-			branchId = null;
+		  branchId = null;
+		}
+
+
+		/* ==== PAYROLL CACHE KEY ==== */
+		const cacheKey = JSON.stringify({
+		  sessionId,
+		  period,
+		  branchId
+		});
+		
+		/* ==== CACHE HIT ==== */
+		if (
+		  Object.prototype.hasOwnProperty.call(
+		    state.payrollCache,
+		    cacheKey
+		  )
+		) {
+		  window.payrollRows = state.payrollCache[cacheKey];
+		  window.payrollCurrentPage = 1;
+		  window.renderPayrollTable();
+		  return;
 		}
 
 		if (!window.payrollHandlersAttached) {
@@ -37150,6 +37181,7 @@ window.loadPayroll = async function () {
 		window.payrollRows = Array.isArray(result.rows)
 			? result.rows
 			: [];
+		state.payrollCache[cacheKey] = window.payrollRows;
 		window.payrollCurrentPage = 1;
 		window.renderPayrollTable();
 	} catch (error) {
@@ -38412,6 +38444,13 @@ window.reimbursementPageSize = 10;
 window.reimbursementModalElement = null;
 const REIMBURSEMENT_SESSION_KEY = 'pos_session_id';
 
+/* ==== REIMBURSEMENT RAM CACHE ==== */
+state.reimbursementCache ??= Object.create(null);
+
+window.invalidateReimbursementCache = function () {
+  state.reimbursementCache = Object.create(null);
+};
+
 /* ==== HELPERS === */
 window.escapeReimbursementHTML = function (value) {
   return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -38671,6 +38710,32 @@ window.loadReimbursements = async function () {
       branchId = null;
     }
 
+		const selectedEmployee = employeeFilter?.value || '';
+		const selectedStatus = statusFilter?.value || '';
+		const cacheKey = JSON.stringify({
+		  sessionId,
+		  period,
+		  branchId,
+		  selectedEmployee,
+		  selectedStatus
+		});
+		
+		/* ==== CACHE HIT ==== */
+		if (
+		  Object.prototype.hasOwnProperty.call(
+		    state.reimbursementCache,
+		    cacheKey
+		  )
+		) {
+		  const cached = state.reimbursementCache[cacheKey];
+		
+		  window.reimbursementRows = cached.rows;
+		  window.reimbursementSummary = cached.summary;
+		  window.reimbursementCurrentPage = 1;
+		  window.renderReimbursementTable();
+		  return;
+		}
+
     tableBody.innerHTML = `
       <tr>
         <td colspan="9" class="px-5 py-10 text-center text-on-surface-variant">
@@ -38687,8 +38752,8 @@ window.loadReimbursements = async function () {
           ? `${period}-01`
           : null,
         p_branch_id: branchId,
-        p_employee_id: employeeFilter?.value || null,
-        p_status: statusFilter?.value || null
+				p_employee_id: selectedEmployee || null,
+				p_status: selectedStatus || null
       }
     );
 
@@ -38703,10 +38768,11 @@ window.loadReimbursements = async function () {
     window.reimbursementRows = Array.isArray(result.rows)
       ? result.rows
       : [];
-    /*
-     * Simpan summary dari RPC.
-     */
     window.reimbursementSummary = result.summary || {};
+		state.reimbursementCache[cacheKey] = {
+		  rows: window.reimbursementRows,
+		  summary: window.reimbursementSummary
+		};
     window.reimbursementCurrentPage = 1;
     window.renderReimbursementTable();
   } catch (error) {
@@ -39562,7 +39628,8 @@ window.handlePayReimbursement = async function (event) {
 
     const result = Array.isArray(data) ? data[0] : data;
     if (!result?.success) { throw new Error( result?.message || 'Pembayaran reimbursement gagal diproses.' ); }
-
+		
+		window.invalidateReimbursementCache();
     window.closePayReimbursementModal();
     alert(
       'Pembayaran reimbursement berhasil dicatat.\n\n' +
@@ -39709,6 +39776,7 @@ window.handleSaveReimbursement = async function (event) {
 
     if (result && result.success === false) { throw new Error(result.message || 'Gagal menyimpan reimbursement.'); }
 
+		window.invalidateReimbursementCache();
     window.closeReimbursementModal();
     await window.loadReimbursements();
 
@@ -39831,7 +39899,7 @@ window.updateReimbursementStatus = async function (
 
     const result = Array.isArray(data) ? data[0] : data;
     if (!result || result.success === false) { throw new Error( result?.message || 'Gagal mengubah status reimbursement.' ); }
-		
+		window.invalidateReimbursementCache();
     await window.loadReimbursements();
     alert(result.message || 'Status reimbursement berhasil diperbarui.');
     return result;
