@@ -24532,42 +24532,40 @@
 				  </div>
 				</section>
 			</section>
-			<!-- ==== PAYROLL ATTENDANCE ===== -->
-      <section id="payrollAttendanceSection"
-        class="mt-5 space-y-5 hidden">
-        <!-- OWNER NOTICE -->
-        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex items-center gap-3">
-            <div class="main-icon-box">
-              <span class="material-symbols-outlined text-3xl"
-                style="font-variation-settings:'FILL' 1;">
-                lock
-              </span>
-            </div>
-
-            <div>
-              <h2 class="text-lg font-bold font-headline text-foreground">
-                Payroll &amp; Attendance
-              </h2>
-
-              <p class="text-xs text-muted mt-1">
-                Owner-only payroll, attendance and salary information
-              </p>
-            </div>
-          </div>
-					<!-- PENGATURAN PPH 21 -->
-					<div class="flex justify-end">
-					  <button
-					    type="button"
-					    onclick="openPPh21SettingsModal()"
-					    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
-					    <span class="material-symbols-outlined text-sm">
-					      settings
-					    </span>
-					    Pengaturan PPh 21
-					  </button>
-					</div>
-        </section>
+				<!-- OWNER NOTICE -->
+				<section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+				  <div class="p-5 flex items-center justify-between gap-4 flex-wrap">
+				    <!-- TITLE -->
+				    <div class="flex items-center gap-3">
+				      <div class="main-icon-box">
+				        <span class="material-symbols-outlined text-3xl"
+				          style="font-variation-settings:'FILL' 1;">
+				          lock
+				        </span>
+				      </div>
+				
+				      <div>
+				        <h2 class="text-lg font-bold font-headline text-foreground">
+				          Payroll &amp; Attendance
+				        </h2>
+				
+				        <p class="text-xs text-muted mt-1">
+				          Owner-only payroll, attendance and salary information
+				        </p>
+				      </div>
+				    </div>
+				    <!-- PENGATURAN PPH 21 -->
+				    <button
+				      type="button"
+				      onclick="openPPh21SettingsModal()"
+				      class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2 shrink-0">
+				      <span class="material-symbols-outlined text-sm">
+				        settings
+				      </span>
+				      Pengaturan PPh 21
+				    </button>
+				  </div>
+				</section>
         <!-- === ATTENDANCE RECAP === -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -27594,134 +27592,483 @@
 	    </div>
 	  </div>
 	</div>
-
+	<!-- ===== PAY SALARY MODAL ===== -->
+	<div id="payEmployeePayrollModal"
+	  class="fixed inset-0 z-[130] hidden items-center justify-center bg-background p-4">
+	  <div class="w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	    <!-- HEADER -->
+	    <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
+	      <div>
+	        <h2 class="text-lg font-semibold text-foreground">
+	          Pay Salary
+	        </h2>
+	        <p class="text-sm text-muted mt-1">
+	          Konfirmasi pembayaran gaji karyawan
+	        </p>
+	      </div>
 	
-<!-- ===== PAY SALARY MODAL ===== -->
-<div id="payEmployeePayrollModal"
-  class="fixed inset-0 z-[130] hidden items-center justify-center bg-background p-4">
-  <div class="w-full max-w-lg max-h-[90vh] overflow-y-auto custom-scrollbar bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-    <!-- HEADER -->
-    <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
-      <div>
-        <h2 class="text-lg font-semibold text-foreground">
-          Pay Salary
-        </h2>
-        <p class="text-sm text-muted mt-1">
-          Konfirmasi pembayaran gaji karyawan
-        </p>
-      </div>
-
-      <button type="button"
-        onclick="closePayEmployeePayrollModal()"
-        class="w-9 h-9 rounded-md hover:bg-outline-variant text-muted flex items-center justify-center"
-        aria-label="Tutup popup">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </div>
-
-    <!-- BODY -->
-    <div class="p-5 space-y-4">
-      <div class="rounded-md border border-outline-variant p-4 space-y-3">
-        <div class="flex justify-between gap-4">
-          <span class="text-sm text-muted">Nama karyawan</span>
-          <span id="payEmployeePayrollName"
-            class="text-sm font-medium text-foreground text-right">
-            -
-          </span>
-        </div>
-
-        <div class="flex justify-between gap-4">
-          <span class="text-sm text-muted">Employee Code</span>
-          <span id="payEmployeePayrollCode"
-            class="text-sm text-foreground text-right">
-            -
-          </span>
-        </div>
-
-        <div class="flex justify-between gap-4">
-          <span class="text-sm text-muted">Outlet</span>
-          <span id="payEmployeePayrollBranch"
-            class="text-sm text-foreground text-right">
-            -
-          </span>
-        </div>
-
-        <div class="flex justify-between gap-4">
-          <span class="text-sm text-muted">Periode</span>
-          <span id="payEmployeePayrollPeriod"
-            class="text-sm text-foreground text-right">
-            -
-          </span>
-        </div>
-      </div>
-
-      <div class="rounded-md border border-outline-variant p-4 space-y-3">
-        <div class="flex justify-between gap-4">
-          <span class="text-sm text-muted">Reimbursement</span>
-          <span id="payEmployeePayrollReimbursement"
-            class="text-sm text-foreground text-right">
-            Rp0
-          </span>
-        </div>
-
-        <div class="flex justify-between gap-4">
-          <span class="text-sm text-muted">Potongan piutang</span>
-          <span id="payEmployeePayrollReceivable"
-            class="text-sm text-foreground text-right">
-            Rp0
-          </span>
-        </div>
-
-        <div class="border-t border-outline-variant pt-3">
-          <p class="text-sm text-muted mb-1">
-            Total yang dibayarkan
-          </p>
-          <p id="payEmployeePayrollAmount"
-            class="text-2xl font-semibold text-foreground">
-            Rp0
-          </p>
-        </div>
-      </div>
-      <!-- PAYMENT METHOD -->
-      <div>
-        <label for="payEmployeePayrollMethod"
-          class="block text-sm font-medium text-foreground mb-2">
-          Payment Method
-        </label>
-
-        <select id="payEmployeePayrollMethod"
-          class="w-full h-11 px-3 rounded-md border
-            border-outline-variant bg-background text-foreground">
-          <option value="CASH">Cash</option>
-          <option value="BANK">Bank</option>
-        </select>
-      </div>
-
-      <p class="text-xs text-muted leading-relaxed">
-        PPh 21 dan Health tidak dibayarkan melalui popup ini.
-        Pembayaran kewajiban tersebut tetap melalui menu Tax
-        dan Health masing-masing.
-      </p>
-    </div>
-    <!-- FOOTER -->
-    <div class="flex justify-end gap-2 px-5 py-4 border-t border-outline-variant">
-      <button type="button"
-        onclick="closePayEmployeePayrollModal()"
-        class="h-10 px-4 rounded-md border border-outline-variant text-sm text-foreground hover:bg-outline-variant">
-        Cancel
-      </button>
-
-      <button type="button"
-        id="confirmPayEmployeePayrollButton"
-        onclick="submitPayEmployeePayroll()"
-        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center">
-        <span class="material-symbols-outlined text-base
-          align-middle mr-1">payments</span>
-        Confirm Payment
-      </button>
-    </div>
-  </div>
-</div>
+	      <button type="button"
+	        onclick="closePayEmployeePayrollModal()"
+	        class="w-9 h-9 rounded-md hover:bg-outline-variant text-muted flex items-center justify-center"
+	        aria-label="Tutup popup">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	
+	    <!-- BODY -->
+	    <div class="p-5 space-y-4">
+	      <div class="rounded-md border border-outline-variant p-4 space-y-3">
+	        <div class="flex justify-between gap-4">
+	          <span class="text-sm text-muted">Nama karyawan</span>
+	          <span id="payEmployeePayrollName"
+	            class="text-sm font-medium text-foreground text-right">
+	            -
+	          </span>
+	        </div>
+	
+	        <div class="flex justify-between gap-4">
+	          <span class="text-sm text-muted">Employee Code</span>
+	          <span id="payEmployeePayrollCode"
+	            class="text-sm text-foreground text-right">
+	            -
+	          </span>
+	        </div>
+	
+	        <div class="flex justify-between gap-4">
+	          <span class="text-sm text-muted">Outlet</span>
+	          <span id="payEmployeePayrollBranch"
+	            class="text-sm text-foreground text-right">
+	            -
+	          </span>
+	        </div>
+	
+	        <div class="flex justify-between gap-4">
+	          <span class="text-sm text-muted">Periode</span>
+	          <span id="payEmployeePayrollPeriod"
+	            class="text-sm text-foreground text-right">
+	            -
+	          </span>
+	        </div>
+	      </div>
+	
+	      <div class="rounded-md border border-outline-variant p-4 space-y-3">
+	        <div class="flex justify-between gap-4">
+	          <span class="text-sm text-muted">Reimbursement</span>
+	          <span id="payEmployeePayrollReimbursement"
+	            class="text-sm text-foreground text-right">
+	            Rp0
+	          </span>
+	        </div>
+	
+	        <div class="flex justify-between gap-4">
+	          <span class="text-sm text-muted">Potongan piutang</span>
+	          <span id="payEmployeePayrollReceivable"
+	            class="text-sm text-foreground text-right">
+	            Rp0
+	          </span>
+	        </div>
+	
+	        <div class="border-t border-outline-variant pt-3">
+	          <p class="text-sm text-muted mb-1">
+	            Total yang dibayarkan
+	          </p>
+	          <p id="payEmployeePayrollAmount"
+	            class="text-2xl font-semibold text-foreground">
+	            Rp0
+	          </p>
+	        </div>
+	      </div>
+	      <!-- PAYMENT METHOD -->
+	      <div>
+	        <label for="payEmployeePayrollMethod"
+	          class="block text-sm font-medium text-foreground mb-2">
+	          Payment Method
+	        </label>
+	
+	        <select id="payEmployeePayrollMethod"
+	          class="w-full h-11 px-3 rounded-md border
+	            border-outline-variant bg-background text-foreground">
+	          <option value="CASH">Cash</option>
+	          <option value="BANK">Bank</option>
+	        </select>
+	      </div>
+	
+	      <p class="text-xs text-muted leading-relaxed">
+	        PPh 21 dan Health tidak dibayarkan melalui popup ini.
+	        Pembayaran kewajiban tersebut tetap melalui menu Tax
+	        dan Health masing-masing.
+	      </p>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="flex justify-end gap-2 px-5 py-4 border-t border-outline-variant">
+	      <button type="button"
+	        onclick="closePayEmployeePayrollModal()"
+	        class="h-10 px-4 rounded-md border border-outline-variant text-sm text-foreground hover:bg-outline-variant">
+	        Cancel
+	      </button>
+	
+	      <button type="button"
+	        id="confirmPayEmployeePayrollButton"
+	        onclick="submitPayEmployeePayroll()"
+	        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center">
+	        <span class="material-symbols-outlined text-base
+	          align-middle mr-1">payments</span>
+	        Confirm Payment
+	      </button>
+	    </div>
+	  </div>
+	</div>
+	
+	<!-- ===== PPH 21 SETTINGS MODAL ===== -->
+	<div id="pph21SettingsModal"
+	  class="fixed inset-0 z-[120] hidden items-center justify-center bg-background p-4">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-4 shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+	            request_quote
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Pengaturan PPh 21
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Manage TER tax rates and annual PTKP values
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closePPh21SettingsModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">
+						Close
+					</span>
+	      </button>
+	    </div>
+	    <!-- TABS -->
+	    <div class="px-5 pt-4 border-b border-outline-variant shrink-0">
+	      <div class="flex items-center gap-2">
+	        <button id="pph21TabTER"
+	          type="button"
+	          onclick="switchPPh21Tab('TER')"
+	          class="px-4 py-3 text-sm font-medium border-b-2 border-primary text-foreground">
+	          Tarif TER
+	        </button>
+	
+	        <button id="pph21TabPTKP"
+	          type="button"
+	          onclick="switchPPh21Tab('PTKP')"
+	          class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-muted hover:text-foreground">
+	          PTKP
+	        </button>
+	      </div>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 overflow-y-auto custom-scrollbar space-y-5">
+	      <div id="pph21TERPanel" class="space-y-5">
+	        <!-- DESCRIPTION + ADD BUTTON -->
+	        <div class="flex items-center justify-between gap-3 flex-wrap">
+	          <div>
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Tarif Efektif Rata-rata (TER)
+	            </h3>
+	            <p class="text-xs text-muted mt-1">
+	              Manage gross income ranges and monthly withholding rates.
+	            </p>
+	          </div>
+	
+	          <button type="button"
+	            onclick="openPPh21TERForm()"
+	            class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
+	            <span class="material-symbols-outlined text-sm">add</span>
+	            Tambah Tarif
+	          </button>
+	        </div>
+	        <!-- CATEGORY FILTER -->
+	        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+	          <div>
+	            <label for="pph21TERCategoryFilter"
+	              class="block text-xs text-muted mb-2">
+	              Kategori TER
+	            </label>
+	            <select id="pph21TERCategoryFilter"
+	              onchange="loadPPh21TER()"
+	              class="w-full h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+	              <option value="">Semua Kategori</option>
+	              <option value="A">Kategori A</option>
+	              <option value="B">Kategori B</option>
+	              <option value="C">Kategori C</option>
+	            </select>
+	          </div>
+	        </div>
+	
+	        <!-- TER FORM -->
+	        <div id="pph21TERForm"
+	          class="hidden border border-outline-variant rounded-md p-4 space-y-4">
+	          <div class="flex items-center justify-between gap-3">
+	            <h3 id="pph21TERFormTitle"
+	              class="text-sm font-semibold text-foreground">
+	              Tambah Tarif TER
+	            </h3>
+	
+	            <button type="button"
+	              onclick="closePPh21TERForm()"
+	              class="w-8 h-8 text-muted hover:text-foreground">
+	              <span class="material-symbols-outlined">
+									Close
+								</span>
+	            </button>
+	          </div>
+	
+	          <input id="pph21TERId" type="hidden">
+	
+	          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	            <div>
+	              <label for="pph21TERCategory"
+	                class="block text-sm font-medium text-foreground mb-2">
+	                Kategori
+	              </label>
+	              <select id="pph21TERCategory"
+	                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+	                <option value="A">Kategori A</option>
+	                <option value="B">Kategori B</option>
+	                <option value="C">Kategori C</option>
+	              </select>
+	            </div>
+	
+	            <div>
+	              <label for="pph21TERRate"
+	                class="block text-sm font-medium text-foreground mb-2">
+	                Tarif Pajak (%)
+	              </label>
+	              <div class="relative">
+	                <input id="pph21TERRate"
+	                  type="number"
+	                  min="0"
+	                  max="100"
+	                  step="0.0001"
+	                  required
+	                  placeholder="0.2500"
+	                  class="w-full h-11 px-3 pr-9 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+	                <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">%</span>
+	              </div>
+	            </div>
+	
+	            <div>
+	              <label for="pph21TERMinGross"
+	                class="block text-sm font-medium text-foreground mb-2">
+	                Minimum Bruto (Rp)
+	              </label>
+	              <input id="pph21TERMinGross"
+	                type="number"
+	                min="0"
+	                step="1"
+	                required
+	                placeholder="5400000"
+	                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+	            </div>
+	
+	            <div>
+	              <label for="pph21TERMaxGross"
+	                class="block text-sm font-medium text-foreground mb-2">
+	                Maksimum Bruto (Rp)
+	              </label>
+	              <input id="pph21TERMaxGross"
+	                type="number"
+	                min="0"
+	                step="1"
+	                placeholder="5650000"
+	                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+	              <p class="text-xs text-muted mt-1.5">
+	                Kosongkan untuk batas penghasilan tertinggi.
+	              </p>
+	            </div>
+	          </div>
+	
+	          <div class="flex justify-end gap-2 pt-2">
+	            <button type="button"
+	              onclick="closePPh21TERForm()"
+	              class="h-10 px-4 text-sm text-muted hover:text-foreground">
+	              Close
+	            </button>
+	            <button type="button"
+	              onclick="savePPh21TER()"
+	              class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	              <span class="material-symbols-outlined text-sm">save</span>
+	              Save
+	            </button>
+	          </div>
+	        </div>
+	        <!-- TER TABLE -->
+	        <div class="border border-outline-variant rounded-md overflow-hidden">
+	          <div class="p-4 border-b border-outline-variant flex items-center justify-between">
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Daftar Tarif TER
+	            </h3>
+	            <span id="pph21TERCount" class="text-xs text-muted">
+	              0 data
+	            </span>
+	          </div>
+	
+	          <div class="overflow-x-auto custom-scrollbar">
+	            <table class="w-full text-sm">
+	              <thead>
+	                <tr class="border-b border-outline-variant text-xs uppercase tracking-wider text-muted">
+	                  <th class="px-4 py-3 text-left">Kategori</th>
+	                  <th class="px-4 py-3 text-right">Min. Bruto</th>
+	                  <th class="px-4 py-3 text-right">Maks. Bruto</th>
+	                  <th class="px-4 py-3 text-right">Tarif</th>
+	                  <th class="px-4 py-3 text-center">Aksi</th>
+	                </tr>
+	              </thead>
+	
+	              <tbody id="pph21TERTableBody"
+	                class="divide-y divide-outline-variant">
+	                <tr>
+	                  <td colspan="5"
+	                    class="px-4 py-8 text-center text-muted">
+	                    Memuat data tarif TER...
+	                  </td>
+	                </tr>
+	              </tbody>
+	            </table>
+	          </div>
+	        </div>
+	      </div>
+	      <!-- ================= PTKP TAB ================= -->
+	      <div id="pph21PTKPPanel" class="hidden space-y-5">
+	        <div>
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Penghasilan Tidak Kena Pajak (PTKP)
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Manage the annual PTKP amount for each employee tax status.
+	          </p>
+	        </div>
+	
+	        <!-- PTKP FORM -->
+	        <div id="pph21PTKPForm"
+	          class="hidden border border-outline-variant rounded-md p-4 space-y-4">
+	          <div class="flex items-center justify-between gap-3">
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Edit Nilai PTKP
+	            </h3>
+	
+	            <button type="button"
+	              onclick="closePPh21PTKPForm()"
+	              class="w-8 h-8 text-muted hover:text-foreground">
+	              <span class="material-symbols-outlined">close</span>
+	            </button>
+	          </div>
+	
+	          <input id="pph21PTKPId" type="hidden">
+	
+	          <div>
+	            <label for="pph21PTKPStatus"
+	              class="block text-sm font-medium text-foreground mb-2">
+	              Status PTKP
+	            </label>
+	            <select id="pph21PTKPStatus"
+	              disabled
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              <option value="TK/0">TK/0</option>
+	              <option value="TK/1">TK/1</option>
+	              <option value="TK/2">TK/2</option>
+	              <option value="TK/3">TK/3</option>
+	              <option value="K/0">K/0</option>
+	              <option value="K/1">K/1</option>
+	              <option value="K/2">K/2</option>
+	              <option value="K/3">K/3</option>
+	            </select>
+	          </div>
+	
+	          <div>
+	            <label for="pph21AnnualPTKP"
+	              class="block text-sm font-medium text-foreground mb-2">
+	              PTKP Tahunan (Rp)
+	            </label>
+	            <div class="relative">
+	              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+	              <input id="pph21AnnualPTKP"
+	                type="number"
+	                min="0"
+	                step="1"
+	                required
+	                placeholder="54000000"
+	                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+	            </div>
+	          </div>
+	
+	          <div class="flex justify-end gap-2 pt-2">
+	            <button type="button"
+	              onclick="closePPh21PTKPForm()"
+	              class="h-10 px-4 text-sm text-muted hover:text-foreground">
+	              Close
+	            </button>
+	
+	            <button type="button"
+	              onclick="savePPh21PTKP()"
+	              class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	              <span class="material-symbols-outlined text-sm">save</span>
+	              Save
+	            </button>
+	          </div>
+	        </div>
+	        <!-- PTKP TABLE -->
+	        <div class="border border-outline-variant rounded-md overflow-hidden">
+	          <div class="p-4 border-b border-outline-variant flex items-center justify-between">
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Daftar Status PTKP
+	            </h3>
+	            <span id="pph21PTKPCount" class="text-xs text-muted">
+	              0 data
+	            </span>
+	          </div>
+	
+	          <div class="overflow-x-auto custom-scrollbar">
+	            <table class="w-full text-sm">
+	              <thead>
+	                <tr class="border-b border-outline-variant text-xs uppercase tracking-wider text-muted">
+	                  <th class="px-4 py-3 text-left">Status</th>
+	                  <th class="px-4 py-3 text-right">PTKP Tahunan</th>
+	                  <th class="px-4 py-3 text-left">Terakhir Diperbarui</th>
+	                  <th class="px-4 py-3 text-center">Aksi</th>
+	                </tr>
+	              </thead>
+	
+	              <tbody id="pph21PTKPTableBody"
+	                class="divide-y divide-outline-variant">
+	                <tr>
+	                  <td colspan="4"
+	                    class="px-4 py-8 text-center text-muted">
+	                    Memuat data PTKP...
+	                  </td>
+	                </tr>
+	              </tbody>
+	            </table>
+	          </div>
+	        </div>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-between gap-3 shrink-0">
+	      <p class="text-xs text-muted">
+	        Pengaturan pajak khusus Owner.
+	      </p>
+	
+	      <button type="button"
+	        onclick="closePPh21SettingsModal()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 <!-- =========================================================
