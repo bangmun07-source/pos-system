@@ -36012,23 +36012,84 @@ function initAttendanceRecap() {
   return loadAttendanceRecap();
 }
 
-/* ==== PPH 21 SETTINGS MODAL ==== */
-function openPPh21SettingsModal() {
-  const modal = document.getElementById('pph21SettingsModal');
 
-  if (!modal) {
-    console.error('PPh 21 Settings Modal tidak ditemukan.');
-    return;
+/* =====================================================
+   MUNO — PPH 21 SETTINGS
+   Load TER/PTKP + Add/Edit TER + Save PTKP
+===================================================== */
+
+let pph21TERData = [];
+let pph21PTKPData = [];
+let pph21TEREditingId = null;
+let pph21PTKPEditingStatus = null;
+let pph21Loading = false;
+let pph21Saving = false;
+
+
+// =====================================================
+// HELPERS
+// =====================================================
+
+function getPPh21SessionId() {
+  return localStorage.getItem('pos_session_id');
+}
+
+function formatPPh21Rupiah(value) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'decimal',
+    maximumFractionDigits: 2
+  }).format(Number(value || 0));
+}
+
+function escapePPh21Html(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[char]);
+}
+
+function showPPh21Message(message, type = 'success') {
+  if (typeof showToast === 'function') {
+    showToast(message, type);
+  } else {
+    alert(message);
   }
+}
+
+function getPPh21Supabase() {
+  // Mengikuti pola Supabase client yang digunakan MUNO.
+  // Jika nama variabel client berbeda, sesuaikan bagian ini.
+  if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+    return supabaseClient; }
+  if (typeof supabase !== 'undefined' &&
+      supabase && typeof supabase.rpc === 'function') {
+    return supabase; }
+
+  throw new Error( 'Supabase client tidak ditemukan. Periksa nama variabel client MUNO.' );
+}
+
+function getPPh21Error(error) {
+  return error?.message || 'Terjadi kesalahan saat memproses PPh 21.';
+}
+
+
+// OPEN POPUP + LOAD DATA
+async function openPPh21SettingsModal() {
+  const modal = document.getElementById('pph21SettingsModal');
+  if (!modal) { showPPh21Message('Popup PPh 21 tidak ditemukan.', 'error'); return; }
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
   document.body.style.overflow = 'hidden';
+
+  await loadPPh21Settings();
 }
 
 function closePPh21SettingsModal() {
   const modal = document.getElementById('pph21SettingsModal');
-
   if (!modal) return;
 
   modal.classList.add('hidden');
@@ -36036,19 +36097,262 @@ function closePPh21SettingsModal() {
   document.body.style.overflow = '';
 }
 
-/* ==== PPH 21 SETTINGS TABS ==== */
+// LOAD TER + PTKP
+// RPC: get_pph21_settings
+async function loadPPh21Settings() {
+  if (pph21Loading) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  pph21Loading = true;
+
+  const terBody = document.getElementById('pph21TERTableBody');
+  const ptkpBody = document.getElementById('pph21PTKPTableBody');
+
+  if (terBody) { terBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-muted">Memuat tarif TER...</td></tr>'; }
+  if (ptkpBody) { ptkpBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-muted">Memuat data PTKP...</td></tr>'; }
+
+  try {
+    const client = getPPh21Supabase();
+    const { data, error } = await supabaseClient.rpc(
+			'get_pph21_settings', {
+	      p_session_id: sessionId
+	    });
+
+    if (error) throw error;
+    if (!data || data.success !== true) { throw new Error(data?.message || 'Data PPh 21 gagal dimuat.'); }
+
+    pph21TERData = Array.isArray(data.ter) ? data.ter : [];
+    pph21PTKPData = Array.isArray(data.ptkp) ? data.ptkp : [];
+
+    renderPPh21TER();
+    renderPPh21PTKP();
+
+  } catch (error) {
+    console.error('[PPh21] Load error:', error);
+    if (terBody) { terBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-red-500">Gagal memuat data TER.</td></tr>'; }
+    if (ptkpBody) { ptkpBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-red-500">Gagal memuat data PTKP.</td></tr>'; }
+
+    showPPh21Message(getPPh21Error(error), 'error');
+
+  } finally {
+    pph21Loading = false;
+  }
+}
+
+// RENDER TER TABLE
+function renderPPh21TER() {
+  const body = document.getElementById('pph21TERTableBody');
+  const count = document.getElementById('pph21TERCount');
+  const filter = document.getElementById('pph21TERCategoryFilter');
+
+  if (!body) return;
+
+  const category = filter?.value || 'ALL';
+  const rows = pph21TERData.filter(row => category === 'ALL' || row.TER_Category === category );
+
+  if (count) count.textContent = `${rows.length} tarif`;
+  if (!rows.length) { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-muted">Belum ada tarif untuk kategori ini.</td></tr>'; return; }
+
+  body.innerHTML = rows.map(row => `
+    <tr class="border-t border-outline-variant hover:bg-surface-container-low">
+      <td class="p-3 text-sm"> ${escapePPh21Html(row.TER_Category)} </td>
+      <td class="p-3 text-sm text-right"> ${formatPPh21Rupiah(row.Min_Gross)} </td>
+      <td class="p-3 text-sm text-right"> ${ row.Max_Gross == null ? 'Tidak terbatas' : formatPPh21Rupiah(row.Max_Gross) } </td>
+      <td class="p-3 text-sm text-right"> ${formatPPh21Rupiah(row.Tax_Rate)}%</td>
+      <td class="p-3 text-right">
+        <button type="button"
+          onclick="openPPh21TERForm(${Number(row.TER_ID)})"
+          class="bottom-theme rounded-md px-3 py-2 text-xs font-medium">
+          	Edit
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// OPEN / CLOSE TER FORM
+function openPPh21TERForm(terId = null) {
+  const form = document.getElementById('pph21TERForm');
+  if (!form) { showPPh21Message('Form TER tidak ditemukan.', 'error'); return; }
+
+  const row = terId == null
+    ? null
+    : pph21TERData.find(item => Number(item.TER_ID) === Number(terId));
+  if (terId != null && !row) { showPPh21Message('Tarif TER tidak ditemukan.', 'error'); return; }
+
+  pph21TEREditingId = row ? Number(row.TER_ID) : null;
+  document.getElementById('pph21TERId').value = row ? row.TER_ID : '';
+  document.getElementById('pph21TERCategory').value = row ? row.TER_Category : 'A';
+  document.getElementById('pph21TERMinGross').value = row ? row.Min_Gross : '';
+  document.getElementById('pph21TERMaxGross').value = row && row.Max_Gross != null ? row.Max_Gross : '';
+  document.getElementById('pph21TERRate').value = row ? row.Tax_Rate : '';
+  form.classList.remove('hidden');
+}
+
+function closePPh21TERForm() {
+  const form = document.getElementById('pph21TERForm');
+  if (form) form.classList.add('hidden');
+
+  pph21TEREditingId = null;
+}
+
+// SAVE / INSERT / UPDATE TER
+// RPC: save_pph21_ter
+async function savePPh21TER() {
+  if (pph21Saving) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  const category = document.getElementById('pph21TERCategory')?.value;
+  const minValue = document.getElementById('pph21TERMinGross')?.value;
+  const maxValue = document.getElementById('pph21TERMaxGross')?.value;
+  const rateValue = document.getElementById('pph21TERRate')?.value;
+  const minGross = minValue === '' ? NaN : Number(minValue);
+  const maxGross = maxValue === '' ? null : Number(maxValue);
+  const taxRate = rateValue === '' ? NaN : Number(rateValue);
+
+  if (!['A', 'B', 'C'].includes(category)) { showPPh21Message('Pilih kategori TER yang valid.', 'error'); return; }
+  if (!Number.isFinite(minGross) || minGross < 0) { showPPh21Message('Masukkan batas bruto minimum yang valid.', 'error'); return; }
+  if (maxGross !== null && ( !Number.isFinite(maxGross) || maxGross <= minGross)) { showPPh21Message('Batas maksimum harus lebih besar dari minimum.', 'error'); return; }
+  if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) { showPPh21Message('Tarif pajak harus antara 0 dan 100%.', 'error'); return; }
+
+  pph21Saving = true;
+
+  try {
+    const client = getPPh21Supabase();
+    const { data, error } = await supabaseClient.rpc(
+			'save_pph21_ter', {
+	      p_session_id: sessionId,
+	      p_ter_id: pph21TEREditingId,
+	      p_category: category,
+	      p_min_gross: minGross,
+	      p_max_gross: maxGross,
+	      p_tax_rate: taxRate
+	    });
+
+    if (error) throw error;
+    if (!data?.success) { throw new Error(data?.message || 'Tarif TER gagal disimpan.'); }
+
+    closePPh21TERForm();
+    showPPh21Message(data.message || 'Tarif TER berhasil disimpan.');
+
+    await loadPPh21Settings();
+
+  } catch (error) {
+    console.error('[PPh21] Save TER error:', error);
+    showPPh21Message(getPPh21Error(error), 'error');
+
+  } finally {
+    pph21Saving = false;
+  }
+}
+
+// RENDER PTKP TABLE
+function renderPPh21PTKP() {
+  const body = document.getElementById('pph21PTKPTableBody');
+  const count = document.getElementById('pph21PTKPCount');
+
+  if (!body) return;
+  if (count) count.textContent = `${pph21PTKPData.length} status`;
+  if (!pph21PTKPData.length) { body.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-muted">Data PTKP belum tersedia.</td></tr>'; return; }
+
+  body.innerHTML = pph21PTKPData.map(row => `
+    <tr class="border-t border-outline-variant hover:bg-surface-container-low">
+      <td class="p-3 text-sm font-medium">${escapePPh21Html(row.PTKP_Status)}</td>
+      <td class="p-3 text-sm text-right">${formatPPh21Rupiah(row.Annual_PTKP)}</td>
+      <td class="p-3 text-right">
+        <button type="button"
+          onclick="openPPh21PTKPForm('${escapePPh21Html(row.PTKP_Status)}')"
+          class="bottom-theme rounded-md px-3 py-2 text-xs font-medium">
+          Edit
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// OPEN / CLOSE PTKP FORM
+function openPPh21PTKPForm(status = null) {
+  const form = document.getElementById('pph21PTKPForm');
+  if (!form) { showPPh21Message('Form PTKP tidak ditemukan.', 'error'); return; }
+
+  const row = status
+    ? pph21PTKPData.find(item => item.PTKP_Status === status)
+    : null;
+  if (status && !row) { showPPh21Message('Status PTKP tidak ditemukan.', 'error'); return; }
+
+  pph21PTKPEditingStatus = row ? row.PTKP_Status : null;
+  document.getElementById('pph21PTKPId').value = row ? row.PTKP_ID : '';
+  document.getElementById('pph21PTKPStatus').value = row ? row.PTKP_Status : '';
+  document.getElementById('pph21AnnualPTKP').value = row ? row.Annual_PTKP : '';
+  form.classList.remove('hidden');
+}
+
+function closePPh21PTKPForm() {
+  const form = document.getElementById('pph21PTKPForm');
+  if (form) form.classList.add('hidden');
+
+  pph21PTKPEditingStatus = null;
+}
+
+// SAVE PTKP
+// RPC: save_pph21_ptkp
+async function savePPh21PTKP() {
+  if (pph21Saving) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  const status = pph21PTKPEditingStatus || document.getElementById('pph21PTKPStatus')?.value;
+  const amountValue = document.getElementById('pph21AnnualPTKP')?.value;
+  const annualPTKP = amountValue === '' ? NaN : Number(amountValue);
+
+  if (!status) { showPPh21Message('Pilih status PTKP.', 'error'); return; }
+  if (!Number.isFinite(annualPTKP) || annualPTKP < 0) { showPPh21Message('Masukkan nilai PTKP tahunan yang valid.', 'error'); return; }
+
+  pph21Saving = true;
+
+  try {
+    const client = getPPh21Supabase();
+    const { data, error } = 
+			await supabaseClient.rpc(
+				'save_pph21_ptkp', {
+		      p_session_id: sessionId,
+		      p_ptkp_status: status,
+		      p_annual_ptkp: annualPTKP
+	    	});
+
+    if (error) throw error;
+    if (!data?.success) { throw new Error(data?.message || 'PTKP gagal disimpan.'); }
+
+    closePPh21PTKPForm();
+    showPPh21Message(data.message || 'PTKP berhasil disimpan.');
+
+    await loadPPh21Settings();
+
+  } catch (error) {
+    console.error('[PPh21] Save PTKP error:', error);
+    showPPh21Message(getPPh21Error(error), 'error');
+  } finally {
+    pph21Saving = false;
+  }
+}
+
+// TAB SWITCH
 function switchPPh21Tab(tab) {
+  const isTER = tab === 'TER';
   const terPanel = document.getElementById('pph21TERPanel');
   const ptkpPanel = document.getElementById('pph21PTKPPanel');
   const terButton = document.getElementById('pph21TabTER');
   const ptkpButton = document.getElementById('pph21TabPTKP');
 
   if (!terPanel || !ptkpPanel || !terButton || !ptkpButton) {
-    console.error('Elemen tab PPh 21 tidak lengkap.');
+    console.error('[PPh21] Elemen tab tidak lengkap.');
     return;
   }
-
-  const isTER = tab === 'TER';
 
   terPanel.classList.toggle('hidden', !isTER);
   ptkpPanel.classList.toggle('hidden', isTER);
@@ -36063,6 +36367,7 @@ function switchPPh21Tab(tab) {
   ptkpButton.classList.toggle('border-transparent', isTER);
   ptkpButton.classList.toggle('text-muted', isTER);
 }
+
 
 function populateAttendanceRecapBranchFilter() {
   const branchFilter = document.getElementById('recapBranchFilter');
