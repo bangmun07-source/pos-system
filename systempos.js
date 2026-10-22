@@ -1842,10 +1842,12 @@ function openViewTransactionModal() {
 function renderViewTransaction(wrapper, trx) {
   const n = (v) => Number(v || 0);
   const items = Array.isArray(trx.items) ? trx.items : [];
+	
   wrapper.querySelector("#viewtrxid").innerText = trx.id || "-";
+	
   const dt = trx.date ? new Date(trx.date) : null;
-  wrapper.querySelector("#viewtrxdate").innerText =
-    dt ? dt.toLocaleDateString("id-ID") : "-";
+	
+  wrapper.querySelector("#viewtrxdate").innerText = dt ? dt.toLocaleDateString("id-ID") : "-";
   wrapper.querySelector("#viewtrxtime").innerText =
     dt ? dt.toLocaleTimeString("id-ID", {
       hour: "2-digit",
@@ -1854,14 +1856,14 @@ function renderViewTransaction(wrapper, trx) {
   wrapper.querySelector("#viewtrxtable").innerText = trx.table || "-";
   wrapper.querySelector("#viewtrxcashier").innerText = trx.cashier || "-";
 
-  const subtotal = items.reduce((sum, i) => {
-    return sum + (i.qty || 0) * (i.price || 0);
-  }, 0);
+  const subtotal = items.reduce((sum, i) => { return sum + (i.qty || 0) * (i.price || 0); }, 0);
+	
   wrapper.querySelector("#viewtrxsubtotal").innerText = "IDR " + subtotal.toLocaleString("id-ID");
   wrapper.querySelector("#viewtrxdiscount").innerText = "- IDR " + n(trx.discount).toLocaleString("id-ID");
   wrapper.querySelector("#viewtrxservice").innerText = "IDR " + n(trx.service).toLocaleString("id-ID");
   wrapper.querySelector("#viewtrxtax").innerText = "IDR " + n(trx.tax).toLocaleString("id-ID");
   wrapper.querySelector("#viewtrxtotal").innerText = "IDR " + n(trx.total).toLocaleString("id-ID");
+	
   const container = wrapper.querySelector("#viewtrxitems");
   if (items.length === 0) {
     container.innerHTML = `
@@ -1875,22 +1877,11 @@ function renderViewTransaction(wrapper, trx) {
   container.innerHTML = items.map(item => `
     <div class="grid grid-cols-12 items-start text-xs">
       <div class="col-span-8 pr-3">
-        <div class="font-medium text-sm">
-          ${item.name || "-"}
-        </div>
-				
-        <div class="text-[10px] opacity-60 mt-1">
-          ${item.note || ""}
-        </div>
+        <div class="font-medium text-sm"> ${item.name || "-"} </div>
+        <div class="text-[10px] opacity-60 mt-1"> ${item.note || ""} </div>
       </div>
-
-      <div class="col-span-1 text-center">
-        ${item.qty || 0}
-      </div>
-
-      <div class="col-span-3 text-right font-medium">
-        ${((item.qty || 0) * (item.price || 0)).toLocaleString("id-ID")}
-      </div>
+      <div class="col-span-1 text-center"> ${item.qty || 0} </div>
+      <div class="col-span-3 text-right font-medium"> ${((item.qty || 0) * (item.price || 0)).toLocaleString("id-ID")} </div>
     </div>
   `).join("");
 }
@@ -1913,31 +1904,22 @@ async function sendReceiptWhatsapp() {
   .getElementById("receiptWhatsappInput")
   .value
   .replace(/\D/g, "");
-		if (!phone) {alert("Nomor belum diisi");
-			return;
-		}
+	if (!phone) {alert("Nomor belum diisi"); return; }
+	
   const trxIdEl =document.getElementById( "receiptTransactionId");
-		if (!trxIdEl) { alert("Modal belum siap (receiptTransactionId tidak ada)");
-			return; }
+	if (!trxIdEl) { alert("Modal belum siap (receiptTransactionId tidak ada)"); return; }
+	
   const trxId = trxIdEl.textContent.trim();
-		if (!trxId || trxId === "undefined") { alert("TRX ID kosong");
-			return; }
+	if (!trxId || trxId === "undefined") { alert("TRX ID kosong"); return; }
 	
   try {
 		
     const trx = await getReceiptDataRPC(trxId);
-    if (!trx) {
-      alert("Transaksi tidak ditemukan");
-      return;
-    }
-    sendReceiptWhatsappWithData(
-      trx,
-      phone,
-      null
-    );
-			}
-			catch(err){
-			alert("Gagal mengambil transaksi" );
+    if (!trx) { alert("Transaksi tidak ditemukan"); return; }
+		
+    sendReceiptWhatsappWithData( trx, phone, null );
+	} catch(err){
+		alert("Gagal mengambil transaksi" );
   }
 }
 
@@ -1951,9 +1933,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 	document.body.appendChild(wrapper);
 	// Terapkan tema ke receipt
 	const isDark = document.documentElement.classList.contains("dark");
-	if (isDark) {
-	  wrapper.classList.add("dark");
-	}
+	if (isDark) { wrapper.classList.add("dark"); }
 	
   const n = (v) => Number(v || 0);
   const subtotal = n(trx.subtotal);
@@ -1961,7 +1941,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   
   // HEADER
   wrapper.querySelector("#receiptTitle").textContent =
-  trx.branchName || "-";
+  trx.company_name || "-";
   if (trx.logo_url) {
   wrapper.querySelector("#receiptLogo").src =
     trx.logo_url;
@@ -2030,65 +2010,48 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 		  );
 		});
 	
-		if (!blob) {
-		  throw new Error("Gagal membuat gambar receipt");
-		}
+		if (!blob) { throw new Error("Gagal membuat gambar receipt"); }
 	
 		// UPLOAD LANGSUNG KE SUPABASE STORAGE
 		const fileName = `${trx.id}.jpg`;
-		const {
-		  error: uploadError
+		const { error: uploadError
 		} = await supabaseClient
 		  .storage
 		  .from("Recipes_Digital")
-		  .upload(
-			fileName,
-			blob,
-			{
-			  contentType: "image/jpeg",
-			  upsert: true
-			}
-		  );
-		if (uploadError) {
-		  throw uploadError;
-		}
+		  .upload( fileName, blob,
+				{
+					contentType: "image/jpeg",
+					upsert: true
+				}
+			);
+		if (uploadError) { throw uploadError; }
 			
 		// PUBLIC URL
-	   const {
-		  data: publicData
+	   const { data: publicData
 		} = supabaseClient
 		  .storage
 		  .from("Recipes_Digital")
 		  .getPublicUrl(fileName);
 	
 		const url = publicData?.publicUrl;
-		if (!url) {
-		  throw new Error(
-			"Receipt URL tidak diterima"
-		  );
-		}
-			const sessionId =
-			localStorage.getItem("pos_session_id");
-			if (!sessionId) {
-			  throw new Error("Session login tidak ditemukan");
-			}
+		if (!url) { throw new Error( "Receipt URL tidak diterima" ); }
+			
+		const sessionId = localStorage.getItem("pos_session_id");
+		if (!sessionId) { throw new Error("Session login tidak ditemukan"); }
 		// UPDATE RECEIPT URL
 		const {
 		  data: rpcResult,
 		  error: rpcError
 		} = await supabaseClient.rpc(
 		  "update_receipt_url",
-		  {
-			p_trx_id: trx.id,
-			p_receipt_url: url,
-			p_session_id: sessionId
-		  }
-		);
+			  {
+				p_trx_id: trx.id,
+				p_receipt_url: url,
+				p_session_id: sessionId
+			  }
+			);
 			
-			if (rpcError) {
-			  throw rpcError;
-			}
-			
+			if (rpcError) { throw rpcError; }
 			if (!rpcResult?.success) {
 			  throw new Error(
 				rpcResult?.message ||
