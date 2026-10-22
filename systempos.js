@@ -17349,13 +17349,10 @@ function renderTransferHistory(data) {
 }
 
 function openTransferModal(){
-  const template =
-    document.getElementById(
-      "transferFundModalTemplate"
-    );
-  if(!template){
-    return;
-  }
+  const template = document.getElementById( "transferFundModalTemplate" );
+	
+  if(!template){ return; }
+	
   const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
 }
@@ -17391,7 +17388,6 @@ async function saveTransfer() {
       "success"
     );
     // CLEAR CACHE
-		
     state.cashFlowData = null;
     state.cashFlowFilter = null;
 		state.accountingReportsData = null;
@@ -17429,51 +17425,41 @@ function renderOwnerHistory(rows) {
     `;
     return;
   }
-  container.innerHTML =
-    rows
-    .slice(0, 10)
-    .map(row => {
-      const isCapital = row.Type === "CAPITAL";
-      return `
-        <div class="flex items-center justify-between p-4 px-4 rounded-md border border-outline-variant bg-background">
-          <div class=px-4>
-            <div class="font-semibold text-sm">
-              ${isCapital ? "Add Capital" : "Withdraw"}
-            </div>
+  container.innerHTML = rows
+	.slice(0, 10)
+	.map(row => {
+		const isCapital = row.Type === "CAPITAL";
+		return `
+			<div class="flex items-center justify-between p-4 px-4 rounded-md border border-outline-variant bg-background">
+				<div class=px-4>
+					<div class="font-semibold text-sm"> ${isCapital ? "Add Capital" : "Withdraw"} </div>
+					<div class="text-xs text-muted  mt-1"> ${row.Account || "-"} </div>
+					<div class="text-xs text-muted "> ${row.Note || "-"} </div>
+				</div>
 
-            <div class="text-xs text-muted  mt-1">
-              ${row.Account || "-"}
-            </div>
+				<div class="text-right px-4">
+					<div class="${
+						isCapital
+							? "text-emerald-700"
+							: "text-red-700"
+						} font-bold">
 
-            <div class="text-xs text-muted ">
-              ${row.Note || "-"}
-            </div>
-          </div>
-
-          <div class="text-right px-4">
-            <div class="${
-              isCapital
-                ? "text-emerald-700"
-                : "text-red-700"
-              } font-bold">
-
-              ${
-                isCapital
-                  ? "+"
-                  : "-"
-              }
-              ${formatRupiah(
-                Number(
-                  row.Amount || 0
-                )
-              )}
-            </div>
-          </div>
-        </div>
-      `;
-    }).join("");
+						${
+							isCapital
+								? "+"
+								: "-"
+						}
+						${formatRupiah(
+							Number(
+								row.Amount || 0
+							)
+						)}
+					</div>
+				</div>
+			</div>
+		`;
+	}).join("");
 }
-
 
 async function saveOwnerCapital() {
   await addOwnerTransaction({
@@ -17546,11 +17532,9 @@ async function saveOwnerTransaction() {
   try {
     const account = document.getElementById("ownerAccount").value;
     const amount = Number( document.getElementById("ownerAmount").value );
-    const note =
-      document.getElementById("ownerNote").value.trim();
-    if (!amount || amount <= 0) {
-      throw new Error("Masukkan nominal yang valid.");
-    }
+    const note = document.getElementById("ownerNote").value.trim();
+		
+    if (!amount || amount <= 0) { throw new Error("Masukkan nominal yang valid."); }
     await addOwnerTransaction({
       branchId: state.branchId,
       type: ownerTransactionType,
@@ -17575,6 +17559,7 @@ async function saveOwnerTransaction() {
 function toggleCashFlowNotification(){
   const dropdown =  document.getElementById("cashFlowNotifDropdown");
   if(!dropdown) return;
+	
   dropdown.classList.toggle("hidden");
   if(!dropdown.classList.contains("hidden")){
     loadCashFlowNotification();
@@ -17594,11 +17579,8 @@ async function loadCashFlowNotification() {
   }
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_yesterday_dashboard_summary",
       {
@@ -17607,10 +17589,7 @@ async function loadCashFlowNotification() {
       }
     );
 
-    if (error) {
-      throw error;
-    }
-
+    if (error) { throw error; }
     // CACHE
     state.cashFlowNotification = data || {};
     state.cashFlowNotificationBranch = branchId;
@@ -17632,23 +17611,19 @@ function renderCashFlowNotification(data){
       </p>
 
       <p class="font-bold text-sm">
-        Income :
-        Rp ${formatRupiah(data.cashFlow.income)}
+        Income : Rp ${formatRupiah(data.cashFlow.income)}
       </p>
 
       <p class="font-bold text-sm">
-        Expense :
-        Rp ${formatRupiah(data.cashFlow.expense)}
+        Expense : Rp ${formatRupiah(data.cashFlow.expense)}
       </p>
 
       <p class="font-bold text-sm">
-        Purchase :
-        Rp ${formatRupiah(data.cashFlow.purchase)}
+        Purchase : Rp ${formatRupiah(data.cashFlow.purchase)}
       </p>
 
       <p class="font-bold text-sm text-on-surface mt-2">
-        Net :
-        Rp ${formatRupiah(data.cashFlow.netFlow)}
+        Net : Rp ${formatRupiah(data.cashFlow.netFlow)}
       </p>
     </div>
 	
@@ -17658,13 +17633,11 @@ function renderCashFlowNotification(data){
       </p>
 
       <p class="text-sm">
-        Deposit :
-        Rp ${formatRupiah(data.ownerEquity.deposit)}
+        Deposit : Rp ${formatRupiah(data.ownerEquity.deposit)}
       </p>
 
       <p class="text-sm">
-        Withdrawal :
-        Rp ${formatRupiah(data.ownerEquity.withdrawal)}
+        Withdrawal : Rp ${formatRupiah(data.ownerEquity.withdrawal)}
       </p>
     </div>
 
@@ -17678,8 +17651,7 @@ function renderCashFlowNotification(data){
       </p>
 
       <p class="text-sm">
-        Total :
-        Rp ${formatRupiah(data.fundTransfer.total)}
+        Total : Rp ${formatRupiah(data.fundTransfer.total)}
       </p>
     </div>
   </div>
@@ -17687,8 +17659,7 @@ function renderCashFlowNotification(data){
 }
 
 function updateCashFlowBadge(data){
-  const badge =
-    document.getElementById("cashFlowNotifBadge");
+  const badge = document.getElementById("cashFlowNotifBadge");
   if(!badge) return;
   const active =
     data.cashFlow.income > 0 ||
@@ -17717,19 +17688,15 @@ function closeBackupChat(){
 function sendBackupChat(){
   const input = document.getElementById("backupChatInput");
   const message = input.value.trim();
-  if(!message) return;
-		input.value = "";
-}
+  if(!message) return; input.value = ""; }
 
 function sendBackupChat(){
   const input = document.getElementById("backupChatInput");
   const message = input.value.trim();
 
   if(!message) return;
-  addBackupChatMessage(
-    "user",
-    message
-  );
+  addBackupChatMessage( "user", message );
+	
   input.value = "";
   handleBackupCommand(message);
 }
@@ -17749,11 +17716,10 @@ document.addEventListener("keydown", function(e){
 function addBackupChatMessage(type, text){
   const container = document.getElementById("backupChatMessages");
   const div = document.createElement("div");
-  if(type === "user"){
-    div.className = ` ml-auto max-w-[80%] border border-outline-variant rounded-md bg-background p-5 text-sm lg:text-base text-lift `;
-  }else{
-    div.className = ` max-w-[80%] border border-outline-variant rounded-md bg-background p-5 text-sm lg:text-base `;
-  }
+	
+  if(type === "user"){  div.className = ` ml-auto max-w-[80%] border border-outline-variant rounded-md bg-background p-5 text-sm lg:text-base text-lift `;
+  }else{ div.className = ` max-w-[80%] border border-outline-variant rounded-md bg-background p-5 text-sm lg:text-base `; }
+	
   div.innerHTML = text;
     container.appendChild(div);
     container.scrollTop =
@@ -17804,6 +17770,7 @@ const intents = {
 		"hapus struk digital",
 		"clear digital receipts",
 		"clear receipt",
+		"hapus receipt",
 		"bersihkan struk digital",
 		"hapus semua receipt"
 	]
@@ -17995,17 +17962,13 @@ function extractAnalyticsRange(text){
 
 // MATCH INTENT
 function matchIntent(cmd, keywords){
-  return keywords.some(keyword =>
-    cmd.includes(keyword)
-  );
+  return keywords.some(keyword => cmd.includes(keyword) );
 }
 
 function formatLocalDate(date){
   const year = date.getFullYear();
-  const month = String(date.getMonth()+1) 
-		.padStart(2,"0");
-  const day = String(date.getDate())
-    .padStart(2,"0");
+  const month = String(date.getMonth()+1)  .padStart(2,"0");
+  const day = String(date.getDate()) .padStart(2,"0");
   return `${year}-${month}-${day}`;
 }
 
@@ -18019,35 +17982,18 @@ function handleBackupCommand(message){
      matchIntent(cmd, analyticsIntents.PEAK_HOURS) ||
      matchIntent(cmd, analyticsIntents.PAYMENT) ||
      matchIntent(cmd, analyticsIntents.STOCK_ALERT)
-     ){
-      handleAnalyticsCommand(message);
-    return;
-  }
+     ){ handleAnalyticsCommand(message);
+		return; }
   // RESTORE
-  if(matchIntent(cmd, intents.RESTORE)){
-    loadBackupList();
-    return;
-  }
+  if(matchIntent(cmd, intents.RESTORE)){ loadBackupList(); return; }
   // DELETE BACKUP
-  if(matchIntent(cmd, intents.DELETE_BACKUP)){
-    loadBackupList();
-    return;
-  }
+  if(matchIntent(cmd, intents.DELETE_BACKUP)){ loadBackupList(); return; }
   // CHECK DATABASE
-  if(matchIntent(cmd, intents.CHECK_DATABASE)){
-    loadBackupList();
-    return;
-  }
+  if(matchIntent(cmd, intents.CHECK_DATABASE)){ loadBackupList(); return; }
 	// CLEAR DIGITAL RECEIPTS
-	if(matchIntent(cmd, intents.CLEAR_DIGITAL_RECEIPTS)){
-	  clearDigitalReceiptsConfirm();
-	  return;
-	}
+	if(matchIntent(cmd, intents.CLEAR_DIGITAL_RECEIPTS)){ clearDigitalReceiptsConfirm(); return; }
   // CLEAR DATABASE
-  if(matchIntent(cmd, intents.CLEAR_DATABASE)){
-    clearDatabaseConfirm();
-    return;
-  }
+  if(matchIntent(cmd, intents.CLEAR_DATABASE)){ clearDatabaseConfirm(); eturn; }
   // BACKUP
   if(matchIntent(cmd, intents.BACKUP)){
     setTimeout(()=>{
@@ -18088,13 +18034,13 @@ function handleAnalyticsCommand(message){
   const branchId = state.branchId;
   const today = formatLocalDate(new Date());
   const selectedDate = extractAnalyticsDate(cmd);
+	
   let range = extractAnalyticsRange(cmd);
-  if(!range && !selectedDate){
-    range =
-      extractAnalyticsMonth(cmd);
-  }
+  if(!range && !selectedDate){ range = extractAnalyticsMonth(cmd); }
+	
   let startDate;
   let endDate;
+	
   if(selectedDate){
     startDate = selectedDate;
     endDate = selectedDate;
@@ -18104,64 +18050,57 @@ function handleAnalyticsCommand(message){
     endDate = range.end;
   }
   else{
-    const start =
-      new Date(
-        new Date().getFullYear(),
-        new Date().getMonth(),
-        1
-      );
-    startDate =
-      formatLocalDate(start);
-    endDate =
-      today;
+    const start = new Date(
+			new Date().getFullYear(),
+			new Date().getMonth(),
+			1
+		);
+    startDate = formatLocalDate(start);
+    endDate = today;
   }
 
   if(matchIntent(cmd,analyticsIntents.NET_PROFIT)){
-      getChatAnalytics(startDate, endDate, branchId,
-        data=>{
-          const a = data.analytics || {};
-          let title = "Net Profit";
-          if(startDate === endDate){
-            title = "Net Profit Hari Ini";
-          }
-          else{
-            const totalDays =
-              (
-                new Date(endDate) -
-                new Date(startDate)
-              ) / (1000*60*60*24) + 1;
+		getChatAnalytics(startDate, endDate, branchId,
+			data=>{
+				const a = data.analytics || {};
+				let title = "Net Profit";
+				if(startDate === endDate){
+					title = "Net Profit Hari Ini";
+				}
+				else{
+					const totalDays =
+						(
+							new Date(endDate) -
+							new Date(startDate)
+						) / (1000*60*60*24) + 1;
 
-            if(totalDays <= 7){
-              title = "Net Profit Mingguan";
-            }
-            else{
-              title = "Net Profit Bulanan";
-            }
-          }
+					if(totalDays <= 7){ title = "Net Profit Mingguan"; }
+					else{ title = "Net Profit Bulanan"; }
+				}
 
-          addBackupChatMessage(
-          "bot",
-          `
-          ${title}
-          <br><br>
-          Revenue:
-          Rp ${Number(a.revenue || 0).toLocaleString()}
-            <br><br>
-          HPP: Rp ${Number(a.hpp || 0).toLocaleString()}
-            <br><br> 
-          Gross Profit: Rp ${Number(a.grossProfit || 0).toLocaleString()}
-            <br><br>
-          Operational Expense: Rp ${Number(a.operational || 0).toLocaleString()}
-            <br><br>
-          Net Profit Before Other Income: Rp ${Number(a.netProfitBeforeOtherIncome || 0).toLocaleString()}
-            <br><br>
-          Other Income: Rp ${Number(a.otherIncome || 0).toLocaleString()}
-            <br><br>
-          <b> Final Net Profit: Rp ${Number(a.netProfit || 0).toLocaleString()} </b>
-          `
-          );
-      });
-    return;
+				addBackupChatMessage(
+				"bot",
+				`
+				${title}
+				<br><br>
+				Revenue:
+				Rp ${Number(a.revenue || 0).toLocaleString()}
+					<br><br>
+				HPP: Rp ${Number(a.hpp || 0).toLocaleString()}
+					<br><br> 
+				Gross Profit: Rp ${Number(a.grossProfit || 0).toLocaleString()}
+					<br><br>
+				Operational Expense: Rp ${Number(a.operational || 0).toLocaleString()}
+					<br><br>
+				Net Profit Before Other Income: Rp ${Number(a.netProfitBeforeOtherIncome || 0).toLocaleString()}
+					<br><br>
+				Other Income: Rp ${Number(a.otherIncome || 0).toLocaleString()}
+					<br><br>
+				<b> Final Net Profit: Rp ${Number(a.netProfit || 0).toLocaleString()} </b>
+				`
+				);
+		});
+	return;
   }
 
   if(matchIntent(cmd,analyticsIntents.REVENUE)){
@@ -18174,15 +18113,9 @@ function handleAnalyticsCommand(message){
         ) / (1000*60*60*24) + 1;
 
       let title = "Omzet";
-      if(totalDays === 1){
-        title = "Omzet Hari Ini";
-      }
-      else if(totalDays <= 7){
-        title = "Omzet Mingguan";
-      }
-      else{
-        title = "Omzet Bulanan";
-      }
+      if(totalDays === 1){ title = "Omzet Hari Ini"; }
+      else if(totalDays <= 7){ title = "Omzet Mingguan"; }
+      else{ title = "Omzet Bulanan"; }
 
       addBackupChatMessage(
         "bot",
@@ -18203,30 +18136,28 @@ function handleAnalyticsCommand(message){
         addBackupChatMessage(
         "bot",
         `
-        Produk Terlaris
-        ${item.name}
-        Terjual:
-        ${item.qty} pcs
+        Produk Terlaris ${item.name}
+        Terjual: ${item.qty} pcs
         `
         );
-    });
-    return;
-  }
+    });  return; }
 
   // PEAK HOURS
   if(matchIntent(cmd,analyticsIntents.PEAK_HOURS)){
     getChatAnalytics(startDate, endDate, branchId,
     data=>{
       let selectedDay = null;
-          for(const hari in hariIndex){
-            if(cmd.includes(hari)){
-              selectedDay = hariIndex[hari];
-              break;
-            }
-          }
+				for(const hari in hariIndex){
+					if(cmd.includes(hari)){
+						selectedDay = hariIndex[hari];
+						break;
+					}
+				}
       let peak = null;
       let max = 0;
+			
       const start = new Date(startDate);
+			
       data.peakHours.forEach((dayData, dayIndex)=>{
         if(selectedDay !== null && dayIndex !== selectedDay){
           return;
@@ -18247,9 +18178,7 @@ function handleAnalyticsCommand(message){
         addBackupChatMessage(
           "bot",
           "Belum ada data jam ramai."
-        );
-        return;
-      }
+        ); return; }
 		
       const totalDays =
       (
@@ -18258,29 +18187,17 @@ function handleAnalyticsCommand(message){
       ) / (1000*60*60*24) + 1;
 
       let title = "Jam Ramai";
-        if(totalDays === 1){
-          title = "Jam Transaksi Harian";
-        }
-        else if(totalDays <= 7){
-          title = "Jam Ramai Periode Minggu Ini";
-        }
-        else{
-          title = "Jam Ramai Periode Bulanan";
-        }
+        if(totalDays === 1){ title = "Jam Transaksi Harian"; }
+        else if(totalDays <= 7){ title = "Jam Ramai Periode Minggu Ini"; }
+        else{ title = "Jam Ramai Periode Bulanan"; }
 		
       addBackupChatMessage(
         "bot",
         `
         ${title}
-
-        Hari:
-        ${peak.hari}
-
-        Jam:
-        ${peak.jam}
-
-        Total Transaksi:
-        ${peak.total}
+        Hari: ${peak.hari}
+        Jam: ${peak.jam}
+        Total Transaksi: ${peak.total}
         `
       );
     });
@@ -18322,9 +18239,7 @@ function handleAnalyticsCommand(message){
     getChatAnalytics(startDate, endDate, branchId,
     data=>{
       const stock = data.rawMaterials || [];
-      const low =
-        stock.filter(item =>
-          Number(item.stock || 0) <= Number(item.minStock || 0));
+      const low = stock.filter(item => Number(item.stock || 0) <= Number(item.minStock || 0));
       if(low.length===0){
         addBackupChatMessage(
           "bot",
@@ -18389,9 +18304,7 @@ function clearDigitalReceiptsConfirm(){
 }
 
 async function startClearDigitalReceipts(){
-  const progressId =
-    "digitalReceiptClearProgress-" +
-    Date.now();
+  const progressId = "digitalReceiptClearProgress-" + Date.now();
   addBackupChatMessage(
     "bot",
     `
@@ -18423,43 +18336,18 @@ async function startClearDigitalReceipts(){
         Math.floor(
           Math.random() * 10
         ) + 5;
-      if(progress >= 90){
-        progress = 90;
-      }
-      const bar =
-        document.getElementById(
-          progressId
-        );
-      const text =
-        document.getElementById(
-          progressId + "-text"
-        );
-      if(bar){
-        bar.style.width =
-          progress + "%";
-      }
+      if(progress >= 90){ progress = 90; }
+			
+      const bar = document.getElementById( progressId );
+      const text = document.getElementById( progressId + "-text" );
+			
+      if(bar){ bar.style.width = progress + "%"; }
       if(text){
-        if(progress < 20){
-          text.innerHTML =
-            "Mengecek digital receipt...";
-        }
-        else if(progress < 40){
-          text.innerHTML =
-            "Mencari file struk digital...";
-        }
-        else if(progress < 65){
-          text.innerHTML =
-            "Menghapus file dari Storage...";
-        }
-        else if(progress < 85){
-          text.innerHTML =
-            "Membersihkan receipt URL...";
-        }
-        else{
-
-          text.innerHTML =
-            "Menyelesaikan proses...";
-        }
+        if(progress < 20){ text.innerHTML = "Mengecek digital receipt..."; }
+        else if(progress < 40){ text.innerHTML = "Mencari file struk digital..."; }
+        else if(progress < 65){ text.innerHTML = "Menghapus file dari Storage..."; }
+        else if(progress < 85){ text.innerHTML = "Membersihkan receipt URL..."; }
+        else{ text.innerHTML = "Menyelesaikan proses..."; }
       }
     }, 800);
 
@@ -18479,35 +18367,19 @@ async function startClearDigitalReceipts(){
 		}
 	  );
 
-    const result =
-      await response.json();
+    const result = await response.json();
     if(
       !response.ok ||
       !result.success
-    ){
-      throw new Error(
-        result.error ||
-        "Gagal menghapus struk digital"
-      );
-    }
+    ){ throw new Error( result.error || "Gagal menghapus struk digital" ); }
+		
     clearInterval(interval);
-
     // FINISH 100%
-    const bar =
-      document.getElementById(
-        progressId
-      );
-    const text =
-      document.getElementById(
-        progressId + "-text"
-      );
-    if(bar){
-      bar.style.width = "100%";
-    }
-    if(text){
-      text.innerHTML =
-        "Selesai.";
-    }
+    const bar = document.getElementById( progressId );
+    const text = document.getElementById( progressId + "-text" );
+		
+    if(bar){ bar.style.width = "100%"; }
+    if(text){ text.innerHTML = "Selesai."; }
 
     // HASIL
     setTimeout(() => {
@@ -18523,17 +18395,11 @@ async function startClearDigitalReceipts(){
         `
       );
     }, 500);
-  }
-  catch(error){
+  } catch(error){
     clearInterval(interval);
-    const text =
-      document.getElementById(
-        progressId + "-text"
-      );
-    if(text){
-      text.innerHTML =
-        "Gagal.";
-    }
+    const text = document.getElementById( progressId + "-text" );
+    if(text){ text.innerHTML = "Gagal."; }
+		
     addBackupChatMessage(
       "bot",
       `
@@ -18547,11 +18413,8 @@ async function startClearDigitalReceipts(){
 	
 async function getChatAnalytics(start, end, branchId, callback) {
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_analytics_dashboard",
       {
@@ -18562,9 +18425,7 @@ async function getChatAnalytics(start, end, branchId, callback) {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
     callback(data || {});
   }
   catch (err) {
@@ -18585,15 +18446,12 @@ async function loadBackupList(){
     const data = await getBackupHistoryRPC();
 
     if(data.length === 0){
-
       addBackupChatMessage(
         "bot",
         `
         ⚠️ Belum ada backup tersedia.
         `
-      );
-      return;
-    }
+      ); return; }
 	  
     let html = `
     <b>List Backup Database</b>
@@ -18602,15 +18460,12 @@ async function loadBackupList(){
       <li>
         Sebelum melakukan restore database, pastikan seluruh data pada tabel tujuan sudah dihapus terlebih dahulu untuk menghindari duplikasi atau konflik data.
       </li>
-
       <li>
         Restore backup akan menggantikan data yang ada dengan data dari file backup. Pastikan memilih file backup yang benar sebelum melanjutkan proses.
       </li>
-
       <li>
         Apabila ingin menghapus backup database, pastikan file backup tersebut sudah tidak diperlukan lagi.
       </li>
-
       <li>
         Data backup yang sudah dihapus tidak dapat dikembalikan. Pastikan melakukan pengecekan terlebih dahulu sebelum menjalankan proses delete backup.
       </li>
@@ -18619,11 +18474,7 @@ async function loadBackupList(){
     `;
 	  
     data.forEach(item=>{
-      const size =
-        (
-          (item.file_size || 0) /
-          1024
-        )
+      const size = ((item.file_size || 0) / 1024)
         .toFixed(1);
 
       html += `
@@ -18702,70 +18553,38 @@ async function startBackupProcess() {
 
   let progress = 5;
   const interval = setInterval(() => {
-    progress +=
-      Math.floor(Math.random() * 10) + 5;
-    if (progress >= 90) {
-      progress = 90;
-    }
+    progress += Math.floor(Math.random() * 10) + 5;
+    if (progress >= 90) { progress = 90; }
+		
     const bar = document.getElementById(progressId);
     const text =document.getElementById(progressId + "-text");
-    if (bar) {
-      bar.style.width =
-        progress + "%";
-    }
+		
+    if (bar) { bar.style.width = progress + "%"; }
     if (text) {
-      if (progress < 20) {
-        text.innerHTML =
-          "Mengambil data Transaksi...";
-      }
-      else if (progress < 35) {
-        text.innerHTML =
-          "Mengambil data Member...";
-      }
-      else if (progress < 50) {
-        text.innerHTML =
-          "Mengambil data Ingredient...";
-      }
-      else if (progress < 80) {
-        text.innerHTML =
-          "Mengambil data Produk...";
-      }
-      else {
-        text.innerHTML =
-          "Menyusun file backup JSON...";
-      }
+      if (progress < 20) { text.innerHTML = "Mengambil data Transaksi..."; }
+      else if (progress < 35) { text.innerHTML = "Mengambil data Member..."; }
+      else if (progress < 50) { text.innerHTML = "Mengambil data Ingredient..."; }
+      else if (progress < 80) { text.innerHTML = "Mengambil data Produk..."; }
+      else { text.innerHTML = "Menyusun file backup JSON..."; }
     }
   }, 800);
 
   try {
     // BACKUP SUPABASE
-    const result =
-      await createFullBackup();
-    if (!result?.success) {
-      throw new Error(
-        result?.message ||
-        "Backup gagal"
-      );
-    }
-
+    const result = await createFullBackup();
+		
+    if (!result?.success) { throw new Error( result?.message || "Backup gagal" ); }
 
     clearInterval(interval);
     const bar = document.getElementById(progressId);
     const text = document.getElementById(progressId + "-text");
-    if (bar) {
-      bar.style.width =
-        "100%";
-    }
-    if (text) {
-      text.innerHTML =
-        "Backup selesai";
-    }
+		
+    if (bar) { bar.style.width = "100%"; }
+    if (text) { text.innerHTML = "Backup selesai"; }
 
     setTimeout(() => {
       const progressBox =document.getElementById(progressId + "-box");
-      if (progressBox) {
-        progressBox.remove();
-      }
+      if (progressBox) { progressBox.remove(); }
 
       addBackupChatMessage(
         "bot",
@@ -18774,9 +18593,7 @@ async function startBackupProcess() {
         <br><br>
 
         File:
-        <b>
-          ${result.backup_id}.json
-        </b>
+        <b> ${result.backup_id}.json </b>
 
         <br><br>
 
@@ -18803,16 +18620,12 @@ async function startBackupProcess() {
 let isRestoring = false;
 async function restoreBackup(id) {
   if (isRestoring) return;
-
   if (
     !confirm(
       `Restore ${id}?
-
 			Semua data sekarang akan diganti
 			dengan backup ini.`)
-  ) {
-    return;
-  }
+  ) { return; }
 
   isRestoring = true;
   const progressId = "restore-progress-" + Date.now();
@@ -18843,46 +18656,20 @@ async function restoreBackup(id) {
         Math.floor(
           Math.random() * 10
         ) + 5;
-      if (progress >= 90) {
-        progress = 90;
-      }
-      const bar =
-        document.getElementById(
-          progressId
-        );
-      const text =
-        document.getElementById(
-          progressId + "-text"
-        );
-      if (bar) {
-        bar.style.width =
-          progress + "%";
-      }
+			
+      if (progress >= 90) { progress = 90; }
+			
+      const bar =  document.getElementById( progressId );
+      const text = document.getElementById( progressId + "-text" );
+			
+      if (bar) { bar.style.width = progress + "%"; }
       if (text) {
-        if (progress < 20) {
-          text.innerHTML =
-            "Mengembalikan data Transaksi...";
-        }
-        else if (progress < 35) {
-          text.innerHTML =
-            "Mengembalikan data Member...";
-        }
-        else if (progress < 45) {
-          text.innerHTML =
-            "Mengembalikan data Ingredient...";
-        }
-        else if (progress < 65) {
-          text.innerHTML =
-            "Mengembalikan data Produk...";
-        }
-        else if (progress < 80) {
-          text.innerHTML =
-            "Membaca file backup JSON...";
-        }
-        else {
-          text.innerHTML =
-            "Menyusun kembali database...";
-        }
+        if (progress < 20) { text.innerHTML = "Mengembalikan data Transaksi..."; }
+        else if (progress < 35) { text.innerHTML = "Mengembalikan data Member..."; }
+        else if (progress < 45) { text.innerHTML = "Mengembalikan data Ingredient..."; }
+        else if (progress < 65) { text.innerHTML = "Mengembalikan data Produk..."; }
+        else if (progress < 80) { text.innerHTML = "Membaca file backup JSON..."; }
+        else { text.innerHTML = "Menyusun kembali database..."; }
       }
     }, 800);
 
@@ -18894,39 +18681,21 @@ async function restoreBackup(id) {
     if (
       res?.success === false
     ) {
-      throw new Error(
-        res.message ||
-        "Restore gagal"
-      );
+      throw new Error( res.message || "Restore gagal" );
     }
     clearInterval(interval);
     isRestoring = false;
-    const bar =
-      document.getElementById(
-        progressId
-      );
-    const text =
-      document.getElementById(
-        progressId + "-text"
-      );
-    if (bar) {
-      bar.style.width =
-        "100%";
-    }
-    if (text) {
-      text.innerHTML =
-        "Restore selesai";
-    }
+		
+    const bar = document.getElementById( progressId );
+    const text = document.getElementById( progressId + "-text" );
+		
+    if (bar) { bar.style.width = "100%"; }
+    if (text) { text.innerHTML = "Restore selesai"; }
 
     setTimeout(() => {
-      const box =
-        document.getElementById(
-          progressId + "-box"
-        );
-
-      if (box) {
-        box.remove();
-      }
+      const box = document.getElementById( progressId + "-box" );
+      if (box) { box.remove(); }
+			
       addBackupChatMessage(
         "bot",
         `
@@ -18997,33 +18766,24 @@ async function deleteBackup(id) {
         Math.floor(
           Math.random() * 10
         ) + 5;
-      if (progress >= 90) {
-        progress = 90;
-      }
+      if (progress >= 90) { progress = 90; }
 
       const bar = document.getElementById(progressId);
       const text = document.getElementById(progressId + "-text");
-      if (bar) {
-        bar.style.width =
-          progress + "%";
-      }
+      if (bar) { bar.style.width = progress + "%"; }
 
       if (text) {
         if (progress < 20) {
-          text.innerHTML =
-            "Mencari data backup...";
+          text.innerHTML = "Mencari data backup...";
         }
         else if (progress < 50) {
-          text.innerHTML =
-            "Menghapus file backup JSON...";
+          text.innerHTML = "Menghapus file backup JSON...";
         }
         else if (progress < 80) {
-          text.innerHTML =
-            "Menghapus dari Storage...";
+          text.innerHTML = "Menghapus dari Storage...";
         }
         else {
-          text.innerHTML =
-            "Menghapus riwayat backup...";
+          text.innerHTML = "Menghapus riwayat backup...";
         }
       }
     }, 800);
