@@ -36275,9 +36275,14 @@ function renderPPh21PTKP() {
 }
 
 // OPEN / CLOSE PTKP FORM
+
 function openPPh21PTKPForm(status = null) {
   const form = document.getElementById('pph21PTKPForm');
-  if (!form) { showPPh21Message('Form PTKP tidak ditemukan.', 'error'); return; }
+  const statusInput = document.getElementById('pph21PTKPStatus');
+  const amountInput = document.getElementById('pph21AnnualPTKP');
+  const title = form?.querySelector('h3');
+
+  if (!form || !statusInput || !amountInput) { showPPh21Message('Form PTKP tidak ditemukan.', 'error'); return; }
 
   const row = status
     ? pph21PTKPData.find(item => item.PTKP_Status === status)
@@ -36285,14 +36290,29 @@ function openPPh21PTKPForm(status = null) {
   if (status && !row) { showPPh21Message('Status PTKP tidak ditemukan.', 'error'); return; }
 
   pph21PTKPEditingStatus = row ? row.PTKP_Status : null;
+
   document.getElementById('pph21PTKPId').value = row ? row.PTKP_ID : '';
-  document.getElementById('pph21PTKPStatus').value = row ? row.PTKP_Status : '';
-  document.getElementById('pph21AnnualPTKP').value = row ? row.Annual_PTKP : '';
+
+  statusInput.value = row ? row.PTKP_Status : '';
+  statusInput.readOnly = !!row;
+  statusInput.placeholder = row
+    ? 'Status PTKP'
+    : 'Contoh: K/4';
+  amountInput.value = row ? row.Annual_PTKP : '';
+
+  if (title) {
+    title.textContent = row
+      ? 'Edit Nilai PTKP'
+      : 'Tambah Status PTKP';
+  }
+
   form.classList.remove('hidden');
+  statusInput.focus();
 }
 
 function closePPh21PTKPForm() {
   const form = document.getElementById('pph21PTKPForm');
+
   if (form) form.classList.add('hidden');
 
   pph21PTKPEditingStatus = null;
@@ -36304,32 +36324,41 @@ async function savePPh21PTKP() {
   if (pph21Saving) return;
 
   const sessionId = getPPh21SessionId();
-  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+  if (!sessionId) { showPPh21Message( 'Session tidak ditemukan. Silakan login kembali.', 'error' ); return; }
 
-  const status = pph21PTKPEditingStatus || document.getElementById('pph21PTKPStatus')?.value;
+  const statusSelect = document.getElementById('pph21PTKPStatus');
   const amountValue = document.getElementById('pph21AnnualPTKP')?.value;
+  const status = pph21PTKPEditingStatus || statusSelect?.value;
   const annualPTKP = amountValue === '' ? NaN : Number(amountValue);
 
   if (!status) { showPPh21Message('Pilih status PTKP.', 'error'); return; }
-  if (!Number.isFinite(annualPTKP) || annualPTKP < 0) { showPPh21Message('Masukkan nilai PTKP tahunan yang valid.', 'error'); return; }
+  if (!Number.isFinite(annualPTKP) || annualPTKP < 0) { showPPh21Message( 'Masukkan nilai PTKP tahunan yang valid.', 'error' ); return; }
+
+  // Cegah status duplikat saat menambah data.
+  const isAdding = !pph21PTKPEditingStatus;
+  if (
+    isAdding &&
+    pph21PTKPData.some(item => item.PTKP_Status === status)
+  ) { showPPh21Message( 'Status PTKP tersebut sudah tersedia.', 'error' ); return; }
 
   pph21Saving = true;
 
   try {
-    const client = getPPh21Supabase();
-    const { data, error } = 
-			await supabaseClient.rpc(
-				'save_pph21_ptkp', {
-		      p_session_id: sessionId,
-		      p_ptkp_status: status,
-		      p_annual_ptkp: annualPTKP
-	    	});
+    const { data, error } = await supabaseClient.rpc(
+      'save_pph21_ptkp',
+      {
+        p_session_id: sessionId,
+        p_ptkp_status: status,
+        p_annual_ptkp: annualPTKP
+      }
+    );
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'PTKP gagal disimpan.'); }
 
     closePPh21PTKPForm();
-    showPPh21Message(data.message || 'PTKP berhasil disimpan.');
+
+    showPPh21Message( data.message || 'PTKP berhasil disimpan.' );
 
     await loadPPh21Settings();
 
@@ -36349,10 +36378,7 @@ function switchPPh21Tab(tab) {
   const terButton = document.getElementById('pph21TabTER');
   const ptkpButton = document.getElementById('pph21TabPTKP');
 
-  if (!terPanel || !ptkpPanel || !terButton || !ptkpButton) {
-    console.error('[PPh21] Elemen tab tidak lengkap.');
-    return;
-  }
+  if (!terPanel || !ptkpPanel || !terButton || !ptkpButton) { return; }
 
   terPanel.classList.toggle('hidden', !isTER);
   ptkpPanel.classList.toggle('hidden', isTER);
