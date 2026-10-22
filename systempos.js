@@ -2948,90 +2948,72 @@ async function checkout() {
 }	
 
 async function sendTransaction(payload){
-  if (!payload) {
-    alert("Payload NULL");
-    return;
-  }
+  if (!payload) { alert("Payload NULL"); return; }
 
   try {
     isProcessing = true;
     const btn = document.getElementById("btnCheckout");
-    	if(btn){btn.disabled = true;}
+		if(btn){btn.disabled = true;}
+		
 		const res = await checkoutTransaction(payload);
-	    isProcessing = false;
-	    if(btn){
-	      btn.disabled = false;
-	    }
-	    if(!res){
-	      alert(
-	        "Backend mengembalikan NULL"
-	      );
-	      return;
-	    }
+		isProcessing = false;
+		
+		if(btn){ btn.disabled = false; }
+		if(!res){ alert( "Backend mengembalikan NULL" ); return; }
 
-	    if(res.success){
-	      showToast(
-	        "Transaksi berhasil ✔",
-	        "success"
-	      );
-
-	      if(payload.memberId){
-	        state.memberPageData = null;
-	        state.members = null;
-	      }
-      state.recentTransactionsData = null;
-      state.recentTransactionsFilter = null;
-      state.recentSummaryData = null;
-      state.recentSummaryFilter = null;
-      state.analyticsData = null;
-      state.analyticsFilter = null;
-      state.cashFlowData = null;
-      state.cashFlowFilter = null;
-      state.dashboardData = null;
-      state.tableData = null;
-      state.inventoryData = null;
-      state.inventoryFilter = null;
-      // state.products = null;
-      state.cart = [];
-			state.products = null;
-			state.productsBranchId = null;
-			state.productsRole = null;
-			await loadProducts();
-      state.currentMember = null;
-      state.selectedMember = null;
-      state.currentMemberPoint = 0;
-      state.paymentMethod = null;
-      state.discountActive = false;
-			state.accountingReportsData = null;
-			state.accountingReportsFilter = null;
-      const memberInput = document.getElementById("member-input");
-      const tableInput = document.getElementById("table-input");
-      if(memberInput){
-        memberInput.value = "";
-      }
-      if(tableInput){
-        tableInput.value = "";
-      }
-      renderCart();
-      updateSummary(0);
-    }
-    else{
-      showToast(
-        "Gagal: " + res.message,
-        "error"
+		if(res.success){ showToast( "Transaksi berhasil ✔", "success" );
+		if(payload.memberId){
+			state.memberPageData = null;
+			state.members = null;
+		}
+										
+		state.recentTransactionsData = null;
+		state.recentTransactionsFilter = null;
+		state.recentSummaryData = null;
+		state.recentSummaryFilter = null;
+		state.analyticsData = null;
+		state.analyticsFilter = null;
+		state.cashFlowData = null;
+		state.cashFlowFilter = null;
+		state.dashboardData = null;
+		state.tableData = null;
+		state.inventoryData = null;
+		state.inventoryFilter = null;
+		// state.products = null;
+		state.cart = [];
+		state.products = null;
+		state.productsBranchId = null;
+		state.productsRole = null;
+		await loadProducts();
+		state.currentMember = null;
+		state.selectedMember = null;
+		state.currentMemberPoint = 0;
+		state.paymentMethod = null;
+		state.discountActive = false;
+		state.accountingReportsData = null;
+		state.accountingReportsFilter = null;
+										
+		const memberInput = document.getElementById("member-input");
+		const tableInput = document.getElementById("table-input");
+										
+		if(memberInput){ memberInput.value = ""; }
+		if(tableInput){ tableInput.value = ""; }
+										
+		renderCart();
+		updateSummary(0);
+	  } else{
+			showToast(
+				"Gagal: " + res.message,
+				"error"
       );
     }
-  }
-  catch(err){
+  } catch(err){
     isProcessing = false;
+		
     const btn = document.getElementById("btnCheckout");
-    if(btn){
-      btn.disabled = false;
-    }
-    alert(
-      err.message ||
-      "Error server!"
-    );
+    if(btn){ btn.disabled = false; }
+		
+    alert( err.message || "Error server!" );
   }
 }
 
@@ -3058,9 +3040,7 @@ function selectPayment(method) {
   // Aktifkan tombol yang dipilih
   const activeBtn = document.getElementById("pay-" + method);
   if (activeBtn) {
-    activeBtn.classList.remove(
-      "bg-background",
-    );
+    activeBtn.classList.remove( "bg-background", );
     activeBtn.classList.add(
       "bg-outline-variant",
       "text-foreground"
@@ -3073,13 +3053,9 @@ function selectPayment(method) {
 function updatePaymentUI(method) {
     const el = document.getElementById("payment-info");
     if (!el) return;
-    if(method === "QRIS") {
-        el.innerHTML = `<img src="${qrisImage}" style="max-width:150px;">`;
-    } else if(method === "Bank") {
-        el.innerHTML = `<p>Nomor Rekening: 123456789</p>`;
-    } else {
-        el.innerHTML = `<p>Bayar Tunai di kasir</p>`;
-    }
+    if(method === "QRIS") { el.innerHTML = `<img src="${qrisImage}" style="max-width:150px;">`;
+    } else if(method === "Bank") { el.innerHTML = `<p>Nomor Rekening: 123456789</p>`;
+    } else { el.innerHTML = `<p>Bayar Tunai di kasir</p>`; }
 }
 
 function renderProducts(products) {
@@ -3093,20 +3069,18 @@ function renderProducts(products) {
     const category = p.Kategori || p.category || "-";
 
     return `
-    <div 
-      class="bg-background rounded-md overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)] cursor-pointer hover:scale-[1.02] transition"
-      onclick="addToCartById('${id}')"
-    >
+    <div class="bg-background rounded-md overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)] cursor-pointer hover:scale-[1.02] transition"
+      onclick="addToCartById('${id}')">
 
       <div class="h-24 overflow-hidden">
-        <img 
-          src="${p.Gambar || 'https://via.placeholder.com/150'}"
-          class="w-full h-full object-cover block"
-        />
+        <img src="${p.Gambar || 'https://via.placeholder.com/150'}"
+          class="w-full h-full object-cover block" />
       </div>
 
       <div class="p-3">
-        <h4 class="font-bold text-foreground text-sm lg:text-lg">${name}</h4>
+        <h4 class="font-bold text-foreground text-sm lg:text-lg">
+					${name}
+				</h4>
 
         <div class="flex justify-between items-center mt-1">
           <span class="text-sm lg:text-lg text-muted">
@@ -3122,7 +3096,6 @@ function renderProducts(products) {
           Stock: ${stock}
         </p>
       </div>
-
     </div>
   `;
   }).join("");
@@ -3133,9 +3106,7 @@ async function loadOrders() {
   if (!el) return;
 
   try {
-
-    const data =
-      await getOrdersRPC();
+    const data = await getOrdersRPC();
     el.innerHTML =
       data.map(o => `
         <div>
@@ -3154,13 +3125,11 @@ async function loadOrders() {
 }
 
 function addToCartFromFilter(id) {
-  const product = state.recipes.find(r =>
-    String(r.id || r.ID || r.productId).toLowerCase() === String(id).toLowerCase()
-  );
+  const product = state.recipes.find(r => String(r.id || r.ID || r.productId).toLowerCase() === String(id).toLowerCase() );
   if (!product) return;
+	
   const existing = state.cart.find(i => i.id === id);
-  if (existing) {
-    existing.qty++;
+  if (existing) {  existing.qty++;
   } else {
 		state.cart.push({
 			id: product.ID_Produk,
@@ -3926,7 +3895,6 @@ function closeRedeem() {
 }
 
     
-    
     // =========================
     // MEMBERS PAGE
     // =========================
@@ -3948,27 +3916,16 @@ async function getMemberDetailPage(memberId, branchId) {
   }
 }
 
-async function uploadMemberImage(
-  base64,
-  memberId
-) {
+async function uploadMemberImage( base64, memberId ) {
 
-  if (!base64) {
-    return null;
-  }
-
-  if (!memberId) {
-    throw new Error(
-      "Member ID kosong"
-    );
-  }
+  if (!base64) { return null; }
+  if (!memberId) { throw new Error( "Member ID kosong" ); }
 
   const response =
     await fetch(
       "/api/handle-member-image-upload",
       {
         method: "POST",
-
         headers: {
           "Content-Type":
             "application/json"
@@ -4000,9 +3957,7 @@ async function uploadMemberImage(
 async function loadMembers(callback) {
 
   const el = document.getElementById( "member-table-body" );
-
   if (!el) return;
-
   // LOAD FROM CACHE
   if (state.memberPageData) {
     const data = state.memberPageData;
@@ -4012,8 +3967,7 @@ async function loadMembers(callback) {
     renderTierSettings( state.settings );
     renderMembers( state.members );
 
-    if (callback) { callback(); } 
-			return; }
+    if (callback) { callback(); }  return; }
 
   // LOAD FROM SUPABASE RPC
   try {
@@ -5944,35 +5898,22 @@ async function previewMemberPhoto(e) {
 
 async function loadTables() {
 
-  if (!state.branchId) {
-    return;
-  }
+  if (!state.branchId) { return; }
   // LOAD FROM CACHE
   if (
     state.tableData &&
     state.tableDataBranchId === state.branchId
-  ) {
-    renderTableGrid(
-      state.tableData
-    );
-    return;
-  }
+  ) { renderTableGrid( state.tableData ); return; }
 
   try {
 
     // SUPABASE RPC
-    const res =
-      await getTableDataRPC(
-        state.branchId
-      );
+    const res = await getTableDataRPC( state.branchId );
 		
-    state.tableData =
-      res || [];
-    state.tableDataBranchId =
-      state.branchId;
-    renderTableGrid(
-      state.tableData
-    );
+    state.tableData = res || [];
+    state.tableDataBranchId = state.branchId;
+		
+    renderTableGrid( state.tableData );
   }
 
   catch (err) {
@@ -5984,23 +5925,12 @@ async function loadTables() {
 }
 
 async function loadBilling(mejaId) {
-
   try {
 	
-    if (!mejaId) {
-      renderBilling(null);
-      return;
-    }
-
+    if (!mejaId) { renderBilling(null); return; }
     // SUPABASE RPC
-    const res =
-      await getLatestTransactionByTableRPC(
-        mejaId
-      );
-
-    renderBilling(
-      res || null
-    );
+    const res = await getLatestTransactionByTableRPC( mejaId );
+    renderBilling( res || null );
   }
 
   catch (err) {
@@ -6130,32 +6060,15 @@ function cancelReserve() {
 }
 
 async function saveReserve() {
-  const name =
-    document.getElementById(
-      "reserveName"
-    )?.value?.trim() || "";
-  const note =
-    document.getElementById(
-      "reserveNote"
-    )?.value?.trim() || "";
+  const name = document.getElementById( "reserveName" )?.value?.trim() || "";
+  const note = document.getElementById( "reserveNote" )?.value?.trim() || "";
 
   try {
 
-    if (!selectedTableId) {
-      showToast(
-        "Meja belum dipilih",
-        "error"
-      );
-      return;
-    }
+    if (!selectedTableId) { showToast( "Meja belum dipilih", "error" ); return; }
 
     // SUPABASE RPC
-    const res =
-      await reserveTableRPC(
-        selectedTableId,
-        name,
-        note
-      );
+    const res = await reserveTableRPC( selectedTableId, name, note );
 
     if (res) {
       state.tableData = null;
@@ -6174,20 +6087,12 @@ async function saveReserve() {
 }
 
 async function clearSelectedTable() {
-  if (!selectedTableId) {
-    alert(
-      "Pilih meja dulu!"
-    );
-    return;
-  }
+  if (!selectedTableId) { alert( "Pilih meja dulu!" ); return; }
 
   try {
 	
     // SUPABASE RPC
-    const res =
-      await clearTableStatusRPC(
-        selectedTableId
-      );
+    const res = await clearTableStatusRPC( selectedTableId );
 		
     if (res) {
       // Clear cache
@@ -6196,15 +6101,9 @@ async function clearSelectedTable() {
       await loadTables();
       // Reset selected table
       selectedTableId = null;
-      const info =
-        document.getElementById(
-          "billing-table-info"
-        );
-
-      if (info) {
-        info.innerText =
-          "No Table Selected";
-      }
+			
+      const info = document.getElementById( "billing-table-info" );
+      if (info) { info.innerText = "No Table Selected"; }
     }
   }
   catch (err) {
@@ -6222,26 +6121,18 @@ function renderBilling(data) {
   const statusEl = document.getElementById("billing-table-status");
 
   if (!data) {
-    container.innerHTML =
-      "<p class='text-muted text-sm'>No active transaction</p>";
-
+    container.innerHTML = "<p class='text-muted text-sm'>No active transaction</p>";
     summary.innerHTML = "";
 
-    if (statusEl) {
-      statusEl.innerText = "No Status";
-    }
-
+    if (statusEl) { statusEl.innerText = "No Status"; }
     return;
   }
 
   // STATUS
-  if (statusEl) {
-    statusEl.innerText = data.status || "No Status";
-  }
+  if (statusEl) { statusEl.innerText = data.status || "No Status"; }
 
   // ITEMS
   container.innerHTML = "";
-
   data.items.forEach(item => {
     container.innerHTML += `
       <div class="flex justify-between items-center bg-background p-4 rounded-2xl">
@@ -6360,33 +6251,18 @@ function closeAddTableModal() {
 }
 	
 async function saveNewTable() {
-  const tableName =
-    document
-      .getElementById("newTableName")
-      ?.value
-      ?.trim();
-  if (!tableName) {
-    alert(
-      "Table Name wajib diisi."
-    );
-    return;
-  }
-
-  if (!state.branchId) {
-    alert(
-      "Branch belum tersedia."
-    );
-    return;
-  }
+  const tableName = document
+		.getElementById("newTableName")
+		?.value
+		?.trim();
+  if (!tableName) { alert( "Table Name wajib diisi." ); return; }
+  if (!state.branchId) { alert( "Branch belum tersedia." ); return; }
 
   try {
 	
     // SUPABASE RPC
     const res =
-      await addNewTableRPC(
-        tableName,
-        state.branchId
-      );
+      await addNewTableRPC( tableName, state.branchId );
 
     if (res) {
       closeAddTableModal();
@@ -6394,7 +6270,6 @@ async function saveNewTable() {
       // CLEAR CACHE
       state.tableData = null;
       state.tableDataBranchId = null;
-
       // RELOAD TABLE
       await loadTables();
     }
@@ -6418,31 +6293,20 @@ async function loadInventoryPage(branchId) {
   if (
     state.inventoryData &&
     state.inventoryBranchId === branchId
-  ) {
-
-    renderInventoryPage(
-      state.inventoryData
-    );
-    return;
-  }
+  ) { renderInventoryPage( state.inventoryData ); return; }
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
-    } = await supabaseClient.rpc(
-      "get_inventory_page",
-      {
-        p_branch_id: branchId,
-				p_session_id: sessionId
-      }
-    );
+		const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
+	    } = await supabaseClient.rpc(
+	      "get_inventory_page",
+	      {
+	        p_branch_id: branchId,
+					p_session_id: sessionId
+	      }
+	    );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 		
     // CACHE
     state.inventoryData =
@@ -6452,14 +6316,9 @@ async function loadInventoryPage(branchId) {
         suppliers: [],
         recipes: []
       };
-
-    state.inventoryBranchId =
-      branchId;
-
+    state.inventoryBranchId = branchId;
     // RENDER
-    renderInventoryPage(
-      state.inventoryData
-    );
+    renderInventoryPage( state.inventoryData );
   } catch (err) {
     showToast(
       err?.message ||
@@ -27056,6 +26915,16 @@ let employeeTaxData = [];
 let employeeTaxCurrentPage = 1;
 const employeeTaxPageSize = 10;
 
+/* ==== EMPLOYEE TAX CACHE ==== */
+state.employeeTaxEmployeesCache ??= Object.create(null);
+state.employeeTaxRecordsCache ??= Object.create(null);
+
+/* ==== INVALIDATE EMPLOYEE TAX CACHE ==== */
+function invalidateEmployeeTaxCache() {
+	state.employeeTaxEmployeesCache = Object.create(null);
+	state.employeeTaxRecordsCache = Object.create(null);
+}
+
 /* ==== INITIALIZE EMPLOYEE TAX SECTION ==== */
 async function initEmployeeTaxSection() {
 	const periodFilter = document.getElementById("employeeTaxPeriodFilter");
@@ -27138,50 +27007,76 @@ function getEmployeeTaxBranchId() {
 async function loadEmployeeTaxEmployees() {
 	const select = document.getElementById("employeeTaxEmployeeFilter");
 	if (!select) return;
+
 	const sessionId = localStorage.getItem("pos_session_id");
 	if (!sessionId) return;
+
+	const branchId = getEmployeeTaxBranchId();
+	const cacheKey = JSON.stringify({ sessionId, branchId });
 	const previousEmployeeId = select.value;
 
 	try {
-		const { data, error } = await supabaseClient.rpc(
-			"get_employees",
-			{
-				p_session_id: sessionId,
-				p_branch_id: getEmployeeTaxBranchId(),
-				p_status: null,
-				p_search: null
-			}
-		);
+		let employees;
+		// CACHE HIT
+		if ( Object.prototype.hasOwnProperty.call( state.employeeTaxEmployeesCache, cacheKey )
+		) { employees = state.employeeTaxEmployeesCache[cacheKey];
+		} else {
+			const { data, error } = await supabaseClient.rpc(
+				"get_employees",
+				{
+					p_session_id: sessionId,
+					p_branch_id: branchId,
+					p_status: null,
+					p_search: null
+				}
+			);
 
-		if (error) throw error;
-		const employees = Array.isArray(data)
-			? data
-			: typeof data === "string"
-				? JSON.parse(data)
-				: [];
-		const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
-		const canViewAllBranches =
-			["owner", "accountant"].includes(role);
+			if (error) throw error;
+
+			employees = Array.isArray(data)
+				? data
+				: typeof data === "string"
+					? JSON.parse(data)
+					: [];
+			// SIMPAN CACHE SETELAH RPC BERHASIL
+			state.employeeTaxEmployeesCache[cacheKey] = employees;
+		}
+
+		const role = String(
+			state.user?.role ||
+			state.user?.Role ||
+			""
+		).trim().toLowerCase();
+
+		const canViewAllBranches = ["owner", "accountant"].includes(role);
 		const userBranchId = String(
 			state.user?.branchId ||
-			state.user?.Branch_ID || "" ).trim();
+			state.user?.Branch_ID ||
+			""
+		).trim();
+
 		const visibleEmployees = employees.filter(employee => {
 			if (canViewAllBranches) return true;
 
-			return String(employee.Branch_ID || "").trim() === userBranchId;
+			return String(employee.Branch_ID || "").trim()
+				=== userBranchId;
 		});
 
 		select.innerHTML = '<option value="">All Employees</option>';
+
 		visibleEmployees.forEach(employee => {
 			const option = document.createElement("option");
 
 			option.value = employee.Employee_ID;
 			option.textContent = [
 				employee.Full_Name || "Unnamed Employee",
-				employee.Employee_Code ].filter(Boolean).join(" · ");
+				employee.Employee_Code
+			].filter(Boolean).join(" · ");
+
 			select.appendChild(option);
 		});
-		// Pertahankan pilihan jika employee masih tersedia.
+
+		// Pertahankan pilihan jika karyawan masih tersedia.
 		if (
 			previousEmployeeId &&
 			visibleEmployees.some(
@@ -27191,7 +27086,6 @@ async function loadEmployeeTaxEmployees() {
 			)
 		) { select.value = previousEmployeeId;
 		} else { select.value = ""; }
-		
 	} catch (error) {
 		select.innerHTML = '<option value="">All Employees</option>';
 	}
@@ -27203,45 +27097,72 @@ async function loadEmployeeTaxRecords() {
 	if (!tbody) return;
 
 	const sessionId = localStorage.getItem("pos_session_id");
-	if (!sessionId) { employeeTaxData = []; renderEmployeeTaxTable(); return; }
-	
-	const periodValue = document.getElementById( "employeeTaxPeriodFilter" )?.value || "";
-	const employeeId = document.getElementById( "employeeTaxEmployeeFilter" )?.value || null;
-	const status = document.getElementById( "employeeTaxStatusFilter" )?.value || null;
-	// Input type="month" dikirim sebagai rentang satu bulan.
+
+	if (!sessionId) {
+		employeeTaxData = [];
+		renderEmployeeTaxTable();
+		return;
+	}
+
+	const periodValue = document.getElementById("employeeTaxPeriodFilter")?.value || "";
+	const employeeId = document.getElementById("employeeTaxEmployeeFilter")?.value || null;
+	const status = document.getElementById("employeeTaxStatusFilter")?.value || null;
+	const branchId = getEmployeeTaxBranchId();
+
+	// Input type="month" menjadi rentang satu bulan.
 	let periodFrom = null;
 	let periodTo = null;
-	
+
 	if (/^\d{4}-\d{2}$/.test(periodValue)) {
-		const [year, month] = periodValue
-			.split("-")
-			.map(Number);
-		const lastDay = new Date( year, month, 0 ).getDate();
+		const [year, month] = periodValue.split("-").map(Number);
+		const lastDay = new Date(year, month, 0).getDate();
+
 		periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
-		periodTo = `${year}-${String(month).padStart(2, "0")}-${String( lastDay ).padStart(2, "0")}`;
+		periodTo = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 	}
+
+	// Kunci cache harus mencakup seluruh filter data.
+	const cacheKey = JSON.stringify({
+		sessionId,
+		branchId,
+		periodFrom,
+		periodTo,
+		employeeId,
+		status
+	});
+
+	// CACHE HIT: tidak perlu memanggil RPC.
+	if (
+		Object.prototype.hasOwnProperty.call( state.employeeTaxRecordsCache, cacheKey )
+	) {
+		employeeTaxData = state.employeeTaxRecordsCache[cacheKey];
+		employeeTaxCurrentPage = 1;
+		renderEmployeeTaxTable();
+		return;
+	}
+
 	tbody.innerHTML = `
 		<tr>
 			<td colspan="9"
 				class="px-5 py-10 text-center text-muted">
-					Loading employee tax data...
+				Loading employee tax data...
 			</td>
 		</tr>
 	`;
-	
+
 	try {
 		const { data, error } = await supabaseClient.rpc(
 			"get_employee_tax_records",
 			{
 				p_session_id: sessionId,
-				p_branch_id: getEmployeeTaxBranchId(),
+				p_branch_id: branchId,
 				p_period_from: periodFrom,
 				p_period_to: periodTo,
 				p_employee_id: employeeId,
 				p_status: status
 			}
 		);
-	
+
 		if (error) throw error;
 
 		const result = typeof data === "string"
@@ -27255,11 +27176,14 @@ async function loadEmployeeTaxRecords() {
 				? result.data
 				: [];
 
+		// Simpan hanya hasil RPC yang berhasil.
+		state.employeeTaxRecordsCache[cacheKey] = employeeTaxData;
+		
 		employeeTaxCurrentPage = 1;
 		renderEmployeeTaxTable();
 	} catch (error) {
 		employeeTaxData = [];
-		renderEmployeeTaxTable( "Failed to load employee tax data" );
+		renderEmployeeTaxTable("Failed to load employee tax data");
 	}
 }
 
@@ -28639,9 +28563,7 @@ function getAccountingTaxYear() {
     Number.isInteger(year) &&
     year >= 2000 &&
     year <= 9999
-  ) {
-    return year;
-  }
+  ) { return year; }
   return new Date().getFullYear();
 }
 
@@ -28665,11 +28587,8 @@ function getTaxObligationBranchId() {
 }
 
 function initializeAccountingTaxMonth() {
-  const monthEl =
-    document.getElementById("taxObligationMonth");
-
+  const monthEl = document.getElementById("taxObligationMonth");
   if (!monthEl) return;
-
   if (!monthEl.value) {
     monthEl.value =
       String(new Date().getMonth() + 1);
@@ -28943,7 +28862,6 @@ async function saveTaxObligasiSettings() {
 
   } catch (error) {
     alert( error?.message || "Gagal menyimpan Tax Settings." );
-
   } finally {
     if (button) {
       button.disabled = false;
@@ -29157,14 +29075,9 @@ async function recordTaxObligation() {
     const alreadyRecordedCount = results.filter( item => item.result.already_recorded ).length;
 
     if (selectedBranchId) {
-      if (alreadyRecordedCount) {
-        showToast( `PPh Final ${taxMonth}/${taxYear} untuk ${selectedBranchId} sudah tercatat.`, "info" );
-      } else {
-        showToast( `PPh Final ${taxMonth}/${taxYear} untuk ${selectedBranchId} berhasil dicatat.`, "success" );
-      }
-    } else {
-      showToast( `PPh Final ${taxMonth}/${taxYear}: ${recordedCount} branch berhasil dicatat, ${alreadyRecordedCount} branch sudah tercatat.`, "success" );
-    }
+      if (alreadyRecordedCount) { showToast( `PPh Final ${taxMonth}/${taxYear} untuk ${selectedBranchId} sudah tercatat.`, "info" );
+      } else { showToast( `PPh Final ${taxMonth}/${taxYear} untuk ${selectedBranchId} berhasil dicatat.`, "success" ); }
+    	} else { showToast( `PPh Final ${taxMonth}/${taxYear}: ${recordedCount} branch berhasil dicatat, ${alreadyRecordedCount} branch sudah tercatat.`, "success" ); }
   } catch (error) {
     showToast( error?.message || "Gagal mencatat tax obligation.", "error" );
 
@@ -34009,12 +33922,7 @@ window.saveSchedule = async function() {
    */
   const selectedDate = new Date(`${weekStart}T00:00:00`);
 
-  if (selectedDate.getDay() !== 1) {
-    alert(
-      'Schedule Week harus memilih hari Senin.'
-    );
-    return;
-  }
+  if (selectedDate.getDay() !== 1) { alert( 'Schedule Week harus memilih hari Senin.' ); return; }
 	
   saveCurrentScheduleDayData();
   const days = [
