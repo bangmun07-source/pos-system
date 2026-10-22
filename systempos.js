@@ -27558,7 +27558,18 @@ async function loadEmployeeHealthEmployees() {
 	}
 }
 
-/* ==== LOAD HEALTH CONTRIBUTIONS ==== */
+/* ==============================
+		LOAD HEALTH CONTRIBUTIONS 
+============================== */
+
+/* ==== EMPLOYEE HEALTH CACHE ==== */
+state.employeeHealthRecordsCache ??= Object.create(null);
+
+/* ==== INVALIDATE EMPLOYEE HEALTH CACHE ==== */
+function invalidateEmployeeHealthCache() {
+	state.employeeHealthRecordsCache = Object.create(null);
+}
+
 async function loadEmployeeHealthRecords() {
 	const tbody = document.getElementById( "employeeHealthTableBody" );
 	if (!tbody) return;
@@ -27572,7 +27583,6 @@ async function loadEmployeeHealthRecords() {
 
 	let periodFrom = null;
 	let periodTo = null;
-
 	// Filter month menjadi rentang tanggal satu bulan.
 	if (/^\d{4}-\d{2}$/.test(periodValue)) {
 		const [year, month] = periodValue
@@ -27584,6 +27594,29 @@ async function loadEmployeeHealthRecords() {
 		periodTo = `${year}-${String(month).padStart(2, "0")}-${String( lastDay ).padStart(2, "0")}`;
 	}
 
+	const branchId = getEmployeeHealthBranchId();
+	const cacheKey = JSON.stringify({
+		sessionId,
+		branchId,
+		periodFrom,
+		periodTo,
+		employeeId,
+		status
+	});
+	/* ==== CACHE HIT ==== */
+	if (
+		Object.prototype.hasOwnProperty.call(
+			state.employeeHealthRecordsCache,
+			cacheKey
+		)
+	) {
+		employeeHealthData =
+			state.employeeHealthRecordsCache[cacheKey];
+	
+		employeeHealthCurrentPage = 1;
+		renderEmployeeHealthTable();
+		return;
+	}
 	tbody.innerHTML = `
 		<tr>
 			<td colspan="9"
@@ -27618,7 +27651,7 @@ async function loadEmployeeHealthRecords() {
 			: Array.isArray(result?.data)
 				? result.data
 				: [];
-
+		state.employeeHealthRecordsCache[cacheKey] = employeeHealthData;
 		employeeHealthCurrentPage = 1;
 		renderEmployeeHealthTable();
 
@@ -31931,6 +31964,14 @@ let filteredEmployeeData = [];
 let employeeCurrentPage = 1;
 const employeePageSize = 10;
 
+/* ==== EMPLOYEE CACHE ==== */
+state.employeeRecordsCache ??= Object.create(null);
+
+/* ==== INVALIDATE EMPLOYEE CACHE ==== */
+function invalidateEmployeeCache() {
+  state.employeeRecordsCache = Object.create(null);
+}
+
 async function loadEmployeeBranches() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
@@ -32163,7 +32204,7 @@ window.deleteEmployee = async function (employeeId) {
       );
 
     if (error) { throw error; }
-		
+		invalidateEmployeeCache();
     await loadEmployees();
     alert('Employee berhasil dihapus.');
 
@@ -32308,6 +32349,7 @@ window.saveEmployee = async function () {
 
     if (error) { throw error; }
 
+		invalidateEmployeeCache();
     closeEmployeeModal();
     await loadEmployees();
 
@@ -32509,6 +32551,25 @@ async function loadEmployees() {
     const branchFilter = canViewAllBranches
       ? (selectedBranch || null)
       : (state.user?.branchId || state.user?.Branch_ID || null);
+		const cacheKey = JSON.stringify({  sessionId, branchFilter });
+		
+		/* ==== CACHE HIT ==== */
+		if (
+		  Object.prototype.hasOwnProperty.call(
+		    state.employeeRecordsCache,
+		    cacheKey
+		  )
+		) {
+		  employeeData = state.employeeRecordsCache[cacheKey];
+		  filteredEmployeeData = [...employeeData];
+		  employeeCurrentPage = 1;
+		
+		  renderEmployeeTable();
+		  updateEmployeeSummary();
+		  window.populatePayrollEmployeeFilter?.();
+		  return;
+		}
+		
     const { data, error } = await supabaseClient.rpc(
       'get_employees',
       {
@@ -32522,6 +32583,7 @@ async function loadEmployees() {
     if (error) throw error;
 
     employeeData = Array.isArray(data) ? data : [];
+		state.employeeRecordsCache[cacheKey] = employeeData;
     filteredEmployeeData = [...employeeData];
     employeeCurrentPage = 1;
 
@@ -32783,8 +32845,7 @@ window.editEmployee = async function (employeeId) {
   if (preview) {
     if (employee.Photo_URL) {
       preview.innerHTML = `
-        <img
-          src="${escapeEmployeeHtml(employee.Photo_URL)}"
+        <img src="${escapeEmployeeHtml(employee.Photo_URL)}"
           alt="Employee Photo"
           class="w-full h-full object-cover"
         >
@@ -32860,7 +32921,6 @@ window.closeEmployeeDetailModal = function () {
 };
 
 /* ==== ATTENDANCE ACCOUNT ==== */
-
 window.editEmployeeAttendanceAccount = async function (employeeId) {
   try {
     const employee = employeeData.find( e => e.Employee_ID === employeeId );
@@ -33554,6 +33614,14 @@ let scheduleCurrentPage = 1;
 const schedulePageSize = 14;
 let filteredScheduleData = [];
 
+/* ==== SCHEDULE CACHE ==== */
+state.scheduleRecordsCache ??= Object.create(null);
+
+/* ==== INVALIDATE SCHEDULE CACHE ==== */
+function invalidateScheduleCache() {
+  state.scheduleRecordsCache = Object.create(null);
+}
+
 async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
   const employeeSelect = document.getElementById('scheduleEmployee');
 
@@ -33985,7 +34053,7 @@ window.saveSchedule = async function() {
       );
 
     if (error) { alert( error.message || 'Gagal menyimpan schedule.' ); return; }
-
+		invalidateScheduleCache();
     alert( editingScheduleWeek
 			? 'Schedule berhasil diperbarui.'
 			: 'Schedule berhasil disimpan.'
@@ -34004,6 +34072,20 @@ async function loadSchedules() {
   const sessionId = localStorage.getItem('pos_session_id');
   if (!sessionId) { return; }
 
+  /* ==== CACHE HIT ==== */
+  if (
+    Object.prototype.hasOwnProperty.call(
+      state.scheduleRecordsCache,
+      sessionId
+    )
+  ) {
+    scheduleData = state.scheduleRecordsCache[sessionId];
+
+    populateScheduleFilters();
+    filterSchedules();
+    return;
+  }
+
   try {
     const { data, error } = await supabaseClient.rpc(
       'get_employee_schedules',
@@ -34015,7 +34097,7 @@ async function loadSchedules() {
     if (error) { alert(error.message || 'Gagal mengambil employee schedule.'); return; }
 
     scheduleData = data || [];
-
+		state.scheduleRecordsCache[sessionId] = scheduleData;
     populateScheduleFilters();
     filterSchedules();
 
@@ -34457,11 +34539,9 @@ function updateScheduleDayButtons() {
 
 function updateScheduleWeekDates() {
   const weekInput = document.getElementById('scheduleWeekStart');
-
   if (!weekInput?.value) return;
 
   const monday = new Date(`${weekInput.value}T00:00:00`);
-
   // Pastikan tanggal yang dipilih adalah Monday
   if (monday.getDay() !== 1) {
     alert('Schedule Week harus memilih hari Senin.');
@@ -34510,15 +34590,8 @@ window.resetScheduleWorkingDays = function() {
 };
 
 function initScheduleTimePickers() {
-  const hourIds = [
-    'scheduleStartHour',
-    'scheduleEndHour'
-  ];
-
-  const minuteIds = [
-    'scheduleStartMinute',
-    'scheduleEndMinute'
-  ];
+  const hourIds = [ 'scheduleStartHour', 'scheduleEndHour' ];
+  const minuteIds = [ 'scheduleStartMinute', 'scheduleEndMinute' ];
 
   hourIds.forEach(id => {
     const select = document.getElementById(id);
@@ -34551,6 +34624,14 @@ let filteredEmployeeAttendanceData = [];
 let employeeAttendanceCurrentPage = 1;
 const employeeAttendancePageSize = 10;
 
+/* ==== EMPLOYEE ATTENDANCE CACHE ==== */
+state.employeeAttendanceCache ??= Object.create(null);
+
+/* ==== INVALIDATE EMPLOYEE ATTENDANCE CACHE ==== */
+function invalidateEmployeeAttendanceCache() {
+  state.employeeAttendanceCache = Object.create(null);
+}
+
 async function loadEmployeeAttendance() {
   const sessionId = localStorage.getItem('pos_session_id');
 
@@ -34560,6 +34641,22 @@ async function loadEmployeeAttendance() {
 	const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
 	const canViewAllBranches = ['owner', 'accountant'].includes(role);
   const tbody = document.getElementById('employeeAttendanceTableBody');
+
+	const cacheKey = JSON.stringify({ sessionId, branchId: canViewAllBranches ? null : userBranchId });
+	
+	/* ==== CACHE HIT ==== */
+	if (
+	  Object.prototype.hasOwnProperty.call(
+	    state.employeeAttendanceCache,
+	    cacheKey
+	  )
+	) {
+	  employeeAttendanceData = state.employeeAttendanceCache[cacheKey];
+	
+	  populateEmployeeAttendanceFilters();
+	  filterEmployeeAttendance();
+	  return;
+	}
 
   if (tbody) {
     tbody.innerHTML = `
@@ -34634,6 +34731,8 @@ async function loadEmployeeAttendance() {
 		  : scheduledRows.filter(row =>
 		      String(row.Branch_ID || '').trim() === userBranchId
 		    );
+		
+		state.employeeAttendanceCache[cacheKey] = employeeAttendanceData;
 		
 		populateEmployeeAttendanceFilters();
 		filterEmployeeAttendance();
@@ -35370,6 +35469,8 @@ async function handleSaveEmployeeCheckIn(event) {
     if (error) throw error;
     if (data?.success !== true) { throw new Error( data?.message || 'Gagal menyimpan check-in.' ); }
 		
+		invalidateEmployeeAttendanceCache();
+		invalidateAttendanceRecapCache();
 		await loadEmployeeAttendance();
     closeAttendanceModal('attendanceCheckInModal');
     alert( `Check-in berhasil disimpan pada ${checkInTime}.` );
@@ -35464,7 +35565,9 @@ async function handleSaveEmployeeOvertime(event) {
 
     if (error) throw error;
     if (data?.success === false) { throw new Error( data.message || 'Gagal menyimpan overtime.' ); }
-
+		
+		invalidateEmployeeAttendanceCache();
+		invalidateAttendanceRecapCache();
     await loadEmployeeOvertime();
     closeAttendanceModal('attendanceOvertimeModal');
     renderEmployeeAttendanceTable();
@@ -35530,7 +35633,9 @@ async function handleSaveAttendanceStatus(event) {
 	
 	if (error) throw error;
 	if (data?.success !== true) { throw new Error( data?.message || 'Gagal menyimpan status attendance.' ); }
-	
+		
+	invalidateEmployeeAttendanceCache();
+	invalidateAttendanceRecapCache();
 	await loadEmployeeAttendance();
 	closeAttendanceModal('attendanceStatusModal');
 	
@@ -35611,6 +35716,13 @@ let attendanceRecapCurrentPage = 1;
 const attendanceRecapPageSize = 10;
 let attendanceRecapAttendanceRows = [];
 let attendanceRecapOvertimeRows = [];
+
+/* ==== ATTENDANCE RECAP CACHE ==== */
+state.attendanceRecapCache ??= Object.create(null);
+
+function invalidateAttendanceRecapCache() {
+  state.attendanceRecapCache = Object.create(null);
+}
 
 function getAttendanceRecapRole() {
   return String(
@@ -36184,39 +36296,67 @@ async function loadAttendanceRecap() {
   const [year, month] = period.split('-').map(Number);
   const dateFrom = `${period}-01`;
   const dateTo = `${period}-${String( new Date(year, month, 0).getDate() ).padStart(2, '0')}`;
+	const cacheKey = JSON.stringify({
+	  sessionId,
+	  period,
+	  branchId,
+	  selectedEmployee
+	});
 
   try {
-    const [attendanceResult, overtimeResult] = await Promise.all([
-      supabaseClient.rpc('get_employee_attendance', {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_employee_id: selectedEmployee || null,
-        p_date_from: dateFrom,
-        p_date_to: dateTo,
-        p_status: null
-      }),
-
-      supabaseClient.rpc('get_employee_overtime', {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_employee_id: selectedEmployee || null,
-        p_date_from: dateFrom,
-        p_date_to: dateTo,
-        p_status: 'RECORDED'
-      })
-    ]);
-
-    if (attendanceResult.error) throw attendanceResult.error;
-    if (overtimeResult.error) throw overtimeResult.error;
-
-    const attendanceRows = Array.isArray(attendanceResult.data)
-      ? attendanceResult.data
-      : [];
-    const overtimeRows = Array.isArray(overtimeResult.data)
-      ? overtimeResult.data
-      : [];
-		attendanceRecapAttendanceRows = attendanceRows || [];
-		attendanceRecapOvertimeRows = overtimeRows || [];
+    let attendanceRows;
+		let overtimeRows;
+		
+		if (
+		  Object.prototype.hasOwnProperty.call(
+		    state.attendanceRecapCache,
+		    cacheKey
+		  )
+		) {
+		  // ==== CACHE HIT ====
+		  const cached = state.attendanceRecapCache[cacheKey];
+		
+		  attendanceRows = cached.attendanceRows;
+		  overtimeRows = cached.overtimeRows;
+		} else {
+		  // ==== CACHE MISS: PANGGIL RPC ====
+		  const [attendanceResult, overtimeResult] = await Promise.all([
+		    supabaseClient.rpc('get_employee_attendance', {
+		      p_session_id: sessionId,
+		      p_branch_id: branchId,
+		      p_employee_id: selectedEmployee || null,
+		      p_date_from: dateFrom,
+		      p_date_to: dateTo,
+		      p_status: null
+		    }),
+		
+		    supabaseClient.rpc('get_employee_overtime', {
+		      p_session_id: sessionId,
+		      p_branch_id: branchId,
+		      p_employee_id: selectedEmployee || null,
+		      p_date_from: dateFrom,
+		      p_date_to: dateTo,
+		      p_status: 'RECORDED'
+		    })
+		  ]);
+		
+		  if (attendanceResult.error) throw attendanceResult.error;
+		  if (overtimeResult.error) throw overtimeResult.error;
+		
+		  attendanceRows = Array.isArray(attendanceResult.data)
+		    ? attendanceResult.data
+		    : [];
+		  overtimeRows = Array.isArray(overtimeResult.data)
+		    ? overtimeResult.data
+		    : [];
+		  state.attendanceRecapCache[cacheKey] = {
+		    attendanceRows,
+		    overtimeRows
+		  };
+		}
+		
+		attendanceRecapAttendanceRows = attendanceRows;
+		attendanceRecapOvertimeRows = overtimeRows;
     const employeeMap = new Map();
 
     function ensureEmployee(row) {
