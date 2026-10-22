@@ -27789,7 +27789,7 @@
 	            onclick="openPPh21TERForm()"
 	            class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
 	            <span class="material-symbols-outlined text-sm">add</span>
-	            Tambah Tarif
+	            Add
 	          </button>
 	        </div>
 	        <!-- CATEGORY FILTER -->
@@ -27944,15 +27944,27 @@
 	        </div>
 	      </div>
 	      <!-- ================= PTKP TAB ================= -->
-	      <div id="pph21PTKPPanel" class="hidden space-y-5">
-	        <div>
-	          <h3 class="text-sm font-semibold text-foreground">
-	            Penghasilan Tidak Kena Pajak (PTKP)
-	          </h3>
-	          <p class="text-xs text-muted mt-1">
-	            Manage the annual PTKP amount for each employee tax status.
-	          </p>
-	        </div>
+				<div id="pph21PTKPPanel" class="hidden space-y-5">
+				  <!-- DESCRIPTION + ADD BUTTON -->
+				  <div class="flex items-center justify-between gap-3 flex-wrap">
+				    <div>
+				      <h3 class="text-sm font-semibold text-foreground">
+				        Penghasilan Tidak Kena Pajak (PTKP)
+				      </h3>
+				      <p class="text-xs text-muted mt-1">
+				        Manage the annual PTKP amount for each employee tax status.
+				      </p>
+				    </div>
+				
+				    <button type="button"
+				      onclick="openPPh21PTKPForm()"
+				      class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2" >
+				      <span class="material-symbols-outlined text-sm">
+								add
+							</span>
+				      	Add
+				    </button>
+				  </div>
 	
 	        <!-- PTKP FORM -->
 	        <div id="pph21PTKPForm"
