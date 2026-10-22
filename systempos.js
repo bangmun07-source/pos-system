@@ -36143,22 +36143,40 @@ function renderPPh21TER() {
   if (!body) return;
 
   const category = filter?.value || 'ALL';
-  const rows = pph21TERData.filter(row => category === 'ALL' || row.TER_Category === category );
+  const rows = pph21TERData.filter(
+    row => category === 'ALL' || row.TER_Category === category
+  );
 
   if (count) count.textContent = `${rows.length} tarif`;
-  if (!rows.length) { body.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-muted">Belum ada tarif untuk kategori ini.</td></tr>'; return; }
+
+  if (!rows.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="5" class="p-4 text-center text-muted">
+          Belum ada tarif untuk kategori ini.
+        </td>
+      </tr>`;
+    return;
+  }
 
   body.innerHTML = rows.map(row => `
     <tr class="border-t border-outline-variant hover:bg-surface-container-low">
-      <td class="p-3 text-sm"> ${escapePPh21Html(row.TER_Category)} </td>
-      <td class="p-3 text-sm text-right"> ${formatPPh21Rupiah(row.Min_Gross)} </td>
-      <td class="p-3 text-sm text-right"> ${ row.Max_Gross == null ? 'Tidak terbatas' : formatPPh21Rupiah(row.Max_Gross) } </td>
-      <td class="p-3 text-sm text-right"> ${formatPPh21Rupiah(row.Tax_Rate)}%</td>
-      <td class="p-3 text-right">
+      <td class="p-3 text-sm">${escapePPh21Html(row.TER_Category)}</td>
+      <td class="p-3 text-sm text-right">${formatPPh21Rupiah(row.Min_Gross)}</td>
+      <td class="p-3 text-sm text-right">
+        ${row.Max_Gross == null ? 'Tidak terbatas' : formatPPh21Rupiah(row.Max_Gross)}
+      </td>
+      <td class="p-3 text-sm text-right">${formatPPh21Rupiah(row.Tax_Rate)}%</td>
+      <td class="p-3 text-right whitespace-nowrap">
         <button type="button"
           onclick="openPPh21TERForm(${Number(row.TER_ID)})"
           class="bottom-theme rounded-md px-3 py-2 text-xs font-medium">
-          	Edit
+          Edit
+        </button>
+        <button type="button"
+          onclick="deletePPh21TER(${Number(row.TER_ID)})"
+          class="rounded-md px-3 py-2 text-xs font-medium bg-red-600 text-white hover:bg-red-700">
+          Delete
         </button>
       </td>
     </tr>
@@ -36240,6 +36258,41 @@ async function savePPh21TER() {
 
   } finally {
     pph21Saving = false;
+  }
+}
+
+async function deletePPh21TER(terId) {
+  if (!Number.isFinite(Number(terId)) || Number(terId) <= 0) { showToast('ID tarif TER tidak valid.', 'error'); return; }
+
+  const confirmed = confirm( 'Yakin ingin menghapus tarif TER ini? Data yang dihapus tidak dapat dipulihkan.' );
+  if (!confirmed) return;
+
+  const sessionId = localStorage.getItem('pos_session_id');
+  if (!sessionId) { showToast('Session tidak ditemukan.', 'error'); return; }
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'delete_pph21_ter',
+      {
+        p_session_id: sessionId,
+        p_ter_id: Number(terId)
+      }
+    );
+
+    if (error) throw error;
+    if (data?.success !== true) { throw new Error(data?.message || 'Tarif TER gagal dihapus.'); }
+
+    showToast('Tarif TER berhasil dihapus.', 'success');
+
+    // Muat ulang data dari database agar tabel tetap sinkron.
+    await loadPPh21Settings();
+
+  } catch (error) {
+    console.error('[PPh21] Delete TER error:', error);
+    showToast(
+      error.message || 'Gagal menghapus tarif TER.',
+      'error'
+    );
   }
 }
 
