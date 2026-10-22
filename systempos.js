@@ -36013,10 +36013,7 @@ function initAttendanceRecap() {
 }
 
 
-/* =====================================================
-   MUNO — PPH 21 SETTINGS
-   Load TER/PTKP + Add/Edit TER + Save PTKP
-===================================================== */
+/* ==== Load TER/PTKP + Add/Edit TER + Save PTKP ==== */
 
 let pph21TERData = [];
 let pph21PTKPData = [];
@@ -36025,11 +36022,7 @@ let pph21PTKPEditingStatus = null;
 let pph21Loading = false;
 let pph21Saving = false;
 
-
-// =====================================================
 // HELPERS
-// =====================================================
-
 function getPPh21SessionId() {
   return localStorage.getItem('pos_session_id');
 }
