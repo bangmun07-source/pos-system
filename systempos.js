@@ -33983,7 +33983,6 @@ async function openScheduleModal(schedule = null) {
 
   if (weekStart) {
     weekStart.value = schedule?.Week_Start || '';
-
     weekStart.onchange = async function () {
       updateScheduleWeekDates();
 
@@ -34354,7 +34353,6 @@ window.saveSchedule = async function() {
         }
       );
 
-
     if (error) { alert( error.message || 'Gagal menyimpan schedule.' ); return; }
 
     alert( editingScheduleWeek
@@ -34373,7 +34371,6 @@ window.saveSchedule = async function() {
 
 async function loadSchedules() {
   const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { return; }
 
   try {
@@ -36015,6 +36012,58 @@ function initAttendanceRecap() {
   return loadAttendanceRecap();
 }
 
+/* ==== PPH 21 SETTINGS MODAL ==== */
+function openPPh21SettingsModal() {
+  const modal = document.getElementById('pph21SettingsModal');
+
+  if (!modal) {
+    console.error('PPh 21 Settings Modal tidak ditemukan.');
+    return;
+  }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePPh21SettingsModal() {
+  const modal = document.getElementById('pph21SettingsModal');
+
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+/* ==== PPH 21 SETTINGS TABS ==== */
+function switchPPh21Tab(tab) {
+  const terPanel = document.getElementById('pph21TERPanel');
+  const ptkpPanel = document.getElementById('pph21PTKPPanel');
+  const terButton = document.getElementById('pph21TabTER');
+  const ptkpButton = document.getElementById('pph21TabPTKP');
+
+  if (!terPanel || !ptkpPanel || !terButton || !ptkpButton) {
+    console.error('Elemen tab PPh 21 tidak lengkap.');
+    return;
+  }
+
+  const isTER = tab === 'TER';
+
+  terPanel.classList.toggle('hidden', !isTER);
+  ptkpPanel.classList.toggle('hidden', isTER);
+
+  terButton.classList.toggle('border-primary', isTER);
+  terButton.classList.toggle('text-foreground', isTER);
+  terButton.classList.toggle('border-transparent', !isTER);
+  terButton.classList.toggle('text-muted', !isTER);
+
+  ptkpButton.classList.toggle('border-primary', !isTER);
+  ptkpButton.classList.toggle('text-foreground', !isTER);
+  ptkpButton.classList.toggle('border-transparent', isTER);
+  ptkpButton.classList.toggle('text-muted', isTER);
+}
+
 function populateAttendanceRecapBranchFilter() {
   const branchFilter = document.getElementById('recapBranchFilter');
   if (!branchFilter) return;
@@ -36416,11 +36465,9 @@ window.changeAttendancePage = function(direction) {
 window.viewAttendanceRecapDetail = function(employeeId) {
   const modal = document.getElementById('attendanceRecapDetailModal');
   const summary = attendanceRecapData.find( row => String(row.Employee_ID) === String(employeeId) );
-
   if (!modal || !summary) { return; }
 	
   const period = document.getElementById('recapPeriod')?.value || '';
-	
   if (!/^\d{4}-\d{2}$/.test(period)) { return; }
 
   const [year, month] = period.split('-').map(Number);
@@ -36508,7 +36555,6 @@ window.viewAttendanceRecapDetail = function(employeeId) {
   });
 
   const historyBody = document.getElementById('recapDetailHistoryBody');
-
   if (historyBody) {
     const history = [...attendance].sort((a, b) =>
       String(a.Attendance_Date || '').localeCompare(
@@ -36523,7 +36569,6 @@ window.viewAttendanceRecapDetail = function(employeeId) {
 				const status = String(row.Status || 'NOT_RECORDED')
 					.trim()
 					.toUpperCase();
-
 				const statusClass = {
 					PRESENT: 'text-green-600',
 					LATE: 'text-amber-600',
@@ -36570,7 +36615,6 @@ window.closeAttendanceRecapDetail = function() {
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
-
 
 /* === EMPLOYEE SALARY / PAYROLL === */
 window.calculatePayroll = async function () {
@@ -36621,7 +36665,6 @@ window.calculatePayroll = async function () {
 		// Validasi tambahan: Employee yang dipilih harus sesuai outlet.
 	if (employeeId && employeeFilter) {
 		const selectedOption = employeeFilter.options[employeeFilter.selectedIndex];
-
 		if (!selectedOption) { throw new Error('Employee yang dipilih tidak valid.'); }
 
 		const selectedBranchId = String( selectedOption.dataset.branchId || '' ).trim();
@@ -36658,7 +36701,6 @@ window.calculatePayroll = async function () {
 	if (error) throw error;
 
 	const result = Array.isArray(data) ? data[0] : data;
-
 	if (!result || result.success !== true) { throw new Error( result?.message || 'Calculate Payroll gagal diproses.' ); }
 	// 8. Refresh tabel
 	if (typeof window.loadPayroll === 'function') {
@@ -36743,7 +36785,6 @@ window.recordPayroll = async function () {
     }
   }
 };
-
 
 /* ==== CANCEL RECORD PAYROLL ==== */
 window.cancelRecordPayroll = async function () {
