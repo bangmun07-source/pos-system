@@ -20298,6 +20298,173 @@
       </div>
     </div>
   </div>
+	<!-- EMPLOYEE HEALTH CONTRIBUTION DETAIL MODAL -->
+	<div id="employeeHealthDetailModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+							health_and_safety
+						</span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Employee Health Contribution Detail
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Contribution information and employee health obligations
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeEmployeeHealthDetail()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition"
+	        aria-label="Close detail">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- EMPLOYEE INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Employee identity and assigned outlet
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Name</label>
+	            <div id="employeeHealthDetailEmployeeName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Code</label>
+	            <div id="employeeHealthDetailEmployeeCode"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Outlet</label>
+	            <div id="employeeHealthDetailBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- CONTRIBUTION INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Contribution Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Contribution period, type, and record references
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Contribution Period</label>
+	            <div id="employeeHealthDetailPeriod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Contribution Type</label>
+	            <div id="employeeHealthDetailType"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Status</label>
+	            <div id="employeeHealthDetailStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Contribution ID</label>
+	            <div id="employeeHealthDetailContributionId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Payroll ID</label>
+	            <div id="employeeHealthDetailPayrollId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Created At</label>
+	            <div id="employeeHealthDetailCreatedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- CONTRIBUTION SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Contribution Summary
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Employee and employer contribution amounts
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Employee Contribution</p>
+	            <p id="employeeHealthDetailEmployeeAmount"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Employer Contribution</p>
+	            <p id="employeeHealthDetailEmployerAmount"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Total Contribution</p>
+	            <p id="employeeHealthDetailTotalAmount"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- NOTES -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Notes
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Additional information saved with this contribution
+	          </p>
+	        </div>
+	
+	        <div id="employeeHealthDetailNote"
+	          class="min-h-20 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap break-words">-</div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end shrink-0">
+	      <button type="button"
+	        onclick="closeEmployeeHealthDetail()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>	
 
 
