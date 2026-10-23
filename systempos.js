@@ -27877,7 +27877,148 @@ function toggleEmployeeHealthActionMenu(button, contributionId) {
 	document.body.appendChild(menu);
 }
 
-/* === OTHER LIABILITY === */
+/* === EMPLOYEE HEALTH CONTRIBUTION DETAIL === */
+async function viewEmployeeHealthDetail(contributionId) {
+  const modal = document.getElementById("employeeHealthDetailModal");
+  if (!modal) { showToast("Modal detail iuran kesehatan tidak ditemukan.", "error"); return; }
+
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { showToast("Session tidak ditemukan.", "error"); return; }
+
+  const id = String(contributionId || "").trim();
+  if (!id) { showToast("Contribution ID tidak valid.", "error"); return; }
+
+  const setText = (elementId, value) => {
+    const element = document.getElementById(elementId);
+    if (element) element.textContent = value ?? "-";
+  };
+  const formatDate = (value, options = {}) => {
+    if (!value) return "-";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return date.toLocaleDateString("id-ID", options);
+  };
+  const formatPeriod = (value) => {
+    if (!value) return "-";
+
+    const date = new Date( `${String(value).slice(0, 10)}T00:00:00` );
+
+    if (Number.isNaN(date.getTime())) return "-";
+
+    return date.toLocaleDateString("id-ID", {
+      month: "long",
+      year: "numeric"
+    });
+  };
+
+  const formatAmount = (value) => { return formatAccountingCurrency(Number(value) || 0); };
+  // Reset modal sebelum memuat record baru
+  setText("employeeHealthDetailEmployeeName", "Loading...");
+  setText("employeeHealthDetailEmployeeCode", "-");
+  setText("employeeHealthDetailBranch", "-");
+  setText("employeeHealthDetailPeriod", "-");
+  setText("employeeHealthDetailType", "-");
+  setText("employeeHealthDetailStatus", "-");
+  setText("employeeHealthDetailContributionId", id);
+  setText("employeeHealthDetailPayrollId", "-");
+  setText("employeeHealthDetailCreatedAt", "-");
+  setText("employeeHealthDetailEmployeeAmount", "Rp0");
+  setText("employeeHealthDetailEmployerAmount", "Rp0");
+  setText("employeeHealthDetailTotalAmount", "Rp0");
+  setText("employeeHealthDetailNote", "-");
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "get_employee_health_contribution_detail",
+      {
+        p_session_id: sessionId,
+        p_contribution_id: id
+      }
+    );
+
+    if (error) throw error;
+
+    const result = typeof data === "string"
+      ? JSON.parse(data)
+      : data;
+    if (!result || result.success !== true) { throw new Error( result?.message || "Gagal memuat detail iuran kesehatan." ); }
+
+    const row = result.data;
+    if (!row || typeof row !== "object") { throw new Error("Data detail iuran kesehatan kosong."); }
+
+    const employeeAmount = Number(row.employee_amount) || 0;
+    const employerAmount = Number(row.employer_amount) || 0;
+    const status = String(row.status || "DRAFT")
+      .trim()
+      .toUpperCase();
+    const contributionType = String(row.contribution_type || "")
+      .trim()
+      .toUpperCase();
+    const contributionLabels = {
+      EMPLOYEE_HEALTH_CONTRIBUTION: "Employee Contribution",
+      EMPLOYER_HEALTH_CONTRIBUTION: "Employer Contribution"
+    };
+    const statusLabels = {
+      DRAFT: "DRAFT",
+      CALCULATED: "CALCULATED",
+      IN_PAYROLL: "IN PAYROLL",
+      PAID: "PAID",
+      CANCELLED: "CANCELLED"
+    };
+    // Resolve outlet name from existing branch data, if available
+    const branches = typeof accountingDebtBranches !== "undefined"
+      ? accountingDebtBranches
+      : [];
+    const branchId = String(row.branch_id || "").trim();
+    const branchName = branches.find( branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+
+    setText( "employeeHealthDetailEmployeeName", row.employee_name || "-" );
+    setText( "employeeHealthDetailEmployeeCode", row.employee_code || "-" );
+    setText( "employeeHealthDetailBranch", branchName );
+    setText( "employeeHealthDetailPeriod", formatPeriod(row.contribution_period) );
+    setText( "employeeHealthDetailType", contributionLabels[contributionType] || contributionType || "-" );
+    setText( "employeeHealthDetailStatus", statusLabels[status] || status );
+    setText( "employeeHealthDetailContributionId", row.contribution_id || id );
+    setText( "employeeHealthDetailPayrollId", row.payroll_id || "-" );
+    setText( "employeeHealthDetailCreatedAt", row.created_at
+			? new Date(row.created_at).toLocaleString("id-ID")
+			: "-"
+    );
+    setText( "employeeHealthDetailEmployeeAmount", formatAmount(employeeAmount) );
+    setText( "employeeHealthDetailEmployerAmount", formatAmount(employerAmount) );
+    setText( "employeeHealthDetailTotalAmount", formatAmount(employeeAmount + employerAmount) );
+    setText( "employeeHealthDetailNote", row.note || "-" );
+
+  } catch (error) {
+    console.error(
+      "Error loading employee health contribution detail:",
+      error
+    );
+
+    setText( "employeeHealthDetailEmployeeName", "Failed to load detail" );
+    showToast( error?.message || "Gagal memuat detail iuran kesehatan.", "error" );
+  }
+}
+
+/* ==== CLOSE DETAIL MODAL ==== */
+function closeEmployeeHealthDetail() {
+  const modal = document.getElementById("employeeHealthDetailModal");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+
+/* ======================
+		OTHER LIABILITY 
+======================= */
 let liabilityData = [];
 let filteredLiabilities = [];
 let liabilityCurrentPage = 1;
