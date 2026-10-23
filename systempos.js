@@ -36943,37 +36943,26 @@ window.cancelRecordPayroll = async function () {
   const branchFilter = document.getElementById('payrollBranchFilter');
   const employeeFilter = document.getElementById('payrollEmployeeFilter');
 
-  if (!period) {
-    alert('Pilih periode payroll terlebih dahulu.');
-    return;
-  }
+  if (!period) { alert('Pilih periode payroll terlebih dahulu.'); return; }
 
   const confirmed = confirm(
     'Batalkan Record Payroll untuk filter yang dipilih?\n\n' +
     'Payroll berstatus RECORDED akan dikembalikan ke CALCULATED. ' +
     'Catatan Tax dan BPJS yang terkait juga akan dipulihkan atau dihapus sesuai RPC.'
   );
-
   if (!confirmed) return;
 
   const role = String(state.user?.role || '').toUpperCase();
   const isOwner = role === 'OWNER';
   const isAccountant = role === 'ACCOUNTANT';
-
   const branchId = (isOwner || isAccountant)
     ? (branchFilter?.value || null)
     : (state.user?.branchId || null);
-
   const employeeId = employeeFilter?.value || null;
 
-  if (!isOwner && !isAccountant && !branchId) {
-    alert('Outlet pengguna tidak ditemukan.');
-    return;
-  }
+  if (!isOwner && !isAccountant && !branchId) { alert('Outlet pengguna tidak ditemukan.'); return; }
 
-  const button = document.querySelector(
-    'button[onclick="cancelRecordPayroll()"]'
-  );
+  const button = document.querySelector( 'button[onclick="cancelRecordPayroll()"]' );
 
   try {
     if (button) {
@@ -36992,13 +36981,12 @@ window.cancelRecordPayroll = async function () {
     );
 
     if (error) throw error;
-
     if (!data?.success) {
-      throw new Error(
-        data?.message || 'Gagal membatalkan Record Payroll.'
-      );
-    }
+      throw new Error( data?.message || 'Gagal membatalkan Record Payroll.' ); }
 
+		invalidateEmployeeTaxCache();
+		invalidateEmployeeHealthCache();
+		window.invalidatePayrollCache();
     await window.loadPayroll();
 
     alert(
@@ -37019,48 +37007,32 @@ window.cancelRecordPayroll = async function () {
 };
 
 /* ==== CANCEL RECORD PAYROLL PER EMPLOYEE ==== */
-window.cancelRecordEmployeePayroll = async function (
-  payrollId,
-  payrollPeriod,
-  branchId,
-  employeeId
-) {
-  if (!payrollId || !payrollPeriod || !branchId || !employeeId) {
-    alert('Data payroll tidak lengkap.');
-    return;
-  }
+window.cancelRecordEmployeePayroll = async function ( payrollId, payrollPeriod, branchId, employeeId ) {
+  if (!payrollId || !payrollPeriod || !branchId || !employeeId) { alert('Data payroll tidak lengkap.'); return; }
 
   const confirmed = confirm(
     'Batalkan Record untuk payroll karyawan ini?\n\n' +
     'Status akan dikembalikan dari RECORDED ke CALCULATED.'
   );
-
   if (!confirmed) return;
 
   try {
     const sessionId = localStorage.getItem('pos_session_id');
+    if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
-    if (!sessionId) {
-      throw new Error('Session tidak ditemukan. Silakan login kembali.');
-    }
-
-    const { data, error } = await supabaseClient.rpc(
-      'cancel_record_employee_payroll',
-      {
-        p_session_id: sessionId,
-        p_payroll_period: String(payrollPeriod).slice(0, 10),
-        p_branch_id: branchId,
-        p_employee_id: employeeId
-      }
-    );
+    const { data, error } 
+			= await supabaseClient.rpc(
+	      'cancel_record_employee_payroll',
+	      {
+	        p_session_id: sessionId,
+	        p_payroll_period: String(payrollPeriod).slice(0, 10),
+	        p_branch_id: branchId,
+	        p_employee_id: employeeId
+	      }
+	    );
 
     if (error) throw error;
-
-    if (!data?.success) {
-      throw new Error(
-        data?.message || 'Gagal membatalkan Record Payroll.'
-      );
-    }
+    if (!data?.success) { throw new Error( data?.message || 'Gagal membatalkan Record Payroll.' ); }
 
     alert(
       'Cancel Record berhasil.\n' +
@@ -37069,7 +37041,9 @@ window.cancelRecordEmployeePayroll = async function (
       'Catatan BPJS dihapus: ' + (data.bpjs_deleted ?? 0)
     );
 
-    // Muat ulang tabel payroll
+		invalidateEmployeeTaxCache();
+		invalidateEmployeeHealthCache();
+		window.invalidatePayrollCache();
     await window.loadPayroll();
 
   } catch (error) {
@@ -37093,12 +37067,10 @@ window.invalidatePayrollCache = function () {
 
 window.loadPayroll = async function () {
 	const tableBody = document.getElementById('payrollTableBody');
-
 	if (!tableBody) return;
 
 	try {
 		const sessionId = localStorage.getItem('pos_session_id');
-
 		if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
 		const periodInput = document.getElementById('payrollPeriod');
@@ -37115,15 +37087,11 @@ window.loadPayroll = async function () {
 
 		if (!['OWNER', 'ACCOUNTANT'].includes(role)) {
 		  branchId = String(user?.branchId || '').trim();
-		
-		  if (!branchId) {
-		    throw new Error('Outlet pengguna tidak ditemukan.');
-		  }
+		  if (!branchId) { throw new Error('Outlet pengguna tidak ditemukan.'); }
 		} else if (!branchId || branchId.toUpperCase() === 'ALL') {
 		  branchId = null;
 		}
-
-
+		
 		/* ==== PAYROLL CACHE KEY ==== */
 		const cacheKey = JSON.stringify({
 		  sessionId,
@@ -37164,19 +37132,19 @@ window.loadPayroll = async function () {
 			</tr>
 		`;
 
-		const { data, error } = await supabaseClient.rpc(
-			'get_employee_payrolls',
-			{
-				p_session_id: sessionId,
-				p_payroll_period: period ? `${period}-01` : null,
-				p_branch_id: branchId
-			}
-		);
+		const { data, error } 
+			= await supabaseClient.rpc(
+				'get_employee_payrolls',
+				{
+					p_session_id: sessionId,
+					p_payroll_period: period ? `${period}-01` : null,
+					p_branch_id: branchId
+				}
+			);
 
 		if (error) throw error;
 
 		const result = Array.isArray(data) ? data[0] : data;
-
 		if (!result || result.success !== true) { throw new Error('Gagal mengambil data Payroll.'); }
 
 		window.payrollRows = Array.isArray(result.rows)
@@ -37202,7 +37170,6 @@ window.loadPayroll = async function () {
 		`;
 	}
 };
-
 
 window.populatePayrollEmployeeFilter = function () {
   const employeeFilter = document.getElementById('payrollEmployeeFilter');
@@ -37238,7 +37205,6 @@ window.populatePayrollEmployeeFilter = function () {
     .forEach(employee => {
       const employeeId = String(employee.Employee_ID || '').trim();
       const employeeName = String(employee.Full_Name || '').trim();
-
       if (!employeeId) return;
 
       const option = document.createElement('option');
@@ -37317,7 +37283,6 @@ window.renderPayrollTable = function () {
 
 	const startIndex = (window.payrollCurrentPage - 1) * pageSize;
 	const pageRows = rows.slice(startIndex, startIndex + pageSize);
-
 	if (pageRows.length === 0) {
 		tableBody.innerHTML = `
 			<tr>
