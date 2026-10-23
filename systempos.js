@@ -27877,8 +27877,29 @@ function toggleEmployeeHealthActionMenu(button, contributionId) {
 	document.body.appendChild(menu);
 }
 
+document.addEventListener("click", function(event) {
+  const menu = document.querySelectorAll(
+    '[id^="employeeHealthActionMenu-"]'
+  );
+
+  menu.forEach(popup => {
+    const clickedInsidePopup = popup.contains(event.target);
+    const clickedThreeDots = event.target.closest(
+      'button[onclick^="toggleEmployeeHealthActionMenu"]'
+    );
+
+    if (!clickedInsidePopup && !clickedThreeDots) {
+      popup.remove();
+    }
+  });
+});
+
 /* === EMPLOYEE HEALTH CONTRIBUTION DETAIL === */
 async function viewEmployeeHealthDetail(contributionId) {
+  // Tutup popup menu aksi sebelum membuka detail
+  document.querySelectorAll('[id^="employeeHealthActionMenu-"]')
+    .forEach(menu => menu.remove());
+	
   const modal = document.getElementById("employeeHealthDetailModal");
   if (!modal) { showToast("Modal detail iuran kesehatan tidak ditemukan.", "error"); return; }
 
