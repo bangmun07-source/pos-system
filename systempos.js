@@ -35322,7 +35322,7 @@ window.exportEmployeeSchedule = async function () {
               >
             ` : ''}
 
-            <h1 class="title">Employee SCHEDULE</h1>
+            <h1 class="title">Employee Schedule</h1>
             <div class="branch-title">${esc(branchTitle)}</div>
             <div class="period">
               Week: ${esc(formatDate(weekDates[0]))}
