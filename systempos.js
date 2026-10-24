@@ -35493,22 +35493,28 @@ function closeAttendanceModal(modalId) {
   modal.classList.remove('flex');
 }
 
+
 function exportEmployeeAttendance() {
   // AMBIL DATA
   const recapRows = Array.isArray(filteredAttendanceRecapData)
     ? filteredAttendanceRecapData
     : [];
+
   const attendanceRows = Array.isArray(attendanceRecapAttendanceRows)
     ? attendanceRecapAttendanceRows
     : [];
+
   const overtimeRows = Array.isArray(attendanceRecapOvertimeRows)
     ? attendanceRecapOvertimeRows
     : [];
+
   // FILTER OUTLET DAN NAMA OUTLET
-  const period = document.getElementById("recapPeriod")?.value || "-";
+  const period =
+    document.getElementById("recapPeriod")?.value || "-";
+
   const branch = document.getElementById("recapBranchFilter");
   const selectedBranchId = String(branch?.value || "").trim();
-  const branchLabel = branch?.selectedOptions?.[0]?.textContent?.trim() || "All Outlets";
+
   const branchNameById = new Map(
     Array.from(branch?.options || [])
       .filter(option => String(option.value || "").trim() !== "")
@@ -35517,26 +35523,57 @@ function exportEmployeeAttendance() {
         option.textContent.trim()
       ])
   );
+
   const getBranchName = branchId => {
     const id = String(branchId || "").trim();
-    return branchNameById.get(id) || id;
+    return branchNameById.get(id) || id || "-";
   };
-  const filterByBranch = rows => {
-    if (!selectedBranchId) return rows;
 
-    return rows.filter( row => String(row.Branch_ID || "").trim() === selectedBranchId );
-  };
+  const branchLabel = selectedBranchId
+    ? getBranchName(selectedBranchId)
+    : "All Outlets";
+
+  // WAJIB PILIH OUTLET TERTENTU
+  if (!selectedBranchId) {
+    alert("Silakan pilih Outlet terlebih dahulu sebelum export.");
+    return;
+  }
+
+  // FILTER BERDASARKAN BRANCH_ID
+  const filterByBranch = rows =>
+    rows.filter(row =>
+      String(row.Branch_ID || "").trim() === selectedBranchId
+    );
+
   const filteredRecapRows = filterByBranch(recapRows);
   const filteredAttendanceRows = filterByBranch(attendanceRows);
   const filteredOvertimeRows = filterByBranch(overtimeRows);
 
+  // DEBUG FILTER
+  console.log("Employee Attendance Export:", {
+    selectedBranchId,
+    branchLabel,
+    recapBefore: recapRows.length,
+    recapAfter: filteredRecapRows.length,
+    recapBranchIDs: [
+      ...new Set(recapRows.map(row => row.Branch_ID))
+    ],
+    attendanceBefore: attendanceRows.length,
+    attendanceAfter: filteredAttendanceRows.length,
+    overtimeBefore: overtimeRows.length,
+    overtimeAfter: filteredOvertimeRows.length
+  });
+
   if (!filteredRecapRows.length) {
-    alert("Tidak ada data attendance recap untuk outlet yang dipilih.");
+    alert(
+      `Tidak ada data attendance recap untuk ${branchLabel}.`
+    );
     return;
   }
 
   // FORMAT DATA
-  const formatDate = value => String(value || "").slice(0, 10);
+  const formatDate = value =>
+    String(value || "").slice(0, 10);
 
   const formatTime = value => {
     if (!value) return "";
@@ -35719,7 +35756,9 @@ function exportEmployeeAttendance() {
 
   for (let col = 0; col < 12; col++) {
     const cell = `${String.fromCharCode(65 + col)}6`;
-    setExcelStyle(ws, cell, { font: { bold: true } });
+    setExcelStyle(ws, cell, {
+      font: { bold: true }
+    });
   }
 
   // STYLE OVERTIME HISTORY
@@ -35732,12 +35771,19 @@ function exportEmployeeAttendance() {
   const overtimeHeaderRow = overtimeTitleRow + 1;
 
   for (let col = 0; col < 9; col++) {
-    const cell = `${String.fromCharCode(65 + col)}${overtimeHeaderRow}`;
-    if (ws[cell]) { setExcelStyle(ws, cell, { font: { bold: true } }); }
+    const cell =
+      `${String.fromCharCode(65 + col)}${overtimeHeaderRow}`;
+
+    if (ws[cell]) {
+      setExcelStyle(ws, cell, {
+        font: { bold: true }
+      });
+    }
   }
 
   // STYLE ATTENDANCE HISTORY
-  const historyTitleRow = overtimeHeaderRow + overtimeHistory.length + 2;
+  const historyTitleRow =
+    overtimeHeaderRow + overtimeHistory.length + 2;
 
   setExcelStyle(ws, `A${historyTitleRow}`, {
     font: { bold: true, sz: 12 }
@@ -35746,14 +35792,22 @@ function exportEmployeeAttendance() {
   const historyHeaderRow = historyTitleRow + 1;
 
   for (let col = 0; col < 12; col++) {
-    const cell = `${String.fromCharCode(65 + col)}${historyHeaderRow}`;
-    if (ws[cell]) { setExcelStyle(ws, cell, { font: { bold: true } }); }
+    const cell =
+      `${String.fromCharCode(65 + col)}${historyHeaderRow}`;
+
+    if (ws[cell]) {
+      setExcelStyle(ws, cell, {
+        font: { bold: true }
+      });
+    }
   }
 
   // EXPORT EXCEL
+  const safePeriod = String(period).replace(/[\\/:*?"<>|]/g, "-");
+
   XLSX.writeFile(
     wb,
-    `employee-attendance-${period}.xlsx`
+    `employee-attendance-${safePeriod}.xlsx`
   );
 }
 
