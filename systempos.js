@@ -35493,55 +35493,272 @@ function closeAttendanceModal(modalId) {
   modal.classList.remove('flex');
 }
 
-/* EXPORT CSV */
+
+/* EXPORT EMPLOYEE ATTENDANCE XLSX */
 function exportEmployeeAttendance() {
-  const rows = filteredEmployeeAttendanceData;
+  const rows = Array.isArray(filteredEmployeeAttendanceData)
+    ? filteredEmployeeAttendanceData
+    : [];
 
-  if (!rows.length) { alert('Tidak ada data attendance untuk diekspor.'); return; }
+  if (!rows.length) {
+    alert("Tidak ada data attendance untuk diekspor.");
+    return;
+  }
 
-  const headers = [
-    'Employee Code',
-    'Employee Name',
-    'Branch',
-    'Attendance Date',
-    'Schedule Start',
-    'Schedule End',
-    'Check In',
-    'Check Out',
-    'Late Minutes',
-    'Work Minutes',
-    'Status',
-    'Note'
+  const period = typeof getEmployeeAttendancePeriod === "function"
+    ? getEmployeeAttendancePeriod()
+    : "Sesuai filter";
+
+  const branch = typeof getEmployeeAttendanceBranch === "function"
+    ? getEmployeeAttendanceBranch()
+    : "Sesuai akses";
+
+  const normalizeStatus = value =>
+    String(value || "NOT_RECORDED")
+      .trim()
+      .toUpperCase()
+      .replace(/[\s-]+/g, "_");
+
+  const employeeMap = new Map();
+
+  rows.forEach(row => {
+    const employeeId = String(row.Employee_ID || "").trim();
+
+    if (!employeeId) return;
+
+    if (!employeeMap.has(employeeId)) {
+      employeeMap.set(employeeId, {
+        employeeId,
+        code: row.Employee_Code || "-",
+        name: row.Full_Name || "-",
+        branch: row.Branch_ID || "-",
+        schedule: 0,
+        present: 0,
+        late: 0,
+        absent: 0,
+        leave: 0,
+        sick: 0,
+        permission: 0,
+        lateMinutes: 0,
+        overtime: 0
+      });
+    }
+
+    const item = employeeMap.get(employeeId);
+    const status = normalizeStatus(row.Status);
+
+    // Setiap baris merepresentasikan satu jadwal aktif.
+    item.schedule++;
+
+    // Pisahkan status kehadiran.
+    if (status === "PRESENT" || status === "ON_TIME") {
+      item.present++;
+    } else if (status === "LATE") {
+      item.late++;
+    } else if (status === "ABSENT") {
+      item.absent++;
+    } else if (status === "LEAVE" || status === "ON_LEAVE") {
+      item.leave++;
+    } else if (status === "SICK") {
+      item.sick++;
+    } else if (
+      status === "PERMISSION" ||
+      status === "PERMITTED"
+    ) {
+      item.permission++;
+    }
+
+    item.lateMinutes += Number(row.Late_Minutes || 0);
+
+    // Mendukung beberapa kemungkinan nama field overtime.
+    const overtimeValue =
+      row.Overtime_Minutes ??
+      row.Overtime ??
+      row.Overtime_Hours ??
+      0;
+
+    item.overtime += Number(overtimeValue || 0);
+  });
+
+  const recap = [...employeeMap.values()]
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  const historyRows = [...rows].sort((a, b) => {
+    const dateCompare = String(a.Attendance_Date || "")
+      .localeCompare(String(b.Attendance_Date || ""));
+
+    return dateCompare ||
+      String(a.Full_Name || "").localeCompare(String(b.Full_Name || ""));
+  });
+
+  const output = [
+    ["EMPLOYEE ATTENDANCE REPORT", "", "", "", "", "", "", "", "", ""],
+    [`Period: ${period}`, "", "", "", "", "", "", "", "", ""],
+    [`Branch: ${branch}`, "", "", "", "", "", "", "", "", ""],
+    [""],
+    ["ATTENDANCE RECAP"],
+    [
+      "Employee Code",
+      "Employee",
+      "Branch",
+      "Schedule",
+      "Present",
+      "Late",
+      "Absent",
+      "Leave",
+      "Sick",
+      "Permission",
+      "Late Minutes",
+      "Overtime"
+    ]
   ];
-  const csvEscape = value => `"${String(value ?? '').replace(/"/g, '""')}"`;
-  const csvRows = rows.map(row => [
-    row.Employee_Code,
-    row.Full_Name,
-    row.Branch_ID,
-    row.Attendance_Date,
-    row.Start_Time,
-    row.End_Time,
-    row.Check_In,
-    row.Check_Out,
-    row.Late_Minutes,
-    row.Work_Minutes,
-    row.Status,
-    row.Note
-  ]);
-  const csv = '\uFEFF' + [
-    headers,
-    ...csvRows
-  ].map(row => row.map(csvEscape).join(',')).join('\r\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
 
-  link.href = url;
-  link.download = `employee-attendance-${new Date().toISOString().slice(0, 10)}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  recap.forEach(item => {
+    output.push([
+      item.code,
+      item.name,
+      item.branch,
+      item.schedule,
+      item.present,
+      item.late,
+      item.absent,
+      item.leave,
+      item.sick,
+      item.permission,
+      item.lateMinutes,
+      item.overtime
+    ]);
+  });
+
+  const recapEndRow = output.length;
+
+  output.push([""]);
+  output.push(["ATTENDANCE HISTORY"]);
+  output.push([
+    "Employee Code",
+    "Employee",
+    "Branch",
+    "Attendance Date",
+    "Schedule Start",
+    "Schedule End",
+    "Check In",
+    "Check Out",
+    "Late Minutes",
+    "Work Minutes",
+    "Status",
+    "Note"
+  ]);
+
+  historyRows.forEach(row => {
+    output.push([
+      row.Employee_Code || "-",
+      row.Full_Name || "-",
+      row.Branch_ID || "-",
+      row.Attendance_Date || row.Schedule_Date || "",
+      row.Start_Time || "",
+      row.End_Time || "",
+      row.Check_In || "",
+      row.Check_Out || "",
+      Number(row.Late_Minutes || 0),
+      Number(row.Work_Minutes || 0),
+      normalizeStatus(row.Status),
+      row.Note || ""
+    ]);
+  });
+
+  const historyHeaderRow = recapEndRow + 2;
+  const historyStartRow = historyHeaderRow + 1;
+  const lastRow = output.length;
+
+  const { wb, ws } = createAccountingWorkbook(
+    "Attendance",
+    output,
+    [
+      "A1:L1",
+      "A2:L2",
+      "A3:L3",
+      "A5:L5",
+      `A${recapEndRow + 1}:L${recapEndRow + 1}`,
+      `A${historyHeaderRow}:L${historyHeaderRow}`
+    ],
+    [18, 24, 18, 12, 12, 12, 12, 12, 15, 15, 18, 30]
+  );
+
+  // Judul laporan.
+  ["A1", "A2", "A3"].forEach(cell => {
+    setExcelStyle(ws, cell, {
+      font: { bold: true },
+      alignment: { horizontal: "center", vertical: "center" }
+    });
+  });
+
+  setExcelStyle(ws, "A1", {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  });
+
+  // Header recap dan history.
+  [6, historyHeaderRow].forEach(rowNumber => {
+    for (let col = 0; col < 12; col++) {
+      const cellAddress =
+        `${String.fromCharCode(65 + col)}${rowNumber}`;
+
+      setExcelStyle(ws, cellAddress, {
+        font: { bold: true },
+        alignment: {
+          horizontal: "center",
+          vertical: "center",
+          wrapText: true
+        }
+      });
+    }
+  });
+
+  // Format angka pada recap.
+  for (let r = 7; r <= recapEndRow; r++) {
+    for (let c = 3; c <= 11; c++) {
+      const cellAddress =
+        `${String.fromCharCode(65 + c)}${r}`;
+
+      const cell = ws[cellAddress];
+      if (!cell) continue;
+
+      cell.s = {
+        ...(cell.s || {}),
+        alignment: { horizontal: "right", vertical: "center" },
+        numFmt: "#,##0"
+      };
+    }
+  }
+
+  // Format angka pada history.
+  for (let r = historyStartRow; r <= lastRow; r++) {
+    ["I", "J"].forEach(column => {
+      const cell = ws[`${column}${r}`];
+      if (!cell) return;
+
+      cell.s = {
+        ...(cell.s || {}),
+        alignment: { horizontal: "right", vertical: "center" },
+        numFmt: "#,##0"
+      };
+    });
+  }
+
+  // Tebalkan judul bagian.
+  [
+    "A5",
+    `A${recapEndRow + 2}`
+  ].forEach(cell => {
+    setExcelStyle(ws, cell, {
+      font: { bold: true }
+    });
+  });
+
+  XLSX.writeFile(
+    wb,
+    `employee-attendance-${new Date().toISOString().slice(0, 10)}.xlsx`
+  );
 }
 
 let employeeOvertimeData = [];
