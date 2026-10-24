@@ -35814,20 +35814,17 @@ async function handleSaveAttendanceStatus(event) {
 	}
 }
 
-
 function initCheckInTimePickers() {
   const hourSelect = document.getElementById('checkInHour');
   const minuteSelect = document.getElementById('checkInMinute');
 
   if (!hourSelect || !minuteSelect) return;
-
   if (hourSelect.options.length <= 1) {
     for (let hour = 0; hour < 24; hour++) {
       const value = String(hour).padStart(2, '0');
       hourSelect.add(new Option(value, value));
     }
   }
-
   if (minuteSelect.options.length <= 1) {
     for (let minute = 0; minute < 60; minute++) {
       const value = String(minute).padStart(2, '0');
@@ -35837,14 +35834,8 @@ function initCheckInTimePickers() {
 }
 
 function initOvertimeTimePickers() {
-  const hourIds = [
-    'overtimeStartHour',
-    'overtimeEndHour'
-  ];
-  const minuteIds = [
-    'overtimeStartMinute',
-    'overtimeEndMinute'
-  ];
+  const hourIds = [ 'overtimeStartHour', 'overtimeEndHour' ];
+  const minuteIds = [ 'overtimeStartMinute', 'overtimeEndMinute' ];
 
   hourIds.forEach(id => {
     const select = document.getElementById(id);
@@ -35869,56 +35860,8 @@ function initOvertimeTimePickers() {
 
 
 /* =========================================================
-   ATTENDANCE RECAP — READ DATA
+   Load TER/PTKP + Add/Edit TER + Save PTKP
 ========================================================= */
-
-let attendanceRecapData = [];
-let filteredAttendanceRecapData = [];
-let attendanceRecapCurrentPage = 1;
-const attendanceRecapPageSize = 10;
-let attendanceRecapAttendanceRows = [];
-let attendanceRecapOvertimeRows = [];
-
-/* ==== ATTENDANCE RECAP CACHE ==== */
-state.attendanceRecapCache ??= Object.create(null);
-
-function invalidateAttendanceRecapCache() {
-  state.attendanceRecapCache = Object.create(null);
-}
-
-function getAttendanceRecapRole() {
-  return String(
-    state.user?.role || state.user?.Role || ''
-  ).trim().toLowerCase();
-}
-
-function initAttendanceRecap() {
-  const periodInput = document.getElementById('recapPeriod');
-  const branchFilter = document.getElementById('recapBranchFilter');
-  const employeeFilter = document.getElementById('recapEmployeeFilter');
-
-  if (!periodInput || !branchFilter || !employeeFilter) return;
-  if (!periodInput.value) {
-    const now = new Date();
-    periodInput.value =
-      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  }
-
-  populateAttendanceRecapBranchFilter();
-  populateAttendanceRecapEmployeeFilter();
-  // Outlet berubah: perbarui daftar karyawan dan rekap.
-  branchFilter.onchange = async function () {
-    populateAttendanceRecapEmployeeFilter();
-    await loadAttendanceRecap();
-  };
-
-  employeeFilter.onchange = loadAttendanceRecap;
-  periodInput.onchange = loadAttendanceRecap;
-  return loadAttendanceRecap();
-}
-
-
-/* ==== Load TER/PTKP + Add/Edit TER + Save PTKP ==== */
 
 let pph21TERData = [];
 let pph21PTKPData = [];
@@ -35972,7 +35915,6 @@ function getPPh21Supabase() {
 function getPPh21Error(error) {
   return error?.message || 'Terjadi kesalahan saat memproses PPh 21.';
 }
-
 
 // OPEN POPUP + LOAD DATA
 async function openPPh21SettingsModal() {
@@ -36243,7 +36185,6 @@ function openPPh21PTKPForm(status = null) {
   pph21PTKPEditingStatus = row ? row.PTKP_Status : null;
 
   document.getElementById('pph21PTKPId').value = row ? row.PTKP_ID : '';
-
   statusInput.value = row ? row.PTKP_Status : '';
   statusInput.readOnly = !!row;
   statusInput.placeholder = row
@@ -36263,7 +36204,6 @@ function openPPh21PTKPForm(status = null) {
 
 function closePPh21PTKPForm() {
   const form = document.getElementById('pph21PTKPForm');
-
   if (form) form.classList.add('hidden');
 
   pph21PTKPEditingStatus = null;
@@ -36345,6 +36285,54 @@ function switchPPh21Tab(tab) {
   ptkpButton.classList.toggle('text-muted', isTER);
 }
 
+/* =========================================================
+   ATTENDANCE RECAP — READ DATA
+========================================================= */
+
+let attendanceRecapData = [];
+let filteredAttendanceRecapData = [];
+let attendanceRecapCurrentPage = 1;
+const attendanceRecapPageSize = 10;
+let attendanceRecapAttendanceRows = [];
+let attendanceRecapOvertimeRows = [];
+
+/* ==== ATTENDANCE RECAP CACHE ==== */
+state.attendanceRecapCache ??= Object.create(null);
+
+function invalidateAttendanceRecapCache() {
+  state.attendanceRecapCache = Object.create(null);
+}
+
+function getAttendanceRecapRole() {
+  return String(
+    state.user?.role || state.user?.Role || ''
+  ).trim().toLowerCase();
+}
+
+function initAttendanceRecap() {
+  const periodInput = document.getElementById('recapPeriod');
+  const branchFilter = document.getElementById('recapBranchFilter');
+  const employeeFilter = document.getElementById('recapEmployeeFilter');
+
+  if (!periodInput || !branchFilter || !employeeFilter) return;
+  if (!periodInput.value) {
+    const now = new Date();
+    periodInput.value =
+      `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  populateAttendanceRecapBranchFilter();
+  populateAttendanceRecapEmployeeFilter();
+  // Outlet berubah: perbarui daftar karyawan dan rekap.
+  branchFilter.onchange = async function () {
+    populateAttendanceRecapEmployeeFilter();
+    await loadAttendanceRecap();
+  };
+
+  employeeFilter.onchange = loadAttendanceRecap;
+  periodInput.onchange = loadAttendanceRecap;
+  return loadAttendanceRecap();
+}
 
 function populateAttendanceRecapBranchFilter() {
   const branchFilter = document.getElementById('recapBranchFilter');
@@ -36518,6 +36506,19 @@ async function loadAttendanceRecap() {
 		}
 		
 		attendanceRecapAttendanceRows = attendanceRows;
+		console.log('[Attendance Recap]', {
+		  period,
+		  dateFrom,
+		  dateTo,
+		  attendanceCount: attendanceRows.length,
+		  attendanceDates: attendanceRows.map(r => r.Attendance_Date),
+		  overtimeCount: overtimeRows.length,
+		  overtimeDates: overtimeRows.map(r => r.Overtime_Date),
+		  scheduleCount: (scheduleData || []).filter(r => {
+		    const date = String(r.Schedule_Date || '').slice(0, 10);
+		    return date >= dateFrom && date <= dateTo && r.Is_Active === true;
+		  }).length
+		});
 		attendanceRecapOvertimeRows = overtimeRows;
     const employeeMap = new Map();
 
