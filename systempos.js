@@ -34989,9 +34989,6 @@ window.exportEmployeeSchedule = async function () {
         <tr>
           <td class="employee-col">
             <div class="employee-name">${esc(employee.name)}</div>
-            ${employee.code
-              ? `<div class="employee-code">${esc(employee.code)}</div>`
-              : ''}
           </td>
           <td class="position-col">${esc(employee.position)}</td>
           <td class="branch-col">${esc(getBranchLabel(employee.branchId))}</td>
@@ -35220,10 +35217,11 @@ window.exportEmployeeSchedule = async function () {
 				  }
 				
 				  /* SHIFT AND OFF */
-				  td.shift-cell {
-				    color: #333;
-				    white-space: nowrap;
-				  }
+					td.shift-cell {
+					  color: #333;
+					  font-weight: 600;
+					  white-space: nowrap;
+					}
 				
 					td.off-cell {
 					  background: #dc2626;
