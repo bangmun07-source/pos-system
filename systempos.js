@@ -35507,6 +35507,9 @@ function exportEmployeeAttendance() {
 
   const period = document.getElementById("recapPeriod")?.value || "-";
   const branch = document.getElementById("recapBranchFilter");
+	console.log("Branch filter element:", branch);
+	console.log("Selected value:", branch?.value);
+	console.log("Selected text:", branch?.selectedOptions?.[0]?.textContent);
   const branchLabel = branch?.selectedOptions?.[0]?.textContent?.trim() || "All Outlets";
   const formatDate = value => String(value || "").slice(0, 10);
   const formatTime = value => {
@@ -35555,7 +35558,7 @@ function exportEmployeeAttendance() {
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
-      row.Branch_ID || "",
+      row.Branch_Name || "",
       Number(row.Working_Days || 0),
       Number(row.Present || 0),
       Number(row.Late || 0),
@@ -35589,7 +35592,7 @@ function exportEmployeeAttendance() {
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
-      row.Branch_ID || "",
+      row.Branch_Name || "",
       formatDate(row.Overtime_Date),
       formatTime(row.Start_Time),
       formatTime(row.End_Time),
@@ -35622,7 +35625,7 @@ function exportEmployeeAttendance() {
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
-      row.Branch_ID || "",
+      row.Branch_Name || "",
       formatDate(row.Attendance_Date),
       formatTime(row.Start_Time),
       formatTime(row.End_Time),
