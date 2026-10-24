@@ -35493,55 +35493,40 @@ function closeAttendanceModal(modalId) {
   modal.classList.remove('flex');
 }
 
-
-
 function exportEmployeeAttendance() {
   const recapRows = Array.isArray(filteredAttendanceRecapData)
     ? filteredAttendanceRecapData
     : [];
-
   const attendanceRows = Array.isArray(attendanceRecapAttendanceRows)
     ? attendanceRecapAttendanceRows
     : [];
-
   const overtimeRows = Array.isArray(attendanceRecapOvertimeRows)
     ? attendanceRecapOvertimeRows
     : [];
-
-  if (!recapRows.length) {
-    alert("Tidak ada data attendance recap untuk diekspor.");
-    return;
-  }
+  if (!recapRows.length) { alert("Tidak ada data attendance recap untuk diekspor."); return; }
 
   const period = document.getElementById("recapPeriod")?.value || "-";
   const branch = document.getElementById("recapBranchFilter");
   const branchLabel = branch?.selectedOptions?.[0]?.textContent?.trim() || "All Outlets";
-
   const formatDate = value => String(value || "").slice(0, 10);
-
   const formatTime = value => {
     if (!value) return "";
+
     const match = String(value).match(/T?(\d{2}:\d{2})/);
     return match ? match[1] : String(value);
   };
+  const normalizeStatus = value => String(value || "NOT_RECORDED").trim().toUpperCase();
 
-  const normalizeStatus = value =>
-    String(value || "NOT_RECORDED").trim().toUpperCase();
-
-  // Overtime direkap berdasarkan Employee_ID.
+  // REKAP TOTAL OVERTIME PER EMPLOYEE
   const overtimeByEmployee = new Map();
-
   overtimeRows.forEach(row => {
     const id = String(row.Employee_ID || "").trim();
     if (!id) return;
 
-    overtimeByEmployee.set(
-      id,
-      (overtimeByEmployee.get(id) || 0) +
-        Number(row.Overtime_Minutes || 0)
-    );
+    overtimeByEmployee.set( id, (overtimeByEmployee.get(id) || 0) + Number(row.Overtime_Minutes || 0));
   });
 
+  // ATTENDANCE RECAP
   const output = [
     ["EMPLOYEE ATTENDANCE REPORT"],
     [`Period: ${period}`],
@@ -35565,9 +35550,8 @@ function exportEmployeeAttendance() {
   ];
 
   recapRows.forEach(row => {
-    const overtimeMinutes =
-      overtimeByEmployee.get(String(row.Employee_ID || "").trim()) || 0;
-
+    const employeeId = String(row.Employee_ID || "").trim();
+    const overtimeMinutes = overtimeByEmployee.get(employeeId) || 0;
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
@@ -35585,7 +35569,37 @@ function exportEmployeeAttendance() {
   });
 
   const recapLastRow = output.length;
+  // OVERTIME HISTORY — TEPAT DI BAWAH RECAP
+  output.push([""]);
+  output.push(["OVERTIME HISTORY"]);
+  output.push([
+    "Employee Code",
+    "Employee",
+    "Branch",
+    "Overtime Date",
+    "Start Time",
+    "End Time",
+    "Overtime Minutes",
+    "Note",
+    "Status"
+  ]);
 
+  const overtimeHistory = [...overtimeRows].sort((a, b) => formatDate(a.Overtime_Date).localeCompare(formatDate(b.Overtime_Date)));
+  overtimeHistory.forEach(row => {
+    output.push([
+      row.Employee_Code || "",
+      row.Full_Name || "",
+      row.Branch_ID || "",
+      formatDate(row.Overtime_Date),
+      formatTime(row.Start_Time),
+      formatTime(row.End_Time),
+      Number(row.Overtime_Minutes || 0),
+      row.Note || "",
+      row.Status || ""
+    ]);
+  });
+
+  // ATTENDANCE HISTORY — SETELAH OVERTIME HISTORY
   output.push([""]);
   output.push(["ATTENDANCE HISTORY"]);
   output.push([
@@ -35603,10 +35617,7 @@ function exportEmployeeAttendance() {
     "Note"
   ]);
 
-  const history = [...attendanceRows].sort((a, b) =>
-    formatDate(a.Attendance_Date).localeCompare(formatDate(b.Attendance_Date))
-  );
-
+  const history = [...attendanceRows].sort((a, b) => formatDate(a.Attendance_Date).localeCompare( formatDate(b.Attendance_Date) ));
   history.forEach(row => {
     output.push([
       row.Employee_Code || "",
@@ -35624,88 +35635,79 @@ function exportEmployeeAttendance() {
     ]);
   });
 
-  // History overtime sebagai bagian terpisah di bawah attendance history.
-  output.push([""]);
-  output.push(["OVERTIME HISTORY"]);
-  output.push([
-    "Employee Code",
-    "Employee",
-    "Branch",
-    "Overtime Date",
-    "Start Time",
-    "End Time",
-    "Overtime Minutes",
-    "Note",
-    "Status"
-  ]);
-
-  const overtimeHistory = [...overtimeRows].sort((a, b) =>
-    formatDate(a.Overtime_Date).localeCompare(formatDate(b.Overtime_Date))
-  );
-
-  overtimeHistory.forEach(row => {
-    output.push([
-      row.Employee_Code || "",
-      row.Full_Name || "",
-      row.Branch_ID || "",
-      formatDate(row.Overtime_Date),
-      formatTime(row.Start_Time),
-      formatTime(row.End_Time),
-      Number(row.Overtime_Minutes || 0),
-      row.Note || "",
-      row.Status || ""
-    ]);
-  });
-
-  const { wb, ws } = createAccountingWorkbook(
-    "Attendance",
-    output,
+  // BUAT WORKBOOK
+  const { wb, ws } = createAccountingWorkbook( "Attendance", output,
     [
       "A1:L1",
       "A2:L2",
       "A3:L3",
       "A5:L5"
     ],
-    [18, 24, 18, 16, 12, 12, 12, 12, 15, 15, 18, 30]
+    [
+      18, 24, 18, 16, 12, 12,
+      12, 12, 15, 15, 18, 30
+    ]
   );
 
-  // Judul laporan.
+  // STYLE JUDUL LAPORAN
   ["A1", "A2", "A3"].forEach(cell => {
     setExcelStyle(ws, cell, {
       font: { bold: true },
-      alignment: { horizontal: "center", vertical: "center" }
+      alignment: {
+        horizontal: "center",
+        vertical: "center"
+      }
     });
   });
 
   setExcelStyle(ws, "A1", {
     font: { bold: true, sz: 16 },
-    alignment: { horizontal: "center", vertical: "center" }
-  });
-
-  // Header recap.
-  for (let col = 0; col < 12; col++) {
-    const cell = `${String.fromCharCode(65 + col)}6`;
-    setExcelStyle(ws, cell, { font: { bold: true } });
-  }
-
-  // Header history dan overtime.
-  const historyHeaderRow = recapLastRow + 2;
-  const overtimeHeaderRow = historyHeaderRow + history.length + 2;
-
-  [historyHeaderRow, overtimeHeaderRow].forEach(rowNumber => {
-    for (let col = 0; col < 12; col++) {
-      const cell = `${String.fromCharCode(65 + col)}${rowNumber}`;
-      if (ws[cell]) {
-        setExcelStyle(ws, cell, { font: { bold: true } });
-      }
+    alignment: {
+      horizontal: "center",
+      vertical: "center"
     }
   });
 
+  // STYLE JUDUL ATTENDANCE RECAP
+  setExcelStyle(ws, "A5", { font: { bold: true, sz: 12 } });
+  // Header kolom recap: baris 6
+  for (let col = 0; col < 12; col++) {
+    const cell = `${String.fromCharCode(65 + col)}6`;
+
+    setExcelStyle(ws, cell, { font: { bold: true } });
+  }
+
+  // STYLE OVERTIME HISTORY
+  const overtimeTitleRow = recapLastRow + 2;
+  setExcelStyle(ws, `A${overtimeTitleRow}`, { font: { bold: true, sz: 12 } });
+  const overtimeHeaderRow = overtimeTitleRow + 1;
+  // Overtime memiliki 9 kolom
+  for (let col = 0; col < 9; col++) {
+    const cell = `${String.fromCharCode(65 + col)}${overtimeHeaderRow}`;
+    if (ws[cell]) { setExcelStyle(ws, cell, { font: { bold: true } }); }
+  }
+
+  // STYLE ATTENDANCE HISTORY
+  const historyTitleRow = overtimeHeaderRow + overtimeHistory.length + 2;
+  setExcelStyle(ws, `A${historyTitleRow}`, { font: { bold: true, sz: 12 } });
+  const historyHeaderRow = historyTitleRow + 1;
+  // Attendance memiliki 12 kolom
+  for (let col = 0; col < 12; col++) {
+    const cell = `${String.fromCharCode(65 + col)}${historyHeaderRow}`;
+    if (ws[cell]) {
+      setExcelStyle(ws, cell, {
+        font: { bold: true }
+      });
+    }
+  }
+
+  // EXPORT EXCEL
   XLSX.writeFile(
     wb,
     `employee-attendance-${period}.xlsx`
   );
 }
+
 
 
 let employeeOvertimeData = [];
