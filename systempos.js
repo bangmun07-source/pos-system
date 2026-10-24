@@ -35493,6 +35493,7 @@ function closeAttendanceModal(modalId) {
   modal.classList.remove('flex');
 }
 
+
 function exportEmployeeAttendance() {
   const recapRows = Array.isArray(filteredAttendanceRecapData)
     ? filteredAttendanceRecapData
@@ -35503,26 +35504,45 @@ function exportEmployeeAttendance() {
   const overtimeRows = Array.isArray(attendanceRecapOvertimeRows)
     ? attendanceRecapOvertimeRows
     : [];
-  if (!recapRows.length) { alert("Tidak ada data attendance recap untuk diekspor."); return; }
+
+  if (!filteredRecapRows.length) { alert("Tidak ada data attendance recap untuk outlet yang dipilih."); return; }
 
   const period = document.getElementById("recapPeriod")?.value || "-";
   const branch = document.getElementById("recapBranchFilter");
-	console.log("Branch filter element:", branch);
-	console.log("Selected value:", branch?.value);
-	console.log("Selected text:", branch?.selectedOptions?.[0]?.textContent);
   const branchLabel = branch?.selectedOptions?.[0]?.textContent?.trim() || "All Outlets";
-  const formatDate = value => String(value || "").slice(0, 10);
-  const formatTime = value => {
-    if (!value) return "";
+  // TAMBAHKAN HELPER INI DI SINI
+  const branchNameById = new Map(
+    Array.from(branch?.options || [])
+      .filter(option => option.value.trim() !== "")
+      .map(option => [
+        option.value.trim(),
+        option.textContent.trim()
+      ])
+  );
+	const getBranchName = branchId => branchNameById.get(String(branchId || "").trim()) || branchId || "";
+	// FILTER DATA BERDASARKAN OUTLET YANG DIPILIH
+	const selectedBranchId = branch?.value || "";
+	const filterByBranch = rows =>
+	  selectedBranchId
+	    ? rows.filter(
+	        row => String(row.Branch_ID || "").trim() === selectedBranchId
+	      )
+	    : rows;
+	
+	const filteredRecapRows = filterByBranch(recapRows);
+	const filteredAttendanceRows = filterByBranch(attendanceRows);
+	const filteredOvertimeRows = filterByBranch(overtimeRows);
+	const formatDate = value => String(value || "").slice(0, 10);
+	const formatTime = value => {
+		if (!value) return "";
 
-    const match = String(value).match(/T?(\d{2}:\d{2})/);
-    return match ? match[1] : String(value);
-  };
+		const match = String(value).match(/T?(\d{2}:\d{2})/);
+		return match ? match[1] : String(value);
+	};
   const normalizeStatus = value => String(value || "NOT_RECORDED").trim().toUpperCase();
-
   // REKAP TOTAL OVERTIME PER EMPLOYEE
   const overtimeByEmployee = new Map();
-  overtimeRows.forEach(row => {
+  filteredOvertimeRows.forEach(row => {
     const id = String(row.Employee_ID || "").trim();
     if (!id) return;
 
@@ -35552,13 +35572,13 @@ function exportEmployeeAttendance() {
     ]
   ];
 
-  recapRows.forEach(row => {
+  filteredRecapRows.forEach(row => {
     const employeeId = String(row.Employee_ID || "").trim();
     const overtimeMinutes = overtimeByEmployee.get(employeeId) || 0;
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
-      row.Branch_Name || "",
+      getBranchName(row.Branch_ID) || "",
       Number(row.Working_Days || 0),
       Number(row.Present || 0),
       Number(row.Late || 0),
@@ -35587,12 +35607,12 @@ function exportEmployeeAttendance() {
     "Status"
   ]);
 
-  const overtimeHistory = [...overtimeRows].sort((a, b) => formatDate(a.Overtime_Date).localeCompare(formatDate(b.Overtime_Date)));
-  overtimeHistory.forEach(row => {
+	const overtimeHistory = [...filteredOvertimeRows].sort((a, b) => formatDate(a.Overtime_Date).localeCompare(formatDate(b.Overtime_Date)));
+	overtimeHistory.forEach(row => {
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
-      row.Branch_Name || "",
+      getBranchName(row.Branch_ID) || "",
       formatDate(row.Overtime_Date),
       formatTime(row.Start_Time),
       formatTime(row.End_Time),
@@ -35620,12 +35640,12 @@ function exportEmployeeAttendance() {
     "Note"
   ]);
 
-  const history = [...attendanceRows].sort((a, b) => formatDate(a.Attendance_Date).localeCompare( formatDate(b.Attendance_Date) ));
+  const history = [...filteredAttendanceRows].sort((a, b) => formatDate(a.Attendance_Date).localeCompare( formatDate(b.Attendance_Date) ));
   history.forEach(row => {
     output.push([
       row.Employee_Code || "",
       row.Full_Name || "",
-      row.Branch_Name || "",
+      getBranchName(row.Branch_ID) || "",
       formatDate(row.Attendance_Date),
       formatTime(row.Start_Time),
       formatTime(row.End_Time),
@@ -35703,7 +35723,6 @@ function exportEmployeeAttendance() {
       });
     }
   }
-
   // EXPORT EXCEL
   XLSX.writeFile(
     wb,
