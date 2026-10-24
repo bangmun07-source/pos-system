@@ -35057,231 +35057,303 @@ window.exportEmployeeSchedule = async function () {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>${esc(filename)}</title>
-
-        <style>
-          * {
-            box-sizing: border-box;
-          }
-
-          html, body {
-            margin: 0;
-            padding: 0;
-          }
-
-          body {
-            background: #0B0F14;
-            color: #333;
-            font-family: Arial, Helvetica, sans-serif;
-            padding: 30px 18px;
-          }
-
-          .toolbar {
-            max-width: 1400px;
-            margin: 0 auto 18px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            color: white;
-            font-size: 14px;
-          }
-
-          .toolbar button {
-            padding: 10px 16px;
-            border: 1px solid rgba(255,255,255,.18);
-            border-radius: 8px;
-            background: #F59E0B;
-            color: #111827;
-            font-weight: 700;
-            cursor: pointer;
-          }
-
-          .report {
-            width: 100%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 28px;
-            background: white;
-            border-radius: 4px;
-          }
-
-          .report-header {
-            text-align: center;
-            margin-bottom: 24px;
-          }
-
-          .logo {
-            display: block;
-            width: auto;
-            max-width: 150px;
-            max-height: 75px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          .title {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 1.5px;
-            color: #111827;
-          }
-
-          .branch-title {
-            margin-top: 7px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #374151;
-          }
-
-          .period {
-            margin-top: 6px;
-            font-size: 12px;
-            color: #6B7280;
-          }
-
-          .table-wrap {
-            width: 100%;
-            overflow: visible;
-          }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-            font-size: 10px;
-          }
-
-          th, td {
-            border: 1px solid #D1D5DB;
-            padding: 9px 5px;
-            text-align: center;
-            vertical-align: middle;
-            overflow-wrap: anywhere;
-          }
-
-          th {
-            background: #F3F4F6;
-            color: #374151;
-            font-weight: 800;
-          }
-
-          th.employee-col,
-          td.employee-col {
-            width: 17%;
-            text-align: left;
-          }
-
-          th.position-col,
-          td.position-col {
-            width: 10%;
-          }
-
-          th.branch-col,
-          td.branch-col {
-            width: 11%;
-          }
-
-          th.day-col,
-          td.shift-cell,
-          td.off-cell {
-            width: 7%;
-          }
-
-          th.attd-col,
-          td.attd-col {
-            width: 6%;
-            font-weight: 800;
-          }
-
-          .date-label {
-            margin-top: 5px;
-            font-size: 9px;
-            font-weight: 500;
-            white-space: nowrap;
-          }
-
-          .employee-name {
-            font-weight: 700;
-            color: #111827;
-          }
-
-          .employee-code {
-            margin-top: 3px;
-            color: #6B7280;
-            font-size: 9px;
-          }
-
-          td.shift-cell {
-            background: #FFFFFF;
-            color: #111827;
-          }
-
-          td.off-cell {
-            background: #FEE2E2;
-            color: #B91C1C;
-            font-weight: 800;
-          }
-
-          .footer {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 9px;
-            color: #9CA3AF;
-          }
-
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
-
-          @media print {
-            html, body {
-              width: 100%;
-              padding: 0;
-              margin: 0;
-              background: white;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-
-            .toolbar {
-              display: none !important;
-            }
-
-            .report {
-              width: 100%;
-              max-width: none;
-              margin: 0;
-              padding: 0;
-              border-radius: 0;
-            }
-
-            .report-header {
-              margin-bottom: 16px;
-            }
-
-            table {
-              page-break-inside: auto;
-            }
-
-            tr {
-              page-break-inside: avoid;
-              break-inside: avoid;
-            }
-
-            thead {
-              display: table-header-group;
-            }
-
-            .off-cell {
-              background: #FEE2E2 !important;
-              color: #B91C1C !important;
-              -webkit-print-color-adjust: exact;
-              print-color-adjust: exact;
-            }
-          }
-        </style>
+    
+				<style>
+				  * {
+				    box-sizing: border-box;
+				  }
+				
+				  html,
+				  body {
+				    margin: 0;
+				    padding: 0;
+				  }
+				
+				  body {
+				    background: #0B0F14;
+				    color: #333;
+				    font-family: Arial, Helvetica, sans-serif;
+				    padding: 40px 20px;
+				  }
+				
+				  /* TOOLBAR — SAME AS CASH FLOW */
+				  .toolbar {
+				    width: 100%;
+				    max-width: 1100px;
+				    margin: 0 auto 20px;
+				    display: flex;
+				    justify-content: space-between;
+				    align-items: center;
+				    gap: 16px;
+				    color: #fff;
+				    font-size: 14px;
+				  }
+				
+				  .toolbar button {
+				    border: 1px solid rgba(255,255,255,.15);
+				    background: rgba(255,255,255,.08);
+				    color: #fff;
+				    padding: 10px 16px;
+				    border-radius: 10px;
+				    cursor: pointer;
+				    font-weight: 700;
+				  }
+				
+				  .toolbar button:hover {
+				    background: rgba(255,255,255,.14);
+				  }
+				
+				  /* WHITE REPORT PAPER */
+				  .report {
+				    width: 100%;
+				    max-width: 1100px;
+				    margin: 0 auto;
+				    padding: 40px;
+				    background: #fff;
+				    border-radius: 4px;
+				    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+				  }
+				
+				  /* REPORT HEADER */
+				  .report-header {
+				    text-align: center;
+				    margin-bottom: 28px;
+				  }
+				
+				  .logo {
+				    display: block;
+				    width: auto;
+				    max-width: 150px;
+				    max-height: 75px;
+				    object-fit: contain;
+				    margin: 0 auto 10px;
+				  }
+				
+				  .title {
+				    margin: 0 0 8px;
+				    font-size: 20px;
+				    font-weight: 700;
+				    letter-spacing: .5px;
+				    color: #222;
+				  }
+				
+				  .branch-title {
+				    margin-top: 4px;
+				    font-size: 12px;
+				    font-weight: 600;
+				    color: #555;
+				  }
+				
+				  .period {
+				    margin-top: 5px;
+				    font-size: 12px;
+				    color: #777;
+				  }
+				
+				  /* TABLE CARD — MATCH CASH FLOW CARDS */
+				  .table-wrap {
+				    width: 100%;
+				    overflow: visible;
+				    border: 1px solid #e5e5e5;
+				    border-radius: 12px;
+				    padding: 16px;
+				    background: #fff;
+				  }
+				
+				  table {
+				    width: 100%;
+				    border-collapse: collapse;
+				    table-layout: fixed;
+				    font-size: 9px;
+				    color: #444;
+				  }
+				
+				  thead {
+				    display: table-header-group;
+				  }
+				
+				  th {
+				    padding: 11px 5px;
+				    background: #f5f5f5;
+				    color: #444;
+				    font-size: 9px;
+				    font-weight: 700;
+				    text-align: center;
+				    vertical-align: middle;
+				    border: none;
+				    border-bottom: 1px solid #e5e5e5;
+				  }
+				
+				  td {
+				    padding: 12px 5px;
+				    text-align: center;
+				    vertical-align: middle;
+				    border: none;
+				    border-bottom: 1px solid #eee;
+				    overflow-wrap: anywhere;
+				  }
+				
+				  tbody tr:nth-child(even) {
+				    background: #fafafa;
+				  }
+				
+				  tbody tr:last-child td {
+				    border-bottom: none;
+				  }
+				
+				  tbody tr {
+				    page-break-inside: avoid;
+				    break-inside: avoid;
+				  }
+				
+				  /* COLUMN WIDTHS */
+				  th.employee-col,
+				  td.employee-col {
+				    width: 17%;
+				    text-align: left;
+				  }
+				
+				  th.position-col,
+				  td.position-col {
+				    width: 10%;
+				    text-align: center;
+				  }
+				
+				  th.branch-col,
+				  td.branch-col {
+				    width: 11%;
+				    text-align: center;
+				  }
+				
+				  th.day-col,
+				  td.shift-cell,
+				  td.off-cell {
+				    width: 7%;
+				  }
+				
+				  th.attd-col,
+				  td.attd-col {
+				    width: 6%;
+				    font-weight: 700;
+				  }
+				
+				  /* EMPLOYEE INFORMATION */
+				  .employee-name {
+				    color: #222;
+				    font-weight: 700;
+				    line-height: 1.4;
+				  }
+				
+				  .employee-code {
+				    margin-top: 3px;
+				    color: #888;
+				    font-size: 8px;
+				    font-weight: 400;
+				  }
+				
+				  .position-col,
+				  .branch-col {
+				    color: #555;
+				  }
+				
+				  .date-label {
+				    margin-top: 5px;
+				    color: #777;
+				    font-size: 8px;
+				    font-weight: 400;
+				    white-space: nowrap;
+				  }
+				
+				  /* SHIFT AND OFF */
+				  td.shift-cell {
+				    color: #333;
+				    white-space: nowrap;
+				  }
+				
+				  td.off-cell {
+				    background: #fef2f2;
+				    color: #dc2626;
+				    font-weight: 700;
+				    white-space: nowrap;
+				  }
+				
+				  td.attd-col {
+				    color: #222;
+				    font-weight: 700;
+				  }
+				
+				  /* FOOTER */
+				  .footer {
+				    margin-top: 28px;
+				    text-align: center;
+				    font-size: 9px;
+				    color: #888;
+				  }
+				
+				  /* PRINT / PDF */
+				  @page {
+				    size: A4 landscape;
+				    margin: 10mm;
+				  }
+				
+				  @media print {
+				    html,
+				    body {
+				      width: 100%;
+				      margin: 0;
+				      padding: 0;
+				      background: #fff;
+				      -webkit-print-color-adjust: exact;
+				      print-color-adjust: exact;
+				    }
+				
+				    .toolbar {
+				      display: none !important;
+				    }
+				
+				    .report {
+				      width: 100%;
+				      max-width: none;
+				      margin: 0;
+				      padding: 8px;
+				      border-radius: 0;
+				      box-shadow: none;
+				    }
+				
+				    .report-header {
+				      margin-bottom: 18px;
+				    }
+				
+				    .table-wrap {
+				      padding: 10px;
+				      border: 1px solid #e5e5e5;
+				      border-radius: 8px;
+				    }
+				
+				    th {
+				      background: #f5f5f5 !important;
+				      -webkit-print-color-adjust: exact;
+				      print-color-adjust: exact;
+				    }
+				
+				    tbody tr:nth-child(even) {
+				      background: #fafafa !important;
+				      -webkit-print-color-adjust: exact;
+				      print-color-adjust: exact;
+				    }
+				
+				    td.off-cell {
+				      background: #fef2f2 !important;
+				      color: #dc2626 !important;
+				      -webkit-print-color-adjust: exact;
+				      print-color-adjust: exact;
+				    }
+				
+				    table {
+				      page-break-inside: auto;
+				    }
+				  }
+				</style>
       </head>
 
       <body>
