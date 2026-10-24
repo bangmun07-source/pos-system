@@ -35494,7 +35494,9 @@ function closeAttendanceModal(modalId) {
 }
 
 function exportEmployeeAttendance() {
-  // AMBIL DATA
+  // =====================================================
+  // 1. AMBIL DATA SUMBER
+  // =====================================================
   const recapRows = Array.isArray(filteredAttendanceRecapData)
     ? filteredAttendanceRecapData
     : [];
@@ -35507,18 +35509,43 @@ function exportEmployeeAttendance() {
     ? attendanceRecapOvertimeRows
     : [];
 
-  // FILTER PERIODE
-  const period =
-    document.getElementById("recapPeriod")?.value || "-";
+  // =====================================================
+  // 2. AMBIL SEMUA FILTER DARI UI EMPLOYEE ATTENDANCE
+  // =====================================================
+  const dateFrom =
+    document.getElementById("attendanceDateFrom")?.value || "";
 
-  // AMBIL FILTER OUTLET DARI UI EMPLOYEE ATTENDANCE
-  // TIDAK MEMBUAT DROPDOWN BARU
-  const branch = document.getElementById("attendanceBranchFilter");
-  const selectedBranchId = String(branch?.value || "").trim();
+  const dateTo =
+    document.getElementById("attendanceDateTo")?.value || "";
 
-  // MAP ID OUTLET KE NAMA OUTLET
+  const employeeSelect =
+    document.getElementById("attendanceEmployeeFilter");
+
+  const selectedEmployeeId =
+    String(employeeSelect?.value || "").trim();
+
+  const branchSelect =
+    document.getElementById("attendanceBranchFilter");
+
+  const selectedBranchId =
+    String(branchSelect?.value || "").trim();
+
+  const selectedStatus =
+    String(
+      document.getElementById("attendanceStatusFilter")?.value || ""
+    ).trim().toUpperCase();
+
+  // Validasi rentang tanggal
+  if (dateFrom && dateTo && dateFrom > dateTo) {
+    alert("Date From tidak boleh melewati Date To.");
+    return;
+  }
+
+  // =====================================================
+  // 3. LABEL OUTLET DAN PERIODE
+  // =====================================================
   const branchNameById = new Map(
-    Array.from(branch?.options || [])
+    Array.from(branchSelect?.options || [])
       .filter(option => String(option.value || "").trim() !== "")
       .map(option => [
         String(option.value).trim(),
@@ -35535,50 +35562,24 @@ function exportEmployeeAttendance() {
     ? getBranchName(selectedBranchId)
     : "All Branch";
 
-  // FILTER KETIGA DATASET DENGAN OUTLET YANG SAMA
-  // All Branch = semua outlet
-  const filterByBranch = rows => {
-    if (!selectedBranchId) return rows;
+  const employeeLabel = selectedEmployeeId
+    ? (
+        employeeSelect?.selectedOptions?.[0]?.textContent?.trim()
+        || selectedEmployeeId
+      )
+    : "All Employees";
 
-    return rows.filter(row =>
-      String(row.Branch_ID || "").trim() === selectedBranchId
-    );
-  };
+  const period = dateFrom && dateTo
+    ? `${dateFrom} to ${dateTo}`
+    : dateFrom
+      ? `From ${dateFrom}`
+      : dateTo
+        ? `Until ${dateTo}`
+        : "All Dates";
 
-  const filteredRecapRows = filterByBranch(recapRows);
-  const filteredAttendanceRows = filterByBranch(attendanceRows);
-  const filteredOvertimeRows = filterByBranch(overtimeRows);
-
-  // DEBUG FILTER
-  console.log("Employee Attendance Export:", {
-    selectedBranchId,
-    branchLabel,
-    recapBefore: recapRows.length,
-    recapAfter: filteredRecapRows.length,
-    recapBranchIDs: [
-      ...new Set(recapRows.map(row => row.Branch_ID))
-    ],
-    attendanceBefore: attendanceRows.length,
-    attendanceAfter: filteredAttendanceRows.length,
-    attendanceBranchIDs: [
-      ...new Set(attendanceRows.map(row => row.Branch_ID))
-    ],
-    overtimeBefore: overtimeRows.length,
-    overtimeAfter: filteredOvertimeRows.length,
-    overtimeBranchIDs: [
-      ...new Set(overtimeRows.map(row => row.Branch_ID))
-    ]
-  });
-
-  // VALIDASI DATA REKAP
-  if (!filteredRecapRows.length) {
-    alert(
-      `Tidak ada data attendance recap untuk ${branchLabel}.`
-    );
-    return;
-  }
-
-  // FORMAT DATA
+  // =====================================================
+  // 4. FORMAT DAN HELPER FILTER
+  // =====================================================
   const formatDate = value =>
     String(value || "").slice(0, 10);
 
@@ -35592,25 +35593,246 @@ function exportEmployeeAttendance() {
   const normalizeStatus = value =>
     String(value || "NOT_RECORDED").trim().toUpperCase();
 
-  // REKAP TOTAL OVERTIME PER EMPLOYEE
+  // Cocokkan karyawan berdasarkan ID atau kode.
+  // Mendukung dropdown yang value-nya berupa Employee_ID
+  // maupun Employee_Code.
+  const matchesEmployee = row => {
+    if (!selectedEmployeeId) return true;
+
+    const selected = selectedEmployeeId.toUpperCase();
+
+    return [
+      row.Employee_ID,
+      row.Employee_Code
+    ].some(value =>
+      String(value || "").trim().toUpperCase() === selected
+    );
+  };
+
+  const matchesBranch = row => {
+    if (!selectedBranchId) return true;
+
+    return String(row.Branch_ID || "").trim() === selectedBranchId;
+  };
+
+  const matchesDate = (value, fieldExists = true) => {
+    const date = formatDate(value);
+
+    // Jangan masukkan baris yang tidak memiliki tanggal
+    // ketika rentang tanggal sedang diterapkan.
+    if (!date || date === "-") {
+      return !dateFrom && !dateTo && fieldExists;
+    }
+
+    if (dateFrom && date < dateFrom) return false;
+    if (dateTo && date > dateTo) return false;
+
+    return true;
+  };
+
+  // =====================================================
+  // 5. FILTER ATTENDANCE HISTORY
+  // =====================================================
+  const filteredAttendanceRows = attendanceRows.filter(row => {
+    if (!matchesBranch(row)) return false;
+    if (!matchesEmployee(row)) return false;
+
+    if (!matchesDate(row.Attendance_Date)) return false;
+
+    if (
+      selectedStatus &&
+      normalizeStatus(row.Status) !== selectedStatus
+    ) {
+      return false;
+    }
+
+    return true;
+  });
+
+  // =====================================================
+  // 6. FILTER OVERTIME HISTORY
+  // =====================================================
+  const filteredOvertimeRows = overtimeRows.filter(row => {
+    if (!matchesBranch(row)) return false;
+    if (!matchesEmployee(row)) return false;
+
+    if (!matchesDate(row.Overtime_Date)) return false;
+
+    return true;
+  });
+
+  // =====================================================
+  // 7. BENTUK DATA KARYAWAN UNTUK REKAP
+  //    Rekap dihitung ulang dari attendance history
+  //    berdasarkan seluruh filter aktif.
+  // =====================================================
+  const employeeMap = new Map();
+
+  // Gunakan data rekap sebagai sumber identitas tambahan,
+  // bukan sebagai sumber angka rekap bulanan.
+  recapRows.forEach(row => {
+    if (!matchesBranch(row) || !matchesEmployee(row)) return;
+
+    const id = String(row.Employee_ID || "").trim();
+    if (!id) return;
+
+    employeeMap.set(id, {
+      Employee_ID: id,
+      Employee_Code: row.Employee_Code || "",
+      Full_Name: row.Full_Name || "",
+      Branch_ID: row.Branch_ID || ""
+    });
+  });
+
+  // Identitas dari riwayat absensi menjadi sumber utama
+  // bagi karyawan yang memiliki data pada rentang terpilih.
+  filteredAttendanceRows.forEach(row => {
+    const id = String(row.Employee_ID || "").trim();
+    if (!id) return;
+
+    const previous = employeeMap.get(id) || {};
+
+    employeeMap.set(id, {
+      ...previous,
+      Employee_ID: id,
+      Employee_Code: row.Employee_Code || previous.Employee_Code || "",
+      Full_Name: row.Full_Name || previous.Full_Name || "",
+      Branch_ID: row.Branch_ID || previous.Branch_ID || ""
+    });
+  });
+
+  // Tambahkan identitas karyawan dari lembur agar data lembur
+  // tetap dapat direkap jika tidak ada baris absensi terpilih.
+  filteredOvertimeRows.forEach(row => {
+    const id = String(row.Employee_ID || "").trim();
+    if (!id) return;
+
+    const previous = employeeMap.get(id) || {};
+
+    employeeMap.set(id, {
+      ...previous,
+      Employee_ID: id,
+      Employee_Code: row.Employee_Code || previous.Employee_Code || "",
+      Full_Name: row.Full_Name || previous.Full_Name || "",
+      Branch_ID: row.Branch_ID || previous.Branch_ID || ""
+    });
+  });
+
+  // =====================================================
+  // 8. HITUNG TOTAL OVERTIME PER KARYAWAN
+  // =====================================================
   const overtimeByEmployee = new Map();
 
   filteredOvertimeRows.forEach(row => {
-    const employeeId = String(row.Employee_ID || "").trim();
-    if (!employeeId) return;
+    const id = String(row.Employee_ID || "").trim();
+    if (!id) return;
 
     overtimeByEmployee.set(
-      employeeId,
-      (overtimeByEmployee.get(employeeId) || 0) +
+      id,
+      (overtimeByEmployee.get(id) || 0) +
         Number(row.Overtime_Minutes || 0)
     );
   });
 
-  // ATTENDANCE RECAP
+  // =====================================================
+  // 9. HITUNG ULANG ATTENDANCE RECAP
+  // =====================================================
+  const recapByEmployee = new Map();
+
+  filteredAttendanceRows.forEach(row => {
+    const id = String(row.Employee_ID || "").trim();
+    if (!id) return;
+
+    const employee = employeeMap.get(id) || {};
+
+    if (!recapByEmployee.has(id)) {
+      recapByEmployee.set(id, {
+        Employee_ID: id,
+        Employee_Code: row.Employee_Code || employee.Employee_Code || "",
+        Full_Name: row.Full_Name || employee.Full_Name || "",
+        Branch_ID: row.Branch_ID || employee.Branch_ID || "",
+        Working_Days: 0,
+        Present: 0,
+        Late: 0,
+        Absent: 0,
+        Leave: 0,
+        Sick: 0,
+        Permission: 0,
+        Late_Minutes: 0
+      });
+    }
+
+    const recap = recapByEmployee.get(id);
+    const status = normalizeStatus(row.Status);
+    const lateMinutes = Math.max(
+      0,
+      Number(row.Late_Minutes || 0)
+    );
+
+    recap.Working_Days += 1;
+
+    if (status === "PRESENT") {
+      recap.Present += 1;
+    } else if (status === "ABSENT") {
+      recap.Absent += 1;
+    } else if (status === "LEAVE") {
+      recap.Leave += 1;
+    } else if (status === "SICK") {
+      recap.Sick += 1;
+    } else if (status === "PERMISSION") {
+      recap.Permission += 1;
+    }
+
+    if (status === "PRESENT" && lateMinutes > 0) {
+      recap.Late += 1;
+    }
+
+    recap.Late_Minutes += lateMinutes;
+  });
+
+  const filteredRecapRows = [...recapByEmployee.values()]
+    .sort((a, b) =>
+      String(a.Employee_Code || "").localeCompare(
+        String(b.Employee_Code || "")
+      )
+    );
+
+  // =====================================================
+  // 10. DEBUG
+  // =====================================================
+  console.log("Employee Attendance Export:", {
+    dateFrom,
+    dateTo,
+    selectedEmployeeId,
+    employeeLabel,
+    selectedBranchId,
+    branchLabel,
+    selectedStatus,
+    recapCount: filteredRecapRows.length,
+    attendanceCount: filteredAttendanceRows.length,
+    overtimeCount: filteredOvertimeRows.length
+  });
+
+  // Jangan batalkan export hanya karena tidak ada rekap.
+  // Riwayat absensi atau lembur mungkin masih memiliki data.
+  if (
+    !filteredRecapRows.length &&
+    !filteredAttendanceRows.length &&
+    !filteredOvertimeRows.length
+  ) {
+    alert("Tidak ada data Employee Attendance sesuai filter yang dipilih.");
+    return;
+  }
+
+  // =====================================================
+  // 11. HEADER LAPORAN
+  // =====================================================
   const output = [
     ["EMPLOYEE ATTENDANCE REPORT"],
     [`Period: ${period}`],
     [`Branch: ${branchLabel}`],
+    [`Employee: ${employeeLabel}`],
+    [`Status: ${selectedStatus || "All Status"}`],
     [""],
     ["ATTENDANCE RECAP"],
     [
@@ -35629,9 +35851,12 @@ function exportEmployeeAttendance() {
     ]
   ];
 
+  // =====================================================
+  // 12. ISI ATTENDANCE RECAP
+  // =====================================================
   filteredRecapRows.forEach(row => {
-    const employeeId = String(row.Employee_ID || "").trim();
-    const overtimeMinutes = overtimeByEmployee.get(employeeId) || 0;
+    const overtimeMinutes =
+      overtimeByEmployee.get(row.Employee_ID) || 0;
 
     output.push([
       row.Employee_Code || "",
@@ -35649,11 +35874,18 @@ function exportEmployeeAttendance() {
     ]);
   });
 
+  const recapTitleRow = 7;
+  const recapHeaderRow = 8;
   const recapLastRow = output.length;
 
-  // OVERTIME HISTORY
+  // =====================================================
+  // 13. OVERTIME HISTORY
+  // =====================================================
   output.push([""]);
+  const overtimeTitleRow = output.length + 1;
   output.push(["OVERTIME HISTORY"]);
+
+  const overtimeHeaderRow = output.length + 1;
   output.push([
     "Employee Code",
     "Employee",
@@ -35687,9 +35919,14 @@ function exportEmployeeAttendance() {
     ]);
   });
 
-  // ATTENDANCE HISTORY
+  // =====================================================
+  // 14. ATTENDANCE HISTORY
+  // =====================================================
   output.push([""]);
+  const historyTitleRow = output.length + 1;
   output.push(["ATTENDANCE HISTORY"]);
+
+  const historyHeaderRow = output.length + 1;
   output.push([
     "Employee Code",
     "Employee",
@@ -35729,16 +35966,26 @@ function exportEmployeeAttendance() {
     ]);
   });
 
-  // BUAT WORKBOOK
+  // =====================================================
+  // 15. BUAT WORKBOOK
+  // =====================================================
   const { wb, ws } = createAccountingWorkbook(
     "Attendance",
     output,
-    ["A1:L1", "A2:L2", "A3:L3", "A5:L5"],
+    [
+      "A1:L1",
+      "A2:L2",
+      "A3:L3",
+      "A4:L4",
+      "A5:L5"
+    ],
     [18, 24, 18, 16, 12, 12, 12, 12, 15, 15, 18, 30]
   );
 
-  // STYLE JUDUL LAPORAN
-  ["A1", "A2", "A3"].forEach(cell => {
+  // =====================================================
+  // 16. STYLE HEADER LAPORAN
+  // =====================================================
+  ["A1", "A2", "A3", "A4", "A5"].forEach(cell => {
     setExcelStyle(ws, cell, {
       font: { bold: true },
       alignment: {
@@ -35756,27 +36003,30 @@ function exportEmployeeAttendance() {
     }
   });
 
-  // STYLE ATTENDANCE RECAP
-  setExcelStyle(ws, "A5", {
+  // =====================================================
+  // 17. STYLE ATTENDANCE RECAP
+  // =====================================================
+  setExcelStyle(ws, `A${recapTitleRow}`, {
     font: { bold: true, sz: 12 }
   });
 
   for (let col = 0; col < 12; col++) {
-    const cell = `${String.fromCharCode(65 + col)}6`;
+    const cell =
+      `${String.fromCharCode(65 + col)}${recapHeaderRow}`;
 
-    setExcelStyle(ws, cell, {
-      font: { bold: true }
-    });
+    if (ws[cell]) {
+      setExcelStyle(ws, cell, {
+        font: { bold: true }
+      });
+    }
   }
 
-  // STYLE OVERTIME HISTORY
-  const overtimeTitleRow = recapLastRow + 2;
-
+  // =====================================================
+  // 18. STYLE OVERTIME HISTORY
+  // =====================================================
   setExcelStyle(ws, `A${overtimeTitleRow}`, {
     font: { bold: true, sz: 12 }
   });
-
-  const overtimeHeaderRow = overtimeTitleRow + 1;
 
   for (let col = 0; col < 9; col++) {
     const cell =
@@ -35789,16 +36039,12 @@ function exportEmployeeAttendance() {
     }
   }
 
-  // STYLE ATTENDANCE HISTORY
-  // Posisi berdasarkan jumlah baris overtime yang benar-benar diekspor.
-  const historyTitleRow =
-    overtimeHeaderRow + overtimeHistory.length + 2;
-
+  // =====================================================
+  // 19. STYLE ATTENDANCE HISTORY
+  // =====================================================
   setExcelStyle(ws, `A${historyTitleRow}`, {
     font: { bold: true, sz: 12 }
   });
-
-  const historyHeaderRow = historyTitleRow + 1;
 
   for (let col = 0; col < 12; col++) {
     const cell =
@@ -35811,15 +36057,19 @@ function exportEmployeeAttendance() {
     }
   }
 
-  // EXPORT EXCEL
+  // =====================================================
+  // 20. EXPORT EXCEL
+  // =====================================================
   const safePeriod = String(period).replace(/[\\/:*?"<>|]/g, "-");
   const safeBranch = String(branchLabel).replace(/[\\/:*?"<>|]/g, "-");
+  const safeEmployee = String(employeeLabel).replace(/[\\/:*?"<>|]/g, "-");
 
   XLSX.writeFile(
     wb,
-    `employee-attendance-${safePeriod}-${safeBranch}.xlsx`
+    `employee-attendance-${safePeriod}-${safeBranch}-${safeEmployee}.xlsx`
   );
 }
+
 
 
 let employeeOvertimeData = [];
