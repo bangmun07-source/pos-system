@@ -34778,6 +34778,591 @@ function initScheduleTimePickers() {
 
 
 /* =========================================================
+   EXPORT EMPLOYEE SCHEDULE 
+========================================================= */
+
+window.exportEmployeeSchedule = async function () {
+  try {
+    const weekFilter = document.getElementById('scheduleWeekFilter');
+    const employeeFilter = document.getElementById('scheduleEmployeeFilter');
+    const branchFilter = document.getElementById('scheduleBranchFilter');
+
+    const selectedWeek = String(weekFilter?.value || '').trim();
+    const selectedEmployee = String(employeeFilter?.value || '').trim();
+    const selectedBranch = String(branchFilter?.value || '').trim();
+
+    const role = String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase();
+
+    const userBranchId = String(
+      state.user?.branchId || state.user?.Branch_ID || ''
+    ).trim();
+
+    const canViewAllBranches =
+      ['owner', 'accountant'].includes(role) ||
+      userBranchId.toUpperCase() === 'ALL';
+
+    // VALIDATE DATA
+    if (!Array.isArray(scheduleData) || !scheduleData.length) {
+      alert('Data Schedule belum tersedia.');
+      return;
+    }
+
+    // Gunakan minggu yang dipilih.
+    // Jika Current Week dipilih, hitung hari Senin minggu ini.
+    const today = new Date();
+    const currentMonday = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+
+    const dayOfWeek = currentMonday.getDay();
+    currentMonday.setDate(
+      currentMonday.getDate() -
+      (dayOfWeek === 0 ? 6 : dayOfWeek - 1)
+    );
+
+    const currentWeekStart = [
+      currentMonday.getFullYear(),
+      String(currentMonday.getMonth() + 1).padStart(2, '0'),
+      String(currentMonday.getDate()).padStart(2, '0')
+    ].join('-');
+
+    const weekStart = selectedWeek || currentWeekStart;
+
+    // FILTER SCHEDULE DATA
+    // Filter Day sengaja tidak digunakan karena PDF adalah
+    // laporan mingguan penuh, bukan laporan satu hari.
+    const rows = scheduleData.filter(row => {
+      const rowWeek = String(row.Week_Start || '').substring(0, 10);
+      const rowBranch = String(row.Branch_ID || '').trim();
+      const rowEmployee = String(row.Employee_ID || '').trim();
+
+      if (rowWeek !== weekStart) return false;
+
+      if (!canViewAllBranches && rowBranch !== userBranchId) {
+        return false;
+      }
+
+      if (selectedEmployee && rowEmployee !== selectedEmployee) {
+        return false;
+      }
+
+      if (selectedBranch && rowBranch !== selectedBranch) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (!rows.length) {
+      alert('Tidak ada Schedule untuk minggu dan filter yang dipilih.');
+      return;
+    }
+
+    // HELPERS
+    const esc = value => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+
+    const formatDate = value => {
+      if (!value) return '-';
+
+      const parts = String(value).substring(0, 10).split('-');
+      if (parts.length !== 3) return esc(value);
+
+      const date = new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
+      );
+
+      return date.toLocaleDateString('en-GB', {
+        day: 'numeric',
+        month: 'short',
+        year: '2-digit'
+      });
+    };
+
+    const formatTime = value => {
+      if (!value) return '';
+      return String(value).substring(0, 5);
+    };
+
+    const days = [
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY'
+    ];
+
+    const dayLabels = [
+      'MON',
+      'TUE',
+      'WED',
+      'THU',
+      'FRI',
+      'SAT',
+      'SUN'
+    ];
+
+    // BRANCH NAME
+    const getBranchLabel = branchId => {
+      const branch = (employeeAttendanceBranches || []).find(item =>
+        String(item.id || '').trim() === String(branchId || '').trim()
+      );
+
+      return branch?.name || branchId || '-';
+    };
+
+    const uniqueBranchIds = [
+      ...new Set(rows.map(row => String(row.Branch_ID || '').trim()))
+    ];
+
+    const branchNames = uniqueBranchIds.map(getBranchLabel);
+    const branchTitle = selectedBranch
+      ? getBranchLabel(selectedBranch)
+      : [...new Set(branchNames)].join(', ') || 'All Branch';
+    // BUILD WEEKLY EMPLOYEE MAP
+    const employeeMap = new Map();
+
+    rows.forEach(row => {
+      const employeeId = String(row.Employee_ID || '').trim();
+      const branchId = String(row.Branch_ID || '').trim();
+
+      const mapKey = `${employeeId}__${branchId}`;
+
+      if (!employeeMap.has(mapKey)) {
+        employeeMap.set(mapKey, {
+          employeeId,
+          name: row.Full_Name || '-',
+          code: row.Employee_Code || '',
+          position:
+            row.Position ||
+            row.position ||
+            row.Job_Title ||
+            row.Job_Title_Name ||
+            row.Employee_Position ||
+            row.Role ||
+            row.role ||
+            '-',
+          branchId,
+          days: {}
+        });
+      }
+
+      const employee = employeeMap.get(mapKey);
+      const day = String(row.Day_Of_Week || '').trim().toUpperCase();
+
+      if (!days.includes(day)) return;
+
+      employee.days[day] = row;
+    });
+
+    const employees = [...employeeMap.values()].sort((a, b) =>
+      String(a.name).localeCompare(String(b.name), 'id')
+    );
+
+    // WEEK DATE HEADERS
+    const monday = new Date(`${weekStart}T00:00:00`);
+
+    if (Number.isNaN(monday.getTime())) {
+      alert('Tanggal Schedule Week tidak valid.');
+      return;
+    }
+
+    const weekDates = days.map((day, index) => {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + index);
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const dayNumber = String(date.getDate()).padStart(2, '0');
+
+      return `${year}-${month}-${dayNumber}`;
+    });
+
+    // TABLE HEADER
+    const headerHtml = `
+      <tr>
+        <th class="employee-col">Employee</th>
+        <th class="position-col">Position</th>
+        <th class="branch-col">Branch</th>
+        ${dayLabels.map((label, index) => `
+          <th class="day-col">
+            <div>${label}</div>
+            <div class="date-label">${formatDate(weekDates[index])}</div>
+          </th>
+        `).join('')}
+        <th class="attd-col">ATTD</th>
+      </tr>
+    `;
+
+    // EMPLOYEE ROWS
+    const employeeRowsHtml = employees.map(employee => {
+      let attendanceDays = 0;
+
+      const dayCells = days.map(day => {
+        const schedule = employee.days[day];
+
+        if (!schedule || schedule.Is_Active !== true) {
+          return `<td class="off-cell">OFF</td>`;
+        }
+
+        attendanceDays++;
+
+        const start = formatTime(schedule.Start_Time);
+        return `
+          <td class="shift-cell">
+            ${esc(start || '-')}
+          </td>
+        `;
+      }).join('');
+
+      return `
+        <tr>
+          <td class="employee-col">
+            <div class="employee-name">${esc(employee.name)}</div>
+            ${employee.code
+              ? `<div class="employee-code">${esc(employee.code)}</div>`
+              : ''}
+          </td>
+          <td class="position-col">${esc(employee.position)}</td>
+          <td class="branch-col">${esc(getBranchLabel(employee.branchId))}</td>
+          ${dayCells}
+          <td class="attd-col">${attendanceDays}</td>
+        </tr>
+      `;
+    }).join('');
+
+    // TENANT LOGO
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+    // REPORT
+    const filename = `Schedule - ${branchTitle} - ${weekStart}.pdf`;
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #0B0F14;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 30px 18px;
+          }
+
+          .toolbar {
+            max-width: 1400px;
+            margin: 0 auto 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            padding: 10px 16px;
+            border: 1px solid rgba(255,255,255,.18);
+            border-radius: 8px;
+            background: #F59E0B;
+            color: #111827;
+            font-weight: 700;
+            cursor: pointer;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 28px;
+            background: white;
+            border-radius: 4px;
+          }
+
+          .report-header {
+            text-align: center;
+            margin-bottom: 24px;
+          }
+
+          .logo {
+            display: block;
+            width: auto;
+            max-width: 150px;
+            max-height: 75px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+          }
+
+          .title {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: #111827;
+          }
+
+          .branch-title {
+            margin-top: 7px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+          }
+
+          .period {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #6B7280;
+          }
+
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+            font-size: 10px;
+          }
+
+          th, td {
+            border: 1px solid #D1D5DB;
+            padding: 9px 5px;
+            text-align: center;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+          }
+
+          th {
+            background: #F3F4F6;
+            color: #374151;
+            font-weight: 800;
+          }
+
+          th.employee-col,
+          td.employee-col {
+            width: 17%;
+            text-align: left;
+          }
+
+          th.position-col,
+          td.position-col {
+            width: 10%;
+          }
+
+          th.branch-col,
+          td.branch-col {
+            width: 11%;
+          }
+
+          th.day-col,
+          td.shift-cell,
+          td.off-cell {
+            width: 7%;
+          }
+
+          th.attd-col,
+          td.attd-col {
+            width: 6%;
+            font-weight: 800;
+          }
+
+          .date-label {
+            margin-top: 5px;
+            font-size: 9px;
+            font-weight: 500;
+            white-space: nowrap;
+          }
+
+          .employee-name {
+            font-weight: 700;
+            color: #111827;
+          }
+
+          .employee-code {
+            margin-top: 3px;
+            color: #6B7280;
+            font-size: 9px;
+          }
+
+          td.shift-cell {
+            background: #FFFFFF;
+            color: #111827;
+          }
+
+          td.off-cell {
+            background: #FEE2E2;
+            color: #B91C1C;
+            font-weight: 800;
+          }
+
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #9CA3AF;
+          }
+
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              padding: 0;
+              margin: 0;
+              background: white;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            .off-cell {
+              background: #FEE2E2 !important;
+              color: #B91C1C !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Employee Schedule Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            ${logoUrl ? `
+              <img
+                src="${esc(logoUrl)}"
+                class="logo"
+                alt="Company Logo"
+                onerror="this.style.display='none'"
+              >
+            ` : ''}
+
+            <h1 class="title">SCHEDULE</h1>
+            <div class="branch-title">${esc(branchTitle)}</div>
+            <div class="period">
+              Week: ${esc(formatDate(weekDates[0]))}
+              – ${esc(formatDate(weekDates[6]))}
+            </div>
+          </header>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                ${headerHtml}
+              </thead>
+              <tbody>
+                ${employeeRowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+
+        <script>
+          window.addEventListener('load', function () {
+            const images = Array.from(document.images);
+
+            Promise.all(images.map(img => {
+              if (img.complete) return Promise.resolve();
+
+              return new Promise(resolve => {
+                img.onload = resolve;
+                img.onerror = resolve;
+              });
+            })).then(() => {
+              // Pengguna menekan tombol Download / Print PDF.
+            });
+          });
+        <\/script>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB
+    const reportWindow = window.open('', '_blank');
+    if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Employee Schedule error:', error);
+    alert('Gagal membuat PDF Schedule. Periksa Console untuk detail kesalahan.');
+  }
+};
+
+
+/* =========================================================
    									EMPLOYEE ATTENDANCE
 ========================================================= */
 let employeeAttendanceBranches = [];
