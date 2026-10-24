@@ -37082,6 +37082,7 @@ window.recordPayroll = async function () {
     if (!data?.success) { throw new Error(data?.message || 'Gagal mencatat payroll.'); }
 		invalidateEmployeeTaxCache();
 		invalidateEmployeeHealthCache();
+		window.invalidatePayrollCache();
     await window.loadPayroll();
 
     alert(
