@@ -35493,7 +35493,6 @@ function closeAttendanceModal(modalId) {
   modal.classList.remove('flex');
 }
 
-
 function exportEmployeeAttendance() {
   // AMBIL DATA
   const recapRows = Array.isArray(filteredAttendanceRecapData)
@@ -35508,12 +35507,16 @@ function exportEmployeeAttendance() {
     ? attendanceRecapOvertimeRows
     : [];
 
-  // FILTER OUTLET DAN NAMA OUTLET
-  const period = document.getElementById("recapPeriod")?.value || "-";
+  // FILTER PERIODE
+  const period =
+    document.getElementById("recapPeriod")?.value || "-";
 
-  const branch = document.getElementById("employeeAttendanceExportBranchFilter");
-	const selectedBranchId = String(branch?.value || "").trim();
+  // AMBIL FILTER OUTLET DARI UI EMPLOYEE ATTENDANCE
+  // TIDAK MEMBUAT DROPDOWN BARU
+  const branch = document.getElementById("attendanceBranchFilter");
+  const selectedBranchId = String(branch?.value || "").trim();
 
+  // MAP ID OUTLET KE NAMA OUTLET
   const branchNameById = new Map(
     Array.from(branch?.options || [])
       .filter(option => String(option.value || "").trim() !== "")
@@ -35530,17 +35533,17 @@ function exportEmployeeAttendance() {
 
   const branchLabel = selectedBranchId
     ? getBranchName(selectedBranchId)
-    : "All Outlets";
+    : "All Branch";
 
-	// FILTER BERDASARKAN BRANCH_ID
-	// Jika All Outlets dipilih, tampilkan semua data.
-	const filterByBranch = rows => {
-	  if (!selectedBranchId) return rows;
-	
-	  return rows.filter(row =>
-	    String(row.Branch_ID || "").trim() === selectedBranchId
-	  );
-	};
+  // FILTER KETIGA DATASET DENGAN OUTLET YANG SAMA
+  // All Branch = semua outlet
+  const filterByBranch = rows => {
+    if (!selectedBranchId) return rows;
+
+    return rows.filter(row =>
+      String(row.Branch_ID || "").trim() === selectedBranchId
+    );
+  };
 
   const filteredRecapRows = filterByBranch(recapRows);
   const filteredAttendanceRows = filterByBranch(attendanceRows);
@@ -35557,10 +35560,17 @@ function exportEmployeeAttendance() {
     ],
     attendanceBefore: attendanceRows.length,
     attendanceAfter: filteredAttendanceRows.length,
+    attendanceBranchIDs: [
+      ...new Set(attendanceRows.map(row => row.Branch_ID))
+    ],
     overtimeBefore: overtimeRows.length,
-    overtimeAfter: filteredOvertimeRows.length
+    overtimeAfter: filteredOvertimeRows.length,
+    overtimeBranchIDs: [
+      ...new Set(overtimeRows.map(row => row.Branch_ID))
+    ]
   });
 
+  // VALIDASI DATA REKAP
   if (!filteredRecapRows.length) {
     alert(
       `Tidak ada data attendance recap untuk ${branchLabel}.`
@@ -35586,12 +35596,12 @@ function exportEmployeeAttendance() {
   const overtimeByEmployee = new Map();
 
   filteredOvertimeRows.forEach(row => {
-    const id = String(row.Employee_ID || "").trim();
-    if (!id) return;
+    const employeeId = String(row.Employee_ID || "").trim();
+    if (!employeeId) return;
 
     overtimeByEmployee.set(
-      id,
-      (overtimeByEmployee.get(id) || 0) +
+      employeeId,
+      (overtimeByEmployee.get(employeeId) || 0) +
         Number(row.Overtime_Minutes || 0)
     );
   });
@@ -35753,6 +35763,7 @@ function exportEmployeeAttendance() {
 
   for (let col = 0; col < 12; col++) {
     const cell = `${String.fromCharCode(65 + col)}6`;
+
     setExcelStyle(ws, cell, {
       font: { bold: true }
     });
@@ -35779,6 +35790,7 @@ function exportEmployeeAttendance() {
   }
 
   // STYLE ATTENDANCE HISTORY
+  // Posisi berdasarkan jumlah baris overtime yang benar-benar diekspor.
   const historyTitleRow =
     overtimeHeaderRow + overtimeHistory.length + 2;
 
@@ -35801,12 +35813,14 @@ function exportEmployeeAttendance() {
 
   // EXPORT EXCEL
   const safePeriod = String(period).replace(/[\\/:*?"<>|]/g, "-");
+  const safeBranch = String(branchLabel).replace(/[\\/:*?"<>|]/g, "-");
 
   XLSX.writeFile(
     wb,
-    `employee-attendance-${safePeriod}.xlsx`
+    `employee-attendance-${safePeriod}-${safeBranch}.xlsx`
   );
 }
+
 
 let employeeOvertimeData = [];
 async function loadEmployeeOvertime() {
