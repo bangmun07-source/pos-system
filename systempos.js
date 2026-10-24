@@ -35509,11 +35509,10 @@ function exportEmployeeAttendance() {
     : [];
 
   // FILTER OUTLET DAN NAMA OUTLET
-  const period =
-    document.getElementById("recapPeriod")?.value || "-";
+  const period = document.getElementById("recapPeriod")?.value || "-";
 
-  const branch = document.getElementById("recapBranchFilter");
-  const selectedBranchId = String(branch?.value || "").trim();
+  const branch = document.getElementById("employeeAttendanceExportBranchFilter");
+	const selectedBranchId = String(branch?.value || "").trim();
 
   const branchNameById = new Map(
     Array.from(branch?.options || [])
@@ -35533,17 +35532,15 @@ function exportEmployeeAttendance() {
     ? getBranchName(selectedBranchId)
     : "All Outlets";
 
-  // WAJIB PILIH OUTLET TERTENTU
-  if (!selectedBranchId) {
-    alert("Silakan pilih Outlet terlebih dahulu sebelum export.");
-    return;
-  }
-
-  // FILTER BERDASARKAN BRANCH_ID
-  const filterByBranch = rows =>
-    rows.filter(row =>
-      String(row.Branch_ID || "").trim() === selectedBranchId
-    );
+	// FILTER BERDASARKAN BRANCH_ID
+	// Jika All Outlets dipilih, tampilkan semua data.
+	const filterByBranch = rows => {
+	  if (!selectedBranchId) return rows;
+	
+	  return rows.filter(row =>
+	    String(row.Branch_ID || "").trim() === selectedBranchId
+	  );
+	};
 
   const filteredRecapRows = filterByBranch(recapRows);
   const filteredAttendanceRows = filterByBranch(attendanceRows);
