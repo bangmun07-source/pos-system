@@ -34790,24 +34790,14 @@ window.exportEmployeeSchedule = async function () {
     const selectedWeek = String(weekFilter?.value || '').trim();
     const selectedEmployee = String(employeeFilter?.value || '').trim();
     const selectedBranch = String(branchFilter?.value || '').trim();
-
-    const role = String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase();
-
-    const userBranchId = String(
-      state.user?.branchId || state.user?.Branch_ID || ''
-    ).trim();
-
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
     const canViewAllBranches =
       ['owner', 'accountant'].includes(role) ||
       userBranchId.toUpperCase() === 'ALL';
 
     // VALIDATE DATA
-    if (!Array.isArray(scheduleData) || !scheduleData.length) {
-      alert('Data Schedule belum tersedia.');
-      return;
-    }
+    if (!Array.isArray(scheduleData) || !scheduleData.length) { alert('Data Schedule belum tersedia.'); return; }
 
     // Gunakan minggu yang dipilih.
     // Jika Current Week dipilih, hitung hari Senin minggu ini.
@@ -34829,7 +34819,6 @@ window.exportEmployeeSchedule = async function () {
       String(currentMonday.getMonth() + 1).padStart(2, '0'),
       String(currentMonday.getDate()).padStart(2, '0')
     ].join('-');
-
     const weekStart = selectedWeek || currentWeekStart;
 
     // FILTER SCHEDULE DATA
@@ -34841,26 +34830,14 @@ window.exportEmployeeSchedule = async function () {
       const rowEmployee = String(row.Employee_ID || '').trim();
 
       if (rowWeek !== weekStart) return false;
-
-      if (!canViewAllBranches && rowBranch !== userBranchId) {
-        return false;
-      }
-
-      if (selectedEmployee && rowEmployee !== selectedEmployee) {
-        return false;
-      }
-
-      if (selectedBranch && rowBranch !== selectedBranch) {
-        return false;
-      }
+      if (!canViewAllBranches && rowBranch !== userBranchId) { return false; }
+      if (selectedEmployee && rowEmployee !== selectedEmployee) { return false; }
+      if (selectedBranch && rowBranch !== selectedBranch) { return false; }
 
       return true;
     });
 
-    if (!rows.length) {
-      alert('Tidak ada Schedule untuk minggu dan filter yang dipilih.');
-      return;
-    }
+    if (!rows.length) { alert('Tidak ada Schedule untuk minggu dan filter yang dipilih.'); return; }
 
     // HELPERS
     const esc = value => String(value ?? '')
@@ -34916,28 +34893,19 @@ window.exportEmployeeSchedule = async function () {
 
     // BRANCH NAME
     const getBranchLabel = branchId => {
-      const branch = (employeeAttendanceBranches || []).find(item =>
-        String(item.id || '').trim() === String(branchId || '').trim()
-      );
+      const branch = (employeeAttendanceBranches || []).find(item => String(item.id || '').trim() === String(branchId || '').trim() );
 
       return branch?.name || branchId || '-';
     };
-
-    const uniqueBranchIds = [
-      ...new Set(rows.map(row => String(row.Branch_ID || '').trim()))
-    ];
-
-    const branchNames = uniqueBranchIds.map(getBranchLabel);
-    const branchTitle = selectedBranch
-      ? getBranchLabel(selectedBranch)
-      : [...new Set(branchNames)].join(', ') || 'All Branch';
+		const branchTitle = selectedBranch
+		  ? getBranchLabel(selectedBranch)
+		  : 'ALL';
     // BUILD WEEKLY EMPLOYEE MAP
     const employeeMap = new Map();
 
     rows.forEach(row => {
       const employeeId = String(row.Employee_ID || '').trim();
       const branchId = String(row.Branch_ID || '').trim();
-
       const mapKey = `${employeeId}__${branchId}`;
 
       if (!employeeMap.has(mapKey)) {
@@ -34961,23 +34929,16 @@ window.exportEmployeeSchedule = async function () {
 
       const employee = employeeMap.get(mapKey);
       const day = String(row.Day_Of_Week || '').trim().toUpperCase();
-
       if (!days.includes(day)) return;
 
       employee.days[day] = row;
     });
 
-    const employees = [...employeeMap.values()].sort((a, b) =>
-      String(a.name).localeCompare(String(b.name), 'id')
-    );
-
+    const employees = [...employeeMap.values()].sort((a, b) => String(a.name).localeCompare(String(b.name), 'id') );
     // WEEK DATE HEADERS
     const monday = new Date(`${weekStart}T00:00:00`);
 
-    if (Number.isNaN(monday.getTime())) {
-      alert('Tanggal Schedule Week tidak valid.');
-      return;
-    }
+    if (Number.isNaN(monday.getTime())) { alert('Tanggal Schedule Week tidak valid.'); return; }
 
     const weekDates = days.map((day, index) => {
       const date = new Date(monday);
@@ -35012,10 +34973,7 @@ window.exportEmployeeSchedule = async function () {
 
       const dayCells = days.map(day => {
         const schedule = employee.days[day];
-
-        if (!schedule || schedule.Is_Active !== true) {
-          return `<td class="off-cell">OFF</td>`;
-        }
+        if (!schedule || schedule.Is_Active !== true) { return `<td class="off-cell">OFF</td>`; }
 
         attendanceDays++;
 
@@ -35070,13 +35028,13 @@ window.exportEmployeeSchedule = async function () {
 				  }
 				
 				  body {
-				    background: #0B0F14;
+				    background: #000000;
 				    color: #333;
 				    font-family: Arial, Helvetica, sans-serif;
 				    padding: 40px 20px;
 				  }
 				
-				  /* TOOLBAR — SAME AS CASH FLOW */
+				  /* TOOLBAR */
 				  .toolbar {
 				    width: 100%;
 				    max-width: 1100px;
@@ -35193,9 +35151,6 @@ window.exportEmployeeSchedule = async function () {
 				    overflow-wrap: anywhere;
 				  }
 				
-				  tbody tr:nth-child(even) {
-				    background: #fafafa;
-				  }
 				
 				  tbody tr:last-child td {
 				    border-bottom: none;
@@ -35270,12 +35225,12 @@ window.exportEmployeeSchedule = async function () {
 				    white-space: nowrap;
 				  }
 				
-				  td.off-cell {
-				    background: #fef2f2;
-				    color: #dc2626;
-				    font-weight: 700;
-				    white-space: nowrap;
-				  }
+					td.off-cell {
+					  background: #dc2626;
+					  color: #000;
+					  font-weight: 700;
+					  white-space: nowrap;
+					}
 				
 				  td.attd-col {
 				    color: #222;
@@ -35336,18 +35291,12 @@ window.exportEmployeeSchedule = async function () {
 				      print-color-adjust: exact;
 				    }
 				
-				    tbody tr:nth-child(even) {
-				      background: #fafafa !important;
-				      -webkit-print-color-adjust: exact;
-				      print-color-adjust: exact;
-				    }
-				
-				    td.off-cell {
-				      background: #fef2f2 !important;
-				      color: #dc2626 !important;
-				      -webkit-print-color-adjust: exact;
-				      print-color-adjust: exact;
-				    }
+						td.off-cell {
+						  background: #dc2626 !important;
+						  color: #000 !important;
+						  -webkit-print-color-adjust: exact;
+						  print-color-adjust: exact;
+						}
 				
 				    table {
 				      page-break-inside: auto;
@@ -35375,7 +35324,7 @@ window.exportEmployeeSchedule = async function () {
               >
             ` : ''}
 
-            <h1 class="title">SCHEDULE</h1>
+            <h1 class="title">Employee SCHEDULE</h1>
             <div class="branch-title">${esc(branchTitle)}</div>
             <div class="period">
               Week: ${esc(formatDate(weekDates[0]))}
