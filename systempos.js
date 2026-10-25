@@ -32934,7 +32934,7 @@ window.changeEmployeePage = function (direction) {
 
 
 /* ==== EXPORT EMPLOYEE LIST PDF ==== */
-window.exportEmployeePDF = function () {
+window.exportEmployee = function () {
   try {
     const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
     const sessionBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
