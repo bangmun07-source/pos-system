@@ -32848,10 +32848,6 @@ function renderEmployeeTable() {
 					  )}
 					</td>
 
-          <td class="px-5 py-4 text-muted">
-            -
-          </td>
-
           <td class="px-5 py-4 text-center">
             <span class="${statusClass}">
               ${escapeEmployeeHtml(employee.Status)}
