@@ -40244,8 +40244,6 @@ window.changePayrollPage = function (direction) {
     window.renderPayrollTable();
 };
 
-
-
 /* ==== EXPORT PAYROLL PDF ==== */
 window.exportPayroll = function () {
   try {
@@ -40267,7 +40265,6 @@ window.exportPayroll = function () {
 		  : Array.isArray(window.branches)
 		    ? window.branches
 		    : [];
-		
 		const getBranchLabel = branchId => {
 		  const id = String(branchId || '').trim();
 		
