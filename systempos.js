@@ -32932,6 +32932,363 @@ window.changeEmployeePage = function (direction) {
   renderEmployeeTable();
 };
 
+
+/* ==== EXPORT EMPLOYEE LIST PDF ==== */
+window.exportEmployeePDF = function () {
+  try {
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const sessionBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+		
+    if (!['owner', 'accountant', 'admin', 'cashier'].includes(role)) { alert('Role tidak memiliki akses ke Employee List.'); return; }
+		
+    const statusFilter = String( document.getElementById('employeeStatusFilter')?.value || '' ).trim().toUpperCase();
+    const branchFilter = String( document.getElementById('employeeBranchFilter')?.value || '' ).trim();
+    const branches = Array.isArray(employeeAttendanceBranches)
+      ? employeeAttendanceBranches
+      : [];
+    const getBranchName = branchId => {
+      const id = String(branchId || '').trim();
+
+      return branches.find(branch =>
+        String(branch.id || '').trim() === id
+      )?.name || id || '-';
+    };
+    // Batasi role non-owner/accountant ke outlet miliknya sendiri.
+    const selectedBranch = ['owner', 'accountant'].includes(role)
+			? branchFilter
+			: sessionBranchId;
+    // Gunakan data employee yang sudah dimuat, bukan hanya halaman tabel.
+    const source = Array.isArray(employeeData) ? employeeData : [];
+    const rows = source.filter(employee => {
+      const employeeStatus = String( employee.Status || '' ).trim().toUpperCase();
+      const employeeBranch = String( employee.Branch_ID || '' ).trim();
+
+      if (statusFilter && employeeStatus !== statusFilter) { return false; }
+      if (selectedBranch && employeeBranch !== selectedBranch) { return false; }
+			
+      return true;
+    });
+
+    if (!rows.length) { alert('Tidak ada data Employee sesuai filter yang dipilih.'); return; }
+
+    const escapeHTML = value => {
+      if (typeof window.escapeEmployeeHtml === 'function') { return window.escapeEmployeeHtml(value ?? '-'); }
+
+      return String(value ?? '-').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    };
+
+    const branchTitle = selectedBranch
+      ? getBranchName(selectedBranch)
+      : 'ALL BRANCHES';
+    const statusTitle = statusFilter || 'ALL STATUS';
+    const tableRows = rows.map((employee, index) => {
+      const status = String( employee.Status || '-' ).trim().toUpperCase();
+      const statusColor = status === 'ACTIVE'
+        ? '#15803d'
+        : '#64748b';
+
+      return `
+        <tr>
+          <td class="center">${index + 1}</td>
+          <td>${escapeHTML(employee.Employee_Code || '-')}</td>
+          <td>${escapeHTML(employee.Full_Name || '-')}</td>
+          <td>${escapeHTML(employee.Position || '-')}</td>
+          <td>${escapeHTML(getBranchName(employee.Branch_ID))}</td>
+          <td class="center">
+            <span style="color:${statusColor};font-weight:600">
+              ${escapeHTML(status)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    const supabaseUrl = String(
+      supabaseClient?.supabaseUrl || ''
+    ).replace(/\/$/, '');
+
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+
+    const reportWindow = window.open('', '_blank');
+
+    if (!reportWindow) {
+      alert(
+        'Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'
+      );
+      return;
+    }
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Employee List - ${escapeHTML(branchTitle)}</title>
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            padding: 24px;
+            background: #181818;
+            color: #111827;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+          }
+
+          .toolbar {
+            max-width: 1100px;
+            margin: 0 auto 16px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+          }
+
+          .toolbar button {
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 5px;
+            background: #f59e0b;
+            color: #111827;
+            font-weight: 700;
+            cursor: pointer;
+          }
+
+          .toolbar button.secondary {
+            background: #ffffff;
+          }
+
+          .page {
+            max-width: 1100px;
+            min-height: 700px;
+            margin: 0 auto;
+            padding: 32px;
+            background: #ffffff;
+          }
+
+          .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #111827;
+          }
+
+          .logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+          }
+
+          .brand {
+            margin: 0 0 5px;
+            font-size: 10px;
+            color: #64748b;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+          }
+
+          h1 {
+            margin: 0;
+            font-size: 25px;
+            letter-spacing: 1px;
+          }
+
+          .subtitle {
+            margin-top: 7px;
+            color: #64748b;
+            font-size: 11px;
+          }
+
+          .meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+          }
+
+          .meta-card {
+            border: 1px solid #e5e7eb;
+            padding: 12px 14px;
+          }
+
+          .meta-label {
+            color: #64748b;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+          }
+
+          .meta-value {
+            font-size: 12px;
+            font-weight: 700;
+          }
+
+          .table-wrap {
+            width: 100%;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            background: #f3f4f6;
+            text-align: left;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+          }
+
+          th, td {
+            border: 1px solid #d1d5db;
+            padding: 10px 8px;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr {
+            break-inside: avoid;
+          }
+
+          .center {
+            text-align: center;
+          }
+
+          .footer {
+            margin-top: 24px;
+            padding-top: 10px;
+            border-top: 1px solid #d1d5db;
+            color: #64748b;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 9px;
+          }
+
+          @page {
+            size: A4 landscape;
+            margin: 12mm;
+          }
+
+          @media print {
+            body {
+              padding: 0;
+              background: #ffffff;
+              print-color-adjust: exact;
+              -webkit-print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .page {
+              max-width: none;
+              min-height: 0;
+              margin: 0;
+              padding: 0;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <button class="secondary" onclick="window.close()">
+            Close
+          </button>
+          <button onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="page">
+          <header class="header">
+            ${
+              logoUrl
+                ? `<img class="logo" src="${escapeHTML(logoUrl)}" alt="MUNO Logo">`
+                : ''
+            }
+
+            <div>
+              <p class="brand">MUNO</p>
+              <h1>EMPLOYEE LIST</h1>
+              <div class="subtitle">
+                Employee biodata and account management
+              </div>
+            </div>
+          </header>
+
+          <section class="meta">
+            <div class="meta-card">
+              <div class="meta-label">Branch / Outlet</div>
+              <div class="meta-value">${escapeHTML(branchTitle)}</div>
+            </div>
+
+            <div class="meta-card">
+              <div class="meta-label">Employee Status</div>
+              <div class="meta-value">${escapeHTML(statusTitle)}</div>
+            </div>
+          </section>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th class="center">No.</th>
+                  <th>Employee ID</th>
+                  <th>Employee Name</th>
+                  <th>Position</th>
+                  <th>Outlet</th>
+                  <th class="center">Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            <span>MUNO • Employee Management</span>
+            <span>Total Employees: ${rows.length}</span>
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Employee PDF error:', error);
+    alert('Gagal membuat PDF Employee. Periksa Console untuk detail kesalahan.');
+  }
+};
+
+
 /* ==== HTML ESCAPE ==== */
 function escapeEmployeeHtml(value) {
   return String(value ?? '')
