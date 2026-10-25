@@ -41291,6 +41291,10 @@ window.exportReimbursement = async function () {
         ? getBranchLabel(userBranchId)
         : 'ALL BRANCHES';
     const periodTitle = selectedPeriod || 'ALL PERIODS';
+    // KPI / SUMMARY
+    const totalAmount = rows.reduce( (sum, row) => sum + getAmount(row), 0 );
+    const totalPaid = rows.reduce( (sum, row) => sum + getPaid(row), 0 );
+    const totalRemaining = rows.reduce( (sum, row) => sum + getRemaining(row), 0 );
     // TABLE ROWS
     const tableRowsHtml = rows.map(row => {
       const status = String(row.Status || 'DRAFT').trim().toUpperCase();
@@ -41317,9 +41321,7 @@ window.exportReimbursement = async function () {
           <td class="amount-cell">${esc(money(getPaid(row)))}</td>
           <td class="amount-cell remaining-cell">${esc(money(getRemaining(row)))}</td>
           <td>${esc(row.Payroll_Period ? String(row.Payroll_Period).slice(0, 7) : '-')}</td>
-          <td>
-            <span class="status ${statusClass}">${esc(status)}</span>
-          </td>
+          <td><span class="status ${statusClass}">${esc(status)}</span></td>
         </tr>
       `;
     }).join('');
@@ -41428,6 +41430,36 @@ window.exportReimbursement = async function () {
             margin-top: 5px;
             font-size: 11px;
             color: #777;
+          }
+
+          /* KPI / SUMMARY */
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+          }
+
+          .summary-label {
+            font-size: 9px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 7px;
+          }
+
+          .summary-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
           }
 
           /* TABLE */
@@ -41577,8 +41609,9 @@ window.exportReimbursement = async function () {
               margin-bottom: 16px;
             }
 
+            .summary-card,
             .table-wrap {
-              break-inside: auto;
+              break-inside: avoid;
             }
 
             th {
@@ -41629,6 +41662,25 @@ window.exportReimbursement = async function () {
             <div class="period">Period: ${esc(periodTitle)}</div>
           </header>
 
+          <!-- KPI / SUMMARY TETAP DIPERTAHANKAN -->
+          <section class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Total Claims (${rows.length})</div>
+              <div class="summary-value">${esc(money(totalAmount))}</div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Paid Amount</div>
+              <div class="summary-value">${esc(money(totalPaid))}</div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Remaining Amount</div>
+              <div class="summary-value">${esc(money(totalRemaining))}</div>
+            </div>
+          </section>
+
+          <!-- TABEL REIMBURSEMENT -->
           <div class="table-wrap">
             <table>
               <thead>
@@ -41662,11 +41714,7 @@ window.exportReimbursement = async function () {
 
     // OPEN REPORT IN NEW TAB — SAMA SEPERTI EMPLOYEE SCHEDULE
     const reportWindow = window.open('', '_blank');
-
-    if (!reportWindow) {
-      alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.');
-      return;
-    }
+    if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
 
     reportWindow.document.open();
     reportWindow.document.write(html);
@@ -41677,7 +41725,6 @@ window.exportReimbursement = async function () {
     alert('Gagal membuat PDF Reimbursement. Periksa Console untuk detail kesalahan.');
   }
 };
-
 
 /* ==== INITIALIZE ==== */
 window.initEmployeeReimbursement = async function () {
