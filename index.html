@@ -24894,8 +24894,8 @@
                 </p>
               </div>
             </div>
-						
-						<div class="flex items-center gap-2">
+
+						<div class="flex items-center gap-2 flex-wrap">
 						  <button type="button"
 						    onclick="calculatePayroll()"
 						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
@@ -24913,58 +24913,77 @@
 						    </span>
 						    Record Payroll
 						  </button>
+						
+						  <button type="button"
+						    onclick="exportPayroll()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      picture_as_pdf
+						    </span>
+						    Export
+						  </button>
 						</div>
           </div>
 					<!-- PAYROLL FILTER -->
 					<div class="p-5 border-b border-outline-variant">
-					  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-					    <!-- PERIOD -->
-					    <div>
-					      <label class="block text-xs text-muted mb-2">
-					        Payroll Period
-					      </label>
-					      <input id="payrollPeriod"
-					        type="month"
-					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
-					    </div>
-					    <!-- OUTLET -->
-					    <div>
-					      <label class="block text-xs text-muted mb-2">
-					        Outlet
-					      </label>
-					      <select id="payrollBranchFilter"
-					        onchange="onPayrollBranchFilterChange()"
-					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					        <option value="">All Branch</option>
-					      </select>
-					    </div>
-					    <!-- EMPLOYEE -->
-					    <div>
-					      <label class="block text-xs text-muted mb-2">
-					        Employee
-					      </label>
-					      <select id="payrollEmployeeFilter"
-					        onchange="renderPayrollTable()"
-					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					        <option value="">All Employees</option>
-					      </select>
-					    </div>
-					    <!-- STATUS -->
-					    <div>
-					      <label class="block text-xs text-muted mb-2">
-					        Status
-					      </label>
-					      <select id="payrollStatusFilter"
-					        onchange="loadPayroll()"
-					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-					        <option value="">All Status</option>
-					        <option value="DRAFT">Draft</option>
-					        <option value="CALCULATED">Calculated</option>
-					        <option value="PAID">Paid</option>
-					        <option value="CANCELLED">Cancelled</option>
-					      </select>
-					    </div>
-					  </div>
+						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+						  <!-- PERIOD -->
+						  <div>
+						    <label class="block text-xs text-muted mb-2">
+						      Payroll Period
+						    </label>
+						    <input id="payrollPeriod"
+						      type="month"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+						  </div>
+						  <!-- YEAR -->
+						  <div>
+						    <label class="block text-xs text-muted mb-2">
+						      Year
+						    </label>
+						    <select id="payrollYearFilter"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value="">All Years</option>
+						    </select>
+						  </div>
+						  <!-- OUTLET -->
+						  <div>
+						    <label class="block text-xs text-muted mb-2">
+						      Outlet
+						    </label>
+						    <select id="payrollBranchFilter"
+						      onchange="onPayrollBranchFilterChange()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value="">All Branch</option>
+						    </select>
+						  </div>
+						  <!-- EMPLOYEE -->
+						  <div>
+						    <label class="block text-xs text-muted mb-2">
+						      Employee
+						    </label>
+						    <select id="payrollEmployeeFilter"
+						      onchange="renderPayrollTable()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value="">All Employees</option>
+						    </select>
+						  </div>
+						  <!-- STATUS -->
+						  <div>
+						    <label class="block text-xs text-muted mb-2">
+						      Status
+						    </label>
+						    <select id="payrollStatusFilter"
+						      onchange="loadPayroll()"
+						      class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+						      <option value="">All Status</option>
+						      <option value="DRAFT">Draft</option>
+						      <option value="CALCULATED">Calculated</option>
+						      <option value="PAID">Paid</option>
+						      <option value="CANCELLED">Cancelled</option>
+						    </select>
+						  </div>
+						</div>
 					</div>
           <!-- PAYROLL SUMMARY -->
           <div class="grid grid-cols-2 md:grid-cols-4">
