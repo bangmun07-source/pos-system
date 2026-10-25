@@ -38866,9 +38866,13 @@ window.loadPayroll = async function () {
 		if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
 		const periodInput = document.getElementById('payrollPeriod');
+		const yearFilter = document.getElementById('payrollYearFilter');
 		const branchFilter = document.getElementById('payrollBranchFilter');
 		const statusFilter = document.getElementById('payrollStatusFilter');
 		const period = periodInput?.value?.trim() || null;
+		const year = yearFilter?.value?.trim() || null;
+		// Tahun dipilih: ambil semua periode, lalu saring berdasarkan tahun.
+		const rpcPeriod = year ? null : period;
 		const user = typeof state !== 'undefined' ? state.user : null;
 		const role = String(user?.role || '').trim().toUpperCase();
 
@@ -38887,7 +38891,8 @@ window.loadPayroll = async function () {
 		/* ==== PAYROLL CACHE KEY ==== */
 		const cacheKey = JSON.stringify({
 		  sessionId,
-		  period,
+		  period: rpcPeriod,
+			year,
 		  branchId
 		});
 		
@@ -38906,8 +38911,14 @@ window.loadPayroll = async function () {
 
 		if (!window.payrollHandlersAttached) {
 			periodInput?.addEventListener('change', () => {
-				window.payrollCurrentPage = 1;
-				window.loadPayroll();
+			  const yearFilter = document.getElementById('payrollYearFilter');
+			
+			  if (periodInput.value && yearFilter) {
+			    yearFilter.value = '';
+			  }
+			
+			  window.payrollCurrentPage = 1;
+			  window.loadPayroll();
 			});
 			statusFilter?.addEventListener('change', () => {
 				window.payrollCurrentPage = 1;
@@ -38929,19 +38940,28 @@ window.loadPayroll = async function () {
 				'get_employee_payrolls',
 				{
 					p_session_id: sessionId,
-					p_payroll_period: period ? `${period}-01` : null,
+					p_payroll_period: rpcPeriod ? `${rpcPeriod}-01` : null,
 					p_branch_id: branchId
 				}
 			);
 
 		if (error) throw error;
-
+		
 		const result = Array.isArray(data) ? data[0] : data;
 		if (!result || result.success !== true) { throw new Error('Gagal mengambil data Payroll.'); }
-
-		window.payrollRows = Array.isArray(result.rows)
-			? result.rows
-			: [];
+		
+		const allRows = Array.isArray(result.rows)
+		  ? result.rows
+		  : [];
+		
+		// Simpan seluruh data untuk sumber dropdown tahun.
+		window.payrollAllRows = allRows;
+		// Isi dropdown tahun sebelum menerapkan filter.
+		window.populatePayrollYearFilter();
+		// Terapkan filter tahun.
+		window.payrollRows = year
+		  ? allRows.filter(row => String(row.Payroll_Period || '').slice(0, 4) === year )
+		  : allRows;
 		state.payrollCache[cacheKey] = window.payrollRows;
 		window.payrollCurrentPage = 1;
 		window.renderPayrollTable();
@@ -39014,6 +39034,48 @@ window.populatePayrollEmployeeFilter = function () {
   ) {
     employeeFilter.value = previousEmployeeId;
   }
+};
+
+/* ==== PAYROLL YEAR FILTER ==== */
+window.populatePayrollYearFilter = function () {
+  const yearFilter = document.getElementById('payrollYearFilter');
+  if (!yearFilter) return;
+
+  const previousYear = yearFilter.value;
+  const rows = Array.isArray(window.payrollRows)
+    ? window.payrollRows
+    : [];
+  const years = new Set();
+  years.add(String(new Date().getFullYear()));
+
+  rows.forEach(row => {
+    const period = String(row.Payroll_Period || '').slice(0, 10);
+    const match = period.match(/^(\d{4})-\d{2}-\d{2}$/);
+
+    if (match) years.add(match[1]);
+  });
+
+  yearFilter.innerHTML =
+    '<option value="">Select Year</option>' +
+    [...years]
+      .sort((a, b) => Number(b) - Number(a))
+      .map(year => `<option value="${year}">${year}</option>`)
+      .join('');
+
+  if (previousYear && years.has(previousYear)) {
+    yearFilter.value = previousYear;
+  }
+};
+
+window.onPayrollYearFilterChange = function () {
+  const yearFilter = document.getElementById('payrollYearFilter');
+  const periodInput = document.getElementById('payrollPeriod');
+
+  // Jika tahun dipilih, kosongkan periode bulanan.
+  if (yearFilter?.value && periodInput) { periodInput.value = ''; }
+
+  window.payrollCurrentPage = 1;
+  window.loadPayroll();
 };
 
 window.onPayrollBranchFilterChange = function () {
@@ -39183,11 +39245,9 @@ window.renderPayrollTable = function () {
 	}
 
 	const paginationInfo = document.getElementById('payrollPaginationInfo');
-
-	if (paginationInfo) {
-		paginationInfo.textContent = totalRows
-			? `Menampilkan ${startIndex + 1}–${Math.min(startIndex + pageSize, totalRows)} dari ${totalRows} data`
-			: '0 data';
+	if (paginationInfo) { paginationInfo.textContent = totalRows
+		? `Menampilkan ${startIndex + 1}–${Math.min(startIndex + pageSize, totalRows)} dari ${totalRows} data`
+		: '0 data';
 	}
 
 	const prevButton = document.getElementById('payrollPrevButton');
@@ -39200,7 +39260,6 @@ window.renderPayrollTable = function () {
 /* ==== PAYROLL - ACTION MENU DI LUAR TABEL ==== */
 window.togglePayrollActionMenu = function (payrollId, button) {
 	const menu = document.getElementById( `payrollActionMenu_${payrollId}` );
-
 	if (!menu || !button) return;
 
 	const isHidden = menu.classList.contains('hidden');
@@ -39393,7 +39452,6 @@ window.renderPayrollDetailContent = function (payroll, details) {
     })[char]);
 
   const rows = Array.isArray(details) ? details : [];
-
   // Iuran perusahaan tidak ditampilkan sebagai komponen gaji karyawan.
   const employeeRows = rows.filter(row =>
     String(row.Component_Type || '').trim().toUpperCase()
@@ -39401,7 +39459,6 @@ window.renderPayrollDetailContent = function (payroll, details) {
     && String(row.Accounting_Category || '').trim().toUpperCase()
       !== 'EMPLOYER_HEALTH_CONTRIBUTION'
   );
-
   // Kelompokkan berdasarkan data aktual, bukan nama komponen yang di-hardcode.
   const groups = new Map();
 
@@ -39459,7 +39516,6 @@ window.renderPayrollDetailContent = function (payroll, details) {
     'RECEIVABLE',
 		'REIMBURSEMENT'
   ];
-
   const orderedGroups = [...groups.entries()].sort((a, b) => {
     const indexA = preferredOrder.indexOf(a[0]);
     const indexB = preferredOrder.indexOf(b[0]);
@@ -39540,14 +39596,10 @@ window.renderPayrollDetailContent = function (payroll, details) {
 
 window.editPayrollSalary = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
-
 	if (!row) { alert('Data payroll tidak ditemukan.'); return; }
 
 	const status = String(row.Status || '').trim().toUpperCase();
-	if (status === 'PAID' || status === 'CANCELLED') {
-		alert('Payroll berstatus ' + status + ' tidak dapat diedit.');
-		return;
-	}
+	if (status === 'PAID' || status === 'CANCELLED') { alert('Payroll berstatus ' + status + ' tidak dapat diedit.'); return; }
 
 	const sessionId = localStorage.getItem('pos_session_id');
 	if (!sessionId) {
