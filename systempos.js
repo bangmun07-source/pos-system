@@ -40245,55 +40245,26 @@ window.changePayrollPage = function (direction) {
 };
 
 
+
 /* ==== EXPORT PAYROLL PDF ==== */
 window.exportPayroll = function () {
   try {
-    const role = String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase();
-
-    const userBranchId = String(
-      state.user?.branchId ||
-      state.user?.Branch_ID ||
-      ''
-    ).trim();
-
-    const year = String(
-      document.getElementById('payrollYearFilter')?.value || ''
-    ).trim();
-
-    const period = String(
-      document.getElementById('payrollPeriod')?.value || ''
-    ).trim();
-
-    const branchFilter = String(
-      document.getElementById('payrollBranchFilter')?.value || ''
-    ).trim();
-
-    const employeeFilter = String(
-      document.getElementById('payrollEmployeeFilter')?.value || ''
-    ).trim();
-
-    const statusFilter = String(
-      document.getElementById('payrollStatusFilter')?.value || ''
-    ).trim().toUpperCase();
-
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+    const year = String( document.getElementById('payrollYearFilter')?.value || '' ).trim();
+    const period = String( document.getElementById('payrollPeriod')?.value || '' ).trim();
+    const branchFilter = String( document.getElementById('payrollBranchFilter')?.value || '' ).trim();
+    const employeeFilter = String( document.getElementById('payrollEmployeeFilter')?.value || '' ).trim();
+    const statusFilter = String( document.getElementById('payrollStatusFilter')?.value || '' ).trim().toUpperCase();
+		
     // VALIDATE ACCESS
-    if (!['owner', 'accountant', 'admin', 'cashier'].includes(role)) {
-      alert('Role tidak memiliki akses ke Payroll.');
-      return;
-    }
-
-    if (!['owner', 'accountant'].includes(role) && !userBranchId) {
-      alert('Outlet pengguna tidak ditemukan.');
-      return;
-    }
+    if (!['owner', 'accountant', 'admin', 'cashier'].includes(role)) { alert('Role tidak memiliki akses ke Payroll.'); return; }
+    if (!['owner', 'accountant'].includes(role) && !userBranchId) { alert('Outlet pengguna tidak ditemukan.'); return; }
 
     // BRANCH LABEL
     const branches = Array.isArray(window.employeeAttendanceBranches)
       ? window.employeeAttendanceBranches
       : [];
-
     const getBranchLabel = branchId => {
       const id = String(branchId || '').trim();
 
@@ -40301,59 +40272,40 @@ window.exportPayroll = function () {
         String(branch.id || '').trim() === id
       )?.name || id || '-';
     };
-
     // APPLY BRANCH ACCESS
     const selectedBranch = ['owner', 'accountant'].includes(role)
       ? branchFilter
       : userBranchId;
-
     // PAYROLL SOURCE
     const sourceRows = Array.isArray(window.payrollRows)
       ? window.payrollRows
       : [];
-
-    // APPLY ALL ACTIVE FILTERS
+    // APPLY ACTIVE FILTERS
     const rows = sourceRows.filter(row => {
       const rowPeriod = String(row.Payroll_Period || '').slice(0, 10);
       const rowYear = rowPeriod.slice(0, 4);
       const rowMonth = rowPeriod.slice(0, 7);
-
       const rowBranch = String(row.Branch_ID || '').trim();
       const rowEmployee = String(row.Employee_ID || '').trim();
       const rowStatus = String(row.Status || '').trim().toUpperCase();
 
       if (year && rowYear !== year) return false;
       if (period && rowMonth !== period) return false;
-
       if (
         selectedBranch &&
         selectedBranch.toUpperCase() !== 'ALL' &&
         rowBranch !== selectedBranch
-      ) {
-        return false;
-      }
-
-      if (employeeFilter && rowEmployee !== employeeFilter) {
-        return false;
-      }
-
-      if (statusFilter && rowStatus !== statusFilter) {
-        return false;
-      }
-
+      ) { return false; }
+      if (employeeFilter && rowEmployee !== employeeFilter) { return false; }
+      if (statusFilter && rowStatus !== statusFilter) { return false; }
       return true;
     });
 
-    if (!rows.length) {
-      alert('Tidak ada data Payroll sesuai filter yang dipilih.');
-      return;
-    }
+    if (!rows.length) { alert('Tidak ada data Payroll sesuai filter yang dipilih.'); return; }
 
     // HELPERS
     const esc = value => {
-      if (typeof window.escapeEmployeeHtml === 'function') {
-        return window.escapeEmployeeHtml(value ?? '-');
-      }
+      if (typeof window.escapeEmployeeHtml === 'function') { return window.escapeEmployeeHtml(value ?? '-'); }
 
       return String(value ?? '-').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
@@ -40364,79 +40316,35 @@ window.exportPayroll = function () {
       })[char]);
     };
 
-    const money = value =>
-      'Rp ' + Number(value || 0).toLocaleString('id-ID');
-
-    const sum = field => rows.reduce(
-      (total, row) => total + (Number(row[field]) || 0),
-      0
-    );
-
-    // KPI
+    const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+    const sum = field => rows.reduce( (total, row) => total + (Number(row[field]) || 0), 0 );
+    // KPI — TIDAK DIUBAH
     const totalGrossSalary = sum('Gross_Salary');
     const totalAllowance = sum('Total_Allowance');
     const totalDeduction = sum('Total_Deduction');
     const totalNetSalary = sum('Net_Salary');
-
     // REPORT FILTER TITLES
-    const branchTitle = selectedBranch &&
-      selectedBranch.toUpperCase() !== 'ALL'
-        ? getBranchLabel(selectedBranch)
-        : 'ALL OUTLETS';
-
+    const branchTitle = selectedBranch && selectedBranch.toUpperCase() !== 'ALL'
+			? getBranchLabel(selectedBranch)
+			: 'ALL OUTLETS';
     const employeeTitle = employeeFilter
-      ? (
-          rows.find(row =>
-            String(row.Employee_ID || '').trim() === employeeFilter
-          )?.Full_Name || employeeFilter
-        )
+      ? ( rows.find(row => String(row.Employee_ID || '').trim() === employeeFilter )?.Full_Name || employeeFilter )
       : 'ALL EMPLOYEES';
-
     const statusTitle = statusFilter || 'ALL STATUS';
-
     const periodTitle = year
       ? `YEAR ${year}`
       : period
         ? period
         : 'ALL PERIODS';
-
-    const filename =
-      `Payroll Report - ${periodTitle} - ${branchTitle}.pdf`;
-
-    // TABLE ROWS
-    const tableRowsHtml = rows.map((row, index) => {
-      const status = String(row.Status || '-')
-        .trim()
-        .toUpperCase();
-
-      const statusClass =
-        status === 'PAID' || status === 'RECORDED'
-          ? 'status-paid'
-          : status === 'CALCULATED'
-            ? 'status-calculated'
-            : 'status-default';
-
-      return `
-        <tr>
-          <td class="number-cell">${index + 1}</td>
-          <td>${esc(row.Employee_Code || row.Employee_ID || '-')}</td>
-          <td class="employee-name">${esc(row.Full_Name || '-')}</td>
-          <td>${esc(getBranchLabel(row.Branch_ID))}</td>
-          <td>${esc(rowPeriodLabel(row.Payroll_Period))}</td>
-          <td>${esc(status)}</td>
-          <td class="amount">${esc(money(row.Gross_Salary))}</td>
-          <td class="amount">${esc(money(row.Total_Allowance))}</td>
-          <td class="amount">${esc(money(row.Total_Deduction))}</td>
-          <td class="amount net">${esc(money(row.Net_Salary))}</td>
-        </tr>
-      `;
-    }).join('');
-
+    const filename = `Payroll Report - ${periodTitle} - ${branchTitle}.pdf`;
+		
+    // PERIOD LABEL
     function rowPeriodLabel(value) {
       const raw = String(value || '').slice(0, 10);
       if (!raw) return '-';
 
       const date = new Date(`${raw.slice(0, 7)}-01T00:00:00`);
+
       if (Number.isNaN(date.getTime())) return raw;
 
       return date.toLocaleDateString('id-ID', {
@@ -40445,15 +40353,53 @@ window.exportPayroll = function () {
       });
     }
 
-    // TENANT LOGO
-    const supabaseUrl = String(
-      supabaseClient?.supabaseUrl || ''
-    ).replace(/\/$/, '');
+    // TABLE ROWS — SESUAI UI PAYROLL + OUTLET NAME
+    const tableRowsHtml = rows.map((row, index) => {
+      const status = String(row.Status || '-')
+        .trim()
+        .toUpperCase();
+      const statusClass = status === 'PAID' || status === 'RECORDED'
+				? 'status-paid'
+				: status === 'CALCULATED'
+					? 'status-calculated'
+					: 'status-default';
+      const lateValue = Number(row.Late_Minutes || 0);
+      const workMinutes = Number(row.Work_Minutes || 0);
+      // Gunakan nilai overtime jika tersedia pada data.
+      // Jangan menganggap Work_Minutes sebagai overtime.
+      const overtimeValue = Number(
+        row.Total_Overtime ?? row.Overtime_Minutes ?? 0
+      );
 
+      return `
+        <tr>
+          <td class="number-cell">${index + 1}</td>
+          <td class="employee-name"> ${esc(row.Full_Name || '-')} </td>
+          <td> ${esc(getBranchLabel(row.Branch_ID))} </td>
+          <td class="amount"> ${esc(money(row.Basic_Salary))} </td>
+          <td class="amount"> ${esc(money(row.Total_Allowance))} </td>
+          <td class="amount"> ${esc(money(row.Total_Deduction))} </td>
+          <td class="amount"> ${esc(lateValue.toLocaleString('id-ID'))} min </td>
+          <td class="amount"> ${esc(overtimeValue.toLocaleString('id-ID'))} </td>
+          <td class="amount"> ${esc(money(row.Health_Amount))} </td>
+          <td class="amount"> ${esc(money(row.Tax_Amount))} </td>
+          <td class="amount"> ${esc(money(row.Receivable_Amount))} </td>
+          <td class="amount"> ${esc(money(row.Reimburse_Amount))} </td>
+          <td class="amount net"> ${esc(money(row.Net_Salary))} </td>
+          <td>
+            <span class="${statusClass}">
+              ${esc(status)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // TENANT LOGO — TETAP
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
     const logoUrl = supabaseUrl
       ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
       : '';
-
     // REPORT HTML
     const html = `
       <!DOCTYPE html>
@@ -40527,6 +40473,7 @@ window.exportPayroll = function () {
             color: #666;
           }
 
+          /* KPI — TETAP SAMA */
           .summary-grid {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -40557,6 +40504,7 @@ window.exportPayroll = function () {
             overflow-wrap: anywhere;
           }
 
+          /* TABLE */
           .table-wrap {
             width: 100%;
             overflow: visible;
@@ -40565,21 +40513,25 @@ window.exportPayroll = function () {
           table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 9px;
-          }
-
-          thead { display: table-header-group; }
-
-          th {
-            padding: 9px 6px;
-            background: #f3f4f6;
-            border-bottom: 1px solid #ddd;
-            text-align: left;
+            table-layout: auto;
             font-size: 8px;
           }
 
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            padding: 8px 5px;
+            background: #f3f4f6;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            font-size: 7px;
+            white-space: nowrap;
+          }
+
           td {
-            padding: 9px 6px;
+            padding: 8px 5px;
             border-bottom: 1px solid #eee;
             vertical-align: top;
             overflow-wrap: anywhere;
@@ -40592,12 +40544,13 @@ window.exportPayroll = function () {
 
           .number-cell {
             text-align: center;
-            width: 28px;
+            width: 24px;
           }
 
           .employee-name {
             font-weight: 700;
             color: #222;
+            min-width: 80px;
           }
 
           .amount {
@@ -40613,8 +40566,9 @@ window.exportPayroll = function () {
           .status-paid,
           .status-calculated,
           .status-default {
-            font-size: 8px;
+            font-size: 7px;
             font-weight: 700;
+            white-space: nowrap;
           }
 
           .status-paid { color: #15803d; }
@@ -40630,11 +40584,12 @@ window.exportPayroll = function () {
 
           @page {
             size: A4 landscape;
-            margin: 10mm;
+            margin: 8mm;
           }
 
           @media print {
             html, body {
+              width: 100%;
               margin: 0;
               padding: 0;
               background: #fff;
@@ -40642,10 +40597,14 @@ window.exportPayroll = function () {
               print-color-adjust: exact;
             }
 
-            .toolbar { display: none !important; }
+            .toolbar {
+              display: none !important;
+            }
 
             .report {
+              width: 100%;
               max-width: none;
+              margin: 0;
               padding: 0;
             }
 
@@ -40658,6 +40617,15 @@ window.exportPayroll = function () {
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
           }
         </style>
       </head>
@@ -40665,6 +40633,7 @@ window.exportPayroll = function () {
       <body>
         <div class="toolbar">
           <div>Payroll Report</div>
+
           <button type="button" onclick="window.print()">
             Download / Print PDF
           </button>
@@ -40673,14 +40642,11 @@ window.exportPayroll = function () {
         <main class="report">
           <header class="report-header">
             ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
+              <img src="${esc(logoUrl)}"
                 class="logo"
                 alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
+                onerror="this.style.display='none'" >
             ` : ''}
-
             <h1>Payroll Report</h1>
             <div class="meta">Period: ${esc(periodTitle)}</div>
             <div class="meta">Outlet: ${esc(branchTitle)}</div>
@@ -40688,44 +40654,59 @@ window.exportPayroll = function () {
             <div class="meta">Status: ${esc(statusTitle)}</div>
           </header>
 
+          <!-- KPI — TIDAK DIUBAH -->
           <section class="summary-grid">
             <div class="summary-card">
               <div class="summary-label">Gross Salary</div>
-              <div class="summary-value">${esc(money(totalGrossSalary))}</div>
+              <div class="summary-value">
+                ${esc(money(totalGrossSalary))}
+              </div>
             </div>
 
             <div class="summary-card">
               <div class="summary-label">Allowance</div>
-              <div class="summary-value">${esc(money(totalAllowance))}</div>
+              <div class="summary-value">
+                ${esc(money(totalAllowance))}
+              </div>
             </div>
 
             <div class="summary-card">
               <div class="summary-label">Deduction</div>
-              <div class="summary-value">${esc(money(totalDeduction))}</div>
+              <div class="summary-value">
+                ${esc(money(totalDeduction))}
+              </div>
             </div>
 
             <div class="summary-card">
               <div class="summary-label">Net Salary</div>
-              <div class="summary-value">${esc(money(totalNetSalary))}</div>
+              <div class="summary-value">
+                ${esc(money(totalNetSalary))}
+              </div>
             </div>
           </section>
 
+          <!-- TABEL SESUAI UI PAYROLL + OUTLET -->
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>No.</th>
-                  <th>Employee ID</th>
-                  <th>Employee Name</th>
+                  <th>Employee</th>
                   <th>Outlet</th>
-                  <th>Period</th>
-                  <th>Status</th>
-                  <th style="text-align:right">Gross Salary</th>
+                  <th style="text-align:right">Basic Salary</th>
                   <th style="text-align:right">Allowance</th>
                   <th style="text-align:right">Deduction</th>
+                  <th style="text-align:right">Late</th>
+                  <th style="text-align:right">Overtime</th>
+                  <th style="text-align:right">Health</th>
+                  <th style="text-align:right">Tax</th>
+                  <th style="text-align:right">Receivable</th>
+                  <th style="text-align:right">Reimburse</th>
                   <th style="text-align:right">Net Salary</th>
+                  <th style="text-align:center">Status</th>
                 </tr>
               </thead>
+
               <tbody>
                 ${tableRowsHtml}
               </tbody>
@@ -40733,26 +40714,34 @@ window.exportPayroll = function () {
           </div>
 
           <footer class="footer">
-            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+            Generated by MUNO •
+            ${esc(new Date().toLocaleString('id-ID'))}
           </footer>
         </main>
       </body>
       </html>
     `;
 
-    // OPEN REPORT
+    // OPEN REPORT — TETAP
     const reportWindow = window.open('', '_blank');
-    if (!reportWindow) {  alert( 'Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.' ); return; }
+
+    if (!reportWindow) {
+      alert(
+        'Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'
+      );
+      return;
+    }
 
     reportWindow.document.open();
     reportWindow.document.write(html);
     reportWindow.document.close();
+
   } catch (error) {
     console.error('Export Payroll PDF error:', error);
+
     alert( 'Gagal membuat PDF Payroll. Periksa Console untuk detail kesalahan.' );
   }
 };
-
 
 
 /* =========================================================
