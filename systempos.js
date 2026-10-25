@@ -40262,16 +40262,35 @@ window.exportPayroll = function () {
     if (!['owner', 'accountant'].includes(role) && !userBranchId) { alert('Outlet pengguna tidak ditemukan.'); return; }
 
     // BRANCH LABEL
-    const branches = Array.isArray(window.employeeAttendanceBranches)
-      ? window.employeeAttendanceBranches
-      : [];
-    const getBranchLabel = branchId => {
-      const id = String(branchId || '').trim();
-
-      return branches.find(branch =>
-        String(branch.id || '').trim() === id
-      )?.name || id || '-';
-    };
+		const branches = Array.isArray(window.employeeAttendanceBranches)
+		  ? window.employeeAttendanceBranches
+		  : Array.isArray(window.branches)
+		    ? window.branches
+		    : [];
+		
+		const getBranchLabel = branchId => {
+		  const id = String(branchId || '').trim();
+		
+		  if (!id) return '-';
+		
+		  const branch = branches.find(branch => {
+		    const candidateId =
+		      branch.id ??
+		      branch.Branch_ID ??
+		      branch.branch_id ??
+		      branch.ID;
+		
+		    return String(candidateId ?? '').trim() === id;
+		  });
+		
+		  return String(
+		    branch?.name ??
+		    branch?.Branch_Name ??
+		    branch?.branch_name ??
+		    branch?.Name ??
+		    id
+		  ).trim();
+		};
     // APPLY BRANCH ACCESS
     const selectedBranch = ['owner', 'accountant'].includes(role)
       ? branchFilter
