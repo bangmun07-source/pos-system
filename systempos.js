@@ -41221,8 +41221,8 @@ window.exportReimbursement = async function () {
     // VALIDATE ACCESS
     if (!['owner', 'accountant', 'admin'].includes(role)) { alert('Role tidak memiliki akses ke Reimbursement.'); return; }
     if (role === 'admin' && !userBranchId) { alert('Outlet Admin tidak ditemukan.'); return; }
-		
-    // DATA SUDAH DIMUAT MELALUI RPC BERDASARKAN FILTER AKTIF
+
+    // DATA REIMBURSEMENT
     const sourceRows = Array.isArray(window.reimbursementRows)
       ? window.reimbursementRows
       : [];
@@ -41241,7 +41241,7 @@ window.exportReimbursement = async function () {
 
       return true;
     });
-		
+
     if (!rows.length) { alert('Tidak ada data Reimbursement sesuai filter yang dipilih.'); return; }
 
     // HELPERS
@@ -41271,36 +41271,26 @@ window.exportReimbursement = async function () {
 
     const getAmount = row => Number(row.Amount || 0);
     const getPaid = row => Number(row.Paid_Amount || 0);
-		const getRemaining = row => {
-		  const status = String(row.Status || '').trim().toUpperCase();
-		
-		  if (['CANCEL', 'CANCELLED', 'CANCELED'].includes(status)) {
-		    return 0;
-		  }
-		
-		  return Math.max(
-		    0,
-		    Number(
-		      row.Remaining_Amount ??
-		      (getAmount(row) - getPaid(row))
-		    )
-		  );
-		};
+    // CANCELLED REIMBURSEMENT DOES NOT COUNT AS REMAINING
+    const getRemaining = row => {
+      const status = String(row.Status || '').trim().toUpperCase();
+      if (['CANCEL', 'CANCELLED', 'CANCELED'].includes(status)) { return 0; }
+
+      return Math.max(
+        0,
+        Number(
+          row.Remaining_Amount ??
+          (getAmount(row) - getPaid(row))
+        )
+      );
+    };
     const getBranchLabel = branchId => window.getReimbursementBranchName(branchId);
     const branchTitle = selectedBranch && selectedBranch !== 'ALL'
       ? getBranchLabel(selectedBranch)
       : role === 'admin'
         ? getBranchLabel(userBranchId)
         : 'ALL BRANCHES';
-    const employeeTitle = selectedEmployee
-      ? (employeeFilter?.selectedOptions[0]?.text || selectedEmployee)
-      : 'ALL EMPLOYEES';
-    const statusTitle = selectedStatus || 'ALL STATUS';
     const periodTitle = selectedPeriod || 'ALL PERIODS';
-    // SUMMARY
-    const totalAmount = rows.reduce( (sum, row) => sum + getAmount(row), 0 );
-    const totalPaid = rows.reduce( (sum, row) => sum + getPaid(row), 0 );
-    const totalRemaining = rows.reduce( (sum, row) => sum + getRemaining(row), 0 );
     // TABLE ROWS
     const tableRowsHtml = rows.map(row => {
       const status = String(row.Status || 'DRAFT').trim().toUpperCase();
@@ -41308,7 +41298,9 @@ window.exportReimbursement = async function () {
         DRAFT: 'status-draft',
         APPROVED: 'status-approved',
         PAID: 'status-paid',
-        CANCELLED: 'status-cancelled'
+        CANCEL: 'status-cancelled',
+        CANCELLED: 'status-cancelled',
+        CANCELED: 'status-cancelled'
       }[status] || 'status-draft';
 
       return `
@@ -41325,7 +41317,9 @@ window.exportReimbursement = async function () {
           <td class="amount-cell">${esc(money(getPaid(row)))}</td>
           <td class="amount-cell remaining-cell">${esc(money(getRemaining(row)))}</td>
           <td>${esc(row.Payroll_Period ? String(row.Payroll_Period).slice(0, 7) : '-')}</td>
-          <td><span class="status ${statusClass}">${esc(status)}</span></td>
+          <td>
+            <span class="status ${statusClass}">${esc(status)}</span>
+          </td>
         </tr>
       `;
     }).join('');
@@ -41356,7 +41350,7 @@ window.exportReimbursement = async function () {
           }
 
           body {
-            background: #000000;
+            background: #000;
             color: #333;
             font-family: Arial, Helvetica, sans-serif;
             padding: 40px 20px;
@@ -41436,74 +41430,6 @@ window.exportReimbursement = async function () {
             color: #777;
           }
 
-          /* FILTER INFORMATION */
-          .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
-          }
-
-          .filter-card {
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 11px 12px;
-            min-width: 0;
-          }
-
-          .filter-label {
-            font-size: 8px;
-            color: #888;
-            text-transform: uppercase;
-            letter-spacing: .7px;
-            margin-bottom: 5px;
-          }
-
-          .filter-value {
-            font-size: 10px;
-            font-weight: 700;
-            color: #333;
-            overflow-wrap: anywhere;
-          }
-
-          /* SUMMARY */
-          .summary-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 22px;
-          }
-
-          .summary-card {
-            border: 1px solid #e5e5e5;
-            border-radius: 10px;
-            padding: 14px 16px;
-            background: #fff;
-          }
-
-          .summary-label {
-            font-size: 9px;
-            color: #777;
-            text-transform: uppercase;
-            letter-spacing: .7px;
-            margin-bottom: 7px;
-          }
-
-          .summary-value {
-            font-size: 15px;
-            font-weight: 700;
-            color: #222;
-            overflow-wrap: anywhere;
-          }
-
-					.summary-card.remaining,
-					.summary-card.remaining .summary-value {
-					  background: transparent;
-					  border-color: transparent;
-					  box-shadow: none;
-					  color: inherit;
-					}
-
           /* TABLE */
           .table-wrap {
             width: 100%;
@@ -41581,11 +41507,16 @@ window.exportReimbursement = async function () {
             font-weight: 700;
           }
 
+          /* STATUS WITHOUT BACKGROUND */
           .status {
             display: inline-block;
             font-size: 7px;
             font-weight: 700;
             white-space: nowrap;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
           }
 
           .status-draft {
@@ -41602,41 +41533,6 @@ window.exportReimbursement = async function () {
 
           .status-cancelled {
             color: #b91c1c;
-          }
-
-          /* TOTAL */
-          .totals {
-            margin-top: 14px;
-            display: flex;
-            justify-content: flex-end;
-          }
-
-          .totals-box {
-            width: 330px;
-            max-width: 100%;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 12px 14px;
-          }
-
-          .total-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 5px 0;
-            font-size: 10px;
-          }
-
-          .total-row strong {
-            text-align: right;
-          }
-
-          .total-row.final {
-            margin-top: 5px;
-            padding-top: 10px;
-            border-top: 1px solid #e5e5e5;
-            font-weight: 700;
-            color: #b77900;
           }
 
           /* FOOTER */
@@ -41681,10 +41577,8 @@ window.exportReimbursement = async function () {
               margin-bottom: 16px;
             }
 
-            .filter-card,
-            .summary-card,
             .table-wrap {
-              break-inside: avoid;
+              break-inside: auto;
             }
 
             th {
@@ -41694,6 +41588,7 @@ window.exportReimbursement = async function () {
             }
 
             .status {
+              background: transparent !important;
               -webkit-print-color-adjust: exact;
               print-color-adjust: exact;
             }
@@ -41734,40 +41629,6 @@ window.exportReimbursement = async function () {
             <div class="period">Period: ${esc(periodTitle)}</div>
           </header>
 
-          <section class="filter-grid">
-            <div class="filter-card">
-              <div class="filter-label">Period</div>
-              <div class="filter-value">${esc(periodTitle)}</div>
-            </div>
-            <div class="filter-card">
-              <div class="filter-label">Branch / Outlet</div>
-              <div class="filter-value">${esc(branchTitle)}</div>
-            </div>
-            <div class="filter-card">
-              <div class="filter-label">Employee</div>
-              <div class="filter-value">${esc(employeeTitle)}</div>
-            </div>
-            <div class="filter-card">
-              <div class="filter-label">Status</div>
-              <div class="filter-value">${esc(statusTitle)}</div>
-            </div>
-          </section>
-
-          <section class="summary-grid">
-            <div class="summary-card">
-              <div class="summary-label">Total Claims (${rows.length})</div>
-              <div class="summary-value">${esc(money(totalAmount))}</div>
-            </div>
-            <div class="summary-card">
-              <div class="summary-label">Paid Amount</div>
-              <div class="summary-value">${esc(money(totalPaid))}</div>
-            </div>
-            <div class="summary-card remaining">
-              <div class="summary-label">Remaining Amount</div>
-              <div class="summary-value">${esc(money(totalRemaining))}</div>
-            </div>
-          </section>
-
           <div class="table-wrap">
             <table>
               <thead>
@@ -41784,28 +41645,12 @@ window.exportReimbursement = async function () {
                   <th>Status</th>
                 </tr>
               </thead>
+
               <tbody>
                 ${tableRowsHtml}
               </tbody>
             </table>
           </div>
-
-          <section class="totals">
-            <div class="totals-box">
-              <div class="total-row">
-                <span>Total Claims</span>
-                <strong>${esc(money(totalAmount))}</strong>
-              </div>
-              <div class="total-row">
-                <span>Total Paid</span>
-                <strong>${esc(money(totalPaid))}</strong>
-              </div>
-              <div class="total-row final">
-                <span>Total Remaining</span>
-                <strong>${esc(money(totalRemaining))}</strong>
-              </div>
-            </div>
-          </section>
 
           <footer class="footer">
             Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
@@ -41832,6 +41677,7 @@ window.exportReimbursement = async function () {
     alert('Gagal membuat PDF Reimbursement. Periksa Console untuk detail kesalahan.');
   }
 };
+
 
 /* ==== INITIALIZE ==== */
 window.initEmployeeReimbursement = async function () {
