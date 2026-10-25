@@ -40245,6 +40245,516 @@ window.changePayrollPage = function (direction) {
 };
 
 
+/* ==== EXPORT PAYROLL PDF ==== */
+window.exportPayroll = function () {
+  try {
+    const role = String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase();
+
+    const userBranchId = String(
+      state.user?.branchId ||
+      state.user?.Branch_ID ||
+      ''
+    ).trim();
+
+    const year = String(
+      document.getElementById('payrollYearFilter')?.value || ''
+    ).trim();
+
+    const period = String(
+      document.getElementById('payrollPeriod')?.value || ''
+    ).trim();
+
+    const branchFilter = String(
+      document.getElementById('payrollBranchFilter')?.value || ''
+    ).trim();
+
+    const employeeFilter = String(
+      document.getElementById('payrollEmployeeFilter')?.value || ''
+    ).trim();
+
+    const statusFilter = String(
+      document.getElementById('payrollStatusFilter')?.value || ''
+    ).trim().toUpperCase();
+
+    // VALIDATE ACCESS
+    if (!['owner', 'accountant', 'admin', 'cashier'].includes(role)) {
+      alert('Role tidak memiliki akses ke Payroll.');
+      return;
+    }
+
+    if (!['owner', 'accountant'].includes(role) && !userBranchId) {
+      alert('Outlet pengguna tidak ditemukan.');
+      return;
+    }
+
+    // BRANCH LABEL
+    const branches = Array.isArray(window.employeeAttendanceBranches)
+      ? window.employeeAttendanceBranches
+      : [];
+
+    const getBranchLabel = branchId => {
+      const id = String(branchId || '').trim();
+
+      return branches.find(branch =>
+        String(branch.id || '').trim() === id
+      )?.name || id || '-';
+    };
+
+    // APPLY BRANCH ACCESS
+    const selectedBranch = ['owner', 'accountant'].includes(role)
+      ? branchFilter
+      : userBranchId;
+
+    // PAYROLL SOURCE
+    const sourceRows = Array.isArray(window.payrollRows)
+      ? window.payrollRows
+      : [];
+
+    // APPLY ALL ACTIVE FILTERS
+    const rows = sourceRows.filter(row => {
+      const rowPeriod = String(row.Payroll_Period || '').slice(0, 10);
+      const rowYear = rowPeriod.slice(0, 4);
+      const rowMonth = rowPeriod.slice(0, 7);
+
+      const rowBranch = String(row.Branch_ID || '').trim();
+      const rowEmployee = String(row.Employee_ID || '').trim();
+      const rowStatus = String(row.Status || '').trim().toUpperCase();
+
+      if (year && rowYear !== year) return false;
+      if (period && rowMonth !== period) return false;
+
+      if (
+        selectedBranch &&
+        selectedBranch.toUpperCase() !== 'ALL' &&
+        rowBranch !== selectedBranch
+      ) {
+        return false;
+      }
+
+      if (employeeFilter && rowEmployee !== employeeFilter) {
+        return false;
+      }
+
+      if (statusFilter && rowStatus !== statusFilter) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (!rows.length) {
+      alert('Tidak ada data Payroll sesuai filter yang dipilih.');
+      return;
+    }
+
+    // HELPERS
+    const esc = value => {
+      if (typeof window.escapeEmployeeHtml === 'function') {
+        return window.escapeEmployeeHtml(value ?? '-');
+      }
+
+      return String(value ?? '-').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+    };
+
+    const money = value =>
+      'Rp ' + Number(value || 0).toLocaleString('id-ID');
+
+    const sum = field => rows.reduce(
+      (total, row) => total + (Number(row[field]) || 0),
+      0
+    );
+
+    // KPI
+    const totalGrossSalary = sum('Gross_Salary');
+    const totalAllowance = sum('Total_Allowance');
+    const totalDeduction = sum('Total_Deduction');
+    const totalNetSalary = sum('Net_Salary');
+
+    // REPORT FILTER TITLES
+    const branchTitle = selectedBranch &&
+      selectedBranch.toUpperCase() !== 'ALL'
+        ? getBranchLabel(selectedBranch)
+        : 'ALL OUTLETS';
+
+    const employeeTitle = employeeFilter
+      ? (
+          rows.find(row =>
+            String(row.Employee_ID || '').trim() === employeeFilter
+          )?.Full_Name || employeeFilter
+        )
+      : 'ALL EMPLOYEES';
+
+    const statusTitle = statusFilter || 'ALL STATUS';
+
+    const periodTitle = year
+      ? `YEAR ${year}`
+      : period
+        ? period
+        : 'ALL PERIODS';
+
+    const filename =
+      `Payroll Report - ${periodTitle} - ${branchTitle}.pdf`;
+
+    // TABLE ROWS
+    const tableRowsHtml = rows.map((row, index) => {
+      const status = String(row.Status || '-')
+        .trim()
+        .toUpperCase();
+
+      const statusClass =
+        status === 'PAID' || status === 'RECORDED'
+          ? 'status-paid'
+          : status === 'CALCULATED'
+            ? 'status-calculated'
+            : 'status-default';
+
+      return `
+        <tr>
+          <td class="number-cell">${index + 1}</td>
+          <td>${esc(row.Employee_Code || row.Employee_ID || '-')}</td>
+          <td class="employee-name">${esc(row.Full_Name || '-')}</td>
+          <td>${esc(getBranchLabel(row.Branch_ID))}</td>
+          <td>${esc(rowPeriodLabel(row.Payroll_Period))}</td>
+          <td>${esc(status)}</td>
+          <td class="amount">${esc(money(row.Gross_Salary))}</td>
+          <td class="amount">${esc(money(row.Total_Allowance))}</td>
+          <td class="amount">${esc(money(row.Total_Deduction))}</td>
+          <td class="amount net">${esc(money(row.Net_Salary))}</td>
+        </tr>
+      `;
+    }).join('');
+
+    function rowPeriodLabel(value) {
+      const raw = String(value || '').slice(0, 10);
+      if (!raw) return '-';
+
+      const date = new Date(`${raw.slice(0, 7)}-01T00:00:00`);
+      if (Number.isNaN(date.getTime())) return raw;
+
+      return date.toLocaleDateString('id-ID', {
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+
+    // TENANT LOGO
+    const supabaseUrl = String(
+      supabaseClient?.supabaseUrl || ''
+    ).replace(/\/$/, '');
+
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * { box-sizing: border-box; }
+
+          body {
+            margin: 0;
+            padding: 30px 20px;
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+          }
+
+          .toolbar {
+            max-width: 1400px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .report {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+            background: #fff;
+          }
+
+          .report-header {
+            text-align: center;
+            margin-bottom: 24px;
+          }
+
+          .logo {
+            display: block;
+            max-width: 150px;
+            max-height: 65px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+          }
+
+          h1 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            color: #222;
+          }
+
+          .meta {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #666;
+          }
+
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 14px;
+            min-width: 0;
+          }
+
+          .summary-label {
+            margin-bottom: 8px;
+            color: #777;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+          }
+
+          .summary-value {
+            color: #222;
+            font-size: 18px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+          }
+
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+          }
+
+          thead { display: table-header-group; }
+
+          th {
+            padding: 9px 6px;
+            background: #f3f4f6;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            font-size: 8px;
+          }
+
+          td {
+            padding: 9px 6px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+          }
+
+          tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .number-cell {
+            text-align: center;
+            width: 28px;
+          }
+
+          .employee-name {
+            font-weight: 700;
+            color: #222;
+          }
+
+          .amount {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .net {
+            font-weight: 700;
+            color: #111;
+          }
+
+          .status-paid,
+          .status-calculated,
+          .status-default {
+            font-size: 8px;
+            font-weight: 700;
+          }
+
+          .status-paid { color: #15803d; }
+          .status-calculated { color: #b45309; }
+          .status-default { color: #475569; }
+
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar { display: none !important; }
+
+            .report {
+              max-width: none;
+              padding: 0;
+            }
+
+            .summary-card {
+              break-inside: avoid;
+            }
+
+            th {
+              background: #f3f4f6 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Payroll Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            ${logoUrl ? `
+              <img
+                src="${esc(logoUrl)}"
+                class="logo"
+                alt="Company Logo"
+                onerror="this.style.display='none'"
+              >
+            ` : ''}
+
+            <h1>Payroll Report</h1>
+            <div class="meta">Period: ${esc(periodTitle)}</div>
+            <div class="meta">Outlet: ${esc(branchTitle)}</div>
+            <div class="meta">Employee: ${esc(employeeTitle)}</div>
+            <div class="meta">Status: ${esc(statusTitle)}</div>
+          </header>
+
+          <section class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Gross Salary</div>
+              <div class="summary-value">${esc(money(totalGrossSalary))}</div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Allowance</div>
+              <div class="summary-value">${esc(money(totalAllowance))}</div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Deduction</div>
+              <div class="summary-value">${esc(money(totalDeduction))}</div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Net Salary</div>
+              <div class="summary-value">${esc(money(totalNetSalary))}</div>
+            </div>
+          </section>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Employee ID</th>
+                  <th>Employee Name</th>
+                  <th>Outlet</th>
+                  <th>Period</th>
+                  <th>Status</th>
+                  <th style="text-align:right">Gross Salary</th>
+                  <th style="text-align:right">Allowance</th>
+                  <th style="text-align:right">Deduction</th>
+                  <th style="text-align:right">Net Salary</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT
+    const reportWindow = window.open('', '_blank');
+    if (!reportWindow) {  alert( 'Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.' ); return; }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+  } catch (error) {
+    console.error('Export Payroll PDF error:', error);
+    alert( 'Gagal membuat PDF Payroll. Periksa Console untuk detail kesalahan.' );
+  }
+};
+
+
+
 /* =========================================================
    EMPLOYEE REIMBURSEMENT
    ========================================================= */
