@@ -40260,33 +40260,19 @@ window.exportPayroll = function () {
     if (!['owner', 'accountant'].includes(role) && !userBranchId) { alert('Outlet pengguna tidak ditemukan.'); return; }
 
     // BRANCH LABEL
-		const branches = Array.isArray(window.employeeAttendanceBranches)
-		  ? window.employeeAttendanceBranches
-		  : Array.isArray(window.branches)
-		    ? window.branches
-		    : [];
 		const getBranchLabel = branchId => {
 		  const id = String(branchId || '').trim();
-		
 		  if (!id) return '-';
 		
-		  const branch = branches.find(branch => {
-		    const candidateId =
-		      branch.id ??
-		      branch.Branch_ID ??
-		      branch.branch_id ??
-		      branch.ID;
+		  if (typeof window.getReimbursementBranchName === 'function') {
+		    const name = window.getReimbursementBranchName(id);
 		
-		    return String(candidateId ?? '').trim() === id;
-		  });
+		    if (name && String(name).trim() !== id) {
+		      return String(name).trim();
+		    }
+		  }
 		
-		  return String(
-		    branch?.name ??
-		    branch?.Branch_Name ??
-		    branch?.branch_name ??
-		    branch?.Name ??
-		    id
-		  ).trim();
+		  return id;
 		};
     // APPLY BRANCH ACCESS
     const selectedBranch = ['owner', 'accountant'].includes(role)
