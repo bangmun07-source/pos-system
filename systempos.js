@@ -41271,13 +41271,21 @@ window.exportReimbursement = async function () {
 
     const getAmount = row => Number(row.Amount || 0);
     const getPaid = row => Number(row.Paid_Amount || 0);
-    const getRemaining = row => Math.max(
-      0,
-      Number(
-        row.Remaining_Amount ??
-        (getAmount(row) - getPaid(row))
-      )
-    );
+		const getRemaining = row => {
+		  const status = String(row.Status || '').trim().toUpperCase();
+		
+		  if (['CANCEL', 'CANCELLED', 'CANCELED'].includes(status)) {
+		    return 0;
+		  }
+		
+		  return Math.max(
+		    0,
+		    Number(
+		      row.Remaining_Amount ??
+		      (getAmount(row) - getPaid(row))
+		    )
+		  );
+		};
     const getBranchLabel = branchId => window.getReimbursementBranchName(branchId);
     const branchTitle = selectedBranch && selectedBranch !== 'ALL'
       ? getBranchLabel(selectedBranch)
@@ -41488,13 +41496,13 @@ window.exportReimbursement = async function () {
             overflow-wrap: anywhere;
           }
 
-          .summary-card.remaining {
-            border-color: #f59e0b;
-          }
-
-          .summary-card.remaining .summary-value {
-            color: #b77900;
-          }
+					.summary-card.remaining,
+					.summary-card.remaining .summary-value {
+					  background: transparent;
+					  border-color: transparent;
+					  box-shadow: none;
+					  color: inherit;
+					}
 
           /* TABLE */
           .table-wrap {
@@ -41575,30 +41583,24 @@ window.exportReimbursement = async function () {
 
           .status {
             display: inline-block;
-            padding: 4px 6px;
-            border-radius: 4px;
             font-size: 7px;
             font-weight: 700;
             white-space: nowrap;
           }
 
           .status-draft {
-            background: #f1f5f9;
             color: #475569;
           }
 
           .status-approved {
-            background: #dbeafe;
             color: #1d4ed8;
           }
 
           .status-paid {
-            background: #dcfce7;
             color: #15803d;
           }
 
           .status-cancelled {
-            background: #fee2e2;
             color: #b91c1c;
           }
 
