@@ -41204,72 +41204,221 @@ window.cancelReimbursement = async function (reimbursementId) {
 };
 
 
-/* === EXPORT CSV === */
+/* === EXPORT REIMBURSEMENT PDF === */
 window.exportReimbursement = function () {
-  const rows = window.getReimbursementVisibleRows();
-  if (!rows.length) { alert('Tidak ada data reimbursement untuk diexport.'); return; }
+  const rows = Array.isArray(window.reimbursementRows)
+    ? window.reimbursementRows
+    : [];
 
-  const headers = [
-    'Reimbursement ID',
-    'Employee ID',
-    'Employee',
-    'Branch ID',
-    'Outlet',
-    'Date',
-    'Payroll Period',
-    'Category',
-    'Description',
-    'Amount',
-		'Paid Amount',
-		'Remaining Amount',
-    'Status',
-    'Payment Method',
-    'Payment Date',
-    'Payroll ID',
-    'Note'
-  ];
-  const csvEscape = value => {
-    let text = String(value ?? '');
-    if (/^[=+\-@]/.test(text)) { text = `'${text}`; }
-    return `"${text.replace(/"/g, '""')}"`;
+  if (!rows.length) {
+    alert('Tidak ada data reimbursement sesuai filter untuk diexport.');
+    return;
+  }
+
+  const jsPDF = window.jspdf?.jsPDF;
+
+  if (
+    !jsPDF ||
+    !jsPDF.API.autoTable
+  ) {
+    alert('Library PDF belum tersedia. Pastikan jsPDF dan AutoTable sudah dimuat.');
+    return;
+  }
+
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4'
+  });
+
+  const period =
+    document.getElementById('reimbursementPeriodFilter')?.value || '';
+
+  const branchFilter =
+    document.getElementById('reimbursementBranchFilter');
+
+  const employeeFilter =
+    document.getElementById('reimbursementEmployeeFilter');
+
+  const statusFilter =
+    document.getElementById('reimbursementStatusFilter');
+
+  const role = window.getReimbursementRole();
+  const user = window.getReimbursementUser();
+
+  const branchName =
+    role === 'admin'
+      ? (window.getReimbursementBranchName(user?.branchId) || 'Outlet Admin')
+      : (branchFilter?.selectedOptions[0]?.text || 'All Branch');
+
+  const employeeName =
+    employeeFilter?.selectedOptions[0]?.text || 'All Employees';
+
+  const statusName =
+    statusFilter?.selectedOptions[0]?.text || 'All Status';
+
+  const money = value =>
+    'Rp ' + Number(value || 0).toLocaleString('id-ID');
+
+  const date = value => {
+    if (!value) return '-';
+    return String(value).slice(0, 10);
   };
-  const csvRows = rows.map(row => [
-    row.Reimbursement_ID,
-    row.Employee_ID,
-    row.Full_Name,
-    row.Branch_ID,
-    window.getReimbursementBranchName(row.Branch_ID),
-    row.Reimbursement_Date,
-    row.Payroll_Period,
-    row.Category,
-    row.Description,
-    row.Amount,
-		row.Paid_Amount ?? 0,
-		row.Remaining_Amount ?? Math.max(0, Number(row.Amount || 0) - Number(row.Paid_Amount || 0)),
-    row.Status,
-    row.Payment_Method,
-    row.Payment_Date,
-    row.Payroll_ID,
-    row.Note
-  ]);
-  const csv = [
-    headers,
-    ...csvRows
-  ].map(row => row.map(csvEscape).join(',')).join('\r\n');
-  const blob = new Blob(
-    ['\uFEFF', csv],
-    { type: 'text/csv;charset=utf-8;' }
-  );
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  const period = document.getElementById( 'reimbursementPeriodFilter' )?.value || 'all-periods';
 
-  link.href = url;
-  link.download = `reimbursements-${period}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  URL.revokeObjectURL(url);
+  const getAmount = row => Number(row.Amount || 0);
+  const getPaid = row => Number(row.Paid_Amount || 0);
+
+  const getRemaining = row =>
+    Number(
+      row.Remaining_Amount ??
+      Math.max(0, getAmount(row) - getPaid(row))
+    );
+
+  const totalAmount = rows.reduce(
+    (sum, row) => sum + getAmount(row), 0
+  );
+
+  const totalPaid = rows.reduce(
+    (sum, row) => sum + getPaid(row), 0
+  );
+
+  const totalRemaining = rows.reduce(
+    (sum, row) => sum + getRemaining(row), 0
+  );
+
+  const amber = [245, 158, 11];
+  const dark = [11, 15, 20];
+  const muted = [100, 116, 139];
+
+  // Header MUNO
+  doc.setFillColor(...dark);
+  doc.rect(0, 0, 297, 36, 'F');
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(19);
+  doc.setTextColor(...amber);
+  doc.text('MUNO', 14, 15);
+  doc.setFontSize(13);
+  doc.setTextColor(255, 255, 255);
+  doc.text('REIMBURSEMENT REPORT', 14, 25);
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(210, 218, 230);
+  doc.text(`Period: ${period || 'All Periods'}`, 283, 13, {
+    align: 'right'
+  });
+  doc.text(
+    `Generated: ${new Date().toLocaleDateString('id-ID')}`,
+    283,
+    20,
+    { align: 'right' }
+  );
+
+  // Filter information
+  doc.setFontSize(8);
+  doc.setTextColor(...muted);
+  doc.text(`Outlet: ${branchName}`, 14, 44);
+  doc.text(`Employee: ${employeeName}`, 105, 44);
+  doc.text(`Status: ${statusName}`, 220, 44);
+
+  // Summary cards
+  [
+    { x: 14, label: 'TOTAL CLAIMS', value: money(totalAmount) },
+    { x: 106, label: 'PAID AMOUNT', value: money(totalPaid) },
+    { x: 198, label: 'REMAINING AMOUNT', value: money(totalRemaining) }
+  ].forEach(item => {
+    doc.setFillColor(245, 247, 250);
+    doc.roundedRect(item.x, 50, 85, 17, 2, 2, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(...muted);
+    doc.text(item.label, item.x + 4, 56);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(10);
+    doc.setTextColor(...dark);
+    doc.text(item.value, item.x + 4, 62.5);
+  });
+
+  // Reimbursement details
+  doc.autoTable({
+    startY: 73,
+    head: [[
+      'Date',
+      'Employee',
+      'Outlet',
+      'Category',
+      'Description',
+      'Amount',
+      'Paid',
+      'Remaining',
+      'Payroll Period',
+      'Status'
+    ]],
+    body: rows.map(row => [
+      date(row.Reimbursement_Date),
+      row.Full_Name || '-',
+      window.getReimbursementBranchName(row.Branch_ID) || '-',
+      row.Category || '-',
+      row.Description || '-',
+      money(getAmount(row)),
+      money(getPaid(row)),
+      money(getRemaining(row)),
+      row.Payroll_Period || '-',
+      row.Status || '-'
+    ]),
+    theme: 'grid',
+    margin: { left: 14, right: 14, bottom: 18 },
+    styles: {
+      font: 'helvetica',
+      fontSize: 7,
+      cellPadding: 2.5,
+      textColor: dark,
+      lineColor: [226, 232, 240],
+      lineWidth: 0.15,
+      overflow: 'linebreak'
+    },
+    headStyles: {
+      fillColor: dark,
+      textColor: amber,
+      fontStyle: 'bold',
+      lineColor: dark
+    },
+    alternateRowStyles: {
+      fillColor: [248, 250, 252]
+    },
+    columnStyles: {
+      0: { cellWidth: 19 },
+      1: { cellWidth: 27 },
+      2: { cellWidth: 23 },
+      3: { cellWidth: 21 },
+      4: { cellWidth: 43 },
+      5: { halign: 'right', cellWidth: 23 },
+      6: { halign: 'right', cellWidth: 23 },
+      7: { halign: 'right', cellWidth: 23 },
+      8: { cellWidth: 21 },
+      9: { cellWidth: 18 }
+    },
+    didDrawPage: function () {
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+
+      doc.setDrawColor(...amber);
+      doc.setLineWidth(0.5);
+      doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(...muted);
+      doc.text('MUNO | Reimbursement Report', 14, pageHeight - 7);
+      doc.text(
+        `Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
+        pageWidth - 14,
+        pageHeight - 7,
+        { align: 'right' }
+      );
+    }
+  });
+
+  const filenamePeriod = period || 'all-periods';
+  doc.save(`reimbursements-${filenamePeriod}.pdf`);
 };
 
 
