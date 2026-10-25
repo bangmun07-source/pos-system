@@ -41203,224 +41203,633 @@ window.cancelReimbursement = async function (reimbursementId) {
   );
 };
 
+/* ==== EXPORT REIMBURSEMENT PDF ==== */
+window.exportReimbursement = async function () {
+  try {
+    const periodFilter = document.getElementById('reimbursementPeriodFilter');
+    const branchFilter = document.getElementById('reimbursementBranchFilter');
+    const employeeFilter = document.getElementById('reimbursementEmployeeFilter');
+    const statusFilter = document.getElementById('reimbursementStatusFilter');
+    const selectedPeriod = String(periodFilter?.value || '').trim();
+    const selectedBranch = String(branchFilter?.value || '').trim();
+    const selectedEmployee = String(employeeFilter?.value || '').trim();
+    const selectedStatus = String(statusFilter?.value || '').trim().toUpperCase();
+    const role = window.getReimbursementRole();
+    const user = window.getReimbursementUser();
+    const userBranchId = String(user?.branchId || user?.Branch_ID || '').trim();
 
-/* === EXPORT REIMBURSEMENT PDF === */
-window.exportReimbursement = function () {
-  const rows = Array.isArray(window.reimbursementRows)
-    ? window.reimbursementRows
-    : [];
+    // VALIDATE ACCESS
+    if (!['owner', 'accountant', 'admin'].includes(role)) { alert('Role tidak memiliki akses ke Reimbursement.'); return; }
+    if (role === 'admin' && !userBranchId) { alert('Outlet Admin tidak ditemukan.'); return; }
+		
+    // DATA SUDAH DIMUAT MELALUI RPC BERDASARKAN FILTER AKTIF
+    const sourceRows = Array.isArray(window.reimbursementRows)
+      ? window.reimbursementRows
+      : [];
+    // FILTER REIMBURSEMENT
+    const rows = sourceRows.filter(row => {
+      const rowPeriod = String(row.Reimbursement_Date || '').slice(0, 7);
+      const rowBranch = String(row.Branch_ID || '').trim();
+      const rowEmployee = String(row.Employee_ID || '').trim();
+      const rowStatus = String(row.Status || '').trim().toUpperCase();
 
-  if (!rows.length) {
-    alert('Tidak ada data reimbursement sesuai filter untuk diexport.');
-    return;
-  }
+      if (selectedPeriod && rowPeriod !== selectedPeriod) return false;
+      if (role === 'admin' && rowBranch !== userBranchId) return false;
+      if (selectedBranch && selectedBranch !== 'ALL' && rowBranch !== selectedBranch) return false;
+      if (selectedEmployee && rowEmployee !== selectedEmployee) return false;
+      if (selectedStatus && rowStatus !== selectedStatus) return false;
 
-  const jsPDF = window.jspdf?.jsPDF;
+      return true;
+    });
+		
+    if (!rows.length) { alert('Tidak ada data Reimbursement sesuai filter yang dipilih.'); return; }
 
-  if (
-    !jsPDF ||
-    !jsPDF.API.autoTable
-  ) {
-    alert('Library PDF belum tersedia. Pastikan jsPDF dan AutoTable sudah dimuat.');
-    return;
-  }
+    // HELPERS
+    const esc = value => window.escapeReimbursementHTML(value);
+    const money = value => window.formatReimbursementCurrency(value);
+    const formatDate = value => {
+      if (!value) return '-';
 
-  const doc = new jsPDF({
-    orientation: 'landscape',
-    unit: 'mm',
-    format: 'a4'
-  });
+      const datePart = String(value).slice(0, 10);
+      const parts = datePart.split('-');
+      if (parts.length !== 3) return esc(datePart);
 
-  const period =
-    document.getElementById('reimbursementPeriodFilter')?.value || '';
-
-  const branchFilter =
-    document.getElementById('reimbursementBranchFilter');
-
-  const employeeFilter =
-    document.getElementById('reimbursementEmployeeFilter');
-
-  const statusFilter =
-    document.getElementById('reimbursementStatusFilter');
-
-  const role = window.getReimbursementRole();
-  const user = window.getReimbursementUser();
-
-  const branchName =
-    role === 'admin'
-      ? (window.getReimbursementBranchName(user?.branchId) || 'Outlet Admin')
-      : (branchFilter?.selectedOptions[0]?.text || 'All Branch');
-
-  const employeeName =
-    employeeFilter?.selectedOptions[0]?.text || 'All Employees';
-
-  const statusName =
-    statusFilter?.selectedOptions[0]?.text || 'All Status';
-
-  const money = value =>
-    'Rp ' + Number(value || 0).toLocaleString('id-ID');
-
-  const date = value => {
-    if (!value) return '-';
-    return String(value).slice(0, 10);
-  };
-
-  const getAmount = row => Number(row.Amount || 0);
-  const getPaid = row => Number(row.Paid_Amount || 0);
-
-  const getRemaining = row =>
-    Number(
-      row.Remaining_Amount ??
-      Math.max(0, getAmount(row) - getPaid(row))
-    );
-
-  const totalAmount = rows.reduce(
-    (sum, row) => sum + getAmount(row), 0
-  );
-
-  const totalPaid = rows.reduce(
-    (sum, row) => sum + getPaid(row), 0
-  );
-
-  const totalRemaining = rows.reduce(
-    (sum, row) => sum + getRemaining(row), 0
-  );
-
-  const amber = [245, 158, 11];
-  const dark = [11, 15, 20];
-  const muted = [100, 116, 139];
-
-  // Header MUNO
-  doc.setFillColor(...dark);
-  doc.rect(0, 0, 297, 36, 'F');
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(19);
-  doc.setTextColor(...amber);
-  doc.text('MUNO', 14, 15);
-  doc.setFontSize(13);
-  doc.setTextColor(255, 255, 255);
-  doc.text('REIMBURSEMENT REPORT', 14, 25);
-  doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.setTextColor(210, 218, 230);
-  doc.text(`Period: ${period || 'All Periods'}`, 283, 13, {
-    align: 'right'
-  });
-  doc.text(
-    `Generated: ${new Date().toLocaleDateString('id-ID')}`,
-    283,
-    20,
-    { align: 'right' }
-  );
-
-  // Filter information
-  doc.setFontSize(8);
-  doc.setTextColor(...muted);
-  doc.text(`Outlet: ${branchName}`, 14, 44);
-  doc.text(`Employee: ${employeeName}`, 105, 44);
-  doc.text(`Status: ${statusName}`, 220, 44);
-
-  // Summary cards
-  [
-    { x: 14, label: 'TOTAL CLAIMS', value: money(totalAmount) },
-    { x: 106, label: 'PAID AMOUNT', value: money(totalPaid) },
-    { x: 198, label: 'REMAINING AMOUNT', value: money(totalRemaining) }
-  ].forEach(item => {
-    doc.setFillColor(245, 247, 250);
-    doc.roundedRect(item.x, 50, 85, 17, 2, 2, 'F');
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(7);
-    doc.setTextColor(...muted);
-    doc.text(item.label, item.x + 4, 56);
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(10);
-    doc.setTextColor(...dark);
-    doc.text(item.value, item.x + 4, 62.5);
-  });
-
-  // Reimbursement details
-  doc.autoTable({
-    startY: 73,
-    head: [[
-      'Date',
-      'Employee',
-      'Outlet',
-      'Category',
-      'Description',
-      'Amount',
-      'Paid',
-      'Remaining',
-      'Payroll Period',
-      'Status'
-    ]],
-    body: rows.map(row => [
-      date(row.Reimbursement_Date),
-      row.Full_Name || '-',
-      window.getReimbursementBranchName(row.Branch_ID) || '-',
-      row.Category || '-',
-      row.Description || '-',
-      money(getAmount(row)),
-      money(getPaid(row)),
-      money(getRemaining(row)),
-      row.Payroll_Period || '-',
-      row.Status || '-'
-    ]),
-    theme: 'grid',
-    margin: { left: 14, right: 14, bottom: 18 },
-    styles: {
-      font: 'helvetica',
-      fontSize: 7,
-      cellPadding: 2.5,
-      textColor: dark,
-      lineColor: [226, 232, 240],
-      lineWidth: 0.15,
-      overflow: 'linebreak'
-    },
-    headStyles: {
-      fillColor: dark,
-      textColor: amber,
-      fontStyle: 'bold',
-      lineColor: dark
-    },
-    alternateRowStyles: {
-      fillColor: [248, 250, 252]
-    },
-    columnStyles: {
-      0: { cellWidth: 19 },
-      1: { cellWidth: 27 },
-      2: { cellWidth: 23 },
-      3: { cellWidth: 21 },
-      4: { cellWidth: 43 },
-      5: { halign: 'right', cellWidth: 23 },
-      6: { halign: 'right', cellWidth: 23 },
-      7: { halign: 'right', cellWidth: 23 },
-      8: { cellWidth: 21 },
-      9: { cellWidth: 18 }
-    },
-    didDrawPage: function () {
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-
-      doc.setDrawColor(...amber);
-      doc.setLineWidth(0.5);
-      doc.line(14, pageHeight - 12, pageWidth - 14, pageHeight - 12);
-      doc.setFont('helvetica', 'normal');
-      doc.setFontSize(7);
-      doc.setTextColor(...muted);
-      doc.text('MUNO | Reimbursement Report', 14, pageHeight - 7);
-      doc.text(
-        `Page ${doc.internal.getCurrentPageInfo().pageNumber}`,
-        pageWidth - 14,
-        pageHeight - 7,
-        { align: 'right' }
+      const date = new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
       );
+
+      if (Number.isNaN(date.getTime())) return '-';
+
+      return date.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    };
+
+    const getAmount = row => Number(row.Amount || 0);
+    const getPaid = row => Number(row.Paid_Amount || 0);
+    const getRemaining = row => Math.max(
+      0,
+      Number(
+        row.Remaining_Amount ??
+        (getAmount(row) - getPaid(row))
+      )
+    );
+    const getBranchLabel = branchId => window.getReimbursementBranchName(branchId);
+    const branchTitle = selectedBranch && selectedBranch !== 'ALL'
+      ? getBranchLabel(selectedBranch)
+      : role === 'admin'
+        ? getBranchLabel(userBranchId)
+        : 'ALL BRANCHES';
+    const employeeTitle = selectedEmployee
+      ? (employeeFilter?.selectedOptions[0]?.text || selectedEmployee)
+      : 'ALL EMPLOYEES';
+    const statusTitle = selectedStatus || 'ALL STATUS';
+    const periodTitle = selectedPeriod || 'ALL PERIODS';
+    // SUMMARY
+    const totalAmount = rows.reduce( (sum, row) => sum + getAmount(row), 0 );
+    const totalPaid = rows.reduce( (sum, row) => sum + getPaid(row), 0 );
+    const totalRemaining = rows.reduce( (sum, row) => sum + getRemaining(row), 0 );
+    // TABLE ROWS
+    const tableRowsHtml = rows.map(row => {
+      const status = String(row.Status || 'DRAFT').trim().toUpperCase();
+      const statusClass = {
+        DRAFT: 'status-draft',
+        APPROVED: 'status-approved',
+        PAID: 'status-paid',
+        CANCELLED: 'status-cancelled'
+      }[status] || 'status-draft';
+
+      return `
+        <tr>
+          <td>${esc(formatDate(row.Reimbursement_Date))}</td>
+          <td>
+            <div class="employee-name">${esc(row.Full_Name || '-')}</div>
+            <div class="employee-code">${esc(row.Employee_ID || '')}</div>
+          </td>
+          <td>${esc(getBranchLabel(row.Branch_ID))}</td>
+          <td>${esc(row.Category || '-')}</td>
+          <td class="description-cell">${esc(row.Description || '-')}</td>
+          <td class="amount-cell">${esc(money(getAmount(row)))}</td>
+          <td class="amount-cell">${esc(money(getPaid(row)))}</td>
+          <td class="amount-cell remaining-cell">${esc(money(getRemaining(row)))}</td>
+          <td>${esc(row.Payroll_Period ? String(row.Payroll_Period).slice(0, 7) : '-')}</td>
+          <td><span class="status ${statusClass}">${esc(status)}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+    // TENANT LOGO — SAMA SEPERTI EMPLOYEE SCHEDULE
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+    const filename = `Reimbursement - ${branchTitle} - ${periodTitle}.pdf`;
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          /* TOOLBAR */
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255,255,255,.14);
+          }
+
+          /* REPORT PAPER */
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          /* HEADER */
+          .report-header {
+            text-align: center;
+            margin-bottom: 24px;
+          }
+
+          .logo {
+            display: block;
+            width: auto;
+            max-width: 150px;
+            max-height: 70px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+          }
+
+          .title {
+            margin: 0 0 8px;
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            color: #222;
+          }
+
+          .branch-title {
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+
+          .period {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #777;
+          }
+
+          /* FILTER INFORMATION */
+          .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+          }
+
+          .filter-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 11px 12px;
+            min-width: 0;
+          }
+
+          .filter-label {
+            font-size: 8px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 5px;
+          }
+
+          .filter-value {
+            font-size: 10px;
+            font-weight: 700;
+            color: #333;
+            overflow-wrap: anywhere;
+          }
+
+          /* SUMMARY */
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+          }
+
+          .summary-label {
+            font-size: 9px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 7px;
+          }
+
+          .summary-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
+          }
+
+          .summary-card.remaining {
+            border-color: #f59e0b;
+          }
+
+          .summary-card.remaining .summary-value {
+            color: #b77900;
+          }
+
+          /* TABLE */
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 9px;
+            color: #444;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            padding: 10px 6px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 8px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 10px 6px;
+            vertical-align: top;
+            border: none;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .employee-name {
+            color: #222;
+            font-weight: 700;
+            line-height: 1.4;
+          }
+
+          .employee-code {
+            margin-top: 3px;
+            color: #888;
+            font-size: 8px;
+          }
+
+          .description-cell {
+            min-width: 120px;
+            white-space: pre-wrap;
+          }
+
+          .amount-cell {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .remaining-cell {
+            font-weight: 700;
+          }
+
+          .status {
+            display: inline-block;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 7px;
+            font-weight: 700;
+            white-space: nowrap;
+          }
+
+          .status-draft {
+            background: #f1f5f9;
+            color: #475569;
+          }
+
+          .status-approved {
+            background: #dbeafe;
+            color: #1d4ed8;
+          }
+
+          .status-paid {
+            background: #dcfce7;
+            color: #15803d;
+          }
+
+          .status-cancelled {
+            background: #fee2e2;
+            color: #b91c1c;
+          }
+
+          /* TOTAL */
+          .totals {
+            margin-top: 14px;
+            display: flex;
+            justify-content: flex-end;
+          }
+
+          .totals-box {
+            width: 330px;
+            max-width: 100%;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 12px 14px;
+          }
+
+          .total-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 5px 0;
+            font-size: 10px;
+          }
+
+          .total-row strong {
+            text-align: right;
+          }
+
+          .total-row.final {
+            margin-top: 5px;
+            padding-top: 10px;
+            border-top: 1px solid #e5e5e5;
+            font-weight: 700;
+            color: #b77900;
+          }
+
+          /* FOOTER */
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          /* PRINT / PDF */
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html,
+            body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            .filter-card,
+            .summary-card,
+            .table-wrap {
+              break-inside: avoid;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .status {
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Employee Reimbursement Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            ${logoUrl ? `
+              <img
+                src="${esc(logoUrl)}"
+                class="logo"
+                alt="Company Logo"
+                onerror="this.style.display='none'"
+              >
+            ` : ''}
+
+            <h1 class="title">Reimbursement Report</h1>
+            <div class="branch-title">${esc(branchTitle)}</div>
+            <div class="period">Period: ${esc(periodTitle)}</div>
+          </header>
+
+          <section class="filter-grid">
+            <div class="filter-card">
+              <div class="filter-label">Period</div>
+              <div class="filter-value">${esc(periodTitle)}</div>
+            </div>
+            <div class="filter-card">
+              <div class="filter-label">Branch / Outlet</div>
+              <div class="filter-value">${esc(branchTitle)}</div>
+            </div>
+            <div class="filter-card">
+              <div class="filter-label">Employee</div>
+              <div class="filter-value">${esc(employeeTitle)}</div>
+            </div>
+            <div class="filter-card">
+              <div class="filter-label">Status</div>
+              <div class="filter-value">${esc(statusTitle)}</div>
+            </div>
+          </section>
+
+          <section class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Total Claims (${rows.length})</div>
+              <div class="summary-value">${esc(money(totalAmount))}</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-label">Paid Amount</div>
+              <div class="summary-value">${esc(money(totalPaid))}</div>
+            </div>
+            <div class="summary-card remaining">
+              <div class="summary-label">Remaining Amount</div>
+              <div class="summary-value">${esc(money(totalRemaining))}</div>
+            </div>
+          </section>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Employee</th>
+                  <th>Outlet</th>
+                  <th>Category</th>
+                  <th>Description</th>
+                  <th style="text-align:right">Amount</th>
+                  <th style="text-align:right">Paid</th>
+                  <th style="text-align:right">Remaining</th>
+                  <th>Payroll Period</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <section class="totals">
+            <div class="totals-box">
+              <div class="total-row">
+                <span>Total Claims</span>
+                <strong>${esc(money(totalAmount))}</strong>
+              </div>
+              <div class="total-row">
+                <span>Total Paid</span>
+                <strong>${esc(money(totalPaid))}</strong>
+              </div>
+              <div class="total-row final">
+                <span>Total Remaining</span>
+                <strong>${esc(money(totalRemaining))}</strong>
+              </div>
+            </div>
+          </section>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB — SAMA SEPERTI EMPLOYEE SCHEDULE
+    const reportWindow = window.open('', '_blank');
+
+    if (!reportWindow) {
+      alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.');
+      return;
     }
-  });
 
-  const filenamePeriod = period || 'all-periods';
-  doc.save(`reimbursements-${filenamePeriod}.pdf`);
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Reimbursement error:', error);
+    alert('Gagal membuat PDF Reimbursement. Periksa Console untuk detail kesalahan.');
+  }
 };
-
 
 /* ==== INITIALIZE ==== */
 window.initEmployeeReimbursement = async function () {
