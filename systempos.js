@@ -27008,8 +27008,6 @@ async function initEmployeeTaxSection() {
 	const statusFilter = document.getElementById("employeeTaxStatusFilter");
 	const now = new Date();
 
-	if (periodFilter && !periodFilter.value) { periodFilter.value = `${now.getFullYear()}-${String( now.getMonth() + 1 ).padStart(2, "0")}`; }
-
 	populateEmployeeTaxBranchFilter();
 	populateEmployeeTaxYearFilter();
 	
