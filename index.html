@@ -20476,6 +20476,185 @@
 	    </div>
 	  </div>
 	</div>
+	<!-- EMPLOYEE TAX DETAIL MODAL -->
+	<div id="employeeTaxDetailModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            receipt_long
+	          </span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Employee Tax Detail
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Employee income tax information and calculation details
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeEmployeeTaxDetail()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition"
+	        aria-label="Close detail">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- EMPLOYEE INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Employee Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Employee identity and assigned outlet
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Name</label>
+	            <div id="employeeTaxDetailEmployeeName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Employee Code</label>
+	            <div id="employeeTaxDetailEmployeeCode"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Outlet</label>
+	            <div id="employeeTaxDetailBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- TAX INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Tax Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Tax period, tax type, calculation method, and record references
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Tax Period</label>
+	            <div id="employeeTaxDetailPeriod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Tax Type</label>
+	            <div id="employeeTaxDetailType"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Status</label>
+	            <div id="employeeTaxDetailStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Calculation Method</label>
+	            <div id="employeeTaxDetailCalculationMethod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Tax Record ID</label>
+	            <div id="employeeTaxDetailRecordId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Payroll ID</label>
+	            <div id="employeeTaxDetailPayrollId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Created At</label>
+	            <div id="employeeTaxDetailCreatedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- TAX SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Tax Summary
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Gross taxable income, tax allowance, deduction, and tax amount
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3">
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Gross Taxable Income</p>
+	            <p id="employeeTaxDetailGrossIncome"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Tax Allowance</p>
+	            <p id="employeeTaxDetailAllowance"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Tax Deduction</p>
+	            <p id="employeeTaxDetailDeduction"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Tax Amount</p>
+	            <p id="employeeTaxDetailTaxAmount"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- CALCULATION NOTES -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Calculation Notes
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Additional information saved with this tax record
+	          </p>
+	        </div>
+	
+	        <div id="employeeTaxDetailNote"
+	          class="min-h-20 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap break-words">-</div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end shrink-0">
+	      <button type="button"
+	        onclick="closeEmployeeTaxDetail()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>	
 
 
