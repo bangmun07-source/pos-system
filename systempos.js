@@ -28012,10 +28012,10 @@ window.exportEmployeeTaxPayable = async function () {
 };
 
 
-
 /* ==========================
 	EMPLOYEE HEALTH PAYABLE 
 ========================== */
+
 let employeeHealthData = [];
 let employeeHealthCurrentPage = 1;
 const employeeHealthPageSize = 10;
@@ -28536,19 +28536,13 @@ function toggleEmployeeHealthActionMenu(button, contributionId) {
 }
 
 document.addEventListener("click", function(event) {
-  const menu = document.querySelectorAll(
-    '[id^="employeeHealthActionMenu-"]'
-  );
+  const menu = document.querySelectorAll( '[id^="employeeHealthActionMenu-"]' );
 
   menu.forEach(popup => {
     const clickedInsidePopup = popup.contains(event.target);
-    const clickedThreeDots = event.target.closest(
-      'button[onclick^="toggleEmployeeHealthActionMenu"]'
-    );
+    const clickedThreeDots = event.target.closest( 'button[onclick^="toggleEmployeeHealthActionMenu"]' );
 
-    if (!clickedInsidePopup && !clickedThreeDots) {
-      popup.remove();
-    }
+    if (!clickedInsidePopup && !clickedThreeDots) { popup.remove(); }
   });
 });
 
@@ -28575,7 +28569,6 @@ async function viewEmployeeHealthDetail(contributionId) {
     if (!value) return "-";
 
     const date = new Date(value);
-
     if (Number.isNaN(date.getTime())) return "-";
 
     return date.toLocaleDateString("id-ID", options);
@@ -28584,7 +28577,6 @@ async function viewEmployeeHealthDetail(contributionId) {
     if (!value) return "-";
 
     const date = new Date( `${String(value).slice(0, 10)}T00:00:00` );
-
     if (Number.isNaN(date.getTime())) return "-";
 
     return date.toLocaleDateString("id-ID", {
@@ -28675,11 +28667,6 @@ async function viewEmployeeHealthDetail(contributionId) {
     setText( "employeeHealthDetailNote", row.note || "-" );
 
   } catch (error) {
-    console.error(
-      "Error loading employee health contribution detail:",
-      error
-    );
-
     setText( "employeeHealthDetailEmployeeName", "Failed to load detail" );
     showToast( error?.message || "Gagal memuat detail iuran kesehatan.", "error" );
   }
@@ -28693,6 +28680,422 @@ function closeEmployeeHealthDetail() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
+
+
+/* ==========================
+   EXPORT EMPLOYEE HEALTH PDF
+========================== */
+window.exportEmployeeHealthData = function () {
+  const periodValue = document.getElementById("employeeHealthPeriodFilter")?.value || "";
+  const yearValue = document.getElementById("employeeHealthYearFilter")?.value || "";
+  const branchValue = document.getElementById("employeeHealthBranchFilter")?.value || "";
+  const employeeValue = document.getElementById("employeeHealthEmployeeFilter")?.value || "";
+  const statusValue = document.getElementById("employeeHealthStatusFilter")?.value || "";
+  const rows = Array.isArray(employeeHealthData)
+    ? employeeHealthData
+    : [];
+  // EmployeeHealthData sudah dimuat sesuai filter dan berisi
+  // semua record hasil RPC, bukan hanya baris halaman aktif.
+  const filteredRows = rows.filter(row => {
+    const status = String(row.status || "").trim().toUpperCase();
+    const branchId = String(row.branch_id || "").trim();
+    const employeeId = String(row.employee_id || "").trim();
+    const contributionPeriod = String( row.contribution_period || "" ).slice(0, 10);
+
+    if (branchValue && branchValue !== "ALL" && branchId !== branchValue) { return false; }
+    if (employeeValue && employeeId !== employeeValue) { return false; }
+    if (statusValue && status !== statusValue) { return false; }
+    // Bulan lebih spesifik daripada tahun.
+    if (/^\d{4}-\d{2}$/.test(periodValue)) {
+      if (!contributionPeriod.startsWith(periodValue)) { return false; }
+    } else if (/^\d{4}$/.test(yearValue)) {
+      if (!contributionPeriod.startsWith(yearValue)) { return false; }
+    } return true;
+  });
+
+  if (!filteredRows.length) { showToast( "Tidak ada data Employee Health Payable untuk filter yang dipilih.", "error" ); return; }
+
+  const escape = value => typeof escapeHtml === "function"
+		? escapeHtml(String(value ?? "-"))
+		: String(value ?? "-").replace(/[&<>"']/g, char => ({
+				"&": "&amp;",
+				"<": "&lt;",
+				">": "&gt;",
+				'"': "&quot;",
+				"'": "&#39;"
+			})[char]);
+  const money = value => typeof formatAccountingCurrency === "function"
+		? formatAccountingCurrency(Number(value) || 0)
+		: new Intl.NumberFormat("id-ID", {
+				style: "currency",
+				currency: "IDR",
+				maximumFractionDigits: 0 
+		}).format(Number(value) || 0);
+  const branches = Array.isArray(accountingDebtBranches)
+    ? accountingDebtBranches
+    : [];
+  const getBranchName = branchId => branches.find( branch => String(branch.id || "").trim() === String(branchId || "").trim() )?.name || branchId || "-";
+  const getEmployeeName = employeeId => {
+    const select = document.getElementById("employeeHealthEmployeeFilter");
+    const option = [...(select?.options || [])].find( item => item.value === String(employeeId || "") );
+    return option?.textContent || "";
+  };
+  const selectedBranch = branchValue && branchValue !== "ALL"
+    ? getBranchName(branchValue)
+    : "All Branches";
+  const selectedEmployee = employeeValue
+    ? getEmployeeName(employeeValue) || "Selected Employee"
+    : "All Employees";
+  const periodLabel = periodValue
+    ? new Date(`${periodValue}-01T00:00:00`).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+    : yearValue || "All Periods";
+  const employeeTotal = filteredRows.reduce( (sum, row) => sum + (Number(row.employee_amount) || 0), 0 );
+  const employerTotal = filteredRows.reduce( (sum, row) => sum + (Number(row.employer_amount) || 0), 0 );
+  const paidTotal = filteredRows.reduce((sum, row) => {
+    const status = String(row.status || "").trim().toUpperCase();
+
+    return sum + ( status === "PAID"
+			? (Number(row.employee_amount) || 0) + (Number(row.employer_amount) || 0)
+			: 0
+    );
+  }, 0);
+
+  const outstandingTotal = filteredRows.reduce((sum, row) => {
+    const status = String(row.status || "").trim().toUpperCase();
+    if (["PAID", "CANCELLED"].includes(status)) { return sum; }
+
+    return sum + (Number(row.employee_amount) || 0) + (Number(row.employer_amount) || 0);
+  }, 0);
+
+  const rowsHtml = filteredRows.map((row, index) => {
+    const status = String(row.status || "DRAFT")
+      .trim()
+      .toUpperCase();
+    const employeeAmount = Number(row.employee_amount) || 0;
+    const employerAmount = Number(row.employer_amount) || 0;
+    const totalAmount = employeeAmount + employerAmount;
+    const paidAmount = status === "PAID" ? totalAmount : 0;
+    const remainingAmount = ["PAID", "CANCELLED"].includes(status) ? 0 : totalAmount;
+    const contributionType = String(row.contribution_type || "")
+      .trim()
+      .toUpperCase();
+    const typeLabels = {
+      EMPLOYEE_HEALTH_CONTRIBUTION: "Employee Contribution",
+      EMPLOYER_HEALTH_CONTRIBUTION: "Employer Contribution"
+    };
+    const date = row.contribution_period
+      ? new Date( `${String(row.contribution_period).slice(0, 10)}T00:00:00` ).toLocaleDateString("en-US", { month: "short", year: "numeric" })
+      : "-";
+
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${escape(date)}</td>
+        <td>
+          <strong>${escape(row.employee_name || "-")}</strong>
+          <div class="sub">${escape(row.employee_code || "")}</div>
+        </td>
+        <td>${escape(getBranchName(row.branch_id))}</td>
+        <td>${escape(typeLabels[contributionType] || contributionType || "-")}</td>
+        <td class="num">${money(employeeAmount)}</td>
+        <td class="num">${money(employerAmount)}</td>
+        <td class="num">${money(paidAmount)}</td>
+        <td class="num">${money(remainingAmount)}</td>
+        <td>${escape(status)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  const logoUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`;
+  const generatedAt = new Date().toLocaleString("en-ID", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  });
+  const printWindow = window.open("", "_blank");
+
+  if (!printWindow) { showToast( "Popup diblokir browser. Izinkan popup untuk membuka export PDF.", "error" ); return; }
+
+  printWindow.document.open();
+  printWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Employee Health Payable - MUNO</title>
+
+      <style>
+        * { box-sizing: border-box; }
+
+        body {
+          margin: 0;
+          background: #e5e7eb;
+          color: #111827;
+          font-family: Arial, Helvetica, sans-serif;
+          font-size: 10px;
+        }
+
+        .toolbar {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          padding: 14px 22px;
+          background: #0B0F14;
+          color: #dae2fd;
+        }
+
+        .toolbar button {
+          border: 0;
+          border-radius: 6px;
+          padding: 10px 16px;
+          background: #f59e0b;
+          color: #111827;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .sheet {
+          width: 100%;
+          max-width: 1500px;
+          margin: 24px auto;
+          padding: 28px;
+          background: white;
+          min-height: 200px;
+        }
+
+        .report-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 20px;
+          padding-bottom: 18px;
+          border-bottom: 2px solid #f59e0b;
+        }
+
+        .logo {
+          max-width: 145px;
+          max-height: 58px;
+          object-fit: contain;
+          object-position: left center;
+        }
+
+        h1 {
+          margin: 12px 0 5px;
+          font-size: 21px;
+        }
+
+        .muted { color: #6b7280; }
+
+        .meta {
+          text-align: right;
+          line-height: 1.7;
+        }
+
+        .summary {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+          margin: 20px 0;
+        }
+
+        .summary-card {
+          padding: 12px;
+          border: 1px solid #e5e7eb;
+          border-radius: 6px;
+        }
+
+        .summary-label {
+          margin-bottom: 8px;
+          color: #6b7280;
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: .5px;
+        }
+
+        .summary-value {
+          font-size: 14px;
+          font-weight: 700;
+        }
+
+        .filters {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 16px;
+          margin-bottom: 16px;
+          color: #374151;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 9px;
+        }
+
+        thead { display: table-header-group; }
+
+        th {
+          background: #f3f4f6;
+          text-align: left;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: .3px;
+        }
+
+        th, td {
+          padding: 8px 6px;
+          border: 1px solid #e5e7eb;
+          vertical-align: top;
+        }
+
+        tbody tr { page-break-inside: avoid; }
+
+        .num {
+          text-align: right;
+          white-space: nowrap;
+        }
+
+        .sub {
+          margin-top: 4px;
+          color: #6b7280;
+          font-size: 8px;
+        }
+
+        tfoot td {
+          background: #f9fafb;
+          font-weight: 700;
+        }
+
+        .footer {
+          margin-top: 24px;
+          padding-top: 10px;
+          border-top: 1px solid #e5e7eb;
+          color: #6b7280;
+          text-align: center;
+          font-size: 9px;
+        }
+
+        @page {
+          size: A4 landscape;
+          margin: 10mm;
+        }
+
+        @media print {
+          body { background: white; font-size: 9px; }
+          .toolbar { display: none !important; }
+          .sheet {
+            max-width: none;
+            margin: 0;
+            padding: 0;
+          }
+          .summary-card { break-inside: avoid; }
+          th {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+        }
+      </style>
+    </head>
+
+    <body>
+      <div class="toolbar">
+        <strong>MUNO · Employee Health Payable</strong>
+        <button type="button" onclick="window.print()">
+          Download / Print PDF
+        </button>
+      </div>
+
+      <main class="sheet">
+        <header class="report-header">
+          <div>
+            <img class="logo"
+              src="${escape(logoUrl)}"
+              alt="MUNO Logo"
+              onerror="this.style.display='none'">
+            <h1>Employee Health Payable</h1>
+            <div class="muted">Employee and employer BPJS contribution obligations</div>
+          </div>
+
+          <div class="meta">
+            <strong>MUNO</strong><br>
+            <span class="muted">Contribution Period:</span>
+            ${escape(periodLabel)}<br>
+            <span class="muted">Generated:</span>
+            ${escape(generatedAt)}
+          </div>
+        </header>
+
+        <section class="summary">
+          <div class="summary-card">
+            <div class="summary-label">Total Records</div>
+            <div class="summary-value">${filteredRows.length}</div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-label">Employee Contribution</div>
+            <div class="summary-value">${money(employeeTotal)}</div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-label">Employer Contribution</div>
+            <div class="summary-value">${money(employerTotal)}</div>
+          </div>
+
+          <div class="summary-card">
+            <div class="summary-label">Outstanding Contributions</div>
+            <div class="summary-value">${money(outstandingTotal)}</div>
+          </div>
+        </section>
+
+        <div class="filters">
+          <span><strong>Outlet:</strong> ${escape(selectedBranch)}</span>
+          <span><strong>Employee:</strong> ${escape(selectedEmployee)}</span>
+          <span><strong>Status:</strong> ${escape(statusValue || "All Status")}</span>
+          <span><strong>Total Paid:</strong> ${money(paidTotal)}</span>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Period</th>
+              <th>Employee</th>
+              <th>Outlet</th>
+              <th>Contribution Type</th>
+              <th class="num">Employee Amount</th>
+              <th class="num">Employer Amount</th>
+              <th class="num">Paid Amount</th>
+              <th class="num">Remaining</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+
+          <tbody>${rowsHtml}</tbody>
+
+          <tfoot>
+            <tr>
+              <td colspan="5">TOTAL CONTRIBUTIONS</td>
+              <td class="num">${money(employeeTotal)}</td>
+              <td class="num">${money(employerTotal)}</td>
+              <td class="num">${money(paidTotal)}</td>
+              <td class="num">${money(outstandingTotal)}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <footer class="footer">
+          Generated by MUNO · Employee Health Payable · ${escape(generatedAt)}
+        </footer>
+      </main>
+    </body>
+    </html>
+  `);
+  printWindow.document.close();
+};
 
 
 /* ======================
