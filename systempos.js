@@ -27364,7 +27364,7 @@ function renderEmployeeTaxTable(errorMessage = "") {
 					<td class="px-5 py-4 text-center">
 						<div class="relative inline-block">
 							<button type="button"
-								onclick="toggleEmployeeTaxActionMenu(this, '${escapeHtml(String(row.tax_id || row.id || ""))}')"
+								onclick="toggleEmployeeTaxActionMenu(this, '${escapeHtml(String(row.tax_record_id || row.tax_id || row.id || ""))}')"
 								class="h-9 w-9 inline-flex items-center justify-center text-muted hover:text-foreground"
 								title="Actions">
 									<span class="material-symbols-outlined">
@@ -27402,7 +27402,6 @@ function updateEmployeeTaxSummary(data) {
   if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
 }
 
-
 /* ==== PAGINATION ==== */
 function updateEmployeeTaxPagination(total, start, end) {
 	const info =document.getElementById("employeeTaxTableInfo");
@@ -27433,47 +27432,45 @@ function changeEmployeeTaxPage(direction) {
 	renderEmployeeTaxTable();
 }
 
+
 /* ==== EMPLOYEE TAX ACTION MENU ==== */
 function toggleEmployeeTaxActionMenu(button, taxId) {
 	const menuId = `employeeTaxActionMenu-${taxId}`;
 	const existingMenu = document.getElementById(menuId);
-
 	// Tutup menu yang sedang terbuka
-	document.querySelectorAll('[id^="employeeTaxActionMenu-"]')
-			.forEach(menu => menu.remove());
-
+	document.querySelectorAll('[id^="employeeTaxActionMenu-"]') .forEach(menu => menu.remove());
+	// Jika menu sebelumnya terbuka, cukup tutup
 	if (existingMenu) return;
 
 	const menu = document.createElement("div");
 	menu.id = menuId;
 	menu.className = "w-40 bg-background border border-outline-variant rounded-md shadow-lg py-1";
-
 	menu.innerHTML = `
 		<button type="button"
 			onclick="viewEmployeeTaxDetail('${escapeHtml(String(taxId))}'); document.getElementById('${menuId}')?.remove();"
 			class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
-				<span class="material-symbols-outlined text-base">
-					visibility
-				</span>
+			<span class="material-symbols-outlined text-base">visibility</span>
 			View Detail
 		</button>
 
 		<button type="button"
 			onclick="payEmployeeTax('${escapeHtml(String(taxId))}'); document.getElementById('${menuId}')?.remove();"
 			class="w-full px-3 py-2 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
-				<span class="material-symbols-outlined text-base">
-					payments
-				</span>
+			<span class="material-symbols-outlined text-base">payments</span>
 			Pay
 		</button>
 	`;
-	// Tampilkan di luar tabel agar tidak tertutup footer
+
+	// Posisi menu
 	const rect = button.getBoundingClientRect();
 
 	menu.style.position = "fixed";
 	menu.style.zIndex = "99999";
 	menu.style.right = "auto";
-	menu.style.left = `${Math.max( 8, Math.min(rect.right - 160, window.innerWidth - 168))}px`;
+	menu.style.left = `${Math.max(
+		8,
+		Math.min(rect.right - 160, window.innerWidth - 168)
+	)}px`;
 
 	const menuHeight = 88;
 	const spaceBelow = window.innerHeight - rect.bottom;
@@ -27483,7 +27480,103 @@ function toggleEmployeeTaxActionMenu(button, taxId) {
 		: `${Math.max(8, rect.top - menuHeight - 4)}px`;
 
 	document.body.appendChild(menu);
+
+	// Tutup saat klik di luar menu dan tombol action
+	const handleOutsideClick = (event) => {
+		if (
+			!menu.contains(event.target) &&
+			!button.contains(event.target)
+		) {
+			menu.remove();
+			document.removeEventListener("click", handleOutsideClick, true);
+		}
+	};
+	// Delay agar klik pembuka menu tidak langsung menutupnya
+	setTimeout(() => {
+		document.addEventListener("click", handleOutsideClick, true);
+	}, 0);
 }
+
+
+/* ==== VIEW EMPLOYEE TAX DETAIL ==== */
+function viewEmployeeTaxDetail(taxId) {
+	const modal = document.getElementById("employeeTaxDetailModal");
+	if (!modal) return;
+
+	const row = employeeTaxData.find(item => String(item.tax_record_id || item.tax_id || item.id || "") === String(taxId) );
+	if (!row) { console.error("Employee tax record not found:", taxId); return; }
+
+	const setText = (id, value) => { 
+		const el = document.getElementById(id); 
+		if (el) el.textContent = value ?? "-"; 
+	};
+	const formatMoney = value => formatAccountingCurrency(Number(value) || 0);
+	const formatDate = value => {
+		if (!value) return "-";
+
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return String(value);
+
+		return date.toLocaleDateString("id-ID", {
+			day: "2-digit",
+			month: "long",
+			year: "numeric"
+		});
+	};
+	const formatDateTime = value => {
+		if (!value) return "-";
+
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return String(value);
+
+		return date.toLocaleString("id-ID", {
+			day: "2-digit",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit"
+		});
+	};
+
+	const branchId = String(row.branch_id || "").trim();
+	const branchName = accountingDebtBranches.find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+	const taxPeriod = row.tax_period
+		? new Date(`${String(row.tax_period).slice(0, 10)}T00:00:00`)
+			.toLocaleDateString("id-ID", {
+				month: "long",
+				year: "numeric"
+			})
+		: "-";
+
+	setText("employeeTaxDetailEmployeeName", row.employee_name || "-");
+	setText("employeeTaxDetailEmployeeCode", row.employee_code || "-");
+	setText("employeeTaxDetailBranch", branchName);
+	setText("employeeTaxDetailPeriod", taxPeriod);
+	setText("employeeTaxDetailType", row.tax_type || "PPh21");
+	setText("employeeTaxDetailStatus", String(row.status || "DRAFT").toUpperCase());
+	setText("employeeTaxDetailCalculationMethod", row.calculation_method || "-");
+	setText("employeeTaxDetailRecordId", row.tax_record_id || row.tax_id || row.id || "-");
+	setText("employeeTaxDetailPayrollId", row.payroll_id || "-");
+	setText("employeeTaxDetailCreatedAt", formatDateTime(row.created_at));
+	setText("employeeTaxDetailGrossIncome", formatMoney(row.gross_taxable_income));
+	setText("employeeTaxDetailAllowance", formatMoney(row.tax_allowance));
+	setText("employeeTaxDetailDeduction", formatMoney(row.tax_deduction));
+	setText("employeeTaxDetailTaxAmount", formatMoney(row.tax_amount));
+	setText("employeeTaxDetailNote", row.calculation_note || "-");
+
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
+}
+
+/* ==== CLOSE EMPLOYEE TAX DETAIL ==== */
+function closeEmployeeTaxDetail() {
+	const modal = document.getElementById("employeeTaxDetailModal");
+	if (!modal) return;
+
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+}
+
 
 
 /* ==== EMPLOYEE HEALTH PAYABLE ==== */
