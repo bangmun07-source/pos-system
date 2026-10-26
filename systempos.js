@@ -27579,6 +27579,441 @@ function closeEmployeeTaxDetail() {
 
 
 
+
+/* ==== EXPORT EMPLOYEE TAX PAYABLE PDF ==== */
+window.exportEmployeeTaxPayable = async function () {
+  try {
+    const periodValue = String( document.getElementById('employeeTaxPeriodFilter')?.value || '' ).trim();
+    const yearValue = String( document.getElementById('employeeTaxYearFilter')?.value || '' ).trim();
+    const branchValue = String( document.getElementById('employeeTaxBranchFilter')?.value || '' ).trim();
+    const employeeValue = String( document.getElementById('employeeTaxEmployeeFilter')?.value || '' ).trim();
+    const statusValue = String( document.getElementById('employeeTaxStatusFilter')?.value || '' ).trim().toUpperCase();
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+    const canViewAllBranches = ['owner', 'accountant'].includes(role) || userBranchId.toUpperCase() === 'ALL';
+
+    if (!Array.isArray(employeeTaxData) || !employeeTaxData.length) { alert('Data Employee Tax Payable belum tersedia.'); return; }
+
+    // FILTER RECORDS
+    const rows = employeeTaxData.filter(row => {
+      const taxPeriod = String(row.tax_period || '').substring(0, 10);
+      const branchId = String(row.branch_id || '').trim();
+      const employeeId = String(row.employee_id || '').trim();
+      const status = String(row.status || '').trim().toUpperCase();
+
+      if (!canViewAllBranches && branchId !== userBranchId) { return false; }
+      if (branchValue && branchId !== branchValue) { return false; }
+      if (employeeValue && employeeId !== employeeValue) { return false; }
+      if (statusValue && status !== statusValue) { return false; }
+      if (/^\d{4}-\d{2}$/.test(periodValue)) {
+        if (taxPeriod.substring(0, 7) !== periodValue) return false;
+      } else if (/^\d{4}$/.test(yearValue)) {
+        if (taxPeriod.substring(0, 4) !== yearValue) return false;
+      }
+
+      return true;
+    });
+
+    if (!rows.length) { alert('Tidak ada data Employee Tax Payable untuk filter yang dipilih.'); return; }
+
+    // HELPERS
+    const esc = value => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+    const money = value => Number(value || 0).toLocaleString('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+    const formatPeriod = value => {
+      if (!value) return '-';
+
+      const parts = String(value).substring(0, 10).split('-');
+      if (parts.length < 2) return esc(value);
+
+      const date = new Date( Number(parts[0]), Number(parts[1]) - 1, 1 );
+      return date.toLocaleDateString('en-GB', {
+        month: 'short',
+        year: 'numeric'
+      });
+    };
+    const getBranchName = id => {
+      const branch = (accountingDebtBranches || []).find( item => String(item.id || '').trim() === String(id || '').trim() );
+			
+      return branch?.name || id || '-';
+    };
+    const branchTitle = branchValue
+      ? getBranchName(branchValue)
+      : canViewAllBranches ? 'ALL BRANCHES' : getBranchName(userBranchId);
+    const periodTitle = /^\d{4}-\d{2}$/.test(periodValue)
+      ? formatPeriod(`${periodValue}-01`)
+      : /^\d{4}$/.test(yearValue)
+        ? yearValue
+        : 'ALL PERIODS';
+    // TABLE ROWS
+    const sortedRows = [...rows].sort((a, b) => {
+      const periodCompare = String(a.tax_period || '') .localeCompare(String(b.tax_period || ''));
+
+      return periodCompare ||
+        String(a.employee_name || '').localeCompare(
+          String(b.employee_name || ''), 'id'
+        );
+    });
+
+    const tableRows = sortedRows.map(row => `
+      <tr>
+        <td>${esc(row.tax_record_id || '-')}</td>
+        <td>
+          <div class="employee-name">${esc(row.employee_name || '-')}</div>
+          <div class="muted">${esc(row.employee_code || '')}</div>
+        </td>
+        <td>${esc(getBranchName(row.branch_id))}</td>
+        <td>${esc(formatPeriod(row.tax_period))}</td>
+        <td>${esc(row.tax_type || 'PPh21')}</td>
+        <td class="number">${esc(money(row.gross_taxable_income))}</td>
+        <td class="number">${esc(money(row.tax_allowance))}</td>
+        <td class="number">${esc(money(row.tax_deduction))}</td>
+        <td class="number tax-amount">${esc(money(row.tax_amount))}</td>
+        <td><span class="status">${esc(String(row.status || 'DRAFT').toUpperCase())}</span></td>
+      </tr>
+    `).join('');
+
+    const totalTax = sortedRows.reduce( (sum, row) => sum + Number(row.tax_amount || 0), 0 );
+    // TENANT LOGO
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+    const filename = `Employee Tax Payable - ${branchTitle} - ${periodTitle}.pdf`;
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * { box-sizing: border-box; }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .report-header {
+            text-align: center;
+            margin-bottom: 26px;
+          }
+
+          .logo {
+            display: block;
+            width: auto;
+            max-width: 150px;
+            max-height: 75px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+          }
+
+          .title {
+            margin: 0 0 8px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: .4px;
+            color: #222;
+          }
+
+          .branch-title {
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+
+          .period {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #777;
+          }
+
+          .summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+          }
+
+          .summary-label {
+            color: #777;
+            font-size: 10px;
+            margin-bottom: 5px;
+          }
+
+          .summary-value {
+            color: #222;
+            font-size: 15px;
+            font-weight: 700;
+          }
+
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 12px;
+            background: #fff;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 9px;
+            color: #444;
+          }
+
+          thead { display: table-header-group; }
+
+          th {
+            padding: 10px 6px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 10px 6px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          tbody tr:last-child td { border-bottom: none; }
+
+          .number {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .employee-name {
+            color: #222;
+            font-weight: 700;
+          }
+
+          .muted {
+            margin-top: 3px;
+            color: #888;
+            font-size: 8px;
+          }
+
+          .tax-amount {
+            color: #222;
+            font-weight: 700;
+          }
+
+          .status {
+            font-size: 8px;
+            font-weight: 700;
+          }
+
+          .total-row td {
+            background: #f8f8f8;
+            border-top: 1px solid #ddd;
+            font-weight: 700;
+          }
+
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar { display: none !important; }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 8px;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .table-wrap {
+              padding: 8px;
+              border-radius: 8px;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table { page-break-inside: auto; }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Employee Tax Payable Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            ${logoUrl ? `
+              <img
+                src="${esc(logoUrl)}"
+                class="logo"
+                alt="Company Logo"
+                onerror="this.style.display='none'"
+              >
+            ` : ''}
+
+            <h1 class="title">Employee Tax Payable</h1>
+            <div class="branch-title">${esc(branchTitle)}</div>
+            <div class="period">
+              Period: ${esc(periodTitle)}
+              ${employeeValue ? ' • Employee Filtered' : ''}
+              ${statusValue ? ` • Status: ${esc(statusValue)}` : ''}
+            </div>
+          </header>
+
+          <div class="summary">
+            <div>
+              <div class="summary-label">Total Records</div>
+              <div class="summary-value">${sortedRows.length}</div>
+            </div>
+            <div>
+              <div class="summary-label">Total Tax Amount</div>
+              <div class="summary-value">${esc(money(totalTax))}</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Record ID</th>
+                  <th>Employee</th>
+                  <th>Branch</th>
+                  <th>Period</th>
+                  <th>Tax Type</th>
+                  <th class="number">Gross Income</th>
+                  <th class="number">Tax Allowance</th>
+                  <th class="number">Tax Deduction</th>
+                  <th class="number">Tax Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${tableRows}
+                <tr class="total-row">
+                  <td colspan="8">TOTAL TAX AMOUNT</td>
+                  <td class="number">${esc(money(totalTax))}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB
+    const reportWindow = window.open('', '_blank');
+
+    if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Employee Tax Payable error:', error);
+    alert('Gagal membuat PDF Employee Tax Payable. Periksa Console untuk detail kesalahan.');
+  }
+};
+
+
+
+
 /* ==== EMPLOYEE HEALTH PAYABLE ==== */
 let employeeHealthData = [];
 let employeeHealthCurrentPage = 1;
