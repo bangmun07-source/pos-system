@@ -28682,420 +28682,799 @@ function closeEmployeeHealthDetail() {
 }
 
 
-/* ==========================
-   EXPORT EMPLOYEE HEALTH PDF
-========================== */
-window.exportEmployeeHealthData = function () {
-  const periodValue = document.getElementById("employeeHealthPeriodFilter")?.value || "";
-  const yearValue = document.getElementById("employeeHealthYearFilter")?.value || "";
-  const branchValue = document.getElementById("employeeHealthBranchFilter")?.value || "";
-  const employeeValue = document.getElementById("employeeHealthEmployeeFilter")?.value || "";
-  const statusValue = document.getElementById("employeeHealthStatusFilter")?.value || "";
-  const rows = Array.isArray(employeeHealthData)
-    ? employeeHealthData
-    : [];
-  // EmployeeHealthData sudah dimuat sesuai filter dan berisi
-  // semua record hasil RPC, bukan hanya baris halaman aktif.
-  const filteredRows = rows.filter(row => {
-    const status = String(row.status || "").trim().toUpperCase();
-    const branchId = String(row.branch_id || "").trim();
-    const employeeId = String(row.employee_id || "").trim();
-    const contributionPeriod = String( row.contribution_period || "" ).slice(0, 10);
+/* ==== EXPORT EMPLOYEE HEALTH PAYABLE PDF ==== */
+window.exportEmployeeHealthData = async function () {
+  try {
+    const periodValue = String(
+      document.getElementById('employeeHealthPeriodFilter')?.value || ''
+    ).trim();
 
-    if (branchValue && branchValue !== "ALL" && branchId !== branchValue) { return false; }
-    if (employeeValue && employeeId !== employeeValue) { return false; }
-    if (statusValue && status !== statusValue) { return false; }
-    // Bulan lebih spesifik daripada tahun.
-    if (/^\d{4}-\d{2}$/.test(periodValue)) {
-      if (!contributionPeriod.startsWith(periodValue)) { return false; }
-    } else if (/^\d{4}$/.test(yearValue)) {
-      if (!contributionPeriod.startsWith(yearValue)) { return false; }
-    } return true;
-  });
+    const yearValue = String(
+      document.getElementById('employeeHealthYearFilter')?.value || ''
+    ).trim();
 
-  if (!filteredRows.length) { showToast( "Tidak ada data Employee Health Payable untuk filter yang dipilih.", "error" ); return; }
+    const branchValue = String(
+      document.getElementById('employeeHealthBranchFilter')?.value || ''
+    ).trim();
 
-  const escape = value => typeof escapeHtml === "function"
-		? escapeHtml(String(value ?? "-"))
-		: String(value ?? "-").replace(/[&<>"']/g, char => ({
-				"&": "&amp;",
-				"<": "&lt;",
-				">": "&gt;",
-				'"': "&quot;",
-				"'": "&#39;"
-			})[char]);
-  const money = value => typeof formatAccountingCurrency === "function"
-		? formatAccountingCurrency(Number(value) || 0)
-		: new Intl.NumberFormat("id-ID", {
-				style: "currency",
-				currency: "IDR",
-				maximumFractionDigits: 0 
-		}).format(Number(value) || 0);
-  const branches = Array.isArray(accountingDebtBranches)
-    ? accountingDebtBranches
-    : [];
-  const getBranchName = branchId => branches.find( branch => String(branch.id || "").trim() === String(branchId || "").trim() )?.name || branchId || "-";
-  const getEmployeeName = employeeId => {
-    const select = document.getElementById("employeeHealthEmployeeFilter");
-    const option = [...(select?.options || [])].find( item => item.value === String(employeeId || "") );
-    return option?.textContent || "";
-  };
-  const selectedBranch = branchValue && branchValue !== "ALL"
-    ? getBranchName(branchValue)
-    : "All Branches";
-  const selectedEmployee = employeeValue
-    ? getEmployeeName(employeeValue) || "Selected Employee"
-    : "All Employees";
-  const periodLabel = periodValue
-    ? new Date(`${periodValue}-01T00:00:00`).toLocaleDateString("en-US", { month: "long", year: "numeric" })
-    : yearValue || "All Periods";
-  const employeeTotal = filteredRows.reduce( (sum, row) => sum + (Number(row.employee_amount) || 0), 0 );
-  const employerTotal = filteredRows.reduce( (sum, row) => sum + (Number(row.employer_amount) || 0), 0 );
-  const paidTotal = filteredRows.reduce((sum, row) => {
-    const status = String(row.status || "").trim().toUpperCase();
+    const employeeValue = String(
+      document.getElementById('employeeHealthEmployeeFilter')?.value || ''
+    ).trim();
 
-    return sum + ( status === "PAID"
-			? (Number(row.employee_amount) || 0) + (Number(row.employer_amount) || 0)
-			: 0
-    );
-  }, 0);
+    const statusValue = String(
+      document.getElementById('employeeHealthStatusFilter')?.value || ''
+    ).trim().toUpperCase();
 
-  const outstandingTotal = filteredRows.reduce((sum, row) => {
-    const status = String(row.status || "").trim().toUpperCase();
-    if (["PAID", "CANCELLED"].includes(status)) { return sum; }
+    const role = String(
+      state.user?.role || state.user?.Role || ''
+    ).trim().toLowerCase();
 
-    return sum + (Number(row.employee_amount) || 0) + (Number(row.employer_amount) || 0);
-  }, 0);
+    const userBranchId = String(
+      state.user?.branchId || state.user?.Branch_ID || ''
+    ).trim();
 
-  const rowsHtml = filteredRows.map((row, index) => {
-    const status = String(row.status || "DRAFT")
-      .trim()
-      .toUpperCase();
-    const employeeAmount = Number(row.employee_amount) || 0;
-    const employerAmount = Number(row.employer_amount) || 0;
-    const totalAmount = employeeAmount + employerAmount;
-    const paidAmount = status === "PAID" ? totalAmount : 0;
-    const remainingAmount = ["PAID", "CANCELLED"].includes(status) ? 0 : totalAmount;
-    const contributionType = String(row.contribution_type || "")
-      .trim()
-      .toUpperCase();
-    const typeLabels = {
-      EMPLOYEE_HEALTH_CONTRIBUTION: "Employee Contribution",
-      EMPLOYER_HEALTH_CONTRIBUTION: "Employer Contribution"
+    const canViewAllBranches =
+      ['owner', 'accountant'].includes(role) ||
+      userBranchId.toUpperCase() === 'ALL';
+
+    if (!Array.isArray(employeeHealthData) || !employeeHealthData.length) {
+      alert('Data Employee Health Payable belum tersedia.');
+      return;
+    }
+
+    /* ==== FILTER DATA ==== */
+    const rows = employeeHealthData.filter(row => {
+      const contributionPeriod = String(
+        row.contribution_period || ''
+      ).substring(0, 10);
+
+      const branchId = String(row.branch_id || '').trim();
+      const employeeId = String(row.employee_id || '').trim();
+      const status = String(row.status || 'DRAFT')
+        .trim()
+        .toUpperCase();
+
+      // Batasi akses berdasarkan branch pengguna.
+      if (!canViewAllBranches && branchId !== userBranchId) {
+        return false;
+      }
+
+      // ALL berarti semua branch, bukan ID branch literal.
+      if (
+        branchValue &&
+        branchValue.toUpperCase() !== 'ALL' &&
+        branchId !== branchValue
+      ) {
+        return false;
+      }
+
+      if (employeeValue && employeeId !== employeeValue) {
+        return false;
+      }
+
+      if (statusValue && status !== statusValue) {
+        return false;
+      }
+
+      // Filter bulan memiliki prioritas atas filter tahun.
+      if (/^\d{4}-\d{2}$/.test(periodValue)) {
+        if (contributionPeriod.substring(0, 7) !== periodValue) {
+          return false;
+        }
+      } else if (/^\d{4}$/.test(yearValue)) {
+        if (contributionPeriod.substring(0, 4) !== yearValue) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    if (!rows.length) {
+      alert(
+        'Tidak ada data Employee Health Payable untuk filter yang dipilih.'
+      );
+      return;
+    }
+
+    /* ==== HELPERS ==== */
+    const esc = value =>
+      String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      })[char]);
+
+    const formatMoney = value =>
+      new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(Number(value) || 0);
+
+    const formatNumber = value =>
+      new Intl.NumberFormat('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(Number(value) || 0);
+
+    const formatPeriod = value => {
+      const period = String(value || '').substring(0, 10);
+
+      if (!/^\d{4}-\d{2}/.test(period)) {
+        return period || '-';
+      }
+
+      const [year, month] = period.substring(0, 7).split('-');
+
+      const date = new Date(
+        Number(year),
+        Number(month) - 1,
+        1
+      );
+
+      return date.toLocaleDateString('en-GB', {
+        month: 'long',
+        year: 'numeric'
+      });
     };
-    const date = row.contribution_period
-      ? new Date( `${String(row.contribution_period).slice(0, 10)}T00:00:00` ).toLocaleDateString("en-US", { month: "short", year: "numeric" })
-      : "-";
 
-    return `
-      <tr>
-        <td>${index + 1}</td>
-        <td>${escape(date)}</td>
-        <td>
-          <strong>${escape(row.employee_name || "-")}</strong>
-          <div class="sub">${escape(row.employee_code || "")}</div>
-        </td>
-        <td>${escape(getBranchName(row.branch_id))}</td>
-        <td>${escape(typeLabels[contributionType] || contributionType || "-")}</td>
-        <td class="num">${money(employeeAmount)}</td>
-        <td class="num">${money(employerAmount)}</td>
-        <td class="num">${money(paidAmount)}</td>
-        <td class="num">${money(remainingAmount)}</td>
-        <td>${escape(status)}</td>
-      </tr>
-    `;
-  }).join("");
+    const getBranchName = branchId => {
+      const branches = Array.isArray(accountingDebtBranches)
+        ? accountingDebtBranches
+        : [];
 
-  const logoUrl = `${supabaseClient.supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`;
-  const generatedAt = new Date().toLocaleString("en-ID", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  });
-  const printWindow = window.open("", "_blank");
+      const branch = branches.find(item =>
+        String(item.branch_id || item.Branch_ID || '').trim() ===
+        String(branchId || '').trim()
+      );
 
-  if (!printWindow) { showToast( "Popup diblokir browser. Izinkan popup untuk membuka export PDF.", "error" ); return; }
+      return (
+        branch?.branch_name ||
+        branch?.Branch_Name ||
+        branch?.name ||
+        branchId ||
+        '-'
+      );
+    };
 
-  printWindow.document.open();
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Employee Health Payable - MUNO</title>
+    const branchTitle = branchValue &&
+      branchValue.toUpperCase() !== 'ALL'
+      ? getBranchName(branchValue)
+      : canViewAllBranches
+        ? 'ALL BRANCHES'
+        : getBranchName(userBranchId);
 
-      <style>
-        * { box-sizing: border-box; }
+    const periodTitle = /^\d{4}-\d{2}$/.test(periodValue)
+      ? formatPeriod(periodValue)
+      : /^\d{4}$/.test(yearValue)
+        ? yearValue
+        : 'ALL PERIODS';
 
-        body {
-          margin: 0;
-          background: #e5e7eb;
-          color: #111827;
-          font-family: Arial, Helvetica, sans-serif;
-          font-size: 10px;
-        }
+    /* ==== SORT DATA ==== */
+    const sortedRows = [...rows].sort((a, b) => {
+      const periodA = String(a.contribution_period || '');
+      const periodB = String(b.contribution_period || '');
 
-        .toolbar {
-          position: sticky;
-          top: 0;
-          z-index: 10;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 12px;
-          padding: 14px 22px;
-          background: #0B0F14;
-          color: #dae2fd;
-        }
+      if (periodA !== periodB) {
+        return periodA.localeCompare(periodB);
+      }
 
-        .toolbar button {
-          border: 0;
-          border-radius: 6px;
-          padding: 10px 16px;
-          background: #f59e0b;
-          color: #111827;
-          font-weight: 700;
-          cursor: pointer;
-        }
+      const employeeA = String(a.employee_name || '');
+      const employeeB = String(b.employee_name || '');
 
-        .sheet {
-          width: 100%;
-          max-width: 1500px;
-          margin: 24px auto;
-          padding: 28px;
-          background: white;
-          min-height: 200px;
-        }
+      return employeeA.localeCompare(employeeB);
+    });
 
-        .report-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          gap: 20px;
-          padding-bottom: 18px;
-          border-bottom: 2px solid #f59e0b;
-        }
+    /* ==== SUMMARY ==== */
+    const paidRows = sortedRows.filter(row =>
+      String(row.status || 'DRAFT').trim().toUpperCase() === 'PAID'
+    );
 
-        .logo {
-          max-width: 145px;
-          max-height: 58px;
-          object-fit: contain;
-          object-position: left center;
-        }
+    const employeePaid = paidRows.reduce(
+      (sum, row) => sum + (Number(row.employee_amount) || 0),
+      0
+    );
 
-        h1 {
-          margin: 12px 0 5px;
-          font-size: 21px;
-        }
+    const employerPaid = paidRows.reduce(
+      (sum, row) => sum + (Number(row.employer_amount) || 0),
+      0
+    );
 
-        .muted { color: #6b7280; }
+    const outstandingAmount = sortedRows.reduce((sum, row) => {
+      const status = String(row.status || 'DRAFT')
+        .trim()
+        .toUpperCase();
 
-        .meta {
-          text-align: right;
-          line-height: 1.7;
-        }
+      if (['PAID', 'CANCELLED'].includes(status)) {
+        return sum;
+      }
 
-        .summary {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 10px;
-          margin: 20px 0;
-        }
+      return sum +
+        (Number(row.employee_amount) || 0) +
+        (Number(row.employer_amount) || 0);
+    }, 0);
 
-        .summary-card {
-          padding: 12px;
-          border: 1px solid #e5e7eb;
-          border-radius: 6px;
-        }
+    const totalRecords = sortedRows.length;
 
-        .summary-label {
-          margin-bottom: 8px;
-          color: #6b7280;
-          font-size: 9px;
-          text-transform: uppercase;
-          letter-spacing: .5px;
-        }
+    /* ==== TABLE ROWS ==== */
+    const tableRows = sortedRows.map(row => {
+      const contributionId = row.contribution_id || '-';
+      const employeeName = row.employee_name || '-';
+      const employeeCode = row.employee_code || '';
+      const branchName = getBranchName(row.branch_id);
+      const contributionPeriod = formatPeriod(row.contribution_period);
 
-        .summary-value {
-          font-size: 14px;
-          font-weight: 700;
-        }
+      const contributionType = String(
+        row.contribution_type || '-'
+      )
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, char => char.toUpperCase());
 
-        .filters {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 16px;
-          margin-bottom: 16px;
-          color: #374151;
-        }
+      const employeeAmount = Number(row.employee_amount) || 0;
+      const employerAmount = Number(row.employer_amount) || 0;
 
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          font-size: 9px;
-        }
+      const totalAmount = employeeAmount + employerAmount;
 
-        thead { display: table-header-group; }
+      const status = String(row.status || 'DRAFT')
+        .trim()
+        .toUpperCase();
 
-        th {
-          background: #f3f4f6;
-          text-align: left;
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: .3px;
-        }
+      // Mengikuti perhitungan status pada tabel Employee Health.
+      const paidAmount = status === 'PAID' ? totalAmount : 0;
 
-        th, td {
-          padding: 8px 6px;
-          border: 1px solid #e5e7eb;
-          vertical-align: top;
-        }
+      const remainingAmount = ['PAID', 'CANCELLED'].includes(status)
+        ? 0
+        : totalAmount;
 
-        tbody tr { page-break-inside: avoid; }
+      const statusLabel = status.replace(/_/g, ' ');
 
-        .num {
-          text-align: right;
-          white-space: nowrap;
-        }
+      const statusClass = status === 'PAID'
+        ? 'paid'
+        : status === 'CANCELLED'
+          ? 'cancelled'
+          : status === 'OVERDUE'
+            ? 'overdue'
+            : 'pending';
 
-        .sub {
-          margin-top: 4px;
-          color: #6b7280;
-          font-size: 8px;
-        }
+      return `
+        <tr>
+          <td class="record-id">${esc(contributionId)}</td>
 
-        tfoot td {
-          background: #f9fafb;
-          font-weight: 700;
-        }
+          <td>
+            <div class="employee-name">${esc(employeeName)}</div>
+            ${
+              employeeCode
+                ? `<div class="muted">${esc(employeeCode)}</div>`
+                : ''
+            }
+          </td>
 
-        .footer {
-          margin-top: 24px;
-          padding-top: 10px;
-          border-top: 1px solid #e5e7eb;
-          color: #6b7280;
-          text-align: center;
-          font-size: 9px;
-        }
+          <td>${esc(branchName)}</td>
 
-        @page {
-          size: A4 landscape;
-          margin: 10mm;
-        }
+          <td>${esc(contributionPeriod)}</td>
 
-        @media print {
-          body { background: white; font-size: 9px; }
-          .toolbar { display: none !important; }
-          .sheet {
-            max-width: none;
+          <td>${esc(contributionType)}</td>
+
+          <td class="number">${formatMoney(employeeAmount)}</td>
+
+          <td class="number">${formatMoney(employerAmount)}</td>
+
+          <td class="number paid-amount">${formatMoney(paidAmount)}</td>
+
+          <td class="number remaining-amount">
+            ${formatMoney(remainingAmount)}
+          </td>
+
+          <td>
+            <span class="status ${statusClass}">
+              ${esc(statusLabel)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    /* ==== LOGO ==== */
+    const supabaseUrl = String(
+      supabaseClient?.supabaseUrl || ''
+    ).replace(/\/$/, '');
+
+    const logoUrl =
+      `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`;
+
+    /* ==== PDF HTML ==== */
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0"
+        >
+
+        <title>
+          Employee Health Payable - ${esc(branchTitle)} - ${esc(periodTitle)}
+        </title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
             margin: 0;
-            padding: 0;
+            padding: 40px 20px;
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
           }
-          .summary-card { break-inside: avoid; }
-          th {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+
+          .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            color: #fff;
           }
-        }
-      </style>
-    </head>
 
-    <body>
-      <div class="toolbar">
-        <strong>MUNO · Employee Health Payable</strong>
-        <button type="button" onclick="window.print()">
-          Download / Print PDF
-        </button>
-      </div>
+          .toolbar-title {
+            font-size: 14px;
+            font-weight: 600;
+          }
 
-      <main class="sheet">
-        <header class="report-header">
-          <div>
-            <img class="logo"
-              src="${escape(logoUrl)}"
-              alt="MUNO Logo"
-              onerror="this.style.display='none'">
-            <h1>Employee Health Payable</h1>
-            <div class="muted">Employee and employer BPJS contribution obligations</div>
+          .toolbar-actions {
+            display: flex;
+            gap: 8px;
+          }
+
+          .toolbar button {
+            padding: 10px 16px;
+            border: 1px solid rgba(255, 255, 255, .2);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, .08);
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255, 255, 255, .16);
+          }
+
+          .report {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            overflow: hidden;
+            border-radius: 4px;
+            background: #fff;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+          }
+
+          .report-header {
+            margin-bottom: 28px;
+            padding-bottom: 22px;
+            border-bottom: 2px solid #222;
+            text-align: center;
+          }
+
+          .report-logo {
+            display: block;
+            max-width: 150px;
+            max-height: 75px;
+            margin: 0 auto 14px;
+            object-fit: contain;
+          }
+
+          .report-title {
+            margin: 0 0 8px;
+            color: #111;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+          }
+
+          .report-subtitle {
+            margin: 5px 0;
+            color: #444;
+            font-size: 13px;
+          }
+
+          .report-period {
+            margin-top: 8px;
+            color: #666;
+            font-size: 12px;
+          }
+
+          .summary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 26px;
+          }
+
+          .summary-card {
+            flex: 1 1 180px;
+            min-width: 0;
+            padding: 16px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fff;
+          }
+
+          .summary-label {
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+          }
+
+          .summary-value {
+            color: #111;
+            font-size: 18px;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+          }
+
+          .table-wrap {
+            overflow: hidden;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+          }
+
+          .table-title {
+            margin: 0 0 12px;
+            color: #111;
+            font-size: 13px;
+            font-weight: 700;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 10px;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          thead th {
+            padding: 10px 7px;
+            border: 1px solid #ddd;
+            background: #f2f2f2;
+            color: #222;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            text-transform: uppercase;
+          }
+
+          tbody td {
+            padding: 9px 7px;
+            border: 1px solid #e3e3e3;
+            color: #333;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:nth-child(even) {
+            background: #fafafa;
+          }
+
+          .record-id {
+            max-width: 110px;
+            color: #666;
+            font-size: 9px;
+            overflow-wrap: anywhere;
+          }
+
+          .employee-name {
+            color: #222;
+            font-weight: 600;
+          }
+
+          .muted {
+            margin-top: 4px;
+            color: #777;
+            font-size: 9px;
+          }
+
+          .number {
+            white-space: nowrap;
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+          }
+
+          .paid-amount {
+            color: #166534;
+            font-weight: 600;
+          }
+
+          .remaining-amount {
+            color: #9a3412;
+            font-weight: 600;
+          }
+
+          .status {
+            display: inline-block;
+            padding: 4px 7px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 700;
+            white-space: nowrap;
+          }
+
+          .status.paid {
+            border-color: #bbf7d0;
+            background: #dcfce7;
+            color: #166534;
+          }
+
+          .status.cancelled {
+            border-color: #e5e7eb;
+            background: #f3f4f6;
+            color: #4b5563;
+          }
+
+          .status.pending {
+            border-color: #fde68a;
+            background: #fef3c7;
+            color: #92400e;
+          }
+
+          .status.overdue {
+            border-color: #fecaca;
+            background: #fee2e2;
+            color: #991b1b;
+          }
+
+          .total-row td {
+            padding: 12px 7px;
+            border-top: 2px solid #333;
+            background: #f2f2f2;
+            color: #111;
+            font-weight: 700;
+          }
+
+          .footer {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 12px;
+            border-top: 1px solid #ddd;
+            color: #777;
+            font-size: 10px;
+          }
+
+          .footer strong {
+            color: #333;
+          }
+
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            body {
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              overflow: visible;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              break-inside: avoid;
+            }
+
+            .summary {
+              break-inside: avoid;
+            }
+
+            .table-wrap {
+              padding: 0;
+              overflow: visible;
+              border: none;
+            }
+
+            table {
+              width: 100%;
+              font-size: 9px;
+            }
+
+            thead th {
+              background: #f2f2f2 !important;
+            }
+
+            tr {
+              break-inside: avoid;
+            }
+
+            .footer {
+              break-inside: avoid;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div class="toolbar-title">
+            Employee Health Payable Report
           </div>
 
-          <div class="meta">
-            <strong>MUNO</strong><br>
-            <span class="muted">Contribution Period:</span>
-            ${escape(periodLabel)}<br>
-            <span class="muted">Generated:</span>
-            ${escape(generatedAt)}
-          </div>
-        </header>
+          <div class="toolbar-actions">
+            <button type="button" onclick="window.print()">
+              Print / Save PDF
+            </button>
 
-        <section class="summary">
-          <div class="summary-card">
-            <div class="summary-label">Total Records</div>
-            <div class="summary-value">${filteredRows.length}</div>
+            <button type="button" onclick="window.close()">
+              Close
+            </button>
           </div>
-
-          <div class="summary-card">
-            <div class="summary-label">Employee Contribution</div>
-            <div class="summary-value">${money(employeeTotal)}</div>
-          </div>
-
-          <div class="summary-card">
-            <div class="summary-label">Employer Contribution</div>
-            <div class="summary-value">${money(employerTotal)}</div>
-          </div>
-
-          <div class="summary-card">
-            <div class="summary-label">Outstanding Contributions</div>
-            <div class="summary-value">${money(outstandingTotal)}</div>
-          </div>
-        </section>
-
-        <div class="filters">
-          <span><strong>Outlet:</strong> ${escape(selectedBranch)}</span>
-          <span><strong>Employee:</strong> ${escape(selectedEmployee)}</span>
-          <span><strong>Status:</strong> ${escape(statusValue || "All Status")}</span>
-          <span><strong>Total Paid:</strong> ${money(paidTotal)}</span>
         </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Period</th>
-              <th>Employee</th>
-              <th>Outlet</th>
-              <th>Contribution Type</th>
-              <th class="num">Employee Amount</th>
-              <th class="num">Employer Amount</th>
-              <th class="num">Paid Amount</th>
-              <th class="num">Remaining</th>
-              <th>Status</th>
-            </tr>
-          </thead>
+        <main class="report">
+          <header class="report-header">
+            <img
+              class="report-logo"
+              src="${esc(logoUrl)}"
+              alt="Company Logo"
+              onerror="this.style.display='none'"
+            >
 
-          <tbody>${rowsHtml}</tbody>
+            <h1 class="report-title">
+              Employee Health Payable
+            </h1>
 
-          <tfoot>
-            <tr>
-              <td colspan="5">TOTAL CONTRIBUTIONS</td>
-              <td class="num">${money(employeeTotal)}</td>
-              <td class="num">${money(employerTotal)}</td>
-              <td class="num">${money(paidTotal)}</td>
-              <td class="num">${money(outstandingTotal)}</td>
-              <td></td>
-            </tr>
-          </tfoot>
-        </table>
+            <div class="report-subtitle">
+              ${esc(branchTitle)}
+            </div>
 
-        <footer class="footer">
-          Generated by MUNO · Employee Health Payable · ${escape(generatedAt)}
-        </footer>
-      </main>
-    </body>
-    </html>
-  `);
-  printWindow.document.close();
+            <div class="report-period">
+              Reporting Period: ${esc(periodTitle)}
+            </div>
+          </header>
+
+          <section class="summary">
+            <div class="summary-card">
+              <div class="summary-label">
+                Total Records
+              </div>
+
+              <div class="summary-value">
+                ${formatNumber(totalRecords)}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                Employee Paid
+              </div>
+
+              <div class="summary-value">
+                ${formatMoney(employeePaid)}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                Employer Paid
+              </div>
+
+              <div class="summary-value">
+                ${formatMoney(employerPaid)}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">
+                Outstanding Contributions
+              </div>
+
+              <div class="summary-value">
+                ${formatMoney(outstandingAmount)}
+              </div>
+            </div>
+          </section>
+
+          <section class="table-wrap">
+            <h2 class="table-title">
+              Employee Health Contribution Details
+            </h2>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Record ID</th>
+                  <th>Employee</th>
+                  <th>Branch</th>
+                  <th>Period</th>
+                  <th>Contribution Type</th>
+                  <th class="number">Employee Amount</th>
+                  <th class="number">Employer Amount</th>
+                  <th class="number">Paid Amount</th>
+                  <th class="number">Remaining</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${tableRows}
+              </tbody>
+            </table>
+          </section>
+
+          <footer class="footer">
+            <div>
+              <strong>MUNO</strong> · Employee Health Payable Report
+            </div>
+
+            <div>
+              Generated: ${esc(new Date().toLocaleString('en-GB'))}
+            </div>
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    /* ==== OPEN REPORT ==== */
+    const printWindow = window.open('', '_blank');
+
+    if (!printWindow) {
+      alert(
+        'Popup diblokir browser. Izinkan pop-up untuk membuka laporan PDF.'
+      );
+      return;
+    }
+
+    printWindow.document.open();
+    printWindow.document.write(html);
+    printWindow.document.close();
+
+  } catch (error) {
+    console.error(
+      'Error exporting Employee Health Payable PDF:',
+      error
+    );
+
+    alert(
+      'Gagal mengekspor Employee Health Payable PDF: ' +
+      (error?.message || error)
+    );
+  }
 };
+
 
 
 /* ======================
