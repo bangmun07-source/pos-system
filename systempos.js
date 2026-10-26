@@ -28013,61 +28013,87 @@ window.exportEmployeeTaxPayable = async function () {
 
 
 
-
-/* ==== EMPLOYEE HEALTH PAYABLE ==== */
+/* ==========================
+	EMPLOYEE HEALTH PAYABLE 
+========================== */
 let employeeHealthData = [];
 let employeeHealthCurrentPage = 1;
 const employeeHealthPageSize = 10;
 
+function populateEmployeeHealthYearFilter() {
+  const select = document.getElementById("employeeHealthYearFilter");
+  if (!select) return;
+
+  const currentYear = new Date().getFullYear();
+  const previousValue = select.value;
+
+  select.innerHTML = '<option value="">All Years</option>';
+
+  // Tampilkan 10 tahun terakhir, termasuk tahun sekarang.
+  for (let year = currentYear; year >= currentYear - 9; year--) {
+    select.add(new Option(String(year), String(year)));
+  }
+
+  if ([...select.options].some(option => option.value === previousValue)) {
+    select.value = previousValue;
+  }
+}
 
 /* ==== INITIALIZE ==== */
 async function initEmployeeHealthSection() {
-	const periodEl = document.getElementById( "employeeHealthPeriodFilter" );
-	const branchEl = document.getElementById( "employeeHealthBranchFilter" );
-	const employeeEl = document.getElementById( "employeeHealthEmployeeFilter" );
-	const statusEl = document.getElementById( "employeeHealthStatusFilter" );
+  const periodEl = document.getElementById("employeeHealthPeriodFilter");
+  const yearEl = document.getElementById("employeeHealthYearFilter");
+  const branchEl = document.getElementById("employeeHealthBranchFilter");
+  const employeeEl = document.getElementById("employeeHealthEmployeeFilter");
+  const statusEl = document.getElementById("employeeHealthStatusFilter");
 
-	// Default periode: bulan sekarang.
-	if (periodEl && !periodEl.value) {
-		const now = new Date();
-		periodEl.value = `${now.getFullYear()}-${String( now.getMonth() + 1 ).padStart(2, "0")}`;
-	}
+  populateEmployeeHealthYearFilter();
+  populateEmployeeHealthBranchFilter();
 
-	populateEmployeeHealthBranchFilter();
+  if (branchEl) {
+    branchEl.onchange = async () => {
+      employeeHealthCurrentPage = 1;
+      await loadEmployeeHealthEmployees();
+      await loadEmployeeHealthRecords();
+    };
+  }
 
-	if (branchEl) {
-		branchEl.onchange = async () => {
-			employeeHealthCurrentPage = 1;
-			await loadEmployeeHealthEmployees();
-			await loadEmployeeHealthRecords();
-		};
-	}
-	if (periodEl) {
-		periodEl.onchange = () => {
-			employeeHealthCurrentPage = 1;
-			loadEmployeeHealthRecords();
-		};
-	}
-	if (employeeEl) {
-		employeeEl.onchange = () => {
-			employeeHealthCurrentPage = 1;
-			loadEmployeeHealthRecords();
-		};
-	}
-	if (statusEl) {
-		statusEl.onchange = () => {
-			employeeHealthCurrentPage = 1;
-			loadEmployeeHealthRecords();
-		};
-	}
+  if (periodEl) {
+    periodEl.onchange = () => {
+      employeeHealthCurrentPage = 1;
+      loadEmployeeHealthRecords();
+    };
+  }
 
-	const prevButton = document.getElementById( "employeeHealthPrevButton" );
-	const nextButton = document.getElementById( "employeeHealthNextButton" );
-	if (prevButton) { prevButton.onclick = () => changeEmployeeHealthPage(-1); }
-	if (nextButton) { nextButton.onclick = () => changeEmployeeHealthPage(1); }
+  if (yearEl) {
+    yearEl.onchange = () => {
+      employeeHealthCurrentPage = 1;
+      loadEmployeeHealthRecords();
+    };
+  }
 
-	await loadEmployeeHealthEmployees();
-	await loadEmployeeHealthRecords();
+  if (employeeEl) {
+    employeeEl.onchange = () => {
+      employeeHealthCurrentPage = 1;
+      loadEmployeeHealthRecords();
+    };
+  }
+
+  if (statusEl) {
+    statusEl.onchange = () => {
+      employeeHealthCurrentPage = 1;
+      loadEmployeeHealthRecords();
+    };
+  }
+
+  const prevButton = document.getElementById("employeeHealthPrevButton");
+  const nextButton = document.getElementById("employeeHealthNextButton");
+
+  if (prevButton) { prevButton.onclick = () => changeEmployeeHealthPage(-1); }
+  if (nextButton) { nextButton.onclick = () => changeEmployeeHealthPage(1); }
+
+  await loadEmployeeHealthEmployees();
+  await loadEmployeeHealthRecords();
 }
 
 /* ==== BRANCH FILTER ==== */
@@ -28189,10 +28215,6 @@ async function loadEmployeeHealthEmployees() {
 	}
 }
 
-/* ==============================
-		LOAD HEALTH CONTRIBUTIONS 
-============================== */
-
 /* ==== EMPLOYEE HEALTH CACHE ==== */
 state.employeeHealthRecordsCache ??= Object.create(null);
 
@@ -28208,21 +28230,26 @@ async function loadEmployeeHealthRecords() {
 	const sessionId = localStorage.getItem("pos_session_id");
 	if (!sessionId) { employeeHealthData = []; renderEmployeeHealthTable("Session tidak ditemukan."); return; }
 
-	const periodValue = document.getElementById( "employeeHealthPeriodFilter" )?.value || "";
-	const employeeId = document.getElementById( "employeeHealthEmployeeFilter" )?.value || null;
-	const status = document.getElementById( "employeeHealthStatusFilter" )?.value || null;
-
+	const periodValue = document.getElementById("employeeHealthPeriodFilter")?.value || "";
+	const yearValue = document.getElementById("employeeHealthYearFilter")?.value || "";
+	const employeeId = document.getElementById("employeeHealthEmployeeFilter")?.value || null;
+	const status = document.getElementById("employeeHealthStatusFilter")?.value || null;
+	
 	let periodFrom = null;
 	let periodTo = null;
-	// Filter month menjadi rentang tanggal satu bulan.
+	
+	// Jika bulan dipilih, gunakan rentang bulan tersebut.
 	if (/^\d{4}-\d{2}$/.test(periodValue)) {
-		const [year, month] = periodValue
-			.split("-")
-			.map(Number);
-		const lastDay = new Date(year, month, 0).getDate();
-
-		periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
-		periodTo = `${year}-${String(month).padStart(2, "0")}-${String( lastDay ).padStart(2, "0")}`;
+	  const [year, month] = periodValue.split("-").map(Number);
+	  const lastDay = new Date(year, month, 0).getDate();
+	
+	  periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
+	  periodTo = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+	}
+	// Jika bulan kosong, gunakan rentang tahun.
+	else if (/^\d{4}$/.test(yearValue)) {
+	  periodFrom = `${yearValue}-01-01`;
+	  periodTo = `${yearValue}-12-31`;
 	}
 
 	const branchId = getEmployeeHealthBranchId();
