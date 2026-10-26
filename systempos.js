@@ -27002,6 +27002,7 @@ function invalidateEmployeeTaxCache() {
 /* ==== INITIALIZE EMPLOYEE TAX SECTION ==== */
 async function initEmployeeTaxSection() {
 	const periodFilter = document.getElementById("employeeTaxPeriodFilter");
+	const yearFilter = document.getElementById("employeeTaxYearFilter");
 	const branchFilter = document.getElementById("employeeTaxBranchFilter");
 	const employeeFilter = document.getElementById("employeeTaxEmployeeFilter");
 	const statusFilter = document.getElementById("employeeTaxStatusFilter");
@@ -27010,15 +27011,14 @@ async function initEmployeeTaxSection() {
 	if (periodFilter && !periodFilter.value) { periodFilter.value = `${now.getFullYear()}-${String( now.getMonth() + 1 ).padStart(2, "0")}`; }
 
 	populateEmployeeTaxBranchFilter();
-
-	if (branchFilter) {
-		branchFilter.onchange = async () => {
-			employeeTaxCurrentPage = 1;
+	populateEmployeeTaxYearFilter();
+	
+	if (branchFilter) { branchFilter.onchange = async () => { employeeTaxCurrentPage = 1;
 			await loadEmployeeTaxEmployees();
 			await loadEmployeeTaxRecords(); 
-		}; 
-	}
+		}; }
 	if (periodFilter) { periodFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
+	if (yearFilter) { yearFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
 	if (employeeFilter) { employeeFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
 	if (statusFilter) { statusFilter.onchange = () => { employeeTaxCurrentPage = 1; loadEmployeeTaxRecords(); }; }
 
@@ -27171,7 +27171,6 @@ async function loadEmployeeTaxRecords() {
 	if (!tbody) return;
 
 	const sessionId = localStorage.getItem("pos_session_id");
-
 	if (!sessionId) {
 		employeeTaxData = [];
 		renderEmployeeTaxTable();
@@ -27179,30 +27178,37 @@ async function loadEmployeeTaxRecords() {
 	}
 
 	const periodValue = document.getElementById("employeeTaxPeriodFilter")?.value || "";
+	const yearValue = document.getElementById("employeeTaxYearFilter")?.value || "";
 	const employeeId = document.getElementById("employeeTaxEmployeeFilter")?.value || null;
 	const status = document.getElementById("employeeTaxStatusFilter")?.value || null;
 	const branchId = getEmployeeTaxBranchId();
 
-	// Input type="month" menjadi rentang satu bulan.
+	// Tentukan rentang tanggal berdasarkan filter bulan atau tahun.
 	let periodFrom = null;
 	let periodTo = null;
-
+	
 	if (/^\d{4}-\d{2}$/.test(periodValue)) {
-		const [year, month] = periodValue.split("-").map(Number);
-		const lastDay = new Date(year, month, 0).getDate();
-
-		periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
-		periodTo = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+	  // Filter bulan memiliki prioritas jika bulan dipilih.
+	  const [year, month] = periodValue.split("-").map(Number);
+	  const lastDay = new Date(year, month, 0).getDate();
+	
+	  periodFrom = `${year}-${String(month).padStart(2, "0")}-01`;
+	  periodTo = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+	} else if (/^\d{4}$/.test(yearValue)) {
+	  // Jika bulan kosong, filter tahun mengambil Januari–Desember.
+	  periodFrom = `${yearValue}-01-01`;
+	  periodTo = `${yearValue}-12-31`;
 	}
 
 	// Kunci cache harus mencakup seluruh filter data.
 	const cacheKey = JSON.stringify({
-		sessionId,
-		branchId,
-		periodFrom,
-		periodTo,
-		employeeId,
-		status
+	  sessionId,
+	  branchId,
+	  periodFrom,
+	  periodTo,
+	  yearValue,
+	  employeeId,
+	  status
 	});
 
 	// CACHE HIT: tidak perlu memanggil RPC.
@@ -27259,6 +27265,31 @@ async function loadEmployeeTaxRecords() {
 		employeeTaxData = [];
 		renderEmployeeTaxTable("Failed to load employee tax data");
 	}
+}
+
+function populateEmployeeTaxYearFilter() {
+  const select = document.getElementById("employeeTaxYearFilter");
+  if (!select) return;
+
+  const currentYear = new Date().getFullYear();
+  const previousValue = select.value;
+
+  select.innerHTML = '<option value="">All Years</option>';
+
+  // Tahun berjalan dan 10 tahun sebelumnya
+  for (let year = currentYear; year >= currentYear - 10; year--) {
+    const option = document.createElement("option");
+    option.value = String(year);
+    option.textContent = String(year);
+    select.appendChild(option);
+  }
+
+  if (
+    previousValue &&
+    [...select.options].some(option => option.value === previousValue)
+  ) {
+    select.value = previousValue;
+  }
 }
 
 /* ==== RENDER EMPLOYEE TAX TABLE ==== */
