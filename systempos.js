@@ -28682,9 +28682,11 @@ function closeEmployeeHealthDetail() {
 }
 
 
+
 /* ==== EXPORT EMPLOYEE HEALTH PAYABLE PDF ==== */
 window.exportEmployeeHealthData = async function () {
   try {
+    // FILTER VALUES
     const periodValue = String(
       document.getElementById('employeeHealthPeriodFilter')?.value || ''
     ).trim();
@@ -28722,7 +28724,7 @@ window.exportEmployeeHealthData = async function () {
       return;
     }
 
-    /* ==== FILTER DATA ==== */
+    // FILTER RECORDS
     const rows = employeeHealthData.filter(row => {
       const contributionPeriod = String(
         row.contribution_period || ''
@@ -28730,16 +28732,12 @@ window.exportEmployeeHealthData = async function () {
 
       const branchId = String(row.branch_id || '').trim();
       const employeeId = String(row.employee_id || '').trim();
-      const status = String(row.status || 'DRAFT')
-        .trim()
-        .toUpperCase();
+      const status = String(row.status || 'DRAFT').trim().toUpperCase();
 
-      // Batasi akses berdasarkan branch pengguna.
       if (!canViewAllBranches && branchId !== userBranchId) {
         return false;
       }
 
-      // ALL berarti semua branch, bukan ID branch literal.
       if (
         branchValue &&
         branchValue.toUpperCase() !== 'ALL' &&
@@ -28756,7 +28754,6 @@ window.exportEmployeeHealthData = async function () {
         return false;
       }
 
-      // Filter bulan memiliki prioritas atas filter tahun.
       if (/^\d{4}-\d{2}$/.test(periodValue)) {
         if (contributionPeriod.substring(0, 7) !== periodValue) {
           return false;
@@ -28777,7 +28774,7 @@ window.exportEmployeeHealthData = async function () {
       return;
     }
 
-    /* ==== HELPERS ==== */
+    // HELPERS
     const esc = value =>
       String(value ?? '').replace(/[&<>"']/g, char => ({
         '&': '&amp;',
@@ -28810,14 +28807,12 @@ window.exportEmployeeHealthData = async function () {
 
       const [year, month] = period.substring(0, 7).split('-');
 
-      const date = new Date(
+      return new Date(
         Number(year),
         Number(month) - 1,
         1
-      );
-
-      return date.toLocaleDateString('en-GB', {
-        month: 'long',
+      ).toLocaleDateString('en-GB', {
+        month: 'short',
         year: 'numeric'
       });
     };
@@ -28828,7 +28823,7 @@ window.exportEmployeeHealthData = async function () {
         : [];
 
       const branch = branches.find(item =>
-        String(item.branch_id || item.Branch_ID || '').trim() ===
+        String(item.branch_id || item.Branch_ID || item.id || '').trim() ===
         String(branchId || '').trim()
       );
 
@@ -28841,35 +28836,32 @@ window.exportEmployeeHealthData = async function () {
       );
     };
 
-    const branchTitle = branchValue &&
-      branchValue.toUpperCase() !== 'ALL'
-      ? getBranchName(branchValue)
-      : canViewAllBranches
-        ? 'ALL BRANCHES'
-        : getBranchName(userBranchId);
+    const branchTitle =
+      branchValue && branchValue.toUpperCase() !== 'ALL'
+        ? getBranchName(branchValue)
+        : canViewAllBranches
+          ? 'ALL BRANCHES'
+          : getBranchName(userBranchId);
 
     const periodTitle = /^\d{4}-\d{2}$/.test(periodValue)
-      ? formatPeriod(periodValue)
+      ? formatPeriod(`${periodValue}-01`)
       : /^\d{4}$/.test(yearValue)
         ? yearValue
         : 'ALL PERIODS';
 
-    /* ==== SORT DATA ==== */
+    // SORT RECORDS
     const sortedRows = [...rows].sort((a, b) => {
-      const periodA = String(a.contribution_period || '');
-      const periodB = String(b.contribution_period || '');
+      const periodCompare = String(a.contribution_period || '')
+        .localeCompare(String(b.contribution_period || ''));
 
-      if (periodA !== periodB) {
-        return periodA.localeCompare(periodB);
-      }
-
-      const employeeA = String(a.employee_name || '');
-      const employeeB = String(b.employee_name || '');
-
-      return employeeA.localeCompare(employeeB);
+      return periodCompare ||
+        String(a.employee_name || '').localeCompare(
+          String(b.employee_name || ''),
+          'id'
+        );
     });
 
-    /* ==== SUMMARY ==== */
+    // SUMMARY
     const paidRows = sortedRows.filter(row =>
       String(row.status || 'DRAFT').trim().toUpperCase() === 'PAID'
     );
@@ -28900,7 +28892,25 @@ window.exportEmployeeHealthData = async function () {
 
     const totalRecords = sortedRows.length;
 
-    /* ==== TABLE ROWS ==== */
+    const totalEmployeeAmount = sortedRows.reduce(
+      (sum, row) => sum + (Number(row.employee_amount) || 0),
+      0
+    );
+
+    const totalEmployerAmount = sortedRows.reduce(
+      (sum, row) => sum + (Number(row.employer_amount) || 0),
+      0
+    );
+
+    const totalPaidAmount = paidRows.reduce(
+      (sum, row) =>
+        sum +
+        (Number(row.employee_amount) || 0) +
+        (Number(row.employer_amount) || 0),
+      0
+    );
+
+    // TABLE ROWS
     const tableRows = sortedRows.map(row => {
       const contributionId = row.contribution_id || '-';
       const employeeName = row.employee_name || '-';
@@ -28916,21 +28926,17 @@ window.exportEmployeeHealthData = async function () {
 
       const employeeAmount = Number(row.employee_amount) || 0;
       const employerAmount = Number(row.employer_amount) || 0;
-
       const totalAmount = employeeAmount + employerAmount;
 
       const status = String(row.status || 'DRAFT')
         .trim()
         .toUpperCase();
 
-      // Mengikuti perhitungan status pada tabel Employee Health.
       const paidAmount = status === 'PAID' ? totalAmount : 0;
 
       const remainingAmount = ['PAID', 'CANCELLED'].includes(status)
         ? 0
         : totalAmount;
-
-      const statusLabel = status.replace(/_/g, ' ');
 
       const statusClass = status === 'PAID'
         ? 'paid'
@@ -28946,323 +28952,295 @@ window.exportEmployeeHealthData = async function () {
 
           <td>
             <div class="employee-name">${esc(employeeName)}</div>
-            ${
-              employeeCode
-                ? `<div class="muted">${esc(employeeCode)}</div>`
-                : ''
+            ${employeeCode
+              ? `<div class="muted">${esc(employeeCode)}</div>`
+              : ''
             }
           </td>
 
           <td>${esc(branchName)}</td>
-
           <td>${esc(contributionPeriod)}</td>
-
           <td>${esc(contributionType)}</td>
 
-          <td class="number">${formatMoney(employeeAmount)}</td>
-
-          <td class="number">${formatMoney(employerAmount)}</td>
-
-          <td class="number paid-amount">${formatMoney(paidAmount)}</td>
-
-          <td class="number remaining-amount">
-            ${formatMoney(remainingAmount)}
-          </td>
+          <td class="number">${esc(formatMoney(employeeAmount))}</td>
+          <td class="number">${esc(formatMoney(employerAmount))}</td>
+          <td class="number paid-amount">${esc(formatMoney(paidAmount))}</td>
+          <td class="number remaining-amount">${esc(formatMoney(remainingAmount))}</td>
 
           <td>
             <span class="status ${statusClass}">
-              ${esc(statusLabel)}
+              ${esc(status.replace(/_/g, ' '))}
             </span>
           </td>
         </tr>
       `;
     }).join('');
 
-    /* ==== LOGO ==== */
+    // TENANT LOGO
     const supabaseUrl = String(
       supabaseClient?.supabaseUrl || ''
     ).replace(/\/$/, '');
 
-    const logoUrl =
-      `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`;
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
 
-    /* ==== PDF HTML ==== */
+    const filename =
+      `Employee Health Payable - ${branchTitle} - ${periodTitle}.pdf`;
+
+    // REPORT HTML
     const html = `
       <!DOCTYPE html>
       <html lang="en">
       <head>
         <meta charset="UTF-8">
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
-        >
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>
-          Employee Health Payable - ${esc(branchTitle)} - ${esc(periodTitle)}
-        </title>
+        <title>${esc(filename)}</title>
 
         <style>
           * {
             box-sizing: border-box;
           }
 
+          html,
           body {
             margin: 0;
-            padding: 40px 20px;
+            padding: 0;
+          }
+
+          body {
             background: #000;
             color: #333;
             font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
             font-size: 12px;
           }
 
           .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 16px;
-            max-width: 1200px;
-            margin: 0 auto 20px;
             color: #fff;
-          }
-
-          .toolbar-title {
             font-size: 14px;
-            font-weight: 600;
-          }
-
-          .toolbar-actions {
-            display: flex;
-            gap: 8px;
           }
 
           .toolbar button {
-            padding: 10px 16px;
-            border: 1px solid rgba(255, 255, 255, .2);
-            border-radius: 6px;
-            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
             color: #fff;
-            font-size: 12px;
+            padding: 10px 16px;
+            border-radius: 10px;
             cursor: pointer;
+            font-weight: 700;
           }
 
           .toolbar button:hover {
-            background: rgba(255, 255, 255, .16);
+            background: rgba(255,255,255,.16);
           }
 
           .report {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 36px;
-            overflow: hidden;
-            border-radius: 4px;
             background: #fff;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
           }
 
           .report-header {
-            margin-bottom: 28px;
-            padding-bottom: 22px;
-            border-bottom: 2px solid #222;
             text-align: center;
+            margin-bottom: 26px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #222;
           }
 
-          .report-logo {
+          .logo {
             display: block;
+            width: auto;
             max-width: 150px;
             max-height: 75px;
-            margin: 0 auto 14px;
             object-fit: contain;
+            margin: 0 auto 10px;
           }
 
-          .report-title {
+          .title {
             margin: 0 0 8px;
-            color: #111;
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
-            letter-spacing: .5px;
-            text-transform: uppercase;
+            letter-spacing: .4px;
+            color: #222;
           }
 
-          .report-subtitle {
-            margin: 5px 0;
-            color: #444;
-            font-size: 13px;
-          }
-
-          .report-period {
-            margin-top: 8px;
-            color: #666;
+          .branch-title {
+            margin-top: 4px;
             font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+
+          .period {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #777;
           }
 
           .summary {
             display: flex;
             flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 26px;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
           }
 
-          .summary-card {
-            flex: 1 1 180px;
+          .summary-item {
+            flex: 1 1 160px;
             min-width: 0;
-            padding: 16px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: #fff;
           }
 
           .summary-label {
-            margin-bottom: 8px;
-            color: #666;
+            color: #777;
             font-size: 10px;
-            font-weight: 600;
-            letter-spacing: .5px;
-            text-transform: uppercase;
+            margin-bottom: 5px;
           }
 
           .summary-value {
-            color: #111;
-            font-size: 18px;
+            color: #222;
+            font-size: 15px;
             font-weight: 700;
             overflow-wrap: anywhere;
           }
 
           .table-wrap {
-            overflow: hidden;
+            width: 100%;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
             padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            background: #fff;
           }
 
           .table-title {
             margin: 0 0 12px;
-            color: #111;
-            font-size: 13px;
+            color: #222;
+            font-size: 12px;
             font-weight: 700;
           }
 
           table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10px;
+            table-layout: auto;
+            font-size: 9px;
+            color: #444;
           }
 
           thead {
             display: table-header-group;
           }
 
-          thead th {
-            padding: 10px 7px;
-            border: 1px solid #ddd;
-            background: #f2f2f2;
-            color: #222;
+          th {
+            padding: 10px 6px;
+            background: #f5f5f5;
+            color: #444;
             font-size: 9px;
             font-weight: 700;
             text-align: left;
-            text-transform: uppercase;
+            vertical-align: middle;
+            border-bottom: 1px solid #e5e5e5;
           }
 
-          tbody td {
-            padding: 9px 7px;
-            border: 1px solid #e3e3e3;
-            color: #333;
-            vertical-align: top;
+          td {
+            padding: 10px 6px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
             overflow-wrap: anywhere;
           }
 
-          tbody tr:nth-child(even) {
-            background: #fafafa;
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
           }
 
           .record-id {
             max-width: 110px;
             color: #666;
-            font-size: 9px;
-            overflow-wrap: anywhere;
+            font-size: 8px;
+          }
+
+          .number {
+            text-align: right;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
           }
 
           .employee-name {
             color: #222;
-            font-weight: 600;
+            font-weight: 700;
           }
 
           .muted {
-            margin-top: 4px;
-            color: #777;
-            font-size: 9px;
-          }
-
-          .number {
-            white-space: nowrap;
-            text-align: right;
-            font-variant-numeric: tabular-nums;
+            margin-top: 3px;
+            color: #888;
+            font-size: 8px;
           }
 
           .paid-amount {
             color: #166534;
-            font-weight: 600;
+            font-weight: 700;
           }
 
           .remaining-amount {
             color: #9a3412;
-            font-weight: 600;
+            font-weight: 700;
           }
 
           .status {
-            display: inline-block;
-            padding: 4px 7px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 700;
             white-space: nowrap;
           }
 
           .status.paid {
-            border-color: #bbf7d0;
-            background: #dcfce7;
             color: #166534;
           }
 
           .status.cancelled {
-            border-color: #e5e7eb;
-            background: #f3f4f6;
-            color: #4b5563;
+            color: #6b7280;
           }
 
           .status.pending {
-            border-color: #fde68a;
-            background: #fef3c7;
             color: #92400e;
           }
 
           .status.overdue {
-            border-color: #fecaca;
-            background: #fee2e2;
             color: #991b1b;
           }
 
           .total-row td {
-            padding: 12px 7px;
-            border-top: 2px solid #333;
-            background: #f2f2f2;
-            color: #111;
+            background: #f8f8f8;
+            border-top: 1px solid #ddd;
             font-weight: 700;
+            color: #222;
           }
 
           .footer {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
             margin-top: 24px;
-            padding-top: 12px;
-            border-top: 1px solid #ddd;
-            color: #777;
-            font-size: 10px;
-          }
-
-          .footer strong {
-            color: #333;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
           }
 
           @page {
@@ -29271,7 +29249,10 @@ window.exportEmployeeHealthData = async function () {
           }
 
           @media print {
+            html,
             body {
+              width: 100%;
+              margin: 0;
               padding: 0;
               background: #fff;
               -webkit-print-color-adjust: exact;
@@ -29286,156 +29267,129 @@ window.exportEmployeeHealthData = async function () {
               width: 100%;
               max-width: none;
               margin: 0;
-              padding: 0;
-              overflow: visible;
+              padding: 8px;
               border-radius: 0;
               box-shadow: none;
             }
 
-            .report-header {
-              break-inside: avoid;
-            }
-
-            .summary {
-              break-inside: avoid;
-            }
-
             .table-wrap {
-              padding: 0;
-              overflow: visible;
-              border: none;
+              padding: 8px;
+              border-radius: 8px;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
             }
 
             table {
-              width: 100%;
-              font-size: 9px;
+              page-break-inside: auto;
             }
 
-            thead th {
-              background: #f2f2f2 !important;
-            }
-
-            tr {
-              break-inside: avoid;
-            }
-
-            .footer {
+            tbody tr {
+              page-break-inside: avoid;
               break-inside: avoid;
             }
           }
         </style>
       </head>
-			
-			<body>
-			  <div class="toolbar">
-			    <div>Employee Health Payable Report</div>
-			    <button type="button" onclick="window.print()">
-			      Download / Print PDF
-			    </button>
-			  </div>
-			
-			  <main class="report">
-			    <header class="report-header">
-			      <img class="logo"
-			        src="${esc(logoUrl)}"
-			        alt="Company Logo"
-			        onerror="this.style.display='none'" >
-			
-			      <h1 class="title">Employee Health Payable</h1>
-			
-			      <div class="branch-title">${esc(branchTitle)}</div>
-			
-			      <div class="period">
-			        Period: ${esc(periodTitle)}
-			        ${employeeValue ? ' • Employee Filtered' : ''}
-			        ${statusValue ? ` • Status: ${esc(statusValue)}` : ''}
-			      </div>
-			    </header>
-			
-			    <div class="summary">
-			      <div>
-			        <div class="summary-label">Total Records</div>
-			        <div class="summary-value">${formatNumber(totalRecords)}</div>
-			      </div>
-			
-			      <div>
-			        <div class="summary-label">Employee Paid</div>
-			        <div class="summary-value">${esc(formatMoney(employeePaid))}</div>
-			      </div>
-			
-			      <div>
-			        <div class="summary-label">Employer Paid</div>
-			        <div class="summary-value">${esc(formatMoney(employerPaid))}</div>
-			      </div>
-			
-			      <div>
-			        <div class="summary-label">Outstanding Contributions</div>
-			        <div class="summary-value">${esc(formatMoney(outstandingAmount))}</div>
-			      </div>
-			    </div>
-			
-			    <div class="table-wrap">
-			      <table>
-			        <thead>
-			          <tr>
-			            <th>Record ID</th>
-			            <th>Employee</th>
-			            <th>Branch</th>
-			            <th>Period</th>
-			            <th>Contribution Type</th>
-			            <th class="number">Employee Amount</th>
-			            <th class="number">Employer Amount</th>
-			            <th class="number">Paid Amount</th>
-			            <th class="number">Remaining</th>
-			            <th>Status</th>
-			          </tr>
-			        </thead>
-			
-			        <tbody>
-			          ${tableRows}
-			          <tr class="total-row">
-			            <td colspan="5">TOTAL CONTRIBUTIONS</td>
-			            <td class="number">${esc(formatMoney(
-			              sortedRows.reduce(
-			                (sum, row) => sum + (Number(row.employee_amount) || 0),
-			                0
-			              )
-			            ))}</td>
-			            <td class="number">${esc(formatMoney(
-			              sortedRows.reduce(
-			                (sum, row) => sum + (Number(row.employer_amount) || 0),
-			                0
-			              )
-			            ))}</td>
-			            <td class="number">${esc(formatMoney(
-			              sortedRows.reduce((sum, row) => {
-			                const status = String(row.status || 'DRAFT')
-			                  .trim().toUpperCase();
-			
-			                return sum + (
-			                  status === 'PAID'
-			                    ? (Number(row.employee_amount) || 0) +
-			                      (Number(row.employer_amount) || 0)
-			                    : 0
-			                );
-			              }, 0)
-			            ))}</td>
-			            <td class="number">${esc(formatMoney(outstandingAmount))}</td>
-			            <td></td>
-			          </tr>
-			        </tbody>
-			      </table>
-			    </div>
-			
-			    <footer class="footer">
-			      Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
-			    </footer>
-			  </main>
-			</body>
-			</html>
-			`;
 
-    /* ==== OPEN REPORT ==== */
+      <body>
+        <div class="toolbar">
+          <div>Employee Health Payable Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            ${logoUrl ? `
+              <img
+                src="${esc(logoUrl)}"
+                class="logo"
+                alt="Company Logo"
+                onerror="this.style.display='none'"
+              >
+            ` : ''}
+
+            <h1 class="title">Employee Health Payable</h1>
+
+            <div class="branch-title">${esc(branchTitle)}</div>
+
+            <div class="period">
+              Period: ${esc(periodTitle)}
+              ${employeeValue ? ' • Employee Filtered' : ''}
+              ${statusValue ? ` • Status: ${esc(statusValue)}` : ''}
+            </div>
+          </header>
+
+          <div class="summary">
+            <div class="summary-item">
+              <div class="summary-label">Total Records</div>
+              <div class="summary-value">${formatNumber(totalRecords)}</div>
+            </div>
+
+            <div class="summary-item">
+              <div class="summary-label">Employee Paid</div>
+              <div class="summary-value">${esc(formatMoney(employeePaid))}</div>
+            </div>
+
+            <div class="summary-item">
+              <div class="summary-label">Employer Paid</div>
+              <div class="summary-value">${esc(formatMoney(employerPaid))}</div>
+            </div>
+
+            <div class="summary-item">
+              <div class="summary-label">Outstanding Contributions</div>
+              <div class="summary-value">${esc(formatMoney(outstandingAmount))}</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <h2 class="table-title">Employee Health Contribution Details</h2>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Record ID</th>
+                  <th>Employee</th>
+                  <th>Branch</th>
+                  <th>Period</th>
+                  <th>Contribution Type</th>
+                  <th class="number">Employee Amount</th>
+                  <th class="number">Employer Amount</th>
+                  <th class="number">Paid Amount</th>
+                  <th class="number">Remaining</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${tableRows}
+
+                <tr class="total-row">
+                  <td colspan="5">TOTAL CONTRIBUTIONS</td>
+                  <td class="number">${esc(formatMoney(totalEmployeeAmount))}</td>
+                  <td class="number">${esc(formatMoney(totalEmployerAmount))}</td>
+                  <td class="number">${esc(formatMoney(totalPaidAmount))}</td>
+                  <td class="number">${esc(formatMoney(outstandingAmount))}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB
     const reportWindow = window.open('', '_blank');
 
     if (!reportWindow) {
@@ -29450,14 +29404,11 @@ window.exportEmployeeHealthData = async function () {
     reportWindow.document.close();
 
   } catch (error) {
-    console.error(
-      'Error exporting Employee Health Payable PDF:',
-      error
-    );
+    console.error('Export Employee Health Payable error:', error);
 
     alert(
-      'Gagal mengekspor Employee Health Payable PDF: ' +
-      (error?.message || error)
+      'Gagal membuat PDF Employee Health Payable. ' +
+      (error?.message || 'Periksa Console untuk detail kesalahan.')
     );
   }
 };
