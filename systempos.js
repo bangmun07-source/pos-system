@@ -23865,6 +23865,7 @@ function generalLedgerNextPage() {
 	renderGeneralLedger();
 }
 
+
 function exportGeneralLedger() {
   const data = getFilteredGeneralLedger();
 
@@ -23873,10 +23874,37 @@ function exportGeneralLedger() {
     return;
   }
 
+  // PERIOD: USE GENERAL LEDGER DATE FILTERS
+  const dateFrom =
+    document.getElementById("journalDateFrom")?.value || "";
+  const dateTo =
+    document.getElementById("journalDateTo")?.value || "";
+
+  let period = "All Dates";
+
+  if (dateFrom && dateTo) {
+    period = `${formatGeneralLedgerDate(dateFrom)} - ${formatGeneralLedgerDate(dateTo)}`;
+  } else if (dateFrom) {
+    period = `From ${formatGeneralLedgerDate(dateFrom)}`;
+  } else if (dateTo) {
+    period = `Until ${formatGeneralLedgerDate(dateTo)}`;
+  }
+
+  // BRANCH: USE GENERAL LEDGER BRANCH FILTER
+  const branchSelect = document.getElementById(
+    "generalLedgerBranchFilter"
+  );
+
+  const branchId = branchSelect?.value || "";
+  const branchName = branchId
+    ? branchSelect.options[branchSelect.selectedIndex]?.textContent?.trim() || branchId
+    : "All Branches";
+
+  // EXCEL DATA
   const rows = [
     ["GENERAL LEDGER", "", "", "", "", "", "", ""],
-    [`Period: ${getAccountingReportPeriod()}`, "", "", "", "", "", "", ""],
-    [`Branch: ${getAccountingReportBranch()}`, "", "", "", "", "", "", ""],
+    [`Period: ${period}`, "", "", "", "", "", "", ""],
+    [`Branch: ${branchName}`, "", "", "", "", "", "", ""],
     ["", "", "", "", "", "", "", ""],
     [
       "Date",
@@ -23923,7 +23951,7 @@ function exportGeneralLedger() {
     alignment: { horizontal: "center" }
   });
 
-  // HEADER
+  // TABLE HEADER
   ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"]
     .forEach(cell => {
       setExcelStyle(ws, cell, {
