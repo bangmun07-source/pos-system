@@ -23878,6 +23878,10 @@ function formatGeneralLedgerDate(value) {
   });
 }
 
+function formatGeneralLedgerCurrency(value) {
+  return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
+}
+
 function exportGeneralLedger() {
   const data = getFilteredGeneralLedger();
 
