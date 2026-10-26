@@ -29325,154 +29325,140 @@ window.exportEmployeeHealthData = async function () {
           }
         </style>
       </head>
+     
+			<body>
+			  <main class="report">
+			    <header class="report-header">
+			      <img
+			        class="report-logo"
+			        src="${esc(logoUrl)}"
+			        alt="Company Logo"
+			        onerror="this.style.display='none'"
+			      >
+			
+			      <h1 class="report-title">
+			        Employee Health Payable
+			      </h1>
+			
+			      <div class="report-subtitle">
+			        ${esc(branchTitle)}
+			      </div>
+			
+			      <div class="report-period">
+			        Reporting Period: ${esc(periodTitle)}
+			      </div>
+			    </header>
+			
+			    <section class="summary">
+			      <div class="summary-card">
+			        <div class="summary-label">Total Records</div>
+			        <div class="summary-value">
+			          ${formatNumber(totalRecords)}
+			        </div>
+			      </div>
+			
+			      <div class="summary-card">
+			        <div class="summary-label">Employee Paid</div>
+			        <div class="summary-value">
+			          ${formatMoney(employeePaid)}
+			        </div>
+			      </div>
+			
+			      <div class="summary-card">
+			        <div class="summary-label">Employer Paid</div>
+			        <div class="summary-value">
+			          ${formatMoney(employerPaid)}
+			        </div>
+			      </div>
+			
+			      <div class="summary-card">
+			        <div class="summary-label">Outstanding Contributions</div>
+			        <div class="summary-value">
+			          ${formatMoney(outstandingAmount)}
+			        </div>
+			      </div>
+			    </section>
+			
+			    <section class="table-wrap">
+			      <h2 class="table-title">
+			        Employee Health Contribution Details
+			      </h2>
+			
+			      <table>
+			        <thead>
+			          <tr>
+			            <th>Record ID</th>
+			            <th>Employee</th>
+			            <th>Branch</th>
+			            <th>Period</th>
+			            <th>Contribution Type</th>
+			            <th class="number">Employee Amount</th>
+			            <th class="number">Employer Amount</th>
+			            <th class="number">Paid Amount</th>
+			            <th class="number">Remaining</th>
+			            <th>Status</th>
+			          </tr>
+			        </thead>
+			
+			        <tbody>
+			          ${tableRows}
+			        </tbody>
+			      </table>
+			    </section>
+			
+			    <footer class="footer">
+			      <div>
+			        <strong>MUNO</strong> · Employee Health Payable Report
+			      </div>
+			
+			      <div>
+			        Generated: ${esc(new Date().toLocaleString('en-GB'))}
+			      </div>
+			    </footer>
+			  </main>
+			</body>
+			</html>
+			`;
+			
+		/* ==== OPEN REPORT AND PRINT AUTOMATICALLY ==== */
+		const printWindow = window.open('', '_blank');
 
-      <body>
-        <div class="toolbar">
-          <div class="toolbar-title">
-            Employee Health Payable Report
-          </div>
+		if (!printWindow) {
+			alert(
+				'Popup diblokir browser. Izinkan pop-up untuk mencetak laporan PDF.'
+			);
+			return;
+		}
 
-          <div class="toolbar-actions">
-            <button type="button" onclick="window.print()">
-              Print / Save PDF
-            </button>
+		printWindow.document.open();
+		printWindow.document.write(html);
+		printWindow.document.close();
 
-            <button type="button" onclick="window.close()">
-              Close
-            </button>
-          </div>
-        </div>
+		const printReport = () => {
+			printWindow.focus();
+			printWindow.print();
+		};
 
-        <main class="report">
-          <header class="report-header">
-            <img
-              class="report-logo"
-              src="${esc(logoUrl)}"
-              alt="Company Logo"
-              onerror="this.style.display='none'"
-            >
+		const logo = printWindow.document.querySelector('.report-logo');
 
-            <h1 class="report-title">
-              Employee Health Payable
-            </h1>
+		if (logo && !logo.complete) {
+			logo.addEventListener('load', printReport, { once: true });
+			logo.addEventListener('error', printReport, { once: true });
+		} else {
+			printReport();
+		}
 
-            <div class="report-subtitle">
-              ${esc(branchTitle)}
-            </div>
+	} catch (error) {
+		console.error(
+			'Error exporting Employee Health Payable PDF:',
+			error
+		);
 
-            <div class="report-period">
-              Reporting Period: ${esc(periodTitle)}
-            </div>
-          </header>
-
-          <section class="summary">
-            <div class="summary-card">
-              <div class="summary-label">
-                Total Records
-              </div>
-
-              <div class="summary-value">
-                ${formatNumber(totalRecords)}
-              </div>
-            </div>
-
-            <div class="summary-card">
-              <div class="summary-label">
-                Employee Paid
-              </div>
-
-              <div class="summary-value">
-                ${formatMoney(employeePaid)}
-              </div>
-            </div>
-
-            <div class="summary-card">
-              <div class="summary-label">
-                Employer Paid
-              </div>
-
-              <div class="summary-value">
-                ${formatMoney(employerPaid)}
-              </div>
-            </div>
-
-            <div class="summary-card">
-              <div class="summary-label">
-                Outstanding Contributions
-              </div>
-
-              <div class="summary-value">
-                ${formatMoney(outstandingAmount)}
-              </div>
-            </div>
-          </section>
-
-          <section class="table-wrap">
-            <h2 class="table-title">
-              Employee Health Contribution Details
-            </h2>
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Record ID</th>
-                  <th>Employee</th>
-                  <th>Branch</th>
-                  <th>Period</th>
-                  <th>Contribution Type</th>
-                  <th class="number">Employee Amount</th>
-                  <th class="number">Employer Amount</th>
-                  <th class="number">Paid Amount</th>
-                  <th class="number">Remaining</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${tableRows}
-              </tbody>
-            </table>
-          </section>
-
-          <footer class="footer">
-            <div>
-              <strong>MUNO</strong> · Employee Health Payable Report
-            </div>
-
-            <div>
-              Generated: ${esc(new Date().toLocaleString('en-GB'))}
-            </div>
-          </footer>
-        </main>
-      </body>
-      </html>
-    `;
-
-    /* ==== OPEN REPORT ==== */
-    const printWindow = window.open('', '_blank');
-
-    if (!printWindow) {
-      alert(
-        'Popup diblokir browser. Izinkan pop-up untuk membuka laporan PDF.'
-      );
-      return;
-    }
-
-    printWindow.document.open();
-    printWindow.document.write(html);
-    printWindow.document.close();
-
-  } catch (error) {
-    console.error(
-      'Error exporting Employee Health Payable PDF:',
-      error
-    );
-
-    alert(
-      'Gagal mengekspor Employee Health Payable PDF: ' +
-      (error?.message || error)
-    );
-  }
+		alert(
+			'Gagal mengekspor Employee Health Payable PDF: ' +
+			(error?.message || error)
+		);
+	}
 };
 
 
