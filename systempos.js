@@ -29057,7 +29057,6 @@ window.exportEmployeeHealthData = async function () {
             text-align: center;
             margin-bottom: 26px;
             padding-bottom: 18px;
-            border-bottom: 2px solid #222;
           }
 
           .logo {
