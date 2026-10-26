@@ -23867,69 +23867,99 @@ function generalLedgerNextPage() {
 
 function exportGeneralLedger() {
   const data = getFilteredGeneralLedger();
-	
-	if (!data.length) { alert("Tidak ada data General Ledger untuk diekspor."); 
-		return; }
-	
-	const headers = [
-		"Date",
-		"Journal No.",
-		"Account Code",
-		"Account Name",
-		"Description",
-		"Debit",
-		"Credit",
-		"Balance"
-	];
 
-	const rows = data.map(row => [
-		formatGeneralLedgerDate(row.journalDate),
-		row.journalNo || "",
-		row.accountCode || "",
-		row.accountName || "",
-		row.description || "",
-		Number(row.debit || 0),
-		Number(row.credit || 0),
-		Number(row.balance || 0)
-	]);
-	
-	const csv = [ headers, ...rows ]
-		.map(row =>
-			row.map(value =>
-				`"${String(value ?? "").replace(/"/g, '""')}"`
-			).join(",")
-		)
-	.join("\n");
-	const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
-	const url = URL.createObjectURL(blob);
-	const link = document.createElement("a");
+  if (!data.length) {
+    alert("Tidak ada data General Ledger untuk diekspor.");
+    return;
+  }
 
-	link.href = url;
-	link.download = `general-ledger-${new Date().toISOString().slice(0, 10)}.csv`;
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
-	URL.revokeObjectURL(url);
-}
+  const rows = [
+    ["GENERAL LEDGER", "", "", "", "", "", "", ""],
+    [`Period: ${getAccountingReportPeriod()}`, "", "", "", "", "", "", ""],
+    [`Branch: ${getAccountingReportBranch()}`, "", "", "", "", "", "", ""],
+    ["", "", "", "", "", "", "", ""],
+    [
+      "Date",
+      "Journal No.",
+      "Account Code",
+      "Account Name",
+      "Description",
+      "Debit",
+      "Credit",
+      "Balance"
+    ],
+    ...data.map(row => [
+      formatGeneralLedgerDate(row.journalDate),
+      row.journalNo || "",
+      row.accountCode || "",
+      row.accountName || "",
+      row.description || "",
+      Number(row.debit || 0),
+      Number(row.credit || 0),
+      Number(row.balance || 0)
+    ])
+  ];
 
-function formatGeneralLedgerCurrency(value) {
-  return `Rp ${Number(value || 0).toLocaleString("id-ID")}`;
-}
+  const { wb, ws } = createAccountingWorkbook(
+    "General Ledger",
+    rows,
+    ["A1:H1", "A2:H2", "A3:H3"],
+    [16, 18, 16, 28, 40, 18, 18, 18]
+  );
 
-function formatGeneralLedgerDate(value) {
-	if (!value) return "-";
-	const date = new Date( `${String(value).substring(0, 10)}T00:00:00` );
-	if (Number.isNaN(date.getTime())) { return String(value); }
-  return date.toLocaleDateString(
-		"en-GB",
-		{
-			day: "2-digit",
-			month: "short",
-			year: "numeric"
-		}
+  // TITLE
+  setExcelStyle(ws, "A1", {
+    font: { bold: true, sz: 16 },
+    alignment: { horizontal: "center", vertical: "center" }
+  });
+
+  setExcelStyle(ws, "A2", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+
+  setExcelStyle(ws, "A3", {
+    font: { bold: true },
+    alignment: { horizontal: "center" }
+  });
+
+  // HEADER
+  ["A5", "B5", "C5", "D5", "E5", "F5", "G5", "H5"]
+    .forEach(cell => {
+      setExcelStyle(ws, cell, {
+        font: { bold: true }
+      });
+    });
+
+  // NUMBER FORMAT
+  formatAccountingNumbers(
+    ws,
+    6,
+    rows.length,
+    ["F", "G", "H"]
+  );
+
+  // RIGHT ALIGNMENT
+  for (let row = 6; row <= rows.length; row++) {
+    ["F", "G", "H"].forEach(column => {
+      const cell = ws[`${column}${row}`];
+      if (!cell) return;
+
+      cell.s = {
+        ...(cell.s || {}),
+        alignment: {
+          horizontal: "right",
+          vertical: "center"
+        }
+      };
+    });
+  }
+
+  XLSX.writeFile(
+    wb,
+    `general-ledger-${getAccountingReportExportDate()}.xlsx`
   );
 }
-
 
 async function initGeneralLedger() {
   initGeneralLedgerFilters();
