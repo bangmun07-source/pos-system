@@ -27602,7 +27602,7 @@ window.exportEmployeeTaxPayable = async function () {
       const status = String(row.status || '').trim().toUpperCase();
 
       if (!canViewAllBranches && branchId !== userBranchId) { return false; }
-      if (branchValue && branchId !== branchValue) { return false; }
+      if ( branchValue && branchValue !== 'ALL' && branchId !== branchValue ) { return false; }
       if (employeeValue && employeeId !== employeeValue) { return false; }
       if (statusValue && status !== statusValue) { return false; }
       if (/^\d{4}-\d{2}$/.test(periodValue)) {
