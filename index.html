@@ -20487,6 +20487,237 @@
 	    </div>
 	  </div>
 	</div>
+	<!-- PAY EMPLOYEE HEALTH MODAL -->
+	<div id="payEmployeeHealthModal"
+	  class="fixed inset-0 z-[120] hidden items-center justify-center bg-background p-4 overflow-y-auto"
+	  onclick="if(event.target === this) closePayEmployeeHealthModal()">
+
+	  <div class="w-full max-w-3xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">health_and_safety</span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Pay Health Contribution
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Record employee health contribution payment
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closePayEmployeeHealthModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition"
+	        aria-label="Close payment">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	
+	    <!-- CONTENT -->
+	    <form id="payEmployeeHealthForm"
+	      onsubmit="submitPayEmployeeHealth(event)"
+	      class="flex flex-col min-h-0">
+	      <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	        <!-- CONTRIBUTION INFORMATION -->
+	        <section>
+	          <div class="pb-3 border-b border-outline-variant mb-4">
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Contribution Information
+	            </h3>
+	            <p class="text-xs text-muted mt-1">
+	              Employee contribution record and outstanding payable
+	            </p>
+	          </div>
+	
+	          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	            <div>
+	              <label class="block text-xs text-muted mb-2">
+	                Employee Name
+	              </label>
+	              <div id="payEmployeeHealthEmployeeName"
+	                class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">
+	                -
+	              </div>
+	            </div>
+	
+	            <div>
+	              <label class="block text-xs text-muted mb-2">
+	                Outlet
+	              </label>
+	              <div id="payEmployeeHealthBranch"
+	                class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">
+	                -
+	              </div>
+	            </div>
+	
+	            <div>
+	              <label class="block text-xs text-muted mb-2">
+	                Contribution Period
+	              </label>
+	              <div id="payEmployeeHealthPeriod"
+	                class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	                -
+	              </div>
+	            </div>
+	
+	            <div>
+	              <label class="block text-xs text-muted mb-2">
+	                Contribution Type
+	              </label>
+	              <div id="payEmployeeHealthType"
+	                class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">
+	                -
+	              </div>
+	            </div>
+	          </div>
+	        </section>
+	        <!-- PAYMENT SUMMARY -->
+	        <section>
+	          <div class="pb-3 border-b border-outline-variant mb-4">
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Payment Summary
+	            </h3>
+	            <p class="text-xs text-muted mt-1">
+	              Outstanding health contribution liability
+	            </p>
+	          </div>
+	
+	          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+	            <div class="border border-outline-variant rounded-md p-4">
+	              <p class="text-xs text-muted">Outstanding Amount</p>
+	              <p id="payEmployeeHealthOutstanding"
+	                class="text-xl font-semibold text-foreground mt-2">
+	                Rp0
+	              </p>
+	            </div>
+	
+	            <div class="border border-outline-variant rounded-md p-4">
+	              <p class="text-xs text-muted">Payment Amount</p>
+	              <p id="payEmployeeHealthDisplayAmount"
+	                class="text-xl font-semibold text-foreground mt-2">
+	                Rp0
+	              </p>
+	            </div>
+	          </div>
+	        </section>
+	        <!-- PAYMENT DETAILS -->
+	        <section>
+	          <div class="pb-3 border-b border-outline-variant mb-4">
+	            <h3 class="text-sm font-semibold text-foreground">
+	              Payment Details
+	            </h3>
+	            <p class="text-xs text-muted mt-1">
+	              Specify the payment date and cash or bank account
+	            </p>
+	          </div>
+
+	          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	            <div>
+	              <label for="payEmployeeHealthAmount"
+	                class="block text-xs text-muted mb-2">
+	                Payment Amount <span class="text-red-500">*</span>
+	              </label>
+	
+	              <input id="payEmployeeHealthAmount"
+	                name="payment_amount"
+	                type="number"
+	                min="1"
+	                step="1"
+	                required
+	                placeholder="Enter payment amount"
+	                oninput="updateEmployeeHealthPaymentDisplay()"
+	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
+	            </div>
+	
+	            <div>
+	              <label for="payEmployeeHealthDate"
+	                class="block text-xs text-muted mb-2">
+	                Payment Date <span class="text-red-500">*</span>
+	              </label>
+	
+	              <input id="payEmployeeHealthDate"
+	                name="payment_date"
+	                type="date"
+	                required
+	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
+	            </div>
+	
+	            <div>
+	              <label for="payEmployeeHealthMethod"
+	                class="block text-xs text-muted mb-2">
+	                Payment Method <span class="text-red-500">*</span>
+	              </label>
+	
+	              <select id="payEmployeeHealthMethod"
+	                name="payment_method"
+	                required
+	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
+	                <option value="CASH">Cash</option>
+	                <option value="BANK">Bank</option>
+	              </select>
+	            </div>
+	
+	            <div>
+	              <label for="payEmployeeHealthReference"
+	                class="block text-xs text-muted mb-2">
+	                Payment Reference
+	              </label>
+	
+	              <input id="payEmployeeHealthReference"
+	                name="payment_reference"
+	                type="text"
+	                maxlength="100"
+	                placeholder="Enter payment reference number"
+	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
+	            </div>
+	
+	            <div class="md:col-span-2">
+	              <label for="payEmployeeHealthNote"
+	                class="block text-xs text-muted mb-2">
+	                Notes
+	              </label>
+	
+	              <textarea id="payEmployeeHealthNote"
+	                name="notes"
+	                rows="3"
+	                maxlength="500"
+	                placeholder="Additional payment notes (optional)"
+	                class="w-full px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500 resize-y"></textarea>
+	            </div>
+	          </div>
+	
+	          <div class="flex justify-end mt-3">
+	            <button type="button"
+	              onclick="setEmployeeHealthFullPayment()"
+	              class="text-xs font-medium text-amber-500 hover:text-amber-400 transition">
+	              Pay Full Outstanding Amount
+	            </button>
+	          </div>
+	        </section>
+	        <input type="hidden" id="payEmployeeHealthContributionId">
+	      </div>
+	      <!-- FOOTER -->
+	      <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3 shrink-0">
+	        <button type="button"
+	          onclick="closePayEmployeeHealthModal()"
+	          class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	          Cancel
+	        </button>
+	
+	        <button id="submitPayEmployeeHealthButton"
+	          type="submit"
+	          class="h-10 px-5 inline-flex items-center gap-2 rounded-md bottom-theme text-sm font-medium">
+	          <span class="material-symbols-outlined text-lg">payments</span>
+	          Pay Health
+	        </button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
 	<!-- EMPLOYEE TAX DETAIL MODAL -->
 	<div id="employeeTaxDetailModal"
 	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
@@ -20807,20 +21038,20 @@
 	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
 	            </div>
 	            <!-- PAYMENT METHOD -->
-				<div>
-				  <label for="payEmployeeTaxMethod"
-				    class="block text-xs text-muted mb-2">
-				    Payment Method <span class="text-red-500">*</span>
-				  </label>
-				
-				  <select id="payEmployeeTaxMethod"
-				    name="payment_method"
-				    required
-				    class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
-				    <option value="CASH">Cash</option>
-				    <option value="BANK">Bank</option>
-				  </select>
-				</div>
+							<div>
+							  <label for="payEmployeeTaxMethod"
+							    class="block text-xs text-muted mb-2">
+							    Payment Method <span class="text-red-500">*</span>
+							  </label>
+							
+							  <select id="payEmployeeTaxMethod"
+							    name="payment_method"
+							    required
+							    class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
+							    <option value="CASH">Cash</option>
+							    <option value="BANK">Bank</option>
+							  </select>
+							</div>
 	
 	            <div class="md:col-span-2">
 	              <label for="payEmployeeTaxReference"
