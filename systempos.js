@@ -22507,7 +22507,7 @@ function renderJournalEntryRow(journal) {
 					</button>
 			
 					<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
-						class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-50">
+						class="hidden absolute right-0 bottom-full mb-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-[9999]">
 						<button type="button"
 							onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
 							class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
@@ -22552,6 +22552,26 @@ function toggleJournalEntryActionMenu(journalId) {
 		});
 	menu.classList.toggle("hidden");
 }
+
+function closeJournalEntryActionMenus() {
+	document
+		.querySelectorAll('[id^="journalActionMenu-"]')
+		.forEach(menu => menu.classList.add("hidden"));
+}
+
+document.addEventListener("click", function (event) {
+	const clickedMenu = event.target.closest(
+		'[id^="journalActionMenu-"]'
+	);
+
+	const clickedButton = event.target.closest(
+		'button[onclick*="toggleJournalEntryActionMenu"]'
+	);
+
+	if (!clickedMenu && !clickedButton) {
+		closeJournalEntryActionMenus();
+	}
+});
 
 async function postManualJournalEntry(journalId) {
 	const journal = journalEntriesData.find( item => item.journalId === journalId );
