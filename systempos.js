@@ -27597,116 +27597,85 @@ function closeEmployeeTaxDetail() {
 	modal.classList.remove("flex");
 }
 
+// ============================================
+// OPEN PAY EMPLOYEE TAX MODAL
+// ============================================
 function payEmployeeTax(taxId) {
-    const tax = employeeTaxData.find(row =>
-        String(
-            row.tax_record_id ??
-            row.tax_id ??
-            row.id
-        ) === String(taxId)
-    );
+	const tax = employeeTaxData.find(row => String( row.tax_record_id ?? row.tax_id ?? row.id ) === String(taxId) );
+	if (!tax) { if (typeof showToast === "function") { showToast("Data pajak karyawan tidak ditemukan.", "error"); } return; }
 
-    if (!tax) {
-        showToast?.("Data pajak karyawan tidak ditemukan.", "error");
-        return;
-    }
+	const status = String(tax.status ?? "").toUpperCase();
+	if (status === "PAID") { if (typeof showToast === "function") { showToast("Pajak ini sudah dibayar.", "warning"); } return; }
+	if (status === "CANCELLED") { if (typeof showToast === "function") { showToast("Pajak yang dibatalkan tidak dapat dibayar.", "warning"); } return; }
 
-    // Cegah membuka pembayaran untuk data yang sudah dibayar
-    const status = String(tax.status ?? "").toUpperCase();
+	const modal = document.getElementById("payEmployeeTaxModal");
+	const form = document.getElementById("payEmployeeTaxForm");
+	if (!modal || !form) { console.error("Pay Employee Tax modal atau form tidak ditemukan."); return; }
 
-    if (status === "PAID") {
-        showToast?.("Pajak ini sudah dibayar.", "warning");
-        return;
-    }
+	const amount = Number(tax.tax_amount ?? 0);
+	if (!Number.isFinite(amount) || amount <= 0) { if (typeof showToast === "function") { showToast("Nominal pajak tidak valid.", "error"); } return; }
 
-    if (status === "CANCELLED") {
-        showToast?.("Pajak yang dibatalkan tidak dapat dibayar.", "warning");
-        return;
-    }
+	const recordId = tax.tax_record_id ?? tax.tax_id ?? tax.id ?? "";
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) element.textContent = value ?? "-";
+	};
 
-    const modal = document.getElementById("payEmployeeTaxModal");
-    const form = document.getElementById("payEmployeeTaxForm");
+	const formatRupiah = value =>
+		new Intl.NumberFormat("id-ID", {
+			style: "currency",
+			currency: "IDR",
+			maximumFractionDigits: 0
+		}).format(value);
 
-    if (!modal || !form) {
-        console.error("Popup pembayaran pajak tidak ditemukan.");
-        return;
-    }
+	// Tax information
+	setText("payEmployeeTaxEmployeeName", tax.employee_name || "-");
+	setText( "payEmployeeTaxBranch", tax.branch_name || tax.branch_id || "-" );
+	setText("payEmployeeTaxPeriod", tax.tax_period || "-");
+	setText("payEmployeeTaxRecordId", recordId || "-");
+	// Payment summary
+	setText("payEmployeeTaxAmount", formatRupiah(amount));
+	setText("payEmployeeTaxDisplayAmount", formatRupiah(amount));
+	// Record ID for future submission
+	const recordIdInput = document.getElementById( "payEmployeeTaxRecordIdInput" );
+	if (recordIdInput) { recordIdInput.value = recordId; }
 
-    const amount = Number(tax.tax_amount ?? 0);
+	// Reset payment form
+	form.reset();
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        showToast?.("Nominal pajak tidak valid.", "error");
-        return;
-    }
+	// Restore the record ID after resetting the form
+	if (recordIdInput) { recordIdInput.value = recordId; }
+	// Default payment date to today's local date
+	const dateInput = document.getElementById("payEmployeeTaxDate");
+	if (dateInput) {
+		const now = new Date();
+		const localDate = [
+			now.getFullYear(),
+			String(now.getMonth() + 1).padStart(2, "0"),
+			String(now.getDate()).padStart(2, "0")
+		].join("-");
+		dateInput.value = localDate;
+	}
+	// Default payment method
+	const methodSelect = document.getElementById("payEmployeeTaxMethod");
+	if (methodSelect) { methodSelect.value = "CASH"; }
+	// Open modal
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 
-    const setText = (id, value) => {
-        const element = document.getElementById(id);
-        if (element) element.textContent = value ?? "-";
-    };
-
-    const formatRupiah = value =>
-        new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            maximumFractionDigits: 0
-        }).format(value);
-
-    // Isi detail pajak
-    setText(
-        "payEmployeeTaxEmployeeName",
-        tax.employee_name || "-"
-    );
-
-    setText(
-        "payEmployeeTaxBranch",
-        tax.branch_name || tax.branch_id || "-"
-    );
-
-    setText(
-        "payEmployeeTaxPeriod",
-        tax.tax_period || "-"
-    );
-
-    setText(
-        "payEmployeeTaxRecordId",
-        tax.tax_record_id ?? tax.tax_id ?? tax.id ?? "-"
-    );
-
-    setText("payEmployeeTaxAmount", formatRupiah(amount));
-    setText("payEmployeeTaxDisplayAmount", formatRupiah(amount));
-
-    // Simpan ID record untuk proses submit nanti
-    const recordIdInput = document.getElementById(
-        "payEmployeeTaxRecordIdInput"
-    );
-
-    if (recordIdInput) {
-        recordIdInput.value =
-            tax.tax_record_id ?? tax.tax_id ?? tax.id ?? "";
-    }
-
-    // Reset input pembayaran tanpa menghapus ID record
-    const dateInput = document.getElementById("payEmployeeTaxDate");
-    const accountSelect = document.getElementById("payEmployeeTaxAccount");
-    const referenceInput = document.getElementById("payEmployeeTaxReference");
-    const noteInput = document.getElementById("payEmployeeTaxNote");
-
-    if (dateInput) {
-        dateInput.value = new Date().toLocaleDateString("en-CA");
-    }
-
-    if (accountSelect) {
-        accountSelect.value = "";
-    }
-
-    if (referenceInput) referenceInput.value = "";
-    if (noteInput) noteInput.value = "";
-
-    // Buka popup
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	document.body.classList.add("overflow-hidden");
 }
 
+// CLOSE PAY EMPLOYEE TAX MODAL
+function closePayEmployeeTaxModal() {
+	const modal = document.getElementById("payEmployeeTaxModal");
+	if (!modal) return;
+
+	modal.classList.add("hidden");
+	modal.classList.remove("flex");
+
+	document.body.classList.remove("overflow-hidden");
+}
 
 /* ==== EXPORT EMPLOYEE TAX PAYABLE PDF ==== */
 window.exportEmployeeTaxPayable = async function () {
