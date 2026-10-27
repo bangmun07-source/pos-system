@@ -27533,13 +27533,12 @@ async function submitPayEmployeeTax(event) {
 	const originalButtonText = submitButton?.textContent;
 	try {
 		if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Memproses..."; }
-		const sessionId = typeof currentSessionId !== "undefined"
-			? currentSessionId
-			: null;
-		if (!sessionId) { throw new Error("Session pengguna tidak ditemukan."); }
+		const sessionId = localStorage.getItem("pos_session_id");
+		
+		if (!sessionId) { throw new Error("Session pengguna tidak ditemukan. Silakan login ulang."); }
 
 		const { data, error } = 
-			await supabase.rpc("pay_employee_tax", {
+			await supabaseClient.rpc("pay_employee_tax", {
 				p_session_id: sessionId,
 				p_tax_record_id: taxRecordId,
 				p_payment_date: paymentDate,
