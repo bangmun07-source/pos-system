@@ -28703,28 +28703,34 @@ async function payEmployeeHealth(contributionId) {
     const modal = document.getElementById("payEmployeeHealthModal");
     if (!modal) { throw new Error("Popup Pay Health tidak ditemukan di HTML."); }
 
-    document.getElementById("payEmployeeHealthContributionId").value =
-      record.contribution_id || record.id || "";
-    document.getElementById("payEmployeeHealthEmployeeName").textContent =
-      record.employee_name || "-";
-    document.getElementById("payEmployeeHealthBranch").textContent =
-      record.branch_name || record.branch_id || "-";
-    document.getElementById("payEmployeeHealthPeriod").textContent = record.contribution_period || "-";
-    document.getElementById("payEmployeeHealthType").textContent = (record.contribution_type || "-").replaceAll("_", " ");
-
+    const type = record.contribution_type;
     const outstanding = Number(
       record.outstanding_amount ??
       record.remaining_amount ??
-      ( record.status === "PAID" || record.status === "CANCELLED"
-				? 0
-				: Number(record.employee_amount || 0) + Number(record.employer_amount || 0)
+      (
+        record.status === "PAID" || record.status === "CANCELLED"
+          ? 0
+          : type === "EMPLOYEE_HEALTH_CONTRIBUTION"
+            ? record.employee_amount
+            : type === "EMPLOYER_HEALTH_CONTRIBUTION"
+              ? record.employer_amount
+              : 0
       )
     );
 
+    if (record.status === "PAID" || record.status === "CANCELLED") { throw new Error("Kontribusi ini sudah dibayar atau dibatalkan."); }
+
+    if (!Number.isFinite(outstanding) || outstanding <= 0) { throw new Error("Nominal kontribusi tidak valid."); }
+
+    document.getElementById("payEmployeeHealthContributionId").value = record.contribution_id || record.id || "";
+    document.getElementById("payEmployeeHealthEmployeeName").textContent = record.employee_name || "-";
+    document.getElementById("payEmployeeHealthBranch").textContent = record.branch_name || record.branch_id || "-";
+    document.getElementById("payEmployeeHealthPeriod").textContent = record.contribution_period || "-";
+    document.getElementById("payEmployeeHealthType").textContent = (type || "-").replaceAll("_", " ");
     document.getElementById("payEmployeeHealthOutstanding").textContent = formatEmployeeHealthCurrency(outstanding);
 
     const amountInput = document.getElementById("payEmployeeHealthAmount");
-    amountInput.value = outstanding > 0 ? outstanding : "";
+    amountInput.value = outstanding;
     amountInput.max = outstanding;
 
     document.getElementById("payEmployeeHealthDate").value = new Date().toLocaleDateString("en-CA");
@@ -28740,6 +28746,60 @@ async function payEmployeeHealth(contributionId) {
   } catch (error) {
     console.error("Pay Health:", error);
     alert(error.message || "Gagal membuka pembayaran kontribusi kesehatan.");
+  }
+}
+
+async function submitPayEmployeeHealth(event) {
+  event.preventDefault();
+
+  const button = document.getElementById( "submitPayEmployeeHealthButton" );
+  if (!button || button.disabled) return;
+
+  const sessionId = localStorage.getItem("pos_session_id");
+  const contributionId = document.getElementById( "payEmployeeHealthContributionId" ).value;
+  const paymentDate = document.getElementById( "payEmployeeHealthDate" ).value;
+  const paymentMethod = document.getElementById( "payEmployeeHealthMethod" ).value;
+  const referenceNo = document.getElementById( "payEmployeeHealthReference" ).value.trim();
+  const note = document.getElementById( "payEmployeeHealthNote" ).value.trim();
+
+  if (!sessionId || !contributionId || !paymentDate) { alert("Data pembayaran belum lengkap."); return; }
+
+  const originalText = button.textContent;
+  button.disabled = true;
+  button.textContent = "Memproses...";
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "pay_employee_health",
+      {
+        p_session_id: sessionId,
+        p_contribution_id: contributionId,
+        p_payment_date: paymentDate,
+        p_payment_method: paymentMethod,
+        p_reference_no: referenceNo || null,
+        p_note: note || null
+      }
+    );
+
+    if (error) throw error;
+    if (!data || data.success !== true) { throw new Error(data?.message || "Pembayaran gagal."); }
+
+    closePayEmployeeHealthModal();
+
+    if (typeof invalidateEmployeeHealthCache === "function") { invalidateEmployeeHealthCache(); }
+    if (typeof loadEmployeeHealthRecords === "function") { await loadEmployeeHealthRecords(); }
+
+    alert(
+      "Pembayaran iuran kesehatan berhasil dicatat.\n" +
+      "Nominal: " + formatEmployeeHealthCurrency(data.amount) +
+      "\nNo. Jurnal: " + (data.journal_no || "-")
+    );
+  } catch (error) {
+    console.error("Submit Pay Health:", error);
+    alert(error.message || "Gagal memproses pembayaran iuran kesehatan.");
+  } finally {
+    button.disabled = false;
+    button.textContent = originalText;
   }
 }
 
@@ -28778,7 +28838,6 @@ function closePayEmployeeHealthModal() {
 
   document.body.style.overflow = "";
 }
-
 
 /* ==== EXPORT EMPLOYEE HEALTH PAYABLE PDF ==== */
 window.exportEmployeeHealthData = async function () {
