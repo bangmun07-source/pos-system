@@ -27597,7 +27597,115 @@ function closeEmployeeTaxDetail() {
 	modal.classList.remove("flex");
 }
 
+function payEmployeeTax(taxId) {
+    const tax = employeeTaxData.find(row =>
+        String(
+            row.tax_record_id ??
+            row.tax_id ??
+            row.id
+        ) === String(taxId)
+    );
 
+    if (!tax) {
+        showToast?.("Data pajak karyawan tidak ditemukan.", "error");
+        return;
+    }
+
+    // Cegah membuka pembayaran untuk data yang sudah dibayar
+    const status = String(tax.status ?? "").toUpperCase();
+
+    if (status === "PAID") {
+        showToast?.("Pajak ini sudah dibayar.", "warning");
+        return;
+    }
+
+    if (status === "CANCELLED") {
+        showToast?.("Pajak yang dibatalkan tidak dapat dibayar.", "warning");
+        return;
+    }
+
+    const modal = document.getElementById("payEmployeeTaxModal");
+    const form = document.getElementById("payEmployeeTaxForm");
+
+    if (!modal || !form) {
+        console.error("Popup pembayaran pajak tidak ditemukan.");
+        return;
+    }
+
+    const amount = Number(tax.tax_amount ?? 0);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        showToast?.("Nominal pajak tidak valid.", "error");
+        return;
+    }
+
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value ?? "-";
+    };
+
+    const formatRupiah = value =>
+        new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }).format(value);
+
+    // Isi detail pajak
+    setText(
+        "payEmployeeTaxEmployeeName",
+        tax.employee_name || "-"
+    );
+
+    setText(
+        "payEmployeeTaxBranch",
+        tax.branch_name || tax.branch_id || "-"
+    );
+
+    setText(
+        "payEmployeeTaxPeriod",
+        tax.tax_period || "-"
+    );
+
+    setText(
+        "payEmployeeTaxRecordId",
+        tax.tax_record_id ?? tax.tax_id ?? tax.id ?? "-"
+    );
+
+    setText("payEmployeeTaxAmount", formatRupiah(amount));
+    setText("payEmployeeTaxDisplayAmount", formatRupiah(amount));
+
+    // Simpan ID record untuk proses submit nanti
+    const recordIdInput = document.getElementById(
+        "payEmployeeTaxRecordIdInput"
+    );
+
+    if (recordIdInput) {
+        recordIdInput.value =
+            tax.tax_record_id ?? tax.tax_id ?? tax.id ?? "";
+    }
+
+    // Reset input pembayaran tanpa menghapus ID record
+    const dateInput = document.getElementById("payEmployeeTaxDate");
+    const accountSelect = document.getElementById("payEmployeeTaxAccount");
+    const referenceInput = document.getElementById("payEmployeeTaxReference");
+    const noteInput = document.getElementById("payEmployeeTaxNote");
+
+    if (dateInput) {
+        dateInput.value = new Date().toLocaleDateString("en-CA");
+    }
+
+    if (accountSelect) {
+        accountSelect.value = "";
+    }
+
+    if (referenceInput) referenceInput.value = "";
+    if (noteInput) noteInput.value = "";
+
+    // Buka popup
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+}
 
 
 /* ==== EXPORT EMPLOYEE TAX PAYABLE PDF ==== */
