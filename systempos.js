@@ -28694,6 +28694,81 @@ function openPayEmployeeHealthModal() {
   document.body.style.overflow = "hidden";
 }
 
+
+async function payEmployeeHealth(contributionId) {
+  try {
+    const record = (employeeHealthData || []).find( row => String(row.contribution_id || row.id) === String(contributionId) );
+    if (!record) { throw new Error("Data kontribusi kesehatan tidak ditemukan. Muat ulang tabel lalu coba lagi."); }
+
+    const modal = document.getElementById("payEmployeeHealthModal");
+    if (!modal) { throw new Error("Popup Pay Health tidak ditemukan di HTML."); }
+
+    document.getElementById("payEmployeeHealthContributionId").value =
+      record.contribution_id || record.id || "";
+    document.getElementById("payEmployeeHealthEmployeeName").textContent =
+      record.employee_name || "-";
+    document.getElementById("payEmployeeHealthBranch").textContent =
+      record.branch_name || record.branch_id || "-";
+    document.getElementById("payEmployeeHealthPeriod").textContent = record.contribution_period || "-";
+    document.getElementById("payEmployeeHealthType").textContent = (record.contribution_type || "-").replaceAll("_", " ");
+
+    const outstanding = Number(
+      record.outstanding_amount ??
+      record.remaining_amount ??
+      ( record.status === "PAID" || record.status === "CANCELLED"
+				? 0
+				: Number(record.employee_amount || 0) + Number(record.employer_amount || 0)
+      )
+    );
+
+    document.getElementById("payEmployeeHealthOutstanding").textContent = formatEmployeeHealthCurrency(outstanding);
+
+    const amountInput = document.getElementById("payEmployeeHealthAmount");
+    amountInput.value = outstanding > 0 ? outstanding : "";
+    amountInput.max = outstanding;
+
+    document.getElementById("payEmployeeHealthDate").value = new Date().toLocaleDateString("en-CA");
+    document.getElementById("payEmployeeHealthMethod").value = "CASH";
+    document.getElementById("payEmployeeHealthReference").value = "";
+    document.getElementById("payEmployeeHealthNote").value = "";
+
+    updateEmployeeHealthPaymentDisplay();
+
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    document.body.style.overflow = "hidden";
+  } catch (error) {
+    console.error("Pay Health:", error);
+    alert(error.message || "Gagal membuka pembayaran kontribusi kesehatan.");
+  }
+}
+
+function formatEmployeeHealthCurrency(amount) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  }).format(Number(amount) || 0);
+}
+
+function updateEmployeeHealthPaymentDisplay() {
+  const amount = Number( document.getElementById("payEmployeeHealthAmount")?.value ) || 0;
+  const display = document.getElementById("payEmployeeHealthDisplayAmount");
+  if (display) {
+    display.textContent = formatEmployeeHealthCurrency(amount);
+  }
+}
+
+function setEmployeeHealthFullPayment() {
+  const outstandingText = document.getElementById( "payEmployeeHealthOutstanding" )?.textContent || "";
+  const outstanding = Number( document.getElementById("payEmployeeHealthAmount")?.max ) || 0;
+  const amountInput = document.getElementById("payEmployeeHealthAmount");
+  if (!amountInput) return;
+
+  amountInput.value = outstanding;
+  updateEmployeeHealthPaymentDisplay();
+}
+
 function closePayEmployeeHealthModal() {
   const modal = document.getElementById("payEmployeeHealthModal");
   if (!modal) return;
