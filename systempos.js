@@ -22509,7 +22509,7 @@ function renderJournalEntryRow(journal) {
 					<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
 						class="hidden absolute right-0 bottom-full mb-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-[9999]">
 						<button type="button"
-							onclick="openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
+							onclick="closeJournalEntryActionMenus(); openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
 							class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
 							View Detail
 						</button>
@@ -22518,13 +22518,13 @@ function renderJournalEntryRow(journal) {
 							journal.status === "DRAFT"
 								? `
 									<button type="button"
-										onclick="editManualJournalEntry('${escapeHtml(journal.journalId)}')"
+										onclick="closeJournalEntryActionMenus(); onclick="editManualJournalEntry('${escapeHtml(journal.journalId)}')"
 										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
 										Edit
 									</button>
 			
 									<button type="button"
-										onclick="postManualJournalEntry('${escapeHtml(journal.journalId)}')"
+										onclick="closeJournalEntryActionMenus(); onclick="postManualJournalEntry('${escapeHtml(journal.journalId)}')"
 										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant text-emerald-700">
 										POSTED
 									</button>
