@@ -28684,6 +28684,26 @@ function closeEmployeeHealthDetail() {
 }
 
 
+function openPayEmployeeHealthModal() {
+  const modal = document.getElementById("payEmployeeHealthModal");
+  if (!modal) return;
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  document.body.style.overflow = "hidden";
+}
+
+function closePayEmployeeHealthModal() {
+  const modal = document.getElementById("payEmployeeHealthModal");
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  document.body.style.overflow = "";
+}
+
 
 /* ==== EXPORT EMPLOYEE HEALTH PAYABLE PDF ==== */
 window.exportEmployeeHealthData = async function () {
