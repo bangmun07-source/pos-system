@@ -20806,19 +20806,21 @@
 	                required
 	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
 	            </div>
-	
-	            <div>
-	              <label for="payEmployeeTaxAccount"
-	                class="block text-xs text-muted mb-2">
-	                Payment Account <span class="text-red-500">*</span>
-	              </label>
-	              <select id="payEmployeeTaxAccount"
-	                name="account_id"
-	                required
-	                class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
-	                <option value="">Select cash/bank account</option>
-	              </select>
-	            </div>
+	            <!-- PAYMENT METHOD -->
+				<div>
+				  <label for="payEmployeeTaxMethod"
+				    class="block text-xs text-muted mb-2">
+				    Payment Method <span class="text-red-500">*</span>
+				  </label>
+				
+				  <select id="payEmployeeTaxMethod"
+				    name="payment_method"
+				    required
+				    class="w-full min-h-11 px-3 py-2.5 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-amber-500">
+				    <option value="CASH">Cash</option>
+				    <option value="BANK">Bank</option>
+				  </select>
+				</div>
 	
 	            <div class="md:col-span-2">
 	              <label for="payEmployeeTaxReference"
@@ -20859,7 +20861,7 @@
 	
 	        <button id="submitPayEmployeeTaxButton"
 	          type="submit"
-	          class="h-10 px-5 inline-flex items-center gap-2 bg-amber-500 text-black rounded-md text-sm font-semibold hover:bg-amber-400 transition disabled:opacity-50 disabled:cursor-not-allowed">
+	          class="h-10 px-5 inline-flex items-center gap-2 rounded-md bottom-theme text-sm font-medium">
 	          <span class="material-symbols-outlined text-lg">payments</span>
 	          Pay Tax
 	        </button>
