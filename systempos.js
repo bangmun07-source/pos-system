@@ -37,13 +37,9 @@ let isProcessing = false;
 let memberSearchValue = "";
 let selectedTier = "ALL";
 
-const params =
-  new URLSearchParams(
-    window.location.search
-  );
+const params = new URLSearchParams( window.location.search );
 
-state.tenantSlug =
-  params.get("tenant");
+state.tenantSlug = params.get("tenant");
 	
 function isLoggedIn() {
   return state.user && state.branchId;
@@ -58,10 +54,7 @@ function isKasir() {
 }
 
 function requireBranch() {
-  if (!state.branchId) {
-    navigate("loginPage");
-    return false;
-  }
+  if (!state.branchId) { navigate("loginPage"); return false; }
   return true;
 }
 
@@ -166,10 +159,8 @@ function toggleTheme() {
 	updateMunoLogo();
 }
 
-const MUNO_LOGO_LIGHT =
-  "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20512.png";
-const MUNO_LOGO_DARK =
-  "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png";
+const MUNO_LOGO_LIGHT = "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20DARK%20512.png";
+const MUNO_LOGO_DARK = "https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png";
 
 function updateMunoLogo() {
   const logo = document.getElementById("munoLogo");
@@ -211,18 +202,13 @@ document.addEventListener("click", function (e) {
 	sidebar.style.width = "4rem";
 });
 
-
-
 let billingOpen = false;
-
 function toggleBillingSidebar(mode = "table") {
   const sidebar = document.getElementById("billingSidebar");
   billingOpen = !billingOpen;
-
-  const width =
-    mode === "pos"
-      ? "w-[520px]"
-      : "w-[350px]";
+  const width = mode === "pos"
+		? "w-[520px]"
+		: "w-[350px]";
 
   if (billingOpen) {
     sidebar.classList.remove(
@@ -251,19 +237,14 @@ function toggleBillingSidebar(mode = "table") {
 
 function setActiveCategory(el){
   document.querySelectorAll(".category-btn")
-    .forEach(btn=>{
-      btn.classList.remove("active-category");
-    });
+    .forEach(btn=>{ btn.classList.remove("active-category"); });
   el.classList.add("active-category");
 }
 
 function waitBranch(callback) {
   const check = () => {
-    if (state.branchId) {
-      callback();
-    } else {
-      setTimeout(check, 50);
-    }
+    if (state.branchId) { callback();
+    } else { setTimeout(check, 50); }
   };
   check();
 }
@@ -299,30 +280,23 @@ function formatIDR(value) {
 
 function setValue(id, value) {
   const el = document.getElementById(id);
-  if (el) {
-    el.value = value;
-  }
+  if (el) { el.value = value; }
 }
 
 function setHTML(id, value) {
   const el = document.getElementById(id);
-  if (el) {
-    el.innerHTML = value;
-  }
+  if (el) { el.innerHTML = value; }
 }
 
 function setText(id, value) {
   const el = document.getElementById(id);
-  if (el) {
-    el.innerText = value;
-  }
+  if (el) { el.innerText = value; }
 }
 	
 applyTheme();
 	
 document.addEventListener("DOMContentLoaded", async () => {
   const params = new URLSearchParams(window.location.search);
-
   // 1. CEK PERUBAHAN TENANT (Wajib Login Ulang Jika Tenant Berubah)
   const urlTenant = params.get("tenant") ? params.get("tenant").trim() : null;
   const savedTenant = localStorage.getItem("pos_tenantSlug");
@@ -343,7 +317,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   } else {
     state.tenantSlug = savedTenant || null;
   }
-	
   // 2. CONNECT TENANT (Dengan Fallback Offline yang Aman)
   if (state.tenantSlug) {
     try {
@@ -369,11 +342,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 	// PUBLIC ATTENDANCE SCANNER
 	const path = window.location.pathname.replace(/\/+$/, '');
 	if (path === '/attendance-scan') {
-		window.__ACTIVE_PAGE =
-			'attendanceScanPage';
-		navigate(
-			'attendanceScanPage'
-		);
+		window.__ACTIVE_PAGE = 'attendanceScanPage';
+		navigate( 'attendanceScanPage' );
 		return;
 	}
 	
@@ -381,25 +351,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const page = params.get("page") || window.__ACTIVE_PAGE || null;
   async function bootApp(targetPage = "dashboardPage") {
     const ok = await restoreSession();
-    if (!ok) {
-      navigate("loginPage");
-      return;
-    }
+    if (!ok) { navigate("loginPage"); return; }
 
     const role = state.user?.role?.toLowerCase();
 		if (role === "owner") {
-		  state.branchId =
-		    localStorage.getItem("pos_branchId") || "";
-		} else {
-		  state.branchId =
-		    state.user?.branchId ||
-		    localStorage.getItem("pos_branchId") ||
-		    "";
-		}
-		
-		if (role === "attendance") {
-		  targetPage = "attendancePage";
-		}
+		  state.branchId = localStorage.getItem("pos_branchId") || "";
+		} else { state.branchId = state.user?.branchId || localStorage.getItem("pos_branchId") || ""; }
+		if (role === "attendance") { targetPage = "attendancePage"; }
 		
 		window.__ACTIVE_PAGE = targetPage;
 		navigate(targetPage);
@@ -418,21 +376,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-
-
 async function restoreSession() {
   const user = localStorage.getItem("pos_user");
   const branchId = localStorage.getItem("pos_branchId");
   const loginTenant = localStorage.getItem("pos_login_tenant");
   const sessionId = localStorage.getItem("pos_session_id");
-
   // TIDAK ADA USER
-  if (!user) {
-    return false;
-  }
+  if (!user) { return false; }
 
   const currentTenant = state.tenantSlug || "master";
-
   // SESSION ID TIDAK ADA
   if (!sessionId) {
     localStorage.removeItem("pos_user");
@@ -443,12 +395,8 @@ async function restoreSession() {
     state.branchId = "";
     return false;
   }
-	
   // TENANT BERBEDA
-  if (
-    loginTenant &&
-    loginTenant !== currentTenant
-  ) {
+  if ( loginTenant && loginTenant !== currentTenant ) {
     localStorage.removeItem("pos_user");
     localStorage.removeItem("pos_branchId");
     localStorage.removeItem("pos_login_tenant");
@@ -463,7 +411,6 @@ async function restoreSession() {
     const response =
       await fetch("/api/auth/login", {
         method: "GET",
-
         headers: {
           "x-session-id": sessionId,
           "x-tenant-slug": currentTenant
@@ -471,13 +418,8 @@ async function restoreSession() {
       });
 
     const result = await response.json();
-
     // TENANT INACTIVE / SESSION INVALID
-    if (
-      !response.ok ||
-      !result.success
-    ) {
-
+    if ( !response.ok || !result.success ) {
       localStorage.removeItem("pos_user");
       localStorage.removeItem("pos_branchId");
       localStorage.removeItem("pos_login_tenant");
@@ -485,10 +427,7 @@ async function restoreSession() {
       state.user = null;
       state.branchId = "";
 
-      alert(
-        result.error ||
-        "Session tidak valid atau tenant tidak aktif."
-      );
+      alert( result.error || "Session tidak valid atau tenant tidak aktif." );
       return false;
     }
 
@@ -503,17 +442,9 @@ async function restoreSession() {
     state.branchId =result.user.branchId || "";
     localStorage.setItem("pos_user", JSON.stringify(state.user));
 
-    if (state.branchId) {
-      localStorage.setItem(
-        "pos_branchId",
-        state.branchId
-      );
-    }
-
-    localStorage.setItem(
-      "pos_login_tenant",
-      currentTenant
-    );
+	if (state.branchId) {
+		localStorage.setItem( "pos_branchId", state.branchId ); }
+    localStorage.setItem( "pos_login_tenant", currentTenant );
     return true;
   } catch (error) {
     // Jangan hapus session kalau hanya
@@ -525,35 +456,14 @@ async function restoreSession() {
 }
 
 function navigate(pageId, params = {}) {
-  const role =
-    (
-      state.user?.Role ||
-      state.user?.role ||
-      ""
-    ).toLowerCase();
+  const role = ( state.user?.Role || state.user?.role || "" ).toLowerCase();
 
   if (params.roles) {
-    const allowedRoles =
-      params.roles.map(
-        r => r.toLowerCase()
-      );
-
-    if (
-      !allowedRoles.includes(role)
-    ) {
-      alert(
-        "You do not have permission to access this page."
-      );
-      return;
-    }
-  }
+    const allowedRoles = params.roles.map( r => r.toLowerCase() );
+    if ( !allowedRoles.includes(role) ) { alert( "You do not have permission to access this page." ); return; }}
   // OWNER ONLY PAGE
   const ownerPages = [ "cashFlowPage" ];
-
-  if (
-    ownerPages.includes(pageId) &&
-    role !== "owner"
-  ) { showToast("Access denied"); return; }
+  if ( ownerPages.includes(pageId) && role !== "owner" ) { showToast("Access denied"); return; }
 
   // ACCOUNTING PAGES: OWNER + ACCOUNTANT
   const accountantPages = [
@@ -565,17 +475,12 @@ function navigate(pageId, params = {}) {
     "accountingTransactionsPage",
     "accountingReportsPage"
   ];
-
-  if (
-    accountantPages.includes(pageId) &&
-    !["owner", "accountant"].includes(role)
-  ) { showToast("Access denied"); return; }
+  if ( accountantPages.includes(pageId) && !["owner", "accountant"].includes(role) ) { showToast("Access denied"); return; }
 
   const template = document.getElementById(pageId);
   const app = document.getElementById("app");
-  if (!template || !app) {
-    return;
-  }
+  if (!template || !app) { return; }
+	
   app.innerHTML = "";
   document.querySelectorAll(".page-overlay").forEach(e => e.remove());
   app.appendChild(template.content.cloneNode(true));
@@ -587,50 +492,37 @@ function navigate(pageId, params = {}) {
   // HEADER USER
   const headerUsername = document.getElementById("headerUsername");
   const headerRole = document.getElementById("headerRole");
-	if (headerUsername) {
-	  headerUsername.textContent =
-	    state.user?.Username ||
-	    state.user?.username ||
-	    "-";
+	if (headerUsername) { headerUsername.textContent =
+		state.user?.Username ||
+		state.user?.username ||
+		"-";
 	}
-	
-	if (headerRole) {
-	  headerRole.textContent =
-	    state.user?.Role ||
-	    state.user?.role ||
-	    "-";
+	if (headerRole) { headerRole.textContent =
+		state.user?.Role ||
+		state.user?.role ||
+		"-";
 	}
-
-	
   // MENU BERDASARKAN ROLE
   const userRole = String( state.user?.Role || state.user?.role || "" ).trim().toLowerCase();
-
   // Settings: Owner, Admin, Accountant
   document.querySelectorAll(".settingsMenu").forEach(menu => {
-    menu.style.display =
-      ["owner", "admin", "accountant"].includes(userRole)
-        ? "flex"
-        : "none";
+    menu.style.display = ["owner", "admin", "accountant"].includes(userRole)
+			? "flex"
+			: "none";
   });
-
   // Menu operasional: selain Accountant
   document.querySelectorAll(".operationalMenu").forEach(menu => {
-    menu.style.display =
-      userRole === "accountant" ? "none" : "flex";
+    menu.style.display = userRole === "accountant" ? "none" : "flex";
   });
-
 	// Menu accounting: hanya Owner dan Accountant
 	document.querySelectorAll(".accountingMenu").forEach(menu => {
-	  menu.style.display =
-	    ["owner", "accountant"].includes(userRole)
-	      ? "flex"
-	      : "none";
+	  menu.style.display = ["owner", "accountant"].includes(userRole)
+			? "flex"
+			: "none";
 	});
-
   // Menu khusus Owner
   document.querySelectorAll(".ownerOnly").forEach(menu => {
-    menu.style.display =
-      userRole === "owner" ? "flex" : "none";
+    menu.style.display = userRole === "owner" ? "flex" : "none";
   });
 
   currentPage = pageId;
@@ -694,36 +586,23 @@ async function handleLogin() {
     const loginRole = String(user.role || "")
       .trim()
       .toLowerCase();
-
     if (loginRole === "attendance") {
       navigate("attendancePage");
     } else if (loginRole === "accountant") {
       navigate("settingsPage");
-    } else {
-      navigate("dashboardPage");
-    }
-
+    } else { navigate("dashboardPage"); }
+		
   } catch (err) {
-    if (
-      err instanceof TypeError &&
-      !navigator.onLine
-    ) {
-      alert(
-        "Tidak ada koneksi internet. Login offline belum tersedia."
-      );
-    } else if (
-      err instanceof TypeError
-    ) {
-      alert(
-        "Tidak dapat terhubung ke server. Periksa koneksi dan coba lagi."
-      );
+    if ( err instanceof TypeError && !navigator.onLine ) {
+      alert( "Tidak ada koneksi internet. Login offline belum tersedia." );
+    } else if ( err instanceof TypeError ) {
+      alert( "Tidak dapat terhubung ke server. Periksa koneksi dan coba lagi." );
     } else {
       alert(err.message || "Login gagal.");
     }
   }
 }
 
-	
 function logout() {
   localStorage.removeItem("pos_user");
   localStorage.removeItem( "pos_branchId" );
@@ -732,9 +611,7 @@ function logout() {
   state.branchId = null;
   state.cart = [];
   state.products = [];
-  navigate(
-    "loginPage"
-  );
+  navigate( "loginPage" );
 }
 	
 function initApp() {
@@ -747,52 +624,23 @@ function initApp() {
   if (urlTenant) {
     state.tenantSlug = urlTenant.trim();
     localStorage.setItem("pos_tenantSlug", state.tenantSlug);
-  } else {
-
-    state.tenantSlug =
-      localStorage.getItem(
-        "pos_tenantSlug"
-      ) || "";
-  }
+  } else { state.tenantSlug = localStorage.getItem( "pos_tenantSlug" ) || ""; }
 	
   // USER
   const user = localStorage.getItem("pos_user");
-  if (!user) {
-    navigate(
-      "loginPage"
-    );
-    return;
-  }
+  if (!user) { navigate( "loginPage" ); return; }
 
   state.user = JSON.parse(user);
-  const role =
-    (
-      state.user?.role ||
-      state.user?.Role ||
-      ""
-    ).toLowerCase();
+  const role = ( state.user?.role || state.user?.Role || "" ).toLowerCase();
 
   // BRANCH CONTEXT
   if (role === "owner") {
-    state.branchId =
-      localStorage.getItem(
-        "pos_branchId"
-      ) || "";
-
-  } else {
-    state.branchId =
-      state.user?.branchId ||
-      localStorage.getItem(
-        "pos_branchId"
-      ) ||
-      "";
-  }
-	
+    state.branchId = localStorage.getItem( "pos_branchId" ) || "";
+  } else { state.branchId = state.user?.branchId || localStorage.getItem( "pos_branchId" ) || ""; }
   if (page) {
     window.__ACTIVE_PAGE = page;
     navigate(page);
-    return;
-  }
+    return; }
   navigate("dashboardPage");
 }
 	
@@ -27597,9 +27445,7 @@ function closeEmployeeTaxDetail() {
 	modal.classList.remove("flex");
 }
 
-// ============================================
 // OPEN PAY EMPLOYEE TAX MODAL
-// ============================================
 function payEmployeeTax(taxId) {
 	const tax = employeeTaxData.find(row => String( row.tax_record_id ?? row.tax_id ?? row.id ) === String(taxId) );
 	if (!tax) { if (typeof showToast === "function") { showToast("Data pajak karyawan tidak ditemukan.", "error"); } return; }
@@ -27665,6 +27511,66 @@ function payEmployeeTax(taxId) {
 
 	document.body.classList.add("overflow-hidden");
 }
+
+
+async function submitPayEmployeeTax(event) {
+	event.preventDefault();
+
+	const form = document.getElementById("payEmployeeTaxForm");
+	const submitButton = document.getElementById("submitPayEmployeeTaxButton");
+	const taxRecordId = document.getElementById("payEmployeeTaxRecordIdInput")?.value?.trim();
+	const paymentDate = document.getElementById("payEmployeeTaxDate")?.value;
+	const paymentMethod = document.getElementById("payEmployeeTaxMethod")?.value;
+	const referenceNo = document.getElementById("payEmployeeTaxReference")?.value?.trim() || null;
+	const note = document.getElementById("payEmployeeTaxNote")?.value?.trim() || null;
+
+	if (!taxRecordId) { showToast("Tax Record ID tidak ditemukan.", "error"); return; }
+	if (!paymentDate) { showToast("Tanggal pembayaran wajib diisi.", "error"); return; }
+	if (!["CASH", "BANK"].includes(paymentMethod)) { showToast("Metode pembayaran tidak valid.", "error"); return; }
+	// Cegah pengiriman berulang dari tombol yang sama.
+	if (submitButton?.disabled) return;
+
+	const originalButtonText = submitButton?.textContent;
+	try {
+		if (submitButton) { submitButton.disabled = true; submitButton.textContent = "Memproses..."; }
+		const sessionId = typeof currentSessionId !== "undefined"
+			? currentSessionId
+			: null;
+		if (!sessionId) { throw new Error("Session pengguna tidak ditemukan."); }
+
+		const { data, error } = 
+			await supabase.rpc("pay_employee_tax", {
+				p_session_id: sessionId,
+				p_tax_record_id: taxRecordId,
+				p_payment_date: paymentDate,
+				p_payment_method: paymentMethod,
+				p_reference_no: referenceNo,
+				p_note: note
+			});
+
+		if (error) throw error;
+
+		const result = Array.isArray(data) ? data[0] : data;
+		if (!result?.success) { throw new Error( result?.message || "Pembayaran PPh 21 gagal diproses." ); }
+
+		closePayEmployeeTaxModal();
+
+		showToast( `Pembayaran PPh 21 berhasil. Jurnal: ${result.journal_no || result.journal_id || "-"}`, "success" );
+		// Refresh daftar pajak agar status PAID langsung terlihat.
+		if (typeof loadEmployeeTaxRecords === "function") { await loadEmployeeTaxRecords(); }
+
+	} catch (error) {
+		console.error("Submit Pay Employee Tax Error:", error);
+		showToast( error?.message || "Terjadi kesalahan saat membayar PPh 21.", "error" );
+
+	} finally {
+		if (submitButton) {
+			submitButton.disabled = false;
+			submitButton.textContent = originalButtonText || "Pay Tax";
+		}
+	}
+}
+
 
 // CLOSE PAY EMPLOYEE TAX MODAL
 function closePayEmployeeTaxModal() {
