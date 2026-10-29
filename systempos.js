@@ -2684,42 +2684,38 @@ async function preloadRecipeMap() {
 async function checkout() { 
   const btn = document.getElementById("btnCheckout");
   if (btn?.disabled) return;
-  if (!state.branchId) {
-    alert("Branch tidak valid");
-    return;
-  }
+  if (!state.branchId) { alert("Branch tidak valid"); return; }
   if (isProcessing) return; 
-  const table = state.currentTable || document.getElementById("table-input")?.value;
-  if (!table) return alert("Pilih meja dulu");
-  state.currentTable = table; 
+	
+	const orderType = document.getElementById("order-type")?.value || "dine_in";
+	const tableInput = document.getElementById("table-input");
+	const onlineSource = document.getElementById("online-source");
+	const table = orderType === "dine_in"
+	  ? (tableInput?.value || state.currentTable || "").trim()
+	  : null;
+	
+	if (orderType === "dine_in" && !table) { return alert("Pilih meja dulu"); }
+	if (orderType === "online" && !onlineSource?.value) { return alert("Pilih sumber pesanan online dulu"); }
+	
+	state.currentTable = table;
+
   if (!state.user) return alert("User belum login");
   if (state.cart.length === 0) return alert("Keranjang kosong");
   if (!state.paymentMethod) return alert("Pilih pembayaran");
 
 	// CEK STATUS TABLE
-	try {
-	  const tableData =
-	    await getTableStatus(table);
 	
-	  if (tableData?.status === "occupied") {
-	    alert(
-	      `Table ${table} sedang digunakan. Silakan clear table terlebih dahulu.`
-	    );
-	    return;
-	  }
+	if (orderType === "dine_in") {
+	  try {
+	    const tableData = await getTableStatus(table);
 	
-	  if (tableData?.status === "reserved") {
-	    alert(
-	      `Table ${table} sedang direservasi.`
-	    );
-	    return;
-	  }
-	} catch (error) {
-	  alert(
-	    "Gagal memeriksa status table."
-	  );
-	  return;
+	    if (tableData?.status === "occupied") { alert(`Table ${table} sedang digunakan. Silakan clear table terlebih dahulu.`); return; }
+	    if (tableData?.status === "reserved") { alert(`Table ${table} sedang direservasi.`); return; }
+			
+	  } catch (error) {
+	    alert("Gagal memeriksa status table."); return; }
 	}
+
   isProcessing = true; //  kunci mulai
   if (btn) btn.disabled = true;
   const memberId = state.currentMember ? String(state.currentMember).trim() : null;
@@ -2732,7 +2728,11 @@ async function checkout() {
 		requestId: crypto.randomUUID(),
 		userId: state.user.username,
 		branchId: state.branchId, 
-		mejaId: state.currentTable,
+		mejaId: orderType === "dine_in" ? table : null,
+		orderType: orderType,
+		orderSource: orderType === "online"
+		  ? onlineSource.value
+		  : null,
 		memberId: memberId,
 		pointUsed: totalPointUsed,
 
@@ -2846,6 +2846,19 @@ async function sendTransaction(payload){
 										
 		if(memberInput){ memberInput.value = ""; }
 		if(tableInput){ tableInput.value = ""; }
+		const orderTypeInput = document.getElementById("order-type");
+		const onlineSourceInput = document.getElementById("online-source");
+		
+		if (orderTypeInput) {
+		  orderTypeInput.value = "dine_in";
+		  setOrderType("dine_in");
+		}
+		
+		if (onlineSourceInput) {
+		  onlineSourceInput.value = "";
+		}
+		
+		state.currentTable = "";
 										
 		renderCart();
 		updateSummary(0);
@@ -3062,40 +3075,30 @@ async function loadProducts(callback) {
 	
 	try {
 	  const products =
-	    await getProductsRPC(
-	      branchId,
-	      role
-	    );
+	    await getProductsRPC( branchId, role );
 
 	  state.products = products || [];
 	  state.productsBranchId = branchId;
 	  state.productsRole = role;
 	  loadNotifications();
 	  renderProducts(state.products);
-	  if(callback){
-	    callback();
-	  }
+	  if(callback){ callback(); }
 	}
 	catch(err){
-	  showToast(
-	    "Gagal memuat produk",
-	    "error"
-	  );
+	  showToast( "Gagal memuat produk", "error" );
 	}
 }
     
 function initSearch() {
   const input = document.getElementById("searchInput");
-  if (!input) {
-    return;
-  }
+  if (!input) { return; }
+	
   input.addEventListener("input", function(e) {
     const keyword = e.target.value.toLowerCase();
+	  
     if (!state.products) return;
-    if (!keyword) {
-      renderProducts(state.products);
-      return;
-    }
+    if (!keyword) { renderProducts(state.products); return; }
+	  
     const hasil = state.products.filter(p =>
       (p.Nama_Produk || "").toLowerCase().includes(keyword) ||
       (p.Kategori || "").toLowerCase().includes(keyword)
@@ -3107,11 +3110,8 @@ function initSearch() {
 function filterProducts(category) {
   if (!state.products || state.products.length === 0) return;
   let filtered = state.products;
-  if (category && category !== "All") {
-    filtered = state.products.filter(p =>
-      p.Kategori.toLowerCase() === category.toLowerCase()
-    );
-  }
+  if (category && category !== "All") { filtered = state.products.filter(p => p.Kategori.toLowerCase() === category.toLowerCase() ); }
+	
   renderProducts(filtered); 
 }
 
