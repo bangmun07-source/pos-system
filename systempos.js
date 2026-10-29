@@ -11769,50 +11769,244 @@ async function loadBranchName() {
   }
 }
 
-
 // ORDER SOURCES SETTINGS MODAL
-function openOrderSourcesSettingsModal() {
-  const modal = document.getElementById( "orderSourcesSettingsModal" );
-  if (!modal) { showToast( "Modal Order Sources tidak ditemukan di HTML.", "error" ); return; }
+let orderSourcesData = [];
+
+async function openOrderSourcesSettingsModal() {
+  const modal = document.getElementById("orderSourcesSettingsModal");
+  if (!modal) { showToast("Modal Order Sources tidak ditemukan.", "error"); return; }
 
   modal.classList.remove("hidden");
   modal.classList.add("flex");
 
-  // Tampilkan form dalam keadaan tertutup
-  const form = document.getElementById("orderSourceForm");
-  if (form) form.classList.add("hidden");
+  closeOrderSourceForm();
+  await loadOrderSources();
 }
 
 function closeOrderSourcesSettingsModal() {
-  const modal = document.getElementById( "orderSourcesSettingsModal" );
+  const modal = document.getElementById("orderSourcesSettingsModal");
   if (!modal) return;
 
   modal.classList.add("hidden");
   modal.classList.remove("flex");
-
   closeOrderSourceForm();
 }
 
 function openOrderSourceForm() {
   const form = document.getElementById("orderSourceForm");
-  const title = document.getElementById("orderSourceFormTitle");
-  const id = document.getElementById("orderSourceId");
-  const name = document.getElementById("orderSourceName");
-  const code = document.getElementById("orderSourceCode");
-
   if (!form) return;
-  if (title) title.textContent = "Tambah Sumber Pesanan";
-  if (id) id.value = "";
-  if (name) name.value = "";
-  if (code) code.value = "";
+
+  document.getElementById("orderSourceFormTitle").textContent = "Tambah Sumber Pesanan";
+  document.getElementById("orderSourceId").value = "";
+  document.getElementById("orderSourceName").value = "";
+  document.getElementById("orderSourceCode").value = "";
 
   form.classList.remove("hidden");
-  name?.focus();
+  document.getElementById("orderSourceName")?.focus();
 }
 
 function closeOrderSourceForm() {
-  const form = document.getElementById("orderSourceForm");
-  if (form) form.classList.add("hidden");
+  document.getElementById("orderSourceForm")?.classList.add("hidden");
+}
+
+// ==========================================
+// LOAD ORDER SOURCES
+// ==========================================
+async function loadOrderSources() {
+  const tbody = document.getElementById("orderSourceTableBody");
+  const count = document.getElementById("orderSourceCount");
+
+  if (!tbody) return;
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="4" class="px-4 py-8 text-center text-muted">
+        Memuat data...
+      </td>
+    </tr>`;
+
+  try {
+    const { data, error } = 
+			await supabase.rpc("get_order_sources", {
+	      p_session_id: sessionId
+	    });
+
+    if (error) throw error;
+    // RPC mengembalikan JSON array
+    orderSourcesData = Array.isArray(data) ? data : [];
+
+    if (count) { count.textContent = `${orderSourcesData.length} data`; }
+    if (orderSourcesData.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="px-4 py-8 text-center text-muted">
+            Belum ada sumber pesanan.
+          </td>
+        </tr>`;
+      return;
+    }
+
+    tbody.innerHTML = orderSourcesData.map(item => `
+      <tr class="border-b border-outline-variant">
+        <td class="px-4 py-3 text-foreground"> ${escapeOrderSourceHtml(item.name)} </td>
+        <td class="px-4 py-3 text-muted"> ${escapeOrderSourceHtml(item.code)} </td>
+        <td class="px-4 py-3 text-center">
+          <span class="inline-flex px-2 py-1 rounded text-xs ${
+            item.is_active
+              ? "bg-emerald-500/10 text-emerald-400"
+              : "bg-gray-500/10 text-muted"
+          }">
+            ${item.is_active ? "Aktif" : "Nonaktif"}
+          </span>
+        </td>
+				<td class="px-4 py-3">
+				  <div class="flex items-center justify-center gap-2 flex-wrap">
+				    <button type="button"
+				      onclick="editOrderSource('${item.id}')"
+				      class="px-3 py-1.5 rounded border border-outline-variant text-foreground hover:bg-white/5 text-xs">
+				      Edit
+				    </button>
+				
+				    <button type="button"
+				      onclick="toggleOrderSourceStatus('${item.id}')"
+				      class="px-3 py-1.5 rounded text-xs font-medium ${
+				        item.is_active
+				          ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
+				          : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+				      }">
+				      ${item.is_active ? 'Nonaktifkan' : 'Aktifkan'}
+				    </button>
+				  </div>
+				</td>
+      </tr>
+    `).join("");
+
+  } catch (error) {
+    console.error("loadOrderSources:", error);
+
+    if (count) count.textContent = "—";
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="4" class="px-4 py-8 text-center text-red-400">
+          Gagal memuat data sumber pesanan.
+        </td>
+      </tr>`;
+
+    showToast("Gagal memuat sumber pesanan.", "error");
+  }
+}
+
+// Escape teks agar nama/kode tidak diperlakukan sebagai HTML.
+function escapeOrderSourceHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+// TOGGLE ORDER SOURCE STATUS
+async function toggleOrderSourceStatus(id) {
+  const item = orderSourcesData.find(row => row.id === id);
+  if (!item) { showToast("Sumber pesanan tidak ditemukan.", "error"); return; }
+
+  const nextStatus = !item.is_active;
+  const action = nextStatus ? "mengaktifkan" : "menonaktifkan";
+
+  if (!confirm(`Yakin ingin ${action} sumber "${item.name}"?`)) { return; }
+
+  try {
+    const { error } = await supabase.rpc("set_order_source_status", {
+      p_session_id: sessionId,
+      p_id: id,
+      p_is_active: nextStatus
+    });
+
+    if (error) throw error;
+
+    showToast( nextStatus
+			? "Sumber pesanan berhasil diaktifkan."
+			: "Sumber pesanan berhasil dinonaktifkan.",
+      "success"
+    );
+
+    await loadOrderSources();
+
+  } catch (error) {
+    console.error("toggleOrderSourceStatus:", error);
+    showToast("Gagal mengubah status sumber pesanan.", "error");
+  }
+}
+
+
+// SAVE / EDIT ORDER SOURCE
+async function saveOrderSource() {
+  const id = document.getElementById("orderSourceId")?.value.trim();
+  const name = document.getElementById("orderSourceName")?.value.trim();
+  const codeInput = document.getElementById("orderSourceCode")?.value.trim();
+  const button = document.querySelector( '#orderSourceForm button[onclick="saveOrderSource()"]' );
+
+  if (!name || !codeInput) { showToast("Nama dan kode sumber wajib diisi.", "error"); return; }
+
+  const code = codeInput.toUpperCase().replace(/\s+/g, "_");
+  if (!/^[A-Z0-9_-]+$/.test(code)) { showToast( "Kode hanya boleh berisi huruf, angka, _ atau -.", "error" ); return; }
+
+  try {
+    if (button) button.disabled = true;
+    const { error } = await supabase.rpc("save_order_source", {
+      p_session_id: sessionId,
+      p_name: name,
+      p_code: code,
+      p_id: id || null
+    });
+
+    if (error) throw error;
+
+    showToast(
+      id
+        ? "Sumber pesanan berhasil diperbarui."
+        : "Sumber pesanan berhasil ditambahkan.",
+      "success"
+    );
+
+    closeOrderSourceForm();
+    await loadOrderSources();
+
+  } catch (error) {
+    console.error("saveOrderSource:", error);
+
+    const message = String(error?.message || "");
+
+    if (
+      message.toLowerCase().includes("duplicate") ||
+      message.toLowerCase().includes("already exists") ||
+      message.toLowerCase().includes("sudah digunakan") ||
+      error?.code === "23505"
+    ) {
+      showToast("Kode sumber sudah digunakan.", "error");
+    } else {
+      showToast(
+        "Gagal menyimpan sumber pesanan. Periksa session dan RPC.",
+        "error"
+      );
+    }
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function editOrderSource(id) {
+  const item = orderSourcesData.find(row => row.id === id);
+  if (!item) return;
+
+  document.getElementById("orderSourceFormTitle").textContent = "Edit Sumber Pesanan";
+  document.getElementById("orderSourceId").value = item.id;
+  document.getElementById("orderSourceName").value = item.name ?? "";
+  document.getElementById("orderSourceCode").value = item.code ?? "";
+  document.getElementById("orderSourceForm").classList.remove("hidden");
 }
 	
 	// ==================================
