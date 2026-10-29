@@ -11850,7 +11850,7 @@ async function loadOrderSources() {
         <td class="px-4 py-3 text-foreground"> ${escapeOrderSourceHtml(item.name)} </td>
         <td class="px-4 py-3 text-muted"> ${escapeOrderSourceHtml(item.code)} </td>
         <td class="px-4 py-3 text-center">
-          <span class="inline-flex px-2 py-1 rounded text-xs ${
+          <span class="inline-flex px-2 py-1 rounded-md text-xs ${
             item.is_active
               ? "bg-emerald-500/10 text-emerald-400"
               : "bg-gray-500/10 text-muted"
@@ -11862,13 +11862,13 @@ async function loadOrderSources() {
 				  <div class="flex items-center justify-center gap-2 flex-wrap">
 				    <button type="button"
 				      onclick="editOrderSource('${item.id}')"
-				      class="px-3 py-1.5 rounded border border-outline-variant text-foreground hover:bg-white/5 text-xs">
+				      class="px-3 py-1.5 text-muted hover:text-foreground text-xs">
 				      Edit
 				    </button>
 				
 				    <button type="button"
 				      onclick="toggleOrderSourceStatus('${item.id}')"
-				      class="px-3 py-1.5 rounded text-xs font-medium ${
+				      class="px-3 py-1.5 rounded-md text-xs font-medium ${
 				        item.is_active
 				          ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
 				          : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
