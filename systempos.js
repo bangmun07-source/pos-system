@@ -11826,7 +11826,7 @@ async function loadOrderSources() {
 
   try {
     const { data, error } = 
-			await supabase.rpc("get_order_sources", {
+			await supabaseClient.rpc("get_order_sources", {
 	      p_session_id: sessionId
 	    });
 
@@ -11882,9 +11882,7 @@ async function loadOrderSources() {
 
   } catch (error) {
     console.error("loadOrderSources:", error);
-
     if (count) count.textContent = "—";
-
     tbody.innerHTML = `
       <tr>
         <td colspan="4" class="px-4 py-8 text-center text-red-400">
@@ -11919,7 +11917,7 @@ async function toggleOrderSourceStatus(id) {
   if (!confirm(`Yakin ingin ${action} sumber "${item.name}"?`)) { return; }
 
   try {
-    const { error } = await supabase.rpc("set_order_source_status", {
+    const { error } = await supabaseClient.rpc("set_order_source_status", {
       p_session_id: sessionId,
       p_id: id,
       p_is_active: nextStatus
@@ -11956,7 +11954,7 @@ async function saveOrderSource() {
 
   try {
     if (button) button.disabled = true;
-    const { error } = await supabase.rpc("save_order_source", {
+    const { error } = await supabaseClient.rpc("save_order_source", {
       p_session_id: sessionId,
       p_name: name,
       p_code: code,
