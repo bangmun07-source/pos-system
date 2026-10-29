@@ -11717,10 +11717,7 @@ async function saveBusinessProfile() {
 	
     // SAVE PROFILE VIA RPC
     const result = await saveBusinessProfileRPC(  data );
-    // CHECK RPC
-    if ( result && result.success === false ) {
-      throw new Error( result.message || "Gagal menyimpan profile" );
-    }
+    if ( result && result.success === false ) { throw new Error( result.message || "Gagal menyimpan profile" ); }
     // UPDATE STATE
     state.businessProfile = {
       ...(state.businessProfile || {}),
@@ -11729,11 +11726,9 @@ async function saveBusinessProfile() {
       receipt_footer: data.receipt_footer,
       logo_url: data.logo_url
     };
-    // UPDATE UI
+
     applyBusinessProfile( state.businessProfile );
-    // CLEAR FILE INPUT
     if (logoInput) { logoInput.value = ""; }
-    // SUCCESS
     showToast( "Business Profile berhasil disimpan", "success" );
   }
   catch (err) {
@@ -11756,9 +11751,7 @@ async function loadBranchName() {
   try {
     // SUPABASE RPC
     const data = await getBranchInfoRPC( state.branchId );
-    // SAVE STATE
     state.branchInfo = data || { branchName: "SISTEM KASIR" };
-    // APPLY UI
     const el = document.getElementById( "appBrandName" );
     if (el) { el.innerText = ( state.branchInfo.branchName || "SISTEM KASIR" ).toUpperCase(); }
   }
