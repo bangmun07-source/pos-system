@@ -2399,7 +2399,7 @@
         <div class="p-8 pb-4">
           <!-- ORDER TYPE -->
           <div class="mb-4">
-            <label class="text-muted text-[10px] lg:text-xs font-bold headline-font uppercase tracking-wider mb-2 block">
+            <label class="text-muted text-xs lg:text-sm font-medium headline-font uppercase tracking-wider mb-2 block">
               Order Type
             </label>
 
@@ -2610,15 +2610,17 @@
 
         const active = key === type;
 
-        button.classList.toggle('border-primary', active);
-        button.classList.toggle('bg-primary/10', active);
-        button.classList.toggle('text-primary', active);
-
-        button.classList.toggle('border-outline-variant', !active);
-        button.classList.toggle('text-muted', !active);
-        button.classList.toggle('bg-transparent', !active);
-
-        button.setAttribute('aria-pressed', String(active));
+				button.classList.remove(
+					'border-outline-variant',
+					'text-muted',
+					'text-foreground',
+					'bg-transparent',
+					'btn-active',
+					'btn-inactive'
+				);
+				
+				button.classList.add(active ? 'btn-active' : 'btn-inactive');
+				button.setAttribute('aria-pressed', String(active));
       });
 
       // Clear the old table when switching away from Dine In.
