@@ -778,6 +778,7 @@ function initModule(pageId) {
 				loadLoyaltySettings();
         preloadRecipeMap();
         loadRecipes(state.branchId);
+				loadOrderSourcesDropdown();
       });
     break;
 		  
@@ -2854,19 +2855,14 @@ async function sendTransaction(payload){
 		  setOrderType("dine_in");
 		}
 		
-		if (onlineSourceInput) {
-		  onlineSourceInput.value = "";
-		}
+		if (onlineSourceInput) { onlineSourceInput.value = ""; }
 		
 		state.currentTable = "";
 										
 		renderCart();
 		updateSummary(0);
 	  } else{
-			showToast(
-				"Gagal: " + res.message,
-				"error"
-      );
+			showToast( "Gagal: " + res.message, "error" );
     }
   } catch(err){
     isProcessing = false;
@@ -2877,6 +2873,45 @@ async function sendTransaction(payload){
     alert( err.message || "Error server!" );
   }
 }
+
+
+async function loadOrderSourcesDropdown() {
+  const select = document.getElementById("online-source");
+  if (!select) return;
+
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) return;
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "get_order_sources",
+      { p_session_id: sessionId }
+    );
+
+    if (error) throw error;
+
+    const currentValue = select.value;
+
+    select.innerHTML = '<option value="">Pilih sumber pesanan</option>';
+
+    (Array.isArray(data) ? data : [])
+      .filter(source => source.is_active === true)
+      .forEach(source => {
+        const option = document.createElement("option");
+        option.value = source.code;
+        option.textContent = source.name;
+        select.appendChild(option);
+      });
+
+    if ([...select.options].some(option => option.value === currentValue)) {
+      select.value = currentValue;
+    }
+  } catch (error) {
+    console.error("loadOrderSourcesDropdown:", error);
+    showToast("Gagal memuat sumber pesanan online.", "error");
+  }
+}
+
 
 function setTable(value) {
   state.currentTable = value.trim();
