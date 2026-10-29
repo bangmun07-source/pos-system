@@ -6684,21 +6684,220 @@
 		</div>
 	</section>
 		  
-	<!-- Footer Copyright -->
-		<footer class="mt-12 flex justify-between items-center surface-variant text-xs font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-outline-variant pt-12 px-10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-			<div class="flex items-center gap-2">
-				<span class="w-2 h-2 rounded-md bg-emerald-600 animate-pulse"></span>
-				MUNO Kasir v2.4.0-Stable
-			</div>
-			<div class="flex gap-8 text-[8px] text-muted ">
-				<a class="hover:text-on-surface transition-colors" onclick="navigate('privacyPolicyPage')">Privacy Policy</a>
-				<a class="hover:text-on-surface transition-colors" onclick="navigate('licenseAgreementPage')">License Agreement</a>
-				<a class="hover:text-on-surface transition-colors" onclick="navigate('documentationPage')">Documentation</a>
-				<a class="hover:text-on-surface transition-colors" onclick="navigate('businesscardPage')">Support Center</a>
-			</div>
-		</footer>
-	</main>
-</div>
+	<!-- ORDER SOURCES SETTINGS -->
+	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-8">
+	  <div class="flex items-center justify-between gap-4">
+	    <div class="flex items-center gap-4">
+	      <div class="main-icon-box">
+	        <span class="material-symbols-outlined text-3xl"
+	              style="font-variation-settings:'FILL' 1;">
+	          shopping_bag
+	        </span>
+	      </div>
+	
+	      <div>
+	        <h2 class="text-lg font-bold font-headline text-foreground">
+	          Order Sources
+	        </h2>
+	        <p class="text-xs text-muted mt-1">
+	          Kelola sumber pesanan online seperti GoFood, GrabFood, dan ShopeeFood.
+	        </p>
+	      </div>
+	    </div>
+	
+	    <button
+	      type="button"
+	      onclick="openOrderSourcesSettingsModal()"
+	      class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	      <span class="material-symbols-outlined text-sm">settings</span>
+	      Kelola Sumber
+	    </button>
+	  </div>
+	</section>
+
+		<!-- Footer Copyright -->
+			<footer class="mt-12 flex justify-between items-center surface-variant text-xs font-bold tracking-widest uppercase pb-12 bg-background rounded-md border border-outline-variant pt-12 px-10 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+				<div class="flex items-center gap-2">
+					<span class="w-2 h-2 rounded-md bg-emerald-600 animate-pulse"></span>
+					MUNO Kasir v2.4.0-Stable
+				</div>
+				<div class="flex gap-8 text-[8px] text-muted ">
+					<a class="hover:text-on-surface transition-colors" onclick="navigate('privacyPolicyPage')">Privacy Policy</a>
+					<a class="hover:text-on-surface transition-colors" onclick="navigate('licenseAgreementPage')">License Agreement</a>
+					<a class="hover:text-on-surface transition-colors" onclick="navigate('documentationPage')">Documentation</a>
+					<a class="hover:text-on-surface transition-colors" onclick="navigate('businesscardPage')">Support Center</a>
+				</div>
+			</footer>
+		</main>
+	</div>
+
+	<!-- ===== ORDER SOURCES SETTINGS MODAL ===== -->
+	<div id="orderSourcesSettingsModal"
+	  class="fixed inset-0 z-[120] hidden items-center justify-center bg-background p-4">
+	  <div class="w-full max-w-4xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between gap-4 shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl"
+	            style="font-variation-settings:'FILL' 1;">
+	            store
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Pengaturan Order Sources
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Kelola sumber pesanan untuk transaksi Online.
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeOrderSourcesSettingsModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 overflow-y-auto custom-scrollbar space-y-5">
+	      <!-- DESCRIPTION + ADD BUTTON -->
+	      <div class="flex items-center justify-between gap-3 flex-wrap">
+	        <div>
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Daftar Sumber Pesanan
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Tambahkan platform atau sumber pesanan sesuai kebutuhan outlet.
+	          </p>
+	        </div>
+	
+	        <button type="button"
+	          onclick="openOrderSourceForm()"
+	          class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
+	          <span class="material-symbols-outlined text-sm">add</span>
+	          Tambah
+	        </button>
+	      </div>
+	
+	      <!-- ADD / EDIT FORM -->
+	      <div id="orderSourceForm"
+	        class="hidden border border-outline-variant rounded-md p-4 space-y-4">
+	        <div class="flex items-center justify-between gap-3">
+	          <h3 id="orderSourceFormTitle"
+	            class="text-sm font-semibold text-foreground">
+	            Tambah Sumber Pesanan
+	          </h3>
+	
+	          <button type="button"
+	            onclick="closeOrderSourceForm()"
+	            class="w-8 h-8 text-muted hover:text-foreground">
+	            <span class="material-symbols-outlined">close</span>
+	          </button>
+	        </div>
+	
+	        <input id="orderSourceId" type="hidden">
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	          <div>
+	            <label for="orderSourceName"
+	              class="block text-sm font-medium text-foreground mb-2">
+	              Nama Sumber
+	            </label>
+	            <input id="orderSourceName"
+	              type="text"
+	              maxlength="100"
+	              required
+	              autocomplete="off"
+	              placeholder="Contoh: GoFood"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-outline-variant">
+	          </div>
+	
+	          <div>
+	            <label for="orderSourceCode"
+	              class="block text-sm font-medium text-foreground mb-2">
+	              Kode Sumber
+	            </label>
+	            <input id="orderSourceCode"
+	              type="text"
+	              maxlength="100"
+	              required
+	              autocomplete="off"
+	              placeholder="Contoh: gofood"
+	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-outline-variant">
+	            <p class="text-xs text-muted mt-1.5">
+	              Gunakan kode unik tanpa spasi, misalnya gofood.
+	            </p>
+	          </div>
+	        </div>
+	
+	        <div class="flex justify-end gap-2 pt-2">
+	          <button type="button"
+	            onclick="closeOrderSourceForm()"
+	            class="h-10 px-4 text-sm text-muted hover:text-foreground">
+	            Batal
+	          </button>
+	
+	          <button type="button"
+	            onclick="saveOrderSource()"
+	            class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+	            <span class="material-symbols-outlined text-sm">save</span>
+	            Simpan
+	          </button>
+	        </div>
+	      </div>
+	      <!-- SOURCE TABLE -->
+	      <div class="border border-outline-variant rounded-md overflow-hidden">
+	        <div class="p-4 border-b border-outline-variant flex items-center justify-between gap-3">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Sumber Pesanan
+	          </h3>
+	
+	          <span id="orderSourceCount" class="text-xs text-muted">
+	            0 data
+	          </span>
+	        </div>
+	
+	        <div class="overflow-x-auto custom-scrollbar">
+	          <table class="w-full text-sm">
+	            <thead>
+	              <tr class="border-b border-outline-variant text-xs uppercase tracking-wider text-muted">
+	                <th class="px-4 py-3 text-left">Nama Sumber</th>
+	                <th class="px-4 py-3 text-left">Kode</th>
+	                <th class="px-4 py-3 text-center">Status</th>
+	                <th class="px-4 py-3 text-center">Aksi</th>
+	              </tr>
+	            </thead>
+	
+	            <tbody id="orderSourceTableBody"
+	              class="divide-y divide-outline-variant">
+	              <tr>
+	                <td colspan="4"
+	                  class="px-4 py-8 text-center text-muted">
+	                  Data sumber pesanan akan dimuat dari database.
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-between gap-3 shrink-0">
+	      <p class="text-xs text-muted">
+	        Pengaturan sumber pesanan khusus Owner.
+	      </p>
+	
+	      <button type="button"
+	        onclick="closeOrderSourcesSettingsModal()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Tutup
+	      </button>
+	    </div>
+	  </div>
+	</div>
 </template>
 
 
