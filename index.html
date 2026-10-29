@@ -2419,7 +2419,7 @@
                 type="button"
                 aria-pressed="true"
                 onclick="setOrderType('dine_in')"
-                class="order-type-button flex flex-col sm:flex-row items-center justify-center gap-1.5 rounded-md border border-primary bg-primary/10 text-primary px-2 py-2.5 text-[10px] lg:text-xs font-semibold transition-all">
+                class="order-type-button gap-1.5 rounded-md bg-background text-muted border border-outline-variant flex items-center justify-center transition-all hover:text-foreground text-xs px-2 py-2.5">
 
                 <span class="material-symbols-outlined text-lg">restaurant</span>
                 <span>Dine In</span>
@@ -2429,7 +2429,7 @@
                 type="button"
                 aria-pressed="false"
                 onclick="setOrderType('take_away')"
-                class="order-type-button flex flex-col sm:flex-row items-center justify-center gap-1.5 rounded-md border border-outline-variant bg-transparent text-muted px-2 py-2.5 text-[10px] lg:text-xs font-semibold transition-all hover:text-foreground">
+                class="order-type-button gap-1.5 rounded-md bg-background text-muted border border-outline-variant flex items-center justify-center transition-all hover:text-foreground text-xs px-2 py-2.5">
 
                 <span class="material-symbols-outlined text-lg">shopping_bag</span>
                 <span>Take Away</span>
@@ -2439,7 +2439,7 @@
                 type="button"
                 aria-pressed="false"
                 onclick="setOrderType('online')"
-                class="order-type-button flex flex-col sm:flex-row items-center justify-center gap-1.5 rounded-md border border-outline-variant bg-transparent text-muted px-2 py-2.5 text-[10px] lg:text-xs font-semibold transition-all hover:text-foreground">
+                class="order-type-button gap-1.5 rounded-md bg-background text-muted border border-outline-variant flex items-center justify-center transition-all hover:text-foreground text-xs px-2 py-2.5">
 
                 <span class="material-symbols-outlined text-lg">smartphone</span>
                 <span>Online</span>
@@ -2482,14 +2482,11 @@
                 storefront
               </span>
 
-              <select id="online-source"
-                class="w-full appearance-none bg-transparent border border-outline-variant rounded-md py-2.5 pl-10 pr-8 text-xs lg:text-sm focus:ring-1 focus:white">
-
-                <option value="gofood">GoFood</option>
-                <option value="grabfood">GrabFood</option>
-                <option value="shopeefood">ShopeeFood</option>
-                <option value="other">Lainnya</option>
-              </select>
+							<select
+							  id="online-source"
+							  class="w-full appearance-none bg-background border border-outline-variant rounded-md py-2.5 pl-10 pr-8 text-xs lg:text-sm focus:ring-1 focus:white">
+							  <option value="">Pilih sumber pesanan</option>
+							</select>
 
               <span class="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
                 expand_more
