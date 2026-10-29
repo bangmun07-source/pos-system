@@ -10654,26 +10654,11 @@ async function exportAnalyticsPDF() {
     return;
   }
 	
-  if (!branchId) {
-    alert(
-      "Branch tidak valid"
-    );
-    return;
-  }
+  if (!branchId) { alert( "Branch tidak valid" ); return; }
 
   // OPEN TAB
-  const pdfTab =
-    window.open(
-      "",
-      "_blank"
-    );
-
-  if (!pdfTab) {
-    alert(
-      "Popup diblokir browser"
-    );
-    return;
-  }
+  const pdfTab = window.open( "", "_blank" );
+  if (!pdfTab) { alert( "Popup diblokir browser" ); return; }
 
   // LOADING PAGE
   pdfTab.document.write(`
@@ -10730,14 +10715,10 @@ async function exportAnalyticsPDF() {
   pdfTab.document.close();
   // CALL VERCEL API
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
-    const response =
-      await fetch("/api/export-pdf", {
+		const sessionId = localStorage.getItem("pos_session_id");
+    const response = await fetch("/api/export-pdf", {
 		  method: "POST",
-		  headers: {
-			"Content-Type": "application/json"
-		  },
+		  headers: { "Content-Type": "application/json" },
 		  body: JSON.stringify({
 			type: "analytics",
 			start,
@@ -10751,36 +10732,24 @@ async function exportAnalyticsPDF() {
     // HTTP ERROR
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(
-        errorText ||
-        `Export gagal (${response.status})`
-      );
-    }
+      throw new Error( errorText || `Export gagal (${response.status})` ); 
+		}
 
     // API RETURN
     const result = await response.text();
-    if (!result) {
-      throw new Error(
-        "Server tidak mengembalikan hasil PDF"
-      );
-    }
+    if (!result) { throw new Error( "Server tidak mengembalikan hasil PDF" ); }
 
     // JIKA API RETURN URL
     if (
       result.startsWith("http://") ||
       result.startsWith("https://") ||
       result.startsWith("/")
-    ) {
-      pdfTab.location.href = result;
-      return;
-    }
-
+    ) { pdfTab.location.href = result; return; }
     // JIKA API RETURN HTML
     pdfTab.document.open();
     pdfTab.document.write(result);
     pdfTab.document.close();
   }
-
   // ERROR
   catch(err) {
     pdfTab.document.open();
@@ -10800,16 +10769,13 @@ async function exportAnalyticsPDF() {
 			        <p style="color:#aaa;">
 			          Gagal membuat Analytics Report.
 			        </p>
-			
+
 			        <pre style="
 			          white-space:pre-wrap;
 			          background:#151A21;
 			          padding:15px;
-			          border-radius:10px;
-			        ">${String(
-			          err?.message ||
-			          err
-			        )}</pre>
+			          border-radius:10px; ">
+								${String( err?.message || err )}</pre>
 		      </body>
 	      </html>
     `);
@@ -10822,17 +10788,15 @@ async function exportAnalyticsPDF() {
 	// SETTINGS
 	// ==================================
 
-	
 function reloadCurrentPage() {
   initModule(currentPage);
 }
 
 function applySettingsPage(data) {
   // update state/cache
-  state.settings = data.settings || {};
- if (data.businessProfile) {
-	  state.businessProfile =
-	    data.businessProfile;
+	state.settings = data.settings || {};
+ 	if (data.businessProfile) {
+	  state.businessProfile = data.businessProfile;
 	}
   // update branch
   window.branchData = data.branches || [];
@@ -10859,15 +10823,10 @@ function applyUserBranchAccess() {
   const role = String(state.user?.role || "").toLowerCase();
   const userBranchId = String(state.user?.branchId || "").trim();
 
-  if (role === "owner") {
-    filteredUsers = [...allUsers];
-    return;
-  }
+  if (role === "owner") { filteredUsers = [...allUsers]; return; }
 
   filteredUsers = (allUsers || []).filter(user => {
-    const userBranchIdData = String(
-      user.branchId ?? user.branch_id ?? ""
-    ).trim();
+    const userBranchIdData = String( user.branchId ?? user.branch_id ?? "" ).trim();
 
     return userBranchIdData === userBranchId;
   });
@@ -10876,9 +10835,7 @@ function applyUserBranchAccess() {
 async function loadSettingsPage() {
   // CACHE
   if (state.settingsPageData) {
-    applySettingsPage(
-      state.settingsPageData
-    );
+    applySettingsPage( state.settingsPageData );
     initBusinessProfile();
     return;
   }
@@ -10887,13 +10844,12 @@ async function loadSettingsPage() {
     // SUPABASE RPC
     const data = await getSettingsPageDataRPC();
     // NORMALIZE RESPONSE
-    const result =
-      data || {
-        settings: {},
-        loyalty: {},
-        branch: {},
-        users: []
-      };
+    const result = data || {
+			settings: {},
+			loyalty: {},
+			branch: {},
+			users: []
+		};
 		
     // CACHE
     state.settingsPageData = result;
@@ -10902,11 +10858,7 @@ async function loadSettingsPage() {
     await loadBusinessProfile();
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat Settings.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat Settings.", "error" );
   }
 }
 	
@@ -10914,30 +10866,20 @@ async function reloadSettingsPage() {
 
   try {
     // SUPABASE RPC
-    const data =
-      await getSettingsPageDataRPC();
-
+    const data = await getSettingsPageDataRPC();
     // UPDATE STATE
-    state.settingsPageData =
-      data || {
-        settings: {},
-        loyalty: {},
-        branch: {},
-        users: []
-      };
+    state.settingsPageData = data || {
+			settings: {},
+			loyalty: {},
+			branch: {},
+			users: []
+		};
 
     // APPLY UI
-    applySettingsPage(
-      state.settingsPageData
-    );
+    applySettingsPage( state.settingsPageData );
   }
-
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal reload Settings.",
-      "error"
-    );
+    showToast( err?.message || "Gagal reload Settings.", "error" );
   }
 }
 
@@ -10947,11 +10889,7 @@ function loadBranchSelector(branches) {
   const role = state.user.role;
   // OWNER
   if (role === "Owner") {
-    select.innerHTML = branches.map(b => `
-      <option value="${b.branchId}">
-        ${b.branchName}
-      </option>
-    `).join("");
+    select.innerHTML = branches.map(b => ` <option value="${b.branchId}"> ${b.branchName} </option> `).join("");
     // default
 	    select.value = state.branchId;
 	    select.disabled = false;
@@ -10962,14 +10900,11 @@ function loadBranchSelector(branches) {
   } 
   // ADMIN / CASHIER
   else {
-    const userBranch = branches.find(
-      b => b.branchId === state.user.branchId
-    );
+    const userBranch = branches.find( b => b.branchId === state.user.branchId );
     select.innerHTML = `
-      <option value="${state.user.branchId}">
-        ${userBranch 
-          ? userBranch.branchName 
-          : state.user.branchId}
+      <option value="${state.user.branchId}"> ${userBranch 
+				? userBranch.branchName 
+				: state.user.branchId}
       </option>
     `;
     select.value = state.user.branchId;
@@ -11000,15 +10935,8 @@ function renderBranchTable(){
           <div class="font-bold text-on-surface">${b.branchName}</div>
           <div class="text-[10px] text-muted ">${b.branchId}</div>
         </td>
-
-        <td class="py-5 px-4 text-md text-on-surface font-bold">
-          ${b.manager || "-"}
-        </td>
-
-        <td class="py-5 px-4 text-sm text-muted">
-          ${b.alamat || "-"}
-        </td>
-
+        <td class="py-5 px-4 text-md text-on-surface font-bold"> ${b.manager || "-"} </td>
+        <td class="py-5 px-4 text-sm text-muted"> ${b.alamat || "-"} </td>
         <td class="py-5 px-4 text-center">
           <label class="relative inline-flex items-center cursor-pointer">
             <input
@@ -11038,7 +10966,6 @@ function renderBranchTable(){
           <div class="flex justify-end gap-2">
             <button onclick="openEditBranchModal('${b.branchId}')"
               class="w-9 h-9 hover:bottom-theme transition rounded-md">
-
               <span class="material-symbols-outlined text-sm">
                 edit
               </span>
@@ -11055,6 +10982,7 @@ function renderBranchTable(){
 function renderBranchPagination() {
   const pagination = document.getElementById("branchPagination");
   if (!pagination) return;
+	
   const totalData = allBranches.length;
   const totalPages = Math.ceil(totalData / branchPerPage);
   // Info Showing
@@ -11112,126 +11040,68 @@ function openAddBranchModal(){
 
 function closeAddBranchModal(){
   const modal = document.getElementById("addBranchModal");
-  if(modal){
-    modal.remove();
-  }
+  if(modal){ modal.remove(); }
 }
 
 async function saveNewBranch() {
   const data = {
-    branchName:
-      document
-        .getElementById("newBranchName")
-        ?.value
-        ?.trim() || "",
-    manager:
-      document
-        .getElementById("newBranchManager")
-        ?.value
-        ?.trim() || "",
-    phone:
-      document
-        .getElementById("newBranchPhone")
-        ?.value
-        ?.trim() || "",
-    alamat:
-      document
-        .getElementById("newBranchAddress")
-        ?.value
-        ?.trim() || ""
+    branchName: document .getElementById("newBranchName")
+			?.value
+			?.trim() || "",
+    manager: document .getElementById("newBranchManager")
+			?.value
+			?.trim() || "",
+    phone: document .getElementById("newBranchPhone")
+			?.value
+			?.trim() || "",
+    alamat: document .getElementById("newBranchAddress")
+			?.value
+			?.trim() || ""
   };
-  if (!data.branchName) {
-    alert(
-      "Branch Name wajib diisi."
-    );
-    return;
-  }
-  if (!data.manager) {
-    alert(
-      "Manager wajib diisi."
-    );
-    return;
-  }
-  if (!data.alamat) {
-    alert(
-      "Address wajib diisi."
-    );
-    return;
-  }
+  if (!data.branchName) { alert( "Branch Name wajib diisi." ); return; }
+  if (!data.manager) { alert( "Manager wajib diisi." ); return; }
+  if (!data.alamat) { alert( "Address wajib diisi." ); return; }
 
   try {
     // SUPABASE RPC
-    const res =
-      await addNewBranchRPC(
-        data
-      );
-
+    const res = await addNewBranchRPC( data );
     // HANDLE RESPONSE
-    if (!res?.success) {
-      alert(
-        res?.message ||
-        "Gagal menambahkan outlet."
-      );
-      return;
-    }
+    if (!res?.success) { alert( res?.message || "Gagal menambahkan outlet." ); return; }
+		
     closeAddBranchModal();
     state.settingsPageData = null;
     await reloadSettingsPage();
-    showToast(
-      "Outlet berhasil ditambahkan."
-    );
+    showToast( "Outlet berhasil ditambahkan." );
   }
 
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menambahkan outlet."
-    );
+    alert( err?.message || "Gagal menambahkan outlet." );
   }
 }
 
 async function toggleBranchStatus(branchId, status) {
   try {
     // SUPABASE RPC
-    const res =
-      await updateBranchStatusRPC(
-        branchId,
-        status
-      );
-
+    const res = await updateBranchStatusRPC( branchId, status );
     // HANDLE RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-      throw new Error(
-        res.message ||
-        "Gagal mengubah status outlet."
-      );
-    }
+    if ( res && res.success === false
+    ) { throw new Error( res.message || "Gagal mengubah status outlet." );}
 
     // CLEAR STATE
     state.settingsPageData = null;
     await reloadSettingsPage();
-    showToast(
-      "Status outlet berhasil diubah"
-    );
+    showToast( "Status outlet berhasil diubah" );
   }
 
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal mengubah status outlet",
-      "error"
-    );
+    showToast( err?.message || "Gagal mengubah status outlet", "error" );
   }
 }
 
 function openEditBranchModal(branchId){
-  const branch = window.branchData.find(
-    x => String(x.branchId) === String(branchId)
-  );
+  const branch = window.branchData.find( x => String(x.branchId) === String(branchId) );
   if(!branch) return;
+	
   openModal("editBranchModal");
   document.getElementById("editBranchId").value = branch.branchId;
   document.getElementById("editBranchName").value = branch.branchName;
@@ -11241,26 +11111,18 @@ function openEditBranchModal(branchId){
 
 async function saveEditBranch() {
   const data = {
-    branchId:
-      document
-        .getElementById("editBranchId")
-        ?.value
-        ?.trim() || "",
-    branchName:
-      document
-        .getElementById("editBranchName")
-        ?.value
-        ?.trim() || "",
-    manager:
-      document
-        .getElementById("editBranchManager")
-        ?.value
-        ?.trim() || "",
-    alamat:
-      document
-        .getElementById("editBranchAddress")
-        ?.value
-        ?.trim() || ""
+    branchId: document .getElementById("editBranchId")
+			?.value
+			?.trim() || "",
+    branchName: document .getElementById("editBranchName")
+			?.value
+			?.trim() || "",
+    manager: document .getElementById("editBranchManager")
+			?.value
+			?.trim() || "",
+    alamat: document .getElementById("editBranchAddress")
+			?.value
+			?.trim() || ""
   };
 
   if (!data.branchName) { alert( "Branch Name wajib diisi." ); return; }
@@ -11275,67 +11137,36 @@ async function saveEditBranch() {
       );
 
     // HANDLE RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-      alert(
-        res.message ||
-        "Gagal memperbarui outlet."
-      );
-      return;
-    }
+    if ( res && res.success === false
+    ) { alert( res.message || "Gagal memperbarui outlet." ); return; }
+		
     closeEditBranchModal();
     state.settingsPageData = null;
+		
     await reloadSettingsPage();
-    showToast(
-      "Outlet berhasil diperbarui."
-    );
+    showToast( "Outlet berhasil diperbarui." );
   }
 
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal memperbarui outlet."
-    );
+    alert( err?.message || "Gagal memperbarui outlet." );
   }
 }
 
 function closeEditBranchModal(){
   const modal = document.getElementById("editBranchModal");
-  if(modal){
-    modal.remove();
-  }
+  if(modal){ modal.remove(); }
 }
 
 async function saveTaxSettings() {
   const data = {
-    tax:
-      Number(
-        document
-          .getElementById("taxInput")
-          ?.value
-      ) || 0,
-    service:
-      Number(
-        document
-          .getElementById("serviceInput")
-          ?.value
-      ) || 0,
-    discount:
-      Number(
-        document
-          .getElementById("discountInput")
-          ?.value
-      ) || 0
+    tax: Number( document .getElementById("taxInput") ?.value ) || 0,
+    service: Number( document .getElementById("serviceInput") ?.value ) || 0,
+    discount: Number( document .getElementById("discountInput") ?.value ) || 0
   };
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data: result,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data: result, error
     } = await supabaseClient.rpc(
       "save_settings",
       {
@@ -11344,21 +11175,14 @@ async function saveTaxSettings() {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
+		
     state.settingsPageData = null;
     await reloadSettingsPage();
-    alert(
-      "Settings saved!"
-    );
+    alert( "Settings saved!" );
   }
-
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menyimpan settings."
-    );
+    alert( err?.message || "Gagal menyimpan settings." );
   }
 }
 
@@ -11399,44 +11223,28 @@ function loadUserFilterOptions() {
           </option>
         `;
       });
-
     // ADMIN → hanya outlet miliknya
     } else if (currentRole === "admin") {
-      const userBranch = (allBranches || []).find(
-        branch =>
-          String(branch.branchId).trim() === userBranchId
-      );
+      const userBranch = (allBranches || []).find( branch => String(branch.branchId).trim() === userBranchId );
 
       branchSelect.innerHTML = `
-        <option value="${userBranchId}">
-          ${userBranch ? userBranch.branchName : userBranchId}
-        </option>
+        <option value="${userBranchId}"> ${userBranch ? userBranch.branchName : userBranchId} </option>
       `;
-
       branchSelect.value = userBranchId;
       branchSelect.disabled = true;
-
     // ROLE LAIN → hanya outlet miliknya
     } else {
       branchSelect.innerHTML = `
-        <option value="${userBranchId}">
-          ${userBranchId}
-        </option>
+        <option value="${userBranchId}"> ${userBranchId} </option>
       `;
-
       branchSelect.value = userBranchId;
       branchSelect.disabled = true;
     }
-
     // Pertahankan pilihan outlet OWNER
     if (
       currentBranch &&
-      [...branchSelect.options].some(
-        option => option.value === currentBranch
-      )
-    ) {
-      branchSelect.value = currentBranch;
-    }
+      [...branchSelect.options].some( option => option.value === currentBranch )
+    ) { branchSelect.value = currentBranch; }
   }
 
   if (roleSelect) {
@@ -11451,14 +11259,9 @@ function loadUserFilterOptions() {
       <option value="Attendance">Attendance</option>
     `;
 
-    if (
-      currentRole &&
-      [...roleSelect.options].some(
-        option => option.value === currentRole
-      )
-    ) {
-      roleSelect.value = currentRole;
-    }
+    if ( currentRole &&
+      [...roleSelect.options].some( option => option.value === currentRole )
+    ) { roleSelect.value = currentRole; }
   }
 }
 
@@ -11485,7 +11288,6 @@ function renderUsers() {
   const start = (userCurrentPage - 1) * userPerPage;
   const end = start + userPerPage;
   const rows = (filteredUsers || []).slice(start, end);
-
   const role = state.user?.role?.toLowerCase();
 
   let html = "";
@@ -11493,62 +11295,35 @@ function renderUsers() {
     const userRole = user.role.toLowerCase();
     const currentUserId = String(state.user?.id || "");
 		const targetUserId = String(user.id || "");
-		const canEdit =
-	    role === "owner" ||
-	    (
-	      role === "admin" &&
-	      (
-	        userRole === "cashier" ||
-	        targetUserId === currentUserId
-	      )
+		const canEdit = role === "owner" ||
+	    ( role === "admin" &&
+	      ( userRole === "cashier" || targetUserId === currentUserId )
 	    );
 	
-	  const canDelete =
-	    role === "owner" ||
-	    (
-	      role === "admin" &&
-	      userRole === "cashier" &&
-	      targetUserId !== currentUserId
-	    );
+	  const canDelete = role === "owner" ||
+	    ( role === "admin" && userRole === "cashier" && targetUserId !== currentUserId );
 
     html += `
       <tr class="hover:bg-outline-variant transition">
         <!-- FULL NAME -->
-        <td class="px-5 py-4 font-medium">
-          ${user.Full_Name || "-"}
-        </td>
-
+        <td class="px-5 py-4 font-medium"> ${user.Full_Name || "-"} </td>
         <!-- USERNAME -->
-        <td class="px-5 py-4">
-          ${user.username}
-        </td>
-
+        <td class="px-5 py-4"> ${user.username} </td>
         <!-- ROLE -->
-        <td class="px-5 py-4">
-          ${user.role}
-        </td>
-
+        <td class="px-5 py-4"> ${user.role} </td>
         <!-- PASSWORD -->
-        <td class="px-5 py-4">
-          ••••••
-        </td>
-
+        <td class="px-5 py-4"> •••••••••••• </td>
         <!-- OUTLET -->
-        <td class="px-5 py-4">
-          ${user.outlet}
-        </td>
-
+        <td class="px-5 py-4"> ${user.outlet} </td>
         <!-- ACTIONS -->
         <td class="px-5 py-4">
           <div class="flex justify-end gap-2">
-
             ${canEdit ? `
 						  <button onclick="openEditUserModal('${user.id}')"
 						    class="w-9 h-9 hover:bottom-theme transition rounded-md">
 						    <span class="material-symbols-outlined text-sm">edit</span>
 						  </button>
 						` : ""}
-						
 						${canDelete ? `
 						  <button onclick="deleteUser('${user.id}')"
 						    class="w-9 h-9 hover:bg-red-600/10 transition rounded-md">
@@ -11617,7 +11392,9 @@ function changeUserPage(page){
 function openEditUserModal(id){
   const user = window.userData.find(x => String(x.id) === String(id));
   if(!user) return;
+	
   openModal("editUserModal");
+	
   document.getElementById("editUserId").value = user.id;
 	document.getElementById("editUserFullName").value = user.full_name || "";
   document.getElementById("editUsername").value = user.username;
@@ -11628,162 +11405,95 @@ function openEditUserModal(id){
 
 async function saveEditUser() {
   const data = {
-    id:
-      document
-        .getElementById("editUserId")
-        ?.value
-        ?.trim() || "",
-    fullName:
-      document
-        .getElementById("editUserFullName")
-        ?.value
-        ?.trim() || "",
-    username:
-      document
-        .getElementById("editUsername")
-        ?.value
-        ?.trim() || "",
-    login_user_id:
-      state.user.id
+    id: document .getElementById("editUserId")
+			?.value
+			?.trim() || "",
+    fullName: document .getElementById("editUserFullName")
+			?.value
+			?.trim() || "",
+    username: document .getElementById("editUsername")
+			?.value
+			?.trim() || "",
+    login_user_id: state.user.id
   };
-  const password =
-    document
-      .getElementById("editPassword")
-      ?.value
-      ?.trim() || "";
-  if (!data.fullName) {
-    alert(
-      "Full Name wajib diisi."
-    );
-    return;
-  }
-  if (!data.username) {
-    alert(
-      "Username wajib diisi."
-    );
-    return;
-  }
-  if (password !== "") {
-    data.password =
-      password;
-  }
+  const password = document .getElementById("editPassword")
+		?.value
+		?.trim() || "";
+	
+  if (!data.fullName) { alert( "Full Name wajib diisi." ); return; }
+  if (!data.username) { alert( "Username wajib diisi." ); return; }
+  if (password !== "") { data.password = password; }
 
   try {
     // SUPABASE RPC
-    const res =
-      await updateUserRPC(
-        data
-      );
-
+    const res = await updateUserRPC( data );
     // HANDLE RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-      alert(
-        res.message ||
-        "Gagal memperbarui user."
-      );
-      return;
-    }
+    if ( res && res.success === false
+    ) { alert( res.message || "Gagal memperbarui user." ); return; }
+		
     closeEditUserModal();
     state.settingsPageData = null;
     await reloadSettingsPage();
-    showToast(
-      "User berhasil diperbarui."
-    );
+    showToast( "User berhasil diperbarui." );
 
   } catch (err) {
-    alert(
-      err?.message ||
-      "Gagal memperbarui user."
-    );
+    alert( err?.message || "Gagal memperbarui user." );
   }
 }
 
 function closeEditUserModal(){
   const modal = document.getElementById("editUserModal");
-  if(modal){
-    modal.remove();
-  }
+  if(modal){ modal.remove(); }
 }
 	
 async function loadBranchOptions() {
-
   try {
     // SUPABASE RPC
     const data =
       await getBranchOptionsRPC({
-        loginUserId:
-          state.user.id
+        loginUserId: state.user.id
       });
-
     // SELECT ELEMENT
-    const select =
-      document.getElementById(
-        "newUserBranch"
-      );
-    if (!select) {
-      return;
-    }
+    const select = document.getElementById( "newUserBranch" );
+    if (!select) { return; }
+		
     const branches = data?.branches || [];
     // CLEAR OPTIONS
     select.innerHTML = "";
-
     // ONLY ONE BRANCH
     if (branches.length === 1) {
       select.innerHTML = `
-        <option
-          value="${branches[0].branchId}"
-        >
-          ${branches[0].branchName}
-        </option>
+        <option value="${branches[0].branchId}"> ${branches[0].branchName} </option>
       `;
-      select.value =
-        branches[0].branchId;
+      select.value = branches[0].branchId;
       select.disabled = true;
     }
-	
     // MULTIPLE BRANCHES
     else {
       select.disabled = false;
       select.innerHTML = `
-        <option value="">
-          Select Outlet
-        </option>
+        <option value=""> Select Outlet </option>
       `;
       branches.forEach(
         branch => {
           select.innerHTML += `
-            <option
-              value="${branch.branchId}"
-            >
-              ${branch.branchName}
-            </option>
+            <option value="${branch.branchId}"> ${branch.branchName} </option>
           `;
         }
       );
     }
   }
-
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat outlet.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat outlet.", "error" );
   }
 }
 
 function loadUserRoleOptions() {
   const select = document.getElementById("newUserRole");
-
   if (!select) return;
 
   const currentRole = String( state.user?.role || "" ).toLowerCase();
-
   select.innerHTML = ` <option value=""> Select Role </option> `;
-	
   // OWNER
   if (currentRole === "owner") {
     select.innerHTML += `
@@ -11814,155 +11524,78 @@ async function saveNewUser() {
 	  fullName: document.getElementById("newUserFullName")?.value?.trim() || "",
 	  password: document.getElementById("newPassword")?.value?.trim() || "",
 	  role: document.getElementById("newUserRole")?.value || "",
-	  branchId:
-	    document.getElementById("newUserBranch")?.value ||
-	    state.user.branchId,
+	  branchId: document.getElementById("newUserBranch")?.value || state.user.branchId,
 	  createdBy: String(state.user.id)
 	};
-  if (!data.branchId) {
-	  alert(
-	    "Silakan pilih outlet."
-	  );
-	  return;
-	}
 	
-	if (!data.fullName) {
-	  alert(
-	    "Full Name wajib diisi."
-	  );
-	  return;
-	}
-	
-	if (!data.username) {
-	  alert(
-	    "Username wajib diisi."
-	  );
-	  return;
-	}
-  if (!data.password) {
-    alert(
-      "Password wajib diisi."
-    );
-    return;
-  }
-  if (!data.role) {
-    alert(
-      "Role wajib dipilih."
-    );
-    return;
-  }
+  if (!data.branchId) { alert( "Silakan pilih outlet." ); return; }
+	if (!data.fullName) { alert( "Full Name wajib diisi." ); return; }
+	if (!data.username) { alert( "Username wajib diisi." ); return; }
+  if (!data.password) { alert( "Password wajib diisi." ); return; }
+  if (!data.role) { alert( "Role wajib dipilih." ); return; }
 
   try {
-
     // SUPABASE RPC
-    const res =
-      await addNewUserRPC(
-        data
-      );
+    const res = await addNewUserRPC( data );
     // HANDLE RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-      alert(
-        res.message ||
-        "Gagal menambahkan user."
-      );
-      return;
-    }
+    if ( res && res.success === false
+    ) { alert( res.message || "Gagal menambahkan user." ); return; }
+		
     closeAddUserModal();
     state.settingsPageData = null;
     await reloadSettingsPage();
-    showToast(
-      "User berhasil ditambahkan."
-    );
+    showToast( "User berhasil ditambahkan." );
   }
 
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menambahkan user."
-    );
+    alert( err?.message || "Gagal menambahkan user." );
   }
 }
 
 function closeAddUserModal(){
   const modal = document.getElementById("addUserModal");
-  if(modal){
-    modal.remove();
-  }
+  if(modal){ modal.remove(); }
 }
 
 async function deleteUser(id) {
-  if (
-    !confirm(
-      "Hapus user ini?"
-    )
-  ) {
-    return;
-  }
+  if ( !confirm( "Hapus user ini?" ) ) { return; }
 
   try {
     // SUPABASE RPC
     const res =
       await deleteUserRPC({
         id: id,
-        login_user_id:
-          state.user.id
+        login_user_id: state.user.id
       });
-
     // HANDLE RESPONSE
-    if (
-      res &&
-      res.success === false
-    ) {
-      alert(
-        res.message ||
-        "Gagal menghapus user."
-      );
-      return;
-    }
+    if ( res && res.success === false
+    ) { alert( res.message || "Gagal menghapus user." ); return; }
+		
     state.settingsPageData = null;
     await reloadSettingsPage();
-    showToast(
-      "User berhasil dihapus."
-    );
+    showToast( "User berhasil dihapus." );
   }
 
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menghapus user."
-    );
+    alert( err?.message || "Gagal menghapus user." );
   }
 }
 
 function applyBusinessProfile(data){
   if(!data) return;
+	
   const companyName = document.getElementById("businessCompanyName");
   const instagram = document.getElementById("businessInstagram");
   const receiptFooter = document.getElementById("businessReceiptFooter");
   const logoPreview = document.getElementById("businessLogoPreview");
-  if(companyName){
-    companyName.value =
-      data.company_name || "";
-  }
-  if(instagram){
-    instagram.value =
-      data.instagram || "";
-  }
-  if(receiptFooter){
-    receiptFooter.value =
-      data.receipt_footer || "";
-  }
-  if(logoPreview){
-    logoPreview.src =
-      data.logo_url || "";
-  }
+	
+  if(companyName){ companyName.value = data.company_name || ""; }
+  if(instagram){ instagram.value = data.instagram || ""; }
+  if(receiptFooter){ receiptFooter.value = data.receipt_footer || ""; }
+  if(logoPreview){ logoPreview.src = data.logo_url || ""; }
 }
 
 async function loadBusinessProfile() {
-
   try {
     const data = await getBusinessProfileRPC();
     state.businessProfile =
@@ -11973,100 +11606,51 @@ async function loadBusinessProfile() {
         logo_url: ""
       };
 
-    applyBusinessProfile(
-      state.businessProfile
-    );
-
+    applyBusinessProfile( state.businessProfile );
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat Business Profile",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat Business Profile", "error" );
   }
 }
 
 function initBusinessProfile() {
-  const saveButton =
-    document.getElementById(
-      "btnSaveBusinessProfile"
-    );
+  const saveButton = document.getElementById( "btnSaveBusinessProfile" );
 
-  if (!saveButton) {
-    return;
-  }
+  if (!saveButton) { return; }
   saveButton.onclick = saveBusinessProfile;
   initBusinessLogoPreview();
 }
 	
 function initBusinessLogoPreview() {
-  const input =
-    document.getElementById(
-      "businessLogoInput"
-    );
-
-  const preview =
-    document.getElementById(
-      "businessLogoPreview"
-    );
+  const input = document.getElementById( "businessLogoInput" );
+  const preview = document.getElementById( "businessLogoPreview" );
 
   if (!input || !preview) return;
   input.onchange = function (e) {
-    const file =
-      e.target.files?.[0];
+    const file = e.target.files?.[0];
     if (!file) return;
-    const reader =
-      new FileReader();
-    reader.onload =
-      function (ev) {
-        preview.src =
-          ev.target.result;
-      };
+    const reader = new FileReader();
+    reader.onload = function (ev) { preview.src = ev.target.result; };
     reader.readAsDataURL(file);
   };
 }
 
 
 async function uploadBusinessLogo(base64) {
-  if (!base64) {
-    return null;
-  }
+  if (!base64) { return null; }
+	
   const client = getActiveSupabase();
-  if (!client) {
-    throw new Error(
-      "Supabase client belum siap"
-    );
-  }
-
+  if (!client) { throw new Error( "Supabase client belum siap" ); }
   // PARSE BASE64
-  const matches =
-    base64.match(
-      /^data:(.+);base64,(.+)$/
-    );
-
-  if (!matches) {
-    throw new Error(
-      "Format gambar tidak valid"
-    );
-  }
+  const matches = base64.match( /^data:(.+);base64,(.+)$/ );
+  if (!matches) { throw new Error( "Format gambar tidak valid" ); }
 
   const mime = matches[1];
   const base64Data = matches[2];
-  const buffer =
-    Uint8Array.from(
-      atob(base64Data),
-      c => c.charCodeAt(0)
-    );
-  // EXTENSION
+  const buffer = Uint8Array.from( atob(base64Data), c => c.charCodeAt(0) );
   const ext = mime.split("/")[1] || "jpg";
-  // PATH
-  const path =
-    `business/logo_${Date.now()}.${ext}`;
-  // UPLOAD
-  const {
-    error: uploadError
-  } = await client.storage
+  const path = `business/logo_${Date.now()}.${ext}`;
+  const { error: uploadError } = await client.storage
     .from("Logo_Digital_Recipes")
     .upload(
       path,
@@ -12077,69 +11661,33 @@ async function uploadBusinessLogo(base64) {
       }
     );
 
-  if (uploadError) {
-    throw uploadError;
-  }
-	
+  if (uploadError) { throw uploadError; }
   // PUBLIC URL
-  const {
-    data: publicData
-  } = client.storage
+  const { data: publicData } = client.storage
     .from("Logo_Digital_Recipes")
     .getPublicUrl(path);
-
-  const logoUrl =
-    publicData?.publicUrl;
-
-  if (!logoUrl) {
-    throw new Error(
-      "Public URL logo tidak ditemukan"
-    );
-  }
+  const logoUrl = publicData?.publicUrl;
+  if (!logoUrl) { throw new Error( "Public URL logo tidak ditemukan" ); }
   return logoUrl;
 }
 
 function fileToBase64(file) {
   return new Promise(
     (resolve, reject) => {
-      const reader =
-        new FileReader();
-      reader.onload =
-        () => resolve(
-          reader.result
-        );
-      reader.onerror =
-        () => reject(
-          new Error(
-            "Gagal membaca file logo"
-          )
-        );
+      const reader = new FileReader();
+      reader.onload = () => resolve( reader.result );
+      reader.onerror = () => reject( new Error( "Gagal membaca file logo" ) );
       reader.readAsDataURL(file);
     }
   );
 }
 
 async function saveBusinessProfile() {
-  const companyName =
-    document.getElementById(
-      "businessCompanyName"
-    );
-  const instagram =
-    document.getElementById(
-      "businessInstagram"
-    );
-  const receiptFooter =
-    document.getElementById(
-      "businessReceiptFooter"
-    );
-  const logoPreview =
-    document.getElementById(
-      "businessLogoPreview"
-    );
-  const logoInput =
-    document.getElementById(
-      "businessLogoInput"
-    );
+  const companyName = document.getElementById( "businessCompanyName" );
+  const instagram = document.getElementById( "businessInstagram" );
+  const receiptFooter = document.getElementById( "businessReceiptFooter" );
+  const logoPreview = document.getElementById( "businessLogoPreview" );
+  const logoInput = document.getElementById( "businessLogoInput" );
 
   // VALIDATE
   if (
@@ -12147,9 +11695,7 @@ async function saveBusinessProfile() {
     !instagram ||
     !receiptFooter ||
     !logoPreview
-  ) {
-    return;
-  }
+  ) { return; }
 
   // DATA AWAL
   const data = {
@@ -12162,45 +11708,19 @@ async function saveBusinessProfile() {
   try {
     // CEK LOGO BARU
     const file = logoInput?.files?.[0];
-
     if (file) {
-      // FILE → BASE64
-      const base64 =
-        await fileToBase64(
-          file
-        );
-
-      // UPLOAD API
-      const logoUrl =
-        await uploadBusinessLogo(
-          base64
-        );
-      if (!logoUrl) {
-        throw new Error(
-          "URL logo tidak diterima dari API"
-        );
-      }
+      const base64 = await fileToBase64( file );
+      const logoUrl = await uploadBusinessLogo( base64 );
+      if (!logoUrl) { throw new Error( "URL logo tidak diterima dari API" ); }
       data.logo_url = logoUrl;
     }
 	
     // SAVE PROFILE VIA RPC
-    const result =
-      await saveBusinessProfileRPC(
-        data
-      );
-
+    const result = await saveBusinessProfileRPC(  data );
     // CHECK RPC
-    if (
-      result &&
-      result.success === false
-    ) {
-
-      throw new Error(
-        result.message ||
-        "Gagal menyimpan profile"
-      );
+    if ( result && result.success === false ) {
+      throw new Error( result.message || "Gagal menyimpan profile" );
     }
-
     // UPDATE STATE
     state.businessProfile = {
       ...(state.businessProfile || {}),
@@ -12209,103 +11729,91 @@ async function saveBusinessProfile() {
       receipt_footer: data.receipt_footer,
       logo_url: data.logo_url
     };
-
     // UPDATE UI
-    applyBusinessProfile(
-      state.businessProfile
-    );
-
+    applyBusinessProfile( state.businessProfile );
     // CLEAR FILE INPUT
-    if (logoInput) {
-      logoInput.value = "";
-    }
-
+    if (logoInput) { logoInput.value = ""; }
     // SUCCESS
-    showToast(
-      "Business Profile berhasil disimpan",
-      "success"
-    );
+    showToast( "Business Profile berhasil disimpan", "success" );
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal menyimpan Business Profile",
-      "error"
-    );
+    showToast( err?.message || "Gagal menyimpan Business Profile", "error" );
   }
 }
 	
 async function loadBranchName() {
   // LOAD FROM STATE
   if (state.branchInfo) {
-    const el =
-      document.getElementById(
-        "appBrandName"
-      );
-
-    if (el) {
-      el.innerText =
-        (
-          state.branchInfo.branchName ||
-          "SISTEM KASIR"
-        ).toUpperCase();
-    }
-    return;
+    const el = document.getElementById( "appBrandName" );
+    if (el) { el.innerText = ( state.branchInfo.branchName || "SISTEM KASIR" ).toUpperCase(); } return;
   }
   // VALIDATE BRANCH
   if (!state.branchId) {
-    const el =
-      document.getElementById(
-        "appBrandName"
-      );
-    if (el) {
-      el.innerText =
-        "PILIH OUTLET";
-    }
-    return;
+    const el = document.getElementById( "appBrandName" );
+    if (el) { el.innerText = "PILIH OUTLET"; } return;
   }
 
   try {
     // SUPABASE RPC
-    const data =
-      await getBranchInfoRPC(
-        state.branchId
-      );
-  
+    const data = await getBranchInfoRPC( state.branchId );
     // SAVE STATE
-    state.branchInfo =
-      data || {
-        branchName:
-          "SISTEM KASIR"
-      };
-	
+    state.branchInfo = data || { branchName: "SISTEM KASIR" };
     // APPLY UI
-    const el =
-      document.getElementById(
-        "appBrandName"
-      );
-
-    if (el) {
-      el.innerText =
-        (
-          state.branchInfo.branchName ||
-          "SISTEM KASIR"
-        ).toUpperCase();
-    }
+    const el = document.getElementById( "appBrandName" );
+    if (el) { el.innerText = ( state.branchInfo.branchName || "SISTEM KASIR" ).toUpperCase(); }
   }
 
   catch (err) {
-    const el =
-      document.getElementById(
-        "appBrandName"
-      );
-    if (el) {
-      el.innerText =
-        "SISTEM KASIR";
-    }
+    const el = document.getElementById( "appBrandName" );
+    if (el) { el.innerText = "SISTEM KASIR"; }
   }
 }
 
+
+// ORDER SOURCES SETTINGS MODAL
+function openOrderSourcesSettingsModal() {
+  const modal = document.getElementById( "orderSourcesSettingsModal" );
+  if (!modal) { showToast( "Modal Order Sources tidak ditemukan di HTML.", "error" ); return; }
+
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+
+  // Tampilkan form dalam keadaan tertutup
+  const form = document.getElementById("orderSourceForm");
+  if (form) form.classList.add("hidden");
+}
+
+function closeOrderSourcesSettingsModal() {
+  const modal = document.getElementById( "orderSourcesSettingsModal" );
+  if (!modal) return;
+
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+
+  closeOrderSourceForm();
+}
+
+function openOrderSourceForm() {
+  const form = document.getElementById("orderSourceForm");
+  const title = document.getElementById("orderSourceFormTitle");
+  const id = document.getElementById("orderSourceId");
+  const name = document.getElementById("orderSourceName");
+  const code = document.getElementById("orderSourceCode");
+
+  if (!form) return;
+  if (title) title.textContent = "Tambah Sumber Pesanan";
+  if (id) id.value = "";
+  if (name) name.value = "";
+  if (code) code.value = "";
+
+  form.classList.remove("hidden");
+  name?.focus();
+}
+
+function closeOrderSourceForm() {
+  const form = document.getElementById("orderSourceForm");
+  if (form) form.classList.add("hidden");
+}
 	
 	// ==================================
 	// TAX
@@ -12313,40 +11821,26 @@ async function loadBranchName() {
 
 async function loadTaxSettings() {
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
+	    } = await supabaseClient.rpc(
+	      "get_settings",
+	      {
+	        p_session_id: sessionId
+	      }
+	    );
 
-    const {
-      data,
-      error
-    } = await supabaseClient.rpc(
-      "get_settings",
-      {
-        p_session_id: sessionId
-      }
-    );
-
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
+		
     const settings = data || {};
     const taxInput = document.getElementById("taxInput");
     const serviceInput = document.getElementById("serviceInput");
     const discountInput = document.getElementById("discountInput");
 
-    if (taxInput) {
-      taxInput.value =
-        settings.tax ?? 0;
-    }
-    if (serviceInput) {
-      serviceInput.value =
-        settings.service ?? 0;
-    }
-    if (discountInput) {
-      discountInput.value =
-        settings.discount ?? 0;
-    }
-  }
+    if (taxInput) { taxInput.value = settings.tax ?? 0; }
+    if (serviceInput) { serviceInput.value = settings.service ?? 0; }
+    if (discountInput) { discountInput.value = settings.discount ?? 0; }
+	}
   catch (err) {
     showToast(
       err?.message ||
