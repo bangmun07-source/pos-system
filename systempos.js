@@ -1844,111 +1844,79 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 	setTimeout(async () => {
 	
 	  try {
-		const receiptCanvas = await html2canvas(canvas, {
-		  scale: 1,
-		  useCORS: true,
-		  backgroundColor: "#101715"
-		});
-	
-		// CANVAS → BLOB
-		const blob = await new Promise(resolve => {
-		  receiptCanvas.toBlob(
-			resolve,
-			"image/jpeg",
-			0.65
-		  );
-		});
-	
-		if (!blob) { throw new Error("Gagal membuat gambar receipt"); }
-	
-		// UPLOAD LANGSUNG KE SUPABASE STORAGE
-		const fileName = `${trx.id}.jpg`;
-		const { error: uploadError
-		} = await supabaseClient
-		  .storage
-		  .from("Recipes_Digital")
-		  .upload( fileName, blob,
-				{
-					contentType: "image/jpeg",
-					upsert: true
+			const receiptCanvas = await html2canvas(canvas, {
+			  scale: 1,
+			  useCORS: true,
+			  backgroundColor: "#101715"
+			});
+		
+			// CANVAS → BLOB
+			const blob = await new Promise(resolve => {
+			  receiptCanvas.toBlob( resolve, "image/jpeg", 0.65 );
+			});
+			if (!blob) { throw new Error("Gagal membuat gambar receipt"); }
+		
+			// UPLOAD LANGSUNG KE SUPABASE STORAGE
+			const fileName = `${trx.id}.jpg`;
+			const { error: uploadError } = await supabaseClient
+			  .storage
+			  .from("Recipes_Digital")
+			  .upload( fileName, blob,
+					{
+						contentType: "image/jpeg",
+						upsert: true
+					}
+				);
+			if (uploadError) { throw uploadError; }
+				
+			// PUBLIC URL
+		  const { data: publicData } = supabaseClient
+				.storage
+				.from("Recipes_Digital")
+				.getPublicUrl(fileName);
+				
+			const url = publicData?.publicUrl;
+			if (!url) { throw new Error( "Receipt URL tidak diterima" ); }
+				
+			const sessionId = localStorage.getItem("pos_session_id");
+			if (!sessionId) { throw new Error("Session login tidak ditemukan"); }
+			// UPDATE RECEIPT URL
+			const { data: rpcResult, error: rpcError } = await supabaseClient.rpc(
+			  "update_receipt_url",
+				  {
+						p_trx_id: trx.id,
+						p_receipt_url: url,
+						p_session_id: sessionId
+				  }
+				);
+				
+				if (rpcError) { throw rpcError; }
+				if (!rpcResult?.success) {
+				  throw new Error(
+					rpcResult?.message ||
+					"Gagal menyimpan receipt URL"
+				  );
 				}
-			);
-		if (uploadError) { throw uploadError; }
 			
-		// PUBLIC URL
-	   const { data: publicData
-		} = supabaseClient
-		  .storage
-		  .from("Recipes_Digital")
-		  .getPublicUrl(fileName);
-	
-		const url = publicData?.publicUrl;
-		if (!url) { throw new Error( "Receipt URL tidak diterima" ); }
-			
-		const sessionId = localStorage.getItem("pos_session_id");
-		if (!sessionId) { throw new Error("Session login tidak ditemukan"); }
-		// UPDATE RECEIPT URL
-		const {
-		  data: rpcResult,
-		  error: rpcError
-		} = await supabaseClient.rpc(
-		  "update_receipt_url",
-			  {
-				p_trx_id: trx.id,
-				p_receipt_url: url,
-				p_session_id: sessionId
-			  }
-			);
-			
-			if (rpcError) { throw rpcError; }
-			if (!rpcResult?.success) {
-			  throw new Error(
-				rpcResult?.message ||
-				"Gagal menyimpan receipt URL"
-			  );
+			// WHATSAPP
+			let wa = String(phone || "") .replace(/\D/g, "");
+			if (wa.startsWith("0")) { wa = "62" + wa.slice(1);
+			} else if (!wa.startsWith("62")) { wa = "62" + wa; }
+		
+			let finalMessage;
+			if (customMessage) { finalMessage = customMessage + "\n\n📎 Digital Receipt\n" + url;
+			} else {
+			  finalMessage =
+				"🧾 *Digital Receipt*\n\n" +
+				"Thank you for visiting.\n" +
+				"Enjoy the moment. Take it slow.\n\n" +
+				"Have a nice day.\n\n" +
+				"📎 Receipt:\n" +
+				url;
 			}
-			
-		// WHATSAPP
-		let wa =
-		  String(phone || "")
-			.replace(/\D/g, "");
-	
-		if (wa.startsWith("0")) {
-		  wa =
-			"62" +
-			wa.slice(1);
-		}
-		else if (!wa.startsWith("62")) {
-		  wa =
-			"62" +
-			wa;
-		}
-	
-		let finalMessage;
-		if (customMessage) {
-		  finalMessage =
-			customMessage +
-			"\n\n📎 Digital Receipt\n" +
-			url;
-	
-		} else {
-		  finalMessage =
-			"🧾 *Digital Receipt*\n\n" +
-			"Thank you for visiting.\n" +
-			"Enjoy the moment. Take it slow.\n\n" +
-			"Have a nice day.\n\n" +
-			"📎 Receipt:\n" +
-			url;
-		}
-			
-		window.open(
-		  "https://api.whatsapp.com/send?phone=" +
-		  wa +
-		  "&text=" +
-		  encodeURIComponent(finalMessage),
-		  "_blank"
-		);
-		wrapper.remove();
+				
+			window.open( "https://api.whatsapp.com/send?phone=" + wa + "&text=" + encodeURIComponent(finalMessage), "_blank" );
+			wrapper.remove();
 	  }
 	  catch (err) {
 		alert( err?.message || "Gagal membuat digital receipt" );
@@ -2809,8 +2777,16 @@ async function sendTransaction(payload){
 		
 		if(btn){ btn.disabled = false; }
 		if(!res){ alert( "Backend mengembalikan NULL" ); return; }
-
 		if(res.success){ showToast( "Transaksi berhasil ✔", "success" );
+	  if (!payload.memberId) {
+	    openWhatsAppComposer({
+	      phone: "",
+	      title: "Kirim Struk Digital",
+	      message: "Terima kasih telah berbelanja!",
+	      trxId: res.transId,
+	      type: "transaction"
+	    });
+	  }
 		if(payload.memberId){
 			state.memberPageData = null;
 			state.members = null;
@@ -2873,7 +2849,6 @@ async function sendTransaction(payload){
     alert( err.message || "Error server!" );
   }
 }
-
 
 async function loadOrderSourcesDropdown() {
   const select = document.getElementById("online-source");
@@ -3865,10 +3840,7 @@ async function loadMembers(callback) {
 
     if (callback) { callback(); }
   } catch (err) {
-    showToast(
-      "Gagal memuat member",
-      "error"
-    );
+    showToast( "Gagal memuat member", "error" );
   }
 }
 	
@@ -3905,10 +3877,9 @@ function renderMembers(data = state.members) {
   if (!tbody) return;
 	
   // INIT PAGINATION
-  if (!state.memberCurrentPage)
-    state.memberCurrentPage = 1;
-  if (!state.memberPerPage)
-    state.memberPerPage = 10;
+  if (!state.memberCurrentPage) state.memberCurrentPage = 1;
+  if (!state.memberPerPage) state.memberPerPage = 10;
+	
   const currentPage = state.memberCurrentPage;
   const perPage = state.memberPerPage;
 
@@ -3917,14 +3888,13 @@ function renderMembers(data = state.members) {
     tbody.innerHTML = `
       <tr>
         <td colspan="7"
-            class="text-center text-muted py-6">
+          class="text-center text-muted py-6">
           No members
         </td>
       </tr>
     `;
     return;
   }
-
   // PAGINATION
   const totalData = data.length;
   const totalPages = Math.ceil(totalData / perPage);
@@ -3951,33 +3921,26 @@ function renderMembers(data = state.members) {
           </span>
         </div>
       </td>
-
       <td class="px-8 py-5 text-sm">
         ${m.Level_Current || "Kenal"}
       </td>
       <td class="px-8 py-5 text-sm text-right">
-        Rp ${(
-          Number(
-            String(m.Total_Spend || 0)
-            .replace(/\./g,"")
-          )
-        ).toLocaleString("id-ID")}
-
+        Rp ${( Number( String(m.Total_Spend || 0)
+					.replace(/\./g,""))).toLocaleString("id-ID")}
       </td>
       <td class="px-8 py-5 text-sm font-bold text-right">
         ${m.Point || 0}
       </td>
-
       <td class="px-8 py-5 text-center">
-      <button onclick="handleMemberCard(this)"
-        data-phone="${m.WA || ''}"
-        data-name="${m.Nama || ''}"
-        data-memberid="${m.ID_Member || ''}"
-        data-level="${m.Level_Current || ''}"
-        data-point="${m.Point || 0}"
-        class="text-blue-700" >
-        <span class="material-symbols-outlined">chat</span>
-      </button>
+	      <button onclick="handleMemberCard(this)"
+	        data-phone="${m.WA || ''}"
+	        data-name="${m.Nama || ''}"
+	        data-memberid="${m.ID_Member || ''}"
+	        data-level="${m.Level_Current || ''}"
+	        data-point="${m.Point || 0}"
+	        class="text-blue-700" >
+	        <span class="material-symbols-outlined">chat</span>
+	      </button>
       </td>
       <td class="px-8 py-5 text-right">
         <button class="text-muted hover:text-on-surface transition-colors"
@@ -3992,17 +3955,14 @@ function renderMembers(data = state.members) {
 
   // FOOTER TEXT
   const footerText = document.querySelector("#memberPage .text-xs.text-on-surface-variant.font-medium");
-  if (footerText) {
-    footerText.innerText = `Showing ${paginatedData.length} of ${totalData} members`;
-  }
+  if (footerText) { footerText.innerText = `Showing ${paginatedData.length} of ${totalData} members`; }
 
   // PAGINATION BUTTON
   const prevBtn = document.getElementById("memberPrevBtn");
   const nextBtn = document.getElementById("memberNextBtn");
   // PREV
   if (prevBtn) {
-    prevBtn.disabled =
-      currentPage <= 1;
+    prevBtn.disabled = currentPage <= 1;
     prevBtn.onclick = () => {
       if (state.memberCurrentPage > 1) {
         state.memberCurrentPage--;
@@ -4013,8 +3973,7 @@ function renderMembers(data = state.members) {
 
   // NEXT
   if (nextBtn) {
-    nextBtn.disabled =
-      currentPage >= totalPages;
+    nextBtn.disabled = currentPage >= totalPages;
     nextBtn.onclick = () => {
       if (state.memberCurrentPage < totalPages) {
         state.memberCurrentPage++;
@@ -4024,14 +3983,11 @@ function renderMembers(data = state.members) {
   }
 }
 
-
 function loadWhatsAppModal(){
   const template = document.getElementById("whatsAppMessageModalTemplate");
   if (!template) return;
-  document.body.appendChild(
-    template.content.cloneNode(true)
-  );
-
+	
+  document.body.appendChild( template.content.cloneNode(true) );
 }
 
 function loadIngredientStockAlertTemplate(){
@@ -4040,46 +3996,28 @@ function loadIngredientStockAlertTemplate(){
   if(document.getElementById("ingredientStockAlertModal")) return;
   const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
-
 }
 
 function ensureIngredientStockAlertModal() {
 
-  let modal =
-    document.getElementById(
-      "ingredientStockAlertModal"
-    );
+  let modal = document.getElementById( "ingredientStockAlertModal" );
+  if (modal) { return modal; }
 
-  if (modal) {
-    return modal;
-  }
+  const template = document.getElementById( "ingredientStockAlertTemplate" );
+  if (!template) { return null; }
 
-  const template =
-    document.getElementById(
-      "ingredientStockAlertTemplate"
-    );
-
-  if (!template) {
-    return null;
-  }
-
-  const clone =
-    template.content.cloneNode(true);
+  const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
-  modal =
-    document.getElementById(
-      "ingredientStockAlertModal"
-    );
+  modal = document.getElementById( "ingredientStockAlertModal" );
   return modal;
 }
 	
 window.ingredientStockData = [];
 function openIngredientStockAlert(data = []) {
   const modal = ensureIngredientStockAlertModal();
-
   if (!modal) { return; }
+	
   const list = document.getElementById( "ingredientStockAlertList" );
-
   if (!list) { return; }
 
   list.innerHTML = "";
@@ -4087,11 +4025,11 @@ function openIngredientStockAlert(data = []) {
     const qty = Number(item.qty || 0);
     const min = Number(item.min || 0);
     const statusClass = qty <= 0
-        ? "text-red-700"
-        : "text-orange-700";
+			? "text-red-700"
+			: "text-orange-700";
     const statusText = qty <= 0
-        ? "OUT"
-        : "LOW";
+			? "OUT"
+			: "LOW";
 
     list.innerHTML += `
       <div class="py-5 border-b border-outline-variant">
@@ -4109,7 +4047,7 @@ function openIngredientStockAlert(data = []) {
               </p>
 
               <p class="text-xs text-on-surface-variant mt-2"> 
-			  	Current Stock :
+			  				Current Stock :
                 <span class="font-semibold text-on-surface">
                   ${qty} ${item.unit || ""}
                 </span>
@@ -4141,133 +4079,48 @@ function closeIngredientStockAlert(){
   const modal = document.getElementById("ingredientStockAlertModal");
   if (!modal) return;
   modal.classList.add("hidden");
-
-}
-
-function ensureWhatsAppModal() {
-
-  let modal =
-    document.getElementById("whatsapp-message-modal");
-
-  if (modal) {
-    return modal;
-  }
-
-  const template =
-    document.getElementById(
-      "whatsAppMessageModalTemplate"
-    );
-
-  if (!template) {
-
-    return null;
-  }
-
-  const clone =
-    template.content.cloneNode(true);
-  document.body.appendChild(clone);
-  modal =
-    document.getElementById(
-      "whatsapp-message-modal"
-    );
-
-  return modal;
 }
 	
 let whatsappComposerData = null;
 function ensureWhatsAppModal() {
-
   // Sudah ada di DOM
-  let modal =
-    document.getElementById(
-      "whatsapp-message-modal"
-    );
-
-  if (modal) {
-    return modal;
-  }
+  let modal = document.getElementById( "whatsapp-message-modal" );
+  if (modal) { return modal; }
 
   // Ambil template
-  const template =
-    document.getElementById(
-      "whatsAppMessageModalTemplate"
-    );
-
-  if (!template) {
-    return null;
-  }
-
+  const template = document.getElementById( "whatsAppMessageModalTemplate" );
+  if (!template) { return null; }
   // Clone isi template
-  const clone =
-    template.content.cloneNode(true);
+  const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
 
   // Ambil kembali setelah masuk DOM
-  modal =
-    document.getElementById(
-      "whatsapp-message-modal"
-    );
-  return modal;
+  modal = document.getElementById( "whatsapp-message-modal" ); return modal;
 }
 
 
 function openWhatsAppComposer({phone, title, message, type = null, trxId}) {
   whatsappComposerData = {phone, title, message, type, trxId};
-  const modal =
-    ensureWhatsAppModal();
-  if (!modal) {
-    return;
-  }
-
+  const modal = ensureWhatsAppModal();
+  if (!modal) { return; }
   // TITLE
-  const titleEl =
-    document.getElementById(
-      "waModalTitle"
-    );
-  if (titleEl) {
-    titleEl.innerText =
-      title || "WhatsApp Message";
-  }
-
+  const titleEl = document.getElementById( "waModalTitle" );
+  if (titleEl) { titleEl.innerText = title || "WhatsApp Message"; }
   // PHONE
-  const phoneEl =
-    document.getElementById(
-      "waRecipient"
-    );
-
-  if (phoneEl) {
-    phoneEl.value =
-      phone || "";
-  }
-
+  const phoneEl = document.getElementById( "waRecipient" );
+  if (phoneEl) { phoneEl.value = phone || ""; }
   // MESSAGE
-  const messageEl =
-    document.getElementById(
-      "waMessage"
-    );
-
-  if (messageEl) {
-    messageEl.value =
-      message || "";
-  }
+  const messageEl = document.getElementById( "waMessage" );
+  if (messageEl) { messageEl.value = message || ""; }
 
   // OPEN MODAL
   modal.classList.remove("hidden");
   modal.classList.add("flex");
-	
   // COUNTER
   updateWhatsAppCounter();
-
   // SEND BUTTON
-  const sendBtn =
-    document.getElementById(
-      "waSendButton"
-    );
-
-  if (sendBtn) {
-    sendBtn.onclick =
-      sendWhatsAppComposer;
-  }
+  const sendBtn = document.getElementById( "waSendButton" );
+  if (sendBtn) { sendBtn.onclick = sendWhatsAppComposer; }
 }
 
 function closeWhatsAppModal() {
@@ -4276,114 +4129,66 @@ function closeWhatsAppModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   }
+	
   whatsappComposerData = null;
 }
 
 async function sendWhatsAppComposer() {
-  if (!whatsappComposerData) {
-    return;
-  }
-  const messageEl =
-    document.getElementById("waMessage");
-  const message =
-    messageEl
-      ? messageEl.value
-      : "";
-  if (!message.trim()) {
-    alert("Message masih kosong");
-    return;
-  }
-  if (
-    whatsappComposerData.type ===
-    "transaction"
-  ) {
-
-    try {
-      const trx =
-        await getReceiptDataRPC(
-          whatsappComposerData.trxId
-        );
-      if (!trx) {
-        alert(
-          "Data transaksi belum tersedia"
-        );
-        return;
-      }
-      sendReceiptWhatsappWithData(
-        trx,
-        whatsappComposerData.phone,
-        message
-      );
-      closeWhatsAppModal();
-    } catch (err) {
-      alert(
-        "Gagal mengambil data transaksi"
-      );
-    }
-    return;
-  }
-  let wa =
-    String(
-      whatsappComposerData.phone || ""
-    )
-    .replace(/\D/g, "");
-  if (wa.startsWith("0")) {
-    wa =
-      "62" +
-      wa.slice(1);
-  } else if (!wa.startsWith("62")) {
-    wa =
-      "62" +
-      wa;
-  }
-  const url =
-    "https://api.whatsapp.com/send?phone=" +
-    wa +
-    "&text=" +
-    encodeURIComponent(message);
-  window.open(
-    url,
-    "_blank"
-  );
+  if (!whatsappComposerData) { return; }
+	
+  const messageEl = document.getElementById("waMessage");
+  const message = messageEl
+		? messageEl.value
+		: "";
+  if (!message.trim()) { alert("Message masih kosong"); return; }
+	if (whatsappComposerData.type === "transaction") {
+	  try {
+	    const phone = document.getElementById("waRecipient")?.value.trim() || "";
+	    if (!phone) { alert("Masukkan nomor WhatsApp pelanggan."); return; }
+	
+	    const trx = await getReceiptDataRPC(whatsappComposerData.trxId);
+	    if (!trx) { alert("Data transaksi belum tersedia"); return; }
+	
+	    sendReceiptWhatsappWithData(trx, phone, message);
+	    closeWhatsAppModal();
+	  } catch (err) {
+	    alert("Gagal mengambil data transaksi"); } return;
+	}
+	
+  let wa = String( whatsappComposerData.phone || "" ) .replace(/\D/g, "");
+  if (wa.startsWith("0")) { wa = "62" + wa.slice(1);
+  } else if (!wa.startsWith("62")) { wa = "62" + wa; }
+  const url = "https://api.whatsapp.com/send?phone=" + wa + "&text=" + encodeURIComponent(message);
+	
+  window.open( url, "_blank" );
   closeWhatsAppModal();
 }
 
 function resetWhatsAppMessage() {
-  if (!whatsappComposerData) {
-    return;
-  }
+  if (!whatsappComposerData) { return; }
+	
   const messageEl = document.getElementById("waMessage");
-  if (messageEl) {
-    messageEl.value =
-      whatsappComposerData.message || "";
-  }
+  if (messageEl) { messageEl.value = whatsappComposerData.message || ""; }
   updateWhatsAppCounter();
 }
 
 function copyWhatsAppMessage() {
   const messageEl = document.getElementById("waMessage");
-  if (!messageEl) {
-    return;
-  }
-  navigator.clipboard.writeText(
-    messageEl.value
-  );
+  if (!messageEl) { return; }
+	
+  navigator.clipboard.writeText(  messageEl.value );
 }
 
 function updateWhatsAppCounter() {
   const messageEl = document.getElementById("waMessage");
   const counterEl = document.getElementById("waCounter");
-  if (!messageEl || !counterEl) {
-    return;
-  }
+  if (!messageEl || !counterEl) { return; }
 
   const length = messageEl.value.length;
-  counterEl.innerText =
-    `${length} Characters`;
+  counterEl.innerText = `${length} Characters`;
 }
 
 function createMemberInfoMessage({name,memberId,level,point}) {
-
   return `
     MEMBER INFORMATION 📢
 
@@ -4439,7 +4244,6 @@ function createTransactionMessage({name,total,point,invoice}){
 	
 function sendMemberCard(phone, name, memberId, level, point) {
   if (!phone) return;
-
   // NORMALISASI NOMOR WA
   let wa = String(phone)
     .replace(/\D/g, "");
@@ -4451,9 +4255,7 @@ function sendMemberCard(phone, name, memberId, level, point) {
   }
 
   // FORMAT POINT
-  const totalPoint =
-    Number(point || 0).toLocaleString("id-ID");
-	
+  const totalPoint = Number(point || 0).toLocaleString("id-ID");
   // PESAN
   const message =
   "MEMBER INFORMATION\n\n" +
@@ -4465,26 +4267,18 @@ function sendMemberCard(phone, name, memberId, level, point) {
   "Terima kasih telah menjadi member kami.\n\n" +
   "Silakan tunjukkan Member ID Anda setiap melakukan transaksi untuk mendapatkan point dan menikmati berbagai reward member.\n\n" +
   "Sampai jumpa kembali";
-
   // BUKA WHATSAPP
-  window.open(
-    "https://wa.me/" +
-      wa +
-      "?text=" +
-      encodeURIComponent(message),
-    "_blank"
-  );
+  window.open( "https://wa.me/" + wa + "?text=" + encodeURIComponent(message), "_blank" );
 }
 
 function handleMemberCard(btn){
   const phone = btn.dataset.phone;
-  const message =
-    createMemberInfoMessage({
-      name: btn.dataset.name,
-      memberId: btn.dataset.memberid,
-      level: btn.dataset.level,
-      point: btn.dataset.point
-    });
+  const message = createMemberInfoMessage({
+		name: btn.dataset.name,
+		memberId: btn.dataset.memberid,
+		level: btn.dataset.level,
+		point: btn.dataset.point
+	});
 
   openWhatsAppComposer({
     phone,
@@ -4496,9 +4290,7 @@ function handleMemberCard(btn){
 
 function handleBirthday(btn){
   const phone = btn.dataset.phone;
-  const message = 
-  createBirthdayMessage({
-	name: btn.dataset.name});
+  const message =  createBirthdayMessage({ name: btn.dataset.name});
   openWhatsAppComposer({
     phone,
     title: "Birthday Greeting",
@@ -4507,13 +4299,12 @@ function handleBirthday(btn){
 }
 
 function handleTransaction(btn){
-  const message =
-    createTransactionMessage({
-      name: btn.dataset.name,
-      total: btn.dataset.total,
-      point: btn.dataset.point,
-      invoice: btn.dataset.invoice
-    });
+  const message = createTransactionMessage({
+	  name: btn.dataset.name,
+	  total: btn.dataset.total,
+	  point: btn.dataset.point,
+	  invoice: btn.dataset.invoice
+	});
 
   openWhatsAppComposer({
     phone: btn.dataset.phone,
@@ -4525,8 +4316,7 @@ function handleTransaction(btn){
 }
 
 function handleNotification(btn){
-  const type =
-    btn.dataset.type;
+  const type = btn.dataset.type;
   if(type === "ingredient"){
     openIngredientStockAlert(
       window.ingredientStockData
@@ -4558,9 +4348,8 @@ function handleTierFilter(tier) {
 
 function initMemberSearch() {
   const input = document.getElementById("memberSearchInput");
-  if (!input) {
-    return;
-  }
+  if (!input) { return; }
+	
   input.addEventListener("input", (e) => {
     handleMemberSearch(e.target.value);
   });
@@ -4568,39 +4357,31 @@ function initMemberSearch() {
 
 function initTierFilter() {
   const select = document.getElementById("tierFilter");
-  if (!select) {
-    return;
-  }
-  select.addEventListener("change", (e) => {
-    handleTierFilter(e.target.value);
-  });
-
+  if (!select) { return; }
+	
+  select.addEventListener("change", (e) => { handleTierFilter(e.target.value); });
 }
 
 function loadMemberStats(){
-  const res =
-    state.memberPageData?.stats;
-
+  const res = state.memberPageData?.stats;
   if(!res) return;
-  document.getElementById("total-members").innerText =
-    formatNumber(res.total);
-  document.getElementById("total-top-tier").innerText =
-    formatNumber(res.topTier);
-  document.getElementById("total-points").innerText =
-    formatCompact(res.points);
-  document.getElementById("top-tier-label").innerText =
-    `${res.topTierName} Tier`;
+	
+  document.getElementById("total-members").innerText = formatNumber(res.total);
+  document.getElementById("total-top-tier").innerText = formatNumber(res.topTier);
+  document.getElementById("total-points").innerText = formatCompact(res.points);
+  document.getElementById("top-tier-label").innerText = `${res.topTierName} Tier`;
 }
 
 function loadMemberGrowth() {
   const res = state.memberPageData;
   if (!res) return;
+	
   const el = document.getElementById("member-growth");
   if (!el) return;
+	
   const growth = res.growth?.growth || 0;
   const sign = growth >= 0 ? "+" : "";
-  el.innerText =
-    `${sign}${growth}%`;
+  el.innerText = `${sign}${growth}%`;
 }
 
 function applyFilters() {
@@ -4608,11 +4389,8 @@ function applyFilters() {
   const tier = document.getElementById("tierFilter")?.value || "all";
   let data = state.members;
 
-  if (tier !== "all") {
-    data = data.filter(m => (m.Level_Current || "Kenal") === tier);
-  }
-  if (keyword) {
-    data = data.filter(m =>
+  if (tier !== "all") { data = data.filter(m => (m.Level_Current || "Kenal") === tier); }
+  if (keyword) { data = data.filter(m =>
       (m.Nama || "").toLowerCase().includes(keyword) ||
       (m.ID_Member || "").toLowerCase().includes(keyword)
     );
@@ -4621,47 +4399,19 @@ function applyFilters() {
 }
 
 function initMemberExport() {
-  const btn =
-    document.getElementById(
-      "btnExportMembersPDF"
-    );
+  const btn = document.getElementById( "btnExportMembersPDF" );
 
   if (!btn) return;
   btn.onclick = exportMembersPDF;
 }
 
 async function exportMembersPDF() {
-
-  // FILTER
-  const tier =
-    document.getElementById("tierFilter")?.value || "ALL";
-
-  const branchId =
-    state?.branchId || "";
- 
-  // VALIDASI
-  if (!branchId) {
-    showToast(
-      "Branch login tidak ditemukan",
-      "error"
-    );
-    return;
-  }
-	
+  const tier = document.getElementById("tierFilter")?.value || "ALL";
+  const branchId = state?.branchId || "";
+  if (!branchId) { showToast( "Branch login tidak ditemukan", "error" ); return; }
   // OPEN REPORT WINDOW
-  const pdfWindow =
-    window.open(
-      "",
-      "_blank"
-    );
-
-  if (!pdfWindow) {
-    showToast(
-      "Popup diblokir browser",
-      "error"
-    );
-    return;
-  }
+  const pdfWindow = window.open( "", "_blank" );
+  if (!pdfWindow) { showToast( "Popup diblokir browser", "error" ); return; }
 	
   // LOADING PAGE
   pdfWindow.document.write(`
@@ -4738,8 +4488,7 @@ async function exportMembersPDF() {
 	
 // REQUEST
 try {	
-	const sessionId =
-		localStorage.getItem("pos_session_id");
+	const sessionId = localStorage.getItem("pos_session_id");
 	
   const payload = {
     type: "members",
@@ -4749,93 +4498,52 @@ try {
 		tenantSlug: state.tenantSlug
   };
 
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-          body:
-            JSON.stringify(
-              payload
-            )
-        }
-      );
+    const response = await fetch(
+			"/api/export-pdf",
+			{
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify( payload )
+			}
+		);
 
     // RESPONSE TEXT
-    const text =
-      await response.text();
+    const text = await response.text();
 
     // HTTP ERROR
     if (!response.ok) {
-      let errorMessage =
-        `Export member gagal (${response.status})`;
+      let errorMessage = `Export member gagal (${response.status})`;
 			
       try {
-        const json =
-          JSON.parse(text);
+        const json = JSON.parse(text);
         errorMessage =
           json?.error ||
           json?.message ||
           errorMessage;
       }
 				
-      catch (_) {
-        if (text) {
-          errorMessage =
-            text;
-        }
-      }
-      throw new Error(
-        errorMessage
-      );
+      catch (_) { if (text) { errorMessage = text; } }
+      throw new Error( errorMessage );
     }
-
     // EMPTY RESPONSE
-    if (
-      !text ||
-      !text.trim()
-    ) {
-      throw new Error(
-        "Server mengembalikan HTML kosong."
-      );
-    }
+    if ( !text || !text.trim() ) { throw new Error( "Server mengembalikan HTML kosong." ); }
 
     // RENDER REPORT
     pdfWindow.document.open();
-    pdfWindow.document.write(
-      text
-    );
+    pdfWindow.document.write( text );
     pdfWindow.document.close();
   }
 
   catch (err) {
-    const message =
-      String(
-        err?.message ||
-        err ||
-        "Unknown error"
-      )
-      .replace(
-        /&/g,
-        "&amp;"
-      )
-      .replace(
-        /</g,
-        "&lt;"
-      )
-      .replace(
-        />/g,
-        "&gt;"
-      );
+    const message = String( err?.message || err || "Unknown error" )
+      .replace( /&/g, "&amp;" )
+      .replace( /</g, "&lt;" )
+      .replace( />/g, "&gt;" );
 
     pdfWindow.document.open();
     pdfWindow.document.write(`
 
-      <!DOCTYPE html>
+    <!DOCTYPE html>
       <html>
       <head>
         <meta charset="UTF-8">
@@ -4885,10 +4593,7 @@ try {
     `);
 
     pdfWindow.document.close();
-    showToast(
-      "Export Member gagal",
-      "error"
-    );
+    showToast( "Export Member gagal", "error" );
   }
 }
 
@@ -4901,23 +4606,14 @@ function openAddMemberModal() {
   document.body.appendChild(modalWrapper);
   // CLOSE BUTTON (FIXED)
   const closeBtn = modalWrapper.querySelector("#closeAddMemberModal");
-  if (closeBtn) {
-    closeBtn.onclick = () => {
-      modalWrapper.remove();
-    };
-  }
+  if (closeBtn) { closeBtn.onclick = () => { modalWrapper.remove(); }; }
   // CLICK OUTSIDE CLOSE
   modalWrapper.addEventListener("click", (e) => {
-    if (e.target === modalWrapper) {
-      modalWrapper.remove();
-    }
+    if (e.target === modalWrapper) { modalWrapper.remove(); }
   });
   // OPTIONAL: ESC KEY CLOSE
   document.addEventListener("keydown", function escClose(e) {
-    if (e.key === "Escape") {
-      modalWrapper.remove();
-      document.removeEventListener("keydown", escClose);
-    }
+    if (e.key === "Escape") { modalWrapper.remove(); document.removeEventListener("keydown", escClose); }
   });
 }
 
@@ -4931,52 +4627,24 @@ function saveMember() {
 
 async function submitMember() {
   const payload = {
-    ID_Member:
-      document.querySelector("#memberID").value,
-    Nama:
-      document.querySelector("#memberName").value,
-    Tgl_Lahir:
-      document.querySelector("#memberDOB").value,
-    WA:
-      document.querySelector("#memberWA").value,
-    Email:
-      document.querySelector("#memberEmail").value,
-    Instagram:
-      document.querySelector("#memberIG").value,
-    Facebook:
-      document.querySelector("#memberFB").value,
-    TikTok:
-      document.querySelector("#memberTiktok").value,
-    Address:
-      document.querySelector("#memberAddress").value,
-    branchId:
-      state.branchId
+    ID_Member: document.querySelector("#memberID").value,
+    Nama: document.querySelector("#memberName").value,
+    Tgl_Lahir: document.querySelector("#memberDOB").value,
+    WA: document.querySelector("#memberWA").value,
+    Email: document.querySelector("#memberEmail").value,
+    Instagram: document.querySelector("#memberIG").value,
+    Facebook: document.querySelector("#memberFB").value,
+    TikTok: document.querySelector("#memberTiktok").value,
+    Address: document.querySelector("#memberAddress").value,
+    branchId: state.branchId
   };
 
   try {
-	  
-    // SUPABASE RPC
-    const result =
-      await addMemberRPC(payload);
-    if (!result) {
-      throw new Error(
-        "Backend mengembalikan data kosong"
-      );
-    }
+    const result = await addMemberRPC(payload);
+    if (!result) { throw new Error( "Backend mengembalikan data kosong" ); }
+    if (result.success === false) { throw new Error( result.message || "Gagal menyimpan member" ); }
 
-    // Jika RPC mengembalikan success false
-    if (result.success === false) {
-      throw new Error(
-        result.message ||
-        "Gagal menyimpan member"
-      );
-    }
-
-    showToast(
-      "Member berhasil ditambahkan ✔",
-      "success"
-    );
-
+    showToast( "Member berhasil ditambahkan ✔", "success" );
     // Reset cache member
     state.memberPageData = null;
     state.members = null;
@@ -4986,40 +4654,26 @@ async function submitMember() {
     await loadMembers();
 	
   } catch (err) {
-    showToast(
-      err.message ||
-      "Gagal simpan member!",
-      "error"
-    );
+    showToast( err.message || "Gagal simpan member!", "error" );
   }
 }
 
 function closeAddMemberModal() {
   const modal = document.getElementById("addMemberModalWrapper");
-  if (modal) {
-    modal.remove();
-  }
+  if (modal) { modal.remove(); }
 }
 
 function updateDOBText() {
   const input = document.getElementById("memberDOB");
   const text = document.getElementById("dobText");
-  if (input.value) {
-    // format default YYYY-MM-DD → bisa langsung tampilkan
-    text.innerText = input.value;
-  } else {
-    text.innerText = "Select Date";
-  }
+  if (input.value) { text.innerText = input.value;
+  } else { text.innerText = "Select Date"; }
 }
 
 function resetMemberForm() {
   // reset semua input
-  const inputs = document.querySelectorAll(
-    "#memberID, #memberName, #memberDOB, #memberWA, #memberEmail, #memberIG, #memberFB, #memberTiktok"
-  );
-  inputs.forEach(el => {
-    if (el) el.value = "";
-  });
+  const inputs = document.querySelectorAll( "#memberID, #memberName, #memberDOB, #memberWA, #memberEmail, #memberIG, #memberFB, #memberTiktok" );
+  inputs.forEach(el => { if (el) el.value = ""; });
   // reset textarea (address)
   const address = document.querySelector("#memberAddress");
   if (address) address.value = "";
@@ -5034,8 +4688,8 @@ function resetMemberForm() {
 function initMemberTabs(modal) {
   const tabs = modal.querySelectorAll("[data-tab]");
   const contents = modal.querySelectorAll("[data-tab-content]");
+	
   function setTab(active) {
-
     tabs.forEach(btn => {
       const isActive = btn.dataset.tab === active;
       btn.classList.toggle("border-b-2", isActive);
@@ -5043,14 +4697,10 @@ function initMemberTabs(modal) {
       btn.classList.toggle("text-on-surface", isActive);
       btn.classList.toggle("text-on-surface-variant", !isActive);
     });
-    contents.forEach(sec => {
-      sec.classList.toggle("hidden", sec.dataset.tabContent !== active);
-    });
+    contents.forEach(sec => { sec.classList.toggle("hidden", sec.dataset.tabContent !== active); });
   }
   tabs.forEach(btn => {
-    btn.addEventListener("click", () => {
-      setTab(btn.dataset.tab);
-    });
+    btn.addEventListener("click", () => {  setTab(btn.dataset.tab); });
   });
   setTab("personal");
 }
@@ -5062,15 +4712,8 @@ function setField(modal, key, value) {
 }
 
 function openMemberProfile(memberId) {
-  const member = state.members.find(m =>
-    String(m.ID_Member).trim() === String(memberId).trim()
-  );
-
-  if (!member) {
-    alert("Member tidak ditemukan di state");
-    return;
-  } editingMember = member;
-
+  const member = state.members.find(m => String(m.ID_Member).trim() === String(memberId).trim() );
+  if (!member) { alert("Member tidak ditemukan di state"); return; } editingMember = member;
   // REMOVE OLD MODAL
   document.getElementById("member-modal-wrapper")?.remove();
   const template = document.getElementById("profilmemberModalTemplate");
@@ -5080,9 +4723,9 @@ function openMemberProfile(memberId) {
   wrapper.className = "fixed inset-0 z-[60]";
   wrapper.appendChild(clone);
   document.body.appendChild(wrapper);
+	
   const modal = wrapper.querySelector("[data-member-modal]");
   if (!modal) return;
-
   // HEADER
   modal.querySelector("#memberName").innerText = member.Nama || "-";
   modal.querySelector("#memberId").innerText = member.ID_Member || "-";
@@ -5101,90 +4744,26 @@ function openMemberProfile(memberId) {
     const tier5 = String(settings.tier_5_name_value || "") .toLowerCase();
     const current = String(tier).toLowerCase();
 
-    if (current === tier5) {
-      tierBadge.classList.add(
-        "bg-cyan-400",
-        "text-on-surface"
-      );
-    }
-
-    else if (current === tier4) {
-      tierBadge.classList.add(
-        "bg-gray-400",
-        "text-on-surface"
-      );
-    }
-
-    else if (current === tier3) {
-      tierBadge.classList.add(
-        "bg-amber-500",
-        "text-on-surface"
-      );
-    }
-
-    else if (current === tier2) {
-      tierBadge.classList.add(
-        "bg-slate-500",
-        "text-on-surface"
-      );
-    }
-
-    else {
-      tierBadge.classList.add(
-        "bg-zinc-700",
-        "text-on-surface"
-      );
-    }
+    if (current === tier5) { tierBadge.classList.add( "bg-cyan-400", "text-on-surface" );
+    } else if (current === tier4) { tierBadge.classList.add( "bg-gray-400", "text-on-surface" );
+    }else if (current === tier3) { tierBadge.classList.add( "bg-amber-500", "text-on-surface" );
+    } else if (current === tier2) { tierBadge.classList.add( "bg-slate-500", "text-on-surface" );
+    } else { tierBadge.classList.add( "bg-zinc-700", "text-on-surface" ); }
   }
   const img = modal.querySelector("#memberPhoto");
-
     if (img) {
       let photoUrl = "";
-      const photo =
-        String(
-          member.Photo || ""
-        ).trim();
+      const photo = String( member.Photo || "" ).trim();
 		
       if (photo) {
-        // ===== SUPABASE =====
-        if (
-          photo.includes("supabase.co")
-        ) {
-          photoUrl = photo;
-        }
-        // ===== GOOGLE DRIVE LINK =====
-        else if (
-          photo.includes(
-            "drive.google.com"
-          )
-        ) {
-          const match =
-            photo.match(
-              /\/d\/([^/]+)/
-            );
-
-          if (match) {
-            photoUrl =
-              "https://drive.google.com/thumbnail?id=" +
-              match[1] +
-              "&sz=w1000";
-          }
-        }
-        // ===== HANYA ID DRIVE =====
-        else {
-          photoUrl =
-            "https://drive.google.com/thumbnail?id=" +
-            photo +
-            "&sz=w1000";
-        }
+        if ( photo.includes("supabase.co") ) { photoUrl = photo; }
+        else if ( photo.includes( "drive.google.com" )
+        ) { const match = photo.match( /\/d\/([^/]+)/ );
+          if (match) { photoUrl = "https://drive.google.com/thumbnail?id=" + match[1] + "&sz=w1000"; }
+        } else { photoUrl = "https://drive.google.com/thumbnail?id=" + photo + "&sz=w1000"; }
       }
 
-      img.src =
-        photoUrl ||
-        "https://ui-avatars.com/api/?name=" +
-        encodeURIComponent(
-          member.Nama || "Member"
-        );
+      img.src = photoUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent( member.Nama || "Member" );
     }
 
   // FIELD MAPPING (FIXED SESUAI TABLE)
@@ -5193,9 +4772,7 @@ function openMemberProfile(memberId) {
     if (el) el.innerText = val ?? "-";
   };
 
-  set(
-  "joinDate",
-  member.Join_Date
+  set( "joinDate", member.Join_Date
     ? new Date(member.Join_Date).toLocaleDateString("id-ID", {
         day: "2-digit",
         month: "long",
@@ -5204,34 +4781,26 @@ function openMemberProfile(memberId) {
     : "-"
   );
 
-  set(
-    "birthday",
-    member.Tgl_Lahir
-      ? new Date(member.Tgl_Lahir).toLocaleDateString("id-ID", {
-          day: "2-digit",
-          month: "long",
-          year: "numeric"
-        })
-      : "-"
+  set( "birthday", member.Tgl_Lahir
+		? new Date(member.Tgl_Lahir).toLocaleDateString("id-ID", {
+				day: "2-digit",
+				month: "long",
+				year: "numeric"
+			})
+		: "-"
   );
   set("whatsapp", member.WA);
   set("address", member.Address);
 
   // MONEY
   const invest = modal.querySelector("#totalInvestment");
-  if (invest) {
-    invest.innerHTML = `IDR ${(Number(member.Total_Spend || 0)).toLocaleString("id-ID")}`;
-  }
+  if (invest) { invest.innerHTML = `IDR ${(Number(member.Total_Spend || 0)).toLocaleString("id-ID")}`; }
+	
   const points = modal.querySelector("#loyaltyPoints");
-  if (points) {
-    points.innerHTML = `${member.Point || 0} <span class="text-xs ml-2">PTS</span>`;
-  }
+  if (points) { points.innerHTML = `${member.Point || 0} <span class="text-xs ml-2">PTS</span>`; }
 
   // TIER HISTORY
-  getMemberDetailPageRPC(
-    member.ID_Member,
-    state.branchId
-  )
+  getMemberDetailPageRPC( member.ID_Member, state.branchId )
   .then(data => {
     if(!data || !data.success){
       renderTierProgression([]);
@@ -5244,12 +4813,8 @@ function openMemberProfile(memberId) {
   })
   .catch(err => {
     renderTierProgression([]);
-    renderTierTimeline(
-      [],
-      modal
-    );
+    renderTierTimeline( [], modal );
   });
-
   document.body.style.overflow = "hidden";
   initMemberTabs(modal);
 }
@@ -5269,10 +4834,7 @@ function initMemberTabs(modal) {
           "text-on-surface",
           "font-semibold"
         );
-        b.classList.add(
-          "text-on-surface-variant"
-        );
-
+        b.classList.add( "text-on-surface-variant" );
       });
       // ACTIVE BUTTON
       btn.classList.add(
@@ -5281,19 +4843,12 @@ function initMemberTabs(modal) {
         "text-on-surface",
         "font-semibold"
       );
-      btn.classList.remove(
-        "text-on-surface-variant"
-      );
+      btn.classList.remove( "text-on-surface-variant" );
       // HIDE CONTENT
-      contents.forEach(content => {
-        content.classList.add("hidden");
-      });
+      contents.forEach(content => { content.classList.add("hidden"); });
       // SHOW TARGET
-      const activeTab =
-        modal.querySelector(`#${target}Tab`);
-      if (activeTab) {
-        activeTab.classList.remove("hidden");
-      }
+      const activeTab = modal.querySelector(`#${target}Tab`);
+      if (activeTab) {activeTab.classList.remove("hidden");}
     });
   });
 }
@@ -5335,8 +4890,6 @@ function renderTierTimeline(history, modal) {
     else if (tierLower === tier3) { description = "Demonstrated strong purchasing activity with enhanced loyalty rewards."; }
     else if (tierLower === tier2) { description = "Actively engaged through recurring visits and steady transaction growth."; }
 
-
-
     return `
       <div class="relative pl-10">
         <div class=" absolute left-[15px] top-2 bottom-0 w-px
@@ -5376,8 +4929,7 @@ function renderTierTimeline(history, modal) {
                 ${description}
               </p>
             </div>
-            ${
-              current
+            ${current
                 ? `
                   <div class=" bg-outline-variant px-2 py-1 rounded-md text-[10px] font-bold text-on-surface border border-outline-variant">
                     CURRENT
@@ -5401,10 +4953,7 @@ function closeMemberProfile() {
 document.addEventListener("click", function (e) {
   // CLOSE BUTTON
   const closeBtn = e.target.closest("[data-member-close]");
-  if (closeBtn) {
-    closeMemberProfile();
-    return;
-  }
+  if (closeBtn) { closeMemberProfile(); return; }
   // BACKDROP CLICK
   const modal = e.target.closest("[data-member-modal]");
   if (modal && e.target === modal) {
@@ -5415,6 +4964,7 @@ document.addEventListener("click", function (e) {
 function enableEditMember() {
   const modal = document.querySelector("[data-member-modal]");
   if (!modal || !editingMember) return;
+	
   const makeInput = (id, value) => {
     const el = modal.querySelector(`#${id}`);
     if (!el) return;
@@ -5429,9 +4979,7 @@ function enableEditMember() {
   makeInput("birthday", editingMember.Tgl_Lahir);
   makeInput("joinDate", editingMember.Join_Date);
   // ubah tombol jadi SAVE
-	const btn =
-	  document.querySelector("#memberEditBtn");
-
+	const btn = document.querySelector("#memberEditBtn");
 	if (btn) {
 	  btn.innerHTML = `
 	    <span
@@ -5446,57 +4994,23 @@ function enableEditMember() {
 }
 
 async function saveMemberEdit() {
-  const modal =
-    document.querySelector(
-      "[data-member-modal]"
-    );
-
-  if (!modal || !editingMember) {
-    return;
-  }
-
+  const modal = document.querySelector( "[data-member-modal]" );
+  if (!modal || !editingMember) { return; }
   // PAYLOAD
   const payload = {
     ...editingMember,
-
-    Nama:
-      document.querySelector(
-        "#edit-memberName"
-      ).value,
-
-    WA:
-      document.querySelector(
-        "#edit-whatsapp"
-      ).value,
-
-    Address:
-      document.querySelector(
-        "#edit-address"
-      ).value,
-
-    Tgl_Lahir:
-      document.querySelector(
-        "#edit-birthday"
-      ).value,
-
-    Join_Date:
-      document.querySelector(
-        "#edit-joinDate"
-      ).value,
-    PhotoBase64:
-      memberPhotoBase64,
-    branchId:
-      state.branchId
-
+    Nama: document.querySelector( "#edit-memberName" ).value,
+    WA: document.querySelector( "#edit-whatsapp" ).value,
+    Address: document.querySelector( "#edit-address" ).value,
+    Tgl_Lahir: document.querySelector( "#edit-birthday" ).value,
+    Join_Date: document.querySelector( "#edit-joinDate" ).value,
+    PhotoBase64: memberPhotoBase64,
+    branchId: state.branchId
   };
 	
   try {
     // UPLOAD FOTO BARU
-    if (
-      payload.PhotoBase64 &&
-      payload.ID_Member
-    ) {
-
+    if ( payload.PhotoBase64 && payload.ID_Member ) {
       const photoUrl =
         await uploadMemberImage(
           payload.PhotoBase64,
