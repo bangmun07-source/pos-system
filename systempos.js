@@ -11809,15 +11809,14 @@ function closeOrderSourceForm() {
   document.getElementById("orderSourceForm")?.classList.add("hidden");
 }
 
-// ==========================================
 // LOAD ORDER SOURCES
-// ==========================================
 async function loadOrderSources() {
+	const sessionId = localStorage.getItem('pos_session_id');
   const tbody = document.getElementById("orderSourceTableBody");
   const count = document.getElementById("orderSourceCount");
 
   if (!tbody) return;
-
+	if (!sessionId) { throw new Error('Session tidak ditemukan.'); }
   tbody.innerHTML = `
     <tr>
       <td colspan="4" class="px-4 py-8 text-center text-muted">
@@ -11912,10 +11911,11 @@ function escapeOrderSourceHtml(value) {
 async function toggleOrderSourceStatus(id) {
   const item = orderSourcesData.find(row => row.id === id);
   if (!item) { showToast("Sumber pesanan tidak ditemukan.", "error"); return; }
-
+	
+	const sessionId = localStorage.getItem('pos_session_id');
   const nextStatus = !item.is_active;
   const action = nextStatus ? "mengaktifkan" : "menonaktifkan";
-
+	if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
   if (!confirm(`Yakin ingin ${action} sumber "${item.name}"?`)) { return; }
 
   try {
@@ -11934,23 +11934,23 @@ async function toggleOrderSourceStatus(id) {
     );
 
     await loadOrderSources();
-
   } catch (error) {
     console.error("toggleOrderSourceStatus:", error);
     showToast("Gagal mengubah status sumber pesanan.", "error");
   }
 }
 
-
 // SAVE / EDIT ORDER SOURCE
 async function saveOrderSource() {
+	const sessionId = localStorage.getItem('pos_session_id');
   const id = document.getElementById("orderSourceId")?.value.trim();
   const name = document.getElementById("orderSourceName")?.value.trim();
   const codeInput = document.getElementById("orderSourceCode")?.value.trim();
   const button = document.querySelector( '#orderSourceForm button[onclick="saveOrderSource()"]' );
 
   if (!name || !codeInput) { showToast("Nama dan kode sumber wajib diisi.", "error"); return; }
-
+	if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+	
   const code = codeInput.toUpperCase().replace(/\s+/g, "_");
   if (!/^[A-Z0-9_-]+$/.test(code)) { showToast( "Kode hanya boleh berisi huruf, angka, _ atau -.", "error" ); return; }
 
@@ -11965,8 +11965,7 @@ async function saveOrderSource() {
 
     if (error) throw error;
 
-    showToast(
-      id
+    showToast( id
         ? "Sumber pesanan berhasil diperbarui."
         : "Sumber pesanan berhasil ditambahkan.",
       "success"
@@ -11977,9 +11976,7 @@ async function saveOrderSource() {
 
   } catch (error) {
     console.error("saveOrderSource:", error);
-
     const message = String(error?.message || "");
-
     if (
       message.toLowerCase().includes("duplicate") ||
       message.toLowerCase().includes("already exists") ||
@@ -12516,47 +12513,47 @@ function renderExpenseTable(data) {
 }
 
 function showExpenseReceipt(index) {
-    const expense = expenseData[index];
-    if (!expense) return;
-    let modal = document.getElementById("expense-receipt-modal");
-    if (!modal) {
-        const template = document.getElementById("expense-receipt-modal-template");
-        document.body.appendChild(template.content.cloneNode(true));
-        modal = document.getElementById("expense-receipt-modal");
-    }
-    // Isi Data
-    document.getElementById("receipt-ref").textContent = expense.refId || "-";
-    document.getElementById("receipt-date").textContent = formatDate(expense.tanggal);
-    document.getElementById("receipt-category").textContent =  expense.category || "-";
-    document.getElementById("receipt-description").textContent =  expense.description || "-";
-    document.getElementById("receipt-payment").textContent = expense.paymentMethod || "-";
-    document.getElementById("receipt-branch").textContent = expense.outlet || "-";
-    document.getElementById("receipt-user").textContent = expense.createdBy || "-";
-    document.getElementById("receipt-amount").textContent = formatCurrency(expense.amount || 0);
-    // Status
-    const status = document.getElementById("receipt-status");
-    status.textContent = expense.status || "-";
-    status.className = "px-4 py-1 rounded-md text-sm font-semibold";
-    switch ((expense.status || "").toLowerCase()) {
-		case "paid":
-			status.classList.add(
-					"bottom-theme", "text-on-surface"
-			); break;
-		case "pending":
-			status.classList.add(
-					"bg-yellow-600", "text-yellow-700"
-			); break;
-		case "void":
-			status.classList.add(
-				"bg-red-600", "text-red-700"
-			); break;
-		default:
-			status.classList.add(
-				"bg-gray-600/20", "text-gray-700"
-			); break;
-    }
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	const expense = expenseData[index];
+	if (!expense) return;
+	let modal = document.getElementById("expense-receipt-modal");
+	if (!modal) {
+			const template = document.getElementById("expense-receipt-modal-template");
+			document.body.appendChild(template.content.cloneNode(true));
+			modal = document.getElementById("expense-receipt-modal");
+	}
+	// Isi Data
+	document.getElementById("receipt-ref").textContent = expense.refId || "-";
+	document.getElementById("receipt-date").textContent = formatDate(expense.tanggal);
+	document.getElementById("receipt-category").textContent =  expense.category || "-";
+	document.getElementById("receipt-description").textContent =  expense.description || "-";
+	document.getElementById("receipt-payment").textContent = expense.paymentMethod || "-";
+	document.getElementById("receipt-branch").textContent = expense.outlet || "-";
+	document.getElementById("receipt-user").textContent = expense.createdBy || "-";
+	document.getElementById("receipt-amount").textContent = formatCurrency(expense.amount || 0);
+	// Status
+	const status = document.getElementById("receipt-status");
+	status.textContent = expense.status || "-";
+	status.className = "px-4 py-1 rounded-md text-sm font-semibold";
+	switch ((expense.status || "").toLowerCase()) {
+	case "paid":
+		status.classList.add(
+				"bottom-theme", "text-on-surface"
+		); break;
+	case "pending":
+		status.classList.add(
+				"bg-yellow-600", "text-yellow-700"
+		); break;
+	case "void":
+		status.classList.add(
+			"bg-red-600", "text-red-700"
+		); break;
+	default:
+		status.classList.add(
+			"bg-gray-600/20", "text-gray-700"
+		); break;
+	}
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 function closeExpenseReceipt() {
@@ -12568,16 +12565,16 @@ function closeExpenseReceipt() {
 
 let selectedExpenseIndex = null;
 function showExpenseMenu(event, index) {
-    event.stopPropagation();
-    selectedExpenseIndex = index;
-    let modal = document.getElementById("expense-action-modal");
-    if (!modal) {
-        const template = document.getElementById("expenseActionModalTemplate");
-        document.body.appendChild(template.content.cloneNode(true));
-        modal = document.getElementById("expense-action-modal");
-    }
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	event.stopPropagation();
+	selectedExpenseIndex = index;
+	let modal = document.getElementById("expense-action-modal");
+	if (!modal) {
+		const template = document.getElementById("expenseActionModalTemplate");
+		document.body.appendChild(template.content.cloneNode(true));
+		modal = document.getElementById("expense-action-modal");
+	}
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 function closeExpenseMenu() {
@@ -12587,18 +12584,18 @@ function closeExpenseMenu() {
 }
 
 function showExpenseStatusModal(expense) {
-    let modal = document.getElementById("expense-status-modal");
-    if (!modal) {
-        const template = document.getElementById("expenseStatusModalTemplate");
-        document.body.appendChild(template.content.cloneNode(true));
-        modal = document.getElementById("expense-status-modal");
-    }
+	let modal = document.getElementById("expense-status-modal");
+	if (!modal) {
+		const template = document.getElementById("expenseStatusModalTemplate");
+		document.body.appendChild(template.content.cloneNode(true));
+		modal = document.getElementById("expense-status-modal");
+	}
 
-    document.getElementById("expenseStatusRef").textContent = expense.refId;
-    document.getElementById("expenseCurrentStatus").textContent = expense.status;
-    document.getElementById("expenseNewStatus").value = expense.status;
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+	document.getElementById("expenseStatusRef").textContent = expense.refId;
+	document.getElementById("expenseCurrentStatus").textContent = expense.status;
+	document.getElementById("expenseNewStatus").value = expense.status;
+	modal.classList.remove("hidden");
+	modal.classList.add("flex");
 }
 
 async function saveExpenseStatus() {
@@ -14330,11 +14327,8 @@ async function loadCategorySettings() {
 
   try {
     const branchId = state.branchId;
-
     if (!branchId) {  return; }
-
-    const categories =
-      await getCategoriesRPC( branchId );
+    const categories =  await getCategoriesRPC( branchId );
 
     // RESET UI
     for (let i = 1; i <= 5; i++) {
@@ -44552,7 +44546,6 @@ function resetAttendanceScannerUI() {
 
 
 async function startAttendanceScanner() {
-
   if (attendanceScannerRunning) { return; }
 
   const reader = document.getElementById( 'attendanceScanReader' );
