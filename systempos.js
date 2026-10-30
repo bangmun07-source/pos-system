@@ -5646,13 +5646,9 @@ async function saveNewTable() {
   if (!state.branchId) { alert( "Branch belum tersedia." ); return; }
 
   try {
-	
     // SUPABASE RPC
-    const res =
-      await addNewTableRPC( tableName, state.branchId );
-
-    if (res) {
-      closeAddTableModal();
+    const res = await addNewTableRPC( tableName, state.branchId );
+    if (res) { closeAddTableModal();
 
       // CLEAR CACHE
       state.tableData = null;
@@ -5663,10 +5659,7 @@ async function saveNewTable() {
   }
 
   catch (err) {
-    alert(
-      err?.message ||
-      "Gagal menambahkan meja"
-    );
+    alert( err?.message || "Gagal menambahkan meja" );
   }
 }
 
@@ -5676,7 +5669,6 @@ async function saveNewTable() {
 // ==================================	
 
 async function loadInventoryPage(branchId) {
-
   if (
     state.inventoryData &&
     state.inventoryBranchId === branchId
@@ -5692,7 +5684,6 @@ async function loadInventoryPage(branchId) {
 					p_session_id: sessionId
 	      }
 	    );
-
     if (error) { throw error; }
 		
     // CACHE
@@ -5707,77 +5698,52 @@ async function loadInventoryPage(branchId) {
     // RENDER
     renderInventoryPage( state.inventoryData );
   } catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal load inventory",
-      "error"
-    );
+    showToast( err?.message || "Gagal load inventory", "error" );
   }
 }
 
 function renderInventoryPage(data) {
 	if (!data) return;
-	
 	// SUMMARY
 	const summary = data.summary || {};
-	const totalMaterials =
-		document.getElementById(
-		"totalMaterialsValue"
-	);
+	const totalMaterials = document.getElementById( "totalMaterialsValue" );
 	if(totalMaterials){
-		totalMaterials.innerHTML =
-		`${summary.totalSKU || 0}
-		<span class="text-sm text-muted ">
-		SKU
-		</span>`;
-	
+		totalMaterials.innerHTML = `${summary.totalSKU || 0}
+			<span class="text-sm text-muted ">
+				SKU
+			</span>`;
 	}
-	const estimatedValue =
-		document.getElementById(
-		"estimatedValueValue"
-	);
+	
+	const estimatedValue = document.getElementById( "estimatedValueValue" );
 	if(estimatedValue){
-		estimatedValue.innerHTML =
-		`${((summary.totalValue || 0) / 1000000).toFixed(1)}
+		estimatedValue.innerHTML = `${((summary.totalValue || 0) / 1000000).toFixed(1)}
 			<span class="text-sm text-muted ">
 				IDR
 			</span>`;
 	}
-	const criticalStock =
-		document.getElementById(
-			"criticalStockValue"
-		);
+	
+	const criticalStock = document.getElementById( "criticalStockValue" );
 	if(criticalStock){
-		criticalStock.innerHTML =
-		`${summary.criticalStock || 0}
+		criticalStock.innerHTML = `${summary.criticalStock || 0}
 			<span class="text-sm text-error/60">
 				Items
 			</span>`;
 	}
-	const dailyDeduction =
-		document.getElementById(
-			"dailyDeductionValue"
-		);
+	
+	const dailyDeduction = document.getElementById( "dailyDeductionValue" );
 	if(dailyDeduction){
-		dailyDeduction.innerHTML =
-		`${summary.dailyDeduction || 0}
+		dailyDeduction.innerHTML = `${summary.dailyDeduction || 0}
 			<span class="text-sm text-muted ">
 				Unit
 			</span>`;
 	}
 	  // INGREDIENTS
-	  state.ingredients =
-	    data.ingredients || [];
+	  state.ingredients = data.ingredients || [];
 	
-	  const tbody =
-	    document.getElementById(
-	      "ingredientsTable"
-	    );
+	  const tbody = document.getElementById( "ingredientsTable" );
 	
 	  if (tbody) {
-	    if (
-	      state.ingredients.length === 0
-	    ) {
+	    if ( state.ingredients.length === 0 ) {
 	      tbody.innerHTML = `
 	        <tr>
 	          <td colspan="8"
@@ -5786,19 +5752,11 @@ function renderInventoryPage(data) {
 	          </td>
 	        </tr>
 	      `;
-	
-	    } else {
-	      renderIngredients(
-	        state.ingredients
-	      );
-	    }
+	    } else { renderIngredients( state.ingredients ); }
 	  }
-	
 	// PURCHASES
-	purchaseData =
-		data.purchases || [];
-	purchaseFilteredData =
-		[...purchaseData];
+	purchaseData = data.purchases || [];
+	purchaseFilteredData = [...purchaseData];
 	purchaseCurrentPage = 1;
 	applyPurchaseFilters();
 	// SUPPLIERS
@@ -5807,37 +5765,22 @@ function renderInventoryPage(data) {
 	state.supplierBranchId = data.branchId || state.branchId;
 	renderSuppliers();
 	// RECIPES
-	state.recipes =
-	  data.recipes || [];
-	allRecipesData =
-	  data.recipes || [];
+	state.recipes = data.recipes || [];
+	allRecipesData = data.recipes || [];
 	renderRecipes();
 }
 
 async function loadIngredients(branchId) {
-  if (!branchId) {
-    return;
-  }
-  const cacheKey =
-    `ingredients_${branchId}`;
+  if (!branchId) { return; }
+  const cacheKey = `ingredients_${branchId}`;
 
   // CACHE
-  if (
-    state.ingredients &&
-    state.ingredientsCacheKey === cacheKey
-  ) {
-    renderIngredients(
-      state.ingredients
-    );
-    return;
-  }
+  if ( state.ingredients && state.ingredientsCacheKey === cacheKey ) {
+    renderIngredients( state.ingredients ); return; }
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_ingredients",
       {
@@ -5845,29 +5788,19 @@ async function loadIngredients(branchId) {
 				p_session_id: sessionId
       }
     );
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
     // CACHE
     state.ingredients = data || [];
     state.ingredientsCacheKey = cacheKey;
     // EMPTY CHECK
-    const tbody =
-      document.getElementById(
-        "ingredientsTable"
-      );
-
-    if (!tbody) {
-      return;
-    }
-    if (
-      !state.ingredients.length
-    ) {
+    const tbody = document.getElementById( "ingredientsTable" );
+    if (!tbody) { return; }
+    if ( !state.ingredients.length ) {
       tbody.innerHTML = `
         <tr>
           <td colspan="8"
-              class="text-center py-6 text-muted">
+						class="text-center py-6 text-muted">
             No data
           </td>
         </tr>
@@ -5875,44 +5808,21 @@ async function loadIngredients(branchId) {
       return;
     }
     // RENDER
-    renderIngredients(
-      state.ingredients
-    );
+    renderIngredients( state.ingredients );
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat ingredients.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat ingredients.", "error" );
   }
 }
 
 function initPurchaseFilters() {
-  const search =
-    document.getElementById(
-      "purchaseSearch"
-    );
-
-  const status =
-    document.getElementById(
-      "purchaseStatusFilter"
-    );
-
-  search?.addEventListener(
-    "input",
-    () => {
-      applyPurchaseFilters();
-    }
-  );
-
-  status?.addEventListener(
-    "change",
-    () => {
-      applyPurchaseFilters();
-    }
-  );
+  const search = document.getElementById("purchaseSearch");
+  const status = document.getElementById("purchaseStatusFilter");
+	
+  search?.addEventListener("input", () => {applyPurchaseFilters();});
+  status?.addEventListener("change", () => { applyPurchaseFilters();});
 }
+
 async function loadIngredientPurchases(branchId, start = null, end = null) {
   const tbody = document.getElementById("ingredientPurchaseTable");
 	if (!branchId) {
@@ -5946,9 +5856,8 @@ async function loadIngredientPurchases(branchId, start = null, end = null) {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
+		
     purchaseData = Array.isArray(data)
       ? data
       : [];
@@ -6010,7 +5919,6 @@ function renderIngredientPurchases(purchases) {
 
   tbody.innerHTML = purchases.map(purchase => {
     const status = String( purchase.Status || "" ).toUpperCase();
-
     return `
       <tr class="hover:bg-outline-variant transition">
         <td class="px-8 py-4 text-sm font-semibold"> ${escapeHtml(purchase.ID || "-")} </td>
@@ -6058,15 +5966,14 @@ function renderPurchasePagination(totalPages) {
   if (totalPages <= 1) { container.innerHTML = ""; return; }
 
   let html = ` <div class="flex items-center gap-1"> `;
-
   // Previous
-  html += `
-    <button onclick="changePurchasePage(${purchaseCurrentPage - 1})"
-      ${purchaseCurrentPage === 1 ? "disabled" : ""}
-      class="px-3 py-1 text-xs disabled:opacity-40">
-      ‹
-    </button>
-  `;
+	  html += `
+	    <button onclick="changePurchasePage(${purchaseCurrentPage - 1})"
+	      ${purchaseCurrentPage === 1 ? "disabled" : ""}
+	      class="px-3 py-1 text-xs disabled:opacity-40">
+	      ‹
+	    </button>
+	  `;
 
   for (
     let i = 1;
@@ -6084,7 +5991,6 @@ function renderPurchasePagination(totalPages) {
       </button>
     `;
   }
-
   // Next
   html += `
     <button onclick="changePurchasePage(${purchaseCurrentPage + 1})"
@@ -6098,21 +6004,9 @@ function renderPurchasePagination(totalPages) {
 }
 
 function changePurchasePage(page) {
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        purchaseFilteredData.length
-        / purchasePageSize
-      )
-    );
-
-  if (
-    page < 1 ||
-    page > totalPages
-  ) {
-    return;
-  }
+  const totalPages = Math.max( 1, Math.ceil( purchaseFilteredData.length / purchasePageSize ) );
+  if ( page < 1 || page > totalPages ) { return; }
+	
   purchaseCurrentPage = page;
   renderPurchasePage();
 }
@@ -6120,9 +6014,9 @@ function changePurchasePage(page) {
 function renderPurchaseStatus(status) {
   let className = "bg-surface-container-high text-muted";
   if (status === "DRAFT") { className = "text-muted"; }
-  if (status === "PAID") { className = "bg-success-container/20 text-success"; }
-  if (status === "PENDING") { className = "bg-warning-container/20 text-warning"; }
-  if (status === "CANCELLED") { className = "bg-error-container/20 text-error"; }
+  if (status === "PAID") { className = "text-emerald-800"; }
+  if (status === "PENDING") { className = "text-blue-800"; }
+  if (status === "CANCELLED") { className = "text-red-800"; }
   return `
     <span class="inline-flex items-center px-3 py-1 rounded-md text-xs font-bold ${className}">
       ${status || "UNKNOWN"}
@@ -6131,15 +6025,12 @@ function renderPurchaseStatus(status) {
 }
 
 window.openPurchaseAction = function (purchaseId) {
-  const purchase = purchaseData.find(
-    item => String(item.ID) === String(purchaseId)
-  );
-
+  const purchase = purchaseData.find( item => String(item.ID) === String(purchaseId) );
   if (!purchase) { return; }
 	
 	window.currentPurchaseAction = purchase;
+	
   const template = document.getElementById( "ingredientPurchaseActionModal" );
-
   if (!template) { return; }
   // Hapus popup lama
   document
@@ -6159,10 +6050,7 @@ window.openPurchaseAction = function (purchaseId) {
   // ISI DATA
   const setText = (id, value) => {
     const el = wrapper.querySelector("#" + id);
-    if (el) {
-      el.textContent =
-        value ?? "-";
-    }
+    if (el) { el.textContent = value ?? "-"; }
   };
 
   setText( "purchaseModalIngredient", purchase.Ingredient );
@@ -6175,9 +6063,7 @@ window.openPurchaseAction = function (purchaseId) {
       style: "currency",
       currency: "IDR",
       maximumFractionDigits: 0
-    }).format(
-      Number(purchase.Total_Price || 0)
-    )
+    }).format(Number(purchase.Total_Price || 0))
   );
   setText( "purchaseModalPayment", purchase.Payment_Method );
   setText( "purchaseModalStatus", purchase.Status );
@@ -11384,8 +11270,8 @@ async function loadOrderSources() {
         <td class="px-4 py-3 text-center">
           <span class="inline-flex px-2 py-1 rounded-md text-xs ${
             item.is_active
-              ? "bg-emerald-600/10 text-emerald-800"
-              : "bg-gray-600/10 text-muted"
+              ? "bg-emerald-600/20 text-emerald-800"
+              : "bg-gray-600/20 text-muted"
           }">
             ${item.is_active ? "Aktif" : "Nonaktif"}
           </span>
@@ -11403,7 +11289,7 @@ async function loadOrderSources() {
 				      class="px-3 py-1.5 rounded-md text-xs font-medium ${
 				        item.is_active
 				          ? 'text-red-800 hover:text-red-800/20'
-				          : 'text-emerald-400 hover:text-emerald-800/20'
+				          : 'text-emerald-800 hover:text-emerald-800/20'
 				      }">
 				      ${item.is_active ? 'Nonaktifkan' : 'Aktifkan'}
 				    </button>
@@ -11417,7 +11303,7 @@ async function loadOrderSources() {
     if (count) count.textContent = "—";
     tbody.innerHTML = `
       <tr>
-        <td colspan="4" class="px-4 py-8 text-center text-red-400">
+        <td colspan="4" class="px-4 py-8 text-center text-muted">
           Gagal memuat data sumber pesanan.
         </td>
       </tr>`;
