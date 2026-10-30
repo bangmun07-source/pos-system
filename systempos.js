@@ -1764,6 +1764,7 @@ async function sendReceiptWhatsapp() {
   try {
 		
     const trx = await getReceiptDataRPC(trxId);
+		console.log("Receipt logo URL:", trx.logo_url);
     if (!trx) { alert("Transaksi tidak ditemukan"); return; }
 		
     sendReceiptWhatsappWithData( trx, phone, null );
@@ -1792,15 +1793,12 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   wrapper.querySelector("#receiptTitle").textContent =
   trx.company_name || "-";
   if (trx.logo_url) {
-  wrapper.querySelector("#receiptLogo").src =
-    trx.logo_url;
-  }
+  wrapper.querySelector("#receiptLogo").src = trx.logo_url; }
+	
   const ig = wrapper.querySelector("#receiptInstagram");
-  if (ig) {
-  ig.textContent =
-    trx.instagram
-      ? "Instagram: " + trx.instagram
-      : "";
+  if (ig) { ig.textContent = trx.instagram
+		? "Instagram: " + trx.instagram
+		: "";
   }
   wrapper.querySelector("#receiptId").textContent = trx.id || "-";
   wrapper.querySelector("#receiptDate").textContent = trx.date || "-";
@@ -1809,11 +1807,8 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   wrapper.querySelector("#receiptPhone").textContent = trx.phone || "-";
   wrapper.querySelector("#receiptAddress").textContent = trx.address || "-";
   const footer = wrapper.querySelector("#receiptFooterText");
-  if (footer) {
-    footer.innerHTML =
-      (trx.receipt_footer || 
-      "Thank you for visiting.\nEnjoy the moment. Take it slow.\nHave a nice day.")
-      .replace(/\n/g, "<br>");
+  if (footer) { footer.innerHTML = (trx.receipt_footer ||  "Thank you for visiting.\nEnjoy the moment. Take it slow.\nHave a nice day.")
+		.replace(/\n/g, "<br>");
   }
   wrapper.querySelector("#receiptTotal").textContent = "Rp " + total.toLocaleString("id-ID");
   // BREAKDOWN (FIXED)
@@ -1851,9 +1846,7 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 			});
 		
 			// CANVAS → BLOB
-			const blob = await new Promise(resolve => {
-			  receiptCanvas.toBlob( resolve, "image/jpeg", 0.65 );
-			});
+			const blob = await new Promise(resolve => { receiptCanvas.toBlob( resolve, "image/jpeg", 0.65 ); });
 			if (!blob) { throw new Error("Gagal membuat gambar receipt"); }
 		
 			// UPLOAD LANGSUNG KE SUPABASE STORAGE
@@ -1874,7 +1867,6 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 				.storage
 				.from("Recipes_Digital")
 				.getPublicUrl(fileName);
-				
 			const url = publicData?.publicUrl;
 			if (!url) { throw new Error( "Receipt URL tidak diterima" ); }
 				
@@ -1890,13 +1882,8 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
 				  }
 				);
 				
-				if (rpcError) { throw rpcError; }
-				if (!rpcResult?.success) {
-				  throw new Error(
-					rpcResult?.message ||
-					"Gagal menyimpan receipt URL"
-				  );
-				}
+			if (rpcError) { throw rpcError; }
+			if (!rpcResult?.success) { throw new Error( rpcResult?.message || "Gagal menyimpan receipt URL" ); }
 			
 			// WHATSAPP
 			let wa = String(phone || "") .replace(/\D/g, "");
