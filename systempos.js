@@ -11384,8 +11384,8 @@ async function loadOrderSources() {
         <td class="px-4 py-3 text-center">
           <span class="inline-flex px-2 py-1 rounded-md text-xs ${
             item.is_active
-              ? "bg-emerald-500/10 text-emerald-400"
-              : "bg-gray-500/10 text-muted"
+              ? "bg-emerald-600/10 text-emerald-800"
+              : "bg-gray-600/10 text-muted"
           }">
             ${item.is_active ? "Aktif" : "Nonaktif"}
           </span>
@@ -11402,8 +11402,8 @@ async function loadOrderSources() {
 				      onclick="toggleOrderSourceStatus('${item.id}')"
 				      class="px-3 py-1.5 rounded-md text-xs font-medium ${
 				        item.is_active
-				          ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20'
-				          : 'bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20'
+				          ? 'text-red-800 hover:text-red-800/20'
+				          : 'text-emerald-400 hover:text-emerald-800/20'
 				      }">
 				      ${item.is_active ? 'Nonaktifkan' : 'Aktifkan'}
 				    </button>
