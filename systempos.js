@@ -1792,9 +1792,12 @@ function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   // HEADER
   wrapper.querySelector("#receiptTitle").textContent =
   trx.company_name || "-";
-  if (trx.logo_url) {
-  wrapper.querySelector("#receiptLogo").src = trx.logo_url; }
-	
+	const logoEl = wrapper.querySelector("#receiptLogo");
+	if (logoEl && trx.logo_url) {
+	  logoEl.src = trx.logo_url;
+	  logoEl.style.display = "block";
+	}
+		
   const ig = wrapper.querySelector("#receiptInstagram");
   if (ig) { ig.textContent = trx.instagram
 		? "Instagram: " + trx.instagram
