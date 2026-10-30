@@ -5725,7 +5725,7 @@ function renderInventoryPage(data) {
 	const criticalStock = document.getElementById( "criticalStockValue" );
 	if(criticalStock){
 		criticalStock.innerHTML = `${summary.criticalStock || 0}
-			<span class="text-sm text-error/60">
+			<span class="text-sm text-red-800">
 				Items
 			</span>`;
 	}
@@ -6283,12 +6283,8 @@ async function loadSuppliers() {
 
 function renderSuppliers() {
   const tbody = document.getElementById( "suppliersTable" );
-
   if (!tbody) return;
-  if (
-    !allSupplierData ||
-    allSupplierData.length === 0
-  ) {
+  if (!allSupplierData || allSupplierData.length === 0) {
     tbody.innerHTML = `
       <tr>
         <td colspan="8"
@@ -6305,22 +6301,18 @@ function renderSuppliers() {
   const end = start + supplierItemsPerPage;
   const paginatedData = allSupplierData.slice( start, end );
 
-  tbody.innerHTML =
-    paginatedData.map(
-      (item, index) => {
-        const initials =
-          (item.name || "")
-            .split(" ")
-            .map(w => w[0])
-            .join("")
-            .substring(0, 2)
-            .toUpperCase();
-
-        const isActive = item.status === "Active";
-        // FINANCIAL DATA
-        const totalSpend = Number( item.total_spend ) || 0;
-        const totalDebt =  Number( item.total_debt ) || 0;
-
+  tbody.innerHTML = paginatedData.map(
+		(item, index) => {
+			const initials = (item.name || "")
+				.split(" ")
+				.map(w => w[0])
+				.join("")
+				.substring(0, 2)
+				.toUpperCase();
+			const isActive = item.status === "Active";
+			// FINANCIAL DATA
+			const totalSpend = Number( item.total_spend ) || 0;
+			const totalDebt =  Number( item.total_debt ) || 0;
         return `
           <tr class="${
             index % 2 === 0
@@ -6364,7 +6356,7 @@ function renderSuppliers() {
             <!-- HUTANG -->
             <td class="px-8 py-5 text-sm font-semibold ${
               totalDebt > 0
-                ? "text-error"
+                ? "text-red-800"
                 : "text-muted"
             }">
               Rp ${totalDebt.toLocaleString("id-ID")}
@@ -6372,8 +6364,7 @@ function renderSuppliers() {
 
             <!-- STATUS -->
             <td class="px-8 py-5">
-              ${
-                isActive
+              ${ isActive
                 ? `
                   <span class="px-3 py-1 bg-outline-variant/20 text-on-surface text-[10px] border border-outline-variant font-headline font-semibold rounded-md uppercase" >
                     Active
@@ -6392,7 +6383,6 @@ function renderSuppliers() {
               <div class="flex items-center justify-end gap-1" >
                 <button onclick="openEditSupplierModal('${item.id}')"
                   class="p-2 hover:text-on-surface rounded-md text-on-surface-variant" >
-
                   <span class="material-symbols-outlined text-sm">
                     edit
                   </span>
@@ -6426,65 +6416,24 @@ function openEditSupplierModal(supplierId) {
   document.body.appendChild(wrapper);
 	
   setTimeout(() => {
-    document.getElementById(
-      "supplierNameInput"
-    ).value = supplier.name || "";
-
-    document.getElementById(
-      "supplierCategoryInput"
-    ).value = supplier.category || "";
-
-    document.getElementById(
-      "supplierContactInput"
-    ).value = supplier.contact || "";
-
-    document.getElementById(
-      "supplierPhoneInput"
-    ).value = supplier.phone || "";
-
-    document.getElementById(
-      "supplierAddressInput"
-    ).value = supplier.notes || "";
-
-    document.getElementById(
-      "supplierStatusInput"
-    ).checked =
-      supplier.status === "Active";
+    document.getElementById( "supplierNameInput" ).value = supplier.name || "";
+    document.getElementById( "supplierCategoryInput" ).value = supplier.category || "";
+    document.getElementById( "supplierContactInput" ).value = supplier.contact || "";
+    document.getElementById( "supplierPhoneInput" ).value = supplier.phone || "";
+    document.getElementById( "supplierAddressInput" ).value = supplier.notes || "";
+    document.getElementById( "supplierStatusInput" ).checked = supplier.status === "Active";
   }, 50);
 }
 
 async function saveeditSupplier() {
   if (!currentSupplierData) return;
 
-  const supplierName =
-    document.getElementById(
-      "supplierNameInput"
-    );
-
-  const category =
-    document.getElementById(
-      "supplierCategoryInput"
-    );
-
-  const contact =
-    document.getElementById(
-      "supplierContactInput"
-    );
-
-  const phone =
-    document.getElementById(
-      "supplierPhoneInput"
-    );
-
-  const notes =
-    document.getElementById(
-      "supplierAddressInput"
-    );
-
-  const status =
-    document.getElementById(
-      "supplierStatusInput"
-    );
+  const supplierName = document.getElementById( "supplierNameInput" );
+  const category = document.getElementById( "supplierCategoryInput" );
+  const contact = document.getElementById( "supplierContactInput" );
+  const phone = document.getElementById( "supplierPhoneInput" );
+  const notes = document.getElementById( "supplierAddressInput" );
+  const status = document.getElementById( "supplierStatusInput" );
 
   if (
     !supplierName ||
@@ -6493,9 +6442,7 @@ async function saveeditSupplier() {
     !phone ||
     !notes ||
     !status
-  ) {
-    return;
-  }
+  ) { return; }
 
   const payload = {
     supplierId: currentSupplierData.id,
@@ -6509,14 +6456,10 @@ async function saveeditSupplier() {
   };
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     // UPDATE SUPPLIER
-    const {
-      data: updateData,
-      error: updateError
-    } =
-      await supabaseClient.rpc(
+    const { data: updateData, error: updateError } =
+			await supabaseClient.rpc(
         "update_supplier",
         {
           p_supplier_id: payload.supplierId,
@@ -6533,15 +6476,10 @@ async function saveeditSupplier() {
         }
       );
 
-    if (updateError) {
-      throw updateError;
-    }
+    if (updateError) { throw updateError; }
 
     // LOAD ULANG SUPPLIER
-    const {
-      data: suppliers,
-      error: suppliersError
-    } =
+    const { data: suppliers, error: suppliersError } =
       await supabaseClient.rpc(
         "get_suppliers",
         {
@@ -6550,9 +6488,7 @@ async function saveeditSupplier() {
         }
       );
 
-    if (suppliersError) {
-      throw suppliersError;
-    }
+    if (suppliersError) { throw suppliersError; }
 	
     // UPDATE CACHE
     allSupplierData = suppliers || [];
@@ -6562,16 +6498,9 @@ async function saveeditSupplier() {
     // RENDER
     renderSuppliers();
     closeEditSupplierModal();
-    showToast(
-      "Supplier updated",
-      "success"
-    );
+    showToast( "Supplier updated", "success" );
   } catch (err) {
-    showToast(
-      err?.message ||
-      "Failed update supplier",
-      "error"
-    );
+    showToast( err?.message || "Failed update supplier", "error" );
   }
 }
 	
@@ -6585,6 +6514,7 @@ function closeEditSupplierModal() {
 function renderSupplierPagination() {
   const container = document.getElementById("supplierPagination");
   if (!container) return;
+	
   const totalPages = Math.ceil(allSupplierData.length / supplierItemsPerPage);
   let html = `
     <div class="flex items-center gap-2">
@@ -6629,9 +6559,8 @@ function renderSupplierPagination() {
 }
 
 function changeSupplierPage(page) {
-  const totalPages = Math.ceil(
-    allSupplierData.length / supplierItemsPerPage
-  );
+  const totalPages = Math.ceil( allSupplierData.length / supplierItemsPerPage );
+	
   if (page < 1 || page > totalPages) return;
   supplierCurrentPage = page;
   renderSuppliers();
@@ -6639,9 +6568,7 @@ function changeSupplierPage(page) {
 
 async function loadRecipes() {
   const branchId = state.branchId;
-  if (!branchId) {
-    return;
-  }
+  if (!branchId) { return; }
 
   // CACHE
   if (
@@ -6655,45 +6582,31 @@ async function loadRecipes() {
   }
 
   try {
-    const sessionId =
-      localStorage.getItem("pos_session_id");
+    const sessionId = localStorage.getItem("pos_session_id");
     // SUPABASE RPC
-	const {
-	  data,
-	  error
-	} = await supabaseClient.rpc(
-	  "get_recipes",
-	  {
-	    p_branch_id: branchId,
-      p_session_id: sessionId
-	  }
-	);
+		const { data, error } = 
+			await supabaseClient.rpc(
+			  "get_recipes",
+			  {
+			    p_branch_id: branchId,
+		      p_session_id: sessionId
+			  }
+			);
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
     // CACHE
     state.recipes = data || [];
     allRecipesData = data || [];
     state.recipeData = data || [];
     state.recipeDataBranchId = branchId;
     // RENDER
-    const tbody =
-      document.getElementById(
-        "recipesTable"
-      );
-
-    if (!tbody) {
-      return;
-    }
+    const tbody = document.getElementById( "recipesTable" );
+    if (!tbody) { return; }
+		
     renderRecipes();
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Gagal memuat recipes.",
-      "error"
-    );
+    showToast( err?.message || "Gagal memuat recipes.", "error" );
   }
 }
 
@@ -6708,17 +6621,12 @@ function renderRecipes() {
           No recipes
         </td>
       </tr>
-    `;
-    return;
-  }
+    `; return; }
 
   // PAGINATION
   const start = (recipeCurrentPage - 1) * recipeItemsPerPage;
   const end = start + recipeItemsPerPage;
-
- 	const filteredData = allRecipesData.filter(item =>
-		!state.branchId || item.branchId === state.branchId
-	);
+ 	const filteredData = allRecipesData.filter(item => !state.branchId || item.branchId === state.branchId );
   const paginatedData = filteredData.slice(start, end);
   tbody.innerHTML = paginatedData.map((item, index) => {
     return `
@@ -6729,23 +6637,18 @@ function renderRecipes() {
       <td class="px-6 py-4 font-bold">
         ${item.productName || item.Product_Name || item.Nama_Produk || item.name || "-"}
       </td>
-
       <td class="px-6 py-4 text-sm text-on-surface-variant">
         ${item.ingredientsLabel || item.ingredients?.map(i => `${i.name} (${i.qty})`).join(", ")}
       </td>
-
       <td class="px-6 py-4">
         Rp ${(item.cost || 0).toLocaleString("id-ID")}
       </td>
-
       <td class="px-6 py-4">
         Rp ${(item.selling || 0).toLocaleString("id-ID")}
       </td>
-
       <td class="px-6 py-4">
         Rp ${(item.net || 0).toLocaleString("id-ID")}
       </td>
-
       <td class="text-center">
         <div class="flex flex-col items-center gap-1">
           <span class="text-xs font-bold">
@@ -6762,11 +6665,9 @@ function renderRecipes() {
           </div>
         </div>
       </td>
-
       <td class="px-6 py-4 font-semibold text-green-700">
         Rp ${item.profit.toLocaleString("id-ID")}
       </td>
-
       <td class="px-6 py-4 text-right text-[10px] text-on-surface-variant">
         <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:text-on-surface">
           <span class="material-symbols-outlined text-sm">edit</span>
@@ -6780,83 +6681,40 @@ function renderRecipes() {
 
 let currentRecipeData = null;
 async function openRecipeModal(recipeId) {
-  const item =
-    allRecipesData.find(
-      x =>
-        String(x.id) ===
-        String(recipeId)
-    );
+  const item = allRecipesData.find( x => String(x.id) === String(recipeId) );
 
   if (!item) return;
   currentRecipeData = item;
   document
-    .getElementById(
-      "recipeModalWrapper"
-    )
+    .getElementById( "recipeModalWrapper" )
     ?.remove();
-
-  const tpl =
-    document.getElementById(
-      "recipemasterledgerModal"
-    );
+	
+  const tpl = document.getElementById( "recipemasterledgerModal" );
   const wrapper = document.createElement("div");
+	
   wrapper.id = "recipeModalWrapper";
   wrapper.appendChild( tpl.content.cloneNode(true) );
   document.body.appendChild( wrapper );
-
   // FILL DATA
-  document.getElementById(
-    "recipeTitle"
-  ).innerText =
-    item.name;
+  document.getElementById( "recipeTitle" ).innerText = item.name;
+  document.getElementById( "recipeNameInput" ).value = item.name;
+  document.getElementById( "recipeSellingPrice" ).value = item.selling;
+  document.getElementById( "recipeNetPrice" ).value = item.net;
 
-  document.getElementById(
-    "recipeNameInput"
-  ).value =
-    item.name;
+  const margin = item.net > 0
+		? ((item.net - item.cost) / item.net) * 100
+		: 0;
 
-  document.getElementById(
-    "recipeSellingPrice"
-  ).value =
-    item.selling;
-
-  document.getElementById(
-    "recipeNetPrice"
-  ).value =
-    item.net;
-
-  const margin =
-    item.net > 0
-      ? (
-          (item.net - item.cost) /
-          item.net
-        ) * 100
-      : 0;
-
-  document.getElementById(
-    "recipeMarginPercent"
-  ).innerHTML =
+  document.getElementById( "recipeMarginPercent" ).innerHTML =
     `${margin.toFixed(1)}
-    <span class="text-xl ml-0.5">
-      %
-    </span>`;
-
-  document.getElementById(
-    "recipeProfitValue"
-  ).innerText =
-    "Rp " +
-    (
-      item.net - item.cost
-    ).toLocaleString("id-ID");
+    <span class="text-xl ml-0.5"> % </span>`;
+  document.getElementById( "recipeProfitValue" ).innerText = "Rp " + (item.net - item.cost).toLocaleString("id-ID");
 
   // PRICE HISTORY
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
+		const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error
     } = await supabaseClient.rpc(
       "get_recipe_price_history",
       {
@@ -6865,38 +6723,24 @@ async function openRecipeModal(recipeId) {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
 
-    renderRecipePriceHistory(
-      data || []
-    );
+    renderRecipePriceHistory( data || [] );
   }
   catch (err) {
-    renderRecipePriceHistory(
-      []
-    );
+    renderRecipePriceHistory( [] );
   }
 }
 	
 async function saveRecipeMaster() {
-
   if (!currentRecipeData) return;
   // GET IMAGE PRODUK
-  const file =
-    document.getElementById(
-      "recipeImageInput"
-    )?.files?.[0];
+  const file = document.getElementById( "recipeImageInput" )?.files?.[0];
 
   let imageBase64 = null;
   if (file) {
-    const compressed =
-      await compressImage(file);
-    imageBase64 =
-      await fileToBase64(
-        compressed
-      );
+    const compressed = await compressImage(file);
+    imageBase64 = await fileToBase64( compressed );
   }
 
   // PAYLOAD
@@ -6905,28 +6749,16 @@ async function saveRecipeMaster() {
     productId: currentRecipeData.productId,
     branchId: currentRecipeData.branchId,
     productName: document.getElementById( "recipeNameInput" ).value,
-
-    sellingPrice:
-      Number(
-        document
-          .getElementById(
-            "recipeSellingPrice"
-          )
-          .value
-          .replace(
-            /[^0-9]/g,
-            ""
-          )
-      ),
-
-    netPrice:
-      Number( document .getElementById( "recipeNetPrice" )
-          .value
-          .replace(
-            /[^0-9]/g,
-            ""
-          )
-      ),
+    sellingPrice: Number( document
+			.getElementById( "recipeSellingPrice" )
+			.value
+			.replace( /[^0-9]/g, "" )
+		),
+    netPrice: Number( document 
+			.getElementById( "recipeNetPrice" )
+			.value
+			.replace( /[^0-9]/g, "" )
+		),
 
     updatedBy:
       state.user?.name ||
@@ -6937,23 +6769,13 @@ async function saveRecipeMaster() {
   };
 
   try {
-		const sessionId =
-      localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     // PRODUCT IMAGE
-    let imageUrl =
-      currentRecipeData.image || "";
-    if (imageBase64) {
-      imageUrl =
-        await uploadProductImage(
-          imageBase64,
-          payload.productId
-        );
-    }
+    let imageUrl = currentRecipeData.image || "";
+    if (imageBase64) { imageUrl = await uploadProductImage( imageBase64, payload.productId ); }
 
     // UPDATE RECIPE MASTER
-    const {
-      data,
-      error
+    const { data, error
     } = await supabaseClient.rpc(
       "update_recipe_master",
       {
@@ -6969,9 +6791,8 @@ async function saveRecipeMaster() {
       }
     );
 
-    if (error) {
-      throw error;
-    }
+    if (error) { throw error; }
+		
     closeRecipeMasterModal();
     state.recipeData = null;
     state.recipeDataBranchId = null;
@@ -6981,49 +6802,25 @@ async function saveRecipeMaster() {
     state.productBranchId = null;
 		
     // RELOAD
-    await loadInventoryPage(
-      state.branchId
-    );
+    await loadInventoryPage( state.branchId );
     await loadRecipes();
-    showToast(
-      "Product updated",
-      "success"
-    );
+    showToast( "Product updated", "success" );
   }
   catch (err) {
-    showToast(
-      err?.message ||
-      "Failed update product",
-      "error"
-    );
+    showToast( err?.message || "Failed update product", "error" );
   }
 }
 
-async function uploadProductImage(
-  base64,
-  productId
-) {
-
-  if (!base64) {
-    return null;
-  }
-
-  if (!productId) {
-    throw new Error(
-      "Product ID tidak ditemukan"
-    );
-  }
+async function uploadProductImage( base64, productId ) {
+  if (!base64) { return null; }
+  if (!productId) { throw new Error( "Product ID tidak ditemukan" ); }
 
   const response =
     await fetch(
       "/api/handle-product-image-upload",
       {
         method: "POST",
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           base64,
           productId,
@@ -7033,26 +6830,14 @@ async function uploadProductImage(
     );
 
   const result = await response.json();
-  if (
-    !response.ok ||
-    !result.success
-  ) {
-    throw new Error(
-      result.error ||
-      "Upload product image gagal"
-    );
-  }
-  return result.url;
-}
+  if ( !response.ok || !result.success ) {
+    throw new Error( result.error || "Upload product image gagal" );
+  } return result.url; }
 
 function renderRecipePriceHistory(data) {
-  const tbody =
-    document.getElementById(
-      "recipePriceHistoryTable"
-    );
+  const tbody = document.getElementById( "recipePriceHistoryTable" );
   if (!tbody) return;
   if (!data.length) {
-
     tbody.innerHTML = `
       <tr>
         <td colspan="4"
@@ -7061,7 +6846,6 @@ function renderRecipePriceHistory(data) {
         </td>
       </tr>
     `;
-
     return;
   }
   tbody.innerHTML = data.map(row => `
@@ -7069,15 +6853,12 @@ function renderRecipePriceHistory(data) {
       <td class="px-6 py-4">
         ${row.date}
       </td>
-
       <td class="px-6 py-4">
         Rp ${row.oldNet.toLocaleString("id-ID")}
       </td>
-
       <td class="px-6 py-4 text-on-surface font-bold">
         Rp ${row.newNet.toLocaleString("id-ID")}
       </td>
-
       <td class="px-6 py-4">
         ${row.updatedBy}
       </td>
@@ -7093,18 +6874,10 @@ function closeRecipeMasterModal() {
 
 async function exportRecipeReport() {
   const branchId = getBranchId();
-  if (!branchId) {
-    alert("Branch tidak ditemukan");
-    return;
-  }
-  const pdfWindow =
-    window.open("", "_blank");
+  if (!branchId) { alert("Branch tidak ditemukan"); return; }
 	
-  if (!pdfWindow) {
-    alert("Popup diblokir browser.");
-    return;
-  }
-
+  const pdfWindow = window.open("", "_blank");
+  if (!pdfWindow) { alert("Popup diblokir browser."); return; }
   // LOADING
   pdfWindow.document.write(`
     <html>
@@ -7123,18 +6896,13 @@ async function exportRecipeReport() {
   `);
 
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
+		const sessionId = localStorage.getItem("pos_session_id");
     const response =
       await fetch(
         "/api/export-pdf",
         {
           method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: "recipe",
             branchId,
@@ -7146,28 +6914,17 @@ async function exportRecipeReport() {
 
     // CHECK RESPONSE
     if (!response.ok) {
-      const errorText =
-        await response.text();
-      throw new Error(
-        errorText ||
-        "Gagal export Recipe Report"
-      );
+      const errorText = await response.text();
+      throw new Error( errorText || "Gagal export Recipe Report" );
     }
 			
     // GET HTML
-    const html =
-      await response.text();
-    if (!html) {
-      throw new Error(
-        "Response export kosong"
-      );
-    }
+    const html = await response.text();
+    if (!html) { throw new Error( "Response export kosong" ); }
 
     // SHOW REPORT
     pdfWindow.document.open();
-    pdfWindow.document.write(
-      html
-    );
+    pdfWindow.document.write( html );
     pdfWindow.document.close();
   }
   catch (err) {
@@ -7180,20 +6937,14 @@ async function exportRecipeReport() {
           </h3>
 
           <pre>
-						${String(
-						  err?.message ||
-						  "Export PDF gagal"
-						)}
+						${String( err?.message || "Export PDF gagal" )}
           </pre>
         </body>
       </html>
     `);
 
     pdfWindow.document.close();
-    alert(
-      err?.message ||
-      "Export Recipe Report gagal"
-    );
+    alert( err?.message || "Export Recipe Report gagal" );
   }
 }
 
@@ -7215,7 +6966,6 @@ function renderRecipePagination() {
       </span>
     </button>
   `;
-
   // PAGE NUMBER
   for (let i = 1; i <= totalPages; i++) {
     buttons += `
@@ -7228,7 +6978,6 @@ function renderRecipePagination() {
       </button>
     `;
   }
-
   // RIGHT
   buttons += `
     <button onclick="changeRecipePage(${recipeCurrentPage + 1})"
@@ -7266,10 +7015,7 @@ function renderIngredients(data) {
   const end = start + inventoryItemsPerPage;
   const paginatedData = data.slice(start, end);
   tbody.innerHTML = paginatedData.map((item, index) => {
-    const itemWithBranch = {
-      ...item,
-      branchId: item.branchId || "BR001"
-    };
+    const itemWithBranch = { ...item, branchId: item.branchId || "BR001" };
     //  ICON MAPPING
     const iconMap = {
       "Kopi": "coffee",
@@ -7330,12 +7076,11 @@ function renderIngredients(data) {
 
         <!-- STATUS -->
         <td class="px-8 py-5 text-center">
-          ${
-            isCritical
-              ? `<span class="px-3 py-1 bg-red-600/20 text-red-700 text-[10px] font-black rounded-md uppercase">Critical</span>`
-              : isLow
-                ? `<span class="px-3 py-1 bg-yellow-600/20 text-yellow-700 text-[10px] font-black rounded-md uppercase">Low</span>`
-                : `<span class="px-3 py-1 bg-green-600/20 text-green-700 text-[10px] font-black rounded-md uppercase">Optimal</span>`
+          ${ isCritical
+						? `<span class="px-3 py-1 bg-red-600/20 text-red-700 text-[10px] font-black rounded-md uppercase">Critical</span>`
+						: isLow
+							? `<span class="px-3 py-1 bg-yellow-600/20 text-yellow-700 text-[10px] font-black rounded-md uppercase">Low</span>`
+							: `<span class="px-3 py-1 bg-green-600/20 text-green-700 text-[10px] font-black rounded-md uppercase">Optimal</span>`
           }
         </td>
 
