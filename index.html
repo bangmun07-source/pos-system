@@ -1082,7 +1082,7 @@
 							</label>
 
 							<select id="shiftSelection"
-								class="w-full h-11 px-3 rounded-md border border-outline-variant bg-surface-container text-on-surface text-sm focus:outline-none focus:border-amber-500">
+								class="w-full h-11 px-3 rounded-md border border-outline-variant bg-background text-on-surface text-sm focus:outline-none focus:border-amber-500">
 								<option value="">Select Shift</option>
 								<option value="Morning">Morning</option>
 								<option value="Afternoon">Afternoon</option>
@@ -1102,80 +1102,16 @@
 									 type="number"
 									 min="0"
 									 placeholder="200000"
-									 class="w-full bg-transparent text-on-surface text-sm outline-none">
+									 class="w-full bg-background text-on-surface text-sm outline-none">
 							</div>
 						</div>
 						<!-- Open Button -->
 						<button onclick="submitOpenShift()"
-							class="w-full h-11 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition">
+							class="w-full h-11 bottom-theme text-sm font-headline font-semibold tracking-[0.15em] transition">
 								Open Shift
 						</button>
 					</div>
 				</div>
-			</div>
-	
-			<!-- SHIFT INFORMATION POPUP -->
-			<div id="shiftInfoPopup"
-			  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
-			  <div class="w-full max-w-md rounded-md border border-outline-variant bg-background shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
-			    <!-- HEADER -->
-			    <div class="flex items-center justify-between border-b border-outline-variant p-5">
-			      <div>
-			        <h2 class="text-lg font-bold text-on-surface">Shift Information</h2>
-			        <p class="mt-1 text-xs text-muted">Current outlet shift details</p>
-			      </div>
-			
-			      <button type="button" onclick="closeShiftPopup()"
-			        class="flex h-9 w-9 items-center justify-center rounded-md text-muted hover:bg-surface hover:text-on-surface transition">
-			        <span class="material-symbols-outlined">close</span>
-			      </button>
-			    </div>
-			
-			    <div class="space-y-5 p-6">
-			      <!-- BUSINESS -->
-			      <div class="flex items-center justify-between">
-			        <div class="flex items-center gap-3">
-			          <div class="flex h-12 w-12 items-center justify-center rounded-md border border-outline-variant">
-			            <span class="material-symbols-outlined text-2xl text-on-surface">store</span>
-			          </div>
-			
-			          <div>
-			            <h3 class="font-semibold text-on-surface">Nama Bisnis</h3>
-			            <p class="text-sm text-muted">Outlet Utama</p>
-			          </div>
-			        </div>
-			
-			        <span class="rounded-md border border-outline-variant px-3 py-1 text-xs font-semibold text-on-surface">
-			          OPEN
-			        </span>
-			      </div>
-			
-			      <!-- USER -->
-			      <div class="border-t border-outline-variant pt-4">
-			        <p class="text-xs text-muted uppercase tracking-wider">Logged In User</p>
-			        <p class="mt-1 font-medium text-on-surface">Nama Kasir</p>
-			      </div>
-			
-			      <!-- SHIFT DETAILS -->
-			      <div class="space-y-3 rounded-md border border-outline-variant p-4">
-			        <div class="flex justify-between gap-3">
-			          <span class="text-sm text-muted">Waktu Mulai</span>
-			          <span id="infoShiftDate" class="text-sm font-medium text-on-surface">-</span>
-			        </div>
-			
-			        <div class="flex justify-between gap-3">
-			          <span class="text-sm text-muted">Kas Awal</span>
-			          <span id="infoOpeningCash" class="text-sm font-semibold text-on-surface">Rp0</span>
-			        </div>
-			      </div>
-			
-			      <!-- CONTINUE -->
-			      <button type="button" onclick="closeShiftPopup()"
-			        class="w-full rounded-md border border-outline-variant bg-on-surface px-5 py-3 font-semibold text-background transition hover:opacity-90">
-			        Lanjut ke POS
-			      </button>
-			    </div>
-			  </div>
 			</div>
 			<!-- CLOSE SHIFT POPUP -->
 			<div id="closeShiftPopup"
@@ -1192,7 +1128,7 @@
 					<div class="px-7 pb-7">
 						<!-- Business Identity -->
 						<div class="flex flex-col items-center text-center mb-7">
-							<div class="w-16 h-16 rounded-md border border-outline-variant bg-surface-container flex items-center justify-center mb-4">
+							<div class="w-16 h-16 rounded-md border border-outline-variant bg-background flex items-center justify-center mb-4">
 								<img id="closeBusinessLogo"
 									 class="max-w-full max-h-full object-contain"
 									 alt="Business Logo">
@@ -1227,7 +1163,7 @@
 						</div>
 						<!-- Cash Summary -->
 						<div class="border border-outline-variant rounded-md overflow-hidden mb-5">
-							<div class="grid grid-cols-2 bg-surface-container px-4 py-3 text-xs font-semibold text-on-surface-variant">
+							<div class="grid grid-cols-2 bg-background px-4 py-3 text-xs font-semibold text-on-surface-variant">
 								<span>Keterangan</span>
 								<span class="text-right">Nominal</span>
 							</div>
@@ -1247,15 +1183,25 @@
 									</span>
 								</div>
 			
-								<div class="grid grid-cols-2 px-4 py-3">
-									<span class="text-muted">Cash Pengeluaran</span>
-									<span id="closeCashExpenses" class="text-right text-on-surface font-medium">
-											Rp 50.000
-									</span>
+								<div class="grid grid-cols-2 items-center px-4 py-3">
+									<label for="closeCashExpenses" class="text-sm text-muted">
+										Cash Pengeluaran
+									</label>
+							
+									<div class="flex items-center justify-end gap-1">
+										<span class="text-sm text-muted">Rp</span>
+										<input id="closeCashExpenses"
+											type="number"
+											min="0"
+											value="0"
+											placeholder="0"
+											oninput="calculateShiftBalance()"
+											class="w-full max-w-32 bg-background text-right text-sm font-medium text-on-surface outline-none" >
+									</div>
 								</div>
 							</div>
 			
-							<div class="border-t border-outline-variant bg-surface-container px-4 py-4">
+							<div class="border-t border-outline-variant bg-background px-4 py-4">
 								<div class="flex justify-between items-center gap-3">
 									<span class="text-sm font-semibold text-on-surface">
 											Total Kas Seharusnya
@@ -1286,7 +1232,7 @@
 							</div>
 						</div>
 						<!-- Balance -->
-						<div class="flex items-center justify-between rounded-md border border-outline-variant bg-surface-container px-4 py-4 mb-5">
+						<div class="flex items-center justify-between rounded-md border border-outline-variant bg-background px-4 py-4 mb-5">
 							<span class="text-sm font-semibold text-on-surface">
 								Balance
 							</span>
@@ -1305,18 +1251,18 @@
 							<textarea id="shiftClosingNote"
 								rows="2"
 								placeholder="Laporan penutupan shift cash..."
-								class="w-full resize-none rounded-md border border-outline-variant bg-surface-container p-3 text-sm text-on-surface placeholder:text-muted outline-none focus:border-amber-500"></textarea>
+								class="w-full resize-none rounded-md border border-outline-variant bg-background p-3 text-sm text-on-surface placeholder:text-muted outline-none focus:border-amber-500"></textarea>
 						</div>
 						<!-- Actions -->
 						<button id="btnCloseShift"
 							onclick="submitCloseShift()"
-							class="w-full h-11 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition">
+							class="w-full h-11 bottom-theme text-sm font-headline font-semibold tracking-[0.15em] transition">
 								Close Shift
 						</button>
 			
 						<button id="btnExportShift"
 							onclick="exportShiftReport()"
-							class="hidden w-full h-11 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition">
+							class="hidden w-full h-11 bottom-theme text-sm font-headline font-semibold tracking-[0.15em] transition">
 								Export
 						</button>
 					</div>
