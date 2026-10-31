@@ -908,6 +908,12 @@ function initModule(pageId) {
 		case "attendanceScanPage":
 		  initAttendanceScanPage();
 		break;
+
+		case "cashierShiftPage":
+			waitBranch(() => {
+				initCashierShiftPage();
+			});
+		break;
   }
 }
 	
@@ -44100,3 +44106,6 @@ async function restartAttendanceScanner() {
   resetAttendanceScannerUI();
   await startAttendanceScanner();
 }
+
+
+
