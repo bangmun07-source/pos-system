@@ -1145,17 +1145,16 @@ function closeShiftPopup() {
 async function loadShiftHeader() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
 
-    if (!sessionId) {
-      throw new Error("Session tidak ditemukan.");
-    }
-
-    const { data, error } = await supabaseClient.rpc(
-      "get_shift_header",
-      {
-        p_session_id: sessionId
-      }
-    );
+		const { data, error } = 
+			await supabaseClient.rpc(
+				"get_shift_header",
+				{
+					p_session_id: sessionId,
+					p_branch_id: state.branch
+				}
+			);
 
     if (error) throw error;
 
