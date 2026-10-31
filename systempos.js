@@ -1258,7 +1258,7 @@ function submitOpenShift() {
 }
 
 /* === CLOSE SHIFT === */
-function showCloseShiftPopup() {
+async function showCloseShiftPopup() {
 	if (!currentShift.isOpen) return;
 	await loadShiftHeader();
 	
