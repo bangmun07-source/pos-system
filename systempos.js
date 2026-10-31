@@ -1101,45 +1101,37 @@ let currentShift = {
 	closingNote: ''
 };
 
-
-/* =========================================
- POPUP MANAGEMENT
-========================================= */
-
+/* === POPUP MANAGEMENT === */
 function showShiftPopup(id) {
 	const popupIds = [
-			'openShiftPopup',
-			'closeShiftPopup'
+		'openShiftPopup',
+		'closeShiftPopup'
 	];
 
 	popupIds.forEach(popupId => {
-			const popup = document.getElementById(popupId);
-			if (!popup) return;
+		const popup = document.getElementById(popupId);
+		if (!popup) return;
 
-			popup.classList.add('hidden');
-			popup.classList.remove('flex');
+		popup.classList.add('hidden');
+		popup.classList.remove('flex');
 	});
-
 	const target = document.getElementById(id);
-
 	if (target) {
-			target.classList.remove('hidden');
-			target.classList.add('flex');
+		target.classList.remove('hidden');
+		target.classList.add('flex');
 	}
 }
 
-
 function closeShiftPopup() {
 	['openShiftPopup', 'closeShiftPopup'].forEach(id => {
-			const popup = document.getElementById(id);
+		const popup = document.getElementById(id);
 
-			if (!popup) return;
+		if (!popup) return;
 
-			popup.classList.add('hidden');
-			popup.classList.remove('flex');
+		popup.classList.add('hidden');
+		popup.classList.remove('flex');
 	});
 }
-
 
 /* ==== OPEN SHIFT ==== */
 async function loadShiftHeader() {
