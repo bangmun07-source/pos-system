@@ -30087,61 +30087,61 @@
             </div>
           </div>
 					<!-- FILTER -->
-        <div class="p-5 border-b border-outline-variant">
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-            <!-- PERIOD FROM -->
-            <div>
-              <label class="block text-xs text-muted mb-2">Period From</label>
-              <input id="cashierShiftPeriodFrom"
-                type="date"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-            </div>
-            <!-- PERIOD TO -->
-            <div>
-              <label class="block text-xs text-muted mb-2">Period To</label>
-              <input id="cashierShiftPeriodTo"
-                type="date"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-            </div>
-            <!-- USER -->
-            <div>
-              <label class="block text-xs text-muted mb-2">Cashier / User</label>
-              <select id="cashierShiftUserFilter"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option value="ALL">All Users</option>
-              </select>
-            </div>
-            <!-- BRANCH -->
-            <div>
-              <label class="block text-xs text-muted mb-2">Branch</label>
-              <select id="cashierShiftBranchFilter"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option value="ALL">All Branches</option>
-              </select>
-            </div>
-            <!-- STATUS -->
-            <div>
-              <label class="block text-xs text-muted mb-2">Shift Status</label>
-              <select id="cashierShiftStatusFilter"
-                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-                <option value="ALL">All Status</option>
-                <option value="OPEN">Open</option>
-                <option value="CLOSED">Closed</option>
-              </select>
-            </div>
-						<!-- ADJUSTMENT STATUS -->
-						<div>
-						  <label class="block text-xs text-muted mb-2">Adjustment Status</label>
-						  <select id="cashierShiftAdjustmentFilter"
-						    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-						    <option value="ALL">All Adjustments</option>
-						    <option value="PENDING">Pending</option>
-						    <option value="PARTIAL">Partial</option>
-						    <option value="DONE">Done</option>
-						  </select>
-						</div>
-          </div>
-        </div>
+	        <div class="p-5 border-b border-outline-variant">
+	          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+	            <!-- PERIOD FROM -->
+	            <div>
+	              <label class="block text-xs text-muted mb-2">Period From</label>
+	              <input id="cashierShiftPeriodFrom"
+	                type="date"
+	                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	            </div>
+	            <!-- PERIOD TO -->
+	            <div>
+	              <label class="block text-xs text-muted mb-2">Period To</label>
+	              <input id="cashierShiftPeriodTo"
+	                type="date"
+	                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	            </div>
+	            <!-- USER -->
+	            <div>
+	              <label class="block text-xs text-muted mb-2">Cashier / User</label>
+	              <select id="cashierShiftUserFilter"
+	                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	                <option value="ALL">All Users</option>
+	              </select>
+	            </div>
+	            <!-- BRANCH -->
+	            <div>
+	              <label class="block text-xs text-muted mb-2">Branch</label>
+	              <select id="cashierShiftBranchFilter"
+	                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	                <option value="ALL">All Branches</option>
+	              </select>
+	            </div>
+	            <!-- STATUS -->
+	            <div>
+	              <label class="block text-xs text-muted mb-2">Shift Status</label>
+	              <select id="cashierShiftStatusFilter"
+	                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+	                <option value="ALL">All Status</option>
+	                <option value="OPEN">Open</option>
+	                <option value="CLOSED">Closed</option>
+	              </select>
+	            </div>
+							<!-- ADJUSTMENT STATUS -->
+							<div>
+							  <label class="block text-xs text-muted mb-2">Adjustment Status</label>
+							  <select id="cashierShiftAdjustmentFilter"
+							    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+							    <option value="ALL">All Adjustments</option>
+							    <option value="PENDING">Pending</option>
+							    <option value="PARTIAL">Partial</option>
+							    <option value="DONE">Done</option>
+							  </select>
+							</div>
+	          </div>
+	        </div>
           <!-- TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-sm">
@@ -30258,6 +30258,25 @@
               </div>
             </div>
           </div>
+					<div class="p-5 border-b border-outline-variant flex items-center gap-3">
+	          <div class="grid grid-cols-3 md:grid-cols-3">
+	            <!-- TOTAL SHIFTS -->
+	            <div class="p-5 border-r border-outline-variant">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">TOTAL ADJUSTMENTS</p>
+	              <p id="shiftTotalAjustments" class="text-xl font-headline mt-1">0</p>
+	            </div>
+	            <!-- OPEN SHIFTS -->
+	            <div class="p-5 border-r border-outline-variant">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">TOTAL REIMBURSED</p>
+	              <p id="shiftTotalReimbursed" class="text-xl font-headline mt-1">0</p>
+	            </div>
+	            <!-- CLOSED SHIFTS -->
+	            <div class="p-5 border-r border-outline-variant">
+	              <p class="text-[11px] text-muted uppercase tracking-wider">TOTAL EXPENSED</p>
+	              <p id="shiftTotalExpenses" class="text-xl font-headline mt-1">0</p>
+	            </div>
+	          </div>
+					</div>
           <!-- ADJUSTMENT TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-sm">
