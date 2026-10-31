@@ -1081,92 +1081,369 @@ function renderShiftPerformance(shift) {
   `;
 }
 
-// OPEN SHIFT
+/* =========================================
+ SHIFT MANAGEMENT
+========================================= */
+// State sementara Shift
 let currentShift = {
-    isOpen: false,
-    isClosed: false,
-    openingCash: 0,
-    cashSales: 0,
-    cashExpenses: 0,
-    actualCash: 0
+	isOpen: false,
+	isClosed: false,
+	shiftType: '',
+	openingCash: 0,
+	cashSales: 0,
+	cashExpenses: 0,
+	expectedCash: 0,
+	actualCash: 0,
+	balance: 0,
+	openingDate: null,
+	closingDate: null,
+	openingUser: '',
+	closingNote: ''
 };
-let hasSeenShiftInfo = false;
+
+
+/* =========================================
+ POPUP MANAGEMENT
+========================================= */
+
 function showShiftPopup(id) {
 	const popupIds = [
-		'openShiftPopup',
-		'shiftInfoPopup',
-		'closeShiftPopup'
+			'openShiftPopup',
+			'closeShiftPopup'
 	];
 
 	popupIds.forEach(popupId => {
-		const popup = document.getElementById(popupId);
-		if (!popup) return;
+			const popup = document.getElementById(popupId);
+			if (!popup) return;
 
-		popup.classList.add('hidden');
-		popup.classList.remove('flex');
+			popup.classList.add('hidden');
+			popup.classList.remove('flex');
 	});
 
 	const target = document.getElementById(id);
-	if (!target) return;
 
-	target.classList.remove('hidden');
-	target.classList.add('flex');
-}
-
-function closeShiftPopup() {
-	[
-		'openShiftPopup',
-		'shiftInfoPopup',
-		'closeShiftPopup'
-	].forEach(id => {
-		const popup = document.getElementById(id);
-		if (!popup) return;
-
-		popup.classList.add('hidden');
-		popup.classList.remove('flex');
-	});
-}
-
-function openShiftPopup() {
-	if (currentShift.isOpen) {
-		if (!hasSeenShiftInfo) { showShiftInfo();
-		} else { showCloseShiftPopup(); }
-	} else {
-		const dateElement = document.getElementById('openShiftDate');
-		if (dateElement) dateElement.textContent = getShiftDate();
-
-		showShiftPopup('openShiftPopup');
+	if (target) {
+			target.classList.remove('hidden');
+			target.classList.add('flex');
 	}
 }
 
-function showShiftInfo() {
-	const dateElement = document.getElementById('infoShiftDate');
-	const cashElement = document.getElementById('infoOpeningCash');
 
-	if (dateElement) dateElement.textContent = getShiftDate();
-	if (cashElement) { cashElement.textContent = formatShiftCurrency( currentShift.openingCash ); }
+function closeShiftPopup() {
+	['openShiftPopup', 'closeShiftPopup'].forEach(id => {
+			const popup = document.getElementById(id);
 
-	hasSeenShiftInfo = true;
-	showShiftPopup('shiftInfoPopup');
+			if (!popup) return;
+
+			popup.classList.add('hidden');
+			popup.classList.remove('flex');
+	});
 }
+
+
+/* =========================================
+ OPEN SHIFT
+========================================= */
+
+function openShiftPopup() {
+	if (currentShift.isOpen) {
+			showCloseShiftPopup();
+	} else {
+			const dateElement = document.getElementById('openShiftDate');
+			const timeElement = document.getElementById('openShiftTime');
+
+			const now = new Date();
+
+			if (dateElement) {
+					dateElement.textContent = now.toLocaleDateString('en-US', {
+							weekday: 'long',
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric'
+					});
+			}
+
+			if (timeElement) {
+					timeElement.textContent = now.toLocaleTimeString('en-US');
+			}
+
+			showShiftPopup('openShiftPopup');
+	}
+}
+
+
+function submitOpenShift() {
+	const shiftType = document.getElementById('shiftSelection')?.value;
+	const openingCashInput = document.getElementById('openingCash');
+
+	const openingCash = Number(openingCashInput?.value);
+
+	if (!shiftType) {
+			alert('Silakan pilih Shift terlebih dahulu.');
+			return;
+	}
+
+	if (
+			openingCashInput.value.trim() === '' ||
+			!Number.isFinite(openingCash) ||
+			openingCash < 0
+	) {
+			alert('Masukkan Kas Awal yang valid.');
+			openingCashInput.focus();
+			return;
+	}
+
+	const now = new Date();
+
+	currentShift = {
+			isOpen: true,
+			isClosed: false,
+			shiftType: shiftType,
+			openingCash: openingCash,
+			cashSales: 0,
+			cashExpenses: 0,
+			expectedCash: openingCash,
+			actualCash: 0,
+			balance: 0,
+			openingDate: now,
+			closingDate: null,
+			openingUser: document.getElementById('shiftLoginUser')?.textContent.trim() || '',
+			closingNote: ''
+	};
+
+	// Reset input Close Shift
+	document.getElementById('closeCashExpenses').value = 0;
+	document.getElementById('actualCash').value = '';
+	document.getElementById('shiftClosingNote').value = '';
+
+	// Tutup Open Shift setelah berhasil dibuka
+	closeShiftPopup();
+
+	alert('Shift berhasil dibuka.');
+}
+
+
+/* =========================================
+ CLOSE SHIFT
+========================================= */
+
+function showCloseShiftPopup() {
+	if (!currentShift.isOpen) return;
+
+	const now = new Date();
+
+	const dateElement = document.getElementById('closeShiftDate');
+	const timeElement = document.getElementById('closeShiftTime');
+
+	if (dateElement) {
+			dateElement.textContent = now.toLocaleDateString('en-US', {
+					weekday: 'long',
+					year: 'numeric',
+					month: 'long',
+					day: 'numeric'
+			});
+	}
+
+	if (timeElement) {
+			timeElement.textContent = now.toLocaleTimeString('en-US');
+	}
+
+	document.getElementById('closeOpeningCash').textContent =
+			formatShiftCurrency(currentShift.openingCash);
+
+	document.getElementById('closeCashSales').textContent =
+			formatShiftCurrency(currentShift.cashSales);
+
+	document.getElementById('closeCashExpenses').value =
+			currentShift.cashExpenses;
+
+	document.getElementById('actualCash').value =
+			currentShift.actualCash || '';
+
+	document.getElementById('shiftClosingNote').value =
+			currentShift.closingNote || '';
+
+	// Tombol sesuai status shift
+	document.getElementById('btnCloseShift').classList.remove('hidden');
+	document.getElementById('btnExportShift').classList.add('hidden');
+
+	calculateShiftBalance();
+
+	showShiftPopup('closeShiftPopup');
+}
+
+
+/* =========================================
+ CALCULATE CASH BALANCE
+========================================= */
+
+function calculateShiftBalance() {
+	const expensesInput = document.getElementById('closeCashExpenses');
+	const actualCashInput = document.getElementById('actualCash');
+
+	const cashExpenses = Math.max(0, Number(expensesInput?.value) || 0);
+	const actualCash = Math.max(0, Number(actualCashInput?.value) || 0);
+
+	const expectedCash =
+			currentShift.openingCash +
+			currentShift.cashSales -
+			cashExpenses;
+
+	const balance = actualCash - expectedCash;
+
+	currentShift.cashExpenses = cashExpenses;
+	currentShift.expectedCash = expectedCash;
+	currentShift.actualCash = actualCash;
+	currentShift.balance = balance;
+
+	const expectedElement = document.getElementById('expectedCash');
+	const balanceElement = document.getElementById('shiftBalance');
+
+	if (expectedElement) {
+			expectedElement.textContent = formatShiftCurrency(expectedCash);
+	}
+
+	if (balanceElement) {
+			balanceElement.textContent = formatShiftCurrency(balance);
+
+			balanceElement.classList.remove(
+					'text-red-400',
+					'text-emerald-400',
+					'text-on-surface'
+			);
+
+			if (balance < 0) {
+					balanceElement.classList.add('text-red-400');
+			} else if (balance > 0) {
+					balanceElement.classList.add('text-emerald-400');
+			} else {
+					balanceElement.classList.add('text-on-surface');
+			}
+	}
+
+	return {
+			cashExpenses,
+			expectedCash,
+			actualCash,
+			balance
+	};
+}
+
+
+/* =========================================
+ SUBMIT CLOSE SHIFT
+========================================= */
+
+function submitCloseShift() {
+	if (!currentShift.isOpen) {
+			alert('Tidak ada Shift yang sedang aktif.');
+			return;
+	}
+
+	const actualCashInput = document.getElementById('actualCash');
+
+	if (
+			actualCashInput.value.trim() === '' ||
+			!Number.isFinite(Number(actualCashInput.value)) ||
+			Number(actualCashInput.value) < 0
+	) {
+			alert('Masukkan jumlah Cash fisik terlebih dahulu.');
+			actualCashInput.focus();
+			return;
+	}
+
+	const result = calculateShiftBalance();
+
+	currentShift.actualCash = result.actualCash;
+	currentShift.cashExpenses = result.cashExpenses;
+	currentShift.expectedCash = result.expectedCash;
+	currentShift.balance = result.balance;
+	currentShift.closingDate = new Date();
+
+	currentShift.closingNote =
+			document.getElementById('shiftClosingNote').value.trim();
+
+	currentShift.isOpen = false;
+	currentShift.isClosed = true;
+
+	// Ubah tombol Close menjadi Export
+	document.getElementById('btnCloseShift').classList.add('hidden');
+	document.getElementById('btnExportShift').classList.remove('hidden');
+
+	alert('Shift berhasil ditutup.');
+}
+
+
+/* =========================================
+ EXPORT SHIFT REPORT
+========================================= */
+
+function exportShiftReport() {
+	if (!currentShift.isClosed) {
+			alert('Shift belum ditutup.');
+			return;
+	}
+
+	const report = [
+			'LAPORAN PENUTUPAN SHIFT',
+			'',
+			'Jenis Shift,' + currentShift.shiftType,
+			'Waktu Mulai,' + formatShiftDate(currentShift.openingDate),
+			'Waktu Tutup,' + formatShiftDate(currentShift.closingDate),
+			'',
+			'Kas Awal,' + currentShift.openingCash,
+			'Cash Penjualan,' + currentShift.cashSales,
+			'Cash Pengeluaran,' + currentShift.cashExpenses,
+			'Total Kas Seharusnya,' + currentShift.expectedCash,
+			'Input Cash,' + currentShift.actualCash,
+			'Balance,' + currentShift.balance,
+			'',
+			'Catatan,' + currentShift.closingNote
+	].join('\n');
+
+	const blob = new Blob([report], {
+			type: 'text/csv;charset=utf-8;'
+	});
+
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+
+	link.href = url;
+	link.download = 'laporan-penutupan-shift.csv';
+
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+
+	URL.revokeObjectURL(url);
+}
+
+
+/* =========================================
+ FORMAT HELPERS
+========================================= */
 
 function formatShiftCurrency(value) {
 	return new Intl.NumberFormat('id-ID', {
-		style: 'currency',
-		currency: 'IDR',
-		maximumFractionDigits: 0
+			style: 'currency',
+			currency: 'IDR',
+			maximumFractionDigits: 0
 	}).format(Number(value) || 0);
 }
 
-function getShiftDate() {
-	return new Date().toLocaleString('id-ID', {
-		day: '2-digit',
-		month: 'long',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit'
+
+function formatShiftDate(date) {
+	if (!date) return '-';
+
+	return new Date(date).toLocaleString('id-ID', {
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
 	});
 }
+
 
   // ==================================
   // RECENT TRANSAKSI
