@@ -1152,7 +1152,7 @@ async function loadShiftHeader() {
 				"get_shift_header",
 				{
 					p_session_id: sessionId,
-					p_branch_id: state.branch
+					p_branch_id: state.branchId
 				}
 			);
 
@@ -3858,20 +3858,10 @@ function updateNote(index, value) {
 }
 
 async function openRedeem() {
-  if (!state.currentMember) {
-    alert("Pilih member dulu!");
-    return;
-  }
-  if (!state.branchId) {
-    alert("Branch belum dipilih!");
-    return;
-  }
-  showToast(
-    "Loading reward...",
-    "info"
-  );
+  if (!state.currentMember) { alert("Pilih member dulu!"); return; }
+  if (!state.branchId) { alert("Branch belum dipilih!"); return; }
+  showToast( "Loading reward...", "info" );
   try {
-
     const res =
       await getRewardsRPC(
         state.currentMember,
@@ -3880,31 +3870,22 @@ async function openRedeem() {
     showRedeemPopup(res);
   }
   catch(err){
-    alert(
-      "Gagal ambil reward"
-    );
+    alert( "Gagal ambil reward" );
   }
 }
 
 function resetPOSMember() {
   state.selectedMember = null;
   state.currentMember = null;
-  const memberInput =
-    document.getElementById("memberSearch");
-  if (memberInput) {
-    memberInput.value = "";
-  }
-  const memberId =
-    document.getElementById("member-id");
-
-  if (memberId) {
-    memberId.value = "";
-  }
-  const result =
-    document.getElementById("memberResult");
-  if (result) {
-    result.style.display = "none";
-  }
+	
+  const memberInput = document.getElementById("memberSearch");
+  if (memberInput) { memberInput.value = ""; }
+	
+  const memberId = document.getElementById("member-id");
+  if (memberId) { memberId.value = ""; }
+	
+  const result = document.getElementById("memberResult");
+  if (result) { result.style.display = "none"; }
 }
 
 async function selectMember(member) {
@@ -3915,21 +3896,16 @@ async function selectMember(member) {
   state.currentMemberData =
   await checkMemberRPC(member.id);
   document.getElementById("memberResult").style.display = "none";
-  const subtotal =
-    state.cart.reduce(
-      (sum, item) =>
-        sum + (item.price * item.qty),
-      0
-    );
+	
+  const subtotal = state.cart.reduce( (sum, item) => sum + (item.price * item.qty), 0 );
+	
   updateSummary(subtotal);
 }
 
 function showRedeemPopup(data) {
   //  1. Ambil template
   const template = document.getElementById("redeempointModal");
-  if (!template) {
-    return;
-  }
+  if (!template) { return; }
   //  2. Clone template
   const clone = template.content.cloneNode(true);
   //  3. Wrapper biar bisa dihapus nanti
@@ -3988,16 +3964,16 @@ function showRedeemPopup(data) {
             onclick="selectReward('${String(r.ID_Reward)}')"
             class=" mt-4 w-full h-10 rounded-md transition active:scale-95
 							${
-									canRedeem
-									? `
-									bottom-theme
-									text-on-surface
-									`
-									: `
-									bg-background-high
-									text-on-surface-variant
-									cursor-not-allowed
-									`
+								canRedeem
+								? `
+								bottom-theme
+								text-on-surface
+								`
+								: `
+								bg-background-high
+								text-on-surface-variant
+								cursor-not-allowed
+								`
 							}">
               ${canRedeem ? 'Redeem' : 'Insufficient Points'}
           </button>
@@ -4009,16 +3985,10 @@ function showRedeemPopup(data) {
 
 function selectReward(rewardId) {
   const reward = state.rewards.find(r => r.ID_Reward == rewardId);
-  if (!reward) {
-    alert("Reward tidak ditemukan");
-    return;
-  }
+  if (!reward) { alert("Reward tidak ditemukan"); return; }
 
   const product = state.products.find(p => p.ID_Produk == reward.Produk_ID);
-  if (!product) {
-    alert("Produk tidak ditemukan");
-    return;
-  }
+  if (!product) { alert("Produk tidak ditemukan"); return; }
 
   // HITUNG POINT YANG SUDAH DIPAKAI
   const totalPointUsed = state.cart
