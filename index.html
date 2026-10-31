@@ -1029,7 +1029,7 @@
 			<!-- ================= SHIFT MANAGEMENT POPUPS ================= -->
 			<!-- OPEN SHIFT POPUP -->
 			<div id="openShiftPopup"
-			 	class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4">
+			 	class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
 				<div class="w-full max-w-md rounded-md border border-outline-variant bg-background shadow-2xl overflow-hidden">
 					<!-- Header -->
 					<div class="flex justify-end p-4">
@@ -1042,38 +1042,38 @@
 					<div class="px-7 pb-7">
 						<!-- Business Identity -->
 						<div class="flex flex-col items-center text-center mb-7">
-								<div class="w-16 h-16 rounded-md border border-outline-variant bg-surface-container flex items-center justify-center mb-4">
-									<img id="shiftBusinessLogo"
-										 class="max-w-full max-h-full object-contain"
-										 alt="Business Logo">
-								</div>
+							<div class="w-16 h-16 rounded-md border border-outline-variant bg-surface-container flex items-center justify-center mb-4">
+								<img id="shiftBusinessLogo"
+									 class="max-w-full max-h-full object-contain"
+									 alt="Business Logo">
+							</div>
 
-								<h3 id="shiftBusinessName"
-									class="text-lg font-bold text-on-surface">
-									NAMA BUSINESS
-								</h3>
+							<h3 id="shiftBusinessName"
+								class="text-lg font-bold text-on-surface">
+								NAMA BUSINESS
+							</h3>
 
-								<p id="shiftOutletName"
-								 class="text-sm text-muted mt-1">
-									Outlet 1
-								</p>
+							<p id="shiftOutletName"
+							 class="text-sm text-muted mt-1">
+								Outlet 1
+							</p>
 
-								<div class="w-full border-t border-outline-variant my-5"></div>
+							<div class="w-full border-t border-outline-variant my-5"></div>
 
-								<p id="shiftLoginUser"
-								 class="text-sm font-semibold text-on-surface">
-									Nama User Login
-								</p>
+							<p id="shiftLoginUser"
+							 class="text-sm font-semibold text-on-surface">
+								Nama User Login
+							</p>
 
-								<p id="openShiftDate"
-								 class="text-xs text-muted mt-2">
-									Saturday, October 31, 2026
-								</p>
+							<p id="openShiftDate"
+							 class="text-xs text-muted mt-2">
+								Saturday, October 31, 2026
+							</p>
 
-								<p id="openShiftTime"
-								 class="text-xs text-muted mt-1">
-									9:00:00 AM
-								</p>
+							<p id="openShiftTime"
+							 class="text-xs text-muted mt-1">
+								9:00:00 AM
+							</p>
 						</div>
 						<!-- Shift Selection -->
 						<div class="space-y-2 mb-5">
@@ -1115,8 +1115,8 @@
 			</div>
 			<!-- CLOSE SHIFT POPUP -->
 			<div id="closeShiftPopup"
-				 class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4">
-				<div class="w-full max-w-lg rounded-md border border-outline-variant bg-background shadow-2xl overflow-hidden">
+				 class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+				<div class="w-full max-w-lg max-h-[90vh] flex flex-col rounded-md border border-outline-variant bg-background shadow-2xl overflow-hidden">
 					<!-- Header -->
 					<div class="flex justify-end p-4">
 						<button onclick="closeShiftPopup()"
@@ -1125,7 +1125,7 @@
 						</button>
 					</div>
 			
-					<div class="px-7 pb-7">
+					<div class="px-7 pb-7 overflow-y-auto custom-scrollbar">
 						<!-- Business Identity -->
 						<div class="flex flex-col items-center text-center mb-7">
 							<div class="w-16 h-16 rounded-md border border-outline-variant bg-background flex items-center justify-center mb-4">
@@ -1172,14 +1172,14 @@
 								<div class="grid grid-cols-2 px-4 py-3">
 									<span class="text-muted">Kas Awal</span>
 									<span id="closeOpeningCash" class="text-right text-on-surface font-medium">
-											Rp 200.000
+										Rp 200.000
 									</span>
 								</div>
 			
 								<div class="grid grid-cols-2 px-4 py-3">
 									<span class="text-muted">Cash Penjualan</span>
 									<span id="closeCashSales" class="text-right text-on-surface font-medium">
-											Rp 500.000
+										Rp 500.000
 									</span>
 								</div>
 			
@@ -1208,7 +1208,7 @@
 									</span>
 			
 									<span id="expectedCash"
-												class="text-sm font-bold text-amber-500">
+										class="text-sm font-bold text-amber-500">
 											Rp 650.000
 									</span>
 								</div>
