@@ -1141,57 +1141,93 @@ function closeShiftPopup() {
 }
 
 
-/* =========================================
- OPEN SHIFT
-========================================= */
+/* ==== OPEN SHIFT ==== */
+async function loadShiftHeader() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
 
-function openShiftPopup() {
-	if (currentShift.isOpen) {
-			showCloseShiftPopup();
-	} else {
-			const dateElement = document.getElementById('openShiftDate');
-			const timeElement = document.getElementById('openShiftTime');
+    if (!sessionId) {
+      throw new Error("Session tidak ditemukan.");
+    }
 
-			const now = new Date();
+    const { data, error } = await supabaseClient.rpc(
+      "get_shift_header",
+      {
+        p_session_id: sessionId
+      }
+    );
 
-			if (dateElement) {
-					dateElement.textContent = now.toLocaleDateString('en-US', {
-							weekday: 'long',
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric'
-					});
-			}
+    if (error) throw error;
 
-			if (timeElement) {
-					timeElement.textContent = now.toLocaleTimeString('en-US');
-			}
+    const logoElements = [
+      "shiftBusinessLogo",
+      "closeBusinessLogo"
+    ];
 
-			showShiftPopup('openShiftPopup');
-	}
+    logoElements.forEach(id => {
+      const img = document.getElementById(id);
+      if (!img) return;
+
+      if (data.logo_url) {
+        img.src = data.logo_url;
+        img.classList.remove("hidden");
+      } else {
+        img.removeAttribute("src");
+        img.classList.add("hidden");
+      }
+    });
+
+    const elements = {
+      shiftBusinessName: data.business_name,
+      closeBusinessName: data.business_name,
+      shiftOutletName: data.outlet_name,
+      closeOutletName: data.outlet_name,
+      shiftLoginUser: data.cashier_name,
+      closeLoginUser: data.cashier_name
+    };
+
+    Object.entries(elements).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value || "-";
+    });
+
+  } catch (err) {
+    console.error("Load Shift Header:", err);
+    showToast(err?.message || "Gagal memuat informasi Shift", "error");
+  }
 }
 
+async function openShiftPopup() {
+	await loadShiftHeader();
+
+	if (currentShift.isOpen) { await showCloseShiftPopup();
+	} else {
+		const dateElement = document.getElementById('openShiftDate');
+		const timeElement = document.getElementById('openShiftTime');
+		const now = new Date();
+
+		if (dateElement) {
+			dateElement.textContent = now.toLocaleDateString('en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+		}
+
+		if (timeElement) { timeElement.textContent = now.toLocaleTimeString('en-US'); }
+		showShiftPopup('openShiftPopup');
+	}
+}
 
 function submitOpenShift() {
 	const shiftType = document.getElementById('shiftSelection')?.value;
 	const openingCashInput = document.getElementById('openingCash');
-
 	const openingCash = Number(openingCashInput?.value);
 
-	if (!shiftType) {
-			alert('Silakan pilih Shift terlebih dahulu.');
-			return;
-	}
-
-	if (
-			openingCashInput.value.trim() === '' ||
-			!Number.isFinite(openingCash) ||
-			openingCash < 0
-	) {
-			alert('Masukkan Kas Awal yang valid.');
-			openingCashInput.focus();
-			return;
-	}
+	if (!shiftType) { alert('Silakan pilih Shift terlebih dahulu.'); return; }
+	if ( openingCashInput.value.trim() === '' || !Number.isFinite(openingCash) || openingCash < 0
+	) { alert('Masukkan Kas Awal yang valid.'); openingCashInput.focus(); return; }
 
 	const now = new Date();
 
@@ -1210,7 +1246,6 @@ function submitOpenShift() {
 			openingUser: document.getElementById('shiftLoginUser')?.textContent.trim() || '',
 			closingNote: ''
 	};
-
 	// Reset input Close Shift
 	document.getElementById('closeCashExpenses').value = 0;
 	document.getElementById('actualCash').value = '';
@@ -1222,73 +1257,46 @@ function submitOpenShift() {
 	alert('Shift berhasil dibuka.');
 }
 
-
-/* =========================================
- CLOSE SHIFT
-========================================= */
-
+/* === CLOSE SHIFT === */
 function showCloseShiftPopup() {
 	if (!currentShift.isOpen) return;
-
+	await loadShiftHeader();
+	
 	const now = new Date();
-
 	const dateElement = document.getElementById('closeShiftDate');
 	const timeElement = document.getElementById('closeShiftTime');
 
 	if (dateElement) {
-			dateElement.textContent = now.toLocaleDateString('en-US', {
-					weekday: 'long',
-					year: 'numeric',
-					month: 'long',
-					day: 'numeric'
-			});
+		dateElement.textContent = now.toLocaleDateString('en-US', {
+			weekday: 'long',
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric'
+		});
 	}
 
-	if (timeElement) {
-			timeElement.textContent = now.toLocaleTimeString('en-US');
-	}
+	if (timeElement) { timeElement.textContent = now.toLocaleTimeString('en-US'); }
 
-	document.getElementById('closeOpeningCash').textContent =
-			formatShiftCurrency(currentShift.openingCash);
-
-	document.getElementById('closeCashSales').textContent =
-			formatShiftCurrency(currentShift.cashSales);
-
-	document.getElementById('closeCashExpenses').value =
-			currentShift.cashExpenses;
-
-	document.getElementById('actualCash').value =
-			currentShift.actualCash || '';
-
-	document.getElementById('shiftClosingNote').value =
-			currentShift.closingNote || '';
-
+	document.getElementById('closeOpeningCash').textContent = formatShiftCurrency(currentShift.openingCash);
+	document.getElementById('closeCashSales').textContent = formatShiftCurrency(currentShift.cashSales);
+	document.getElementById('closeCashExpenses').value = currentShift.cashExpenses;
+	document.getElementById('actualCash').value = currentShift.actualCash || '';
+	document.getElementById('shiftClosingNote').value = currentShift.closingNote || '';
 	// Tombol sesuai status shift
 	document.getElementById('btnCloseShift').classList.remove('hidden');
 	document.getElementById('btnExportShift').classList.add('hidden');
 
 	calculateShiftBalance();
-
 	showShiftPopup('closeShiftPopup');
 }
 
-
-/* =========================================
- CALCULATE CASH BALANCE
-========================================= */
-
+/* ==== CALCULATE CASH BALANCE ==== */
 function calculateShiftBalance() {
 	const expensesInput = document.getElementById('closeCashExpenses');
 	const actualCashInput = document.getElementById('actualCash');
-
 	const cashExpenses = Math.max(0, Number(expensesInput?.value) || 0);
 	const actualCash = Math.max(0, Number(actualCashInput?.value) || 0);
-
-	const expectedCash =
-			currentShift.openingCash +
-			currentShift.cashSales -
-			cashExpenses;
-
+	const expectedCash = currentShift.openingCash + currentShift.cashSales - cashExpenses;
 	const balance = actualCash - expectedCash;
 
 	currentShift.cashExpenses = cashExpenses;
@@ -1299,58 +1307,36 @@ function calculateShiftBalance() {
 	const expectedElement = document.getElementById('expectedCash');
 	const balanceElement = document.getElementById('shiftBalance');
 
-	if (expectedElement) {
-			expectedElement.textContent = formatShiftCurrency(expectedCash);
-	}
-
+	if (expectedElement) { expectedElement.textContent = formatShiftCurrency(expectedCash); }
 	if (balanceElement) {
-			balanceElement.textContent = formatShiftCurrency(balance);
+		balanceElement.textContent = formatShiftCurrency(balance);
 
-			balanceElement.classList.remove(
-					'text-red-400',
-					'text-emerald-400',
-					'text-on-surface'
-			);
+		balanceElement.classList.remove(
+			'text-red-400',
+			'text-emerald-400',
+			'text-on-surface'
+		);
 
-			if (balance < 0) {
-					balanceElement.classList.add('text-red-400');
-			} else if (balance > 0) {
-					balanceElement.classList.add('text-emerald-400');
-			} else {
-					balanceElement.classList.add('text-on-surface');
-			}
+		if (balance < 0) { balanceElement.classList.add('text-red-400');
+		} else if (balance > 0) { balanceElement.classList.add('text-emerald-400');
+		} else { balanceElement.classList.add('text-on-surface'); }
 	}
 
 	return {
-			cashExpenses,
-			expectedCash,
-			actualCash,
-			balance
+		cashExpenses,
+		expectedCash,
+		actualCash,
+		balance
 	};
 }
 
-
-/* =========================================
- SUBMIT CLOSE SHIFT
-========================================= */
-
+/* === SUBMIT CLOSE SHIFT === */
 function submitCloseShift() {
-	if (!currentShift.isOpen) {
-			alert('Tidak ada Shift yang sedang aktif.');
-			return;
-	}
+	if (!currentShift.isOpen) { alert('Tidak ada Shift yang sedang aktif.'); return; }
 
 	const actualCashInput = document.getElementById('actualCash');
-
-	if (
-			actualCashInput.value.trim() === '' ||
-			!Number.isFinite(Number(actualCashInput.value)) ||
-			Number(actualCashInput.value) < 0
-	) {
-			alert('Masukkan jumlah Cash fisik terlebih dahulu.');
-			actualCashInput.focus();
-			return;
-	}
+	if ( actualCashInput.value.trim() === '' || !Number.isFinite(Number(actualCashInput.value)) || Number(actualCashInput.value) < 0
+	) { alert('Masukkan jumlah Cash fisik terlebih dahulu.'); actualCashInput.focus(); return; }
 
 	const result = calculateShiftBalance();
 
@@ -1359,10 +1345,7 @@ function submitCloseShift() {
 	currentShift.expectedCash = result.expectedCash;
 	currentShift.balance = result.balance;
 	currentShift.closingDate = new Date();
-
-	currentShift.closingNote =
-			document.getElementById('shiftClosingNote').value.trim();
-
+	currentShift.closingNote = document.getElementById('shiftClosingNote').value.trim();
 	currentShift.isOpen = false;
 	currentShift.isClosed = true;
 
@@ -1373,16 +1356,9 @@ function submitCloseShift() {
 	alert('Shift berhasil ditutup.');
 }
 
-
-/* =========================================
- EXPORT SHIFT REPORT
-========================================= */
-
+/* === EXPORT SHIFT REPORT === */
 function exportShiftReport() {
-	if (!currentShift.isClosed) {
-			alert('Shift belum ditutup.');
-			return;
-	}
+	if (!currentShift.isClosed) { alert('Shift belum ditutup.'); return; }
 
 	const report = [
 			'LAPORAN PENUTUPAN SHIFT',
@@ -1401,10 +1377,7 @@ function exportShiftReport() {
 			'Catatan,' + currentShift.closingNote
 	].join('\n');
 
-	const blob = new Blob([report], {
-			type: 'text/csv;charset=utf-8;'
-	});
-
+	const blob = new Blob([report], { type: 'text/csv;charset=utf-8;' });
 	const url = URL.createObjectURL(blob);
 	const link = document.createElement('a');
 
@@ -1418,36 +1391,31 @@ function exportShiftReport() {
 	URL.revokeObjectURL(url);
 }
 
-
-/* =========================================
- FORMAT HELPERS
-========================================= */
-
+/* === FORMAT HELPERS === */
 function formatShiftCurrency(value) {
 	return new Intl.NumberFormat('id-ID', {
-			style: 'currency',
-			currency: 'IDR',
-			maximumFractionDigits: 0
+		style: 'currency',
+		currency: 'IDR',
+		maximumFractionDigits: 0
 	}).format(Number(value) || 0);
 }
-
 
 function formatShiftDate(date) {
 	if (!date) return '-';
 
 	return new Date(date).toLocaleString('id-ID', {
-			day: '2-digit',
-			month: 'long',
-			year: 'numeric',
-			hour: '2-digit',
-			minute: '2-digit'
+		day: '2-digit',
+		month: 'long',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit'
 	});
 }
 
 
-  // ==================================
-  // RECENT TRANSAKSI
-  // ==================================
+// ==================================
+// RECENT TRANSAKSI
+// ==================================
 
 function renderTransactions(data) {
   const tbody = document.getElementById("recentTransactionsList");
