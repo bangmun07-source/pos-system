@@ -29205,7 +29205,7 @@
 	            <div>
 	              <label for="pph21TERRate"
 	                class="block text-sm font-medium text-foreground mb-2">
-	                Tarif Pajak (%)
+	                	Tarif Pajak (%)
 	              </label>
 	              <div class="relative">
 	                <input id="pph21TERRate"
@@ -29223,7 +29223,7 @@
 	            <div>
 	              <label for="pph21TERMinGross"
 	                class="block text-sm font-medium text-foreground mb-2">
-	                Minimum Bruto (Rp)
+	                	Minimum Bruto (Rp)
 	              </label>
 	              <input id="pph21TERMinGross"
 	                type="number"
@@ -29237,7 +29237,7 @@
 	            <div>
 	              <label for="pph21TERMaxGross"
 	                class="block text-sm font-medium text-foreground mb-2">
-	                Maksimum Bruto (Rp)
+	                	Maksimum Bruto (Rp)
 	              </label>
 	              <input id="pph21TERMaxGross"
 	                type="number"
@@ -29246,7 +29246,7 @@
 	                placeholder="5650000"
 	                class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
 	              <p class="text-xs text-muted mt-1.5">
-	                Kosongkan untuk batas penghasilan tertinggi.
+									Kosongkan untuk batas penghasilan tertinggi.
 	              </p>
 	            </div>
 	          </div>
@@ -29255,13 +29255,13 @@
 	            <button type="button"
 	              onclick="closePPh21TERForm()"
 	              class="h-10 px-4 text-sm text-muted hover:text-foreground">
-	              Close
+	              	Close
 	            </button>
 	            <button type="button"
 	              onclick="savePPh21TER()"
 	              class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
 	              <span class="material-symbols-outlined text-sm">save</span>
-	              Save
+	              	Save
 	            </button>
 	          </div>
 	        </div>
@@ -30085,6 +30085,17 @@
                 </p>
               </div>
             </div>
+
+						<div class="flex items-center gap-2 flex-wrap">
+							<button type="button"
+								onclick="exportShiftHistory()"
+								class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+								<span class="material-symbols-outlined text-sm">
+									picture_as_pdf
+								</span>
+								Export
+							</button>
+						</div>
           </div>
 					<!-- FILTER -->
 	        <div class="p-5 border-b border-outline-variant">
@@ -30212,6 +30223,17 @@
                 Review cashier shift cash adjustment records
               </p>
             </div>
+						
+						<div class="flex items-center gap-2 flex-wrap">
+						  <button type="button"
+						    onclick="exportCashierShiftAdjustments()"
+						    class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+						    <span class="material-symbols-outlined text-sm">
+						      picture_as_pdf
+						    </span>
+						    Export
+						  </button>
+						</div>
           </div>
           <!-- ADJUSTMENT FILTERS -->
           <div class="p-5 border-b border-outline-variant">
