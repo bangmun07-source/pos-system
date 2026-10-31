@@ -921,30 +921,18 @@ async function loadDashboard() {
   if (
     state.dashboardData &&
     state.dashboardFilter === cacheKey
-  ) {
-    renderDashboard(
-      state.dashboardData
-    );
-    return;
-  }
-  if (!branchId) {
-    return;
-  }
+  ) { renderDashboard( state.dashboardData ); return; }
+  if (!branchId) { return; }
   try {
     const dashboardData =
-      await getDashboardDataRPC(
-        branchId
-      );
+      await getDashboardDataRPC( branchId );
 
     state.dashboardData = dashboardData || {};
     state.dashboardFilter = cacheKey;
     renderDashboard(state.dashboardData);
   }
   catch(err) {
-    showToast(
-      "Gagal memuat dashboard",
-      "error"
-    );
+    showToast( "Gagal memuat dashboard", "error" );
   }
 }
 
@@ -1026,11 +1014,7 @@ function renderLowStock(items) {
   const el = document.getElementById("low-stock-list");
   if (!el) return;
 
-  if (!items.length) {
-    el.innerHTML = `<p class="text-muted text-sm">No low stock items</p>`;
-    return;
-  }
-
+  if (!items.length) { el.innerHTML = `<p class="text-muted text-sm">No low stock items</p>`; return; }
   el.innerHTML = items.map(i => `
     <div class="flex justify-between text-sm py-1 border-b border-outline-variant">
       <span>${i.nama}</span>
@@ -1068,10 +1052,8 @@ function renderShiftPerformance(shift) {
   if (!el) return;
 
   const format = v => "IDR " + (v || 0).toLocaleString("id-ID");
-
   el.innerHTML = `
     <div class="flex flex-col gap-3">
-
       <div class="flex items-center justify-between py-3 border-b border-outline-variant">
         <div>
           <p class="text-sm text-on-surface font-medium font-bold">MORNING</p>
@@ -1095,9 +1077,88 @@ function renderShiftPerformance(shift) {
         </div>
         <p class="font-bold">${format(shift.malam?.revenue)}</p>
       </div>
-
     </div>
   `;
+}
+
+// OPEN SHIFT
+
+let hasSeenShiftInfo = false;
+function showShiftPopup(id) {
+	const popupIds = [
+		'openShiftPopup',
+		'shiftInfoPopup',
+		'closeShiftPopup'
+	];
+
+	popupIds.forEach(popupId => {
+		const popup = document.getElementById(popupId);
+		if (!popup) return;
+
+		popup.classList.add('hidden');
+		popup.classList.remove('flex');
+	});
+
+	const target = document.getElementById(id);
+	if (!target) return;
+
+	target.classList.remove('hidden');
+	target.classList.add('flex');
+}
+
+function closeShiftPopup() {
+	[
+		'openShiftPopup',
+		'shiftInfoPopup',
+		'closeShiftPopup'
+	].forEach(id => {
+		const popup = document.getElementById(id);
+		if (!popup) return;
+
+		popup.classList.add('hidden');
+		popup.classList.remove('flex');
+	});
+}
+
+function openShiftPopup() {
+	if (currentShift.isOpen) {
+		if (!hasSeenShiftInfo) { showShiftInfo();
+		} else { showCloseShiftPopup(); }
+	} else {
+		const dateElement = document.getElementById('openShiftDate');
+		if (dateElement) dateElement.textContent = getShiftDate();
+
+		showShiftPopup('openShiftPopup');
+	}
+}
+
+function showShiftInfo() {
+	const dateElement = document.getElementById('infoShiftDate');
+	const cashElement = document.getElementById('infoOpeningCash');
+
+	if (dateElement) dateElement.textContent = getShiftDate();
+	if (cashElement) { cashElement.textContent = formatShiftCurrency( currentShift.openingCash ); }
+
+	hasSeenShiftInfo = true;
+	showShiftPopup('shiftInfoPopup');
+}
+
+function formatShiftCurrency(value) {
+	return new Intl.NumberFormat('id-ID', {
+		style: 'currency',
+		currency: 'IDR',
+		maximumFractionDigits: 0
+	}).format(Number(value) || 0);
+}
+
+function getShiftDate() {
+	return new Date().toLocaleString('id-ID', {
+		day: '2-digit',
+		month: 'long',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit'
+	});
 }
 
   // ==================================
