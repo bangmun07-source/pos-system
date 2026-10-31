@@ -1082,7 +1082,14 @@ function renderShiftPerformance(shift) {
 }
 
 // OPEN SHIFT
-
+let currentShift = {
+    isOpen: false,
+    isClosed: false,
+    openingCash: 0,
+    cashSales: 0,
+    cashExpenses: 0,
+    actualCash: 0
+};
 let hasSeenShiftInfo = false;
 function showShiftPopup(id) {
 	const popupIds = [
