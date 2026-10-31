@@ -30069,13 +30069,25 @@
             </div>
           </div>
         </section>
-        <!-- FILTER -->
-        <section class="bg-background border border-outline-variant rounded-md p-5">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="material-symbols-outlined text-muted">filter_list</span>
-            <h2 class="text-sm font-semibold text-foreground">Filter Shifts</h2>
+        <!-- SHIFT HISTORY TABLE -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl">history</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Shift History
+                </h2>
+                <p class="text-xs text-muted mt-1">
+                  Review cashier shifts and cash reconciliation records
+                </p>
+              </div>
+            </div>
           </div>
-
+					<!-- FILTER -->
+        <div class="p-5 border-b border-outline-variant">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <!-- PERIOD FROM -->
             <div>
@@ -30129,32 +30141,7 @@
 						  </select>
 						</div>
           </div>
-
-          <div class="flex justify-end mt-4">
-            <button type="button"
-              onclick="resetCashierShiftFilters()"
-              class="h-9 px-4 rounded-md border border-outline-variant text-xs text-muted hover:text-foreground transition">
-              Reset Filters
-            </button>
-          </div>
-        </section>
-        <!-- SHIFT HISTORY TABLE -->
-        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="main-icon-box">
-                <span class="material-symbols-outlined text-3xl">history</span>
-              </div>
-              <div>
-                <h2 class="text-lg font-bold font-headline text-foreground">
-                  Shift History
-                </h2>
-                <p class="text-xs text-muted mt-1">
-                  Review cashier shifts and cash reconciliation records
-                </p>
-              </div>
-            </div>
-          </div>
+        </div>
           <!-- TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-sm">
@@ -30228,13 +30215,6 @@
           </div>
           <!-- ADJUSTMENT FILTERS -->
           <div class="p-5 border-b border-outline-variant">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="material-symbols-outlined text-muted">filter_list</span>
-              <h3 class="text-sm font-semibold text-foreground">
-                Filter Adjustments
-              </h3>
-            </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               <!-- PERIOD FROM -->
               <div>
