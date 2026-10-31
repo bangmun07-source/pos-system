@@ -1029,57 +1029,89 @@
 			<!-- ================= SHIFT MANAGEMENT POPUPS ================= -->
 			<!-- OPEN SHIFT POPUP -->
 			<div id="openShiftPopup"
-			  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
-			  <div class="w-full max-w-md rounded-md border border-outline-variant bg-background shadow-2xl">
-			
-			    <div class="flex items-center justify-between border-b border-outline-variant p-5">
-			      <h2 class="text-lg font-semibold text-on-surface">Open Shift</h2>
-			      <button onclick="closeShiftPopup()" class="text-on-surface-variant hover:text-on-surface">
-			        <span class="material-symbols-outlined">close</span>
-			      </button>
-			    </div>
-			
-			    <div class="space-y-5 p-6">
-			
-			      <div class="flex items-center gap-3">
-			        <div class="flex h-12 w-12 items-center justify-center rounded-md border border-outline-variant">
-			          <span class="material-symbols-outlined text-2xl text-primary">store</span>
-			        </div>
-			        <div>
-			          <h3 class="font-semibold text-on-surface">Nama Bisnis</h3>
-			          <p class="text-sm text-on-surface-variant">Outlet Utama</p>
-			        </div>
-			      </div>
-			
-			      <div class="grid grid-cols-2 gap-4">
-			        <div>
-			          <p class="text-xs text-on-surface-variant">Logged In User</p>
-			          <p class="mt-1 font-medium text-on-surface">Nama Kasir</p>
-			        </div>
-			        <div>
-			          <p class="text-xs text-on-surface-variant">Tanggal & Waktu</p>
-			          <p id="openShiftDate" class="mt-1 font-medium text-on-surface">-</p>
-			        </div>
-			      </div>
-			
-			      <div class="border-t border-outline-variant pt-5">
-			        <label for="openingCash" class="mb-2 block text-sm font-medium text-on-surface">
-			          Kas Awal (Cash)
-			        </label>
-			        <input id="openingCash" type="number" min="0" value="0"
-			          placeholder="Masukkan kas awal"
-			          class="w-full rounded-lg border border-outline-variant bg-surface px-4 py-3 text-lg text-on-surface outline-none focus:border-primary">
-			        <p class="mt-2 text-xs text-on-surface-variant">
-			          Masukkan jumlah uang tunai yang tersedia di laci kasir.
-			        </p>
-			      </div>
-			
-			      <button onclick="submitOpenShift()"
-			        class="w-full rounded-lg bg-primary px-5 py-3 font-semibold text-black transition hover:opacity-90">
-			        Open Shift
-			      </button>
-			    </div>
-			  </div>
+			 	class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4">
+				<div class="w-full max-w-md rounded-md border border-outline-variant bg-background shadow-2xl overflow-hidden">
+					<!-- Header -->
+					<div class="flex justify-end p-4">
+						<button onclick="closeShiftPopup()"
+							class="text-muted hover:text-on-surface transition">
+							<span class="material-symbols-outlined">close</span>
+						</button>
+					</div>
+		
+					<div class="px-7 pb-7">
+						<!-- Business Identity -->
+						<div class="flex flex-col items-center text-center mb-7">
+								<div class="w-16 h-16 rounded-md border border-outline-variant bg-surface-container flex items-center justify-center mb-4">
+									<img id="shiftBusinessLogo"
+										 class="max-w-full max-h-full object-contain"
+										 alt="Business Logo">
+								</div>
+
+								<h3 id="shiftBusinessName"
+									class="text-lg font-bold text-on-surface">
+									NAMA BUSINESS
+								</h3>
+
+								<p id="shiftOutletName"
+								 class="text-sm text-muted mt-1">
+									Outlet 1
+								</p>
+
+								<div class="w-full border-t border-outline-variant my-5"></div>
+
+								<p id="shiftLoginUser"
+								 class="text-sm font-semibold text-on-surface">
+									Nama User Login
+								</p>
+
+								<p id="openShiftDate"
+								 class="text-xs text-muted mt-2">
+									Saturday, October 31, 2026
+								</p>
+
+								<p id="openShiftTime"
+								 class="text-xs text-muted mt-1">
+									9:00:00 AM
+								</p>
+						</div>
+						<!-- Shift Selection -->
+						<div class="space-y-2 mb-5">
+							<label class="text-xs font-semibold text-on-surface-variant">
+									Shift
+							</label>
+
+							<select id="shiftSelection"
+								class="w-full h-11 px-3 rounded-md border border-outline-variant bg-surface-container text-on-surface text-sm focus:outline-none focus:border-amber-500">
+								<option value="">Select Shift</option>
+								<option value="Morning">Morning</option>
+								<option value="Afternoon">Afternoon</option>
+								<option value="Night">Night</option>
+							</select>
+						</div>
+		
+						<!-- Opening Cash -->
+						<div class="space-y-2 mb-7">
+							<label class="text-xs font-semibold text-on-surface-variant">
+									Kas Awal
+							</label>
+		
+							<div class="flex items-center h-12 rounded-md border border-outline-variant bg-surface-container px-3">
+								<span class="text-sm text-muted mr-2">Rp</span>
+								<input id="openingCash"
+									 type="number"
+									 min="0"
+									 placeholder="200000"
+									 class="w-full bg-transparent text-on-surface text-sm outline-none">
+							</div>
+						</div>
+						<!-- Open Button -->
+						<button onclick="submitOpenShift()"
+							class="w-full h-11 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition">
+								Open Shift
+						</button>
+					</div>
+				</div>
 			</div>
 	
 			<!-- SHIFT INFORMATION POPUP -->
@@ -1145,117 +1177,150 @@
 			    </div>
 			  </div>
 			</div>
-			
-			
 			<!-- CLOSE SHIFT POPUP -->
 			<div id="closeShiftPopup"
-			  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4">
-			  <div class="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-md border border-outline-variant bg-background shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
-			    <!-- HEADER -->
-			    <div class="sticky top-0 z-10 flex items-center justify-between border-b border-outline-variant bg-background p-5">
-			      <div>
-			        <h2 class="text-lg font-bold text-on-surface">Close Shift</h2>
-			        <p class="mt-1 text-xs text-muted">Cash reconciliation</p>
-			      </div>
+				 class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/70 p-4">
+				<div class="w-full max-w-lg rounded-md border border-outline-variant bg-background shadow-2xl overflow-hidden">
+					<!-- Header -->
+					<div class="flex justify-end p-4">
+						<button onclick="closeShiftPopup()"
+							class="text-muted hover:text-on-surface transition">
+								<span class="material-symbols-outlined">close</span>
+						</button>
+					</div>
 			
-			      <button type="button" onclick="closeShiftPopup()"
-			        class="flex h-9 w-9 items-center justify-center rounded-md text-muted hover:bg-surface hover:text-on-surface transition">
-			        <span class="material-symbols-outlined">close</span>
-			      </button>
-			    </div>
+					<div class="px-7 pb-7">
+						<!-- Business Identity -->
+						<div class="flex flex-col items-center text-center mb-7">
+							<div class="w-16 h-16 rounded-md border border-outline-variant bg-surface-container flex items-center justify-center mb-4">
+								<img id="closeBusinessLogo"
+									 class="max-w-full max-h-full object-contain"
+									 alt="Business Logo">
+							</div>
 			
-			    <div class="space-y-5 p-6">
-			      <!-- BUSINESS INFORMATION -->
-			      <div>
-			        <h3 class="font-semibold text-on-surface">Nama Bisnis</h3>
-			        <p class="text-sm text-muted">Outlet Utama · Nama Kasir</p>
-			        <p id="closeShiftDate" class="mt-1 text-xs text-muted">-</p>
-			      </div>
+							<h3 id="closeBusinessName"
+								class="text-lg font-bold text-on-surface">
+								NAMA BUSINESS
+							</h3>
 			
-			      <!-- CASH SUMMARY -->
-			      <div class="space-y-4 border-t border-outline-variant pt-4">
-			        <h3 class="text-sm font-bold uppercase tracking-wider text-on-surface">
-			          Ringkasan Kas
-			        </h3>
+							<p id="closeOutletName"
+							 class="text-sm text-muted mt-1">
+								Outlet 1
+							</p>
 			
-			        <div class="flex justify-between text-sm">
-			          <span class="text-muted">Kas Awal</span>
-			          <span id="closeOpeningCash" class="font-medium text-on-surface">Rp0</span>
-			        </div>
+							<div class="w-full border-t border-outline-variant my-5"></div>
 			
-			        <div class="flex justify-between text-sm">
-			          <span class="text-muted">Cash Penjualan</span>
-			          <span id="closeCashSales" class="font-medium text-on-surface">Rp0</span>
-			        </div>
+							<p id="closeLoginUser"
+							 class="text-sm font-semibold text-on-surface">
+								Nama User Login
+							</p>
 			
-			        <div class="flex justify-between text-sm">
-			          <span class="text-muted">Cash Pengeluaran</span>
-			          <span id="closeCashExpenses" class="font-medium text-on-surface">-Rp0</span>
-			        </div>
+							<p id="closeShiftDate"
+							 class="text-xs text-muted mt-2">
+								Saturday, October 31, 2026
+							</p>
 			
-			        <div class="flex justify-between gap-3 border-t border-outline-variant pt-4">
-			          <span class="font-semibold text-on-surface">Total Kas Seharusnya</span>
-			          <span id="expectedCash" class="font-bold text-on-surface">Rp0</span>
-			        </div>
+							<p id="closeShiftTime"
+							 class="text-xs text-muted mt-1">
+								9:00:00 AM
+							</p>
+						</div>
+						<!-- Cash Summary -->
+						<div class="border border-outline-variant rounded-md overflow-hidden mb-5">
+							<div class="grid grid-cols-2 bg-surface-container px-4 py-3 text-xs font-semibold text-on-surface-variant">
+								<span>Keterangan</span>
+								<span class="text-right">Nominal</span>
+							</div>
 			
-			      </div>
+							<div class="divide-y divide-outline-variant text-sm">
+								<div class="grid grid-cols-2 px-4 py-3">
+									<span class="text-muted">Kas Awal</span>
+									<span id="closeOpeningCash" class="text-right text-on-surface font-medium">
+											Rp 200.000
+									</span>
+								</div>
 			
-			      <!-- ACTUAL CASH -->
-			      <div class="border-t border-outline-variant pt-5">
+								<div class="grid grid-cols-2 px-4 py-3">
+									<span class="text-muted">Cash Penjualan</span>
+									<span id="closeCashSales" class="text-right text-on-surface font-medium">
+											Rp 500.000
+									</span>
+								</div>
 			
-			        <label for="actualCash" class="mb-2 block text-sm font-semibold text-on-surface">
-			          Input Cash (Uang Fisik)
-			        </label>
+								<div class="grid grid-cols-2 px-4 py-3">
+									<span class="text-muted">Cash Pengeluaran</span>
+									<span id="closeCashExpenses" class="text-right text-on-surface font-medium">
+											Rp 50.000
+									</span>
+								</div>
+							</div>
 			
-			        <div class="relative">
-			          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-muted">
-			            Rp
-			          </span>
+							<div class="border-t border-outline-variant bg-surface-container px-4 py-4">
+								<div class="flex justify-between items-center gap-3">
+									<span class="text-sm font-semibold text-on-surface">
+											Total Kas Seharusnya
+									</span>
 			
-			          <input
-			            id="actualCash"
-			            type="number"
-			            min="0"
-			            value="0"
-			            oninput="calculateShiftBalance()"
-			            placeholder="0"
-			            class="w-full rounded-md border border-outline-variant bg-background py-3 pl-12 pr-4 text-lg font-semibold text-on-surface outline-none focus:border-on-surface">
-			        </div>
+									<span id="expectedCash"
+												class="text-sm font-bold text-amber-500">
+											Rp 650.000
+									</span>
+								</div>
+							</div>
+						</div>
+						<!-- Physical Cash Input -->
+						<div class="space-y-2 mb-5">
+							<label class="text-xs font-semibold text-on-surface-variant">
+								Input Cash
+							</label>
 			
-			      </div>
+							<div class="flex items-center h-12 rounded-md border border-outline-variant bg-surface-container px-3">
+								<span class="text-sm text-muted mr-2">Rp</span>
 			
-			      <!-- BALANCE -->
-			      <div class="rounded-md border border-outline-variant p-4">
+								<input id="actualCash"
+									 type="number"
+									 min="0"
+									 placeholder="Masukkan jumlah uang fisik"
+									 oninput="calculateShiftBalance()"
+									 class="w-full bg-transparent text-on-surface text-sm outline-none">
+							</div>
+						</div>
+						<!-- Balance -->
+						<div class="flex items-center justify-between rounded-md border border-outline-variant bg-surface-container px-4 py-4 mb-5">
+							<span class="text-sm font-semibold text-on-surface">
+								Balance
+							</span>
 			
-			        <div class="flex items-center justify-between gap-3">
-			          <span class="font-semibold text-on-surface">Balance</span>
-			          <span id="shiftBalance" class="text-xl font-bold text-on-surface">Rp0</span>
-			        </div>
+							<span id="shiftBalance"
+								class="text-base font-bold text-on-surface">
+									Rp 0
+							</span>
+						</div>
+						<!-- Noted -->
+						<div class="space-y-2 mb-6">
+							<label class="text-xs font-semibold text-on-surface-variant">
+								Noted
+							</label>
 			
-			        <p class="mt-2 text-xs text-muted">
-			          Selisih antara uang fisik dan total kas seharusnya.
-			        </p>
+							<textarea id="shiftClosingNote"
+								rows="2"
+								placeholder="Laporan penutupan shift cash..."
+								class="w-full resize-none rounded-md border border-outline-variant bg-surface-container p-3 text-sm text-on-surface placeholder:text-muted outline-none focus:border-amber-500"></textarea>
+						</div>
+						<!-- Actions -->
+						<button id="btnCloseShift"
+							onclick="submitCloseShift()"
+							class="w-full h-11 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition">
+								Close Shift
+						</button>
 			
-			      </div>
-			
-			      <!-- CLOSE BUTTON -->
-			      <button id="btnCloseShift"
-			        type="button"
-			        onclick="submitCloseShift()"
-			        class="w-full rounded-md border border-outline-variant bg-on-surface px-5 py-3 font-semibold text-background transition hover:opacity-90">
-			        Close Shift
-			      </button>
-			
-			      <!-- EXPORT BUTTON AFTER CLOSING -->
-			      <button id="btnExportShift"
-			        type="button"
-			        onclick="exportShiftReport()"
-			        class="hidden w-full rounded-md border border-outline-variant bg-on-surface px-5 py-3 font-semibold text-background transition hover:opacity-90">
-			        <span class="material-symbols-outlined mr-2 inline-block align-middle">download</span>
-			        Export
-			      </button>
-			    </div>
-			  </div>
+						<button id="btnExportShift"
+							onclick="exportShiftReport()"
+							class="hidden w-full h-11 rounded-md bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition">
+								Export
+						</button>
+					</div>
+				</div>
 			</div>
 		</main>
 	</div>
