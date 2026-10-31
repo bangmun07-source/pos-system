@@ -29906,6 +29906,310 @@
     </section>
   </main>
 </template>
+
+
+<!-- =========================================================
+     CASHIER SHIFT PAGE
+========================================================= -->
+	
+<template id="cashierShiftPage">
+  <!-- SIDEBAR -->
+  <aside id="sidebar"
+    class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
+    <div class="sidebar-menu flex flex-col h-full">
+      <nav class="flex-1 flex flex-col overflow-y-auto overflow-x-hidden py-8 px-2 gap-2">
+        <a class="operationalMenu" onclick="navigate('dashboardPage')">
+          <span class="material-symbols-outlined sidebar-icon">home</span>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+
+        <a class="operationalMenu" onclick="navigate('analyticsPage', { roles:['Owner','Admin'] })">
+          <span class="material-symbols-outlined sidebar-icon">analytics</span>
+          <span class="sidebar-label">Analytics</span>
+        </a>
+
+        <a class="operationalMenu" onclick="navigate('inventoryPage', { roles:['Owner','Admin'] })">
+          <span class="material-symbols-outlined sidebar-icon">inventory_2</span>
+          <span class="sidebar-label">Inventory</span>
+        </a>
+
+        <a class="operationalMenu" onclick="navigate('employeePage', { roles:['Owner','Admin','Accountant'] })">
+          <span class="material-symbols-outlined sidebar-icon">badge</span>
+          <span class="sidebar-label">Employees</span>
+        </a>
+
+        <a class="active operationalMenu" onclick="navigate('cashierShiftPage', { roles:['Owner','Admin'] })">
+          <span class="material-symbols-outlined sidebar-icon">point_of_sale</span>
+          <span class="sidebar-label">Cashier Shifts</span>
+        </a>
+
+        <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
+          <span class="material-symbols-outlined sidebar-icon">account_balance_wallet</span>
+          <span class="sidebar-label">Cash Flow</span>
+        </a>
+
+        <a class="accountingMenu" onclick="navigate('accountingTransactionsPage', { roles:['Owner','Accountant'] })">
+          <span class="material-symbols-outlined sidebar-icon">menu_book</span>
+          <span class="sidebar-label">Journal Entries</span>
+        </a>
+      </nav>
+
+      <div class="mt-auto p-2 pb-2">
+        <div class="flex h-10 items-center gap-3 overflow-hidden rounded-md border border-outline-variant">
+          <span class="shrink-0 w-8 h-8 flex items-center justify-center">
+            <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          </span>
+          <div class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+            <p class="text-[10px] text-muted">SYSTEM STATUS</p>
+            <span class="sidebar-label">SERVER ACTIVE</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent" class="flex-1 flex flex-col h-screen">
+    <!-- HEADER -->
+    <header class="h-20 flex-shrink-0 z-40 bg-background border border-outline-variant flex items-center px-1 pr-5 overflow-visible">
+      <div class="flex items-center gap-5 flex-1">
+        <div class="w-[44px] h-[44px] flex items-center justify-center">
+          <img id="munoLogo"
+            src="https://glbyqlibiapiorztgxee.supabase.co/storage/v1/object/public/App-Logo/MUNO%20WHITE%20512.png"
+            alt="MUNO"
+            class="w-12 h-12 object-contain">
+        </div>
+        <span class="h-7 w-px bg-outline-variant"></span>
+        <p class="text-xl text-muted font-medium headline-font tracking-[0.2em]">MUNO</p>
+      </div>
+
+      <div class="ml-auto flex items-center gap-3">
+        <button onclick="logout()"
+          class="ml-auto w-10 h-10 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors rounded-md active:scale-95 duration-200">
+          <span class="material-symbols-outlined">logout</span>
+        </button>
+      </div>
+    </header>
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-auto custom-scrollbar pt-4 pr-4 pb-10 pl-20">
+      <!-- HERO -->
+      <section class="mb-4 mt-0 relative overflow-hidden rounded-md bg-background border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] min-h-[200px]">
+        <div class="absolute inset-0 flex items-center justify-center overflow-hidden">
+          <img src="https://lh3.googleusercontent.com/d/1A6iAplqifTz16AS_szzuX1AQcwXxDuqG"
+            class="w-full h-full object-cover"
+            style="object-position:right 40%;"
+            alt="">
+        </div>
+
+        <div class="absolute inset-0 bg-gradient-to-r from-[#000000] via-[#000000]/70 to-[#000000]/40"></div>
+
+        <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-12">
+          <span class="text-muted text-sm lg:text-base font-medium tracking-[0.25em] uppercase">
+            Cashier Operations
+          </span>
+          <h2 class="lg:text-3xl md:text-2xl headline-font font-black text-[#e0e0e0] mt-2 mb-4 leading-tight tracking-[0.25em] uppercase">
+            Cashier Shift Management
+          </h2>
+        </div>
+      </section>
+
+      <!-- SHIFT OVERVIEW -->
+      <section class="mt-5 space-y-5">
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex items-center gap-3">
+            <div class="main-icon-box">
+              <span class="material-symbols-outlined text-3xl"
+                style="font-variation-settings:'FILL' 1;">
+                point_of_sale
+              </span>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold font-headline text-foreground">
+                Shift Overview
+              </h2>
+              <p class="text-xs text-muted mt-1">
+                Cashier shift activity and reconciliation summary
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4">
+            <!-- TOTAL SHIFTS -->
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">Total Shifts</p>
+              <p id="shiftTotalCount" class="text-xl font-headline mt-1">0</p>
+              <p class="text-[11px] text-muted mt-1">Recorded shifts</p>
+            </div>
+            <!-- OPEN SHIFTS -->
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">Open Shifts</p>
+              <p id="shiftOpenCount" class="text-xl font-headline mt-1">0</p>
+              <p class="text-[11px] text-muted mt-1">Currently active</p>
+            </div>
+            <!-- CLOSED SHIFTS -->
+            <div class="p-5 border-r border-outline-variant">
+              <p class="text-[11px] text-muted uppercase tracking-wider">Closed Shifts</p>
+              <p id="shiftClosedCount" class="text-xl font-headline mt-1">0</p>
+              <p class="text-[11px] text-muted mt-1">Completed shifts</p>
+            </div>
+            <!-- CASH DIFFERENCE -->
+            <div class="p-5">
+              <p class="text-[11px] text-muted uppercase tracking-wider">Cash Difference</p>
+              <p id="shiftTotalDifference" class="text-xl font-headline mt-1">Rp 0</p>
+              <p class="text-[11px] text-muted mt-1">Total recorded variance</p>
+            </div>
+          </div>
+        </section>
+        <!-- FILTER -->
+        <section class="bg-background border border-outline-variant rounded-md p-5">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-muted">filter_list</span>
+            <h2 class="text-sm font-semibold text-foreground">Filter Shifts</h2>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- PERIOD FROM -->
+            <div>
+              <label class="block text-xs text-muted mb-2">Period From</label>
+              <input id="cashierShiftPeriodFrom"
+                type="date"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+            </div>
+            <!-- PERIOD TO -->
+            <div>
+              <label class="block text-xs text-muted mb-2">Period To</label>
+              <input id="cashierShiftPeriodTo"
+                type="date"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+            </div>
+            <!-- USER -->
+            <div>
+              <label class="block text-xs text-muted mb-2">Cashier / User</label>
+              <select id="cashierShiftUserFilter"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                <option value="ALL">All Users</option>
+              </select>
+            </div>
+            <!-- BRANCH -->
+            <div>
+              <label class="block text-xs text-muted mb-2">Branch</label>
+              <select id="cashierShiftBranchFilter"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                <option value="ALL">All Branches</option>
+              </select>
+            </div>
+            <!-- STATUS -->
+            <div>
+              <label class="block text-xs text-muted mb-2">Shift Status</label>
+              <select id="cashierShiftStatusFilter"
+                class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                <option value="ALL">All Status</option>
+                <option value="OPEN">Open</option>
+                <option value="CLOSED">Closed</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex justify-end mt-4">
+            <button type="button"
+              onclick="resetCashierShiftFilters()"
+              class="h-9 px-4 rounded-md border border-outline-variant text-xs text-muted hover:text-foreground transition">
+              Reset Filters
+            </button>
+          </div>
+        </section>
+        <!-- SHIFT HISTORY TABLE -->
+        <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
+          <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="main-icon-box">
+                <span class="material-symbols-outlined text-3xl">history</span>
+              </div>
+              <div>
+                <h2 class="text-lg font-bold font-headline text-foreground">
+                  Shift History
+                </h2>
+                <p class="text-xs text-muted mt-1">
+                  Review cashier shifts and cash reconciliation records
+                </p>
+              </div>
+            </div>
+          </div>
+          <!-- TABLE -->
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-xs font-medium headline-font">
+                  <th class="px-5 py-3 text-left whitespace-nowrap">Cashier</th>
+                  <th class="px-5 py-3 text-left whitespace-nowrap">Branch</th>
+                  <th class="px-5 py-3 text-left whitespace-nowrap">Opened At</th>
+                  <th class="px-5 py-3 text-left whitespace-nowrap">Closed At</th>
+                  <th class="px-5 py-3 text-right whitespace-nowrap">Opening Cash</th>
+                  <th class="px-5 py-3 text-right whitespace-nowrap">Total Sales</th>
+                  <th class="px-5 py-3 text-right whitespace-nowrap">Expected Cash</th>
+                  <th class="px-5 py-3 text-right whitespace-nowrap">Actual Cash</th>
+                  <th class="px-5 py-3 text-right whitespace-nowrap">Difference</th>
+                  <th class="px-5 py-3 text-center whitespace-nowrap">Status</th>
+                  <th class="px-5 py-3 text-center whitespace-nowrap">Adjustment</th>
+                  <th class="px-5 py-3 text-center whitespace-nowrap">Action</th>
+                </tr>
+              </thead>
+
+              <tbody id="cashierShiftTableBody" class="divide-y divide-outline-variant">
+                <tr>
+                  <td colspan="12" class="px-5 py-10 text-center text-muted text-sm">
+                    No shift records found
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- PAGINATION -->
+          <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between">
+            <p id="cashierShiftPaginationInfo"
+              class="text-xs text-on-surface-variant font-medium">
+              Showing 0–0 of 0
+            </p>
+
+            <div class="flex items-center gap-2">
+              <button id="cashierShiftPrevButton"
+                type="button"
+                onclick="cashierShiftPrevPage()"
+                class="px-3 py-2 text-muted font-medium headline-font transition">
+                <span class="material-symbols-outlined text-sm">chevron_left</span>
+              </button>
+
+              <button id="cashierShiftNextButton"
+                type="button"
+                onclick="cashierShiftNextPage()"
+                class="px-3 py-2 text-muted font-medium headline-font transition">
+                <span class="material-symbols-outlined text-sm">chevron_right</span>
+              </button>
+            </div>
+          </div>
+          <!-- EXPORT FOOTER -->
+          <div class="px-5 py-4 border-t border-outline-variant flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold text-foreground">Export Shift Report</p>
+              <p class="text-[11px] text-muted mt-1">
+                Export shift records based on the selected filters
+              </p>
+            </div>
+
+            <button type="button"
+              id="cashierShiftExportButton"
+              onclick="exportCashierShiftReport()"
+              class="h-10 px-5 rounded-md bg-primary text-on-primary text-sm font-semibold flex items-center gap-2 hover:opacity-90 transition">
+              <span class="material-symbols-outlined text-lg">download</span>
+              Export Report
+            </button>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+</template>
+
 	
 <!-- 
   MUNO KASIR: MASTER SPA LOGIC (Script.html)
