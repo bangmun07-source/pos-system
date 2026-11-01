@@ -45004,7 +45004,7 @@ function renderCashierShiftHistoryTable(rows) {
 		return `
 			<tr class="border-b border-outline-variant">
 				<td class="px-4 py-3">
-					<div class="font-medium">
+					<div class="font-medium whitespace-nowrap">
 						${escapeShiftHtml(row.cashier_name)}
 					</div>
 					<div class="text-xs text-muted">
@@ -45044,14 +45044,14 @@ function renderCashierShiftHistoryTable(rows) {
 					${formatShiftCurrency(difference)}
 				</td>
 
-				<td class="px-4 py-3">
-					<span class="text-center ${statusClass}">
+				<td class="px-4 py-3 text-center">
+					<span class="${statusClass}">
 						${escapeShiftHtml(row.status)}
 					</span>
 				</td>
 
-				<td class="px-4 py-3">
-					<span class="text-center ${adjustmentClass}">
+				<td class="px-4 py-3 text-center">
+					<span class="${adjustmentClass}">
 						${escapeShiftHtml(row.adjustment_status)}
 					</span>
 				</td>
