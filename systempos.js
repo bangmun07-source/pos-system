@@ -1194,53 +1194,92 @@ async function loadShiftHeader() {
   }
 }
 
-async function openShiftPopup() {
-	await loadShiftHeader();
 
-	try {
-			const sessionId = localStorage.getItem('pos_session_id');
+async function restoreActiveShift() {
+    const sessionId = localStorage.getItem('pos_session_id');
 
-			if (!sessionId) {
-					throw new Error('Session tidak ditemukan.');
-			}
+    if (!sessionId) {
+        throw new Error('Session tidak ditemukan.');
+    }
 
-			const { data, error } = await supabaseClient.rpc(
-					'get_active_cashier_shift',
-					{
-							p_session_id: sessionId,
-							p_branch_id: state.branchId
-					}
-			);
+    const { data, error } = await supabaseClient.rpc(
+        'get_active_cashier_shift',
+        {
+            p_session_id: sessionId,
+            p_branch_id: state.branchId
+        }
+    );
 
-			if (error) throw error;
+    if (error) throw error;
+		if (!data) {
+		    currentShift = {
+		        ...currentShift,
+		        isOpen: false,
+		        isClosed: false,
+		        shiftId: null,
+		        shiftType: '',
+		        openingCash: 0,
+		        cashSales: 0,
+		        cashExpenses: 0,
+		        expectedCash: 0,
+		        actualCash: 0,
+		        balance: 0,
+		        openingDate: null
+		    };
+		
+		    return false;
+		}
+	
+    currentShift = {
+        ...currentShift,
+        isOpen: true,
+        isClosed: false,
+        shiftId: data.id,
+        shiftType: data.shift_type,
+        openingCash: Number(data.opening_cash),
+        cashSales: Number(data.cash_sales),
+        cashExpenses: Number(data.cash_expenses),
+        expectedCash: Number(data.expected_cash),
+        openingDate: data.opened_at
+    };
 
-			if (data) {
-					await showCloseShiftPopup();
-					return;
-			}
-
-			currentShift.isOpen = false;
-
-			const now = new Date();
-
-			document.getElementById('openShiftDate').textContent =
-					now.toLocaleDateString('en-US', {
-							weekday: 'long',
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric'
-					});
-
-			document.getElementById('openShiftTime').textContent =
-					now.toLocaleTimeString('en-US');
-
-			showShiftPopup('openShiftPopup');
-
-	} catch (err) {
-			console.error('Open Shift Popup:', err);
-			alert(err.message || 'Gagal memeriksa Shift.');
-	}
+    return true;
 }
+
+
+
+async function openShiftPopup() {
+    try {
+        await loadShiftHeader();
+
+        const hasActiveShift = await restoreActiveShift();
+
+        if (hasActiveShift) {
+            await showCloseShiftPopup();
+            return;
+        }
+
+        const now = new Date();
+
+        document.getElementById('openShiftDate').textContent =
+            now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+        document.getElementById('openShiftTime').textContent =
+            now.toLocaleTimeString('en-US');
+
+        showShiftPopup('openShiftPopup');
+
+    } catch (err) {
+        console.error('Open Shift Popup:', err);
+        alert(err.message || 'Gagal memeriksa Shift.');
+    }
+}
+
 
 
 async function submitOpenShift() {
