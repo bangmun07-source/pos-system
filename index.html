@@ -19550,16 +19550,6 @@
 						Employees
 					</span>
 				</a>
-				<!-- CASH SHIFT -->
-				<a class="active operationalMenu" onclick="navigate('cashierShiftPage', { roles:['Owner','Admin'] })">
-          <span class="material-symbols-outlined sidebar-icon">
-						point_of_sale
-					</span>
-					
-          <span class="sidebar-label">
-						Cashier Shifts
-					</span>
-        </a>
         <!-- CASH FLOW -->
         <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
           <span class="material-symbols-outlined sidebar-icon">
@@ -24866,12 +24856,9 @@
   </div>
 </template>
 
-
-  <!-- =========================================================
-		    								EMPLOYEE PAGE
-  ========================================================== -->
-
-
+	
+<!--  EMPLOYEE PAGE  -->
+	
 <template id="employeePage">
   <!-- ==== SIDEBAR ==== -->
   <aside id="sidebar"
@@ -24962,6 +24949,16 @@
           <span class="sidebar-label">
             Employees
           </span>
+        </a>
+				<!-- CASHIER SHIFT -->
+				<a class="active operationalMenu" onclick="navigate('cashierShiftPage', { roles:['Owner','Admin'] })">
+          <span class="material-symbols-outlined sidebar-icon">
+						point_of_sale
+					</span>
+					
+          <span class="sidebar-label">
+						Cashier Shifts
+					</span>
         </a>
 				<!-- CASH FLOW -->
         <a class="accountingMenu" onclick="navigate('cashFlowPage', { roles:['Owner','Accountant'] })">
