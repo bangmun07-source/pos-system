@@ -1217,42 +1217,66 @@ async function openShiftPopup() {
 	}
 }
 
-function submitOpenShift() {
+
+async function submitOpenShift() {
 	const shiftType = document.getElementById('shiftSelection')?.value;
 	const openingCashInput = document.getElementById('openingCash');
 	const openingCash = Number(openingCashInput?.value);
 
 	if (!shiftType) { alert('Silakan pilih Shift terlebih dahulu.'); return; }
-	if ( openingCashInput.value.trim() === '' || !Number.isFinite(openingCash) || openingCash < 0
-	) { alert('Masukkan Kas Awal yang valid.'); openingCashInput.focus(); return; }
+	if ( !openingCashInput || openingCashInput.value.trim() === '' || !Number.isFinite(openingCash) || openingCash < 0
+	) { alert('Masukkan Kas Awal yang valid.');
+			openingCashInput?.focus();
+			return; 
+		}
 
-	const now = new Date();
+	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) { throw new Error('Session tidak ditemukan.'); }
 
-	currentShift = {
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'open_cashier_shift',
+				{
+					p_session_id: sessionId,
+					p_branch_id: state.branchId,
+					p_shift_type: shiftType,
+					p_opening_cash: openingCash
+				}
+			);
+
+		if (error) throw error;
+
+		currentShift = {
 			isOpen: true,
 			isClosed: false,
-			shiftType: shiftType,
-			openingCash: openingCash,
+			shiftId: data.id,
+			shiftType: data.shift_type,
+			openingCash: Number(data.opening_cash),
 			cashSales: 0,
 			cashExpenses: 0,
-			expectedCash: openingCash,
+			expectedCash: Number(data.expected_cash),
 			actualCash: 0,
 			balance: 0,
-			openingDate: now,
+			openingDate: data.opened_at,
 			closingDate: null,
 			openingUser: document.getElementById('shiftLoginUser')?.textContent.trim() || '',
 			closingNote: ''
-	};
-	// Reset input Close Shift
-	document.getElementById('closeCashExpenses').value = 0;
-	document.getElementById('actualCash').value = '';
-	document.getElementById('shiftClosingNote').value = '';
+		};
 
-	// Tutup Open Shift setelah berhasil dibuka
-	closeShiftPopup();
+		document.getElementById('closeCashExpenses').value = 0;
+		document.getElementById('actualCash').value = '';
+		document.getElementById('shiftClosingNote').value = '';
 
-	alert('Shift berhasil dibuka.');
+		closeShiftPopup();
+		alert('Shift berhasil dibuka.');
+
+	} catch (err) {
+		console.error('Open Shift Error:', err);
+		alert(err.message || 'Gagal membuka Shift.');
+	}
 }
+
 
 /* === CLOSE SHIFT === */
 async function showCloseShiftPopup() {
