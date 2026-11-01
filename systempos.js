@@ -45004,58 +45004,26 @@ function renderCashierShiftHistoryTable(rows) {
 		return `
 			<tr class="border-b border-outline-variant">
 				<td class="px-4 py-3">
-					<div class="font-medium whitespace-nowrap">
-						${escapeShiftHtml(row.cashier_name)}
-					</div>
-					<div class="text-xs text-muted">
-						${escapeShiftHtml(row.shift_type || '-')}
-					</div>
+					<div class="font-medium whitespace-nowrap"> ${escapeShiftHtml(row.cashier_name)} </div>
+					<div class="text-xs text-muted"> ${escapeShiftHtml(row.shift_type || '-')} </div>
 				</td>
-
-				<td class="px-4 py-3">
-					${escapeShiftHtml(row.branch_name)}
-				</td>
-
-				<td class="px-4 py-3 whitespace-nowrap">
-					${formatShiftDate(row.opened_at)}
-				</td>
-
-				<td class="px-4 py-3 whitespace-nowrap">
-					${row.closed_at ? formatShiftDate(row.closed_at) : '-'}
-				</td>
-
-				<td class="px-4 py-3 text-right">
-					${formatShiftCurrency(row.opening_cash)}
-				</td>
-
-				<td class="px-4 py-3 text-right">
-					${formatShiftCurrency(row.total_sales)}
-				</td>
-
-				<td class="px-4 py-3 text-right">
-					${formatShiftCurrency(row.expected_cash)}
-				</td>
-
-				<td class="px-4 py-3 text-right">
-					${formatShiftCurrency(row.actual_cash)}
-				</td>
-
+				<td class="px-4 py-3"> ${escapeShiftHtml(row.branch_name)} </td>
+				<td class="px-4 py-3 whitespace-nowrap"> ${formatShiftDate(row.opened_at)} </td>
+				<td class="px-4 py-3 whitespace-nowrap"> ${row.closed_at ? formatShiftDate(row.closed_at) : '-'} </td>
+				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.opening_cash)} </td>
+				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.total_sales)} </td>
+				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.cash_expenses)} </td>
+				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.expected_cash)} </td>
+				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.actual_cash)} </td>
 				<td class="px-4 py-3 text-right ${difference < 0 ? 'text-red-400' : difference > 0 ? 'text-amber-400' : 'text-emerald-400'}">
 					${formatShiftCurrency(difference)}
 				</td>
-
 				<td class="px-4 py-3 text-center">
-					<span class="${statusClass}">
-						${escapeShiftHtml(row.status)}
-					</span>
+					<span class="${statusClass}"> ${escapeShiftHtml(row.status)} </span>
 				</td>
-
 				<td class="px-4 py-3 text-center">
-					<span class="${adjustmentClass}">
-						${escapeShiftHtml(row.adjustment_status)}
-					</span>
+					<span class="${adjustmentClass}"> ${escapeShiftHtml(row.adjustment_status)} </span>
 				</td>
-
 				<td class="px-4 py-3 text-center">
 					<button type="button"
 						onclick="toggleCashierShiftMenu('${row.id}')"
