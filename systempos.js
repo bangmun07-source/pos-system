@@ -1521,75 +1521,57 @@ async function submitCloseShift() {
 /* === EXPORT SHIFT REPORT === */
 
 function exportShiftReport() {
-	if (!currentShift.isClosed) {
-			alert('Shift belum ditutup.');
-			return;
-	}
+	if (!currentShift.isClosed) { alert('Shift belum ditutup.'); return; }
 
 	try {
 			// HELPERS
 			const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
-					'&': '&amp;',
-					'<': '&lt;',
-					'>': '&gt;',
-					'"': '&quot;',
-					"'": '&#39;'
+				'&': '&amp;',
+				'<': '&lt;',
+				'>': '&gt;',
+				'"': '&quot;',
+				"'": '&#39;'
 			})[char]);
-
 			const money = value => formatShiftCurrency(value);
-
 			const formatDate = value => {
-					if (!value) return '-';
-
-					return new Date(value).toLocaleString('id-ID', {
-							day: '2-digit',
-							month: 'long',
-							year: 'numeric',
-							hour: '2-digit',
-							minute: '2-digit'
-					});
+				if (!value) return '-';
+				return new Date(value).toLocaleString('id-ID', {
+					day: '2-digit',
+					month: 'long',
+					year: 'numeric',
+					hour: '2-digit',
+					minute: '2-digit'
+				});
 			};
-
-			const businessName =
-					document.getElementById('closeBusinessName')?.textContent.trim() || 'Business';
-
-			const outletName =
-					document.getElementById('closeOutletName')?.textContent.trim() || '-';
-
-			const cashierName =
-					document.getElementById('closeLoginUser')?.textContent.trim() || '-';
-
+			const businessName = document.getElementById('closeBusinessName')?.textContent.trim() || 'Business';
+			const outletName = document.getElementById('closeOutletName')?.textContent.trim() || '-';
+			const cashierName = document.getElementById('closeLoginUser')?.textContent.trim() || '-';
 			const logoElement = document.getElementById('closeBusinessLogo');
 			const logoUrl = logoElement && !logoElement.classList.contains('hidden')
-					? logoElement.src
-					: '';
-
+				? logoElement.src
+				: '';
 			const shiftType = currentShift.shiftType || '-';
 			const openingDate = currentShift.openingDate;
 			const closingDate = currentShift.closingDate;
-
 			const openingCash = Number(currentShift.openingCash) || 0;
 			const cashSales = Number(currentShift.cashSales) || 0;
+			const qrisSales = Number(currentShift.qrisSales) || 0;
+			const bankSales = Number(currentShift.bankSales) || 0;
 			const cashExpenses = Number(currentShift.cashExpenses) || 0;
 			const expectedCash = Number(currentShift.expectedCash) || 0;
 			const actualCash = Number(currentShift.actualCash) || 0;
 			const balance = Number(currentShift.balance) || 0;
-
 			const balanceLabel = balance < 0
-					? 'SHORTAGE'
-					: balance > 0
-							? 'SURPLUS'
-							: 'BALANCED';
-
+				? 'SHORTAGE'
+				: balance > 0
+					? 'SURPLUS'
+					: 'BALANCED';
 			const balanceClass = balance < 0
-					? 'negative'
-					: balance > 0
-							? 'positive'
-							: 'neutral';
-
-			const filename =
-					`Shift Closing - ${outletName} - ${formatDate(closingDate)}.pdf`;
-
+				? 'negative'
+				: balance > 0
+					? 'positive'
+					: 'neutral';
+			const filename = `Shift Closing - ${outletName} - ${formatDate(closingDate)}.pdf`;
 			// REPORT HTML
 			const html = `
 					<!DOCTYPE html>
@@ -1958,9 +1940,7 @@ function exportShiftReport() {
 											` : ''}
 
 											<h1 class="title">Shift Closing Report</h1>
-											<div class="business-name">${esc(businessName)}</div>
 											<div class="branch-title">${esc(outletName)}</div>
-											<div class="period">Cashier: ${esc(cashierName)}</div>
 									</header>
 
 									<!-- SHIFT INFORMATION -->
@@ -1997,6 +1977,16 @@ function exportShiftReport() {
 													<div class="summary-label">Cash Sales</div>
 													<div class="summary-value">${esc(money(cashSales))}</div>
 											</div>
+											
+											<div class="summary-card">
+											    <div class="summary-label">QRIS Sales</div>
+											    <div class="summary-value">${esc(money(qrisSales))}</div>
+											</div>
+											
+											<div class="summary-card">
+											    <div class="summary-label">Bank Sales</div>
+											    <div class="summary-value">${esc(money(bankSales))}</div>
+											</div>
 
 											<div class="summary-card">
 													<div class="summary-label">Cash Expenses</div>
@@ -2030,6 +2020,16 @@ function exportShiftReport() {
 															<tr>
 																	<td>Cash Sales</td>
 																	<td class="amount">${esc(money(cashSales))}</td>
+															</tr>
+
+															<tr>
+															    <td>QRIS Sales</td>
+															    <td class="amount">${esc(money(qrisSales))}</td>
+															</tr>
+															
+															<tr>
+															    <td>Bank Sales</td>
+															    <td class="amount">${esc(money(bankSales))}</td>
 															</tr>
 
 															<tr>
