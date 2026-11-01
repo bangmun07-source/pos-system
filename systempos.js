@@ -1519,39 +1519,581 @@ async function submitCloseShift() {
 
 
 /* === EXPORT SHIFT REPORT === */
+
 function exportShiftReport() {
-	if (!currentShift.isClosed) { alert('Shift belum ditutup.'); return; }
+	if (!currentShift.isClosed) {
+			alert('Shift belum ditutup.');
+			return;
+	}
 
-	const report = [
-			'LAPORAN PENUTUPAN SHIFT',
-			'',
-			'Jenis Shift,' + currentShift.shiftType,
-			'Waktu Mulai,' + formatShiftDate(currentShift.openingDate),
-			'Waktu Tutup,' + formatShiftDate(currentShift.closingDate),
-			'',
-			'Kas Awal,' + currentShift.openingCash,
-			'Cash Penjualan,' + currentShift.cashSales,
-			'Cash Pengeluaran,' + currentShift.cashExpenses,
-			'Total Kas Seharusnya,' + currentShift.expectedCash,
-			'Input Cash,' + currentShift.actualCash,
-			'Balance,' + currentShift.balance,
-			'',
-			'Catatan,' + currentShift.closingNote
-	].join('\n');
+	try {
+			// HELPERS
+			const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
+					'&': '&amp;',
+					'<': '&lt;',
+					'>': '&gt;',
+					'"': '&quot;',
+					"'": '&#39;'
+			})[char]);
 
-	const blob = new Blob([report], { type: 'text/csv;charset=utf-8;' });
-	const url = URL.createObjectURL(blob);
-	const link = document.createElement('a');
+			const money = value => formatShiftCurrency(value);
 
-	link.href = url;
-	link.download = 'laporan-penutupan-shift.csv';
+			const formatDate = value => {
+					if (!value) return '-';
 
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
+					return new Date(value).toLocaleString('id-ID', {
+							day: '2-digit',
+							month: 'long',
+							year: 'numeric',
+							hour: '2-digit',
+							minute: '2-digit'
+					});
+			};
 
-	URL.revokeObjectURL(url);
+			const businessName =
+					document.getElementById('closeBusinessName')?.textContent.trim() || 'Business';
+
+			const outletName =
+					document.getElementById('closeOutletName')?.textContent.trim() || '-';
+
+			const cashierName =
+					document.getElementById('closeLoginUser')?.textContent.trim() || '-';
+
+			const logoElement = document.getElementById('closeBusinessLogo');
+			const logoUrl = logoElement && !logoElement.classList.contains('hidden')
+					? logoElement.src
+					: '';
+
+			const shiftType = currentShift.shiftType || '-';
+			const openingDate = currentShift.openingDate;
+			const closingDate = currentShift.closingDate;
+
+			const openingCash = Number(currentShift.openingCash) || 0;
+			const cashSales = Number(currentShift.cashSales) || 0;
+			const cashExpenses = Number(currentShift.cashExpenses) || 0;
+			const expectedCash = Number(currentShift.expectedCash) || 0;
+			const actualCash = Number(currentShift.actualCash) || 0;
+			const balance = Number(currentShift.balance) || 0;
+
+			const balanceLabel = balance < 0
+					? 'SHORTAGE'
+					: balance > 0
+							? 'SURPLUS'
+							: 'BALANCED';
+
+			const balanceClass = balance < 0
+					? 'negative'
+					: balance > 0
+							? 'positive'
+							: 'neutral';
+
+			const filename =
+					`Shift Closing - ${outletName} - ${formatDate(closingDate)}.pdf`;
+
+			// REPORT HTML
+			const html = `
+					<!DOCTYPE html>
+					<html lang="id">
+					<head>
+							<meta charset="UTF-8">
+							<meta name="viewport" content="width=device-width, initial-scale=1.0">
+							<title>${esc(filename)}</title>
+
+							<style>
+									* {
+											box-sizing: border-box;
+									}
+
+									html, body {
+											margin: 0;
+											padding: 0;
+									}
+
+									body {
+											background: #000;
+											color: #333;
+											font-family: Arial, Helvetica, sans-serif;
+											padding: 40px 20px;
+									}
+
+									/* TOOLBAR */
+									.toolbar {
+											width: 100%;
+											max-width: 850px;
+											margin: 0 auto 20px;
+											display: flex;
+											justify-content: space-between;
+											align-items: center;
+											gap: 16px;
+											color: #fff;
+											font-size: 14px;
+									}
+
+									.toolbar button {
+											border: 1px solid rgba(255,255,255,.15);
+											background: rgba(255,255,255,.08);
+											color: #fff;
+											padding: 10px 16px;
+											border-radius: 10px;
+											cursor: pointer;
+											font-weight: 700;
+									}
+
+									.toolbar button:hover {
+											background: rgba(255,255,255,.14);
+									}
+
+									/* REPORT PAPER */
+									.report {
+											width: 100%;
+											max-width: 850px;
+											margin: 0 auto;
+											padding: 36px;
+											background: #fff;
+											border-radius: 4px;
+											box-shadow: 0 20px 60px rgba(0,0,0,.45);
+									}
+
+									/* HEADER */
+									.report-header {
+											text-align: center;
+											margin-bottom: 26px;
+									}
+
+									.logo {
+											display: block;
+											width: auto;
+											max-width: 150px;
+											max-height: 70px;
+											object-fit: contain;
+											margin: 0 auto 10px;
+									}
+
+									.title {
+											margin: 0 0 8px;
+											font-size: 21px;
+											font-weight: 700;
+											letter-spacing: .5px;
+											color: #222;
+									}
+
+									.business-name {
+											font-size: 13px;
+											font-weight: 700;
+											color: #333;
+									}
+
+									.branch-title {
+											margin-top: 4px;
+											font-size: 12px;
+											font-weight: 600;
+											color: #555;
+									}
+
+									.period {
+											margin-top: 7px;
+											font-size: 11px;
+											color: #777;
+									}
+
+									/* SHIFT INFORMATION */
+									.shift-info {
+											display: grid;
+											grid-template-columns: repeat(2, minmax(0, 1fr));
+											gap: 12px;
+											margin-bottom: 22px;
+									}
+
+									.info-card {
+											border: 1px solid #e5e5e5;
+											border-radius: 10px;
+											padding: 14px 16px;
+									}
+
+									.info-label {
+											font-size: 9px;
+											color: #777;
+											text-transform: uppercase;
+											letter-spacing: .7px;
+											margin-bottom: 7px;
+									}
+
+									.info-value {
+											font-size: 13px;
+											font-weight: 700;
+											color: #222;
+											overflow-wrap: anywhere;
+									}
+
+									/* SUMMARY */
+									.summary-grid {
+											display: grid;
+											grid-template-columns: repeat(2, minmax(0, 1fr));
+											gap: 12px;
+											margin-bottom: 22px;
+									}
+
+									.summary-card {
+											border: 1px solid #e5e5e5;
+											border-radius: 10px;
+											padding: 15px 16px;
+											background: #fff;
+									}
+
+									.summary-label {
+											font-size: 9px;
+											color: #777;
+											text-transform: uppercase;
+											letter-spacing: .7px;
+											margin-bottom: 7px;
+									}
+
+									.summary-value {
+											font-size: 17px;
+											font-weight: 700;
+											color: #222;
+											overflow-wrap: anywhere;
+									}
+
+									/* TABLE */
+									.section-title {
+											margin: 24px 0 12px;
+											font-size: 12px;
+											font-weight: 700;
+											color: #222;
+											text-transform: uppercase;
+											letter-spacing: .5px;
+									}
+
+									.table-wrap {
+											width: 100%;
+											border: 1px solid #e5e5e5;
+											border-radius: 10px;
+											padding: 10px;
+											background: #fff;
+									}
+
+									table {
+											width: 100%;
+											border-collapse: collapse;
+											font-size: 11px;
+											color: #444;
+									}
+
+									th {
+											padding: 11px 9px;
+											background: #f5f5f5;
+											color: #444;
+											font-size: 9px;
+											font-weight: 700;
+											text-align: left;
+											border-bottom: 1px solid #e5e5e5;
+									}
+
+									td {
+											padding: 12px 9px;
+											border-bottom: 1px solid #eee;
+											vertical-align: top;
+									}
+
+									tbody tr:last-child td {
+											border-bottom: none;
+									}
+
+									.amount {
+											text-align: right;
+											white-space: nowrap;
+											font-weight: 600;
+									}
+
+									.total-row td {
+											font-weight: 700;
+											background: #fafafa;
+									}
+
+									/* BALANCE */
+									.balance-box {
+											margin-top: 18px;
+											padding: 17px;
+											border: 1px solid #e5e5e5;
+											border-radius: 10px;
+											display: flex;
+											justify-content: space-between;
+											align-items: center;
+											gap: 12px;
+									}
+
+									.balance-label {
+											font-size: 12px;
+											font-weight: 700;
+											color: #333;
+									}
+
+									.balance-value {
+											font-size: 18px;
+											font-weight: 700;
+											text-align: right;
+									}
+
+									.negative {
+											color: #b91c1c;
+									}
+
+									.positive {
+											color: #15803d;
+									}
+
+									.neutral {
+											color: #333;
+									}
+
+									.balance-status {
+											display: block;
+											margin-top: 4px;
+											font-size: 9px;
+											letter-spacing: .5px;
+									}
+
+									/* NOTE */
+									.note-box {
+											margin-top: 20px;
+											border: 1px solid #e5e5e5;
+											border-radius: 10px;
+											padding: 15px;
+									}
+
+									.note-title {
+											font-size: 10px;
+											font-weight: 700;
+											color: #777;
+											text-transform: uppercase;
+											margin-bottom: 8px;
+									}
+
+									.note-content {
+											font-size: 11px;
+											color: #444;
+											line-height: 1.6;
+											white-space: pre-wrap;
+											overflow-wrap: anywhere;
+									}
+
+									/* FOOTER */
+									.footer {
+											margin-top: 28px;
+											text-align: center;
+											font-size: 9px;
+											color: #888;
+									}
+
+									/* PRINT */
+									@page {
+											size: A4 portrait;
+											margin: 12mm;
+									}
+
+									@media print {
+											html, body {
+													width: 100%;
+													margin: 0;
+													padding: 0;
+													background: #fff;
+													-webkit-print-color-adjust: exact;
+													print-color-adjust: exact;
+											}
+
+											.toolbar {
+													display: none !important;
+											}
+
+											.report {
+													width: 100%;
+													max-width: none;
+													margin: 0;
+													padding: 0;
+													border-radius: 0;
+													box-shadow: none;
+											}
+
+											.report-header {
+													margin-bottom: 20px;
+											}
+
+											.info-card,
+											.summary-card,
+											.table-wrap,
+											.balance-box,
+											.note-box {
+													break-inside: avoid;
+											}
+
+											th {
+													background: #f5f5f5 !important;
+													-webkit-print-color-adjust: exact;
+													print-color-adjust: exact;
+											}
+									}
+							</style>
+					</head>
+
+					<body>
+							<div class="toolbar">
+									<div>Cashier Shift Closing Report</div>
+									<button type="button" onclick="window.print()">
+											Download / Print PDF
+									</button>
+							</div>
+
+							<main class="report">
+
+									<!-- HEADER -->
+									<header class="report-header">
+											${logoUrl ? `
+													<img
+															src="${esc(logoUrl)}"
+															class="logo"
+															alt="Business Logo"
+															onerror="this.style.display='none'"
+													>
+											` : ''}
+
+											<h1 class="title">Shift Closing Report</h1>
+											<div class="business-name">${esc(businessName)}</div>
+											<div class="branch-title">${esc(outletName)}</div>
+											<div class="period">Cashier: ${esc(cashierName)}</div>
+									</header>
+
+									<!-- SHIFT INFORMATION -->
+									<section class="shift-info">
+											<div class="info-card">
+													<div class="info-label">Shift Type</div>
+													<div class="info-value">${esc(shiftType)}</div>
+											</div>
+
+											<div class="info-card">
+													<div class="info-label">Opening Time</div>
+													<div class="info-value">${esc(formatDate(openingDate))}</div>
+											</div>
+
+											<div class="info-card">
+													<div class="info-label">Closing Time</div>
+													<div class="info-value">${esc(formatDate(closingDate))}</div>
+											</div>
+
+											<div class="info-card">
+													<div class="info-label">Cashier</div>
+													<div class="info-value">${esc(cashierName)}</div>
+											</div>
+									</section>
+
+									<!-- SUMMARY -->
+									<section class="summary-grid">
+											<div class="summary-card">
+													<div class="summary-label">Opening Cash</div>
+													<div class="summary-value">${esc(money(openingCash))}</div>
+											</div>
+
+											<div class="summary-card">
+													<div class="summary-label">Cash Sales</div>
+													<div class="summary-value">${esc(money(cashSales))}</div>
+											</div>
+
+											<div class="summary-card">
+													<div class="summary-label">Cash Expenses</div>
+													<div class="summary-value">${esc(money(cashExpenses))}</div>
+											</div>
+
+											<div class="summary-card">
+													<div class="summary-label">Expected Cash</div>
+													<div class="summary-value">${esc(money(expectedCash))}</div>
+											</div>
+									</section>
+
+									<!-- CASH DETAILS -->
+									<h2 class="section-title">Cash Reconciliation</h2>
+
+									<div class="table-wrap">
+											<table>
+													<thead>
+															<tr>
+																	<th>Description</th>
+																	<th class="amount">Amount</th>
+															</tr>
+													</thead>
+
+													<tbody>
+															<tr>
+																	<td>Opening Cash</td>
+																	<td class="amount">${esc(money(openingCash))}</td>
+															</tr>
+
+															<tr>
+																	<td>Cash Sales</td>
+																	<td class="amount">${esc(money(cashSales))}</td>
+															</tr>
+
+															<tr>
+																	<td>Cash Expenses</td>
+																	<td class="amount">(${esc(money(cashExpenses))})</td>
+															</tr>
+
+															<tr class="total-row">
+																	<td>Expected Cash</td>
+																	<td class="amount">${esc(money(expectedCash))}</td>
+															</tr>
+
+															<tr>
+																	<td>Actual Physical Cash</td>
+																	<td class="amount">${esc(money(actualCash))}</td>
+															</tr>
+													</tbody>
+											</table>
+									</div>
+
+									<!-- BALANCE -->
+									<div class="balance-box">
+											<div class="balance-label">Cash Difference</div>
+
+											<div class="balance-value ${balanceClass}">
+													${esc(money(balance))}
+													<span class="balance-status">${esc(balanceLabel)}</span>
+											</div>
+									</div>
+
+									<!-- NOTE -->
+									<div class="note-box">
+											<div class="note-title">Closing Note</div>
+											<div class="note-content">${esc(currentShift.closingNote || '-')}</div>
+									</div>
+
+									<!-- FOOTER -->
+									<footer class="footer">
+											Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+									</footer>
+
+							</main>
+					</body>
+					</html>
+			`;
+
+			// OPEN REPORT IN NEW TAB
+			const reportWindow = window.open('', '_blank');
+
+			if (!reportWindow) {
+					alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.');
+					return;
+			}
+
+			reportWindow.document.open();
+			reportWindow.document.write(html);
+			reportWindow.document.close();
+
+	} catch (error) {
+			console.error('Export Shift Report Error:', error);
+			alert('Gagal membuat PDF Shift. Periksa Console untuk detail kesalahan.');
+	}
 }
+
 
 /* === FORMAT HELPERS === */
 function formatShiftCurrency(value) {
