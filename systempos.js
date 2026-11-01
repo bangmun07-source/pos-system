@@ -1280,36 +1280,69 @@ async function submitOpenShift() {
 
 /* === CLOSE SHIFT === */
 async function showCloseShiftPopup() {
-	if (!currentShift.isOpen) return;
-	await loadShiftHeader();
-	
-	const now = new Date();
-	const dateElement = document.getElementById('closeShiftDate');
-	const timeElement = document.getElementById('closeShiftTime');
+	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) { throw new Error('Session tidak ditemukan.'); }
 
-	if (dateElement) {
-		dateElement.textContent = now.toLocaleDateString('en-US', {
-			weekday: 'long',
-			year: 'numeric',
-			month: 'long',
-			day: 'numeric'
-		});
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_active_cashier_shift',
+				{
+					p_session_id: sessionId,
+					p_branch_id: state.branchId
+				}
+			);
+
+		if (error) throw error;
+		if (!data) {
+				currentShift.isOpen = false;
+				alert('Tidak ada Shift aktif.');
+				return;
+		}
+
+		// Perbarui data shift dari database
+		currentShift = {
+			...currentShift,
+			isOpen: true,
+			isClosed: false,
+			shiftId: data.id,
+			shiftType: data.shift_type,
+			openingCash: Number(data.opening_cash),
+			cashSales: Number(data.cash_sales),
+			cashExpenses: Number(data.cash_expenses),
+			expectedCash: Number(data.expected_cash),
+			openingDate: data.opened_at
+		};
+
+		await loadShiftHeader();
+
+		const now = new Date();
+
+		document.getElementById('closeShiftDate').textContent =
+			now.toLocaleDateString('en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+		document.getElementById('closeShiftTime').textContent = now.toLocaleTimeString('en-US');
+		document.getElementById('closeOpeningCash').textContent = formatShiftCurrency(currentShift.openingCash);
+		document.getElementById('closeCashSales').textContent = formatShiftCurrency(currentShift.cashSales);
+		document.getElementById('closeCashExpenses').value = currentShift.cashExpenses;
+		document.getElementById('actualCash').value = '';
+		document.getElementById('shiftClosingNote').value = '';
+		document.getElementById('btnCloseShift').classList.remove('hidden');
+		document.getElementById('btnExportShift').classList.add('hidden');
+
+		calculateShiftBalance();
+		showShiftPopup('closeShiftPopup');
+
+	} catch (err) {
+		console.error('Load Active Shift Error:', err);
+		alert(err.message || 'Gagal memuat data Shift.');
 	}
-
-	if (timeElement) { timeElement.textContent = now.toLocaleTimeString('en-US'); }
-
-	document.getElementById('closeOpeningCash').textContent = formatShiftCurrency(currentShift.openingCash);
-	document.getElementById('closeCashSales').textContent = formatShiftCurrency(currentShift.cashSales);
-	document.getElementById('closeCashExpenses').value = currentShift.cashExpenses;
-	document.getElementById('actualCash').value = currentShift.actualCash || '';
-	document.getElementById('shiftClosingNote').value = currentShift.closingNote || '';
-	// Tombol sesuai status shift
-	document.getElementById('btnCloseShift').classList.remove('hidden');
-	document.getElementById('btnExportShift').classList.add('hidden');
-
-	calculateShiftBalance();
-	showShiftPopup('closeShiftPopup');
 }
+
 
 /* ==== CALCULATE CASH BALANCE ==== */
 function calculateShiftBalance() {
