@@ -1352,30 +1352,74 @@ function calculateShiftBalance() {
 }
 
 /* === SUBMIT CLOSE SHIFT === */
-function submitCloseShift() {
+
+async function submitCloseShift() {
 	if (!currentShift.isOpen) { alert('Tidak ada Shift yang sedang aktif.'); return; }
 
 	const actualCashInput = document.getElementById('actualCash');
-	if ( actualCashInput.value.trim() === '' || !Number.isFinite(Number(actualCashInput.value)) || Number(actualCashInput.value) < 0
-	) { alert('Masukkan jumlah Cash fisik terlebih dahulu.'); actualCashInput.focus(); return; }
+	const expensesInput = document.getElementById('closeCashExpenses');
 
-	const result = calculateShiftBalance();
+	if ( !actualCashInput || actualCashInput.value.trim() === '' || !Number.isFinite(Number(actualCashInput.value)) || Number(actualCashInput.value) < 0
+	) { alert('Masukkan jumlah Cash fisik terlebih dahulu.');
+			actualCashInput?.focus();
+			return;
+	}
 
-	currentShift.actualCash = result.actualCash;
-	currentShift.cashExpenses = result.cashExpenses;
-	currentShift.expectedCash = result.expectedCash;
-	currentShift.balance = result.balance;
-	currentShift.closingDate = new Date();
-	currentShift.closingNote = document.getElementById('shiftClosingNote').value.trim();
-	currentShift.isOpen = false;
-	currentShift.isClosed = true;
+	const cashExpenses = Number(expensesInput?.value || 0);
 
-	// Ubah tombol Close menjadi Export
-	document.getElementById('btnCloseShift').classList.add('hidden');
-	document.getElementById('btnExportShift').classList.remove('hidden');
+	if (!Number.isFinite(cashExpenses) || cashExpenses < 0) {
+			alert('Jumlah pengeluaran kas tidak valid.');
+			expensesInput?.focus();
+			return;
+	}
 
-	alert('Shift berhasil ditutup.');
+	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) { throw new Error('Session tidak ditemukan.'); }
+
+		const closingNote = document.getElementById('shiftClosingNote')?.value.trim() || null;
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'close_cashier_shift',
+				{
+					p_session_id: sessionId,
+					p_branch_id: state.branchId,
+					p_actual_cash: Number(actualCashInput.value),
+					p_cash_expenses: cashExpenses,
+					p_closing_note: closingNote
+				}
+			);
+
+		if (error) throw error;
+
+		currentShift = {
+			...currentShift,
+			isOpen: false,
+			isClosed: true,
+			shiftId: data.id,
+			shiftType: data.shift_type,
+			openingCash: Number(data.opening_cash),
+			cashSales: Number(data.cash_sales),
+			cashExpenses: Number(data.cash_expenses),
+			expectedCash: Number(data.expected_cash),
+			actualCash: Number(data.actual_cash),
+			balance: Number(data.cash_difference),
+			openingDate: data.opened_at,
+			closingDate: data.closed_at,
+			closingNote: data.closing_note || ''
+		};
+
+		document.getElementById('btnCloseShift').classList.add('hidden');
+		document.getElementById('btnExportShift').classList.remove('hidden');
+
+		alert('Shift berhasil ditutup.');
+
+	} catch (err) {
+		console.error('Close Shift Error:', err);
+		alert(err.message || 'Gagal menutup Shift.');
+	}
 }
+
 
 /* === EXPORT SHIFT REPORT === */
 function exportShiftReport() {
