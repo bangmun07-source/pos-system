@@ -1197,23 +1197,48 @@ async function loadShiftHeader() {
 async function openShiftPopup() {
 	await loadShiftHeader();
 
-	if (currentShift.isOpen) { await showCloseShiftPopup();
-	} else {
-		const dateElement = document.getElementById('openShiftDate');
-		const timeElement = document.getElementById('openShiftTime');
-		const now = new Date();
+	try {
+			const sessionId = localStorage.getItem('pos_session_id');
 
-		if (dateElement) {
-			dateElement.textContent = now.toLocaleDateString('en-US', {
-				weekday: 'long',
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric'
-			});
-		}
+			if (!sessionId) {
+					throw new Error('Session tidak ditemukan.');
+			}
 
-		if (timeElement) { timeElement.textContent = now.toLocaleTimeString('en-US'); }
-		showShiftPopup('openShiftPopup');
+			const { data, error } = await supabaseClient.rpc(
+					'get_active_cashier_shift',
+					{
+							p_session_id: sessionId,
+							p_branch_id: state.branchId
+					}
+			);
+
+			if (error) throw error;
+
+			if (data) {
+					await showCloseShiftPopup();
+					return;
+			}
+
+			currentShift.isOpen = false;
+
+			const now = new Date();
+
+			document.getElementById('openShiftDate').textContent =
+					now.toLocaleDateString('en-US', {
+							weekday: 'long',
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric'
+					});
+
+			document.getElementById('openShiftTime').textContent =
+					now.toLocaleTimeString('en-US');
+
+			showShiftPopup('openShiftPopup');
+
+	} catch (err) {
+			console.error('Open Shift Popup:', err);
+			alert(err.message || 'Gagal memeriksa Shift.');
 	}
 }
 
