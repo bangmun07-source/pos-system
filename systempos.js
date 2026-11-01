@@ -1164,7 +1164,6 @@ async function loadShiftHeader() {
     logoElements.forEach(id => {
       const img = document.getElementById(id);
       if (!img) return;
-
       if (data.logo_url) {
         img.src = data.logo_url;
         img.classList.remove("hidden");
@@ -1194,93 +1193,78 @@ async function loadShiftHeader() {
   }
 }
 
-
 async function restoreActiveShift() {
-    const sessionId = localStorage.getItem('pos_session_id');
+	const sessionId = localStorage.getItem('pos_session_id');
+	if (!sessionId) { throw new Error('Session tidak ditemukan.'); }
 
-    if (!sessionId) {
-        throw new Error('Session tidak ditemukan.');
-    }
-
-    const { data, error } = await supabaseClient.rpc(
-        'get_active_cashier_shift',
-        {
-            p_session_id: sessionId,
-            p_branch_id: state.branchId
-        }
-    );
-
-    if (error) throw error;
-		if (!data) {
-		    currentShift = {
-		        ...currentShift,
-		        isOpen: false,
-		        isClosed: false,
-		        shiftId: null,
-		        shiftType: '',
-		        openingCash: 0,
-		        cashSales: 0,
-		        cashExpenses: 0,
-		        expectedCash: 0,
-		        actualCash: 0,
-		        balance: 0,
-		        openingDate: null
-		    };
-		
-		    return false;
+	const { data, error } = await supabaseClient.rpc(
+		'get_active_cashier_shift',
+		{
+			p_session_id: sessionId,
+			p_branch_id: state.branchId
 		}
-	
-    currentShift = {
-        ...currentShift,
-        isOpen: true,
-        isClosed: false,
-        shiftId: data.id,
-        shiftType: data.shift_type,
-        openingCash: Number(data.opening_cash),
-        cashSales: Number(data.cash_sales),
-        cashExpenses: Number(data.cash_expenses),
-        expectedCash: Number(data.expected_cash),
-        openingDate: data.opened_at
-    };
+	);
 
-    return true;
+	if (error) throw error;
+	if (!data) {
+		currentShift = {
+			...currentShift,
+			isOpen: false,
+			isClosed: false,
+			shiftId: null,
+			shiftType: '',
+			openingCash: 0,
+			cashSales: 0,
+			cashExpenses: 0,
+			expectedCash: 0,
+			actualCash: 0,
+			balance: 0,
+			openingDate: null
+		};
+		return false;
+	}
+
+	currentShift = {
+		...currentShift,
+		isOpen: true,
+		isClosed: false,
+		shiftId: data.id,
+		shiftType: data.shift_type,
+		openingCash: Number(data.opening_cash),
+		cashSales: Number(data.cash_sales),
+		qrisSales: Number(data.qris_sales) || 0,
+		bankSales: Number(data.bank_sales) || 0,
+		cashExpenses: Number(data.cash_expenses),
+		expectedCash: Number(data.expected_cash),
+		openingDate: data.opened_at
+	};
+	return true;
 }
-
-
 
 async function openShiftPopup() {
-    try {
-        await loadShiftHeader();
+	try {
+		await loadShiftHeader();
 
-        const hasActiveShift = await restoreActiveShift();
+		const hasActiveShift = await restoreActiveShift();
+		if (hasActiveShift) { await showCloseShiftPopup(); return; }
 
-        if (hasActiveShift) {
-            await showCloseShiftPopup();
-            return;
-        }
+		const now = new Date();
+		document.getElementById('openShiftDate').textContent =
+			now.toLocaleDateString('en-US', {
+				weekday: 'long',
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric'
+			});
+		document.getElementById('openShiftTime').textContent = now.toLocaleTimeString('en-US');
 
-        const now = new Date();
+		showShiftPopup('openShiftPopup');
 
-        document.getElementById('openShiftDate').textContent =
-            now.toLocaleDateString('en-US', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-
-        document.getElementById('openShiftTime').textContent =
-            now.toLocaleTimeString('en-US');
-
-        showShiftPopup('openShiftPopup');
-
-    } catch (err) {
-        console.error('Open Shift Popup:', err);
-        alert(err.message || 'Gagal memeriksa Shift.');
-    }
+	} catch (err) {
+		console.error('Open Shift Popup:', err);
+		alert(err.message || 'Gagal memeriksa Shift.');
+	}
 }
-
-
 
 async function submitOpenShift() {
 	const shiftType = document.getElementById('shiftSelection')?.value;
@@ -1341,7 +1325,6 @@ async function submitOpenShift() {
 	}
 }
 
-
 /* === CLOSE SHIFT === */
 async function showCloseShiftPopup() {
 	try {
@@ -1373,6 +1356,8 @@ async function showCloseShiftPopup() {
 			shiftType: data.shift_type,
 			openingCash: Number(data.opening_cash),
 			cashSales: Number(data.cash_sales),
+			qrisSales: Number(data.qris_sales) || 0,
+			bankSales: Number(data.bank_sales) || 0,
 			cashExpenses: Number(data.cash_expenses),
 			expectedCash: Number(data.expected_cash),
 			openingDate: data.opened_at
@@ -1428,7 +1413,6 @@ function calculateShiftBalance() {
 	if (expectedElement) { expectedElement.textContent = formatShiftCurrency(expectedCash); }
 	if (balanceElement) {
 		balanceElement.textContent = formatShiftCurrency(balance);
-
 		balanceElement.classList.remove(
 			'text-red-400',
 			'text-emerald-400',
@@ -1440,12 +1424,7 @@ function calculateShiftBalance() {
 		} else { balanceElement.classList.add('text-on-surface'); }
 	}
 
-	return {
-		cashExpenses,
-		expectedCash,
-		actualCash,
-		balance
-	};
+	return { cashExpenses, expectedCash, actualCash, balance };
 }
 
 /* === SUBMIT CLOSE SHIFT === */
