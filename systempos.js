@@ -44860,7 +44860,7 @@ async function loadCashierShiftFilterOptions() {
 				'get_cashier_shift_filter_options',
 				{
 					p_session_id: sessionId,
-					p_branch_id: state.branchId || null
+					p_branch_id: null
 				}
 			);
 
@@ -45002,7 +45002,7 @@ function renderCashierShiftHistoryTable(rows) {
 				? 'text-red-400'
 				: 'text-amber-400';
 		return `
-			<tr class="border-b border-outline-variant/30">
+			<tr class="border-b border-outline-variant">
 				<td class="px-4 py-3">
 					<div class="font-medium">
 						${escapeShiftHtml(row.cashier_name)}
@@ -45045,27 +45045,26 @@ function renderCashierShiftHistoryTable(rows) {
 				</td>
 
 				<td class="px-4 py-3">
-					<span class="${statusClass}">
+					<span class="text-center ${statusClass}">
 						${escapeShiftHtml(row.status)}
 					</span>
 				</td>
 
 				<td class="px-4 py-3">
-					<span class="${adjustmentClass}">
+					<span class="text-center ${adjustmentClass}">
 						${escapeShiftHtml(row.adjustment_status)}
 					</span>
 				</td>
 
 				<td class="px-4 py-3 text-center">
-				    <button
-				        type="button"
-				        onclick="toggleCashierShiftMenu('${row.id}')"
-				        class="p-1 rounded-md hover:bg-surface-container-high transition-colors"
-				        title="More Actions">
-				        <span class="material-symbols-outlined">
-				            more_vert
-				        </span>
-				    </button>
+					<button type="button"
+						onclick="toggleCashierShiftMenu('${row.id}')"
+						class="p-1 rounded-md hover:bg-surface-container-high transition-colors"
+						title="More Actions">
+						<span class="material-symbols-outlined">
+								more_vert
+						</span>
+					</button>
 				</td>
 			</tr>
 		`;
@@ -45092,22 +45091,22 @@ function renderCashierShiftPagination() {
 }
 
 function cashierShiftPrevPage() {
-    if (cashierShiftHistoryState.currentPage <= 1) return;
+	if (cashierShiftHistoryState.currentPage <= 1) return;
 
-    cashierShiftHistoryState.currentPage--;
-    loadCashierShiftHistory();
+	cashierShiftHistoryState.currentPage--;
+	loadCashierShiftHistory();
 }
 
 function cashierShiftNextPage() {
-    const maxPage = Math.ceil(
-        cashierShiftHistoryState.totalCount /
-        cashierShiftHistoryState.pageSize
-    );
+	const maxPage = Math.ceil(
+			cashierShiftHistoryState.totalCount /
+			cashierShiftHistoryState.pageSize
+	);
 
-    if (cashierShiftHistoryState.currentPage >= maxPage) return;
+	if (cashierShiftHistoryState.currentPage >= maxPage) return;
 
-    cashierShiftHistoryState.currentPage++;
-    loadCashierShiftHistory();
+	cashierShiftHistoryState.currentPage++;
+	loadCashierShiftHistory();
 }
 // HELPERS
 function setShiftText(id, value) {
