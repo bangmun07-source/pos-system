@@ -44907,7 +44907,11 @@ async function loadCashierShiftHistory() {
 	const page = cashierShiftHistoryState.currentPage;
 	const limit = cashierShiftHistoryState.pageSize;
 	const offset = (page - 1) * limit;
-	const getValue = id => document.getElementById(id)?.value || null;
+	const getValue = id => {
+		const value = document.getElementById(id)?.value;
+		return !value || value === 'ALL' ? null : value;
+	};
+	
 	const params = {
 		p_session_id: sessionId,
 		p_branch_id: getValue('cashierShiftBranchFilter'),
@@ -45052,8 +45056,16 @@ function renderCashierShiftHistoryTable(rows) {
 					</span>
 				</td>
 
-				<td class="px-4 py-3">
-					${escapeShiftHtml(row.closing_note || '-')}
+				<td class="px-4 py-3 text-center">
+				    <button
+				        type="button"
+				        onclick="toggleCashierShiftMenu('${row.id}')"
+				        class="p-1 rounded-md hover:bg-surface-container-high transition-colors"
+				        title="More Actions">
+				        <span class="material-symbols-outlined">
+				            more_vert
+				        </span>
+				    </button>
 				</td>
 			</tr>
 		`;
@@ -45079,6 +45091,24 @@ function renderCashierShiftPagination() {
 	if (next) next.disabled = currentPage >= totalPages;
 }
 
+function cashierShiftPrevPage() {
+    if (cashierShiftHistoryState.currentPage <= 1) return;
+
+    cashierShiftHistoryState.currentPage--;
+    loadCashierShiftHistory();
+}
+
+function cashierShiftNextPage() {
+    const maxPage = Math.ceil(
+        cashierShiftHistoryState.totalCount /
+        cashierShiftHistoryState.pageSize
+    );
+
+    if (cashierShiftHistoryState.currentPage >= maxPage) return;
+
+    cashierShiftHistoryState.currentPage++;
+    loadCashierShiftHistory();
+}
 // HELPERS
 function setShiftText(id, value) {
 	const element = document.getElementById(id);
