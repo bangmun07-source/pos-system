@@ -1525,10 +1525,11 @@ function exportShiftReport() {
 			const businessName = document.getElementById('closeBusinessName')?.textContent.trim() || 'Business';
 			const outletName = document.getElementById('closeOutletName')?.textContent.trim() || '-';
 			const cashierName = document.getElementById('closeLoginUser')?.textContent.trim() || '-';
-			const logoElement = document.getElementById('closeBusinessLogo');
-			const logoUrl = logoElement && !logoElement.classList.contains('hidden')
-				? logoElement.src
-				: '';
+			// TENANT LOGO — SAME AS REIMBURSEMENT EXPORT
+			const supabaseUrl = String(supabaseClient?.supabaseUrl || '').replace(/\/$/, '');
+			const logoUrl = supabaseUrl
+			    ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+			    : '';
 			const shiftType = currentShift.shiftType || '-';
 			const openingDate = currentShift.openingDate;
 			const closingDate = currentShift.closingDate;
