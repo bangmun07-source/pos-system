@@ -45020,7 +45020,9 @@ function renderCashierShiftHistoryTable(rows) {
 				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.expected_cash)} </td>
 				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.actual_cash)} </td>
 				<td class="px-4 py-3 text-right ${difference < 0 ? 'text-red-400' : difference > 0 ? 'text-amber-400' : 'text-emerald-400'}">
-					${formatShiftCurrency(difference)}
+			    ${difference < 0
+						? `-Rp${Math.abs(difference).toLocaleString('id-ID')}`
+						: `Rp${difference.toLocaleString('id-ID')}`}
 				</td>
 				<td class="px-4 py-3 text-center">
 					<span class="${statusClass}"> ${escapeShiftHtml(row.status)} </span>
