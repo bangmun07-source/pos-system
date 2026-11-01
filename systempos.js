@@ -44775,4 +44775,340 @@ async function restartAttendanceScanner() {
 }
 
 
+// ==========================================
+// CASHIER SHIFT MANAGEMENT
+// ==========================================
+
+let cashierShiftHistoryState = {
+	rows: [],
+	totalCount: 0,
+	currentPage: 1,
+	pageSize: 10,
+	users: [],
+	branches: []
+};
+
+// INITIALIZE PAGE
+async function initCashierShiftPage() {
+	cashierShiftHistoryState.currentPage = 1;
+
+	bindCashierShiftFilters();
+	await loadCashierShiftFilterOptions();
+	await loadCashierShiftHistory();
+}
+
+// FILTER EVENTS
+function bindCashierShiftFilters() {
+	const filterIds = [
+		'cashierShiftPeriodFrom',
+		'cashierShiftPeriodTo',
+		'cashierShiftUserFilter',
+		'cashierShiftBranchFilter',
+		'cashierShiftStatusFilter',
+		'cashierShiftAdjustmentFilter'
+	];
+
+	filterIds.forEach(id => {
+		const element = document.getElementById(id);
+		if (!element || element.dataset.shiftBound === '1') return;
+
+		element.addEventListener('change', () => {
+			cashierShiftHistoryState.currentPage = 1;
+			loadCashierShiftHistory();
+		});
+
+		element.dataset.shiftBound = '1';
+	});
+
+	const prev = document.getElementById('cashierShiftPrevButton');
+	const next = document.getElementById('cashierShiftNextButton');
+
+	if (prev && prev.dataset.shiftBound !== '1') {
+		prev.addEventListener('click', () => {
+			if (cashierShiftHistoryState.currentPage > 1) {
+				cashierShiftHistoryState.currentPage--;
+				loadCashierShiftHistory();
+			}
+		});
+		prev.dataset.shiftBound = '1';
+	}
+
+	if (next && next.dataset.shiftBound !== '1') {
+		next.addEventListener('click', () => {
+			const maxPage = Math.ceil(
+				cashierShiftHistoryState.totalCount /
+				cashierShiftHistoryState.pageSize
+			);
+
+			if (cashierShiftHistoryState.currentPage < maxPage) {
+				cashierShiftHistoryState.currentPage++;
+				loadCashierShiftHistory();
+			}
+		});
+		next.dataset.shiftBound = '1';
+	}
+}
+
+// FILTER OPTIONS
+async function loadCashierShiftFilterOptions() {
+	const sessionId = localStorage.getItem('pos_session_id');
+	if (!sessionId) return;
+
+	try {
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_cashier_shift_filter_options',
+				{
+					p_session_id: sessionId,
+					p_branch_id: state.branchId || null
+				}
+			);
+
+			if (error) throw error;
+
+			cashierShiftHistoryState.users = data?.users || [];
+			cashierShiftHistoryState.branches = data?.branches || [];
+
+			const userSelect = document.getElementById('cashierShiftUserFilter');
+			const branchSelect = document.getElementById('cashierShiftBranchFilter');
+
+			if (userSelect) {
+				const selected = userSelect.value;
+				userSelect.innerHTML = '<option value="">Semua Kasir</option>' +
+					cashierShiftHistoryState.users.map(user => `
+						<option value="${escapeShiftHtml(user.user_id)}">
+							${escapeShiftHtml(user.full_name)}
+						</option>
+					`).join('');
+				userSelect.value = selected;
+			}
+
+			if (branchSelect) {
+				const selected = branchSelect.value;
+				branchSelect.innerHTML = '<option value="">Semua Cabang</option>' +
+					cashierShiftHistoryState.branches.map(branch => `
+							<option value="${escapeShiftHtml(branch.branch_id)}">
+									${escapeShiftHtml(branch.branch_name)}
+							</option>
+					`).join('');
+				branchSelect.value = selected;
+			}
+	} catch (error) {
+		console.error('Gagal memuat filter shift:', error);
+	}
+}
+
+
+// LOAD SHIFT HISTORY
+async function loadCashierShiftHistory() {
+	const sessionId = localStorage.getItem('pos_session_id');
+	if (!sessionId) return;
+
+	const page = cashierShiftHistoryState.currentPage;
+	const limit = cashierShiftHistoryState.pageSize;
+	const offset = (page - 1) * limit;
+	const getValue = id => document.getElementById(id)?.value || null;
+	const params = {
+		p_session_id: sessionId,
+		p_branch_id: getValue('cashierShiftBranchFilter'),
+		p_date_from: getValue('cashierShiftPeriodFrom'),
+		p_date_to: getValue('cashierShiftPeriodTo'),
+		p_user_id: getValue('cashierShiftUserFilter'),
+		p_status: getValue('cashierShiftStatusFilter'),
+		p_adjustment_status: getValue('cashierShiftAdjustmentFilter'),
+		p_limit: limit,
+		p_offset: offset
+	};
+
+	const tableBody = document.getElementById('cashierShiftTableBody');
+	if (tableBody) {
+		tableBody.innerHTML = `
+			<tr>
+				<td colspan="100%" class="text-center py-8 text-muted">
+					Memuat riwayat shift...
+				</td>
+			</tr>
+		`;
+	}
+
+	try {
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_cashier_shift_history',
+				params
+			);
+		if (error) throw error;
+
+		const overview = data?.overview || {};
+		const rows = data?.rows || [];
+
+		cashierShiftHistoryState.rows = rows;
+		cashierShiftHistoryState.totalCount = Number( data?.total_count || 0 );
+
+		renderCashierShiftOverview(overview);
+		renderCashierShiftHistoryTable(rows);
+		renderCashierShiftPagination();
+
+	} catch (error) {
+		console.error('Gagal memuat riwayat shift:', error);
+		if (tableBody) {
+			tableBody.innerHTML = `
+				<tr>
+					<td colspan="100%" class="text-center py-8 text-red-400">
+						Gagal memuat data shift.
+					</td>
+				</tr>
+			`;
+		}
+	}
+}
+
+// OVERVIEW KPI
+function renderCashierShiftOverview(data) {
+	setShiftText('shiftTotalCount', data.total_count ?? 0);
+	setShiftText('shiftOpenCount', data.open_count ?? 0);
+	setShiftText('shiftClosedCount', data.closed_count ?? 0);
+	setShiftText( 'shiftTotalDifference', formatShiftCurrency(data.total_difference || 0) );
+}
+
+// HISTORY TABLE
+function renderCashierShiftHistoryTable(rows) {
+	const tbody = document.getElementById('cashierShiftTableBody');
+	if (!tbody) return;
+
+	if (!rows.length) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="100%" class="text-center py-8 text-muted">
+					Belum ada riwayat shift.
+				</td>
+			</tr>
+		`;
+		return;
+	}
+
+	tbody.innerHTML = rows.map(row => {
+		const difference = Number(row.cash_difference || 0);
+		const statusClass = row.status === 'CLOSED'
+			? 'text-emerald-400'
+			: 'text-amber-400';
+		const adjustmentClass = row.adjustment_status === 'DONE'
+			? 'text-emerald-400'
+			: row.adjustment_status === 'PENDING'
+				? 'text-red-400'
+				: 'text-amber-400';
+		return `
+			<tr class="border-b border-outline-variant/30">
+				<td class="px-4 py-3">
+					<div class="font-medium">
+						${escapeShiftHtml(row.cashier_name)}
+					</div>
+					<div class="text-xs text-muted">
+						${escapeShiftHtml(row.shift_type || '-')}
+					</div>
+				</td>
+
+				<td class="px-4 py-3">
+					${escapeShiftHtml(row.branch_name)}
+				</td>
+
+				<td class="px-4 py-3 whitespace-nowrap">
+					${formatShiftDate(row.opened_at)}
+				</td>
+
+				<td class="px-4 py-3 whitespace-nowrap">
+					${row.closed_at ? formatShiftDate(row.closed_at) : '-'}
+				</td>
+
+				<td class="px-4 py-3 text-right">
+					${formatShiftCurrency(row.opening_cash)}
+				</td>
+
+				<td class="px-4 py-3 text-right">
+					${formatShiftCurrency(row.total_sales)}
+				</td>
+
+				<td class="px-4 py-3 text-right">
+					${formatShiftCurrency(row.expected_cash)}
+				</td>
+
+				<td class="px-4 py-3 text-right">
+					${formatShiftCurrency(row.actual_cash)}
+				</td>
+
+				<td class="px-4 py-3 text-right ${difference < 0 ? 'text-red-400' : difference > 0 ? 'text-amber-400' : 'text-emerald-400'}">
+					${formatShiftCurrency(difference)}
+				</td>
+
+				<td class="px-4 py-3">
+					<span class="${statusClass}">
+						${escapeShiftHtml(row.status)}
+					</span>
+				</td>
+
+				<td class="px-4 py-3">
+					<span class="${adjustmentClass}">
+						${escapeShiftHtml(row.adjustment_status)}
+					</span>
+				</td>
+
+				<td class="px-4 py-3">
+					${escapeShiftHtml(row.closing_note || '-')}
+				</td>
+			</tr>
+		`;
+	}).join('');
+}
+
+// PAGINATION
+function renderCashierShiftPagination() {
+	const total = cashierShiftHistoryState.totalCount;
+	const pageSize = cashierShiftHistoryState.pageSize;
+	const currentPage = cashierShiftHistoryState.currentPage;
+
+	const totalPages = Math.ceil(total / pageSize);
+	const start = total === 0 ? 0 : ((currentPage - 1) * pageSize) + 1;
+	const end = Math.min(currentPage * pageSize, total);
+
+	setShiftText( 'cashierShiftPaginationInfo', `${start}-${end} dari ${total} data` );
+
+	const prev = document.getElementById('cashierShiftPrevButton');
+	const next = document.getElementById('cashierShiftNextButton');
+
+	if (prev) prev.disabled = currentPage <= 1;
+	if (next) next.disabled = currentPage >= totalPages;
+}
+
+// HELPERS
+function setShiftText(id, value) {
+	const element = document.getElementById(id);
+	if (element) element.textContent = value;
+}
+
+function formatShiftCurrency(value) {
+	return 'Rp' + Number(value || 0).toLocaleString('id-ID');
+}
+
+function formatShiftDate(value) {
+	if (!value) return '-';
+
+	return new Date(value).toLocaleString('id-ID', {
+		day: '2-digit',
+		month: 'short',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit'
+	});
+}
+
+function escapeShiftHtml(value) {
+	return String(value ?? '').replace(/[&<>"']/g, char => ({
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;'
+	})[char]);
+}
+
 
