@@ -34154,34 +34154,21 @@ function renderEmployeeTable() {
               ${escapeEmployeeHtml(employee.Full_Name)}
             </div>
           </td>
-
-          <td class="px-5 py-4">
-            ${escapeEmployeeHtml(employee.Employee_Code)}
-          </td>
-
-          <td class="px-5 py-4">
-            ${escapeEmployeeHtml(employee.Position || '-')}
-          </td>
-
+          <td class="px-5 py-4"> ${escapeEmployeeHtml(employee.Employee_Code)} </td>
+          <td class="px-5 py-4"> ${escapeEmployeeHtml(employee.Position || '-')} </td>
 					<td class="px-5 py-4">
-					  ${escapeEmployeeHtml(
-					    employeeAttendanceBranches.find(branch =>
-					      String(branch.id || '').trim() ===
-					      String(employee.Branch_ID || '').trim()
-					    )?.name || employee.Branch_ID || '-'
-					  )}
+					  ${escapeEmployeeHtml( employeeAttendanceBranches.find(branch =>
+							String(branch.id || '').trim() === String(employee.Branch_ID || '').trim() )?.name || employee.Branch_ID || '-' )}
 					</td>
-
           <td class="px-5 py-4 text-center">
             <span class="${statusClass}">
               ${escapeEmployeeHtml(employee.Status)}
             </span>
           </td>
-
-					<td class="px-5 py-4 text-center">
+					<td class="px-5 py-4">
 					  <button type="button"
 					    onclick="openEmployeeActionModal('${employee.Employee_ID}')"
-					    class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
+					    class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground transition">
 					    <span class="material-symbols-outlined text-lg">
 					      more_vert
 					    </span>
@@ -34200,12 +34187,9 @@ function updateEmployeeSummary() {
   const activeEl = document.getElementById('employeeActiveCount');
   const inactiveEl = document.getElementById('employeeInactiveCount');
   const scheduledEl = document.getElementById('employeeScheduledCount');
-
   // Jika halaman Employee tidak sedang aktif,
   // jangan jalankan update summary.
-  if (!totalEl || !activeEl || !inactiveEl || !scheduledEl) {
-    return;
-  }
+  if (!totalEl || !activeEl || !inactiveEl || !scheduledEl) { return; }
 
   const total = employeeData.length;
   const active = employeeData.filter(e => e.Status === 'ACTIVE').length;
@@ -34214,7 +34198,6 @@ function updateEmployeeSummary() {
   totalEl.textContent = total;
   activeEl.textContent = active;
   inactiveEl.textContent = inactive;
-
   // Schedule belum dibuat, jadi sementara 0
   scheduledEl.textContent = '0';
 }
@@ -34238,20 +34221,10 @@ function updateEmployeePagination(total, start, end) {
 
 
 window.changeEmployeePage = function (direction) {
-  const totalPages =
-    Math.max(
-      1,
-      Math.ceil(
-        filteredEmployeeData.length / employeePageSize
-      )
-    );
+  const totalPages = Math.max( 1, Math.ceil( filteredEmployeeData.length / employeePageSize ));
 
   employeeCurrentPage += direction;
-  employeeCurrentPage =
-    Math.max(
-      1,
-      Math.min(employeeCurrentPage, totalPages) 
-		);
+  employeeCurrentPage = Math.max( 1, Math.min(employeeCurrentPage, totalPages));
 	
   renderEmployeeTable();
 };
@@ -34292,17 +34265,12 @@ window.exportEmployee = function () {
       const employeeStatus = String( employee.Status || '' ).trim().toUpperCase();
       const employeeBranch = String( employee.Branch_ID || '' ).trim();
 
-      if (
-        statusFilter &&
-        employeeStatus !== statusFilter
+      if ( statusFilter && employeeStatus !== statusFilter
       ) { return false; }
-      if (
-        selectedBranch &&
-        employeeBranch !== selectedBranch
+      if ( selectedBranch && employeeBranch !== selectedBranch
       ) { return false; }
       return true;
     });
-
     if (!rows.length) { alert('Tidak ada data Employee sesuai filter yang dipilih.'); return; }
 
     // HELPERS
@@ -34747,13 +34715,9 @@ window.exportEmployee = function () {
 
   } catch (error) {
     console.error('Export Employee PDF error:', error);
-
-    alert(
-      'Gagal membuat PDF Employee. Periksa Console untuk detail kesalahan.'
-    );
+    alert( 'Gagal membuat PDF Employee. Periksa Console untuk detail kesalahan.' );
   }
 };
-
 
 
 /* ==== HTML ESCAPE ==== */
@@ -34768,7 +34732,6 @@ function escapeEmployeeHtml(value) {
 
 window.editEmployee = async function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
-
   if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
   /* === MODE EDIT === */
@@ -34796,7 +34759,6 @@ window.editEmployee = async function (employeeId) {
 	if (ptkpInput) ptkpInput.value = 'TK/0';
 	
 	const role = String(state.user.role || '').trim().toLowerCase();
-	
 	if (role === 'owner' || role === 'accountant') {
 	  const sessionId = localStorage.getItem('pos_session_id');
 	  const { data, error } = await supabaseClient.rpc(
@@ -34806,11 +34768,9 @@ window.editEmployee = async function (employeeId) {
 	      p_employee_id: employee.Employee_ID
 	    }
 	  );
-	
 	  if (error) { alert('Data NIK, NPWP, dan PTKP gagal dimuat.'); return; }
 	
 	  const sensitive = Array.isArray(data) ? data[0] : data;
-	
 	  if (sensitive) {
 	    if (nikInput) nikInput.value = sensitive.NIK || '';
 	    if (npwpInput) npwpInput.value = sensitive.NPWP || '';
@@ -34823,7 +34783,6 @@ window.editEmployee = async function (employeeId) {
   const photoInput = document.getElementById('employeePhoto');
 
   if (photoInput) { photoInput.value = ''; }
-
   if (preview) {
     if (employee.Photo_URL) {
       preview.innerHTML = `
@@ -34842,8 +34801,8 @@ window.editEmployee = async function (employeeId) {
   }
   /* === OPEN MODAL === */
   const modal = document.getElementById('employeeModal');
-
   if (!modal) return;
+	
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
@@ -34851,16 +34810,13 @@ window.editEmployee = async function (employeeId) {
 /* ==== VIEW EMPLOYEE ==== */
 window.viewEmployee = function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
-
   if (!employee) return;
   /* === PHOTO === */
 	const photo = document.getElementById('detailEmployeePhoto');
-	
 	if (photo) {
 	  if (employee.Photo_URL) {
 	    photo.innerHTML = `
-	      <img
-	        src="${escapeEmployeeHtml(employee.Photo_URL)}"
+	      <img src="${escapeEmployeeHtml(employee.Photo_URL)}"
 	        alt="Employee Photo"
 	        class="w-full h-full object-cover"
 	        onerror="this.parentElement.innerHTML='<span class=&quot;material-symbols-outlined text-4xl text-muted&quot;>person</span>'"
@@ -34886,8 +34842,8 @@ window.viewEmployee = function (employeeId) {
   document.getElementById('detailEmployeeAddress').textContent = employee.Address || '-';
   /* === OPEN DETAIL MODAL === */
   const modal = document.getElementById('employeeDetailModal');
-
   if (!modal) return;
+	
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
@@ -34896,8 +34852,8 @@ window.viewEmployee = function (employeeId) {
 /* ==== CLOSE EMPLOYEE DETAIL MODAL ==== */
 window.closeEmployeeDetailModal = function () {
   const modal = document.getElementById('employeeDetailModal');
-
   if (!modal) return;
+	
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
@@ -34906,11 +34862,9 @@ window.closeEmployeeDetailModal = function () {
 window.editEmployeeAttendanceAccount = async function (employeeId) {
   try {
     const employee = employeeData.find( e => e.Employee_ID === employeeId );
-
     if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
     const sessionId = localStorage.getItem('pos_session_id');
-
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
     const { data, error } =
@@ -34937,17 +34891,14 @@ window.editEmployeeAttendanceAccount = async function (employeeId) {
       if (accountIdInput) { accountIdInput.value = ''; }
       if (pinInput) { pinInput.value = ''; }
       if (activeInput) { activeInput.checked = true; }
-    }
-    else {
-			if (accountIdInput) {
-				accountIdInput.value =
-					account.Account_ID || ''; }
+    } 
+		else {
+			if (accountIdInput) { accountIdInput.value = account.Account_ID || ''; }
       if (pinInput) { pinInput.value = ''; }
       if (activeInput) { activeInput.checked = account.Is_Active !== false; }
     }
 
     const modal = document.getElementById( 'attendanceAccountModal' );
-
     if (!modal) return;
 
     modal.classList.remove('hidden');
@@ -34967,7 +34918,6 @@ window.editEmployeeAttendanceAccount = async function (employeeId) {
 /* === CLOSE ATTENDANCE ACCOUNT MODAL === */
 window.closeAttendanceAccountModal = function () {
   const modal = document.getElementById( 'attendanceAccountModal' );
-
   if (!modal) return;
 
   modal.classList.add('hidden');
@@ -34998,7 +34948,6 @@ window.saveAttendanceAccount = async function () {
 
   try {
     const sessionId = localStorage.getItem('pos_session_id');
-
     if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
 
     const { data, error } =
@@ -35029,7 +34978,6 @@ window.openEmployeeSalarySetting = async function (employeeId) {
   if (state.user.role !== 'Owner') { alert('Hanya Owner yang dapat mengatur salary employee.'); return; }
 
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
-
   if (!employee) { alert('Employee tidak ditemukan.'); return; }
 
   const modal = document.getElementById('salaryModal');
@@ -35055,7 +35003,6 @@ window.openEmployeeSalarySetting = async function (employeeId) {
   if (note) note.value = '';
 	if (pph21Enabled) pph21Enabled.checked = true;
 	if (pph21PTKP) pph21PTKP.value = employee.PTKP_Status || 'TK/0';
-	
 
   renderSalaryComponents([]);
 
@@ -35064,7 +35011,6 @@ window.openEmployeeSalarySetting = async function (employeeId) {
   /* === LOAD EXISTING SALARY === */
   try {
     const sessionId = localStorage.getItem('pos_session_id');
-
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
     const { data, error } = await supabaseClient.rpc(
@@ -35153,7 +35099,6 @@ function renderSalaryComponents(components = []) {
 
   const renderList = (element, items, emptyMessage, iconName) => {
     if (!element) return;
-
     if (!items.length) {
       element.innerHTML = `
         <div class="px-4 py-5 text-center">
@@ -35165,39 +35110,28 @@ function renderSalaryComponents(components = []) {
       `;
       return;
     }
-
     element.innerHTML = items
       .map(component => renderSalaryComponentRow(component))
       .join('');
   };
 
-  const activeComponents = employeeSalaryComponents.filter(
-    component => component.Is_Active !== false
-  );
+  const activeComponents = employeeSalaryComponents.filter( component => component.Is_Active !== false );
 
   renderList(
     allowanceList,
-    activeComponents.filter(component =>
-      component.Component_Type === 'ALLOWANCE'
-    ),
+    activeComponents.filter(component => component.Component_Type === 'ALLOWANCE' ),
     'No allowance configured',
     'payments'
   );
-
   renderList(
     deductionList,
-    activeComponents.filter(component =>
-      component.Component_Type === 'DEDUCTION'
-    ),
+    activeComponents.filter(component => component.Component_Type === 'DEDUCTION' ),
     'No deduction configured',
     'remove_circle_outline'
   );
-
   renderList(
     employerList,
-    activeComponents.filter(component =>
-      component.Component_Type === 'EMPLOYER_CONTRIBUTION'
-    ),
+    activeComponents.filter(component => component.Component_Type === 'EMPLOYER_CONTRIBUTION' ),
     'No employer contributions configured',
     'health_and_safety'
   );
@@ -35218,20 +35152,12 @@ function renderSalaryComponentRow(component) {
   return `
     <div class="px-4 py-3 flex items-center justify-between gap-4 border-b border-outline-variant last:border-b-0">
       <div class="min-w-0">
-        <p class="text-sm font-medium text-foreground truncate">
-          ${componentName}
-        </p>
-
-        <p class="text-[11px] text-muted mt-0.5">
-          ${calculationType}
-        </p>
+        <p class="text-sm font-medium text-foreground truncate"> ${componentName} </p>
+        <p class="text-[11px] text-muted mt-0.5">  ${calculationType} </p>
       </div>
 	  
     	<div class="flex items-center gap-3 shrink-0">
-        <span class="text-sm font-medium text-foreground">
-          ${amountDisplay}
-        </span>
-
+        <span class="text-sm font-medium text-foreground"> ${amountDisplay} </span>
         <button type="button"
           onclick="editSalaryComponent('${componentId}')"
           class="w-8 h-8 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
@@ -35274,7 +35200,6 @@ window.openSalaryComponentModal = function (type) {
   if (amountInput) amountInput.value = '';
   if (categoryInput) categoryInput.value = '';
   if (calculationBase) calculationBase.value = 'BASIC_SALARY';
-
   if (calculationInput) {
     calculationInput.value = 'FIXED';
     calculationInput.onchange = updateSalaryComponentAmountUnit;
@@ -35294,15 +35219,12 @@ window.openSalaryComponentModal = function (type) {
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
-  if (nameInput) {
-    setTimeout(() => nameInput.focus(), 50);
-  }
+  if (nameInput) { setTimeout(() => nameInput.focus(), 50); }
 };
 
 /* === CLOSE SALARY COMPONENT MODAL === */
 window.closeSalaryComponentModal = function () {
   const modal = document.getElementById( 'salaryComponentModal' );
-
   if (!modal) return;
 
   modal.classList.add('hidden');
@@ -35334,29 +35256,12 @@ window.saveSalaryComponent = function () {
   if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
   if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
   if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
-  if (
-    type === 'EMPLOYER_CONTRIBUTION' &&
-    accountingCategory !== 'EMPLOYER_HEALTH_CONTRIBUTION'
-  ) {
-    alert('Pilih kategori Employer Contribution yang sesuai.');
-    return;
-  }
-
-  if (
-    type === 'ALLOWANCE' &&
-    ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
-  ) {
-    alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.');
-    return;
-  }
-
-  if (
-    type === 'DEDUCTION' &&
-    ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
-  ) {
-    alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.');
-    return;
-  }
+  if ( type === 'EMPLOYER_CONTRIBUTION' && accountingCategory !== 'EMPLOYER_HEALTH_CONTRIBUTION'
+  ) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
+  if ( type === 'ALLOWANCE' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
+  ) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
+  if ( type === 'DEDUCTION' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
+  ) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
 
   const componentData = {
     Component_Type: type,
@@ -35369,10 +35274,7 @@ window.saveSalaryComponent = function () {
   };
 
   if (componentId) {
-    const index = employeeSalaryComponents.findIndex(
-      component => component.Component_ID === componentId
-    );
-
+    const index = employeeSalaryComponents.findIndex( component => component.Component_ID === componentId );
     if (index === -1) { alert('Komponen yang akan diedit tidak ditemukan.'); return; }
 
     employeeSalaryComponents[index] = {
@@ -35397,7 +35299,6 @@ window.saveSalaryComponent = function () {
 function updateSalaryComponentCalculationBase() {
   const calculationType = document.getElementById('salaryComponentCalculationType')?.value;
   const wrapper = document.getElementById('salaryComponentCalculationBaseWrapper');
-	
   if (!wrapper) return;
 
   wrapper.classList.toggle(
@@ -35409,7 +35310,6 @@ function updateSalaryComponentCalculationBase() {
 /* === EDIT SALARY COMPONENT === */
 window.editSalaryComponent = function (componentId) {
   const component = employeeSalaryComponents.find( item => item.Component_ID === componentId );
-
   if (!component) return;
 
   const modal = document.getElementById('salaryComponentModal');
@@ -35457,23 +35357,13 @@ window.editSalaryComponent = function (componentId) {
 
 /* === REMOVE SALARY COMPONENT === */
 window.removeSalaryComponent = function (componentId) {
-  const component =
-    employeeSalaryComponents.find(
-      item =>
-        item.Component_ID === componentId
-    );
-
+  const component = employeeSalaryComponents.find( item => item.Component_ID === componentId );
   if (!component) return;
 
   const confirmed = confirm( `Hapus component "${component.Component_Name}"?` );
-
   if (!confirmed) return;
 
-  employeeSalaryComponents =
-    employeeSalaryComponents.filter(
-      item =>
-        item.Component_ID !== componentId
-    );
+  employeeSalaryComponents = employeeSalaryComponents.filter( item => item.Component_ID !== componentId );
   renderSalaryComponents( employeeSalaryComponents );
 };
 
@@ -35494,7 +35384,6 @@ window.saveEmployeeSalary = async function () {
 
   try {
     const sessionId = localStorage.getItem('pos_session_id');
-
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
     const components = employeeSalaryComponents.map(component => ({
@@ -35526,7 +35415,6 @@ window.saveEmployeeSalary = async function () {
 				p_components: components
       }
     );
-
     if (error) throw error;
 		if (!data) { throw new Error('Gagal menyimpan salary employee.'); }
 		
@@ -35539,9 +35427,8 @@ window.saveEmployeeSalary = async function () {
 		  });
 		
 		if (taxError) throw taxError;
-		if (!taxData?.success) {
-		  throw new Error('Gagal menyimpan pengaturan PPh 21.');
-		}
+		if (!taxData?.success) { throw new Error('Gagal menyimpan pengaturan PPh 21.'); }
+		
     closeSalaryModal();
     alert('Salary employee berhasil disimpan.');
   } catch (error) {
@@ -35606,17 +35493,13 @@ function invalidateScheduleCache() {
 
 async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
   const employeeSelect = document.getElementById('scheduleEmployee');
-
   if (!employeeSelect) { return; }
 
   employeeSelect.innerHTML = ` <option value="">Select Employee</option> `;
 
   if (!branchId) { return; }
 
-  const employees = employeeData.filter(employee => {
-    return String(employee.Branch_ID || '').trim() ===
-           String(branchId || '').trim();
-  });
+  const employees = employeeData.filter(employee => { return String(employee.Branch_ID || '').trim() === String(branchId || '').trim(); });
 
   employees.forEach(employee => {
     const option = document.createElement('option');
@@ -35626,20 +35509,13 @@ async function loadScheduleEmployees(branchId, selectedEmployeeId = '') {
     employeeSelect.appendChild(option);
   });
 
-  if (selectedEmployeeId) {
-    employeeSelect.value = selectedEmployeeId;
-  }
+  if (selectedEmployeeId) { employeeSelect.value = selectedEmployeeId; }
 }
 
 async function openScheduleModal(schedule = null) {
-  const currentRole = String(
-    state.user?.role || state.user?.Role || ''
-  ).trim().toLowerCase();
-
-  if (currentRole === 'accountant') {
-    alert('Accountant hanya dapat membaca data Schedule.');
-    return;
-  }
+  const currentRole = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+  if (currentRole === 'accountant') { alert('Accountant hanya dapat membaca data Schedule.'); return; }
+	
   const modal = document.getElementById('scheduleModal');
   if (!modal) { return; }
   initScheduleTimePickers();
@@ -35649,7 +35525,6 @@ async function openScheduleModal(schedule = null) {
   const employeeSelect = document.getElementById('scheduleEmployee');
   const active = document.getElementById('scheduleActive');
   const weekStart = document.getElementById('scheduleWeekStart');
-
   const isEdit =
     !!schedule &&
     !!schedule.Employee_ID &&
@@ -35659,28 +35534,15 @@ async function openScheduleModal(schedule = null) {
 
   resetScheduleWorkingDays();
 
-  if (scheduleId) {
-    scheduleId.value = '';
-  }
-
-  if (active) {
-    active.checked = true;
-  }
-
+  if (scheduleId) { scheduleId.value = ''; }
+  if (active) { active.checked = true; }
   if (weekStart) {
     weekStart.value = schedule?.Week_Start || '';
     weekStart.onchange = async function () {
       updateScheduleWeekDates();
 
-      if (
-        employeeSelect?.value &&
-        this.value
-      ) {
-        await loadScheduleWeek(
-          employeeSelect.value,
-          this.value
-        );
-      }
+      if ( employeeSelect?.value && this.value
+      ) { await loadScheduleWeek( employeeSelect.value, this.value ); }
     };
   }
   if (branchSelect) {
@@ -35694,29 +35556,16 @@ async function openScheduleModal(schedule = null) {
       );
     } else {
       const branchId = state.user.branchId;
-
       branchSelect.value = branchId || '';
       branchSelect.disabled = true;
 
-      await loadScheduleEmployees(
-        branchId,
-        schedule?.Employee_ID || ''
-      );
+      await loadScheduleEmployees( branchId, schedule?.Employee_ID || '' );
     }
   }
   if (employeeSelect) {
     employeeSelect.onchange = async function () {
-      if (!this.value) {
-        resetScheduleWorkingDays();
-        return;
-      }
-
-      if (weekStart?.value) {
-        await loadScheduleWeek(
-          this.value,
-          weekStart.value
-        );
-      }
+      if (!this.value) { resetScheduleWorkingDays(); return; }
+      if (weekStart?.value) { await loadScheduleWeek( this.value, weekStart.value ); }
     };
   }
 
@@ -35724,32 +35573,21 @@ async function openScheduleModal(schedule = null) {
     branchSelect.onchange = async function () {
       await loadScheduleEmployees(this.value);
 
-      if (employeeSelect) {
-        employeeSelect.value = '';
-      }
+      if (employeeSelect) { employeeSelect.value = ''; }
 
       resetScheduleWorkingDays();
     };
   }
   if (isEdit) {
-    if (weekStart) {
-      weekStart.value = schedule.Week_Start;
-    }
+    if (weekStart) { weekStart.value = schedule.Week_Start; 
 
     const employeeId = schedule.Employee_ID;
     const selectedWeek = schedule.Week_Start;
-    const savedWeekData = scheduleData.filter(row =>
-      String(row.Employee_ID || '').trim() ===
-        String(employeeId || '').trim()
-      &&
-      String(row.Week_Start || '').substring(0, 10) ===
-        String(selectedWeek || '').substring(0, 10)
-    );
+    const savedWeekData = scheduleData.filter(row => String(row.Employee_ID || '').trim() === String(employeeId || '').trim() && String(row.Week_Start || '').substring(0, 10) === String(selectedWeek || '').substring(0, 10));
     /*
      * Pastikan tanggal Senin-Minggu tersedia
      */
     const monday = new Date(`${selectedWeek}T00:00:00`);
-
     const days = [
       'MONDAY',
       'TUESDAY',
@@ -35773,9 +35611,7 @@ async function openScheduleModal(schedule = null) {
     });
 		
     savedWeekData.forEach(row => {
-      const day = String(
-        row.Day_Of_Week || ''
-      )
+      const day = String( row.Day_Of_Week || '' )
         .trim()
         .toUpperCase();
 
@@ -35815,8 +35651,8 @@ async function openScheduleModal(schedule = null) {
 
 function closeScheduleModal() {
   const modal = document.getElementById('scheduleModal');
-
   if (!modal) return;
+	
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 }
@@ -35825,7 +35661,6 @@ async function loadScheduleWeek( employeeId, weekStart ) {
   if (!employeeId || !weekStart) { return; }
 
   const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { return; }
 
   try {
@@ -35843,7 +35678,6 @@ async function loadScheduleWeek( employeeId, weekStart ) {
 
 	  resetScheduleWorkingDays();
 		const weekInput = document.getElementById('scheduleWeekStart');
-		
 		if (weekInput) { weekInput.value = weekStart; }
 		
 		const monday = new Date(`${weekStart}T00:00:00`);
@@ -35865,15 +35699,13 @@ async function loadScheduleWeek( employeeId, weekStart ) {
 			const month = String(date.getMonth() + 1).padStart(2, '0');
 			const dayNumber = String(date.getDate()).padStart(2, '0');
 		
-			scheduleDayData[day].date =
-				`${year}-${month}-${dayNumber}`;
+			scheduleDayData[day].date = `${year}-${month}-${dayNumber}`;
 		});
 		
 		(data || []).forEach(row => {
 		  const day = String(row.Day_Of_Week || '')
 		    .trim()
 		    .toUpperCase();
-	
 		  if (!scheduleDayData[day]) { return; }
 		
 		  scheduleDayData[day] = {
@@ -35900,16 +35732,13 @@ async function loadScheduleWeek( employeeId, weekStart ) {
 
 function formatScheduleTime(time) {
   if (!time) return '';
-
-  return String(time)
-    .substring(0, 5);
+  return String(time) .substring(0, 5);
 }
 
 window.selectScheduleDay = function(button) {
   if (!button) return;
 
   const day = button.dataset.day;
-
   if (!day || !scheduleDayData[day]) return;
 
   saveCurrentScheduleDayData();
@@ -35924,7 +35753,6 @@ window.selectScheduleDay = function(button) {
 
 function saveCurrentScheduleDayData() {
 	const day = selectedScheduleDay;
-	
 	if (!day || !scheduleDayData[day]) return;
 	
 	const startHour = document.getElementById('scheduleStartHour');
@@ -35949,7 +35777,6 @@ function saveCurrentScheduleDayData() {
 
 window.saveSchedule = async function() {
   const currentRole = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
-
   if (currentRole === 'accountant') { alert('Accountant hanya dapat membaca data Schedule.'); return; }
 
   const sessionId = localStorage.getItem('pos_session_id');
@@ -35967,11 +35794,7 @@ window.saveSchedule = async function() {
   if (!employeeId) { alert('Employee wajib dipilih.'); return; }
   if (!weekStart) { alert('Schedule Week wajib dipilih.'); return; }
 
-  /*
-   * Pastikan Monday
-   */
   const selectedDate = new Date(`${weekStart}T00:00:00`);
-
   if (selectedDate.getDay() !== 1) { alert( 'Schedule Week harus memilih hari Senin.' ); return; }
 	
   saveCurrentScheduleDayData();
@@ -36005,15 +35828,9 @@ window.saveSchedule = async function() {
     });
 
   for (const day of scheduleDays) {
-    if (!day.Is_Active) { continue; }
-
-    if (
-      !day.Start_Time ||
-      !day.End_Time
-    ) {
-      alert(
-        `Jam kerja ${day.Day_Of_Week} belum lengkap.`
-      );
+    if ( !day.Is_Active ) { continue; }
+    if ( !day.Start_Time || !day.End_Time
+    ) { alert( `Jam kerja ${day.Day_Of_Week} belum lengkap.` );
       selectedScheduleDay = day.Day_Of_Week;
       updateScheduleDayButtons();
       loadSelectedScheduleDay();
@@ -36055,14 +35872,8 @@ async function loadSchedules() {
   if (!sessionId) { return; }
 
   /* ==== CACHE HIT ==== */
-  if (
-    Object.prototype.hasOwnProperty.call(
-      state.scheduleRecordsCache,
-      sessionId
-    )
-  ) {
-    scheduleData = state.scheduleRecordsCache[sessionId];
-
+  if ( Object.prototype.hasOwnProperty.call( state.scheduleRecordsCache, sessionId )
+  ) { scheduleData = state.scheduleRecordsCache[sessionId];
     populateScheduleFilters();
     filterSchedules();
     return;
@@ -36103,16 +35914,14 @@ function populateScheduleFilters() {
     employeeFilter.innerHTML = `<option value="">All Employees</option>`;
 
     const employees = [
-      ...new Map(
-        visibleScheduleData.map(row => [
-          row.Employee_ID,
-          {
-            id: row.Employee_ID,
-            name: row.Full_Name,
-            code: row.Employee_Code
-          }
-        ])
-      ).values()
+      ...new Map( visibleScheduleData.map(row => [
+				row.Employee_ID,
+				{
+					id: row.Employee_ID,
+					name: row.Full_Name,
+					code: row.Employee_Code
+				}
+			]) ).values()
     ];
     employees.forEach(employee => {
       const option = document.createElement('option');
@@ -36121,12 +35930,9 @@ function populateScheduleFilters() {
       option.textContent = `${employee.name || '-'} • ${employee.code || '-'}`;
       employeeFilter.appendChild(option);
     });
-    employeeFilter.value =
-      [...employeeFilter.options].some(
-        option => option.value === currentValue
-      )
-        ? currentValue
-        : '';
+    employeeFilter.value = [...employeeFilter.options].some( option => option.value === currentValue )
+			? currentValue
+			: '';
   }
 
   if (branchFilter) {
@@ -36135,10 +35941,9 @@ function populateScheduleFilters() {
 	  branchFilter.innerHTML = `<option value="">All Branch</option>`;
 	
 	  const branches = [
-	    ...new Set(
-	      visibleScheduleData
-	        .map(row => String(row.Branch_ID || '').trim())
-	        .filter(Boolean)
+	    ...new Set( visibleScheduleData
+				.map(row => String(row.Branch_ID || '').trim())
+				.filter(Boolean)
 	    )
 	  ];
 	
@@ -36150,28 +35955,17 @@ function populateScheduleFilters() {
 	    branchFilter.appendChild(option);
 	  });
 	
-	  branchFilter.value =
-	    [...branchFilter.options].some(
-	      option => option.value === currentValue
-	    )
-	      ? currentValue
-	      : '';
+	  branchFilter.value = [...branchFilter.options].some( option => option.value === currentValue )
+			? currentValue
+			: '';
 	  branchFilter.onchange = function() {
 	    const selectedBranch = String( this.value || '' ).trim();
-	    const employeeDataForFilter =
-			  selectedBranch
-			    ? scheduleData.filter(row =>
-			        String(row.Branch_ID || '').trim() ===
-			        selectedBranch
-			      )
-			    : (
-			        canViewAllBranches
-			          ? scheduleData
-			          : scheduleData.filter(row =>
-			              String(row.Branch_ID || '').trim() ===
-			              userBranchId
-			            )
-			      );
+	    const employeeDataForFilter = selectedBranch
+				? scheduleData.filter(row => String(row.Branch_ID || '').trim() === selectedBranch )
+				: ( canViewAllBranches
+						? scheduleData
+						: scheduleData.filter(row => String(row.Branch_ID || '').trim() === userBranchId )
+					);
 	    const employees = [
 	      ...new Map(
 	        employeeDataForFilter.map(row => [
@@ -36187,7 +35981,6 @@ function populateScheduleFilters() {
 	
 	    if (employeeFilter) {
 	      employeeFilter.innerHTML = `<option value="">All Employees</option>`;
-	
 	      employees.forEach(employee => {
 	        const option = document.createElement('option');
 	
@@ -36195,7 +35988,6 @@ function populateScheduleFilters() {
 	        option.textContent = `${employee.name || '-'} • ${employee.code || '-'}`;
 	        employeeFilter.appendChild(option);
 	      });
-	
 	      employeeFilter.value = '';
 	    }
 	    filterSchedules();
@@ -36211,8 +36003,7 @@ function populateScheduleFilters() {
       ...new Set(
         visibleScheduleData
           .map(row => row.Week_Start)
-          .filter(Boolean)
-      )
+          .filter(Boolean))
     ].sort().reverse();
 
     weeks.forEach(week => {
@@ -36222,12 +36013,9 @@ function populateScheduleFilters() {
       option.textContent = formatScheduleDate(week);
       weekFilter.appendChild(option);
     });
-    weekFilter.value =
-      [...weekFilter.options].some(
-        option => option.value === currentValue
-      )
-        ? currentValue
-        : '';
+    weekFilter.value = [...weekFilter.options].some( option => option.value === currentValue )
+			? currentValue
+			: '';
   }
 }
 
@@ -36236,42 +36024,18 @@ window.filterSchedules = function() {
   const employeeId = document.getElementById('scheduleEmployeeFilter')?.value || '';
   const branchId = document.getElementById('scheduleBranchFilter')?.value || '';
   const day = document.getElementById('scheduleDayFilter')?.value || '';
-  const role = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase();
-	const userBranchId = String(
-	  state.user?.branchId || state.user?.Branch_ID || ''
-	).trim();
-	const canViewAllBranches =
-	  ['owner', 'accountant'].includes(role) ||
-	  userBranchId.toUpperCase() === 'ALL';
+  const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+	const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+	const canViewAllBranches = ['owner', 'accountant'].includes(role) || userBranchId.toUpperCase() === 'ALL';
 	
 	let filtered = canViewAllBranches
 	  ? [...scheduleData]
-	  : scheduleData.filter(row =>
-	      String(row.Branch_ID || '').trim() === userBranchId
-	    );
+	  : scheduleData.filter(row => String(row.Branch_ID || '').trim() === userBranchId );
 
-  if (week) {
-    filtered = filtered.filter(row =>
-      String(row.Week_Start || '') === String(week)
-    );
-  }
-  if (employeeId) {
-    filtered = filtered.filter(row =>
-      String(row.Employee_ID || '') === String(employeeId)
-    );
-  }
-  if (branchId) {
-    filtered = filtered.filter(row =>
-      String(row.Branch_ID || '') === String(branchId)
-    );
-  }
-  if (day) {
-    filtered = filtered.filter(row =>
-      String(row.Day_Of_Week || '') === String(day)
-    );
-  }
+  if (week) { filtered = filtered.filter(row => String(row.Week_Start || '') === String(week)); }
+  if (employeeId) { filtered = filtered.filter(row => String(row.Employee_ID || '') === String(employeeId)); }
+  if (branchId) { filtered = filtered.filter(row => String(row.Branch_ID || '') === String(branchId)); }
+  if (day) { filtered = filtered.filter(row => String(row.Day_Of_Week || '') === String(day)); }
 
   filteredScheduleData = filtered;
   scheduleCurrentPage = 1;
@@ -36597,9 +36361,7 @@ function initScheduleTimePickers() {
 }
 
 
-/* =========================================================
-   EXPORT EMPLOYEE SCHEDULE 
-========================================================= */
+/* === EXPORT EMPLOYEE SCHEDULE === */
 
 window.exportEmployeeSchedule = async function () {
   try {
@@ -37212,7 +36974,6 @@ const employeeAttendancePageSize = 10;
 
 /* ==== EMPLOYEE ATTENDANCE CACHE ==== */
 state.employeeAttendanceCache ??= Object.create(null);
-
 /* ==== INVALIDATE EMPLOYEE ATTENDANCE CACHE ==== */
 function invalidateEmployeeAttendanceCache() {
   state.employeeAttendanceCache = Object.create(null);
@@ -37220,25 +36981,17 @@ function invalidateEmployeeAttendanceCache() {
 
 async function loadEmployeeAttendance() {
   const sessionId = localStorage.getItem('pos_session_id');
-
   if (!sessionId) { return; }
 
 	const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
 	const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
 	const canViewAllBranches = ['owner', 'accountant'].includes(role);
   const tbody = document.getElementById('employeeAttendanceTableBody');
-
 	const cacheKey = JSON.stringify({ sessionId, branchId: canViewAllBranches ? null : userBranchId });
 	
 	/* ==== CACHE HIT ==== */
-	if (
-	  Object.prototype.hasOwnProperty.call(
-	    state.employeeAttendanceCache,
-	    cacheKey
-	  )
-	) {
-	  employeeAttendanceData = state.employeeAttendanceCache[cacheKey];
-	
+	if ( Object.prototype.hasOwnProperty.call( state.employeeAttendanceCache, cacheKey )
+	) { employeeAttendanceData = state.employeeAttendanceCache[cacheKey];
 	  populateEmployeeAttendanceFilters();
 	  filterEmployeeAttendance();
 	  return;
@@ -37281,10 +37034,7 @@ async function loadEmployeeAttendance() {
 		
 		// Tampilkan semua jadwal aktif, termasuk karyawan yang belum scan QR.
 		const scheduledRows = schedules
-		  .filter(schedule =>
-		    schedule.Schedule_Date &&
-		    schedule.Is_Active === true
-		  )
+		  .filter(schedule => schedule.Schedule_Date && schedule.Is_Active === true )
 		  .map(schedule => {
 		    const date = String(schedule.Schedule_Date).slice(0, 10);
 		    const key = `${schedule.Employee_ID}|${date}`;
@@ -37314,9 +37064,7 @@ async function loadEmployeeAttendance() {
 		// Pembatasan outlet tetap berlaku.
 		employeeAttendanceData = canViewAllBranches
 		  ? scheduledRows
-		  : scheduledRows.filter(row =>
-		      String(row.Branch_ID || '').trim() === userBranchId
-		    );
+		  : scheduledRows.filter(row => String(row.Branch_ID || '').trim() === userBranchId );
 		
 		state.employeeAttendanceCache[cacheKey] = employeeAttendanceData;
 		
@@ -37339,22 +37087,15 @@ async function loadEmployeeAttendance() {
 function populateEmployeeAttendanceFilters() {
   const employeeFilter = document.getElementById('attendanceEmployeeFilter');
   const branchFilter = document.getElementById('attendanceBranchFilter');
-	const role = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase();
-	const userBranchId = String(
-	  state.user?.branchId || state.user?.Branch_ID || ''
-	).trim();
+	const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+	const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
 	const canViewAllBranches = ['owner', 'accountant'].includes(role);
 
   // OUTLET FILTER
   if (branchFilter) {
     const branches = employeeAttendanceBranches || [];
     if (!canViewAllBranches) {
-      const branch = branches.find(row =>
-        String(row.id || '').trim() === userBranchId
-      );
-
+      const branch = branches.find(row => String(row.id || '').trim() === userBranchId );
       const branchName = branch?.name || userBranchId || 'Unnamed Branch';
       branchFilter.innerHTML = `
         <option value="${escapeHtml(userBranchId)}">
@@ -37375,40 +37116,22 @@ function populateEmployeeAttendanceFilters() {
       `;
 
       branchFilter.disabled = false;
-      if ([...branchFilter.options].some(
-        option => option.value === previousValue
-      )) {
-        branchFilter.value = previousValue;
-      }
+      if ([...branchFilter.options].some( option => option.value === previousValue
+      )) { branchFilter.value = previousValue; }
     }
   }
   // EMPLOYEE FILTER — SESUAI OUTLET TERPILIH
   if (employeeFilter) {
     const previousValue = employeeFilter.value;
-    const selectedBranchId = String(
-      branchFilter?.value || ''
-    ).trim();
-
+    const selectedBranchId = String( branchFilter?.value || '' ).trim();
     const employeeMap = new Map();
 
     employeeAttendanceData.forEach(row => {
       const rowBranchId = String(row.Branch_ID || '').trim();
       // Jika memilih outlet tertentu, abaikan karyawan outlet lain
-      if (
-        selectedBranchId &&
-        rowBranchId !== selectedBranchId
-      ) {
-        return;
-      }
-
-      if (row.Employee_ID) {
-        employeeMap.set(row.Employee_ID, {
-          id: row.Employee_ID,
-          name: row.Full_Name || row.Employee_ID
-        });
-      }
+      if ( selectedBranchId && rowBranchId !== selectedBranchId ) { return; }
+      if (row.Employee_ID) { employeeMap.set(row.Employee_ID, { id: row.Employee_ID, name: row.Full_Name || row.Employee_ID });}
     });
-
     employeeFilter.innerHTML = `
       <option value="">All Employees</option>
       ${Array.from(employeeMap.values())
@@ -37419,12 +37142,9 @@ function populateEmployeeAttendanceFilters() {
           </option>
         `).join('')}
     `;
-
     // Pertahankan pilihan karyawan jika masih tersedia
-    if ([...employeeFilter.options].some(
-      option => option.value === previousValue
-    )) {
-      employeeFilter.value = previousValue;
+    if ([...employeeFilter.options].some( option => option.value === previousValue
+    )) { employeeFilter.value = previousValue;
     } else {
       employeeFilter.value = '';
     }
@@ -37469,24 +37189,12 @@ function renderEmployeeAttendanceTable() {
   const tbody = document.getElementById('employeeAttendanceTableBody');
   if (!tbody) return;
 	
-	const isAccountant = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase() === 'accountant';
+	const isAccountant = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase() === 'accountant';
   const totalRows = filteredEmployeeAttendanceData.length;
-  const totalPages = Math.max(
-    1,
-    Math.ceil(totalRows / employeeAttendancePageSize)
-  );
-  employeeAttendanceCurrentPage = Math.min(
-    employeeAttendanceCurrentPage,
-    totalPages
-  );
+  const totalPages = Math.max( 1, Math.ceil(totalRows / employeeAttendancePageSize) );
+  employeeAttendanceCurrentPage = Math.min( employeeAttendanceCurrentPage, totalPages );
   const startIndex = (employeeAttendanceCurrentPage - 1) * employeeAttendancePageSize;
-  const pageRows = filteredEmployeeAttendanceData.slice(
-    startIndex,
-    startIndex + employeeAttendancePageSize
-  );
-
+  const pageRows = filteredEmployeeAttendanceData.slice( startIndex, startIndex + employeeAttendancePageSize );
   if (!pageRows.length) {
     tbody.innerHTML = `
       <tr>
@@ -37498,22 +37206,15 @@ function renderEmployeeAttendanceTable() {
   } else {
     tbody.innerHTML = pageRows.map((row, index) => {
       const rowIndex = startIndex + index;
-
       const attendanceDate = row.Attendance_Date
-        ? new Date(
-            `${String(row.Attendance_Date).slice(0, 10)}T00:00:00`
-          ).toLocaleDateString('id-ID')
+        ? new Date( `${String(row.Attendance_Date).slice(0, 10)}T00:00:00` ).toLocaleDateString('id-ID')
         : '-';
-
       const formatTime = value => {
         if (!value) return '-';
         // Waktu dari kolom TIME, misalnya 08:30:00.
-        if (/^\d{2}:\d{2}/.test(String(value))) {
-          return String(value).slice(0, 5);
-        }
+        if (/^\d{2}:\d{2}/.test(String(value))) { return String(value).slice(0, 5); }
 
         const date = new Date(value);
-
         return Number.isNaN(date.getTime())
           ? '-'
           : date.toLocaleTimeString('id-ID', {
@@ -37522,7 +37223,6 @@ function renderEmployeeAttendanceTable() {
               hour12: false
             });
       };
-
       const checkIn = formatTime(row.Check_In);
       const statusLabels = {
 	      PRESENT: 'PRESENT',
@@ -37540,11 +37240,9 @@ function renderEmployeeAttendanceTable() {
         SICK: 'text-yellow-700',
         NOT_RECORDED: 'text-on-surface-variant'
       }[row.Status] || 'text-on-surface-variant';
-
       const schedule = row.Start_Time && row.End_Time
 				? `${formatTime(row.Start_Time)} - ${formatTime(row.End_Time)}`
 				: '-';
-
       const alreadyCheckedIn = Boolean(row.Check_In);
 			const statusManuallySet = [
 			  'PRESENT',
@@ -37654,52 +37352,31 @@ function renderEmployeeAttendanceTable() {
   }
 
   const info = document.getElementById('attendancePaginationInfo');
-
   if (info) {
     info.textContent = totalRows
-      ? `Showing ${startIndex + 1}-${Math.min(
-          startIndex + pageRows.length,
-          totalRows
-        )} of ${totalRows}`
+      ? `Showing ${startIndex + 1}-${Math.min( startIndex + pageRows.length, totalRows )} of ${totalRows}`
       : 'Showing 0 of 0';
   }
 
   const prevButton = document.getElementById('attendancePrevButton');
   const nextButton = document.getElementById('attendanceNextButton');
 
-  if (prevButton) {
-    prevButton.disabled = employeeAttendanceCurrentPage <= 1;
-  }
-
-  if (nextButton) {
-    nextButton.disabled = employeeAttendanceCurrentPage >= totalPages;
-  }
+  if (prevButton) { prevButton.disabled = employeeAttendanceCurrentPage <= 1; }
+  if (nextButton) { nextButton.disabled = employeeAttendanceCurrentPage >= totalPages; }
 }
 
 /*  PAGINATION  */
 function changeEmployeeAttendancePage(direction) {
-  const totalPages = Math.max(
-    1,
-    Math.ceil(
-      filteredEmployeeAttendanceData.length / employeeAttendancePageSize
-    )
-  );
-  employeeAttendanceCurrentPage = Math.max(
-    1,
-    Math.min(totalPages, employeeAttendanceCurrentPage + direction)
-  );
+  const totalPages = Math.max( 1, Math.ceil( filteredEmployeeAttendanceData.length / employeeAttendancePageSize ) );
+  employeeAttendanceCurrentPage = Math.max( 1, Math.min(totalPages, employeeAttendanceCurrentPage + direction) );
   renderEmployeeAttendanceTable();
 }
 
 function openAttendanceAction(action, rowIndex) {
   const row = filteredEmployeeAttendanceData[rowIndex];
-
   if (!row) { return; }
 
-	const role = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase();
-	
+	const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
 	if (role === 'accountant' && action !== 'detail') {
 	  alert('Accountant hanya dapat membaca data Attendance.');
 	  return;
@@ -37742,7 +37419,6 @@ function openAttendanceAction(action, rowIndex) {
   };
   const showModal = modalId => {
     const modal = document.getElementById(modalId);
-		
     if (!modal) { return; }
 		
     modal.classList.remove('hidden');
@@ -37779,7 +37455,6 @@ function openAttendanceAction(action, rowIndex) {
   // OVERTIME
   if (action === 'overtime') {
     const modal = document.getElementById('attendanceOvertimeModal');
-		
     if (!modal) { return; }
 
     setValue('overtimeEmployeeId', row.Employee_ID);
@@ -37810,11 +37485,9 @@ function openAttendanceAction(action, rowIndex) {
     setValue('statusAttendanceId', row.Attendance_ID || '');
 		setInputValue('statusEmployeeName', row.Full_Name);
 		setInputValue('statusDate', date);
-    setValue(
-      'attendanceStatusValue',
-      ['PRESENT', 'ABSENT', 'SICK', 'PERMISSION', 'LEAVE'].includes(row.Status)
-        ? row.Status
-        : 'PRESENT'
+    setValue( 'attendanceStatusValue', ['PRESENT', 'ABSENT', 'SICK', 'PERMISSION', 'LEAVE'].includes(row.Status)
+			? row.Status
+			: 'PRESENT'
     );
     setValue('attendanceStatusNote', row.Note || '');
     showModal('attendanceStatusModal');
@@ -37873,7 +37546,6 @@ function toggleAttendanceActionMenu(event, rowIndex) {
   });
 
   const isOpening = targetMenu.classList.contains('hidden');
-
   if (!isOpening) { targetMenu.classList.add('hidden'); return; }
 
   targetMenu.classList.remove('hidden');
@@ -37918,56 +37590,32 @@ function closeAttendanceModal(modalId) {
 }
 
 function exportEmployeeAttendance() {
-  // =====================================================
   // 1. AMBIL DATA SUMBER
-  // =====================================================
   const recapRows = Array.isArray(filteredAttendanceRecapData)
     ? filteredAttendanceRecapData
     : [];
-
   const attendanceRows = Array.isArray(attendanceRecapAttendanceRows)
     ? attendanceRecapAttendanceRows
     : [];
-
   const overtimeRows = Array.isArray(attendanceRecapOvertimeRows)
     ? attendanceRecapOvertimeRows
     : [];
-
-  // =====================================================
   // 2. AMBIL SEMUA FILTER DARI UI EMPLOYEE ATTENDANCE
-  // =====================================================
-  const dateFrom =
-    document.getElementById("attendanceDateFrom")?.value || "";
-
-  const dateTo =
-    document.getElementById("attendanceDateTo")?.value || "";
-
-  const employeeSelect =
-    document.getElementById("attendanceEmployeeFilter");
-
-  const selectedEmployeeId =
-    String(employeeSelect?.value || "").trim();
-
-  const branchSelect =
-    document.getElementById("attendanceBranchFilter");
-
-  const selectedBranchId =
-    String(branchSelect?.value || "").trim();
-
-  const selectedStatus =
-    String(
-      document.getElementById("attendanceStatusFilter")?.value || ""
-    ).trim().toUpperCase();
-
+  const dateFrom = document.getElementById("attendanceDateFrom")?.value || "";
+  const dateTo = document.getElementById("attendanceDateTo")?.value || "";
+  const employeeSelect = document.getElementById("attendanceEmployeeFilter");
+  const selectedEmployeeId = String(employeeSelect?.value || "").trim();
+  const branchSelect = document.getElementById("attendanceBranchFilter");
+  const selectedBranchId = String(branchSelect?.value || "").trim();
+  const selectedStatus = String( document.getElementById("attendanceStatusFilter")?.value || "" ).trim().toUpperCase();
+	
   // Validasi rentang tanggal
   if (dateFrom && dateTo && dateFrom > dateTo) {
     alert("Date From tidak boleh melewati Date To.");
     return;
   }
 
-  // =====================================================
   // 3. LABEL OUTLET DAN PERIODE
-  // =====================================================
   const branchNameById = new Map(
     Array.from(branchSelect?.options || [])
       .filter(option => String(option.value || "").trim() !== "")
@@ -38000,29 +37648,20 @@ function exportEmployeeAttendance() {
       : dateTo
         ? `Until ${dateTo}`
         : "All Dates";
-
-  // =====================================================
   // 4. FORMAT DAN HELPER FILTER
-  // =====================================================
-  const formatDate = value =>
-    String(value || "").slice(0, 10);
-
+  const formatDate = value => String(value || "").slice(0, 10);
   const formatTime = value => {
     if (!value) return "";
 
     const match = String(value).match(/T?(\d{2}:\d{2})/);
     return match ? match[1] : String(value);
   };
-
-  const normalizeStatus = value =>
-    String(value || "NOT_RECORDED").trim().toUpperCase();
-
+  const normalizeStatus = value => String(value || "NOT_RECORDED").trim().toUpperCase();
   // Cocokkan karyawan berdasarkan ID atau kode.
   // Mendukung dropdown yang value-nya berupa Employee_ID
   // maupun Employee_Code.
   const matchesEmployee = row => {
     if (!selectedEmployeeId) return true;
-
     const selected = selectedEmployeeId.toUpperCase();
 
     return [
@@ -38032,71 +37671,39 @@ function exportEmployeeAttendance() {
       String(value || "").trim().toUpperCase() === selected
     );
   };
-
   const matchesBranch = row => {
     if (!selectedBranchId) return true;
 
     return String(row.Branch_ID || "").trim() === selectedBranchId;
   };
-
   const matchesDate = (value, fieldExists = true) => {
     const date = formatDate(value);
-
-    // Jangan masukkan baris yang tidak memiliki tanggal
-    // ketika rentang tanggal sedang diterapkan.
-    if (!date || date === "-") {
-      return !dateFrom && !dateTo && fieldExists;
-    }
-
+    if (!date || date === "-") { return !dateFrom && !dateTo && fieldExists; }
     if (dateFrom && date < dateFrom) return false;
     if (dateTo && date > dateTo) return false;
 
     return true;
   };
-
-  // =====================================================
   // 5. FILTER ATTENDANCE HISTORY
-  // =====================================================
   const filteredAttendanceRows = attendanceRows.filter(row => {
     if (!matchesBranch(row)) return false;
     if (!matchesEmployee(row)) return false;
-
     if (!matchesDate(row.Attendance_Date)) return false;
-
-    if (
-      selectedStatus &&
-      normalizeStatus(row.Status) !== selectedStatus
-    ) {
-      return false;
-    }
-
+    if ( selectedStatus && normalizeStatus(row.Status) !== selectedStatus ) { return false; }
     return true;
   });
-
-  // =====================================================
   // 6. FILTER OVERTIME HISTORY
-  // =====================================================
   const filteredOvertimeRows = overtimeRows.filter(row => {
     if (!matchesBranch(row)) return false;
     if (!matchesEmployee(row)) return false;
-
     if (!matchesDate(row.Overtime_Date)) return false;
-
     return true;
   });
 
-  // =====================================================
-  // 7. BENTUK DATA KARYAWAN UNTUK REKAP
-  //    Rekap dihitung ulang dari attendance history
-  //    berdasarkan seluruh filter aktif.
-  // =====================================================
   const employeeMap = new Map();
 
-  // Gunakan data rekap sebagai sumber identitas tambahan,
-  // bukan sebagai sumber angka rekap bulanan.
   recapRows.forEach(row => {
     if (!matchesBranch(row) || !matchesEmployee(row)) return;
-
     const id = String(row.Employee_ID || "").trim();
     if (!id) return;
 
@@ -38141,10 +37748,7 @@ function exportEmployeeAttendance() {
       Branch_ID: row.Branch_ID || previous.Branch_ID || ""
     });
   });
-
-  // =====================================================
   // 8. HITUNG TOTAL OVERTIME PER KARYAWAN
-  // =====================================================
   const overtimeByEmployee = new Map();
 
   filteredOvertimeRows.forEach(row => {
@@ -38157,10 +37761,7 @@ function exportEmployeeAttendance() {
         Number(row.Overtime_Minutes || 0)
     );
   });
-
-  // =====================================================
   // 9. HITUNG ULANG ATTENDANCE RECAP
-  // =====================================================
   const recapByEmployee = new Map();
 
   filteredAttendanceRows.forEach(row => {
@@ -38168,7 +37769,6 @@ function exportEmployeeAttendance() {
     if (!id) return;
 
     const employee = employeeMap.get(id) || {};
-
     if (!recapByEmployee.has(id)) {
       recapByEmployee.set(id, {
         Employee_ID: id,
@@ -38185,13 +37785,9 @@ function exportEmployeeAttendance() {
         Late_Minutes: 0
       });
     }
-
     const recap = recapByEmployee.get(id);
     const status = normalizeStatus(row.Status);
-    const lateMinutes = Math.max(
-      0,
-      Number(row.Late_Minutes || 0)
-    );
+    const lateMinutes = Math.max(0, Number(row.Late_Minutes || 0));
 
     recap.Working_Days += 1;
 
@@ -38206,51 +37802,21 @@ function exportEmployeeAttendance() {
     } else if (status === "PERMISSION") {
       recap.Permission += 1;
     }
-
-    if (status === "PRESENT" && lateMinutes > 0) {
-      recap.Late += 1;
-    }
-
+    if (status === "PRESENT" && lateMinutes > 0) { recap.Late += 1; }
     recap.Late_Minutes += lateMinutes;
   });
-
   const filteredRecapRows = [...recapByEmployee.values()]
     .sort((a, b) =>
       String(a.Employee_Code || "").localeCompare(
         String(b.Employee_Code || "")
       )
     );
-
-  // =====================================================
-  // 10. DEBUG
-  // =====================================================
-  console.log("Employee Attendance Export:", {
-    dateFrom,
-    dateTo,
-    selectedEmployeeId,
-    employeeLabel,
-    selectedBranchId,
-    branchLabel,
-    selectedStatus,
-    recapCount: filteredRecapRows.length,
-    attendanceCount: filteredAttendanceRows.length,
-    overtimeCount: filteredOvertimeRows.length
-  });
-
   // Jangan batalkan export hanya karena tidak ada rekap.
   // Riwayat absensi atau lembur mungkin masih memiliki data.
-  if (
-    !filteredRecapRows.length &&
-    !filteredAttendanceRows.length &&
-    !filteredOvertimeRows.length
-  ) {
-    alert("Tidak ada data Employee Attendance sesuai filter yang dipilih.");
-    return;
-  }
+  if ( !filteredRecapRows.length && !filteredAttendanceRows.length && !filteredOvertimeRows.length
+  ) { alert("Tidak ada data Employee Attendance sesuai filter yang dipilih."); return; }
 
-  // =====================================================
   // 11. HEADER LAPORAN
-  // =====================================================
   const output = [
     ["EMPLOYEE ATTENDANCE REPORT"],
     [`Period: ${period}`],
@@ -38274,13 +37840,9 @@ function exportEmployeeAttendance() {
       "Overtime (Hours)"
     ]
   ];
-
-  // =====================================================
   // 12. ISI ATTENDANCE RECAP
-  // =====================================================
   filteredRecapRows.forEach(row => {
-    const overtimeMinutes =
-      overtimeByEmployee.get(row.Employee_ID) || 0;
+    const overtimeMinutes = overtimeByEmployee.get(row.Employee_ID) || 0;
 
     output.push([
       row.Employee_Code || "",
@@ -38297,14 +37859,10 @@ function exportEmployeeAttendance() {
       overtimeMinutes / 60
     ]);
   });
-
   const recapTitleRow = 7;
   const recapHeaderRow = 8;
   const recapLastRow = output.length;
-
-  // =====================================================
   // 13. OVERTIME HISTORY
-  // =====================================================
   output.push([""]);
   const overtimeTitleRow = output.length + 1;
   output.push(["OVERTIME HISTORY"]);
@@ -38321,7 +37879,6 @@ function exportEmployeeAttendance() {
     "Note",
     "Status"
   ]);
-
   const overtimeHistory = [...filteredOvertimeRows].sort(
     (a, b) =>
       formatDate(a.Overtime_Date).localeCompare(
@@ -38342,10 +37899,7 @@ function exportEmployeeAttendance() {
       row.Status || ""
     ]);
   });
-
-  // =====================================================
   // 14. ATTENDANCE HISTORY
-  // =====================================================
   output.push([""]);
   const historyTitleRow = output.length + 1;
   output.push(["ATTENDANCE HISTORY"]);
@@ -38365,14 +37919,12 @@ function exportEmployeeAttendance() {
     "Status",
     "Note"
   ]);
-
   const history = [...filteredAttendanceRows].sort(
     (a, b) =>
       formatDate(a.Attendance_Date).localeCompare(
         formatDate(b.Attendance_Date)
       )
   );
-
   history.forEach(row => {
     output.push([
       row.Employee_Code || "",
@@ -38389,10 +37941,7 @@ function exportEmployeeAttendance() {
       row.Note || ""
     ]);
   });
-
-  // =====================================================
   // 15. BUAT WORKBOOK
-  // =====================================================
   const { wb, ws } = createAccountingWorkbook(
     "Attendance",
     output,
@@ -38405,10 +37954,7 @@ function exportEmployeeAttendance() {
     ],
     [18, 24, 18, 16, 12, 12, 12, 12, 15, 15, 18, 30]
   );
-
-  // =====================================================
   // 16. STYLE HEADER LAPORAN
-  // =====================================================
   ["A1", "A2", "A3", "A4", "A5"].forEach(cell => {
     setExcelStyle(ws, cell, {
       font: { bold: true },
@@ -38426,75 +37972,31 @@ function exportEmployeeAttendance() {
       vertical: "center"
     }
   });
-
-  // =====================================================
   // 17. STYLE ATTENDANCE RECAP
-  // =====================================================
-  setExcelStyle(ws, `A${recapTitleRow}`, {
-    font: { bold: true, sz: 12 }
-  });
-
+  setExcelStyle(ws, `A${recapTitleRow}`, {font: { bold: true, sz: 12 }});
   for (let col = 0; col < 12; col++) {
-    const cell =
-      `${String.fromCharCode(65 + col)}${recapHeaderRow}`;
-
-    if (ws[cell]) {
-      setExcelStyle(ws, cell, {
-        font: { bold: true }
-      });
-    }
+    const cell = `${String.fromCharCode(65 + col)}${recapHeaderRow}`;
+    if (ws[cell]) {setExcelStyle(ws, cell, {font: { bold: true }});}
   }
-
-  // =====================================================
   // 18. STYLE OVERTIME HISTORY
-  // =====================================================
-  setExcelStyle(ws, `A${overtimeTitleRow}`, {
-    font: { bold: true, sz: 12 }
-  });
-
+  setExcelStyle(ws, `A${overtimeTitleRow}`, {font: { bold: true, sz: 12 }});
   for (let col = 0; col < 9; col++) {
-    const cell =
-      `${String.fromCharCode(65 + col)}${overtimeHeaderRow}`;
-
-    if (ws[cell]) {
-      setExcelStyle(ws, cell, {
-        font: { bold: true }
-      });
-    }
+    const cell = `${String.fromCharCode(65 + col)}${overtimeHeaderRow}`;
+    if (ws[cell]) {setExcelStyle(ws, cell, {font: { bold: true }});}
   }
-
-  // =====================================================
   // 19. STYLE ATTENDANCE HISTORY
-  // =====================================================
-  setExcelStyle(ws, `A${historyTitleRow}`, {
-    font: { bold: true, sz: 12 }
-  });
-
+  setExcelStyle(ws, `A${historyTitleRow}`, {font: { bold: true, sz: 12 }});
   for (let col = 0; col < 12; col++) {
-    const cell =
-      `${String.fromCharCode(65 + col)}${historyHeaderRow}`;
-
-    if (ws[cell]) {
-      setExcelStyle(ws, cell, {
-        font: { bold: true }
-      });
-    }
+    const cell = `${String.fromCharCode(65 + col)}${historyHeaderRow}`;
+    if (ws[cell]) { setExcelStyle(ws, cell, {font: { bold: true }});}
   }
-
-  // =====================================================
   // 20. EXPORT EXCEL
-  // =====================================================
   const safePeriod = String(period).replace(/[\\/:*?"<>|]/g, "-");
   const safeBranch = String(branchLabel).replace(/[\\/:*?"<>|]/g, "-");
   const safeEmployee = String(employeeLabel).replace(/[\\/:*?"<>|]/g, "-");
 
-  XLSX.writeFile(
-    wb,
-    `employee-attendance-${safePeriod}-${safeBranch}-${safeEmployee}.xlsx`
-  );
+  XLSX.writeFile(wb, `employee-attendance-${safePeriod}-${safeBranch}-${safeEmployee}.xlsx`);
 }
-
-
 
 let employeeOvertimeData = [];
 async function loadEmployeeOvertime() {
@@ -38521,12 +38023,8 @@ async function loadEmployeeOvertime() {
 
 async function handleSaveEmployeeCheckIn(event) {
   // ACCOUNTANT: READ ONLY
-  if (
-    String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase() === 'accountant'
-  ) {
-    event.preventDefault();
+  if ( String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase() === 'accountant'
+  ) { event.preventDefault();
     alert('Accountant hanya dapat membaca data Attendance.');
     return;
   }
@@ -38547,13 +38045,8 @@ async function handleSaveEmployeeCheckIn(event) {
 
   if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
   if (!employeeId || !attendanceDate) { alert('Data karyawan atau tanggal attendance tidak lengkap.'); return; }
-  if (
-    hour == null || hour === '' ||
-    minute == null || minute === ''
-  ) {
-    alert('Pilih jam dan menit Check In.');
-    return;
-  }
+  if ( hour == null || hour === '' || minute == null || minute === ''
+  ) { alert('Pilih jam dan menit Check In.'); return; }
 
   const checkInTime = `${hour}:${minute}`;
   const checkInDateTime = new Date( `${attendanceDate}T${checkInTime}:00` );
@@ -38601,15 +38094,11 @@ async function handleSaveEmployeeCheckIn(event) {
 
 async function handleSaveEmployeeOvertime(event) {
   // ACCOUNTANT: READ ONLY
-  if (
-    String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase() === 'accountant'
-  ) {
-    event.preventDefault();
+  if ( String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase() === 'accountant'
+  ) { event.preventDefault();
     alert('Accountant hanya dapat membaca data Attendance.');
-    return;
-  }
+    return; 
+	  }
 
   event.preventDefault();
 
@@ -38632,27 +38121,19 @@ async function handleSaveEmployeeOvertime(event) {
   const sessionId = localStorage.getItem('pos_session_id');
 
   if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
-  if (
-    !employeeId ||
-    !overtimeDate ||
-    !startTime ||
-    !endTime
+  if ( !employeeId || !overtimeDate || !startTime || !endTime
   ) { alert('Lengkapi tanggal, waktu mulai, dan waktu selesai overtime.'); return; }
 
   // Buat timestamp lokal berdasarkan tanggal dan jam pilihan.
   const startDateTime = new Date(`${overtimeDate}T${startTime}:00`);
   let endDateTime = new Date(`${overtimeDate}T${endTime}:00`);
 
-  if (
-    Number.isNaN(startDateTime.getTime()) ||
-    Number.isNaN(endDateTime.getTime())
+  if ( Number.isNaN(startDateTime.getTime()) || Number.isNaN(endDateTime.getTime())
   ) { alert('Tanggal atau waktu overtime tidak valid.'); return; }
-
   // Jika selesai <= mulai, berarti selesai pada hari berikutnya.
   if (endDateTime <= startDateTime) { endDateTime.setDate(endDateTime.getDate() + 1); }
 
   const durationMinutes = (endDateTime.getTime() - startDateTime.getTime()) / 60000;
-
   if (durationMinutes > 24 * 60) { alert('Durasi overtime tidak boleh lebih dari 24 jam.'); return; }
 
   const startTimestamp = startDateTime.toISOString();
@@ -38686,10 +38167,7 @@ async function handleSaveEmployeeOvertime(event) {
     closeAttendanceModal('attendanceOvertimeModal');
     renderEmployeeAttendanceTable();
 
-    alert( `Overtime berhasil disimpan. Durasi: ${
-			Number(data?.Overtime_Minutes || durationMinutes)
-      } menit.`
-    );
+    alert( `Overtime berhasil disimpan. Durasi: ${ Number(data?.Overtime_Minutes || durationMinutes) } menit.` );
   } catch (error) {
     alert(error.message || 'Gagal menyimpan overtime.');
   } finally {
@@ -38703,12 +38181,8 @@ async function handleSaveEmployeeOvertime(event) {
 
 async function handleSaveAttendanceStatus(event) {
   // ACCOUNTANT: READ ONLY
-  if (
-    String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase() === 'accountant'
-  ) {
-    event.preventDefault();
+  if ( String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase() === 'accountant'
+  ) { event.preventDefault();
     alert('Accountant hanya dapat membaca data Attendance.');
     return;
   }
@@ -38755,13 +38229,11 @@ async function handleSaveAttendanceStatus(event) {
 	
 	alert(data.message || 'Status attendance berhasil disimpan.');
 
-	} catch (error) {
-		alert(error.message || 'Gagal menyimpan status attendance.');
+	} catch (error) { alert(error.message || 'Gagal menyimpan status attendance.');
 	} finally {
 		if (submitButton) {
 			submitButton.disabled = false;
-			submitButton.innerHTML =
-			submitButton.dataset.originalText || 'Save Status';
+			submitButton.innerHTML = submitButton.dataset.originalText || 'Save Status';
 		}
 	}
 }
