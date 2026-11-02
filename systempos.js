@@ -28782,19 +28782,16 @@ window.exportEmployeeHealthData = async function () {
       );
     };
 
-    const branchTitle =
-      branchValue && branchValue.toUpperCase() !== 'ALL'
+    const branchTitle = branchValue && branchValue.toUpperCase() !== 'ALL'
         ? getBranchName(branchValue)
         : canViewAllBranches
           ? 'ALL BRANCHES'
           : getBranchName(userBranchId);
-
     const periodTitle = /^\d{4}-\d{2}$/.test(periodValue)
       ? formatPeriod(`${periodValue}-01`)
       : /^\d{4}$/.test(yearValue)
         ? yearValue
         : 'ALL PERIODS';
-
     // SORT RECORDS
     const sortedRows = [...rows].sort((a, b) => {
       const periodCompare = String(a.contribution_period || '')
@@ -28873,17 +28870,13 @@ window.exportEmployeeHealthData = async function () {
       const employeeAmount = Number(row.employee_amount) || 0;
       const employerAmount = Number(row.employer_amount) || 0;
       const totalAmount = employeeAmount + employerAmount;
-
       const status = String(row.status || 'DRAFT')
         .trim()
         .toUpperCase();
-
       const paidAmount = status === 'PAID' ? totalAmount : 0;
-
       const remainingAmount = ['PAID', 'CANCELLED'].includes(status)
         ? 0
         : totalAmount;
-
       const statusClass = status === 'PAID'
         ? 'paid'
         : status === 'CANCELLED'
@@ -28895,7 +28888,6 @@ window.exportEmployeeHealthData = async function () {
       return `
         <tr>
           <td class="record-id">${esc(contributionId)}</td>
-
           <td>
             <div class="employee-name">${esc(employeeName)}</div>
             ${employeeCode
@@ -28903,16 +28895,13 @@ window.exportEmployeeHealthData = async function () {
               : ''
             }
           </td>
-
           <td>${esc(branchName)}</td>
           <td>${esc(contributionPeriod)}</td>
           <td>${esc(contributionType)}</td>
-
           <td class="number">${esc(formatMoney(employeeAmount))}</td>
           <td class="number">${esc(formatMoney(employerAmount))}</td>
           <td class="number paid-amount">${esc(formatMoney(paidAmount))}</td>
           <td class="number remaining-amount">${esc(formatMoney(remainingAmount))}</td>
-
           <td>
             <span class="status ${statusClass}">
               ${esc(status.replace(/_/g, ' '))}
@@ -35579,7 +35568,7 @@ async function openScheduleModal(schedule = null) {
     };
   }
   if (isEdit) {
-    if (weekStart) { weekStart.value = schedule.Week_Start; 
+    if (weekStart) { weekStart.value = schedule.Week_Start; }
 
     const employeeId = schedule.Employee_ID;
     const selectedWeek = schedule.Week_Start;
@@ -37264,7 +37253,6 @@ function renderEmployeeAttendanceTable() {
               ${escapeHtml(row.Employee_Code || row.Employee_ID || '')}
             </div>
           </td>
-
           <td class="px-4 py-3 text-center">
 					  ${escapeHtml(
 					    employeeAttendanceBranches.find(branch =>
@@ -37273,15 +37261,8 @@ function renderEmployeeAttendanceTable() {
 					    )?.name || row.Branch_ID || '-'
 					  )}
           </td>
-
-          <td class="px-4 py-3 whitespace-nowrap">
-            ${escapeHtml(attendanceDate)}
-          </td>
-
-          <td class="px-4 py-3 text-center whitespace-nowrap">
-            ${escapeHtml(schedule)}
-          </td>
-
+          <td class="px-4 py-3 whitespace-nowrap"> ${escapeHtml(attendanceDate)} </td>
+          <td class="px-4 py-3 text-center whitespace-nowrap"> ${escapeHtml(schedule)} </td>
           <td class="px-4 py-3 whitespace-nowrap">
             ${escapeHtml(checkIn)}
             ${
@@ -37292,17 +37273,14 @@ function renderEmployeeAttendanceTable() {
                 : ''
             }
           </td>
-
           <td class="px-4 py-3 text-center">
             <span class="inline-flex rounded-md px-2 py-1 text-xs font-semibold ${statusClass}">
               ${escapeHtml(statusLabels[row.Status] || row.Status || '-')}
             </span>
           </td>
-
           <td class="px-4 py-3">
             ${escapeHtml(row.Note || '-')}
           </td>
-
 					<td class="px-4 py-3 text-center">
 					  <div class="relative inline-block text-center">
 					    <button type="button"
@@ -37633,14 +37611,9 @@ function exportEmployeeAttendance() {
   const branchLabel = selectedBranchId
     ? getBranchName(selectedBranchId)
     : "All Branch";
-
   const employeeLabel = selectedEmployeeId
-    ? (
-        employeeSelect?.selectedOptions?.[0]?.textContent?.trim()
-        || selectedEmployeeId
-      )
+    ? ( employeeSelect?.selectedOptions?.[0]?.textContent?.trim() || selectedEmployeeId )
     : "All Employees";
-
   const period = dateFrom && dateTo
     ? `${dateFrom} to ${dateTo}`
     : dateFrom
@@ -37667,9 +37640,7 @@ function exportEmployeeAttendance() {
     return [
       row.Employee_ID,
       row.Employee_Code
-    ].some(value =>
-      String(value || "").trim().toUpperCase() === selected
-    );
+    ].some(value => String(value || "").trim().toUpperCase() === selected);
   };
   const matchesBranch = row => {
     if (!selectedBranchId) return true;
@@ -44024,9 +43995,7 @@ async function getAttendanceEmployeeTodaySchedule(employeeId) {
 
 function renderAttendanceQr(token) {
   const qrCode = document.getElementById('attendanceKioskQrCode');
-
   if (!qrCode) return;
-
   qrCode.innerHTML = '';
 
   new QRCode(qrCode, {
@@ -44050,11 +44019,7 @@ function startAttendanceQrTimer(seconds = 60) {
 
   attendanceKioskQrTimer = setInterval(() => {
     remaining--;
-    if (timerEl) {
-      timerEl.textContent =
-        `${Math.max(remaining, 0)}s`;
-    }
-
+    if (timerEl) { timerEl.textContent = `${Math.max(remaining, 0)}s`; }
     if (remaining <= 0) {
       clearInterval(attendanceKioskQrTimer);
       attendanceKioskQrTimer = null;
