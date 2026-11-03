@@ -44467,14 +44467,12 @@ function renderCashierShiftHistoryTable(rows) {
 				<td class="px-4 py-3 text-center">
 					<span class="${adjustmentClass}"> ${escapeShiftHtml(row.adjustment_status)} </span>
 				</td>
-				<td class="px-4 py-3 text-center">
+				<td class="px-4 py-3 text-center relative">
 					<button type="button"
-						onclick="toggleCashierShiftMenu('${row.id}')"
-						class="p-1 rounded-md hover:bg-surface-container-high transition-colors"
-						title="More Actions">
-						<span class="material-symbols-outlined">
-								more_vert
-						</span>
+							onclick="toggleCashierShiftMenu('${row.id}')"
+							class="p-1 rounded-md hover:bg-surface-container-high transition-colors"
+							title="More Actions">
+							<span class="material-symbols-outlined">more_vert</span>
 					</button>
 				</td>
 			</tr>
@@ -44523,6 +44521,117 @@ function cashierShiftNextPage() {
 function setShiftText(id, value) {
 	const element = document.getElementById(id);
 	if (element) element.textContent = value;
+}
+
+function toggleCashierShiftMenu(shiftId) {
+	// Tutup menu lain yang sedang terbuka
+	document.querySelectorAll('.cashier-shift-action-menu')
+		.forEach(menu => menu.remove());
+
+	const buttons = document.querySelectorAll( `button[onclick="toggleCashierShiftMenu('${shiftId}')"]` );
+	const button = buttons[0];
+	if (!button) return;
+
+	const row = button.closest('tr');
+	const shift = window.cashierShiftHistoryRows?.find( item => String(item.id) === String(shiftId) );
+
+	if (!row || !shift) return;
+
+	const status = String(shift.status || '').toUpperCase();
+	const adjustmentStatus = String( shift.adjustment_status || 'PENDING' ).toUpperCase();
+	const isClosed = status === 'CLOSED';
+	const hasAdjustment = Number(shift.cash_difference || 0) !== 0;
+	const menu = document.createElement('div');
+
+	menu.className = ` cashier-shift-action-menu absolute right-2 top-full mt-1 z-50 w-52 rounded-md bg-background border border-white/10 shadow-xl p-1.5 text-left `;
+	const actions = [
+		{
+			label: 'View Details',
+			icon: 'visibility',
+			show: true,
+			action: 'details'
+		},
+		{
+			label: 'View Adjustments',
+			icon: 'receipt_long',
+			show: hasAdjustment,
+			action: 'adjustments'
+		},
+		{
+			label: 'Reimbursed',
+			subtitle: 'Report only',
+			icon: 'wallet',
+			show: isClosed && hasAdjustment && adjustmentStatus === 'PENDING',
+			action: 'reimbursed'
+		},
+		{
+			label: 'Expensed',
+			icon: 'payments',
+			show: isClosed && hasAdjustment && adjustmentStatus === 'PENDING',
+			action: 'expensed'
+		},
+		{
+			label: 'Reversal',
+			icon: 'undo',
+			show: isClosed && hasAdjustment && ['REIMBURSED', 'EXPENSED'].includes(adjustmentStatus),
+			action: 'reversal'
+		}
+	];
+
+	menu.innerHTML = actions
+		.filter(item => item.show)
+		.map(item => `
+			<button type="button"
+				onclick="handleCashierShiftAction('${item.action}', '${shiftId}')"
+				class="w-full flex items-center gap-3 px-3 py-2.5 rounded-md text-sm text-left text-on-surface hover:bg-outline-variant transition-colors">
+				<span class="material-symbols-outlined text-sm">
+					${item.icon}
+				</span>
+
+				<span class="flex-1">
+					<span class="block font-medium">${item.label}</span>
+					${item.subtitle
+						? `<span class="block text-xs text-gray-400">${item.subtitle}</span>`
+						: ''}
+				</span>
+			</button>
+		`).join('');
+
+	row.querySelector('td:last-child').appendChild(menu);
+
+    // Tutup saat klik di luar menu
+	setTimeout(() => {
+		document.addEventListener('click', function closeMenu(event) {
+			if (!menu.contains(event.target) &&
+				!button.contains(event.target)) {
+				menu.remove();
+				document.removeEventListener('click', closeMenu);
+			}
+		});
+	}, 0);
+}
+
+function handleCashierShiftAction(action, shiftId) {
+	document.querySelectorAll('.cashier-shift-action-menu')
+		.forEach(menu => menu.remove());
+
+	switch (action) {
+		case 'details':
+			openCashierShiftDetailsModal(shiftId);
+			break;
+		case 'adjustments':
+			openCashierShiftAdjustmentsModal(shiftId);
+			break;
+		case 'reimbursed':
+			openCashierShiftReimbursedModal(shiftId);
+			break;
+		case 'expensed':
+			openCashierShiftExpensedModal(shiftId);
+			break;
+		case 'reversal':
+			openCashierShiftReversalModal(shiftId);
+			break;
+	}
 }
 
 function formatShiftCurrency(value) {
