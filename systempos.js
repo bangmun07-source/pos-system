@@ -44655,9 +44655,48 @@ function openCashierShiftDetailsModal(shiftId) {
     const modal = document.getElementById('cashierShiftDetailsModal');
     if (!modal) return;
 
-    // Tutup popup lain terlebih dahulu
-    closeCashierShiftAdjustmentsModal();
+    const shift = cashierShiftHistoryState.rows.find( item => String(item.id) === String(shiftId) );
+    if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
 
+    // Tutup popup lain
+    closeCashierShiftAdjustmentsModal();
+    // SHIFT INFORMATION
+    setShiftText('cashierShiftDetailCashierName', shift.cashier_name || '-');
+    setShiftText('cashierShiftDetailBranch', shift.branch_name || '-');
+    setShiftText('cashierShiftDetailStatus', shift.status || '-');
+    setShiftText('cashierShiftDetailShiftId', shift.id || '-');
+    setShiftText( 'cashierShiftDetailOpenedAt', formatShiftDate(shift.opened_at));
+    setShiftText('cashierShiftDetailClosedAt', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
+
+    // DURASI SHIFT
+    let duration = '-';
+
+    if (shift.opened_at && shift.closed_at) {
+        const start = new Date(shift.opened_at);
+        const end = new Date(shift.closed_at);
+        const diffMinutes = Math.max(0, Math.floor((end - start) / 60000));
+        const hours = Math.floor(diffMinutes / 60);
+        const minutes = diffMinutes % 60;
+
+        duration = `${hours} jam ${minutes} menit`;
+    }
+
+    setShiftText('cashierShiftDetailDuration', duration);
+    setShiftText('cashierShiftDetailTotalSales', formatShiftCurrency(shift.total_sales));
+    setShiftText('cashierShiftDetailOpeningCash', formatShiftCurrency(shift.opening_cash));
+		setShiftText('cashierShiftDetailCashSales', formatShiftCurrency(shift.cash_sales));
+    setShiftText('cashierShiftDetailExpectedCash', formatShiftCurrency(shift.expected_cash));
+    setShiftText('cashierShiftDetailActualCash', formatShiftCurrency(shift.actual_cash));
+
+    const difference = Number(shift.cash_difference || 0);
+    const differenceText = difference < 0
+			? `-Rp${Math.abs(difference).toLocaleString('id-ID')}`
+			: `Rp${difference.toLocaleString('id-ID')}`;
+
+    setShiftText( 'cashierShiftDetailCashDifference', differenceText);
+    setShiftText('cashierShiftDetailAdjustmentStatus', shift.adjustment_status || 'PENDING');
+    setShiftText('cashierShiftDetailClosingNote', shift.closing_note || '-');
+    // TAMPILKAN POPUP
     modal.classList.remove('hidden');
     modal.classList.add('flex');
 
