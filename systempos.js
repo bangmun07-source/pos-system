@@ -44806,7 +44806,7 @@ async function loadCashierReimbursedEmployees(shiftId) {
 			await supabaseClient.rpc(
 				'get_cashier_shift_responsible_employees',
 				{
-					p_session_id: currentSessionId,
+					p_session_id: sessionId,
 					p_shift_id: shiftId
 				}
 			);
