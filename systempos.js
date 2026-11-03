@@ -44738,7 +44738,7 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 
 	currentAdjustmentShiftId = shift.id;
 
-	// Tutup popup lain
+	// TUTUP POPUP LAIN
 	closeCashierShiftDetailsModal();
 	closeCashierShiftReimbursedModal();
 	closeCashierShiftExpensedModal();
@@ -44757,8 +44757,9 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 
 	setShiftText('cashierAdjustmentDifference', differenceText);
 	setShiftText('cashierAdjustmentStatus', shift.adjustment_status || 'PENDING');
-	setShiftText('cashierAdjustmentType', latest.adjustment_type || '-');
-	setShiftText('cashierAdjustmentLatestNote', latest.note || '-');
+	// RESET SUMMARY
+	setShiftText('cashierAdjustmentType', '-');
+	setShiftText('cashierAdjustmentLatestNote', '-');
 
 	// LOADING HISTORY
 	historyBody.innerHTML = `
@@ -44768,6 +44769,7 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 			</td>
 		</tr>
 	`;
+
 	// TAMPILKAN POPUP
 	modal.classList.remove('hidden');
 	modal.classList.add('flex');
@@ -44786,6 +44788,7 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 		if (error) throw error;
 
 		const adjustments = data?.adjustments || [];
+		// JIKA BELUM ADA ADJUSTMENT
 		if (adjustments.length === 0) {
 			historyBody.innerHTML = `
 				<tr>
@@ -44796,37 +44799,37 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 			`;
 			return;
 		}
+
 		// DATA ADJUSTMENT TERBARU
 		const latest = adjustments[0];
-
 		setShiftText( 'cashierAdjustmentType', latest.adjustment_type || '-' );
 		setShiftText( 'cashierAdjustmentLatestNote', latest.note || '-' );
 
 		// RENDER HISTORY
 		historyBody.innerHTML = adjustments.map(item => {
-			const date = item.created_at
-				? formatShiftDate(item.created_at)
-				: '-';
-			const amount = Number(item.amount || 0);
-			const actionLabel = item.adjustment_type === 'REIMBURSED'
-				? 'Reimbursed'
-				: item.adjustment_type === 'EXPENSED'
-					? 'Expensed'
-					: item.adjustment_type || '-';
+				const date = item.created_at
+					? formatShiftDate(item.created_at)
+					: '-';
+				const amount = Number(item.amount || 0);
+				const actionLabel = item.adjustment_type === 'REIMBURSED'
+					? 'Reimbursed'
+					: item.adjustment_type === 'EXPENSED'
+						? 'Expensed'
+						: item.adjustment_type || '-';
 
-			return `
-				<tr>
-					<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(date)} </td>
-					<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(actionLabel)} </td>
-					<td class="px-4 py-3 text-foreground"> ${escapeHTML(item.processed_by_name || '-')} </td>
-					<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${formatShiftCurrency(amount)} </td>
-				</tr>
-			`;
+				return `
+					<tr>
+						<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(date)} </td>
+						<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(actionLabel)} </td>
+						<td class="px-4 py-3 text-foreground"> ${escapeHTML(item.processed_by_name || '-')} </td>
+						<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${formatShiftCurrency(amount)} </td>
+					</tr>
+				`;
 		}).join('');
 
 	} catch (error) {
 		console.error('Gagal memuat adjustment history:', error);
-	
+
 		historyBody.innerHTML = `
 			<tr>
 				<td colspan="4" class="px-4 py-8 text-center text-sm text-red-400">
