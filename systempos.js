@@ -44650,6 +44650,54 @@ function handleCashierShiftAction(action, shiftId) {
 	}
 }
 
+// CASHIER SHIFT DETAILS MODAL
+function openCashierShiftDetailsModal(shiftId) {
+    const modal = document.getElementById('cashierShiftDetailsModal');
+    if (!modal) return;
+
+    // Tutup popup lain terlebih dahulu
+    closeCashierShiftAdjustmentsModal();
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeCashierShiftDetailsModal() {
+    const modal = document.getElementById('cashierShiftDetailsModal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+
+    document.body.classList.remove('overflow-hidden');
+}
+
+// CASHIER SHIFT ADJUSTMENTS MODAL
+function openCashierShiftAdjustmentsModal(shiftId) {
+    const modal = document.getElementById('cashierShiftAdjustmentsModal');
+    if (!modal) return;
+
+    // Tutup popup lain terlebih dahulu
+    closeCashierShiftDetailsModal();
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeCashierShiftAdjustmentsModal() {
+    const modal = document.getElementById('cashierShiftAdjustmentsModal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+
+    document.body.classList.remove('overflow-hidden');
+}
+
 function formatShiftCurrency(value) {
 	return 'Rp' + Number(value || 0).toLocaleString('id-ID');
 }
