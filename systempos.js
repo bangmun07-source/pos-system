@@ -44800,6 +44800,8 @@ async function loadCashierReimbursedEmployees(shiftId) {
 	select.disabled = true;
 
 	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) {throw new Error('Session tidak ditemukan. Silakan login kembali.');}
 		const { data, error } = 
 			await supabaseClient.rpc(
 				'get_cashier_shift_responsible_employees',
