@@ -44834,6 +44834,58 @@ async function loadCashierReimbursedEmployees(shiftId) {
 	} finally { select.disabled = false; }
 }
 
+async function submitCashierShiftReimbursement() {
+	const submitBtn = document.getElementById( 'cashierReimbursedSubmitBtn' );
+	const responsible = document.getElementById( 'cashierReimbursedResponsible' );
+	const note = document.getElementById( 'cashierReimbursedNote' );
+	const sessionId = localStorage.getItem( 'pos_session_id' );
+
+	if (!currentReimbursedShiftId) { alert('Data shift tidak ditemukan.'); return; }
+	if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
+	if (!responsible?.value) { alert('Silakan pilih Responsible Person.'); responsible?.focus(); return; }
+	
+	const confirmed = confirm( 'Konfirmasi reimbursement kekurangan kas ini?' );
+	if (!confirmed) return;
+
+	const originalText = submitBtn?.textContent;
+
+	try {
+		if (submitBtn) {
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'Processing...';
+		}
+
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'submit_cashier_shift_reimbursement',
+				{
+					p_session_id: sessionId,
+					p_shift_id: currentReimbursedShiftId,
+					p_responsible_employee_id: responsible.value,
+					p_note: note?.value?.trim() || null
+				}
+			);
+
+		if (error) throw error;
+		if (!data?.success) { throw new Error('Reimbursement gagal diproses.');}
+
+		alert('Reimbursement berhasil disimpan.');
+
+		closeCashierShiftReimbursedModal();
+		// Muat ulang riwayat agar status terbaru terlihat
+		await loadCashierShiftHistory();
+	} catch (error) {
+		console.error('Gagal menyimpan reimbursement:', error);
+		alert( error.message || 'Gagal menyimpan reimbursement.' );
+
+	} finally {
+		if (submitBtn) {
+			submitBtn.disabled = false;
+			submitBtn.textContent = originalText || 'Confirm Reimbursement';
+		}
+	}
+}
+
 function closeCashierShiftReimbursedModal() {
 	const modal = document.getElementById('cashierShiftReimbursedModal');
 	if (!modal) return;
