@@ -30496,6 +30496,11 @@
 	            <span class="text-muted">Cash Sales</span>
 	            <span id="cashierShiftDetailCashSales" class="font-medium text-foreground">Rp0</span>
 	          </div>
+
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Cash Expenses</span>
+	            <span id="cashierShiftDetailCashExpenses" class="font-medium text-foreground">-Rp0</span>
+	          </div>
 	
 	          <div class="flex justify-between items-center px-4 py-3 text-sm">
 	            <span class="text-muted">Expected Cash</span>
@@ -30573,7 +30578,6 @@
 			</div>
 			<!-- CONTENT -->
 			<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
-				<!-- SHIFT INFORMATION -->
 				<section>
 					<h3 class="text-sm font-semibold text-foreground mb-3">
 						Shift Information
@@ -30706,6 +30710,437 @@
 				</button>
 			</div>
 		</div>
+	</div>
+	<!-- REIMBURSED MODAL -->
+	<div id="cashierShiftReimbursedModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            payments
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Reimburse Cash Shortage
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Record reimbursement for cashier shift cash shortage
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeCashierShiftReimbursedModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition"
+	        aria-label="Close reimbursement">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- SHIFT INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Shift Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Cashier identity, branch, and shift period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Cashier Name</label>
+	            <div id="cashierReimbursedCashierName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Branch</label>
+	            <div id="cashierReimbursedBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Shift ID</label>
+	            <div id="cashierReimbursedShiftId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Opened At</label>
+	            <div id="cashierReimbursedOpenedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Closed At</label>
+	            <div id="cashierReimbursedClosedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- CASH SHORTAGE -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Cash Shortage
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Cash difference recorded during shift closing
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Expected Cash</span>
+	            <span id="cashierReimbursedExpectedCash" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Actual Cash</span>
+	            <span id="cashierReimbursedActualCash" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-4">
+	            <span class="text-sm font-semibold text-foreground">Cash Difference</span>
+	            <span id="cashierReimbursedDifference"
+	              class="text-lg font-semibold text-foreground">Rp0</span>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- REIMBURSEMENT INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Reimbursement Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Record who is responsible for replacing the cash shortage
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Responsible Person <span class="text-error">*</span>
+	            </label>
+	            <select id="cashierReimbursedResponsible"
+	              class="w-full min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground focus:outline-none focus:border-primary">
+	              <option value="">Select responsible person</option>
+	            </select>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Reimbursement Amount
+	            </label>
+	            <div id="cashierReimbursedAmount"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              Rp0
+	            </div>
+	            <p class="text-xs text-muted mt-1">
+	              Automatically follows the cash difference
+	            </p>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Processed By
+	            </label>
+	            <div id="cashierReimbursedProcessedBy"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              -
+	            </div>
+	            <p class="text-xs text-muted mt-1">
+	              Automatically identified from the logged-in account
+	            </p>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Reimbursement Date
+	            </label>
+	            <div id="cashierReimbursedDate"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              -
+	            </div>
+	          </div>
+	        </div>
+	
+	        <div class="mt-4">
+	          <label class="block text-xs text-muted mb-2">
+	            Notes
+	          </label>
+	          <textarea id="cashierReimbursedNote"
+	            rows="3"
+	            placeholder="Enter reimbursement notes..."
+	            class="w-full px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-primary resize-y"></textarea>
+	        </div>
+	      </section>
+	      <!-- ADJUSTMENT STATUS -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Adjustment Status
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Current cash adjustment status
+	          </p>
+	        </div>
+	
+	        <div class="flex justify-between items-center px-4 py-3 border border-outline-variant rounded-md">
+	          <span class="text-sm text-muted">Current Status</span>
+	          <span id="cashierReimbursedCurrentStatus"
+	            class="text-sm font-semibold text-foreground">PENDING</span>
+	        </div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex flex-col-reverse sm:flex-row justify-end gap-3 shrink-0">
+	      <button type="button"
+	        onclick="closeCashierShiftReimbursedModal()"
+	        class="px-5 py-2.5 border border-outline-variant rounded-md text-sm font-medium text-muted hover:text-foreground hover:bg-surface-container transition">
+	        Cancel
+	      </button>
+	
+	      <button type="button"
+	        id="cashierReimbursedSubmitBtn"
+	        onclick="submitCashierShiftReimbursement()"
+	        class="px-5 py-2.5 bg-primary text-on-primary rounded-md text-sm font-semibold hover:opacity-90 transition">
+	        Confirm Reimbursement
+	      </button>
+	    </div>
+	  </div>
+	</div>
+	<!-- EXPENSED MODAL -->
+	<div id="cashierShiftExpensedModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            receipt_long
+	          </span>
+	        </div>
+	
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Expense Cash Shortage
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Record cashier shift cash shortage as a company expense
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeCashierShiftExpensedModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition"
+	        aria-label="Close expense">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- SHIFT INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Shift Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Cashier identity, branch, and shift period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Cashier Name</label>
+	            <div id="cashierExpensedCashierName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Branch</label>
+	            <div id="cashierExpensedBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Shift ID</label>
+	            <div id="cashierExpensedShiftId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Opened At</label>
+	            <div id="cashierExpensedOpenedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Closed At</label>
+	            <div id="cashierExpensedClosedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- CASH SHORTAGE -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Cash Shortage
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Cash difference recorded during shift closing
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Expected Cash</span>
+	            <span id="cashierExpensedExpectedCash"
+	              class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Actual Cash</span>
+	            <span id="cashierExpensedActualCash"
+	              class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-4">
+	            <span class="text-sm font-semibold text-foreground">Cash Difference</span>
+	            <span id="cashierExpensedDifference"
+	              class="text-lg font-semibold text-foreground">Rp0</span>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- EXPENSE INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Expense Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Record the cash shortage recognized as a company expense
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Expense Amount
+	            </label>
+	            <div id="cashierExpensedAmount"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              Rp0
+	            </div>
+	            <p class="text-xs text-muted mt-1">
+	              Automatically follows the cash difference
+	            </p>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Processed By
+	            </label>
+	            <div id="cashierExpensedProcessedBy"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              -
+	            </div>
+	            <p class="text-xs text-muted mt-1">
+	              Automatically identified from the logged-in account
+	            </p>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">
+	              Expense Date
+	            </label>
+	            <div id="cashierExpensedDate"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+	              -
+	            </div>
+	          </div>
+	        </div>
+	
+	        <div class="mt-4">
+	          <label class="block text-xs text-muted mb-2">
+	            Notes
+	          </label>
+	          <textarea id="cashierExpensedNote"
+	            rows="3"
+	            placeholder="Enter expense notes..."
+	            class="w-full px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground placeholder:text-muted focus:outline-none focus:border-primary resize-y"></textarea>
+	        </div>
+	      </section>
+	      <!-- ACCOUNTING INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Accounting Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Accounting treatment for the cash shortage
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Debit</span>
+	            <span class="font-medium text-foreground">Cash Shortage Expense</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Credit</span>
+	            <span class="font-medium text-foreground">Cash</span>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- ADJUSTMENT STATUS -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Adjustment Status
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Current cash adjustment status
+	          </p>
+	        </div>
+	
+	        <div class="flex justify-between items-center px-4 py-3 border border-outline-variant rounded-md">
+	          <span class="text-sm text-muted">Current Status</span>
+	          <span id="cashierExpensedCurrentStatus"
+	            class="text-sm font-semibold text-foreground">PENDING</span>
+	        </div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex flex-col-reverse sm:flex-row justify-end gap-3 shrink-0">
+	      <button type="button"
+	        onclick="closeCashierShiftExpensedModal()"
+	        class="px-5 py-2.5 border border-outline-variant rounded-md text-sm font-medium text-muted hover:text-foreground hover:bg-surface-container transition">
+	        Cancel
+	      </button>
+	
+	      <button type="button"
+	        id="cashierExpensedSubmitBtn"
+	        onclick="submitCashierShiftExpensed()"
+	        class="px-5 py-2.5 bg-primary text-on-primary rounded-md text-sm font-semibold hover:opacity-90 transition">
+	        Confirm Expense
+	      </button>
+	    </div>
+	  </div>
 	</div>
 </template>
 
