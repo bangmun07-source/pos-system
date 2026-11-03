@@ -44543,7 +44543,7 @@ function toggleCashierShiftMenu(shiftId) {
 	const hasAdjustment = Number(shift.cash_difference || 0) !== 0;
 	const menu = document.createElement('div');
 
-	menu.className = ` cashier-shift-action-menu absolute right-2 top-full mt-1 z-50 w-52 rounded-md bg-background border border-white/10 shadow-xl p-1.5 text-left `;
+	menu.className = ` cashier-shift-action-menu fixed z-[9999] w-52 rounded-md bg-background border border-outline-variant shadow-xl p-1.5 text-left `;
 	const actions = [
 		{
 			label: 'View Details',
@@ -44591,13 +44591,29 @@ function toggleCashierShiftMenu(shiftId) {
 				<span class="flex-1">
 					<span class="block font-medium">${item.label}</span>
 					${item.subtitle
-						? `<span class="block text-xs text-gray-400">${item.subtitle}</span>`
+						? `<span class="block text-xs text-on-surface-variant">${item.subtitle}</span>`
 						: ''}
 				</span>
 			</button>
 		`).join('');
 
-	row.querySelector('td:last-child').appendChild(menu);
+	document.body.appendChild(menu);
+
+	const rect = button.getBoundingClientRect();
+	const menuHeight = menu.offsetHeight;
+	const spaceBelow = window.innerHeight - rect.bottom;
+	const margin = 12;
+	
+	let top;
+	
+	if (spaceBelow >= menuHeight + margin) { top = rect.bottom + 4;
+	} else { top = rect.top - menuHeight - 4; }
+	
+	// Batasi agar menu tidak keluar dari layar
+	top = Math.max( margin, Math.min(top, window.innerHeight - menuHeight - margin) );
+	
+	menu.style.top = `${top}px`;
+	menu.style.left = `${Math.max( margin, Math.min(rect.right - 208, window.innerWidth - 220) )}px`;
 
     // Tutup saat klik di luar menu
 	setTimeout(() => {
