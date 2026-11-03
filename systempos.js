@@ -44533,7 +44533,7 @@ function toggleCashierShiftMenu(shiftId) {
 	if (!button) return;
 
 	const row = button.closest('tr');
-	const shift = window.cashierShiftHistoryRows?.find( item => String(item.id) === String(shiftId) );
+	const shift = cashierShiftHistoryState.rows.find( item => String(item.id) === String(shiftId) );
 
 	if (!row || !shift) return;
 
