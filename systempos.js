@@ -44652,157 +44652,194 @@ function handleCashierShiftAction(action, shiftId) {
 
 // CASHIER SHIFT DETAILS MODAL
 function openCashierShiftDetailsModal(shiftId) {
-    const modal = document.getElementById('cashierShiftDetailsModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftDetailsModal');
+	if (!modal) return;
 
-    const shift = cashierShiftHistoryState.rows.find( item => String(item.id) === String(shiftId) );
-    if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
+	const shift = cashierShiftHistoryState.rows.find( item => String(item.id) === String(shiftId) );
+	if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
+	// Tutup popup lain
+	closeCashierShiftAdjustmentsModal();
+	// SHIFT INFORMATION
+	setShiftText('cashierShiftDetailCashierName', shift.cashier_name || '-');
+	setShiftText('cashierShiftDetailBranch', shift.branch_name || '-');
+	setShiftText('cashierShiftDetailStatus', shift.status || '-');
+	setShiftText('cashierShiftDetailShiftId', shift.id || '-');
+	setShiftText( 'cashierShiftDetailOpenedAt', formatShiftDate(shift.opened_at));
+	setShiftText('cashierShiftDetailClosedAt', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
+	// DURASI SHIFT
+	let duration = '-';
 
-    // Tutup popup lain
-    closeCashierShiftAdjustmentsModal();
-    // SHIFT INFORMATION
-    setShiftText('cashierShiftDetailCashierName', shift.cashier_name || '-');
-    setShiftText('cashierShiftDetailBranch', shift.branch_name || '-');
-    setShiftText('cashierShiftDetailStatus', shift.status || '-');
-    setShiftText('cashierShiftDetailShiftId', shift.id || '-');
-    setShiftText( 'cashierShiftDetailOpenedAt', formatShiftDate(shift.opened_at));
-    setShiftText('cashierShiftDetailClosedAt', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
+	if (shift.opened_at && shift.closed_at) {
+		const start = new Date(shift.opened_at);
+		const end = new Date(shift.closed_at);
+		const diffMinutes = Math.max(0, Math.floor((end - start) / 60000));
+		const hours = Math.floor(diffMinutes / 60);
+		const minutes = diffMinutes % 60;
 
-    // DURASI SHIFT
-    let duration = '-';
+		duration = `${hours} jam ${minutes} menit`;
+	}
 
-    if (shift.opened_at && shift.closed_at) {
-        const start = new Date(shift.opened_at);
-        const end = new Date(shift.closed_at);
-        const diffMinutes = Math.max(0, Math.floor((end - start) / 60000));
-        const hours = Math.floor(diffMinutes / 60);
-        const minutes = diffMinutes % 60;
+	setShiftText('cashierShiftDetailDuration', duration);
+	setShiftText('cashierShiftDetailTotalSales', formatShiftCurrency(shift.total_sales));
+	setShiftText('cashierShiftDetailPaymentCash', formatShiftCurrency(shift.cash_sales));
+	setShiftText('cashierShiftDetailPaymentQris', formatShiftCurrency(shift.qris_sales));
+	setShiftText('cashierShiftDetailPaymentBank', formatShiftCurrency(shift.bank_sales));
+	setShiftText('cashierShiftDetailOpeningCash', formatShiftCurrency(shift.opening_cash));
+	setShiftText('cashierShiftDetailCashSales', formatShiftCurrency(shift.cash_sales));
 
-        duration = `${hours} jam ${minutes} menit`;
-    }
+	const cashExpenses = Number(shift.cash_expenses || 0);
+	setShiftText( 'cashierShiftDetailCashExpenses', `-Rp${cashExpenses.toLocaleString('id-ID')}`);
+	setShiftText('cashierShiftDetailExpectedCash', formatShiftCurrency(shift.expected_cash));
+	setShiftText('cashierShiftDetailActualCash', formatShiftCurrency(shift.actual_cash));
 
-    setShiftText('cashierShiftDetailDuration', duration);
-    setShiftText('cashierShiftDetailTotalSales', formatShiftCurrency(shift.total_sales));
-		setShiftText('cashierShiftDetailPaymentCash', formatShiftCurrency(shift.cash_sales));
-		setShiftText('cashierShiftDetailPaymentQris', formatShiftCurrency(shift.qris_sales));
-		setShiftText('cashierShiftDetailPaymentBank', formatShiftCurrency(shift.bank_sales));
-    setShiftText('cashierShiftDetailOpeningCash', formatShiftCurrency(shift.opening_cash));
-		setShiftText('cashierShiftDetailCashSales', formatShiftCurrency(shift.cash_sales));
-	
-		const cashExpenses = Number(shift.cash_expenses || 0);
-		setShiftText( 'cashierShiftDetailCashExpenses', `-Rp${cashExpenses.toLocaleString('id-ID')}`);
-	
-    setShiftText('cashierShiftDetailExpectedCash', formatShiftCurrency(shift.expected_cash));
-    setShiftText('cashierShiftDetailActualCash', formatShiftCurrency(shift.actual_cash));
+	const difference = Number(shift.cash_difference || 0);
+	const differenceText = difference < 0
+		? `-Rp${Math.abs(difference).toLocaleString('id-ID')}`
+		: `Rp${difference.toLocaleString('id-ID')}`;
 
-    const difference = Number(shift.cash_difference || 0);
-    const differenceText = difference < 0
-			? `-Rp${Math.abs(difference).toLocaleString('id-ID')}`
-			: `Rp${difference.toLocaleString('id-ID')}`;
+	setShiftText( 'cashierShiftDetailCashDifference', differenceText);
+	setShiftText('cashierShiftDetailAdjustmentStatus', shift.adjustment_status || 'PENDING');
+	setShiftText('cashierShiftDetailClosingNote', shift.closing_note || '-');
+	// TAMPILKAN POPUP
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
 
-    setShiftText( 'cashierShiftDetailCashDifference', differenceText);
-    setShiftText('cashierShiftDetailAdjustmentStatus', shift.adjustment_status || 'PENDING');
-    setShiftText('cashierShiftDetailClosingNote', shift.closing_note || '-');
-    // TAMPILKAN POPUP
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-
-    document.body.classList.add('overflow-hidden');
+	document.body.classList.add('overflow-hidden');
 }
 
 function closeCashierShiftDetailsModal() {
-    const modal = document.getElementById('cashierShiftDetailsModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftDetailsModal');
+	if (!modal) return;
 
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+	modal.classList.add('hidden');
+	modal.classList.remove('flex');
 
-    document.body.classList.remove('overflow-hidden');
+	document.body.classList.remove('overflow-hidden');
 }
 
 // CASHIER SHIFT ADJUSTMENTS MODAL
 function openCashierShiftAdjustmentsModal(shiftId) {
-    const modal = document.getElementById('cashierShiftAdjustmentsModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftAdjustmentsModal');
+	if (!modal) return;
 
-    // Tutup popup lain terlebih dahulu
-    closeCashierShiftDetailsModal();
+	// Tutup popup lain terlebih dahulu
+	closeCashierShiftDetailsModal();
 
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
 
-    document.body.classList.add('overflow-hidden');
+	document.body.classList.add('overflow-hidden');
 }
 
 function closeCashierShiftAdjustmentsModal() {
-    const modal = document.getElementById('cashierShiftAdjustmentsModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftAdjustmentsModal');
+	if (!modal) return;
 
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+	modal.classList.add('hidden');
+	modal.classList.remove('flex');
 
-    document.body.classList.remove('overflow-hidden');
+	document.body.classList.remove('overflow-hidden');
 }
 
 // CASHIER SHIFT REIMBURSED MODAL
 let currentReimbursedShiftId = null;
 
 function openCashierShiftReimbursedModal(shiftId) {
-    const modal = document.getElementById('cashierShiftReimbursedModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftReimbursedModal');
+	if (!modal) return;
 
-    const shift = cashierShiftHistoryState.rows.find(item => String(item.id) === String(shiftId));
-    if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
+	const shift = cashierShiftHistoryState.rows.find(item => String(item.id) === String(shiftId));
+	if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
 
-    // Hanya shift CLOSED dengan selisih kas kurang dan status PENDING
-    const difference = Number(shift.cash_difference || 0);
+	// Hanya shift CLOSED dengan selisih kas kurang dan status PENDING
+	const difference = Number(shift.cash_difference || 0);
 
-    if ( shift.status !== 'CLOSED' || difference >= 0 || (shift.adjustment_status || 'PENDING') !== 'PENDING'
-    ) { console.warn('Shift tidak memenuhi syarat reimbursement.'); return; }
+	if ( shift.status !== 'CLOSED' || difference >= 0 || (shift.adjustment_status || 'PENDING') !== 'PENDING'
+	) { console.warn('Shift tidak memenuhi syarat reimbursement.'); return; }
 
-    currentReimbursedShiftId = shift.id;
+	currentReimbursedShiftId = shift.id;
 
-    // Tutup popup lain
-    closeCashierShiftDetailsModal();
-    closeCashierShiftAdjustmentsModal();
-    closeCashierShiftExpensedModal();
+	// Tutup popup lain
+	closeCashierShiftDetailsModal();
+	closeCashierShiftAdjustmentsModal();
+	closeCashierShiftExpensedModal();
 
-    // SHIFT INFORMATION
-    setShiftText('cashierReimbursedCashierName', shift.cashier_name || '-');
-    setShiftText('cashierReimbursedBranch', shift.branch_name || '-');
-    setShiftText('cashierReimbursedShiftId', shift.id || '-');
-    setShiftText('cashierReimbursedOpenedAt', formatShiftDate(shift.opened_at));
-    setShiftText('cashierReimbursedClosedAt', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
-    setShiftText('cashierReimbursedExpectedCash', formatShiftCurrency(shift.expected_cash));
-    setShiftText('cashierReimbursedActualCash', formatShiftCurrency(shift.actual_cash));
-    setShiftText('cashierReimbursedDifference', `-Rp${Math.abs(difference).toLocaleString('id-ID')}`);
-    setShiftText('cashierReimbursedAmount', `Rp${Math.abs(difference).toLocaleString('id-ID')}`);
-    setShiftText('cashierReimbursedCurrentStatus', shift.adjustment_status || 'PENDING');
-    setShiftText('cashierReimbursedDate', formatShiftDate(new Date().toISOString()));
+	// SHIFT INFORMATION
+	setShiftText('cashierReimbursedCashierName', shift.cashier_name || '-');
+	setShiftText('cashierReimbursedBranch', shift.branch_name || '-');
+	setShiftText('cashierReimbursedShiftId', shift.id || '-');
+	setShiftText('cashierReimbursedOpenedAt', formatShiftDate(shift.opened_at));
+	setShiftText('cashierReimbursedClosedAt', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
+	setShiftText('cashierReimbursedExpectedCash', formatShiftCurrency(shift.expected_cash));
+	setShiftText('cashierReimbursedActualCash', formatShiftCurrency(shift.actual_cash));
+	setShiftText('cashierReimbursedDifference', `-Rp${Math.abs(difference).toLocaleString('id-ID')}`);
+	setShiftText('cashierReimbursedAmount', `Rp${Math.abs(difference).toLocaleString('id-ID')}`);
+	setShiftText('cashierReimbursedCurrentStatus', shift.adjustment_status || 'PENDING');
+	setShiftText('cashierReimbursedDate', formatShiftDate(new Date().toISOString()));
 
-    // Reset input
-    const responsible = document.getElementById( 'cashierReimbursedResponsible' );
-    if (responsible) responsible.value = '';
+	// Reset input
+	const responsible = document.getElementById( 'cashierReimbursedResponsible' );
+	if (responsible) responsible.value = '';
 
-    const note = document.getElementById('cashierReimbursedNote');
-    if (note) note.value = '';
-    // Belum dihubungkan ke data akun login
-    setShiftText('cashierReimbursedProcessedBy', '-');
-    // Tampilkan popup
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.body.classList.add('overflow-hidden');
+	const note = document.getElementById('cashierReimbursedNote');
+	if (note) note.value = '';
+	// Belum dihubungkan ke data akun login
+	setShiftText('cashierReimbursedProcessedBy', '-');
+	// Tampilkan popup
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
+	document.body.classList.add('overflow-hidden');
+}
+
+async function loadCashierReimbursedEmployees(shiftId) {
+	const select = document.getElementById( 'cashierReimbursedResponsible' );
+	if (!select) return;
+
+	select.innerHTML = ` <option value="">Loading employees...</option> `;
+	select.disabled = true;
+
+	try {
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_cashier_shift_responsible_employees',
+				{
+					p_session_id: currentSessionId,
+					p_shift_id: shiftId
+				}
+			);
+
+		if (error) throw error;
+
+		const employees = data?.employees || [];
+
+		select.innerHTML = ` <option value="">Select responsible person</option> `;
+		employees.forEach(employee => {
+			const option = document.createElement('option');
+
+				option.value = employee.employee_id;
+				option.textContent = employee.position
+					? `${employee.full_name} — ${employee.position}`
+					: employee.full_name;
+				select.appendChild(option);
+		});
+
+		if (employees.length === 0) { select.innerHTML = ` <option value="">No active employees in this branch</option> `; }
+
+	} catch (error) {
+			console.error('Gagal memuat karyawan:', error);
+			select.innerHTML = ` <option value="">Failed to load employees</option> `;
+	} finally { select.disabled = false; }
 }
 
 function closeCashierShiftReimbursedModal() {
-    const modal = document.getElementById('cashierShiftReimbursedModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftReimbursedModal');
+	if (!modal) return;
 
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    document.body.classList.remove('overflow-hidden');
+	modal.classList.add('hidden');
+	modal.classList.remove('flex');
+	document.body.classList.remove('overflow-hidden');
 
-    currentReimbursedShiftId = null;
+	currentReimbursedShiftId = null;
 }
 
 // CASHIER SHIFT EXPENSED MODAL
