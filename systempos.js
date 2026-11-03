@@ -711,6 +711,17 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+// ESCAPE HTML UNTUK DATA DARI DATABASE
+function escapeHTML(value) {
+	return String(value ?? '').replace(/[&<>"']/g, char => ({
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;'
+	})[char]);
+}
 	
 let clockInterval;
 function startClock() {
@@ -36173,15 +36184,6 @@ function formatScheduleDate(date) {
   );
 }
 
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
 function updateSchedulePaginationInfo(from, to, total) {
   const info = document.getElementById('schedulePaginationInfo');
 
@@ -44717,18 +44719,122 @@ function closeCashierShiftDetailsModal() {
 	document.body.classList.remove('overflow-hidden');
 }
 
+
 // CASHIER SHIFT ADJUSTMENTS MODAL
-function openCashierShiftAdjustmentsModal(shiftId) {
+
+let currentAdjustmentShiftId = null;
+
+async function openCashierShiftAdjustmentsModal(shiftId) {
 	const modal = document.getElementById('cashierShiftAdjustmentsModal');
-	if (!modal) return;
+	const historyBody = document.getElementById('cashierAdjustmentHistoryBody');
 
-	// Tutup popup lain terlebih dahulu
+	if (!modal || !historyBody) return;
+
+	const shift = cashierShiftHistoryState.rows.find( item => String(item.id) === String(shiftId) );
+	if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
+
+	const sessionId = localStorage.getItem('pos_session_id');
+	if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
+
+	currentAdjustmentShiftId = shift.id;
+
+	// Tutup popup lain
 	closeCashierShiftDetailsModal();
+	closeCashierShiftReimbursedModal();
+	closeCashierShiftExpensedModal();
 
+	// SHIFT INFORMATION
+	setShiftText('cashierAdjustmentShiftId', shift.id || '-');
+	setShiftText('cashierAdjustmentCashierName', shift.cashier_name || '-');
+	setShiftText('cashierAdjustmentBranch', shift.branch_name || '-');
+	setShiftText('cashierAdjustmentShiftDate', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
+
+	// ADJUSTMENT SUMMARY
+	const difference = Number(shift.cash_difference || 0);
+	const differenceText = difference < 0
+		? `-Rp${Math.abs(difference).toLocaleString('id-ID')}`
+		: `Rp${difference.toLocaleString('id-ID')}`;
+
+	setShiftText('cashierAdjustmentDifference', differenceText);
+	setShiftText('cashierAdjustmentStatus', shift.adjustment_status || 'PENDING');
+	setShiftText('cashierAdjustmentType', latest.adjustment_type || '-');
+	setShiftText('cashierAdjustmentLatestNote', latest.note || '-');
+
+	// LOADING HISTORY
+	historyBody.innerHTML = `
+		<tr>
+			<td colspan="4" class="px-4 py-8 text-center text-sm text-muted">
+				Loading adjustment history...
+			</td>
+		</tr>
+	`;
+	// TAMPILKAN POPUP
 	modal.classList.remove('hidden');
 	modal.classList.add('flex');
-
 	document.body.classList.add('overflow-hidden');
+
+	try {
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_cashier_shift_adjustments',
+				{
+					p_session_id: sessionId,
+					p_shift_id: shift.id
+				}
+			);
+
+		if (error) throw error;
+
+		const adjustments = data?.adjustments || [];
+		if (adjustments.length === 0) {
+			historyBody.innerHTML = `
+				<tr>
+					<td colspan="4" class="px-4 py-8 text-center text-sm text-muted">
+						No adjustment history available.
+					</td>
+				</tr>
+			`;
+			return;
+		}
+		// DATA ADJUSTMENT TERBARU
+		const latest = adjustments[0];
+
+		setShiftText( 'cashierAdjustmentType', latest.adjustment_type || '-' );
+		setShiftText( 'cashierAdjustmentLatestNote', latest.note || '-' );
+
+		// RENDER HISTORY
+		historyBody.innerHTML = adjustments.map(item => {
+			const date = item.created_at
+				? formatShiftDate(item.created_at)
+				: '-';
+			const amount = Number(item.amount || 0);
+			const actionLabel = item.adjustment_type === 'REIMBURSED'
+				? 'Reimbursed'
+				: item.adjustment_type === 'EXPENSED'
+					? 'Expensed'
+					: item.adjustment_type || '-';
+
+			return `
+				<tr>
+					<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(date)} </td>
+					<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(actionLabel)} </td>
+					<td class="px-4 py-3 text-foreground"> ${escapeHTML(item.processed_by_name || '-')} </td>
+					<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${formatShiftCurrency(amount)} </td>
+				</tr>
+			`;
+		}).join('');
+
+	} catch (error) {
+		console.error('Gagal memuat adjustment history:', error);
+	
+		historyBody.innerHTML = `
+			<tr>
+				<td colspan="4" class="px-4 py-8 text-center text-sm text-red-400">
+					Failed to load adjustment history.
+				</td>
+			</tr>
+		`;
+	}
 }
 
 function closeCashierShiftAdjustmentsModal() {
@@ -44739,6 +44845,8 @@ function closeCashierShiftAdjustmentsModal() {
 	modal.classList.remove('flex');
 
 	document.body.classList.remove('overflow-hidden');
+
+	currentAdjustmentShiftId = null;
 }
 
 // CASHIER SHIFT REIMBURSED MODAL
