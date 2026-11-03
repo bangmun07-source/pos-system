@@ -44745,17 +44745,52 @@ function closeCashierShiftAdjustmentsModal() {
 }
 
 // CASHIER SHIFT REIMBURSED MODAL
+let currentReimbursedShiftId = null;
+
 function openCashierShiftReimbursedModal(shiftId) {
     const modal = document.getElementById('cashierShiftReimbursedModal');
     if (!modal) return;
 
+    const shift = cashierShiftHistoryState.rows.find(item => String(item.id) === String(shiftId));
+    if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
+
+    // Hanya shift CLOSED dengan selisih kas kurang dan status PENDING
+    const difference = Number(shift.cash_difference || 0);
+
+    if ( shift.status !== 'CLOSED' || difference >= 0 || (shift.adjustment_status || 'PENDING') !== 'PENDING'
+    ) { console.warn('Shift tidak memenuhi syarat reimbursement.'); return; }
+
+    currentReimbursedShiftId = shift.id;
+
+    // Tutup popup lain
     closeCashierShiftDetailsModal();
     closeCashierShiftAdjustmentsModal();
     closeCashierShiftExpensedModal();
 
+    // SHIFT INFORMATION
+    setShiftText('cashierReimbursedCashierName', shift.cashier_name || '-');
+    setShiftText('cashierReimbursedBranch', shift.branch_name || '-');
+    setShiftText('cashierReimbursedShiftId', shift.id || '-');
+    setShiftText('cashierReimbursedOpenedAt', formatShiftDate(shift.opened_at));
+    setShiftText('cashierReimbursedClosedAt', shift.closed_at ? formatShiftDate(shift.closed_at) : '-');
+    setShiftText('cashierReimbursedExpectedCash', formatShiftCurrency(shift.expected_cash));
+    setShiftText('cashierReimbursedActualCash', formatShiftCurrency(shift.actual_cash));
+    setShiftText('cashierReimbursedDifference', `-Rp${Math.abs(difference).toLocaleString('id-ID')}`);
+    setShiftText('cashierReimbursedAmount', `Rp${Math.abs(difference).toLocaleString('id-ID')}`);
+    setShiftText('cashierReimbursedCurrentStatus', shift.adjustment_status || 'PENDING');
+    setShiftText('cashierReimbursedDate', formatShiftDate(new Date().toISOString()));
+
+    // Reset input
+    const responsible = document.getElementById( 'cashierReimbursedResponsible' );
+    if (responsible) responsible.value = '';
+
+    const note = document.getElementById('cashierReimbursedNote');
+    if (note) note.value = '';
+    // Belum dihubungkan ke data akun login
+    setShiftText('cashierReimbursedProcessedBy', '-');
+    // Tampilkan popup
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-
     document.body.classList.add('overflow-hidden');
 }
 
@@ -44765,8 +44800,9 @@ function closeCashierShiftReimbursedModal() {
 
     modal.classList.add('hidden');
     modal.classList.remove('flex');
-
     document.body.classList.remove('overflow-hidden');
+
+    currentReimbursedShiftId = null;
 }
 
 // CASHIER SHIFT EXPENSED MODAL
