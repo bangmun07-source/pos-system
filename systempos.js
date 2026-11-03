@@ -44683,6 +44683,9 @@ function openCashierShiftDetailsModal(shiftId) {
 
     setShiftText('cashierShiftDetailDuration', duration);
     setShiftText('cashierShiftDetailTotalSales', formatShiftCurrency(shift.total_sales));
+		setShiftText('cashierShiftDetailPaymentCash', formatShiftCurrency(shift.cash_sales));
+		setShiftText('cashierShiftDetailPaymentQris', formatShiftCurrency(shift.qris_sales));
+		setShiftText('cashierShiftDetailPaymentBank', formatShiftCurrency(shift.bank_sales));
     setShiftText('cashierShiftDetailOpeningCash', formatShiftCurrency(shift.opening_cash));
 		setShiftText('cashierShiftDetailCashSales', formatShiftCurrency(shift.cash_sales));
 	
