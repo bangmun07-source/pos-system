@@ -44792,7 +44792,7 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 		if (adjustments.length === 0) {
 			historyBody.innerHTML = `
 				<tr>
-					<td colspan="4" class="px-4 py-8 text-center text-sm text-muted">
+					<td colspan="5" class="px-4 py-8 text-center text-sm text-muted">
 						No adjustment history available.
 					</td>
 				</tr>
@@ -44821,6 +44821,7 @@ async function openCashierShiftAdjustmentsModal(shiftId) {
 					<tr>
 						<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(date)} </td>
 						<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${escapeHTML(actionLabel)} </td>
+						<td class="px-4 py-3 text-foreground"> ${escapeHTML(item.responsible_employee_name || '-')} </td>
 						<td class="px-4 py-3 text-foreground"> ${escapeHTML(item.processed_by_name || '-')} </td>
 						<td class="px-4 py-3 text-foreground whitespace-nowrap"> ${formatShiftCurrency(amount)} </td>
 					</tr>
