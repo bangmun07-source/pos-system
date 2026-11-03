@@ -30361,6 +30361,412 @@
       </section>
     </main>
   </div>
+	<!-- VIEW DETAIL -->
+	<div id="cashierShiftDetailsModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">
+	            point_of_sale
+	          </span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Cashier Shift Details
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Detailed cashier shift information and reconciliation
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeCashierShiftDetailsModal()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition"
+	        aria-label="Close detail">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- SHIFT INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Shift Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Cashier identity, outlet, and shift period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Cashier Name</label>
+	            <div id="cashierShiftDetailCashierName"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Branch</label>
+	            <div id="cashierShiftDetailBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Shift Status</label>
+	            <div id="cashierShiftDetailStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Opened At</label>
+	            <div id="cashierShiftDetailOpenedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Closed At</label>
+	            <div id="cashierShiftDetailClosedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Duration</label>
+	            <div id="cashierShiftDetailDuration"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Shift ID</label>
+	            <div id="cashierShiftDetailShiftId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- SALES SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Sales Summary
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Sales performance and transaction summary during this shift
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3">
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Total Sales</p>
+	            <p id="cashierShiftDetailTotalSales"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Total Transactions</p>
+	            <p id="cashierShiftDetailTotalTransactions"
+	              class="text-xl font-semibold text-foreground mt-2">0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Subtotal</p>
+	            <p id="cashierShiftDetailSubtotal"
+	              class="text-lg font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Discount</p>
+	            <p id="cashierShiftDetailDiscount"
+	              class="text-lg font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Tax</p>
+	            <p id="cashierShiftDetailTax"
+	              class="text-lg font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Service</p>
+	            <p id="cashierShiftDetailService"
+	              class="text-lg font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- PAYMENT BREAKDOWN -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Payment Breakdown
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Sales grouped by payment method
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Cash</span>
+	            <span id="cashierShiftDetailPaymentCash" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">QRIS</span>
+	            <span id="cashierShiftDetailPaymentQris" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Bank Transfer</span>
+	            <span id="cashierShiftDetailPaymentBank" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Other Payments</span>
+	            <span id="cashierShiftDetailPaymentOther" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- CASH RECONCILIATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Cash Reconciliation
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Comparison between expected and actual cash
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md divide-y divide-outline-variant">
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Opening Cash</span>
+	            <span id="cashierShiftDetailOpeningCash" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Cash Sales</span>
+	            <span id="cashierShiftDetailCashSales" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Expected Cash</span>
+	            <span id="cashierShiftDetailExpectedCash" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-3 text-sm">
+	            <span class="text-muted">Actual Cash</span>
+	            <span id="cashierShiftDetailActualCash" class="font-medium text-foreground">Rp0</span>
+	          </div>
+	
+	          <div class="flex justify-between items-center px-4 py-4">
+	            <span class="text-sm font-semibold text-foreground">Cash Difference</span>
+	            <span id="cashierShiftDetailCashDifference"
+	              class="text-lg font-semibold text-foreground">Rp0</span>
+	          </div>
+	        </div>
+	
+	        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Adjustment Status</label>
+	            <div id="cashierShiftDetailAdjustmentStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- SHIFT NOTES -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Shift Notes
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Additional information recorded during shift opening and closing
+	          </p>
+	        </div>
+	
+	        <div class="space-y-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Opening Note</label>
+	            <div id="cashierShiftDetailOpeningNote"
+	              class="min-h-16 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Closing Note</label>
+	            <div id="cashierShiftDetailClosingNote"
+	              class="min-h-16 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end shrink-0">
+	      <button type="button"
+	        onclick="closeCashierShiftDetailsModal()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	    </div>
+	  </div>
+	</div>
+	<!-- VIEW ADJUSTMENTS -->
+	<div id="cashierShiftAdjustmentsModal"
+		 class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+		<div class="w-full max-w-4xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-2xl overflow-hidden flex flex-col">
+			<!-- HEADER -->
+			<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
+				<div>
+					<h2 class="text-lg font-semibold text-foreground">Cash Adjustments</h2>
+					<p class="text-sm text-muted mt-1">
+						Adjustment details and transaction history
+					</p>
+				</div>
+	
+				<button type="button"
+					onclick="closeCashierShiftAdjustmentsModal()"
+					class="p-2 hover:text-foreground text-muted">
+					<span class="material-symbols-outlined">close</span>
+				</button>
+			</div>
+			<!-- CONTENT -->
+			<div class="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-6">
+				<!-- SHIFT INFORMATION -->
+				<section>
+					<h3 class="text-sm font-semibold text-foreground mb-3">
+						Shift Information
+					</h3>
+	
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div class="p-4 rounded-md border border-outline-variant bg-surface">
+							<p class="text-xs text-muted mb-1">Shift ID</p>
+							<p id="cashierAdjustmentShiftId"
+								class="text-sm font-medium text-foreground">-</p>
+						</div>
+	
+						<div class="p-4 rounded-md border border-outline-variant bg-surface">
+							<p class="text-xs text-muted mb-1">Cashier</p>
+							<p id="cashierAdjustmentCashierName"
+								 class="text-sm font-medium text-foreground">-</p>
+						</div>
+	
+						<div class="p-4 rounded-md border border-outline-variant bg-surface">
+							<p class="text-xs text-muted mb-1">Branch</p>
+							<p id="cashierAdjustmentBranch"
+								 class="text-sm font-medium text-foreground">-</p>
+						</div>
+	
+						<div class="p-4 rounded-md border border-outline-variant bg-surface">
+							<p class="text-xs text-muted mb-1">Shift Date</p>
+							<p id="cashierAdjustmentShiftDate"
+								 class="text-sm font-medium text-foreground">-</p>
+						</div>
+					</div>
+				</section>
+				<!-- ADJUSTMENT SUMMARY -->
+				<section>
+					<h3 class="text-sm font-semibold text-foreground mb-3">
+						Adjustment Summary
+					</h3>
+					
+					<div class="rounded-md border border-outline-variant p-5 space-y-4">
+						<div class="flex items-center justify-between gap-4">
+							<span class="text-sm text-muted">Cash Difference</span>
+							<span id="cashierAdjustmentDifference"
+								class="text-lg font-semibold text-foreground">Rp0</span>
+						</div>
+	
+						<div class="flex items-center justify-between gap-4">
+							<span class="text-sm text-muted">Adjustment Type</span>
+							<span id="cashierAdjustmentType"
+								class="text-sm font-medium text-foreground">-</span>
+						</div>
+	
+						<div class="flex items-center justify-between gap-4">
+							<span class="text-sm text-muted">Current Status</span>
+							<span id="cashierAdjustmentStatus"
+								class="text-sm font-medium text-foreground">-</span>
+						</div>
+	
+						<div class="border-t border-outline-variant pt-3">
+								<p class="text-xs text-muted mb-1">Latest Note</p>
+								<p id="cashierAdjustmentLatestNote"
+									 class="text-sm text-foreground">-</p>
+						</div>
+					</div>
+				</section>
+				<!-- ADJUSTMENT HISTORY -->
+				<section>
+					<div class="flex items-center justify-between mb-3">
+						<div>
+							<h3 class="text-sm font-semibold text-foreground">
+								Adjustment History
+							</h3>
+							<p class="text-xs text-muted mt-1">
+								Record of all adjustment status changes
+							</p>
+						</div>
+					</div>
+	
+					<div class="border border-outline-variant rounded-md overflow-hidden">
+						<div class="overflow-x-auto">
+							<table class="w-full text-sm text-left">
+								<thead class="bg-surface text-muted">
+									<tr>
+										<th class="px-4 py-3 font-medium whitespace-nowrap">Date & Time</th>
+										<th class="px-4 py-3 font-medium whitespace-nowrap">Action</th>
+										<th class="px-4 py-3 font-medium whitespace-nowrap">Performed By</th>
+										<th class="px-4 py-3 font-medium whitespace-nowrap">Amount</th>
+										<th class="px-4 py-3 font-medium whitespace-nowrap">Journal Ref</th>
+									</tr>
+								</thead>
+			
+								<tbody id="cashierAdjustmentHistoryBody"
+									class="divide-y divide-outline-variant">
+									<tr>
+										<td colspan="5"
+											class="px-4 py-8 text-center text-sm text-muted">
+											No adjustment history available.
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</section>
+				<!-- SELECTED HISTORY DETAIL -->
+				<section>
+					<h3 class="text-sm font-semibold text-foreground mb-3">
+						Adjustment Notes
+					</h3>
+		
+					<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						<div class="p-4 rounded-md border border-outline-variant bg-surface">
+							<p class="text-xs text-muted mb-2">Reason</p>
+							<p id="cashierAdjustmentReason"
+								 class="text-sm text-foreground whitespace-pre-wrap">-</p>
+						</div>
+		
+						<div class="p-4 rounded-md border border-outline-variant bg-surface">
+							<p class="text-xs text-muted mb-2">Additional Notes</p>
+							<p id="cashierAdjustmentNotes"
+								 class="text-sm text-foreground whitespace-pre-wrap">-</p>
+						</div>
+					</div>
+				</section>
+			</div>
+			<!-- FOOTER -->
+			<div class="px-6 py-4 border-t border-outline-variant flex justify-end">
+				<button type="button"
+					onclick="closeCashierShiftAdjustmentsModal()"
+					class="px-5 py-2.5 rounded-md bg-outline-variant hover:opacity-80 text-foreground text-sm font-medium transition">
+						Close
+				</button>
+			</div>
+		</div>
+	</div>
 </template>
 
 	
