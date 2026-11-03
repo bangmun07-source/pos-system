@@ -44758,11 +44758,12 @@ function openCashierShiftReimbursedModal(shiftId) {
 	) { console.warn('Shift tidak memenuhi syarat reimbursement.'); return; }
 
 	currentReimbursedShiftId = shift.id;
-
 	// Tutup popup lain
 	closeCashierShiftDetailsModal();
 	closeCashierShiftAdjustmentsModal();
 	closeCashierShiftExpensedModal();
+	// Muat daftar karyawan
+	loadCashierReimbursedEmployees(shiftId);
 
 	// SHIFT INFORMATION
 	setShiftText('cashierReimbursedCashierName', shift.cashier_name || '-');
