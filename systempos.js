@@ -44431,13 +44431,13 @@ function renderCashierShiftHistoryTable(rows) {
 	tbody.innerHTML = rows.map(row => {
 		const difference = Number(row.cash_difference || 0);
 		const statusClass = row.status === 'CLOSED'
-			? 'text-emerald-400'
-			: 'text-amber-400';
+			? 'text-emerald-700'
+			: 'text-amber-700';
 		const adjustmentClass = row.adjustment_status === 'DONE'
-			? 'text-emerald-400'
+			? 'text-emerald-700'
 			: row.adjustment_status === 'PENDING'
-				? 'text-red-400'
-				: 'text-amber-400';
+				? 'text-red-700'
+				: 'text-amber-700';
 		return `
 			<tr class="border-b border-outline-variant">
 				<td class="px-4 py-3">
@@ -44445,18 +44445,18 @@ function renderCashierShiftHistoryTable(rows) {
 					<div class="text-xs text-muted"> ${escapeShiftHtml(row.shift_type || '-')} </div>
 				</td>
 				<td class="px-4 py-3"> ${escapeShiftHtml(row.branch_name)} </td>
-				<td class="px-4 py-3 whitespace-nowrap"> ${formatShiftDate(row.opened_at)} </td>
-				<td class="px-4 py-3 whitespace-nowrap"> ${row.closed_at ? formatShiftDate(row.closed_at) : '-'} </td>
+				<td class="px-4 py-3 text-on-surface-variant whitespace-nowrap"> ${formatShiftDate(row.opened_at)} </td>
+				<td class="px-4 py-3 text-on-surface-variant whitespace-nowrap"> ${row.closed_at ? formatShiftDate(row.closed_at) : '-'} </td>
 				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.opening_cash)} </td>
 				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.total_sales)} </td>
-				<td class="px-4 py-3 text-right text-red-400">
+				<td class="px-4 py-3 text-right text-red-700">
 					${Number(row.cash_expenses || 0) > 0
 						? '-' + formatShiftCurrency(row.cash_expenses)
 						: formatShiftCurrency(0)}
 				</td>
 				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.expected_cash)} </td>
 				<td class="px-4 py-3 text-right"> ${formatShiftCurrency(row.actual_cash)} </td>
-				<td class="px-4 py-3 text-right ${difference < 0 ? 'text-red-400' : difference > 0 ? 'text-amber-400' : 'text-emerald-400'}">
+				<td class="px-4 py-3 text-right ${difference < 0 ? 'text-red-700' : difference > 0 ? 'text-amber-700' : 'text-emerald-700'}">
 			    ${difference < 0
 						? `-Rp${Math.abs(difference).toLocaleString('id-ID')}`
 						: `Rp${difference.toLocaleString('id-ID')}`}
@@ -44470,7 +44470,7 @@ function renderCashierShiftHistoryTable(rows) {
 				<td class="px-4 py-3 text-center relative">
 					<button type="button"
 							onclick="toggleCashierShiftMenu('${row.id}')"
-							class="p-1 rounded-md hover:bg-surface-container-high transition-colors"
+							class="p-1 text-on-surface-variant hover:text-on-surface transition-colors"
 							title="More Actions">
 							<span class="material-symbols-outlined">more_vert</span>
 					</button>
