@@ -44685,6 +44685,10 @@ function openCashierShiftDetailsModal(shiftId) {
     setShiftText('cashierShiftDetailTotalSales', formatShiftCurrency(shift.total_sales));
     setShiftText('cashierShiftDetailOpeningCash', formatShiftCurrency(shift.opening_cash));
 		setShiftText('cashierShiftDetailCashSales', formatShiftCurrency(shift.cash_sales));
+	
+		const cashExpenses = Number(shift.cash_expenses || 0);
+		setShiftText( 'cashierShiftDetailCashExpenses', `-Rp${cashExpenses.toLocaleString('id-ID')}`);
+	
     setShiftText('cashierShiftDetailExpectedCash', formatShiftCurrency(shift.expected_cash));
     setShiftText('cashierShiftDetailActualCash', formatShiftCurrency(shift.actual_cash));
 
@@ -44729,6 +44733,56 @@ function openCashierShiftAdjustmentsModal(shiftId) {
 
 function closeCashierShiftAdjustmentsModal() {
     const modal = document.getElementById('cashierShiftAdjustmentsModal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+
+    document.body.classList.remove('overflow-hidden');
+}
+
+// CASHIER SHIFT REIMBURSED MODAL
+function openCashierShiftReimbursedModal(shiftId) {
+    const modal = document.getElementById('cashierShiftReimbursedModal');
+    if (!modal) return;
+
+    closeCashierShiftDetailsModal();
+    closeCashierShiftAdjustmentsModal();
+    closeCashierShiftExpensedModal();
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeCashierShiftReimbursedModal() {
+    const modal = document.getElementById('cashierShiftReimbursedModal');
+    if (!modal) return;
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+
+    document.body.classList.remove('overflow-hidden');
+}
+
+// CASHIER SHIFT EXPENSED MODAL
+function openCashierShiftExpensedModal(shiftId) {
+    const modal = document.getElementById('cashierShiftExpensedModal');
+    if (!modal) return;
+
+    closeCashierShiftDetailsModal();
+    closeCashierShiftAdjustmentsModal();
+    closeCashierShiftReimbursedModal();
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeCashierShiftExpensedModal() {
+    const modal = document.getElementById('cashierShiftExpensedModal');
     if (!modal) return;
 
     modal.classList.add('hidden');
