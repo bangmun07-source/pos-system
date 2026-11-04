@@ -29910,71 +29910,75 @@ async function saveLiabilityPayment() {
 	const sessionId = localStorage.getItem("pos_session_id");
 	const branchId = state.branchId;
 	const liabilityId = document.getElementById("liabilityPaymentId")?.value;
-	const paymentDate = document.getElementById( "liabilityPaymentDate" )?.value;
-	const principal =  Number( document.getElementById( "liabilityPaymentPrincipal" )?.value || 0 );
-	const interest = Number( document.getElementById( "liabilityPaymentInterest" )?.value || 0 );
-	const method = document.getElementById( "liabilityPaymentMethod" )?.value;
-	const referenceNo = document.getElementById( "liabilityPaymentReference" )?.value.trim() || null;
-	const note = document.getElementById( "liabilityPaymentNote" )?.value.trim() || null;
+	const paymentDate = document.getElementById("liabilityPaymentDate")?.value;
+	const principal = Number(document.getElementById("liabilityPaymentPrincipal")?.value || 0);
+	const interest = Number(document.getElementById("liabilityPaymentInterest")?.value || 0);
+	const method = document.getElementById("liabilityPaymentMethod")?.value;
+	const referenceNo = document.getElementById("liabilityPaymentReference")?.value.trim() || null;
+	const note = document.getElementById("liabilityPaymentNote")?.value.trim() || null;
 
-	if (!sessionId) { showAccountingDebtMessage( "Session tidak ditemukan", "error" ); return; }
-	if (!branchId) { showAccountingDebtMessage( "Branch belum tersedia", "error" ); return; }
-	if (!liabilityId) { showAccountingDebtMessage( "Liability tidak ditemukan", "error" ); return; }
-	if (!paymentDate) { showAccountingDebtMessage( "Tanggal pembayaran wajib diisi", "error" ); return; }
-	if (principal <= 0 && interest <= 0) { showAccountingDebtMessage( "Masukkan pokok atau bunga", "error" ); return; }
-	if (principal < 0 || interest < 0) { showAccountingDebtMessage( "Nominal tidak valid", "error" ); return; }
-	
-	const liability = liabilityData.find(
-		x => String(x.liability_id) === String(liabilityId) );
-	
-	if (!liability) { showAccountingDebtMessage( "Data liability tidak ditemukan", "error" ); return; }
-	
-	const outstanding = Number( liability.outstanding_principal || 0 );
-	if (principal > outstanding) { showAccountingDebtMessage( "Pembayaran pokok melebihi outstanding", "error" ); return; }
-	
-	const btn = document.getElementById( "saveLiabilityPaymentBtn" );
-	
-try {
+	if (!sessionId) { showAccountingDebtMessage("Session tidak ditemukan", "error"); return; }
+	if (!branchId) { showAccountingDebtMessage("Branch belum tersedia", "error"); return; }
+	if (!liabilityId) { showAccountingDebtMessage("Liability tidak ditemukan", "error"); return; }
+	if (!paymentDate) { showAccountingDebtMessage("Tanggal pembayaran wajib diisi", "error"); return; }
+	if (principal <= 0 && interest <= 0) { showAccountingDebtMessage("Masukkan pokok atau bunga", "error"); return; }
+	if (principal < 0 || interest < 0) { showAccountingDebtMessage("Nominal tidak valid", "error"); return; }
+
+	const liability = liabilityData.find( x => String(x.liability_id) === String(liabilityId) );
+	if (!liability) { showAccountingDebtMessage("Data liability tidak ditemukan", "error"); return; }
+
+	// Gunakan cabang asli liability, bukan filter ALL milik Owner.
+	const paymentBranchId = liability.branch_id;
+	if (!paymentBranchId || paymentBranchId === "ALL") { showAccountingDebtMessage("Cabang liability tidak valid", "error"); return; }
+
+	const outstanding = Number(liability.outstanding_principal || 0);
+	if (principal > outstanding) { showAccountingDebtMessage("Pembayaran pokok melebihi outstanding", "error"); return; }
+
+	const btn = document.getElementById("saveLiabilityPaymentBtn");
+
+	try {
 		if (btn) { btn.disabled = true; btn.textContent = "Menyimpan..."; }
+
 		console.log("LIABILITY PAYMENT DEBUG", {
-	    liabilityId,
-	    branchId,
-	    sessionId,
-	    modalLiabilityId: document.getElementById("liabilityPaymentId")?.value,
-	    selectedLiability: liabilityData.find(
-	        x => String(x.liability_id) === String(liabilityId)
-	    )
-	});
-		const { data, error } =
-			await supabaseClient.rpc(
-				"create_liability_payment",
-				{
-					p_session_id: sessionId,
-					p_branch_id: branchId,
-					p_liability_id: liabilityId,
-					p_payment_date: paymentDate,
-					p_principal_amount: principal,
-					p_interest_amount: interest,
-					p_other_amount: 0,
-					p_payment_method: method,
-					p_reference_no: referenceNo,
-					p_note: note
-				}
-			);
+			liabilityId,
+			filterBranchId: branchId,
+			paymentBranchId,
+			sessionId,
+			selectedLiability: liability
+		});
 
+		const { data, error } = await supabaseClient.rpc(
+			"create_liability_payment",
+			{
+				p_session_id: sessionId,
+				p_branch_id: paymentBranchId,
+				p_liability_id: liabilityId,
+				p_payment_date: paymentDate,
+				p_principal_amount: principal,
+				p_interest_amount: interest,
+				p_other_amount: 0,
+				p_payment_method: method,
+				p_reference_no: referenceNo,
+				p_note: note
+			}
+		);
 
-		if (error) { throw error; }
-		if (!data?.success) { throw new Error( data?.message || "Gagal menyimpan pembayaran" ); }
-	
+		if (error) throw error;
+		if (!data?.success) { throw new Error(data?.message || "Gagal menyimpan pembayaran"); }
+
 		state.accountingLiabilitiesData = null;
 		state.accountingLiabilitiesFilter = null;
 		state.accountingReportsData = null;
 		state.accountingReportsFilter = null;
+
 		closeLiabilityPaymentModal();
 		await loadLiabilities();
-		showAccountingDebtMessage( "Pembayaran liability berhasil", "success" );
+
+		showAccountingDebtMessage("Pembayaran liability berhasil", "success");
+
 	} catch (err) {
-		showAccountingDebtMessage( err.message || "Gagal menyimpan pembayaran", "error" );
+		console.error("LIABILITY PAYMENT ERROR:", err);
+		showAccountingDebtMessage(err.message || "Gagal menyimpan pembayaran", "error");
 	} finally {
 		if (btn) {
 			btn.disabled = false;
