@@ -26535,12 +26535,18 @@ function openPpnPaymentFromRow(paymentId) {
 async function openTaxPaymentModal() {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) { alert("Session tidak ditemukan."); return; }
-	
-  await loadTaxPayable();
-  const outstanding = Number(taxPayableData?.outstanding) || 0;
-  if (outstanding <= 0) { alert("Tax Payable tidak memiliki saldo terutang."); return; }
-	
-  document.getElementById("taxPaymentAccount").textContent = "2200 · Tax Payable";
+  // Ambil data dari PPN Payment yang dipilih
+  const payment = currentPpnPayment;
+  if (!payment) { alert("PPN payment tidak ditemukan."); return; }
+
+  const branchId = payment.branch_id;
+  const outstanding = Number(payment.amount) || 0;
+
+  if (!branchId || branchId.toUpperCase() === "ALL") { alert("Branch PPN tidak valid."); return; }
+  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { alert("PPN payment ini sudah tidak outstanding."); return; }
+  if (outstanding <= 0) { alert("PPN tidak memiliki saldo terutang.");  return; }
+
+  document.getElementById("taxPaymentAccount").textContent = `2200 · Tax Payable (${branchId})`;
   document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
   document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
   document.getElementById("taxPaymentAmount").value = outstanding;
@@ -26548,8 +26554,9 @@ async function openTaxPaymentModal() {
   document.getElementById("taxPaymentMethod").value = "CASH";
   document.getElementById("taxPaymentReference").value = "";
   document.getElementById("taxPaymentNote").value = "";
-	
+
   const modal = document.getElementById("taxPaymentModal");
+
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
