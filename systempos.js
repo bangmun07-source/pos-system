@@ -26576,29 +26576,29 @@ function closeTaxPaymentModal() {
 async function saveTaxPayment() {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) { alert("Session tidak ditemukan."); return; }
-  const branchId = state.branchId;
-  if (!branchId) { alert("Branch tidak ditemukan."); return; }
+
+  const payment = currentPpnPayment;
+  if (!payment) { alert("PPN payment tidak ditemukan."); return; }
+	
+  const paymentBranchId = payment.branch_id;
+  const paymentId = payment.payment_id;
+  const outstanding = Number(payment.amount) || 0;
+
+  if (!paymentBranchId || paymentBranchId.toUpperCase() === "ALL") { alert("Cabang pembayaran PPN tidak valid."); return; }
+  if (!paymentId) { alert("PPN Payment ID tidak ditemukan."); return; }
+  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { alert("PPN payment ini sudah tidak outstanding."); return; }
 
   const paymentDate = document.getElementById("taxPaymentDate")?.value;
-  const amount = Number( document.getElementById("taxPaymentAmount")?.value ) || 0;
+  const amount = Number(document.getElementById("taxPaymentAmount")?.value) || 0;
   const method = document.getElementById("taxPaymentMethod")?.value || "CASH";
-  const referenceNo = document .getElementById("taxPaymentReference")
-		?.value
-		?.trim() || null;
-  const note = document .getElementById("taxPaymentNote")
-		?.value
-		?.trim() || null;
-	
+  const referenceNo = document.getElementById("taxPaymentReference")?.value?.trim() || null;
+  const note = document.getElementById("taxPaymentNote")?.value?.trim() || null;
+
   if (!paymentDate) { alert("Tanggal pembayaran wajib diisi."); return; }
   if (amount <= 0) { alert("Jumlah pembayaran harus lebih dari 0."); return; }
-
-  const outstanding = Number(taxPayableData?.outstanding) || 0;
-  if (outstanding <= 0) { alert("Tax Payable tidak memiliki saldo terutang."); return; }
+  if (outstanding <= 0) { alert("PPN tidak memiliki saldo terutang."); return; }
   if (amount > outstanding) { alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}` ); return; }
   if (!["CASH", "BANK", "QRIS"].includes(method)) { alert("Metode pembayaran tidak valid."); return; }
-
-	const paymentBranchId = currentPpnPayment?.branch_id;
-	if (!paymentBranchId || paymentBranchId === "ALL") { alert("Cabang pembayaran PPN tidak valid."); return; }
 
   const button = document.getElementById("saveTaxPaymentButton");
 
@@ -26607,31 +26607,38 @@ async function saveTaxPayment() {
       button.disabled = true;
       button.textContent = "Menyimpan...";
     }
-    const { data, error } =
-		  await supabaseClient.rpc("create_ppn_payment", {
-		    p_session_id: sessionId,
-		    p_branch_id: paymentBranchId,
-		    p_payment_id: currentPpnPayment?.payment_id,
-		    p_payment_date: paymentDate,
-		    p_amount: amount,
-		    p_payment_method: method,
-		    p_reference_no: referenceNo,
-		    p_note: note
-		  });
 
-    if (error) { throw error; }
-		state.accountingTaxPayableData = null;
-		state.accountingTaxPayableFilter = null;
-		state.accountingReportsData = null;
-		state.accountingReportsFilter = null;	
+    const { data, error } = await supabaseClient.rpc(
+      "create_ppn_payment",
+      {
+        p_session_id: sessionId,
+        p_branch_id: paymentBranchId,
+        p_payment_id: paymentId,
+        p_payment_date: paymentDate,
+        p_amount: amount,
+        p_payment_method: method,
+        p_reference_no: referenceNo,
+        p_note: note
+      }
+    );
+    if (error) throw error;
+
+    state.accountingTaxPayableData = null;
+    state.accountingTaxPayableFilter = null;
+    state.accountingReportsData = null;
+    state.accountingReportsFilter = null;
 
     closeTaxPaymentModal();
-    alert( data?.message || "Pembayaran Tax Payable berhasil." );
-	
+
+    alert(data?.message || "Pembayaran Tax Payable berhasil.");
+
+    currentPpnPayment = null;
+
     await loadTaxPayable();
-		await loadPpnPayments();
+    await loadPpnPayments();
+
   } catch (error) {
-    alert( error?.message || "Gagal menyimpan pembayaran Tax Payable." );
+    alert(error?.message || "Gagal menyimpan pembayaran Tax Payable.");
   } finally {
     if (button) {
       button.disabled = false;
