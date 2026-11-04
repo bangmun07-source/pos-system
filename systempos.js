@@ -26590,6 +26590,9 @@ async function saveTaxPayment() {
   if (amount > outstanding) { alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}` ); return; }
   if (!["CASH", "BANK", "QRIS"].includes(method)) { alert("Metode pembayaran tidak valid."); return; }
 
+	const paymentBranchId = currentPpnPayment?.branch_id;
+	if (!paymentBranchId || paymentBranchId === "ALL") { alert("Cabang pembayaran PPN tidak valid."); return; }
+
   const button = document.getElementById("saveTaxPaymentButton");
 
   try {
@@ -26597,18 +26600,10 @@ async function saveTaxPayment() {
       button.disabled = true;
       button.textContent = "Menyimpan...";
     }
-console.log("PPN PAYMENT DEBUG", {
-    filterBranchId: branchId,
-    paymentId: currentPpnPayment?.payment_id,
-    paymentBranchId: currentPpnPayment?.branch_id,
-    currentPpnPayment,
-    outstanding: taxPayableData?.outstanding,
-    amount
-});
     const { data, error } =
 		  await supabaseClient.rpc("create_ppn_payment", {
 		    p_session_id: sessionId,
-		    p_branch_id: branchId,
+		    p_branch_id: paymentBranchId,
 		    p_payment_id: currentPpnPayment?.payment_id,
 		    p_payment_date: paymentDate,
 		    p_amount: amount,
