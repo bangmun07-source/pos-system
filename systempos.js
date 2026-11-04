@@ -45437,7 +45437,7 @@ function renderCashierShiftAdjustmentTable() {
 			<tr class="hover:bg-surface-container/30 transition-colors">
 				<td class="px-5 py-4 whitespace-nowrap text-foreground"> ${escapeAdjustmentHTML(formatAdjustmentDate(row.created_at))} </td>
 				<td class="px-5 py-4 whitespace-nowrap text-foreground"> ${escapeAdjustmentHTML(row.cashier_name || '-')} </td>
-				<td class="px-5 py-4 whitespace-nowrap text-muted"> ${escapeAdjustmentHTML(row.branch_id || '-')} </td>
+				<td class="px-5 py-4 whitespace-nowrap text-muted"> ${escapeAdjustmentHTML(row.branch_name || row.branch_id || '-')} </td>
 				<td class="px-5 py-4 whitespace-nowrap">
 					<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${typeClass}">
 						${typeLabel}
