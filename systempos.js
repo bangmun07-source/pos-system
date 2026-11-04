@@ -26607,7 +26607,12 @@ async function saveTaxPayment() {
       button.disabled = true;
       button.textContent = "Menyimpan...";
     }
-
+		console.log("PPN PAYMENT DEBUG", {
+		  sessionId,
+		  paymentId,
+		  paymentBranchId,
+		  amount
+		});
     const { data, error } = await supabaseClient.rpc(
       "create_ppn_payment",
       {
