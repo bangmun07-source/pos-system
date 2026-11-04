@@ -45333,7 +45333,6 @@ function populateCashierAdjustmentFilters() {
 				])
 			).values()
 		].filter(item => item.id);
-
 		cashierSelect.innerHTML = '<option value="ALL">All Cashiers</option>' + cashiers.map(item => `
 			<option value="${escapeAdjustmentHTML(item.id)}"> ${escapeAdjustmentHTML(item.name)} </option>
 		`).join('');
@@ -45342,12 +45341,26 @@ function populateCashierAdjustmentFilters() {
 			: 'ALL';
 	}
 	if (branchSelect) {
-		const selected = branchSelect.value || 'ALL';
-		const branches = [...new Set(rows.map(row => row.branch_id).filter(Boolean))].sort();
-		branchSelect.innerHTML = '<option value="ALL">All Branches</option>' + branches.map(branch => `
-			<option value="${escapeAdjustmentHTML(branch)}"> ${escapeAdjustmentHTML(branch)} </option>
-		`).join('');
-		branchSelect.value = branches.includes(selected) ? selected : 'ALL';
+		const selected = branchSelect.value;
+		const branches = [
+			...new Map(
+				rows.map(row => [
+					row.branch_id,
+					{
+						branch_id: row.branch_id,
+						branch_name: row.branch_name
+					}
+				])
+			).values()
+		];
+
+		branchSelect.innerHTML = '<option value="">Semua Cabang</option>' +
+			branches.map(branch => `
+				<option value="${escapeAdjustmentHTML(branch.branch_id)}">
+					${escapeAdjustmentHTML(branch.branch_name || branch.branch_id)}
+				</option>
+			`).join('');
+		branchSelect.value = selected;
 	}
 }
 
