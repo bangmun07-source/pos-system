@@ -29936,7 +29936,15 @@ async function saveLiabilityPayment() {
 	
 try {
 		if (btn) { btn.disabled = true; btn.textContent = "Menyimpan..."; }
-	
+		console.log("LIABILITY PAYMENT DEBUG", {
+	    liabilityId,
+	    branchId,
+	    sessionId,
+	    modalLiabilityId: document.getElementById("liabilityPaymentId")?.value,
+	    selectedLiability: liabilityData.find(
+	        x => String(x.liability_id) === String(liabilityId)
+	    )
+	});
 		const { data, error } =
 			await supabaseClient.rpc(
 				"create_liability_payment",
