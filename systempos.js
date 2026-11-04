@@ -45023,18 +45023,88 @@ function closeCashierShiftReimbursedModal() {
 }
 
 // CASHIER SHIFT EXPENSED MODAL
+let currentExpensedShiftId = null;
 function openCashierShiftExpensedModal(shiftId) {
-    const modal = document.getElementById('cashierShiftExpensedModal');
-    if (!modal) return;
+	const modal = document.getElementById('cashierShiftExpensedModal');
+	if (!modal) return;
+	// Ambil data shift dari state
+	const shift = cashierShiftHistoryState.rows.find(item => String(item.id) === String(shiftId));
+	if (!shift) { console.error('Data shift tidak ditemukan:', shiftId); return; }
 
-    closeCashierShiftDetailsModal();
-    closeCashierShiftAdjustmentsModal();
-    closeCashierShiftReimbursedModal();
+	const difference = Number(shift.cash_difference || 0);
+	if ( shift.status !== 'CLOSED' || difference >= 0 || (shift.adjustment_status || 'PENDING') !== 'PENDING'
+	) { console.warn('Shift tidak memenuhi syarat expense.'); return; }
 
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+	currentExpensedShiftId = shift.id;
 
-    document.body.classList.add('overflow-hidden');
+	// Tutup popup lain
+	closeCashierShiftDetailsModal();
+	closeCashierShiftAdjustmentsModal();
+	closeCashierShiftReimbursedModal();
+
+	// Helper untuk mengisi teks
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) element.textContent = value ?? '-';
+	};
+
+	// Format tanggal
+	const formatDate = (value) => {
+		if (!value) return '-';
+
+		const date = new Date(value);
+		if (Number.isNaN(date.getTime())) return '-';
+
+		return date.toLocaleString('id-ID', {
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit'
+		});
+	};
+
+	setText('cashierExpensedCashierName', shift.cashier_name || '-');
+	setText('cashierExpensedBranch', shift.branch_name || '-');
+	setText('cashierExpensedShiftId', shift.id || '-');
+	setText('cashierExpensedOpenedAt', formatDate(shift.opened_at));
+	setText('cashierExpensedClosedAt', formatDate(shift.closed_at));
+	setText( 'cashierExpensedExpectedCash', formatShiftCurrency(shift.expected_cash));
+	setText('cashierExpensedActualCash', formatShiftCurrency(shift.actual_cash));
+	setText('cashierExpensedDifference', `-Rp${Math.abs(difference).toLocaleString('id-ID')}`);
+	// Nominal expense = nilai kekurangan kas
+	const amountInput = document.getElementById('cashierExpensedAmount');
+	if (amountInput) { amountInput.value = Math.abs(difference); }
+
+	// Tanggal default hari ini
+	const dateInput = document.getElementById('cashierExpensedDate');
+	if (dateInput) {
+		const today = new Date();
+		const year = today.getFullYear();
+		const month = String(today.getMonth() + 1).padStart(2, '0');
+		const day = String(today.getDate()).padStart(2, '0');
+
+		dateInput.value = `${year}-${month}-${day}`;
+	}
+
+	// Catatan dikosongkan setiap popup dibuka
+	const noteInput = document.getElementById('cashierExpensedNote');
+	if (noteInput) noteInput.value = '';
+
+	// Status penyesuaian
+	setText('cashierExpensedCurrentStatus', 'PENDING');
+
+	// Reset tombol submit
+	const submitBtn = document.getElementById('cashierExpensedSubmitBtn');
+	if (submitBtn) {
+		submitBtn.disabled = false;
+		submitBtn.textContent = 'Konfirmasi Expense';
+	}
+
+	// Tampilkan popup
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
+	document.body.classList.add('overflow-hidden');
 }
 
 function closeCashierShiftExpensedModal() {
@@ -45045,6 +45115,7 @@ function closeCashierShiftExpensedModal() {
     modal.classList.remove('flex');
 
     document.body.classList.remove('overflow-hidden');
+    currentExpensedShiftId = null;
 }
 
 function formatShiftCurrency(value) {
