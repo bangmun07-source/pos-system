@@ -45069,24 +45069,20 @@ function openCashierShiftExpensedModal(shiftId) {
 	setText('cashierExpensedShiftId', shift.id || '-');
 	setText('cashierExpensedOpenedAt', formatDate(shift.opened_at));
 	setText('cashierExpensedClosedAt', formatDate(shift.closed_at));
-	setText( 'cashierExpensedExpectedCash', formatShiftCurrency(shift.expected_cash));
+	setText('cashierExpensedExpectedCash', formatShiftCurrency(shift.expected_cash));
 	setText('cashierExpensedActualCash', formatShiftCurrency(shift.actual_cash));
 	setText('cashierExpensedDifference', `-Rp${Math.abs(difference).toLocaleString('id-ID')}`);
-	// Nominal expense = nilai kekurangan kas
-	const amountInput = document.getElementById('cashierExpensedAmount');
-	if (amountInput) { amountInput.value = Math.abs(difference); }
-
+	setText('cashierExpensedAmount', formatShiftCurrency(Math.abs(difference)));
 	// Tanggal default hari ini
-	const dateInput = document.getElementById('cashierExpensedDate');
-	if (dateInput) {
-		const today = new Date();
-		const year = today.getFullYear();
-		const month = String(today.getMonth() + 1).padStart(2, '0');
-		const day = String(today.getDate()).padStart(2, '0');
-
-		dateInput.value = `${year}-${month}-${day}`;
-	}
-
+	const today = new Date();
+	setText('cashierExpensedDate',
+		today.toLocaleDateString('id-ID', {
+			day: '2-digit',
+			month: 'long',
+			year: 'numeric'
+		})
+	);
+	setText('cashierExpensedProcessedBy', '-');
 	// Catatan dikosongkan setiap popup dibuka
 	const noteInput = document.getElementById('cashierExpensedNote');
 	if (noteInput) noteInput.value = '';
