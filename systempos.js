@@ -45103,6 +45103,61 @@ function openCashierShiftExpensedModal(shiftId) {
 	document.body.classList.add('overflow-hidden');
 }
 
+
+async function submitCashierShiftExpensed() {
+	const submitBtn = document.getElementById('cashierExpensedSubmitBtn');
+	const note = document.getElementById('cashierExpensedNote');
+	const sessionId = localStorage.getItem('pos_session_id');
+
+	if (!currentExpensedShiftId) { alert('Data shift tidak ditemukan.'); return; }
+	if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
+
+	const confirmed = confirm( 'Konfirmasi expense kekurangan kas ini?' );
+	if (!confirmed) return;
+
+	const originalText = submitBtn?.textContent;
+
+	try {
+		if (submitBtn) {
+			submitBtn.disabled = true;
+			submitBtn.textContent = 'Processing...';
+		}
+
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'submit_cashier_shift_expensed',
+				{
+					p_session_id: sessionId,
+					p_shift_id: currentExpensedShiftId,
+					p_expense_date: (() => {
+						const d = new Date();
+						return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; })(),
+					p_note: note?.value?.trim() || null
+				}
+		);
+
+		if (error) throw error;
+		if (!data?.success) { throw new Error('Expense gagal diproses.'); }
+
+		alert('Expense berhasil disimpan.\n' + 'Nomor Jurnal: ' + (data.journal_no || '-'));
+
+		closeCashierShiftExpensedModal();
+		// Muat ulang riwayat agar status terbaru terlihat
+		await loadCashierShiftHistory();
+
+	} catch (error) {
+		console.error('Gagal menyimpan expense:', error);
+		alert(error.message || 'Gagal menyimpan expense.');
+
+	} finally {
+		if (submitBtn) {
+			submitBtn.disabled = false;
+			submitBtn.textContent = originalText || 'Konfirmasi Expense';
+		}
+	}
+}
+
+
 function closeCashierShiftExpensedModal() {
     const modal = document.getElementById('cashierShiftExpensedModal');
     if (!modal) return;
