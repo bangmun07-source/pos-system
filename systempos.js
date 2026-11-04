@@ -6699,7 +6699,6 @@ function renderInventoryPage(data) {
 	  state.ingredients = data.ingredients || [];
 	
 	  const tbody = document.getElementById( "ingredientsTable" );
-	
 	  if (tbody) {
 	    if ( state.ingredients.length === 0 ) {
 	      tbody.innerHTML = `
@@ -7156,32 +7155,25 @@ window.confirmPurchaseStatus = async function () {
     );
 
     if (error) { throw error; }
-
-    if (
-      data &&
-      data.success === false
-    ) {
-      throw new Error(
-        "Gagal mengubah status purchase"
-      );
-    }
-	purchase.Status = status;
-	closePurchaseStatus();
-	closePurchaseAction();
-	renderPurchasePage();
-	state.supplierData = null;
-	state.supplierBranchId = null;
-	state.ingredients = null;
-	state.ingredientsCacheKey = null;
-	state.cashFlowData = null;
-  state.cashFlowFilter = null;
-	await loadSuppliers();
-    showToast(
-      "Status purchase berhasil diubah",
-      "success"
-    );
-  }
-  catch (err) {
+    if ( data && data.success === false
+    ) { throw new Error( "Gagal mengubah status purchase" ); }
+		
+		purchase.Status = status;
+		closePurchaseStatus();
+		closePurchaseAction();
+		renderPurchasePage();
+		state.inventoryData = null;
+    state.inventoryBranchId = null;
+		state.supplierData = null;
+		state.supplierBranchId = null;
+		state.ingredients = null;
+		state.ingredientsCacheKey = null;
+		state.cashFlowData = null;
+	  state.cashFlowFilter = null;
+		await loadSuppliers();
+		await loadInventoryPage(state.branchId);
+		showToast( "Status purchase berhasil diubah", "success" );
+  } catch (err) {
     showToast(
       err?.message ||
       "Gagal mengubah status purchase",
@@ -9219,34 +9211,22 @@ window.loadStockInData = async function () {
   loadStockInIngredients(modal, branchId);
   loadBranchDropdown();
   // SUPPLIER
-  const supplierSelect =
-    modal.querySelector(
-      "#supplierSelect"
-    );
+  const supplierSelect = modal.querySelector( "#supplierSelect" );
   if (!supplierSelect) return;
   // CACHE SUPPLIER
-  if (
-    state.supplierData &&
-    state.supplierBranchId ===
-      branchId
-  ) {
-    renderSupplierOptions(
-      supplierSelect, state.supplierData );
-    return;
-  }
+  if ( state.supplierData && state.supplierBranchId === branchId
+  ) { renderSupplierOptions( supplierSelect, state.supplierData ); return; }
 	
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const {
-      data,
-      error
-    } = await supabaseClient.rpc(
-      "get_suppliers",
-      {
-        p_branch_id:branchId,
-				p_session_id: sessionId
-      }
-    );
+    const { data, error } 
+			= await supabaseClient.rpc(
+	      "get_suppliers",
+	      {
+	        p_branch_id:branchId,
+					p_session_id: sessionId
+	      }
+	    );
     if (error) { throw error; }
     const suppliers = data || [];
     // CACHE
