@@ -44243,10 +44243,12 @@ let cashierShiftHistoryState = {
 // INITIALIZE PAGE
 async function initCashierShiftPage() {
 	cashierShiftHistoryState.currentPage = 1;
-
+	
 	bindCashierShiftFilters();
 	await loadCashierShiftFilterOptions();
 	await loadCashierShiftHistory();
+	initializeCashierShiftAdjustmentFilters();
+	await loadCashierShiftAdjustments();
 }
 
 // FILTER EVENTS
