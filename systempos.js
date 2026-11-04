@@ -45157,7 +45157,6 @@ async function submitCashierShiftExpensed() {
 	}
 }
 
-
 function closeCashierShiftExpensedModal() {
     const modal = document.getElementById('cashierShiftExpensedModal');
     if (!modal) return;
@@ -45193,6 +45192,383 @@ function escapeShiftHtml(value) {
 		'"': '&quot;',
 		"'": '&#39;'
 	})[char]);
+}
+
+// ==========================================
+// CASHIER SHIFT ADJUSTMENT
+// ==========================================
+
+let cashierShiftAdjustmentState = {
+	rows: [],
+	filteredRows: [],
+	currentPage: 1,
+	pageSize: 10
+};
+
+// FORMAT HELPERS
+function formatAdjustmentCurrency(value) {
+	return 'Rp' + Number(value || 0).toLocaleString('id-ID');
+}
+
+function escapeAdjustmentHTML(value) {
+	return String(value ?? '').replace(/[&<>"']/g, char => ({
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;'
+	})[char]);
+}
+
+function formatAdjustmentDate(value) {
+	if (!value) return '-';
+
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '-';
+
+	return date.toLocaleString('id-ID', {
+			day: '2-digit',
+			month: 'short',
+			year: 'numeric',
+			hour: '2-digit',
+			minute: '2-digit',
+			hour12: false
+	});
+}
+
+function getAdjustmentLocalDate(value) {
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return '';
+
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, '0');
+	const day = String(date.getDate()).padStart(2, '0');
+
+	return `${year}-${month}-${day}`;
+}
+
+// LOAD DATA
+async function loadCashierShiftAdjustments() {
+	const tbody = document.getElementById( 'cashierShiftAdjustmentTableBody' );
+	const sessionId = localStorage.getItem('pos_session_id');
+	if (!sessionId) {
+		if (tbody) {
+			tbody.innerHTML = `
+				<tr>
+					<td colspan="8"
+						class="px-5 py-10 text-center text-red-400">
+						Session tidak ditemukan. Silakan login kembali.
+					</td>
+				</tr>
+			`;
+		}
+		return;
+	}
+	if (tbody) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="8"
+					class="px-5 py-10 text-center text-muted">
+					Loading adjustment records...
+				</td>
+			</tr>
+		`;
+	}
+
+	try {
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_cashier_shift_adjustment_history',
+				{
+					p_session_id: sessionId
+				}
+			);
+
+		if (error) throw error;
+		if (!data?.success) { throw new Error('Gagal mengambil data adjustment.'); }
+
+		cashierShiftAdjustmentState.rows = Array.isArray(data.adjustments)
+			? data.adjustments
+			: [];
+
+		cashierShiftAdjustmentState.currentPage = 1;
+
+		populateCashierAdjustmentFilters();
+		applyCashierAdjustmentFilters();
+
+	} catch (error) {
+		console.error( 'LOAD CASHIER SHIFT ADJUSTMENTS ERROR:', error );
+
+		if (tbody) {
+			tbody.innerHTML = `
+				<tr>
+					<td colspan="8"
+						class="px-5 py-10 text-center text-red-400">
+						${escapeAdjustmentHTML(error.message || 'Gagal memuat data.')}
+					</td>
+				</tr>
+			`;
+		}
+	}
+}
+
+// POPULATE FILTERS
+function populateCashierAdjustmentFilters() {
+	const rows = cashierShiftAdjustmentState.rows;
+	const cashierSelect = document.getElementById( 'cashierAdjustmentUserFilter' );
+	const branchSelect = document.getElementById( 'cashierAdjustmentBranchFilter' );
+
+	if (cashierSelect) {
+		const selected = cashierSelect.value || 'ALL';
+		const cashiers = [
+			...new Map(
+				rows.map(row => [
+					row.cashier_user_id,
+					{
+						id: row.cashier_user_id,
+						name: row.cashier_name
+					}
+				])
+			).values()
+		].filter(item => item.id);
+
+		cashierSelect.innerHTML = '<option value="ALL">All Cashiers</option>' + cashiers.map(item => `
+			<option value="${escapeAdjustmentHTML(item.id)}"> ${escapeAdjustmentHTML(item.name)} </option>
+		`).join('');
+		cashierSelect.value = cashiers.some(item => item.id === selected)
+			? selected
+			: 'ALL';
+	}
+	if (branchSelect) {
+		const selected = branchSelect.value || 'ALL';
+		const branches = [...new Set(rows.map(row => row.branch_id).filter(Boolean))].sort();
+		branchSelect.innerHTML = '<option value="ALL">All Branches</option>' + branches.map(branch => `
+			<option value="${escapeAdjustmentHTML(branch)}"> ${escapeAdjustmentHTML(branch)} </option>
+		`).join('');
+		branchSelect.value = branches.includes(selected) ? selected : 'ALL';
+	}
+}
+
+// FILTER DATA
+function applyCashierAdjustmentFilters() {
+	const fromDate = document.getElementById( 'cashierAdjustmentPeriodFrom' )?.value || '';
+	const toDate = document.getElementById( 'cashierAdjustmentPeriodTo' )?.value || '';
+	const cashier = document.getElementById( 'cashierAdjustmentUserFilter' )?.value || 'ALL';
+	const branch = document.getElementById( 'cashierAdjustmentBranchFilter' )?.value || 'ALL';
+	const type = document.getElementById( 'cashierAdjustmentTypeFilter' )?.value || 'ALL';
+
+	let rows = cashierShiftAdjustmentState.rows.filter(row => {
+		const date = getAdjustmentLocalDate(row.created_at);
+
+		if (fromDate && date < fromDate) return false;
+		if (toDate && date > toDate) return false;
+		if (cashier !== 'ALL' && String(row.cashier_user_id) !== String(cashier)) return false;
+		if (branch !== 'ALL' && String(row.branch_id) !== String(branch)) return false;
+		if (type !== 'ALL' && row.adjustment_type !== type) return false;
+		return true;
+	});
+
+	cashierShiftAdjustmentState.filteredRows = rows;
+	cashierShiftAdjustmentState.currentPage = 1;
+
+	renderCashierAdjustmentKPI();
+	renderCashierShiftAdjustmentTable();
+}
+
+// KPI
+function renderCashierAdjustmentKPI() {
+	const rows = cashierShiftAdjustmentState.filteredRows;
+	const totalAdjustments = rows.length;
+	const totalReimbursed = rows
+		.filter(row => row.adjustment_type === 'REIMBURSED')
+		.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+	const totalExpenses = rows
+		.filter(row => row.adjustment_type === 'EXPENSED')
+		.reduce((sum, row) => sum + Number(row.amount || 0), 0);
+	const setText = (id, value) => {
+		const element = document.getElementById(id);
+		if (element) element.textContent = value;
+	};
+
+	setText('shiftTotalAjustments', totalAdjustments.toLocaleString('id-ID'));
+	setText('shiftTotalReimbursed', formatAdjustmentCurrency(totalReimbursed));
+	setText('shiftTotalExpenses', formatAdjustmentCurrency(totalExpenses));
+}
+
+// RENDER TABLE
+function renderCashierShiftAdjustmentTable() {
+	const tbody = document.getElementById( 'cashierShiftAdjustmentTableBody');
+	if (!tbody) return;
+
+	const rows = cashierShiftAdjustmentState.filteredRows;
+	const currentPage = cashierShiftAdjustmentState.currentPage;
+	const pageSize = cashierShiftAdjustmentState.pageSize;
+	const total = rows.length;
+	const totalPages = Math.ceil(total / pageSize);
+
+	if (total === 0) {
+		tbody.innerHTML = `
+			<tr>
+				<td colspan="8"
+					class="px-5 py-10 text-center text-muted text-sm">
+					No adjustment records found
+				</td>
+			</tr>
+		`;
+
+		updateCashierAdjustmentPagination(0, 0, 0, 0);
+		return;
+	}
+
+	const startIndex = (currentPage - 1) * pageSize;
+	const pageRows = rows.slice( startIndex, startIndex + pageSize );
+
+	tbody.innerHTML = pageRows.map(row => {
+		const isReimbursed = row.adjustment_type === 'REIMBURSED';
+		const typeLabel = isReimbursed
+			? 'Reimbursed'
+			: 'Expensed';
+		const typeClass = isReimbursed
+			? 'text-emerald-400 bg-emerald-400/10'
+			: 'text-amber-400 bg-amber-400/10';
+		return `
+			<tr class="hover:bg-surface-container/30 transition-colors">
+				<td class="px-5 py-4 whitespace-nowrap text-foreground"> ${escapeAdjustmentHTML(formatAdjustmentDate(row.created_at))} </td>
+				<td class="px-5 py-4 whitespace-nowrap text-foreground"> ${escapeAdjustmentHTML(row.cashier_name || '-')} </td>
+				<td class="px-5 py-4 whitespace-nowrap text-muted"> ${escapeAdjustmentHTML(row.branch_id || '-')} </td>
+				<td class="px-5 py-4 whitespace-nowrap">
+					<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-semibold ${typeClass}">
+						${typeLabel}
+					</span>
+				</td>
+				<td class="px-5 py-4 text-right whitespace-nowrap font-semibold text-foreground"> ${escapeAdjustmentHTML(formatAdjustmentCurrency(row.amount))} </td>
+				<td class="px-5 py-4 whitespace-nowrap text-foreground"> ${escapeAdjustmentHTML(row.responsible_name || '-')} </td>
+				<td class="px-5 py-4 whitespace-nowrap text-foreground"> ${escapeAdjustmentHTML(row.processed_by_name || '-')} </td>
+				<td class="px-5 py-4 min-w-[200px] text-muted"> ${escapeAdjustmentHTML(row.note || '-')} </td>
+			</tr>
+		`;
+	}).join('');
+
+	updateCashierAdjustmentPagination( startIndex + 1, Math.min(startIndex + pageRows.length, total), total, totalPages );
+}
+
+// PAGINATION
+function updateCashierAdjustmentPagination( start, end, total, totalPages ) {
+	const info = document.getElementById( 'cashierAdjustmentPaginationInfo' );
+	const prevButton = document.getElementById( 'cashierAdjustmentPrevButton' );
+	const nextButton = document.getElementById( 'cashierAdjustmentNextButton' );
+
+	if (info) { info.textContent = `Showing ${start}–${end} of ${total}`; }
+	if (prevButton) {
+		prevButton.disabled = cashierShiftAdjustmentState.currentPage <= 1;
+		prevButton.classList.toggle( 'opacity-30', prevButton.disabled );
+		prevButton.classList.toggle( 'cursor-not-allowed', prevButton.disabled );
+	}
+	if (nextButton) {
+		nextButton.disabled = totalPages === 0 || cashierShiftAdjustmentState.currentPage >= totalPages;
+		nextButton.classList.toggle( 'opacity-30', nextButton.disabled );
+		nextButton.classList.toggle( 'cursor-not-allowed', nextButton.disabled );
+	}
+}
+
+function cashierAdjustmentPrevPage() {
+	if (cashierShiftAdjustmentState.currentPage <= 1) return;
+	cashierShiftAdjustmentState.currentPage--;
+
+	renderCashierShiftAdjustmentTable();
+}
+
+function cashierAdjustmentNextPage() {
+	const totalPages = Math.ceil( cashierShiftAdjustmentState.filteredRows.length / cashierShiftAdjustmentState.pageSize );
+	if (cashierShiftAdjustmentState.currentPage >= totalPages) return;
+
+	cashierShiftAdjustmentState.currentPage++;
+
+	renderCashierShiftAdjustmentTable();
+}
+
+// ========================================
+// EXPORT CSV
+// ========================================
+
+function exportCashierShiftAdjustments() {
+	const rows = cashierShiftAdjustmentState.filteredRows;
+
+	if (!rows.length) {
+			alert('Tidak ada data adjustment untuk diexport.');
+			return;
+	}
+
+	const headers = [
+			'Date & Time',
+			'Cashier',
+			'Branch',
+			'Adjustment Type',
+			'Amount',
+			'Responsible User',
+			'Processed By',
+			'Note'
+	];
+
+	const csvEscape = value => {
+			let text = String(value ?? '');
+
+			// Prevent spreadsheet formula injection
+			if (/^[=+\-@\t\r]/.test(text)) {
+					text = "'" + text;
+			}
+
+			return '"' + text.replace(/"/g, '""') + '"';
+	};
+
+	const csvRows = rows.map(row => [
+			formatAdjustmentDate(row.created_at),
+			row.cashier_name || '-',
+			row.branch_id || '-',
+			row.adjustment_type || '-',
+			Number(row.amount || 0),
+			row.responsible_name || '-',
+			row.processed_by_name || '-',
+			row.note || '-'
+	]);
+
+	const csvContent = [
+			headers,
+			...csvRows
+	].map(row => row.map(csvEscape).join(',')).join('\r\n');
+
+	const blob = new Blob(
+			['\uFEFF' + csvContent],
+			{ type: 'text/csv;charset=utf-8;' }
+	);
+
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement('a');
+
+	link.href = url;
+	link.download = `cashier-shift-adjustments-${getAdjustmentLocalDate(new Date())}.csv`;
+
+	document.body.appendChild(link);
+	link.click();
+	document.body.removeChild(link);
+
+	URL.revokeObjectURL(url);
+}
+
+
+// FILTER EVENT LISTENERS
+function initializeCashierShiftAdjustmentFilters() {
+	[
+		'cashierAdjustmentPeriodFrom',
+		'cashierAdjustmentPeriodTo',
+		'cashierAdjustmentUserFilter',
+		'cashierAdjustmentBranchFilter',
+		'cashierAdjustmentTypeFilter'
+	].forEach(id => {
+		const element = document.getElementById(id);
+
+		if (element) { element.onchange = applyCashierAdjustmentFilters; }
+	});
 }
 
 
