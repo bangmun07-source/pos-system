@@ -21124,18 +21124,18 @@ function renderAccountingAccounts(accounts) {
 				</td>
 
 				<td class="px-6 py-4">
-					<div class="font-medium text-on-surface">
+					<div class="font-medium text-on-surface whitespace-nowrap">
 						${escapeHtml(account.accountName || "-")}
 					</div>
 				</td>
 
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 text-center">
 					<span class="px-2.5 py-1 rounded-md text-xs font-medium ${typeClass}">
 						${typeLabel}
 					</span>
 				</td>
 
-				<td class="px-6 py-4 text-on-surface-variant">
+				<td class="px-6 py-4 text-on-surface-variant text-center">
 					${escapeHtml(account.parentName || "—")}
 				</td>
 
@@ -21148,7 +21148,7 @@ function renderAccountingAccounts(accounts) {
 					</span>
 				</td>
 
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 text-center">
 					<span class="px-2.5 py-1 rounded-md text-center text-xs font-medium ${statusClass}">
 						${statusLabel}
 					</span>
@@ -21575,33 +21575,31 @@ function renderAccountingMappings() {
 			? "ACTIVE"
 			: "INACTIVE";
 		const debitAccount =
-			mapping.debitAccountCode ||
-			mapping.debitAccountName
-					? `
-						<div class="font-medium text-on-surface">
-							${escapeHtml( mapping.debitAccountName || "-" )}
-						</div>
-						<div class="text-xs text-muted mt-1 font-mono">
-							${escapeHtml( mapping.debitAccountCode || "-" )}
-						</div>
-						`
-					: "—";
+			mapping.debitAccountCode || mapping.debitAccountName
+				? `
+					<div class="font-medium text-on-surface">
+						${escapeHtml( mapping.debitAccountName || "-" )}
+					</div>
+					<div class="text-xs text-muted mt-1 font-mono">
+						${escapeHtml( mapping.debitAccountCode || "-" )}
+					</div>
+					`
+				: "—";
 		const creditAccount =
-			mapping.creditAccountCode ||
-			mapping.creditAccountName
-					? `
+			mapping.creditAccountCode || mapping.creditAccountName
+				? `
 				<div class="font-medium text-on-surface">
 					${escapeHtml( mapping.creditAccountName || "-" )}
 				</div>
 				<div class="text-xs text-muted mt-1 font-mono">
 					${escapeHtml( mapping.creditAccountCode || "-" )}
 				</div>
-			`
+				`
 		: "—";
 		return `
 			<tr class="border-b border-outline-variant hover:bg-outline-variant">
 				<!-- TRANSACTION -->
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 whitespace-nowrap">
 					<div class="font-medium text-on-surface">
 						${escapeHtml( mapping.mappingName || "-" )}
 					</div>
@@ -21617,25 +21615,25 @@ function renderAccountingMappings() {
 					</span>
 				</td>
 				<!-- DEBIT -->
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 whitespace-nowrap">
 					${debitAccount}
 				</td>
 				<!-- CREDIT -->
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 whitespace-nowrap">
 					${creditAccount}
 				</td>
 				<!-- STATUS -->
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 text-center">
 					<span class="px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
 						${statusLabel}
 					</span>
 				</td>
 				<!-- ACTION -->
-				<td class="px-6 py-4">
+				<td class="px-6 py-4 text-center">
 					<div class="relative">
 						<button type="button"
 							onclick="toggleAccountingMappingMenu('${escapeHtml(mapping.mappingId)}')"
-							class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface hover:bg-white/5 transition">
+							class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-on-surface transition">
 	
 							<span class="material-symbols-outlined text-lg">
 									more_vert
@@ -32651,23 +32649,14 @@ function renderAccountsReceivableRecords() {
 		  const remainingAmount = Number( row.remainingAmount ?? ( totalAmount - paidAmount ) );
 		  return `
 		    <tr class="hover:bg-surface-container transition-colors">
-		      <!-- TYPE -->
-		      <td class="px-5 py-4 font-medium"> ${row.arTypeLabel || row.arType || "-"} </td>
-		      <!-- PARTY -->
-		      <td class="px-5 py-4"> ${row.partyName || "-"} </td>
-		      <!-- DATE -->
+		      <td class="px-5 py-4 font-medium whitespace-nowrap"> ${row.arTypeLabel || row.arType || "-"} </td>
+		      <td class="px-5 py-4 whitespace-nowrap"> ${row.partyName || "-"} </td>
 		      <td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatAccountsReceivableDate(row.arDate)} </td>
-		      <!-- DUE DATE -->
 		      <td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatAccountsReceivableDate(row.dueDate)} </td>
-		      <!-- TOTAL -->
 		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap"> ${formatAccountingTaxCurrency(totalAmount)} </td>
-		      <!-- PAID -->
 		      <td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingTaxCurrency(paidAmount)} </td>
-		      <!-- OUTSTANDING -->
 		      <td class="px-5 py-4 text-right font-semibold whitespace-nowrap"> ${formatAccountingTaxCurrency(remainingAmount)} </td>
-		      <!-- STATUS -->
 		      <td class="px-5 py-4 text-center"> ${getAccountsReceivableStatusBadge(status)} </td>
-		      <!-- ACTION -->
 		      <td class="px-5 py-4 text-center">
 		        <button type="button"
 		          onclick="openAccountsReceivableRecordMenu('${row.id}')"
