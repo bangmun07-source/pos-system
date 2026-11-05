@@ -20396,18 +20396,49 @@ async function loadAccountingBranchOptions() {
 function renderAccountingBranchOptions(branches) {
   const select = document.getElementById("accounting-branch");
   if (!select) return;
-  select.innerHTML = `
-    <option value="ALL">
-      All Branch
-    </option>
-  `;
+
+  const role = String(
+    state.user?.role || state.user?.Role || ""
+  ).trim().toLowerCase();
+
+  const branchId = state.user?.branchId;
+
+  // ADMIN: hanya outlet sendiri
+  if (role === "admin") {
+    const userBranch = (branches || []).find(branch =>
+      String(branch.id || "").trim() ===
+      String(branchId || "").trim()
+    );
+
+    const branchName =
+      userBranch?.name ||
+      branchId ||
+      "Unnamed Branch";
+
+    select.innerHTML = "";
+
+    const option = document.createElement("option");
+    option.value = branchId || "";
+    option.textContent = `Outlet: ${branchName}`;
+
+    select.appendChild(option);
+    select.value = branchId || "";
+    select.disabled = true;
+
+    return;
+  }
+
+  // OWNER / ACCOUNTANT: semua outlet
+  select.innerHTML = `<option value="ALL">All Branch</option>`;
+
   (branches || []).forEach(branch => {
-    select.innerHTML += `
-      <option value="${branch.id}">
-        ${branch.name}
-      </option>
-    `;
+    const option = document.createElement("option");
+    option.value = branch.id || "";
+    option.textContent = branch.name || branch.id || "Unnamed Branch";
+    select.appendChild(option);
   });
+
+  select.disabled = false;
 }
 
 function getAccountingDateRange(period) {
