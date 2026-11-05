@@ -22068,34 +22068,13 @@ function renderJournalEntryRow(journal) {
 	
 	return `
 		<tr class="border-b border-outline-variant hover:bg-outline-variant">
-			<td class="px-5 py-4 font-medium">
-				${escapeHtml( journal.journalNo || "-" )}
-			</td>
-
-			<td class="px-5 py-4 text-muted">
-				${formatJournalDate( journal.journalDate )}
-			</td>
-
-			<td class="px-5 py-4">
-				${escapeHtml( sourceLabel )}
-			</td>
-
-			<td class="px-5 py-4">
-				${escapeHtml( journal.description || "-" )}
-			</td>
-
-			<td class="px-5 py-4 text-right">
-				${formatJournalCurrency( journal.totalDebit )}
-			</td>
-
-			<td class="px-5 py-4 text-right">
-				${formatJournalCurrency( journal.totalCredit )}
-			</td>
-
-			<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}">
-				${escapeHtml( statusLabel )}
-			</td>
-
+			<td class="px-5 py-4 font-medium whitespace-nowrap"> ${escapeHtml( journal.journalNo || "-" )} </td>
+			<td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatJournalDate( journal.journalDate )} </td>
+			<td class="px-5 py-4"> ${escapeHtml( sourceLabel )} </td>
+			<td class="px-5 py-4"> ${escapeHtml( journal.description || "-" )} </td>
+			<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalDebit )} </td>
+			<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
+			<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
 			<td class="px-5 py-4 text-right">
 				<div class="relative inline-block">
 					<button type="button"
@@ -22140,15 +22119,12 @@ function renderJournalEntryRow(journal) {
 
 function toggleJournalEntryActionMenu(journalId) {
 	const menu = document.getElementById( `journalActionMenu-${journalId}` );
-
 	if (!menu) return;
 
 	document
 		.querySelectorAll('[id^="journalActionMenu-"]')
 		.forEach(el => {
-			if (el !== menu) {
-				el.classList.add("hidden");
-			}
+			if (el !== menu) { el.classList.add("hidden"); }
 		});
 	menu.classList.toggle("hidden");
 }
@@ -22160,13 +22136,8 @@ function closeJournalEntryActionMenus() {
 }
 
 document.addEventListener("click", function (event) {
-	const clickedMenu = event.target.closest(
-		'[id^="journalActionMenu-"]'
-	);
-
-	const clickedButton = event.target.closest(
-		'button[onclick*="toggleJournalEntryActionMenu"]'
-	);
+	const clickedMenu = event.target.closest( '[id^="journalActionMenu-"]' );
+	const clickedButton = event.target.closest( 'button[onclick*="toggleJournalEntryActionMenu"]' );
 
 	if (!clickedMenu && !clickedButton) {
 		closeJournalEntryActionMenus();
@@ -22184,11 +22155,9 @@ async function postManualJournalEntry(journalId) {
 		`Setelah diposting, journal tidak dapat diedit lagi ` +
 		`dan akan mempengaruhi Account Balance.`
 	);
-
 	if (!confirmed) { return; }
 
 	const sessionId = localStorage.getItem("pos_session_id");
-
 	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 
 	try {
@@ -22225,12 +22194,10 @@ async function postManualJournalEntry(journalId) {
 
 async function editManualJournalEntry(journalId) {
 	const journal = journalEntriesData.find( item => item.journalId === journalId );
-	
 	if (!journal) return;
 	if (journal.status !== "DRAFT") { alert("Hanya journal DRAFT yang dapat diedit."); return; }
 	
 	const sessionId = localStorage.getItem("pos_session_id");
-	
 	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 	
 	try {
@@ -22279,7 +22246,6 @@ async function editManualJournalEntry(journalId) {
 		 * POPULATE LINES
 		 */
 		const container = document.getElementById( "newJournalLinesContainer" );
-	
 		if (!container) return;
 	
 		container.innerHTML = "";
@@ -22351,7 +22317,6 @@ async function editManualJournalEntry(journalId) {
 	    container.appendChild(row);
 	
 	    const accountEl = document.getElementById( `newJournalAccount-${lineId}` );
-	
 	    if (accountEl) { accountEl.value = line.accountId || ""; }
 		});
 	
@@ -22365,7 +22330,6 @@ async function editManualJournalEntry(journalId) {
 		if (subtitleEl) { subtitleEl.textContent = "Edit a draft manual journal entry"; }
 	
 		const saveButton = document.getElementById( "saveNewJournalButton" );
-	
 		if (saveButton) {
 			saveButton.innerHTML = `
 				<span class="material-symbols-outlined text-md">
@@ -22437,34 +22401,30 @@ function updateJournalEntriesPagination( total, totalPages ) {
 				( journalEntriesCurrentPage - 1  ) 
 				* JOURNAL_ENTRIES_PAGE_SIZE
 			) + 1;
-	const end =
-		Math.min(
-			journalEntriesCurrentPage *
-			JOURNAL_ENTRIES_PAGE_SIZE,
-			total
-		);
+	const end = Math.min(
+		journalEntriesCurrentPage *
+		JOURNAL_ENTRIES_PAGE_SIZE,
+		total
+	);
 	if (info) { info.textContent = `Showing ${start}–${end} of ${total} Entries`; }
 	if (prevButton) { prevButton.disabled = journalEntriesCurrentPage <= 1; }
 	if (nextButton) { nextButton.disabled = journalEntriesCurrentPage >= totalPages; }
 }
 
 function journalEntriesPrevPage() {
-	if ( journalEntriesCurrentPage <= 1 ) 
-		{ return; }
+	if ( journalEntriesCurrentPage <= 1 )  { return; }
 	journalEntriesCurrentPage--;
 	renderJournalEntries( journalEntriesData );
 }
 
 function journalEntriesNextPage() {
 	const filteredEntries = getFilteredJournalEntries( journalEntriesData );
-	const totalPages =
-		Math.max(
-			1,
-			Math.ceil(
-				filteredEntries.length /
-				JOURNAL_ENTRIES_PAGE_SIZE
-			)
-		);
+	const totalPages = Math.max( 1,
+		Math.ceil(
+			filteredEntries.length /
+			JOURNAL_ENTRIES_PAGE_SIZE
+		)
+	);
 
 	if ( journalEntriesCurrentPage >= totalPages )  { return; }
 	
@@ -22478,13 +22438,10 @@ function initJournalEntriesFilters() {
 	const source = document.getElementById( "journalSourceFilter" );
 	const status =  document.getElementById( "journalStatusFilter" );
 	const search = document.getElementById( "journalSearch" );
-	const resetPage =
-		() => {
-			journalEntriesCurrentPage = 1;
-			renderJournalEntries(
-				journalEntriesData
-			);
-		};
+	const resetPage = () => {
+		journalEntriesCurrentPage = 1;
+		renderJournalEntries( journalEntriesData );
+	};
 	dateFrom?.addEventListener( "change", resetPage );
 	dateTo?.addEventListener( "change", resetPage );
 	source?.addEventListener( "change", resetPage );
@@ -22496,7 +22453,6 @@ function formatJournalDate( dateValue ) {
 	if (!dateValue) { return "-"; }
 	
 	const date = new Date( `${dateValue}T00:00:00` );
-	
 	if ( Number.isNaN( date.getTime() ) ) { return escapeHtml(  String(dateValue) ); }
 	
 	return date.toLocaleDateString( "en-GB",
@@ -22516,7 +22472,6 @@ function formatJournalCurrency( value ) {
 async function loadJournalAccounts() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
-
 		if (!sessionId) { return []; }
 
 		const { data, error } =
@@ -22541,7 +22496,6 @@ async function loadJournalAccounts() {
 async function loadJournalBranches() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
-
 		if (!sessionId) {  return []; }
 
 		const { data, error } =
@@ -22587,7 +22541,6 @@ async function openNewJournalModal() {
 	populateNewJournalBranches();
 
 	const container = document.getElementById("newJournalLinesContainer");
-
 	if (container) { container.innerHTML = ""; }
 
 	newJournalLineCounter = 0;
@@ -22610,7 +22563,6 @@ function closeNewJournalModal() {
 
 function populateNewJournalBranches() {
 	const branchEl = document.getElementById("newJournalBranch");
-	
 	if (!branchEl) return;
 	
 	const branches = window.journalBranches || [];
@@ -22647,9 +22599,7 @@ function populateNewJournalBranches() {
 function getNewJournalAccounts() {
 	const accounts = window.journalAccounts || [];
 
-	return accounts.filter(
-		account => account && account.isActive !== false
-	);
+	return accounts.filter( account => account && account.isActive !== false );
 }
 
 function buildNewJournalAccountOptions() {
@@ -22673,8 +22623,10 @@ function addNewJournalLine() {
 	const container = document.getElementById("newJournalLinesContainer");
 	if (!container) return;
 	newJournalLineCounter++;
+	
 	const lineId = newJournalLineCounter;
 	const row = document.createElement("tr");
+	
 	row.id = `newJournalLine-${lineId}`;
 	row.className = "border-b border-white/5 last:border-b-0";
 	row.innerHTML = `
@@ -22738,32 +22690,24 @@ function handleNewJournalDebitInput(lineId) {
 	const creditEl = document.getElementById(`newJournalCredit-${lineId}`);
 	
 	if (!debitEl || !creditEl) return;
-	
 	const debit = Number(debitEl.value || 0);
 	
-	if (debit > 0) {
-		creditEl.value = "0";
-	}
+	if (debit > 0) { creditEl.value = "0"; }
 	calculateNewJournalTotals();
 }
 
 function handleNewJournalCreditInput(lineId) {
 	const debitEl = document.getElementById(`newJournalDebit-${lineId}`);
 	const creditEl = document.getElementById(`newJournalCredit-${lineId}`);
-	
 	if (!debitEl || !creditEl) return;
 	
 	const credit = Number(creditEl.value || 0);
-	
-	if (credit > 0) {
-		debitEl.value = "0";
-	}
+	if (credit > 0) { debitEl.value = "0"; }
 	calculateNewJournalTotals();
 }
 
 function calculateNewJournalTotals() {
 	const container = document.getElementById("newJournalLinesContainer");
-	
 	if (!container) return;
 	
 	let totalDebit = 0;
@@ -22785,18 +22729,14 @@ function calculateNewJournalTotals() {
 	if (debitDisplay) { debitDisplay.textContent = formatJournalCurrency(totalDebit); }
 	if (creditDisplay) { creditDisplay.textContent = formatJournalCurrency(totalCredit); }
 	if (differenceDisplay) {
-		differenceDisplay.textContent =
-			formatJournalCurrency(Math.abs(difference));
+		differenceDisplay.textContent = formatJournalCurrency(Math.abs(difference));
 		differenceDisplay.classList.remove(
 			"text-green-700",
 			"text-red-700",
 			"text-gray-700"
 		);
-		if (difference === 0) {
-				differenceDisplay.classList.add("text-green-700");
-		} else {
-				differenceDisplay.classList.add("text-red-700");
-		}
+		if (difference === 0) { differenceDisplay.classList.add("text-green-700");
+		} else { differenceDisplay.classList.add("text-red-700"); }
 	}
 
 	return {
@@ -22808,7 +22748,6 @@ function calculateNewJournalTotals() {
 
 function getNewJournalLines() {
 	const container = document.getElementById("newJournalLinesContainer");
-	
 	if (!container) return [];
 	
 	const rows = container.querySelectorAll("tr");
@@ -23219,39 +23158,16 @@ function renderGeneralLedger() {
 		const balance = Number(row.balance || 0);
 		return `
 			<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
-				<td class="px-5 py-4 text-muted">
-						${formatGeneralLedgerDate(row.journalDate)}
+				<td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatGeneralLedgerDate(row.journalDate)} </td>
+				<td class="px-5 py-4 font-medium text-on-surface whitespace-nowrap"> ${escapeHtml(row.journalNo || "-")} </td>
+				<td class="px-5 py-4 text-on-surface whitespace-nowrap">
+					<div class="text-sm font-medium"> ${escapeHtml(row.accountCode || "-")} </div>
+					<div class="text-xs text-on-surface-variant mt-1"> ${escapeHtml(row.accountName || "-")} </div>
 				</td>
-
-				<td class="px-5 py-4 font-medium text-on-surface">
-						${escapeHtml(row.journalNo || "-")}
-				</td>
-
-				<td class="px-5 py-4 text-on-surface">
-						<div class="text-sm font-medium">
-								${escapeHtml(row.accountCode || "-")}
-						</div>
-
-						<div class="text-xs text-on-surface-variant mt-1">
-								${escapeHtml(row.accountName || "-")}
-						</div>
-				</td>
-
-				<td class="px-5 py-4 text-on-surface-variant">
-						${escapeHtml(row.description || "-")}
-				</td>
-
-				<td class="px-5 py-4 text-right text-on-surface">
-						${debit > 0 ? formatGeneralLedgerCurrency(debit) : "—"}
-				</td>
-
-				<td class="px-5 py-4 text-right text-on-surface">
-						${credit > 0 ? formatGeneralLedgerCurrency(credit) : "—"}
-				</td>
-
-				<td class="px-5 py-4 text-right font-medium text-on-surface">
-						${formatGeneralLedgerCurrency(balance)}
-				</td>
+				<td class="px-5 py-4 text-on-surface-variant"> ${escapeHtml(row.description || "-")} </td>
+				<td class="px-5 py-4 text-right text-on-surface whitespace-nowrap"> ${debit > 0 ? formatGeneralLedgerCurrency(debit) : "—"} </td>
+				<td class="px-5 py-4 text-right text-on-surface whitespace-nowrap"> ${credit > 0 ? formatGeneralLedgerCurrency(credit) : "—"} </td>
+				<td class="px-5 py-4 text-right font-medium text-on-surface whitespace-nowrap"> ${formatGeneralLedgerCurrency(balance)} </td>
 			</tr>
 		`;
 	}).join("");
