@@ -25251,56 +25251,58 @@
         <!-- ==== EMPLOYEE LIST ==== -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
           <!-- HEADER -->
-          <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="main-icon-box">
-                <span class="material-symbols-outlined text-3xl"
-                  style="font-variation-settings:'FILL' 1;">
-                  badge
-                </span>
-              </div>
-
-              <div>
-                <h2 class="text-lg font-bold font-headline text-foreground">
-                  Employee List
-                </h2>
-
-                <p class="text-xs text-muted mt-1">
-                  Employee biodata and account management
-                </p>
-              </div>
-            </div>
-						
-					  <div class="p-5 border-b border-outline-variant">
-					    <div class="grid grid-cols-1 md:grid-cols-4 xl:grid-cols-4 gap-2">
-	              <div class="relative">
-	                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">
-	                  search
-	                </span>
-	
-	                <input id="employeeSearch"
-	                  type="text"
-	                  placeholder="Search employee..."
-	                  oninput="filterEmployees()"
-	                  class="w-full sm:w-64 h-10 pl-9 pr-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
-	              </div>
-	              <!-- STATUS -->
-	              <select id="employeeStatusFilter"
-	                onchange="filterEmployees()"
-	                class="w-full sm:w-40 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-	                <option value=""> All Status </option>
-	                <option value="ACTIVE"> Active </option>
-	                <option value="INACTIVE"> Inactive </option>
-	              </select>
-	              <!-- BRANCH -->
-	              <select id="employeeBranchFilter"
-	                onchange="filterEmployees()"
-	                class="w-full sm:w-40 h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-	                <option value=""> All Branch </option>
-	              </select>
-	            </div>
-						</div>
-          </div>
+					<div class="p-5 border-b border-outline-variant">
+					  <!-- TITLE -->
+					  <div class="flex items-center gap-3">
+					    <div class="main-icon-box">
+					      <span class="material-symbols-outlined text-3xl"
+					        style="font-variation-settings:'FILL' 1;">
+					        badge
+					      </span>
+					    </div>
+					
+					    <div>
+					      <h2 class="text-lg font-bold font-headline text-foreground">
+					        Employee List
+					      </h2>
+					
+					      <p class="text-xs text-muted mt-1">
+					        Employee biodata and account management
+					      </p>
+					    </div>
+					  </div>
+					  <!-- FILTERS -->
+					  <div class="mt-5">
+					    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+					      <!-- SEARCH -->
+					      <div class="relative">
+					        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-sm">
+					          search
+					        </span>
+					
+					        <input id="employeeSearch"
+					          type="text"
+					          placeholder="Search employee..."
+					          oninput="filterEmployees()"
+					          class="w-full h-10 pl-9 pr-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
+					      </div>
+					      <!-- STATUS -->
+					      <select id="employeeStatusFilter"
+					        onchange="filterEmployees()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Status</option>
+					        <option value="ACTIVE">Active</option>
+					        <option value="INACTIVE">Inactive</option>
+					      </select>
+					      <!-- BRANCH -->
+					      <select id="employeeBranchFilter"
+					        onchange="filterEmployees()"
+					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+					        <option value="">All Branch</option>
+					      </select>
+					    </div>
+					  </div>
+					</div>
           <!-- TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-sm">
