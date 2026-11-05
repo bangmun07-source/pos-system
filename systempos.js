@@ -12549,7 +12549,7 @@ function renderExpenseTable(data) {
 
     table.innerHTML += `
       <tr class="border-b border-outline-variant hover:bg-outline-variant transition-colors">
-        <td class="px-8 py-5">
+        <td class="px-8 py-5 whitespace-nowrap">
           <p class="font-bold text-on-surface">
             ${formatDate(item.tanggal)}
           </p>
@@ -13163,7 +13163,7 @@ function renderOtherIncomeTable() {
   rows.forEach(item => {
     tbody.innerHTML += `
       <tr class="border border-outline-variant hover:bg-outline-variant transition-colors">
-        <td class="px-8 py-5">
+        <td class="px-8 py-5 whitespace-nowrap">
           <p class="font-bold text-on-surface">
             ${formatDate(item.date)}
           </p>
