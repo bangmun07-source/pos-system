@@ -6878,15 +6878,15 @@ function renderIngredientPurchases(purchases) {
     const status = String( purchase.Status || "" ).toUpperCase();
     return `
       <tr class="hover:bg-outline-variant transition">
-        <td class="px-8 py-4 text-sm font-semibold"> ${escapeHtml(purchase.ID || "-")} </td>
-        <td class="px-8 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Date || "-")} </td>
-        <td class="px-8 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Name_Supplier || "-")} </td>
-        <td class="px-8 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Ingredient || "-")} </td>
-        <td class="px-8 py-4 text-sm"> ${Number(purchase.Qty || 0).toLocaleString("id-ID")} </td>
-        <td class="px-8 py-4 text-sm font-semibold whitespace-nowrap"> Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")} </td>
-        <td class="px-8 py-4 text-sm text-center"> ${escapeHtml(purchase.Payment_Method || "-")} </td>
-        <td class="px-8 py-4 text-sm text-center"> ${renderPurchaseStatus(status)} </td>
-        <td class="px-8 py-4 text-right">
+        <td class="px-5 py-4 text-sm font-semibold"> ${escapeHtml(purchase.ID || "-")} </td>
+        <td class="px-5 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Date || "-")} </td>
+        <td class="px-5 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Name_Supplier || "-")} </td>
+        <td class="px-5 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Ingredient || "-")} </td>
+        <td class="px-5 py-4 text-sm"> ${Number(purchase.Qty || 0).toLocaleString("id-ID")} </td>
+        <td class="px-5 py-4 text-sm font-semibold whitespace-nowrap"> Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")} </td>
+        <td class="px-5 py-4 text-sm text-center"> ${escapeHtml(purchase.Payment_Method || "-")} </td>
+        <td class="px-5 py-4 text-sm text-center"> ${renderPurchaseStatus(status)} </td>
+        <td class="px-5 py-4 text-right">
           <button onclick="openPurchaseAction('${escapeHtml(purchase.ID)}')"
             class="p-2 rounded-md text-on-surface-variant hover:text-on-surface transition">
             <span class="material-symbols-outlined text-lg">
@@ -10459,10 +10459,7 @@ function renderRawMaterialAnalysis(data) {
 }
 
 function renderRawMaterialPage() {
-  const tbody =
-    document.getElementById(
-      "rawMaterialAnalysisBody"
-    );
+  const tbody = document.getElementById( "rawMaterialAnalysisBody" );
   if (!tbody) return;
   tbody.innerHTML = "";
   if (!rawMaterialData.length) {
@@ -10500,76 +10497,61 @@ function renderRawMaterialPage() {
         border-red-600/20
       `;
     }
-    const daysColor =
-      item.status === "Critical"
-        ? "text-red-700"
-        : item.status === "Warning"
-        ? "text-amber-700"
-        : "text-emerald-700";
+    const daysColor = item.status === "Critical"
+			? "text-red-700"
+			: item.status === "Warning"
+			? "text-amber-700"
+			: "text-emerald-700";
     return `
       <tr class="hover:bg-outline-variant transition-colors">
-        <td class="px-8 py-6">
+        <td class="px-5 py-4 whitespace-nowrap">
           <div class="font-bold text-sm">
             ${item.name}
           </div>
         </td>
 
-        <td class="px-8 py-6 text-sm">
+        <td class="px-5 py-4 text-sm">
           ${formatNumber(item.stock)}
           ${item.unit}
         </td>
 
-        <td class="px-8 py-6 text-sm text-muted">
+        <td class="px-5 py-4 text-sm text-muted whitespace-nowrap">
           ${formatNumber(item.dailyUsage)}
           ${item.unit}/day
         </td>
 
-        <td class="px-8 py-6 text-sm text-muted ">
+        <td class="px-5 py-4 text-sm text-muted ">
           ${formatNumber(item.minStock)}
           ${item.unit}
         </td>
 
-        <td class="px-8 py-6">
-          <span class="
-            px-3 py-1 rounded-md
-            text-[10px]
-            font-bold
-            uppercase
-            border
-            ${statusClass}
-          ">
+        <td class="px-5 py-4">
+          <span class=" px-3 py-1 rounded-md text-[10px] font-bold uppercase border ${statusClass} ">
             ${item.status}
           </span>
         </td>
 
-        <td class="px-8 py-6">
-          <span class="
-            text-sm
-            font-bold
-            ${daysColor}
-          ">
+        <td class="px-5 py-4">
+          <span class=" text-sm font-bold ${daysColor} ">
             ${item.daysLeft} Days
           </span>
         </td>
 
-        <td class="px-8 py-6 text-right font-headline font-bold text-on-surface">
+        <td class="px-5 py-4 text-right font-headline font-bold text-on-surface whitespace-nowrap">
           ${formatNumber(item.stockValue)}
         </td>
 
-        <td class="px-8 py-6 text-xs text-muted ">
-          ${
-            item.lastRestock
-              ? new Date(item.lastRestock)
-                  .toLocaleDateString("id-ID")
-              : "-"
+        <td class="px-5 py-4 text-xs text-muted ">
+          ${ item.lastRestock
+						? new Date(item.lastRestock)
+								.toLocaleDateString("id-ID")
+						: "-"
           }
         </td>
 
-        <td class="px-8 py-6 text-right text-on-surface-variant">
-          <button
-            onclick="navigate('inventoryPage')"
-            class="p-2 hover:text-on-surface transition-all"
-          >
+        <td class="px-5 py-4 text-right text-on-surface-variant">
+          <button onclick="navigate('inventoryPage')"
+            class="p-2 hover:text-on-surface transition-all" >
             <span class="material-symbols-outlined text-sm">
               visibility
             </span>
@@ -11038,7 +11020,7 @@ function renderBranchTable(){
   rows.forEach(b => {
     html += `
       <tr class="group hover:bg-outline-variant transition-colors">
-        <td class="py-5 px-4">
+        <td class="py-5 px-4 branchTableBody"">
           <div class="font-bold text-on-surface">${b.branchName}</div>
           <div class="text-[10px] text-muted ">${b.branchId}</div>
         </td>
@@ -11412,17 +11394,11 @@ function renderUsers() {
 
     html += `
       <tr class="hover:bg-outline-variant transition">
-        <!-- FULL NAME -->
-        <td class="px-5 py-4 font-medium"> ${user.Full_Name || "-"} </td>
-        <!-- USERNAME -->
+        <td class="px-5 py-4 font-medium whitespace-nowrap"> ${user.Full_Name || "-"} </td>
         <td class="px-5 py-4"> ${user.username} </td>
-        <!-- ROLE -->
         <td class="px-5 py-4"> ${user.role} </td>
-        <!-- PASSWORD -->
         <td class="px-5 py-4"> •••••••••••• </td>
-        <!-- OUTLET -->
         <td class="px-5 py-4"> ${user.outlet} </td>
-        <!-- ACTIONS -->
         <td class="px-5 py-4">
           <div class="flex justify-end gap-2">
             ${canEdit ? `
