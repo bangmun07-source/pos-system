@@ -12549,7 +12549,7 @@ function renderExpenseTable(data) {
 
     table.innerHTML += `
       <tr class="border-b border-outline-variant hover:bg-outline-variant transition-colors">
-        <td class="px-8 py-5 whitespace-nowrap">
+        <td class="px-5 py-4 whitespace-nowrap">
           <p class="font-bold text-on-surface">
             ${formatDate(item.tanggal)}
           </p>
@@ -12559,25 +12559,25 @@ function renderExpenseTable(data) {
           </p>
         </td>
 
-        <td class="px-4 py-5 font-medium text-on-surface">
+        <td class="px-5 py-4 font-medium text-on-surface">
           ${item.description || "-"}
         </td>
 
-        <td class="px-4 py-5">
+        <td class="px-5 py-4">
           <span class="px-2 py-0.5 text-xs text-on-surface uppercase font-headline font-bold tracking-[0.20em]">
             ${item.category || "-"}
           </span>
         </td>
 
-        <td class="px-4 py-5 text-on-surface-variant">
+        <td class="px-5 py-4 text-on-surface-variant">
           ${item.paymentMethod || "-"}
         </td>
 
-        <td class="px-4 py-5 font-bold text-on-surface text-sm">
+        <td class="px-5 py-4 font-bold text-on-surface text-sm">
           Rp ${amount.toLocaleString("id-ID")}
         </td>
 
-        <td class="px-4 py-5">
+        <td class="px-5 py-4">
           <div class="flex items-center gap-1.5 ${statusColor}">
             <span class="w-1.5 h-1.5 rounded-md bg-current"></span>
 
@@ -12587,7 +12587,7 @@ function renderExpenseTable(data) {
           </div>
         </td>
 
-        <td class="px-8 py-5 text-right">
+        <td class="px-5 py-4 text-right">
           <div class="flex justify-end gap-3">
             <button onclick="showExpenseReceipt(${index})"
               class="text-on-surface-variant hover:text-on-surface transition-colors">
@@ -12839,11 +12839,11 @@ function openExpenseAttachmentFile() {
 	
 				<div>
 					<p class="font-semibold text-on-surface">
-							PDF Document
+						PDF Document
 					</p>
 	
 					<p class="text-xs text-on-surface-variant mt-1">
-							${expense.Attachment_URL.split("/").pop()}
+						${expense.Attachment_URL.split("/").pop()}
 					</p>
 				</div>
 
@@ -13163,7 +13163,7 @@ function renderOtherIncomeTable() {
   rows.forEach(item => {
     tbody.innerHTML += `
       <tr class="border border-outline-variant hover:bg-outline-variant transition-colors">
-        <td class="px-8 py-5 whitespace-nowrap">
+        <td class="px-5 py-4 whitespace-nowrap">
           <p class="font-bold text-on-surface">
             ${formatDate(item.date)}
           </p>
@@ -13173,29 +13173,29 @@ function renderOtherIncomeTable() {
           </p>
         </td>
 
-        <td class="px-4 py-5 font-medium text-on-surface">
+        <td class="px-5 py-4 font-medium text-on-surface">
           ${item.description || "-"}
         </td>
 
-        <td class="px-4 py-5">
+        <td class="px-5 py-4">
           <span class="px-2 py-0.5 text-on-surface rounded-md text-xs uppercase tracking-widest font-headline font-bold tracking-[0.20em]">
             ${item.category}
           </span>
         </td>
 
-        <td class="px-4 py-5 text-on-surface-variant">
+        <td class="px-5 py-4 text-on-surface-variant">
           ${item.method}
         </td>
 
-        <td class="px-4 py-5 font-bold text-on-surface text-sm">
+        <td class="px-5 py-4 font-bold text-on-surface text-sm">
           ${formatRupiah(item.amount)}
         </td>
 
-        <td class="px-4 py-5 text-on-surface">
+        <td class="px-5 py-4 text-on-surface">
           ${renderOtherIncomeStatus(item.status)}
         </td>
 
-        <td class="px-8 py-5 text-right">
+        <td class="px-5 py-4 text-right">
           <div class="flex justify-end gap-3">
             <button onclick="viewOtherIncome('${item.refId}')"
             	class="text-on-surface-variant hover:text-on-surface hover:scale-110 transition-all">
