@@ -20396,39 +20396,11 @@ async function loadAccountingBranchOptions() {
 function renderAccountingBranchOptions(branches) {
   const select = document.getElementById("accounting-branch");
   if (!select) return;
-
-  const role = String(
-    state.user?.role || state.user?.Role || ""
-  ).trim().toLowerCase();
-
-  const userBranchId = String(
-    state.user?.branchId || state.user?.Branch_ID || ""
-  ).trim();
-
-  select.innerHTML = "";
-
-  // ADMIN: hanya menampilkan outlet sendiri
-  if (role === "admin") {
-    const ownBranch = (branches || []).find(
-      branch => String(branch.id) === userBranchId
-    );
-
-    select.innerHTML = `
-      <option value="${userBranchId}">
-        ${ownBranch?.name || userBranchId}
-      </option>
-    `;
-
-    select.value = userBranchId;
-    select.disabled = true;
-    return;
-  }
-
-  // OWNER / ACCOUNTANT: bisa memilih semua outlet
   select.innerHTML = `
-    <option value="ALL">All Branch</option>
+    <option value="ALL">
+      All Branch
+    </option>
   `;
-
   (branches || []).forEach(branch => {
     select.innerHTML += `
       <option value="${branch.id}">
@@ -20436,8 +20408,6 @@ function renderAccountingBranchOptions(branches) {
       </option>
     `;
   });
-
-  select.disabled = false;
 }
 
 function getAccountingDateRange(period) {
