@@ -19031,7 +19031,7 @@ function renderAssetTable() {
       return `
         <tr class="border-b border-outline-variant hover:bg-outline-variant text-on-surface-variant transition-colors">
           <!-- ASSET -->
-          <td class="px-6 py-4">
+          <td class="px-6 py-4 whitespace-nowrap">
             <div class="flex flex-col">
               <span class="font-semibold text-on-surface text-sm">
                 ${escapeAssetHTML(asset.Asset_Name)}
@@ -19049,7 +19049,7 @@ function renderAssetTable() {
           </td>
 
           <!-- PURCHASE COST -->
-          <td class="px-6 py-4 text-right text-on-surface text-sm">
+          <td class="px-6 py-4 text-right text-on-surface text-sm whitespace-nowrap">
             ${formatAssetCurrency(asset.Purchase_Cost)}
           </td>
 
@@ -19065,23 +19065,21 @@ function renderAssetTable() {
           </td>
 
           <!-- DEPRECIATION -->
-          <td class="px-6 py-4 text-right text-sm">
+          <td class="px-6 py-4 text-right text-sm whitespace-nowrap">
             ${
               depreciationPerMonth > 0
-                ? formatAssetCurrency(
-                    depreciationPerMonth
-                  )
+                ? formatAssetCurrency( depreciationPerMonth )
                 : "-"
             }
           </td>
 
           <!-- ACCUMULATED -->
-          <td class="px-6 py-4 text-right text-on-surface text-sm">
+          <td class="px-6 py-4 text-right text-on-surface text-sm whitespace-nowrap">
             ${formatAssetCurrency(asset.Accumulated_Depreciation )}
           </td>
 
           <!-- BOOK VALUE -->
-          <td class="px-6 py-4 text-right text-sm text-on-surface font-semibold">
+          <td class="px-6 py-4 text-right text-sm text-on-surface font-semibold whitespace-nowrap">
             ${formatAssetCurrency( asset.Book_Value)}
           </td>
 
@@ -19555,7 +19553,7 @@ function renderAssetPurchases(rows) {
     return `
       <tr class="border-b border-outline-variant hover:bg-outline-variant transition">
         <!-- ASSET -->
-        <td class="px-4 py-3 font-semibold text-on-surface">
+        <td class="px-4 py-3 font-semibold text-on-surface whitespace-nowrap">
           ${escapeHtmlAssetPurchase(row.Asset_Name)}
         </td>
 
@@ -19565,27 +19563,27 @@ function renderAssetPurchases(rows) {
         </td>
 
         <!-- PURCHASE COST -->
-        <td class="px-4 py-3 text-right">
+        <td class="px-4 py-3 text-right whitespace-nowrap">
           ${formatAssetPurchaseCurrency(row.Purchase_Cost)}
         </td>
 
         <!-- INTEREST -->
-        <td class="px-4 py-3 text-right">
+        <td class="px-4 py-3 text-right whitespace-nowrap">
           ${formatAssetPurchaseCurrency(row.Interest_Amount)}
         </td>
 
         <!-- TOTAL -->
-        <td class="px-4 py-3 text-right font-semibold">
+        <td class="px-4 py-3 text-right font-semibold whitespace-nowrap">
           ${formatAssetPurchaseCurrency(row.Total_Obligation)}
         </td>
 
         <!-- PAID -->
-        <td class="px-4 py-3 text-right">
+        <td class="px-4 py-3 text-right whitespace-nowrap">
           ${formatAssetPurchaseCurrency(row.Paid_Amount)}
         </td>
 
         <!-- OUTSTANDING -->
-        <td class="px-4 py-3 text-right">
+        <td class="px-4 py-3 text-right whitespace-nowrap">
           ${formatAssetPurchaseCurrency(row.Outstanding_Amount)}
         </td>
 
@@ -19598,7 +19596,7 @@ function renderAssetPurchases(rows) {
         <td class="px-4 py-3 text-center">
           <buttontype="button"
             onclick="openAssetPurchaseActionMenu('${escapeHtmlAssetPurchase(row.Purchase_ID)}')"
-            class="inline-flex items-center justify-center w-9 h-9 rounded-md text-on-surface-variant hover:text-on-surface transition"
+            class="inline-flex items-center justify-center w-8 h-8 rounded-md text-on-surface-variant hover:text-on-surface transition"
             title="Action" >
 		        <span class="material-symbols-outlined text-3xl">
 		          payments
@@ -36036,9 +36034,7 @@ function renderSchedules(data = filteredScheduleData) {
 
   if (!tbody) return;
 	
-	const isAccountant = String(
-	  state.user?.role || state.user?.Role || ''
-	).trim().toLowerCase() === 'accountant';
+	const isAccountant = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase() === 'accountant';
   // Simpan data hasil filter untuk pagination
   filteredScheduleData = data;
 
@@ -36084,7 +36080,7 @@ function renderSchedules(data = filteredScheduleData) {
 
     return `
       <tr class="hover:bg-outline-variant">
-        <td class="px-5 py-3">
+        <td class="px-5 py-4 whitespace-nowrap">
           <div class="font-medium text-foreground">
             ${escapeHtml(row.Full_Name || '-')}
           </div>
@@ -36093,7 +36089,7 @@ function renderSchedules(data = filteredScheduleData) {
           </div>
         </td>
 
-        <td class="px-5 py-3 text-center">
+        <td class="px-5 py-4 text-center">
           ${escapeHtml(
             employeeAttendanceBranches.find(branch =>
               String(branch.id || '').trim() ===
@@ -36102,7 +36098,7 @@ function renderSchedules(data = filteredScheduleData) {
           )}
         </td>
 
-        <td class="px-5 py-3">
+        <td class="px-5 py-4">
           <div class="font-medium">
             ${escapeHtml(row.Day_Of_Week || '-')}
           </div>
@@ -36111,17 +36107,17 @@ function renderSchedules(data = filteredScheduleData) {
           </div>
         </td>
 
-        <td class="px-5 py-3">${start}</td>
-        <td class="px-5 py-3">${end}</td>
-        <td class="px-5 py-3">${breakMinutes}</td>
+        <td class="px-5 py-4">${start}</td>
+        <td class="px-5 py-4">${end}</td>
+        <td class="px-5 py-4">${breakMinutes}</td>
 
-        <td class="px-5 py-3 text-center">
+        <td class="px-5 py-4 text-center">
           <span class="font-semibold ${statusClass}">
             ${statusText}
           </span>
         </td>
 
-        <td class="px-5 py-3 text-center">
+        <td class="px-5 py-4 text-center">
 					<button type="button"
 					  onclick='openScheduleModal(${JSON.stringify(row).replace(/'/g, "&#39;")})'
 					  class="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-background ${isAccountant ? 'hidden' : ''}"
@@ -37235,7 +37231,7 @@ function renderEmployeeAttendanceTable() {
 
       return `
         <tr class="border-b border-outline-variant hover:bg-outline-variant">
-          <td class="px-4 py-3">
+          <td class="px-5 py-4 whitespace-nowrap">
             <div class="font-medium">
               ${escapeHtml(row.Full_Name || '-')}
             </div>
@@ -37243,7 +37239,7 @@ function renderEmployeeAttendanceTable() {
               ${escapeHtml(row.Employee_Code || row.Employee_ID || '')}
             </div>
           </td>
-          <td class="px-4 py-3 text-center">
+          <td class="px-5 py-4 text-center">
 					  ${escapeHtml(
 					    employeeAttendanceBranches.find(branch =>
 					      String(branch.id || '').trim() ===
@@ -37251,27 +37247,25 @@ function renderEmployeeAttendanceTable() {
 					    )?.name || row.Branch_ID || '-'
 					  )}
           </td>
-          <td class="px-4 py-3 whitespace-nowrap"> ${escapeHtml(attendanceDate)} </td>
-          <td class="px-4 py-3 text-center whitespace-nowrap"> ${escapeHtml(schedule)} </td>
-          <td class="px-4 py-3 whitespace-nowrap">
+          <td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(attendanceDate)} </td>
+          <td class="px-5 py-4 text-center whitespace-nowrap"> ${escapeHtml(schedule)} </td>
+          <td class="px-5 py-4 whitespace-nowrap">
             ${escapeHtml(checkIn)}
             ${
               Number(row.Late_Minutes) > 0
-                ? `<div class="text-xs text-red-500">
-                     ${Number(row.Late_Minutes)} min late
-                   </div>`
+                ? `<div class="text-xs text-red-500"> ${Number(row.Late_Minutes)} min late </div>`
                 : ''
             }
           </td>
-          <td class="px-4 py-3 text-center">
+          <td class="px-5 py-4 text-center">
             <span class="inline-flex rounded-md px-2 py-1 text-xs font-semibold ${statusClass}">
               ${escapeHtml(statusLabels[row.Status] || row.Status || '-')}
             </span>
           </td>
-          <td class="px-4 py-3">
+          <td class="px-5 py-4 whitespace-nowrap">
             ${escapeHtml(row.Note || '-')}
           </td>
-					<td class="px-4 py-3 text-center">
+					<td class="px-5 py-4 text-center">
 					  <div class="relative inline-block text-center">
 					    <button type="button"
 					      onclick="toggleAttendanceActionMenu(event, ${rowIndex})"
@@ -39915,23 +39909,23 @@ window.renderPayrollTable = function () {
 
 			return `
 				<tr class="border-b border-outline-variant">
-					<td class="px-4 py-3">
+					<td class="px-5 py-4 whitespace-nowrap">
 						<div class="font-medium">${escapeHtml(row.Full_Name)}</div>
 						<div class="text-xs text-muted">
 							${escapeHtml(row.Employee_Code)}
 						</div>
 					</td>
-					<td class="px-4 py-3 whitespace-nowrap">${money(row.Basic_Salary)}</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Total_Allowance)}</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
-					<td class="px-4 py-3 text-center whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Total_Overtime)}</td>
-					<td class="px-4 py-3 text-right text-right whitespace-nowrap">${money(row.Health_Amount)}</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Tax_Amount)}</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Receivable_Amount)}</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
-					<td class="px-4 py-3 text-right whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
-					<td class="px-4 py-3">
+					<td class="px-5 py-4 whitespace-nowrap">${money(row.Basic_Salary)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Total_Allowance)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
+					<td class="px-5 py-4 text-center whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Total_Overtime)}</td>
+					<td class="px-5 py-4 text-right text-right whitespace-nowrap">${money(row.Health_Amount)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Tax_Amount)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Receivable_Amount)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
+					<td class="px-5 py-4">
 						<span class="px-2 py-1 text-center rounded-md font-semibold text-xs ${statusClass}">
 							${escapeHtml(status)}
 						</span>
