@@ -2123,13 +2123,13 @@ function renderTransactions(data) {
             : "-"}
         </td>
         <td class="px-6 py-4 text-center"> ${trx.table || "-"} </td>
-        <td> ${trx.memberName || trx.memberId || trx.member || "-"} </td>
+        <td class="px-6 py-4"> ${trx.memberName || trx.memberId || trx.member || "-"} </td>
         <td class="px-6 py-4 text-right font-bold whitespace-nowrap"> Rp ${Number(trx.total || 0).toLocaleString("id-ID")} </td>
         <td class="px-6 py-4 text-center"> ${trx.status || "-"} </td>
         <td class="px-6 py-4 text-center">
           <button
             onclick="openTransactionModal('${trx.id}')"
-            class="text-blue-700 hover:underline text-sm">
+            class="text-blue-700 hover:text-blue-800 text-sm">
             View
           </button>
         </td>
