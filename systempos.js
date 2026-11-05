@@ -20338,42 +20338,60 @@ async function exportAssets() {
 /* ==================================
 				OVERVIEW AKUNTANSI 
 	 ================================== */
+
 async function loadAccountingOverview() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
-  if (!periodEl || !branchEl) { return; }
-  // Pastikan branch selalu dimuat sebelum membaca branch
+
+  if (!periodEl || !branchEl) return;
+
   if (branchEl.options.length <= 1) {
     await loadAccountingBranchOptions();
   }
+
   const period = periodEl.value || "month";
   const branch = branchEl.value || "ALL";
   const { start, end } = getAccountingDateRange(period);
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_accounting_overview",
-        {
-          p_branch_id: branch,
-          p_start: start,
-          p_end: end,
-          p_session_id: sessionId
-        }
-      );
-		
-    if (error) throw error;
+    const sessionId = localStorage.getItem("pos_session_id");
+
+    const { data, error } = await supabaseClient.rpc(
+      "get_accounting_overview",
+      {
+        p_branch_id: branch,
+        p_start: start,
+        p_end: end,
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) {
+      console.error("ACCOUNTING OVERVIEW ERROR:", error);
+      console.error("Error Code:", error.code);
+      console.error("Error Message:", error.message);
+      console.error("Error Details:", error.details);
+      console.error("Error Hint:", error.hint);
+
+      throw error;
+    }
+
     if (!data) {
       throw new Error(
         "Accounting Overview tidak mengembalikan data."
       );
     }
+
     renderAccountingOverview(data);
+
   } catch (error) {
-	  showToast( error?.message || "Gagal memuat Accounting Overview.", "error" );
-	}
+    showToast(
+      error?.message || "Gagal memuat Accounting Overview.",
+      "error"
+    );
+  }
 }
+
 
 async function loadAccountingBranchOptions() {
 	
