@@ -4297,7 +4297,7 @@
 						<th class="px-5 py-4 font-bold">Unit</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Min Threshold</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Est. Cost (IDR)</th>
-						<th class="px-5 py-4 font-bold">Status</th>
+						<th class="px-5 py-4 font-bold text-center">Status</th>
 						<th class="px-5 py-4 font-bold text-right">Actions</th>
 					</tr>
 				</thead>
@@ -4524,7 +4524,7 @@
 				<thead>
 					<tr class="sticky top-0 border border-outline-variant text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Product Name</th>
-						<th class="px-5 py-4 font-bold text-center">Ingredients</th>
+						<th class="px-5 py-4 font-bold">Ingredients</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Est. Cost (IDR)</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Price (IDR)</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Net Price (IDR)</th>
@@ -4661,12 +4661,10 @@
 </div>
 </main>
 </div>
-
 </template>
 
 
 <!-- ADD PRODUCT MODAL -->
-
 <template id="addProductModalTemplate">
 	<div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background backdrop-blur-md">
 	  <!-- Overlay -->
@@ -6350,8 +6348,8 @@
 							</div>
 							<!-- Raw Material Stock Analysis -->
 							<section class="bg-background rounded-md relative overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-								<div class="p-8 flex justify-between items-center">
-									<div class="flex items-center gap-4">
+								<div class="p-5 flex justify-between items-center">
+									<div class="flex items-center gap-3">
 										<div class="main-icon-box">
 								      <span class="main-icon-box material-symbols-outlined text-3xl">
 												inventory_2
@@ -6366,18 +6364,18 @@
 									<table class="w-full text-left border-collapse min-w-[1000px]">
 										<thead>
 											<tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Material</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Current Stock</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Daily Usage</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Min. Threshold</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Status</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Days Left</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest text-right">Value (IDR)</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest">Last Restock</th>
-												<th class="px-8 py-4 font-bold uppercase tracking-widest text-right">Action</th>
+												<th class="px-5 py-4 font-bold">Material</th>
+												<th class="px-5 py-4 font-bold whitespace-nowrap">Current Stock</th>
+												<th class="px-5 py-4 font-bold whitespace-nowrap">Daily Usage</th>
+												<th class="px-5 py-4 font-bold whitespace-nowrap">Min. Threshold</th>
+												<th class="px-5 py-4 font-bold text-center">Status</th>
+												<th class="px-5 py-4 font-bold whitespace-nowrap">Days Left</th>
+												<th class="px-5 py-4 font-bold whitespace-nowrap text-righ">Value (IDR)</th>
+												<th class="px-5 py-4 font-bold whitespace-nowrap">Last Restock</th>
+												<th class="px-5 py-4 font-bold text-right">Action</th>
 											</tr>
 										</thead>
-									<tbody id="rawMaterialAnalysisBody" class="divide-y divide-white/5">
+									<tbody id="rawMaterialAnalysisBody" class="divide-y divide-outline-variant">
 										<tr>
 											<td colspan="9" class="text-center text-muted ">
 												Loading...
@@ -6386,7 +6384,7 @@
 									</tbody>
 								</table>
 							</div>
-							<div class="p-6 border-t border-outline-variant flex items-center justify-between">
+							<div class="p-5 border-t border-outline-variant flex items-center justify-between">
 								<p id="rawMaterialPaginationInfo" class="text-xs text-muted ">
 									Showing <span class="text-on-surface font-bold">1</span> to <span class="text-on-surface font-bold">4</span> of <span class="text-on-surface font-bold">24</span> entries
 								</p>
@@ -6680,13 +6678,12 @@
 		</div>
 	</div>
 </div>
-		
-		<!-- Bento Grid Layout -->
+<!-- Bento Grid Layout -->
 <div class="grid grid-cols-12 gap-4">
 	<!-- Business Outlets Section -->
-	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)]  ">
+	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 		<div class="flex items-center justify-between mb-8 border-b border-outline-variant pb-6">
-			<div class="flex items-center gap-4">
+			<div class="flex items-center gap-3">
 				<div class="main-icon-box">		                
 					<span class="material-symbols-outlined text-3xl"
 							style="font-variation-settings:'FILL' 1;">
@@ -6710,11 +6707,11 @@
 			<table class="w-full text-left">
 					<thead>
 							<tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant">
-							<th class="pb-4 px-4">Branch Name</th>
-							<th class="pb-4 px-4">Manager</th>
-							<th class="pb-4 px-4">Address</th>
-							<th class="pb-4 px-4 text-center">Status</th>
-							<th class="pb-4 px-4 text-right">Actions</th>
+							<th class="pb-5 px-4 whitespace-nowrap">Branch Name</th>
+							<th class="pb-5 px-4">Manager</th>
+							<th class="pb-5 px-4">Address</th>
+							<th class="pb-5 px-4 text-center">Status</th>
+							<th class="pb-5 px-4 text-right">Actions</th>
 							</tr>
 					</thead>
 				
@@ -6747,10 +6744,10 @@
 	</section>
 	
 	<!-- User Management -->
-	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	<section class="col-span-12 bg-background rounded-md border border-outline-variant p-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 	  <div class="flex items-center justify-between mb-8 border-b border-outline-variant pb-6">
 	    <!-- TITLE -->
-	    <div class="flex items-center gap-4">
+	    <div class="flex items-center gap-3">
 	      <div class="main-icon-box">
 	        <span class="material-symbols-outlined text-3xl"
 	              style="font-variation-settings:'FILL' 1;">
@@ -6770,7 +6767,7 @@
 	    </div>
 	
 	    <!-- FILTER + ADD USER -->
-	    <div class="flex items-center gap-3">
+	    <div class="flex items-center gap-2">
 	      <!-- ROLE -->
 	      <select id="userRoleFilter"
 	        onchange="filterUsers()"
@@ -6805,7 +6802,7 @@
 	    <table class="w-full text-left">
 	      <thead>
 	        <tr class="text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest border-b border-outline-variant">
-	          <th class="px-5 py-4">Full Name</th>
+	          <th class="px-5 py-4 whitespace-nowrap">Full Name</th>
 	          <th class="px-5 py-4">Username</th>
 	          <th class="px-5 py-4">Role</th>
 	          <th class="px-5 py-4">Password</th>
@@ -6842,9 +6839,9 @@
 </div>
 		
 <!-- BUSINESS PROFILE -->
-<section class="col-span-12 bg-background rounded-md border border-outline-variant p-8 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-8">
+<section class="col-span-12 bg-background rounded-md border border-outline-variant p-5 shadow-[0_2px_10px_rgba(0,0,0,0.15)] mt-8">
 	<div class="flex items-center justify-between mb-8 border-b border-outline-variant pb-6">
-		<div class="flex items-center gap-4">
+		<div class="flex items-center gap-3">
 			<div class="main-icon-box">		                
 				<span class="material-symbols-outlined text-3xl"
 						style="font-variation-settings:'FILL' 1;">
