@@ -12569,15 +12569,15 @@ function renderExpenseTable(data) {
           </span>
         </td>
 
-        <td class="px-5 py-4 text-on-surface-variant">
+        <td class="px-5 py-4 text-on-surface-variant text-center">
           ${item.paymentMethod || "-"}
         </td>
 
-        <td class="px-5 py-4 font-bold text-on-surface text-sm">
+        <td class="px-5 py-4 font-bold text-on-surface text-sm whitespace-nowra">
           Rp ${amount.toLocaleString("id-ID")}
         </td>
 
-        <td class="px-5 py-4">
+        <td class="px-5 py-4 text-center">
           <div class="flex items-center gap-1.5 ${statusColor}">
             <span class="w-1.5 h-1.5 rounded-md bg-current"></span>
 
@@ -13183,15 +13183,15 @@ function renderOtherIncomeTable() {
           </span>
         </td>
 
-        <td class="px-5 py-4 text-on-surface-variant">
+        <td class="px-5 py-4 text-on-surface-variant text-center">
           ${item.method}
         </td>
 
-        <td class="px-5 py-4 font-bold text-on-surface text-sm">
+        <td class="px-5 py-4 font-bold text-on-surface text-sm whitespace-nowra">
           ${formatRupiah(item.amount)}
         </td>
 
-        <td class="px-5 py-4 text-on-surface">
+        <td class="px-5 py-4 text-on-surface text-center">
           ${renderOtherIncomeStatus(item.status)}
         </td>
 
