@@ -25948,7 +25948,6 @@
 					        onchange="loadAttendanceRecap()"
 					        class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none focus:border-primary transition">
 					    </div>
-					
 					    <!-- EMPLOYEE -->
 					    <div class="md:col-span-4">
 					      <label class="block text-xs text-muted mb-2">
@@ -25961,7 +25960,6 @@
 					        <option value="">All Employees</option>
 					      </select>
 					    </div>
-					
 					    <!-- OUTLET -->
 					    <div class="md:col-span-3">
 					      <label class="block text-xs text-muted mb-2">
@@ -25974,7 +25972,6 @@
 					        <option value="">All Branch</option>
 					      </select>
 					    </div>
-					
 					    <!-- REFRESH -->
 					    <div class="md:col-span-2 flex items-end">
 					      <button type="button"
@@ -26116,7 +26113,7 @@
         </section>
         <!-- === PAYROLL === -->
         <section class="bg-background border border-outline-variant rounded-md overflow-hidden">
-          <div class="p-5 border-b border-outline-variant flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="p-5 border-b border-outline-variant flex flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3">
               <div class="main-icon-box">
                 <span class="material-symbols-outlined text-3xl"
@@ -26167,7 +26164,7 @@
           </div>
 					<!-- PAYROLL FILTER -->
 					<div class="p-5 border-b border-outline-variant">
-						<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
+						<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-5 gap-4">
 						  <!-- PERIOD -->
 						  <div>
 						    <label class="block text-xs text-muted mb-2">
@@ -26335,7 +26332,6 @@
       </section>
     </main>
   </div>
-	
   <!-- === EMPLOYEE MODAL === -->
 	<div id="employeeModal"
 	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4 overflow-y-auto">
@@ -26506,7 +26502,6 @@
 						    Masukkan 16 digit NIK karyawan.
 						  </p>
 						</div>
-						
 						<!-- NPWP -->
 						<div>
 						  <label class="block text-sm font-medium text-foreground mb-2">
@@ -27006,22 +27001,17 @@
 				      id="employeePPh21Enabled"
 				      type="checkbox"
 				      checked
-				      class="w-4 h-4"
-				    >
+				      class="w-4 h-4" >
 				  </label>
 				
 				  <div>
-				    <label
-				      for="employeePPh21PTKP"
-				      class="block text-sm font-medium text-foreground mb-2"
-				    >
+				    <label for="employeePPh21PTKP"
+				      class="block text-sm font-medium text-foreground mb-2" >
 				      PTKP Status
 				    </label>
 				
-				    <select
-				      id="employeePPh21PTKP"
-				      class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
-				    >
+				    <select id="employeePPh21PTKP"
+				      class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground" >
 				      <option value="TK/0">TK/0 — Tidak Kawin, 0 tanggungan</option>
 				      <option value="TK/1">TK/1 — Tidak Kawin, 1 tanggungan</option>
 				      <option value="TK/2">TK/2 — Tidak Kawin, 2 tanggungan</option>
@@ -27107,39 +27097,39 @@
 	          </div>
 	        </div>
 	      </div>
-			<!-- EMPLOYER CONTRIBUTIONS -->
-			<div class="space-y-3 border-t border-outline-variant pt-4">
-			  <div class="flex items-center justify-between">
-			    <div>
-			      <h3 class="text-sm font-semibold">
-			        Employer Contributions
-			      </h3>
-			      <p class="text-xs text-on-surface-variant">
-			        Iuran yang ditanggung perusahaan.
-			      </p>
-			    </div>
-			
-			    <button
-			      type="button"
-			      onclick="openSalaryComponentModal('EMPLOYER_CONTRIBUTION')"
-			      class="h-9 px-3 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-1.5">
-			      <span class="material-symbols-outlined text-base">add</span>
-			      Add
-			    </button>
-			  </div>
-			
-			  <div
-			    id="salaryEmployerContributionList"
-			    class="border border-outline-variant rounded-md overflow-hidden">
-			    <div
-			      id="salaryEmployerContributionEmpty"
-			      class="px-4 py-5 text-center">
-			      <p class="text-xs text-on-surface-variant">
-			        No employer contributions configured
-			      </p>
-			    </div>
-			  </div>
-			</div>
+				<!-- EMPLOYER CONTRIBUTIONS -->
+				<div class="space-y-3 border-t border-outline-variant pt-4">
+				  <div class="flex items-center justify-between">
+				    <div>
+				      <h3 class="text-sm font-semibold">
+				        Employer Contributions
+				      </h3>
+				      <p class="text-xs text-on-surface-variant">
+				        Iuran yang ditanggung perusahaan.
+				      </p>
+				    </div>
+				
+				    <button
+				      type="button"
+				      onclick="openSalaryComponentModal('EMPLOYER_CONTRIBUTION')"
+				      class="h-9 px-3 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-1.5">
+				      <span class="material-symbols-outlined text-base">add</span>
+				      Add
+				    </button>
+				  </div>
+				
+				  <div
+				    id="salaryEmployerContributionList"
+				    class="border border-outline-variant rounded-md overflow-hidden">
+				    <div
+				      id="salaryEmployerContributionEmpty"
+				      class="px-4 py-5 text-center">
+				      <p class="text-xs text-on-surface-variant">
+				        No employer contributions configured
+				      </p>
+				    </div>
+				  </div>
+				</div>
 	      <!-- EFFECTIVE -->
 	      <div>
 	        <label class="block text-sm font-medium text-foreground mb-2">
@@ -28828,63 +28818,63 @@
 	      </section>
 	      <!-- EARNINGS -->
 	      <section>
-			<div class="pb-3 border-b border-outline-variant mb-4 flex items-center justify-between gap-3">
-			  <div>
-				<h3 class="text-sm font-semibold text-foreground">
-				  Earnings
-				</h3>
-				<p class="text-xs text-muted mt-1">
-				  Edit the amounts included in employee gross salary
-				</p>
-			  </div>
-			
-			  <button type="button"
-				onclick="addEditPayrollComponent('EARNING')"
-				class="h-9 px-3 rounded-md bottom-theme text-sm font-medium transition flex items-center gap-1.5 shrink-0">
-				<span class="material-symbols-outlined text-base">add</span>
-				Add Earning
-			  </button>
-			</div>
-			  
-	        <div class="border border-outline-variant rounded-md overflow-hidden">
-	          <table class="w-full text-sm">
-	            <thead>
-	              <tr class="border-b border-outline-variant text-xs text-muted uppercase tracking-wider">
-	                <th class="px-4 py-3 text-left">Component</th>
-	                <th class="px-4 py-3 text-left">Type</th>
-	                <th class="px-4 py-3 text-right">Amount (Rp)</th>
-	              </tr>
-	            </thead>
-	            <tbody id="editPayrollEarningsBody"
-	              class="divide-y divide-outline-variant">
-	              <tr>
-	                <td colspan="3" class="px-4 py-6 text-center text-muted">
-	                  Payroll components will appear here
-	                </td>
-	              </tr>
-	            </tbody>
-	          </table>
-	        </div>
-	      </section>
+					<div class="pb-3 border-b border-outline-variant mb-4 flex items-center justify-between gap-3">
+					  <div>
+						<h3 class="text-sm font-semibold text-foreground">
+						  Earnings
+						</h3>
+						<p class="text-xs text-muted mt-1">
+						  Edit the amounts included in employee gross salary
+						</p>
+					  </div>
+					
+					  <button type="button"
+						onclick="addEditPayrollComponent('EARNING')"
+						class="h-9 px-3 rounded-md bottom-theme text-sm font-medium transition flex items-center gap-1.5 shrink-0">
+						<span class="material-symbols-outlined text-base">add</span>
+						Add Earning
+					  </button>
+					</div>
+					
+					<div class="border border-outline-variant rounded-md overflow-hidden">
+						<table class="w-full text-sm">
+							<thead>
+								<tr class="border-b border-outline-variant text-xs text-muted uppercase tracking-wider">
+									<th class="px-4 py-3 text-left">Component</th>
+									<th class="px-4 py-3 text-left">Type</th>
+									<th class="px-4 py-3 text-right">Amount (Rp)</th>
+								</tr>
+							</thead>
+							<tbody id="editPayrollEarningsBody"
+								class="divide-y divide-outline-variant">
+								<tr>
+									<td colspan="3" class="px-4 py-6 text-center text-muted">
+										Payroll components will appear here
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
 	      <!-- DEDUCTIONS -->
-	      <section>
-			<div class="pb-3 border-b border-outline-variant mb-4 flex items-center justify-between gap-3">
-			  <div>
-			    <h3 class="text-sm font-semibold text-foreground">
-			      Employee Deductions
-			    </h3>
-			    <p class="text-xs text-muted mt-1">
-			      Review and edit deductions applied to employee salary
-			    </p>
-			  </div>
-			
-			  <button type="button"
-			    onclick="addEditPayrollComponent('DEDUCTION')"
-			    class="h-9 px-3 rounded-md bottom-theme text-sm font-medium transition flex items-center gap-1.5 shrink-0">
-			    <span class="material-symbols-outlined text-base">add</span>
-			    Add Deduction
-			  </button>
-			</div>
+			  <section>
+					<div class="pb-3 border-b border-outline-variant mb-4 flex items-center justify-between gap-3">
+					  <div>
+					    <h3 class="text-sm font-semibold text-foreground">
+					      Employee Deductions
+					    </h3>
+					    <p class="text-xs text-muted mt-1">
+					      Review and edit deductions applied to employee salary
+					    </p>
+					  </div>
+					
+					  <button type="button"
+					    onclick="addEditPayrollComponent('DEDUCTION')"
+					    class="h-9 px-3 rounded-md bottom-theme text-sm font-medium transition flex items-center gap-1.5 shrink-0">
+					    <span class="material-symbols-outlined text-base">add</span>
+					    Add Deduction
+					  </button>
+					</div>
 	
 	        <div class="border border-outline-variant rounded-md overflow-hidden">
 	          <table class="w-full text-sm">
@@ -30102,7 +30092,7 @@
           </div>
 					<!-- FILTER -->
 	        <div class="p-5 border-b border-outline-variant">
-	          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+	          <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-4">
 	            <!-- PERIOD FROM -->
 	            <div>
 	              <label class="block text-xs text-muted mb-2">Period From</label>
@@ -30244,7 +30234,7 @@
           </div>
           <!-- ADJUSTMENT FILTERS -->
           <div class="p-5 border-b border-outline-variant">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-4">
               <!-- PERIOD FROM -->
               <div>
                 <label class="block text-xs text-muted mb-2">Period From</label>
