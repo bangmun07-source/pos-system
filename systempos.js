@@ -13162,7 +13162,7 @@ function renderOtherIncomeTable() {
   const rows = filteredOtherIncomeData.slice(start, end);
   rows.forEach(item => {
     tbody.innerHTML += `
-      <tr class="border border-outline-variant hover:bg-outline-variant transition-colors">
+      <tr class="border-b border-outline-variant hover:bg-outline-variant transition-colors">
         <td class="px-5 py-4 whitespace-nowrap">
           <p class="font-bold text-on-surface">
             ${formatDate(item.date)}
