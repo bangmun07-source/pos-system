@@ -2117,32 +2117,15 @@ function renderTransactions(data) {
 
     return `
       <tr class="hover:bg-outline-variant transition-colors">
-        <td class="px-6 py-4 font-medium">
-          ${trx.id || "-"}
-        </td>
-
-        <td>
-          ${trx.date || trx.createdAt
+        <td class="px-6 py-4 font-medium"> ${trx.id || "-"} </td>
+        <td class="px-6 py-4 whitespace-nowrap"> ${trx.date || trx.createdAt
             ? formatDate(trx.date || trx.createdAt)
             : "-"}
         </td>
-
-        <td class="px-6 py-4 text-center">
-          ${trx.table || "-"}
-        </td>
-
-        <td>
-          ${trx.memberName || trx.memberId || trx.member || "-"}
-        </td>
-
-        <td class="px-6 py-4 text-right font-bold">
-          Rp ${Number(trx.total || 0).toLocaleString("id-ID")}
-        </td>
-
-        <td class="px-6 py-4 text-center">
-          ${trx.status || "-"}
-        </td>
-
+        <td class="px-6 py-4 text-center"> ${trx.table || "-"} </td>
+        <td> ${trx.memberName || trx.memberId || trx.member || "-"} </td>
+        <td class="px-6 py-4 text-right font-bold whitespace-nowrap"> Rp ${Number(trx.total || 0).toLocaleString("id-ID")} </td>
+        <td class="px-6 py-4 text-center"> ${trx.status || "-"} </td>
         <td class="px-6 py-4 text-center">
           <button
             onclick="openTransactionModal('${trx.id}')"
@@ -3015,13 +2998,7 @@ async function loadGrossRevenuePage() {
     return;
   }
   try {
-	  const res =
-	    await getGrossRevenueDataRPC(
-	      branchId,
-	      startDate,
-	      endDate
-	    );
-
+	  const res = await getGrossRevenueDataRPC( branchId, startDate, endDate );
 	  // SIMPAN CACHE
 	  state.grossRevenueData = res;
 	  state.grossRevenueFilter = cacheKey;
@@ -3451,11 +3428,7 @@ tbody.innerHTML = "";
 
 // PAGINATION
 const totalData = allTopRevenueData.length;
-const totalPages =
-  Math.max(
-    1,
-    Math.ceil(totalData / topRevenueItemsPerPage)
-  );
+const totalPages = Math.max( 1, Math.ceil(totalData / topRevenueItemsPerPage) );
 const start = (topRevenueCurrentPage - 1) * topRevenueItemsPerPage;
 const end = start + topRevenueItemsPerPage;
 const data = allTopRevenueData.slice(start, end);
@@ -3470,7 +3443,7 @@ data.forEach(item => {
 
   tbody.innerHTML += `
     <tr class="hover:bg-outline-variant transition-colors">
-      <td class="px-8 py-5">
+      <td class="px-8 py-5 whitespace-nowrap">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 rounded-md bg-surface-container overflow-hidden">
             <img src="${img}" class="w-full h-full object-cover"/>
@@ -3484,7 +3457,7 @@ data.forEach(item => {
         </div>
       </td>
 
-      <td class="px-8 py-5">
+      <td class="px-8 py-5 text-center">
         <span class="px-2.5 py-1 rounded-md bottom-theme text-on-surface text-[10px] font-bold uppercase">
           ${item.category || "-"}
         </span>
@@ -3494,11 +3467,11 @@ data.forEach(item => {
         ${(item.units || 0).toLocaleString("id-ID")}
       </td>
 
-      <td class="px-8 py-5 text-right font-headline font-bold">
+      <td class="px-8 py-5 text-right font-headline font-bold whitespace-nowrap">
         Rp ${(item.revenue || 0).toLocaleString("id-ID")}
       </td>
 
-      <td class="px-8 py-5 text-right">
+      <td class="px-8 py-5 text-center">
         <span class="material-symbols-outlined text-sm text-on-surface">
           trending_up
         </span>
@@ -4675,19 +4648,13 @@ function selectReward(rewardId) {
     }, 0);
 
   // CEK POINT
-  if ((state.currentMemberPoint - totalPointUsed) < (Number(product.Redeem_Point) || 0)) {
-    alert("Point tidak cukup");
-    return;
-  }
+  if ((state.currentMemberPoint - totalPointUsed) < (Number(product.Redeem_Point) || 0)) { alert("Point tidak cukup"); return; }
 
   // CEK MAX REDEEM
   const usedQty = state.cart
     .filter(i => i.isRedeem && i.id === product.ID_Produk)
     .reduce((sum, i) => sum + i.qty, 0);
-  if (reward.Max_Redeem && usedQty >= reward.Max_Redeem) {
-    alert("Maksimal redeem tercapai");
-    return;
-  }
+  if (reward.Max_Redeem && usedQty >= reward.Max_Redeem) { alert("Maksimal redeem tercapai"); return; }
 
   // MASUK CART (INI YANG HARUS KONSISTEN)
   addToCart(product, true, reward.ID_Reward);
@@ -4701,9 +4668,9 @@ function closeRedeem() {
 }
 
     
-    // =========================
-    // MEMBERS PAGE
-    // =========================
+// =========================
+// MEMBERS PAGE
+// =========================
 
 function calculatePoints(total){
   return Math.floor(total / state.settings.point_ratio)
@@ -4711,11 +4678,8 @@ function calculatePoints(total){
 
 async function getMemberDetailPage(memberId, branchId) {
   try {
-    const data =
-      await getMemberDetailPageRPC(
-        memberId,
-        branchId
-      );
+    const data = await getMemberDetailPageRPC( memberId, branchId );
+		
     return data;
   } catch (error) {
     throw error;
@@ -4723,7 +4687,6 @@ async function getMemberDetailPage(memberId, branchId) {
 }
 
 async function uploadMemberImage( base64, memberId ) {
-
   if (!base64) { return null; }
   if (!memberId) { throw new Error( "Member ID kosong" ); }
 
@@ -4745,23 +4708,13 @@ async function uploadMemberImage( base64, memberId ) {
       }
     );
 
-  const result =
-    await response.json();
-  if (
-    !response.ok ||
-    !result.success
-  ) {
-    throw new Error(
-      result.error ||
-      "Gagal upload member image"
-    );
-  }
-
+  const result = await response.json();
+  if ( !response.ok || !result.success
+  ) { throw new Error( result.error || "Gagal upload member image" ); }
   return result.url;
 }
 
 async function loadMembers(callback) {
-
   const el = document.getElementById( "member-table-body" );
   if (!el) return;
   // LOAD FROM CACHE
@@ -4857,7 +4810,7 @@ function renderMembers(data = state.members) {
       <td class="px-8 py-5 text-sm font-mono text-on-surface">
         ${m.ID_Member}
       </td>
-      <td class="px-8 py-5">
+      <td class="px-8 py-5 whitespace-nowrap">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-md bg-background flex items-center justify-center font-bold text-xs">
             ${(m.Nama || "")
@@ -4870,13 +4823,13 @@ function renderMembers(data = state.members) {
         </div>
       </td>
       <td class="px-8 py-5 text-sm">
-        ${m.Level_Current || "Kenal"}
+        ${m.Level_Current || "-"}
       </td>
-      <td class="px-8 py-5 text-sm text-right">
+      <td class="px-8 py-5 text-sm text-right whitespace-nowrap">
         Rp ${( Number( String(m.Total_Spend || 0)
 					.replace(/\./g,""))).toLocaleString("id-ID")}
       </td>
-      <td class="px-8 py-5 text-sm font-bold text-right">
+      <td class="px-8 py-5 text-sm font-bold text-center">
         ${m.Point || 0}
       </td>
       <td class="px-8 py-5 text-center">
@@ -4890,7 +4843,7 @@ function renderMembers(data = state.members) {
 	        <span class="material-symbols-outlined">chat</span>
 	      </button>
       </td>
-      <td class="px-8 py-5 text-right">
+      <td class="px-8 py-5 text-center">
         <button class="text-muted hover:text-on-surface transition-colors"
           onclick="openMemberProfile('${String(m.ID_Member).trim()}')" >
           <span class="material-symbols-outlined">
