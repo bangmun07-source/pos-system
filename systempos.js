@@ -6879,12 +6879,12 @@ function renderIngredientPurchases(purchases) {
     return `
       <tr class="hover:bg-outline-variant transition">
         <td class="px-8 py-4 text-sm font-semibold"> ${escapeHtml(purchase.ID || "-")} </td>
-        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Date || "-")} </td>
-        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Name_Supplier || "-")} </td>
-        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Ingredient || "-")} </td>
+        <td class="px-8 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Date || "-")} </td>
+        <td class="px-8 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Name_Supplier || "-")} </td>
+        <td class="px-8 py-4 text-sm whitespace-nowrap"> ${escapeHtml(purchase.Ingredient || "-")} </td>
         <td class="px-8 py-4 text-sm"> ${Number(purchase.Qty || 0).toLocaleString("id-ID")} </td>
-        <td class="px-8 py-4 text-sm font-semibold"> Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")} </td>
-        <td class="px-8 py-4 text-sm"> ${escapeHtml(purchase.Payment_Method || "-")} </td>
+        <td class="px-8 py-4 text-sm font-semibold whitespace-nowrap"> Rp ${Number(purchase.Total_Price || 0).toLocaleString("id-ID")} </td>
+        <td class="px-8 py-4 text-sm text-center"> ${escapeHtml(purchase.Payment_Method || "-")} </td>
         <td class="px-8 py-4 text-sm text-center"> ${renderPurchaseStatus(status)} </td>
         <td class="px-8 py-4 text-right">
           <button onclick="openPurchaseAction('${escapeHtml(purchase.ID)}')"
@@ -7271,7 +7271,7 @@ function renderSuppliers() {
           } hover:bg-outline-variant transition-colors group">
 
             <!-- SUPPLIER NAME -->
-            <td class="px-8 py-5">
+            <td class="px-5 py-4 whitespace-nowrap">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-md bg-outline-variant flex items-center justify-center text-on-surface font-bold">
                   ${initials}
@@ -7284,27 +7284,27 @@ function renderSuppliers() {
             </td>
 
             <!-- CATEGORY -->
-            <td class="px-8 py-5 text-sm text-muted">
+            <td class="px-5 py-4 text-sm text-muted">
               ${item.category || "-"}
             </td>
 
             <!-- CONTACT -->
-            <td class="px-8 py-5 text-sm font-medium">
+            <td class="px-5 py-4 text-sm font-medium">
               ${item.contact || "-"}
             </td>
 
             <!-- PHONE -->
-            <td class="px-8 py-5 text-sm text-muted">
+            <td class="px-5 py-4 text-sm text-muted">
               ${item.phone || "-"}
             </td>
 
             <!-- TOTAL SPEND -->
-            <td class="px-8 py-5 text-sm font-semibold">
+            <td class="px-5 py-4 whitespace-nowrap text-sm font-semibold">
               Rp ${totalSpend.toLocaleString("id-ID")}
             </td>
 
             <!-- HUTANG -->
-            <td class="px-8 py-5 text-sm font-semibold ${
+            <td class="px-5 py-4 whitespace-nowrap text-sm font-semibold ${
               totalDebt > 0
                 ? "text-red-800"
                 : "text-muted"
@@ -7313,7 +7313,7 @@ function renderSuppliers() {
             </td>
 
             <!-- STATUS -->
-            <td class="px-8 py-5">
+            <td class="px-5 py-4 text-center">
               ${ isActive
                 ? `
                   <span class="px-3 py-1 bg-outline-variant/20 text-on-surface text-[10px] border border-outline-variant font-headline font-semibold rounded-md uppercase" >
@@ -7329,7 +7329,7 @@ function renderSuppliers() {
             </td>
 
             <!-- ACTIONS -->
-            <td class="px-8 py-5 text-right">
+            <td class="px-5 py-4 text-right">
               <div class="flex items-center justify-end gap-1" >
                 <button onclick="openEditSupplierModal('${item.id}')"
                   class="p-2 hover:text-on-surface rounded-md text-on-surface-variant" >
@@ -7584,19 +7584,19 @@ function renderRecipes() {
       ${index % 2 === 0 ? 'bg-background/10' : ''}
       hover:bg-outline-variant transition-colors ">
 
-      <td class="px-6 py-4 font-bold">
+      <td class="px-5 py-4 font-bold whitespace-nowrap">
         ${item.productName || item.Product_Name || item.Nama_Produk || item.name || "-"}
       </td>
-      <td class="px-6 py-4 text-sm text-on-surface-variant">
+      <td class="px-5 py-4 text-sm text-on-surface-variant">
         ${item.ingredientsLabel || item.ingredients?.map(i => `${i.name} (${i.qty})`).join(", ")}
       </td>
-      <td class="px-6 py-4">
+      <td class="px-5 py-4 whitespace-nowrap">
         Rp ${(item.cost || 0).toLocaleString("id-ID")}
       </td>
-      <td class="px-6 py-4">
+      <td class="px-5 py-4 whitespace-nowrap">
         Rp ${(item.selling || 0).toLocaleString("id-ID")}
       </td>
-      <td class="px-6 py-4">
+      <td class="px-5 py-4 whitespace-nowrap">
         Rp ${(item.net || 0).toLocaleString("id-ID")}
       </td>
       <td class="text-center">
@@ -7615,10 +7615,10 @@ function renderRecipes() {
           </div>
         </div>
       </td>
-      <td class="px-6 py-4 font-semibold text-green-700">
+      <td class="px-5 py-4 font-semibold text-green-700 whitespace-nowrap">
         Rp ${item.profit.toLocaleString("id-ID")}
       </td>
-      <td class="px-6 py-4 text-right text-[10px] text-on-surface-variant">
+      <td class="px-5 py-4 text-right text-xs text-on-surface-variant">
         <button onclick="openRecipeModal('${item.id}')" class="p-2 hover:text-on-surface">
           <span class="material-symbols-outlined text-sm">edit</span>
         </button>
@@ -7674,7 +7674,6 @@ async function openRecipeModal(recipeId) {
     );
 
     if (error) { throw error; }
-
     renderRecipePriceHistory( data || [] );
   }
   catch (err) {
@@ -7990,42 +7989,42 @@ function renderIngredients(data) {
         hover:bg-outline-variant transition-colors group">
 
         <!-- INGREDIENT -->
-        <td class="px-8 py-5">
+        <td class="px-5 py-4">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 flex items-center justify-center text-on-surface">
               <span class="material-symbols-outlined">${icon}</span>
             </div>
-            <span class="font-bold text-sm">${item.name}</span>
+            <span class="font-bold text-sm whitespace-nowrap">${item.name}</span>
           </div>
         </td>
 
         <!-- VALUE -->
-        <td class="px-8 py-5 text-sm font-medium">
+        <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">
           ${formatIDR(value)}
         </td>
 
         <!-- QTY -->
-        <td class="px-8 py-5 font-headline font-bold text-lg ${isLow ? 'text-error' : 'text-on-surface'}">
+        <td class="px-5 py-4 font-headline font-bold text-lg ${isLow ? 'text-error' : 'text-on-surface'}">
           ${item.qty}
         </td>
 
         <!-- UNIT -->
-        <td class="px-8 py-5 text-sm text-muted">
+        <td class="px-5 py-4 text-sm text-muted">
           ${item.unit}
         </td>
 
         <!-- MIN -->
-        <td class="px-8 py-5 text-sm text-muted">
+        <td class="px-5 py-4 text-sm text-muted">
           ${item.min}
         </td>
 
         <!-- COST -->
-        <td class="px-8 py-5 text-sm font-medium">
+        <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">
           ${formatIDR(item.costPerUnit)}
         </td>
 
         <!-- STATUS -->
-        <td class="px-8 py-5 text-center">
+        <td class="px-5 py-4 text-center">
           ${ isCritical
 						? `<span class="px-3 py-1 bg-red-600/20 text-red-700 text-[10px] font-black rounded-md uppercase">Critical</span>`
 						: isLow
@@ -8035,7 +8034,7 @@ function renderIngredients(data) {
         </td>
 
         <!-- ACTION -->
-        <td class="px-8 py-5 text-right flex items-center justify-end gap-1">
+        <td class="px-5 py-4 text-right flex items-center justify-end gap-1">
           <button onclick='openIngredientModal(${JSON.stringify(itemWithBranch)})' class="p-2 hover:text-on-surface text-on-surface-variant">
             <span class="material-symbols-outlined text-sm">more_vert</span>
           </button>
