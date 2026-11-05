@@ -17081,7 +17081,7 @@
       </section>
       <!-- CHART OF ACCOUNTS -->
       <section class="mb-4 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
-        <div class="p-6 border-b border-outline-variant flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="p-5 border-b border-outline-variant flex flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3">
             <div class="main-icon-box">
               <span class="material-symbols-outlined text-3xl">
@@ -17110,7 +17110,7 @@
         </div>
         <!-- FILTER -->
         <div class="p-5 border-b border-outline-variant">
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-3">
             <div class="relative lg:col-span-2">
               <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted">
                 search
@@ -17144,10 +17144,10 @@
             <thead>
               <tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
                 <th class="text-left px-6 py-4"> Code </th>
-                <th class="text-left px-6 py-4"> Account Name </th>
-                <th class="text-left px-6 py-4"> Type </th>
-                <th class="text-left px-6 py-4"> Parent Account </th>
-                <th class="text-left px-6 py-4 text-center"> Normal Balance </th>
+                <th class="text-left px-6 py-4 whitespace-nowrap"> Account Name </th>
+                <th class="text-left px-6 py-4 text-cente"> Type </th>
+                <th class="text-left px-6 py-4 whitespace-nowrap text-cente"> Parent Account </th>
+                <th class="text-left px-6 py-4 text-center whitespace-nowrap text-cente"> Normal Balance </th>
                 <th class="text-left px-6 py-4 text-center"> Status </th>
                 <th class="text-right px-6 py-4 text-center"> Action </th>
               </tr>
@@ -17189,7 +17189,7 @@
       </section>
       <!-- ACCOUNT MAPPING -->
       <section class="mb-4 bg-background rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
-        <div class="p-6 border-b border-outline-variant flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div class="p-5 border-b border-outline-variant flex flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-3">
             <div class="main-icon-box">
               <span class="material-symbols-outlined text-3xl">
@@ -17253,9 +17253,9 @@
               <tr class="border-b border-outline-variant text-muted text-sm lg:text-base font-medium headline-font uppercase tracking-widest">
                 <th class="text-left px-6 py-4"> Transaction </th>
                 <th class="text-left px-6 py-4"> Source </th>
-                <th class="text-left px-6 py-4"> Debit Account </th>
-                <th class="text-left px-6 py-4"> Credit Account </th>
-                <th class="text-left px-6 py-4"> Status </th>
+                <th class="text-left px-6 py-4 whitespace-nowrap"> Debit Account </th>
+                <th class="text-left px-6 py-4 whitespace-nowrap"> Credit Account </th>
+                <th class="text-left px-6 py-4 text-center"> Status </th>
                 <th class="text-left px-6 py-4 text-center"> Action </th>
               </tr>
             </thead>
@@ -24122,7 +24122,7 @@
 				</div>
       </section>
 			<!-- ACCOUNTS RECEIVABLE FILTER -->
-			<section class="bg-background border border-outline-variant rounded-md p-5 mt-4">
+			<section class="bg-background border border-outline-variant rounded-md p-5 mt-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 			  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 			    <!-- BRANCH -->
 			    <div>
@@ -24176,47 +24176,49 @@
             </p>
           </div>
           <!-- FILTERS -->
-          <div class="flex flex-wrap items-center gap-3">
-            <select id="accountsReceivableTypeFilter"
-              onchange="loadAccountsReceivableRecords()"
-              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
-              <option value="ALL"> All Types </option>
-              <option value="EMPLOYEE"> Employee </option>
-              <option value="BUSINESS"> Business </option>
-              <option value="TAX"> Tax </option>
-              <option value="OTHER"> Other </option>
-            </select>
-            <!-- STATUS -->
-            <select id="accountsReceivableStatusFilter"
-              onchange="loadAccountsReceivableRecords()"
-              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
-              <option value="ALL"> All Status </option>
-              <option value="DRAFT"> Draft </option>
-              <option value="OUTSTANDING"> Outstanding </option>
-              <option value="PAID"> Paid </option>
-            </select>
-            <!-- SEARCH -->
-            <div class="relative">
-              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg" >
-                search
-              </span>
-
-              <input id="accountsReceivableSearch"
-                type="text"
-                placeholder="Search receivable..."
-                oninput="loadAccountsReceivableRecords()"
-                class="h-10 w-56 pl-10 pr-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" />
-            </div>
-						
-						 <button type="button"
-		          onclick="openAccountsReceivableModal()"
-		          class="inline-flex items-center py-2.5 h-10 px-4 rounded-md bottom-theme text-sm font-medium gap-2">
-		          <span class="material-symbols-outlined text-lg">
-		            add
-		          </span>
-		          New Receivable
-		        </button>
-          </div>
+					<div class="mt-5 w-full">
+	          <div class="flex flex-wrap items-center gap-2 w-full">
+	            <select id="accountsReceivableTypeFilter"
+	              onchange="loadAccountsReceivableRecords()"
+	              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
+	              <option value="ALL"> All Types </option>
+	              <option value="EMPLOYEE"> Employee </option>
+	              <option value="BUSINESS"> Business </option>
+	              <option value="TAX"> Tax </option>
+	              <option value="OTHER"> Other </option>
+	            </select>
+	            <!-- STATUS -->
+	            <select id="accountsReceivableStatusFilter"
+	              onchange="loadAccountsReceivableRecords()"
+	              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
+	              <option value="ALL"> All Status </option>
+	              <option value="DRAFT"> Draft </option>
+	              <option value="OUTSTANDING"> Outstanding </option>
+	              <option value="PAID"> Paid </option>
+	            </select>
+	            <!-- SEARCH -->
+	            <div class="relative">
+	              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg" >
+	                search
+	              </span>
+	
+	              <input id="accountsReceivableSearch"
+	                type="text"
+	                placeholder="Search receivable..."
+	                oninput="loadAccountsReceivableRecords()"
+	                class="h-10 w-56 pl-10 pr-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" />
+	            </div>
+							
+							 <button type="button"
+			          onclick="openAccountsReceivableModal()"
+			          class="inline-flex items-center py-2.5 h-10 px-4 rounded-md bottom-theme text-sm font-medium gap-2">
+			          <span class="material-symbols-outlined text-lg">
+			            add
+			          </span>
+			          New Receivable
+			        </button>
+	          </div>
+					</div>
         </div>
         <!-- TABLE -->
         <div class="overflow-x-auto custom-scrollbar">
