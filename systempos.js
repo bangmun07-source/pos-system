@@ -20341,105 +20341,115 @@ async function exportAssets() {
 async function loadAccountingOverview() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
-  if (!periodEl || !branchEl) { return; }
-  // Pastikan branch selalu dimuat sebelum membaca branch
-  if (branchEl.options.length <= 1) {
-    await loadAccountingBranchOptions();
-  }
-  const period = periodEl.value || "month";
-  const branch = branchEl.value || "ALL";
-  const { start, end } = getAccountingDateRange(period);
+
+  if (!periodEl || !branchEl) return;
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_accounting_overview",
-        {
-          p_branch_id: branch,
-          p_start: start,
-          p_end: end,
-          p_session_id: sessionId
-        }
-      );
-		
-    if (error) throw error;
-    if (!data) {
-      throw new Error(
-        "Accounting Overview tidak mengembalikan data."
-      );
+    await loadAccountingBranchOptions();
+
+    const period = periodEl.value || "month";
+    const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || "" ).trim();
+
+    let branch;
+
+    if (role === "admin") {
+      if (!userBranchId) { throw new Error("Outlet Admin tidak ditemukan."); }
+
+      branch = userBranchId;
+      branchEl.value = userBranchId;
+      branchEl.disabled = true;
+    } else {
+      branch = branchEl.value || "ALL";
+      branchEl.disabled = false;
     }
+
+    const { start, end } = getAccountingDateRange(period);
+    const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error } = await supabaseClient.rpc(
+      "get_accounting_overview",
+      {
+        p_branch_id: branch,
+        p_start: start,
+        p_end: end,
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) throw error;
+    if (!data) { throw new Error( "Accounting Overview tidak mengembalikan data." ); }
+
     renderAccountingOverview(data);
+
   } catch (error) {
-	  showToast( error?.message || "Gagal memuat Accounting Overview.", "error" );
-	}
+    showToast( error?.message || "Gagal memuat Accounting Overview.", "error" );
+  }
 }
 
 async function loadAccountingBranchOptions() {
-	
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_expense_branches",
-        {
-          p_session_id: sessionId
-        }
-      );
-		
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_branches",
+      {
+        p_session_id: sessionId
+      }
+    );
     if (error) throw error;
+
     state.accountingBranches = Array.isArray(data) ? data : [];
+
     renderAccountingBranchOptions( state.accountingBranches );
-  } catch (err) { }
+
+  } catch (err) {
+    console.error("ACCOUNTING BRANCH ERROR:", err);
+    throw err;
+  }
 }
 
 function renderAccountingBranchOptions(branches) {
   const select = document.getElementById("accounting-branch");
   if (!select) return;
-  select.innerHTML = `
-    <option value="ALL">
-      All Branch
-    </option>
-  `;
-  (branches || []).forEach(branch => {
-    select.innerHTML += `
-      <option value="${branch.id}">
-        ${branch.name}
-      </option>
-    `;
-  });
+
+  const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
+  const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || "" ).trim();
+
+  select.innerHTML = "";
+  if (role === "admin") {
+    const ownBranch = (branches || []).find( branch => String(branch.id) === userBranchId );
+    const branchName =
+      ownBranch?.name ||
+      state.user?.branchName ||
+      state.user?.Branch_Name ||
+      userBranchId;
+
+    select.add( new Option(branchName, userBranchId) );
+    select.value = userBranchId;
+    select.disabled = true;
+
+    return;
+  }
+  select.add( new Option("All Branch", "ALL") );
+  (branches || []).forEach(branch => { select.add( new Option(branch.name, branch.id) ); });
+  select.disabled = false;
 }
 
 function getAccountingDateRange(period) {
   const today = new Date();
   const formatDate = (date) => {
     const year = date.getFullYear();
-    const month =
-      String(
-        date.getMonth() + 1
-      ).padStart(2, "0");
-    const day =
-      String(
-        date.getDate()
-      ).padStart(2, "0");
+    const month = String( date.getMonth() + 1 ).padStart(2, "0");
+    const day = String( date.getDate() ).padStart(2, "0");
+		
     return `${year}-${month}-${day}`;
   };
   let start;
   let end;
   switch (period) {
     case "last_month": {
-      const lastDayPreviousMonth =
-        new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          0
-        );
-      const firstDayPreviousMonth =
-        new Date(
-          today.getFullYear(),
-          today.getMonth() - 1,
-          1
-        );
+      const lastDayPreviousMonth = new Date( today.getFullYear(), today.getMonth(), 0 );
+      const firstDayPreviousMonth = new Date( today.getFullYear(), today.getMonth() - 1, 1 );
+			
       start = formatDate(firstDayPreviousMonth);
       end = formatDate(lastDayPreviousMonth);
       break;
@@ -20448,63 +20458,32 @@ function getAccountingDateRange(period) {
     case "quarter": {
       const currentQuarter = Math.floor(today.getMonth() / 3);
       const firstMonthOfQuarter = currentQuarter * 3;
-      const firstDayQuarter =
-        new Date(
-          today.getFullYear(),
-          firstMonthOfQuarter,
-          1
-        );
-      const lastDayQuarter =
-        new Date(
-          today.getFullYear(),
-          firstMonthOfQuarter + 3,
-          0
-        );
+      const firstDayQuarter = new Date( today.getFullYear(), firstMonthOfQuarter, 1 );
+      const lastDayQuarter = new Date( today.getFullYear(), firstMonthOfQuarter + 3, 0 );
+			
       start = formatDate(firstDayQuarter);
       end = formatDate(lastDayQuarter);
       break;
     }
 
     case "year": {
-      const firstDayYear =
-        new Date(
-          today.getFullYear(),
-          0,
-          1
-        );
-      const lastDayYear =
-        new Date(
-          today.getFullYear(),
-          11,
-          31
-        );
+      const firstDayYear = new Date( today.getFullYear(), 0, 1 );
+      const lastDayYear = new Date( today.getFullYear(), 11, 31 );
       start = formatDate(firstDayYear);
       end = formatDate(lastDayYear);
       break;
     }
-			
     case "month":
     default: {
-      const firstDayMonth =
-        new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          1
-        );
-      const lastDayMonth =
-        new Date(
-          today.getFullYear(),
-          today.getMonth() + 1,
-          0
-        );
+      const firstDayMonth = new Date( today.getFullYear(), today.getMonth(), 1 );
+      const lastDayMonth = new Date( today.getFullYear(), today.getMonth() + 1, 0 );
+			
       start = formatDate(firstDayMonth);
       end = formatDate(lastDayMonth);
       break;
     }
   }
-  return {
-    start, end
-  };
+  return { start, end };
 }
 
 async function initAccountingModule() {
@@ -20524,9 +20503,7 @@ async function initAccountingModule() {
 function renderAccountingOverview(data) {
   if (!data) { return; }
   const toNumber = (value) => {
-    if (value === null || value === undefined || value === "") {
-      return 0;
-    }
+    if (value === null || value === undefined || value === "") { return 0; }
     const number = Number(value);
     return Number.isFinite(number) ? number : 0;
   };
@@ -20541,15 +20518,11 @@ function renderAccountingOverview(data) {
   };
   const setText = (id, value) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.textContent = formatIDR(value);
-    }
+    if (el) { el.textContent = formatIDR(value); }
   };
   const setPlainText = (id, value) => {
     const el = document.getElementById(id);
-    if (el) {
-      el.textContent = value ?? "-";
-    }
+    if (el) { el.textContent = value ?? "-"; }
   };
   const escapeHTML = (value) => {
     return String(value ?? "")
@@ -20586,19 +20559,18 @@ function renderAccountingOverview(data) {
   setText("accounting-equity", kpi.equity);
 	
   /* ===== FINANCIAL POSITION - ACCOUNT DETAIL ===== */
-const assetsContainer = document.getElementById("accounting-assets-list");
-const liabilitiesEquityContainer = document.getElementById("accounting-liabilities-equity-list");
-const assets = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "ASSET" );
-const liabilities = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "LIABILITY" );
-const equity = balanceSheetAccounts.filter(  account => String(account.accountType || "").toUpperCase() === "EQUITY" );
-const totalAssets = assets.reduce((sum, account) => {
+	const assetsContainer = document.getElementById("accounting-assets-list");
+	const liabilitiesEquityContainer = document.getElementById("accounting-liabilities-equity-list");
+	const assets = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "ASSET" );
+	const liabilities = balanceSheetAccounts.filter( account => String(account.accountType || "").toUpperCase() === "LIABILITY" );
+	const equity = balanceSheetAccounts.filter(  account => String(account.accountType || "").toUpperCase() === "EQUITY" );
+	const totalAssets = assets.reduce((sum, account) => {
   const balance = toNumber(account.balance);
   const normalBalance = String(account.normalBalance || "").toUpperCase();
 
-  return sum + (
-    normalBalance === "CREDIT"
-      ? -Math.abs(balance)
-      : balance
+  return sum + ( normalBalance === "CREDIT"
+		? -Math.abs(balance)
+		: balance
   );
 }, 0);
 const totalLiabilities = liabilities.reduce( (sum, account) => sum + toNumber(account.balance), 0 );
@@ -41701,7 +41673,6 @@ window.populateReimbursementFilters = function () {
   }
 };
 
-
 /* ==== LOAD REIMBURSEMENTS RPC: get_employee_reimbursements ==== */
 window.loadReimbursements = async function () {
   const tableBody = document.getElementById( 'reimbursementTableBody' );
@@ -43490,9 +43461,6 @@ window.exportReimbursement = async function () {
 window.initEmployeeReimbursement = async function () {
   window.ensureReimbursementModal();
   window.populateReimbursementFilters();
-
-  const periodInput = document.getElementById( 'reimbursementPeriodFilter' );
-  if (periodInput && !periodInput.value) { periodInput.value = new Date().toISOString().slice(0, 7); }
 
   const branchFilter = document.getElementById( 'reimbursementBranchFilter' );
   const employeeFilter = document.getElementById( 'reimbursementEmployeeFilter' );
