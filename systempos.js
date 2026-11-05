@@ -20341,96 +20341,102 @@ async function exportAssets() {
 async function loadAccountingOverview() {
   const periodEl = document.getElementById("accounting-period");
   const branchEl = document.getElementById("accounting-branch");
-
-  if (!periodEl || !branchEl) return;
+  if (!periodEl || !branchEl) { return; }
+  // Pastikan branch selalu dimuat sebelum membaca branch
+  if (branchEl.options.length <= 1) {
+    await loadAccountingBranchOptions();
+  }
+  const period = periodEl.value || "month";
+  const branch = branchEl.value || "ALL";
+  const { start, end } = getAccountingDateRange(period);
 
   try {
-    await loadAccountingBranchOptions();
-
-    const period = periodEl.value || "month";
-    const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
-    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || "" ).trim();
-
-    let branch;
-
-    if (role === "admin") {
-      if (!userBranchId) { throw new Error("Outlet Admin tidak ditemukan."); }
-
-      branch = userBranchId;
-      branchEl.value = userBranchId;
-      branchEl.disabled = true;
-    } else {
-      branch = branchEl.value || "ALL";
-      branchEl.disabled = false;
-    }
-
-    const { start, end } = getAccountingDateRange(period);
-    const sessionId = localStorage.getItem("pos_session_id");
-    const { data, error } = await supabaseClient.rpc(
-      "get_accounting_overview",
-      {
-        p_branch_id: branch,
-        p_start: start,
-        p_end: end,
-        p_session_id: sessionId
-      }
-    );
-
+		const sessionId = localStorage.getItem("pos_session_id");
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_accounting_overview",
+        {
+          p_branch_id: branch,
+          p_start: start,
+          p_end: end,
+          p_session_id: sessionId
+        }
+      );
+		
     if (error) throw error;
-    if (!data) { throw new Error( "Accounting Overview tidak mengembalikan data." ); }
-
+    if (!data) {
+      throw new Error(
+        "Accounting Overview tidak mengembalikan data."
+      );
+    }
     renderAccountingOverview(data);
-
   } catch (error) {
-    showToast( error?.message || "Gagal memuat Accounting Overview.", "error" );
-  }
+	  showToast( error?.message || "Gagal memuat Accounting Overview.", "error" );
+	}
 }
 
 async function loadAccountingBranchOptions() {
+	
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const { data, error } = await supabaseClient.rpc(
-      "get_expense_branches",
-      {
-        p_session_id: sessionId
-      }
-    );
+    const { data, error } =
+      await supabaseClient.rpc(
+        "get_expense_branches",
+        {
+          p_session_id: sessionId
+        }
+      );
+		
     if (error) throw error;
-
     state.accountingBranches = Array.isArray(data) ? data : [];
-
     renderAccountingBranchOptions( state.accountingBranches );
-
-  } catch (err) {
-    console.error("ACCOUNTING BRANCH ERROR:", err);
-    throw err;
-  }
+  } catch (err) { }
 }
 
 function renderAccountingBranchOptions(branches) {
   const select = document.getElementById("accounting-branch");
   if (!select) return;
 
-  const role = String( state.user?.role || state.user?.Role || "" ).trim().toLowerCase();
-  const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || "" ).trim();
+  const role = String(
+    state.user?.role || state.user?.Role || ""
+  ).trim().toLowerCase();
+
+  const userBranchId = String(
+    state.user?.branchId || state.user?.Branch_ID || ""
+  ).trim();
 
   select.innerHTML = "";
-  if (role === "admin") {
-    const ownBranch = (branches || []).find( branch => String(branch.id) === userBranchId );
-    const branchName =
-      ownBranch?.name ||
-      state.user?.branchName ||
-      state.user?.Branch_Name ||
-      userBranchId;
 
-    select.add( new Option(branchName, userBranchId) );
+  // ADMIN: hanya menampilkan outlet sendiri
+  if (role === "admin") {
+    const ownBranch = (branches || []).find(
+      branch => String(branch.id) === userBranchId
+    );
+
+    select.innerHTML = `
+      <option value="${userBranchId}">
+        ${ownBranch?.name || userBranchId}
+      </option>
+    `;
+
     select.value = userBranchId;
     select.disabled = true;
-
     return;
   }
-  select.add( new Option("All Branch", "ALL") );
-  (branches || []).forEach(branch => { select.add( new Option(branch.name, branch.id) ); });
+
+  // OWNER / ACCOUNTANT: bisa memilih semua outlet
+  select.innerHTML = `
+    <option value="ALL">All Branch</option>
+  `;
+
+  (branches || []).forEach(branch => {
+    select.innerHTML += `
+      <option value="${branch.id}">
+        ${branch.name}
+      </option>
+    `;
+  });
+
   select.disabled = false;
 }
 
