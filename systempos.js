@@ -2147,20 +2147,35 @@ function initTransactionFilters() {
   const start = document.getElementById("startDate");
   const end = document.getElementById("endDate");
   const status = document.getElementById("statusFilter");
+  const search = document.getElementById("recentTransactionSearch");
+
   if (!start || !end) return;
+
   let timer;
 
   const trigger = () => {
     clearTimeout(timer);
-    timer = setTimeout(() => {
-      refreshRecentTransactions();
-    }, 300);
+    timer = setTimeout(() => { refreshRecentTransactions(); }, 300);
   };
+
   start.addEventListener("change", trigger);
   end.addEventListener("change", trigger);
   start.addEventListener("input", trigger);
   end.addEventListener("input", trigger);
   status?.addEventListener("change", trigger);
+
+  // SEARCH ORDER ID
+  search?.addEventListener("input", () => {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+      const searchValue = search.value.trim().toLowerCase();
+      const filteredData = (recentData || []).filter(trx =>  String(trx.id || "").toLowerCase().includes(searchValue));
+
+      recentCurrentPage = 1;
+      paginateRecentTransactions(filteredData);
+    }, 300);
+  });
 }
 	
 async function loadRecentTransactionsPage() {
@@ -2193,14 +2208,8 @@ async function loadRecentTransactionsPage() {
     return;
   }
   try {
-    const transactions =
-      await getRecentTransactionsPageRPC(
-        state.branchId,
-        start,
-        end,
-        status,
-        table
-      );
+    const transactions = await getRecentTransactionsPageRPC( state.branchId, start, end, status, table );
+		
     recentData = transactions || [];
     state.recentTransactionsData = recentData;
     state.recentTransactionsFilter = cacheKey;
@@ -2216,8 +2225,7 @@ async function loadRecentTransactionsPage() {
 }
 
 async function initExportButton() {
-  const btn =
-    document.getElementById("exportBtn");
+  const btn = document.getElementById("exportBtn");
   if (!btn) return;
   btn.onclick = async () => {
     const start = document.getElementById("startDate")?.value || "";
