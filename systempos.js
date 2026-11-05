@@ -25627,47 +25627,34 @@ async function loadDebtLiabilityBranchFilters() {
 }
 
 function initDebtLiabilityFilters() {
-    const branchEl = document.getElementById("debtLiabilityBranchFilter");
-    const fromEl = document.getElementById("debtLiabilityPeriodFrom");
-    const toEl = document.getElementById("debtLiabilityPeriodTo");
+	const branchEl = document.getElementById("debtLiabilityBranchFilter");
+	const fromEl = document.getElementById("debtLiabilityPeriodFrom");
+	const toEl = document.getElementById("debtLiabilityPeriodTo");
 
-    if (fromEl && !fromEl.value) {
-        const now = new Date();
-        fromEl.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
-    }
+	// Tidak ada default periode.
+	// Jika kosong, tampilkan semua periode.
 
-    if (toEl && !toEl.value) { toEl.value = getTodayAccountingDate(); }
-    const handleChange = () => {
-        const filter = getDebtLiabilityFilter();
-        if (
-            filter.periodFrom &&
-            filter.periodTo &&
-            filter.periodFrom > filter.periodTo
-        ) {
-            showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" );
-            return; }
-        debtLiabilityFilter = filter;
-        reloadDebtLiabilityData();
-    };
+	const handleChange = () => {
+			const filter = getDebtLiabilityFilter();
+			if ( filter.periodFrom && filter.periodTo && filter.periodFrom > filter.periodTo
+			) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" ); return; }
 
-    if (branchEl) branchEl.onchange = handleChange;
-    if (fromEl) fromEl.onchange = handleChange;
-    if (toEl) toEl.onchange = handleChange;
+			debtLiabilityFilter = filter;
+			reloadDebtLiabilityData();
+	};
 
-    debtLiabilityFilter = getDebtLiabilityFilter();
+	if (branchEl) branchEl.onchange = handleChange;
+	if (fromEl) fromEl.onchange = handleChange;
+	if (toEl) toEl.onchange = handleChange;
+
+	debtLiabilityFilter = getDebtLiabilityFilter();
 }
 
 async function reloadDebtLiabilityData() {
 	try {
 		const filter = getDebtLiabilityFilter();
-
-		if (
-			filter.periodFrom &&
-			filter.periodTo &&
-			filter.periodFrom > filter.periodTo
-		) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" );
-			return;
-		}
+		if ( filter.periodFrom && filter.periodTo && filter.periodFrom > filter.periodTo
+		) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" ); return; }
 
 		debtLiabilityFilter = filter;
 		state.accountingSupplierDebtData = null;
@@ -25740,8 +25727,7 @@ async function loadSupplierDebt() {
     if (
       state.accountingSupplierDebtData &&
       state.accountingSupplierDebtFilter &&
-      JSON.stringify(state.accountingSupplierDebtFilter) ===
-        JSON.stringify(currentFilter)
+      JSON.stringify(state.accountingSupplierDebtFilter) === JSON.stringify(currentFilter)
     ) {
       supplierDebtData = state.accountingSupplierDebtData;
       updateSupplierDebtSummary();
@@ -25927,8 +25913,7 @@ function renderSupplierDebtTable() {
 				const branchId = String(item.branchId || "").trim();
 				const branchName = (typeof accountingDebtBranches !== "undefined"
 					? accountingDebtBranches
-					: []
-				).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+					: [] ).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
 				const statusClass = item.status === "PAID"
 					? "text-green-700"
 					: "text-amber-700";
@@ -25937,24 +25922,24 @@ function renderSupplierDebtTable() {
 						<button type="button"
 							onclick="openSupplierPaymentModal('${escapeJs(item.id)}')"
 							class="px-3 py-1.5 text-on-surface-variant text-xs font-medium hover:text-on-surface">
-							Bayar
+							PAY
 						</button>
 					`
 					: `
 						<span class="text-xs text-on-surface-variant">
-							Lunas
+							DONE
 						</span>
 					`;
 				return `
 					<tr class="border-b border-outline-variant hover:bg-outline-variant">
 						<td class="px-4 py-3 text-sm font-medium"> ${escapeHtml(item.id)} </td>
 						<td class="px-4 py-3 text-sm"> ${escapeHtml(branchName)} </td>
-						<td class="px-4 py-3 text-sm"> ${escapeHtml(item.supplier)} </td>
-						<td class="px-4 py-3 text-sm"> ${formatAccountingDate(item.date)} </td>
-						<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.total)} </td>
-						<td class="px-4 py-3 text-sm text-right"> ${formatAccountingCurrency(item.paid)} </td>
-						<td class="px-4 py-3 text-sm text-right font-semibold"> ${formatAccountingCurrency(item.outstanding)} </td>
-						<td class="px-4 py-3">
+						<td class="px-4 py-3 text-sm whitespace-nowrap"> ${escapeHtml(item.supplier)} </td>
+						<td class="px-4 py-3 text-sm whitespace-nowrap"> ${formatAccountingDate(item.date)} </td>
+						<td class="px-4 py-3 text-sm text-right whitespace-nowrap"> ${formatAccountingCurrency(item.total)} </td>
+						<td class="px-4 py-3 text-sm text-right whitespace-nowrap"> ${formatAccountingCurrency(item.paid)} </td>
+						<td class="px-4 py-3 text-sm text-right font-semibold whitespace-nowrap"> ${formatAccountingCurrency(item.outstanding)} </td>
+						<td class="px-4 py-3 text-center">
 							<span class="inline-flex px-2.5 py-1 text-xs font-medium ${statusClass}">
 								${item.status}
 							</span>
@@ -26330,10 +26315,10 @@ function renderPpnPayments() {
         <tr class="hover:bg-outline-variant">
           <td class="px-5 py-3"> ${paymentDate} </td>
           <td class="px-5 py-3"> ${escapeHtml(branchName)} </td>
-          <td class="px-5 py-3"> ${note} </td>
-          <td class="px-5 py-3 text-right font-medium"> ${formatAccountingCurrency(amount)} </td>
-          <td class="px-5 py-3"> ${method} </td>
-          <td class="px-5 py-3">
+          <td class="px-5 py-3 whitespace-nowrap"> ${note} </td>
+          <td class="px-5 py-3 text-right font-medium whitespace-nowrap"> ${formatAccountingCurrency(amount)} </td>
+          <td class="px-5 py-3 text-center"> ${method} </td>
+          <td class="px-5 py-3 text-center">
             <span class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
               ${status}
             </span>
@@ -26990,7 +26975,7 @@ function renderEmployeeTaxTable(errorMessage = "") {
 			return `
 				<tr class="hover:bg-outline-variant transition">
 					<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
-					<td class="px-5 py-4">
+					<td class="px-5 py-4 whitespace-nowrap">
 						<div class="font-medium text-foreground">  ${escapeHtml(employeeName)} </div>
 						<div class="text-xs text-muted"> ${escapeHtml(employeeCode)} </div>
 					</td>
@@ -28168,7 +28153,7 @@ function renderEmployeeHealthTable(errorMessage = "") {
 			return `
 				<tr class="hover:bg-outline-variant transition">
 					<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
-					<td class="px-5 py-4">
+					<td class="px-5 py-4 whitespace-nowrap">
 						<div class="font-medium text-foreground"> ${escapeHtml(row.employee_name || "-")} </div>
 						<div class="text-xs text-muted"> ${escapeHtml(row.employee_code || "")} </div>
 					</td>
@@ -29494,10 +29479,8 @@ function renderLiabilities() {
 			item.branch_id ||
 			item.Branch_ID ||
 			item.branchId ||
-			""
-		).trim();
-		const branchName = (accountingDebtBranches || []).find(branch =>
-			String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+			"" ).trim();
+		const branchName = (accountingDebtBranches || []).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
 		const creditor = escapeHtml(item.creditor || "-");
 		const startDate = formatLiabilityDate(item.start_date);
 		const dueDate = item.due_date
@@ -29515,14 +29498,14 @@ function renderLiabilities() {
 
 		return `
 			<tr class="border-b border-outline-variant hover:bg-outline-variant">
-				<td class="px-5 py-3">
+				<td class="px-5 py-3 whitespace-nowrap">
 					<div class="font-medium text-on-surface"> ${type} </div>
 					<div class="text-xs text-on-surface-variant"> ${id} </div>
 				</td>
 				<td class="px-5 py-3 text-on-surface"> ${escapeHtml(branchName)} </td>
 				<td class="px-5 py-3 text-on-surface"> ${creditor} </td>
-				<td class="px-5 py-3 text-on-surface-variant text-sm"> ${startDate} </td>
-				<td class="px-5 py-3 text-on-surface-variant text-sm"> ${dueDate} </td>
+				<td class="px-5 py-3 text-on-surface-variant text-sm whitespace-nowrap"> ${startDate} </td>
+				<td class="px-5 py-3 text-on-surface-variant text-sm whitespace-nowrap"> ${dueDate} </td>
 				<td class="px-5 py-3 text-right text-on-surface"> ${original} </td>
 				<td class="px-5 py-3 text-right text-on-surface"> ${paid} </td>
 				<td class="px-5 py-3 text-right font-semibold text-on-surface"> ${outstanding} </td>
