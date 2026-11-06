@@ -46239,7 +46239,7 @@ window.exportCashierShiftAdjustments = function () {
 					.logo {
 						display: block;
 						width: 100px;
-						height: 65px;
+						height: 70px;
 						object-fit: contain;
 						object-position: center;
 						flex-shrink: 0;
@@ -46249,18 +46249,18 @@ window.exportCashierShiftAdjustments = function () {
 					.brand-info {
 						display: flex;
 						flex-direction: column;
-						gap: 6px;
+						gap: 3px;
 					}
 					
 					.brand-name {
 						margin: 0;
-						font-size: 17px;
+						font-size: 18px;
 						font-weight: 700;
 						color: #222;
 					}
 					
 					.branch-title {
-						font-size: 11px;
+						font-size: 10px;
 						font-weight: 500;
 						color: #666;
 					}
