@@ -10082,13 +10082,6 @@ window.exportIngredientPurchases = async function () {
     });
 
     const supplierRows = Object.values(supplierMap) .sort((a, b) => b.spending - a.spending);
-    // PAYMENT BREAKDOWN
-    const paymentMap = {};
-    rows.forEach(r => {
-      const payment = r.Payment_Method ?? r.payment_method ?? "-";
-      paymentMap[payment] = (paymentMap[payment] || 0) + (Number(r.Total_Price ?? r.total_price ?? 0) || 0);
-    });
-    const paymentRows = Object.entries(paymentMap) .map(([payment, total]) => ({ payment, total }));
     // PURCHASE HISTORY
     const purchaseRows = rows.length
       ? rows.map(r => {
@@ -10097,7 +10090,6 @@ window.exportIngredientPurchases = async function () {
 				const qty = Number( r.Qty ?? r.qty ?? 0 ) || 0;
 				const totalPrice = Number( r.Total_Price ?? r.total_price ?? 0 ) || 0;
 				const supplier = r.Name_Supplier ?? r.name_supplier ?? "-";
-				const payment = r.Payment_Method ?? r.payment_method ?? "-";
 				const status = String( r.Status ?? r.status ?? "" ).toUpperCase() || "-";
 				const balanceDue = status === "PENDING" ? totalPrice : 0;
 				const outlet = r.Outlet ?? r.outlet ?? "-";
@@ -10113,7 +10105,6 @@ window.exportIngredientPurchases = async function () {
 						<td class="text-right">${qty.toLocaleString("id-ID")}</td>
 						<td class="amount-cell">${esc(money(totalPrice))}</td>
 						<td>${esc(supplier)}</td>
-						<td>${esc(payment)}</td>
 						<td>${esc(status)}</td>
 						<td class="amount-cell">${esc(money(balanceDue))}</td>
 						<td>${esc(outlet)}</td>
@@ -10123,26 +10114,11 @@ window.exportIngredientPurchases = async function () {
 			}).join("")
 		: `
 			<tr>
-				<td colspan="10" class="empty">
+				<td colspan="9" class="empty">
 					No purchase data
 				</td>
 			</tr>
 		`;
-    // PAYMENT HTML
-    const paymentHtml = paymentRows.length
-      ? paymentRows.map(r => `
-				<tr>
-					<td>${esc(r.payment)}</td>
-					<td class="amount-cell">${esc(money(r.total))}</td>
-				</tr>
-			`).join("")
-		: `
-				<tr>
-					<td colspan="2" class="empty">
-						No payment data
-					</td>
-				</tr>
-			`;
     // SUPPLIER HTML
     const supplierHtml = supplierRows.length
       ? supplierRows.map(r => `
@@ -10566,24 +10542,6 @@ window.exportIngredientPurchases = async function () {
             </div>
           </section>
 
-          <!-- PAYMENT BREAKDOWN -->
-          <div class="card">
-            <h3>Payment Method Breakdown</h3>
-
-            <table>
-              <thead>
-                <tr>
-                  <th>Payment Method</th>
-                  <th class="text-right">Total Spending</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                ${paymentHtml}
-              </tbody>
-            </table>
-          </div>
-
           <!-- SUPPLIER BREAKDOWN -->
           <div class="card">
             <h3>Supplier Breakdown</h3>
@@ -10616,7 +10574,6 @@ window.exportIngredientPurchases = async function () {
                   <th class="text-right">Qty</th>
                   <th class="text-right">Total Price</th>
                   <th>Supplier</th>
-                  <th>Payment</th>
                   <th>Status</th>
                   <th class="text-right">Balance Due</th>
                   <th>Outlet</th>
