@@ -20219,36 +20219,22 @@ window.exportAssets = async function () {
 
   try {
     const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
-
     // FILTER VALUES
     const filter = getAssetGlobalFilter();
-
     const branchId = filter?.branchId || null;
     const start = filter?.dateFrom || null;
     const end = filter?.dateTo || null;
 
-    if (start && end && start > end) {
-      alert('Period From tidak boleh melebihi Period To.');
-      return;
-    }
+    if (start && end && start > end) { alert('Period From tidak boleh melebihi Period To.'); return; }
 
     // OPEN TAB BEFORE ASYNC RPC
     reportWindow = window.open('', '_blank');
 
-    if (!reportWindow) {
-      alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.');
-      return;
-    }
-
+    if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
     // HELPERS
     const esc = value => escapeAssetHTML(value ?? '-');
-
-    const money = value =>
-      'Rp ' + Number(value || 0).toLocaleString('id-ID');
-
-    const normalizeValue = value =>
-      String(value || '').trim().toUpperCase();
-
+    const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+    const normalizeValue = value => String(value || '').trim().toUpperCase();
     const formatPeriodDate = value => {
       if (!value) return 'ALL PERIODS';
 
@@ -20262,7 +20248,6 @@ window.exportAssets = async function () {
       );
 
       if (Number.isNaN(date.getTime())) return '-';
-
       return date.toLocaleDateString('id-ID', {
         day: '2-digit',
         month: 'short',
@@ -20273,20 +20258,8 @@ window.exportAssets = async function () {
     const filterDate = (rows, dateField, startDate, endDate) => {
       return rows.filter(row => {
         const rowDate = row[dateField[0]] ?? row[dateField[1]] ?? '';
-
-        const matchStart =
-          !startDate ||
-          (
-            rowDate &&
-            new Date(rowDate) >= new Date(`${startDate}T00:00:00`)
-          );
-
-        const matchEnd =
-          !endDate ||
-          (
-            rowDate &&
-            new Date(rowDate) <= new Date(`${endDate}T23:59:59.999`)
-          );
+        const matchStart = !startDate || ( rowDate && new Date(rowDate) >= new Date(`${startDate}T00:00:00`) );
+        const matchEnd = !endDate || ( rowDate && new Date(rowDate) <= new Date(`${endDate}T23:59:59.999`) );
 
         return matchStart && matchEnd;
       });
@@ -20294,118 +20267,59 @@ window.exportAssets = async function () {
 
     // SESSION
     const sessionId = localStorage.getItem('pos_session_id');
-
-    if (!sessionId) {
-      throw new Error('Session tidak ditemukan. Silakan login kembali.');
-    }
+    if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
     // RPC ASSETS
-    const {
-      data: assets,
-      error: assetError
-    } = await supabaseClient.rpc('get_assets', {
-      p_branch_id: branchId,
-      p_session_id: sessionId
-    });
-
+    const { data: assets, error: assetError } = 
+			await supabaseClient.rpc('get_assets', {
+	      p_branch_id: branchId,
+	      p_session_id: sessionId
+	    });
     if (assetError) throw assetError;
 
     // RPC ASSET PURCHASES
-    const {
-      data: purchases,
-      error: purchaseError
-    } = await supabaseClient.rpc('get_asset_purchases', {
-      p_session_id: sessionId,
-      p_branch_id: branchId
-    });
-
+    const { data: purchases, error: purchaseError } =
+			await supabaseClient.rpc('get_asset_purchases', {
+	      p_session_id: sessionId,
+	      p_branch_id: branchId
+	    });
     if (purchaseError) throw purchaseError;
 
     // RPC DEPRECIATION HISTORY
-    const {
-      data: depreciation,
-      error: depreciationError
-    } = await supabaseClient.rpc('get_asset_depreciation_history', {
-      p_branch_id: branchId,
-      p_session_id: sessionId
-    });
-
+    const { data: depreciation, error: depreciationError } = 
+			await supabaseClient.rpc('get_asset_depreciation_history', {
+	      p_branch_id: branchId,
+	      p_session_id: sessionId
+	    });
     if (depreciationError) throw depreciationError;
 
     // NORMALIZE DATA
     const assetRows = Array.isArray(assets) ? assets : [];
     const purchaseRows = Array.isArray(purchases) ? purchases : [];
     const depreciationRows = Array.isArray(depreciation) ? depreciation : [];
-
     // DATE FILTER
-    const filteredAssets = filterDate(
-      assetRows,
-      ['Purchase_Date', 'purchase_date'],
-      start,
-      end
-    );
-
-    const filteredPurchases = filterDate(
-      purchaseRows,
-      ['Purchase_Date', 'purchase_date'],
-      start,
-      end
-    );
-
-    const filteredDepreciation = filterDate(
-      depreciationRows,
-      ['Period', 'period'],
-      start,
-      end
-    );
-
+    const filteredAssets = filterDate( assetRows, ['Purchase_Date', 'purchase_date'], start, end );
+    const filteredPurchases = filterDate( purchaseRows, ['Purchase_Date', 'purchase_date'], start, end );
+    const filteredDepreciation = filterDate( depreciationRows, ['Period', 'period'], start, end );
     // BRANCH & PERIOD LABEL
-    const branchTitle =
-      filter?.branchName ||
-      filter?.branch ||
-      branchId ||
-      'ALL BRANCHES';
-
-    const periodTitle =
-      start || end
-        ? `${formatPeriodDate(start)} - ${formatPeriodDate(end)}`
-        : 'ALL PERIODS';
-
+    const branchTitle = filter?.branchName || filter?.branch || branchId || 'ALL BRANCHES';
+    const periodTitle = start || end
+			? `${formatPeriodDate(start)} - ${formatPeriodDate(end)}`
+			: 'ALL PERIODS';
     // KPI
-    const activeAssets = filteredAssets.filter(
-      row => normalizeValue(row.Status) === 'ACTIVE'
-    );
-
+    const activeAssets = filteredAssets.filter( row => normalizeValue(row.Status) === 'ACTIVE' );
     const totalAssets = activeAssets.length;
-
-    const purchaseCost = activeAssets.reduce(
-      (sum, row) => sum + Number(row.Purchase_Cost || 0),
-      0
-    );
-
-    const accumulatedDepreciation = activeAssets.reduce(
-      (sum, row) => sum + Number(row.Accumulated_Depreciation || 0),
-      0
-    );
-
-    const bookValue = activeAssets.reduce(
-      (sum, row) => sum + Number(row.Book_Value || 0),
-      0
-    );
-
+    const purchaseCost = activeAssets.reduce((sum, row) => sum + Number(row.Purchase_Cost || 0), 0 );
+    const accumulatedDepreciation = activeAssets.reduce((sum, row) => sum + Number(row.Accumulated_Depreciation || 0), 0 );
+    const bookValue = activeAssets.reduce((sum, row) => sum + Number(row.Book_Value || 0), 0 );
     const monthlyDepreciation = activeAssets.reduce((sum, row) => {
       const method = normalizeValue(row.Depreciation_Method);
       const usefulLife = Number(row.Useful_Life_Months || 0);
 
-      if (method === 'STRAIGHT LINE' && usefulLife > 0) {
-        return sum + (
-          Number(row.Purchase_Cost || 0) / usefulLife
-        );
-      }
+      if (method === 'STRAIGHT LINE' && usefulLife > 0) { return sum + ( Number(row.Purchase_Cost || 0) / usefulLife ); }
 
       return sum;
     }, 0);
-
     // ASSET MANAGEMENT ROWS
     const assetManagementRows = filteredAssets.length
       ? filteredAssets.map(row => {
@@ -20440,7 +20354,6 @@ window.exportAssets = async function () {
           <td colspan="10" class="empty">No asset data</td>
         </tr>
       `;
-
     // ASSET PURCHASE ROWS
     const assetPurchaseRows = filteredPurchases.length
       ? filteredPurchases.map(row => {
@@ -20475,7 +20388,6 @@ window.exportAssets = async function () {
           <td colspan="10" class="empty">No asset purchase data</td>
         </tr>
       `;
-
     // DEPRECIATION HISTORY ROWS
     const depreciationHistoryRows = filteredDepreciation.length
       ? filteredDepreciation.map(row => {
@@ -20508,18 +20420,12 @@ window.exportAssets = async function () {
       `;
 
     // TENANT LOGO
-    const supabaseUrl = String(
-      supabaseClient?.supabaseUrl || ''
-    ).replace(/\/$/, '');
-
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
     const logoUrl = supabaseUrl
       ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
       : '';
-
     // FILENAME
-    const filename =
-      `Asset Report - ${branchTitle} - ${periodTitle}.pdf`;
-
+    const filename = `Asset Report - ${branchTitle} - ${periodTitle}.pdf`;
     // REPORT HTML
     const html = `
       <!DOCTYPE html>
@@ -20747,9 +20653,26 @@ window.exportAssets = async function () {
             color: #888;
           }
 
-          .page-break {
-            page-break-before: always;
-          }
+					table {
+					  width: 100%;
+					  border-collapse: collapse;
+					  font-size: 9px;
+					  margin-top: 8px;
+					  page-break-inside: auto;
+					}
+					
+					thead {
+					  display: table-header-group;
+					}
+					
+					tbody {
+					  page-break-inside: auto;
+					}
+					
+					tr {
+					  page-break-inside: avoid;
+					  break-inside: avoid;
+					}
 
           /* PRINT */
           @page {
@@ -20784,10 +20707,19 @@ window.exportAssets = async function () {
               margin-bottom: 16px;
             }
 
-            .kpi-card,
-            .card {
-              break-inside: avoid;
-            }
+						.kpi-card {
+						  break-inside: avoid;
+						}
+						
+						.card {
+						  break-inside: auto;
+						  page-break-inside: auto;
+						}
+						
+						.card h3 {
+						  break-after: avoid;
+						  page-break-after: avoid;
+						}
 
             th {
               background: #f5f5f5 !important;
@@ -20909,11 +20841,8 @@ window.exportAssets = async function () {
           </div>
 
           <!-- ASSET PURCHASE -->
-          <div class="page-break"></div>
-
           <div class="card">
             <h3>Asset Purchase & Financing</h3>
-
             <table>
               <thead>
                 <tr>
@@ -20937,11 +20866,8 @@ window.exportAssets = async function () {
           </div>
 
           <!-- DEPRECIATION HISTORY -->
-          <div class="page-break"></div>
-
           <div class="card">
             <h3>Depreciation History</h3>
-
             <table>
               <thead>
                 <tr>
