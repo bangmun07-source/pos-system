@@ -46058,74 +46058,483 @@ function cashierAdjustmentNextPage() {
 	renderCashierShiftAdjustmentTable();
 }
 
-// ========================================
-// EXPORT CSV
-// ========================================
 
-function exportCashierShiftAdjustments() {
-	const rows = cashierShiftAdjustmentState.filteredRows;
+/* ==== EXPORT CASHIER SHIFT ADJUSTMENTS PDF ==== */
+window.exportCashierShiftAdjustments = function () {
+	try {
+		const rows = cashierShiftAdjustmentState.filteredRows;
+		if (!rows.length) { alert('Tidak ada data adjustment untuk diexport.'); return; }
 
-	if (!rows.length) {
-			alert('Tidak ada data adjustment untuk diexport.');
-			return;
+		// FILTER VALUES
+		const getValue = id => {
+			const value = document.getElementById(id)?.value;
+			return !value || value === 'ALL' ? null : value;
+		};
+		const dateFrom = getValue('cashierAdjustmentPeriodFrom');
+		const dateTo = getValue('cashierAdjustmentPeriodTo');
+		const selectedUser = getValue('cashierAdjustmentUserFilter');
+		const selectedBranch = getValue('cashierAdjustmentBranchFilter');
+		const selectedType = getValue('cashierAdjustmentTypeFilter');
+
+		if (dateFrom && dateTo && dateFrom > dateTo) { alert('Period From tidak boleh melebihi Period To.'); return; }
+
+		// HELPERS
+		const esc = value => escapeAdjustmentHTML(value ?? '-');
+		const money = value => formatAdjustmentCurrency(Number(value || 0));
+		const formatPeriodDate = value => {
+			if (!value) return 'All Dates';
+
+			const parts = String(value).slice(0, 10).split('-');
+			if (parts.length !== 3) return esc(value);
+
+			const date = new Date(
+				Number(parts[0]),
+				Number(parts[1]) - 1,
+				Number(parts[2])
+			);
+			if (Number.isNaN(date.getTime())) return '-';
+
+			return date.toLocaleDateString('id-ID', {
+				day: '2-digit',
+				month: 'short',
+				year: 'numeric'
+			});
+		};
+
+		const getSelectLabel = (id, fallback) => {
+			const select = document.getElementById(id);
+			if (!select || !select.value || select.value === 'ALL') { return fallback; }
+
+			return select.options[select.selectedIndex]?.textContent?.trim() || fallback;
+		};
+
+		// FILTER LABELS
+		const branchTitle = getSelectLabel( 'cashierAdjustmentBranchFilter', 'ALL BRANCHES' );
+		const cashierTitle = getSelectLabel( 'cashierAdjustmentUserFilter', 'ALL CASHIERS' );
+		const typeTitle = getSelectLabel( 'cashierAdjustmentTypeFilter', 'ALL TYPES' );
+		const periodTitle = dateFrom || dateTo
+			? `${formatPeriodDate(dateFrom)} - ${formatPeriodDate(dateTo)}`
+			: 'ALL PERIODS';
+		// SUMMARY
+		const totalAdjustments = rows.length;
+		const reimbursedRows = rows.filter( row => row.adjustment_type === 'REIMBURSED' );
+		const expensedRows = rows.filter( row => row.adjustment_type === 'EXPENSED' );
+		const totalReimbursed = reimbursedRows.reduce( (sum, row) => sum + Number(row.amount || 0), 0 );
+		const totalExpenses = expensedRows.reduce( (sum, row) => sum + Number(row.amount || 0), 0 );
+
+		// TABLE ROWS
+		const tableRowsHtml = rows.map((row, index) => {
+			const isReimbursed = row.adjustment_type === 'REIMBURSED';
+			const typeLabel = isReimbursed
+				? 'REIMBURSED'
+				: row.adjustment_type === 'EXPENSED'
+					? 'EXPENSED'
+					: String(row.adjustment_type || '-').toUpperCase();
+			const typeClass = isReimbursed
+				? 'type-reimbursed'
+				: 'type-expensed';
+
+			return `
+				<tr>
+					<td class="text-center">${index + 1}</td>
+					<td class="date-cell"> ${esc(formatAdjustmentDate(row.created_at))} </td>
+					<td>${esc(row.cashier_name || '-')}</td>
+					<td>${esc(row.branch_name || row.branch_id || '-')}</td>
+					<td class="text-center">
+						<span class="status ${typeClass}"> ${esc(typeLabel)} </span>
+					</td>
+					<td class="amount-cell"> ${esc(money(row.amount))} </td>
+					<td>${esc(row.responsible_name || '-')}</td>
+					<td>${esc(row.processed_by_name || '-')}</td>
+					<td>${esc(row.note || '-')}</td>
+				</tr>
+			`;
+		}).join('');
+
+		// TENANT LOGO
+		const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
+		const logoUrl = supabaseUrl
+			? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+			: '';
+		const filename = `Cashier Shift Adjustments - ${branchTitle} - ${periodTitle}.pdf`;
+		// REPORT HTML
+		const html = `
+			<!DOCTYPE html>
+			<html lang="id">
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>${esc(filename)}</title>
+
+				<style>
+					* {
+						box-sizing: border-box;
+					}
+
+					html,
+					body {
+						margin: 0;
+						padding: 0;
+					}
+
+					body {
+						background: #000;
+						color: #333;
+						font-family: Arial, Helvetica, sans-serif;
+						padding: 40px 20px;
+					}
+
+					/* TOOLBAR */
+					.toolbar {
+						width: 100%;
+						max-width: 1200px;
+						margin: 0 auto 20px;
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						gap: 16px;
+						color: #fff;
+						font-size: 14px;
+					}
+
+					.toolbar button {
+						border: 1px solid rgba(255,255,255,.15);
+						background: rgba(255,255,255,.08);
+						color: #fff;
+						padding: 10px 16px;
+						border-radius: 10px;
+						cursor: pointer;
+						font-weight: 700;
+					}
+
+					.toolbar button:hover {
+						background: rgba(255,255,255,.14);
+					}
+
+					/* REPORT PAPER */
+					.report {
+						width: 100%;
+						max-width: 1200px;
+						margin: 0 auto;
+						padding: 36px;
+						background: #fff;
+						border-radius: 4px;
+						box-shadow: 0 20px 60px rgba(0,0,0,.45);
+					}
+
+					/* HEADER */
+					.report-header {
+						text-align: center;
+						margin-bottom: 24px;
+					}
+
+					.logo {
+						display: block;
+						width: auto;
+						max-width: 150px;
+						max-height: 70px;
+						object-fit: contain;
+						margin: 0 auto 10px;
+					}
+
+					.title {
+						margin: 0 0 8px;
+						font-size: 21px;
+						font-weight: 700;
+						letter-spacing: .5px;
+						color: #222;
+					}
+
+					.branch-title {
+						margin-top: 4px;
+						font-size: 12px;
+						font-weight: 600;
+						color: #555;
+					}
+
+					.period {
+						margin-top: 5px;
+						font-size: 11px;
+						color: #777;
+					}
+
+					.filter-info {
+						margin-top: 8px;
+						font-size: 9px;
+						line-height: 1.7;
+						color: #777;
+					}
+
+					/* KPI */
+					.summary-grid {
+						display: grid;
+						grid-template-columns: repeat(3, minmax(0, 1fr));
+						gap: 12px;
+						margin-bottom: 22px;
+					}
+
+					.summary-card {
+						border: 1px solid #e5e5e5;
+						border-radius: 10px;
+						padding: 14px 16px;
+						background: #fff;
+					}
+
+					.summary-label {
+						font-size: 9px;
+						color: #777;
+						text-transform: uppercase;
+						letter-spacing: .7px;
+						margin-bottom: 7px;
+					}
+
+					.summary-value {
+						font-size: 15px;
+						font-weight: 700;
+						color: #222;
+						overflow-wrap: anywhere;
+					}
+
+					/* TABLE */
+					.table-wrap {
+						width: 100%;
+						overflow: visible;
+						border: 1px solid #e5e5e5;
+						border-radius: 10px;
+						padding: 10px;
+						background: #fff;
+					}
+
+					table {
+						width: 100%;
+						border-collapse: collapse;
+						table-layout: auto;
+						font-size: 8px;
+						color: #444;
+					}
+
+					thead {
+						display: table-header-group;
+					}
+
+					th {
+						padding: 9px 5px;
+						background: #f5f5f5;
+						color: #444;
+						font-size: 7px;
+						font-weight: 700;
+						text-align: left;
+						vertical-align: middle;
+						border: none;
+						border-bottom: 1px solid #e5e5e5;
+						white-space: nowrap;
+					}
+
+					td {
+						padding: 9px 5px;
+						vertical-align: top;
+						border: none;
+						border-bottom: 1px solid #eee;
+						overflow-wrap: anywhere;
+					}
+
+					tbody tr:last-child td {
+						border-bottom: none;
+					}
+
+					tbody tr {
+						page-break-inside: avoid;
+						break-inside: avoid;
+					}
+
+					.text-center {
+						text-align: center;
+					}
+
+					.date-cell {
+						white-space: nowrap;
+					}
+
+					.amount-cell {
+						text-align: right;
+						white-space: nowrap;
+						font-weight: 700;
+					}
+
+					/* STATUS */
+					.status {
+						display: inline-block;
+						font-size: 7px;
+						font-weight: 700;
+						white-space: nowrap;
+						background: transparent !important;
+						box-shadow: none !important;
+						border: none !important;
+						padding: 0 !important;
+					}
+
+					.type-reimbursed {
+						color: #15803d;
+					}
+
+					.type-expensed {
+						color: #b45309;
+					}
+
+					/* FOOTER */
+					.footer {
+						margin-top: 24px;
+						text-align: center;
+						font-size: 9px;
+						color: #888;
+					}
+
+					/* PRINT */
+					@page {
+						size: A4 landscape;
+						margin: 10mm;
+					}
+
+				@media print {
+					html,
+					body {
+						width: 100%;
+						margin: 0;
+						padding: 0;
+						background: #fff;
+						-webkit-print-color-adjust: exact;
+						print-color-adjust: exact;
+					}
+
+					.toolbar {
+						display: none !important;
+					}
+
+					.report {
+						width: 100%;
+						max-width: none;
+						margin: 0;
+						padding: 0;
+						border-radius: 0;
+						box-shadow: none;
+					}
+
+					.report-header {
+						margin-bottom: 16px;
+					}
+
+					.summary-card,
+					.table-wrap {
+						break-inside: avoid;
+					}
+
+					th {
+						background: #f5f5f5 !important;
+						-webkit-print-color-adjust: exact;
+						print-color-adjust: exact;
+					}
+
+					table {
+						page-break-inside: auto;
+					}
+
+					tr {
+						page-break-inside: avoid;
+						break-inside: avoid;
+					}
+				}
+			</style>
+		</head>
+
+		<body>
+			<div class="toolbar">
+				<div>Cashier Shift Adjustment Report</div>
+				<button type="button" onclick="window.print()"> Download / Print PDF </button>
+			</div>
+
+			<main class="report">
+				<header class="report-header">
+					${logoUrl ? `
+						<img src="${esc(logoUrl)}"
+								class="logo"
+								alt="Company Logo"
+								onerror="this.style.display='none'" >
+					` : ''}
+
+					<h1 class="title">Cashier Shift Adjustment Report</h1>
+
+					<div class="branch-title"> ${esc(branchTitle)} </div>
+					<div class="period"> Period: ${esc(periodTitle)} </div>
+
+					<div class="filter-info">
+							Cashier: ${esc(cashierTitle)}
+							&nbsp; | &nbsp;
+							Adjustment Type: ${esc(typeTitle)}
+					</div>
+				</header>
+
+				<!-- SUMMARY -->
+				<section class="summary-grid">
+					<div class="summary-card">
+						<div class="summary-label">Total Adjustments</div>
+						<div class="summary-value"> ${totalAdjustments.toLocaleString('id-ID')} </div>
+					</div>
+
+					<div class="summary-card">
+						<div class="summary-label">Total Reimbursed</div>
+						<div class="summary-value"> ${esc(money(totalReimbursed))} </div>
+					</div>
+
+					<div class="summary-card">
+						<div class="summary-label">Total Expensed</div>
+						<div class="summary-value"> ${esc(money(totalExpenses))} </div>
+					</div>
+				</section>
+
+				<!-- ADJUSTMENT TABLE -->
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th class="text-center">No.</th>
+								<th>Date & Time</th>
+								<th>Cashier</th>
+								<th>Branch</th>
+								<th>Adjustment Type</th>
+								<th style="text-align:right">Amount</th>
+								<th>Responsible User</th>
+								<th>Processed By</th>
+								<th>Note</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							${tableRowsHtml}
+						</tbody>
+					</table>
+				</div>
+
+				<footer class="footer">
+					Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+				</footer>
+			</main>
+		</body>
+		</html>
+	`;
+
+		// OPEN REPORT IN NEW TAB
+		const reportWindow = window.open('', '_blank');
+		if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
+
+		reportWindow.document.open();
+		reportWindow.document.write(html);
+		reportWindow.document.close();
+
+	} catch (error) {
+			console.error('Export Cashier Shift Adjustment error:', error);
+			alert('Gagal membuat PDF Cashier Shift Adjustment. Periksa Console untuk detail kesalahan.');
 	}
-
-	const headers = [
-			'Date & Time',
-			'Cashier',
-			'Branch',
-			'Adjustment Type',
-			'Amount',
-			'Responsible User',
-			'Processed By',
-			'Note'
-	];
-
-	const csvEscape = value => {
-			let text = String(value ?? '');
-
-			// Prevent spreadsheet formula injection
-			if (/^[=+\-@\t\r]/.test(text)) {
-					text = "'" + text;
-			}
-
-			return '"' + text.replace(/"/g, '""') + '"';
-	};
-
-	const csvRows = rows.map(row => [
-			formatAdjustmentDate(row.created_at),
-			row.cashier_name || '-',
-			row.branch_id || '-',
-			row.adjustment_type || '-',
-			Number(row.amount || 0),
-			row.responsible_name || '-',
-			row.processed_by_name || '-',
-			row.note || '-'
-	]);
-
-	const csvContent = [
-			headers,
-			...csvRows
-	].map(row => row.map(csvEscape).join(',')).join('\r\n');
-
-	const blob = new Blob(
-			['\uFEFF' + csvContent],
-			{ type: 'text/csv;charset=utf-8;' }
-	);
-
-	const url = URL.createObjectURL(blob);
-	const link = document.createElement('a');
-
-	link.href = url;
-	link.download = `cashier-shift-adjustments-${getAdjustmentLocalDate(new Date())}.csv`;
-
-	document.body.appendChild(link);
-	link.click();
-	document.body.removeChild(link);
-
-	URL.revokeObjectURL(url);
-}
-
+};
 
 // FILTER EVENT LISTENERS
 function initializeCashierShiftAdjustmentFilters() {
