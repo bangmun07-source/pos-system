@@ -27217,6 +27217,7 @@ function closePayEmployeeTaxModal() {
 /* ==== EXPORT EMPLOYEE TAX PAYABLE PDF ==== */
 window.exportEmployeeTaxPayable = async function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     const periodValue = String( document.getElementById('employeeTaxPeriodFilter')?.value || '' ).trim();
     const yearValue = String( document.getElementById('employeeTaxYearFilter')?.value || '' ).trim();
     const branchValue = String( document.getElementById('employeeTaxBranchFilter')?.value || '' ).trim();
@@ -27244,7 +27245,6 @@ window.exportEmployeeTaxPayable = async function () {
       } else if (/^\d{4}$/.test(yearValue)) {
         if (taxPeriod.substring(0, 4) !== yearValue) return false;
       }
-
       return true;
     });
 
@@ -27272,7 +27272,6 @@ window.exportEmployeeTaxPayable = async function () {
     };
     const getBranchName = id => {
       const branch = (accountingDebtBranches || []).find( item => String(item.id || '').trim() === String(id || '').trim() );
-			
       return branch?.name || id || '-';
     };
     const branchTitle = branchValue
@@ -27286,7 +27285,6 @@ window.exportEmployeeTaxPayable = async function () {
     // TABLE ROWS
     const sortedRows = [...rows].sort((a, b) => {
       const periodCompare = String(a.tax_period || '') .localeCompare(String(b.tax_period || ''));
-
       return periodCompare ||
         String(a.employee_name || '').localeCompare(
           String(b.employee_name || ''), 'id'
@@ -27375,39 +27373,90 @@ window.exportEmployeeTaxPayable = async function () {
           }
 
           .report-header {
-            text-align: center;
-            margin-bottom: 26px;
-          }
-
-          .logo {
-            display: block;
-            width: auto;
-            max-width: 150px;
-            max-height: 75px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          .title {
-            margin: 0 0 8px;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: .4px;
-            color: #222;
-          }
-
-          .branch-title {
-            margin-top: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-          }
-
-          .period {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #777;
-          }
+					  margin-bottom: 24px;
+					}
+					
+					.brand-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  min-height: 75px;
+					  margin-bottom: 16px;
+					}
+					
+					.brand-left {
+					  display: flex;
+					  align-items: center;
+					  gap: 6px;
+					  min-width: 0;
+					}
+					
+					.logo {
+					  display: block;
+					  width: 70px;
+					  height: 70px;
+					  object-fit: contain;
+					  object-position: center;
+					  flex-shrink: 0;
+					  margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+					  display: flex;
+					  flex-direction: column;
+					  justify-content: center;
+					  gap: 2px;
+					  margin: 0;
+					}
+					
+					.brand-name {
+					  margin: 0;
+					  font-size: 18px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.branch-title {
+					  font-size: 10px;
+					  font-weight: 500;
+					  color: #666;
+					}
+					
+					.period {
+					  font-size: 11px;
+					  font-weight: 600;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					  align-self: flex-end;
+					  margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  padding-top: 14px;
+					  border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+					  margin: 0;
+					  font-size: 16px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.filter-info {
+					  margin: 0;
+					  font-size: 9px;
+					  line-height: 1.7;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					}
 
           .summary {
             display: flex;
@@ -27565,24 +27614,49 @@ window.exportEmployeeTaxPayable = async function () {
         </div>
 
         <main class="report">
-          <header class="report-header">
-            ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
-            ` : ''}
-
-            <h1 class="title">Employee Tax Payable</h1>
-            <div class="branch-title">${esc(branchTitle)}</div>
-            <div class="period">
-              Period: ${esc(periodTitle)}
-              ${employeeValue ? ' • Employee Filtered' : ''}
-              ${statusValue ? ` • Status: ${esc(statusValue)}` : ''}
-            </div>
-          </header>
+					<header class="report-header">
+					  <div class="brand-row">
+					    <div class="brand-left">
+					      ${logoUrl ? `
+					        <img
+					          src="${esc(logoUrl)}"
+					          class="logo"
+					          alt="Company Logo"
+					          onerror="this.style.display='none'"
+					        >
+					      ` : ''}
+					
+					      <div class="brand-info">
+					        <h2 class="brand-name">${esc(companyName)}</h2>
+					        <div class="branch-title">
+					          Branch : ${esc(branchTitle)}
+					        </div>
+					      </div>
+					    </div>
+					
+					    <div class="period">
+					      Period : ${esc(periodTitle)}
+					    </div>
+					  </div>
+					
+					  <div class="report-meta-row">
+					    <h1 class="title">Employee Tax Payable Report</h1>
+					
+					    <div class="filter-info">
+					      Employee: ${esc(
+					        employeeValue
+					          ? (
+					              sortedRows.find(row =>
+					                String(row.employee_id || '').trim() === employeeValue
+					              )?.employee_name || employeeValue
+					            )
+					          : 'ALL EMPLOYEES'
+					      )}
+					      &nbsp; | &nbsp;
+					      Status: ${esc(statusValue || 'ALL STATUS')}
+					    </div>
+					  </div>
+					</header>
 
           <div class="summary">
             <div>
@@ -28474,93 +28548,42 @@ function closePayEmployeeHealthModal() {
 /* ==== EXPORT EMPLOYEE HEALTH PAYABLE PDF ==== */
 window.exportEmployeeHealthData = async function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     // FILTER VALUES
-    const periodValue = String(
-      document.getElementById('employeeHealthPeriodFilter')?.value || ''
-    ).trim();
+    const periodValue = String( document.getElementById('employeeHealthPeriodFilter')?.value || '').trim();
+    const yearValue = String( document.getElementById('employeeHealthYearFilter')?.value || '' ).trim();
+    const branchValue = String( document.getElementById('employeeHealthBranchFilter')?.value || '' ).trim();
+    const employeeValue = String( document.getElementById('employeeHealthEmployeeFilter')?.value || '' ).trim();
+    const statusValue = String( document.getElementById('employeeHealthStatusFilter')?.value || '' ).trim().toUpperCase();
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+    const canViewAllBranches = ['owner', 'accountant'].includes(role) || userBranchId.toUpperCase() === 'ALL';
 
-    const yearValue = String(
-      document.getElementById('employeeHealthYearFilter')?.value || ''
-    ).trim();
-
-    const branchValue = String(
-      document.getElementById('employeeHealthBranchFilter')?.value || ''
-    ).trim();
-
-    const employeeValue = String(
-      document.getElementById('employeeHealthEmployeeFilter')?.value || ''
-    ).trim();
-
-    const statusValue = String(
-      document.getElementById('employeeHealthStatusFilter')?.value || ''
-    ).trim().toUpperCase();
-
-    const role = String(
-      state.user?.role || state.user?.Role || ''
-    ).trim().toLowerCase();
-
-    const userBranchId = String(
-      state.user?.branchId || state.user?.Branch_ID || ''
-    ).trim();
-
-    const canViewAllBranches =
-      ['owner', 'accountant'].includes(role) ||
-      userBranchId.toUpperCase() === 'ALL';
-
-    if (!Array.isArray(employeeHealthData) || !employeeHealthData.length) {
-      alert('Data Employee Health Payable belum tersedia.');
-      return;
-    }
+    if (!Array.isArray(employeeHealthData) || !employeeHealthData.length) { alert('Data Employee Health Payable belum tersedia.'); return; }
 
     // FILTER RECORDS
     const rows = employeeHealthData.filter(row => {
-      const contributionPeriod = String(
-        row.contribution_period || ''
-      ).substring(0, 10);
-
+      const contributionPeriod = String(  row.contribution_period || '' ).substring(0, 10);
       const branchId = String(row.branch_id || '').trim();
       const employeeId = String(row.employee_id || '').trim();
       const status = String(row.status || 'DRAFT').trim().toUpperCase();
 
-      if (!canViewAllBranches && branchId !== userBranchId) {
-        return false;
-      }
+      if (!canViewAllBranches && branchId !== userBranchId) { return false; }
 
-      if (
-        branchValue &&
-        branchValue.toUpperCase() !== 'ALL' &&
-        branchId !== branchValue
-      ) {
-        return false;
-      }
-
-      if (employeeValue && employeeId !== employeeValue) {
-        return false;
-      }
-
-      if (statusValue && status !== statusValue) {
-        return false;
-      }
+      if ( branchValue && branchValue.toUpperCase() !== 'ALL' && branchId !== branchValue
+      ) { return false; }
+      if (employeeValue && employeeId !== employeeValue) { return false; }
+      if (statusValue && status !== statusValue) { return false; }
 
       if (/^\d{4}-\d{2}$/.test(periodValue)) {
-        if (contributionPeriod.substring(0, 7) !== periodValue) {
-          return false;
-        }
+        if (contributionPeriod.substring(0, 7) !== periodValue) { return false; }
       } else if (/^\d{4}$/.test(yearValue)) {
-        if (contributionPeriod.substring(0, 4) !== yearValue) {
-          return false;
-        }
+        if (contributionPeriod.substring(0, 4) !== yearValue) { return false; }
       }
 
       return true;
     });
-
-    if (!rows.length) {
-      alert(
-        'Tidak ada data Employee Health Payable untuk filter yang dipilih.'
-      );
-      return;
-    }
+    if (!rows.length) { alert( 'Tidak ada data Employee Health Payable untuk filter yang dipilih.' ); return; }
 
     // HELPERS
     const esc = value =>
@@ -28571,7 +28594,6 @@ window.exportEmployeeHealthData = async function () {
         '"': '&quot;',
         "'": '&#39;'
       })[char]);
-
     const formatMoney = value =>
       new Intl.NumberFormat('id-ID', {
         style: 'currency',
@@ -28579,7 +28601,6 @@ window.exportEmployeeHealthData = async function () {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
       }).format(Number(value) || 0);
-
     const formatNumber = value =>
       new Intl.NumberFormat('id-ID', {
         minimumFractionDigits: 0,
@@ -28588,10 +28609,7 @@ window.exportEmployeeHealthData = async function () {
 
     const formatPeriod = value => {
       const period = String(value || '').substring(0, 10);
-
-      if (!/^\d{4}-\d{2}/.test(period)) {
-        return period || '-';
-      }
+      if (!/^\d{4}-\d{2}/.test(period)) { return period || '-'; }
 
       const [year, month] = period.substring(0, 7).split('-');
 
@@ -28609,7 +28627,6 @@ window.exportEmployeeHealthData = async function () {
       const branches = Array.isArray(accountingDebtBranches)
         ? accountingDebtBranches
         : [];
-
       const branch = branches.find(item =>
         String(item.branch_id || item.Branch_ID || item.id || '').trim() ===
         String(branchId || '').trim()
@@ -28623,7 +28640,6 @@ window.exportEmployeeHealthData = async function () {
         '-'
       );
     };
-
     const branchTitle = branchValue && branchValue.toUpperCase() !== 'ALL'
         ? getBranchName(branchValue)
         : canViewAllBranches
@@ -28636,65 +28652,32 @@ window.exportEmployeeHealthData = async function () {
         : 'ALL PERIODS';
     // SORT RECORDS
     const sortedRows = [...rows].sort((a, b) => {
-      const periodCompare = String(a.contribution_period || '')
-        .localeCompare(String(b.contribution_period || ''));
-
+      const periodCompare = String(a.contribution_period || '') .localeCompare(String(b.contribution_period || ''));
       return periodCompare ||
         String(a.employee_name || '').localeCompare(
           String(b.employee_name || ''),
           'id'
         );
     });
-
     // SUMMARY
-    const paidRows = sortedRows.filter(row =>
-      String(row.status || 'DRAFT').trim().toUpperCase() === 'PAID'
-    );
-
-    const employeePaid = paidRows.reduce(
-      (sum, row) => sum + (Number(row.employee_amount) || 0),
-      0
-    );
-
-    const employerPaid = paidRows.reduce(
-      (sum, row) => sum + (Number(row.employer_amount) || 0),
-      0
-    );
-
+    const paidRows = sortedRows.filter(row => String(row.status || 'DRAFT').trim().toUpperCase() === 'PAID' );
+    const employeePaid = paidRows.reduce((sum, row) => sum + (Number(row.employee_amount) || 0), 0 );
+    const employerPaid = paidRows.reduce((sum, row) => sum + (Number(row.employer_amount) || 0), 0 );
     const outstandingAmount = sortedRows.reduce((sum, row) => {
       const status = String(row.status || 'DRAFT')
         .trim()
         .toUpperCase();
 
-      if (['PAID', 'CANCELLED'].includes(status)) {
-        return sum;
-      }
+      if (['PAID', 'CANCELLED'].includes(status)) { return sum; }
 
       return sum +
         (Number(row.employee_amount) || 0) +
         (Number(row.employer_amount) || 0);
     }, 0);
-
     const totalRecords = sortedRows.length;
-
-    const totalEmployeeAmount = sortedRows.reduce(
-      (sum, row) => sum + (Number(row.employee_amount) || 0),
-      0
-    );
-
-    const totalEmployerAmount = sortedRows.reduce(
-      (sum, row) => sum + (Number(row.employer_amount) || 0),
-      0
-    );
-
-    const totalPaidAmount = paidRows.reduce(
-      (sum, row) =>
-        sum +
-        (Number(row.employee_amount) || 0) +
-        (Number(row.employer_amount) || 0),
-      0
-    );
-
+    const totalEmployeeAmount = sortedRows.reduce((sum, row) => sum + (Number(row.employee_amount) || 0), 0 );
+    const totalEmployerAmount = sortedRows.reduce((sum, row) => sum + (Number(row.employer_amount) || 0), 0 );
+    const totalPaidAmount = paidRows.reduce((sum, row) => sum + (Number(row.employee_amount) || 0) + (Number(row.employer_amount) || 0), 0 );
     // TABLE ROWS
     const tableRows = sortedRows.map(row => {
       const contributionId = row.contribution_id || '-';
@@ -28702,13 +28685,9 @@ window.exportEmployeeHealthData = async function () {
       const employeeCode = row.employee_code || '';
       const branchName = getBranchName(row.branch_id);
       const contributionPeriod = formatPeriod(row.contribution_period);
-
-      const contributionType = String(
-        row.contribution_type || '-'
-      )
+      const contributionType = String( row.contribution_type || '-' )
         .replace(/_/g, ' ')
         .replace(/\b\w/g, char => char.toUpperCase());
-
       const employeeAmount = Number(row.employee_amount) || 0;
       const employerAmount = Number(row.employer_amount) || 0;
       const totalAmount = employeeAmount + employerAmount;
@@ -28754,17 +28733,11 @@ window.exportEmployeeHealthData = async function () {
     }).join('');
 
     // TENANT LOGO
-    const supabaseUrl = String(
-      supabaseClient?.supabaseUrl || ''
-    ).replace(/\/$/, '');
-
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
     const logoUrl = supabaseUrl
       ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
       : '';
-
-    const filename =
-      `Employee Health Payable - ${branchTitle} - ${periodTitle}.pdf`;
-
+    const filename = `Employee Health Payable - ${branchTitle} - ${periodTitle}.pdf`;
     // REPORT HTML
     const html = `
       <!DOCTYPE html>
@@ -28830,41 +28803,92 @@ window.exportEmployeeHealthData = async function () {
             box-shadow: 0 20px 60px rgba(0,0,0,.45);
           }
 
-          .report-header {
-            text-align: center;
-            margin-bottom: 26px;
-            padding-bottom: 18px;
-          }
-
-          .logo {
-            display: block;
-            width: auto;
-            max-width: 150px;
-            max-height: 75px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          .title {
-            margin: 0 0 8px;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: .4px;
-            color: #222;
-          }
-
-          .branch-title {
-            margin-top: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-          }
-
-          .period {
-            margin-top: 5px;
-            font-size: 12px;
-            color: #777;
-          }
+					/* HEADER */
+					.report-header {
+					  margin-bottom: 24px;
+					}
+					
+					.brand-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  min-height: 75px;
+					  margin-bottom: 16px;
+					}
+					
+					.brand-left {
+					  display: flex;
+					  align-items: center;
+					  gap: 6px;
+					  min-width: 0;
+					}
+					
+					.logo {
+					  display: block;
+					  width: 70px;
+					  height: 70px;
+					  object-fit: contain;
+					  object-position: center;
+					  flex-shrink: 0;
+					  margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+					  display: flex;
+					  flex-direction: column;
+					  justify-content: center;
+					  gap: 2px;
+					  margin: 0;
+					}
+					
+					.brand-name {
+					  margin: 0;
+					  font-size: 18px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.branch-title {
+					  font-size: 10px;
+					  font-weight: 500;
+					  color: #666;
+					}
+					
+					.period {
+					  font-size: 11px;
+					  font-weight: 600;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					  align-self: flex-end;
+					  margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  padding-top: 14px;
+					  border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+					  margin: 0;
+					  font-size: 16px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.filter-info {
+					  margin: 0;
+					  font-size: 9px;
+					  line-height: 1.7;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					}
 
           .summary {
             display: flex;
@@ -29080,26 +29104,49 @@ window.exportEmployeeHealthData = async function () {
         </div>
 
         <main class="report">
-          <header class="report-header">
-            ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
-            ` : ''}
-
-            <h1 class="title">Employee Health Payable</h1>
-
-            <div class="branch-title">${esc(branchTitle)}</div>
-
-            <div class="period">
-              Period: ${esc(periodTitle)}
-              ${employeeValue ? ' • Employee Filtered' : ''}
-              ${statusValue ? ` • Status: ${esc(statusValue)}` : ''}
-            </div>
-          </header>
+					<header class="report-header">
+					  <div class="brand-row">
+					    <div class="brand-left">
+					      ${logoUrl ? `
+					        <img
+					          src="${esc(logoUrl)}"
+					          class="logo"
+					          alt="Company Logo"
+					          onerror="this.style.display='none'"
+					        >
+					      ` : ''}
+					
+					      <div class="brand-info">
+					        <h2 class="brand-name">${esc(companyName)}</h2>
+					        <div class="branch-title">
+					          Branch : ${esc(branchTitle)}
+					        </div>
+					      </div>
+					    </div>
+					
+					    <div class="period">
+					      Period : ${esc(periodTitle)}
+					    </div>
+					  </div>
+					
+					  <div class="report-meta-row">
+					    <h1 class="title">Employee Health Payable Report</h1>
+					
+					    <div class="filter-info">
+					      Employee: ${esc(
+					        employeeValue
+					          ? (
+					              sortedRows.find(row =>
+					                String(row.employee_id || '').trim() === employeeValue
+					              )?.employee_name || employeeValue
+					            )
+					          : 'ALL EMPLOYEES'
+					      )}
+					      &nbsp; | &nbsp;
+					      Status: ${esc(statusValue || 'ALL STATUS')}
+					    </div>
+					  </div>
+					</header>
 
           <div class="summary">
             <div class="summary-item">
@@ -34064,6 +34111,7 @@ window.changeEmployeePage = function (direction) {
 /* ==== EXPORT EMPLOYEE PDF ==== */
 window.exportEmployee = function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
     const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
     const statusFilter = String( document.getElementById('employeeStatusFilter')?.value || '' ).trim().toUpperCase();
@@ -34231,41 +34279,92 @@ window.exportEmployee = function () {
             box-shadow: 0 20px 60px rgba(0,0,0,.45);
           }
 
-          /* HEADER */
-          .report-header {
-            text-align: center;
-            margin-bottom: 24px;
-          }
-
-          .logo {
-            display: block;
-            width: auto;
-            max-width: 150px;
-            max-height: 70px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          .title {
-            margin: 0 0 8px;
-            font-size: 21px;
-            font-weight: 700;
-            letter-spacing: .5px;
-            color: #222;
-          }
-
-          .branch-title {
-            margin-top: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-          }
-
-          .period {
-            margin-top: 5px;
-            font-size: 11px;
-            color: #777;
-          }
+					/* HEADER */
+					.report-header {
+					  margin-bottom: 24px;
+					}
+					
+					.brand-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  min-height: 75px;
+					  margin-bottom: 16px;
+					}
+					
+					.brand-left {
+					  display: flex;
+					  align-items: center;
+					  gap: 6px;
+					  min-width: 0;
+					}
+					
+					.logo {
+					  display: block;
+					  width: 70px;
+					  height: 70px;
+					  object-fit: contain;
+					  object-position: center;
+					  flex-shrink: 0;
+					  margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+					  display: flex;
+					  flex-direction: column;
+					  justify-content: center;
+					  gap: 2px;
+					  margin: 0;
+					}
+					
+					.brand-name {
+					  margin: 0;
+					  font-size: 18px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.branch-title {
+					  font-size: 10px;
+					  font-weight: 500;
+					  color: #666;
+					}
+					
+					.period {
+					  font-size: 11px;
+					  font-weight: 600;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					  align-self: flex-end;
+					  margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  padding-top: 14px;
+					  border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+					  margin: 0;
+					  font-size: 16px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.filter-info {
+					  margin: 0;
+					  font-size: 9px;
+					  line-height: 1.7;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					}
 
           /* KPI / SUMMARY */
           .summary-grid {
@@ -34469,26 +34568,40 @@ window.exportEmployee = function () {
         </div>
 
         <main class="report">
-          <header class="report-header">
-            ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
-            ` : ''}
-
-            <h1 class="title">Employee List</h1>
-
-            <div class="branch-title">
-              ${esc(branchTitle)}
-            </div>
-
-            <div class="period">
-              Status: ${esc(statusTitle)}
-            </div>
-          </header>
+					<header class="report-header">
+					  <div class="brand-row">
+					    <div class="brand-left">
+					      ${logoUrl ? `
+					        <img src="${esc(logoUrl)}"
+					          class="logo"
+					          alt="Company Logo"
+					          onerror="this.style.display='none'"
+					        >
+					      ` : ''}
+					
+					      <div class="brand-info">
+					        <h2 class="brand-name">${esc(companyName)}</h2>
+					        <div class="branch-title">
+					          Branch : ${esc(branchTitle)}
+					        </div>
+					      </div>
+					    </div>
+					
+					    <div class="period">
+					      Status : ${esc(statusTitle)}
+					    </div>
+					  </div>
+					
+					  <div class="report-meta-row">
+					    <h1 class="title">Employee List Report</h1>
+					
+					    <div class="filter-info">
+					      Branch: ${esc(branchTitle)}
+					      &nbsp; | &nbsp;
+					      Status: ${esc(statusTitle)}
+					    </div>
+					  </div>
+					</header>
 
           <!-- KPI / SUMMARY -->
           <section class="summary-grid">
@@ -36186,6 +36299,7 @@ function initScheduleTimePickers() {
 
 window.exportEmployeeSchedule = async function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     const weekFilter = document.getElementById('scheduleWeekFilter');
     const employeeFilter = document.getElementById('scheduleEmployeeFilter');
     const branchFilter = document.getElementById('scheduleBranchFilter');
@@ -36472,41 +36586,92 @@ window.exportEmployeeSchedule = async function () {
 				    box-shadow: 0 20px 60px rgba(0,0,0,.45);
 				  }
 				
-				  /* REPORT HEADER */
-				  .report-header {
-				    text-align: center;
-				    margin-bottom: 28px;
-				  }
-				
-				  .logo {
-				    display: block;
-				    width: auto;
-				    max-width: 150px;
-				    max-height: 75px;
-				    object-fit: contain;
-				    margin: 0 auto 10px;
-				  }
-				
-				  .title {
-				    margin: 0 0 8px;
-				    font-size: 20px;
-				    font-weight: 700;
-				    letter-spacing: .5px;
-				    color: #222;
-				  }
-				
-				  .branch-title {
-				    margin-top: 4px;
-				    font-size: 12px;
-				    font-weight: 600;
-				    color: #555;
-				  }
-				
-				  .period {
-				    margin-top: 5px;
-				    font-size: 12px;
-				    color: #777;
-				  }
+					/* REPORT HEADER */
+					.report-header {
+					  margin-bottom: 24px;
+					}
+					
+					.brand-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  min-height: 75px;
+					  margin-bottom: 16px;
+					}
+					
+					.brand-left {
+					  display: flex;
+					  align-items: center;
+					  gap: 6px;
+					  min-width: 0;
+					}
+					
+					.logo {
+					  display: block;
+					  width: 70px;
+					  height: 70px;
+					  object-fit: contain;
+					  object-position: center;
+					  flex-shrink: 0;
+					  margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+					  display: flex;
+					  flex-direction: column;
+					  justify-content: center;
+					  gap: 2px;
+					  margin: 0;
+					}
+					
+					.brand-name {
+					  margin: 0;
+					  font-size: 18px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.branch-title {
+					  font-size: 10px;
+					  font-weight: 500;
+					  color: #666;
+					}
+					
+					.period {
+					  font-size: 11px;
+					  font-weight: 600;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					  align-self: flex-end;
+					  margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  padding-top: 14px;
+					  border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+					  margin: 0;
+					  font-size: 16px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.filter-info {
+					  margin: 0;
+					  font-size: 9px;
+					  line-height: 1.7;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					}
 				
 				  /* TABLE CARD — MATCH CASH FLOW CARDS */
 				  .table-wrap {
@@ -36715,23 +36880,44 @@ window.exportEmployeeSchedule = async function () {
         </div>
 
         <main class="report">
-          <header class="report-header">
-            ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
-            ` : ''}
-
-            <h1 class="title">Employee Schedule</h1>
-            <div class="branch-title">${esc(branchTitle)}</div>
-            <div class="period">
-              Week: ${esc(formatDate(weekDates[0]))}
-              – ${esc(formatDate(weekDates[6]))}
-            </div>
-          </header>
+					<header class="report-header">
+					  <div class="brand-row">
+					    <div class="brand-left">
+					      ${logoUrl ? `
+					        <img
+					          src="${esc(logoUrl)}"
+					          class="logo"
+					          alt="Company Logo"
+					          onerror="this.style.display='none'"
+					        >
+					      ` : ''}
+					
+					      <div class="brand-info">
+					        <h2 class="brand-name">${esc(companyName)}</h2>
+					        <div class="branch-title">
+					          Branch : ${esc(branchTitle)}
+					        </div>
+					      </div>
+					    </div>
+					
+					    <div class="period">
+					      Week: ${esc(formatDate(weekDates[0]))}
+					      – ${esc(formatDate(weekDates[6]))}
+					    </div>
+					  </div>
+					
+					  <div class="report-meta-row">
+					    <h1 class="title">Employee Schedule Report</h1>
+					
+					    <div class="filter-info">
+					      Employee: ${esc(
+					        selectedEmployee
+					          ? (employees.find(emp => emp.employeeId === selectedEmployee)?.name || selectedEmployee)
+					          : 'ALL EMPLOYEES'
+					      )}
+					    </div>
+					  </div>
+					</header>
 
           <div class="table-wrap">
             <table>
@@ -40963,6 +41149,7 @@ window.changePayrollPage = function (direction) {
 /* ==== EXPORT PAYROLL PDF ==== */
 window.exportPayroll = function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
     const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
     const year = String( document.getElementById('payrollYearFilter')?.value || '' ).trim();
@@ -41166,30 +41353,92 @@ window.exportPayroll = function () {
             background: #fff;
           }
 
-          .report-header {
-            text-align: center;
-            margin-bottom: 24px;
-          }
-
-          .logo {
-            display: block;
-            max-width: 150px;
-            max-height: 65px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          h1 {
-            margin: 0 0 8px;
-            font-size: 22px;
-            color: #222;
-          }
-
-          .meta {
-            margin-top: 5px;
-            font-size: 11px;
-            color: #666;
-          }
+					/* HEADER */
+					.report-header {
+					  margin-bottom: 24px;
+					}
+					
+					.brand-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  min-height: 75px;
+					  margin-bottom: 16px;
+					}
+					
+					.brand-left {
+					  display: flex;
+					  align-items: center;
+					  gap: 6px;
+					  min-width: 0;
+					}
+					
+					.logo {
+					  display: block;
+					  width: 70px;
+					  height: 70px;
+					  object-fit: contain;
+					  object-position: center;
+					  flex-shrink: 0;
+					  margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+					  display: flex;
+					  flex-direction: column;
+					  justify-content: center;
+					  gap: 2px;
+					  margin: 0;
+					}
+					
+					.brand-name {
+					  margin: 0;
+					  font-size: 18px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.branch-title {
+					  font-size: 10px;
+					  font-weight: 500;
+					  color: #666;
+					}
+					
+					.period {
+					  font-size: 11px;
+					  font-weight: 600;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					  align-self: flex-end;
+					  margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+					  display: flex;
+					  align-items: center;
+					  justify-content: space-between;
+					  gap: 20px;
+					  padding-top: 14px;
+					  border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+					  margin: 0;
+					  font-size: 16px;
+					  font-weight: 700;
+					  color: #222;
+					}
+					
+					.filter-info {
+					  margin: 0;
+					  font-size: 9px;
+					  line-height: 1.7;
+					  color: #777;
+					  text-align: right;
+					  white-space: nowrap;
+					}
 
           /* KPI — TETAP SAMA */
           .summary-grid {
@@ -41358,19 +41607,39 @@ window.exportPayroll = function () {
         </div>
 
         <main class="report">
-          <header class="report-header">
-            ${logoUrl ? `
-              <img src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'" >
-            ` : ''}
-            <h1>Payroll Report</h1>
-            <div class="meta">Period: ${esc(periodTitle)}</div>
-            <div class="meta">Outlet: ${esc(branchTitle)}</div>
-            <div class="meta">Employee: ${esc(employeeTitle)}</div>
-            <div class="meta">Status: ${esc(statusTitle)}</div>
-          </header>
+					<header class="report-header">
+					  <div class="brand-row">
+					    <div class="brand-left">
+					      ${logoUrl ? `
+					        <img src="${esc(logoUrl)}"
+					          class="logo"
+					          alt="Company Logo"
+					          onerror="this.style.display='none'">
+					      ` : ''}
+					
+					      <div class="brand-info">
+					        <h2 class="brand-name">${esc(companyName)}</h2>
+					        <div class="branch-title">
+					          Branch : ${esc(branchTitle)}
+					        </div>
+					      </div>
+					    </div>
+					
+					    <div class="period">
+					      Period : ${esc(periodTitle)}
+					    </div>
+					  </div>
+					
+					  <div class="report-meta-row">
+					    <h1 class="title">Payroll Report</h1>
+					
+					    <div class="filter-info">
+					      Employee: ${esc(employeeTitle)}
+					      &nbsp; | &nbsp;
+					      Status: ${esc(statusTitle)}
+					    </div>
+					  </div>
+					</header>
 
           <!-- KPI — TIDAK DIUBAH -->
           <section class="summary-grid">
