@@ -46267,11 +46267,19 @@ window.exportCashierShiftAdjustments = function () {
 					
 					.report-meta-row {
 						display: flex;
-						align-items: center;
+						align-items: flex-start;
 						justify-content: space-between;
 						gap: 20px;
 						padding-bottom: 16px;
 						border-bottom: 1px solid #e5e5e5;
+					}
+					
+					.period {
+						font-size: 11px;
+						font-weight: 600;
+						color: #555;
+						text-align: right;
+						margin-bottom: 12px;
 					}
 					
 					.title {
@@ -46281,18 +46289,13 @@ window.exportCashierShiftAdjustments = function () {
 						color: #222;
 					}
 					
-					.period {
-						font-size: 11px;
-						font-weight: 600;
-						color: #555;
-						text-align: right;
-					}
-					
 					.filter-info {
-						margin-top: 10px;
+						margin: 0;
 						font-size: 9px;
 						line-height: 1.7;
 						color: #777;
+						text-align: right;
+						white-space: nowrap;
 					}
 
 					/* KPI */
@@ -46504,23 +46507,24 @@ window.exportCashierShiftAdjustments = function () {
 						</div>
 			    </div>
 			
-			    <!-- REPORT TITLE & PERIOD -->
-			    <div class="report-meta-row">
+			    <!-- PERIOD ABOVE LINE -->
+					<div class="period">
+						Period : ${esc(periodTitle)}
+					</div>
+					
+					<!-- REPORT TITLE & FILTER INFORMATION -->
+					<div class="report-meta-row">
 						<h1 class="title">
-							Cashier Shift Adjustment Report
+								Cashier Shift Adjustment Report
 						</h1>
-		
-						<div class="period">
-							Period : ${esc(periodTitle)}
+					
+						<div class="filter-info">
+								Cashier: ${esc(cashierTitle)}
+								&nbsp; | &nbsp;
+								Adjustment Type: ${esc(typeTitle)}
 						</div>
-			    </div>
-			    <!-- FILTER INFORMATION -->
-			    <div class="filter-info">
-						Cashier: ${esc(cashierTitle)}
-						&nbsp; | &nbsp;
-						Adjustment Type: ${esc(typeTitle)}
-			    </div>
-			</header>
+					</div>
+				</header>
 
 				<!-- SUMMARY -->
 				<section class="summary-grid">
