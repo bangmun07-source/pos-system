@@ -43497,6 +43497,7 @@ window.initEmployeeReimbursement = async function () {
 
   const branchFilter = document.getElementById( 'reimbursementBranchFilter' );
   const employeeFilter = document.getElementById( 'reimbursementEmployeeFilter' );
+	const periodInput = document.getElementById('reimbursementPeriodFilter');
 
   if (
     branchFilter &&
