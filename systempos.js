@@ -46276,7 +46276,7 @@ window.exportCashierShiftAdjustments = function () {
 					
 					.title {
 						margin: 0;
-						font-size: 21px;
+						font-size: 18px;
 						font-weight: 700;
 						color: #222;
 					}
