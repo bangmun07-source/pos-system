@@ -45126,6 +45126,631 @@ function escapeShiftHtml(value) {
 	})[char]);
 }
 
+/* ==== EXPORT SHIFT HISTORY PDF ==== */
+window.exportShiftHistory = async function () {
+  try {
+    const getValue = id => {
+      const value = document.getElementById(id)?.value;
+      return !value || value === 'ALL' ? null : value;
+    };
+
+    const dateFrom = getValue('cashierShiftPeriodFrom');
+    const dateTo = getValue('cashierShiftPeriodTo');
+    const selectedUser = getValue('cashierShiftUserFilter');
+    const selectedBranch = getValue('cashierShiftBranchFilter');
+    const selectedStatus = getValue('cashierShiftStatusFilter');
+    const selectedAdjustment = getValue('cashierShiftAdjustmentFilter');
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) { alert('Session tidak ditemukan. Silakan login kembali.'); return; }
+    // VALIDATE PERIOD
+    if (dateFrom && dateTo && dateFrom > dateTo) { alert('Period From tidak boleh melebihi Period To.'); return; }
+
+    // GET ALL SHIFT HISTORY — TANPA PAGINATION
+    const { data, error } = await supabaseClient.rpc(
+      'get_cashier_shift_history',
+      {
+        p_session_id: sessionId,
+        p_branch_id: selectedBranch,
+        p_date_from: dateFrom,
+        p_date_to: dateTo,
+        p_user_id: selectedUser,
+        p_status: selectedStatus,
+        p_adjustment_status: selectedAdjustment,
+        p_limit: 10000,
+        p_offset: 0
+      }
+    );
+		
+    if (error) throw error;
+
+    const rows = Array.isArray(data?.rows) ? data.rows : [];
+    if (!rows.length) { alert('Tidak ada data Shift History sesuai filter yang dipilih.'); return; }
+
+    // HELPERS
+    const esc = value => escapeShiftHtml(value ?? '-');
+    const money = value => formatShiftCurrency(Number(value || 0));
+    const formatDateTime = value => {
+      if (!value) return '-';
+
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '-';
+			
+      return date.toLocaleString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      });
+    };
+    const formatPeriodDate = value => {
+      if (!value) return 'All Dates';
+
+      const parts = String(value).slice(0, 10).split('-');
+      if (parts.length !== 3) return esc(value);
+
+      const date = new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
+      );
+      if (Number.isNaN(date.getTime())) return '-';
+
+      return date.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    };
+    // FILTER LABELS
+    const getSelectLabel = (id, fallback) => {
+      const select = document.getElementById(id);
+      if (!select || !select.value || select.value === 'ALL') { return fallback; }
+
+      return select.options[select.selectedIndex]?.textContent?.trim() || fallback;
+    };
+    const branchTitle = getSelectLabel( 'cashierShiftBranchFilter', 'ALL BRANCHES' );
+    const cashierTitle = getSelectLabel( 'cashierShiftUserFilter', 'ALL CASHIERS' );
+    const statusTitle = getSelectLabel( 'cashierShiftStatusFilter', 'ALL STATUS' );
+    const adjustmentTitle = getSelectLabel( 'cashierShiftAdjustmentFilter', 'ALL ADJUSTMENTS' );
+    const periodTitle = dateFrom || dateTo
+      ? `${formatPeriodDate(dateFrom)} - ${formatPeriodDate(dateTo)}`
+      : 'ALL PERIODS';
+    // SUMMARY
+    const totalShifts = rows.length;
+    const openShifts = rows.filter( row => String(row.status || '').toUpperCase() === 'OPEN' ).length;
+    const closedShifts = rows.filter( row => String(row.status || '').toUpperCase() === 'CLOSED' ).length;
+    const totalDifference = rows.reduce( (sum, row) => sum + Number(row.cash_difference || 0), 0 );
+    // TABLE ROWS
+    const tableRowsHtml = rows.map(row => {
+      const difference = Number(row.cash_difference || 0);
+      const status = String(row.status || '-').toUpperCase();
+      const adjustment = String( row.adjustment_status || '-' ).toUpperCase();
+      const statusClass = status === 'CLOSED'
+        ? 'status-closed'
+        : 'status-open';
+      const adjustmentClass = adjustment === 'DONE'
+        ? 'status-done'
+        : adjustment === 'PENDING'
+          ? 'status-pending'
+          : 'status-partial';
+      const differenceClass = difference < 0
+        ? 'difference-negative'
+        : difference > 0
+          ? 'difference-positive'
+          : 'difference-zero';
+
+      return `
+        <tr>
+          <td>
+            <div class="cashier-name">${esc(row.cashier_name)}</div>
+            <div class="cashier-type">${esc(row.shift_type || '-')}</div>
+          </td>
+
+          <td>${esc(row.branch_name)}</td>
+
+          <td class="date-cell">
+            ${esc(formatDateTime(row.opened_at))}
+          </td>
+
+          <td class="date-cell">
+            ${esc(formatDateTime(row.closed_at))}
+          </td>
+
+          <td class="amount-cell">
+            ${esc(money(row.opening_cash))}
+          </td>
+
+          <td class="amount-cell">
+            ${esc(money(row.total_sales))}
+          </td>
+
+          <td class="amount-cell">
+            ${Number(row.cash_expenses || 0) > 0
+              ? '-' + esc(money(row.cash_expenses))
+              : esc(money(0))}
+          </td>
+
+          <td class="amount-cell">
+            ${esc(money(row.expected_cash))}
+          </td>
+
+          <td class="amount-cell">
+            ${esc(money(row.actual_cash))}
+          </td>
+
+          <td class="amount-cell ${differenceClass}">
+            ${difference < 0
+              ? '-Rp' + Math.abs(difference).toLocaleString('id-ID')
+              : 'Rp' + difference.toLocaleString('id-ID')}
+          </td>
+
+          <td class="text-center">
+            <span class="status ${statusClass}">
+              ${esc(status)}
+            </span>
+          </td>
+
+          <td class="text-center">
+            <span class="status ${adjustmentClass}">
+              ${esc(adjustment)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+
+    // TENANT LOGO — SAME AS REIMBURSEMENT
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+    const filename = `Shift History - ${branchTitle} - ${periodTitle}.pdf`;
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          /* TOOLBAR */
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255,255,255,.14);
+          }
+
+          /* REPORT PAPER */
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          /* HEADER */
+          .report-header {
+            text-align: center;
+            margin-bottom: 24px;
+          }
+
+          .logo {
+            display: block;
+            width: auto;
+            max-width: 150px;
+            max-height: 70px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+          }
+
+          .title {
+            margin: 0 0 8px;
+            font-size: 21px;
+            font-weight: 700;
+            letter-spacing: .5px;
+            color: #222;
+          }
+
+          .branch-title {
+            margin-top: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+          }
+
+          .period {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #777;
+          }
+
+          .filter-info {
+            margin-top: 8px;
+            font-size: 9px;
+            line-height: 1.7;
+            color: #777;
+          }
+
+          /* KPI */
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+          }
+
+          .summary-label {
+            font-size: 9px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 7px;
+          }
+
+          .summary-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
+          }
+
+          /* TABLE */
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 8px;
+            color: #444;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            padding: 9px 5px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 7px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+            white-space: nowrap;
+          }
+
+          td {
+            padding: 9px 5px;
+            vertical-align: top;
+            border: none;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .cashier-name {
+            color: #222;
+            font-weight: 700;
+            line-height: 1.4;
+          }
+
+          .cashier-type {
+            margin-top: 3px;
+            color: #888;
+            font-size: 7px;
+          }
+
+          .date-cell {
+            white-space: nowrap;
+          }
+
+          .amount-cell {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .difference-negative {
+            color: #b91c1c;
+            font-weight: 700;
+          }
+
+          .difference-positive {
+            color: #b45309;
+            font-weight: 700;
+          }
+
+          .difference-zero {
+            color: #15803d;
+            font-weight: 700;
+          }
+
+          /* STATUS */
+          .status {
+            display: inline-block;
+            font-size: 7px;
+            font-weight: 700;
+            white-space: nowrap;
+            background: transparent !important;
+            box-shadow: none !important;
+            border: none !important;
+            padding: 0 !important;
+          }
+
+          .status-closed,
+          .status-done {
+            color: #15803d;
+          }
+
+          .status-open {
+            color: #b45309;
+          }
+
+          .status-pending {
+            color: #b91c1c;
+          }
+
+          .status-partial {
+            color: #b45309;
+          }
+
+          /* FOOTER */
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          /* PRINT */
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html,
+            body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            .summary-card,
+            .table-wrap {
+              break-inside: avoid;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Cashier Shift History Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            ${logoUrl ? `
+              <img
+                src="${esc(logoUrl)}"
+                class="logo"
+                alt="Company Logo"
+                onerror="this.style.display='none'"
+              >
+            ` : ''}
+
+            <h1 class="title">Shift History Report</h1>
+
+            <div class="branch-title">
+              ${esc(branchTitle)}
+            </div>
+
+            <div class="period">
+              Period: ${esc(periodTitle)}
+            </div>
+
+            <div class="filter-info">
+              Cashier: ${esc(cashierTitle)}
+              &nbsp; | &nbsp;
+              Shift Status: ${esc(statusTitle)}
+              &nbsp; | &nbsp;
+              Adjustment: ${esc(adjustmentTitle)}
+            </div>
+          </header>
+
+          <!-- SUMMARY -->
+          <section class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Total Shifts</div>
+              <div class="summary-value">
+                ${totalShifts.toLocaleString('id-ID')}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Open Shifts</div>
+              <div class="summary-value">
+                ${openShifts.toLocaleString('id-ID')}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Closed Shifts</div>
+              <div class="summary-value">
+                ${closedShifts.toLocaleString('id-ID')}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Total Difference</div>
+              <div class="summary-value">
+                ${esc(money(totalDifference))}
+              </div>
+            </div>
+          </section>
+
+          <!-- SHIFT HISTORY TABLE -->
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cashier</th>
+                  <th>Branch</th>
+                  <th>Opened At</th>
+                  <th>Closed At</th>
+                  <th style="text-align:right">Opening Cash</th>
+                  <th style="text-align:right">Total Sales</th>
+                  <th style="text-align:right">Cash Expenses</th>
+                  <th style="text-align:right">Expected Cash</th>
+                  <th style="text-align:right">Actual Cash</th>
+                  <th style="text-align:right">Difference</th>
+                  <th>Status</th>
+                  <th>Adjustment</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${tableRowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB
+    const reportWindow = window.open('', '_blank');
+
+    if (!reportWindow) {
+      alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.');
+      return;
+    }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Shift History error:', error);
+    alert('Gagal membuat PDF Shift History. Periksa Console untuk detail kesalahan.');
+  }
+};
+
+
+
 // ==========================================
 // CASHIER SHIFT ADJUSTMENT
 // ==========================================
