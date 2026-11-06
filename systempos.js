@@ -5395,6 +5395,13 @@ async function exportMembersPDF() {
 
     // GET TOP TIER SETTING
 		const topTierName = window.loyaltySettings?.tier_5_name_value || "Top Tier";
+		console.log("DEBUG TOP TIER:", {
+		  selectedTier: tier,
+		  topTierName,
+		  loyaltySettings: window.loyaltySettings,
+		  memberTiers: rows.map(r => r.tier),
+		  memberCount: rows.length
+		});
     // SUMMARY
     const totalMembers = rows.length;
 		const normalizeTier = value => String(value ?? "").trim().toUpperCase();
