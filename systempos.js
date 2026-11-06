@@ -46257,11 +46257,13 @@ window.exportCashierShiftAdjustments = function () {
 					.brand-info {
 						display: flex;
 						flex-direction: column;
-						gap: 3px;
+						justify-content: center;
+						gap: 2px;
+						margin: 0;
 					}
 					
 					.brand-name {
-						margin: 0 0 5px 0;
+						margin: 0;
 						font-size: 18px;
 						font-weight: 700;
 						color: #222;
