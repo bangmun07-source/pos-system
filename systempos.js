@@ -46274,11 +46274,13 @@ window.exportCashierShiftAdjustments = function () {
 					}
 					
 					.period {
-						font-size: 11px;
-						font-weight: 600;
-						color: #555;
-						text-align: right;
-						white-space: nowrap;
+					    font-size: 11px;
+					    font-weight: 600;
+					    color: #555;
+					    text-align: right;
+					    white-space: nowrap;
+					    align-self: flex-end;
+					    margin-bottom: 5px;
 					}
 					
 					.report-meta-row {
