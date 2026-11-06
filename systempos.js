@@ -11642,13 +11642,13 @@ function applyBusinessProfile(data){
 async function loadBusinessProfile() {
   try {
     const data = await getBusinessProfileRPC();
-    state.businessProfile =
-      data || {
-        company_name: "",
-        instagram: "",
-        receipt_footer: "",
-        logo_url: ""
-      };
+	    state.businessProfile =
+	      data || {
+	        company_name: "",
+	        instagram: "",
+	        receipt_footer: "",
+	        logo_url: ""
+	      };
 
     applyBusinessProfile( state.businessProfile );
   }
@@ -46062,6 +46062,7 @@ function cashierAdjustmentNextPage() {
 /* ==== EXPORT CASHIER SHIFT ADJUSTMENTS PDF ==== */
 window.exportCashierShiftAdjustments = function () {
 	try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
 		const rows = cashierShiftAdjustmentState.filteredRows;
 		if (!rows.length) { alert('Tidak ada data adjustment untuk diexport.'); return; }
 
@@ -46224,42 +46225,71 @@ window.exportCashierShiftAdjustments = function () {
 
 					/* HEADER */
 					.report-header {
-						text-align: center;
 						margin-bottom: 24px;
 					}
-
+					
+					.brand-row {
+						display: flex;
+						align-items: center;
+						gap: 18px;
+						min-height: 75px;
+						margin-bottom: 24px;
+					}
+					
 					.logo {
 						display: block;
-						width: auto;
-						max-width: 150px;
-						max-height: 70px;
+						width: 100px;
+						height: 65px;
 						object-fit: contain;
-						margin: 0 auto 10px;
+						object-position: left center;
+						flex-shrink: 0;
+						margin: 0;
 					}
-
-					.title {
-						margin: 0 0 8px;
-						font-size: 21px;
+					
+					.brand-info {
+						display: flex;
+						flex-direction: column;
+						gap: 6px;
+					}
+					
+					.brand-name {
+						margin: 0;
+						font-size: 17px;
 						font-weight: 700;
-						letter-spacing: .5px;
 						color: #222;
 					}
-
+					
 					.branch-title {
-						margin-top: 4px;
-						font-size: 12px;
+						font-size: 11px;
+						font-weight: 500;
+						color: #666;
+					}
+					
+					.report-meta-row {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						gap: 20px;
+						padding-bottom: 16px;
+						border-bottom: 1px solid #e5e5e5;
+					}
+					
+					.title {
+						margin: 0;
+						font-size: 21px;
+						font-weight: 700;
+						color: #222;
+					}
+					
+					.period {
+						font-size: 11px;
 						font-weight: 600;
 						color: #555;
+						text-align: right;
 					}
-
-					.period {
-						margin-top: 5px;
-						font-size: 11px;
-						color: #777;
-					}
-
+					
 					.filter-info {
-						margin-top: 8px;
+						margin-top: 10px;
 						font-size: 9px;
 						line-height: 1.7;
 						color: #777;
@@ -46454,24 +46484,43 @@ window.exportCashierShiftAdjustments = function () {
 
 			<main class="report">
 				<header class="report-header">
-					${logoUrl ? `
-						<img src="${esc(logoUrl)}"
-								class="logo"
-								alt="Company Logo"
-								onerror="this.style.display='none'" >
-					` : ''}
-
-					<h1 class="title">Cashier Shift Adjustment Report</h1>
-
-					<div class="branch-title"> ${esc(branchTitle)} </div>
-					<div class="period"> Period: ${esc(periodTitle)} </div>
-
-					<div class="filter-info">
-							Cashier: ${esc(cashierTitle)}
-							&nbsp; | &nbsp;
-							Adjustment Type: ${esc(typeTitle)}
-					</div>
-				</header>
+			    <!-- BRAND -->
+			    <div class="brand-row">
+						${logoUrl ? `
+							<img src="${esc(logoUrl)}"
+								 class="logo"
+								 alt="Company Logo"
+								 onerror="this.style.display='none'">
+						` : ''}
+		
+						<div class="brand-info">
+							<h2 class="brand-name">
+								${esc(companyName)}
+							</h2>
+	
+							<div class="branch-title">
+								Branch : ${esc(branchTitle)}
+							</div>
+						</div>
+			    </div>
+			
+			    <!-- REPORT TITLE & PERIOD -->
+			    <div class="report-meta-row">
+						<h1 class="title">
+							Cashier Shift Adjustment Report
+						</h1>
+		
+						<div class="period">
+							Period : ${esc(periodTitle)}
+						</div>
+			    </div>
+			    <!-- FILTER INFORMATION -->
+			    <div class="filter-info">
+						Cashier: ${esc(cashierTitle)}
+						&nbsp; | &nbsp;
+						Adjustment Type: ${esc(typeTitle)}
+			    </div>
+			</header>
 
 				<!-- SUMMARY -->
 				<section class="summary-grid">
