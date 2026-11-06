@@ -32476,9 +32476,9 @@ function formatAccountsReceivableDate(value) {
 function getAccountsReceivableStatusBadge(status) {
   const value = String(status || "DRAFT").toUpperCase();
   const config = {
-    DRAFT: { label: "Draft", className: "bg-surface-container-high text-on-surface-variant" },
-    OUTSTANDING: { label: "Outstanding", className: "bg-yellow-500/10 text-yellow-400" },
-    PAID: { label: "Paid", className: "bg-green-500/10 text-green-400" }
+    DRAFT: { label: "Draft", className: "text-on-surface-variant" },
+    OUTSTANDING: { label: "Outstanding", className: "bg-yellow-600/10 text-yellow-700" },
+    PAID: { label: "Paid", className: "bg-green-600/10 text-green-700" }
   };
 
   const item = config[value] || config.DRAFT;
