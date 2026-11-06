@@ -46241,7 +46241,7 @@ window.exportCashierShiftAdjustments = function () {
 						width: 100px;
 						height: 65px;
 						object-fit: contain;
-						object-position: left center;
+						object-position: center;
 						flex-shrink: 0;
 						margin: 0;
 					}
@@ -46549,7 +46549,7 @@ window.exportCashierShiftAdjustments = function () {
 								<th>Date & Time</th>
 								<th>Cashier</th>
 								<th>Branch</th>
-								<th>Adjustment Type</th>
+								<th class="text-center">Adjustment Type</th>
 								<th style="text-align:right">Amount</th>
 								<th>Responsible User</th>
 								<th>Processed By</th>
