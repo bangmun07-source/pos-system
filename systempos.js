@@ -5405,7 +5405,8 @@ async function exportMembersPDF() {
     const topTierName = tier5Setting?.name_value || "Top Tier";
     // SUMMARY
     const totalMembers = rows.length;
-    const totalTopTier = rows.filter(r => String(r.tier || "").toUpperCase() === String(topTierName).toUpperCase()).length;
+    const normalizeTier = value => String(value ?? "").trim().toUpperCase();
+		const totalTopTier = rows.filter(r => normalizeTier(r.tier) === normalizeTier(topTierName)).length;
     const totalPoints = rows.reduce( (sum, r) => sum + (Number(r.points) || 0), 0 );
     // MEMBER ROWS
     const memberRows = rows.length
