@@ -5394,18 +5394,10 @@ async function exportMembersPDF() {
     if (tier && tier.toUpperCase() !== "ALL") { rows = rows.filter(r => String(r.tier || "").toUpperCase() === tier.toUpperCase()); }
 
     // GET TOP TIER SETTING
-    const { data: tier5Setting, error: tier5Error } = 
-			await supabaseClient
-	      .from("Settings")
-	      .select("name_value")
-	      .eq("key", "tier_5")
-	      .maybeSingle();
-
-    if (tier5Error) throw tier5Error;
-    const topTierName = tier5Setting?.name_value || "Top Tier";
+		const topTierName = window.loyaltySettings?.tier_5_name_value || "Top Tier";
     // SUMMARY
     const totalMembers = rows.length;
-    const normalizeTier = value => String(value ?? "").trim().toUpperCase();
+		const normalizeTier = value => String(value ?? "").trim().toUpperCase();
 		const totalTopTier = rows.filter(r => normalizeTier(r.tier) === normalizeTier(topTierName)).length;
     const totalPoints = rows.reduce( (sum, r) => sum + (Number(r.points) || 0), 0 );
     // MEMBER ROWS
