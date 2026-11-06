@@ -46339,7 +46339,7 @@ window.exportCashierShiftAdjustments = function () {
 						width: 100%;
 						border-collapse: collapse;
 						table-layout: auto;
-						font-size: 8px;
+						font-size: 11px;
 						color: #444;
 					}
 
@@ -46351,7 +46351,7 @@ window.exportCashierShiftAdjustments = function () {
 						padding: 9px 5px;
 						background: #f5f5f5;
 						color: #444;
-						font-size: 7px;
+						font-size: 10 px;
 						font-weight: 700;
 						text-align: left;
 						vertical-align: middle;
