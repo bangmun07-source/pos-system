@@ -5314,195 +5314,575 @@ function initMemberExport() {
   btn.onclick = exportMembersPDF;
 }
 
+/* ==== EXPORT MEMBER PDF ==== */
 async function exportMembersPDF() {
-  const tier = document.getElementById("tierFilter")?.value || "ALL";
-  const branchId = state?.branchId || "";
-  if (!branchId) { showToast( "Branch login tidak ditemukan", "error" ); return; }
-  // OPEN REPORT WINDOW
-  const pdfWindow = window.open( "", "_blank" );
-  if (!pdfWindow) { showToast( "Popup diblokir browser", "error" ); return; }
-	
-  // LOADING PAGE
-  pdfWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>
-        Generating Member Report...
-      </title>
+  let pdfWindow = null;
 
-      <style>
-        body {
-          margin: 0;
-          height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background: #0B0F14;
-          color: white;
-          font-family: Arial,
-            sans-serif;
-        }
+  try {
+    // FILTER VALUES
+    const tier = document.getElementById("tierFilter")?.value || "ALL";
+    const branchId = state?.branchId || "";
 
-        .box {
-          text-align: center;
-        }
+    if (!branchId) { showToast("Branch login tidak ditemukan", "error"); return; }
 
-        .loader {
-          width: 32px;
-          height: 32px;
-          border: 3px solid
-            rgba(255,255,255,.2);
-          border-top-color: white;
-          border-radius: 50%;
-          animation: spin .8s linear infinite;
-          margin: 0 auto 20px;
-        }
+    // SESSION
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { showToast("Session tidak ditemukan. Silakan login kembali.", "error"); return; }
 
-        @keyframes spin {
-          to {
-            transform: rotate(360deg);
-          }
-        }
+    // HELPERS
+    const esc = value => escapeAdjustmentHTML(value ?? "-");
+    const money = value => formatAdjustmentCurrency(Number(value || 0));
+    // REPORT INFORMATION
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchTitle = String(state.branchName || branchId);
+    // TENANT LOGO
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    const filename = `Member Directory Report - ${branchTitle} - ${tier}`;
 
-        h2 {
-          margin: 0 0 8px;
-          font-size: 18px;
-        }
+    // OPEN POPUP BEFORE ASYNC RPC
+    pdfWindow = window.open("", "_blank");
+    if (!pdfWindow) { showToast("Popup diblokir browser", "error"); return; }
 
-        p {
-          margin: 0;
-          font-size: 13px;
-          opacity: .65;
-        }
-
-      </style>
-    </head>
-
-    <body>
-      <div class="box">
-        <div class="loader"></div>
-        <h2>
-          Generating Member Report...
-        </h2>
-
-        <p>
-          Please wait
-        </p>
-      </div>
-    </body>
-    </html>
-  `);
-	
-// REQUEST
-try {	
-	const sessionId = localStorage.getItem("pos_session_id");
-	
-  const payload = {
-    type: "members",
-    tier: tier,
-    branchId: branchId,
-		sessionId,
-		tenantSlug: state.tenantSlug
-  };
-
-    const response = await fetch(
-			"/api/export-pdf",
-			{
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify( payload )
-			}
-		);
-
-    // RESPONSE TEXT
-    const text = await response.text();
-
-    // HTTP ERROR
-    if (!response.ok) {
-      let errorMessage = `Export member gagal (${response.status})`;
-			
-      try {
-        const json = JSON.parse(text);
-        errorMessage =
-          json?.error ||
-          json?.message ||
-          errorMessage;
-      }
-				
-      catch (_) { if (text) { errorMessage = text; } }
-      throw new Error( errorMessage );
-    }
-    // EMPTY RESPONSE
-    if ( !text || !text.trim() ) { throw new Error( "Server mengembalikan HTML kosong." ); }
-
-    // RENDER REPORT
-    pdfWindow.document.open();
-    pdfWindow.document.write( text );
-    pdfWindow.document.close();
-  }
-
-  catch (err) {
-    const message = String( err?.message || err || "Unknown error" )
-      .replace( /&/g, "&amp;" )
-      .replace( /</g, "&lt;" )
-      .replace( />/g, "&gt;" );
-
+    // LOADING PAGE
     pdfWindow.document.open();
     pdfWindow.document.write(`
-
-    <!DOCTYPE html>
+      <!DOCTYPE html>
       <html>
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          height:100vh;
+          margin:0;
+        ">
+          Generating Member Report...
+        </body>
+      </html>
+    `);
+    pdfWindow.document.close();
+
+    // GET MEMBER DATA
+    const { data: members, error } = 
+			await supabaseClient.rpc(
+	      "get_members",
+	      {
+	        p_session_id: sessionId,
+	        p_branch_id: null
+	      }
+	    );
+    if (error) throw error;
+
+    // NORMALIZE
+    let rows = Array.isArray(members)
+      ? members.map(m => ({
+          id: m.ID_Member,
+          name: m.Nama,
+          tier: m.Level_Current,
+          spend: m.Total_Spend,
+          points: m.Point,
+          wa: m.WA
+        }))
+      : [];
+
+    // FILTER TIER
+    if (tier && tier.toUpperCase() !== "ALL") { rows = rows.filter(r => String(r.tier || "").toUpperCase() === tier.toUpperCase()); }
+
+    // GET TOP TIER SETTING
+    const { data: tier5Setting, error: tier5Error } = 
+			await supabaseClient
+	      .from("Settings")
+	      .select("name_value")
+	      .eq("key", "tier_5")
+	      .maybeSingle();
+
+    if (tier5Error) throw tier5Error;
+    const topTierName = tier5Setting?.name_value || "Top Tier";
+    // SUMMARY
+    const totalMembers = rows.length;
+    const totalTopTier = rows.filter(r => String(r.tier || "").toUpperCase() === String(topTierName).toUpperCase()).length;
+    const totalPoints = rows.reduce( (sum, r) => sum + (Number(r.points) || 0), 0 );
+    // MEMBER ROWS
+    const memberRows = rows.length
+      ? rows.map(m => `
+				<tr>
+					<td>${esc(m.id)}</td>
+					<td>${esc(m.name)}</td>
+					<td>${esc(m.tier)}</td>
+					<td class="amount-cell">${esc(money(m.spend))}</td>
+					<td class="text-right">
+						${(Number(m.points) || 0).toLocaleString("id-ID")}
+					</td>
+					<td>${esc(m.wa)}</td>
+				</tr>
+			`).join("")
+		: `
+				<tr>
+					<td colspan="6" class="empty">
+						No members
+					</td>
+				</tr>
+			`;
+
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
       <head>
         <meta charset="UTF-8">
-        <title>
-          Export Member Error
-        </title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
 
         <style>
-          body {
+          * {
+            box-sizing: border-box;
+          }
+
+          html, body {
             margin: 0;
-            padding: 40px;
-            background: #0B0F14;
-            color: white;
-            font-family: Arial,
-              sans-serif;
+            padding: 0;
           }
 
-          .error {
-            color: #ff6b6b;
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
           }
 
-          .message {
-            margin-top: 20px;
-            background: #151A21;
-            padding: 15px;
+          /* TOOLBAR */
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
             border-radius: 10px;
-            white-space: pre-wrap;
-            color: #ff8080;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255,255,255,.14);
+          }
+
+          /* REPORT PAPER */
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          /* HEADER */
+          .report-header {
+            margin-bottom: 24px;
+          }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 75px;
+            margin-bottom: 16px;
+          }
+
+          .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+          }
+
+          .logo {
+            display: block;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+            margin: 0;
+          }
+
+          .brand-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            margin: 0;
+          }
+
+          .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .branch-title {
+            font-size: 10px;
+            font-weight: 500;
+            color: #666;
+          }
+
+          .period {
+            font-size: 11px;
+            font-weight: 600;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+            align-self: flex-end;
+            margin-bottom: 5px;
+          }
+
+          .report-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e5e5;
+          }
+
+          .title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .filter-info {
+            margin: 0;
+            font-size: 9px;
+            line-height: 1.7;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          /* KPI */
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+          }
+
+          .summary-label {
+            font-size: 9px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 7px;
+          }
+
+          .summary-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
+          }
+
+          /* TABLE */
+          .card {
+            width: 100%;
+            margin-top: 18px;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px;
+            font-size: 13px;
+            color: #333;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 10px;
+            color: #444;
+            page-break-inside: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            padding: 9px 5px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 9px 5px;
+            vertical-align: top;
+            border: none;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .text-right {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .amount-cell {
+            text-align: right;
+            white-space: nowrap;
+            font-weight: 700;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          /* FOOTER */
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          /* PRINT */
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            .summary-card {
+              break-inside: avoid;
+            }
+
+            .card {
+              break-inside: auto;
+              page-break-inside: auto;
+            }
+
+            .card h3 {
+              break-after: avoid;
+              page-break-after: avoid;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
           }
         </style>
       </head>
 
       <body>
-        <h2 class="error">
-          Export Member Error
-        </h2>
-
-        <p>
-          Gagal membuat Member Report.
-        </p>
-
-        <div class="message">
-          ${message}
+        <div class="toolbar">
+          <div>Member Directory Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
         </div>
+
+        <main class="report">
+          <!-- HEADER -->
+          <header class="report-header">
+            <div class="brand-row">
+              <div class="brand-left">
+                ${logoUrl ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="Company Logo"
+                    onerror="this.style.display='none'"
+                  >
+                ` : ""}
+
+                <div class="brand-info">
+                  <h2 class="brand-name">${esc(companyName)}</h2>
+                  <div class="branch-title">
+                    Branch : ${esc(branchTitle)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                Tier : ${esc(tier)}
+              </div>
+            </div>
+
+            <div class="report-meta-row">
+              <h1 class="title">Member Directory Report</h1>
+
+              <div class="filter-info">
+                MEMBER DIRECTORY
+              </div>
+            </div>
+          </header>
+
+          <!-- KPI -->
+          <section class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Total Members</div>
+              <div class="summary-value">
+                ${totalMembers.toLocaleString("id-ID")}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">${esc(topTierName)} Tier</div>
+              <div class="summary-value">
+                ${totalTopTier.toLocaleString("id-ID")}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Points Issued</div>
+              <div class="summary-value">
+                ${totalPoints.toLocaleString("id-ID")}
+              </div>
+            </div>
+          </section>
+
+          <!-- MEMBER DIRECTORY -->
+          <div class="card">
+            <h3>Member Directory</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Tier</th>
+                  <th class="text-right">Spend</th>
+                  <th class="text-right">Points</th>
+                  <th>WhatsApp</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${memberRows}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString("id-ID"))}
+          </footer>
+        </main>
       </body>
       </html>
-    `);
+    `;
 
+    // SHOW REPORT
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
     pdfWindow.document.close();
-    showToast( "Export Member gagal", "error" );
+
+  } catch (error) {
+    console.error("Export Member error:", error);
+
+    if (pdfWindow && !pdfWindow.closed) {
+      pdfWindow.document.open();
+      pdfWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family:Arial;padding:40px;">
+            <h2>Export PDF Failed</h2>
+            <pre>${escapeAdjustmentHTML(error?.message || "Export PDF gagal")}</pre>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+
+    showToast(
+      error?.message || "Export Member gagal",
+      "error"
+    );
   }
 }
 
