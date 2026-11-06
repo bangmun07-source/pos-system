@@ -46231,9 +46231,17 @@ window.exportCashierShiftAdjustments = function () {
 					.brand-row {
 						display: flex;
 						align-items: center;
-						gap: 18px;
+						justify-content: space-between;
+						gap: 20px;
 						min-height: 75px;
-						margin-bottom: 24px;
+						margin-bottom: 16px;
+					}
+					
+					.brand-left {
+						display: flex;
+						align-items: center;
+						gap: 6px;
+						min-width: 0;
 					}
 					
 					.logo {
@@ -46265,21 +46273,21 @@ window.exportCashierShiftAdjustments = function () {
 						color: #666;
 					}
 					
-					.report-meta-row {
-						display: flex;
-						align-items: flex-start;
-						justify-content: space-between;
-						gap: 20px;
-						padding-bottom: 16px;
-						border-bottom: 1px solid #e5e5e5;
-					}
-					
 					.period {
 						font-size: 11px;
 						font-weight: 600;
 						color: #555;
 						text-align: right;
-						margin-bottom: 12px;
+						white-space: nowrap;
+					}
+					
+					.report-meta-row {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						gap: 20px;
+						padding-top: 14px;
+						border-top: 1px solid #e5e5e5;
 					}
 					
 					.title {
@@ -46487,41 +46495,41 @@ window.exportCashierShiftAdjustments = function () {
 
 			<main class="report">
 				<header class="report-header">
-			    <!-- BRAND -->
-			    <div class="brand-row">
-						${logoUrl ? `
-							<img src="${esc(logoUrl)}"
-								 class="logo"
-								 alt="Company Logo"
-								 onerror="this.style.display='none'">
-						` : ''}
-		
-						<div class="brand-info">
-							<h2 class="brand-name">
-								${esc(companyName)}
-							</h2>
+					<!-- BRAND LEFT & PERIOD RIGHT -->
+					<div class="brand-row">
+						<div class="brand-left">
+							${logoUrl ? `
+								<img src="${esc(logoUrl)}"
+									 class="logo"
+									 alt="Company Logo"
+									 onerror="this.style.display='none'">
+							` : ''}
+			
+							<div class="brand-info">
+								<h2 class="brand-name">
+									${esc(companyName)}
+								</h2>
 	
-							<div class="branch-title">
-								Branch : ${esc(branchTitle)}
+								<div class="branch-title">
+									Branch : ${esc(branchTitle)}
+								</div>
 							</div>
 						</div>
-			    </div>
-			
-			    <!-- PERIOD ABOVE LINE -->
-					<div class="period">
-						Period : ${esc(periodTitle)}
+				
+						<div class="period">
+							Period : ${esc(periodTitle)}
+						</div>
 					</div>
-					
-					<!-- REPORT TITLE & FILTER INFORMATION -->
+					<!-- REPORT TITLE LEFT & FILTER RIGHT -->
 					<div class="report-meta-row">
 						<h1 class="title">
-								Cashier Shift Adjustment Report
+							Cashier Shift Adjustment Report
 						</h1>
-					
+			
 						<div class="filter-info">
-								Cashier: ${esc(cashierTitle)}
-								&nbsp; | &nbsp;
-								Adjustment Type: ${esc(typeTitle)}
+							Cashier: ${esc(cashierTitle)}
+							&nbsp; | &nbsp;
+							Adjustment Type: ${esc(typeTitle)}
 						</div>
 					</div>
 				</header>
