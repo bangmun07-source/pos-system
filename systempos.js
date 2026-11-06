@@ -20213,8 +20213,6 @@ async function initAssetPage() {
 	loadAssetPurchases();
 }
 
-
-async function 
 /* ==== EXPORT ASSET REPORT PDF ==== */
 window.exportAssets = async function () {
   let reportWindow = null;
