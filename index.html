@@ -24042,49 +24042,46 @@
               Track receivables and payment status.
             </p>
           </div>
-          <!-- FILTERS -->
-					<div class="w-full xl:w-auto xl:flex-1">
-					  <div class="flex flex-col sm:flex-row sm:flex-wrap xl:justify-end items-stretch sm:items-center gap-2 w-full">
-	            <select id="accountsReceivableTypeFilter"
-	              onchange="loadAccountsReceivableRecords()"
-	              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
-	              <option value="ALL"> All Types </option>
-	              <option value="EMPLOYEE"> Employee </option>
-	              <option value="BUSINESS"> Business </option>
-	              <option value="TAX"> Tax </option>
-	              <option value="OTHER"> Other </option>
-	            </select>
-	            <!-- STATUS -->
-	            <select id="accountsReceivableStatusFilter"
-	              onchange="loadAccountsReceivableRecords()"
-	              class="h-10 px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" >
-	              <option value="ALL"> All Status </option>
-	              <option value="DRAFT"> Draft </option>
-	              <option value="OUTSTANDING"> Outstanding </option>
-	              <option value="PAID"> Paid </option>
-	            </select>
-	            <!-- SEARCH -->
-	            <div class="relative">
-	              <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg" >
-	                search
-	              </span>
-	
-	              <input id="accountsReceivableSearch"
-	                type="text"
-	                placeholder="Search receivable..."
-	                oninput="loadAccountsReceivableRecords()"
-	                class="h-10 w-56 pl-10 pr-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" />
-	            </div>
-							
-							 <button type="button"
-			          onclick="openAccountsReceivableModal()"
-			          class="inline-flex items-center py-2.5 h-10 px-4 rounded-md bottom-theme text-sm font-medium gap-2">
-			          <span class="material-symbols-outlined text-lg">
-			            add
-			          </span>
-			          New Receivable
-			        </button>
-	          </div>
+					<!-- FILTERS -->
+					<div class="w-full min-w-0 xl:flex-1">
+					  <div class="flex flex-col sm:flex-row sm:flex-wrap xl:justify-end items-stretch gap-2 w-full">
+					    <select id="accountsReceivableTypeFilter"
+					      onchange="loadAccountsReceivableRecords()"
+					      class="h-10 w-full sm:flex-1 sm:min-w-[130px] xl:flex-none xl:w-auto px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary">
+					      <option value="ALL">All Types</option>
+					      <option value="EMPLOYEE">Employee</option>
+					      <option value="BUSINESS">Business</option>
+					      <option value="TAX">Tax</option>
+					      <option value="OTHER">Other</option>
+					    </select>
+					
+					    <select id="accountsReceivableStatusFilter"
+					      onchange="loadAccountsReceivableRecords()"
+					      class="h-10 w-full sm:flex-1 sm:min-w-[130px] xl:flex-none xl:w-auto px-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary">
+					      <option value="ALL">All Status</option>
+					      <option value="DRAFT">Draft</option>
+					      <option value="OUTSTANDING">Outstanding</option>
+					      <option value="PAID">Paid</option>
+					    </select>
+					
+					    <div class="relative w-full sm:flex-1 sm:min-w-[180px] xl:flex-none xl:w-56">
+					      <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted text-lg">
+					        search
+					      </span>
+					      <input id="accountsReceivableSearch"
+					        type="text"
+					        placeholder="Search receivable..."
+					        oninput="loadAccountsReceivableRecords()"
+					        class="h-10 w-full pl-10 pr-3 rounded-md bg-background border border-outline-variant text-sm outline-none focus:border-primary" />
+					    </div>
+					
+					    <button type="button"
+					      onclick="openAccountsReceivableModal()"
+					      class="inline-flex items-center justify-center py-2.5 h-10 w-full sm:flex-1 xl:flex-none xl:w-auto px-4 rounded-md bottom-theme text-sm font-medium gap-2">
+					      <span class="material-symbols-outlined text-lg">add</span>
+					      New Receivable
+					    </button>
+					  </div>
 					</div>
         </div>
         <!-- TABLE -->
