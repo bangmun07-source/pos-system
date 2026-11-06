@@ -46246,7 +46246,7 @@ window.exportCashierShiftAdjustments = function () {
 					
 					.logo {
 						display: block;
-						width: 100px;
+						width: 70px;
 						height: 70px;
 						object-fit: contain;
 						object-position: center;
@@ -46278,7 +46278,7 @@ window.exportCashierShiftAdjustments = function () {
 					.period {
 					    font-size: 11px;
 					    font-weight: 600;
-					    color: #555;
+					    color: #777;
 					    text-align: right;
 					    white-space: nowrap;
 					    align-self: flex-end;
