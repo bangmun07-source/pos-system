@@ -46251,7 +46251,7 @@ window.exportCashierShiftAdjustments = function () {
 						object-fit: contain;
 						object-position: center;
 						flex-shrink: 0;
-						margin: 0;
+						margin: 0 0 5px 0;
 					}
 					
 					.brand-info {
@@ -46261,7 +46261,7 @@ window.exportCashierShiftAdjustments = function () {
 					}
 					
 					.brand-name {
-						margin: 0;
+						margin: 0 0 5px 0;
 						font-size: 18px;
 						font-weight: 700;
 						color: #222;
