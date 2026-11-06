@@ -20214,134 +20214,792 @@ async function initAssetPage() {
 }
 
 
-async function exportAssets() {
-  const filter = getAssetGlobalFilter();
-  const pdfWindow = window.open("", "_blank");
+async function 
+/* ==== EXPORT ASSET REPORT PDF ==== */
+window.exportAssets = async function () {
+  let reportWindow = null;
 
-  if (!pdfWindow) { showToast("Popup diblokir browser", "error"); return; }
+  try {
+    const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
 
-  pdfWindow.document.write(`
-    <!DOCTYPE html>
-    <html>
+    // FILTER VALUES
+    const filter = getAssetGlobalFilter();
+
+    const branchId = filter?.branchId || null;
+    const start = filter?.dateFrom || null;
+    const end = filter?.dateTo || null;
+
+    if (start && end && start > end) {
+      alert('Period From tidak boleh melebihi Period To.');
+      return;
+    }
+
+    // OPEN TAB BEFORE ASYNC RPC
+    reportWindow = window.open('', '_blank');
+
+    if (!reportWindow) {
+      alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.');
+      return;
+    }
+
+    // HELPERS
+    const esc = value => escapeAssetHTML(value ?? '-');
+
+    const money = value =>
+      'Rp ' + Number(value || 0).toLocaleString('id-ID');
+
+    const normalizeValue = value =>
+      String(value || '').trim().toUpperCase();
+
+    const formatPeriodDate = value => {
+      if (!value) return 'ALL PERIODS';
+
+      const parts = String(value).slice(0, 10).split('-');
+      if (parts.length !== 3) return String(value);
+
+      const date = new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
+      );
+
+      if (Number.isNaN(date.getTime())) return '-';
+
+      return date.toLocaleDateString('id-ID', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
+      });
+    };
+
+    const filterDate = (rows, dateField, startDate, endDate) => {
+      return rows.filter(row => {
+        const rowDate = row[dateField[0]] ?? row[dateField[1]] ?? '';
+
+        const matchStart =
+          !startDate ||
+          (
+            rowDate &&
+            new Date(rowDate) >= new Date(`${startDate}T00:00:00`)
+          );
+
+        const matchEnd =
+          !endDate ||
+          (
+            rowDate &&
+            new Date(rowDate) <= new Date(`${endDate}T23:59:59.999`)
+          );
+
+        return matchStart && matchEnd;
+      });
+    };
+
+    // SESSION
+    const sessionId = localStorage.getItem('pos_session_id');
+
+    if (!sessionId) {
+      throw new Error('Session tidak ditemukan. Silakan login kembali.');
+    }
+
+    // RPC ASSETS
+    const {
+      data: assets,
+      error: assetError
+    } = await supabaseClient.rpc('get_assets', {
+      p_branch_id: branchId,
+      p_session_id: sessionId
+    });
+
+    if (assetError) throw assetError;
+
+    // RPC ASSET PURCHASES
+    const {
+      data: purchases,
+      error: purchaseError
+    } = await supabaseClient.rpc('get_asset_purchases', {
+      p_session_id: sessionId,
+      p_branch_id: branchId
+    });
+
+    if (purchaseError) throw purchaseError;
+
+    // RPC DEPRECIATION HISTORY
+    const {
+      data: depreciation,
+      error: depreciationError
+    } = await supabaseClient.rpc('get_asset_depreciation_history', {
+      p_branch_id: branchId,
+      p_session_id: sessionId
+    });
+
+    if (depreciationError) throw depreciationError;
+
+    // NORMALIZE DATA
+    const assetRows = Array.isArray(assets) ? assets : [];
+    const purchaseRows = Array.isArray(purchases) ? purchases : [];
+    const depreciationRows = Array.isArray(depreciation) ? depreciation : [];
+
+    // DATE FILTER
+    const filteredAssets = filterDate(
+      assetRows,
+      ['Purchase_Date', 'purchase_date'],
+      start,
+      end
+    );
+
+    const filteredPurchases = filterDate(
+      purchaseRows,
+      ['Purchase_Date', 'purchase_date'],
+      start,
+      end
+    );
+
+    const filteredDepreciation = filterDate(
+      depreciationRows,
+      ['Period', 'period'],
+      start,
+      end
+    );
+
+    // BRANCH & PERIOD LABEL
+    const branchTitle =
+      filter?.branchName ||
+      filter?.branch ||
+      branchId ||
+      'ALL BRANCHES';
+
+    const periodTitle =
+      start || end
+        ? `${formatPeriodDate(start)} - ${formatPeriodDate(end)}`
+        : 'ALL PERIODS';
+
+    // KPI
+    const activeAssets = filteredAssets.filter(
+      row => normalizeValue(row.Status) === 'ACTIVE'
+    );
+
+    const totalAssets = activeAssets.length;
+
+    const purchaseCost = activeAssets.reduce(
+      (sum, row) => sum + Number(row.Purchase_Cost || 0),
+      0
+    );
+
+    const accumulatedDepreciation = activeAssets.reduce(
+      (sum, row) => sum + Number(row.Accumulated_Depreciation || 0),
+      0
+    );
+
+    const bookValue = activeAssets.reduce(
+      (sum, row) => sum + Number(row.Book_Value || 0),
+      0
+    );
+
+    const monthlyDepreciation = activeAssets.reduce((sum, row) => {
+      const method = normalizeValue(row.Depreciation_Method);
+      const usefulLife = Number(row.Useful_Life_Months || 0);
+
+      if (method === 'STRAIGHT LINE' && usefulLife > 0) {
+        return sum + (
+          Number(row.Purchase_Cost || 0) / usefulLife
+        );
+      }
+
+      return sum;
+    }, 0);
+
+    // ASSET MANAGEMENT ROWS
+    const assetManagementRows = filteredAssets.length
+      ? filteredAssets.map(row => {
+          const assetId = row.Asset_ID || '';
+          const assetName = row.Asset_Name || '';
+          const purchaseDate = row.Purchase_Date || row.purchase_date || '';
+          const cost = Number(row.Purchase_Cost || 0);
+          const accumulated = Number(row.Accumulated_Depreciation || 0);
+          const book = Number(row.Book_Value || 0);
+          const status = row.Status || '';
+          const rowBranch = row.BranchId || '';
+          const usefulLife = row.Useful_Life_Months || '';
+          const method = row.Depreciation_Method || '';
+
+          return `
+            <tr>
+              <td>${esc(purchaseDate)}</td>
+              <td>${esc(assetId)}</td>
+              <td>${esc(assetName)}</td>
+              <td>${esc(rowBranch)}</td>
+              <td class="right">${money(cost)}</td>
+              <td class="right">${money(accumulated)}</td>
+              <td class="right">${money(book)}</td>
+              <td>${esc(status)}</td>
+              <td class="right">${esc(usefulLife)}</td>
+              <td>${esc(method)}</td>
+            </tr>
+          `;
+        }).join('')
+      : `
+        <tr>
+          <td colspan="10" class="empty">No asset data</td>
+        </tr>
+      `;
+
+    // ASSET PURCHASE ROWS
+    const assetPurchaseRows = filteredPurchases.length
+      ? filteredPurchases.map(row => {
+          const purchaseId = row.Purchase_ID || '';
+          const assetName = row.Asset_Name || '';
+          const purchaseDate = row.Purchase_Date || row.purchase_date || '';
+          const cost = Number(row.Purchase_Cost || 0);
+          const interest = Number(row.Interest_Amount || 0);
+          const obligation = Number(row.Total_Obligation || 0);
+          const paid = Number(row.Paid_Amount || 0);
+          const outstanding = Number(row.Outstanding_Amount || 0);
+          const status = row.Status || '';
+          const paymentType = row.Payment_Type || '';
+
+          return `
+            <tr>
+              <td>${esc(purchaseDate)}</td>
+              <td>${esc(purchaseId)}</td>
+              <td>${esc(assetName)}</td>
+              <td>${esc(paymentType)}</td>
+              <td class="right">${money(cost)}</td>
+              <td class="right">${money(interest)}</td>
+              <td class="right">${money(obligation)}</td>
+              <td class="right">${money(paid)}</td>
+              <td class="right">${money(outstanding)}</td>
+              <td>${esc(status)}</td>
+            </tr>
+          `;
+        }).join('')
+      : `
+        <tr>
+          <td colspan="10" class="empty">No asset purchase data</td>
+        </tr>
+      `;
+
+    // DEPRECIATION HISTORY ROWS
+    const depreciationHistoryRows = filteredDepreciation.length
+      ? filteredDepreciation.map(row => {
+          const period = row.Period || row.period || '';
+          const assetId = row.Asset_ID || '';
+          const assetName = row.Asset_Name || '';
+          const rowBranch = row.BranchId || '';
+          const depreciationAmount = Number(row.Depreciation_Amount || 0);
+          const before = Number(row.Book_Value_Before || 0);
+          const after = Number(row.Book_Value_After || 0);
+          const createdAt = row.Created_At || '';
+
+          return `
+            <tr>
+              <td>${esc(period)}</td>
+              <td>${esc(assetId)}</td>
+              <td>${esc(assetName)}</td>
+              <td>${esc(rowBranch)}</td>
+              <td class="right">${money(depreciationAmount)}</td>
+              <td class="right">${money(before)}</td>
+              <td class="right">${money(after)}</td>
+              <td>${esc(createdAt)}</td>
+            </tr>
+          `;
+        }).join('')
+      : `
+        <tr>
+          <td colspan="8" class="empty">No depreciation data</td>
+        </tr>
+      `;
+
+    // TENANT LOGO
+    const supabaseUrl = String(
+      supabaseClient?.supabaseUrl || ''
+    ).replace(/\/$/, '');
+
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+
+    // FILENAME
+    const filename =
+      `Asset Report - ${branchTitle} - ${periodTitle}.pdf`;
+
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
       <head>
-        <title>Generating Asset Report</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
 
         <style>
-          body {
-            margin: 0;
-            background: #0B0F14;
-            color: white;
-            font-family: Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+          * {
+            box-sizing: border-box;
           }
 
-          .loading {
-            text-align: center;
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          /* TOOLBAR */
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255,255,255,.14);
+          }
+
+          /* REPORT */
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 35px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          /* HEADER */
+          .report-header {
+            margin-bottom: 20px;
+          }
+
+          .brand-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+          }
+
+          .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+          }
+
+          .logo {
+            display: block;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+          }
+
+          .brand-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+          }
+
+          .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+          }
+
+          .branch-title {
+            font-size: 11px;
+            color: #666;
+          }
+
+          .period {
+            font-size: 11px;
+            color: #555;
+            white-space: nowrap;
+            text-align: right;
+          }
+
+          .report-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            padding-top: 13px;
           }
 
           .title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 8px;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
           }
 
-          .text {
-            font-size: 13px;
-            opacity: .7;
+          .filter-info {
+            font-size: 10px;
+            color: #666;
+            text-align: right;
+          }
+
+          /* KPI */
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 24px 0;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 8px;
+            background: #fafafa;
+            text-align: center;
+          }
+
+          .kpi-title {
+            font-size: 9px;
+            color: #666;
+            font-weight: 700;
+            margin-bottom: 9px;
+          }
+
+          .kpi-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
+          }
+
+          /* TABLE */
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 18px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px;
+            font-size: 14px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+            margin-top: 8px;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 8px 5px;
+            text-align: left;
+            font-weight: 700;
+            white-space: nowrap;
+          }
+
+          td {
+            padding: 8px 5px;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          .right {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          /* FOOTER */
+          .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          .page-break {
+            page-break-before: always;
+          }
+
+          /* PRINT */
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            .kpi-card,
+            .card {
+              break-inside: avoid;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
           }
         </style>
       </head>
 
       <body>
-        <div class="loading">
-          <div class="title">
-            Asset Report
-          </div>
-
-          <div class="text">
-            Generating report...
-          </div>
+        <div class="toolbar">
+          <div>Asset Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
         </div>
+
+        <main class="report">
+
+          <!-- HEADER -->
+          <header class="report-header">
+            <div class="brand-row">
+              <div class="brand-left">
+                ${logoUrl ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="Company Logo"
+                    onerror="this.style.display='none'"
+                  >
+                ` : ''}
+
+                <div class="brand-info">
+                  <h2 class="brand-name">${esc(companyName)}</h2>
+                  <div class="branch-title">
+                    Branch : ${esc(branchTitle)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                Period : ${esc(periodTitle)}
+              </div>
+            </div>
+
+            <div class="report-meta-row">
+              <h1 class="title">Asset Report</h1>
+
+              <div class="filter-info">
+                Status: ALL ASSETS
+              </div>
+            </div>
+          </header>
+
+          <!-- KPI -->
+          <section class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">TOTAL ASSETS</div>
+              <div class="kpi-value">
+                ${totalAssets.toLocaleString('id-ID')}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">PURCHASE COST</div>
+              <div class="kpi-value">${money(purchaseCost)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">ACCUMULATED DEPRECIATION</div>
+              <div class="kpi-value">${money(accumulatedDepreciation)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">CURRENT BOOK VALUE</div>
+              <div class="kpi-value">${money(bookValue)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">DEPRECIATION / MONTH</div>
+              <div class="kpi-value">${money(monthlyDepreciation)}</div>
+            </div>
+          </section>
+
+          <!-- ASSET MANAGEMENT -->
+          <div class="card">
+            <h3>Asset Management</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Asset ID</th>
+                  <th>Asset Name</th>
+                  <th>Branch</th>
+                  <th class="right">Purchase Cost</th>
+                  <th class="right">Accumulated Dep.</th>
+                  <th class="right">Book Value</th>
+                  <th>Status</th>
+                  <th class="right">Life (Months)</th>
+                  <th>Method</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${assetManagementRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ASSET PURCHASE -->
+          <div class="page-break"></div>
+
+          <div class="card">
+            <h3>Asset Purchase & Financing</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Purchase ID</th>
+                  <th>Asset Name</th>
+                  <th>Payment</th>
+                  <th class="right">Purchase Cost</th>
+                  <th class="right">Interest</th>
+                  <th class="right">Total Obligation</th>
+                  <th class="right">Paid</th>
+                  <th class="right">Outstanding</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${assetPurchaseRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- DEPRECIATION HISTORY -->
+          <div class="page-break"></div>
+
+          <div class="card">
+            <h3>Depreciation History</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Period</th>
+                  <th>Asset ID</th>
+                  <th>Asset Name</th>
+                  <th>Branch</th>
+                  <th class="right">Depreciation</th>
+                  <th class="right">Book Value Before</th>
+                  <th class="right">Book Value After</th>
+                  <th>Created At</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${depreciationHistoryRows}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+
+        </main>
       </body>
-    </html>
-  `);
-
-  try {
-    const sessionId = localStorage.getItem("pos_session_id");
-    const payload = {
-      type: "asset",
-      branchId: filter?.branchId || null,
-      start: filter?.dateFrom || null,
-      end: filter?.dateTo || null,
-      sessionId,
-      tenantSlug: state.tenantSlug
-    };
-
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-          body: JSON.stringify(payload)
-        }
-      );
-
-    if (!response.ok) {
-			const errorText = await response.text();
-			throw new Error( errorText || `Export gagal (${response.status})` ); }
-		
-    const html = await response.text();
-
-    if (!html) { throw new Error( "Server mengembalikan HTML kosong" ); }
-    pdfWindow.document.open();
-    pdfWindow.document.write(html);
-    pdfWindow.document.close();
-  } catch (err) {
-    pdfWindow.document.open();
-    pdfWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <body style="
-          background:#0B0F14;
-          color:white;
-          font-family:Arial;
-          padding:40px; ">
-
-          <h2>
-            Export Failed
-          </h2>
-
-          <p style="color:#aaa;">
-            Gagal membuat Asset Report.
-          </p>
-
-          <pre style="
-            white-space:pre-wrap;
-            background:#151A21;
-            padding:15px;
-            border-radius:10px;
-            color:#ff6b6b;
-          ">${String(
-            err?.message ||
-            err ||
-            "Unknown error"
-          )
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")}</pre>
-        </body>
       </html>
-    `);
-    pdfWindow.document.close();
+    `;
+
+    // OPEN REPORT
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Asset Report error:', error);
+
+    if (reportWindow && !reportWindow.closed) {
+      reportWindow.document.open();
+      reportWindow.document.write(`
+        <html>
+          <body style="font-family:Arial;padding:30px">
+            <h3>Gagal membuat Asset Report</h3>
+            <p>${escapeAssetHTML(error.message || 'Terjadi kesalahan.')}</p>
+          </body>
+        </html>
+      `);
+      reportWindow.document.close();
+    }
+
+    alert('Gagal membuat Asset Report. Periksa Console untuk detail kesalahan.');
   }
-}
+};
+
+
+
 
 /* ==================================
 				OVERVIEW AKUNTANSI 
