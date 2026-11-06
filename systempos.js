@@ -9955,133 +9955,719 @@ function initIngredientExportDate() {
   end.onchange = applyDateFilter;
 }
 
-async function exportIngredientPurchases() {
-  const branchId =
-    getBranchId();
-  if (!branchId) {
-    alert(
-      "Branch tidak ditemukan"
-    );
-    return;
-  }
-
-  const startDate =
-    document.getElementById(
-      "ingredientExportStart"
-    )?.value;
-
-  const endDate =
-    document.getElementById(
-      "ingredientExportEnd"
-    )?.value;
-
-  const pdfWindow =
-    window.open(
-      "",
-      "_blank"
-    );
-
-  if (!pdfWindow) {
-    alert(
-      "Popup diblokir browser"
-    );
-    return;
-  }
-
-  // LOADING
-  pdfWindow.document.write(`
-    <html>
-      <body style="
-        background:#0B0F14;
-        color:white;
-        font-family:Arial;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        height:100vh;
-      ">
-        Generating Ingredient Purchase Report...
-      </body>
-    </html>
-  `);
-
+/* ==== EXPORT INGREDIENT PURCHASE PDF ==== */
+window.exportIngredientPurchases = async function () {
+  let pdfWindow = null;
   try {
-		const sessionId =
-  		localStorage.getItem("pos_session_id");
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+    const branchId = getBranchId();
+    if (!branchId) { alert("Branch tidak ditemukan"); return; }
 
-          body: JSON.stringify({
-            type: "ingredient-purchase",
-            branchId: branchId,
-            start: startDate,
-            end: endDate,
-						sessionId,
-						tenantSlug: state.tenantSlug
-          })
-        }
+    // FILTER VALUES
+    const startDate = document.getElementById("ingredientExportStart")?.value || "";
+    const endDate = ocument.getElementById("ingredientExportEnd")?.value || "";
+		
+    if (startDate && endDate && startDate > endDate) { alert("Start Date tidak boleh melebihi End Date."); return; }
+
+    // SESSION
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { alert("Session tidak ditemukan. Silakan login kembali."); return; }
+		
+    // HELPERS
+    const esc = value => escapeAdjustmentHTML(value ?? "-");
+    const money = value => formatAdjustmentCurrency(Number(value || 0));
+    const formatPeriodDate = value => {
+      if (!value) return "All Dates";
+
+      const parts = String(value).slice(0, 10).split("-");
+      if (parts.length !== 3) return esc(value);
+
+      const date = new Date(
+        Number(parts[0]),
+        Number(parts[1]) - 1,
+        Number(parts[2])
       );
 
-    // CHECK RESPONSE
-    if (!response.ok) {
-      const errorText =
-        await response.text();
-      throw new Error(
-        errorText ||
-        "Export Ingredient Purchase gagal"
-      );
-    }
+      if (Number.isNaN(date.getTime())) return "-";
 
-    // GET HTML
-    const html = await response.text();
+      return date.toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric"
+      });
+    };
+    // REPORT INFORMATION
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchTitle = String( state.branchName || branchId );
+    const periodTitle = startDate || endDate
+      ? `${formatPeriodDate(startDate)} - ${formatPeriodDate(endDate)}`
+      : "ALL PERIODS";
+    // TENANT LOGO
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    const filename = `Ingredient Purchase Report - ${branchTitle} - ${periodTitle}.pdf`;
 
-    if (!html) {
-      throw new Error(
-        "Response export kosong"
-      );
-    }
+    // OPEN POPUP BEFORE ASYNC RPC
+    pdfWindow = window.open("", "_blank");
 
-    // SHOW REPORT
-    pdfWindow.document.open();
-    pdfWindow.document.write(
-      html
-    );
-    pdfWindow.document.close();
-  }
+    if (!pdfWindow) { alert("Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi."); return; }
 
-  catch (err) {
     pdfWindow.document.open();
     pdfWindow.document.write(`
+      <!DOCTYPE html>
       <html>
-        <body style="font-family:Arial; padding:40px;">
-
-          <h2>
-            Export PDF Failed
-          </h2>
-
-          <pre>
-			${String(
-			  err?.message ||
-			  "Export PDF gagal"
-			)}
-          </pre>
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          height:100vh;
+          margin:0;
+        ">
+          Generating Ingredient Purchase Report...
         </body>
       </html>
     `);
     pdfWindow.document.close();
+
+    // GET PURCHASE DATA
+    const { data, error } = await supabaseClient.rpc(
+      "get_ingredient_purchases",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_start: startDate || null,
+        p_end: endDate || null
+      }
+    );
+    if (error) throw error;
+
+    const rows = Array.isArray(data) ? data : [];
+    // TOTAL
+    const totalPurchases = rows.length;
+    const totalSpending = rows.reduce((sum, r) => {
+      const status = String(r.Status ?? r.status ?? "").toUpperCase();
+      const totalPrice = Number(r.Total_Price ?? r.total_price ?? 0) || 0;
+
+      return status === "PAID"
+        ? sum + totalPrice
+        : sum; }, 0);
+
+    const totalSuppliers = new Set(rows.map(r => r.Name_Supplier ?? r.name_supplier ?? "-" )).size;
+    // SUPPLIER BREAKDOWN
+    const supplierMap = {};
+
+    rows.forEach(r => {
+      const supplier = r.Name_Supplier ?? r.name_supplier ?? "-";
+      if (!supplierMap[supplier]) {
+        supplierMap[supplier] = {
+          supplier,
+          purchases: 0,
+          spending: 0,
+          balanceDue: 0
+        };
+      }
+      supplierMap[supplier].purchases++;
+
+      const totalPrice = Number( r.Total_Price ?? r.total_price ?? 0 ) || 0;
+      const status = String( r.Status ?? r.status ?? "" ).toUpperCase();
+      if (status === "PAID") {
+        supplierMap[supplier].spending += totalPrice;
+      } else if (status === "PENDING") {
+        supplierMap[supplier].balanceDue += totalPrice;
+      }
+    });
+
+    const supplierRows = Object.values(supplierMap) .sort((a, b) => b.spending - a.spending);
+    // PAYMENT BREAKDOWN
+    const paymentMap = {};
+    rows.forEach(r => {
+      const payment = r.Payment_Method ?? r.payment_method ?? "-";
+      paymentMap[payment] = (paymentMap[payment] || 0) + (Number(r.Total_Price ?? r.total_price ?? 0) || 0);
+    });
+    const paymentRows = Object.entries(paymentMap) .map(([payment, total]) => ({ payment, total }));
+    // PURCHASE HISTORY
+    const purchaseRows = rows.length
+      ? rows.map(r => {
+				const date = r.Date ?? r.date ?? "";
+				const ingredient = r.Ingredient ?? r.ingredient ?? "-";
+				const qty = Number( r.Qty ?? r.qty ?? 0 ) || 0;
+				const totalPrice = Number( r.Total_Price ?? r.total_price ?? 0 ) || 0;
+				const supplier = r.Name_Supplier ?? r.name_supplier ?? "-";
+				const payment = r.Payment_Method ?? r.payment_method ?? "-";
+				const status = String( r.Status ?? r.status ?? "" ).toUpperCase() || "-";
+				const balanceDue = status === "PENDING" ? totalPrice : 0;
+				const outlet = r.Outlet ?? r.outlet ?? "-";
+				const note = r.Note ?? r.note ?? "-";
+				const formattedDate = date
+					? new Date(date).toLocaleDateString("id-ID")
+					: "-";
+
+				return `
+					<tr>
+						<td class="date-cell">${esc(formattedDate)}</td>
+						<td>${esc(ingredient)}</td>
+						<td class="text-right">${qty.toLocaleString("id-ID")}</td>
+						<td class="amount-cell">${esc(money(totalPrice))}</td>
+						<td>${esc(supplier)}</td>
+						<td>${esc(payment)}</td>
+						<td>${esc(status)}</td>
+						<td class="amount-cell">${esc(money(balanceDue))}</td>
+						<td>${esc(outlet)}</td>
+						<td>${esc(note)}</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+			<tr>
+				<td colspan="10" class="empty">
+					No purchase data
+				</td>
+			</tr>
+		`;
+    // PAYMENT HTML
+    const paymentHtml = paymentRows.length
+      ? paymentRows.map(r => `
+				<tr>
+					<td>${esc(r.payment)}</td>
+					<td class="amount-cell">${esc(money(r.total))}</td>
+				</tr>
+			`).join("")
+		: `
+				<tr>
+					<td colspan="2" class="empty">
+						No payment data
+					</td>
+				</tr>
+			`;
+    // SUPPLIER HTML
+    const supplierHtml = supplierRows.length
+      ? supplierRows.map(r => `
+				<tr>
+					<td>${esc(r.supplier)}</td>
+					<td class="text-right">
+						${r.purchases.toLocaleString("id-ID")}
+					</td>
+					<td class="amount-cell">${esc(money(r.spending))}</td>
+					<td class="amount-cell">${esc(money(r.balanceDue))}</td>
+				</tr>
+			`).join("")
+		: `
+				<tr>
+					<td colspan="4" class="empty">
+						No supplier data
+					</td>
+				</tr>
+			`;
+
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          /* TOOLBAR */
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255,255,255,.14);
+          }
+
+          /* REPORT PAPER */
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          /* HEADER */
+          .report-header {
+            margin-bottom: 24px;
+          }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 75px;
+            margin-bottom: 16px;
+          }
+
+          .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+          }
+
+          .logo {
+            display: block;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+            margin: 0;
+          }
+
+          .brand-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            margin: 0;
+          }
+
+          .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .branch-title {
+            font-size: 10px;
+            font-weight: 500;
+            color: #666;
+          }
+
+          .period {
+            font-size: 11px;
+            font-weight: 600;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+            align-self: flex-end;
+            margin-bottom: 5px;
+          }
+
+          .report-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e5e5;
+          }
+
+          .title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .filter-info {
+            margin: 0;
+            font-size: 9px;
+            line-height: 1.7;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          /* KPI */
+          .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .summary-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+          }
+
+          .summary-label {
+            font-size: 9px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 7px;
+          }
+
+          .summary-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
+          }
+
+          /* TABLE */
+          .card {
+            width: 100%;
+            margin-top: 18px;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px;
+            font-size: 13px;
+            color: #333;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 10px;
+            color: #444;
+            page-break-inside: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            padding: 9px 5px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border: none;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 9px 5px;
+            vertical-align: top;
+            border: none;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .text-right {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .amount-cell {
+            text-align: right;
+            white-space: nowrap;
+            font-weight: 700;
+          }
+
+          .date-cell {
+            white-space: nowrap;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          /* FOOTER */
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          /* PRINT */
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            .summary-card {
+              break-inside: avoid;
+            }
+
+            .card {
+              break-inside: auto;
+              page-break-inside: auto;
+            }
+
+            .card h3 {
+              break-after: avoid;
+              page-break-after: avoid;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table {
+              page-break-inside: auto;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Ingredient Purchase Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+
+          <!-- HEADER -->
+          <header class="report-header">
+            <div class="brand-row">
+              <div class="brand-left">
+                ${logoUrl ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="Company Logo"
+                    onerror="this.style.display='none'"
+                  >
+                ` : ""}
+
+                <div class="brand-info">
+                  <h2 class="brand-name">${esc(companyName)}</h2>
+                  <div class="branch-title">
+                    Branch : ${esc(branchTitle)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                Period : ${esc(periodTitle)}
+              </div>
+            </div>
+
+            <div class="report-meta-row">
+              <h1 class="title">Ingredient Purchase Report</h1>
+
+              <div class="filter-info">
+                PURCHASE HISTORY
+              </div>
+            </div>
+          </header>
+
+          <!-- KPI -->
+          <section class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-label">Total Purchases</div>
+              <div class="summary-value">
+                ${totalPurchases.toLocaleString("id-ID")}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Total Spending</div>
+              <div class="summary-value">
+                ${esc(money(totalSpending))}
+              </div>
+            </div>
+
+            <div class="summary-card">
+              <div class="summary-label">Total Suppliers</div>
+              <div class="summary-value">
+                ${totalSuppliers.toLocaleString("id-ID")}
+              </div>
+            </div>
+          </section>
+
+          <!-- PAYMENT BREAKDOWN -->
+          <div class="card">
+            <h3>Payment Method Breakdown</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Payment Method</th>
+                  <th class="text-right">Total Spending</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${paymentHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- SUPPLIER BREAKDOWN -->
+          <div class="card">
+            <h3>Supplier Breakdown</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Supplier</th>
+                  <th class="text-right">Purchases</th>
+                  <th class="text-right">Total Spending</th>
+                  <th class="text-right">Balance Due</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${supplierHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PURCHASE HISTORY -->
+          <div class="card">
+            <h3>Purchase History</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Ingredient</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Total Price</th>
+                  <th>Supplier</th>
+                  <th>Payment</th>
+                  <th>Status</th>
+                  <th class="text-right">Balance Due</th>
+                  <th>Outlet</th>
+                  <th>Note</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${purchaseRows}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString("id-ID"))}
+          </footer>
+
+        </main>
+      </body>
+      </html>
+    `;
+
+    // SHOW REPORT
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
+    pdfWindow.document.close();
+
+  } catch (error) {
+    console.error("Export Ingredient Purchase error:", error);
+
+    if (pdfWindow && !pdfWindow.closed) {
+      pdfWindow.document.open();
+      pdfWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <body style="font-family:Arial;padding:40px;">
+            <h2>Export PDF Failed</h2>
+            <pre>${escapeAdjustmentHTML(error?.message || "Export PDF gagal")}</pre>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+
     alert(
-      err?.message ||
-      "Export PDF gagal"
+      error?.message ||
+      "Gagal membuat PDF Ingredient Purchase. Periksa Console untuk detail kesalahan."
     );
   }
-}
+};
+
 
 
 	// ==================================
