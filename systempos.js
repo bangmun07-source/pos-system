@@ -42970,6 +42970,7 @@ window.cancelReimbursement = async function (reimbursementId) {
 /* ==== EXPORT REIMBURSEMENT PDF ==== */
 window.exportReimbursement = async function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     const periodFilter = document.getElementById('reimbursementPeriodFilter');
     const branchFilter = document.getElementById('reimbursementBranchFilter');
     const employeeFilter = document.getElementById('reimbursementEmployeeFilter');
@@ -43160,41 +43161,92 @@ window.exportReimbursement = async function () {
             box-shadow: 0 20px 60px rgba(0,0,0,.45);
           }
 
-          /* HEADER */
-          .report-header {
-            text-align: center;
-            margin-bottom: 24px;
-          }
-
-          .logo {
-            display: block;
-            width: auto;
-            max-width: 150px;
-            max-height: 70px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          .title {
-            margin: 0 0 8px;
-            font-size: 21px;
-            font-weight: 700;
-            letter-spacing: .5px;
-            color: #222;
-          }
-
-          .branch-title {
-            margin-top: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-          }
-
-          .period {
-            margin-top: 5px;
-            font-size: 11px;
-            color: #777;
-          }
+					/* HEADER */
+					.report-header {
+						margin-bottom: 24px;
+					}
+					
+					.brand-row {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						gap: 20px;
+						min-height: 75px;
+						margin-bottom: 16px;
+					}
+					
+					.brand-left {
+						display: flex;
+						align-items: center;
+						gap: 6px;
+						min-width: 0;
+					}
+					
+					.logo {
+						display: block;
+						width: 70px;
+						height: 70px;
+						object-fit: contain;
+						object-position: center;
+						flex-shrink: 0;
+						margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+						gap: 2px;
+						margin: 0;
+					}
+					
+					.brand-name {
+						margin: 0;
+						font-size: 18px;
+						font-weight: 700;
+						color: #222;
+					}
+					
+					.branch-title {
+						font-size: 10px;
+						font-weight: 500;
+						color: #666;
+					}
+					
+					.period {
+						font-size: 11px;
+						font-weight: 600;
+						color: #777;
+						text-align: right;
+						white-space: nowrap;
+						align-self: flex-end;
+						margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						gap: 20px;
+						padding-top: 14px;
+						border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+						margin: 0;
+						font-size: 16px;
+						font-weight: 700;
+						color: #222;
+					}
+					
+					.filter-info {
+						margin: 0;
+						font-size: 9px;
+						line-height: 1.7;
+						color: #777;
+						text-align: right;
+						white-space: nowrap;
+					}
 
           /* KPI / SUMMARY */
           .summary-grid {
@@ -43411,20 +43463,49 @@ window.exportReimbursement = async function () {
         </div>
 
         <main class="report">
-          <header class="report-header">
-            ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
-            ` : ''}
-
-            <h1 class="title">Reimbursement Report</h1>
-            <div class="branch-title">${esc(branchTitle)}</div>
-            <div class="period">Period: ${esc(periodTitle)}</div>
-          </header>
+					<header class="report-header">
+						<!-- BRAND LEFT & PERIOD RIGHT -->
+						<div class="brand-row">
+							<div class="brand-left">
+								${logoUrl ? `
+									<img src="${esc(logoUrl)}"
+										class="logo"
+										alt="Company Logo"
+										onerror="this.style.display='none'"
+									>
+							` : ''}
+					
+								<div class="brand-info">
+									<h2 class="brand-name">
+										${esc(companyName)}
+									</h2>
+					
+									<div class="branch-title">
+										Branch : ${esc(branchTitle)}
+									</div>
+								</div>
+							</div>
+					
+							<div class="period">
+								Period : ${esc(periodTitle)}
+							</div>
+						</div>
+					
+						<!-- REPORT TITLE LEFT & FILTER RIGHT -->
+						<div class="report-meta-row">
+							<h1 class="title">
+								Reimbursement Report
+							</h1>
+					
+							<div class="filter-info">
+								Employee: ${esc(selectedEmployee
+									? (rows.find(row => String(row.Employee_ID).trim() === selectedEmployee)?.Full_Name || selectedEmployee)
+									: 'ALL EMPLOYEES')}
+								&nbsp; | &nbsp;
+								Status: ${esc(selectedStatus || 'ALL STATUS')}
+							</div>
+						</div>
+					</header>
 
           <!-- KPI / SUMMARY TETAP DIPERTAHANKAN -->
           <section class="summary-grid">
@@ -45130,6 +45211,7 @@ function escapeShiftHtml(value) {
 /* ==== EXPORT SHIFT HISTORY PDF ==== */
 window.exportShiftHistory = async function () {
   try {
+		const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
     const getValue = id => {
       const value = document.getElementById(id)?.value;
       return !value || value === 'ALL' ? null : value;
@@ -45375,47 +45457,91 @@ window.exportShiftHistory = async function () {
           }
 
           /* HEADER */
-          .report-header {
-            text-align: center;
-            margin-bottom: 24px;
-          }
-
-          .logo {
-            display: block;
-            width: auto;
-            max-width: 150px;
-            max-height: 70px;
-            object-fit: contain;
-            margin: 0 auto 10px;
-          }
-
-          .title {
-            margin: 0 0 8px;
-            font-size: 21px;
-            font-weight: 700;
-            letter-spacing: .5px;
-            color: #222;
-          }
-
-          .branch-title {
-            margin-top: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #555;
-          }
-
-          .period {
-            margin-top: 5px;
-            font-size: 11px;
-            color: #777;
-          }
-
-          .filter-info {
-            margin-top: 8px;
-            font-size: 9px;
-            line-height: 1.7;
-            color: #777;
-          }
+					.report-header {
+						margin-bottom: 24px;
+					}
+					
+					.brand-row {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						gap: 20px;
+						min-height: 75px;
+						margin-bottom: 16px;
+					}
+					
+					.brand-left {
+						display: flex;
+						align-items: center;
+						gap: 6px;
+						min-width: 0;
+					}
+					
+					.logo {
+						display: block;
+						width: 70px;
+						height: 70px;
+						object-fit: contain;
+						object-position: center;
+						flex-shrink: 0;
+						margin: 0 0 5px 0;
+					}
+					
+					.brand-info {
+						display: flex;
+						flex-direction: column;
+						justify-content: center;
+						gap: 2px;
+						margin: 0;
+					}
+					
+					.brand-name {
+						margin: 0;
+						font-size: 18px;
+						font-weight: 700;
+						color: #222;
+					}
+					
+					.branch-title {
+						font-size: 10px;
+						font-weight: 500;
+						color: #666;
+					}
+					
+					.period {
+						font-size: 11px;
+						font-weight: 600;
+						color: #777;
+						text-align: right;
+						white-space: nowrap;
+						align-self: flex-end;
+						margin-bottom: 5px;
+					}
+					
+					.report-meta-row {
+						display: flex;
+						align-items: center;
+						justify-content: space-between;
+						gap: 20px;
+						padding-top: 14px;
+						border-top: 1px solid #e5e5e5;
+					}
+					
+					.title {
+						margin: 0;
+						font-size: 16px;
+						font-weight: 700;
+						color: #222;
+					}
+					
+					.filter-info {
+						margin: 0;
+						font-size: 9px;
+						line-height: 1.7;
+						color: #777;
+						text-align: right;
+						white-space: nowrap;
+					}
 
           /* KPI */
           .summary-grid {
@@ -45639,33 +45765,47 @@ window.exportShiftHistory = async function () {
 
         <main class="report">
           <header class="report-header">
-            ${logoUrl ? `
-              <img
-                src="${esc(logoUrl)}"
-                class="logo"
-                alt="Company Logo"
-                onerror="this.style.display='none'"
-              >
-            ` : ''}
-
-            <h1 class="title">Shift History Report</h1>
-
-            <div class="branch-title">
-              ${esc(branchTitle)}
-            </div>
-
-            <div class="period">
-              Period: ${esc(periodTitle)}
-            </div>
-
-            <div class="filter-info">
-              Cashier: ${esc(cashierTitle)}
-              &nbsp; | &nbsp;
-              Shift Status: ${esc(statusTitle)}
-              &nbsp; | &nbsp;
-              Adjustment: ${esc(adjustmentTitle)}
-            </div>
-          </header>
+						<!-- BRAND LEFT & PERIOD RIGHT -->
+						<div class="brand-row">
+							<div class="brand-left">
+								${logoUrl ? `
+									<img src="${esc(logoUrl)}"
+										class="logo"
+										alt="Company Logo"
+										onerror="this.style.display='none'">
+								` : ''}
+				
+								<div class="brand-info">
+									<h2 class="brand-name">
+										${esc(companyName)}
+									</h2>
+		
+									<div class="branch-title">
+										Branch : ${esc(branchTitle)}
+									</div>
+								</div>
+							</div>
+					
+							<div class="period">
+								Period : ${esc(periodTitle)}
+							</div>
+						</div>
+					
+						<!-- REPORT TITLE LEFT & FILTER RIGHT -->
+						<div class="report-meta-row">
+							<h1 class="title">
+								Shift History Report
+							</h1>
+				
+							<div class="filter-info">
+								Cashier: ${esc(cashierTitle)}
+								&nbsp; | &nbsp;
+								Shift Status: ${esc(statusTitle)}
+								&nbsp; | &nbsp;
+								Adjustment: ${esc(adjustmentTitle)}
+							</div>
+						</div>
+					</header>
 
           <!-- SUMMARY -->
           <section class="summary-grid">
