@@ -9964,7 +9964,7 @@ window.exportIngredientPurchases = async function () {
 
     // FILTER VALUES
     const startDate = document.getElementById("ingredientExportStart")?.value || "";
-    const endDate = ocument.getElementById("ingredientExportEnd")?.value || "";
+    const endDate = document.getElementById("ingredientExportEnd")?.value || "";
 		
     if (startDate && endDate && startDate > endDate) { alert("Start Date tidak boleh melebihi End Date."); return; }
 
