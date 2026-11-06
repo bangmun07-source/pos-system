@@ -5393,20 +5393,14 @@ async function exportMembersPDF() {
     // FILTER TIER
     if (tier && tier.toUpperCase() !== "ALL") { rows = rows.filter(r => String(r.tier || "").toUpperCase() === tier.toUpperCase()); }
 
-    // GET TOP TIER SETTING
-		const topTierName = window.loyaltySettings?.tier_5_name_value || "Top Tier";
-		console.log("DEBUG TOP TIER:", {
-		  selectedTier: tier,
-		  topTierName,
-		  loyaltySettings: window.loyaltySettings,
-		  memberTiers: rows.map(r => r.tier),
-		  memberCount: rows.length
-		});
-    // SUMMARY
-    const totalMembers = rows.length;
-		const normalizeTier = value => String(value ?? "").trim().toUpperCase();
-		const totalTopTier = rows.filter(r => normalizeTier(r.tier) === normalizeTier(topTierName)).length;
-    const totalPoints = rows.reduce( (sum, r) => sum + (Number(r.points) || 0), 0 );
+		// GET MEMBER STATS
+		const stats = state.memberPageData?.stats || {};
+		// TOP TIER SETTING
+		const topTierName = stats.topTierName || "Top Tier";
+		// SUMMARY
+		const totalMembers = rows.length;
+		const totalTopTier = Number(stats.topTier) || 0;
+		const totalPoints = rows.reduce((sum, r) => sum + (Number(r.points) || 0), 0);
     // MEMBER ROWS
     const memberRows = rows.length
       ? rows.map(m => `
