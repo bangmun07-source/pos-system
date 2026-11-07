@@ -14906,161 +14906,722 @@ document.addEventListener("click", function (e) {
   exportExpensePDF();
 });
 
+
 async function exportExpensePDF() {
-  const f = getExpenseFilters();
-  const branchId = state?.branchId || "";
-
-  if (!branchId) {
-    showToast( "Branch login tidak ditemukan", "error" );
-    return; }
-  // OPEN WINDOW
-  const pdfWindow =  window.open( "", "_blank" );
-
-  if (!pdfWindow) {
-    showToast( "Popup diblokir browser", "error" );
-    return; }
-  // LOADING
-  pdfWindow.document.write(`
-    <!DOCTYPE html>
-	    <html>
-		    <head>
-		      <title>
-		        Generating Expense Report
-		      </title>
-
-		      <style>
-		        body {
-		          margin: 0;
-		          background: #0B0F14;
-		          color: white;
-		          font-family: Arial, sans-serif;
-		          display: flex;
-		          align-items: center;
-		          justify-content: center;
-		          height: 100vh;
-		        }
-		
-		        .loading {
-		          text-align: center;
-		        }
-		
-		        .title {
-		          font-size: 18px;
-		          font-weight: bold;
-		          margin-bottom: 8px;
-		        }
-		
-		        .text {
-		          font-size: 13px;
-		          opacity: .7;
-		        }
-		
-		      </style>
-		    </head>
-		
-		    <body>
-		      <div class="loading">
-		        <div class="title">
-		          Expense Report
-		        </div>
-		
-		        <div class="text">
-		          Generating report...
-		        </div>
-		      </div>
-		    </body>
-	    </html>
-  `);
+  let pdfWindow = null;
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const payload = {
-      type: "expense",
-      branchId: branchId,
-			sessionId,
-      start: f?.startDate || null,
-      end: f?.endDate || null,
-      status: f?.status === "All Status"
-				? "ALL"
-				: f?.status || "ALL",
-      category: f?.category === "All Categories"
-				? "ALL"
-				: f?.category || "ALL",
-			tenantSlug: state.tenantSlug
-	};
+    // FILTER VALUES
+    const f = getExpenseFilters();
+    const branchId = state?.branchId || "";
+    if (!branchId) { showToast("Branch login tidak ditemukan", "error"); return; }
+
+    // SESSION
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { showToast("Session tidak ditemukan. Silakan login kembali.", "error"); return; }
 		
-    // CALL SINGLE EXPORT API
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-          body:
-            JSON.stringify(payload)
-        }
-      );
+    // NORMALIZE FILTER
+    const normalizedStatus = f?.status === "All Status"
+			? "ALL"
+			: f?.status || "ALL";
+    const normalizedCategory = f?.category === "All Categories"
+			? "ALL"
+			: f?.category || "ALL";
+    const start = f?.startDate || null;
+    const end = f?.endDate || null;
+    // HELPERS
+    const esc = value => escapeAdjustmentHTML(value ?? "-");
+    const money = value => formatAdjustmentCurrency(Number(value || 0));
+    const normalize = value => String(value ?? "").trim().toUpperCase();
+    // REPORT INFORMATION
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchTitle = String(state.branchName || branchId);
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    const filename = `Expense Ledger Report - ${branchTitle} (${start || "-"} - ${end || "-"})`;
 
-    // HTTP ERROR
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        errorText ||
-        `Export gagal (${response.status})`
-      );
-    }
-    // GET HTML REPORT
-    const html = await response.text();
-    if (!html) {
-      throw new Error(
-        "Server mengembalikan HTML kosong"
-      );
-    }
-    // RENDER REPORT
-    pdfWindow.document.open();
-    pdfWindow.document.write(html);
-    pdfWindow.document.close();
-  }
+    // OPEN POPUP BEFORE ASYNC RPC
+    pdfWindow = window.open("", "_blank");
 
-  catch (err) {
+    if (!pdfWindow) { showToast("Popup diblokir browser", "error"); return; }
+
+    // LOADING PAGE
     pdfWindow.document.open();
     pdfWindow.document.write(`
       <!DOCTYPE html>
-	      <html>
-		      <body style="
-		        background:#0B0F14;
-		        color:white;
-		        font-family:Arial;
-		        padding:40px;">
-	
-		        <h2>
-		          Export Failed
-		        </h2>
-		
-		        <p style=" color:#aaa;">
-		          Gagal membuat Expense Report.
-		        </p>
-		
-		        <pre style="
-		          white-space:pre-wrap;
-		          background:#151A21;
-		          padding:15px;
-		          border-radius:10px;
-		          color:#ff6b6b;">
-								${String( err?.message || err || "Unknown error" )
-			          .replace(/&/g, "&amp;")
-			          .replace(/</g, "&lt;")
-			          .replace(/>/g, "&gt;") }
-					</pre>
-				</body>
-			</html>
+      <html>
+        <body style="
+          background:#0B0F14;
+          color:white;
+          font-family:Arial;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          height:100vh;
+          margin:0;
+        ">
+          Generating Expense Report...
+        </body>
+      </html>
     `);
     pdfWindow.document.close();
+
+    // GET EXPENSE DATA
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_dashboard",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_status: normalizedStatus,
+        p_category: normalizedCategory,
+        p_keyword: "",
+        p_start: start,
+        p_end: end
+      }
+    );
+
+    if (error) throw error;
+
+    // DATA
+    const rows = Array.isArray(data?.expenses)
+      ? data.expenses
+      : [];
+    // FILTER
+    const filteredRows = rows.filter(row => {
+      const rowBranch =
+        row.branchId ??
+        row.branch_id ??
+        row.branchid ??
+        "";
+      const rowStatus =
+        row.status ??
+        row.Status ??
+        "";
+      const rowCategory =
+        row.category ??
+        row.Category ??
+        "";
+      const rowDate =
+        row.tanggal ??
+        row.date ??
+        "";
+      const rowDateOnly = String(rowDate).slice(0, 10);
+      const matchBranch = normalize(rowBranch) === normalize(branchId);
+      const matchStatus = normalizedStatus === "ALL" || normalize(rowStatus) === normalize(normalizedStatus);
+      const matchCategory = normalizedCategory === "ALL" || normalize(rowCategory) === normalize(normalizedCategory);
+      const matchStart = !start || (rowDateOnly && rowDateOnly >= start);
+      const matchEnd = !end || (rowDateOnly && rowDateOnly <= end);
+
+      return (
+        matchBranch &&
+        matchStatus &&
+        matchCategory &&
+        matchStart &&
+        matchEnd
+      );
+    });
+
+    // PAID ROWS
+    const paidRows = filteredRows.filter(row => {
+      const rowStatus =
+        row.status ??
+        row.Status ??
+        "";
+
+      return normalize(rowStatus) === "PAID";
+    });
+
+    // CATEGORY BREAKDOWN
+    const categoryMap = {};
+    let categoryTotal = 0;
+
+    paidRows.forEach(row => {
+      const categoryName =
+        row.category ??
+        row.Category ??
+        "Other";
+      const amount = Number(
+        row.amount ??
+        row.Amount ??
+        0
+      );
+
+      categoryMap[categoryName] = (categoryMap[categoryName] || 0) + amount;
+      categoryTotal += amount;
+    });
+
+    const categoryBreakdown = Object.entries(categoryMap)
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        percent: categoryTotal > 0
+          ? (amount / categoryTotal) * 100
+          : 0
+      })) .sort((a, b) => b.amount - a.amount);
+    // TOTAL EXPENDITURE
+    const total = paidRows.reduce((sum, row) => {
+      return sum + Number(
+        row.amount ??
+        row.Amount ??
+        0
+      );
+    }, 0);
+    // CATEGORY HTML
+    const categoryRows = categoryBreakdown.length
+      ? categoryBreakdown.map(item => `
+          <tr>
+            <td>${esc(item.name)}</td>
+            <td class="right">${item.percent.toFixed(1)}%</td>
+            <td class="right">Rp ${money(item.amount)}</td>
+          </tr>
+        `).join("")
+      : `
+          <tr>
+            <td colspan="3" class="empty">
+              No expense data
+            </td>
+          </tr>
+        `;
+
+    // LEDGER HTML
+    const ledgerRows = filteredRows.length
+      ? filteredRows.map(row => {
+          const date =
+            row.tanggal ??
+            row.date ??
+            "";
+          const refId =
+            row.refId ??
+            row.ref_id ??
+            "";
+          const description =
+            row.description ??
+            "";
+          const rowCategory =
+            row.category ??
+            row.Category ??
+            "";
+          const payment =
+            row.paymentMethod ??
+            row.payment_method ??
+            row.method ??
+            "";
+          const rowBranch =
+            row.branchId ??
+            row.branch_id ??
+            "";
+          const rowStatus =
+            row.status ??
+            row.Status ??
+            "";
+
+          const amount = Number(
+            row.amount ??
+            row.Amount ??
+            0
+          );
+
+          return `
+            <tr>
+              <td>${esc(date)}</td>
+              <td>${esc(refId)}</td>
+              <td>${esc(description)}</td>
+              <td>${esc(rowCategory)}</td>
+              <td>${esc(payment)}</td>
+              <td>${esc(rowBranch)}</td>
+              <td>${esc(rowStatus)}</td>
+              <td class="right">${money(amount)}</td>
+            </tr>
+          `;
+        }).join("")
+      : `
+          <tr>
+            <td colspan="8" class="empty">
+              No expense data
+            </td>
+          </tr>
+        `;
+
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="id">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          /* TOOLBAR */
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .toolbar button:hover {
+            background: rgba(255,255,255,.14);
+          }
+
+          /* REPORT */
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          /* HEADER */
+          .report-header {
+            margin-bottom: 24px;
+          }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 75px;
+            margin-bottom: 16px;
+          }
+
+          .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+          }
+
+          .logo {
+            display: block;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            flex-shrink: 0;
+          }
+
+          .brand-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+          }
+
+          .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .branch-title {
+            font-size: 10px;
+            color: #666;
+          }
+
+          .period {
+            font-size: 11px;
+            font-weight: 600;
+            color: #777;
+            text-align: right;
+            align-self: flex-end;
+            margin-bottom: 5px;
+          }
+
+          .report-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 14px;
+            border-top: 1px solid #e5e5e5;
+          }
+
+          .title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .filter-info {
+            font-size: 9px;
+            line-height: 1.7;
+            color: #777;
+            text-align: right;
+          }
+
+          /* KPI */
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 14px 16px;
+            background: #fff;
+          }
+
+          .kpi-title {
+            font-size: 9px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            margin-bottom: 7px;
+          }
+
+          .kpi-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: #222;
+            overflow-wrap: anywhere;
+          }
+
+          /* TABLE CARD */
+          .card {
+            width: 100%;
+            margin-top: 18px;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 10px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px;
+            font-size: 13px;
+            color: #333;
+          }
+
+          .meta {
+            font-size: 10px;
+            color: #777;
+            margin-bottom: 10px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 10px;
+            color: #444;
+            page-break-inside: auto;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            padding: 9px 5px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 9px 5px;
+            vertical-align: top;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr:last-child td {
+            border-bottom: none;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          .right {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .total {
+            margin-top: 15px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 13px;
+          }
+
+          /* FOOTER */
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          /* PRINT */
+          @page {
+            size: A4 landscape;
+            margin: 10mm;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar {
+              display: none !important;
+            }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 0;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .report-header {
+              margin-bottom: 16px;
+            }
+
+            .kpi-card {
+              break-inside: avoid;
+            }
+
+            .card {
+              break-inside: auto;
+              page-break-inside: auto;
+            }
+
+            .card h3 {
+              break-after: avoid;
+              page-break-after: avoid;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            tr {
+              page-break-inside: avoid;
+              break-inside: avoid;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Expense Ledger Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+
+          <!-- HEADER -->
+          <header class="report-header">
+            <div class="brand-row">
+              <div class="brand-left">
+                ${logoUrl ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="Company Logo"
+                    onerror="this.style.display='none'"
+                  >
+                ` : ""}
+
+                <div class="brand-info">
+                  <h2 class="brand-name">${esc(companyName)}</h2>
+                  <div class="branch-title">
+                    Branch : ${esc(branchTitle)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                Period : ${esc(start || "-")} - ${esc(end || "-")}
+              </div>
+            </div>
+
+            <div class="report-meta-row">
+              <h1 class="title">Expense Ledger Report</h1>
+
+              <div class="filter-info">
+                Status : ${esc(normalizedStatus)}
+                &nbsp; | &nbsp;
+                Category : ${esc(normalizedCategory)}
+              </div>
+            </div>
+          </header>
+
+          <!-- KPI -->
+          <section class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">Total Expenditure</div>
+              <div class="kpi-value">
+                ${money(total)}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">Total Expense Records</div>
+              <div class="kpi-value">
+                ${filteredRows.length.toLocaleString("id-ID")}
+              </div>
+            </div>
+          </section>
+
+          <!-- CATEGORY BREAKDOWN -->
+          <div class="card">
+            <h3>Category Breakdown</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th class="right">Percent</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${categoryRows}
+              </tbody>
+            </table>
+
+            <div class="total">
+              TOTAL EXPENDITURE: ${money(total)}
+            </div>
+          </div>
+
+          <!-- EXPENSE LEDGER -->
+          <div class="card">
+            <h3>Expense Ledger</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Ref ID</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Payment</th>
+                  <th>Branch</th>
+                  <th>Status</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${ledgerRows}
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString("id-ID"))}
+          </footer>
+
+        </main>
+      </body>
+      </html>
+    `;
+
+    // SHOW REPORT
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
+    pdfWindow.document.close();
+
+  } catch (error) {
+    console.error("Export Expense error:", error);
+
+    if (pdfWindow && !pdfWindow.closed) {
+      pdfWindow.document.open();
+      pdfWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <body style="
+            background:#0B0F14;
+            color:white;
+            font-family:Arial;
+            padding:40px;
+          ">
+            <h2>Export Expense Failed</h2>
+            <pre style="white-space:pre-wrap;">${escapeAdjustmentHTML(
+              error?.message || "Export PDF gagal"
+            )}</pre>
+          </body>
+        </html>
+      `);
+      pdfWindow.document.close();
+    }
+
+    showToast(
+      error?.message || "Export Expense gagal",
+      "error"
+    );
   }
 }
+
 
 function paginate(data) {
   const start = (currentPage - 1) * itemsPerPage;
