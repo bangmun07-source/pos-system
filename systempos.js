@@ -19305,16 +19305,16 @@ async function startClearDigitalReceipts(){
 async function getChatAnalytics(start, end, branchId, callback) {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const { data, error
-    } = await supabaseClient.rpc(
-      "get_analytics_dashboard",
-      {
-				p_branch_id: branchId,
-				p_start: start || null,
-				p_end: end || null,
-				p_session_id: sessionId
-      }
-    );
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      "get_analytics_dashboard",
+	      {
+					p_branch_id: branchId,
+					p_start: start || null,
+					p_end: end || null,
+					p_session_id: sessionId
+	      }
+	    );
 
     if (error) { throw error; }
     callback(data || {});
@@ -19333,9 +19333,7 @@ async function getChatAnalytics(start, end, branchId, callback) {
 
 async function loadBackupList(){
   try {
-
     const data = await getBackupHistoryRPC();
-
     if(data.length === 0){
       addBackupChatMessage(
         "bot",
@@ -19365,8 +19363,7 @@ async function loadBackupList(){
     `;
 	  
     data.forEach(item=>{
-      const size = ((item.file_size || 0) / 1024)
-        .toFixed(1);
+      const size = ((item.file_size || 0) / 1024) .toFixed(1);
 
       html += `
       <div class="border border-outline-variant rounded-md p-4 mb-3">
@@ -19463,7 +19460,6 @@ async function startBackupProcess() {
   try {
     // BACKUP SUPABASE
     const result = await createFullBackup();
-		
     if (!result?.success) { throw new Error( result?.message || "Backup gagal" ); }
 
     clearInterval(interval);
@@ -19511,11 +19507,10 @@ async function startBackupProcess() {
 let isRestoring = false;
 async function restoreBackup(id) {
   if (isRestoring) return;
-  if (
-    !confirm(
-      `Restore ${id}?
-			Semua data sekarang akan diganti
-			dengan backup ini.`)
+  if ( !confirm(
+		`Restore ${id}?
+		Semua data sekarang akan diganti
+		dengan backup ini.`)
   ) { return; }
 
   isRestoring = true;
@@ -19543,11 +19538,7 @@ async function restoreBackup(id) {
   let progress = 5;
   const interval =
     setInterval(() => {
-      progress +=
-        Math.floor(
-          Math.random() * 10
-        ) + 5;
-			
+      progress += Math.floor( Math.random() * 10 ) + 5;
       if (progress >= 90) { progress = 90; }
 			
       const bar =  document.getElementById( progressId );
@@ -19565,15 +19556,11 @@ async function restoreBackup(id) {
     }, 800);
 
   try {
-	  
     // RESTORE VIA VERCEL
-    const res =
-      await restoreBackupById(id);
-    if (
-      res?.success === false
-    ) {
-      throw new Error( res.message || "Restore gagal" );
-    }
+    const res = await restoreBackupById(id);
+    if ( res?.success === false
+    ) { throw new Error( res.message || "Restore gagal" ); }
+		
     clearInterval(interval);
     isRestoring = false;
 		
@@ -19624,11 +19611,9 @@ async function restoreBackup(id) {
 
 async function deleteBackup(id) {
   if (!confirm(
-      `Hapus backup ${id} ?
-			File backup akan dihapus permanen.`)
-  ) {
-    return;
-  }
+		`Hapus backup ${id} ?
+		File backup akan dihapus permanen.`)
+  ) { return; }
   const progressId = "delete-progress-" + Date.now();
   addBackupChatMessage(
     "bot",
@@ -19653,29 +19638,18 @@ async function deleteBackup(id) {
   let progress = 5;
   const interval =
     setInterval(() => {
-      progress +=
-        Math.floor(
-          Math.random() * 10
-        ) + 5;
+      progress += Math.floor( Math.random() * 10 ) + 5;
       if (progress >= 90) { progress = 90; }
 
       const bar = document.getElementById(progressId);
       const text = document.getElementById(progressId + "-text");
+			
       if (bar) { bar.style.width = progress + "%"; }
-
       if (text) {
-        if (progress < 20) {
-          text.innerHTML = "Mencari data backup...";
-        }
-        else if (progress < 50) {
-          text.innerHTML = "Menghapus file backup JSON...";
-        }
-        else if (progress < 80) {
-          text.innerHTML = "Menghapus dari Storage...";
-        }
-        else {
-          text.innerHTML = "Menghapus riwayat backup...";
-        }
+        if (progress < 20) { text.innerHTML = "Mencari data backup...";
+        } else if (progress < 50) { text.innerHTML = "Menghapus file backup JSON...";
+        } else if (progress < 80) { text.innerHTML = "Menghapus dari Storage..."; 
+				} else { text.innerHTML = "Menghapus riwayat backup..."; }
       }
     }, 800);
 
@@ -19695,15 +19669,9 @@ async function deleteBackup(id) {
     clearInterval(interval);
     const bar = document.getElementById(progressId);
     const text =document.getElementById(progressId + "-text");
-    if (bar) {
-      bar.style.width =
-        "100%";
-    }
-
-    if (text) {
-      text.innerHTML =
-        "Backup berhasil dihapus";
-    }
+		
+    if (bar) { bar.style.width = "100%"; }
+    if (text) { text.innerHTML = "Backup berhasil dihapus"; }
 
     setTimeout(() => {
       addBackupChatMessage(
@@ -19730,8 +19698,7 @@ async function deleteBackup(id) {
   }
 }
 	
-document.addEventListener(
-  "click",
+document.addEventListener( "click",
   function(e) {
     const btn = e.target.closest( "#btnExportCashFlowPDF" );
 
@@ -19742,34 +19709,27 @@ document.addEventListener(
 
 
 async function exportCashFlowReport() {
-  const startDate = document.getElementById( "cf-start-date" )?.value || "";
-  const endDate = document.getElementById( "cf-end-date" )?.value || "";
-  const branch = document.getElementById( "cf-branch" )?.value || state?.branchId || "ALL";
+  const startDate = document.getElementById("cf-start-date")?.value || "";
+  const endDate = document.getElementById("cf-end-date")?.value || "";
+  const branch = document.getElementById("cf-branch")?.value || state?.branchId || "";
   const loginUserId = state?.user?.id || "";
-  // VALIDASI
-  if (!startDate || !endDate) {
-    alert( "Pilih tanggal dulu" );
-    return; }
-  if (!branch) {
-    alert( "Branch tidak valid" );
-    return; }
-  if (!loginUserId) {
-    alert( "User login tidak ditemukan." );
-    return; }
+  const sessionId = localStorage.getItem("pos_session_id");
 
-  const pdfWindow = window.open( "", "_blank" );
+  // VALIDATION
+  if (!startDate || !endDate) { alert("Pilih tanggal dulu"); return; }
+  if (!branch) { alert("Branch tidak valid"); return; }
+  if (!loginUserId) { alert("User login tidak ditemukan."); return; }
+  if (!sessionId) { alert("Session login tidak ditemukan."); return; }
+	
+  const pdfWindow = window.open("", "_blank");
+  if (!pdfWindow) { alert("Popup diblokir browser."); return; }
 
-  if (!pdfWindow) {
-    alert( "Popup diblokir browser." );
-    return; }
   // LOADING
   pdfWindow.document.write(`
+    <!DOCTYPE html>
     <html>
       <head>
-        <title>
-          Generating Cash Flow Report
-        </title>
-				
+        <title>Generating Cash Flow Report</title>
         <style>
           body {
             margin: 0;
@@ -19801,80 +19761,788 @@ async function exportCashFlowReport() {
 
       <body>
         <div class="loading">
-          <div class="title">
-            Cash Flow Report
-          </div>
-
-          <div class="text">
-            Generating PDF...
-          </div>
+          <div class="title">Cash Flow Report</div>
+          <div class="text">Generating PDF...</div>
         </div>
       </body>
     </html>
   `);
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const response =
-	  await fetch("/api/export-pdf", {
-		method: "POST",
-		headers: {
-		  "Content-Type": "application/json"
-		},
-	
-		body: JSON.stringify({
-		  type: "cash-flow",
-		  start: startDate,
-		  end: endDate,
-		  branchId: branch,
-			sessionId,
-		  loginUserId,
-			tenantSlug: state.tenantSlug
-		})
-	});
-		
-    // HTTP ERROR
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error( errorText || `Export gagal (${response.status})` ); }
-    // GET HTML REPORT
-    const html = await response.text();
-    if (!html) { throw new Error( "Server mengembalikan HTML kosong" ); }
+    // HELPERS
+    const esc = value => escapeAdjustmentHTML(value ?? "-");
+    const money = value => formatAdjustmentCurrency(Number(value || 0));
+    const number = value => Number(value) || 0;
+    // REPORT HEADER
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = branch === "ALL"
+			? "ALL BRANCHES"
+			: state.branchName || branch;
+    // GET CASH FLOW DATA
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      "get_cash_flow_page_data",
+	      {
+	        p_login_user_id: loginUserId,
+	        p_session_id: sessionId,
+	        p_branch_id: branch,
+	        p_start: startDate || null,
+	        p_end: endDate || null
+	      }
+	    );
+
+    if (error) throw error;
+    if (!data) { throw new Error("Data Cash Flow kosong"); }
+    if (data.success === false) { throw new Error( data.message || "Gagal mengambil data Cash Flow" ); }
+
+    // NORMALIZE
+    const account = data.account || {};
+    const summary = data.summary || {};
+    const history = Array.isArray(data.history)
+      ? data.history
+      : [];
+    const transfers = Array.isArray(data.transfers)
+      ? data.transfers
+      : [];
+    const ownerTransactions = Array.isArray(data.ownerTransactions)
+      ? data.ownerTransactions
+      : [];
+    // KPI
+    const cashIn = number(
+      summary.cashIn ??
+      summary.cash_in ??
+      summary.totalCashIn ??
+      0
+    );
+    const cashOut = number(
+      summary.cashOut ??
+      summary.cash_out ??
+      summary.totalCashOut ??
+      0
+    );
+    const netFlow = number(
+      summary.netFlow ??
+      summary.net_flow ??
+      (cashIn - cashOut)
+    );
+    const cashBalance = number(
+      account.cash ??
+      account.Cash ??
+      account.cashBalance ??
+      account.cash_balance ??
+      0
+    );
+    const bankBalance = number(
+      account.bank ??
+      account.Bank ??
+      account.bankBalance ??
+      account.bank_balance ??
+      0
+    );
+    const assetBalance = number(
+      account.asset ??
+      account.Asset ??
+      account.assets ??
+      account.Assets ??
+      account.assetBalance ??
+      account.asset_balance ??
+      0
+    );
+    const inventoryBalance = number(
+      account.inventory ??
+      account.Inventory ??
+      account.inventoryBalance ??
+      account.inventory_balance ??
+      0
+    );
+    const totalBalance = number(
+      account.total ??
+      account.Total ??
+      account.balance ??
+      account.Balance ??
+      (cashBalance + bankBalance)
+    );
+    const balanceBase = cashBalance + bankBalance;
+    const cashPercent = balanceBase > 0
+      ? (cashBalance / balanceBase) * 100
+      : 0;
+    const bankPercent = balanceBase > 0
+      ? (bankBalance / balanceBase) * 100
+      : 0;
+    // INCOME SOURCE
+    const incomeSource = Array.isArray(summary.incomeSource)
+      ? summary.incomeSource
+      : Array.isArray(summary.income_source)
+        ? summary.income_source
+        : [];
+    const totalIncome = incomeSource.reduce(
+      (sum, item) =>
+        sum + number(
+          item.amount ??
+          item.total ??
+          item.value
+        ),
+      0
+    );
+
+    const incomeRows = incomeSource.length
+      ? incomeSource.map(item => {
+          const amount = number(
+            item.amount ??
+            item.total ??
+            item.value
+          );
+          const percent = totalIncome > 0
+            ? (amount / totalIncome) * 100
+            : 0;
+
+          return `
+            <tr>
+              <td>${esc(
+                item.name ??
+                item.source ??
+                item.type ??
+                "-"
+              )}</td>
+
+              <td class="right">${money(amount)}</td>
+
+              <td class="right">${percent.toFixed(1)}%</td>
+            </tr>
+          `;
+        }).join("")
+      : `
+        <tr>
+          <td colspan="3" class="empty">No income data</td>
+        </tr>
+      `;
+    // EXPENSE CATEGORY
+    const expenseCategory = Array.isArray(summary.expenseCategory)
+      ? summary.expenseCategory
+      : Array.isArray(summary.expense_category)
+        ? summary.expense_category
+        : [];
+    const totalExpense = expenseCategory.reduce(
+      (sum, item) => sum + number(
+				item.amount ??
+				item.total ??
+				item.value
+        ), 0
+    );
+    const expenseRows = expenseCategory.length ? expenseCategory.map(item => {
+			const amount = number(
+				item.amount ??
+				item.total ??
+				item.value
+			);
+			const percent = totalExpense > 0
+				? (amount / totalExpense) * 100
+				: 0;
+
+			return `
+				<tr>
+					<td>${esc(
+						item.name ??
+						item.category ??
+						"-"
+					)}</td>
+
+					<td class="right">${money(amount)}</td>
+
+					<td class="right">${percent.toFixed(1)}%</td>
+				</tr>
+			`;
+		}).join("")
+	: `
+		<tr>
+			<td colspan="3" class="empty">No expense data</td>
+		</tr>
+	`;
+    // CASH FLOW HISTORY
+    const historyRows = history.length ? history.map(item => {
+			const type = String(
+				item.type ??
+				item.Type ??
+				"-"
+			);
+
+			return `
+				<tr>
+					<td>${esc(
+						item.date ??
+						item.Date ??
+						"-"
+					)}</td>
+
+					<td>${esc(
+						type.toUpperCase() === "OPEX"
+							? "EXPENSE"
+							: type
+					)}</td>
+
+					<td>${esc(
+						item.description ??
+						item.Description ??
+						item.note ??
+						item.Notes ??
+						"-"
+					)}</td>
+
+					<td class="right">${money(
+						item.amount ??
+						item.Amount ??
+						0
+					)}</td>
+				</tr>
+			`;
+		}).join("")
+	: `
+		<tr>
+			<td colspan="4" class="empty">No cash flow data</td>
+		</tr>
+	`;
+
+    // FUND TRANSFERS
+    const transferRows = transfers.length
+      ? transfers.map(item => `
+				<tr>
+					<td>${esc(
+						item.Date ??
+						item.date ??
+						"-"
+					)}</td>
+					<td>${esc(item.From_Account ?? "-")}</td>
+					<td>${esc(item.To_Account ?? "-")}</td>
+					<td class="right">${money( item.Amount ?? 0 )}</td>
+				</tr>
+			`).join("")
+		: `
+			<tr>
+				<td colspan="4" class="empty">No fund transfers</td>
+			</tr>
+		`;
+
+    // OWNER TRANSACTIONS
+    const ownerTransactionRows = ownerTransactions.length
+      ? ownerTransactions.map(item => `
+				<tr>
+					<td>${esc(
+						item.date ??
+						item.Date ??
+						"-"
+					)}</td>
+
+					<td>${esc(
+						item.type ??
+						item.Type ??
+						"-"
+					)}</td>
+
+					<td>${esc(
+						item.description ??
+						item.Description ??
+						item.Note ??
+						"-"
+					)}</td>
+
+					<td class="right">${money(
+						item.amount ??
+						item.Amount ??
+						0
+					)}</td>
+				</tr>
+			`).join("")
+		: `
+			<tr>
+				<td colspan="4" class="empty">No owner transactions</td>
+			</tr>
+		`;
+
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Cash Flow Report</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #0B0F14;
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 40px 20px;
+          }
+
+          .export-toolbar {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+          }
+
+          .export-toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 45px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+          }
+
+          .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+          }
+
+          .brand-info {
+            flex: 1;
+          }
+
+          .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .branch-name {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+          }
+
+          .period {
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+            align-self: flex-end;
+            padding-bottom: 5px;
+          }
+
+          .header-divider {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 18px 0;
+          }
+
+          .report-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+          }
+
+          .title {
+            font-size: 20px;
+            font-weight: bold;
+          }
+
+          .subtitle {
+            font-size: 11px;
+            color: #777;
+            text-align: right;
+          }
+
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 25px 0;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 22px;
+            background: #fafafa;
+            text-align: center;
+          }
+
+          .kpi-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 12px;
+          }
+
+          .kpi-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 20px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 16px;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+          }
+
+          td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+          }
+
+          tr {
+            page-break-inside: avoid;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @media print {
+            @page {
+              size: A4 landscape;
+              margin: 10mm;
+            }
+
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .export-toolbar {
+              display: none;
+            }
+
+            .report {
+              max-width: none;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 15px;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="export-toolbar">
+          <div>Cash Flow Report</div>
+
+          <button onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <div class="report">
+
+          <!-- HEADER -->
+          <div class="brand-row">
+            ${
+              logoUrl
+                ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="MUNO"
+                  />
+                `
+                : ""
+            }
+
+            <div class="brand-info">
+              <div class="company-name">${esc(companyName)}</div>
+              <div class="branch-name">${esc(branchName)}</div>
+            </div>
+
+            <div class="period">
+              Period: ${esc(startDate)} - ${esc(endDate)}
+            </div>
+          </div>
+
+          <hr class="header-divider">
+
+          <div class="report-heading">
+            <div class="title">Cash Flow Report</div>
+            <div class="subtitle">${esc(branchName)}</div>
+          </div>
+
+          <!-- SUMMARY -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">CASH IN</div>
+              <div class="kpi-value">${money(cashIn)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">CASH OUT</div>
+              <div class="kpi-value">${money(cashOut)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">NET FLOW</div>
+              <div class="kpi-value">${money(netFlow)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">BALANCE</div>
+              <div class="kpi-value">${money(totalBalance)}</div>
+            </div>
+          </div>
+
+          <!-- ACCOUNT BALANCE -->
+          <div class="card">
+            <h3>Account Balance</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Account</th>
+                  <th class="right">Balance</th>
+                  <th class="right">Percentage</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>Cash</td>
+                  <td class="right">${money(cashBalance)}</td>
+                  <td class="right">${cashPercent.toFixed(1)}%</td>
+                </tr>
+
+                <tr>
+                  <td>Bank</td>
+                  <td class="right">${money(bankBalance)}</td>
+                  <td class="right">${bankPercent.toFixed(1)}%</td>
+                </tr>
+
+                <tr>
+                  <td>Asset</td>
+                  <td class="right">${money(assetBalance)}</td>
+                  <td class="right">-</td>
+                </tr>
+
+                <tr>
+                  <td>Inventory</td>
+                  <td class="right">${money(inventoryBalance)}</td>
+                  <td class="right">-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- INCOME SOURCE -->
+          <div class="card">
+            <h3>Income Source</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Source</th>
+                  <th class="right">Amount</th>
+                  <th class="right">Percentage</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${incomeRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- EXPENSE CATEGORY -->
+          <div class="card">
+            <h3>Expense Category</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th class="right">Amount</th>
+                  <th class="right">Percentage</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${expenseRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CASH FLOW HISTORY -->
+          <div class="card">
+            <h3>Cash Flow History</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${historyRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FUND TRANSFERS -->
+          <div class="card">
+            <h3>Fund Transfers</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${transferRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- OWNER TRANSACTIONS -->
+          <div class="card">
+            <h3>Owner Transactions</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${ownerTransactionRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="footer">
+            Generated by MUNO • ${new Date().toLocaleString("id-ID")}
+          </div>
+
+        </div>
+      </body>
+      </html>
+    `;
+
     // RENDER REPORT
     pdfWindow.document.open();
     pdfWindow.document.write(html);
     pdfWindow.document.close();
-  }
 
-  catch (err) {
+  } catch (err) {
     // ERROR PAGE
     pdfWindow.document.open();
+
     pdfWindow.document.write(`
+      <!DOCTYPE html>
       <html>
         <body style="
           background:#0B0F14;
           color:white;
           font-family:Arial;
-          padding:40px;">
-
-          <h2>
-            Export Failed
-          </h2>
+          padding:40px;
+        ">
+          <h2>Export Failed</h2>
 
           <p style="color:#aaa;">
             Gagal membuat Cash Flow Report.
           </p>
 
-          <pre style=" white-space:pre-wrap;
+          <pre style="
+            white-space:pre-wrap;
             background:#151A21;
             padding:15px;
-            border-radius:10px;">
-							${String( err?.message || err)}
-					</pre>
+            border-radius:10px;
+          ">${escapeAdjustmentHTML(
+            err?.message || String(err)
+          )}</pre>
         </body>
       </html>
     `);
+
     pdfWindow.document.close();
+
+    console.error("Cash Flow PDF Export Error:", err);
   }
 }
 
