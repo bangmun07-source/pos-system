@@ -3111,25 +3111,6 @@ async function deleteBackupHistoryRPC(data = {}) {
   return result;
 }
 
-async function clearDatabaseRPC() {
-  const sessionId =
-    localStorage.getItem("pos_session_id");
-  const {
-    data,
-    error
-  } = await supabaseClient.rpc(
-    "clear_database",
-    {
-      p_session_id: sessionId
-    }
-  );
-
-  if (error) {
-    throw error;
-  }
-  return data;
-}
-
 async function getBackupHistoryRPC() {
   const sessionId =
     localStorage.getItem("pos_session_id");
