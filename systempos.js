@@ -18097,15 +18097,6 @@ const intents = {
     "list backup",
     "backup tersedia"
   ],
-  CLEAR_DATABASE: [
-    "database tabel",
-    "delete tabel",
-    "hapus tabel",
-    "clear tabel",
-    "clear database",
-    "reset database",
-    "kosongkan database"
-  ],
 	CLEAR_DIGITAL_RECEIPTS: [
 		"hapus semua struk digital",
 		"hapus struk digital",
@@ -18333,8 +18324,6 @@ function handleBackupCommand(message){
   if(matchIntent(cmd, intents.CHECK_DATABASE)){ loadBackupList(); return; }
 	// CLEAR DIGITAL RECEIPTS
 	if(matchIntent(cmd, intents.CLEAR_DIGITAL_RECEIPTS)){ clearDigitalReceiptsConfirm(); return; }
-  // CLEAR DATABASE
-  if(matchIntent(cmd, intents.CLEAR_DATABASE)){ clearDatabaseConfirm(); eturn; }
   // BACKUP
   if(matchIntent(cmd, intents.BACKUP)){
     setTimeout(()=>{
@@ -19173,117 +19162,6 @@ async function deleteBackup(id) {
       "bot",
       `
       ❌ Hapus backup gagal
-      <br><br>
-      ${err.message}
-      `
-    );
-  }
-}
-	
-async function clearDatabaseConfirm() {
-  if (
-    !confirm(`
-⚠️ PERINGATAN
-
-Semua data POS aktif akan dihapus:
-
-- Transaksi
-- Member
-- Produk
-- Inventory
-- Cashflow
-- Data operasional lainnya
-
-Pastikan data POS sudah backup terbaru.
-
-Lanjutkan?
-    `)
-  ) {
-    return;
-  }
-
-  const progressId = "clear-progress-" + Date.now();
-  addBackupChatMessage(
-    "bot",
-    `
-    Mengosongkan database...
-
-    <div id="${progressId}-box"
-      class="w-full bg-outline-variant/10 rounded-md h-2 overflow-hidden">
-      <div id="${progressId}"
-        class="h-full bg-primary rounded-md transition-all duration-500"
-        style="width:5%">
-			</div>
-    </div>
-
-    <p id="${progressId}-text"
-      class="text-xs text-muted mt-2">
-      Menyiapkan database...
-    </p>
-    `
-  );
-
-  let progress = 5;
-  const interval =
-    setInterval(() => {
-      progress +=
-        Math.floor(
-          Math.random() * 10
-        ) + 5;
-      if (progress >= 90) {
-        progress = 90;
-      }
-      const bar = document.getElementById( progressId );
-      const text = document.getElementById( progressId + "-text" );
-      if (bar) { bar.style.width = progress + "%"; }
-      if (text) {
-        if (progress < 20) { text.innerHTML = "Clear tabel Transaksi..."; }
-        else if (progress < 35) { text.innerHTML = "Clear tabel Member..."; }
-        else if (progress < 50) { text.innerHTML = "Clear tabel Ingredient..."; }
-        else if (progress < 80) { text.innerHTML = "Clear tabel History..."; }
-        else { text.innerHTML = "Clear database..."; }
-      }
-    }, 800);
-	
-  try {
-    // CLEAR DATABASE
-    const res = await clearDatabaseRPC();
-
-    if (
-      res?.success === false
-    ) {
-      throw new Error( res.message || "Clear database gagal" );
-    }
-
-    clearInterval(interval);
-    const bar = document.getElementById(progressId);
-    const text = document.getElementById(progressId + "-text");
-    if (bar) { bar.style.width = "100%"; }
-    if (text) { text.innerHTML = "Database berhasil dikosongkan"; }
-
-    addBackupChatMessage(
-      "bot",
-      `
-      Tabel database berhasil dikosongkan
-      <br><br>
-      ${res?.message || "Database berhasil dikosongkan."}
-      `
-    );
-
-    // CLEAR CACHE
-    state.cashFlowData = null;
-    state.cashFlowFilter = null;
-    state.expenseDashboardData = null;
-    state.expenseDashboardFilter = null;
-    state.grossRevenueData = null;
-    state.grossRevenueFilter = null;
-  }
-  catch (err) {
-    clearInterval(interval);
-    addBackupChatMessage(
-      "bot",
-      `
-      ❌ Clear database gagal
       <br><br>
       ${err.message}
       `
