@@ -3092,10 +3092,7 @@ async function applyDateFilter() {
 document.addEventListener(
   "click",
   function(e) {
-    const btn =
-      e.target.closest(
-        "#btnExportGrossRevenuePDF"
-      );
+    const btn = e.target.closest( "#btnExportGrossRevenuePDF" );
 
     if (!btn) return;
     exportGrossRevenuePDF();
@@ -3106,143 +3103,608 @@ async function exportGrossRevenuePDF() {
   const start = document.getElementById("startDate")?.value;
   const end = document.getElementById("endDate")?.value;
   const branchId = state.branchId;
+  const sessionId = localStorage.getItem("pos_session_id");
 
   // VALIDASI
-  if (!start || !end) {
-    alert("Pilih tanggal dulu");
-    return;
-  }
-  if (!branchId) {
-    alert("Branch tidak valid");
-    return;
-  }
-
+  if (!start || !end) { alert("Pilih tanggal dulu"); return; }
+  if (!branchId) { alert("Branch tidak valid"); return; }
+  if (!sessionId) { alert("Session tidak valid. Silakan login kembali."); return; }
   // OPEN WINDOW
   const pdfWindow = window.open("", "_blank");
-  if (!pdfWindow) {
-    alert("Popup diblokir browser.");
-    return;
-  }
+  if (!pdfWindow) { alert("Popup diblokir browser."); return; }
 
   // LOADING
   pdfWindow.document.write(`
+    <!DOCTYPE html>
     <html>
+    <head>
+      <title>Generating Gross Revenue Report</title>
+      <style>
+        body {
+          margin: 0;
+          background: #0B0F14;
+          color: white;
+          font-family: Arial, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+        }
+
+        .loading {
+          text-align: center;
+        }
+
+        .title {
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 8px;
+        }
+
+        .text {
+          font-size: 13px;
+          opacity: .7;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="loading">
+        <div class="title">Gross Revenue Report</div>
+        <div class="text">Generating PDF...</div>
+      </div>
+    </body>
+    </html>
+  `);
+
+  try {
+    const esc = escapeAdjustmentHTML;
+    const money = formatAdjustmentCurrency;
+    // GET GROSS REVENUE
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      "get_gross_revenue_by_date",
+	      {
+	        p_session_id: sessionId,
+	        p_branch_id: branchId,
+	        p_start: start || null,
+	        p_end: end || null
+	      }
+	    );
+
+    if (error) throw error;
+
+    // GET TOP PRODUCTS
+    const { data: topProductData, error: topProductError } = 
+			await supabaseClient.rpc(
+	      "get_top_revenue_products",
+	      {
+	        p_session_id: sessionId,
+	        p_branch_id: branchId,
+	        p_start: start || null,
+	        p_end: end || null,
+	        p_limit: 10,
+	        p_offset: 0,
+	        p_export: true
+	      }
+	    );
+
+    if (topProductError) throw topProductError;
+		
+    // NORMALIZE
+    const report = data || {};
+    const summary = report.summary || {};
+    const category = Array.isArray(report.category)
+      ? report.category
+      : [];
+    const trend = Array.isArray(report.trend)
+      ? report.trend
+      : [];
+    const topProducts = Array.isArray(topProductData)
+      ? topProductData
+      : [];
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = state.branchName || branchId;
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    // CATEGORY ROWS
+    const categoryRows = category.length
+      ? category.map(item => `
+          <tr>
+            <td>${esc(item.category || "-")}</td>
+            <td class="right">${money(item.grossRevenue || 0)}</td>
+          </tr>
+        `).join("")
+      : `
+          <tr>
+            <td colspan="2" class="empty">
+              No category data
+            </td>
+          </tr>
+        `;
+    // TOP PRODUCT ROWS
+    const topProductRows = topProducts.length
+      ? topProducts.map((item, index) => `
+          <tr>
+            <td>${index + 1}</td>
+            <td>${esc(item.name || "-")}</td>
+            <td>${esc(item.category || "-")}</td>
+            <td class="right">${Number(item.units || 0).toLocaleString("id-ID")}</td>
+            <td class="right">${money(item.revenue || 0)}</td>
+          </tr>
+        `).join("")
+      : `
+          <tr>
+            <td colspan="5" class="empty">
+              No product data
+            </td>
+          </tr>
+        `;
+    // TREND ROWS
+    const trendRows = trend.length
+      ? trend.map(item => {
+				const date = new Date(`${item.date}T00:00:00`);
+				const dayName = isNaN(date.getTime())
+					? "-"
+					: date.toLocaleDateString("id-ID", { weekday: "long" });
+
+				return `
+					<tr>
+						<td>${esc(item.date || "-")}</td>
+						<td>${esc(dayName)}</td>
+						<td class="right">${money(item.total || 0)}</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="3" class="empty">
+						No trend data
+					</td>
+				</tr>
+			`;
+
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
       <head>
-        <title>Generating Gross Revenue Report</title>
+        <meta charset="UTF-8">
+        <title>Gross Revenue Report</title>
+
         <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
           body {
             margin: 0;
-            background: #0B0F14;
-            color: white;
-            font-family: Arial, sans-serif;
+            padding: 0;
+          }
 
+          body {
+            background: #0B0F14;
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 40px 20px;
+          }
+
+          .export-toolbar {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+          }
+
+          .export-toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 35px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #ddd;
+          }
+
+          .brand {
             display: flex;
             align-items: center;
-            justify-content: center;
-
-            height: 100vh;
+            gap: 14px;
+            min-width: 0;
           }
 
-          .loading {
-            text-align: center;
+          .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            flex-shrink: 0;
           }
 
-          .title {
+          .company-name {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 8px;
+            color: #222;
           }
 
-          .text {
-            font-size: 13px;
-            opacity: .7;
+          .branch-name {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+          }
+
+          .period {
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .report-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 18px;
+          }
+
+          .report-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .report-filter {
+            font-size: 11px;
+            color: #777;
+            text-align: right;
+          }
+
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 25px 0;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fafafa;
+          }
+
+          .kpi-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 12px;
+          }
+
+          .kpi-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 18px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #222;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+          }
+
+          td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          tr {
+            page-break-inside: avoid;
+          }
+
+          @media print {
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .export-toolbar {
+              display: none;
+            }
+
+            .report {
+              max-width: none;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 25px;
+            }
           }
         </style>
       </head>
 
       <body>
-        <div class="loading">
-          <div class="title">
-            Gross Revenue Report
+        <div class="export-toolbar">
+          <div>Gross Revenue Report</div>
+          <button onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <div class="report">
+
+          <!-- HEADER -->
+          <div class="report-header">
+            <div class="brand">
+              ${
+                logoUrl
+                  ? `<img src="${esc(logoUrl)}" class="logo" alt="Company Logo">`
+                  : ""
+              }
+
+              <div>
+                <div class="company-name">
+                  ${esc(companyName)}
+                </div>
+
+                <div class="branch-name">
+                  Branch: ${esc(branchName)}
+                </div>
+              </div>
+            </div>
+
+            <div class="period">
+              Period: ${esc(start)} - ${esc(end)}
+            </div>
           </div>
 
-          <div class="text">
-            Generating PDF...
+          <div class="report-title-row">
+            <div class="report-title">
+              Gross Revenue Report
+            </div>
+
+            <div class="report-filter">
+              Revenue Analysis
+            </div>
           </div>
+
+          <!-- KPI -->
+          <div class="kpi-grid">
+
+            <div class="kpi-card">
+              <div class="kpi-title">GROSS REVENUE</div>
+              <div class="kpi-value">
+                ${money(summary.totalSubtotal || 0)}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">NET REVENUE</div>
+              <div class="kpi-value">
+                ${money(summary.totalNetRevenue || 0)}
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">GRAND TOTAL</div>
+              <div class="kpi-value">
+                ${money(summary.totalRevenue || 0)}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- REVENUE SUMMARY -->
+          <div class="card">
+            <h3>Revenue Summary</h3>
+
+            <table>
+              <tbody>
+                <tr>
+                  <td>Gross Revenue</td>
+                  <td class="right">${money(summary.totalSubtotal || 0)}</td>
+                </tr>
+
+                <tr>
+                  <td>Total Discount</td>
+                  <td class="right">${money(summary.totalDiscount || 0)}</td>
+                </tr>
+
+                <tr>
+                  <td>Net Revenue</td>
+                  <td class="right">${money(summary.totalNetRevenue || 0)}</td>
+                </tr>
+
+                <tr>
+                  <td>Total Tax</td>
+                  <td class="right">${money(summary.totalTax || 0)}</td>
+                </tr>
+
+                <tr>
+                  <td>Total Service</td>
+                  <td class="right">${money(summary.totalService || 0)}</td>
+                </tr>
+
+                <tr>
+                  <td>Grand Total Payment</td>
+                  <td class="right">${money(summary.totalRevenue || 0)}</td>
+                </tr>
+
+                <tr>
+                  <td>AOV</td>
+                  <td class="right">${money(Math.round(Number(summary.aov) || 0))}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- CATEGORY -->
+          <div class="card">
+            <h3>Revenue by Category</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th class="right">Revenue</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${categoryRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TOP PRODUCTS -->
+          <div class="card">
+            <h3>Top Products</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th class="right">Units</th>
+                  <th class="right">Revenue</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${topProductRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TREND -->
+          <div class="card">
+            <h3>Revenue Trend</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Day</th>
+                  <th class="right">Revenue</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${trendRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="footer">
+            Generated by MUNO POS
+            •
+            ${new Date().toLocaleString("id-ID")}
+          </div>
+
         </div>
       </body>
-    </html>
-  `);
+      </html>
+    `;
 
-  try {
-    const sessionId =
-			localStorage.getItem("pos_session_id");
-    const response =
-      await fetch("/api/export-pdf", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json"
-				},
-				body: JSON.stringify({
-					type: "gross-revenue",
-					start,
-					end,
-					branchId,
-					sessionId,
-					tenantSlug: state.tenantSlug
-				})
-			});
-
-    // HTTP ERROR
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        errorText ||
-        `Export gagal (${response.status})`
-      );
-    }
-
-    // GET HTML REPORT
-    const html = await response.text();
-    if (!html) {
-      throw new Error(
-        "Server mengembalikan HTML kosong"
-      );
-    }
-
-    // RENDER REPORT
     pdfWindow.document.open();
     pdfWindow.document.write(html);
     pdfWindow.document.close();
-  }
-  catch (err) {
-    // ERROR PAGE
+
+  } catch (err) {
+    console.error("Gross Revenue Export Error:", err);
+
     pdfWindow.document.open();
     pdfWindow.document.write(`
+      <!DOCTYPE html>
       <html>
-        <body style="
-          background:#0B0F14;
-          color:white;
-          font-family:Arial;
-          padding:40px;">
-          <h2>
-            Export Failed
-          </h2>
+      <body style="
+        background:#000000;
+        color:white;
+        font-family:Arial;
+        padding:40px; ">
+        <h2>Export Failed</h2>
 
-          <p style="color:#aaa;">
-            Gagal membuat Gross Revenue Report.
-          </p>
+        <p style="color:#aaa;">
+          Gagal membuat Gross Revenue Report.
+        </p>
 
-          <pre style="
-            white-space:pre-wrap;
-            background:#151A21;
-            padding:15px;
-            border-radius:10px;">
-							${String(
-	            err?.message ||
-	            err)}
-					</pre>
-        </body>
+        <pre style="
+          white-space:pre-wrap;
+          background:#151A21;
+          padding:15px;
+          border-radius:10px;
+        ">${escapeAdjustmentHTML(
+          err?.message || String(err)
+        )}</pre>
+      </body>
       </html>
     `);
     pdfWindow.document.close();
@@ -15690,26 +16152,25 @@ document.addEventListener("click", function(e) {
 });
 
 document.addEventListener("click", function (e) {
-  if (
-    e.target &&
-    (
-      e.target.id === "btnExportOtherIncomePDF" ||
-      e.target.closest("#btnExportOtherIncomePDF")
-    )
-  ) {
-    exportOtherIncomePDF();
-  }
+  if ( e.target && (e.target.id === "btnExportOtherIncomePDF" || e.target.closest("#btnExportOtherIncomePDF"))
+  ) { exportOtherIncomePDF(); }
 });
 
 async function exportOtherIncomePDF() {
   const f = getOtherIncomeFilters();
-  const win = window.open( "", "_blank" );
-  if (!win) {
-    alert( "Popup diblokir browser" );
-    return; }
+  const branchId = state?.branchId || "";
+  const sessionId = localStorage.getItem("pos_session_id");
+
+  // VALIDATION
+  if (!branchId) { alert("Branch tidak valid"); return; }
+  if (!sessionId) { alert("Session login tidak ditemukan"); return; }
+
+  const win = window.open("", "_blank");
+  if (!win) { alert("Popup diblokir browser"); return; }
 
   // LOADING
   win.document.write(`
+    <!DOCTYPE html>
     <html>
       <body style="
         background:#0B0F14;
@@ -15718,74 +16179,536 @@ async function exportOtherIncomePDF() {
         display:flex;
         align-items:center;
         justify-content:center;
-        height:100vh; ">
+        height:100vh;">
         Generating Other Income Report...
       </body>
     </html>
   `);
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+    // HELPERS
+    const esc = value => escapeAdjustmentHTML(value ?? "-");
+    const money = value => formatAdjustmentCurrency(Number(value || 0));
+    const norm = value => String(value ?? "").trim().toUpperCase();
+    // FILTERS
+    const categoryValue = String(f?.category || "").trim();
+    const statusValue = String(f?.status || "").trim();
+    const searchValue = String(f?.keyword || "").trim();
+    const startDate = String(f?.startDate || "").trim();
+    const endDate = String(f?.endDate || "").trim();
+    // REPORT HEADER
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = state.branchName || branchId;
+    // GET DATA
+    const { data, error } = await supabaseClient.rpc(
+      "get_expense_dashboard",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_start: startDate || null,
+        p_end: endDate || null
+      }
+    );
 
-          body: JSON.stringify({
-            type: "other-income",
-            branchId: state.branchId,
-            category: f.category,
-            status: f.status,
-            search: f.keyword,
-            start: f.startDate,
-            end: f.endDate,
-						sessionId,
-						tenantSlug: state.tenantSlug
-          })
-        }
-      );
-		
-    // CHECK RESPONSE
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error( errorText || "Export Other Income gagal" );
-    }
-    // GET HTML
-    const html = await response.text();
-    if (!html) {
-      throw new Error( "Response export kosong" );
-    }
-    // SHOW REPORT
+    if (error) throw error;
+    if (!data) { throw new Error("Data Other Income kosong"); }
+
+    // NORMALIZE
+    const rows = Array.isArray(data.otherIncome)
+      ? data.otherIncome
+      : [];
+    // FILTER
+    const filteredRows = rows.filter(r => {
+      const rowBranch = norm(r.branchId);
+      const rowCategory = norm(r.category);
+      const rowStatus = norm(r.status);
+      const keyword = JSON.stringify(r).toUpperCase();
+
+      // BRANCH
+      if ( branchId && norm(branchId) !== "ALL" && rowBranch !== norm(branchId)
+      ) { return false; }
+      // CATEGORY
+      if ( categoryValue && norm(categoryValue) !== "ALL" && norm(categoryValue) !== "ALL CATEGORIES" && rowCategory !== norm(categoryValue)
+      ) { return false; }
+      // STATUS
+      if ( statusValue && norm(statusValue) !== "ALL" && norm(statusValue) !== "ALL STATUS" && rowStatus !== norm(statusValue)
+      ) { return false; }
+      // SEARCH
+      if ( searchValue && !keyword.includes(searchValue.toUpperCase())
+      ) { return false; }
+
+      // DATE RANGE
+      const rowDate = r.date
+        ? new Date(r.date + "T00:00:00")
+        : null;
+      const startDateObj = startDate
+        ? new Date(startDate + "T00:00:00")
+        : null;
+      const endDateObj = endDate
+        ? new Date(endDate + "T23:59:59")
+        : null;
+
+      if ( startDateObj && rowDate && rowDate < startDateObj
+      ) { return false; }
+      if ( endDateObj && rowDate && rowDate > endDateObj
+      ) { return false; }
+      return true;
+    });
+
+    // CATEGORY BREAKDOWN
+    const categoryMap = {};
+    let totalIncome = 0;
+
+    filteredRows.forEach(r => {
+      const cat = r.category || "Other";
+      const amount = Number(r.amount || 0);
+
+      categoryMap[cat] = (categoryMap[cat] || 0) + amount;
+      totalIncome += amount;
+    });
+
+    const categoryBreakdown = Object.keys(categoryMap)
+      .map(cat => {
+        const amount = categoryMap[cat];
+
+        return {
+          name: cat,
+          amount,
+          percent: totalIncome > 0
+            ? (amount / totalIncome) * 100
+            : 0
+        };
+      })
+      .sort((a, b) => b.amount - a.amount);
+
+    // DISPLAY FILTER
+    const categoryDisplay = categoryValue && norm(categoryValue) !== "ALL" && norm(categoryValue) !== "ALL CATEGORIES"
+			? categoryValue
+			: "ALL";
+    const statusDisplay = statusValue && norm(statusValue) !== "ALL" && norm(statusValue) !== "ALL STATUS"
+			? statusValue
+			: "ALL";
+    // CATEGORY ROWS
+    const categoryRows = categoryBreakdown.length
+      ? categoryBreakdown.map(c => `
+          <tr>
+            <td>${esc(c.name)}</td>
+            <td class="right">${c.percent.toFixed(1)}%</td>
+            <td class="right">${money(c.amount)}</td>
+          </tr>
+        `).join("")
+      : `
+          <tr>
+            <td colspan="3" class="empty">No Data Found</td>
+          </tr>
+        `;
+    // LEDGER ROWS
+    const ledgerRows = filteredRows.length
+      ? filteredRows.map(r => `
+          <tr>
+            <td>${esc(r.date || "-")}</td>
+            <td>${esc(r.refId || "-")}</td>
+            <td>${esc(r.description || "-")}</td>
+            <td>${esc(r.category || "-")}</td>
+            <td>${esc(r.method || "-")}</td>
+            <td class="right">${money(r.amount)}</td>
+            <td>${esc(r.status || "-")}</td>
+            <td>${esc(r.branchId || "-")}</td>
+          </tr>
+        `).join("")
+      : `
+          <tr>
+            <td colspan="8" class="empty">No Data Found</td>
+          </tr>
+        `;
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Other Income Report</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            margin: 0;
+            padding: 40px 20px;
+            background: #0B0F14;
+            font-family: Arial, sans-serif;
+            color: #333;
+          }
+
+          .export-toolbar {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+          }
+
+          .export-toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 45px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+          }
+
+          .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+          }
+
+          .brand-info {
+            flex: 1;
+          }
+
+          .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .branch-name {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+          }
+
+          .period {
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+            align-self: flex-end;
+            padding-bottom: 5px;
+          }
+
+          .header-divider {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin: 18px 0;
+          }
+
+          .report-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+          }
+
+          .title {
+            font-size: 20px;
+            font-weight: bold;
+          }
+
+          .subtitle {
+            font-size: 11px;
+            color: #777;
+            text-align: right;
+          }
+
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 18px;
+            margin-top: 20px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin-top: 0;
+            margin-bottom: 12px;
+            font-size: 16px;
+          }
+
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin: 25px 0;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 14px;
+            padding: 22px;
+            background: #fafafa;
+            text-align: center;
+          }
+
+          .kpi-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 12px;
+          }
+
+          .kpi-value {
+            font-size: 22px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .meta {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 12px;
+            line-height: 1.6;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+          }
+
+          td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+          }
+
+          tr {
+            page-break-inside: avoid;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @media print {
+            @page {
+              size: A4 landscape;
+              margin: 10mm;
+            }
+
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .export-toolbar {
+              display: none;
+            }
+
+            .report {
+              max-width: none;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 15px;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="export-toolbar">
+          <div>Other Income Report</div>
+
+          <button onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <div class="report">
+          <!-- HEADER -->
+          <div class="brand-row">
+            ${
+              logoUrl
+                ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="MUNO"
+                  />
+                `
+                : ""
+            }
+
+            <div class="brand-info">
+              <div class="company-name">${esc(companyName)}</div>
+              <div class="branch-name">${esc(branchName)}</div>
+            </div>
+
+            <div class="period">
+              Period: ${esc(startDate || "-")} - ${esc(endDate || "-")}
+            </div>
+          </div>
+
+          <hr class="header-divider">
+
+          <div class="report-heading">
+            <div class="title">Other Income Report</div>
+            <div class="subtitle">${esc(branchName)}</div>
+          </div>
+
+          <!-- KPI -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-title">TOTAL OTHER INCOME</div>
+              <div class="kpi-value">${money(totalIncome)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">TOTAL INCOME RECORDS</div>
+              <div class="kpi-value">${filteredRows.length}</div>
+            </div>
+          </div>
+
+          <!-- CATEGORY BREAKDOWN -->
+          <div class="card">
+            <h3>Category Breakdown</h3>
+						
+            <div class="meta">
+              <b>Category:</b> ${esc(categoryDisplay)}
+              &nbsp; | &nbsp;
+              <b>Status:</b> ${esc(statusDisplay)}
+              <br>
+              <b>Search:</b> ${esc(searchValue || "-")}
+            </div>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th class="right">Percent</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${categoryRows}
+              </tbody>
+            </table>
+
+            <div style="
+              margin-top:15px;
+              text-align:right;
+              font-weight:bold; ">
+              TOTAL OTHER INCOME: ${money(totalIncome)}
+            </div>
+          </div>
+
+          <!-- LEDGER -->
+          <div class="card">
+            <h3>Other Income Ledger Report</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Ref ID</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Method</th>
+                  <th class="right">Amount</th>
+                  <th>Status</th>
+                  <th>Branch</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${ledgerRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="footer">
+            Generated by MUNO • ${new Date().toLocaleString("id-ID")}
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // RENDER REPORT
     win.document.open();
     win.document.write(html);
     win.document.close();
-  }
 
-  catch (err) {
+  } catch (err) {
     win.document.open();
     win.document.write(`
+      <!DOCTYPE html>
       <html>
         <body style="
+          background:#0B0F14;
+          color:white;
           font-family:Arial;
-          padding:40px; ">
-          <h2>
-            Export PDF Failed
-          </h2>
+          padding:40px;
+        ">
+          <h2>Export PDF Failed</h2>
 
-          <pre>
-						${String( err?.message || "Export PDF gagal" )}
-          </pre>
+          <pre style="
+            white-space:pre-wrap;
+            background:#151A21;
+            padding:15px;
+            border-radius:10px;
+          ">${escapeAdjustmentHTML(
+            err?.message || String(err)
+          )}</pre>
         </body>
       </html>
     `);
 
     win.document.close();
-    alert( err?.message || "Export PDF gagal" );
+    console.error("Other Income PDF Export Error:", err);
   }
 }
 
