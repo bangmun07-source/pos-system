@@ -6150,12 +6150,6 @@ async function exportMembersPDF() {
             color: #888;
           }
 
-          /* PRINT */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
-
           @media print {
             html, body {
               width: 100%;
@@ -11244,12 +11238,6 @@ window.exportIngredientPurchases = async function () {
             color: #888;
           }
 
-          /* PRINT */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
-
           @media print {
             html, body {
               width: 100%;
@@ -15869,12 +15857,6 @@ async function exportExpensePDF() {
             color: #888;
           }
 
-          /* PRINT */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
-
           @media print {
             html, body {
               width: 100%;
@@ -16532,11 +16514,6 @@ async function exportOtherIncomePDF() {
           }
 
           @media print {
-            @page {
-              size: A4 landscape;
-              margin: 10mm;
-            }
-
             body {
               background: white;
               padding: 0;
@@ -21189,11 +21166,6 @@ async function exportCashFlowReport() {
           }
 
           @media print {
-            @page {
-              size: A4 landscape;
-              margin: 10mm;
-            }
-
             body {
               background: white;
               padding: 0;
@@ -23620,12 +23592,6 @@ window.exportAssets = async function () {
 					  page-break-inside: avoid;
 					  break-inside: avoid;
 					}
-
-          /* PRINT */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
 
           @media print {
             html, body {
@@ -31092,11 +31058,6 @@ window.exportEmployeeTaxPayable = async function () {
             color: #888;
           }
 
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
-
           @media print {
             html, body {
               width: 100%;
@@ -32570,11 +32531,6 @@ window.exportEmployeeHealthData = async function () {
             text-align: center;
             font-size: 9px;
             color: #888;
-          }
-
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
           }
 
           @media print {
@@ -38024,12 +37980,6 @@ window.exportEmployee = function () {
             color: #888;
           }
 
-          /* PRINT / PDF */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
-          }
-
           @media print {
             html,
             body {
@@ -40338,12 +40288,6 @@ window.exportEmployeeSchedule = async function () {
 				    text-align: center;
 				    font-size: 9px;
 				    color: #888;
-				  }
-				
-				  /* PRINT / PDF */
-				  @page {
-				    size: A4 landscape;
-				    margin: 10mm;
 				  }
 				
 				  @media print {
@@ -45077,12 +45021,7 @@ window.exportPayroll = function () {
             font-size: 9px;
             color: #888;
           }
-
-          @page {
-            size: A4 landscape;
-            margin: 8mm;
-          }
-
+					
           @media print {
             html, body {
               width: 100%;
@@ -47187,12 +47126,6 @@ window.exportReimbursement = async function () {
             text-align: center;
             font-size: 9px;
             color: #888;
-          }
-
-          /* PRINT / PDF */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
           }
 
           @media print {
@@ -49494,12 +49427,6 @@ window.exportShiftHistory = async function () {
             text-align: center;
             font-size: 9px;
             color: #888;
-          }
-
-          /* PRINT */
-          @page {
-            size: A4 landscape;
-            margin: 10mm;
           }
 
           @media print {
