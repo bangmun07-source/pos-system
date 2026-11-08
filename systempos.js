@@ -12190,7 +12190,7 @@ window.exportIngredientPurchases = async function () {
             justify-content: space-between;
             gap: 20px;
             padding-top: 14px;
-            border-bottom: 2px solid #222;
+            border-top: 2px solid #222;
           }
 
           .title {
@@ -17543,7 +17543,7 @@ async function exportExpensePDF() {
             justify-content: space-between;
             gap: 20px;
             padding-top: 14px;
-            border-bottom: 2px solid #222;
+            border-top: 2px solid #222;
           }
 
           .title {
@@ -18219,7 +18219,7 @@ async function exportOtherIncomePDF() {
 
           .header-divider {
             border: 0;
-            border-top: 1px solid #ddd;
+            border-top: 2px solid #222;
             margin: 18px 0;
           }
 
@@ -22878,7 +22878,7 @@ async function exportCashFlowReport() {
 
           .header-divider {
             border: 0;
-            border-top: 1px solid #ddd;
+            border-top: 2px solid #222;
             margin: 18px 0;
           }
 
@@ -32756,7 +32756,7 @@ window.exportEmployeeTaxPayable = async function () {
 					  justify-content: space-between;
 					  gap: 20px;
 					  padding-top: 14px;
-					  border-top: 1px solid #e5e5e5;
+					  border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -34183,7 +34183,7 @@ window.exportEmployeeHealthData = async function () {
 					  justify-content: space-between;
 					  gap: 20px;
 					  padding-top: 14px;
-					  border-top: 1px solid #e5e5e5;
+					  border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -39654,7 +39654,7 @@ window.exportEmployee = function () {
 					  justify-content: space-between;
 					  gap: 20px;
 					  padding-top: 14px;
-					  border-top: 1px solid #e5e5e5;
+					  border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -41955,7 +41955,7 @@ window.exportEmployeeSchedule = async function () {
 					  justify-content: space-between;
 					  gap: 20px;
 					  padding-top: 14px;
-					  border-top: 1px solid #e5e5e5;
+					  border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -46716,7 +46716,7 @@ window.exportPayroll = function () {
 					  justify-content: space-between;
 					  gap: 20px;
 					  padding-top: 14px;
-					  border-top: 1px solid #e5e5e5;
+					  border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -48788,7 +48788,7 @@ window.exportReimbursement = async function () {
 						justify-content: space-between;
 						gap: 20px;
 						padding-top: 14px;
-						border-top: 1px solid #e5e5e5;
+						border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -51077,7 +51077,7 @@ window.exportShiftHistory = async function () {
 						justify-content: space-between;
 						gap: 20px;
 						padding-top: 14px;
-						border-top: 1px solid #e5e5e5;
+						border-top: 2px solid #222;
 					}
 					
 					.title {
@@ -51963,13 +51963,13 @@ window.exportCashierShiftAdjustments = function () {
 					}
 					
 					.period {
-					    font-size: 11px;
-					    font-weight: 600;
-					    color: #777;
-					    text-align: right;
-					    white-space: nowrap;
-					    align-self: flex-end;
-					    margin-bottom: 5px;
+						font-size: 11px;
+						font-weight: 600;
+						color: #777;
+						text-align: right;
+						white-space: nowrap;
+						align-self: flex-end;
+						margin-bottom: 5px;
 					}
 					
 					.report-meta-row {
@@ -51978,7 +51978,7 @@ window.exportCashierShiftAdjustments = function () {
 						justify-content: space-between;
 						gap: 20px;
 						padding-top: 14px;
-						border-top: 1px solid #e5e5e5;
+						border-top: 2px solid #222;
 					}
 					
 					.title {
