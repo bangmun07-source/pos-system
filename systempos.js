@@ -12037,13 +12037,9 @@ function renderTopSellingItems(items){
   });
 }
 
-document.addEventListener(
-  "click",
+document.addEventListener( "click",
   function(e) {
-    const btn =
-      e.target.closest(
-        "#btnExportAnalyticsPDF"
-      );
+    const btn = e.target.closest( "#btnExportAnalyticsPDF" );
     if (!btn) return;
     exportAnalyticsPDF();
   }
@@ -12051,151 +12047,888 @@ document.addEventListener(
 
 
 async function exportAnalyticsPDF() {
-  const start =
-    document.getElementById(
-      "analyticsStartDate"
-    )?.value;
-
-  const end =
-    document.getElementById(
-      "analyticsEndDate"
-    )?.value;
-
+  const start = document.getElementById("analyticsStartDate")?.value;
+  const end = document.getElementById("analyticsEndDate")?.value;
   const branchId = state.branchId;
-
+  const sessionId = localStorage.getItem("pos_session_id");
   // VALIDASI
-  if (!start || !end) {
-    alert(
-      "Pilih tanggal dulu"
-    );
-    return;
-  }
-	
-  if (!branchId) { alert( "Branch tidak valid" ); return; }
+  if (!start || !end) { alert("Pilih tanggal dulu"); return; }
+  if (!branchId) { alert("Branch tidak valid"); return; }
+  if (!sessionId) { alert("Session login tidak ditemukan"); return; }
+  // OPEN WINDOW
+  const pdfTab = window.open("", "_blank");
+  if (!pdfTab) { alert("Popup diblokir browser"); return; }
 
-  // OPEN TAB
-  const pdfTab = window.open( "", "_blank" );
-  if (!pdfTab) { alert( "Popup diblokir browser" ); return; }
-
-  // LOADING PAGE
+  // LOADING
   pdfTab.document.write(`
     <!DOCTYPE html>
     <html>
     <head>
-      <title>
-        Analytics Report
-      </title>
-			
+      <title>Generating Analytics Report</title>
       <style>
-
         body {
-          background:#0B0F14;
-          color:white;
-          font-family:Arial;
-          display:flex;
-          align-items:center;
-          justify-content:center;
-          height:100vh;
-          margin:0;
+          margin: 0;
+          background: #0B0F14;
+          color: white;
+          font-family: Arial, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
         }
 
         .loading {
-          text-align:center;
+          text-align: center;
         }
 
         .title {
-          font-size:18px;
-          font-weight:bold;
-          margin-bottom:8px;
+          font-size: 18px;
+          font-weight: bold;
+          margin-bottom: 8px;
         }
 
         .subtitle {
-          font-size:13px;
-          opacity:.7;
+          font-size: 13px;
+          opacity: .7;
         }
       </style>
     </head>
-
     <body>
       <div class="loading">
-        <div class="title">
-          Analytics Report
-        </div>
-				
-        <div class="subtitle">
-          Generating PDF...
-        </div>
+        <div class="title">Analytics Report</div>
+        <div class="subtitle">Generating PDF...</div>
       </div>
     </body>
     </html>
   `);
-  pdfTab.document.close();
-  // CALL VERCEL API
+
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const response = await fetch("/api/export-pdf", {
-		  method: "POST",
-		  headers: { "Content-Type": "application/json" },
-		  body: JSON.stringify({
-			type: "analytics",
-			start,
-			end,
-			branchId,
-			sessionId,
-			tenantSlug: state.tenantSlug
-		  })
-		});
+    const esc = escapeAdjustmentHTML;
+    const money = formatAdjustmentCurrency;
+    // GET ANALYTICS DATA
+    const { data, error } =
+			await supabaseClient.rpc(
+	      "get_analytics_dashboard",
+	      {
+	        p_branch_id: branchId,
+	        p_start: start || null,
+	        p_end: end || null,
+	        p_session_id: sessionId
+	      }
+	    );
 
-    // HTTP ERROR
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error( errorText || `Export gagal (${response.status})` ); 
-		}
+    if (error) throw error;
+		
+    // NORMALIZE
+    const report = data || {};
+    const analytics = report.analytics || {};
+    const weekly = Array.isArray(analytics.weekly)
+      ? analytics.weekly
+      : [];
+    const paymentDistribution = Array.isArray(report.paymentDistribution)
+      ? report.paymentDistribution
+      : [];
+    const topSelling = Array.isArray(report.topSelling)
+      ? report.topSelling
+      : [];
+    const peakHours = Array.isArray(report.peakHours)
+      ? report.peakHours
+      : [];
+    const rawMaterials = Array.isArray(report.rawMaterials)
+      ? report.rawMaterials
+      : [];
+    const activeMembers = Array.isArray(analytics.activeMemberList)
+      ? analytics.activeMemberList
+      : [];
+    // HEADER DATA
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = state.branchName || branchId;
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    // PROFIT SUMMARY
+    const revenue = Number(analytics.revenue || 0);
+    const serviceRevenue = Number(analytics.serviceRevenue || 0);
+    const hpp = Number(analytics.hpp || 0);
+    const grossProfit = Number(analytics.grossProfit || 0);
+    const operational = Number(analytics.operational || 0);
+    const netProfitBeforeOtherIncome = Number(analytics.netProfitBeforeOtherIncome || 0);
+    const otherIncome = Number(analytics.otherIncome || 0);
+    const netProfit = Number(analytics.netProfit || 0);
+    const growth = Number(analytics.growth || 0);
+    const profitSummaryRows = `
+      <tr>
+        <td>Revenue</td>
+        <td class="right">${money(revenue)}</td>
+      </tr>
 
-    // API RETURN
-    const result = await response.text();
-    if (!result) { throw new Error( "Server tidak mengembalikan hasil PDF" ); }
+      <tr>
+        <td>Service Revenue</td>
+        <td class="right">${money(serviceRevenue)}</td>
+      </tr>
 
-    // JIKA API RETURN URL
-    if (
-      result.startsWith("http://") ||
-      result.startsWith("https://") ||
-      result.startsWith("/")
-    ) { pdfTab.location.href = result; return; }
-    // JIKA API RETURN HTML
+      <tr>
+        <td>HPP</td>
+        <td class="right">${money(hpp)}</td>
+      </tr>
+
+      <tr>
+        <td>Gross Profit</td>
+        <td class="right">${money(grossProfit)}</td>
+      </tr>
+
+      <tr>
+        <td>Operational</td>
+        <td class="right">${money(operational)}</td>
+      </tr>
+
+      <tr>
+        <td>Net Profit Before Other Income</td>
+        <td class="right">${money(netProfitBeforeOtherIncome)}</td>
+      </tr>
+
+      <tr>
+        <td>Other Income</td>
+        <td class="right">${money(otherIncome)}</td>
+      </tr>
+
+      <tr>
+        <td>Net Profit</td>
+        <td class="right">
+          <strong>${money(netProfit)}</strong>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Growth</td>
+        <td class="right">${growth.toFixed(2)}%</td>
+      </tr>
+    `;
+    // WEEKLY REVENUE
+    const weeklyRows = weekly.length
+      ? weekly.map((item, index) => {
+				let day = `Week ${index + 1}`;
+				let amount = 0;
+
+				if (typeof item === "number") {
+					amount = Number(item);
+				} else if (item && typeof item === "object") {
+					day =
+						item.day ??
+						item.date ??
+						item.label ??
+						item.Day ??
+						`Week ${index + 1}`;
+
+					amount = Number(
+						item.revenue ??
+						item.total ??
+						item.amount ??
+						item.value ??
+						0
+					);
+				}
+
+				return `
+					<tr>
+						<td>${esc(day)}</td>
+						<td class="right">${money(amount)}</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="2" class="empty">
+						No weekly revenue data
+					</td>
+				</tr>
+			`;
+    // PAYMENT DISTRIBUTION
+    const paymentRows = paymentDistribution.length
+      ? paymentDistribution.map(item => {
+				const method =
+					item?.method ??
+					item?.paymentMethod ??
+					item?.payment_method ??
+					item?.name ??
+					item?.type ??
+					"-";
+				const amount = Number(
+					item?.value ??
+					item?.amount ??
+					item?.total ??
+					item?.revenue ??
+					0
+				);
+				const percent = Number(
+					item?.percent ??
+					item?.percentage ??
+					0
+				);
+
+				return `
+					<tr>
+						<td>${esc(method)}</td>
+						<td class="right">${money(amount)}</td>
+						<td class="right">${percent.toFixed(1)}%</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="3" class="empty">
+						No payment data
+					</td>
+				</tr>
+			`;
+    // TOP SELLING PRODUCTS
+    const topSellingRows = topSelling.length
+      ? topSelling.map((item, index) => {
+				const product =
+					item?.name ??
+					item?.product ??
+					item?.productName ??
+					item?.product_name ??
+					"-";
+				const quantity = Number(
+					item?.qty ??
+					item?.quantity ??
+					item?.totalQuantity ??
+					0
+				);
+				const amount = Number(
+					item?.revenue ??
+					item?.totalRevenue ??
+					item?.amount ??
+					item?.total ??
+					0
+				);
+
+				return `
+					<tr>
+						<td>${index + 1}</td>
+						<td>${esc(product)}</td>
+						<td class="center">
+							${quantity.toLocaleString("id-ID")}
+						</td>
+						<td class="right">${money(amount)}</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="4" class="empty">
+						No top selling products
+					</td>
+				</tr>
+			`;
+    // PEAK HOURS
+    const peakHourRows = [];
+    const dayNames = [
+      "Minggu",
+      "Senin",
+      "Selasa",
+      "Rabu",
+      "Kamis",
+      "Jumat",
+      "Sabtu"
+    ];
+
+    const startDateObj = start
+      ? new Date(`${start}T00:00:00`)
+      : new Date();
+    const endDateObj = end
+      ? new Date(`${end}T00:00:00`)
+      : new Date(startDateObj);
+
+    peakHours.forEach((day, dayIndex) => {
+      if (!Array.isArray(day)) return;
+
+      const dayName = dayNames[dayIndex];
+
+      let foundDate = null;
+      const checkDate = new Date(startDateObj);
+
+      while (checkDate <= endDateObj) {
+        if (checkDate.getDay() === dayIndex) {
+          foundDate = new Date(checkDate);
+          break;
+        }
+        checkDate.setDate(checkDate.getDate() + 1);
+      }
+
+      if (!foundDate) return;
+
+      const dateText = foundDate.toLocaleDateString("id-ID");
+
+      day.forEach((count, hour) => {
+        const value = Number(count || 0);
+        if (value <= 0) return;
+
+        const nextHour = (hour + 1) % 24;
+        const hourLabel = `${String(hour).padStart(2, "0")}:00 - ` + `${String(nextHour).padStart(2, "0")}:00`;
+
+        peakHourRows.push(`
+          <tr>
+            <td>${esc(dateText)}</td>
+            <td>${esc(dayName)}</td>
+            <td class="center">${hourLabel}</td>
+            <td class="center">
+              ${value.toLocaleString("id-ID")}
+            </td>
+          </tr>
+        `);
+      });
+    });
+
+    const peakRows = peakHourRows.length
+      ? peakHourRows.join("")
+      : `
+          <tr>
+            <td colspan="4" class="empty">
+              No peak hour data
+            </td>
+          </tr>
+        `;
+
+    // RAW MATERIALS
+    const rawMaterialRows = rawMaterials.length
+      ? rawMaterials.map(item => {
+				const id = item?.id ?? "-";
+				const name = item?.name ?? "-";
+				const status = item?.status ?? "-";
+				const unit = item?.unit ?? "-";
+				const stock = Number(item?.stock || 0);
+
+				return `
+					<tr>
+						<td>${esc(id)}</td>
+						<td>${esc(name)}</td>
+						<td>${esc(status)}</td>
+						<td class="center">${esc(unit)}</td>
+						<td class="right">
+							${stock.toLocaleString("id-ID")}
+						</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="5" class="empty">
+						No raw material data
+					</td>
+				</tr>
+			`;
+    // ACTIVE MEMBERS
+    const memberRows = activeMembers.length
+      ? activeMembers.map(member => {
+				const memberName = member?.name ?? member?.Nama ?? "-";
+				const tier = member?.tier ?? member?.Tier ?? member?.Level_Current ?? "-";
+				const point = Number( member?.point ?? member?.Point ?? 0 );
+
+				return `
+					<tr>
+						<td>${esc(memberName)}</td>
+						<td>${esc(tier)}</td>
+						<td class="right">
+							${point.toLocaleString("id-ID")} PTS
+						</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="3" class="empty">
+						No active members
+					</td>
+				</tr>
+			`;
+		
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>Analytics Report</title>
+
+        <style>
+          * {
+            box-sizing: border-box;
+          }
+
+          html,
+          body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #0B0F14;
+            font-family: Arial, sans-serif;
+            color: #333;
+            padding: 40px 20px;
+          }
+
+          .export-toolbar {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+          }
+
+          .export-toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            background: white;
+            padding: 35px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #ddd;
+          }
+
+          .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+          }
+
+          .logo {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            flex-shrink: 0;
+          }
+
+          .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .branch-name {
+            font-size: 11px;
+            color: #777;
+            margin-top: 5px;
+          }
+
+          .period {
+            font-size: 11px;
+            color: #666;
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .report-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 18px;
+          }
+
+          .report-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .report-filter {
+            font-size: 11px;
+            color: #777;
+            text-align: right;
+          }
+
+          .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin: 25px 0;
+          }
+
+          .kpi-card {
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 20px;
+            background: #fafafa;
+          }
+
+          .kpi-title {
+            font-size: 11px;
+            color: #666;
+            font-weight: bold;
+            margin-bottom: 12px;
+          }
+
+          .kpi-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+          }
+
+          .card {
+            border: 1px solid #e5e5e5;
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 18px;
+            background: #fff;
+          }
+
+          .card h3 {
+            margin: 0 0 12px;
+            font-size: 15px;
+            color: #222;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            margin-top: 10px;
+          }
+
+          th {
+            background: #f5f5f5;
+            padding: 10px;
+            text-align: left;
+            font-weight: bold;
+          }
+
+          td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+          }
+
+          .right {
+            text-align: right;
+          }
+
+          .center {
+            text-align: center;
+          }
+
+          .empty {
+            text-align: center;
+            color: #777;
+            padding: 25px;
+          }
+
+          .footer {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          thead {
+            display: table-header-group;
+          }
+
+          tr {
+            page-break-inside: avoid;
+          }
+
+          @media print {
+            body {
+              background: white;
+              padding: 0;
+            }
+
+            .export-toolbar {
+              display: none;
+            }
+
+            .report {
+              max-width: none;
+              box-shadow: none;
+              border-radius: 0;
+              padding: 25px;
+            }
+          }
+        </style>
+      </head>
+
+      <body>
+
+        <!-- TOOLBAR -->
+        <div class="export-toolbar">
+          <div>Analytics Report</div>
+
+          <button onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <!-- REPORT -->
+        <div class="report">
+
+          <!-- HEADER -->
+          <div class="report-header">
+            <div class="brand">
+              ${
+                logoUrl
+                  ? `<img src="${esc(logoUrl)}" class="logo" alt="Company Logo">`
+                  : ""
+              }
+
+              <div>
+                <div class="company-name">
+                  ${esc(companyName)}
+                </div>
+
+                <div class="branch-name">
+                  Branch: ${esc(branchName)}
+                </div>
+              </div>
+            </div>
+
+            <div class="period">
+              Period: ${esc(start)} - ${esc(end)}
+            </div>
+          </div>
+
+          <div class="report-title-row">
+            <div class="report-title">
+              Analytics Report
+            </div>
+
+            <div class="report-filter">
+              Business Analytics
+            </div>
+          </div>
+
+          <!-- KPI -->
+          <div class="kpi-grid">
+
+            <div class="kpi-card">
+              <div class="kpi-title">REVENUE</div>
+              <div class="kpi-value">${money(revenue)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">HPP</div>
+              <div class="kpi-value">${money(hpp)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">NET PROFIT</div>
+              <div class="kpi-value">${money(netProfit)}</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-title">GROWTH</div>
+              <div class="kpi-value">${growth.toFixed(2)}%</div>
+            </div>
+
+          </div>
+
+          <!-- PROFIT SUMMARY -->
+          <div class="card">
+            <h3>Profit Summary</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="right">Amount</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${profitSummaryRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- WEEKLY -->
+          <div class="card">
+            <h3>Weekly Revenue</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th class="right">Revenue</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${weeklyRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PAYMENT -->
+          <div class="card">
+            <h3>Payment Distribution</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Payment Method</th>
+                  <th class="right">Amount</th>
+                  <th class="right">Percentage</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${paymentRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- TOP SELLING -->
+          <div class="card">
+            <h3>Top Selling Products</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product</th>
+                  <th class="center">Quantity</th>
+                  <th class="right">Revenue</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${topSellingRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- PEAK HOURS -->
+          <div class="card">
+            <h3>Peak Hours</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Day</th>
+                  <th class="center">Hour</th>
+                  <th class="center">Transactions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${peakRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- RAW MATERIALS -->
+          <div class="card">
+            <h3>Raw Materials</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Material</th>
+                  <th>Status</th>
+                  <th class="center">Unit</th>
+                  <th class="right">Stock</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${rawMaterialRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- ACTIVE MEMBERS -->
+          <div class="card">
+            <h3>Active Members</h3>
+
+            <table>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Tier</th>
+                  <th class="right">Points</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${memberRows}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- FOOTER -->
+          <div class="footer">
+            Generated by MUNO POS
+            •
+            ${new Date().toLocaleString("id-ID")}
+          </div>
+
+        </div>
+      </body>
+      </html>
+    `;
+
     pdfTab.document.open();
-    pdfTab.document.write(result);
+    pdfTab.document.write(html);
     pdfTab.document.close();
-  }
-  // ERROR
-  catch(err) {
+
+  } catch (err) {
+    console.error("Analytics Export Error:", err);
+
     pdfTab.document.open();
     pdfTab.document.write(`
       <!DOCTYPE html>
-					<html>
-						<body style="
-							background:#0B0F14;
-							color:white;
-							font-family:Arial;
-							padding:40px;">
-			
-			        <h2>
-			          Failed Generate PDF
-			        </h2>
-			
-			        <p style="color:#aaa;">
-			          Gagal membuat Analytics Report.
-			        </p>
+      <html>
+      <body style="
+        background:#000000;
+        color:white;
+        font-family:Arial;
+        padding:40px;
+      ">
+        <h2>Export Failed</h2>
 
-			        <pre style="
-			          white-space:pre-wrap;
-			          background:#151A21;
-			          padding:15px;
-			          border-radius:10px; ">
-								${String( err?.message || err )}</pre>
-		      </body>
-	      </html>
+        <p style="color:#aaa;">
+          Gagal membuat Analytics Report.
+        </p>
+
+        <pre style="
+          white-space:pre-wrap;
+          background:#151A21;
+          padding:15px;
+          border-radius:10px;
+        ">${escapeAdjustmentHTML(
+          err?.message || String(err)
+        )}</pre>
+      </body>
+      </html>
     `);
+
     pdfTab.document.close();
   }
 }
