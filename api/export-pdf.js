@@ -140,7 +140,7 @@ const logoSrc =
     // RECENT TRANSACTIONS
     // ==========================================
     
-    else if (type === "recent-transactions") {
+ if (type === "recent-transactions") {
       
       if (!branchId) {
         return res
