@@ -3594,7 +3594,7 @@ async function exportGrossRevenuePDF() {
             align-items: flex-end;
             gap: 20px;
             padding-bottom: 18px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 2px solid #222;
           }
 
           .brand {
@@ -6283,7 +6283,7 @@ async function exportMembersPDF() {
             justify-content: space-between;
             gap: 20px;
             padding-top: 14px;
-            border-top: 1px solid #e5e5e5;
+            border-bottom: 2px solid #222;;
           }
 
           .title {
@@ -12190,7 +12190,7 @@ window.exportIngredientPurchases = async function () {
             justify-content: space-between;
             gap: 20px;
             padding-top: 14px;
-            border-top: 1px solid #e5e5e5;
+            border-bottom: 2px solid #222;
           }
 
           .title {
@@ -13597,7 +13597,7 @@ async function exportAnalyticsPDF() {
             align-items: flex-end;
             gap: 20px;
             padding-bottom: 18px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 2px solid #222;
           }
 
           .brand {
@@ -17543,7 +17543,7 @@ async function exportExpensePDF() {
             justify-content: space-between;
             gap: 20px;
             padding-top: 14px;
-            border-top: 1px solid #e5e5e5;
+            border-bottom: 2px solid #222;
           }
 
           .title {
@@ -25242,7 +25242,7 @@ window.exportAssets = async function () {
             align-items: flex-end;
             gap: 20px;
             padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 2px solid #222;
           }
 
           .brand-left {
