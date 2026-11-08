@@ -2224,105 +2224,6 @@ async function loadRecentTransactionsPage() {
   }
 }
 
-async function initExportButton() {
-  const btn = document.getElementById("exportBtn");
-  if (!btn) return;
-  btn.onclick = async () => {
-    const start = document.getElementById("startDate")?.value || "";
-    const end = document.getElementById("endDate")?.value || "";
-    const status = document.getElementById("statusFilter")?.value || "ALL";
-    // Buka tab dulu agar tidak kena popup blocker
-    const pdfTab = window.open("", "_blank");
-    if (pdfTab) {
-      pdfTab.document.write(`
-        <html>
-          <head>
-            <title>
-              Generating PDF...
-            </title>
-
-            <style>
-              body {
-                font-family: Arial;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                background: #0B0F14;
-                color: white;
-              }
-            </style>
-          </head>
-          <body>
-            <h2>
-              Generating PDF...
-            </h2>
-          </body>
-        </html>
-      `);
-    }
-    try {
-			const sessionId =
-  				localStorage.getItem("pos_session_id");
-      const res =
-        await fetch(
-          "/api/export-pdf-report",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-            body: JSON.stringify({
-              start,
-              end,
-              status,
-              branchId: state.branchId,
-							sessionId,
-							tenantSlug: state.tenantSlug
-            })
-          }
-        );
-      if (!res.ok) {
-        throw new Error(
-          await res.text()
-        );
-      }
-      const url =
-        await res.text();
-      if (pdfTab && url) {
-        pdfTab.location.href =
-          url;
-      }
-      else {
-        if (pdfTab) {
-          pdfTab.document.body.innerHTML = `
-            <h2>
-              PDF belum aktif
-            </h2>
-          `;
-        }
-      }
-    }
-    catch (err) {
-	  showToast(
-		"Gagal export PDF",
-		"error"
-	  );
-      if (pdfTab) {
-        pdfTab.document.body.innerHTML = `
-          <h2>
-            Failed Generate PDF
-          </h2>
-          <p>
-            ${err.message || ""}
-          </p>
-        `;
-      }
-    }
-  };
-}
-
 function paginateRecentTransactions(data) {
   const start = (recentCurrentPage - 1) * recentItemsPerPage;
   const end = start + recentItemsPerPage;
@@ -2336,10 +2237,9 @@ function paginateRecentTransactions(data) {
 function renderRecentPagination(totalData) {
   const totalPages = Math.max( 1, Math.ceil(totalData / recentItemsPerPage) );
   // INFO
-  const from =
-    totalData === 0
-      ? 0
-      : (recentCurrentPage - 1) * recentItemsPerPage + 1;
+  const from = totalData === 0
+		? 0
+		: (recentCurrentPage - 1) * recentItemsPerPage + 1;
   const to = Math.min( recentCurrentPage * recentItemsPerPage, totalData );
   const info = document.getElementById("recentTransactionInfo");
   if (info) { info.innerText =  `Showing ${from}-${to} of ${totalData}`;}
@@ -2368,7 +2268,6 @@ document.addEventListener("click", function(e) {
   }
 });
 
-
 function formatCurrency(value) {
   return "IDR " + Number(value || 0).toLocaleString("id-ID");
 }
@@ -2380,35 +2279,13 @@ async function loadRecentTransactionSummary() {
   const table = document.getElementById("tableFilter")?.value || "ALL";
   const branchId = state.branchId || "";
   const role = state.user?.role || "user";
-  const cacheKey =
-    JSON.stringify({
-      branchId,
-      role,
-      start,
-      end,
-      status,
-      table
-    });
+  const cacheKey = JSON.stringify({ branchId, role, start, end, status, table });
 
-  if (
-    state.recentSummaryData &&
-    state.recentSummaryFilter === cacheKey
-  ) {
-    renderRecentTransactionSummary(
-      state.recentSummaryData
-    );
-    return;
-  }
+  if ( state.recentSummaryData && state.recentSummaryFilter === cacheKey
+  ) { renderRecentTransactionSummary( state.recentSummaryData ); return; }
 
   try {
-    const summary =
-      await getRecentTransactionSummaryRPC(
-        branchId,
-        start,
-        end,
-        status,
-        table
-      );
+    const summary = await getRecentTransactionSummaryRPC( branchId, start, end, status, table );
 
     state.recentSummaryData = summary || {};
     state.recentSummaryFilter = cacheKey;
@@ -2419,57 +2296,30 @@ async function loadRecentTransactionSummary() {
 }
 
 function renderRecentTransactionSummary(data) {
-  document.getElementById(
-    "totalRevenueValue"
-  ).textContent =
-    formatCurrency(data.revenue || 0);
-
-  document.getElementById(
-    "activeGuestsValue"
-  ).textContent =
-    Number(data.activeGuests || 0)
-      .toLocaleString("id-ID");
-
-  document.getElementById(
-    "itemsSoldValue"
-  ).textContent =
-    Number(data.itemsSold || 0)
-      .toLocaleString("id-ID");
+  document.getElementById( "totalRevenueValue" ).textContent = formatCurrency(data.revenue || 0);
+  document.getElementById( "activeGuestsValue" ).textContent = Number(data.activeGuests || 0) .toLocaleString("id-ID");
+  document.getElementById( "itemsSoldValue" ).textContent = Number(data.itemsSold || 0) .toLocaleString("id-ID");
 }
 
 async function exportRecentTransactions() {
-	
   const start = document.getElementById("startDate")?.value || "";
   const end = document.getElementById("endDate")?.value || "";
+
   const status = document.getElementById("statusFilter")?.value || "ALL";
+  if (!start || !end) { alert("Pilih tanggal dulu"); return; }
 
-  if (!start || !end) {
-    alert("Pilih tanggal dulu");
-    return;
-  }
-
-  const branchId =
-    state.branchId || "";
-  if (!branchId) {
-    alert("Branch belum tersedia");
-    return;
-  }
-
-  // OPEN PDF / REPORT TAB
+  const branchId = getBranchId();
+  if (!branchId) { alert("Branch belum tersedia"); return; }
+  // OPEN REPORT TAB
   const pdfWindow = window.open("", "_blank");
-  if (!pdfWindow) {
-    alert("Popup diblokir browser");
-    return;
-  }
+  if (!pdfWindow) { alert("Popup diblokir browser"); return; }
 
+  // LOADING
   pdfWindow.document.write(`
     <!DOCTYPE html>
     <html>
       <head>
-        <title>
-          Generating Report...
-        </title>
-
+        <title>Generating Report...</title>
         <style>
           body {
             margin: 0;
@@ -2507,120 +2357,566 @@ async function exportRecentTransactions() {
       <body>
         <div class="box">
           <div class="loader"></div>
-          <h2>
-            Generating Report...
-          </h2>
-
-          <p>
-            Please wait
-          </p>
+          <h2>Generating Report...</h2>
+          <p>Please wait</p>
         </div>
       </body>
     </html>
   `);
 
   try {
-		const sessionId =
-		  localStorage.getItem("pos_session_id");
-    const response =
-	  await fetch(
-	    "/api/export-pdf",
-	    {
-	      method: "POST",
-	      headers: {
-	        "Content-Type":
-	          "application/json"
-	      },
-	
-	      body: JSON.stringify({
-	        type: "recent-transactions",
-	        start,
-	        end,
-	        status,
-	        branchId,
-					sessionId,
-					tenantSlug: state.tenantSlug
-	      })
-	    }
-	  );
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { throw new Error("Session tidak ditemukan. Silakan login kembali."); }
 
-    // GET RESPONSE AS TEXT
-    const text = await response.text();
+    // GET TRANSACTIONS
+    const { data: transactions, error: trxError } = 
+			await supabaseClient.rpc(
+				"get_recent_transactions_page",
+				{
+					p_session_id: sessionId,
+					p_branch_id: branchId,
+					p_start: start || null,
+					p_end: end || null,
+					p_status: status || "ALL",
+					p_table: "ALL"
+				}
+			);
 
-    // SERVER ERROR
-    if (!response.ok) {
-      throw new Error(
-        text ||
-        "Export gagal"
-      );
-    }
+    if (trxError) throw trxError;
 
-    // VALIDATE HTML
-    if (
-      !text ||
-      !text.trim()
-    ) {
-      throw new Error(
-        "Response API kosong."
-      );
-    }
-		
-    // WRITE REPORT
-    pdfWindow.document.open();
-    pdfWindow.document.write(text);
-    pdfWindow.document.close();
-  }
+    // GET SUMMARY
+    const { data: summary, error: summaryError } =
+			await supabaseClient.rpc(
+	      "get_recent_transaction_summary",
+	      {
+	        p_session_id: sessionId,
+	        p_branch_id: branchId,
+	        p_start: start || null,
+	        p_end: end || null,
+	        p_status: status || "ALL",
+	        p_table: "ALL"
+	      }
+	    );
 
-  catch (err) {
-    if (pdfWindow) {
-      pdfWindow.document.open();
-      pdfWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>
-              Export Error
-            </title>
+    if (summaryError) throw summaryError;
 
-            <style>
+    // NORMALIZE DATA
+    const rows = Array.isArray(transactions)
+      ? transactions
+      : [];
+    const reportSummary = summary || {};
+    const paymentDistribution = reportSummary.paymentDistribution || {};
+    const activeMembers = Array.isArray(reportSummary.activeMembers)
+			? reportSummary.activeMembers
+			: [];
+    // COMPANY & BRANCH
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = state.branchName || branchId;
+    const supabaseUrl = String(supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    // TRANSACTION ROWS
+    const transactionRows = rows.length
+      ? rows.map(row => {
+				const items = Array.isArray(row.items)
+					? row.items
+					: [];
+				const itemsCount = items.reduce((total, item) => total + Number(item.qty || 0), 0);
+
+				return `
+					<tr>
+						<td> ${escapeAdjustmentHTML(row.id ?? "-")} </td>
+						<td> ${escapeAdjustmentHTML(row.date ?? "-")} </td>
+						<td> ${escapeAdjustmentHTML(row.member || "Guest")} </td>
+						<td class="center"> ${escapeAdjustmentHTML(row.status || "-")} </td>
+						<td class="center"> ${itemsCount.toLocaleString("id-ID")} </td>
+						<td class="right"> ${formatAdjustmentCurrency(row.total)} </td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="6" class="empty">
+						No transactions
+					</td>
+				</tr>
+			`;
+
+    // PAYMENT ROWS
+    const paymentEntries = Object.entries(paymentDistribution);
+    const paymentRows = paymentEntries.length
+      ? paymentEntries.map(([method, total]) => {
+				const amount = Number(total || 0);
+				const revenue = Number(reportSummary.revenue || 0);
+				const percent = revenue > 0
+					? (amount / revenue) * 100
+					: 0;
+
+				return `
+					<tr>
+						<td> ${escapeAdjustmentHTML(method)} </td>
+						<td class="right"> ${formatAdjustmentCurrency(amount)} </td>
+						<td class="right"> ${percent.toFixed(1)}% </td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="3" class="empty">
+						No payment data
+					</td>
+				</tr>
+			`;
+
+    // ACTIVE MEMBERS
+    const memberRows = activeMembers.length
+      ? activeMembers.map(member => `
+				<tr>
+					<td> ${escapeAdjustmentHTML(member.name ?? "-")} </td>
+					<td class="center"> ${escapeAdjustmentHTML(member.level ?? "-")} </td>
+					<td class="right"> ${Number(member.point || 0).toLocaleString("id-ID")} PTS </td>
+				</tr>
+			`).join("")
+		: `
+				<tr>
+					<td colspan="3" class="empty">
+						No active member
+					</td>
+				</tr>
+			`;
+
+    // SUMMARY VALUES
+    const revenue = Number(reportSummary.revenue || 0);
+    const activeGuests = Number(reportSummary.activeGuests || 0);
+    const itemsSold = Number(reportSummary.itemsSold || 0);
+    // DATE
+    const now = new Date();
+    const generatedDate = now.toLocaleString("id-ID");
+    const filename = `Recent Transactions Report - ${branchName} (${start} - ${end}).pdf`;
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+
+          <title>
+            ${escapeAdjustmentHTML(filename)}
+          </title>
+
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+            }
+
+            body {
+              background: #0B0F14;
+              font-family: Arial, sans-serif;
+              color: #333;
+              padding: 40px 20px;
+            }
+
+            .export-toolbar {
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              color: white;
+              font-size: 14px;
+            }
+
+            .export-toolbar button {
+              border: 1px solid rgba(255,255,255,.15);
+              background: rgba(255,255,255,.08);
+              color: white;
+              padding: 10px 16px;
+              border-radius: 10px;
+              cursor: pointer;
+              font-weight: bold;
+            }
+
+            .report {
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto;
+              background: white;
+              padding: 35px;
+              border-radius: 4px;
+            }
+
+            .header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 20px;
+              padding-bottom: 18px;
+              border-bottom: 2px solid #222;
+            }
+
+            .company-info {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+              min-width: 0;
+            }
+
+            .logo {
+              width: 70px;
+              height: 70px;
+              object-fit: contain;
+            }
+
+            .company-name {
+              font-size: 18px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .branch-name {
+              font-size: 11px;
+              color: #777;
+              margin-top: 5px;
+            }
+
+            .period {
+              text-align: right;
+              font-size: 11px;
+              color: #555;
+              white-space: nowrap;
+            }
+
+            .report-heading {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 15px;
+              margin: 22px 0;
+            }
+
+            .title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .subtitle {
+              font-size: 11px;
+              color: #777;
+              text-align: right;
+            }
+
+            .kpi-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 16px;
+              margin: 25px 0;
+            }
+
+            .kpi-card {
+              border: 1px solid #e5e5e5;
+              border-radius: 10px;
+              padding: 18px;
+              background: #fafafa;
+              text-align: center;
+            }
+
+            .kpi-title {
+              font-size: 11px;
+              color: #666;
+              font-weight: bold;
+              margin-bottom: 10px;
+            }
+
+            .kpi-value {
+              font-size: 20px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .card {
+              border: 1px solid #e5e5e5;
+              border-radius: 10px;
+              padding: 18px;
+              margin-top: 20px;
+              background: white;
+            }
+
+            .card h3 {
+              margin: 0 0 12px 0;
+              font-size: 15px;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 11px;
+              margin-top: 10px;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            th {
+              background: #f5f5f5;
+              padding: 10px;
+              text-align: left;
+              font-weight: bold;
+            }
+
+            td {
+              padding: 10px;
+              border-bottom: 1px solid #eee;
+              vertical-align: top;
+            }
+
+            tr {
+              page-break-inside: avoid;
+            }
+
+            .right {
+              text-align: right;
+            }
+
+            .center {
+              text-align: center;
+            }
+
+            .empty {
+              text-align: center;
+              color: #777;
+              padding: 25px;
+            }
+
+            .footer {
+              margin-top: 35px;
+              padding-top: 12px;
+              border-top: 1px solid #eee;
+              text-align: center;
+              font-size: 9px;
+              color: #888;
+            }
+
+            @media print {
               body {
-                font-family: Arial;
-                padding: 40px;
-                background: #0B0F14;
-                color: white;
+                background: white;
+                padding: 0;
               }
 
-              .error {
-                color: #ff6b6b;
+              .export-toolbar {
+                display: none;
               }
-            </style>
-          </head>
 
-          <body>
-            <h2 class="error">
-              Export Error
-            </h2>
+              .report {
+                max-width: none;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+              }
 
-            <p>
-              ${String(err.message || err)}
-            </p>
-          </body>
-        </html>
-      `);
-      pdfWindow.document.close();
-    }
+              .card,
+              .kpi-card {
+                break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="export-toolbar">
+            <div>
+              ${escapeAdjustmentHTML(filename)}
+            </div>
+
+            <button onclick="window.print()">
+              Download / Print PDF
+            </button>
+          </div>
+
+          <div class="report">
+            <div class="header">
+              <div class="company-info">
+                ${
+                  logoUrl
+                    ? `
+                      <img src="${logoUrl}"
+                        class="logo"
+                        alt="Company Logo" />
+                    `
+                    : ""
+                }
+
+                <div>
+                  <div class="company-name">
+                    ${escapeAdjustmentHTML(companyName)}
+                  </div>
+
+                  <div class="branch-name">
+                    ${escapeAdjustmentHTML(branchName)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                <b>Generated</b><br>
+                ${escapeAdjustmentHTML(generatedDate)}
+              </div>
+            </div>
+
+            <div class="report-heading">
+              <div class="title">
+                Recent Transactions Report
+              </div>
+
+              <div class="subtitle">
+                Period: ${escapeAdjustmentHTML(start)} - ${escapeAdjustmentHTML(end)}<br>
+                Status: ${escapeAdjustmentHTML(status)}
+              </div>
+            </div>
+
+            <div class="kpi-grid">
+              <div class="kpi-card">
+                <div class="kpi-title">
+                  TOTAL REVENUE
+                </div>
+
+                <div class="kpi-value">
+                  ${formatAdjustmentCurrency(revenue)}
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-title">
+                  ACTIVE GUEST
+                </div>
+
+                <div class="kpi-value">
+                  ${activeGuests.toLocaleString("id-ID")}
+                </div>
+              </div>
+
+              <div class="kpi-card">
+                <div class="kpi-title">
+                  ITEMS SOLD
+                </div>
+
+                <div class="kpi-value">
+                  ${itemsSold.toLocaleString("id-ID")}
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Payment Distribution</h3>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Payment</th>
+                    <th class="right">Total</th>
+                    <th class="right">Percentage</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${paymentRows}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3>Active Members</h3>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th class="center">Tier</th>
+                    <th class="right">Point</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${memberRows}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="card">
+              <h3>Recent Transactions</h3>
+							
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Member</th>
+                    <th class="center">Status</th>
+                    <th class="center">Items</th>
+                    <th class="right">Total</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${transactionRows}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="footer">
+              Generated by MUNO POS • ${escapeAdjustmentHTML(generatedDate)}
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    // SHOW REPORT
+    pdfWindow.document.open();
+    pdfWindow.document.write(html);
+    pdfWindow.document.close();
+
+  } catch (err) {
+    const errorMessage = escapeAdjustmentHTML( err?.message || "Export gagal" );
+
+    pdfWindow.document.open();
+    pdfWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <body style="
+          font-family:Arial;
+          padding:40px;
+          background:#0B0F14;
+          color:white; ">
+          <h2 style="color:#ff6b6b">
+            Export Error
+          </h2>
+
+          <pre>${errorMessage}</pre>
+        </body>
+      </html>
+    `);
+
+    pdfWindow.document.close();
+    alert(err?.message || "Export Recent Transactions gagal");
   }
 }
-
-
 
 function openTransactionModal(trxId) {
   // hapus modal lama
   document.getElementById("transactionModalWrapper")?.remove();
   const template = document.getElementById("transactionModalTemplate");
-        if (!template) {
-          return;
-        }
+  if (!template) { return; }
+	
   const clone = template.content.cloneNode(true);
   const wrapper = document.createElement("div");
   wrapper.id = "transactionModalWrapper";
@@ -2628,29 +2924,28 @@ function openTransactionModal(trxId) {
   document.body.appendChild(wrapper);
 
   const trx = recentData.find(t => String(t.ID_Transaksi || t.id).trim() === String(trxId).trim());
-        if (!trx) return;
+  if (!trx) return;
   // SIMPAN TRANSAKSI AKTIF
   currentTransaction = { id: trx.ID_Transaksi || trx.id || trx.trxId };
   wrapper.querySelector("#modalTransactionId").innerText = trx.ID_Transaksi || trx.id;
-  wrapper.querySelector("#modalTransactionTotal").innerText =
-    "Rp " + Number(trx.total || 0).toLocaleString("id-ID");
+  wrapper.querySelector("#modalTransactionTotal").innerText = "Rp " + Number(trx.total || 0).toLocaleString("id-ID");
   wrapper
   .querySelector("#transactionModalOverlay")
   .addEventListener("click", function(e){
-
-    if(e.target.id === "transactionModalOverlay"){
-      closeTransactionModal();
-    }
+    if(e.target.id === "transactionModalOverlay"){ closeTransactionModal(); }
   });
 }
 
 function openViewTransactionModal() {
   document.getElementById("transactionModalWrapper")?.remove();
-        if (!currentTransaction) return;
+  if (!currentTransaction) return;
+	
   const trxId = currentTransaction.id;
   document.getElementById("viewTransactionModalWrapper")?.remove();
+	
   const template = document.getElementById("viewtransactionModalTemplate");
-        if (!template) return;
+	if (!template) return;
+	
   const wrapper = document.createElement("div");
   wrapper.id = "viewTransactionModalWrapper";
   wrapper.appendChild(template.content.cloneNode(true));
@@ -2659,10 +2954,7 @@ function openViewTransactionModal() {
   container.innerHTML = "Loading...";
   // AMBIL DARI DATA YANG SUDAH LO LOAD (getTransactionWithItems)
   const trx = recentData.find(t => t.id === trxId);
-		if (!trx) {
-			container.innerHTML = "Data tidak ditemukan";
-			return;
-		}
+	if (!trx) { container.innerHTML = "Data tidak ditemukan"; return; }
   trx.items = Array.isArray(trx.items) ? trx.items : [];
   renderViewTransaction(wrapper, trx);
 }
@@ -2741,7 +3033,6 @@ async function sendReceiptWhatsapp() {
 	if (!trxId || trxId === "undefined") { alert("TRX ID kosong"); return; }
 	
   try {
-		
     const trx = await getReceiptDataRPC(trxId);
 		console.log("Receipt logo URL:", trx.logo_url);
     if (!trx) { alert("Transaksi tidak ditemukan"); return; }
@@ -2755,6 +3046,7 @@ async function sendReceiptWhatsapp() {
 function sendReceiptWhatsappWithData(trx, phone, customMessage = null) {
   const tpl = document.getElementById("receiptTemplate");
   if (!tpl) return;
+	
   const wrapper = document.createElement("div");
   wrapper.style.position = "absolute";
   wrapper.style.left = "-9999px";
@@ -2901,6 +3193,7 @@ function renderReceipt(data) {
   const tpl = document.getElementById("receiptTemplate");
   const clone = tpl.content.cloneNode(true);
   const wrapper = document.createElement("div");
+	
   wrapper.style.position = "absolute";
   wrapper.style.left = "-9999px";
   wrapper.appendChild(clone);
@@ -2914,6 +3207,7 @@ function renderReceipt(data) {
   wrapper.querySelector("#receiptTax").textContent = data.tax;
   wrapper.querySelector("#receiptService").textContent = data.service;
   wrapper.querySelector("#receiptDiscount").textContent = data.discount;
+	
   const canvas = wrapper.querySelector("#receiptCanvas");
 	const receiptBackground = "#101715";
   html2canvas(canvas, {
@@ -2921,11 +3215,7 @@ function renderReceipt(data) {
     useCORS: true,
     backgroundColor: "#101715"
   }).then(canvas => {
-    const image =
-      canvas.toDataURL(
-        "image/jpeg",
-        0.65
-      );
+    const image = canvas.toDataURL( "image/jpeg", 0.65 );
     wrapper.remove();
   });
 }
@@ -2939,10 +3229,8 @@ document.addEventListener("click", function(e) {
 });
 
 function closeTransactionModal() {
-  document
-    .querySelectorAll(
-      "#transactionModalWrapper, #viewTransactionModalWrapper"
-    )
+  document 
+		.querySelectorAll( "#transactionModalWrapper, #viewTransactionModalWrapper" )
     .forEach(el => el.remove());
 }
 
@@ -2955,19 +3243,12 @@ function closeViewTransactionModal() {
 
 async function fetchSettings(callback) {
   try {
-    const data =
-      await getSettingsPageDataRPC();
-    if (!data) {
-      throw new Error(
-        "Data settings tidak ditemukan"
-      );
-    }
+    const data = await getSettingsPageDataRPC();
+    if (!data) { throw new Error( "Data settings tidak ditemukan" ); }
     // Ambil bagian settings saja
     state.settings = data.settings || {};
 		
-    if (callback) {
-      callback();
-    }
+    if (callback) { callback(); }
   } catch (err) {
     alert(
       "Gagal mengambil settings"
@@ -2976,9 +3257,9 @@ async function fetchSettings(callback) {
 }
 
 
-    // ==================================
-    // GROSS REVENUE
-    // ==================================      
+// ==================================
+// GROSS REVENUE
+// ==================================      
 
 async function loadGrossRevenuePage() {
   const branchId = state.branchId || "";
@@ -2991,11 +3272,8 @@ async function loadGrossRevenuePage() {
   });
 
   // CACHE FRONTEND
-  if (
-    state.grossRevenueData &&
-    state.grossRevenueFilter === cacheKey
-  ) {
-    const res = state.grossRevenueData;
+  if ( state.grossRevenueData && state.grossRevenueFilter === cacheKey
+  ) { const res = state.grossRevenueData;
     renderGrossRevenue(res.summary || {});
     renderRevenueTrend(res.trend || []);
     renderDonut(res.category || []);
@@ -3027,8 +3305,7 @@ async function loadGrossRevenuePage() {
 }
 
 async function applyDateFilter() {
-  const branchId =
-    state.branchId || "";
+  const branchId = state.branchId || "";
   // Owner belum pilih outlet
   if (!branchId) return;
   const start = document.getElementById("startDate")?.value;
@@ -3037,14 +3314,9 @@ async function applyDateFilter() {
   toggleLoading(true);
 
   try {
-	  
     // GET GROSS REVENUE DATA
     const res =
-      await getGrossRevenueDataRPC(
-        branchId,
-        start,
-        end
-      );
+      await getGrossRevenueDataRPC( branchId, start, end );
 	  
     // CACHE
     state.grossRevenueData = res;
@@ -3078,19 +3350,13 @@ async function applyDateFilter() {
     topRevenueCurrentPage = 1;
     renderTopRevenueTable();
   }
-  catch (err) {
-    showToast(
-      "Gagal memuat Gross Revenue",
-      "error"
-    );
-  }
-  finally {
-    toggleLoading(false);
-  }
+  catch (err) { 
+		showToast( "Gagal memuat Gross Revenue", "error" ); 
+	}
+  finally { toggleLoading(false); }
 }
 
-document.addEventListener(
-  "click",
+document.addEventListener( "click",
   function(e) {
     const btn = e.target.closest( "#btnExportGrossRevenuePDF" );
 
@@ -8607,17 +8873,17 @@ function renderRecipePriceHistory(data) {
 }
 	
 function closeRecipeMasterModal() {
-  document
-    .getElementById("recipeModalWrapper")
+  document .getElementById("recipeModalWrapper")
     ?.remove();
 }
 
 async function exportRecipeReport() {
   const branchId = getBranchId();
   if (!branchId) { alert("Branch tidak ditemukan"); return; }
-	
+
   const pdfWindow = window.open("", "_blank");
   if (!pdfWindow) { alert("Popup diblokir browser."); return; }
+
   // LOADING
   pdfWindow.document.write(`
     <html>
@@ -8636,55 +8902,502 @@ async function exportRecipeReport() {
   `);
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "recipe",
-            branchId,
-						sessionId,
-						tenantSlug: state.tenantSlug
-          })
-        }
-      );
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { throw new Error("Session tidak ditemukan. Silakan login kembali."); }
+    // GET RECIPE DATA
+    const { data, error } = await supabaseClient.rpc(
+      "get_recipes",
+      {
+        p_branch_id: branchId,
+        p_session_id: sessionId
+      }
+    );
 
-    // CHECK RESPONSE
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error( errorText || "Gagal export Recipe Report" );
-    }
+    if (error) throw error;
+
+    const recipes = Array.isArray(data) ? data : [];
+    // FILTER BRANCH
+    const normalizeValue = value => String(value ?? "").trim().toLowerCase();
+    const filtered = recipes.filter(row => {
+      const rowBranch =
+        row.branchId ??
+        row.branch_id ??
+        row.branchid ??
+        "";
+
+      return (normalizeValue(rowBranch) === normalizeValue(branchId));
+    });
+    // COMPANY & BRANCH
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = state.branchName || branchId;
+    const supabaseUrl = String(supabaseClient?.supabaseUrl || "").replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    // SUMMARY
+    const totalRecipes = filtered.length;
+    const totalCost = filtered.reduce((sum, row) => sum + Number(row.cost ?? row.Cost ?? 0), 0);
+    const totalProfit = filtered.reduce((sum, row) => sum + Number(row.profit ?? row.Profit ?? 0), 0);
+    const avgCostPercent = totalRecipes > 0
+			? filtered.reduce((sum, row) => sum + Number( row.costPercent ?? row.cost_percent ?? row.Cost_Percent ?? 0 ), 0 ) / totalRecipes
+			: 0;
+    // TABLE ROWS
+    const rows = filtered.map((item, i) => {
+      const productName =
+        item.productName ??
+        item.product_name ??
+        item.Product_Name ??
+        item.Nama_Produk ??
+        item.name ??
+        "-";
+      const ingredients = Array.isArray(item.ingredients)
+        ? item.ingredients
+					.map(ing => {
+						const name = ing.name ?? ing.ingredientName ?? "-";
+						const qty = ing.qty ?? 0;
+						const unit = ing.unit ?? "";
+
+						return `${name} (${qty}${unit})`;
+					}) .join(", ")
+			: ( item.ingredientsLabel ?? item.ingredients_label ?? "-" );
 			
-    // GET HTML
-    const html = await response.text();
-    if (!html) { throw new Error( "Response export kosong" ); }
+      const cost = Number( item.cost ?? item.Cost ?? 0 );
+      const selling = Number(
+        item.selling ??
+        item.Selling ??
+        item.sellingPrice ??
+        item.selling_price ??
+        0
+      );
+      const net = Number( item.net ?? item.Net ?? 0 );
+      const costPercent = Number( item.costPercent ?? item.cost_percent ?? 0 );
+      const profit = Number( item.profit ?? item.Profit ?? 0 );
+
+      return `
+        <tr>
+          <td>${i + 1}</td>
+          <td> ${escapeAdjustmentHTML(productName)} </td>
+          <td> ${escapeAdjustmentHTML(ingredients)} </td>
+          <td class="right"> ${formatAdjustmentCurrency(cost)} </td>
+          <td class="right"> ${formatAdjustmentCurrency(selling)} </td>
+          <td class="right"> ${formatAdjustmentCurrency(net)} </td>
+          <td class="center"> ${costPercent}% </td>
+          <td class="right"> ${formatAdjustmentCurrency(profit)} </td>
+        </tr>
+      `;
+    }).join("");
+
+    // EMPTY
+    const recipeRows = rows || `
+      <tr>
+        <td colspan="8" class="empty">
+          No recipe data
+        </td>
+      </tr>
+    `;
+
+    // DATE
+    const now = new Date();
+
+    const generatedDate = now.toLocaleString("id-ID");
+
+    const today = now.toLocaleDateString("id-ID");
+
+    const filename =
+      `Recipe Master Ledger Report - ${branchName} (${today}).pdf`;
+
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+
+          <title>
+            ${escapeAdjustmentHTML(filename)}
+          </title>
+
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+            }
+
+            body {
+              background: #0B0F14;
+              font-family: Arial, sans-serif;
+              color: #333;
+              padding: 40px 20px;
+            }
+
+            .export-toolbar {
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto 20px auto;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              color: white;
+              font-size: 14px;
+            }
+
+            .export-toolbar button {
+              border: 1px solid rgba(255,255,255,.15);
+              background: rgba(255,255,255,.08);
+              color: white;
+              padding: 10px 16px;
+              border-radius: 10px;
+              cursor: pointer;
+              font-weight: bold;
+            }
+
+            .report {
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto;
+              background: white;
+              padding: 35px;
+              border-radius: 4px;
+            }
+
+            .header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 20px;
+              padding-bottom: 18px;
+              border-bottom: 2px solid #222;
+            }
+
+            .company-info {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+              min-width: 0;
+            }
+
+            .logo {
+              width: 70px;
+              height: 70px;
+              object-fit: contain;
+            }
+
+            .company-name {
+              font-size: 18px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .branch-name {
+              font-size: 11px;
+              color: #777;
+              margin-top: 5px;
+            }
+
+            .period {
+              text-align: right;
+              font-size: 11px;
+              color: #555;
+              white-space: nowrap;
+            }
+
+            .report-heading {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 15px;
+              margin: 22px 0;
+            }
+
+            .title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .subtitle {
+              font-size: 11px;
+              color: #777;
+              text-align: right;
+            }
+
+            .summary-grid {
+              display: grid;
+              grid-template-columns: repeat(4, 1fr);
+              gap: 16px;
+              margin: 25px 0;
+            }
+
+            .summary-card {
+              border: 1px solid #e5e5e5;
+              border-radius: 10px;
+              padding: 18px;
+              background: #fafafa;
+              text-align: center;
+            }
+
+            .summary-label {
+              font-size: 11px;
+              color: #666;
+              font-weight: bold;
+              margin-bottom: 10px;
+            }
+
+            .summary-value {
+              font-size: 20px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .card {
+              border: 1px solid #e5e5e5;
+              border-radius: 10px;
+              padding: 18px;
+              margin-top: 20px;
+              background: #fff;
+            }
+
+            .card h3 {
+              margin: 0 0 12px 0;
+              font-size: 15px;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 10px;
+              margin-top: 10px;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            th {
+              background: #f5f5f5;
+              padding: 10px;
+              text-align: left;
+              font-weight: bold;
+            }
+
+            td {
+              padding: 10px;
+              border-bottom: 1px solid #eee;
+              vertical-align: top;
+              word-break: break-word;
+            }
+
+            tr {
+              page-break-inside: avoid;
+            }
+
+            .right {
+              text-align: right;
+            }
+
+            .center {
+              text-align: center;
+            }
+
+            .empty {
+              text-align: center;
+              padding: 25px;
+              color: #777;
+            }
+
+            .footer {
+              margin-top: 35px;
+              padding-top: 12px;
+              border-top: 1px solid #eee;
+              text-align: center;
+              font-size: 9px;
+              color: #888;
+            }
+
+            @media print {
+              body {
+                background: white;
+                padding: 0;
+              }
+
+              .export-toolbar {
+                display: none;
+              }
+
+              .report {
+                max-width: none;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+              }
+
+              .card,
+              .summary-card {
+                break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="export-toolbar">
+            <div>
+              ${escapeAdjustmentHTML(filename)}
+            </div>
+
+            <button onclick="window.print()">
+              Download / Print PDF
+            </button>
+          </div>
+
+          <div class="report">
+
+            <div class="header">
+              <div class="company-info">
+                ${
+                  logoUrl
+                    ? `
+                      <img
+                        src="${logoUrl}"
+                        class="logo"
+                        alt="Company Logo"
+                      />
+                    `
+                    : ""
+                }
+
+                <div>
+                  <div class="company-name">
+                    ${escapeAdjustmentHTML(companyName)}
+                  </div>
+
+                  <div class="branch-name">
+                    ${escapeAdjustmentHTML(branchName)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                <b>Generated</b><br>
+                ${escapeAdjustmentHTML(generatedDate)}
+              </div>
+            </div>
+
+            <div class="report-heading">
+              <div class="title">
+                Recipe Master Ledger Report
+              </div>
+
+              <div class="subtitle">
+                Recipe Overview
+              </div>
+            </div>
+
+            <div class="summary-grid">
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  TOTAL RECIPES
+                </div>
+
+                <div class="summary-value">
+                  ${totalRecipes.toLocaleString("id-ID")}
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  TOTAL COST
+                </div>
+
+                <div class="summary-value">
+                  ${formatAdjustmentCurrency(totalCost)}
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  TOTAL PROFIT
+                </div>
+
+                <div class="summary-value">
+                  ${formatAdjustmentCurrency(totalProfit)}
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  AVG COST %
+                </div>
+
+                <div class="summary-value">
+                  ${avgCostPercent.toFixed(0)}%
+                </div>
+              </div>
+
+            </div>
+
+            <div class="card">
+              <h3>Recipe Master Ledger</h3>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>No</th>
+                    <th>Product Name</th>
+                    <th>Ingredients</th>
+                    <th class="right">Est Cost</th>
+                    <th class="right">Selling Price</th>
+                    <th class="right">Net Price</th>
+                    <th class="center">Cost %</th>
+                    <th class="right">Profit</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${recipeRows}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="footer">
+              Generated by MUNO POS • ${escapeAdjustmentHTML(generatedDate)}
+            </div>
+
+          </div>
+        </body>
+      </html>
+    `;
 
     // SHOW REPORT
     pdfWindow.document.open();
-    pdfWindow.document.write( html );
+    pdfWindow.document.write(html);
     pdfWindow.document.close();
-  }
-  catch (err) {
+
+  } catch (err) {
+    const errorMessage = escapeAdjustmentHTML(
+      err?.message || "Export PDF gagal"
+    );
+
     pdfWindow.document.open();
     pdfWindow.document.write(`
+      <!DOCTYPE html>
       <html>
-        <body style="font-family:Arial; padding:40px;">
-          <h3>
-            Export PDF Failed
-          </h3>
-
-          <pre>
-						${String( err?.message || "Export PDF gagal" )}
-          </pre>
+        <body style="font-family:Arial;padding:40px;">
+          <h3>Export PDF Failed</h3>
+          <pre>${errorMessage}</pre>
         </body>
       </html>
     `);
 
     pdfWindow.document.close();
-    alert( err?.message || "Export Recipe Report gagal" );
+
+    alert(err?.message || "Export Recipe Report gagal");
   }
 }
 
