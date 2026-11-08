@@ -10359,17 +10359,11 @@ function getBranchId() {
 
 async function exportInventoryPDF() {
   const branchId = getBranchId();
-  if (!branchId) {
-    alert(
-      "Branch tidak ditemukan"
-    );
-    return;
-  }
-  const pdfWindow = window.open( "", "_blank" );
-  if (!pdfWindow) { alert( "Popup diblokir browser" );
-    return;
-  }
-  // LOADING
+  if (!branchId) { alert("Branch tidak ditemukan"); return; }
+
+  const pdfWindow = window.open("", "_blank");
+  if (!pdfWindow) { alert("Popup diblokir browser"); return; }
+
   pdfWindow.document.write(`
     <html>
       <body style="
@@ -10386,67 +10380,449 @@ async function exportInventoryPDF() {
   `);
 
   try {
-		const sessionId = localStorage.getItem("pos_session_id");
-    const response =
-      await fetch(
-        "/api/export-pdf",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { throw new Error("Session tidak ditemukan. Silakan login kembali."); }
+    // GET INVENTORY DATA
+    const { data, error } = await supabaseClient.rpc(
+      "get_inventory_page",
+      {
+        p_branch_id: branchId,
+        p_session_id: sessionId
+      }
+    );
 
-          body: JSON.stringify({
-            type: "inventory",
-            branchId: branchId,
-						sessionId,
-						tenantSlug: state.tenantSlug
-          })
-        }
-      );
-    // CHECK RESPONSE
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        errorText ||
-        "Export Inventory gagal"
-      );
-    }
-    // GET HTML
-    const html = await response.text();
-    if (!html) {
-      throw new Error(
-        "Response export kosong"
-      );
-    }
+    if (error) throw error;
+		
+    const inventoryData = data || {
+      summary: {},
+      ingredients: [],
+      suppliers: [],
+      recipes: []
+    };
+    const rows = Array.isArray(inventoryData.ingredients)
+      ? inventoryData.ingredients
+      : [];
+    // COMPANY & BRANCH
+    const companyName = state.businessProfile?.company_name || "YOUR BRANCH";
+    const branchName = state.branchName || branchId;
+    const supabaseUrl = String( supabaseClient?.supabaseUrl || "" ).replace(/\/$/, "");
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : "";
+    // TOTAL
+    const totalValue = rows.reduce((sum, r) => {
+      const qty = Number(r.qty) || 0;
+      const cost = Number(r.costPerUnit) || 0;
+
+      return sum + (qty * cost);
+    }, 0);
+    const totalItems = rows.length;
+    const lowStockCount = rows.filter(r => {
+      const qty = Number(r.qty) || 0;
+      const min = Number(r.min) || 0;
+
+      return qty <= min;
+    }).length;
+    // INVENTORY ROWS
+    const inventoryRows = rows.length
+      ? rows.map(r => {
+				const qty = Number(r.qty) || 0;
+				const min = Number(r.min) || 0;
+				const cost = Number(r.costPerUnit) || 0;
+				const value = qty * cost;
+
+				return `
+					<tr>
+						<td>${escapeAdjustmentHTML(r.id ?? "-")}</td>
+						<td>${escapeAdjustmentHTML(r.name ?? "-")}</td>
+						<td class="right">${qty.toLocaleString("id-ID")}</td>
+						<td>${escapeAdjustmentHTML(r.unit || "-")}</td>
+						<td class="right">${min.toLocaleString("id-ID")}</td>
+						<td class="right">${formatAdjustmentCurrency(cost)}</td>
+						<td class="right">${formatAdjustmentCurrency(value)}</td>
+					</tr>
+				`;
+			}).join("")
+		: `
+				<tr>
+					<td colspan="7" class="empty">
+						No inventory data
+					</td>
+				</tr>
+			`;
+    // DATE
+    const now = new Date();
+    const generatedDate = now.toLocaleString("id-ID");
+    const today = now.toLocaleDateString("id-ID");
+    const filename = `Inventory Report - ${branchName} (${today}).pdf`;
+    // HTML REPORT
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>${escapeAdjustmentHTML(filename)}</title>
+
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+
+            html,
+            body {
+              margin: 0;
+              padding: 0;
+            }
+
+            body {
+              background: #0B0F14;
+              font-family: Arial, sans-serif;
+              color: #333;
+              padding: 40px 20px;
+            }
+
+            .export-toolbar {
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto 20px auto;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              color: white;
+              font-size: 14px;
+            }
+
+            .export-toolbar button {
+              border: 1px solid rgba(255,255,255,.15);
+              background: rgba(255,255,255,.08);
+              color: white;
+              padding: 10px 16px;
+              border-radius: 10px;
+              cursor: pointer;
+              font-weight: bold;
+            }
+
+            .report {
+              width: 100%;
+              max-width: 1100px;
+              margin: 0 auto;
+              background: white;
+              padding: 35px;
+              border-radius: 4px;
+            }
+
+            .header {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 20px;
+              padding-bottom: 18px;
+              border-bottom: 2px solid #222;
+            }
+
+            .company-info {
+              display: flex;
+              align-items: center;
+              gap: 15px;
+              min-width: 0;
+            }
+
+            .logo {
+              width: 70px;
+              height: 70px;
+              object-fit: contain;
+            }
+
+            .company-name {
+              font-size: 18px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .branch-name {
+              font-size: 11px;
+              color: #777;
+              margin-top: 5px;
+            }
+
+            .period {
+              text-align: right;
+              font-size: 11px;
+              color: #555;
+              white-space: nowrap;
+            }
+
+            .report-heading {
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              gap: 15px;
+              margin: 22px 0;
+            }
+
+            .title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .subtitle {
+              font-size: 11px;
+              color: #777;
+              text-align: right;
+            }
+
+            .summary-grid {
+              display: grid;
+              grid-template-columns: repeat(3, 1fr);
+              gap: 16px;
+              margin: 25px 0;
+            }
+
+            .summary-card {
+              border: 1px solid #e5e5e5;
+              border-radius: 10px;
+              padding: 18px;
+              background: #fafafa;
+            }
+
+            .summary-label {
+              font-size: 11px;
+              color: #666;
+              font-weight: bold;
+              margin-bottom: 10px;
+            }
+
+            .summary-value {
+              font-size: 20px;
+              font-weight: bold;
+              color: #222;
+            }
+
+            .card {
+              border: 1px solid #e5e5e5;
+              border-radius: 10px;
+              padding: 18px;
+              margin-top: 20px;
+              background: #fff;
+            }
+
+            .card h3 {
+              margin: 0 0 12px 0;
+              font-size: 15px;
+            }
+
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              font-size: 11px;
+              margin-top: 10px;
+            }
+
+            thead {
+              display: table-header-group;
+            }
+
+            th {
+              background: #f5f5f5;
+              padding: 10px;
+              text-align: left;
+              font-weight: bold;
+            }
+
+            td {
+              padding: 10px;
+              border-bottom: 1px solid #eee;
+            }
+
+            tr {
+              page-break-inside: avoid;
+            }
+
+            .right {
+              text-align: right;
+            }
+
+            .empty {
+              text-align: center;
+              color: #777;
+              padding: 25px;
+            }
+
+            .footer {
+              margin-top: 35px;
+              padding-top: 12px;
+              border-top: 1px solid #eee;
+              text-align: center;
+              font-size: 9px;
+              color: #888;
+            }
+
+            @media print {
+              body {
+                background: white;
+                padding: 0;
+              }
+
+              .export-toolbar {
+                display: none;
+              }
+
+              .report {
+                max-width: none;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 20px;
+              }
+
+              .card,
+              .summary-card {
+                break-inside: avoid;
+              }
+            }
+          </style>
+        </head>
+
+        <body>
+          <div class="export-toolbar">
+            <div>Inventory Report</div>
+
+            <button onclick="window.print()">
+              Download / Print PDF
+            </button>
+          </div>
+
+          <div class="report">
+
+            <div class="header">
+              <div class="company-info">
+                ${
+                  logoUrl
+                    ? `
+                      <img
+                        src="${logoUrl}"
+                        class="logo"
+                        alt="Company Logo"
+                      />
+                    `
+                    : ""
+                }
+
+                <div>
+                  <div class="company-name">
+                    ${escapeAdjustmentHTML(companyName)}
+                  </div>
+
+                  <div class="branch-name">
+                    ${escapeAdjustmentHTML(branchName)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                <b>Generated</b><br>
+                ${escapeAdjustmentHTML(generatedDate)}
+              </div>
+            </div>
+
+            <div class="report-heading">
+              <div class="title">
+                Ingredient Stock Report
+              </div>
+
+              <div class="subtitle">
+                Inventory Overview
+              </div>
+            </div>
+
+            <div class="summary-grid">
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  TOTAL ITEMS
+                </div>
+
+                <div class="summary-value">
+                  ${totalItems.toLocaleString("id-ID")}
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  LOW STOCK
+                </div>
+
+                <div class="summary-value">
+                  ${lowStockCount.toLocaleString("id-ID")}
+                </div>
+              </div>
+
+              <div class="summary-card">
+                <div class="summary-label">
+                  INVENTORY VALUE
+                </div>
+
+                <div class="summary-value">
+                  ${formatAdjustmentCurrency(totalValue)}
+                </div>
+              </div>
+
+            </div>
+
+            <div class="card">
+              <h3>Ingredient Stock Report</h3>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Ingredient</th>
+                    <th class="right">Qty</th>
+                    <th>Unit</th>
+                    <th class="right">Min</th>
+                    <th class="right">Cost</th>
+                    <th class="right">Value</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  ${inventoryRows}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="footer">
+              Generated by MUNO POS • ${escapeAdjustmentHTML(generatedDate)}
+            </div>
+
+          </div>
+        </body>
+      </html>
+    `;
+
     // SHOW REPORT
     pdfWindow.document.open();
     pdfWindow.document.write(html);
     pdfWindow.document.close();
-  }
 
-  catch (err) {
+  } catch (err) {
+    const errorMessage = escapeAdjustmentHTML(
+      err?.message || "Export PDF gagal"
+    );
+
     pdfWindow.document.open();
     pdfWindow.document.write(`
+      <!DOCTYPE html>
       <html>
-        <body style=" font-family:Arial; padding:40px;">
-          <h2>
-            Export PDF Failed
-          </h2>
-
-          <pre>
-						${String(
-						  err?.message ||
-						  "Export PDF gagal"
-						)}
-          </pre>
+        <body style="font-family:Arial;padding:40px;">
+          <h2>Export PDF Failed</h2>
+          <pre>${errorMessage}</pre>
         </body>
       </html>
     `);
-
     pdfWindow.document.close();
-    alert( err?.message || "Export PDF gagal" );
+
+    alert(err?.message || "Export PDF gagal");
   }
 }
 
