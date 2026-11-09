@@ -22067,9 +22067,9 @@
 						    <label class="block text-xs font-medium text-muted mb-2">
 						      Period
 						    </label>
-						    <input
-						      type="month"
+						    <input type="month"
 						      id="taxObligationPeriodFilter"
+									onchange="applyTaxObligationsFilters()"
 						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 						  </div>
 							<!-- PERIOD YEAR -->
@@ -22077,8 +22077,8 @@
 								<label class="block text-xs font-medium text-muted mb-2">
 									Period (Yearly)
 								</label>
-								<select
-									id="taxObligationYearFilter"
+								<select id="taxObligationYearFilter"
+									onchange="applyTaxObligationsFilters()"
 									class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 									<option value="">All Years</option>
 								</select>
@@ -22088,8 +22088,8 @@
 						    <label class="block text-xs font-medium text-muted mb-2">
 						      Branch
 						    </label>
-						    <select
-						      id="taxObligationBranchDataFilter"
+						    <select id="taxObligationBranchDataFilter"
+									onchange="loadTaxObligations()"
 						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 						      <option value="">All Branches</option>
 						    </select>
