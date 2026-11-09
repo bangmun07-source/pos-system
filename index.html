@@ -22030,6 +22030,93 @@
 					    </div>
 					  </div>
 					</section>
+					<!-- TAX OBLIGATIONS -->
+					<section class="bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+					  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
+					    <div class="flex items-center gap-3">
+					      <div class="main-icon-box">
+					        <span class="material-symbols-outlined text-3xl"
+					          style="font-variation-settings:'FILL' 1;">
+					          receipt
+					        </span>
+					      </div>
+					
+					      <div>
+					        <h2 class="text-lg font-bold font-headline text-foreground">
+					          Tax PPh Final Obligations
+					        </h2>
+					
+					        <p class="text-xs text-muted mt-1">
+					          Monthly tax obligation records and journal status
+					        </p>
+					      </div>
+					    </div>
+					
+							<button
+							  type="button"
+							  onclick="exportTaxObligationsPDF()"
+							  class="px-4 py-2 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+							  <span class="material-symbols-outlined text-lg">download</span>
+							  Export
+							</button>
+					  </div>
+					  <!-- TABLE -->
+					  <div class="overflow-x-auto custom-scrollbar">
+					    <table class="w-full text-sm">
+					      <thead>
+					        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+					          <th class="px-5 py-3 text-left whitespace-nowrap">Tax Period</th>
+					          <th class="px-5 py-3 text-left whitespace-nowrap">Branch</th>
+					          <th class="px-5 py-3 text-right whitespace-nowrap">Revenue</th>
+					          <th class="px-5 py-3 text-right whitespace-nowrap">Tax Rate</th>
+					          <th class="px-5 py-3 text-right whitespace-nowrap">Taxable Amount</th>
+					          <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
+					          <th class="px-5 py-3 text-center">Status</th>
+					          <th class="px-5 py-3 text-center">Action</th>
+					        </tr>
+					      </thead>
+					
+					      <tbody id="taxObligationsTableBody"
+					        class="divide-y divide-outline-variant">
+					        <tr>
+					          <td colspan="8"
+					            class="px-5 py-10 text-center text-muted">
+					            No tax obligation data
+					          </td>
+					        </tr>
+					      </tbody>
+					    </table>
+					  </div>
+					  <!-- PAGINATION -->
+					  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
+					    <div>
+					      <p id="taxObligationsPaginationInfo"
+					        class="text-xs text-on-surface-variant font-medium">
+					        Showing 0–0 of 0
+					      </p>
+					    </div>
+					
+					    <div class="flex items-center gap-2">
+					      <button id="taxObligationsPrevButton"
+					        type="button"
+					        onclick="changeTaxObligationsPage(-1)"
+					        class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+					        <span class="material-symbols-outlined text-sm">
+					          chevron_left
+					        </span>
+					      </button>
+					
+					      <button id="taxObligationsNextButton"
+					        type="button"
+					        onclick="changeTaxObligationsPage(1)"
+					        class="w-9 h-9 flex items-center justify-center rounded-md border border-outline-variant text-muted hover:text-foreground hover:bg-background disabled:opacity-40 disabled:cursor-not-allowed">
+					        <span class="material-symbols-outlined text-sm">
+					          chevron_right
+					        </span>
+					      </button>
+					    </div>
+					  </div>
+					</section>
 					<!-- TAX PAYMENTS -->
 					<section class="bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 					  <div class="p-5 border-b border-outline-variant flex items-center justify-between">
