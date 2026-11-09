@@ -37328,9 +37328,7 @@ function closePphBadanFiscalAdjustmentModal() {
 	modal.classList.remove("flex");
 }
 
-
 /* ==== PPH BADAN - APPLY FISCAL ADJUSTMENTS ==== */
-
 async function applyPphBadanFiscalAdjustments() {
 	if (pphBadanCalculating) return;
 
@@ -38366,10 +38364,12 @@ window.exportTaxPphBadansPDF = async function () {
       currency: 'IDR',
       maximumFractionDigits: 0
     });
-    const getBranchName = id => {
-      const branch = (accountingDebtBranches || []).find(item => String(item.id || '').trim() === String(id || '').trim());
-      return branch?.name || id || '-';
-    };
+		const getBranchName = item => {
+		  const branchId = item.branchId || item.branch_id || '';
+		
+		  return item.branchName ||
+		    item.branch_name || (accountingDebtBranches || []).find(branch => String(branch.id || '').trim() === String(branchId).trim())?.name || branchId || '-';
+		};
     const branchTitle = branchValue && branchValue.toUpperCase() !== 'ALL'
       ? getBranchName(branchValue)
       : canViewAllBranches
@@ -38388,7 +38388,7 @@ window.exportTaxPphBadansPDF = async function () {
       return `
         <tr>
           <td>${esc(item.taxYear || '-')}</td>
-          <td>${esc(getBranchName(branchId))}</td>
+          <td>${esc(getBranchName(item))}</td>
           <td class="number">${esc(money(item.taxableIncome))}</td>
           <td class="number tax-amount">${esc(money(item.taxAmount))}</td>
           <td class="number">${esc(money(item.paidAmount))}</td>
