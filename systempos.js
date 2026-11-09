@@ -35417,20 +35417,50 @@ async function loadTaxObligasiSettings() {
 
 function renderCurrentTaxSettings() {
   const setting = currentTaxSettings || {};
-  const nameEl = document.getElementById( "currentTaxSettingName" );
-  const rateEl = document.getElementById( "currentTaxSettingRate" );
-  const fromEl = document.getElementById( "currentTaxSettingFrom" );
-  const statusEl = document.getElementById( "currentTaxSettingStatus" );
+  const nameEl = document.getElementById("currentTaxSettingName");
+  const rateEl = document.getElementById("currentTaxSettingRate");
+  const facilityEl = document.getElementById("currentTaxSettingFacility");
+  const facilityAmountEl = document.getElementById("currentTaxSettingFacilityAmount");
+  const fromEl = document.getElementById("currentTaxSettingFrom");
+  const statusEl = document.getElementById("currentTaxSettingStatus");
 
-  if (nameEl) { nameEl.textContent = setting.tax_name || "-";}
-  if (rateEl) { const rate = Number(setting.tax_rate);
+  // TAX NAME
+  if (nameEl) { nameEl.textContent = setting.tax_name || "-"; }
+  // TAX RATE
+  if (rateEl) {
+    const rate = Number(setting.tax_rate);
+
     rateEl.textContent = Number.isFinite(rate)
-			? `${rate.toFixed(4)}%`
-			: "0.0000%"; }
+      ? `${rate.toFixed(4)}%`
+      : "0.0000%";
+  }
+  // TAX FACILITY
+  if (facilityEl) {
+    const facility = setting.tax_facility || "NONE";
+
+    facilityEl.textContent = facility === "TURNOVER_EXEMPTION"
+			? "Annual Turnover Exemption"
+			: "No Tax Facility";
+  }
+  // FACILITY AMOUNT
+  if (facilityAmountEl) {
+    const amount = Number(setting.facility_amount || 0);
+
+    facilityAmountEl.textContent = amount > 0
+			? new Intl.NumberFormat("id-ID", {
+					style: "currency",
+					currency: "IDR",
+					maximumFractionDigits: 0
+				}).format(amount)
+			: "Rp0";
+  }
+  // EFFECTIVE FROM
   if (fromEl) { fromEl.textContent = setting.effective_from || "-"; }
+  // STATUS
   if (statusEl) { statusEl.textContent = setting.is_active === false
 		? "Inactive"
-		: "Active"; }
+		: "Active";
+  }
 }
 
 async function loadAccountingTaxBranchFilters() {
@@ -35480,12 +35510,16 @@ async function openTaxSettingsModal() {
     const setting = currentTaxSettings || {};
     const nameEl = document.getElementById( "taxSettingName" );
     const rateEl = document.getElementById( "taxSettingRate" );
+		const facilityEl = document.getElementById("taxSettingFacility");
+		const facilityAmountEl = document.getElementById("taxSettingFacilityAmount");
     const fromEl = document.getElementById( "taxSettingEffectiveFrom" );
     const toEl = document.getElementById( "taxSettingEffectiveTo" );
     const activeEl = document.getElementById( "taxSettingActive" );
     const noteEl = document.getElementById( "taxSettingNote" );
 		
     if (nameEl) { nameEl.value = setting.tax_name || "Annual Revenue Tax"; }
+		if (facilityEl) { facilityEl.value = setting.tax_facility || "NONE"; }
+		if (facilityAmountEl) { facilityAmountEl.value = setting.facility_amount ?? 0; }
     if (rateEl) { const rate = Number(setting.tax_rate);
       rateEl.value = Number.isFinite(rate)
 				? rate
@@ -35523,6 +35557,8 @@ async function saveTaxObligasiSettings() {
 	
   const nameEl = document.getElementById( "taxSettingName" );
   const rateEl = document.getElementById( "taxSettingRate" );
+	const facilityEl = document.getElementById("taxSettingFacility");
+	const facilityAmountEl = document.getElementById("taxSettingFacilityAmount");
   const fromEl = document.getElementById( "taxSettingEffectiveFrom" );
   const toEl = document.getElementById( "taxSettingEffectiveTo" );
   const activeEl = document.getElementById( "taxSettingActive" );
@@ -35530,6 +35566,8 @@ async function saveTaxObligasiSettings() {
   const button = document.getElementById( "saveTaxObligasiSettingsButton" );
   const taxName = nameEl?.value?.trim();
   const taxRate = Number(rateEl?.value);
+	const taxFacility = facilityEl?.value || "NONE";
+	const facilityAmount = Number(facilityAmountEl?.value || 0);
   const effectiveFrom = fromEl?.value;
   const effectiveTo = toEl?.value || null;
   const isActive = activeEl?.checked ?? true;
@@ -35537,6 +35575,9 @@ async function saveTaxObligasiSettings() {
   /* ===== VALIDATION ===== */
   if (!taxName) { alert( "Tax Name wajib diisi." ); return; }
   if ( !Number.isFinite(taxRate) || taxRate < 0 ) { alert( "Tax Rate tidak valid." ); return; }
+	if ( !Number.isFinite(facilityAmount) || facilityAmount < 0
+	) { alert("Facility Amount tidak valid."); return; }
+	if (taxFacility === "NONE" && facilityAmount !== 0) { alert("Facility Amount harus 0 jika tidak menggunakan Tax Facility."); return; }
   if (!effectiveFrom) { alert( "Effective From wajib diisi." ); return; }
   if ( effectiveTo && effectiveTo < effectiveFrom ) { alert( "Effective To tidak boleh lebih kecil dari Effective From." ); return; }
 
@@ -35557,6 +35598,8 @@ async function saveTaxObligasiSettings() {
           p_session_id: sessionId,
           p_tax_name: taxName,
           p_tax_rate: taxRate,
+					p_tax_facility: taxFacility,
+					p_facility_amount: facilityAmount,
           p_effective_from: effectiveFrom,
           p_effective_to: effectiveTo,
           p_is_active: isActive,
