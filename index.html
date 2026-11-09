@@ -23153,6 +23153,205 @@
 			</div>
 		</div>
 	</div>
+	<!-- TAX OBLIGATION DETAIL MODAL -->
+	<div id="taxObligationDetailModal"
+	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+	    <!-- HEADER -->
+	    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+	      <div class="flex items-center gap-3">
+	        <div class="main-icon-box">
+	          <span class="material-symbols-outlined text-3xl">request_quote</span>
+	        </div>
+	        <div>
+	          <h2 class="text-lg font-bold font-headline text-foreground">
+	            Tax Obligation Detail
+	          </h2>
+	          <p class="text-xs text-muted mt-1">
+	            Monthly PPh Final tax obligation and payment history
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button type="button"
+	        onclick="closeTaxObligationDetail()"
+	        class="w-9 h-9 flex items-center justify-center text-muted hover:text-foreground transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+	      <!-- TAX INFORMATION -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Tax Information
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Tax obligation identity and reporting period
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Obligation ID</label>
+	            <div id="taxDetailObligationId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Branch</label>
+	            <div id="taxDetailBranch"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Tax Period</label>
+	            <div id="taxDetailPeriod"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Tax Rate</label>
+	            <div id="taxDetailRate"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">0%</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Status</label>
+	            <div id="taxDetailStatus"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Journal ID</label>
+	            <div id="taxDetailJournalId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- TAX SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Tax Summary
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Revenue and calculated PPh Final obligation
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Revenue</p>
+	            <p id="taxDetailRevenue"
+	              class="text-xl font-semibold text-foreground mt-1">Rp 0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Taxable Amount</p>
+	            <p id="taxDetailTaxableAmount"
+	              class="text-xl font-semibold text-foreground mt-1">Rp 0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Tax Amount</p>
+	            <p id="taxDetailTaxAmount"
+	              class="text-xl font-semibold text-foreground mt-1">Rp 0</p>
+	          </div>
+	
+	        </div>
+	      </section>
+	      <!-- PAYMENT SUMMARY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Payment Summary
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Payment status for this tax obligation
+	          </p>
+	        </div>
+	
+	        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Total Tax</p>
+	            <p id="taxDetailPaymentTotal"
+	              class="text-xl font-semibold text-foreground mt-1">Rp 0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Total Paid</p>
+	            <p id="taxDetailTotalPaid"
+	              class="text-xl font-semibold text-foreground mt-1">Rp 0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-3">
+	            <p class="text-xs text-muted">Outstanding Balance</p>
+	            <p id="taxDetailOutstanding"
+	              class="text-xl font-semibold text-foreground mt-1">Rp 0</p>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- PAYMENT HISTORY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Payment History
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            Recorded tax payments and transaction references
+	          </p>
+	        </div>
+	
+	        <div class="overflow-x-auto custom-scrollbar border border-outline-variant rounded-md">
+	          <table class="w-full text-sm whitespace-nowrap">
+	            <thead>
+	              <tr class="border-b border-outline-variant uppercase tracking-wider text-muted text-xs">
+	                <th class="px-4 py-3 text-left">Payment Date</th>
+	                <th class="px-4 py-3 text-left">Payment ID</th>
+	                <th class="px-4 py-3 text-right">Amount</th>
+	                <th class="px-4 py-3 text-left">Payment Method</th>
+	                <th class="px-4 py-3 text-left">Reference No.</th>
+	                <th class="px-4 py-3 text-center">Status</th>
+	                <th class="px-4 py-3 text-left">Note</th>
+	              </tr>
+	            </thead>
+	
+	            <tbody id="taxDetailPaymentHistoryBody"
+	              class="divide-y divide-outline-variant">
+	              <tr>
+	                <td colspan="7" class="px-4 py-8 text-center text-muted">
+	                  No payment history
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
+	        </div>
+	      </section>
+	      <!-- NOTE -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Note
+	          </h3>
+	        </div>
+	
+	        <div id="taxDetailNote"
+	          class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap">-</div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <div class="p-5 border-t border-outline-variant flex items-center justify-end shrink-0">
+	      <button type="button"
+	        onclick="closeTaxObligationDetail()"
+	        class="h-10 px-4 text-sm font-medium text-muted hover:text-foreground transition">
+	        Close
+	      </button>
+	    </div>
+	  </div>
+	</div>
 	<!-- TAX OBLIGATION PAYMENT MODAL -->
 	<div id="taxObligationPaymentModal"
 		class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
