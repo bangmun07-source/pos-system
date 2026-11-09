@@ -44261,7 +44261,7 @@ function renderPPh21PTKP() {
     <tr class="border-t border-outline-variant hover:bg-surface-container-low">
       <td class="p-3 text-sm font-medium">${escapePPh21Html(row.PTKP_Status)}</td>
       <td class="p-3 text-sm text-right">${formatPPh21Rupiah(row.Annual_PTKP)}</td>
-      <td class="p-3 text-right">
+      <td class="p-3 text-center">
         <button type="button"
           onclick="openPPh21PTKPForm('${escapePPh21Html(row.PTKP_Status)}')"
           class="bottom-theme rounded-md px-3 py-2 text-xs font-medium">
