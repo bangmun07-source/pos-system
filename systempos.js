@@ -37506,10 +37506,8 @@ async function loadPphBadanRecords() {
     const branchId = getPphBadanBranchId();
     if (!sessionId) { return; }
 			  
-
     const taxYearEl = document.getElementById("pphBadanYear");
     const taxYear = Number(taxYearEl?.value || 0);
-
     const { data, error
     } = await supabaseClient.rpc(
       "get_pph_badan_records",
@@ -38213,7 +38211,6 @@ function resetPphBadanTaxRuleDisplay() {
   window.currentPphBadanTaxRule = null;
 }
 
-
 function formatPphBadanTaxRuleDate(value) {
   if (!value) return "—";
 	
@@ -38225,7 +38222,6 @@ function formatPphBadanTaxRuleDate(value) {
     year: "numeric"
   });
 }
-
 
 function openPphBadanTaxRuleModal() {
   const modal = document.getElementById("pphBadanTaxRuleModal");
@@ -38331,6 +38327,468 @@ function closePphBadanTaxRuleModal() {
   modal.classList.add("hidden");
   modal.classList.remove("flex");
 }
+
+
+/* ==== EXPORT PPH BADAN PDF ==== */
+window.exportTaxPphBadansPDF = async function () {
+  try {
+    const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
+    const yearValue = String( document.getElementById('pphBadanYear')?.value || '' ).trim();
+    const branchValue = String( getPphBadanBranchId() || '' ).trim();
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+    const canViewAllBranches = ['owner', 'accountant'].includes(role) || userBranchId.toUpperCase() === 'ALL';
+
+    if (!Array.isArray(pphBadanRecords) || !pphBadanRecords.length) { alert('Data PPh Badan belum tersedia.'); return; }
+
+    // FILTER RECORDS
+    const rows = pphBadanRecords.filter(item => {
+      const itemYear = String(item.taxYear || '');
+      const branchId = String(item.branchId || item.branch_id || '').trim();
+
+      if (yearValue && itemYear !== yearValue) return false;
+      if (!canViewAllBranches && branchId !== userBranchId) return false;
+      if ( branchValue && branchValue.toUpperCase() !== 'ALL' && branchId !== branchValue
+      ) return false;
+      return true;
+    });
+
+    if (!rows.length) { alert('Tidak ada data PPh Badan untuk filter yang dipilih.'); return; }
+    // HELPERS
+    const esc = value => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+    const money = value => Number(value || 0).toLocaleString('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0
+    });
+    const getBranchName = id => {
+      const branch = (accountingDebtBranches || []).find(item => String(item.id || '').trim() === String(id || '').trim());
+      return branch?.name || id || '-';
+    };
+    const branchTitle = branchValue && branchValue.toUpperCase() !== 'ALL'
+      ? getBranchName(branchValue)
+      : canViewAllBranches
+        ? 'ALL BRANCHES'
+        : getBranchName(userBranchId);
+    const periodTitle = /^\d{4}$/.test(yearValue)
+      ? yearValue
+      : 'ALL YEARS';
+    // SORT RECORDS
+    const sortedRows = [...rows].sort((a, b) => Number(a.taxYear || 0) - Number(b.taxYear || 0));
+    // TABLE ROWS
+    const tableRows = sortedRows.map(item => {
+      const branchId = item.branchId || item.branch_id || '';
+      const status = String(item.status || 'DRAFT').toUpperCase();
+
+      return `
+        <tr>
+          <td>${esc(item.taxYear || '-')}</td>
+          <td>${esc(getBranchName(branchId))}</td>
+          <td class="number">${esc(money(item.taxableIncome))}</td>
+          <td class="number tax-amount">${esc(money(item.taxAmount))}</td>
+          <td class="number">${esc(money(item.paidAmount))}</td>
+          <td class="number">${esc(money(item.remainingAmount))}</td>
+          <td>${esc(status)}</td>
+        </tr>
+      `;
+    }).join('');
+
+    const totalTaxable = sortedRows.reduce((sum, item) => sum + Number(item.taxableIncome || 0), 0);
+
+    const totalTax = sortedRows.reduce((sum, item) => sum + Number(item.taxAmount || 0), 0);
+    const totalPaid = sortedRows.reduce((sum, item) => sum + Number(item.paidAmount || 0), 0);
+    const totalRemaining = sortedRows.reduce((sum, item) => sum + Number(item.remainingAmount || 0), 0);
+    // TENANT LOGO
+    const supabaseUrl = String(supabaseClient?.supabaseUrl || '').replace(/\/$/, '');
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+    const filename = `PPh Badan - ${branchTitle} - ${periodTitle}.pdf`;
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * { box-sizing: border-box; }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .report-header { margin-bottom: 24px; }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 75px;
+            margin-bottom: 16px;
+          }
+
+          .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+          }
+
+          .logo {
+            display: block;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+            margin: 0 0 5px 0;
+          }
+
+          .brand-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            margin: 0;
+          }
+
+          .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .branch-title {
+            font-size: 10px;
+            font-weight: 500;
+            color: #666;
+          }
+
+          .period {
+            font-size: 11px;
+            font-weight: 600;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+            align-self: flex-end;
+            margin-bottom: 5px;
+          }
+
+          .report-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 14px;
+            border-top: 2px solid #222;
+          }
+
+          .title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .filter-info {
+            margin: 0;
+            font-size: 9px;
+            line-height: 1.7;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+          }
+
+          .summary-label {
+            color: #777;
+            font-size: 10px;
+            margin-bottom: 5px;
+          }
+
+          .summary-value {
+            color: #222;
+            font-size: 15px;
+            font-weight: 700;
+          }
+
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 12px;
+            background: #fff;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 9px;
+            color: #444;
+          }
+
+          thead { display: table-header-group; }
+
+          th {
+            padding: 10px 6px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 10px 6px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          tbody tr:last-child td { border-bottom: none; }
+
+          .number {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .tax-amount {
+            color: #222;
+            font-weight: 700;
+          }
+
+          .total-row td {
+            background: #f8f8f8;
+            border-top: 1px solid #ddd;
+            font-weight: 700;
+          }
+
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar { display: none !important; }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 8px;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .table-wrap {
+              padding: 8px;
+              border-radius: 8px;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table { page-break-inside: auto; }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>PPh Badan Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            <div class="brand-row">
+              <div class="brand-left">
+                ${logoUrl ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="Company Logo"
+                    onerror="this.style.display='none'"
+                  >
+                ` : ''}
+
+                <div class="brand-info">
+                  <h2 class="brand-name">${esc(companyName)}</h2>
+                  <div class="branch-title">
+                    Branch : ${esc(branchTitle)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                Period : ${esc(periodTitle)}
+              </div>
+            </div>
+
+            <div class="report-meta-row">
+              <h1 class="title">Corporate Income Tax Report</h1>
+              <div class="filter-info">
+                Tax Year: ${esc(periodTitle)}
+              </div>
+            </div>
+          </header>
+
+          <div class="summary">
+            <div>
+              <div class="summary-label">Total Records</div>
+              <div class="summary-value">${sortedRows.length}</div>
+            </div>
+            <div>
+              <div class="summary-label">Taxable Income</div>
+              <div class="summary-value">${esc(money(totalTaxable))}</div>
+            </div>
+            <div>
+              <div class="summary-label">Tax Amount</div>
+              <div class="summary-value">${esc(money(totalTax))}</div>
+            </div>
+            <div>
+              <div class="summary-label">Total Paid</div>
+              <div class="summary-value">${esc(money(totalPaid))}</div>
+            </div>
+            <div>
+              <div class="summary-label">Remaining</div>
+              <div class="summary-value">${esc(money(totalRemaining))}</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tax Year</th>
+                  <th>Branch</th>
+                  <th class="number">Taxable Income</th>
+                  <th class="number">Tax Amount</th>
+                  <th class="number">Paid Amount</th>
+                  <th class="number">Remaining</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${tableRows}
+                <tr class="total-row">
+                  <td colspan="3">TOTAL</td>
+                  <td class="number">${esc(money(totalTax))}</td>
+                  <td class="number">${esc(money(totalPaid))}</td>
+                  <td class="number">${esc(money(totalRemaining))}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB
+    const reportWindow = window.open('', '_blank');
+    if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export PPh Badan error:', error);
+    alert('Gagal membuat PDF PPh Badan. Periksa Console untuk detail kesalahan.');
+  }
+};
+
 
 
 /* =========================================================
