@@ -22196,19 +22196,19 @@
 						    <label class="block text-xs font-medium text-muted mb-2">
 						      Period
 						    </label>
-						    <input
-						      type="month"
-						      id="taxPaymentsPeriodFilter"
-						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+							<input type="month"
+							  id="taxPaymentsPeriodFilter"
+							  onchange="applyTaxPaymentsFilters()"
+							  class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 						  </div>
 							<!-- PERIOD YEAR -->
 							<div>
 							  <label class="block text-xs font-medium text-muted mb-2">
 							    Period (Yearly)
 							  </label>
-							  <select
-							    id="taxPaymentsYearFilter"
-							    class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+								<select id="taxPaymentsYearFilter"
+								  onchange="applyTaxPaymentsFilters()"
+								  class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 							    <option value="">All Years</option>
 							  </select>
 							</div>
@@ -22217,9 +22217,9 @@
 						    <label class="block text-xs font-medium text-muted mb-2">
 						      Branch
 						    </label>
-						    <select
-						      id="taxPaymentsBranchFilter"
-						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+							<select id="taxPaymentsBranchFilter"
+							  onchange="loadTaxPayments()"
+							  class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 						      <option value="">All Branches</option>
 						    </select>
 						  </div>
@@ -22228,9 +22228,9 @@
 						    <label class="block text-xs font-medium text-muted mb-2">
 						      Status
 						    </label>
-						    <select
-						      id="taxPaymentsStatusFilter"
-						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+							<select id="taxPaymentsStatusFilter"
+							  onchange="applyTaxPaymentsFilters()"
+							  class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
 						      <option value="">All Status</option>
 						      <option value="OUTSTANDING">Outstanding</option>
 						      <option value="PAID">Paid</option>
