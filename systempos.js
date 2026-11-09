@@ -36287,27 +36287,16 @@ function renderTaxObligations() {
             ${escapeTaxObligationHTML(statusLabel)}
           </td>
 
-					<td class="px-5 py-3 text-center whitespace-nowrap">
-					  <div class="relative inline-block">
-					    <button
-					      type="button"
-					      onclick="toggleTaxObligationMenu(this)"
-					      class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-surface-container text-foreground"
-					      title="More actions">
-					      <i class="fa-solid fa-ellipsis-vertical"></i>
-					    </button>
-					
-					    <div class="tax-obligation-menu hidden absolute right-0 top-full mt-1 w-40 bg-surface border border-outline-variant rounded-lg shadow-lg z-50 text-left">
-					      <button
-					        type="button"
-					        onclick="viewTaxObligation('${escapeTaxObligationHTML(item.obligation_id)}')"
-					        class="w-full px-4 py-2.5 text-sm text-left hover:bg-surface-container">
-					        <i class="fa-regular fa-eye mr-2"></i> View Detail
-					      </button>
-					    </div>
-					  </div>
+					<td class="px-5 py-3 text-center">
+					  <button type="button"
+					    data-obligation-id="${escapeTaxObligationHTML(item.obligation_id)}"
+					    onclick="viewTaxObligationDetail(this.dataset.obligationId)"
+					    title="View Detail"
+					    aria-label="View Detail"
+					    class="w-9 h-9 inline-flex items-center justify-center rounded-md text-muted hover:text-foreground hover:bg-outline-variant transition">
+					    <span class="material-symbols-outlined">more_vert</span>
+					  </button>
 					</td>
-
         </tr>
       `;
     }).join("");
@@ -36347,18 +36336,6 @@ function getFilteredTaxPayments() {
   });
 }
 
-function toggleTaxObligationMenu(button) {
-  const currentMenu = button.nextElementSibling;
-  const wasOpen = !currentMenu.classList.contains("hidden");
-
-  // Tutup semua menu yang sedang terbuka
-  document.querySelectorAll(".tax-obligation-menu").forEach(menu => { menu.classList.add("hidden"); });
-
-  // Buka menu yang diklik
-  if (!wasOpen) {
-    currentMenu.classList.remove("hidden");
-  }
-}
 
 function applyTaxPaymentsFilters() {
   taxPaymentsPage = 1;
