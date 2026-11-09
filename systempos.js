@@ -36123,11 +36123,29 @@ async function loadTaxObligationPaymentSummary() {
 }
 
 /* ===== TAX PAYMENTS ===== */
+function getFilteredTaxPayments() {
+  const month = document.getElementById("taxPaymentsPeriodFilter")?.value || "";
+  const year = document.getElementById("taxPaymentsYearFilter")?.value || "";
+
+  return taxPaymentsData.filter(payment => {
+    const paymentDate = String(payment.payment_date || "");
+
+    if (month && paymentDate.substring(0, 7) !== month) { return false; }
+    if (year && paymentDate.substring(0, 4) !== year) { return false; }
+
+    return true;
+  });
+}
+
+function applyTaxPaymentsFilters() {
+  taxPaymentsPage = 1;
+  renderTaxPayments();
+}
+
 async function loadTaxPayments() {
   try {
 	  const sessionId = localStorage.getItem("pos_session_id");
 	 	const branchId = document.getElementById("taxPaymentBranchFilter")?.value || null;
-
     const { data, error } =
       await supabaseClient.rpc(
         "get_tax_payments",
@@ -36144,7 +36162,8 @@ async function loadTaxPayments() {
     taxPaymentsData = Array.isArray(result)
 			? result
 			: [];
-
+		
+		populateTaxPaymentsYears();
     taxPaymentsPage = 1;
     renderTaxPayments();
     return taxPaymentsData;
@@ -36164,15 +36183,14 @@ function renderTaxPayments() {
 	
   if (!tbody) return;
 
-  const total = Array.isArray(taxPaymentsData)
-		? taxPaymentsData.length
-		: 0;
+	const filteredData = getFilteredTaxPayments();
+	const total = filteredData.length;
   const totalPages = Math.max( Math.ceil(total / taxPaymentsPerPage), 1 );
   if (taxPaymentsPage > totalPages) { taxPaymentsPage = totalPages; }
 	
   const startIndex = (taxPaymentsPage - 1) * taxPaymentsPerPage;
   const endIndex = Math.min( startIndex + taxPaymentsPerPage, total );
-  const pageData = taxPaymentsData.slice( startIndex, endIndex );
+  const pageData = filteredData.slice(startIndex, endIndex);
   if (!pageData.length) {
     tbody.innerHTML = `
       <tr>
@@ -36252,9 +36270,7 @@ function renderTaxPayments() {
 }
 
 function changeTaxPaymentsPage(direction) {
-  const total = Array.isArray(taxPaymentsData)
-		? taxPaymentsData.length
-		: 0;
+	const total = getFilteredTaxPayments().length;
   const totalPages = Math.max( Math.ceil(total / taxPaymentsPerPage), 1 );
   const nextPage = taxPaymentsPage + Number(direction);
 
@@ -36273,7 +36289,6 @@ function openTaxPaymentFromRow(paymentId) {
   openTaxObligationPaymentModal();
 }
 
-
 function changeTaxRegime() {
   const regime = document.getElementById("taxRegime")?.value;
   const finalSection = document.getElementById("pphFinalSection");
@@ -36287,6 +36302,29 @@ function changeTaxRegime() {
     finalSection.classList.remove("hidden");
     badanSection.classList.add("hidden");
   }
+}
+
+function populateTaxPaymentsYears() {
+  const select = document.getElementById("taxPaymentsYearFilter");
+  if (!select) return;
+
+  const selectedYear = select.value;
+  const years = [
+    ...new Set(
+      taxPaymentsData
+        .map(payment => String(payment.payment_date || "").substring(0, 4))
+        .filter(year => /^\d{4}$/.test(year))
+    )
+  ].sort((a, b) => b.localeCompare(a));
+
+  select.innerHTML = `
+    <option value="">All Years</option>
+    ${years.map(year => `
+      <option value="${year}">${year}</option>
+    `).join("")}
+  `;
+
+  select.value = years.includes(selectedYear) ? selectedYear : "";
 }
 
 /* =========================================================
