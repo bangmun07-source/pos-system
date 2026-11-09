@@ -22149,6 +22149,17 @@
 	                0%
 	              </p>
 	            </div>
+
+							<div class="p-5 border-r border-outline-variant">
+							  <p class="text-[11px] text-muted uppercase tracking-wider">
+							    Tax Facility
+							  </p>
+							
+							  <p id="currentTaxSettingFacility"
+							    class="text-sm mt-1">
+							    -
+							  </p>
+							</div>
 				  
 	            <div class="p-5 border-r border-outline-variant">
 	              <p class="text-[11px] text-muted uppercase tracking-wider">
@@ -22839,6 +22850,28 @@
 					<p class="text-[11px] text-muted mt-1">
 						Example: 0.5 = 0.5%
 					</p>
+				</div>
+				<!-- TAX FACILITY -->
+				<div>
+				  <label class="block text-xs text-muted mb-2">
+				    Tax Facility
+				  </label>
+				
+				  <select id="taxSettingFacility"
+				    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+				
+				    <option value="NONE">
+				      No Tax Facility
+				    </option>
+				
+				    <option value="OP_500M">
+				      Personal Taxpayer - Rp500 Million Exemption
+				    </option>
+				  </select>
+				
+				  <p class="text-[11px] text-muted mt-1">
+				    Select the applicable annual revenue exemption facility.
+				  </p>
 				</div>
 				<!-- EFFECTIVE DATES -->
 				<div class="grid grid-cols-2 gap-4">
