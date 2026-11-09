@@ -6283,7 +6283,7 @@ async function exportMembersPDF() {
             justify-content: space-between;
             gap: 20px;
             padding-top: 14px;
-            border-bottom: 2px solid #222;;
+            border-top: 2px solid #222;;
           }
 
           .title {
@@ -38721,7 +38721,7 @@ window.exportTaxPphBadansPDF = async function () {
             <div class="report-meta-row">
               <h1 class="title">Corporate Income Tax Report</h1>
               <div class="filter-info">
-                Tax Year: ${esc(periodTitle)}
+                PPH BADAN HISTORY
               </div>
             </div>
           </header>
