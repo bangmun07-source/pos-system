@@ -36287,14 +36287,26 @@ function renderTaxObligations() {
             ${escapeTaxObligationHTML(statusLabel)}
           </td>
 
-          <td class="px-5 py-3 text-center whitespace-nowrap">
-            <span class="text-xs text-muted"
-              title="${escapeTaxObligationHTML(item.obligation_id)}">
-              ${item.journal_id
-                ? `Journal: ${escapeTaxObligationHTML(item.journal_id)}`
-                : "—"}
-            </span>
-          </td>
+					<td class="px-5 py-3 text-center whitespace-nowrap">
+					  <div class="relative inline-block">
+					    <button
+					      type="button"
+					      onclick="toggleTaxObligationMenu(this)"
+					      class="w-8 h-8 flex items-center justify-center rounded-md hover:bg-surface-container text-foreground"
+					      title="More actions">
+					      <i class="fa-solid fa-ellipsis-vertical"></i>
+					    </button>
+					
+					    <div class="tax-obligation-menu hidden absolute right-0 top-full mt-1 w-40 bg-surface border border-outline-variant rounded-lg shadow-lg z-50 text-left">
+					      <button
+					        type="button"
+					        onclick="viewTaxObligation('${escapeTaxObligationHTML(item.obligation_id)}')"
+					        class="w-full px-4 py-2.5 text-sm text-left hover:bg-surface-container">
+					        <i class="fa-regular fa-eye mr-2"></i> View Detail
+					      </button>
+					    </div>
+					  </div>
+					</td>
 
         </tr>
       `;
@@ -36333,6 +36345,19 @@ function getFilteredTaxPayments() {
 
     return true;
   });
+}
+
+function toggleTaxObligationMenu(button) {
+  const currentMenu = button.nextElementSibling;
+  const wasOpen = !currentMenu.classList.contains("hidden");
+
+  // Tutup semua menu yang sedang terbuka
+  document.querySelectorAll(".tax-obligation-menu").forEach(menu => { menu.classList.add("hidden"); });
+
+  // Buka menu yang diklik
+  if (!wasOpen) {
+    currentMenu.classList.remove("hidden");
+  }
 }
 
 function applyTaxPaymentsFilters() {
