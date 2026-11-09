@@ -35481,8 +35481,9 @@ async function loadAccountingTaxBranchFilters() {
 			? JSON.parse(data)
 			: (data || []);
     const selects = [
-      document.getElementById("taxObligationBranchFilter"),
-      document.getElementById("pphBadanBranchFilter")
+		  document.getElementById("taxObligationBranchFilter"),
+		  document.getElementById("pphBadanBranchFilter"),
+		  document.getElementById("taxPaymentsBranchFilter")
     ];
 
     selects.forEach(select => {
@@ -36126,12 +36127,15 @@ async function loadTaxObligationPaymentSummary() {
 function getFilteredTaxPayments() {
   const month = document.getElementById("taxPaymentsPeriodFilter")?.value || "";
   const year = document.getElementById("taxPaymentsYearFilter")?.value || "";
+  const status = document.getElementById("taxPaymentsStatusFilter")?.value || "";
 
   return taxPaymentsData.filter(payment => {
     const paymentDate = String(payment.payment_date || "");
+    const paymentStatus = String(payment.status || "OUTSTANDING").toUpperCase();
 
-    if (month && paymentDate.substring(0, 7) !== month) { return false; }
-    if (year && paymentDate.substring(0, 4) !== year) { return false; }
+    if (month && paymentDate.substring(0, 7) !== month) return false;
+    if (year && paymentDate.substring(0, 4) !== year) return false;
+    if (status && paymentStatus !== status) return false;
 
     return true;
   });
@@ -36145,7 +36149,7 @@ function applyTaxPaymentsFilters() {
 async function loadTaxPayments() {
   try {
 	  const sessionId = localStorage.getItem("pos_session_id");
-	 	const branchId = document.getElementById("taxPaymentBranchFilter")?.value || null;
+	 	const branchId = document.getElementById("taxPaymentsBranchFilter")?.value || null;
     const { data, error } =
       await supabaseClient.rpc(
         "get_tax_payments",
