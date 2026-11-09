@@ -22127,7 +22127,7 @@
 	            </div>
 	          </div>
 	
-	          <div class="grid grid-cols-2 md:grid-cols-4">
+	          <div class="grid grid-cols-5 md:grid-cols-5">
 	            <div class="p-5 border-r border-outline-variant">
 	              <p class="text-[11px] text-muted uppercase tracking-wider">
 	                Tax Name
@@ -22149,7 +22149,7 @@
 	                0%
 	              </p>
 	            </div>
-
+							
 							<div class="p-5 border-r border-outline-variant">
 							  <p class="text-[11px] text-muted uppercase tracking-wider">
 							    Tax Facility
@@ -22157,6 +22157,11 @@
 							
 							  <p id="currentTaxSettingFacility"
 							    class="text-sm mt-1">
+							    -
+							  </p>
+							
+							  <p id="currentTaxSettingFacilityAmount"
+							    class="text-xs text-muted mt-1">
 							    -
 							  </p>
 							</div>
@@ -22864,13 +22869,32 @@
 				      No Tax Facility
 				    </option>
 				
-				    <option value="OP_500M">
-				      Personal Taxpayer - Rp500 Million Exemption
+				    <option value="TURNOVER_EXEMPTION">
+				      Annual Turnover Exemption
 				    </option>
+				
 				  </select>
 				
 				  <p class="text-[11px] text-muted mt-1">
-				    Select the applicable annual revenue exemption facility.
+				    Select the applicable tax facility.
+				  </p>
+				</div>
+				
+				<!-- FACILITY AMOUNT -->
+				<div id="taxFacilityAmountContainer">
+				  <label class="block text-xs text-muted mb-2">
+				    Facility Amount (IDR)
+				  </label>
+				
+				  <input id="taxSettingFacilityAmount"
+				    type="number"
+				    min="0"
+				    step="1"
+				    placeholder="500000000"
+				    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground placeholder:text-muted outline-none">
+				
+				  <p class="text-[11px] text-muted mt-1">
+				    Enter the applicable exemption amount.
 				  </p>
 				</div>
 				<!-- EFFECTIVE DATES -->
