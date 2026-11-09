@@ -35364,6 +35364,7 @@ async function initAccountingTaxPage() {
 		await Promise.all([
 			loadTaxObligasiSettings(),
 			loadTaxObligation(),
+			loadTaxObligations(),
 		  loadTaxPayments(),
 		  loadPphBadanRecords(),
 		  loadPphBadanTaxRule()
