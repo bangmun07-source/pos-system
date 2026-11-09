@@ -36288,7 +36288,8 @@ function renderTaxObligations() {
           </td>
 
 					<td class="px-5 py-3 text-center">
-					  <button type="button"
+					  <button
+					    type="button"
 					    data-obligation-id="${escapeTaxObligationHTML(item.obligation_id)}"
 					    onclick="viewTaxObligationDetail(this.dataset.obligationId)"
 					    title="View Detail"
@@ -36316,6 +36317,155 @@ function changeTaxObligationsPage(direction) {
 
   taxObligationsPage = nextPage;
   renderTaxObligations();
+}
+
+/* ===== TAX OBLIGATION DETAIL ===== */
+function formatTaxDetailCurrency(value) {
+  return Number(value || 0).toLocaleString("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  });
+}
+
+function setTaxDetailValue(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value ?? "-";
+}
+
+async function viewTaxObligationDetail(obligationId) {
+  const item = taxObligationsData.find(
+    row => String(row.obligation_id) === String(obligationId)
+  );
+
+  if (!item) {
+    alert("Tax obligation data not found.");
+    return;
+  }
+
+  const modal = document.getElementById("taxObligationDetailModal");
+
+  // TAX INFORMATION
+  setTaxDetailValue("taxDetailObligationId", item.obligation_id);
+  setTaxDetailValue("taxDetailBranch", item.branch_id);
+
+  const period = new Date(
+    Number(item.tax_year),
+    Number(item.tax_month) - 1,
+    1
+  ).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric"
+  });
+
+  setTaxDetailValue("taxDetailPeriod", period);
+  setTaxDetailValue("taxDetailRate", `${Number(item.tax_rate || 0)}%`);
+  setTaxDetailValue("taxDetailStatus", item.status);
+  setTaxDetailValue("taxDetailJournalId", item.journal_id || "-");
+
+  // TAX SUMMARY
+  setTaxDetailValue(
+    "taxDetailRevenue",
+    formatTaxDetailCurrency(item.revenue_amount)
+  );
+
+  setTaxDetailValue(
+    "taxDetailTaxableAmount",
+    formatTaxDetailCurrency(item.taxable_amount)
+  );
+
+  setTaxDetailValue(
+    "taxDetailTaxAmount",
+    formatTaxDetailCurrency(item.tax_amount)
+  );
+
+  // PAYMENT HISTORY
+  const payments = (taxPaymentsData || []).filter(payment =>
+    String(payment.obligation_id || "") === String(item.obligation_id)
+  );
+
+  const totalPaid = payments
+    .filter(payment => String(payment.status || "").toUpperCase() === "PAID")
+    .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+
+  const outstanding = Math.max(
+    Number(item.tax_amount || 0) - totalPaid,
+    0
+  );
+
+  setTaxDetailValue(
+    "taxDetailPaymentTotal",
+    formatTaxDetailCurrency(item.tax_amount)
+  );
+
+  setTaxDetailValue(
+    "taxDetailTotalPaid",
+    formatTaxDetailCurrency(totalPaid)
+  );
+
+  setTaxDetailValue(
+    "taxDetailOutstanding",
+    formatTaxDetailCurrency(outstanding)
+  );
+
+  setTaxDetailValue("taxDetailNote", item.note || "-");
+
+  const historyBody = document.getElementById(
+    "taxDetailPaymentHistoryBody"
+  );
+
+  if (historyBody) {
+    if (payments.length === 0) {
+      historyBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-4 py-8 text-center text-muted">
+            No payment history
+          </td>
+        </tr>
+      `;
+    } else {
+      historyBody.innerHTML = payments.map(payment => {
+        const status = String(payment.status || "OUTSTANDING").toUpperCase();
+
+        return `
+          <tr>
+            <td class="px-4 py-3">
+              ${escapeTaxObligationHTML(payment.payment_date || "-")}
+            </td>
+            <td class="px-4 py-3">
+              ${escapeTaxObligationHTML(payment.payment_id || "-")}
+            </td>
+            <td class="px-4 py-3 text-right">
+              ${formatTaxDetailCurrency(payment.amount)}
+            </td>
+            <td class="px-4 py-3">
+              ${escapeTaxObligationHTML(payment.payment_method || "-")}
+            </td>
+            <td class="px-4 py-3">
+              ${escapeTaxObligationHTML(payment.reference_no || "-")}
+            </td>
+            <td class="px-4 py-3 text-center">
+              ${escapeTaxObligationHTML(status)}
+            </td>
+            <td class="px-4 py-3">
+              ${escapeTaxObligationHTML(payment.note || "-")}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+  }
+
+  // OPEN MODAL
+  modal?.classList.remove("hidden");
+  modal?.classList.add("flex");
+}
+
+function closeTaxObligationDetail() {
+  const modal = document.getElementById("taxObligationDetailModal");
+
+  modal?.classList.add("hidden");
+  modal?.classList.remove("flex");
 }
 
 /* ===== TAX PAYMENTS ===== */
