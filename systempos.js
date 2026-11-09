@@ -35261,7 +35261,7 @@ let taxPaymentsData = [];
 let taxPaymentsPage = 1;
 const taxPaymentsPerPage = 10;
 let currentTaxPayment = null;
-
+let accountingTaxBranches = [];
 
 /* =========================================================
    HELPERS
@@ -35466,6 +35466,7 @@ async function loadAccountingTaxBranchFilters() {
     const branches = typeof data === "string"
 			? JSON.parse(data)
 			: (data || []);
+		accountingTaxBranches = branches;
     const selects = [
 		  document.getElementById("taxObligationBranchFilter"),
 		  document.getElementById("pphBadanBranchFilter"),
@@ -38365,20 +38366,17 @@ window.exportTaxPphBadansPDF = async function () {
       maximumFractionDigits: 0
     });
 		const getBranchName = value => {
-		  // Bisa menerima object record atau Branch ID langsung
 		  const branchId = typeof value === 'object' && value !== null
 		    ? String(value.branchId || value.branch_id || '').trim()
 		    : String(value || '').trim();
 		
 		  if (!branchId) return '-';
-		  // Prioritaskan nama yang tersedia di record
-		  if (typeof value === 'object' && value !== null) {
-		    const name = value.branchName || value.branch_name;
-		    if (name) return name;
-		  }
-
-		  // Cari nama berdasarkan Branch ID
-		  const branch = (accountingDebtBranches || []).find(item => String(item.id || '').trim() === branchId);
+		
+		  // Cari nama dari daftar cabang yang digunakan filter Accounting Tax
+		  const branch = (accountingTaxBranches || []).find(
+		    item => String(item.id || '').trim() === branchId
+		  );
+		
 		  return branch?.name || branchId;
 		};
     const branchTitle = branchValue && branchValue.toUpperCase() !== 'ALL'
