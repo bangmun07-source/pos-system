@@ -36135,24 +36135,18 @@ async function loadTaxObligations() {
     const result = typeof data === "string"
       ? JSON.parse(data)
       : data;
-
     taxObligationsData = Array.isArray(result)
       ? result
       : [];
 
     populateTaxObligationsYears();
-
     taxObligationsPage = 1;
     renderTaxObligations();
-
     return taxObligationsData;
-
   } catch (error) {
     console.error("Load Tax Obligations Error:", error);
-
     taxObligationsData = [];
     renderTaxObligations();
-
     throw error;
   }
 }
@@ -36164,7 +36158,6 @@ function getFilteredTaxObligations() {
   const status = document.getElementById("taxObligationStatusFilter")?.value || "";
 
   return taxObligationsData.filter(item => {
-
     const itemYear = String(item.tax_year || "");
     const itemMonth = String(item.tax_month || "").padStart(2, "0");
     const itemPeriod = `${itemYear}-${itemMonth}`;
@@ -36197,14 +36190,12 @@ function populateTaxObligationsYears() {
         .filter(year => /^\d{4}$/.test(year))
     )
   ].sort((a, b) => b.localeCompare(a));
-
   select.innerHTML = `
     <option value="">All Years</option>
     ${years.map(year => `
       <option value="${year}">${year}</option>
     `).join("")}
   `;
-
   select.value = years.includes(selectedYear)
     ? selectedYear
     : "";
@@ -36247,7 +36238,6 @@ function renderTaxObligations() {
         month: "long",
         year: "numeric"
       });
-
       const status = String(item.status || "").toUpperCase();
       const statusLabel = {
         DRAFT: "Draft",
@@ -36255,41 +36245,21 @@ function renderTaxObligations() {
         PAID: "Paid",
         VOID: "Void"
       }[status] || status;
+			const branchName = (accountingDebtBranches || []).find(
+			  branch => String(branch.id || '').trim() === String(item.branch_id || '').trim()
+			)?.name || item.branch_id || '-';
 
       return `
         <tr class="border-b border-outline-variant">
-
-          <td class="px-5 py-3 whitespace-nowrap">
-            ${escapeTaxObligationHTML(monthName)}
-          </td>
-
-          <td class="px-5 py-3 whitespace-nowrap">
-            ${escapeTaxObligationHTML(item.branch_id)}
-          </td>
-
-          <td class="px-5 py-3 text-right whitespace-nowrap">
-            ${formatTaxObligationCurrency(item.revenue_amount)}
-          </td>
-
-          <td class="px-5 py-3 text-right whitespace-nowrap">
-            ${Number(item.tax_rate || 0)}%
-          </td>
-
-          <td class="px-5 py-3 text-right whitespace-nowrap">
-            ${formatTaxObligationCurrency(item.taxable_amount)}
-          </td>
-
-          <td class="px-5 py-3 text-right whitespace-nowrap font-medium">
-            ${formatTaxObligationCurrency(item.tax_amount)}
-          </td>
-
-          <td class="px-5 py-3 text-center whitespace-nowrap">
-            ${escapeTaxObligationHTML(statusLabel)}
-          </td>
-
+          <td class="px-5 py-3 whitespace-nowrap"> ${escapeTaxObligationHTML(monthName)} </td>
+          <td class="px-5 py-3 whitespace-nowrap"> ${escapeTaxObligationHTML(branchName)} </td>
+          <td class="px-5 py-3 text-right whitespace-nowrap"> ${formatTaxObligationCurrency(item.revenue_amount)} </td>
+          <td class="px-5 py-3 text-right whitespace-nowrap"> ${Number(item.tax_rate || 0)}% </td>
+          <td class="px-5 py-3 text-right whitespace-nowrap"> ${formatTaxObligationCurrency(item.taxable_amount)} </td>
+          <td class="px-5 py-3 text-right whitespace-nowrap font-medium"> ${formatTaxObligationCurrency(item.tax_amount)} </td>
+          <td class="px-5 py-3 text-center whitespace-nowrap"> ${escapeTaxObligationHTML(statusLabel)} </td>
 					<td class="px-5 py-3 text-center">
-					  <button
-					    type="button"
+					  <button type="button"
 					    data-obligation-id="${escapeTaxObligationHTML(item.obligation_id)}"
 					    onclick="viewTaxObligationDetail(this.dataset.obligationId)"
 					    title="View Detail"
