@@ -35254,6 +35254,9 @@ let currentTaxSettings = null;
 let currentTaxObligation = null;
 let accountingTaxLoading = false;
 let accountingTaxRecording = false;
+let taxObligationsData = [];
+let taxObligationsPage = 1;
+const taxObligationsPerPage = 10;
 let taxPaymentsData = [];
 let taxPaymentsPage = 1;
 const taxPaymentsPerPage = 10;
@@ -35285,14 +35288,8 @@ function getAccountingTaxMonth() {
   const monthEl = document.getElementById("taxObligationMonth");
   const month = Number(monthEl?.value);
 
-  if (
-    Number.isInteger(month) &&
-    month >= 1 &&
-    month <= 12
-  ) {
-    return month;
-  }
-  return new Date().getMonth() + 1;
+  if ( Number.isInteger(month) && month >= 1 && month <= 12
+  ) { return month; } return new Date().getMonth() + 1;
 }
 
 function getTaxObligationBranchId() {
@@ -35304,8 +35301,7 @@ function initializeAccountingTaxMonth() {
   const monthEl = document.getElementById("taxObligationMonth");
   if (!monthEl) return;
   if (!monthEl.value) {
-    monthEl.value =
-      String(new Date().getMonth() + 1);
+    monthEl.value = String(new Date().getMonth() + 1);
   }
 }
 
@@ -35344,14 +35340,9 @@ function populateAccountingTaxYears() {
     }
 
     // Pertahankan pilihan sebelumnya jika masih tersedia
-    if (
-      currentValue &&
-      [...select.options].some(option => option.value === currentValue)
-    ) {
-      select.value = currentValue;
-    } else {
-      select.value = String(currentYear);
-    }
+    if ( currentValue && [...select.options].some(option => option.value === currentValue)
+    ) { select.value = currentValue;
+    } else { select.value = String(currentYear); }
   });
 }
 
@@ -35363,27 +35354,23 @@ async function initAccountingTaxPage() {
   accountingTaxLoading = true;
 
   try {
-	changeTaxRegime();
-    const yearEl = document.getElementById("taxObligationYear");
-
-    if (yearEl && !yearEl.value) { yearEl.value = String(new Date().getFullYear()); }
-		
-	populateAccountingTaxYears();
-	initializeAccountingTaxMonth();
-	await loadAccountingTaxBranchFilters();
-	await Promise.all([
-		loadTaxObligasiSettings(),
-		loadTaxObligation(),
-	  loadTaxPayments(),
-	  loadPphBadanRecords(),
-	  loadPphBadanTaxRule()
+		changeTaxRegime();
+		const yearEl = document.getElementById("taxObligationYear");
+		if (yearEl && !yearEl.value) { yearEl.value = String(new Date().getFullYear()); }
+			
+		populateAccountingTaxYears();
+		initializeAccountingTaxMonth();
+		await loadAccountingTaxBranchFilters();
+		await Promise.all([
+			loadTaxObligasiSettings(),
+			loadTaxObligation(),
+		  loadTaxPayments(),
+		  loadPphBadanRecords(),
+		  loadPphBadanTaxRule()
 	]);
 
   } catch (error) {
-    alert(
-      error?.message ||
-      "Gagal memuat Accounting Tax."
-    );
+    alert( error?.message || "Gagal memuat Accounting Tax." );
   } finally {
     accountingTaxLoading = false;
   }
@@ -35428,7 +35415,6 @@ function renderCurrentTaxSettings() {
   // TAX RATE
   if (rateEl) {
     const rate = Number(setting.tax_rate);
-
     rateEl.textContent = Number.isFinite(rate)
       ? `${rate.toFixed(4)}%`
       : "0.0000%";
@@ -35436,7 +35422,6 @@ function renderCurrentTaxSettings() {
   // TAX FACILITY
   if (facilityEl) {
     const facility = setting.tax_facility || "NONE";
-
     facilityEl.textContent = facility === "TURNOVER_EXEMPTION"
 			? "Annual Turnover Exemption"
 			: "No Tax Facility";
@@ -35483,6 +35468,7 @@ async function loadAccountingTaxBranchFilters() {
     const selects = [
 		  document.getElementById("taxObligationBranchFilter"),
 		  document.getElementById("pphBadanBranchFilter"),
+			document.getElementById("taxObligationBranchDataFilter"),
 		  document.getElementById("taxPaymentsBranchFilter")
     ];
 
@@ -35496,7 +35482,6 @@ async function loadAccountingTaxBranchFilters() {
         select.appendChild(option);
       });
     });
-
   } catch (error) { }
 }
 
@@ -35520,10 +35505,9 @@ async function openTaxSettingsModal() {
     if (nameEl) { nameEl.value = setting.tax_name || "Annual Revenue Tax"; }
 		if (facilityEl) { facilityEl.value = setting.tax_facility || "NONE"; }
 		if (facilityAmountEl) { facilityAmountEl.value = setting.facility_amount ?? 0; }
-    if (rateEl) { const rate = Number(setting.tax_rate);
-      rateEl.value = Number.isFinite(rate)
-				? rate
-				: 0.5; }
+    if (rateEl) { const rate = Number(setting.tax_rate); rateEl.value = Number.isFinite(rate)
+			? rate
+			: 0.5; }
     if (fromEl) { fromEl.value = setting.effective_from || getTodayAccountingTaxDate(); }
     if (toEl) { toEl.value = setting.effective_to || ""; }
     if (activeEl) { activeEl.checked = setting.is_active !== false; }
@@ -35532,10 +35516,7 @@ async function openTaxSettingsModal() {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   } catch (error) {
-    alert(
-      error?.message ||
-      "Gagal memuat Tax Settings."
-    );
+    alert( error?.message || "Gagal memuat Tax Settings." );
   }
 }
 
@@ -35552,7 +35533,9 @@ async function saveTaxObligasiSettings() {
 
 	try {
 	  sessionId = localStorage.getItem("pos_session_id");
-			} catch (error) { alert(error.message); return; }
+	} catch (error) { 
+		alert(error.message); return; 
+	}
 	if (!sessionId) { alert("Session tidak ditemukan. Silakan login ulang."); return; }
 	
   const nameEl = document.getElementById( "taxSettingName" );
@@ -35690,10 +35673,7 @@ document.addEventListener("change", function(event) {
 
   loadTaxObligation()
     .catch(error => {
-      alert(
-        error?.message ||
-        "Gagal memuat Tax Obligation."
-      );
+      alert( error?.message || "Gagal memuat Tax Obligation." );
     });
 });
 
@@ -35707,10 +35687,9 @@ function renderTaxObligation(data) {
   const statusEl = document.getElementById( "taxObligationStatus" );
 	
   if (revenueEl) { revenueEl.textContent = formatAccountingTaxCurrency( obligation.revenue_amount ); }
-  if (rateEl) { const rate = Number(obligation.tax_rate);
-    rateEl.textContent = Number.isFinite(rate)
-			? `${rate.toFixed(4)}%`
-			: "0.0000%"; }
+  if (rateEl) { const rate = Number(obligation.tax_rate); rateEl.textContent = Number.isFinite(rate)
+		? `${rate.toFixed(4)}%`
+		: "0.0000%"; }
   if (taxableEl) { taxableEl.textContent =  formatAccountingTaxCurrency( obligation.taxable_amount ); }
   if (amountEl) { amountEl.textContent = formatAccountingTaxCurrency( obligation.tax_amount ); }
   if (statusEl) { const status = String( obligation.status || "" ).toUpperCase();
@@ -35749,7 +35728,6 @@ function renderTaxObligation(data) {
 }
 
 /* ==== RECORD TAX OBLIGATION ==== */
-
 async function recordTaxObligation() {
 	if (accountingTaxRecording) { return; }
 
@@ -35849,12 +35827,10 @@ async function recordTaxObligation() {
   }
 }
 
-
 const TAX_OBLIGATION_PAYABLE_ACCOUNT_ID = "ACC-4DC408145FCA";
 const TAX_OBLIGATION_PAYABLE_ACCOUNT_CODE = "2210";
 const TAX_OBLIGATION_CASH_ACCOUNT_ID = "ACC-84AE6A4B9528";
 const TAX_OBLIGATION_BANK_ACCOUNT_ID = "ACC-1CE751522EEC";
-
 
 /* ===== OPEN TAX OBLIGATION PAYMENT MODAL ===== */
 
@@ -36121,6 +36097,223 @@ async function loadTaxObligationPaymentSummary() {
   } catch (error) {
     throw error;
   }
+}
+
+/* ===== TAX PPH FINAL ===== */
+function escapeTaxObligationHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+
+function formatTaxObligationCurrency(value) {
+  return new Intl.NumberFormat("id-ID").format(
+    Number(value) || 0
+  );
+}
+
+/* LOAD DATA */
+async function loadTaxObligations() {
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    const branchId = document.getElementById("taxObligationBranchDataFilter")?.value || null;
+    const { data, error } = await supabaseClient.rpc(
+      "get_tax_obligations_list",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId
+      }
+    );
+
+    if (error) throw error;
+
+    const result = typeof data === "string"
+      ? JSON.parse(data)
+      : data;
+
+    taxObligationsData = Array.isArray(result)
+      ? result
+      : [];
+
+    populateTaxObligationsYears();
+
+    taxObligationsPage = 1;
+    renderTaxObligations();
+
+    return taxObligationsData;
+
+  } catch (error) {
+    console.error("Load Tax Obligations Error:", error);
+
+    taxObligationsData = [];
+    renderTaxObligations();
+
+    throw error;
+  }
+}
+
+/* FILTER DATA */
+function getFilteredTaxObligations() {
+  const month = document.getElementById("taxObligationPeriodFilter")?.value || "";
+  const year = document.getElementById("taxObligationYearFilter")?.value || "";
+  const status = document.getElementById("taxObligationStatusFilter")?.value || "";
+
+  return taxObligationsData.filter(item => {
+
+    const itemYear = String(item.tax_year || "");
+    const itemMonth = String(item.tax_month || "").padStart(2, "0");
+    const itemPeriod = `${itemYear}-${itemMonth}`;
+    const itemStatus = String(item.status || "").toUpperCase();
+
+    if (month && itemPeriod !== month) return false;
+    if (year && itemYear !== year) return false;
+    if (status && itemStatus !== status) return false;
+
+    return true;
+  });
+}
+
+/* APPLY FILTER */
+function applyTaxObligationsFilters() {
+  taxObligationsPage = 1;
+  renderTaxObligations();
+}
+
+/* POPULATE YEARS */
+function populateTaxObligationsYears() {
+  const select = document.getElementById("taxObligationYearFilter");
+  if (!select) return;
+
+  const selectedYear = select.value;
+  const years = [
+    ...new Set(
+      taxObligationsData
+        .map(item => String(item.tax_year || ""))
+        .filter(year => /^\d{4}$/.test(year))
+    )
+  ].sort((a, b) => b.localeCompare(a));
+
+  select.innerHTML = `
+    <option value="">All Years</option>
+    ${years.map(year => `
+      <option value="${year}">${year}</option>
+    `).join("")}
+  `;
+
+  select.value = years.includes(selectedYear)
+    ? selectedYear
+    : "";
+}
+
+/* RENDER TABLE */
+function renderTaxObligations() {
+  const tbody = document.getElementById("taxObligationsTableBody");
+  const paginationInfo = document.getElementById("taxObligationsPaginationInfo");
+  const prevButton = document.getElementById("taxObligationsPrevButton");
+  const nextButton = document.getElementById("taxObligationsNextButton");
+
+  if (!tbody) return;
+
+  const filteredData = getFilteredTaxObligations();
+  const total = filteredData.length;
+  const totalPages = Math.max( Math.ceil(total / taxObligationsPerPage), 1 );
+
+  if (taxObligationsPage > totalPages) { taxObligationsPage = totalPages; }
+
+  const startIndex = (taxObligationsPage - 1) * taxObligationsPerPage;
+  const endIndex = Math.min( startIndex + taxObligationsPerPage, total );
+  const pageData = filteredData.slice(startIndex, endIndex);
+
+  if (pageData.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" class="px-5 py-10 text-center text-muted">
+          No tax obligation data
+        </td>
+      </tr>
+    `;
+  } else {
+    tbody.innerHTML = pageData.map(item => {
+      const monthName = new Date(
+        Number(item.tax_year),
+        Number(item.tax_month) - 1,
+        1
+      ).toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric"
+      });
+
+      const status = String(item.status || "").toUpperCase();
+      const statusLabel = {
+        DRAFT: "Draft",
+        RECORDED: "Recorded",
+        PAID: "Paid",
+        VOID: "Void"
+      }[status] || status;
+
+      return `
+        <tr class="border-b border-outline-variant">
+
+          <td class="px-5 py-3 whitespace-nowrap">
+            ${escapeTaxObligationHTML(monthName)}
+          </td>
+
+          <td class="px-5 py-3 whitespace-nowrap">
+            ${escapeTaxObligationHTML(item.branch_id)}
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap">
+            ${formatTaxObligationCurrency(item.revenue_amount)}
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap">
+            ${Number(item.tax_rate || 0)}%
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap">
+            ${formatTaxObligationCurrency(item.taxable_amount)}
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap font-medium">
+            ${formatTaxObligationCurrency(item.tax_amount)}
+          </td>
+
+          <td class="px-5 py-3 text-center whitespace-nowrap">
+            ${escapeTaxObligationHTML(statusLabel)}
+          </td>
+
+          <td class="px-5 py-3 text-center whitespace-nowrap">
+            <span class="text-xs text-muted"
+              title="${escapeTaxObligationHTML(item.obligation_id)}">
+              ${item.journal_id
+                ? `Journal: ${escapeTaxObligationHTML(item.journal_id)}`
+                : "—"}
+            </span>
+          </td>
+
+        </tr>
+      `;
+    }).join("");
+  }
+
+  if (paginationInfo) { paginationInfo.textContent = `Showing ${total === 0 ? 0 : startIndex + 1}–${endIndex} of ${total}`; }
+  if (prevButton) { prevButton.disabled = taxObligationsPage <= 1; }
+  if (nextButton) { nextButton.disabled = taxObligationsPage >= totalPages; }
+}
+
+/* PAGINATION */
+function changeTaxObligationsPage(direction) {
+  const total = getFilteredTaxObligations().length;
+  const totalPages = Math.max( Math.ceil(total / taxObligationsPerPage), 1 );
+  const nextPage = taxObligationsPage + Number(direction);
+  if (nextPage < 1 || nextPage > totalPages) return;
+
+  taxObligationsPage = nextPage;
+  renderTaxObligations();
 }
 
 /* ===== TAX PAYMENTS ===== */
