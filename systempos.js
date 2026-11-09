@@ -38364,11 +38364,22 @@ window.exportTaxPphBadansPDF = async function () {
       currency: 'IDR',
       maximumFractionDigits: 0
     });
-		const getBranchName = item => {
-		  const branchId = item.branchId || item.branch_id || '';
+		const getBranchName = value => {
+		  // Bisa menerima object record atau Branch ID langsung
+		  const branchId = typeof value === 'object' && value !== null
+		    ? String(value.branchId || value.branch_id || '').trim()
+		    : String(value || '').trim();
 		
-		  return item.branchName ||
-		    item.branch_name || (accountingDebtBranches || []).find(branch => String(branch.id || '').trim() === String(branchId).trim())?.name || branchId || '-';
+		  if (!branchId) return '-';
+		  // Prioritaskan nama yang tersedia di record
+		  if (typeof value === 'object' && value !== null) {
+		    const name = value.branchName || value.branch_name;
+		    if (name) return name;
+		  }
+
+		  // Cari nama berdasarkan Branch ID
+		  const branch = (accountingDebtBranches || []).find(item => String(item.id || '').trim() === branchId);
+		  return branch?.name || branchId;
 		};
     const branchTitle = branchValue && branchValue.toUpperCase() !== 'ALL'
       ? getBranchName(branchValue)
