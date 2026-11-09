@@ -36334,25 +36334,17 @@ function setTaxDetailValue(id, value) {
 }
 
 async function viewTaxObligationDetail(obligationId) {
-  const item = taxObligationsData.find(
-    row => String(row.obligation_id) === String(obligationId)
-  );
-
-  if (!item) {
-    alert("Tax obligation data not found.");
-    return;
-  }
+  const item = taxObligationsData.find(row => String(row.obligation_id) === String(obligationId));
+  if (!item) { alert("Tax obligation data not found."); return; }
 
   const modal = document.getElementById("taxObligationDetailModal");
-
   // TAX INFORMATION
   setTaxDetailValue("taxDetailObligationId", item.obligation_id);
   setTaxDetailValue("taxDetailBranch", item.branch_id);
 
   const period = new Date(
     Number(item.tax_year),
-    Number(item.tax_month) - 1,
-    1
+    Number(item.tax_month) - 1, 1
   ).toLocaleDateString("en-US", {
     month: "long",
     year: "numeric"
@@ -36362,58 +36354,24 @@ async function viewTaxObligationDetail(obligationId) {
   setTaxDetailValue("taxDetailRate", `${Number(item.tax_rate || 0)}%`);
   setTaxDetailValue("taxDetailStatus", item.status);
   setTaxDetailValue("taxDetailJournalId", item.journal_id || "-");
-
   // TAX SUMMARY
-  setTaxDetailValue(
-    "taxDetailRevenue",
-    formatTaxDetailCurrency(item.revenue_amount)
-  );
-
-  setTaxDetailValue(
-    "taxDetailTaxableAmount",
-    formatTaxDetailCurrency(item.taxable_amount)
-  );
-
-  setTaxDetailValue(
-    "taxDetailTaxAmount",
-    formatTaxDetailCurrency(item.tax_amount)
-  );
+  setTaxDetailValue("taxDetailRevenue", formatTaxDetailCurrency(item.revenue_amount));
+  setTaxDetailValue("taxDetailTaxableAmount", formatTaxDetailCurrency(item.taxable_amount));
+  setTaxDetailValue("taxDetailTaxAmount", formatTaxDetailCurrency(item.tax_amount));
 
   // PAYMENT HISTORY
-  const payments = (taxPaymentsData || []).filter(payment =>
-    String(payment.obligation_id || "") === String(item.obligation_id)
-  );
-
+  const payments = (taxPaymentsData || []).filter(payment => String(payment.obligation_id || "") === String(item.obligation_id));
   const totalPaid = payments
     .filter(payment => String(payment.status || "").toUpperCase() === "PAID")
     .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+  const outstanding = Math.max(Number(item.tax_amount || 0) - totalPaid, 0);
 
-  const outstanding = Math.max(
-    Number(item.tax_amount || 0) - totalPaid,
-    0
-  );
-
-  setTaxDetailValue(
-    "taxDetailPaymentTotal",
-    formatTaxDetailCurrency(item.tax_amount)
-  );
-
-  setTaxDetailValue(
-    "taxDetailTotalPaid",
-    formatTaxDetailCurrency(totalPaid)
-  );
-
-  setTaxDetailValue(
-    "taxDetailOutstanding",
-    formatTaxDetailCurrency(outstanding)
-  );
-
+  setTaxDetailValue("taxDetailPaymentTotal", formatTaxDetailCurrency(item.tax_amount));
+  setTaxDetailValue("taxDetailTotalPaid", formatTaxDetailCurrency(totalPaid));
+  setTaxDetailValue("taxDetailOutstanding", formatTaxDetailCurrency(outstanding));
   setTaxDetailValue("taxDetailNote", item.note || "-");
 
-  const historyBody = document.getElementById(
-    "taxDetailPaymentHistoryBody"
-  );
-
+  const historyBody = document.getElementById("taxDetailPaymentHistoryBody");
   if (historyBody) {
     if (payments.length === 0) {
       historyBody.innerHTML = `
@@ -36426,36 +36384,20 @@ async function viewTaxObligationDetail(obligationId) {
     } else {
       historyBody.innerHTML = payments.map(payment => {
         const status = String(payment.status || "OUTSTANDING").toUpperCase();
-
         return `
           <tr>
-            <td class="px-4 py-3">
-              ${escapeTaxObligationHTML(payment.payment_date || "-")}
-            </td>
-            <td class="px-4 py-3">
-              ${escapeTaxObligationHTML(payment.payment_id || "-")}
-            </td>
-            <td class="px-4 py-3 text-right">
-              ${formatTaxDetailCurrency(payment.amount)}
-            </td>
-            <td class="px-4 py-3">
-              ${escapeTaxObligationHTML(payment.payment_method || "-")}
-            </td>
-            <td class="px-4 py-3">
-              ${escapeTaxObligationHTML(payment.reference_no || "-")}
-            </td>
-            <td class="px-4 py-3 text-center">
-              ${escapeTaxObligationHTML(status)}
-            </td>
-            <td class="px-4 py-3">
-              ${escapeTaxObligationHTML(payment.note || "-")}
-            </td>
+            <td class="px-4 py-3"> ${escapeTaxObligationHTML(payment.payment_date || "-")} </td>
+            <td class="px-4 py-3"> ${escapeTaxObligationHTML(payment.payment_id || "-")} </td>
+            <td class="px-4 py-3 text-right"> ${formatTaxDetailCurrency(payment.amount)} </td>
+            <td class="px-4 py-3"> ${escapeTaxObligationHTML(payment.payment_method || "-")} </td>
+            <td class="px-4 py-3"> ${escapeTaxObligationHTML(payment.reference_no || "-")} </td>
+            <td class="px-4 py-3 text-center"> ${escapeTaxObligationHTML(status)} </td>
+            <td class="px-4 py-3"> ${escapeTaxObligationHTML(payment.note || "-")} </td>
           </tr>
         `;
       }).join("");
     }
   }
-
   // OPEN MODAL
   modal?.classList.remove("hidden");
   modal?.classList.add("flex");
@@ -36467,6 +36409,492 @@ function closeTaxObligationDetail() {
   modal?.classList.add("hidden");
   modal?.classList.remove("flex");
 }
+
+
+/* ==== EXPORT TAX OBLIGATIONS PDF ==== */
+window.exportTaxObligationsPDF = async function () {
+  try {
+    const companyName = state.businessProfile?.company_name || 'YOUR BRANCH';
+    const periodValue = String( document.getElementById('taxObligationPeriodFilter')?.value || '' ).trim();
+    const yearValue = String( document.getElementById('taxObligationYearFilter')?.value || '' ).trim();
+    const branchValue = String( document.getElementById('taxObligationBranchDataFilter')?.value || '' ).trim();
+    const statusValue = String( document.getElementById('taxObligationStatusFilter')?.value || '' ).trim().toUpperCase();
+    const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+    const userBranchId = String( state.user?.branchId || state.user?.Branch_ID || '' ).trim();
+    const canViewAllBranches = ['owner', 'accountant'].includes(role) || userBranchId.toUpperCase() === 'ALL';
+
+    if (!Array.isArray(taxObligationsData) || !taxObligationsData.length) { alert('Data Tax Obligations belum tersedia.'); return; }
+    // FILTER RECORDS
+    const rows = taxObligationsData.filter(item => {
+      const itemYear = String(item.tax_year || '');
+      const itemMonth = String(item.tax_month || '').padStart(2, '0');
+      const itemPeriod = `${itemYear}-${itemMonth}`;
+      const branchId = String(item.branch_id || '').trim();
+      const status = String(item.status || '').trim().toUpperCase();
+
+      if (!canViewAllBranches && branchId !== userBranchId) return false;
+      if ( branchValue && branchValue !== 'ALL' && branchId !== branchValue ) return false;
+      if (statusValue && status !== statusValue) return false;
+      // MONTH FILTER TAKES PRIORITY OVER YEAR FILTER
+      if (/^\d{4}-\d{2}$/.test(periodValue)) { if (itemPeriod !== periodValue) return false;
+      } else if (/^\d{4}$/.test(yearValue)) { if (itemYear !== yearValue) return false; }
+      return true;
+    });
+
+    if (!rows.length) { alert('Tidak ada data Tax Obligations untuk filter yang dipilih.'); return; }
+
+    // HELPERS
+    const esc = value => String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+    const money = value => Number(value || 0).toLocaleString('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0
+    });
+    const formatPeriod = (year, month) => {
+      const date = new Date(Number(year), Number(month) - 1, 1);
+
+      return date.toLocaleDateString('en-GB', {
+        month: 'short',
+        year: 'numeric'
+      });
+    };
+    const getBranchName = id => {
+      const branch = (accountingDebtBranches || []).find(item => String(item.id || '').trim() === String(id || '').trim());
+
+      return branch?.name || id || '-';
+    };
+    const branchTitle = branchValue && branchValue !== 'ALL'
+      ? getBranchName(branchValue)
+      : canViewAllBranches
+        ? 'ALL BRANCHES'
+        : getBranchName(userBranchId);
+    const periodTitle = /^\d{4}-\d{2}$/.test(periodValue)
+      ? formatPeriod(periodValue.substring(0, 4), periodValue.substring(5, 7))
+      : /^\d{4}$/.test(yearValue)
+        ? yearValue
+        : 'ALL PERIODS';
+    // SORT RECORDS
+    const sortedRows = [...rows].sort((a, b) => {
+      const periodA = `${a.tax_year}-${String(a.tax_month).padStart(2, '0')}`;
+      const periodB = `${b.tax_year}-${String(b.tax_month).padStart(2, '0')}`;
+
+      return periodA.localeCompare(periodB) ||
+        String(a.branch_id || '').localeCompare(String(b.branch_id || ''));
+    });
+    // TABLE ROWS
+    const tableRows = sortedRows.map(item => {
+      const period = formatPeriod(item.tax_year, item.tax_month);
+      const status = String(item.status || 'DRAFT').toUpperCase();
+
+      return `
+        <tr>
+          <td>${esc(item.obligation_id || '-')}</td>
+          <td>${esc(getBranchName(item.branch_id))}</td>
+          <td>${esc(period)}</td>
+          <td class="number">${esc(money(item.revenue_amount))}</td>
+          <td class="number">${Number(item.tax_rate || 0)}%</td>
+          <td class="number">${esc(money(item.taxable_amount))}</td>
+          <td class="number tax-amount">${esc(money(item.tax_amount))}</td>
+          <td><span class="status">${esc(status)}</span></td>
+        </tr>
+      `;
+    }).join('');
+    const totalRevenue = sortedRows.reduce((sum, item) => sum + Number(item.revenue_amount || 0), 0);
+    const totalTaxable = sortedRows.reduce((sum, item) => sum + Number(item.taxable_amount || 0), 0);
+    const totalTax = sortedRows.reduce((sum, item) => sum + Number(item.tax_amount || 0), 0);
+    // TENANT LOGO
+    const supabaseUrl = String(supabaseClient?.supabaseUrl || '' ).replace(/\/$/, '');
+    const logoUrl = supabaseUrl
+      ? `${supabaseUrl}/storage/v1/object/public/Logo/LOGOEXPORT.png`
+      : '';
+    const filename = `Tax Obligations - ${branchTitle} - ${periodTitle}.pdf`;
+    // REPORT HTML
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>${esc(filename)}</title>
+
+        <style>
+          * { box-sizing: border-box; }
+
+          html, body {
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            background: #000;
+            color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            padding: 40px 20px;
+          }
+
+          .toolbar {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            color: #fff;
+            font-size: 14px;
+          }
+
+          .toolbar button {
+            border: 1px solid rgba(255,255,255,.15);
+            background: rgba(255,255,255,.08);
+            color: #fff;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+          }
+
+          .report {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 36px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.45);
+          }
+
+          .report-header { margin-bottom: 24px; }
+
+          .brand-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            min-height: 75px;
+            margin-bottom: 16px;
+          }
+
+          .brand-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+          }
+
+          .logo {
+            display: block;
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+            object-position: center;
+            flex-shrink: 0;
+            margin: 0 0 5px 0;
+          }
+
+          .brand-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2px;
+            margin: 0;
+          }
+
+          .brand-name {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .branch-title {
+            font-size: 10px;
+            font-weight: 500;
+            color: #666;
+          }
+
+          .period {
+            font-size: 11px;
+            font-weight: 600;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+            align-self: flex-end;
+            margin-bottom: 5px;
+          }
+
+          .report-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-top: 14px;
+            border-top: 2px solid #222;
+          }
+
+          .title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+          }
+
+          .filter-info {
+            margin: 0;
+            font-size: 9px;
+            line-height: 1.7;
+            color: #777;
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .summary {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 16px;
+            padding: 14px 16px;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+          }
+
+          .summary-label {
+            color: #777;
+            font-size: 10px;
+            margin-bottom: 5px;
+          }
+
+          .summary-value {
+            color: #222;
+            font-size: 15px;
+            font-weight: 700;
+          }
+
+          .table-wrap {
+            width: 100%;
+            overflow: visible;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 12px;
+            background: #fff;
+          }
+
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: auto;
+            font-size: 9px;
+            color: #444;
+          }
+
+          thead { display: table-header-group; }
+
+          th {
+            padding: 10px 6px;
+            background: #f5f5f5;
+            color: #444;
+            font-size: 9px;
+            font-weight: 700;
+            text-align: left;
+            vertical-align: middle;
+            border-bottom: 1px solid #e5e5e5;
+          }
+
+          td {
+            padding: 10px 6px;
+            vertical-align: middle;
+            border-bottom: 1px solid #eee;
+            overflow-wrap: anywhere;
+          }
+
+          tbody tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+          }
+
+          tbody tr:last-child td { border-bottom: none; }
+
+          .number {
+            text-align: right;
+            white-space: nowrap;
+          }
+
+          .tax-amount {
+            color: #222;
+            font-weight: 700;
+          }
+
+          .status {
+            font-size: 8px;
+            font-weight: 700;
+          }
+
+          .total-row td {
+            background: #f8f8f8;
+            border-top: 1px solid #ddd;
+            font-weight: 700;
+          }
+
+          .footer {
+            margin-top: 24px;
+            text-align: center;
+            font-size: 9px;
+            color: #888;
+          }
+
+          @media print {
+            html, body {
+              width: 100%;
+              margin: 0;
+              padding: 0;
+              background: #fff;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            .toolbar { display: none !important; }
+
+            .report {
+              width: 100%;
+              max-width: none;
+              margin: 0;
+              padding: 8px;
+              border-radius: 0;
+              box-shadow: none;
+            }
+
+            .table-wrap {
+              padding: 8px;
+              border-radius: 8px;
+            }
+
+            th {
+              background: #f5f5f5 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+
+            table { page-break-inside: auto; }
+          }
+        </style>
+      </head>
+
+      <body>
+        <div class="toolbar">
+          <div>Tax Obligations Report</div>
+          <button type="button" onclick="window.print()">
+            Download / Print PDF
+          </button>
+        </div>
+
+        <main class="report">
+          <header class="report-header">
+            <div class="brand-row">
+              <div class="brand-left">
+                ${logoUrl ? `
+                  <img
+                    src="${esc(logoUrl)}"
+                    class="logo"
+                    alt="Company Logo"
+                    onerror="this.style.display='none'"
+                  >
+                ` : ''}
+
+                <div class="brand-info">
+                  <h2 class="brand-name">${esc(companyName)}</h2>
+                  <div class="branch-title">
+                    Branch : ${esc(branchTitle)}
+                  </div>
+                </div>
+              </div>
+
+              <div class="period">
+                Period : ${esc(periodTitle)}
+              </div>
+            </div>
+
+            <div class="report-meta-row">
+              <h1 class="title">Tax Obligations Report</h1>
+
+              <div class="filter-info">
+                Status: ${esc(statusValue || 'ALL STATUS')}
+              </div>
+            </div>
+          </header>
+
+          <div class="summary">
+            <div>
+              <div class="summary-label">Total Records</div>
+              <div class="summary-value">${sortedRows.length}</div>
+            </div>
+            <div>
+              <div class="summary-label">Total Revenue</div>
+              <div class="summary-value">${esc(money(totalRevenue))}</div>
+            </div>
+            <div>
+              <div class="summary-label">Total Taxable Amount</div>
+              <div class="summary-value">${esc(money(totalTaxable))}</div>
+            </div>
+            <div>
+              <div class="summary-label">Total Tax Amount</div>
+              <div class="summary-value">${esc(money(totalTax))}</div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Obligation ID</th>
+                  <th>Branch</th>
+                  <th>Tax Period</th>
+                  <th class="number">Revenue</th>
+                  <th class="number">Tax Rate</th>
+                  <th class="number">Taxable Amount</th>
+                  <th class="number">Tax Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                ${tableRows}
+                <tr class="total-row">
+                  <td colspan="6">TOTAL TAX AMOUNT</td>
+                  <td class="number">${esc(money(totalTax))}</td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="footer">
+            Generated by MUNO • ${esc(new Date().toLocaleString('id-ID'))}
+          </footer>
+        </main>
+      </body>
+      </html>
+    `;
+
+    // OPEN REPORT IN NEW TAB
+    const reportWindow = window.open('', '_blank');
+    if (!reportWindow) { alert('Browser memblokir tab export. Izinkan pop-up untuk aplikasi MUNO lalu coba lagi.'); return; }
+
+    reportWindow.document.open();
+    reportWindow.document.write(html);
+    reportWindow.document.close();
+
+  } catch (error) {
+    console.error('Export Tax Obligations error:', error);
+    alert('Gagal membuat PDF Tax Obligations. Periksa Console untuk detail kesalahan.');
+  }
+};
+
+
 
 /* ===== TAX PAYMENTS ===== */
 function getFilteredTaxPayments() {
@@ -36485,7 +36913,6 @@ function getFilteredTaxPayments() {
     return true;
   });
 }
-
 
 function applyTaxPaymentsFilters() {
   taxPaymentsPage = 1;
