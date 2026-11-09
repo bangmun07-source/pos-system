@@ -22060,6 +22060,45 @@
 							  Export
 							</button>
 					  </div>
+						<!-- FILTERS -->
+						<div class="p-5 border-b border-outline-variant grid grid-cols-1 md:grid-cols-3 gap-4">
+						  <!-- PERIOD -->
+						  <div>
+						    <label class="block text-xs font-medium text-muted mb-2">
+						      Period
+						    </label>
+						    <input
+						      type="month"
+						      id="taxObligationPeriodFilter"
+						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+						  </div>
+						  <!-- BRANCH -->
+						  <div>
+						    <label class="block text-xs font-medium text-muted mb-2">
+						      Branch
+						    </label>
+						    <select
+						      id="taxObligationBranchFilter"
+						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+						      <option value="">All Branches</option>
+						    </select>
+						  </div>
+						  <!-- STATUS -->
+						  <div>
+						    <label class="block text-xs font-medium text-muted mb-2">
+						      Status
+						    </label>
+						    <select
+						      id="taxObligationStatusFilter"
+						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+						      <option value="">All Status</option>
+						      <option value="DRAFT">Draft</option>
+						      <option value="RECORDED">Recorded</option>
+						      <option value="PAID">Paid</option>
+						      <option value="VOID">Void</option>
+						    </select>
+						  </div>
+						</div>
 					  <!-- TABLE -->
 					  <div class="overflow-x-auto custom-scrollbar">
 					    <table class="w-full text-sm">
@@ -22139,6 +22178,43 @@
 					      </div>
 					    </div>
 					  </div>
+						<!-- FILTERS -->
+						<div class="p-5 border-b border-outline-variant grid grid-cols-1 md:grid-cols-3 gap-4">
+						  <!-- PERIOD -->
+						  <div>
+						    <label class="block text-xs font-medium text-muted mb-2">
+						      Period
+						    </label>
+						    <input
+						      type="month"
+						      id="taxPaymentsPeriodFilter"
+						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+						  </div>
+						  <!-- BRANCH -->
+						  <div>
+						    <label class="block text-xs font-medium text-muted mb-2">
+						      Branch
+						    </label>
+						    <select
+						      id="taxPaymentsBranchFilter"
+						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+						      <option value="">All Branches</option>
+						    </select>
+						  </div>
+						  <!-- STATUS -->
+						  <div>
+						    <label class="block text-xs font-medium text-muted mb-2">
+						      Status
+						    </label>
+						    <select
+						      id="taxPaymentsStatusFilter"
+						      class="w-full px-3 py-2 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+						      <option value="">All Status</option>
+						      <option value="OUTSTANDING">Outstanding</option>
+						      <option value="PAID">Paid</option>
+						    </select>
+						  </div>
+						</div>
 					  <!-- TABLE -->
 					  <div class="overflow-x-auto custom-scrollbar">
 					    <table class="w-full text-sm">
