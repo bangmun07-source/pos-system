@@ -46900,13 +46900,14 @@ window.viewPayrollDetail = async function (payrollId) {
 	showPayrollModal('payrollDetailModal');
 
 	try {
-		const { data, error } = await supabaseClient.rpc(
-			'get_employee_payroll_detail',
-			{
-				p_session_id: sessionId,
-				p_payroll_id: row.Payroll_ID
-			}
-		);
+		const { data, error } = 
+			await supabaseClient.rpc(
+				'get_employee_payroll_detail',
+				{
+					p_session_id: sessionId,
+					p_payroll_id: row.Payroll_ID
+				}
+			);
 
 		if (error) throw error;
 		if (!data?.success) { throw new Error( data?.message || 'Gagal mengambil detail payroll.' ); }
@@ -47760,7 +47761,7 @@ async function cancelEmployeePayroll(payrollId) {
 		if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
 
 		const { data, error } = 
-			await supabase.rpc(
+			await supabaseClient.rpc(
 				'cancel_employee_payroll', 
 				{
 					p_session_id: sessionId,
