@@ -47774,7 +47774,7 @@ async function cancelEmployeePayroll(payrollId) {
 
 		showToast(data.message, 'success');
 		// Refresh tampilan payroll
-		await renderEmployeePayroll();
+		window.loadPayroll();
 
 	} catch (error) {
 		console.error('Cancel Employee Payroll:', error);
