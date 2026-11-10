@@ -32125,7 +32125,7 @@ function renderEmployeeTaxTable(errorMessage = "") {
 	if (!pageData.length) {
 		tbody.innerHTML = `
 			<tr>
-				<td colspan="9"
+				<td colspan="11"
 					class="px-5 py-10 text-center text-muted">
 						${escapeHtml( errorMessage || "No employee tax data" )}
 				</td>
@@ -32165,18 +32165,18 @@ function renderEmployeeTaxTable(errorMessage = "") {
 				<tr class="hover:bg-outline-variant transition">
 					<td class="px-5 py-4 whitespace-nowrap"> ${escapeHtml(period)} </td>
 					<td class="px-5 py-4 whitespace-nowrap">
-						<div class="font-medium text-foreground">  ${escapeHtml(employeeName)} </div>
+						<div class="font-medium text-foreground"> ${escapeHtml(employeeName)} </div>
 						<div class="text-xs text-muted"> ${escapeHtml(employeeCode)} </div>
 					</td>
 					<td class="px-5 py-4"> ${escapeHtml(branchName)} </td>
-					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency( Number(row.gross_taxable_income) || 0 )} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(Number(row.gross_salary_taxable) || 0)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(Number(row.employer_health_taxable) || 0)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${formatAccountingCurrency(Number(row.gross_taxable_income) || 0)} </td>
 					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(taxAmount)} </td>
 					<td class="px-5 py-4 text-right"> — </td>
 					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(remaining)} </td>
 					<td class="px-5 py-4 text-center">
-						<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
-							${escapeHtml(status)}
-						</span>
+						<span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}"> ${escapeHtml(status)} </span>
 					</td>
 					<td class="px-5 py-4 text-center">
 						<div class="relative inline-block">
@@ -32191,7 +32191,7 @@ function renderEmployeeTaxTable(errorMessage = "") {
 						</div>
 					</td>
 				</tr>
-			`;
+				`;
 		}).join("");
 	}
 	updateEmployeeTaxSummary(data);
