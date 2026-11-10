@@ -41679,39 +41679,48 @@ function renderSalaryComponents(components = []) {
 
 
 /* ==== COMPONENT ROW ==== */
+/* ==== COMPONENT ROW ==== */
 function renderSalaryComponentRow(component) {
-  const componentId = escapeEmployeeHtml( component.Component_ID || '' );
-  const componentName = escapeEmployeeHtml( component.Component_Name || '-' );
+  const componentId = escapeEmployeeHtml(component.Component_ID || '');
+  const componentName = escapeEmployeeHtml(component.Component_Name || '-');
   const amount = Number(component.Amount || 0);
-  const calculationType = escapeEmployeeHtml( component.Calculation_Type || 'FIXED' );
+  const calculationType = escapeEmployeeHtml(component.Calculation_Type || 'FIXED');
+  const accountingCategory = component.Accounting_Category || '';
   const formattedAmount = new Intl.NumberFormat('id-ID').format(amount);
   const amountDisplay = component.Calculation_Type === 'PERCENTAGE'
-		? `${formattedAmount} %`
-		: `Rp ${formattedAmount}`;
+    ? `${formattedAmount} %`
+    : `Rp ${formattedAmount}`;
+  const categoryLabel = {
+    EMPLOYER_HEALTH_CONTRIBUTION: 'Employer Contribution',
+    EMPLOYER_TAXABLE_CONTRIBUTION: 'Employer Contribution - Taxable PPh 21'
+  }[accountingCategory] || calculationType;
 
   return `
     <div class="px-4 py-3 flex items-center justify-between gap-4 border-b border-outline-variant last:border-b-0">
       <div class="min-w-0">
-        <p class="text-sm font-medium text-foreground truncate"> ${componentName} </p>
-        <p class="text-[11px] text-muted mt-0.5">  ${calculationType} </p>
+        <p class="text-sm font-medium text-foreground truncate">
+          ${componentName}
+        </p>
+        <p class="text-[11px] text-muted mt-0.5">
+          ${escapeEmployeeHtml(categoryLabel)}
+        </p>
       </div>
-	  
-    	<div class="flex items-center gap-3 shrink-0">
-        <span class="text-sm font-medium text-foreground"> ${amountDisplay} </span>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <span class="text-sm font-medium text-foreground">
+          ${amountDisplay}
+        </span>
+
         <button type="button"
           onclick="editSalaryComponent('${componentId}')"
           class="w-8 h-8 rounded-md flex items-center justify-center text-muted hover:text-foreground hover:bg-surface-container-high transition">
-          <span class="material-symbols-outlined text-base">
-            edit
-          </span>
+          <span class="material-symbols-outlined text-base">edit</span>
         </button>
 
         <button type="button"
           onclick="removeSalaryComponent('${componentId}')"
           class="w-8 h-8 rounded-md flex items-center justify-center text-muted hover:text-red-500 hover:bg-surface-container-high transition">
-          <span class="material-symbols-outlined text-base">
-            delete
-          </span>
+          <span class="material-symbols-outlined text-base">delete</span>
         </button>
       </div>
     </div>
@@ -41796,12 +41805,9 @@ window.saveSalaryComponent = function () {
   if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
   if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
   if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
-  if ( type === 'EMPLOYER_CONTRIBUTION' && accountingCategory !== 'EMPLOYER_HEALTH_CONTRIBUTION'
-  ) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
-  if ( type === 'ALLOWANCE' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
-  ) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
-  if ( type === 'DEDUCTION' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)
-  ) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
+  if (type === 'EMPLOYER_CONTRIBUTION' && ![ 'EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION' ].includes(accountingCategory)) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
+  if ( type === 'ALLOWANCE' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
+  if ( type === 'DEDUCTION' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
 
   const componentData = {
     Component_Type: type,
