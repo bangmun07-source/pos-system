@@ -32609,22 +32609,24 @@ window.exportEmployeeTaxPayable = async function () {
     });
 
     const tableRows = sortedRows.map(row => `
-      <tr>
-        <td>${esc(row.tax_record_id || '-')}</td>
-        <td>
-          <div class="employee-name">${esc(row.employee_name || '-')}</div>
-          <div class="muted">${esc(row.employee_code || '')}</div>
-        </td>
-        <td>${esc(getBranchName(row.branch_id))}</td>
-        <td>${esc(formatPeriod(row.tax_period))}</td>
-        <td>${esc(row.tax_type || 'PPh21')}</td>
-        <td class="number">${esc(money(row.gross_taxable_income))}</td>
-        <td class="number">${esc(money(row.tax_allowance))}</td>
-        <td class="number">${esc(money(row.tax_deduction))}</td>
-        <td class="number tax-amount">${esc(money(row.tax_amount))}</td>
-        <td><span class="status">${esc(String(row.status || 'DRAFT').toUpperCase())}</span></td>
-      </tr>
-    `).join('');
+		  <tr>
+		    <td>${esc(row.tax_record_id || '-')}</td>
+		    <td>
+		      <div class="employee-name">${esc(row.employee_name || '-')}</div>
+		      <div class="muted">${esc(row.employee_code || '')}</div>
+		    </td>
+		    <td>${esc(getBranchName(row.branch_id))}</td>
+		    <td>${esc(formatPeriod(row.tax_period))}</td>
+		    <td>${esc(row.tax_type || 'PPh21')}</td>
+		    <td class="number">${esc(money(row.gross_salary_taxable))}</td>
+		    <td class="number">${esc(money(row.employer_health_taxable))}</td>
+		    <td class="number">${esc(money(row.gross_taxable_income))}</td>
+		    <td class="number">${esc(money(row.tax_allowance))}</td>
+		    <td class="number">${esc(money(row.tax_deduction))}</td>
+		    <td class="number tax-amount">${esc(money(row.tax_amount))}</td>
+		    <td><span class="status">${esc(String(row.status || 'DRAFT').toUpperCase())}</span></td>
+		  </tr>
+		`).join('');
 
     const totalTax = sortedRows.reduce( (sum, row) => sum + Number(row.tax_amount || 0), 0 );
     // TENANT LOGO
@@ -32805,34 +32807,34 @@ window.exportEmployeeTaxPayable = async function () {
             padding: 12px;
             background: #fff;
           }
-
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: auto;
-            font-size: 9px;
-            color: #444;
-          }
+					
+					table {
+					  width: 100%;
+					  border-collapse: collapse;
+					  table-layout: auto;
+					  font-size: 8px;
+					  color: #444;
+					}
 
           thead { display: table-header-group; }
 
-          th {
-            padding: 10px 6px;
-            background: #f5f5f5;
-            color: #444;
-            font-size: 9px;
-            font-weight: 700;
-            text-align: left;
-            vertical-align: middle;
-            border-bottom: 1px solid #e5e5e5;
-          }
+					th {
+					  padding: 8px 4px;
+					  background: #f5f5f5;
+					  color: #444;
+					  font-size: 8px;
+					  font-weight: 700;
+					  text-align: left;
+					  vertical-align: middle;
+					  border-bottom: 1px solid #e5e5e5;
+					}
 
-          td {
-            padding: 10px 6px;
-            vertical-align: middle;
-            border-bottom: 1px solid #eee;
-            overflow-wrap: anywhere;
-          }
+					td {
+					  padding: 8px 4px;
+					  vertical-align: middle;
+					  border-bottom: 1px solid #eee;
+					  overflow-wrap: anywhere;
+					}
 
           tbody tr {
             page-break-inside: avoid;
@@ -32983,27 +32985,29 @@ window.exportEmployeeTaxPayable = async function () {
 
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>Record ID</th>
-                  <th>Employee</th>
-                  <th>Branch</th>
-                  <th>Period</th>
-                  <th>Tax Type</th>
-                  <th class="number">Gross Income</th>
-                  <th class="number">Tax Allowance</th>
-                  <th class="number">Tax Deduction</th>
-                  <th class="number">Tax Amount</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
+							<thead>
+							  <tr>
+							    <th>Record ID</th>
+							    <th>Employee</th>
+							    <th>Branch</th>
+							    <th>Period</th>
+							    <th>Tax Type</th>
+							    <th class="number">Gross Salary</th>
+							    <th class="number">Employer Health</th>
+							    <th class="number">Gross Taxable Income</th>
+							    <th class="number">Tax Allowance</th>
+							    <th class="number">Tax Deduction</th>
+							    <th class="number">Tax Amount</th>
+							    <th>Status</th>
+							  </tr>
+							</thead>
               <tbody>
                 ${tableRows}
-                <tr class="total-row">
-                  <td colspan="8">TOTAL TAX AMOUNT</td>
-                  <td class="number">${esc(money(totalTax))}</td>
-                  <td></td>
-                </tr>
+								<tr class="total-row">
+									<td colspan="10">TOTAL TAX AMOUNT</td>
+									<td class="number">${esc(money(totalTax))}</td>
+									<td></td>
+								</tr>
               </tbody>
             </table>
           </div>
