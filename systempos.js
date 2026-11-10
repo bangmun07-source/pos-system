@@ -47745,6 +47745,42 @@ window.changePayrollPage = function (direction) {
     window.renderPayrollTable();
 };
 
+async function cancelEmployeePayroll(payrollId) {
+	if (!payrollId) { showToast('Payroll ID tidak ditemukan', 'error'); return; }
+
+	const confirmed = confirm(
+		'Apakah kamu yakin ingin menghapus payroll ini secara permanen?\n\n' +
+		'Jika payroll sudah dibayar, saldo Cash/Bank akan dikembalikan.\n' +
+		'Jurnal dan histori pembayaran payroll juga akan dihapus.'
+	);
+	if (!confirmed) return;
+
+	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) { throw new Error('Session tidak ditemukan. Silakan login kembali.'); }
+
+		const { data, error } = 
+			await supabase.rpc(
+				'cancel_employee_payroll', 
+				{
+					p_session_id: sessionId,
+					p_payroll_id: payrollId
+				}
+			);
+
+		if (error) throw error;
+		if (!data || data.success !== true) { throw new Error(data?.message || 'Gagal menghapus payroll.'); }
+
+		showToast(data.message, 'success');
+		// Refresh tampilan payroll
+		await renderEmployeePayroll();
+
+	} catch (error) {
+		console.error('Cancel Employee Payroll:', error);
+		showToast(error.message || 'Gagal menghapus payroll.', 'error');
+	}
+}
+
 /* ==== EXPORT PAYROLL PDF ==== */
 window.exportPayroll = function () {
   try {
@@ -47768,14 +47804,8 @@ window.exportPayroll = function () {
 		
 		  if (typeof window.getReimbursementBranchName === 'function') {
 		    const name = window.getReimbursementBranchName(id);
-		
-		    if (name && String(name).trim() !== id) {
-		      return String(name).trim();
-		    }
-		  }
-		
-		  return id;
-		};
+		    if (name && String(name).trim() !== id) { return String(name).trim(); }
+		  } return id; };
     // APPLY BRANCH ACCESS
     const selectedBranch = ['owner', 'accountant'].includes(role)
       ? branchFilter
