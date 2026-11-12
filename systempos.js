@@ -45084,10 +45084,11 @@ async function loadPPh21Settings() {
 
   try {
     const client = getPPh21Supabase();
-    const { data, error } = await supabaseClient.rpc(
-			'get_pph21_settings', {
-	      p_session_id: sessionId
-	    });
+    const { data, error } = 
+			await supabaseClient.rpc(
+				'get_pph21_settings', {
+		      p_session_id: sessionId
+		    });
 
     if (error) throw error;
     if (!data || data.success !== true) { throw new Error(data?.message || 'Data PPh 21 gagal dimuat.'); }
@@ -45210,15 +45211,16 @@ async function savePPh21TER() {
 
   try {
     const client = getPPh21Supabase();
-    const { data, error } = await supabaseClient.rpc(
-			'save_pph21_ter', {
-	      p_session_id: sessionId,
-	      p_ter_id: pph21TEREditingId,
-	      p_category: category,
-	      p_min_gross: minGross,
-	      p_max_gross: maxGross,
-	      p_tax_rate: taxRate
-	    });
+    const { data, error } = 
+			await supabaseClient.rpc(
+				'save_pph21_ter', {
+		      p_session_id: sessionId,
+		      p_ter_id: pph21TEREditingId,
+		      p_category: category,
+		      p_min_gross: minGross,
+		      p_max_gross: maxGross,
+		      p_tax_rate: taxRate
+		    });
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'Tarif TER gagal disimpan.'); }
@@ -45247,13 +45249,14 @@ async function deletePPh21TER(terId) {
   if (!sessionId) { showToast('Session tidak ditemukan.', 'error'); return; }
 
   try {
-    const { data, error } = await supabaseClient.rpc(
-      'delete_pph21_ter',
-      {
-        p_session_id: sessionId,
-        p_ter_id: Number(terId)
-      }
-    );
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      'delete_pph21_ter',
+	      {
+	        p_session_id: sessionId,
+	        p_ter_id: Number(terId)
+	      }
+	    );
 
     if (error) throw error;
     if (data?.success !== true) { throw new Error(data?.message || 'Tarif TER gagal dihapus.'); }
@@ -45360,14 +45363,15 @@ async function savePPh21PTKP() {
   pph21Saving = true;
 
   try {
-    const { data, error } = await supabaseClient.rpc(
-      'save_pph21_ptkp',
-      {
-        p_session_id: sessionId,
-        p_ptkp_status: status,
-        p_annual_ptkp: annualPTKP
-      }
-    );
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      'save_pph21_ptkp',
+	      {
+	        p_session_id: sessionId,
+	        p_ptkp_status: status,
+	        p_annual_ptkp: annualPTKP
+	      }
+	    );
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'PTKP gagal disimpan.'); }
@@ -45613,13 +45617,14 @@ async function deletePPh21Progressive(rateId) {
   if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
 
   try {
-    const { data, error } = await supabaseClient.rpc(
-      'delete_pph21_progressive_rate',
-      {
-        p_session_id: sessionId,
-        p_progressive_rate_id: rateId
-      }
-    );
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      'delete_pph21_progressive_rate',
+	      {
+	        p_session_id: sessionId,
+	        p_progressive_rate_id: rateId
+	      }
+	    );
 
     if (error) throw error;
     if (data?.success !== true) { throw new Error(data?.message || 'Tarif progresif gagal dihapus.'); }
@@ -45659,9 +45664,9 @@ function switchPPh21Tab(tab) {
     button.classList.toggle('text-muted', !isActive);
   });
   // Load progressive rates when tab is opened
-  if (tab === 'PROGRESSIVE') {
-    renderPPh21Progressive();
-  }
+	if (tab === 'PROGRESSIVE') {
+	  loadPPh21Progressive();
+	}
 }
 
 /* =========================================================
