@@ -45083,7 +45083,6 @@ async function loadPPh21Settings() {
   if (ptkpBody) { ptkpBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-muted">Memuat data PTKP...</td></tr>'; }
 
   try {
-    const client = getPPh21Supabase();
     const { data, error } = 
 			await supabaseClient.rpc(
 				'get_pph21_settings', {
