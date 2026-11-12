@@ -44998,6 +44998,12 @@ let pph21TEREditingId = null;
 let pph21PTKPEditingStatus = null;
 let pph21Loading = false;
 let pph21Saving = false;
+let pph21PositionExpenseData = {
+  rate_percent: 5,
+  monthly_cap: 500000,
+  annual_cap: 6000000
+};
+let pph21PositionExpenseLoading = false;
 
 // HELPERS
 function getPPh21SessionId() {
@@ -45637,12 +45643,109 @@ async function deletePPh21Progressive(rateId) {
   }
 }
 
+// LOAD BIAYA JABATAN
+// RPC: get_pph21_position_expense_settings
+async function loadPPh21PositionExpenseSettings() {
+  if (pph21PositionExpenseLoading) return;
+
+  const sessionId = getPPh21SessionId();
+
+  if (!sessionId) {
+    showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error');
+    return;
+  }
+
+  pph21PositionExpenseLoading = true;
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'get_pph21_position_expense_settings',
+      {
+        p_session_id: sessionId
+      }
+    );
+
+    if (error) throw error;
+    if (data?.success !== true) { throw new Error( data?.message || 'Pengaturan Biaya Jabatan gagal dimuat.' ); }
+
+    const settings = data.settings;
+    if (!settings) { throw new Error('Data pengaturan Biaya Jabatan tidak ditemukan.'); }
+
+    pph21PositionExpenseData = {
+      rate_percent: Number(settings.rate_percent),
+      monthly_cap: Number(settings.monthly_cap),
+      annual_cap: Number(settings.annual_cap)
+    };
+    document.getElementById('pph21PositionExpenseRate').value = pph21PositionExpenseData.rate_percent;
+    document.getElementById('pph21PositionExpenseMonthlyCap').value = pph21PositionExpenseData.monthly_cap;
+    document.getElementById('pph21PositionExpenseAnnualCap').value = pph21PositionExpenseData.annual_cap;
+
+  } catch (error) {
+    console.error('[PPh21] Load position expense error:', error);
+    showPPh21Message(getPPh21Error(error), 'error');
+
+  } finally {
+    pph21PositionExpenseLoading = false;
+  }
+}
+
+// SAVE BIAYA JABATAN
+// RPC: save_pph21_position_expense_settings
+async function savePPh21PositionExpenseSettings() {
+  if (pph21Saving) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  const rateValue = document.getElementById('pph21PositionExpenseRate')?.value;
+  const monthlyValue = document.getElementById('pph21PositionExpenseMonthlyCap')?.value;
+  const annualValue = document.getElementById('pph21PositionExpenseAnnualCap')?.value;
+  const ratePercent = rateValue === '' ? NaN : Number(rateValue);
+  const monthlyCap = monthlyValue === '' ? NaN : Number(monthlyValue);
+  const annualCap = annualValue === '' ? NaN : Number(annualValue);
+  // VALIDASI
+  if ( !Number.isFinite(ratePercent) || ratePercent < 0 || ratePercent > 100
+  ) { showPPh21Message('Persentase harus antara 0 sampai 100%.', 'error'); return; }
+  if ( !Number.isSafeInteger(monthlyCap) || monthlyCap < 0
+  ) { showPPh21Message('Maksimal biaya jabatan per bulan tidak valid.', 'error'); return; }
+  if ( !Number.isSafeInteger(annualCap) || annualCap < 0
+  ) { showPPh21Message('Maksimal biaya jabatan per tahun tidak valid.', 'error'); return; }
+
+  pph21Saving = true;
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'save_pph21_position_expense_settings',
+      {
+        p_session_id: sessionId,
+        p_rate_percent: ratePercent,
+        p_monthly_cap: monthlyCap,
+        p_annual_cap: annualCap
+      }
+    );
+
+    if (error) throw error;
+    if (data?.success !== true) { throw new Error( data?.message || 'Pengaturan Biaya Jabatan gagal disimpan.' ); }
+
+    showPPh21Message( data.message || 'Pengaturan Biaya Jabatan berhasil disimpan.' );
+    await loadPPh21PositionExpenseSettings();
+
+  } catch (error) {
+    console.error('[PPh21] Save position expense error:', error);
+    showPPh21Message(getPPh21Error(error), 'error');
+
+  } finally {
+    pph21Saving = false;
+  }
+}
+
 // TAB SWITCH
 function switchPPh21Tab(tab) {
   const tabs = {
     TER: { panel: 'pph21TERPanel', button: 'pph21TabTER' },
     PTKP: { panel: 'pph21PTKPPanel', button: 'pph21TabPTKP' },
-    PROGRESSIVE: { panel: 'pph21ProgressivePanel',  button: 'pph21TabProgressive' }
+    PROGRESSIVE: { panel: 'pph21ProgressivePanel',  button: 'pph21TabProgressive' },
+		POSITION_EXPENSE: { panel: 'pph21PositionExpensePanel', button: 'pph21TabPositionExpense' }
   };
 
   if (!tabs[tab]) return;
@@ -45663,9 +45766,8 @@ function switchPPh21Tab(tab) {
     button.classList.toggle('text-muted', !isActive);
   });
   // Load progressive rates when tab is opened
-	if (tab === 'PROGRESSIVE') {
-	  loadPPh21Progressive();
-	}
+	if (tab === 'PROGRESSIVE') { loadPPh21Progressive(); }
+	if (tab === 'POSITION_EXPENSE') { loadPPh21PositionExpenseSettings(); }
 }
 
 /* =========================================================
