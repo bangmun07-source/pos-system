@@ -45386,6 +45386,253 @@ async function savePPh21PTKP() {
   }
 }
 
+/* === PPh21 PROGRESSIVE RATES === */
+let pph21ProgressiveData = [];
+let pph21ProgressiveEditingId = null;
+let pph21ProgressiveLoading = false;
+
+// LOAD TARIF PROGRESIF
+async function loadPPh21Progressive() {
+  if (pph21ProgressiveLoading) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  const body = document.getElementById('pph21ProgressiveTableBody');
+  if (body) { body.innerHTML = `
+		<tr>
+			<td colspan="4" class="p-4 text-center text-muted">
+				Memuat tarif progresif...
+			</td>
+		</tr>`;
+  }
+
+  pph21ProgressiveLoading = true;
+
+  try {
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      'get_pph21_progressive_rates',
+	      {
+	        p_session_id: sessionId
+	      }
+	    );
+
+    if (error) throw error;
+    if (data?.success !== true) { throw new Error(data?.message || 'Tarif progresif gagal dimuat.'); }
+
+    pph21ProgressiveData = Array.isArray(data.rates)
+      ? data.rates
+      : [];
+
+    renderPPh21Progressive();
+
+  } catch (error) {
+    console.error('[PPh21] Load progressive error:', error);
+
+    if (body) { body.innerHTML = `
+			<tr>
+				<td colspan="4" class="p-4 text-center text-red-500">
+					Gagal memuat tarif progresif.
+				</td>
+			</tr>`;
+    }
+    showPPh21Message(getPPh21Error(error), 'error');
+  } finally {
+    pph21ProgressiveLoading = false;
+  }
+}
+
+// RENDER TARIF PROGRESIF
+function renderPPh21Progressive() {
+  const body = document.getElementById('pph21ProgressiveTableBody');
+  const count = document.getElementById('pph21ProgressiveCount');
+
+  if (!body) return;
+  if (count) { count.textContent = `${pph21ProgressiveData.length} tarif`; }
+  if (!pph21ProgressiveData.length) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="4" class="p-4 text-center text-muted">
+          Belum ada tarif progresif.
+        </td>
+      </tr>`;
+    return;
+  }
+	
+  const rows = [...pph21ProgressiveData].sort((a, b) => Number(a.Min_PKP) - Number(b.Min_PKP));
+
+  body.innerHTML = rows.map(row => `
+    <tr class="border-t border-outline-variant hover:bg-surface-container-low">
+      <td class="p-3 text-sm text-right"> ${formatPPh21Rupiah(row.Min_PKP)} </td>
+      <td class="p-3 text-sm text-right">
+        ${row.Max_PKP == null
+          ? 'Tidak terbatas'
+          : formatPPh21Rupiah(row.Max_PKP)}
+      </td>
+      <td class="p-3 text-sm text-right font-medium"> ${formatPPh21Rupiah(row.Tax_Rate)}% </td>
+      <td class="p-3 text-right whitespace-nowrap">
+        <button type="button"
+          onclick="openPPh21ProgressiveForm('${escapePPh21Html(row.Progressive_Rate_ID)}')"
+          class="bottom-theme rounded-md px-3 py-2 text-xs font-medium">
+          Edit
+        </button>
+
+        <button type="button"
+          onclick="deletePPh21Progressive('${escapePPh21Html(row.Progressive_Rate_ID)}')"
+          class="rounded-md px-3 py-2 text-xs font-medium bg-red-600 text-white hover:bg-red-700">
+          Delete
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// OPEN FORM
+function openPPh21ProgressiveForm(rateId = null) {
+  const form = document.getElementById('pph21ProgressiveForm');
+  const title = document.getElementById('pph21ProgressiveFormTitle');
+  const idInput = document.getElementById('pph21ProgressiveId');
+  const minInput = document.getElementById('pph21ProgressiveMinPKP');
+  const maxInput = document.getElementById('pph21ProgressiveMaxPKP');
+  const rateInput = document.getElementById('pph21ProgressiveRate');
+
+  if (!form || !idInput || !minInput || !maxInput || !rateInput) { showPPh21Message('Form tarif progresif tidak ditemukan.', 'error'); return; }
+
+  const row = rateId
+    ? pph21ProgressiveData.find(item => String(item.Progressive_Rate_ID) === String(rateId))
+    : null;
+
+  if (rateId && !row) { showPPh21Message('Tarif progresif tidak ditemukan.', 'error'); return; }
+
+  pph21ProgressiveEditingId = row
+    ? row.Progressive_Rate_ID
+    : null;
+
+  idInput.value = row ? row.Progressive_Rate_ID : '';
+  minInput.value = row ? row.Min_PKP : '';
+  maxInput.value = row && row.Max_PKP != null ? row.Max_PKP : '';
+  rateInput.value = row ? row.Tax_Rate : '';
+
+  if (title) { title.textContent = row
+		? 'Edit Tarif Progresif'
+		: 'Tambah Tarif Progresif';
+  }
+
+  form.classList.remove('hidden');
+  minInput.focus();
+}
+
+// CLOSE FORM
+function closePPh21ProgressiveForm() {
+  const form = document.getElementById('pph21ProgressiveForm');
+  if (form) form.classList.add('hidden');
+
+  pph21ProgressiveEditingId = null;
+
+  const idInput = document.getElementById('pph21ProgressiveId');
+  if (idInput) idInput.value = '';
+}
+
+// RPC: save_pph21_progressive_rate
+async function savePPh21Progressive() {
+  if (pph21Saving) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  const minValue = document.getElementById('pph21ProgressiveMinPKP')?.value;
+  const maxValue = document.getElementById('pph21ProgressiveMaxPKP')?.value;
+  const rateValue = document.getElementById('pph21ProgressiveRate')?.value;
+  const minPKP = minValue === '' ? NaN : Number(minValue);
+  const maxPKP = maxValue === '' ? null : Number(maxValue);
+  const taxRate = rateValue === '' ? NaN : Number(rateValue);
+
+  if (!Number.isFinite(minPKP) || minPKP < 0) { showPPh21Message('Minimum PKP harus berupa angka minimal 0.', 'error'); return; }
+  if ( maxPKP !== null && (!Number.isFinite(maxPKP) || maxPKP <= minPKP)
+  ) { showPPh21Message('Maksimum PKP harus lebih besar dari minimum PKP.', 'error'); return; }
+  if (!Number.isFinite(taxRate) || taxRate < 0 || taxRate > 100) { showPPh21Message('Tarif pajak harus antara 0 dan 100%.', 'error'); return; }
+
+  // Cegah rentang PKP yang saling tumpang tindih.
+  const hasOverlap = pph21ProgressiveData.some(row => {
+    if ( pph21ProgressiveEditingId && String(row.Progressive_Rate_ID) === String(pph21ProgressiveEditingId)
+    ) { return false; }
+
+    const existingMin = Number(row.Min_PKP);
+    const existingMax = row.Max_PKP == null
+      ? Infinity
+      : Number(row.Max_PKP);
+    const newMax = maxPKP == null ? Infinity : maxPKP;
+
+    return minPKP < existingMax && newMax > existingMin;
+  });
+
+  if (hasOverlap) { showPPh21Message( 'Rentang PKP bertabrakan dengan tarif yang sudah tersedia.', 'error' ); return; }
+
+  pph21Saving = true;
+
+  try {
+    const { data, error } = 
+			await supabaseClient.rpc(
+	      'save_pph21_progressive_rate',
+	      {
+	        p_session_id: sessionId,
+	        p_progressive_rate_id: pph21ProgressiveEditingId,
+	        p_min_pkp: minPKP,
+	        p_max_pkp: maxPKP,
+	        p_tax_rate: taxRate
+	      }
+	    );
+
+    if (error) throw error;
+    if (data?.success !== true) { throw new Error(data?.message || 'Tarif progresif gagal disimpan.'); }
+
+    closePPh21ProgressiveForm();
+    showPPh21Message( data.message || 'Tarif progresif berhasil disimpan.' );
+
+    await loadPPh21Progressive();
+
+  } catch (error) {
+    console.error('[PPh21] Save progressive error:', error);
+    showPPh21Message(getPPh21Error(error), 'error');
+
+  } finally {
+    pph21Saving = false;
+  }
+}
+
+// DELETE TARIF PROGRESIF
+// RPC: delete_pph21_progressive_rate
+async function deletePPh21Progressive(rateId) {
+  if (!rateId) { showPPh21Message('ID tarif progresif tidak valid.', 'error'); return; }
+
+  const confirmed = confirm( 'Yakin ingin menghapus tarif progresif ini? Data yang dihapus tidak dapat dipulihkan.' );
+  if (!confirmed) return;
+
+  const sessionId = getPPh21SessionId();
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
+
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      'delete_pph21_progressive_rate',
+      {
+        p_session_id: sessionId,
+        p_progressive_rate_id: rateId
+      }
+    );
+
+    if (error) throw error;
+    if (data?.success !== true) { throw new Error(data?.message || 'Tarif progresif gagal dihapus.'); }
+
+    showPPh21Message(data.message || 'Tarif progresif berhasil dihapus.');
+    await loadPPh21Progressive();
+
+  } catch (error) {
+    console.error('[PPh21] Delete progressive error:', error);
+    showPPh21Message(getPPh21Error(error), 'error');
+  }
+}
+
 // TAB SWITCH
 function switchPPh21Tab(tab) {
   const tabs = {
