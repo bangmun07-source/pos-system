@@ -29419,6 +29419,13 @@
 	          class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-muted hover:text-foreground">
 	          PTKP
 	        </button>
+
+					<button id="pph21TabProgressive"
+					  type="button"
+					  onclick="switchPPh21Tab('PROGRESSIVE')"
+					  class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-muted hover:text-foreground">
+					  Tarif Progresif
+					</button>
 	      </div>
 	    </div>
 	    <!-- CONTENT -->
@@ -29713,6 +29720,144 @@
 	          </div>
 	        </div>
 	      </div>
+				<!-- ================= PROGRESSIVE TAX TAB ================= -->
+				<div id="pph21ProgressivePanel" class="hidden space-y-5">
+				  <!-- DESCRIPTION + ADD BUTTON -->
+				  <div class="flex items-center justify-between gap-3 flex-wrap">
+				    <div>
+				      <h3 class="text-sm font-semibold text-foreground">
+				        Tarif Progresif PPh 21
+				      </h3>
+				      <p class="text-xs text-muted mt-1">
+				        Manage annual taxable income ranges and progressive tax rates.
+				      </p>
+				    </div>
+				
+				    <button type="button"
+				      onclick="openPPh21ProgressiveForm()"
+				      class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
+				      <span class="material-symbols-outlined text-sm">add</span>
+				      Add
+				    </button>
+				  </div>
+				  <!-- PROGRESSIVE FORM -->
+				  <div id="pph21ProgressiveForm"
+				    class="hidden border border-outline-variant rounded-md p-4 space-y-4">
+				    <div class="flex items-center justify-between gap-3">
+				      <h3 id="pph21ProgressiveFormTitle"
+				        class="text-sm font-semibold text-foreground">
+				        Tambah Tarif Progresif
+				      </h3>
+				
+				      <button type="button"
+				        onclick="closePPh21ProgressiveForm()"
+				        class="w-8 h-8 text-muted hover:text-foreground">
+				        <span class="material-symbols-outlined">close</span>
+				      </button>
+				    </div>
+				
+				    <input id="pph21ProgressiveId" type="hidden">
+				
+				    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				      <div>
+				        <label for="pph21ProgressiveMinPKP"
+				          class="block text-sm font-medium text-foreground mb-2">
+				          Minimum PKP (Rp)
+				        </label>
+				        <input id="pph21ProgressiveMinPKP"
+				          type="number"
+				          min="0"
+				          step="1"
+				          required
+				          placeholder="0"
+				          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+				      </div>
+				
+				      <div>
+				        <label for="pph21ProgressiveMaxPKP"
+				          class="block text-sm font-medium text-foreground mb-2">
+				          Maksimum PKP (Rp)
+				        </label>
+				        <input id="pph21ProgressiveMaxPKP"
+				          type="number"
+				          min="0"
+				          step="1"
+				          placeholder="60000000"
+				          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+				        <p class="text-xs text-muted mt-1.5">
+				          Kosongkan untuk batas penghasilan tertinggi.
+				        </p>
+				      </div>
+				
+				      <div>
+				        <label for="pph21ProgressiveRate"
+				          class="block text-sm font-medium text-foreground mb-2">
+				          Tarif Pajak (%)
+				        </label>
+				        <div class="relative">
+				          <input id="pph21ProgressiveRate"
+				            type="number"
+				            min="0"
+				            max="100"
+				            step="0.01"
+				            required
+				            placeholder="5"
+				            class="w-full h-11 px-3 pr-9 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+				          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">%</span>
+				        </div>
+				      </div>
+				    </div>
+				
+				    <div class="flex justify-end gap-2 pt-2">
+				      <button type="button"
+				        onclick="closePPh21ProgressiveForm()"
+				        class="h-10 px-4 text-sm text-muted hover:text-foreground">
+				        Close
+				      </button>
+				
+				      <button type="button"
+				        onclick="savePPh21Progressive()"
+				        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				        <span class="material-symbols-outlined text-sm">save</span>
+				        Save
+				      </button>
+				    </div>
+				  </div>
+				  <!-- PROGRESSIVE TABLE -->
+				  <div class="border border-outline-variant rounded-md overflow-hidden">
+				    <div class="p-4 border-b border-outline-variant flex items-center justify-between">
+				      <h3 class="text-sm font-semibold text-foreground">
+				        Daftar Tarif Progresif
+				      </h3>
+				      <span id="pph21ProgressiveCount" class="text-xs text-muted">
+				        0 data
+				      </span>
+				    </div>
+				
+				    <div class="overflow-x-auto custom-scrollbar">
+				      <table class="w-full text-sm">
+				        <thead>
+				          <tr class="border-b border-outline-variant text-xs uppercase tracking-wider text-muted">
+				            <th class="px-4 py-3 text-right">Minimum PKP</th>
+				            <th class="px-4 py-3 text-right">Maksimum PKP</th>
+				            <th class="px-4 py-3 text-right">Tarif</th>
+				            <th class="px-4 py-3 text-center">Aksi</th>
+				          </tr>
+				        </thead>
+				
+				        <tbody id="pph21ProgressiveTableBody"
+				          class="divide-y divide-outline-variant">
+				          <tr>
+				            <td colspan="4"
+				              class="px-4 py-8 text-center text-muted">
+				              Memuat data tarif progresif...
+				            </td>
+				          </tr>
+				        </tbody>
+				      </table>
+				    </div>
+				  </div>
+				</div>
 	    </div>
 	    <!-- FOOTER -->
 	    <div class="p-5 border-t border-outline-variant flex items-center justify-between gap-3 shrink-0">
