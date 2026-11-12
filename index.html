@@ -29427,6 +29427,13 @@
 					  Tarif Progresif
 					</button>
 	      </div>
+
+				<button id="pph21TabPositionExpense"
+				  type="button"
+				  onclick="switchPPh21Tab('POSITION_EXPENSE')"
+				  class="px-4 py-3 text-sm font-medium border-b-2 border-transparent text-muted hover:text-foreground">
+				  Biaya Jabatan
+				</button>
 	    </div>
 	    <!-- CONTENT -->
 	    <div class="p-5 overflow-y-auto custom-scrollbar space-y-5">
@@ -29855,6 +29862,150 @@
 				          </tr>
 				        </tbody>
 				      </table>
+				    </div>
+				  </div>
+				</div>
+				<!-- ================= POSITION EXPENSE TAB ================= -->
+				<div id="pph21PositionExpensePanel" class="hidden space-y-5">
+				  <!-- DESCRIPTION -->
+				  <div>
+				    <h3 class="text-sm font-semibold text-foreground">
+				      Biaya Jabatan
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Pengaturan pengurang penghasilan bruto untuk rekonsiliasi
+				      PPh 21 tahunan pegawai tetap.
+				    </p>
+				  </div>
+				  <!-- SETTINGS FORM -->
+				  <div class="border border-outline-variant rounded-md p-4 space-y-5">
+				    <div class="flex items-center justify-between gap-3">
+				      <div>
+				        <h3 class="text-sm font-semibold text-foreground">
+				          Ketentuan Biaya Jabatan
+				        </h3>
+				        <p class="text-xs text-muted mt-1">
+				          Atur persentase dan batas maksimal biaya jabatan.
+				        </p>
+				      </div>
+				
+				      <span class="px-3 py-1 rounded-full text-xs font-medium
+				        bg-green-500/10 text-green-600">
+				        Aktif
+				      </span>
+				    </div>
+				
+				    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+				      <!-- PERCENTAGE -->
+				      <div>
+				        <label for="pph21PositionExpenseRate"
+				          class="block text-sm font-medium text-foreground mb-2">
+				          Persentase Biaya Jabatan
+				        </label>
+				
+				        <div class="relative">
+				          <input id="pph21PositionExpenseRate"
+				            type="number"
+				            min="0"
+				            max="100"
+				            step="0.01"
+				            value="5"
+				            class="w-full h-11 px-3 pr-9 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+				
+				          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				            %
+				          </span>
+				        </div>
+				      </div>
+				      <!-- MONTHLY CAP -->
+				      <div>
+				        <label for="pph21PositionExpenseMonthlyCap"
+				          class="block text-sm font-medium text-foreground mb-2">
+				          Maksimal Biaya Jabatan per Bulan
+				        </label>
+				
+				        <div class="relative">
+				          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				            Rp
+				          </span>
+				
+				          <input id="pph21PositionExpenseMonthlyCap"
+				            type="number"
+				            min="0"
+				            step="1"
+				            value="500000"
+				            class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+				        </div>
+				      </div>
+				      <!-- ANNUAL CAP -->
+				      <div>
+				        <label for="pph21PositionExpenseAnnualCap"
+				          class="block text-sm font-medium text-foreground mb-2">
+				          Maksimal Biaya Jabatan per Tahun
+				        </label>
+				
+				        <div class="relative">
+				          <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">
+				            Rp
+				          </span>
+				
+				          <input id="pph21PositionExpenseAnnualCap"
+				            type="number"
+				            min="0"
+				            step="1"
+				            value="6000000"
+				            class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+				        </div>
+				      </div>
+				    </div>
+				    <!-- INFORMATION -->
+				    <div class="p-4 rounded-md border border-outline-variant bg-surface space-y-2">
+				      <div class="flex items-center gap-2">
+				        <span class="material-symbols-outlined text-primary text-lg">
+				          info
+				        </span>
+				        <span class="text-sm font-semibold text-foreground">
+				          Informasi Perhitungan
+				        </span>
+				      </div>
+				
+				      <p class="text-xs text-muted leading-relaxed">
+				        Biaya jabatan dihitung sebesar persentase dari penghasilan
+				        bruto yang menjadi dasar perhitungan, dengan batas maksimal
+				        per bulan dan per tahun.
+				      </p>
+				
+				      <p class="text-xs text-muted leading-relaxed">
+				        Biaya jabatan hanya digunakan untuk mengurangi penghasilan
+				        neto dalam rekonsiliasi PPh 21 tahunan. Tidak mengurangi
+				        gaji yang diterima karyawan dan tidak mengubah tarif TER
+				        Januari sampai November.
+				      </p>
+				    </div>
+				  </div>
+				  <!-- CALCULATION EXAMPLE -->
+				  <div class="border border-outline-variant rounded-md p-4 space-y-3">
+				    <h3 class="text-sm font-semibold text-foreground">
+				      Contoh Perhitungan
+				    </h3>
+				
+				    <div class="flex justify-between text-sm">
+				      <span class="text-muted">Penghasilan bruto setahun</span>
+				      <span class="font-medium">Rp120.000.000</span>
+				    </div>
+				
+				    <div class="flex justify-between text-sm">
+				      <span class="text-muted">Biaya jabatan (5%)</span>
+				      <span class="font-medium">Rp6.000.000</span>
+				    </div>
+				
+				    <div class="border-t border-outline-variant pt-3 flex justify-between text-sm">
+				      <span class="font-semibold text-foreground">
+				        Penghasilan neto setahun
+				      </span>
+				      <span class="font-semibold text-foreground">
+				        Rp114.000.000
+				      </span>
 				    </div>
 				  </div>
 				</div>
