@@ -45312,7 +45312,6 @@ function openPPh21PTKPForm(status = null) {
   if (status && !row) { showPPh21Message('Status PTKP tidak ditemukan.', 'error'); return; }
 
   pph21PTKPEditingStatus = row ? row.PTKP_Status : null;
-
   document.getElementById('pph21PTKPId').value = row ? row.PTKP_ID : '';
   statusInput.value = row ? row.PTKP_Status : '';
   statusInput.readOnly = !!row;
@@ -45321,10 +45320,9 @@ function openPPh21PTKPForm(status = null) {
     : 'Contoh: K/4';
   amountInput.value = row ? row.Annual_PTKP : '';
 
-  if (title) {
-    title.textContent = row
-      ? 'Edit Nilai PTKP'
-      : 'Tambah Status PTKP';
+  if (title) { title.textContent = row
+		? 'Edit Nilai PTKP'
+		: 'Tambah Status PTKP';
   }
 
   form.classList.remove('hidden');
@@ -45356,9 +45354,7 @@ async function savePPh21PTKP() {
 
   // Cegah status duplikat saat menambah data.
   const isAdding = !pph21PTKPEditingStatus;
-  if (
-    isAdding &&
-    pph21PTKPData.some(item => item.PTKP_Status === status)
+  if ( isAdding && pph21PTKPData.some(item => item.PTKP_Status === status)
   ) { showPPh21Message( 'Status PTKP tersebut sudah tersedia.', 'error' ); return; }
 
   pph21Saving = true;
@@ -45392,26 +45388,33 @@ async function savePPh21PTKP() {
 
 // TAB SWITCH
 function switchPPh21Tab(tab) {
-  const isTER = tab === 'TER';
-  const terPanel = document.getElementById('pph21TERPanel');
-  const ptkpPanel = document.getElementById('pph21PTKPPanel');
-  const terButton = document.getElementById('pph21TabTER');
-  const ptkpButton = document.getElementById('pph21TabPTKP');
+  const tabs = {
+    TER: { panel: 'pph21TERPanel', button: 'pph21TabTER' },
+    PTKP: { panel: 'pph21PTKPPanel', button: 'pph21TabPTKP' },
+    PROGRESSIVE: { panel: 'pph21ProgressivePanel',  button: 'pph21TabProgressive' }
+  };
 
-  if (!terPanel || !ptkpPanel || !terButton || !ptkpButton) { return; }
+  if (!tabs[tab]) return;
 
-  terPanel.classList.toggle('hidden', !isTER);
-  ptkpPanel.classList.toggle('hidden', isTER);
+  Object.entries(tabs).forEach(([key, item]) => {
+    const panel = document.getElementById(item.panel);
+    const button = document.getElementById(item.button);
+		
+    if (!panel || !button) return;
 
-  terButton.classList.toggle('border-primary', isTER);
-  terButton.classList.toggle('text-foreground', isTER);
-  terButton.classList.toggle('border-transparent', !isTER);
-  terButton.classList.toggle('text-muted', !isTER);
-
-  ptkpButton.classList.toggle('border-primary', !isTER);
-  ptkpButton.classList.toggle('text-foreground', !isTER);
-  ptkpButton.classList.toggle('border-transparent', isTER);
-  ptkpButton.classList.toggle('text-muted', isTER);
+    const isActive = key === tab;
+    // Panel visibility
+    panel.classList.toggle('hidden', !isActive);
+    // Button styling
+    button.classList.toggle('border-primary', isActive);
+    button.classList.toggle('text-foreground', isActive);
+    button.classList.toggle('border-transparent', !isActive);
+    button.classList.toggle('text-muted', !isActive);
+  });
+  // Load progressive rates when tab is opened
+  if (tab === 'PROGRESSIVE') {
+    renderPPh21Progressive();
+  }
 }
 
 /* =========================================================
