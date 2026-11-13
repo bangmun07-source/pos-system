@@ -40477,7 +40477,8 @@ window.saveEmployeeTaxHistory = async function () {
 
     // PAYLOAD UNTUK SATU RPC DAN SATU TABEL
     const payload = {
-      Employee_ID: employeeId,
+		  Tax_Record_ID: getValue('taxHistoryRecordId') || null,
+		  Employee_ID: employeeId,
       Tax_Year: taxYear,
       Employment_Status: employmentStatus,
       Certificate_Number: hasBPA1 ? getValue('taxHistoryBPA1Number') : null,
