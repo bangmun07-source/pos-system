@@ -40429,22 +40429,18 @@ window.openEmployeeTaxHistoryModal = async function (employeeId) {
 
 window.saveEmployeeTaxHistory = async function () {
   const saveButton = document.getElementById('saveEmployeeTaxHistoryBtn');
-  // Helper membaca input teks
-  const getValue = (id) => { return document.getElementById(id)?.value?.trim() || ''; };
-  // Helper membaca nominal Rupiah
+  const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
   const getNumber = (id) => {
     let value = getValue(id);
     if (!value) return 0;
+
     value = value.replace(/[^\d,.-]/g, '');
 
-    // Format Indonesia: 1.000.000,50
     if (value.includes(',') && value.includes('.')) {
       value = value.replace(/\./g, '').replace(',', '.');
-    }  // Format Indonesia: 1.000.000
-    else if (value.includes('.')) {
+    } else if (value.includes('.')) {
       value = value.replace(/\./g, '');
-    }  // Format desimal: 1000,50
-    else if (value.includes(',')) {
+    } else if (value.includes(',')) {
       value = value.replace(',', '.');
     }
 
@@ -40453,71 +40449,78 @@ window.saveEmployeeTaxHistory = async function () {
   };
 
   const employeeId = getValue('taxHistoryEmployeeId');
-  const certificateNumber = getValue('taxHistoryBPA1Number');
-  const employerName = getValue('taxHistoryEmployerName');
-  const taxYear = getValue('taxHistoryYear');
+  const taxYear = Number(getValue('taxHistoryYear'));
+  const employmentStatus = getValue('taxHistoryEmploymentStatus');
 
-  // Validasi input wajib
   if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
-  if (!taxYear) { alert('Tahun pajak wajib dipilih.'); return; }
-  if (!certificateNumber) { alert('Nomor sertifikat BPA1 wajib diisi.'); return; }
-  if (!employerName) { alert('Nama perusahaan sebelumnya wajib diisi.'); return; }
+  if (!taxYear || taxYear < 2000 || taxYear > 2100) { alert('Tahun pajak tidak valid.'); return; }
+  if (!employmentStatus) { alert('Status pekerjaan wajib dipilih.'); return; }
   if (saveButton?.disabled) return;
 
-  const originalButtonText = saveButton?.textContent;
+  const originalButtonHTML = saveButton?.innerHTML;
 
   try {
-    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Menyimpan...'; }
-		
+    if (saveButton) {
+      saveButton.disabled = true;
+      saveButton.textContent = 'Menyimpan...';
+    }
+
     const sessionId = localStorage.getItem('pos_session_id');
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
-    // PAYLOAD BPA1
+    // VALIDASI BPA1 HANYA JIKA STATUS MEMILIKI BPA1
+    const hasBPA1 = employmentStatus === 'HAS_PREVIOUS_EMPLOYER_BPA1';
+    if (hasBPA1) {
+      if (!getValue('taxHistoryBPA1Number')) { throw new Error('Nomor sertifikat BPA1 wajib diisi.'); }
+      if (!getValue('taxHistoryEmployerName')) { throw new Error('Nama perusahaan sebelumnya wajib diisi.'); }
+    }
+
+    // PAYLOAD UNTUK SATU RPC DAN SATU TABEL
     const payload = {
       Employee_ID: employeeId,
-      Tax_Year: Number(taxYear),
-      Certificate_Number: certificateNumber,
-      Income_Period_Start: getValue('taxHistoryPeriodStart'),
-      Income_Period_End: getValue('taxHistoryPeriodEnd'),
-      Certificate_Type: getValue('taxHistoryCertificateType'),
-      Certificate_Status: getValue('taxHistoryCertificateStatus'),
-      Correction_Number: getValue('taxHistoryCorrectionNumber') || 0,
-      Withholding_Nature: getValue('taxHistoryWithholdingNature'),
-      Previous_Employer_Name: employerName,
-      Previous_Employer_NPWP: getValue('taxHistoryEmployerNPWP'),
-      Previous_Employer_NITKU: getValue('taxHistoryEmployerNITKU'),
+      Tax_Year: taxYear,
+      Employment_Status: employmentStatus,
+      Certificate_Number: hasBPA1 ? getValue('taxHistoryBPA1Number') : null,
+      Income_Period_Start: hasBPA1 ? getValue('taxHistoryPeriodStart') || null : null,
+      Income_Period_End: hasBPA1 ? getValue('taxHistoryPeriodEnd') || null : null,
+      Certificate_Type: hasBPA1 ? getValue('taxHistoryCertificateType') : null,
+      Certificate_Status: hasBPA1 ? getValue('taxHistoryCertificateStatus') : null,
+      Correction_Number: hasBPA1 ? getValue('taxHistoryCorrectionNumber') || 0 : 0,
+      Withholding_Nature: hasBPA1 ? getValue('taxHistoryWithholdingNature') : null,
+      Previous_Employer_Name: hasBPA1 ? getValue('taxHistoryEmployerName') : null,
+      Previous_Employer_NPWP: hasBPA1 ? getValue('taxHistoryEmployerNPWP') : null,
+      Previous_Employer_NITKU: hasBPA1 ? getValue('taxHistoryEmployerNITKU') : null,
       Employee_PTKP_Status: getValue('taxHistoryPTKPStatus'),
       Multiple_Employers: document.getElementById('taxHistoryMultipleEmployers')?.checked || false,
-      Gross_Salary: getNumber('taxHistoryGrossSalary'),
-      Income_Tax_Allowance: getNumber('taxHistoryIncomeTaxAllowance'),
-      Other_Allowances: getNumber('taxHistoryOtherAllowances'),
-      Honorarium: getNumber('taxHistoryHonorarium'),
-      Employer_Insurance_Premium: getNumber('taxHistoryInsurancePremium'),
-      Taxable_Natura: getNumber('taxHistoryTaxableNatura'),
-      Bonus_THR: getNumber('taxHistoryBonusTHR'),
-      Total_Gross_Income: getNumber('taxHistoryTotalGrossIncome'),
-      Job_Expense_Deduction: getNumber('taxHistoryJobExpense'),
-      Pension_Contribution: getNumber('taxHistoryPensionContribution'),
-      Mandatory_Religious_Donation: getNumber('taxHistoryReligiousDonation'),
-      Total_Deductions: getNumber('taxHistoryTotalDeductions'),
-      Net_Income: getNumber('taxHistoryNetIncome'),
-      Previous_Withholder_Net_Income: getNumber('taxHistoryPreviousNetIncome'),
-      Annualized_Net_Income: getNumber('taxHistoryAnnualizedNetIncome'),
-      PTKP_Amount: getNumber('taxHistoryPTKPAmount'),
-      Taxable_Income: getNumber('taxHistoryPKP'),
-      Annual_PPh21_On_Taxable_Income: getNumber('taxHistoryAnnualPPh21'),
-      PPh21_Payable: getNumber('taxHistoryPPh21Payable'),
-      Previous_Certificate_PPh21: getNumber('taxHistoryPreviousCertificatePPh21'),
-      Current_Certificate_PPh21: getNumber('taxHistoryCurrentCertificatePPh21'),
-      Total_PPh21_Withheld: getNumber('taxHistoryTaxWithheld'),
-      PPh21_Underpayment_Overpayment: getNumber('taxHistoryUnderpaymentOverpayment'),
-
-      Tax_Facility: getValue('taxHistoryTaxFacility'),
-      Certificate_Issue_Date: getValue('taxHistoryIssueDate'),
+      Gross_Salary: hasBPA1 ? getNumber('taxHistoryGrossSalary') : 0,
+      Income_Tax_Allowance: hasBPA1 ? getNumber('taxHistoryIncomeTaxAllowance') : 0,
+      Other_Allowances: hasBPA1 ? getNumber('taxHistoryOtherAllowances') : 0,
+      Honorarium: hasBPA1 ? getNumber('taxHistoryHonorarium') : 0,
+      Employer_Insurance_Premium: hasBPA1 ? getNumber('taxHistoryInsurancePremium') : 0,
+      Taxable_Natura: hasBPA1 ? getNumber('taxHistoryTaxableNatura') : 0,
+      Bonus_THR: hasBPA1 ? getNumber('taxHistoryBonusTHR') : 0,
+      Total_Gross_Income: hasBPA1 ? getNumber('taxHistoryTotalGrossIncome') : 0,
+      Job_Expense_Deduction: hasBPA1 ? getNumber('taxHistoryJobExpense') : 0,
+      Pension_Contribution: hasBPA1 ? getNumber('taxHistoryPensionContribution') : 0,
+      Mandatory_Religious_Donation: hasBPA1 ? getNumber('taxHistoryReligiousDonation') : 0,
+      Total_Deductions: hasBPA1 ? getNumber('taxHistoryTotalDeductions') : 0,
+      Net_Income: hasBPA1 ? getNumber('taxHistoryNetIncome') : 0,
+      Previous_Withholder_Net_Income: hasBPA1 ? getNumber('taxHistoryPreviousNetIncome') : 0,
+      Annualized_Net_Income: hasBPA1 ? getNumber('taxHistoryAnnualizedNetIncome') : 0,
+      PTKP_Amount: hasBPA1 ? getNumber('taxHistoryPTKPAmount') : 0,
+      Taxable_Income: hasBPA1 ? getNumber('taxHistoryPKP') : 0,
+      Annual_PPh21_On_Taxable_Income: hasBPA1 ? getNumber('taxHistoryAnnualPPh21') : 0,
+      PPh21_Payable: hasBPA1 ? getNumber('taxHistoryPPh21Payable') : 0,
+      Previous_Certificate_PPh21: hasBPA1 ? getNumber('taxHistoryPreviousCertificatePPh21') : 0,
+      Current_Certificate_PPh21: hasBPA1 ? getNumber('taxHistoryCurrentCertificatePPh21') : 0,
+      Total_PPh21_Withheld: hasBPA1 ? getNumber('taxHistoryTaxWithheld') : 0,
+      PPh21_Underpayment_Overpayment: hasBPA1 ? getNumber('taxHistoryUnderpaymentOverpayment') : 0,
+      Tax_Facility: hasBPA1 ? getValue('taxHistoryTaxFacility') : null,
+      Certificate_Issue_Date: hasBPA1 ? getValue('taxHistoryIssueDate') || null : null,
       Notes: getValue('taxHistoryNote')
     };
 
-    // SIMPAN MELALUI RPC
+    // SIMPAN KE Employee_Previous_Tax_Records
     const { data, error } = await supabaseClient.rpc(
       'save_employee_previous_tax_record',
       {
@@ -40527,18 +40530,19 @@ window.saveEmployeeTaxHistory = async function () {
     );
 
     if (error) throw error;
-    if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan data BPA1.'); }
-    alert(data.message || 'Data BPA1 berhasil disimpan.');
+    if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan riwayat pajak.'); }
+
+    alert(data.message || 'Riwayat pajak berhasil disimpan.');
     closeEmployeeTaxHistoryModal();
 
   } catch (error) {
     console.error('Save Employee Tax History Error:', error);
-    alert(error?.message || 'Gagal menyimpan data BPA1.');
+    alert(error?.message || 'Gagal menyimpan riwayat pajak.');
 
   } finally {
     if (saveButton) {
       saveButton.disabled = false;
-      saveButton.textContent = originalButtonText || 'Simpan';
+      saveButton.innerHTML = originalButtonHTML || 'Simpan';
     }
   }
 };
