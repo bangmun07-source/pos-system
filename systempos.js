@@ -40218,43 +40218,217 @@ window.openEmployeeTaxHistoryModal = function (employeeId) {
   const modal = document.getElementById('employeeTaxHistoryModal');
   if (!modal) { alert('Tax History modal tidak ditemukan.'); return; }
 
-  // Employee information
-  document.getElementById('taxHistoryEmployeeId').value = employee.Employee_ID;
-  document.getElementById('taxHistoryEmployeeName').textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`;
+  // === EMPLOYEE INFORMATION ===
+  const employeeIdInput = document.getElementById('taxHistoryEmployeeId');
+  const employeeName = document.getElementById('taxHistoryEmployeeName');
 
-  // Default tax year
- 	const yearInput = document.getElementById('taxHistoryYear');
-	const currentYear = new Date().getFullYear();
-	
-	if (yearInput) {
-	  yearInput.innerHTML = '';
-	  // Tampilkan 5 tahun terakhir, termasuk tahun berjalan
-	  for (let year = currentYear; year >= currentYear - 4; year--) {
-	    yearInput.add(new Option(String(year), String(year)));
-	  } yearInput.value = String(currentYear); }
-  // Reset form saat membuka employee
-  [
-    'taxHistoryEmployerName',
+  if (employeeIdInput) { employeeIdInput.value = employee.Employee_ID; }
+  if (employeeName) { employeeName.textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`; }
+
+  // === RESET ALL FORM FIELDS ===
+  const fieldsToReset = [
     'taxHistoryBPA1Number',
-    'taxHistoryEmploymentPeriod',
-    'taxHistoryGrossIncome',
-    'taxHistoryDeductions',
+    'taxHistoryCertificateType',
+    'taxHistoryCertificateStatus',
+    'taxHistoryCorrectionNumber',
+    'taxHistoryWithholdingNature',
+    'taxHistoryIssueDate',
+
+    'taxHistoryEmployerName',
+    'taxHistoryEmployerNPWP',
+    'taxHistoryEmployerNITKU',
+
+    'taxHistoryPeriodStart',
+    'taxHistoryPeriodEnd',
+    'taxHistoryPTKPStatus',
+    'taxHistoryTaxFacility',
+
+    'taxHistoryGrossSalary',
+    'taxHistoryIncomeTaxAllowance',
+    'taxHistoryOtherAllowances',
+    'taxHistoryHonorarium',
+    'taxHistoryInsurancePremium',
+    'taxHistoryTaxableNatura',
+    'taxHistoryBonusTHR',
+    'taxHistoryTotalGrossIncome',
+
+    'taxHistoryJobExpense',
+    'taxHistoryPensionContribution',
+    'taxHistoryReligiousDonation',
+    'taxHistoryTotalDeductions',
+
     'taxHistoryNetIncome',
+    'taxHistoryPreviousNetIncome',
+    'taxHistoryAnnualizedNetIncome',
+    'taxHistoryPTKPAmount',
     'taxHistoryPKP',
+    'taxHistoryAnnualPPh21',
+    'taxHistoryPPh21Payable',
+
+    'taxHistoryPreviousCertificatePPh21',
+    'taxHistoryCurrentCertificatePPh21',
     'taxHistoryTaxWithheld',
+    'taxHistoryUnderpaymentOverpayment',
+
     'taxHistoryNote'
-  ].forEach(id => {
+  ];
+
+  fieldsToReset.forEach(id => {
     const input = document.getElementById(id);
-    if (input) input.value = '';
+    if (input) { input.value = ''; }
   });
 
-  const includeBPA1 = document.getElementById( 'taxHistoryIncludeBPA1' );
-  if (includeBPA1) { includeBPA1.checked = false; }
-  // Open modal
+  // === RESET CHECKBOX ===
+  const multipleEmployers = document.getElementById( 'taxHistoryMultipleEmployers' );
+  if (multipleEmployers) { multipleEmployers.checked = false; }
+
+  // === DEFAULT VALUES ===
+  const currentYear = new Date().getFullYear();
+  const yearInput = document.getElementById('taxHistoryYear');
+
+  if (yearInput) {
+    yearInput.innerHTML = '';
+
+    for ( let year = currentYear;
+      year >= currentYear - 4;
+      year--
+    ) { yearInput.add(new Option(String(year), String(year))); 
+			} yearInput.value = String(currentYear); }
+
+  // Default certificate values
+  const certificateType = document.getElementById( 'taxHistoryCertificateType' );
+  if (certificateType) { certificateType.value = 'BPA1'; }
+
+  const certificateStatus = document.getElementById( 'taxHistoryCertificateStatus' );
+  if (certificateStatus) { certificateStatus.value = 'NORMAL'; }
+
+  const correctionNumber = document.getElementById( 'taxHistoryCorrectionNumber' );
+  if (correctionNumber) { correctionNumber.value = '0'; }
+
+  const withholdingNature = document.getElementById( 'taxHistoryWithholdingNature' );
+  if (withholdingNature) { withholdingNature.value = 'TIDAK FINAL'; }
+
+  // === OPEN MODAL ===
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 };
 
+
+window.saveEmployeeTaxHistory = async function () {
+  const saveButton = document.getElementById('saveEmployeeTaxHistoryBtn');
+  // Helper membaca input teks
+  const getValue = (id) => { return document.getElementById(id)?.value?.trim() || ''; };
+  // Helper membaca nominal Rupiah
+  const getNumber = (id) => {
+    let value = getValue(id);
+    if (!value) return 0;
+    value = value.replace(/[^\d,.-]/g, '');
+
+    // Format Indonesia: 1.000.000,50
+    if (value.includes(',') && value.includes('.')) {
+      value = value.replace(/\./g, '').replace(',', '.');
+    }  // Format Indonesia: 1.000.000
+    else if (value.includes('.')) {
+      value = value.replace(/\./g, '');
+    }  // Format desimal: 1000,50
+    else if (value.includes(',')) {
+      value = value.replace(',', '.');
+    }
+
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+  };
+
+  const employeeId = getValue('taxHistoryEmployeeId');
+  const certificateNumber = getValue('taxHistoryBPA1Number');
+  const employerName = getValue('taxHistoryEmployerName');
+  const taxYear = getValue('taxHistoryYear');
+
+  // Validasi input wajib
+  if (!employeeId) { alert('Employee tidak ditemukan.'); return; }
+  if (!taxYear) { alert('Tahun pajak wajib dipilih.'); return; }
+  if (!certificateNumber) { alert('Nomor sertifikat BPA1 wajib diisi.'); return; }
+  if (!employerName) { alert('Nama perusahaan sebelumnya wajib diisi.'); return; }
+  if (saveButton?.disabled) return;
+
+  const originalButtonText = saveButton?.textContent;
+
+  try {
+    if (saveButton) { saveButton.disabled = true; saveButton.textContent = 'Menyimpan...'; }
+		
+    const sessionId = localStorage.getItem('pos_session_id');
+    if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
+    // PAYLOAD BPA1
+    const payload = {
+      Employee_ID: employeeId,
+      Tax_Year: Number(taxYear),
+      Certificate_Number: certificateNumber,
+      Income_Period_Start: getValue('taxHistoryPeriodStart'),
+      Income_Period_End: getValue('taxHistoryPeriodEnd'),
+      Certificate_Type: getValue('taxHistoryCertificateType'),
+      Certificate_Status: getValue('taxHistoryCertificateStatus'),
+      Correction_Number: getValue('taxHistoryCorrectionNumber') || 0,
+      Withholding_Nature: getValue('taxHistoryWithholdingNature'),
+      Previous_Employer_Name: employerName,
+      Previous_Employer_NPWP: getValue('taxHistoryEmployerNPWP'),
+      Previous_Employer_NITKU: getValue('taxHistoryEmployerNITKU'),
+      Employee_PTKP_Status: getValue('taxHistoryPTKPStatus'),
+      Multiple_Employers: document.getElementById('taxHistoryMultipleEmployers')?.checked || false,
+      Gross_Salary: getNumber('taxHistoryGrossSalary'),
+      Income_Tax_Allowance: getNumber('taxHistoryIncomeTaxAllowance'),
+      Other_Allowances: getNumber('taxHistoryOtherAllowances'),
+      Honorarium: getNumber('taxHistoryHonorarium'),
+      Employer_Insurance_Premium: getNumber('taxHistoryInsurancePremium'),
+      Taxable_Natura: getNumber('taxHistoryTaxableNatura'),
+      Bonus_THR: getNumber('taxHistoryBonusTHR'),
+      Total_Gross_Income: getNumber('taxHistoryTotalGrossIncome'),
+      Job_Expense_Deduction: getNumber('taxHistoryJobExpense'),
+      Pension_Contribution: getNumber('taxHistoryPensionContribution'),
+      Mandatory_Religious_Donation: getNumber('taxHistoryReligiousDonation'),
+      Total_Deductions: getNumber('taxHistoryTotalDeductions'),
+      Net_Income: getNumber('taxHistoryNetIncome'),
+      Previous_Withholder_Net_Income: getNumber('taxHistoryPreviousNetIncome'),
+      Annualized_Net_Income: getNumber('taxHistoryAnnualizedNetIncome'),
+      PTKP_Amount: getNumber('taxHistoryPTKPAmount'),
+      Taxable_Income: getNumber('taxHistoryPKP'),
+      Annual_PPh21_On_Taxable_Income: getNumber('taxHistoryAnnualPPh21'),
+      PPh21_Payable: getNumber('taxHistoryPPh21Payable'),
+      Previous_Certificate_PPh21: getNumber('taxHistoryPreviousCertificatePPh21'),
+      Current_Certificate_PPh21: getNumber('taxHistoryCurrentCertificatePPh21'),
+      Total_PPh21_Withheld: getNumber('taxHistoryTaxWithheld'),
+      PPh21_Underpayment_Overpayment: getNumber('taxHistoryUnderpaymentOverpayment'),
+
+      Tax_Facility: getValue('taxHistoryTaxFacility'),
+      Certificate_Issue_Date: getValue('taxHistoryIssueDate'),
+      Notes: getValue('taxHistoryNote')
+    };
+
+    // SIMPAN MELALUI RPC
+    const { data, error } = await supabaseClient.rpc(
+      'save_employee_previous_tax_record',
+      {
+        p_session_id: sessionId,
+        p_payload: payload
+      }
+    );
+
+    if (error) throw error;
+    if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan data BPA1.'); }
+    alert(data.message || 'Data BPA1 berhasil disimpan.');
+    closeEmployeeTaxHistoryModal();
+
+  } catch (error) {
+    console.error('Save Employee Tax History Error:', error);
+    alert(error?.message || 'Gagal menyimpan data BPA1.');
+
+  } finally {
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = originalButtonText || 'Simpan';
+    }
+  }
+};
 
 /* === CLOSE EMPLOYEE TAX HISTORY MODAL === */
 window.closeEmployeeTaxHistoryModal = function () {
@@ -40264,7 +40438,6 @@ window.closeEmployeeTaxHistoryModal = function () {
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
-
 
 /* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
