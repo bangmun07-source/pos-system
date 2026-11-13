@@ -40259,7 +40259,8 @@ window.openEmployeeTaxHistoryModal = async function (employeeId) {
 
   // === RESET ALL FORM FIELDS ===
   const fieldsToReset = [
-    'taxHistoryBPA1Number',
+	  'taxHistoryRecordId',
+	  'taxHistoryBPA1Number',
     'taxHistoryCertificateType',
     'taxHistoryCertificateStatus',
     'taxHistoryCorrectionNumber',
@@ -40364,6 +40365,7 @@ window.openEmployeeTaxHistoryModal = async function (employeeId) {
     if (!data.found || !data.record) { return; }
 		
     const record = data.record;
+		document.getElementById('taxHistoryRecordId').value = record.Tax_Record_ID || '';
     // === MAP DATABASE COLUMN TO POPUP INPUT ===
     const fieldMapping = {
       taxHistoryBPA1Number: 'Certificate_Number',
@@ -40532,6 +40534,7 @@ window.saveEmployeeTaxHistory = async function () {
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan riwayat pajak.'); }
+		if (data.tax_record_id) { document.getElementById('taxHistoryRecordId').value = data.tax_record_id; }
 
     alert(data.message || 'Riwayat pajak berhasil disimpan.');
     closeEmployeeTaxHistoryModal();
