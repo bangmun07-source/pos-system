@@ -40365,7 +40365,8 @@ window.openEmployeeTaxHistoryModal = async function (employeeId) {
     if (!data.found || !data.record) { return; }
 		
     const record = data.record;
-		document.getElementById('taxHistoryRecordId').value = record.Tax_Record_ID || '';
+		const recordIdInput = document.getElementById('taxHistoryRecordId');
+		if (recordIdInput) { recordIdInput.value = record.Tax_Record_ID || ''; }
     // === MAP DATABASE COLUMN TO POPUP INPUT ===
     const fieldMapping = {
       taxHistoryBPA1Number: 'Certificate_Number',
