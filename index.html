@@ -29870,7 +29870,7 @@
 	                  <th class="px-4 py-3 text-right">Min. Bruto</th>
 	                  <th class="px-4 py-3 text-right">Maks. Bruto</th>
 	                  <th class="px-4 py-3 text-right">Tarif</th>
-	                  <th class="px-4 py-3 text-center">Aksi</th>
+	                  <th class="px-4 py-3 text-center">Action</th>
 	                </tr>
 	              </thead>
 	
@@ -29941,6 +29941,21 @@
 						    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
 						</div>
 
+						<div>
+						  <label for="pph21PTKPTerCategory"
+						    class="block text-sm font-medium text-foreground mb-2">
+						    Kategori TER
+						  </label>
+						
+						  <select id="pph21PTKPTerCategory"
+						    required
+						    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary">
+						    <option value="A">Kategori A</option>
+						    <option value="B">Kategori B</option>
+						    <option value="C">Kategori C</option>
+						  </select>
+						</div>
+
 	          <div>
 	            <label for="pph21AnnualPTKP"
 	              class="block text-sm font-medium text-foreground mb-2">
@@ -29988,16 +30003,17 @@
 	            <table class="w-full text-sm">
 	              <thead>
 	                <tr class="border-b border-outline-variant text-xs uppercase tracking-wider text-muted">
-	                  <th class="px-4 py-3 text-left">Status</th>
-	                  <th class="px-4 py-3 text-right">PTKP Tahunan</th>
-	                  <th class="px-4 py-3 text-center">Aksi</th>
+										<th class="p-3 text-left">Status PTKP</th>
+										<th class="p-3 text-left">Kategori TER</th>
+										<th class="p-3 text-right">Nilai PTKP</th>
+										<th class="p-3 text-center">Action</th>
 	                </tr>
 	              </thead>
 	
 	              <tbody id="pph21PTKPTableBody"
 	                class="divide-y divide-outline-variant">
 	                <tr>
-	                  <td colspan="3"
+	                  <td colspan="4"
 	                    class="px-4 py-8 text-center text-muted">
 	                    Memuat data PTKP...
 	                  </td>
