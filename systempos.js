@@ -40223,12 +40223,15 @@ window.openEmployeeTaxHistoryModal = function (employeeId) {
   document.getElementById('taxHistoryEmployeeName').textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`;
 
   // Default tax year
-  const yearInput = document.getElementById('taxHistoryYear');
-  const currentYear = new Date().getFullYear();
-
-  if (yearInput) {
-    const yearExists = Array.from(yearInput.options).some( option => Number(option.value) === currentYear );
-    if (!yearExists) { yearInput.add( new Option(String(currentYear), String(currentYear))); } yearInput.value = String(currentYear); }
+ 	const yearInput = document.getElementById('taxHistoryYear');
+	const currentYear = new Date().getFullYear();
+	
+	if (yearInput) {
+	  yearInput.innerHTML = '';
+	  // Tampilkan 5 tahun terakhir, termasuk tahun berjalan
+	  for (let year = currentYear; year >= currentYear - 4; year--) {
+	    yearInput.add(new Option(String(year), String(year)));
+	  } yearInput.value = String(currentYear); }
   // Reset form saat membuka employee
   [
     'taxHistoryEmployerName',
