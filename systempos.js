@@ -40128,6 +40128,15 @@ window.openEmployeeActionModal = function (employeeId) {
       openEmployeeSalarySetting(employeeId);
     };
   }
+	/* === TAX HISTORY (BPA1) === */
+	const taxHistoryButton = document.getElementById('employeeActionTaxHistory');
+	
+	if (taxHistoryButton) {
+	  taxHistoryButton.onclick = function () {
+	    closeEmployeeActionModal();
+	    openEmployeeTaxHistoryModal(employeeId);
+	  };
+	}
   /* === DELETE === */
 	const deleteButton = document.getElementById('employeeActionDelete');
 	
@@ -40137,16 +40146,23 @@ window.openEmployeeActionModal = function (employeeId) {
 	    deleteEmployee(employeeId);
 	  };
 	}
+
 	// === ROLE PERMISSION ===
 	const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
 	const isAccountant = role === 'accountant';
-	// Accountant hanya boleh melihat detail
+	
+	// Accountant hanya boleh melihat Detail dan Tax History
 	[editButton, attendanceButton, deleteButton].forEach(button => {
 	  button?.classList.toggle('hidden', isAccountant);
 	});
 	
 	// Salary hanya untuk Owner
 	salaryButton?.classList.toggle('hidden', role !== 'owner');
+	// Tax History hanya untuk Owner dan Accountant
+	taxHistoryButton?.classList.toggle(
+	  'hidden',
+	  !['owner', 'accountant'].includes(role)
+	);
 	/* === OPEN MODAL === */
 	modal.classList.remove('hidden');
 	modal.classList.add('flex');
@@ -40192,6 +40208,60 @@ window.closeEmployeeActionModal = function () {
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
+
+
+/* === OPEN EMPLOYEE TAX HISTORY MODAL === */
+window.openEmployeeTaxHistoryModal = function (employeeId) {
+  const employee = employeeData.find( e => e.Employee_ID === employeeId );
+  if (!employee) { alert('Employee tidak ditemukan.'); return; }
+
+  const modal = document.getElementById('employeeTaxHistoryModal');
+  if (!modal) { alert('Tax History modal tidak ditemukan.'); return; }
+
+  // Employee information
+  document.getElementById('taxHistoryEmployeeId').value = employee.Employee_ID;
+  document.getElementById('taxHistoryEmployeeName').textContent = `${employee.Full_Name || '-'} • ${employee.Employee_Code || '-'}`;
+
+  // Default tax year
+  const yearInput = document.getElementById('taxHistoryYear');
+  const currentYear = new Date().getFullYear();
+
+  if (yearInput) {
+    const yearExists = Array.from(yearInput.options).some( option => Number(option.value) === currentYear );
+    if (!yearExists) { yearInput.add( new Option(String(currentYear), String(currentYear))); } yearInput.value = String(currentYear); }
+  // Reset form saat membuka employee
+  [
+    'taxHistoryEmployerName',
+    'taxHistoryBPA1Number',
+    'taxHistoryEmploymentPeriod',
+    'taxHistoryGrossIncome',
+    'taxHistoryDeductions',
+    'taxHistoryNetIncome',
+    'taxHistoryPKP',
+    'taxHistoryTaxWithheld',
+    'taxHistoryNote'
+  ].forEach(id => {
+    const input = document.getElementById(id);
+    if (input) input.value = '';
+  });
+
+  const includeBPA1 = document.getElementById( 'taxHistoryIncludeBPA1' );
+  if (includeBPA1) { includeBPA1.checked = false; }
+  // Open modal
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+
+/* === CLOSE EMPLOYEE TAX HISTORY MODAL === */
+window.closeEmployeeTaxHistoryModal = function () {
+  const modal = document.getElementById('employeeTaxHistoryModal');
+  if (!modal) return;
+
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+};
+
 
 /* === OPEN EMPLOYEE MODAL === */
 window.openEmployeeModal = function () {
