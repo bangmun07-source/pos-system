@@ -20130,35 +20130,36 @@
 				      </p>
 				    </div>
 				  </div>
-				  <!-- TABLE -->
-				  <div class="overflow-x-auto custom-scrollbar">
-				    <table class="w-full text-sm">
-				      <thead>
-				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-				          <th class="px-5 py-3 text-left whitespace-nowrap">Period</th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
-								  <th class="px-5 py-3 text-right whitespace-nowrap">Gross Salary</th>
-								  <th class="px-5 py-3 text-right whitespace-nowrap">Employer Health</th>
-								  <th class="px-5 py-3 text-right whitespace-nowrap">Gross Taxable Income</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Paid Amount</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Remaining</th>
-				          <th class="px-5 py-3 text-center">Status</th>
-				          <th class="px-5 py-3 text-center">Action</th>
-				        </tr>
-				      </thead>
-				
-				      <tbody id="employeeTaxTableBody"
-				        class="divide-y divide-outline-variant">
-				        <tr>
-				          <td colspan="11" class="px-5 py-10 text-center text-muted">
-				            No employee tax data
-				          </td>
-				        </tr>
-				      </tbody>
-				    </table>
-				  </div>
+				  <!-- TABLE -->	  
+					<div class="overflow-x-auto custom-scrollbar">
+					  <table class="w-full text-sm">
+					    <thead>
+					      <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-xs font-medium headline-font">
+					        <th class="px-5 py-3 text-left whitespace-nowrap">Period</th>
+					        <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
+					        <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Gross Salary</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Employer Health</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Gross Taxable</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Paid Amount</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Remaining</th>
+					        <th class="px-5 py-3 text-center whitespace-nowrap">Status</th>
+					        <th class="px-5 py-3 text-center whitespace-nowrap">Action</th>
+					      </tr>
+					    </thead>
+					
+					    <tbody id="employeeTaxTableBody"
+					      class="divide-y divide-outline-variant">
+					      <tr>
+					        <td colspan="11"
+					          class="px-5 py-10 text-center text-muted">
+					          No employee tax data
+					        </td>
+					      </tr>
+					    </tbody>
+					  </table>
+					</div>
 				  <!-- PAGINATION -->
 				  <div class="px-8 py-4 border-t border-outline-variant flex items-center justify-between gap-4">
 				    <p id="employeeTaxTableInfo"
@@ -21278,6 +21279,147 @@
 	          </div>
 	        </div>
 	      </section>
+				<!-- MUNO INCOME DETAILS -->
+				<section>
+				  <div class="pb-3 border-b border-outline-variant mb-4">
+				    <h3 class="text-sm font-semibold text-foreground">
+				      MUNO Income Details
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Taxable income and deductible expenses from MUNO
+				    </p>
+				  </div>
+				
+				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Gross Salary Taxable</label>
+				      <div id="employeeTaxDetailGrossSalaryTaxable"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Employer Health Taxable</label>
+				      <div id="employeeTaxDetailEmployerHealthTaxable"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Gross Taxable Income</label>
+				      <div id="employeeTaxDetailMunoGrossIncome"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Annual Gross Taxable Income</label>
+				      <div id="employeeTaxDetailAnnualGrossIncome"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Annual Position Expense</label>
+				      <div id="employeeTaxDetailAnnualPositionExpense"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				  </div>
+				</section>
+				<!-- PREVIOUS EMPLOYER DETAILS -->
+				<section>
+				  <div class="pb-3 border-b border-outline-variant mb-4">
+				    <h3 class="text-sm font-semibold text-foreground">
+				      Previous Employer Details
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Income and PPh 21 tax credit from the previous employer
+				    </p>
+				  </div>
+				
+				  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-xs text-muted">Previous Employer Net Income</p>
+				      <p id="employeeTaxDetailPreviousEmployerIncome"
+				        class="text-xl font-semibold text-foreground mt-2">
+				        Rp0
+				      </p>
+				    </div>
+				
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-xs text-muted">Previous Employer Tax Credit</p>
+				      <p id="employeeTaxDetailPreviousEmployerCredit"
+				        class="text-xl font-semibold text-foreground mt-2">
+				        Rp0
+				      </p>
+				    </div>
+				  </div>
+				</section>
+				<!-- ANNUAL TAX RECONCILIATION -->
+				<section>
+				  <div class="pb-3 border-b border-outline-variant mb-4">
+				    <h3 class="text-sm font-semibold text-foreground">
+				      Annual Tax Reconciliation
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Combined annual tax calculation from MUNO and previous employer
+				    </p>
+				  </div>
+				
+				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-xs text-muted">
+				        Annual Net Income (Combined)
+				      </p>
+				      <p id="employeeTaxDetailAnnualNetIncome"
+				        class="text-xl font-semibold text-foreground mt-2">
+				        Rp0
+				      </p>
+				    </div>
+				
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-xs text-muted">Annual PKP</p>
+				      <p id="employeeTaxDetailAnnualPKP"
+				        class="text-xl font-semibold text-foreground mt-2">
+				        Rp0
+				      </p>
+				    </div>
+				
+				    <div class="border border-outline-variant rounded-md p-4">
+				      <p class="text-xs text-muted">Annual Tax Liability</p>
+				      <p id="employeeTaxDetailAnnualTaxLiability"
+				        class="text-xl font-semibold text-foreground mt-2">
+				        Rp0
+				      </p>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">
+				        Tax Withheld Jan–Nov
+				      </label>
+				      <div id="employeeTaxDetailTaxWithheldJanNov"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">
+				        Tax Overpayment
+				      </label>
+				      <div id="employeeTaxDetailTaxOverpayment"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				  </div>
+				</section>	
 	      <!-- TAX SUMMARY -->
 	      <section>
 	        <div class="pb-3 border-b border-outline-variant mb-4">
