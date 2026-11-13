@@ -45772,6 +45772,14 @@ async function savePPh21PTKP() {
   }
 }
 
+// CLOSE PTKP FORM
+function closePPh21PTKPForm() {
+  const form = document.getElementById('pph21PTKPForm');
+  if (form) form.classList.add('hidden');
+
+  pph21PTKPEditingStatus = null;
+}
+
 /* === PPh21 PROGRESSIVE RATES === */
 let pph21ProgressiveData = [];
 let pph21ProgressiveEditingId = null;
