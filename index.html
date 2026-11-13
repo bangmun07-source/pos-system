@@ -27663,210 +27663,179 @@
         <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-    <!-- CONTENT -->
-    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
-      <input id="taxHistoryEmployeeId" type="hidden">
-      <!-- EMPLOYEE -->
-      <div class="border border-outline-variant rounded-md p-4">
-        <p class="text-[11px] text-muted uppercase tracking-wider">
-          Employee
-        </p>
-
-        <p id="taxHistoryEmployeeName"
-          class="text-sm font-medium mt-1">
-          -
-        </p>
-      </div>
-      <!-- TAX YEAR -->
-      <div>
-        <label for="taxHistoryYear"
-          class="block text-sm font-medium text-foreground mb-2">
-          Tax Year
-        </label>
-
-				<select id="taxHistoryYear"
-				  class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-				</select>
-      </div>
-      <!-- PREVIOUS EMPLOYER -->
-      <div class="space-y-4">
-        <div>
-          <h3 class="text-sm font-semibold text-foreground">
-            Previous Employer
-          </h3>
-
-          <p class="text-xs text-muted mt-1">
-            Enter information from the employee's previous employer BPA1 certificate.
-          </p>
-        </div>
-        <!-- COMPANY NAME -->
-        <div>
-          <label for="taxHistoryEmployerName"
-            class="block text-sm font-medium text-foreground mb-2">
-            Previous Company Name
-          </label>
-
-          <input id="taxHistoryEmployerName"
-            type="text"
-            placeholder="Enter previous company name"
-            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-        </div>
-        <!-- BPA1 NUMBER + EMPLOYMENT PERIOD -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="taxHistoryBPA1Number"
-              class="block text-sm font-medium text-foreground mb-2">
-              BPA1 Certificate Number
-            </label>
-
-            <input id="taxHistoryBPA1Number"
-              type="text"
-              placeholder="Enter certificate number"
-              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-          </div>
-
-          <div>
-            <label for="taxHistoryEmploymentPeriod"
-              class="block text-sm font-medium text-foreground mb-2">
-              Employment Period
-            </label>
-
-            <input id="taxHistoryEmploymentPeriod"
-              type="text"
-              placeholder="Example: January - September"
-              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-          </div>
-        </div>
-      </div>
-      <!-- BPA1 TAX INFORMATION -->
-      <div class="border-t border-outline-variant pt-4 space-y-4">
-        <div>
-          <h3 class="text-sm font-semibold text-foreground">
-            BPA1 Tax Information
-          </h3>
-
-          <p class="text-xs text-muted mt-1">
-            Enter the amounts exactly as stated in the BPA1 certificate.
-          </p>
-        </div>
-        <!-- AMOUNTS -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="taxHistoryGrossIncome"
-              class="block text-sm font-medium text-foreground mb-2">
-              Gross Income
-            </label>
-
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
-
-              <input id="taxHistoryGrossIncome"
-                type="number" min="0" step="1"
-                placeholder="0"
-                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-          </div>
-
-          <div>
-            <label for="taxHistoryDeductions"
-              class="block text-sm font-medium text-foreground mb-2">
-              Total Deductions
-            </label>
-
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
-
-              <input id="taxHistoryDeductions"
-                type="number" min="0" step="1"
-                placeholder="0"
-                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-          </div>
-
-          <div>
-            <label for="taxHistoryNetIncome"
-              class="block text-sm font-medium text-foreground mb-2">
-              Net Income
-            </label>
-
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
-
-              <input id="taxHistoryNetIncome"
-                type="number" min="0" step="1"
-                placeholder="0"
-                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-          </div>
-
-          <div>
-            <label for="taxHistoryPKP"
-              class="block text-sm font-medium text-foreground mb-2">
-              Taxable Income (PKP)
-            </label>
-
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
-
-              <input id="taxHistoryPKP"
-                type="number" min="0" step="1"
-                placeholder="0"
-                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-          </div>
-
-          <div class="md:col-span-2">
-            <label for="taxHistoryTaxWithheld"
-              class="block text-sm font-medium text-foreground mb-2">
-              PPh 21 Withheld
-            </label>
-
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
-
-              <input id="taxHistoryTaxWithheld"
-                type="number" min="0" step="1"
-                placeholder="0"
-                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- RECONCILIATION OPTION -->
-      <div class="border border-outline-variant rounded-md p-4 space-y-3">
-        <div>
-          <h3 class="text-sm font-semibold text-foreground">
-            Annual Tax Reconciliation
-          </h3>
-
-          <p class="text-xs text-muted mt-1">
-            Choose whether this previous employer certificate will be used in the applicable annual PPh 21 reconciliation.
-          </p>
-        </div>
-
-        <label class="flex items-center justify-between gap-3">
-          <span class="text-sm font-medium text-foreground">
-            Include Previous Employer BPA1
-          </span>
-
-          <input id="taxHistoryIncludeBPA1"
-            type="checkbox"
-            class="w-4 h-4">
-        </label>
-      </div>
-      <!-- NOTE -->
-      <div>
-        <label for="taxHistoryNote"
-          class="block text-sm font-medium text-foreground mb-2">
-          Note
-        </label>
-
-        <textarea id="taxHistoryNote"
-          rows="3"
-          placeholder="Additional information..."
-          class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
-      </div>
-    </div>
+		<!-- CONTENT -->
+		<div class="p-5 space-y-6 overflow-y-auto custom-scrollbar">
+		  <input id="taxHistoryEmployeeId" type="hidden">
+		  <!-- EMPLOYEE -->
+		  <div class="border border-outline-variant rounded-md p-4">
+		    <p class="text-[11px] text-muted uppercase tracking-wider">Employee</p>
+		    <p id="taxHistoryEmployeeName" class="text-sm font-medium mt-1">-</p>
+		  </div>
+		
+		  <!-- TAX CERTIFICATE -->
+		  <section class="space-y-4">
+		    <h3 class="text-sm font-semibold">Tax Certificate Information</h3>
+		
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div>
+		        <label class="block text-sm mb-2">Tax Year</label>
+		        <select id="taxHistoryYear" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></select>
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Certificate Number</label>
+		        <input id="taxHistoryBPA1Number" type="text" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Certificate Type</label>
+		        <select id="taxHistoryCertificateType" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		          <option value="BPA1">BPA1</option>
+		        </select>
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Certificate Status</label>
+		        <select id="taxHistoryCertificateStatus" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		          <option value="NORMAL">Normal</option>
+		          <option value="CORRECTION">Correction</option>
+		        </select>
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Correction Number</label>
+		        <input id="taxHistoryCorrectionNumber" type="number" min="0" value="0" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Withholding Nature</label>
+		        <input id="taxHistoryWithholdingNature" type="text" value="TIDAK FINAL" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Certificate Issue Date</label>
+		        <input id="taxHistoryIssueDate" type="date" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		    </div>
+		  </section>
+		
+		  <!-- PREVIOUS EMPLOYER -->
+		  <section class="border-t border-outline-variant pt-5 space-y-4">
+		    <h3 class="text-sm font-semibold">Previous Employer</h3>
+		    <div>
+		      <label class="block text-sm mb-2">Company Name</label>
+		      <input id="taxHistoryEmployerName" type="text" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		    </div>
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div>
+		        <label class="block text-sm mb-2">Employer NPWP</label>
+		        <input id="taxHistoryEmployerNPWP" type="text" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Employer NITKU</label>
+		        <input id="taxHistoryEmployerNITKU" type="text" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		    </div>
+		  </section>
+		
+		  <!-- EMPLOYMENT & TAX STATUS -->
+		  <section class="border-t border-outline-variant pt-5 space-y-4">
+		    <h3 class="text-sm font-semibold">Employment & Tax Status</h3>
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div>
+		        <label class="block text-sm mb-2">Income Period Start (Month)</label>
+		        <select id="taxHistoryPeriodStart" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		          <option value="">Select month</option>
+		          <option value="1">January</option><option value="2">February</option>
+		          <option value="3">March</option><option value="4">April</option>
+		          <option value="5">May</option><option value="6">June</option>
+		          <option value="7">July</option><option value="8">August</option>
+		          <option value="9">September</option><option value="10">October</option>
+		          <option value="11">November</option><option value="12">December</option>
+		        </select>
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Income Period End (Month)</label>
+		        <select id="taxHistoryPeriodEnd" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		          <option value="">Select month</option>
+		          <option value="1">January</option><option value="2">February</option>
+		          <option value="3">March</option><option value="4">April</option>
+		          <option value="5">May</option><option value="6">June</option>
+		          <option value="7">July</option><option value="8">August</option>
+		          <option value="9">September</option><option value="10">October</option>
+		          <option value="11">November</option><option value="12">December</option>
+		        </select>
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">PTKP Status on BPA1</label>
+		        <select id="taxHistoryPTKPStatus" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		          <option value="">Select PTKP</option>
+		          <option>TK/0</option><option>TK/1</option><option>TK/2</option><option>TK/3</option>
+		          <option>K/0</option><option>K/1</option><option>K/2</option><option>K/3</option>
+		        </select>
+		      </div>
+		      <div>
+		        <label class="block text-sm mb-2">Tax Facility</label>
+		        <input id="taxHistoryTaxFacility" type="text" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm">
+		      </div>
+		    </div>
+		    <label class="flex items-center gap-2 text-sm">
+		      <input id="taxHistoryMultipleEmployers" type="checkbox" class="w-4 h-4">
+		      Employee had multiple employers in this tax year
+		    </label>
+		  </section>
+		
+		  <!-- GROSS INCOME -->
+		  <section class="border-t border-outline-variant pt-5 space-y-4">
+		    <h3 class="text-sm font-semibold">Gross Income Details</h3>
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div><label class="block text-sm mb-2">Gross Salary</label><input id="taxHistoryGrossSalary" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Income Tax Allowance</label><input id="taxHistoryIncomeTaxAllowance" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Other Allowances</label><input id="taxHistoryOtherAllowances" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Honorarium</label><input id="taxHistoryHonorarium" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Employer Insurance Premium</label><input id="taxHistoryInsurancePremium" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Taxable Natura</label><input id="taxHistoryTaxableNatura" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Bonus / THR</label><input id="taxHistoryBonusTHR" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Total Gross Income</label><input id="taxHistoryTotalGrossIncome" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		    </div>
+		  </section>
+		
+		  <!-- DEDUCTIONS -->
+		  <section class="border-t border-outline-variant pt-5 space-y-4">
+		    <h3 class="text-sm font-semibold">Income Deductions</h3>
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div><label class="block text-sm mb-2">Job Expense Deduction</label><input id="taxHistoryJobExpense" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Pension Contribution</label><input id="taxHistoryPensionContribution" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Mandatory Religious Donation</label><input id="taxHistoryReligiousDonation" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Total Deductions</label><input id="taxHistoryTotalDeductions" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		    </div>
+		  </section>
+		
+		  <!-- TAX CALCULATION -->
+		  <section class="border-t border-outline-variant pt-5 space-y-4">
+		    <h3 class="text-sm font-semibold">Tax Calculation</h3>
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div><label class="block text-sm mb-2">Net Income</label><input id="taxHistoryNetIncome" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Previous Withholder Net Income</label><input id="taxHistoryPreviousNetIncome" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Annualized Net Income</label><input id="taxHistoryAnnualizedNetIncome" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">PTKP Amount</label><input id="taxHistoryPTKPAmount" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Taxable Income (PKP)</label><input id="taxHistoryPKP" type="number" min="0" step="1" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Annual PPh 21 on PKP</label><input id="taxHistoryAnnualPPh21" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">PPh 21 Payable</label><input id="taxHistoryPPh21Payable" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		    </div>
+		  </section>
+		
+		  <!-- TAX WITHHOLDING -->
+		  <section class="border-t border-outline-variant pt-5 space-y-4">
+		    <h3 class="text-sm font-semibold">Tax Withholding</h3>
+		    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+		      <div><label class="block text-sm mb-2">Previous Certificate PPh 21</label><input id="taxHistoryPreviousCertificatePPh21" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Current Certificate PPh 21</label><input id="taxHistoryCurrentCertificatePPh21" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Total PPh 21 Withheld</label><input id="taxHistoryTaxWithheld" type="number" min="0" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		      <div><label class="block text-sm mb-2">Underpayment / (Overpayment)</label><input id="taxHistoryUnderpaymentOverpayment" type="number" step="0.01" class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm"></div>
+		    </div>
+		  </section>
+		
+		  <!-- NOTES -->
+		  <section class="border-t border-outline-variant pt-5">
+		    <label class="block text-sm font-medium mb-2">Notes</label>
+		    <textarea id="taxHistoryNote" rows="3" class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm"></textarea>
+		  </section>
+		</div>
     <!-- FOOTER -->
     <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3 shrink-0">
       <button type="button"
