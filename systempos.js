@@ -45464,7 +45464,7 @@ async function loadPPh21Settings() {
   const ptkpBody = document.getElementById('pph21PTKPTableBody');
 
   if (terBody) { terBody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-muted">Memuat tarif TER...</td></tr>'; }
-  if (ptkpBody) { ptkpBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-muted">Memuat data PTKP...</td></tr>'; }
+  if (ptkpBody) { ptkpBody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-muted">Memuat data PTKP...</td></tr>'; }
 
   try {
     const { data, error } = 
@@ -45664,12 +45664,18 @@ function renderPPh21PTKP() {
   const count = document.getElementById('pph21PTKPCount');
 
   if (!body) return;
+
   if (count) count.textContent = `${pph21PTKPData.length} status`;
-  if (!pph21PTKPData.length) { body.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-muted">Data PTKP belum tersedia.</td></tr>'; return; }
+
+  if (!pph21PTKPData.length) {
+    body.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-muted">Data PTKP belum tersedia.</td></tr>';
+    return;
+  }
 
   body.innerHTML = pph21PTKPData.map(row => `
     <tr class="border-t border-outline-variant hover:bg-surface-container-low">
       <td class="p-3 text-sm font-medium">${escapePPh21Html(row.PTKP_Status)}</td>
+      <td class="p-3 text-sm">${escapePPh21Html(row.TER_Category || '-')}</td>
       <td class="p-3 text-sm text-right">${formatPPh21Rupiah(row.Annual_PTKP)}</td>
       <td class="p-3 text-center">
         <button type="button"
@@ -45683,14 +45689,14 @@ function renderPPh21PTKP() {
 }
 
 // OPEN / CLOSE PTKP FORM
-
 function openPPh21PTKPForm(status = null) {
   const form = document.getElementById('pph21PTKPForm');
   const statusInput = document.getElementById('pph21PTKPStatus');
   const amountInput = document.getElementById('pph21AnnualPTKP');
+  const categoryInput = document.getElementById('pph21PTKPTerCategory');
   const title = form?.querySelector('h3');
 
-  if (!form || !statusInput || !amountInput) { showPPh21Message('Form PTKP tidak ditemukan.', 'error'); return; }
+  if (!form || !statusInput || !amountInput || !categoryInput) { showPPh21Message('Form PTKP tidak ditemukan.', 'error'); return; }
 
   const row = status
     ? pph21PTKPData.find(item => item.PTKP_Status === status)
@@ -45698,13 +45704,13 @@ function openPPh21PTKPForm(status = null) {
   if (status && !row) { showPPh21Message('Status PTKP tidak ditemukan.', 'error'); return; }
 
   pph21PTKPEditingStatus = row ? row.PTKP_Status : null;
+	
   document.getElementById('pph21PTKPId').value = row ? row.PTKP_ID : '';
   statusInput.value = row ? row.PTKP_Status : '';
   statusInput.readOnly = !!row;
-  statusInput.placeholder = row
-    ? 'Status PTKP'
-    : 'Contoh: K/4';
+  statusInput.placeholder = row ? 'Status PTKP' : 'Contoh: K/4';
   amountInput.value = row ? row.Annual_PTKP : '';
+  categoryInput.value = row ? (row.TER_Category || '') : 'A';
 
   if (title) { title.textContent = row
 		? 'Edit Nilai PTKP'
@@ -45715,54 +45721,47 @@ function openPPh21PTKPForm(status = null) {
   statusInput.focus();
 }
 
-function closePPh21PTKPForm() {
-  const form = document.getElementById('pph21PTKPForm');
-  if (form) form.classList.add('hidden');
-
-  pph21PTKPEditingStatus = null;
-}
-
 // SAVE PTKP
 // RPC: save_pph21_ptkp
 async function savePPh21PTKP() {
   if (pph21Saving) return;
 
   const sessionId = getPPh21SessionId();
-  if (!sessionId) { showPPh21Message( 'Session tidak ditemukan. Silakan login kembali.', 'error' ); return; }
+  if (!sessionId) { showPPh21Message('Session tidak ditemukan. Silakan login kembali.', 'error'); return; }
 
-  const statusSelect = document.getElementById('pph21PTKPStatus');
+  const statusInput = document.getElementById('pph21PTKPStatus');
   const amountValue = document.getElementById('pph21AnnualPTKP')?.value;
-  const status = pph21PTKPEditingStatus || statusSelect?.value;
+  const categoryInput = document.getElementById('pph21PTKPTerCategory');
+  const status = pph21PTKPEditingStatus || statusInput?.value;
   const annualPTKP = amountValue === '' ? NaN : Number(amountValue);
+  const terCategory = categoryInput?.value;
 
   if (!status) { showPPh21Message('Pilih status PTKP.', 'error'); return; }
-  if (!Number.isFinite(annualPTKP) || annualPTKP < 0) { showPPh21Message( 'Masukkan nilai PTKP tahunan yang valid.', 'error' ); return; }
+  if (!['A', 'B', 'C'].includes(terCategory)) { showPPh21Message('Pilih kategori TER yang valid.', 'error'); return; }
+  if (!Number.isFinite(annualPTKP) || annualPTKP < 0) { showPPh21Message('Masukkan nilai PTKP tahunan yang valid.', 'error'); return; }
 
-  // Cegah status duplikat saat menambah data.
   const isAdding = !pph21PTKPEditingStatus;
   if ( isAdding && pph21PTKPData.some(item => item.PTKP_Status === status)
-  ) { showPPh21Message( 'Status PTKP tersebut sudah tersedia.', 'error' ); return; }
+  ) { showPPh21Message('Status PTKP tersebut sudah tersedia.', 'error'); return; }
 
   pph21Saving = true;
 
   try {
-    const { data, error } = 
-			await supabaseClient.rpc(
-	      'save_pph21_ptkp',
-	      {
-	        p_session_id: sessionId,
-	        p_ptkp_status: status,
-	        p_annual_ptkp: annualPTKP
-	      }
-	    );
+    const { data, error } = await supabaseClient.rpc(
+      'save_pph21_ptkp',
+      {
+        p_session_id: sessionId,
+        p_ptkp_status: status,
+        p_annual_ptkp: annualPTKP,
+        p_ter_category: terCategory
+      }
+    );
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'PTKP gagal disimpan.'); }
 
     closePPh21PTKPForm();
-
-    showPPh21Message( data.message || 'PTKP berhasil disimpan.' );
-
+    showPPh21Message(data.message || 'PTKP berhasil disimpan.');
     await loadPPh21Settings();
 
   } catch (error) {
