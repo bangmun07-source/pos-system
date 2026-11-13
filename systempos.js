@@ -32027,10 +32027,8 @@ async function loadEmployeeTaxRecords() {
 	});
 
 	// CACHE HIT: tidak perlu memanggil RPC.
-	if (
-		Object.prototype.hasOwnProperty.call( state.employeeTaxRecordsCache, cacheKey )
-	) {
-		employeeTaxData = state.employeeTaxRecordsCache[cacheKey];
+	if ( Object.prototype.hasOwnProperty.call( state.employeeTaxRecordsCache, cacheKey )
+	) { employeeTaxData = state.employeeTaxRecordsCache[cacheKey];
 		employeeTaxCurrentPage = 1;
 		renderEmployeeTaxTable();
 		return;
@@ -32380,6 +32378,22 @@ function viewEmployeeTaxDetail(taxId) {
 	setText("employeeTaxDetailDeduction", formatMoney(row.tax_deduction));
 	setText("employeeTaxDetailTaxAmount", formatMoney(row.tax_amount));
 	setText("employeeTaxDetailNote", row.calculation_note || "-");
+	// MUNO INCOME DETAILS
+	setText("employeeTaxDetailGrossSalaryTaxable", formatMoney(row.gross_salary_taxable));
+	setText("employeeTaxDetailEmployerHealthTaxable", formatMoney(row.employer_health_taxable));
+	setText("employeeTaxDetailMunoGrossIncome", formatMoney(row.gross_taxable_income));
+	setText("employeeTaxDetailAnnualGrossIncome", formatMoney(row.annual_gross_taxable_income));
+	setText("employeeTaxDetailAnnualPositionExpense", formatMoney(row.annual_position_expense));
+	// PREVIOUS EMPLOYER DETAILS
+	setText("employeeTaxDetailPreviousEmployerIncome", formatMoney(row.previous_employer_net_income));
+	setText("employeeTaxDetailPreviousEmployerCredit", formatMoney(row.previous_employer_tax_credit));
+	// ANNUAL TAX RECONCILIATION
+	setText("employeeTaxDetailAnnualNetIncome", formatMoney(row.annual_net_income));
+	setText("employeeTaxDetailAnnualPKP", formatMoney(row.annual_pkp));
+	setText("employeeTaxDetailAnnualTaxLiability", formatMoney(row.annual_tax_liability));
+	setText("employeeTaxDetailTaxWithheldJanNov",formatMoney(row.tax_withheld_jan_nov));
+	setText("employeeTaxDetailTaxOverpayment", formatMoney(row.tax_overpayment));
+
 
 	modal.classList.remove("hidden");
 	modal.classList.add("flex");
