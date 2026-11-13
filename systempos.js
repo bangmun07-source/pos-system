@@ -40364,9 +40364,17 @@ window.openEmployeeTaxHistoryModal = async function (employeeId) {
     // Tidak ada record: popup tetap menggunakan nilai default
     if (!data.found || !data.record) { return; }
 		
-    const record = data.record;
+		const record = data.record;
+		
 		const recordIdInput = document.getElementById('taxHistoryRecordId');
-		if (recordIdInput) { recordIdInput.value = record.Tax_Record_ID || ''; }
+		if (!recordIdInput) { throw new Error('Input taxHistoryRecordId tidak ditemukan di HTML modal.'); }
+		recordIdInput.value = record.Tax_Record_ID || '';
+		
+		const employmentStatusInput = document.getElementById('taxHistoryEmploymentStatus');
+		if (employmentStatusInput) {
+		  employmentStatusInput.value = record.Employment_Status || 'HAS_PREVIOUS_EMPLOYER_BPA1';
+		  window.handleTaxHistoryEmploymentStatusChange();
+		}
     // === MAP DATABASE COLUMN TO POPUP INPUT ===
     const fieldMapping = {
       taxHistoryBPA1Number: 'Certificate_Number',
@@ -40535,7 +40543,9 @@ window.saveEmployeeTaxHistory = async function () {
 
     if (error) throw error;
     if (!data?.success) { throw new Error(data?.message || 'Gagal menyimpan riwayat pajak.'); }
-		if (data.tax_record_id) { document.getElementById('taxHistoryRecordId').value = data.tax_record_id; }
+		
+		const recordIdInput = document.getElementById('taxHistoryRecordId');
+		if (recordIdInput && data.tax_record_id) { recordIdInput.value = data.tax_record_id; }
 
     alert(data.message || 'Riwayat pajak berhasil disimpan.');
     closeEmployeeTaxHistoryModal();
