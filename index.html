@@ -27631,6 +27631,263 @@
 	    </div>
 	  </div>
 	</div>
+
+<!-- === EMPLOYEE TAX HISTORY MODAL === -->
+<div id="employeeTaxHistoryModal"
+  class="fixed inset-0 z-[120] hidden items-center justify-center bg-background p-4">
+  <div class="w-full max-w-2xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden flex flex-col">
+    <!-- HEADER -->
+    <div class="p-5 border-b border-outline-variant flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="main-icon-box">
+          <span class="material-symbols-outlined text-3xl"
+            style="font-variation-settings:'FILL' 1;">
+            receipt_long
+          </span>
+        </div>
+
+        <div>
+          <h2 class="text-lg font-bold font-headline text-foreground">
+            Employee Tax History
+          </h2>
+
+          <p class="text-xs text-muted mt-1">
+            Previous Employer Tax Certificate (BPA1)
+          </p>
+        </div>
+      </div>
+
+      <button type="button"
+        onclick="closeEmployeeTaxHistoryModal()"
+        class="w-9 h-9 rounded-md hover:bg-surface-container-high flex items-center justify-center text-muted hover:text-foreground transition">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <!-- CONTENT -->
+    <div class="p-5 space-y-5 overflow-y-auto custom-scrollbar">
+      <input id="taxHistoryEmployeeId" type="hidden">
+      <!-- EMPLOYEE -->
+      <div class="border border-outline-variant rounded-md p-4">
+        <p class="text-[11px] text-muted uppercase tracking-wider">
+          Employee
+        </p>
+
+        <p id="taxHistoryEmployeeName"
+          class="text-sm font-medium mt-1">
+          -
+        </p>
+      </div>
+      <!-- TAX YEAR -->
+      <div>
+        <label for="taxHistoryYear"
+          class="block text-sm font-medium text-foreground mb-2">
+          Tax Year
+        </label>
+
+        <select id="taxHistoryYear"
+          class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          <option value="2026">2026</option>
+          <option value="2025">2025</option>
+        </select>
+      </div>
+      <!-- PREVIOUS EMPLOYER -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-semibold text-foreground">
+            Previous Employer
+          </h3>
+
+          <p class="text-xs text-muted mt-1">
+            Enter information from the employee's previous employer BPA1 certificate.
+          </p>
+        </div>
+        <!-- COMPANY NAME -->
+        <div>
+          <label for="taxHistoryEmployerName"
+            class="block text-sm font-medium text-foreground mb-2">
+            Previous Company Name
+          </label>
+
+          <input id="taxHistoryEmployerName"
+            type="text"
+            placeholder="Enter previous company name"
+            class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+        </div>
+        <!-- BPA1 NUMBER + EMPLOYMENT PERIOD -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="taxHistoryBPA1Number"
+              class="block text-sm font-medium text-foreground mb-2">
+              BPA1 Certificate Number
+            </label>
+
+            <input id="taxHistoryBPA1Number"
+              type="text"
+              placeholder="Enter certificate number"
+              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          </div>
+
+          <div>
+            <label for="taxHistoryEmploymentPeriod"
+              class="block text-sm font-medium text-foreground mb-2">
+              Employment Period
+            </label>
+
+            <input id="taxHistoryEmploymentPeriod"
+              type="text"
+              placeholder="Example: January - September"
+              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+          </div>
+        </div>
+      </div>
+      <!-- BPA1 TAX INFORMATION -->
+      <div class="border-t border-outline-variant pt-4 space-y-4">
+        <div>
+          <h3 class="text-sm font-semibold text-foreground">
+            BPA1 Tax Information
+          </h3>
+
+          <p class="text-xs text-muted mt-1">
+            Enter the amounts exactly as stated in the BPA1 certificate.
+          </p>
+        </div>
+        <!-- AMOUNTS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="taxHistoryGrossIncome"
+              class="block text-sm font-medium text-foreground mb-2">
+              Gross Income
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+
+              <input id="taxHistoryGrossIncome"
+                type="number" min="0" step="1"
+                placeholder="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="taxHistoryDeductions"
+              class="block text-sm font-medium text-foreground mb-2">
+              Total Deductions
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+
+              <input id="taxHistoryDeductions"
+                type="number" min="0" step="1"
+                placeholder="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="taxHistoryNetIncome"
+              class="block text-sm font-medium text-foreground mb-2">
+              Net Income
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+
+              <input id="taxHistoryNetIncome"
+                type="number" min="0" step="1"
+                placeholder="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="taxHistoryPKP"
+              class="block text-sm font-medium text-foreground mb-2">
+              Taxable Income (PKP)
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+
+              <input id="taxHistoryPKP"
+                type="number" min="0" step="1"
+                placeholder="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+
+          <div class="md:col-span-2">
+            <label for="taxHistoryTaxWithheld"
+              class="block text-sm font-medium text-foreground mb-2">
+              PPh 21 Withheld
+            </label>
+
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">Rp</span>
+
+              <input id="taxHistoryTaxWithheld"
+                type="number" min="0" step="1"
+                placeholder="0"
+                class="w-full h-11 pl-10 pr-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- RECONCILIATION OPTION -->
+      <div class="border border-outline-variant rounded-md p-4 space-y-3">
+        <div>
+          <h3 class="text-sm font-semibold text-foreground">
+            Annual Tax Reconciliation
+          </h3>
+
+          <p class="text-xs text-muted mt-1">
+            Choose whether this previous employer certificate will be used in the applicable annual PPh 21 reconciliation.
+          </p>
+        </div>
+
+        <label class="flex items-center justify-between gap-3">
+          <span class="text-sm font-medium text-foreground">
+            Include Previous Employer BPA1
+          </span>
+
+          <input id="taxHistoryIncludeBPA1"
+            type="checkbox"
+            class="w-4 h-4">
+        </label>
+      </div>
+      <!-- NOTE -->
+      <div>
+        <label for="taxHistoryNote"
+          class="block text-sm font-medium text-foreground mb-2">
+          Note
+        </label>
+
+        <textarea id="taxHistoryNote"
+          rows="3"
+          placeholder="Additional information..."
+          class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
+      </div>
+    </div>
+    <!-- FOOTER -->
+    <div class="p-5 border-t border-outline-variant flex items-center justify-end gap-3 shrink-0">
+      <button type="button"
+        onclick="closeEmployeeTaxHistoryModal()"
+        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high transition">
+        Cancel
+      </button>
+
+      <button type="button"
+        id="saveEmployeeTaxHistoryBtn"
+        onclick="saveEmployeeTaxHistory()"
+        class="h-10 px-5 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">save</span>
+        Save BPA1
+      </button>
+    </div>
+  </div>
+</div>
+
   <!-- ==== SCHEDULE MODAL ===== -->
   <div id="scheduleModal"
     class="fixed inset-0 z-[100] hidden items-center justify-center bg-background p-4">
@@ -28054,6 +28311,26 @@
 	          </div>
 	        </div>
 	      </button>
+				<!-- TAX HISTORY -->
+				<button type="button"
+				  id="employeeActionTaxHistory"
+				  class="w-full px-4 py-3 rounded-md flex items-center gap-4 text-left text-foreground hover:bg-surface-container-high transition">
+				  <div class="w-10 h-10 rounded-md bg-surface-container-high flex items-center justify-center shrink-0">
+				    <span class="material-symbols-outlined text-lg">
+				      receipt_long
+				    </span>
+				  </div>
+				
+				  <div>
+				    <div class="text-sm font-medium">
+				      Tax History (BPA1)
+				    </div>
+				
+				    <div class="text-xs text-muted mt-0.5">
+				      Manage previous employer tax records
+				    </div>
+				  </div>
+				</button>
 	      <!-- DIVIDER -->
 	      <div class="border-t border-outline-variant my-2"></div>
 	      <!-- DELETE -->
