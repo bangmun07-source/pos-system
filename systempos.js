@@ -40210,6 +40210,39 @@ window.closeEmployeeActionModal = function () {
 };
 
 
+/* === HANDLE EMPLOYMENT STATUS CHANGE === */
+window.handleTaxHistoryEmploymentStatusChange = function () {
+  const status = document.getElementById('taxHistoryEmploymentStatus')?.value;
+  const fields = document.getElementById('taxHistoryBPA1Fields');
+  const info = document.getElementById('taxHistoryEmploymentStatusInfo');
+  const button = document.getElementById('saveEmployeeTaxHistoryBtn');
+
+  const hasBPA1 = status === 'HAS_PREVIOUS_EMPLOYER_BPA1';
+
+  if (fields) {
+    fields.classList.toggle('hidden', !hasBPA1);
+  }
+
+  if (info) {
+    const messages = {
+      HAS_PREVIOUS_EMPLOYER_BPA1:
+        'Isi informasi sesuai dokumen BPA1 dari perusahaan sebelumnya.',
+      HAS_PREVIOUS_EMPLOYER_NO_BPA1:
+        'Karyawan pernah bekerja di perusahaan lain pada tahun pajak ini, tetapi tidak menyerahkan BPA1.',
+      FIRST_JOB:
+        'Karyawan tidak memiliki pekerjaan lain sebelum bekerja di perusahaan ini pada tahun pajak tersebut.'
+    };
+
+    info.textContent = messages[status] || '';
+  }
+
+  if (button) {
+    button.innerHTML = hasBPA1
+      ? '<span class="material-symbols-outlined text-sm">save</span> Save BPA1'
+      : '<span class="material-symbols-outlined text-sm">save</span> Save Status';
+  }
+};
+
 /* === OPEN EMPLOYEE TAX HISTORY MODAL === */
 window.openEmployeeTaxHistoryModal = async function (employeeId) {
   const employee = employeeData.find( e => e.Employee_ID === employeeId );
@@ -40273,6 +40306,12 @@ window.openEmployeeTaxHistoryModal = async function (employeeId) {
   // === RESET CHECKBOX ===
   const multipleEmployers = document.getElementById( 'taxHistoryMultipleEmployers' );
   if (multipleEmployers) { multipleEmployers.checked = false; }
+
+	// === RESET EMPLOYMENT STATUS ===
+	const employmentStatus = document.getElementById('taxHistoryEmploymentStatus');
+	if (employmentStatus) { employmentStatus.value = 'HAS_PREVIOUS_EMPLOYER_BPA1'; }
+	
+	window.handleTaxHistoryEmploymentStatusChange();
 
   // === DEFAULT YEAR ===
   const currentYear = new Date().getFullYear();
