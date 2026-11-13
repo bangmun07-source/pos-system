@@ -32384,6 +32384,14 @@ function viewEmployeeTaxDetail(taxId) {
 	setText("employeeTaxDetailMunoGrossIncome", formatMoney(row.gross_taxable_income));
 	setText("employeeTaxDetailAnnualGrossIncome", formatMoney(row.annual_gross_taxable_income));
 	setText("employeeTaxDetailAnnualPositionExpense", formatMoney(row.annual_position_expense));
+	
+	// PTKP INFORMATION
+	const taxYear = row.tax_period
+		? String(row.tax_period).slice(0, 4)
+		: "-";
+	setText("employeeTaxDetailTaxYear", taxYear);
+	setText("employeeTaxDetailPTKPStatus", row.employee_ptkp_status || "-");
+	setText("employeeTaxDetailAnnualPTKP", formatMoney(row.annual_ptkp));
 	// PREVIOUS EMPLOYER DETAILS
 	setText("employeeTaxDetailPreviousEmployerIncome", formatMoney(row.previous_employer_net_income));
 	setText("employeeTaxDetailPreviousEmployerCredit", formatMoney(row.previous_employer_tax_credit));
