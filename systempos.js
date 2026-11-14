@@ -42089,8 +42089,6 @@ function renderSalaryComponents(components = []) {
   );
 }
 
-
-/* ==== COMPONENT ROW ==== */
 /* ==== COMPONENT ROW ==== */
 function renderSalaryComponentRow(component) {
   const componentId = escapeEmployeeHtml(component.Component_ID || '');
@@ -42139,6 +42137,21 @@ function renderSalaryComponentRow(component) {
   `;
 }
 
+/* === NATURA TAX TREATMENT VISIBILITY === */
+function updateNaturaTaxTreatmentVisibility() {
+  const category = document.getElementById( 'salaryComponentAccountingCategory' )?.value;
+  const wrapper = document.getElementById( 'salaryComponentNaturaTaxWrapper' );
+  const treatment = document.getElementById( 'salaryComponentNaturaTaxTreatment' );
+
+  if (!wrapper || !treatment) return;
+  const isNatura = category === 'TAXABLE_NATURA';
+
+  wrapper.classList.toggle('hidden', !isNatura);
+  treatment.required = isNatura;
+
+  if (!isNatura) { treatment.value = ''; }
+}
+
 /* ==== OPEN SALARY COMPONENT MODAL ==== */
 window.openSalaryComponentModal = function (type) {
   if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) { return; }
@@ -42154,18 +42167,22 @@ window.openSalaryComponentModal = function (type) {
   const calculationInput = document.getElementById('salaryComponentCalculationType');
   const categoryInput = document.getElementById('salaryComponentAccountingCategory');
   const calculationBase = document.getElementById('salaryComponentCalculationBase');
+	const naturaTreatmentInput = document.getElementById('salaryComponentNaturaTaxTreatment');
 
   if (typeInput) typeInput.value = type;
   if (componentIdInput) componentIdInput.value = '';
   if (nameInput) nameInput.value = '';
   if (amountInput) amountInput.value = '';
   if (categoryInput) categoryInput.value = '';
+	if (naturaTreatmentInput) naturaTreatmentInput.value = '';
+	if (categoryInput) { categoryInput.onchange = updateNaturaTaxTreatmentVisibility; }
   if (calculationBase) calculationBase.value = 'BASIC_SALARY';
   if (calculationInput) {
     calculationInput.value = 'FIXED';
     calculationInput.onchange = updateSalaryComponentAmountUnit;
   }
 
+	updateNaturaTaxTreatmentVisibility();
   updateSalaryComponentAmountUnit();
   updateSalaryComponentCalculationBase();
 
@@ -42194,11 +42211,15 @@ window.closeSalaryComponentModal = function () {
   const componentIdInput = document.getElementById( 'salaryComponentId' );
   const nameInput = document.getElementById( 'salaryComponentName' );
   const amountInput = document.getElementById( 'salaryComponentAmount' );
-	
+	const naturaTreatmentInput = document.getElementById('salaryComponentNaturaTaxTreatment');
+
   if (typeInput) { typeInput.value = ''; }
   if (componentIdInput) { componentIdInput.value = ''; }
   if (nameInput) { nameInput.value = ''; }
   if (amountInput) { amountInput.value = ''; }
+	if (naturaTreatmentInput) naturaTreatmentInput.value = '';
+	
+	updateNaturaTaxTreatmentVisibility();
 };
 
 
@@ -42210,26 +42231,32 @@ window.saveSalaryComponent = function () {
   const amount = Number( document.getElementById('salaryComponentAmount')?.value || 0 );
   const calculationType = document.getElementById('salaryComponentCalculationType')?.value || 'FIXED';
   const accountingCategory = document.getElementById('salaryComponentAccountingCategory')?.value;
+	const naturaTaxTreatment = document.getElementById( 'salaryComponentNaturaTaxTreatment' )?.value || null;
   const calculationBase = document.getElementById('salaryComponentCalculationBase')?.value || 'BASIC_SALARY';
 
   if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) { alert('Component type tidak valid.'); return; }
   if (!name) { alert('Component Name wajib diisi.'); return; }
   if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
+	if (accountingCategory === 'TAXABLE_NATURA' && !['TAXABLE', 'EXEMPT'].includes(naturaTaxTreatment)) { alert('Tax Treatment untuk Natura wajib dipilih.'); return; }
   if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
   if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
   if (type === 'EMPLOYER_CONTRIBUTION' && ![ 'EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION' ].includes(accountingCategory)) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
   if ( type === 'ALLOWANCE' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
   if ( type === 'DEDUCTION' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
 
-  const componentData = {
-    Component_Type: type,
-    Component_Name: name,
-    Amount: amount,
-    Calculation_Type: calculationType,
-    Accounting_Category: accountingCategory,
-    Calculation_Base: calculationType === 'PERCENTAGE' ? calculationBase : null,
-    Is_Active: true
-  };
+	const componentData = {
+	  Component_Type: type,
+	  Component_Name: name,
+	  Amount: amount,
+	  Calculation_Type: calculationType,
+	  Accounting_Category: accountingCategory,
+	  Calculation_Base: calculationType === 'PERCENTAGE' ? calculationBase : null,
+	  Natura_Tax_Treatment:
+	    accountingCategory === 'TAXABLE_NATURA'
+	      ? naturaTaxTreatment
+	      : null,
+	  Is_Active: true
+	};
 
   if (componentId) {
     const index = employeeSalaryComponents.findIndex( component => component.Component_ID === componentId );
@@ -42281,7 +42308,8 @@ window.editSalaryComponent = function (componentId) {
   const calculationInput = document.getElementById('salaryComponentCalculationType');
   const categoryInput = document.getElementById('salaryComponentAccountingCategory');
   const calculationBase = document.getElementById('salaryComponentCalculationBase');
-
+	const naturaTreatmentInput = document.getElementById('salaryComponentNaturaTaxTreatment');
+	
 	if (title) {
 	  title.textContent = {
 	    ALLOWANCE: 'Edit Allowance',
@@ -42294,6 +42322,8 @@ window.editSalaryComponent = function (componentId) {
   if (nameInput) nameInput.value = component.Component_Name || '';
   if (amountInput) amountInput.value = component.Amount ?? 0;
   if (categoryInput) { categoryInput.value = component.Accounting_Category || ''; }
+	if (naturaTreatmentInput) { naturaTreatmentInput.value = component.Natura_Tax_Treatment || ''; }
+	if (categoryInput) { categoryInput.onchange = updateNaturaTaxTreatmentVisibility; }
   if (calculationInput) {
     calculationInput.value = component.Calculation_Type || 'FIXED';
     calculationInput.onchange = updateSalaryComponentAmountUnit;
@@ -42301,7 +42331,7 @@ window.editSalaryComponent = function (componentId) {
   if (calculationBase) { calculationBase.value = component.Calculation_Base || 'BASIC_SALARY'; }
 
   updateSalaryComponentAmountUnit();
-
+	updateNaturaTaxTreatmentVisibility();
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
@@ -42345,21 +42375,25 @@ window.saveEmployeeSalary = async function () {
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 
     const components = employeeSalaryComponents.map(component => ({
-      Component_ID: String(component.Component_ID || '').startsWith('TEMP-')
+			Component_ID: String(component.Component_ID || '').startsWith('TEMP-')
 				? null
 				: component.Component_ID || null,
-      Salary_ID: component.Salary_ID || null,
-      Employee_ID: employeeId,
-      Component_Type: component.Component_Type,
-      Component_Name: component.Component_Name,
-      Amount: Number(component.Amount || 0),
-      Calculation_Type: component.Calculation_Type || 'FIXED',
-      Accounting_Category: component.Accounting_Category || null,
-      Calculation_Base: component.Calculation_Type === 'PERCENTAGE'
+			Salary_ID: component.Salary_ID || null,
+			Employee_ID: employeeId,
+			Component_Type: component.Component_Type,
+			Component_Name: component.Component_Name,
+			Amount: Number(component.Amount || 0),
+			Calculation_Type: component.Calculation_Type || 'FIXED',
+			Accounting_Category: component.Accounting_Category || null,
+			Calculation_Base: component.Calculation_Type === 'PERCENTAGE'
 				? component.Calculation_Base || 'BASIC_SALARY'
 				: null,
-      Is_Active: component.Is_Active !== false
-    }));
+			Natura_Tax_Treatment:
+				component.Accounting_Category === 'TAXABLE_NATURA'
+					? component.Natura_Tax_Treatment || null
+					: null,
+			Is_Active: component.Is_Active !== false
+		}));
 
     const { data, error } = await supabaseClient.rpc(
       'save_employee_salary',
