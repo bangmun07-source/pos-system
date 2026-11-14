@@ -47732,63 +47732,76 @@ window.renderPayrollDetailContent = function (payroll, details) {
     && String(row.Accounting_Category || '').trim().toUpperCase()
       !== 'EMPLOYER_HEALTH_CONTRIBUTION'
   );
-  // Kelompokkan berdasarkan data aktual, bukan nama komponen yang di-hardcode.
+ 
+  // Kelompokkan komponen payroll berdasarkan Accounting_Category.
   const groups = new Map();
+  const groupConfig = {
+    EARNING: {
+      key: 'EARNING',
+      label: 'Earnings'
+    },
+    NATURA: {
+      key: 'NATURA',
+      label: 'Taxable Non-Cash Benefits'
+    },
+    DEDUCTION: {
+      key: 'DEDUCTION',
+      label: 'Employee Deductions'
+    },
+    ZAKAT: {
+      key: 'ZAKAT',
+      label: 'Zakat'
+    },
+    TAX: {
+      key: 'TAX',
+      label: 'Employee Tax'
+    },
+    RECEIVABLE: {
+      key: 'RECEIVABLE',
+      label: 'Employee Receivable'
+    }
+  };
 
   employeeRows.forEach(row => {
-    const type = String(row.Component_Type || '') .trim().toUpperCase();
-    const category = String(row.Accounting_Category || '') .trim().toUpperCase();
+    const type = String(row.Component_Type || '').trim().toUpperCase();
+    const category = String(row.Accounting_Category || '').trim().toUpperCase();
+    const componentName = String(row.Component_Name || '').trim();
 
-    let groupKey;
-    let groupLabel;
+    let group;
 
-    if (type === 'EARNING') {
-      groupKey = 'EARNING';
-      groupLabel = 'EARNING';
-    } else if (category === 'EMPLOYEE_TAX') {
-      groupKey = 'TAX';
-      groupLabel = 'Employee Tax';
-    } else if (category === 'REIMBURSEMENT') {
-      groupKey = 'REIMBURSEMENT';
-      groupLabel = 'Reimbursements';
-    } else if (
-      category === 'EMPLOYEE_LOAN' &&
-      String(row.Component_Name || '').trim()
-        === 'Potongan Piutang Karyawan'
-    ) {
-      groupKey = 'RECEIVABLE';
-      groupLabel = 'Employee Receivable';
-    } else if (type === 'DEDUCTION') {
-      groupKey = 'DEDUCTION';
-      groupLabel = 'DEDUCTION';
+    if (category === 'EMPLOYEE_TAX') { group = groupConfig.TAX;
+    } else if (category === 'MANDATORY_RELIGIOUS_DONATION') { group = groupConfig.ZAKAT;
+    } else if (category === 'TAXABLE_NATURA') { group = groupConfig.NATURA;
+    } else if ( category === 'EMPLOYEE_LOAN' && componentName === 'Potongan Piutang Karyawan'
+    ) { group = groupConfig.RECEIVABLE;
+    } else if (type === 'EARNING') { group = groupConfig.EARNING;
+    } else if (type === 'DEDUCTION') { group = groupConfig.DEDUCTION;
     } else {
-      // Jenis baru yang belum dikenal tetap ditampilkan.
-      groupKey = type || category || 'OTHER';
-      groupLabel = type
-        ? type.replace(/_/g, ' ')
-        : category
-          ? category.replace(/_/g, ' ')
-          : 'Other Components';
-    }
+      // Komponen baru tetap ditampilkan.
+      const fallbackKey = type || category || 'OTHER';
 
-    if (!groups.has(groupKey)) {
-      groups.set(groupKey, {
-        label: groupLabel,
-        rows: []
-      });
+      group = {
+        key: fallbackKey,
+        label: type
+          ? type.replace(/_/g, ' ')
+          : category
+            ? category.replace(/_/g, ' ')
+            : 'Other Components'
+      };
     }
-
-    groups.get(groupKey).rows.push(row);
+    if (!groups.has(group.key)) { groups.set(group.key, { label: group.label, rows: [] }); }
+    groups.get(group.key).rows.push(row);
   });
-
-  // Susunan kategori utama. Kategori baru tetap ikut dirender.
+  // Urutan kelompok Payroll Detail.
   const preferredOrder = [
     'EARNING',
+    'NATURA',
     'DEDUCTION',
+    'ZAKAT',
     'TAX',
-    'RECEIVABLE',
-		'REIMBURSEMENT'
+    'RECEIVABLE'
   ];
+
   const orderedGroups = [...groups.entries()].sort((a, b) => {
     const indexA = preferredOrder.indexOf(a[0]);
     const indexB = preferredOrder.indexOf(b[0]);
