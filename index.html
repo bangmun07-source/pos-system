@@ -27710,7 +27710,7 @@
 						
 						<optgroup label="PPh 21 Taxable Components">
 						  <option value="HONORARIUM_INCENTIVE">Honorarium / Incentive</option>
-						  <option value="TAXABLE_NATURA">Taxable Natura</option>
+						  <option value="TAXABLE_NATURA">Natura / Non-Cash Benefits</option>
 						  <option value="BONUS_THR">Bonus / THR</option>
 						  <option value="TAX_ALLOWANCE">Tax Allowance</option>
 						</optgroup>
@@ -27742,6 +27742,28 @@
 	          Determines the accounting treatment of this component.
 	        </p>
 	      </div>
+
+				<!-- NATURA TAX TREATMENT -->
+				<div id="salaryComponentNaturaTaxWrapper" class="hidden">
+				  <label for="salaryComponentNaturaTaxTreatment"
+				    class="block text-sm font-medium text-foreground mb-2">
+				    Tax Treatment
+				  </label>
+				
+				  <select id="salaryComponentNaturaTaxTreatment"
+				    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+				
+				    <option value="">Select tax treatment</option>
+				    <option value="TAXABLE">Taxable (Subject to PPh 21)</option>
+				    <option value="EXEMPT">Exempt (Not Subject to PPh 21)</option>
+				
+				  </select>
+				
+				  <p class="text-xs text-muted mt-1.5">
+				    Select whether the non-cash benefit is subject to PPh 21
+				    based on applicable tax regulations.
+				  </p>
+				</div>
 	
 	      <!-- AMOUNT -->
 	      <div>
