@@ -48026,8 +48026,7 @@ window.editPayrollSalary = async function (payrollId) {
 				    </td>
 				
 				    <td class="px-4 py-3">
-				      <select
-				        class="edit-payroll-component-category w-full min-w-40 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
+				      <select class="edit-payroll-component-category custom-scrollbar w-full min-w-40 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
 				        data-payroll-detail-id="${id}">
 				        ${getEditPayrollCategoryOptions(detail.Accounting_Category)}
 				      </select>
