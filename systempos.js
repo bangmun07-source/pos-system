@@ -40519,9 +40519,17 @@ window.saveEmployeeTaxHistory = async function () {
       Income_Period_End: hasBPA1 ? getValue('taxHistoryPeriodEnd') || null : null,
       Certificate_Type: hasBPA1 ? getValue('taxHistoryCertificateType') : null,
       Certificate_Status: hasBPA1 ? getValue('taxHistoryCertificateStatus') : null,
-      Correction_Number: hasBPA1 ? getValue('taxHistoryCorrectionNumber') || 0 : 0,
+      Certificate_Number: hasBPA1
+			  ? getValue('taxHistoryBPA1Number')
+			  : employmentStatus === 'FIRST_JOB'
+			    ? 'FIRST-JOB'
+			    : 'NO-BPA1',
       Withholding_Nature: hasBPA1 ? getValue('taxHistoryWithholdingNature') : null,
-      Previous_Employer_Name: hasBPA1 ? getValue('taxHistoryEmployerName') : null,
+      Previous_Employer_Name: hasBPA1
+				? getValue('taxHistoryEmployerName')
+				: employmentStatus === 'FIRST_JOB'
+					? 'TIDAK ADA'
+					: 'TIDAK ADA BPA1',
       Previous_Employer_NPWP: hasBPA1 ? getValue('taxHistoryEmployerNPWP') : null,
       Previous_Employer_NITKU: hasBPA1 ? getValue('taxHistoryEmployerNITKU') : null,
       Employee_PTKP_Status: getValue('taxHistoryPTKPStatus'),
