@@ -47919,10 +47919,12 @@ window.renderPayrollDetailContent = function (payroll, details) {
   setText('payrollDetailGrossSalary', money(payroll.Gross_Salary));
   setText('payrollDetailNetSalary', money(payroll.Net_Salary));
 
-  // Total potongan yang benar-benar mengurangi gaji bersih.
-  const totalDeductions = (Number(payroll.Gross_Salary) || 0) - (Number(payroll.Net_Salary) || 0);
-
-  setText('payrollDetailTotalDeduction', money(totalDeductions));
+	// Total seluruh potongan karyawan berdasarkan detail payroll.
+	const totalDeductions = employeeRows
+	  .filter(row => String(row.Component_Type || '').trim().toUpperCase() === 'DEDUCTION' )
+	  .reduce((sum, row) => sum + (Number(row.Amount) || 0), 0);
+	
+	setText('payrollDetailTotalDeduction', money(totalDeductions));
 };
 
 
