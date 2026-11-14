@@ -46943,7 +46943,21 @@ window.calculatePayroll = async function () {
 		}
 	);
 	
-	if (error) throw error;
+		if (error) {
+	    console.error('CALCULATE PAYROLL RPC ERROR:', {
+	        code: error.code,
+	        message: error.message,
+	        details: error.details,
+	        hint: error.hint
+	    });
+	
+	    throw new Error(
+	        `Code: ${error.code || '-'}\n` +
+	        `Message: ${error.message || '-'}\n` +
+	        `Details: ${error.details || '-'}\n` +
+	        `Hint: ${error.hint || '-'}`
+	    );
+	}
 
 	const result = Array.isArray(data) ? data[0] : data;
 	if (!result || result.success !== true) { throw new Error( result?.message || 'Calculate Payroll gagal diproses.' ); }
