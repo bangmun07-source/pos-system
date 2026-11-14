@@ -47867,6 +47867,24 @@ window.renderPayrollDetailContent = function (payroll, details) {
 
 /* ==== 2. EDIT SALARY ==== */
 
+function getEditPayrollCategoryOptions(selected = '') {
+  const source = document.getElementById('salaryComponentAccountingCategory');
+
+  if (!source) return '<option value="">Select category</option>';
+
+  return Array.from(source.querySelectorAll('optgroup')).map(group => {
+    const options = Array.from(group.querySelectorAll('option')).map(option => `
+      <option value="${option.value}"
+        ${option.value === String(selected).toUpperCase() ? 'selected' : ''}>
+        ${option.textContent.trim()}
+      </option>
+    `).join('');
+
+    return `<optgroup label="${group.label}">${options}</optgroup>`;
+  }).join('');
+}
+
+			
 window.editPayrollSalary = async function (payrollId) {
 	const row = window.getPayrollRow(payrollId);
 	if (!row) { alert('Data payroll tidak ditemukan.'); return; }
@@ -47894,13 +47912,13 @@ window.editPayrollSalary = async function (payrollId) {
 
 		if (earningsBody) {
 			earningsBody.innerHTML = `
-				<tr><td colspan="3" class="px-4 py-6 text-center text-muted">
+				<tr><td colspan="4" class="px-4 py-6 text-center text-muted">
 					Memuat komponen gaji...
 				</td></tr>`;
 		}
 		if (deductionsBody) {
 			deductionsBody.innerHTML = `
-				<tr><td colspan="3" class="px-4 py-6 text-center text-muted">
+				<tr><td colspan="4" class="px-4 py-6 text-center text-muted">
 					Memuat potongan...
 				</td></tr>`;
 		}
@@ -47985,7 +48003,7 @@ window.editPayrollSalary = async function (payrollId) {
 			if (!filtered.length) {
 				target.innerHTML = `
 					<tr>
-						<td colspan="3" class="px-4 py-6 text-center text-muted">
+						<td colspan="4" class="px-4 py-6 text-center text-muted">
 							${emptyMessage}
 						</td>
 					</tr>`;
@@ -47998,36 +48016,46 @@ window.editPayrollSalary = async function (payrollId) {
 				const calculationType = escapeHtml(detail.Calculation_Type || '-');
 
 				return `
-					<tr class="border-b border-outline-variant last:border-b-0">
-						<td class="px-4 py-3 text-sm text-foreground">
-							${name}
-						</td>
-						<td class="px-4 py-3 text-sm text-muted">
-							${calculationType}
-						</td>
-						<td class="px-4 py-3 text-right">
-							<div class="flex items-center justify-end gap-2">
-								<input
-									type="number"
-									min="0"
-									step="0.01"
-									inputmode="decimal"
-									data-payroll-detail-id="${id}"
-									value="${Number(detail.Amount) || 0}"
-									aria-label="Nominal ${name}"
-									class="edit-payroll-component-amount w-full min-w-28 max-w-44 rounded-md border border-outline-variant bg-background px-3 py-2 text-right text-sm text-foreground"
-								/>
+				  <tr class="border-b border-outline-variant last:border-b-0">
+				    <td class="px-4 py-3 text-sm text-foreground">
+				      ${name}
+				    </td>
 				
-								<button
-									type="button"
-									onclick="markEditPayrollComponentDeleted('${id}')"
-									class="px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
-									title="Hapus komponen">
-									<span class="material-symbols-outlined text-base">delete</span>
-								</button>
-							</div>
-						</td>
-					</tr>`;
+				    <td class="px-4 py-3 text-sm text-muted">
+				      ${calculationType}
+				    </td>
+				
+				    <td class="px-4 py-3">
+				      <select
+				        class="edit-payroll-component-category w-full min-w-40 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
+				        data-payroll-detail-id="${id}">
+				        ${getEditPayrollCategoryOptions(detail.Accounting_Category)}
+				      </select>
+				    </td>
+				
+				    <td class="px-4 py-3 text-right">
+				      <div class="flex items-center justify-end gap-2">
+				        <input
+				          type="number"
+				          min="0"
+				          step="0.01"
+				          inputmode="decimal"
+				          data-payroll-detail-id="${id}"
+				          value="${Number(detail.Amount) || 0}"
+				          aria-label="Nominal ${name}"
+				          class="edit-payroll-component-amount w-full min-w-28 max-w-44 rounded-md border border-outline-variant bg-background px-3 py-2 text-right text-sm text-foreground"
+				        />
+				
+				        <button
+				          type="button"
+				          onclick="markEditPayrollComponentDeleted('${id}')"
+				          class="px-2 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+				          title="Hapus komponen">
+				          <span class="material-symbols-outlined text-base">delete</span>
+				        </button>
+				      </div>
+				    </td>
+				  </tr>`;
 			}).join('');
 		};
 		renderRows('EARNING', 'Belum ada komponen pendapatan.');
@@ -48071,36 +48099,44 @@ window.addEditPayrollComponent = function (type) {
   row.dataset.newComponent = 'true';
   row.dataset.componentType = componentType;
   row.innerHTML = `
-    <td class="px-4 py-3">
-      <input type="text"
-        class="edit-payroll-new-name w-full min-w-32 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
-        placeholder="${componentType === 'EARNING' ? 'Allowance name' : 'Deduction name'}"
-        maxlength="100"
-        required >
-      <span class="block text-xs text-muted mt-1">
-        One-time payroll adjustment
-      </span>
-    </td>
-
-    <td class="px-4 py-3 text-sm text-muted">
-      ${componentType === 'EARNING' ? 'Additional Earning' : 'Additional Deduction'}
-    </td>
-
-    <td class="px-4 py-3">
-      <input type="number"
-        class="edit-payroll-new-amount w-full min-w-28 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground text-right"
-        min="0"
-        step="1"
-        value="0"
-        required >
-				
-      <button type="button"
-        class="mt-2 text-xs text-red-500 hover:underline"
-        data-remove-new-component >
-        Remove
-      </button>
-    </td>
-  `;
+	  <td class="px-4 py-3">
+	    <input type="text"
+	      class="edit-payroll-new-name w-full min-w-32 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
+	      placeholder="${componentType === 'EARNING' ? 'Allowance name' : 'Deduction name'}"
+	      maxlength="100"
+	      required>
+	    <span class="block text-xs text-muted mt-1">
+	      One-time payroll adjustment
+	    </span>
+	  </td>
+	
+	  <td class="px-4 py-3 text-sm text-muted">
+	    ${componentType === 'EARNING' ? 'Additional Earning' : 'Additional Deduction'}
+	  </td>
+	
+	  <td class="px-4 py-3">
+	    <select
+	      class="edit-payroll-new-category w-full min-w-40 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground"
+	      required>
+	      ${getEditPayrollCategoryOptions()}
+	    </select>
+	  </td>
+	
+	  <td class="px-4 py-3">
+	    <input type="number"
+	      class="edit-payroll-new-amount w-full min-w-28 h-10 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground text-right"
+	      min="0"
+	      step="1"
+	      value="0"
+	      required>
+	
+	    <button type="button"
+	      class="mt-2 text-xs text-red-500 hover:underline"
+	      data-remove-new-component>
+	      Remove
+	    </button>
+	  </td>
+	`;
   tbody.appendChild(row);
   // Hitung ulang ketika nominal berubah.
   const amountInput = row.querySelector('.edit-payroll-new-amount');
@@ -48136,7 +48172,6 @@ window.markEditPayrollComponentDeleted = function (detailId) {
   detail._deleted = true;
 
   const input = document.querySelector( `#editPayrollSalaryModal [data-payroll-detail-id="${CSS.escape(String(detailId))}"]` );
-
   const row = input?.closest('tr');
   if (row) row.remove();
   window.recalculateEditPayrollSalary();
@@ -48146,58 +48181,57 @@ window.markEditPayrollComponentDeleted = function (detailId) {
 window.recalculateEditPayrollSalary = function () {
   const active = window.activeEditPayroll;
   if (!active) return;
-	
-	const money = value =>
-	  new Intl.NumberFormat('id-ID', {
-	    style: 'currency',
-	    currency: 'IDR',
-	    minimumFractionDigits: 0,
-	    maximumFractionDigits: 0
-	  })
-	    .format(Math.round(Number(value) || 0))
-	    .replace(/\s/g, '');
+
+  const money = value =>
+    new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    })
+      .format(Math.round(Number(value) || 0))
+      .replace(/\s/g, '');
 
   // Perbarui nominal komponen yang sudah tersimpan.
-  document.querySelectorAll(
-    '#editPayrollSalaryModal .edit-payroll-component-amount'
-  ).forEach(input => {
+  document.querySelectorAll( '#editPayrollSalaryModal .edit-payroll-component-amount' ).forEach(input => {
+    const detail = active.details.find(item => String(item.Payroll_Detail_ID) === String(input.dataset.payrollDetailId));
+    if (detail) { detail.Amount = input.value === ''
+			? 0
+			: Math.max(0, Number(input.value) || 0); }
+  });
+
+  // Perbarui Accounting Category komponen yang sudah tersimpan.
+  document.querySelectorAll( '#editPayrollSalaryModal .edit-payroll-component-category' ).forEach(select => {
     const detail = active.details.find(item =>
       String(item.Payroll_Detail_ID) ===
-      String(input.dataset.payrollDetailId)
+      String(select.dataset.payrollDetailId)
     );
-    if (detail) {  detail.Amount = input.value === ''
-			? 0
-			: Math.max(0, Number(input.value) || 0);
-    }
+    if (detail) { detail.Accounting_Category = select.value; }
   });
 
   // Ambil komponen tambahan yang belum disimpan ke database.
   const newComponents = [];
-  document.querySelectorAll(
-    '#editPayrollSalaryModal tr[data-new-component="true"]'
-  ).forEach(row => {
+
+  document.querySelectorAll( '#editPayrollSalaryModal tr[data-new-component="true"]' ).forEach(row => {
     const nameInput = row.querySelector('.edit-payroll-new-name');
     const amountInput = row.querySelector('.edit-payroll-new-amount');
-
+    const categorySelect = row.querySelector('.edit-payroll-new-category');
     newComponents.push({
       Component_Name: String(nameInput?.value || '').trim(),
       Component_Type: String(row.dataset.componentType || '').toUpperCase(),
+      Accounting_Category: categorySelect?.value || '',
       Amount: amountInput?.value === ''
         ? 0
         : Math.max(0, Number(amountInput?.value) || 0)
     });
   });
 
-	const earnings = active.details.filter(detail => !detail._deleted && String(detail.Component_Type || '').toUpperCase() === 'EARNING' );
-	const deductions = active.details.filter(detail => !detail._deleted && String(detail.Component_Type || '').toUpperCase() === 'DEDUCTION' );
+  const earnings = active.details.filter(detail => !detail._deleted && String(detail.Component_Type || '').toUpperCase() === 'EARNING' );
+  const deductions = active.details.filter(detail => !detail._deleted && String(detail.Component_Type || '').toUpperCase() === 'DEDUCTION' );
   const newEarnings = newComponents.filter(item => item.Component_Type === 'EARNING' );
   const newDeductions = newComponents.filter(item => item.Component_Type === 'DEDUCTION' );
-  const grossSalary =
-    earnings.reduce((sum, item) => sum + Number(item.Amount || 0), 0) +
-    newEarnings.reduce((sum, item) => sum + item.Amount, 0);
-  const totalDeductions =
-    deductions.reduce((sum, item) => sum + Number(item.Amount || 0), 0) +
-    newDeductions.reduce((sum, item) => sum + item.Amount, 0);
+  const grossSalary = earnings.reduce((sum, item) => sum + Number(item.Amount || 0), 0) + newEarnings.reduce((sum, item) => sum + item.Amount, 0);
+  const totalDeductions = deductions.reduce((sum, item) => sum + Number(item.Amount || 0), 0) + newDeductions.reduce((sum, item) => sum + item.Amount, 0);
   const netSalary = grossSalary - totalDeductions;
   const setText = (id, value) => {
     const element = document.getElementById(id);
@@ -48213,8 +48247,10 @@ window.recalculateEditPayrollSalary = function () {
     Total_Deduction: totalDeductions,
     Net_Salary: netSalary
   };
+
   active.newComponents = newComponents;
 };
+
 
 /* ==== EDIT SALARY - SAVE CHANGES ==== */
 window.saveEditPayrollSalary = async function () {
@@ -48230,43 +48266,42 @@ window.saveEditPayrollSalary = async function () {
   // Pastikan ringkasan dan nilai input terbaru sudah terbaca.
   window.recalculateEditPayrollSalary();
 
-  const newComponents = Array.from(
-    document.querySelectorAll(
-      '#editPayrollSalaryModal tr[data-new-component="true"]'
-    )
-  ).map(row => {
-    const name = String( row.querySelector('.edit-payroll-new-name')?.value || '' ).trim();
-    const amountInput = row.querySelector('.edit-payroll-new-amount');
-    const amount = Number(amountInput?.value);
-
-    return {
-      Component_Name: name,
-      Component_Type: String(row.dataset.componentType || '').toUpperCase(),
-      Amount: amount
-    };
-  });
-
-  // Validasi komponen baru.
-  for (const component of newComponents) {
-    if (!component.Component_Name) { alert('Nama komponen tambahan wajib diisi.'); return; }
-    if ( !['EARNING', 'DEDUCTION'].includes(component.Component_Type) ||
-      !Number.isFinite(component.Amount) ||
-      component.Amount < 0
-    ) { alert('Periksa kembali jenis dan nominal komponen tambahan.'); return; }
-  }
-
+  const newComponents = Array.from( document.querySelectorAll( '#editPayrollSalaryModal tr[data-new-component="true"]' )
+	).map(row => {
+	  const name = String(row.querySelector('.edit-payroll-new-name')?.value || '').trim();
+	  const amountInput = row.querySelector('.edit-payroll-new-amount');
+	  const amount = Number(amountInput?.value);
+	  const category = row.querySelector('.edit-payroll-new-category')?.value || '';
+	
+	  return {
+	    Component_Name: name,
+	    Component_Type: String(row.dataset.componentType || '').toUpperCase(),
+	    Accounting_Category: category,
+	    Amount: amount
+	  };
+	});
+	
+	// Validasi komponen baru.
+	for (const component of newComponents) {
+	  if (!component.Component_Name) { alert('Nama komponen tambahan wajib diisi.'); return; }
+	  if (!component.Accounting_Category) { alert('Accounting Category wajib dipilih.'); return; }
+	  if (!['EARNING', 'DEDUCTION'].includes(component.Component_Type) || !Number.isFinite(component.Amount) || component.Amount < 0
+	  ) { alert('Periksa kembali jenis dan nominal komponen tambahan.'); return; }
+	}
+	
 	const details = active.details
 	  .filter(detail => !detail._deleted)
 	  .map(detail => ({
 	    Payroll_Detail_ID: detail.Payroll_Detail_ID,
-	    Amount: Number(detail.Amount)
+	    Amount: Number(detail.Amount),
+	    Accounting_Category: detail.Accounting_Category
 	  }));
 	const deletedDetails = active.details
 	  .filter(detail => detail._deleted)
 	  .map(detail => detail.Payroll_Detail_ID);
-
-  if (details.some(item =>
-    !Number.isFinite(item.Amount) || item.Amount < 0
+	
+	if (details.some(item => !item.Accounting_Category)) { alert('Accounting Category pada komponen payroll wajib dipilih.'); return; }
+  if (details.some(item => !Number.isFinite(item.Amount) || item.Amount < 0
   )) { alert('Periksa kembali nominal komponen payroll.'); return; }
   if (active.summary.Net_Salary < 0) { alert('Total potongan tidak boleh melebihi gross salary.'); return; }
 
