@@ -21289,24 +21289,18 @@
 				<section>
 				  <div class="pb-3 border-b border-outline-variant mb-4">
 				    <h3 class="text-sm font-semibold text-foreground">
-				      MUNO Income Details
+				      Income Details
 				    </h3>
 				    <p class="text-xs text-muted mt-1">
-				      Taxable income and deductible expenses from MUNO
+				      Ringkasan penghasilan bruto kena pajak dari penggajian
 				    </p>
 				  </div>
 				
-				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+				  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 				    <div>
-				      <label class="block text-xs text-muted mb-2">Gross Salary Taxable</label>
-				      <div id="employeeTaxDetailGrossSalaryTaxable"
-				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
-				        Rp0
-				      </div>
-				    </div>
-				
-				    <div>
-				      <label class="block text-xs text-muted mb-2">Gross Taxable Income</label>
+				      <label class="block text-xs text-muted mb-2">
+				        Current Period Gross Taxable Income
+				      </label>
 				      <div id="employeeTaxDetailMunoGrossIncome"
 				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 				        Rp0
@@ -21314,16 +21308,10 @@
 				    </div>
 				
 				    <div>
-				      <label class="block text-xs text-muted mb-2">Annual Gross Taxable Income</label>
+				      <label class="block text-xs text-muted mb-2">
+				        Annual Gross Taxable Income
+				      </label>
 				      <div id="employeeTaxDetailAnnualGrossIncome"
-				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
-				        Rp0
-				      </div>
-				    </div>
-				
-				    <div>
-				      <label class="block text-xs text-muted mb-2">Annual Position Expense</label>
-				      <div id="employeeTaxDetailAnnualPositionExpense"
 				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 				        Rp0
 				      </div>
@@ -21333,15 +21321,23 @@
 				<!-- ADDITIONAL TAXABLE COMPONENTS -->
 				<section>
 				  <div class="pb-3 border-b border-outline-variant mb-4">
-				    <h3 class="text-sm font-semibold text-foreground">
-				      Additional Tax Components
-				    </h3>
-				    <p class="text-xs text-muted mt-1">
-				      Employer and employee contributions, taxable benefits, and other tax components
-				    </p>
+						<h3 class="text-sm font-semibold text-foreground">
+						  Gross Income Components
+						</h3>
+						<p class="text-xs text-muted mt-1">
+						  Rincian komponen gaji, iuran perusahaan, dan tunjangan lain yang dikenakan pajak
+						</p>
 				  </div>
 				
 				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+		    		<div>
+				      <label class="block text-xs text-muted mb-2">Gross Salary Taxable</label>
+				      <div id="employeeTaxDetailGrossSalaryTaxable"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+						
 				    <div>
 				      <label class="block text-xs text-muted mb-2">Employer Contribution</label>
 				      <div id="employeeTaxDetailEmployerContribution"
@@ -21349,10 +21345,10 @@
 				        Rp0
 				      </div>
 				    </div>
-				
-				    <div>
-				      <label class="block text-xs text-muted mb-2">Employee Contribution</label>
-				      <div id="employeeTaxDetailEmployeeContribution"
+ 
+						<div>
+				      <label class="block text-xs text-muted mb-2">Tax Allowance</label>
+				      <div id="employeeTaxDetailAllowance"
 				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 				        Rp0
 				      </div>
@@ -21381,10 +21377,37 @@
 				        Rp0
 				      </div>
 				    </div>
+				  </div>
+				</section>
+				<!-- INCOME DEDUCTION COMPONENTS -->
+				<section>
+				  <div class="pb-3 border-b border-outline-variant mb-4">
+						<h3 class="text-sm font-semibold text-foreground">
+						 	Income Deduction Components
+						</h3>
+						<p class="text-xs text-muted mt-1">
+						  pengeluaran yang dapat dikurangkan dan iuran karyawan yang digunakan dalam perhitungan PPh 21.
+						</p>
+				  </div>
 				
-				    <div>
+				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+		    		<div>
 				      <label class="block text-xs text-muted mb-2">Mandatory Religious Donation</label>
 				      <div id="employeeTaxDetailMandatoryReligiousDonation"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+						<div>
+				      <label class="block text-xs text-muted mb-2">Annual Position Expense</label>
+				      <div id="employeeTaxDetailAnnualPositionExpense"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Employee Contribution</label>
+				      <div id="employeeTaxDetailEmployeeContribution"
 				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 				        Rp0
 				      </div>
@@ -21398,7 +21421,7 @@
 				      PTKP Information
 				    </h3>
 				    <p class="text-xs text-muted mt-1">
-				      Employee tax status and annual non-taxable income threshold
+				      Status PTKP karyawan dan batas penghasilan tidak kena pajak tahunan
 				    </p>
 				  </div>
 				
@@ -21441,7 +21464,7 @@
 				      Previous Employer Details
 				    </h3>
 				    <p class="text-xs text-muted mt-1">
-				      Income and PPh 21 tax credit from the previous employer
+				      Informasi penghasilan dan kredit pajak PPh 21 dari pemberi kerja sebelumnya
 				    </p>
 				  </div>
 				
@@ -21470,7 +21493,7 @@
 				      Annual Tax Reconciliation
 				    </h3>
 				    <p class="text-xs text-muted mt-1">
-				      Combined annual tax calculation from MUNO and previous employer
+				      Rekonsiliasi perhitungan pajak penghasilan tahunan karyawan
 				    </p>
 				  </div>
 				
@@ -21529,7 +21552,7 @@
 	            Tax Summary
 	          </h3>
 	          <p class="text-xs text-muted mt-1">
-	            Gross taxable income, tax allowance, deduction, and tax amount
+	            Ringkasan penghasilan bruto kena pajak, pengurang pajak, dan jumlah pajak terutang
 	          </p>
 	        </div>
 	
@@ -21537,12 +21560,6 @@
 	          <div class="border border-outline-variant rounded-md p-4">
 	            <p class="text-xs text-muted">Gross Taxable Income</p>
 	            <p id="employeeTaxDetailGrossIncome"
-	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
-	          </div>
-	
-	          <div class="border border-outline-variant rounded-md p-4">
-	            <p class="text-xs text-muted">Tax Allowance</p>
-	            <p id="employeeTaxDetailAllowance"
 	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
 	          </div>
 	
