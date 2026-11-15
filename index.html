@@ -20139,7 +20139,7 @@
 					        <th class="px-5 py-3 text-left whitespace-nowrap">Employee</th>
 					        <th class="px-5 py-3 text-left whitespace-nowrap">Outlet</th>
 					        <th class="px-5 py-3 text-right whitespace-nowrap">Gross Salary</th>
-					        <th class="px-5 py-3 text-right whitespace-nowrap">Employer Health</th>
+					        <th class="px-5 py-3 text-right whitespace-nowrap">Employer Contribution</th>
 					        <th class="px-5 py-3 text-right whitespace-nowrap">Gross Taxable</th>
 					        <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
 					        <th class="px-5 py-3 text-right whitespace-nowrap">Paid Amount</th>
@@ -21261,6 +21261,18 @@
 	          </div>
 	
 	          <div>
+	            <label class="block text-xs text-muted mb-2">Created At</label>
+	            <div id="employeeTaxDetailCreatedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+	          </div>
+
+						<div>
+						  <label class="block text-xs text-muted mb-2">Updated At</label>
+						  <div id="employeeTaxDetailUpdatedAt"
+						    class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
+						</div>
+
+						<div>
 	            <label class="block text-xs text-muted mb-2">Tax Record ID</label>
 	            <div id="employeeTaxDetailRecordId"
 	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
@@ -21271,15 +21283,9 @@
 	            <div id="employeeTaxDetailPayrollId"
 	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-all">-</div>
 	          </div>
-	
-	          <div>
-	            <label class="block text-xs text-muted mb-2">Created At</label>
-	            <div id="employeeTaxDetailCreatedAt"
-	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
-	          </div>
 	        </div>
 	      </section>
-				<!-- MUNO INCOME DETAILS -->
+				<!-- INCOME DETAILS -->
 				<section>
 				  <div class="pb-3 border-b border-outline-variant mb-4">
 				    <h3 class="text-sm font-semibold text-foreground">
@@ -21326,6 +21332,67 @@
 				    <div>
 				      <label class="block text-xs text-muted mb-2">Annual Position Expense</label>
 				      <div id="employeeTaxDetailAnnualPositionExpense"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				  </div>
+				</section>
+				<!-- ADDITIONAL TAXABLE COMPONENTS -->
+				<section>
+				  <div class="pb-3 border-b border-outline-variant mb-4">
+				    <h3 class="text-sm font-semibold text-foreground">
+				      Additional Tax Components
+				    </h3>
+				    <p class="text-xs text-muted mt-1">
+				      Employer and employee contributions, taxable benefits, and other tax components
+				    </p>
+				  </div>
+				
+				  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Employer Contribution</label>
+				      <div id="employeeTaxDetailEmployerContribution"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Employee Contribution</label>
+				      <div id="employeeTaxDetailEmployeeContribution"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Taxable Natura</label>
+				      <div id="employeeTaxDetailTaxableNatura"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Taxable Bonus / THR</label>
+				      <div id="employeeTaxDetailTaxableBonusTHR"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Honorarium / Incentive</label>
+				      <div id="employeeTaxDetailHonorariumIncentive"
+				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+				        Rp0
+				      </div>
+				    </div>
+				
+				    <div>
+				      <label class="block text-xs text-muted mb-2">Mandatory Religious Donation</label>
+				      <div id="employeeTaxDetailMandatoryReligiousDonation"
 				        class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
 				        Rp0
 				      </div>
