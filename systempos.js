@@ -32168,7 +32168,7 @@ function renderEmployeeTaxTable(errorMessage = "") {
 					</td>
 					<td class="px-5 py-4"> ${escapeHtml(branchName)} </td>
 					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(Number(row.gross_salary_taxable) || 0)} </td>
-					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(Number(row.employer_health_taxable) || 0)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(Number(row.employer_contribution) || 0)} </td>
 					<td class="px-5 py-4 text-right whitespace-nowrap font-medium"> ${formatAccountingCurrency(Number(row.gross_taxable_income) || 0)} </td>
 					<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatAccountingCurrency(taxAmount)} </td>
 					<td class="px-5 py-4 text-right"> — </td>
@@ -32380,7 +32380,7 @@ function viewEmployeeTaxDetail(taxId) {
 	setText("employeeTaxDetailNote", row.calculation_note || "-");
 	// MUNO INCOME DETAILS
 	setText("employeeTaxDetailGrossSalaryTaxable", formatMoney(row.gross_salary_taxable));
-	setText("employeeTaxDetailEmployerHealthTaxable", formatMoney(row.employer_health_taxable));
+	setText("employeeTaxDetailEmployerHealthTaxable", formatMoney(row.employer_contribution));
 	setText("employeeTaxDetailMunoGrossIncome", formatMoney(row.gross_taxable_income));
 	setText("employeeTaxDetailAnnualGrossIncome", formatMoney(row.annual_gross_taxable_income));
 	setText("employeeTaxDetailAnnualPositionExpense", formatMoney(row.annual_position_expense));
@@ -32641,7 +32641,7 @@ window.exportEmployeeTaxPayable = async function () {
 		    <td>${esc(formatPeriod(row.tax_period))}</td>
 		    <td>${esc(row.tax_type || 'PPh21')}</td>
 		    <td class="number">${esc(money(row.gross_salary_taxable))}</td>
-		    <td class="number">${esc(money(row.employer_health_taxable))}</td>
+		    <td class="number">${esc(money(row.employer_contribution))}</td>
 		    <td class="number">${esc(money(row.gross_taxable_income))}</td>
 		    <td class="number">${esc(money(row.tax_allowance))}</td>
 		    <td class="number">${esc(money(row.tax_deduction))}</td>
