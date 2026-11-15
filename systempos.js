@@ -33308,15 +33308,8 @@ async function loadEmployeeHealthRecords() {
 		status
 	});
 	/* ==== CACHE HIT ==== */
-	if (
-		Object.prototype.hasOwnProperty.call(
-			state.employeeHealthRecordsCache,
-			cacheKey
-		)
-	) {
-		employeeHealthData =
-			state.employeeHealthRecordsCache[cacheKey];
-	
+	if ( Object.prototype.hasOwnProperty.call( state.employeeHealthRecordsCache, cacheKey )
+	) { employeeHealthData = state.employeeHealthRecordsCache[cacheKey];
 		employeeHealthCurrentPage = 1;
 		renderEmployeeHealthTable();
 		return;
@@ -33416,16 +33409,14 @@ function renderEmployeeHealthTable(errorMessage = "") {
 			const contributionType = String( row.contribution_type || "" ).trim().toUpperCase();
 
 			let contributionLabel = contributionType || "-";
-
-			if (contributionType === "EMPLOYEE_HEALTH_CONTRIBUTION") {
-				contributionLabel = "Employee Contribution";
-			} else if (
-				contributionType === "EMPLOYER_HEALTH_CONTRIBUTION"
-			) {
-				contributionLabel = "Employer Contribution";
+			if (contributionType === "EMPLOYEE_HEALTH_CONTRIBUTION") { contributionLabel = "Employee Contribution";
+			} else if (contributionType === "EMPLOYEE_HEALTH_CONTRIBUTION_TAX_DEDUCTION") { contributionLabel = "Employee Contribution (Tax Deductible)";
+			} else if (contributionType === "EMPLOYER_HEALTH_CONTRIBUTION") { contributionLabel = "Employer Contribution";
+			} else if (contributionType === "EMPLOYER_TAXABLE_CONTRIBUTION") { contributionLabel = "Employer Contribution (Taxable)";
 			}
+			
 			if (row.note) { contributionLabel += ` · ${row.note}`; }
-
+			
 			const statusClass = {
 				DRAFT: "bg-surface-container-high text-muted",
 				CALCULATED: "bg-blue-600/10 text-blue-700",
@@ -47200,7 +47191,6 @@ window.loadPayroll = async function () {
 		let branchId = branchFilter?.value?.trim() || null;
 		// Owner dapat memilih outlet tertentu atau semua outlet.
 		// Admin dan Cashier dibatasi pada outlet miliknya di UI.
-
 		if (!['OWNER', 'ACCOUNTANT'].includes(role)) {
 		  branchId = String(user?.branchId || '').trim();
 		  if (!branchId) { throw new Error('Outlet pengguna tidak ditemukan.'); }
@@ -47217,11 +47207,7 @@ window.loadPayroll = async function () {
 		});
 		
 		/* ==== CACHE HIT ==== */
-		if (
-		  Object.prototype.hasOwnProperty.call(
-		    state.payrollCache,
-		    cacheKey
-		  )
+		if ( Object.prototype.hasOwnProperty.call( state.payrollCache, cacheKey )
 		) {
 		  window.payrollRows = state.payrollCache[cacheKey];
 		  window.payrollCurrentPage = 1;
@@ -47233,9 +47219,7 @@ window.loadPayroll = async function () {
 			periodInput?.addEventListener('change', () => {
 			  const yearFilter = document.getElementById('payrollYearFilter');
 			
-			  if (periodInput.value && yearFilter) {
-			    yearFilter.value = '';
-			  }
+			  if (periodInput.value && yearFilter) { yearFilter.value = ''; }
 			
 			  window.payrollCurrentPage = 1;
 			  window.loadPayroll();
