@@ -32373,6 +32373,7 @@ function viewEmployeeTaxDetail(taxId) {
 	setText("employeeTaxDetailRecordId", row.tax_record_id || row.tax_id || row.id || "-");
 	setText("employeeTaxDetailPayrollId", row.payroll_id || "-");
 	setText("employeeTaxDetailCreatedAt", formatDateTime(row.created_at));
+	setText("employeeTaxDetailUpdatedAt", formatDateTime(row.updated_at));
 	setText("employeeTaxDetailGrossIncome", formatMoney(row.gross_taxable_income));
 	setText("employeeTaxDetailAllowance", formatMoney(row.tax_allowance));
 	setText("employeeTaxDetailDeduction", formatMoney(row.tax_deduction));
@@ -32380,10 +32381,16 @@ function viewEmployeeTaxDetail(taxId) {
 	setText("employeeTaxDetailNote", row.calculation_note || "-");
 	// MUNO INCOME DETAILS
 	setText("employeeTaxDetailGrossSalaryTaxable", formatMoney(row.gross_salary_taxable));
-	setText("employeeTaxDetailEmployerHealthTaxable", formatMoney(row.employer_contribution));
 	setText("employeeTaxDetailMunoGrossIncome", formatMoney(row.gross_taxable_income));
 	setText("employeeTaxDetailAnnualGrossIncome", formatMoney(row.annual_gross_taxable_income));
 	setText("employeeTaxDetailAnnualPositionExpense", formatMoney(row.annual_position_expense));
+	// ADDITIONAL TAX COMPONENTS
+	setText("employeeTaxDetailEmployerContribution", formatMoney(row.employer_contribution));
+	setText("employeeTaxDetailEmployeeContribution", formatMoney(row.employee_contribution));
+	setText("employeeTaxDetailTaxableNatura", formatMoney(row.taxable_natura));
+	setText("employeeTaxDetailTaxableBonusTHR", formatMoney(row.taxable_bonus_thr));
+	setText("employeeTaxDetailHonorariumIncentive", formatMoney(row.honorarium_incentive));
+	setText("employeeTaxDetailMandatoryReligiousDonation", formatMoney(row.mandatory_religious_donation));
 	
 	// PTKP INFORMATION
 	const taxYear = row.tax_period
