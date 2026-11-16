@@ -32379,11 +32379,18 @@ function viewEmployeeTaxDetail(taxId) {
 	setText("employeeTaxDetailDeduction", formatMoney(row.tax_deduction));
 	setText("employeeTaxDetailTaxAmount", formatMoney(row.tax_amount));
 	setText("employeeTaxDetailNote", row.calculation_note || "-");
-	// MUNO INCOME DETAILS
+	// INCOME DETAILS
+	const taxMonth = Number(String(row.tax_period || "").slice(5, 7));
+	const isDecember = taxMonth === 12;
+	
 	setText("employeeTaxDetailGrossSalaryTaxable", formatMoney(row.gross_salary_taxable));
 	setText("employeeTaxDetailMunoGrossIncome", formatMoney(row.gross_taxable_income));
-	setText("employeeTaxDetailAnnualGrossIncome", formatMoney(row.annual_gross_taxable_income));
-	setText("employeeTaxDetailAnnualPositionExpense", formatMoney(row.annual_position_expense));
+	setText("employeeTaxDetailAnnualGrossIncome", isDecember
+		? formatMoney(row.annual_gross_taxable_income)
+		: "-");
+	setText("employeeTaxDetailAnnualPositionExpense", isDecember
+		? formatMoney(row.annual_position_expense)
+		: "-");
 	// ADDITIONAL TAX COMPONENTS
 	setText("employeeTaxDetailEmployerContribution", formatMoney(row.employer_contribution));
 	setText("employeeTaxDetailEmployeeContribution", formatMoney(row.employee_contribution));
