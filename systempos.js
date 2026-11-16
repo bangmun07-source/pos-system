@@ -42072,7 +42072,7 @@ function renderSalaryComponents(components = []) {
       .join('');
   };
 
-  const activeComponents = employeeSalaryComponents.filter( component => component.Is_Active !== false );
+  const activeComponents = employeeSalaryComponents;
 
   renderList(
     allowanceList,
@@ -42173,6 +42173,7 @@ window.openSalaryComponentModal = function (type) {
   const categoryInput = document.getElementById('salaryComponentAccountingCategory');
   const calculationBase = document.getElementById('salaryComponentCalculationBase');
 	const naturaTreatmentInput = document.getElementById('salaryComponentNaturaTaxTreatment');
+	const taxAllowanceActiveInput = document.getElementById( 'salaryComponentTaxAllowanceActive' );
 
   if (typeInput) typeInput.value = type;
   if (componentIdInput) componentIdInput.value = '';
@@ -42180,7 +42181,13 @@ window.openSalaryComponentModal = function (type) {
   if (amountInput) amountInput.value = '';
   if (categoryInput) categoryInput.value = '';
 	if (naturaTreatmentInput) naturaTreatmentInput.value = '';
-	if (categoryInput) { categoryInput.onchange = updateNaturaTaxTreatmentVisibility; }
+	if (categoryInput) { categoryInput.onchange = function () {
+	    updateNaturaTaxTreatmentVisibility();
+	    updateSalaryComponentTaxAllowanceVisibility();
+	  };
+	}
+	
+	if (taxAllowanceActiveInput) { taxAllowanceActiveInput.checked = true; }
   if (calculationBase) calculationBase.value = 'BASIC_SALARY';
   if (calculationInput) {
     calculationInput.value = 'FIXED';
@@ -42190,6 +42197,7 @@ window.openSalaryComponentModal = function (type) {
 	updateNaturaTaxTreatmentVisibility();
   updateSalaryComponentAmountUnit();
   updateSalaryComponentCalculationBase();
+	updateSalaryComponentTaxAllowanceVisibility();
 
 	if (title) {
 		title.textContent = {
@@ -42225,6 +42233,7 @@ window.closeSalaryComponentModal = function () {
 	if (naturaTreatmentInput) naturaTreatmentInput.value = '';
 	
 	updateNaturaTaxTreatmentVisibility();
+	updateSalaryComponentTaxAllowanceVisibility();
 };
 
 
@@ -42238,29 +42247,33 @@ window.saveSalaryComponent = function () {
   const accountingCategory = document.getElementById('salaryComponentAccountingCategory')?.value;
 	const naturaTaxTreatment = document.getElementById( 'salaryComponentNaturaTaxTreatment' )?.value || null;
   const calculationBase = document.getElementById('salaryComponentCalculationBase')?.value || 'BASIC_SALARY';
+	const isTaxAllowance = accountingCategory === 'TAX_ALLOWANCE';
+	const taxAllowanceActive = document.getElementById('salaryComponentTaxAllowanceActive')?.checked ?? true;
 
   if (!['ALLOWANCE', 'DEDUCTION', 'EMPLOYER_CONTRIBUTION'].includes(type)) { alert('Component type tidak valid.'); return; }
   if (!name) { alert('Component Name wajib diisi.'); return; }
   if (!accountingCategory) { alert('Accounting Category wajib dipilih.'); return; }
 	if (accountingCategory === 'TAXABLE_NATURA' && !['TAXABLE', 'EXEMPT'].includes(naturaTaxTreatment)) { alert('Tax Treatment untuk Natura wajib dipilih.'); return; }
-  if (!Number.isFinite(amount) || amount < 0) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
-  if (calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
+  if (!isTaxAllowance && (!Number.isFinite(amount) || amount < 0)) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
+  if (!isTaxAllowance && calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
   if (type === 'EMPLOYER_CONTRIBUTION' && ![ 'EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION' ].includes(accountingCategory)) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
   if ( type === 'ALLOWANCE' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
   if ( type === 'DEDUCTION' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
+	if (isTaxAllowance && type !== 'ALLOWANCE') { alert('Tax Allowance hanya dapat digunakan pada komponen Allowance.'); return; }
 
 	const componentData = {
 	  Component_Type: type,
 	  Component_Name: name,
-	  Amount: amount,
-	  Calculation_Type: calculationType,
+		Amount: isTaxAllowance ? 0 : amount,
+		Calculation_Type: isTaxAllowance ? 'FIXED' : calculationType,
 	  Accounting_Category: accountingCategory,
-	  Calculation_Base: calculationType === 'PERCENTAGE' ? calculationBase : null,
-	  Natura_Tax_Treatment:
-	    accountingCategory === 'TAXABLE_NATURA'
-	      ? naturaTaxTreatment
-	      : null,
-	  Is_Active: true
+	 	Calculation_Base: !isTaxAllowance && calculationType === 'PERCENTAGE'
+			? calculationBase
+			: null,
+	  Natura_Tax_Treatment: accountingCategory === 'TAXABLE_NATURA'
+			? naturaTaxTreatment
+			: null,
+	  Is_Active: isTaxAllowance ? taxAllowanceActive : true
 	};
 
   if (componentId) {
@@ -42314,6 +42327,7 @@ window.editSalaryComponent = function (componentId) {
   const categoryInput = document.getElementById('salaryComponentAccountingCategory');
   const calculationBase = document.getElementById('salaryComponentCalculationBase');
 	const naturaTreatmentInput = document.getElementById('salaryComponentNaturaTaxTreatment');
+	const taxAllowanceActiveInput = document.getElementById( 'salaryComponentTaxAllowanceActive' );
 	
 	if (title) {
 	  title.textContent = {
@@ -42328,7 +42342,12 @@ window.editSalaryComponent = function (componentId) {
   if (amountInput) amountInput.value = component.Amount ?? 0;
   if (categoryInput) { categoryInput.value = component.Accounting_Category || ''; }
 	if (naturaTreatmentInput) { naturaTreatmentInput.value = component.Natura_Tax_Treatment || ''; }
-	if (categoryInput) { categoryInput.onchange = updateNaturaTaxTreatmentVisibility; }
+	if (categoryInput) { categoryInput.onchange = function () {
+	    updateNaturaTaxTreatmentVisibility();
+	    updateSalaryComponentTaxAllowanceVisibility();
+	  };
+	}
+	if (taxAllowanceActiveInput) { taxAllowanceActiveInput.checked = component.Is_Active !== false; }
   if (calculationInput) {
     calculationInput.value = component.Calculation_Type || 'FIXED';
     calculationInput.onchange = updateSalaryComponentAmountUnit;
@@ -42337,6 +42356,7 @@ window.editSalaryComponent = function (componentId) {
 
   updateSalaryComponentAmountUnit();
 	updateNaturaTaxTreatmentVisibility();
+	updateSalaryComponentTaxAllowanceVisibility();
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 
@@ -42460,6 +42480,29 @@ function updateSalaryComponentAmountUnit() {
   }
   updateSalaryComponentCalculationBase();
 }
+
+
+function updateSalaryComponentTaxAllowanceVisibility() {
+  const category = document.getElementById( 'salaryComponentAccountingCategory' )?.value;
+  const isTaxAllowance = category === 'TAX_ALLOWANCE';
+  const taxWrapper = document.getElementById( 'salaryComponentTaxAllowanceWrapper' );
+  const amountWrapper = document.getElementById( 'salaryComponentAmountWrapper' );
+  const calculationWrapper = document.getElementById( 'salaryComponentCalculationTypeWrapper' );
+  const calculationBaseWrapper = document.getElementById( 'salaryComponentCalculationBaseWrapper' );
+  const amountInput = document.getElementById( 'salaryComponentAmount' );
+  const calculationInput = document.getElementById( 'salaryComponentCalculationType' );
+
+  if (taxWrapper) { taxWrapper.classList.toggle('hidden', !isTaxAllowance); }
+  if (amountWrapper) { amountWrapper.classList.toggle('hidden', isTaxAllowance); }
+  if (calculationWrapper) { calculationWrapper.classList.toggle('hidden', isTaxAllowance); }
+  if (calculationBaseWrapper) { calculationBaseWrapper.classList.toggle( 'hidden', isTaxAllowance || calculationInput?.value !== 'PERCENTAGE' ); }
+
+  if (isTaxAllowance) {
+    if (amountInput) amountInput.value = '0';
+    if (calculationInput) calculationInput.value = 'FIXED';
+  }
+}
+
 
 /* =========================================================
    									EMPLOYEE SCHEDULE
