@@ -27351,7 +27351,7 @@ function renderJournalEntryRow(journal) {
 			<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
 			<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
 			<td class="px-5 py-4 text-right">
-				<div class="relative inline-block">
+				<div class="relative inline-block overflow-visible">
 					<button type="button"
 						onclick="toggleJournalEntryActionMenu('${escapeHtml(journal.journalId)}')"
 						class="text-muted hover:text-foreground">
@@ -27361,7 +27361,7 @@ function renderJournalEntryRow(journal) {
 					</button>
 			
 					<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
-						class="hidden absolute right-0 bottom-full mb-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-[9999]">
+						class="hidden absolute right-0 bottom-full mb-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-[99999]">
 						<button type="button"
 							onclick="closeJournalEntryActionMenus(); openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
 							class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
@@ -27372,15 +27372,15 @@ function renderJournalEntryRow(journal) {
 							journal.status === "DRAFT"
 								? `
 									<button type="button"
-										onclick="closeJournalEntryActionMenus(); onclick="editManualJournalEntry('${escapeHtml(journal.journalId)}')"
+										onclick="closeJournalEntryActionMenus(); editManualJournalEntry('${escapeHtml(journal.journalId)}')"
 										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
-										Edit
+											Edit
 									</button>
 			
 									<button type="button"
-										onclick="closeJournalEntryActionMenus(); onclick="postManualJournalEntry('${escapeHtml(journal.journalId)}')"
+										onclick="closeJournalEntryActionMenus(); postManualJournalEntry('${escapeHtml(journal.journalId)}')"
 										class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant text-emerald-700">
-										POSTED
+											POSTED
 									</button>
 								`
 							: ""
