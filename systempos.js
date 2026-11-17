@@ -27255,6 +27255,7 @@ async function loadJournalEntries() {
   try {
     if (journalEntriesLoaded) {
       journalEntriesCurrentPage = 1;
+			populateJournalSourceFilter(journalEntriesData);
       renderJournalEntries(journalEntriesData);
       updateJournalEntriesSummary(journalEntriesData);
       return; }
@@ -27274,15 +27275,56 @@ async function loadJournalEntries() {
     if (error) { return; }
 
     const entries = Array.isArray(data) ? data : [];
-    journalEntriesData = entries;
-    window.journalEntries = entries;
-    journalEntriesLoaded = true;
+		journalEntriesData = entries;
+		window.journalEntries = entries;
+		journalEntriesLoaded = true;
     journalEntriesCurrentPage = 1;
+		populateJournalSourceFilter(entries);
     renderJournalEntries(entries);
     updateJournalEntriesSummary(entries);
 
   } catch (err) { return; }
 }
+
+
+function populateJournalSourceFilter(entries) {
+	const select = document.getElementById("journalSourceFilter");
+	if (!select) return;
+
+	const selectedSource = select.value;
+
+	const sources = [
+			...new Set(
+					entries
+							.map(journal => String(journal.source || "").trim())
+							.filter(Boolean)
+			)
+	].sort();
+
+	select.innerHTML = "";
+
+	const allOption = document.createElement("option");
+	allOption.value = "";
+	allOption.textContent = "All Sources";
+	select.appendChild(allOption);
+
+	sources.forEach(source => {
+			const option = document.createElement("option");
+			option.value = source;
+
+			option.textContent = source
+					.replace(/_/g, " ")
+					.toLowerCase()
+					.replace(/\b\w/g, char => char.toUpperCase());
+
+			select.appendChild(option);
+	});
+
+	select.value = sources.includes(selectedSource)
+			? selectedSource
+			: "";
+}
+
 
 function renderJournalEntries(entries) {
 	const tbody = document.getElementById( "journalEntriesTableBody" );
@@ -27343,14 +27385,14 @@ function renderJournalEntryRow(journal) {
 	
 	return `
 		<tr class="border-b border-outline-variant hover:bg-outline-variant">
-			<td class="px-5 py-4 font-medium whitespace-nowrap"> ${escapeHtml( journal.journalNo || "-" )} </td>
-			<td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatJournalDate( journal.journalDate )} </td>
-			<td class="px-5 py-4"> ${escapeHtml( sourceLabel )} </td>
-			<td class="px-5 py-4"> ${escapeHtml( journal.description || "-" )} </td>
-			<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalDebit )} </td>
-			<td class="px-5 py-4 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
-			<td class="px-5 py-4 uppercase tracking-widest font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
-			<td class="px-5 py-4 text-right">
+			<td class="px-5 py-3 font-medium whitespace-nowrap"> ${escapeHtml( journal.journalNo || "-" )} </td>
+			<td class="px-5 py-3 text-muted whitespace-nowrap"> ${formatJournalDate( journal.journalDate )} </td>
+			<td class="px-5 py-3"> ${escapeHtml( sourceLabel )} </td>
+			<td class="px-5 py-3"> ${escapeHtml( journal.description || "-" )} </td>
+			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalDebit )} </td>
+			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
+			<td class="px-5 py-3 uppercase tracking-widest font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
+			<td class="px-5 py-3 text-right">
 				<div class="relative inline-block overflow-visible">
 					<button type="button"
 						onclick="toggleJournalEntryActionMenu('${escapeHtml(journal.journalId)}')"
