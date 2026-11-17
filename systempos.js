@@ -27359,17 +27359,10 @@ function renderJournalEntries(entries) {
 }
 
 function renderJournalEntryRow(journal) {
-	const sourceLabel = {
-		SALES: "Sales",
-		PURCHASE: "Purchasing",
-		PAYMENT: "Payment",
-		EXPENSE: "Expense",
-		INVENTORY: "Inventory",
-		EQUITY: "Equity",
-		MANUAL: "Manual"
-	}[
-	    journal.source
-	] || journal.source || "-";
+const sourceLabel = String(journal.source || "-")
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/\b\w/g, char => char.toUpperCase());
 	
 	const statusLabel = {
 		POSTED: "Posted",
@@ -27509,6 +27502,50 @@ async function postManualJournalEntry(journalId) {
 	}
 }
 
+function populateNewJournalSources(selectedSource = "") {
+	const sourceEl = document.getElementById("newJournalSource");
+	if (!sourceEl) return;
+
+	const sources = [
+		...new Set(
+			(journalEntriesData || [])
+				.map(journal => String(journal.source || "").trim())
+				.filter(Boolean)
+		)
+	].sort();
+
+	sourceEl.innerHTML = `
+		<option value="">Select Source</option>
+		${sources.map(source => {
+			const label = source
+				.replace(/_/g, " ")
+				.toLowerCase()
+				.replace(/\b\w/g, char => char.toUpperCase());
+
+			return `
+				<option value="${escapeHtml(source)}">
+					${escapeHtml(label)}
+				</option>
+			`;
+		}).join("")}
+	`;
+
+	sourceEl.value = selectedSource;
+
+	// Jika source belum ada di daftar, tetap tampilkan source dari journal.
+	if (selectedSource && sourceEl.value !== selectedSource) {
+		const option = document.createElement("option");
+		option.value = selectedSource;
+		option.textContent = selectedSource
+			.replace(/_/g, " ")
+			.toLowerCase()
+			.replace(/\b\w/g, char => char.toUpperCase());
+
+		sourceEl.appendChild(option);
+		sourceEl.value = selectedSource;
+	}
+}
+
 async function editManualJournalEntry(journalId) {
 	const journal = journalEntriesData.find( item => item.journalId === journalId );
 	if (!journal) return;
@@ -27532,17 +27569,14 @@ async function editManualJournalEntry(journalId) {
 	
 		const journalData = data;
 		editingManualJournalId = journalData.journalId;
-		/*
-		 * LOAD MASTER DATA
-		 */
+
 		await Promise.all([
 			loadJournalAccounts(),
 			loadJournalBranches()
 		]);
-	
-		/*
-		 * POPULATE HEADER
-		 */
+		
+		populateNewJournalSources(journalData.source || "");
+		
 		const dateEl = document.getElementById("newJournalDate");
 		const sourceEl = document.getElementById("newJournalSource");
 		const branchEl = document.getElementById("newJournalBranch");
@@ -27551,7 +27585,6 @@ async function editManualJournalEntry(journalId) {
 		const statusEl = document.getElementById("newJournalStatus");
 
 		if (dateEl) { dateEl.value = journalData.journalDate || ""; }
-		if (sourceEl) { sourceEl.value = "MANUAL"; }
 	
 		populateNewJournalBranches();
 	
@@ -27836,6 +27869,8 @@ async function openNewJournalModal() {
 	const modal = document.getElementById("newJournalModal");
 	if (!modal) return;
 
+  if (!journalEntriesLoaded) { await loadJournalEntries(); }
+
 	const today = new Date().toISOString().split("T")[0];
 	const dateEl = document.getElementById("newJournalDate");
 	const sourceEl = document.getElementById("newJournalSource");
@@ -27844,8 +27879,7 @@ async function openNewJournalModal() {
 	const descriptionEl = document.getElementById("newJournalDescription");
 	const statusEl = document.getElementById("newJournalStatus");
 
-	if (dateEl) { dateEl.value = today; }
-	if (sourceEl) { sourceEl.value = "MANUAL"; }
+	if (dateEl) { dateEl.value = today; };
 	if (referenceEl) { referenceEl.value = ""; }
 	if (descriptionEl) { descriptionEl.value = ""; }
 	if (statusEl) { statusEl.value = "DRAFT"; }
@@ -27853,9 +27887,12 @@ async function openNewJournalModal() {
 	// LOAD COA UNTUK PAGE JOURNAL ENTRIES
 	await Promise.all([
 		loadJournalAccounts(),
-		loadJournalBranches()
+		loadJournalBranches(),
+		loadJournalSources()
 	]);
+	
 	populateNewJournalBranches();
+	populateNewJournalSources();
 
 	const container = document.getElementById("newJournalLinesContainer");
 	if (container) { container.innerHTML = ""; }
@@ -28091,7 +28128,6 @@ function getNewJournalLines() {
 
 async function saveNewJournalEntry() {
 	const sessionId = localStorage.getItem("pos_session_id");
-	
 	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 	
 	const dateEl = document.getElementById("newJournalDate");
@@ -28119,7 +28155,6 @@ async function saveNewJournalEntry() {
 
 	for (let i = 0; i < lines.length; i++) {
 		const line = lines[i];
-	
 		if (!line.accountId) { alert(`Account pada line ${i + 1} wajib dipilih.`); return; }
 	
 		const debit = Number(line.debit || 0);
@@ -28129,103 +28164,95 @@ async function saveNewJournalEntry() {
 		if (debit > 0 && credit > 0) { alert(`Line ${i + 1} tidak boleh memiliki Debit dan Credit sekaligus.`); return; }
 	}
 	
-	const totalDebit = lines.reduce(
-		(sum, line) => sum + Number(line.debit || 0),
-		0
-	);
-	const totalCredit = lines.reduce(
-		(sum, line) => sum + Number(line.credit || 0),
-		0
-	);
+	const totalDebit = lines.reduce((sum, line) => sum + Number(line.debit || 0), 0);
+	const totalCredit = lines.reduce((sum, line) => sum + Number(line.credit || 0), 0);
 	
-	if (totalDebit <= 0 || totalCredit <= 0) {
-		alert("Total Debit dan Credit harus lebih dari 0.");
-		return;
-	}
+	if (totalDebit <= 0 || totalCredit <= 0) { alert("Total Debit dan Credit harus lebih dari 0."); return; }
 	if (totalDebit !== totalCredit) {
 		alert(
-				`Journal belum balance.\n\n` +
-				`Debit: ${formatJournalCurrency(totalDebit)}\n` +
-				`Credit: ${formatJournalCurrency(totalCredit)}`
+			`Journal belum balance.\n\n` +
+			`Debit: ${formatJournalCurrency(totalDebit)}\n` +
+			`Credit: ${formatJournalCurrency(totalCredit)}`
 		);
 		return;
 	}
 	
 	const originalButtonHtml = saveButton?.innerHTML;
 	try {
-			if (saveButton) {
-					saveButton.disabled = true;
-					saveButton.innerHTML = `
-							<span class="material-symbols-outlined text-md animate-spin">
-									progress_activity
-							</span>
-							Saving...
-					`;
+		if (saveButton) {
+			saveButton.disabled = true;
+			saveButton.innerHTML = `
+					<span class="material-symbols-outlined text-md animate-spin">
+						progress_activity
+					</span>
+					Saving...
+				`;
 			}
-			let data;
-			let error;
-			if (editingManualJournalId) {
-			    // EDIT DRAFT
+		let data;
+		let error;
+		if (editingManualJournalId) {
+				// EDIT DRAFT
+			const result =
+				await supabaseClient.rpc(
+					"update_manual_journal_entry",
+					{
+						p_journal_id: editingManualJournalId,
+						p_journal_date: journalDate,
+						p_branch_id: branchId,
+						p_reference_id: referenceId,
+						p_description: description,
+						p_lines: lines,
+						p_source: source,
+						p_session_id: sessionId
+					}
+				);
+			data = result.data;
+			error = result.error;
+		} else {
 				const result =
 					await supabaseClient.rpc(
-						"update_manual_journal_entry",
+						"create_journal_entry",
 						{
-							p_journal_id: editingManualJournalId,
 							p_journal_date: journalDate,
 							p_branch_id: branchId,
+							p_source: source,
 							p_reference_id: referenceId,
 							p_description: description,
+							p_status: status,
 							p_lines: lines,
 							p_session_id: sessionId
 						}
 					);
-				data = result.data;
-				error = result.error;
-			} else {
-			    const result =
-						await supabaseClient.rpc(
-							"create_journal_entry",
-							{
-								p_journal_date: journalDate,
-								p_branch_id: branchId,
-								p_source: source,
-								p_reference_id: referenceId,
-								p_description: description,
-								p_status: status,
-								p_lines: lines,
-								p_session_id: sessionId
-							}
-						);
-				data = result.data;
-				error = result.error;
-			}
-			
-			if (error) { throw error; }
+			data = result.data;
+			error = result.error;
+		}
 		
-			closeNewJournalModal();
-			// ===== CLEAR JOURNAL ENTRIES CACHE =====
-			journalEntriesLoaded = false;
-			journalEntriesData = [];
-			window.journalEntries = [];
-			
-			// ===== CLEAR GENERAL LEDGER CACHE =====
-			generalLedgerLoaded = false;
-			generalLedgerData = [];
-			await loadJournalEntries();
-			alert("Journal berhasil disimpan.");
+		if (error) { throw error; }
+	
+		closeNewJournalModal();
+		// ===== CLEAR JOURNAL ENTRIES CACHE =====
+		journalEntriesLoaded = false;
+		journalEntriesData = [];
+		window.journalEntries = [];
+		
+		// ===== CLEAR GENERAL LEDGER CACHE =====
+		generalLedgerLoaded = false;
+		generalLedgerData = [];
+		await loadJournalEntries();
+		alert("Journal berhasil disimpan.");
 	} catch (error) {
-			alert( error?.message || "Gagal menyimpan journal." );
+		alert( error?.message || "Gagal menyimpan journal." );
 	} finally {
 		if (saveButton) {
-				saveButton.disabled = false;
-				saveButton.innerHTML =
-						originalButtonHtml ||
-						`
-						<span class="material-symbols-outlined text-md">
-								save
-						</span>
-						Save Journal
-						`;
+			saveButton.disabled = false;
+			saveButton.innerHTML =
+				originalButtonHtml ||
+				`
+				<span class="material-symbols-outlined text-md">
+						save
+				</span>
+				Save Journal
+				`;
 		}
 	}
 }
@@ -28247,11 +28274,10 @@ async function openJournalEntryDetail(journalId) {
 			}
 		);
 
-		if (error) {
-			alert(error.message || "Gagal memuat detail journal");
-			return; }
-		if (!data) { alert("Journal tidak ditemukan");
-			return; }
+		if (error) { alert(error.message || "Gagal memuat detail journal"); return; }
+		if (!data) { alert("Journal tidak ditemukan"); return; }
+		await loadJournalSources();
+		populateNewJournalSources(journalData.source || "");
 		renderJournalEntryDetail(data);
 		modal.classList.remove("hidden");
 		modal.classList.add("flex");
