@@ -17828,7 +17828,7 @@
               </label>
 
 							<select id="journalSourceFilter"
-							    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+							    class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none custom-scrollbar">
 							    <option value="">All Sources</option>
 							</select>
             </div>
@@ -18017,10 +18017,11 @@
                 <label class="block text-xs text-muted mb-2">
                   Account
                 </label>
+								
                <select id="generalLedgerAccountFilter"
-				  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
-				  <option value="">All Accounts</option>
-				</select>
+							  class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none custom-scrollbar">
+							  <option value="">All Accounts</option>
+							</select>
               </div>
 
               <div>
@@ -18028,7 +18029,7 @@
                   Branch
                 </label>
 
-                <select id="generalLedgerBranchFilter" class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none">
+                <select id="generalLedgerBranchFilter" class="w-full h-10 px-3 rounded-md bg-background border border-outline-variant text-sm text-foreground outline-none custom-scrollbar">
                   <option value="">All Branches</option>
                 </select>
               </div>
@@ -18132,14 +18133,8 @@
 								</label>
 
 								<select id="newJournalSource"
-									class="w-full h-12 bg-background border border-outline-variant rounded-md px-4 pr-10 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
-									<option value="MANUAL">Manual</option>
-									<option value="SALES">Sales</option>
-									<option value="PURCHASE">Purchasing</option>
-									<option value="PAYMENT">Payment</option>
-									<option value="EXPENSE">Expense</option>
-									<option value="INVENTORY">Inventory</option>
-									<option value="EQUITY">Equity</option>
+								    class="w-full h-12 bg-background border border-outline-variant rounded-md px-4 pr-10 text-xs lg:text-sm text-on-surface appearance-none outline-none focus:ring-1 focus:ring-primary transition-all">
+								    <option value="">Select Source</option>
 								</select>
 							</div>
 							<!-- BRANCH -->
