@@ -27502,48 +27502,43 @@ async function postManualJournalEntry(journalId) {
 	}
 }
 
+let journalSources = [];
+
+async function loadJournalSources() {
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) return [];
+
+  const { data, error } = await supabaseClient.rpc(
+    "get_journal_sources",
+    { p_session_id: sessionId }
+  );
+
+  if (error) {
+    console.error("Failed to load journal sources:", error);
+    return [];
+  }
+
+  journalSources = Array.isArray(data) ? data : [];
+  return journalSources;
+}
+
 function populateNewJournalSources(selectedSource = "") {
-	const sourceEl = document.getElementById("newJournalSource");
-	if (!sourceEl) return;
+  const sourceEl = document.getElementById("newJournalSource");
+  if (!sourceEl) return;
 
-	const sources = [
-		...new Set(
-			(journalEntriesData || [])
-				.map(journal => String(journal.source || "").trim())
-				.filter(Boolean)
-		)
-	].sort();
+  sourceEl.innerHTML = '<option value="">Select Source</option>';
 
-	sourceEl.innerHTML = `
-		<option value="">Select Source</option>
-		${sources.map(source => {
-			const label = source
-				.replace(/_/g, " ")
-				.toLowerCase()
-				.replace(/\b\w/g, char => char.toUpperCase());
+  journalSources.forEach(source => {
+    const option = document.createElement("option");
+    option.value = source;
+    option.textContent = source
+      .replace(/_/g, " ")
+      .toLowerCase()
+      .replace(/\b\w/g, char => char.toUpperCase());
 
-			return `
-				<option value="${escapeHtml(source)}">
-					${escapeHtml(label)}
-				</option>
-			`;
-		}).join("")}
-	`;
-
-	sourceEl.value = selectedSource;
-
-	// Jika source belum ada di daftar, tetap tampilkan source dari journal.
-	if (selectedSource && sourceEl.value !== selectedSource) {
-		const option = document.createElement("option");
-		option.value = selectedSource;
-		option.textContent = selectedSource
-			.replace(/_/g, " ")
-			.toLowerCase()
-			.replace(/\b\w/g, char => char.toUpperCase());
-
-		sourceEl.appendChild(option);
-		sourceEl.value = selectedSource;
-	}
+    sourceEl.appendChild(option);
+  });
+  sourceEl.value = selectedSource;
 }
 
 async function editManualJournalEntry(journalId) {
