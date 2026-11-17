@@ -28186,41 +28186,40 @@ async function saveNewJournalEntry() {
 		let data;
 		let error;
 		if (editingManualJournalId) {
-				// EDIT DRAFT
-			const result =
-				await supabaseClient.rpc(
-					"update_manual_journal_entry",
-					{
-						p_journal_id: editingManualJournalId,
-						p_journal_date: journalDate,
-						p_branch_id: branchId,
-						p_reference_id: referenceId,
-						p_description: description,
-						p_lines: lines,
-						p_source: source,
-						p_session_id: sessionId
-					}
-				);
-			data = result.data;
-			error = result.error;
+		  // EDIT DRAFT
+		  const result = await supabaseClient.rpc(
+		    "update_manual_journal_entry",
+		    {
+		      p_journal_id: editingManualJournalId,
+		      p_journal_date: journalDate,
+		      p_branch_id: branchId,
+		      p_reference_id: referenceId,
+		      p_description: description,
+		      p_lines: lines,
+		      p_session_id: sessionId
+		    }
+		  );
+		  data = result.data;
+		  error = result.error;
 		} else {
-				const result =
-					await supabaseClient.rpc(
-						"create_journal_entry",
-						{
-							p_journal_date: journalDate,
-							p_branch_id: branchId,
-							p_source: source,
-							p_reference_id: referenceId,
-							p_description: description,
-							p_status: status,
-							p_lines: lines,
-							p_session_id: sessionId
-						}
-					);
-			data = result.data;
-			error = result.error;
+		  // CREATE NEW JOURNAL
+		  const result = await supabaseClient.rpc(
+		    "create_journal_entry",
+		    {
+		      p_journal_date: journalDate,
+		      p_branch_id: branchId,
+		      p_source: source,
+		      p_reference_id: referenceId,
+		      p_description: description,
+		      p_status: status,
+		      p_lines: lines,
+		      p_session_id: sessionId
+		    }
+		  );
+		  data = result.data;
+		  error = result.error;
 		}
+
 		
 		if (error) { throw error; }
 	
