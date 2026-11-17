@@ -27360,8 +27360,8 @@ function renderJournalEntryRow(journal) {
 						</span>
 					</button>
 			
-					<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
-						class="hidden absolute right-0 bottom-full mb-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-[99999]">
+				<div id="journalActionMenu-${escapeHtml(journal.journalId)}"
+			    class="hidden absolute right-0 top-full mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-lg z-[99999]">
 						<button type="button"
 							onclick="closeJournalEntryActionMenus(); openJournalEntryDetail('${escapeHtml(journal.journalId)}')"
 							class="w-full px-4 py-2 text-left text-sm hover:bg-outline-variant">
