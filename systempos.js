@@ -28196,6 +28196,7 @@ async function saveNewJournalEntry() {
 		      p_reference_id: referenceId,
 		      p_description: description,
 		      p_lines: lines,
+					p_source: source,
 		      p_session_id: sessionId
 		    }
 		  );
