@@ -28253,10 +28253,10 @@ async function saveNewJournalEntry() {
 }
 
 /* === JOURNAL DETAIL ==== */
-
 async function openJournalEntryDetail(journalId) {
 	const modal = document.getElementById("journalEntryDetailModal");
-	if (!modal) {  return; }
+	if (!modal) return;
+
 	const sessionId = localStorage.getItem("pos_session_id");
 	if (!sessionId) { alert("Session tidak ditemukan"); return; }
 
@@ -28269,15 +28269,17 @@ async function openJournalEntryDetail(journalId) {
 			}
 		);
 
-		if (error) { alert(error.message || "Gagal memuat detail journal"); return; }
+		if (error) throw error;
 		if (!data) { alert("Journal tidak ditemukan"); return; }
-		await loadJournalSources();
-		populateNewJournalSources(journalData.source || "");
+
 		renderJournalEntryDetail(data);
+
 		modal.classList.remove("hidden");
 		modal.classList.add("flex");
+
 	} catch (err) {
-		alert("Gagal memuat detail journal");
+		console.error("Journal Detail Error:", err);
+		alert(err?.message || "Gagal memuat detail journal");
 	}
 }
 
