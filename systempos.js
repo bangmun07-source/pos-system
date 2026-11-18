@@ -42007,6 +42007,9 @@ window.viewEmployee = function (employeeId) {
   document.getElementById('detailEmployeePhone').textContent = employee.Phone || '-';
   document.getElementById('detailEmployeeEmail').textContent = employee.Email || '-';
   document.getElementById('detailEmployeeJoinDate').textContent = employee.Hire_Date || '-';
+	document.getElementById('detailEmployeeEmploymentType').textContent = employee.Employment_Type === 'CONTRACT' ? 'Contract' : 'Permanent';
+	document.getElementById('detailEmployeeContractStart').textContent = employee.Contract_Start_Date || '-';
+	document.getElementById('detailEmployeeContractEnd').textContent = employee.Contract_End_Date || '-';
   document.getElementById('detailEmployeeStatus').textContent = employee.Status || '-';
   document.getElementById('detailEmployeeAddress').textContent = employee.Address || '-';
   /* === OPEN DETAIL MODAL === */
