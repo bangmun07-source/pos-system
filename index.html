@@ -26978,6 +26978,20 @@
 	              type="date"
 	              class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
 	          </div>
+						<!-- EMPLOYMENT TYPE -->
+						<div>
+						  <label class="block text-sm font-medium text-foreground mb-2">
+						    Employment Type
+						  </label>
+						
+						  <select id="employeeEmploymentType"
+						    onchange="toggleEmployeeContractFields()"
+						    class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition">
+						    <option value="PERMANENT">Permanent (Karyawan Tetap)</option>
+						    <option value="CONTRACT">Contract (Karyawan Kontrak)</option>
+						    <option value="DAILY">Daily (Karyawan Harian)</option>
+						  </select>
+						</div>
 	          <!-- STATUS -->
 	          <div>
 	            <label class="block text-sm font-medium text-foreground mb-2">
@@ -26991,6 +27005,48 @@
 	            </select>
 	          </div>
 	        </div>
+					<!-- CONTRACT INFORMATION -->
+					<div id="employeeContractFields"
+					  class="hidden mt-5 p-4 border border-outline-variant rounded-md">
+					  <h3 class="text-sm font-semibold text-foreground mb-3">
+					    Contract Information
+					  </h3>
+					
+					  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+					    <div>
+					      <label class="block text-sm font-medium text-foreground mb-2">
+					        Contract Start Date
+					      </label>
+					      <input id="employeeContractStartDate"
+					        type="date"
+					        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+					    </div>
+					
+					    <div>
+					      <label class="block text-sm font-medium text-foreground mb-2">
+					        Contract End Date
+					      </label>
+					      <input id="employeeContractEndDate"
+					        type="date"
+					        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+					    </div>
+					
+					    <div class="md:col-span-2">
+					      <label class="block text-sm font-medium text-foreground mb-2">
+					        Contract Document
+					      </label>
+					
+					      <input id="employeeContractDocument"
+					        type="file"
+					        accept=".pdf,.jpg,.jpeg,.png"
+					        class="block w-full text-sm text-foreground">
+					
+					      <p class="text-xs text-muted mt-2">
+					        Upload kontrak kerja dalam format PDF, JPG, atau PNG.
+					      </p>
+					    </div>
+					  </div>
+					</div>
 	      </div>
 	      <!-- PERSONAL INFORMATION -->
 	      <div>
@@ -27063,6 +27119,28 @@
 						  <p class="text-xs text-muted mt-1">
 						    Masukkan NPWP jika tersedia. NIK dan NPWP dapat menggunakan nomor yang sama sesuai status perpajakan karyawan.
 						  </p>
+						</div>
+						<!-- ADDITIONAL IDENTIFICATION -->
+						<div class="md:col-span-2">
+						  <div class="flex items-center justify-between mb-3">
+						    <div>
+						      <label class="block text-sm font-medium text-foreground">
+						        Additional Identification
+						      </label>
+						      <p class="text-xs text-muted mt-1">
+						        BPJS or other employee identification numbers.
+						      </p>
+						    </div>
+						
+						    <button type="button"
+						      onclick="addEmployeeIdentification()"
+						      class="h-9 px-3 rounded-md border border-outline-variant text-sm font-medium text-foreground hover:bg-surface-container-high">
+						      + Add Number
+						    </button>
+						  </div>
+						
+						  <div id="employeeIdentificationList" class="space-y-3">
+						  </div>
 						</div>
 	          <!-- GENDER -->
 	          <div>
@@ -27144,6 +27222,50 @@
 					      placeholder="Employee address"
 					      class="w-full px-3 py-2 bg-background border border-outline-variant rounded-md text-sm text-foreground outline-none focus:border-primary transition resize-none"></textarea>
 					  </div>
+						<!-- EMERGENCY CONTACT -->
+						<div class="mt-5 pt-5 border-t border-outline-variant">
+						  <div class="pb-3 mb-4">
+						    <h3 class="text-sm font-semibold text-foreground">
+						      Emergency Contact
+						    </h3>
+						
+						    <p class="text-xs text-muted mt-1">
+						      Person to contact in case of emergency.
+						    </p>
+						  </div>
+						
+						  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+						    <div>
+						      <label class="block text-sm font-medium text-foreground mb-2">
+						        Contact Name
+						      </label>
+						      <input id="employeeEmergencyName"
+						        type="text"
+						        placeholder="Emergency contact name"
+						        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+						    </div>
+						
+						    <div>
+						      <label class="block text-sm font-medium text-foreground mb-2">
+						        Phone Number
+						      </label>
+						      <input id="employeeEmergencyPhone"
+						        type="tel"
+						        placeholder="08xxxxxxxxxx"
+						        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+						    </div>
+						
+						    <div class="md:col-span-2">
+						      <label class="block text-sm font-medium text-foreground mb-2">
+						        Relationship
+						      </label>
+						      <input id="employeeEmergencyRelationship"
+						        type="text"
+						        placeholder="Example: Spouse, Parent, Sibling"
+						        class="w-full h-11 px-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">
+						    </div>
+						  </div>
+						</div>
 					</div>
 				</div>
 	    </div>
