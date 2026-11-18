@@ -40750,24 +40750,23 @@ window.addEmployeeIdentification = function () {
 
 	row.className = 'grid grid-cols-1 md:grid-cols-3 gap-2 mb-2';
 	row.innerHTML = `
-		<select class="employee-identification-type bg-background text-foreground border border-outline-variant rounded-md p-2">
+		<select class="employee-identification-type text-sm bg-background text-foreground border border-outline-variant rounded-md p-2">
 			<option value="BPJS_HEALTH">BPJS Kesehatan</option>
 			<option value="BPJS_EMPLOYMENT">BPJS Ketenagakerjaan</option>
 			<option value="OTHER">Lainnya</option>
 		</select>
 
 		<input type="text"
-			class="employee-identification-name bg-background text-foreground border border-outline-variant rounded-md p-2"
-			placeholder="Nama identitas"
-			value="BPJS Kesehatan" >
+			class="employee-identification-name text-sm bg-background text-foreground border border-outline-variant rounded-md p-2"
+			placeholder="Nama identitas" >
 
 		<div class="flex gap-2">
 			<input type="text"
-				class="employee-identification-number bg-background text-foreground border border-outline-variant rounded-md p-2 w-full"
+				class="employee-identification-number text-sm bg-background text-foreground border border-outline-variant rounded-md p-2 w-full"
 				placeholder="Nomor identitas" >
 
 			<button type="button"
-				class="text-red-500 px-2"
+				class="text-red-500 text-sm px-2"
 				onclick="this.closest('div.grid').remove()" >
 					Hapus
 			</button>
