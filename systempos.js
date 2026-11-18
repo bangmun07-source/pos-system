@@ -40672,6 +40672,15 @@ window.closeEmployeeTaxHistoryModal = function () {
 };
 
 /* === OPEN EMPLOYEE MODAL === */
+window.toggleEmployeeContractFields = function () {
+  const type = document.getElementById('employeeEmploymentType')?.value;
+  const section = document.getElementById('employeeContractFields');
+
+  if (!section) return;
+
+  section.classList.toggle('hidden', type !== 'CONTRACT');
+};
+							 
 window.openEmployeeModal = function () {
   document.getElementById('employeeModalTitle').textContent = 'Add Employee';
   document.getElementById('employeeId').value = '';
@@ -40704,6 +40713,20 @@ window.openEmployeeModal = function () {
   document.getElementById('employeePhoto').value = '';
   document.getElementById('employeeNotes').value = '';
   document.getElementById('employeeAddress').value = '';
+	// EMPLOYMENT TYPE
+	document.getElementById('employeeEmploymentType').value = 'PERMANENT';
+	// CONTRACT INFORMATION
+	document.getElementById('employeeContractStartDate').value = '';
+	document.getElementById('employeeContractEndDate').value = '';
+	document.getElementById('employeeContractDocument').value = '';
+	// RESET CONTRACT SECTION
+	toggleEmployeeContractFields();
+	// ADDITIONAL IDENTIFICATION
+	document.getElementById('employeeIdentificationList').innerHTML = '';
+	// EMERGENCY CONTACT
+	document.getElementById('employeeEmergencyName').value = '';
+	document.getElementById('employeeEmergencyPhone').value = '';
+	document.getElementById('employeeEmergencyRelationship').value = '';
 
   const preview = document.getElementById('employeePhotoPreview');
 
