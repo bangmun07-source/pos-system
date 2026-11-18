@@ -47621,7 +47621,7 @@ window.renderPayrollTable = function () {
 	const kpiValues = {
 		payrollBasicSalary: sum('Basic_Salary'),
 		payrollAllowance: sum('Total_Allowance') + sum('Total_Overtime') + sum('Reimburse_Amount'),
-		payrollGrossSalary: sum('Gross_Salary'),
+		payrollGrossSalary: sum('Gross_Salary') + sum('Reimburse_Amount'),
 		payrollDeduction: sum('Total_Deduction') + sum('Tax_Amount'),
 		payrollNetSalary: sum('Net_Salary')
 	};
@@ -48908,7 +48908,7 @@ window.exportPayroll = function () {
     // KPI — TIDAK DIUBAH
 		const totalBasicSalary = sum('Basic_Salary');
 		const totalAllowance = sum('Total_Allowance') + sum('Total_Overtime') + sum('Reimburse_Amount');
-		const totalGrossSalary = sum('Gross_Salary');
+		const totalGrossSalary = sum('Gross_Salary') + sum('Reimburse_Amount');
 		const totalDeduction = sum('Total_Deduction') + sum('Tax_Amount');
 		const totalNetSalary = sum('Net_Salary');
     // REPORT FILTER TITLES
