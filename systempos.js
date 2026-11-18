@@ -48878,10 +48878,7 @@ window.exportPayroll = function () {
 
       if (year && rowYear !== year) return false;
       if (period && rowMonth !== period) return false;
-      if (
-        selectedBranch &&
-        selectedBranch.toUpperCase() !== 'ALL' &&
-        rowBranch !== selectedBranch
+      if ( selectedBranch && selectedBranch.toUpperCase() !== 'ALL' && rowBranch !== selectedBranch
       ) { return false; }
       if (employeeFilter && rowEmployee !== employeeFilter) { return false; }
       if (statusFilter && rowStatus !== statusFilter) { return false; }
@@ -48903,7 +48900,7 @@ window.exportPayroll = function () {
       })[char]);
     };
 
-    const money = value => 'Rp ' + Number(value || 0).toLocaleString('id-ID');
+    const money = value => 'Rp ' + Math.round(Number(value) || 0).toLocaleString('id-ID');
     const sum = field => rows.reduce( (total, row) => total + (Number(row[field]) || 0), 0 );
     // KPI — TIDAK DIUBAH
     const totalGrossSalary = sum('Gross_Salary');
