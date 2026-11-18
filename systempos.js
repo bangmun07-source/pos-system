@@ -48905,10 +48905,10 @@ window.exportPayroll = function () {
     const money = value => 'Rp ' + Math.round(Number(value) || 0).toLocaleString('id-ID');
     const sum = field => rows.reduce( (total, row) => total + (Number(row[field]) || 0), 0 );
     // KPI — TIDAK DIUBAH
-    const totalGrossSalary = sum('Gross_Salary');
-    const totalAllowance = sum('Total_Allowance');
-    const totalDeduction = sum('Total_Deduction');
-    const totalNetSalary = sum('Net_Salary');
+		const totalGrossSalary = sum('Gross_Salary');
+		const totalAllowance = sum('Total_Allowance') + sum('Total_Overtime') + sum('Reimburse_Amount');
+		const totalDeduction = sum('Total_Deduction') + sum('Tax_Amount');
+		const totalNetSalary = sum('Net_Salary');
     // REPORT FILTER TITLES
     const branchTitle = selectedBranch && selectedBranch.toUpperCase() !== 'ALL'
 			? getBranchLabel(selectedBranch)
@@ -48953,9 +48953,9 @@ window.exportPayroll = function () {
       const workMinutes = Number(row.Work_Minutes || 0);
       // Gunakan nilai overtime jika tersedia pada data.
       // Jangan menganggap Work_Minutes sebagai overtime.
-      const overtimeValue = Number(
-        row.Total_Overtime ?? row.Overtime_Minutes ?? 0
-      );
+      const overtimeValue = Number(row.Total_Overtime ?? row.Overtime_Minutes ?? 0);
+			const receivable = Number(row.Receivable_Amount) || 0;
+			const deduction = Math.max((Number(row.Total_Deduction) || 0) - receivable,0);
 
       return `
         <tr>
@@ -48964,12 +48964,12 @@ window.exportPayroll = function () {
           <td> ${esc(getBranchLabel(row.Branch_ID))} </td>
           <td class="amount"> ${esc(money(row.Basic_Salary))} </td>
           <td class="amount"> ${esc(money(row.Total_Allowance))} </td>
-          <td class="amount"> ${esc(money(row.Total_Deduction))} </td>
+          <td class="amount"> ${esc(money(deduction))} </td>
           <td class="amount"> ${esc(lateValue.toLocaleString('id-ID'))} min </td>
           <td class="amount"> ${esc(overtimeValue.toLocaleString('id-ID'))} </td>
           <td class="amount"> ${esc(money(row.Health_Amount))} </td>
           <td class="amount"> ${esc(money(row.Tax_Amount))} </td>
-          <td class="amount"> ${esc(money(row.Receivable_Amount))} </td>
+          <td class="amount"> ${esc(money(receivable))} </td>
           <td class="amount"> ${esc(money(row.Reimburse_Amount))} </td>
           <td class="amount net"> ${esc(money(row.Net_Salary))} </td>
           <td>
