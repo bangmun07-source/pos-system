@@ -41897,6 +41897,7 @@ window.editEmployee = async function (employeeId) {
 	if (npwpInput) npwpInput.value = '';
 	if (ptkpInput) ptkpInput.value = 'TK/0';
 	
+	window.employeeIdentifications = [];
 	const role = String(state.user.role || '').trim().toLowerCase();
 	if (role === 'owner' || role === 'accountant') {
 	  const sessionId = localStorage.getItem('pos_session_id');
@@ -41914,6 +41915,7 @@ window.editEmployee = async function (employeeId) {
 	    if (nikInput) nikInput.value = sensitive.NIK || '';
 	    if (npwpInput) npwpInput.value = sensitive.NPWP || '';
 	    if (ptkpInput) ptkpInput.value = sensitive.PTKP_Status || 'TK/0';
+			window.employeeIdentifications = sensitive.Identifications || [];
 	  }
 	}
 
