@@ -41899,6 +41899,10 @@ window.editEmployee = async function (employeeId) {
   document.getElementById('employeePosition').value = employee.Position || '';
   document.getElementById('employeeDepartment').value = employee.Department || '';
   document.getElementById('employeeJoinDate').value = employee.Hire_Date || '';
+	document.getElementById('employeeEmploymentType').value = employee.Employment_Type || 'PERMANENT';
+	toggleEmployeeContractFields();
+	document.getElementById('employeeContractStartDate').value = employee.Contract_Start_Date || '';
+	document.getElementById('employeeContractEndDate').value = employee.Contract_End_Date || '';
   document.getElementById('employeeStatus').value = employee.Status || 'ACTIVE';
   document.getElementById('employeePhone').value = employee.Phone || '';
   document.getElementById('employeeEmail').value = employee.Email || '';
@@ -41910,6 +41914,7 @@ window.editEmployee = async function (employeeId) {
 	document.getElementById('employeeEmergencyName').value = employee.Emergency_Name || '';
 	document.getElementById('employeeEmergencyPhone').value = employee.Emergency_Phone || '';
 	document.getElementById('employeeEmergencyRelationship').value = employee.Emergency_Relationship || '';
+	
 
 	const nikInput = document.getElementById('employeeNIK');
 	const npwpInput = document.getElementById('employeeNPWP');
