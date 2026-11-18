@@ -40810,7 +40810,7 @@ window.saveEmployee = async function () {
 	const hireDate = document.getElementById('employeeJoinDate').value || null;
 	const status = document.getElementById('employeeStatus').value;
 	const notes = document.getElementById('employeeNotes').value.trim();
-	const address = document.getElementById('employeeAddress').value.trim();\
+	const address = document.getElementById('employeeAddress').value.trim();
 	// EMPLOYMENT INFORMATION
 	const employmentType = document.getElementById('employeeEmploymentType').value;
 	const contractStartDate = document.getElementById('employeeContractStartDate').value || null;
