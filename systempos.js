@@ -47677,8 +47677,8 @@ window.renderPayrollTable = function () {
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(deduction)}</td>
 					<td class="px-5 py-4 text-center whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Total_Overtime)}</td>
-					<td class="px-5 py-4 text-right text-right whitespace-nowrap">${money(row.Health_Amount)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Tax_Amount)}</td>
+					<td class="px-5 py-4 text-right text-right whitespace-nowrap">${money(row.Health_Amount)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(receivable)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
@@ -48969,8 +48969,8 @@ window.exportPayroll = function () {
           <td class="amount"> ${esc(money(deduction))} </td>
           <td class="amount"> ${esc(lateValue.toLocaleString('id-ID'))} min </td>
           <td class="amount"> ${esc(overtimeValue.toLocaleString('id-ID'))} </td>
-          <td class="amount"> ${esc(money(row.Health_Amount))} </td>
           <td class="amount"> ${esc(money(row.Tax_Amount))} </td>
+					<td class="amount"> ${esc(money(row.Health_Amount))} </td>
           <td class="amount"> ${esc(money(receivable))} </td>
           <td class="amount"> ${esc(money(row.Reimburse_Amount))} </td>
           <td class="amount net"> ${esc(money(row.Net_Salary))} </td>
@@ -49329,7 +49329,7 @@ window.exportPayroll = function () {
 						</div>
             
             <div class="summary-card">
-              <div class="summary-label">Allowance</div>
+              <div class="summary-label">Total Allowance</div>
               <div class="summary-value">
                 ${esc(money(totalAllowance))}
               </div>
@@ -49343,7 +49343,7 @@ window.exportPayroll = function () {
             </div>
 
             <div class="summary-card">
-              <div class="summary-label">Deduction</div>
+              <div class="summary-label">Total Deduction</div>
               <div class="summary-value">
                 ${esc(money(totalDeduction))}
               </div>
@@ -49370,8 +49370,8 @@ window.exportPayroll = function () {
                   <th style="text-align:right">Deduction</th>
                   <th style="text-align:right">Late</th>
                   <th style="text-align:right">Overtime</th>
-                  <th style="text-align:right">Employer Contributions</th>
                   <th style="text-align:right">Tax</th>
+									<th style="text-align:right">Employer Contributions</th>
                   <th style="text-align:right">Receivable</th>
                   <th style="text-align:right">Reimburse</th>
                   <th style="text-align:right">Net Salary</th>
