@@ -40729,7 +40729,6 @@ window.openEmployeeModal = function () {
 	document.getElementById('employeeEmergencyRelationship').value = '';
 
   const preview = document.getElementById('employeePhotoPreview');
-
   if (preview) {
     preview.innerHTML = `
       <span class="material-symbols-outlined text-3xl text-muted">
@@ -40737,11 +40736,56 @@ window.openEmployeeModal = function () {
       </span>
     `;
   }
-
   const modal = document.getElementById('employeeModal');
 
   modal.classList.remove('hidden');
   modal.classList.add('flex');
+};
+
+window.addEmployeeIdentification = function () {
+	const container = document.getElementById('employeeIdentificationList');
+	if (!container) return;
+
+	const row = document.createElement('div');
+
+	row.className = 'grid grid-cols-1 md:grid-cols-3 gap-2 mb-2';
+	row.innerHTML = `
+		<select class="employee-identification-type border rounded-md p-2">
+			<option value="BPJS_HEALTH">BPJS Kesehatan</option>
+			<option value="BPJS_EMPLOYMENT">BPJS Ketenagakerjaan</option>
+			<option value="OTHER">Lainnya</option>
+		</select>
+
+		<input type="text"
+			class="employee-identification-name border rounded-md p-2"
+			placeholder="Nama identitas"
+			value="BPJS Kesehatan" >
+
+		<div class="flex gap-2">
+			<input type="text"
+				class="employee-identification-number border rounded-md p-2 w-full"
+				placeholder="Nomor identitas" >
+
+			<button type="button"
+				class="text-red-500 px-2"
+				onclick="this.closest('div.grid').remove()" >
+					Hapus
+			</button>
+		</div>
+	`;
+
+	const typeSelect = row.querySelector('.employee-identification-type');
+	const nameInput = row.querySelector('.employee-identification-name');
+
+	typeSelect.addEventListener('change', function () {
+		const names = {
+			BPJS_HEALTH: 'BPJS Kesehatan',
+			BPJS_EMPLOYMENT: 'BPJS Ketenagakerjaan',
+			OTHER: ''
+		};
+		nameInput.value = names[this.value];
+	});
+	container.appendChild(row);
 };
 
 /* === CLOSE EMPLOYEE MODAL === */
@@ -40751,7 +40795,6 @@ window.closeEmployeeModal = function () {
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 };
-
 
 /* === SAVE EMPLOYEE === */
 window.saveEmployee = async function () {
