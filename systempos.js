@@ -40787,6 +40787,24 @@ window.addEmployeeIdentification = function () {
 	container.appendChild(row);
 };
 
+/* === RENDER EMPLOYEE IDENTIFICATIONS === */
+window.renderEmployeeIdentifications = function (identifications = []) {
+  const container = document.getElementById('employeeIdentificationList');
+  if (!container) return;
+
+  container.innerHTML = '';
+  identifications.forEach(item => {
+    window.addEmployeeIdentification();
+
+    const rows = container.querySelectorAll('.grid');
+    const row = rows[rows.length - 1];
+
+    row.querySelector('.employee-identification-type').value = item.identification_type || '';
+    row.querySelector('.employee-identification-name').value = item.identification_name || '';
+    row.querySelector('.employee-identification-number').value = item.identification_number || '';
+  });
+};
+
 /* === CLOSE EMPLOYEE MODAL === */
 window.closeEmployeeModal = function () {
   const modal = document.getElementById('employeeModal');
@@ -41916,6 +41934,7 @@ window.editEmployee = async function (employeeId) {
 	    if (npwpInput) npwpInput.value = sensitive.NPWP || '';
 	    if (ptkpInput) ptkpInput.value = sensitive.PTKP_Status || 'TK/0';
 			window.employeeIdentifications = sensitive.Identifications || [];
+			renderEmployeeIdentifications(window.employeeIdentifications);
 	  }
 	}
 
