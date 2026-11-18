@@ -40797,101 +40797,123 @@ window.closeEmployeeModal = function () {
 
 /* === SAVE EMPLOYEE === */
 window.saveEmployee = async function () {
-  const employeeId = document.getElementById('employeeId').value.trim();
-  const fullName = document.getElementById('employeeName').value.trim();
-  const phone = document.getElementById('employeePhone').value.trim();
-  const email = document.getElementById('employeeEmail').value.trim();
+	const employeeId = document.getElementById('employeeId').value.trim();
+	const fullName = document.getElementById('employeeName').value.trim();
+	const phone = document.getElementById('employeePhone').value.trim();
+	const email = document.getElementById('employeeEmail').value.trim();
 	const nik = document.getElementById('employeeNIK').value.trim();
 	const npwp = document.getElementById('employeeNPWP').value.trim();
-  const position = document.getElementById('employeePosition').value.trim();
-  const department = document.getElementById('employeeDepartment').value.trim();
-  const gender = document.getElementById('employeeGender').value;
-  const birthDate = document.getElementById('employeeBirthDate').value || null;
-  const hireDate = document.getElementById('employeeJoinDate').value || null;
-  const status = document.getElementById('employeeStatus').value;
-  const notes = document.getElementById('employeeNotes').value.trim();
-  const address = document.getElementById('employeeAddress').value.trim();
+	const position = document.getElementById('employeePosition').value.trim();
+	const department = document.getElementById('employeeDepartment').value.trim();
+	const gender = document.getElementById('employeeGender').value;
+	const birthDate = document.getElementById('employeeBirthDate').value || null;
+	const hireDate = document.getElementById('employeeJoinDate').value || null;
+	const status = document.getElementById('employeeStatus').value;
+	const notes = document.getElementById('employeeNotes').value.trim();
+	const address = document.getElementById('employeeAddress').value.trim();\
 	// EMPLOYMENT INFORMATION
 	const employmentType = document.getElementById('employeeEmploymentType').value;
 	const contractStartDate = document.getElementById('employeeContractStartDate').value || null;
 	const contractEndDate = document.getElementById('employeeContractEndDate').value || null;
-	// EMPLOYMENT DOCUMENT
-	const contractDocumentInput = document.getElementById('employeeContractDocument');
-	const contractDocumentFile = contractDocumentInput?.files?.[0] || null;
 	// EMERGENCY CONTACT
 	const emergencyName = document.getElementById('employeeEmergencyName').value.trim();
 	const emergencyPhone = document.getElementById('employeeEmergencyPhone').value.trim();
 	const emergencyRelationship = document.getElementById('employeeEmergencyRelationship').value.trim();
-  const photoInput = document.getElementById('employeePhoto');
-  const photoFile = photoInput?.files?.[0] || null;
-  const role = state.user.role;
-	
-  let branchId;
-	
-  if (role === "Owner") {
-    branchId = document.getElementById('employeeBranch').value;
-  } else {
-    branchId = state.user.branchId;
-  }
-  if (!fullName) { alert('Full Name wajib diisi.'); return; }
-  if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
-  if (!status) { alert('Status employee wajib dipilih.'); return; }
-	if (!['PERMANENT', 'CONTRACT', 'DAILY'].includes(employmentType)) { alert('Employment Type tidak valid.'); return; }
-	if (employmentType === 'CONTRACT') {
-	  if (!contractStartDate || !contractEndDate) { alert('Tanggal mulai dan akhir kontrak wajib diisi.'); return; }
-	  if (contractEndDate < contractStartDate) { alert('Tanggal akhir kontrak tidak boleh sebelum tanggal mulai.'); return; }
+	// EMPLOYEE IDENTIFICATIONS
+	const identificationRows = document.querySelectorAll('#employeeIdentificationList > div');
+	const identifications = [];
+
+	for (const row of identificationRows) {
+		const type = row.querySelector('.employee-identification-type')?.value || '';
+		const name = row.querySelector('.employee-identification-name')?.value.trim() || '';
+		const number = row.querySelector('.employee-identification-number')?.value.trim() || '';
+
+		if (!name && !number) continue;
+		if (!name || !number) { alert('Nama dan nomor identitas wajib diisi.'); return; }
+
+		identifications.push({
+			identification_type: type,
+			identification_name: name,
+			identification_number: number
+		});
 	}
 
-  try {
-    const sessionId = localStorage.getItem('pos_session_id');
+	// EMPLOYEE PHOTO
+	const photoInput = document.getElementById('employeePhoto');
+	const photoFile = photoInput?.files?.[0] || null;
+	const role = state.user.role;
 
-    if (!sessionId) { throw new Error( 'Session POS tidak ditemukan.' ); }
-    let photoUrl = null;
-    if (photoFile) {
-      photoUrl = await uploadEmployeePhoto(photoFile);
-    }
-		
-    const { data, error } =
-      await supabaseClient.rpc(
-        'save_employee',
-        {
-          p_session_id: sessionId,
-          p_employee_id: employeeId || null,
-          p_employee_code: null,
-          p_full_name: fullName,
-          p_phone: phone || null,
-          p_email: email || null,
-          p_address: address || null,
-          p_gender: gender || null,
-          p_birth_date: birthDate,
-          p_position: position || null,
-          p_department: department || null,
-          p_branch_id: branchId,
-          p_hire_date: hireDate,
-          p_status: status,
-          p_photo_url: photoUrl,
-					p_notes: notes || null,
-					p_nik: nik || null,
-					p_npwp: npwp || null
-        }
-      );
+	let branchId;
+	if (role === "Owner") { branchId = document.getElementById('employeeBranch').value;
+	} else { branchId = state.user.branchId; }
+	// VALIDATION
+	if (!fullName) { alert('Full Name wajib diisi.'); return; }
+	if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
+	if (!status) { alert('Status employee wajib dipilih.'); return; }
+	if (!['PERMANENT', 'CONTRACT', 'DAILY'].includes(employmentType)) { alert('Employment Type tidak valid.'); return; }
+	if (employmentType === 'CONTRACT') {
+		if (!contractStartDate || !contractEndDate) { alert('Tanggal mulai dan akhir kontrak wajib diisi.'); return; }
+		if (contractEndDate < contractStartDate) { alert('Tanggal akhir kontrak tidak boleh sebelum tanggal mulai.');	return; }
+	}
 
-    if (error) { throw error; }
+	try {
+		const sessionId = localStorage.getItem('pos_session_id');
+		if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
+
+		let photoUrl = null;
+		if (photoFile) { photoUrl = await uploadEmployeePhoto(photoFile); }
+
+		const { data, error } = await supabaseClient.rpc(
+			'save_employee',
+			{
+				p_session_id: sessionId,
+				p_employee_id: employeeId || null,
+				p_employee_code: null,
+				p_full_name: fullName,
+				p_phone: phone || null,
+				p_email: email || null,
+				p_address: address || null,
+				p_gender: gender || null,
+				p_birth_date: birthDate,
+				p_position: position || null,
+				p_department: department || null,
+				p_branch_id: branchId,
+				p_hire_date: hireDate,
+				p_status: status,
+				p_photo_url: photoUrl,
+				p_notes: notes || null,
+				p_nik: nik || null,
+				p_npwp: npwp || null,
+				// EMPLOYMENT INFORMATION
+				p_employment_type: employmentType,
+				p_contract_start_date: contractStartDate,
+				p_contract_end_date: contractEndDate,
+				// EMERGENCY CONTACT
+				p_emergency_name: emergencyName || null,
+				p_emergency_phone: emergencyPhone || null,
+				p_emergency_relationship: emergencyRelationship || null,
+				// IDENTIFICATIONS
+				p_identifications: identifications
+			}
+		);
+
+		if (error) { throw error; }
 
 		invalidateEmployeeCache();
-    closeEmployeeModal();
-    await loadEmployees();
+		closeEmployeeModal();
+		await loadEmployees();
 
-    alert(
-      employeeId
-        ? 'Employee berhasil diperbarui.'
-        : 'Employee berhasil ditambahkan.'
-    );
+		alert( employeeId
+			? 'Employee berhasil diperbarui.'
+			: 'Employee berhasil ditambahkan.'
+		);
 
-  } catch (error) {
-    alert( error?.message || 'Gagal menyimpan employee.' );
-  }
+	} catch (error) {
+		console.error('SAVE EMPLOYEE ERROR:', error);
+		alert(error?.message || 'Gagal menyimpan employee.');
+	}
 };
+
 
 /* === UPLOAD EMPLOYEE PHOTO === */
 async function uploadEmployeePhoto(file) {
