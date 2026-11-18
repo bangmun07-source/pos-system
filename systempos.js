@@ -40769,6 +40769,17 @@ window.saveEmployee = async function () {
   const status = document.getElementById('employeeStatus').value;
   const notes = document.getElementById('employeeNotes').value.trim();
   const address = document.getElementById('employeeAddress').value.trim();
+	// EMPLOYMENT INFORMATION
+	const employmentType = document.getElementById('employeeEmploymentType').value;
+	const contractStartDate = document.getElementById('employeeContractStartDate').value || null;
+	const contractEndDate = document.getElementById('employeeContractEndDate').value || null;
+	// EMPLOYMENT DOCUMENT
+	const contractDocumentInput = document.getElementById('employeeContractDocument');
+	const contractDocumentFile = contractDocumentInput?.files?.[0] || null;
+	// EMERGENCY CONTACT
+	const emergencyName = document.getElementById('employeeEmergencyName').value.trim();
+	const emergencyPhone = document.getElementById('employeeEmergencyPhone').value.trim();
+	const emergencyRelationship = document.getElementById('employeeEmergencyRelationship').value.trim();
   const photoInput = document.getElementById('employeePhoto');
   const photoFile = photoInput?.files?.[0] || null;
   const role = state.user.role;
@@ -40783,6 +40794,11 @@ window.saveEmployee = async function () {
   if (!fullName) { alert('Full Name wajib diisi.'); return; }
   if (!branchId) { alert('Outlet tidak ditemukan.'); return; }
   if (!status) { alert('Status employee wajib dipilih.'); return; }
+	if (!['PERMANENT', 'CONTRACT', 'DAILY'].includes(employmentType)) { alert('Employment Type tidak valid.'); return; }
+	if (employmentType === 'CONTRACT') {
+	  if (!contractStartDate || !contractEndDate) { alert('Tanggal mulai dan akhir kontrak wajib diisi.'); return; }
+	  if (contractEndDate < contractStartDate) { alert('Tanggal akhir kontrak tidak boleh sebelum tanggal mulai.'); return; }
+	}
 
   try {
     const sessionId = localStorage.getItem('pos_session_id');
