@@ -41137,11 +41137,7 @@ async function loadEmployees() {
 		const cacheKey = JSON.stringify({  sessionId, branchFilter });
 		
 		/* ==== CACHE HIT ==== */
-		if (
-		  Object.prototype.hasOwnProperty.call(
-		    state.employeeRecordsCache,
-		    cacheKey
-		  )
+		if ( Object.prototype.hasOwnProperty.call( state.employeeRecordsCache, cacheKey )
 		) {
 		  employeeData = state.employeeRecordsCache[cacheKey];
 		  filteredEmployeeData = [...employeeData];
@@ -41185,31 +41181,19 @@ async function loadEmployees() {
 
 /* === FILTER EMPLOYEES === */
 window.filterEmployees = async function () {
-  const role = String(
-    state.user?.role || state.user?.Role || ''
-  ).trim().toLowerCase();
-
-  const search = (
-    document.getElementById('employeeSearch')?.value || ''
-  ).trim().toLowerCase();
-
-  const status =
-    document.getElementById('employeeStatusFilter')?.value || '';
-
+  const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
+  const search = ( document.getElementById('employeeSearch')?.value || '' ).trim().toLowerCase();
+  const status = document.getElementById('employeeStatusFilter')?.value || '';
   // Owner dan Accountant: muat ulang sesuai outlet yang dipilih
-  if (['owner', 'accountant'].includes(role)) {
-    await loadEmployees();
-  }
+  if (['owner', 'accountant'].includes(role)) { await loadEmployees(); }
 
   filteredEmployeeData = employeeData.filter(employee => {
-    const searchMatch =
-      !search ||
-      String(employee.Full_Name || '').toLowerCase().includes(search) ||
-      String(employee.Employee_Code || '').toLowerCase().includes(search) ||
-      String(employee.Position || '').toLowerCase().includes(search);
-
-    const statusMatch =
-      !status || employee.Status === status;
+		const searchMatch = !search ||
+		  String(employee.Full_Name || '').toLowerCase().includes(search) ||
+		  String(employee.Employee_Code || '').toLowerCase().includes(search) ||
+		  String(employee.Position || '').toLowerCase().includes(search) ||
+		  String(employee.Department || '').toLowerCase().includes(search);
+    const statusMatch = !status || employee.Status === status;
 
     return searchMatch && statusMatch;
   });
@@ -41218,10 +41202,10 @@ window.filterEmployees = async function () {
   renderEmployeeTable();
 };
 
+
 /* === RENDER EMPLOYEE TABLE === */
 function renderEmployeeTable() {
   const tbody = document.getElementById('employeeTableBody');
-
   if (!tbody) return;
 
   const total = filteredEmployeeData.length;
@@ -41232,45 +41216,47 @@ function renderEmployeeTable() {
   if (!rows.length) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7"
+        <td colspan="6"
           class="px-5 py-10 text-center text-muted">
           No employee data
         </td>
       </tr>
     `;
-
   } else {
     tbody.innerHTML = rows.map(employee => {
       const statusClass = employee.Status === 'ACTIVE'
-				? 'text-green-500'
-				: 'text-muted';
+        ? 'text-green-500'
+        : 'text-muted';
+      const branchName = employeeAttendanceBranches.find(branch => String(branch.id || '').trim() === String(employee.Branch_ID || '').trim())?.name || employee.Branch_ID || '-';
       return `
         <tr class="hover:bg-outline-variant transition">
+          <!-- EMPLOYEE NAME + ID -->
           <td class="px-5 py-4">
-            <div class="font-medium text-foreground">
-              ${escapeEmployeeHtml(employee.Full_Name)}
-            </div>
+            <div class="font-medium text-foreground"> ${escapeEmployeeHtml(employee.Full_Name)} </div>
+            <div class="text-xs text-muted mt-1"> ${escapeEmployeeHtml(employee.Employee_Code)} </div>
           </td>
-          <td class="px-5 py-4"> ${escapeEmployeeHtml(employee.Employee_Code)} </td>
+          <!-- POSITION -->
           <td class="px-5 py-4"> ${escapeEmployeeHtml(employee.Position || '-')} </td>
-					<td class="px-5 py-4">
-					  ${escapeEmployeeHtml( employeeAttendanceBranches.find(branch =>
-							String(branch.id || '').trim() === String(employee.Branch_ID || '').trim() )?.name || employee.Branch_ID || '-' )}
-					</td>
+          <!-- DEPARTMENT -->
+          <td class="px-5 py-4"> ${escapeEmployeeHtml(employee.Department || '-')} </td>
+          <!-- OUTLET -->
+          <td class="px-5 py-4"> ${escapeEmployeeHtml(branchName)} </td>
+          <!-- STATUS -->
           <td class="px-5 py-4 text-center">
             <span class="${statusClass}">
               ${escapeEmployeeHtml(employee.Status)}
             </span>
           </td>
-					<td class="px-5 py-4">
-					  <button type="button"
-					    onclick="openEmployeeActionModal('${employee.Employee_ID}')"
-					    class="w-9 h-9 rounded-md flex items-center justify-center text-muted hover:text-foreground transition">
-					    <span class="material-symbols-outlined text-lg">
-					      more_vert
-					    </span>
-					  </button>
-					</td>
+          <!-- ACTION -->
+          <td class="px-5 py-4 text-center">
+            <button type="button"
+              onclick="openEmployeeActionModal('${employee.Employee_ID}')"
+              class="w-9 h-9 rounded-md inline-flex items-center justify-center text-muted hover:text-foreground transition">
+              <span class="material-symbols-outlined text-lg">
+                more_vert
+              </span>
+            </button>
+          </td>
         </tr>
       `;
     }).join('');
@@ -41283,10 +41269,8 @@ function updateEmployeeSummary() {
   const totalEl = document.getElementById('employeeTotalCount');
   const activeEl = document.getElementById('employeeActiveCount');
   const inactiveEl = document.getElementById('employeeInactiveCount');
-  const scheduledEl = document.getElementById('employeeScheduledCount');
-  // Jika halaman Employee tidak sedang aktif,
-  // jangan jalankan update summary.
-  if (!totalEl || !activeEl || !inactiveEl || !scheduledEl) { return; }
+
+  if (!totalEl || !activeEl || !inactiveEl) return;
 
   const total = employeeData.length;
   const active = employeeData.filter(e => e.Status === 'ACTIVE').length;
@@ -41295,8 +41279,6 @@ function updateEmployeeSummary() {
   totalEl.textContent = total;
   activeEl.textContent = active;
   inactiveEl.textContent = inactive;
-  // Schedule belum dibuat, jadi sementara 0
-  scheduledEl.textContent = '0';
 }
 
 /* ==== PAGINATION ==== */
