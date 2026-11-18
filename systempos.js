@@ -40750,20 +40750,20 @@ window.addEmployeeIdentification = function () {
 
 	row.className = 'grid grid-cols-1 md:grid-cols-3 gap-2 mb-2';
 	row.innerHTML = `
-		<select class="employee-identification-type border rounded-md p-2">
+		<select class="employee-identification-type bg:backgeound border rounded-md p-2">
 			<option value="BPJS_HEALTH">BPJS Kesehatan</option>
 			<option value="BPJS_EMPLOYMENT">BPJS Ketenagakerjaan</option>
 			<option value="OTHER">Lainnya</option>
 		</select>
 
 		<input type="text"
-			class="employee-identification-name border rounded-md p-2"
+			class="employee-identification-name border bg:backgeound rounded-md p-2"
 			placeholder="Nama identitas"
 			value="BPJS Kesehatan" >
 
 		<div class="flex gap-2">
 			<input type="text"
-				class="employee-identification-number border rounded-md p-2 w-full"
+				class="employee-identification-number border bg:backgeoundrounded-md p-2 w-full"
 				placeholder="Nomor identitas" >
 
 			<button type="button"
