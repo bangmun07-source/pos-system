@@ -47620,8 +47620,8 @@ window.renderPayrollTable = function () {
 	// KPI mengikuti periode, outlet, dan status filter.
 	const kpiValues = {
 		payrollGrossSalary: sum('Gross_Salary'),
-		payrollAllowance: sum('Total_Allowance'),
-		payrollDeduction: sum('Total_Deduction'),
+		payrollAllowance: sum('Total_Allowance') + sum('Total_Overtime') + sum('Reimburse_Amount'),
+		payrollDeduction: sum('Total_Deduction') + sum('Tax_Amount'),
 		payrollNetSalary: sum('Net_Salary')
 	};
 
@@ -47652,7 +47652,9 @@ window.renderPayrollTable = function () {
 		`;
 	} else {
 		tableBody.innerHTML = pageRows.map(row => {
-			const status = String(row.Status || '').toUpperCase();
+	    const status = String(row.Status || '').toUpperCase();
+	    const receivable = Number(row.Receivable_Amount) || 0;
+	    const deduction = Math.max((Number(row.Total_Deduction) || 0) - receivable, 0);
 
 			const statusClass = {
 				DRAFT: 'text-gray-700',
@@ -47671,12 +47673,12 @@ window.renderPayrollTable = function () {
 					</td>
 					<td class="px-5 py-4 whitespace-nowrap">${money(row.Basic_Salary)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Total_Allowance)}</td>
-					<td class="px-5 py-4 text-right whitespace-nowrap"> ${money(row.Total_Deduction)} </td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(deduction)}</td>
 					<td class="px-5 py-4 text-center whitespace-nowrap">${Number(row.Late_Minutes) || 0} menit</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Total_Overtime)}</td>
 					<td class="px-5 py-4 text-right text-right whitespace-nowrap">${money(row.Health_Amount)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Tax_Amount)}</td>
-					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Receivable_Amount)}</td>
+					<td class="px-5 py-4 text-right whitespace-nowrap">${money(receivable)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap">${money(row.Reimburse_Amount)}</td>
 					<td class="px-5 py-4 text-right whitespace-nowrap font-medium">${money(row.Net_Salary)}</td>
 					<td class="px-5 py-4">
