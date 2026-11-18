@@ -47619,8 +47619,9 @@ window.renderPayrollTable = function () {
 	const sum = key => rows.reduce( (total, row) => total + (Number(row[key]) || 0), 0 );
 	// KPI mengikuti periode, outlet, dan status filter.
 	const kpiValues = {
-		payrollGrossSalary: sum('Gross_Salary'),
+		payrollBasicSalary: sum('Basic_Salary'),
 		payrollAllowance: sum('Total_Allowance') + sum('Total_Overtime') + sum('Reimburse_Amount'),
+		payrollGrossSalary: sum('Gross_Salary'),
 		payrollDeduction: sum('Total_Deduction') + sum('Tax_Amount'),
 		payrollNetSalary: sum('Net_Salary')
 	};
@@ -48905,8 +48906,9 @@ window.exportPayroll = function () {
     const money = value => 'Rp ' + Math.round(Number(value) || 0).toLocaleString('id-ID');
     const sum = field => rows.reduce( (total, row) => total + (Number(row[field]) || 0), 0 );
     // KPI — TIDAK DIUBAH
-		const totalGrossSalary = sum('Gross_Salary');
+		const totalBasicSalary = sum('Basic_Salary');
 		const totalAllowance = sum('Total_Allowance') + sum('Total_Overtime') + sum('Reimburse_Amount');
+		const totalGrossSalary = sum('Gross_Salary');
 		const totalDeduction = sum('Total_Deduction') + sum('Tax_Amount');
 		const totalNetSalary = sum('Net_Salary');
     // REPORT FILTER TITLES
@@ -49124,7 +49126,7 @@ window.exportPayroll = function () {
           /* KPI — TETAP SAMA */
           .summary-grid {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 12px;
             margin-bottom: 22px;
           }
@@ -49319,17 +49321,24 @@ window.exportPayroll = function () {
 
           <!-- KPI — TIDAK DIUBAH -->
           <section class="summary-grid">
-            <div class="summary-card">
-              <div class="summary-label">Gross Salary</div>
-              <div class="summary-value">
-                ${esc(money(totalGrossSalary))}
-              </div>
-            </div>
-
+						<div class="summary-card">
+							<div class="summary-label">Basic Salary</div>
+							<div class="summary-value">
+								${esc(money(totalBasicSalary))}
+							</div>
+						</div>
+            
             <div class="summary-card">
               <div class="summary-label">Allowance</div>
               <div class="summary-value">
                 ${esc(money(totalAllowance))}
+              </div>
+            </div>
+
+						<div class="summary-card">
+              <div class="summary-label">Gross Salary</div>
+              <div class="summary-value">
+                ${esc(money(totalGrossSalary))}
               </div>
             </div>
 
@@ -49361,7 +49370,7 @@ window.exportPayroll = function () {
                   <th style="text-align:right">Deduction</th>
                   <th style="text-align:right">Late</th>
                   <th style="text-align:right">Overtime</th>
-                  <th style="text-align:right">Health</th>
+                  <th style="text-align:right">Employer Contributions</th>
                   <th style="text-align:right">Tax</th>
                   <th style="text-align:right">Receivable</th>
                   <th style="text-align:right">Reimburse</th>
