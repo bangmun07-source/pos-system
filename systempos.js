@@ -40841,6 +40841,9 @@ window.saveEmployee = async function () {
 	// EMPLOYEE PHOTO
 	const photoInput = document.getElementById('employeePhoto');
 	const photoFile = photoInput?.files?.[0] || null;
+	// EMPLOYMENT DOCUMENT
+	const contractDocumentInput = document.getElementById('employeeContractDocument');
+	const contractDocumentFile = contractDocumentInput?.files?.[0] || null;
 	const role = state.user.role;
 
 	let branchId;
@@ -40862,6 +40865,9 @@ window.saveEmployee = async function () {
 
 		let photoUrl = null;
 		if (photoFile) { photoUrl = await uploadEmployeePhoto(photoFile); }
+		// UPLOAD CONTRACT DOCUMENT
+		let contractDocumentUrl = null;
+		if (contractDocumentFile) { contractDocumentUrl = await uploadEmployeeContractDocument(contractDocumentFile); }
 
 		const { data, error } = await supabaseClient.rpc(
 			'save_employee',
@@ -40881,6 +40887,7 @@ window.saveEmployee = async function () {
 				p_hire_date: hireDate,
 				p_status: status,
 				p_photo_url: photoUrl,
+				p_employment_document_url: contractDocumentUrl,
 				p_notes: notes || null,
 				p_nik: nik || null,
 				p_npwp: npwp || null,
@@ -41049,6 +41056,33 @@ async function compressEmployeePhoto(file) {
   }
 }
 
+/* === UPLOAD EMPLOYEE CONTRACT DOCUMENT === */
+async function uploadEmployeeContractDocument(file) {
+	if (!file) return null;
+
+	const allowedTypes = [
+		'application/pdf',
+		'image/jpeg',
+		'image/png'
+	];
+
+	if (!allowedTypes.includes(file.type)) { throw new Error('Dokumen kontrak harus PDF, JPG, atau PNG.'); }
+	if (file.size > 10 * 1024 * 1024) { throw new Error('Ukuran dokumen kontrak maksimal 10 MB.'); }
+
+	const extension = file.name.split('.').pop().toLowerCase();
+	const fileName = `${crypto.randomUUID()}.${extension}`;
+	const filePath = `employees/${fileName}`;
+	const { error: uploadError } = await supabaseClient.storage
+		.from('employee-documents')
+		.upload(filePath, file, {
+			cacheControl: '31536000',
+			upsert: false,
+			contentType: file.type
+		});
+	if (uploadError) throw uploadError;
+	return filePath;
+}
+
 document.addEventListener('change', function (event) {
   if (event.target.id !== 'employeePhoto') return;
 
@@ -41065,7 +41099,6 @@ document.addEventListener('change', function (event) {
     `;
     return;
   }
-
   if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
     alert('Foto harus JPG, PNG, atau WebP.');
     event.target.value = '';
@@ -41093,7 +41126,6 @@ document.addEventListener('change', function (event) {
 async function loadEmployees() {
   try {
     const sessionId = localStorage.getItem('pos_session_id');
-
     if (!sessionId) { throw new Error('Session POS tidak ditemukan.'); }
 		
     const role = String( state.user?.role || state.user?.Role || '' ).trim().toLowerCase();
