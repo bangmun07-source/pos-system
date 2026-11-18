@@ -25742,7 +25742,7 @@
 						</div>
           </div>
           <!-- KPI -->
-          <div class="grid grid-cols-2 md:grid-cols-4">
+          <div class="grid grid-cols-3 md:grid-cols-3">
             <div class="p-5 border-r border-outline-variant">
               <p class="text-[11px] text-muted uppercase tracking-wider">
                 Total Employees
@@ -25771,17 +25771,6 @@
               </p>
 
               <p id="employeeInactiveCount"
-                class="text-xl font-headline mt-1">
-                0
-              </p>
-            </div>
-
-            <div class="p-5">
-              <p class="text-[11px] text-muted uppercase tracking-wider">
-                Scheduled
-              </p>
-
-              <p id="employeeScheduledCount"
                 class="text-xl font-headline mt-1">
                 0
               </p>
@@ -25846,21 +25835,21 @@
           <!-- TABLE -->
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-                  <th class="px-5 py-3 text-left"> Employee </th>
-                  <th class="px-5 py-3 text-left"> Employee ID </th>
-                  <th class="px-5 py-3 text-left"> Position </th>
-                  <th class="px-5 py-3 text-left"> Outlet </th>
-                  <th class="px-5 py-3 text-center"> Status </th>
-                  <th class="px-5 py-3 text-center"> Action </th>
-                </tr>
-              </thead>
+							<thead>
+							  <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+							    <th class="px-5 py-3 text-left">Employee</th>
+							    <th class="px-5 py-3 text-left">Position</th>
+							    <th class="px-5 py-3 text-left">Department</th>
+							    <th class="px-5 py-3 text-left">Outlet</th>
+							    <th class="px-5 py-3 text-center">Status</th>
+							    <th class="px-5 py-3 text-center">Action</th>
+							  </tr>
+							</thead>
 
               <tbody id="employeeTableBody"
                 class="divide-y divide-outline-variant">
                 <tr>
-                  <td colspan="7"
+                  <td colspan="6"
                     class="px-5 py-10 text-center text-muted">
                     No employee data
                   </td>
