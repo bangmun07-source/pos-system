@@ -41906,6 +41906,10 @@ window.editEmployee = async function (employeeId) {
   document.getElementById('employeeBirthDate').value = employee.Birth_Date || '';
   document.getElementById('employeeNotes').value = employee.Notes || '';
   document.getElementById('employeeAddress').value = employee.Address || '';
+	// === EMERGENCY CONTACT ===
+	document.getElementById('employeeEmergencyName').value = employee.Emergency_Name || '';
+	document.getElementById('employeeEmergencyPhone').value = employee.Emergency_Phone || '';
+	document.getElementById('employeeEmergencyRelationship').value = employee.Emergency_Relationship || '';
 
 	const nikInput = document.getElementById('employeeNIK');
 	const npwpInput = document.getElementById('employeeNPWP');
