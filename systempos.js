@@ -42471,9 +42471,22 @@ window.saveSalaryComponent = function () {
 	if (accountingCategory === 'TAXABLE_NATURA' && !['TAXABLE', 'EXEMPT'].includes(naturaTaxTreatment)) { alert('Tax Treatment untuk Natura wajib dipilih.'); return; }
   if (!isTaxAllowance && (!Number.isFinite(amount) || amount < 0)) { alert('Amount tidak boleh negatif atau tidak valid.'); return; }
   if (!isTaxAllowance && calculationType === 'PERCENTAGE' && amount > 100) { alert('Persentase tidak boleh lebih dari 100%.'); return; }
-  if (type === 'EMPLOYER_CONTRIBUTION' && ![ 'EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION' ].includes(accountingCategory)) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
-  if ( type === 'ALLOWANCE' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
-  if ( type === 'DEDUCTION' && ['EMPLOYER_HEALTH_CONTRIBUTION', 'EMPLOYER_TAXABLE_CONTRIBUTION', 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
+	if ( type === 'EMPLOYER_CONTRIBUTION' &&
+	  ![
+	    'EMPLOYER_HEALTH_CONTRIBUTION',
+	    'EMPLOYER_TAXABLE_CONTRIBUTION',
+	    'EMPLOYER_PENSION_CONTRIBUTION',
+	    'EMPLOYER_PENSION_TAXABLE_CONTRIBUTION'
+	  ].includes(accountingCategory)
+	) { alert('Pilih kategori Employer Contribution yang sesuai.'); return; }
+	const employerContributionCategories = [
+	  'EMPLOYER_HEALTH_CONTRIBUTION',
+	  'EMPLOYER_TAXABLE_CONTRIBUTION',
+	  'EMPLOYER_PENSION_CONTRIBUTION',
+	  'EMPLOYER_PENSION_TAXABLE_CONTRIBUTION'
+	];
+	if (type === 'ALLOWANCE' && [...employerContributionCategories, 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Allowance.'); return; }
+	if (type === 'DEDUCTION' && [...employerContributionCategories, 'REIMBURSEMENT'].includes(accountingCategory)) { alert('Kategori tersebut tidak dapat disimpan sebagai Deduction.'); return; }
 	if (isTaxAllowance && type !== 'ALLOWANCE') { alert('Tax Allowance hanya dapat digunakan pada komponen Allowance.'); return; }
 
 	const componentData = {
@@ -42490,7 +42503,6 @@ window.saveSalaryComponent = function () {
 			: null,
 	  Is_Active: isTaxAllowance ? taxAllowanceActive : true
 	};
-
   if (componentId) {
     const index = employeeSalaryComponents.findIndex( component => component.Component_ID === componentId );
     if (index === -1) { alert('Komponen yang akan diedit tidak ditemukan.'); return; }
