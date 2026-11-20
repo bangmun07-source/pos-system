@@ -27294,11 +27294,10 @@ function populateJournalSourceFilter(entries) {
 	const selectedSource = select.value;
 
 	const sources = [
-			...new Set(
-					entries
-							.map(journal => String(journal.source || "").trim())
-							.filter(Boolean)
-			)
+		...new Set( entries
+			.map(journal => String(journal.source || "").trim())
+			.filter(Boolean)
+		)
 	].sort();
 
 	select.innerHTML = "";
@@ -27309,20 +27308,18 @@ function populateJournalSourceFilter(entries) {
 	select.appendChild(allOption);
 
 	sources.forEach(source => {
-			const option = document.createElement("option");
-			option.value = source;
-
-			option.textContent = source
-					.replace(/_/g, " ")
-					.toLowerCase()
-					.replace(/\b\w/g, char => char.toUpperCase());
-
-			select.appendChild(option);
+		const option = document.createElement("option");
+		option.value = source;
+		option.textContent = source
+			.replace(/_/g, " ")
+			.toLowerCase()
+			.replace(/\b\w/g, char => char.toUpperCase());
+		select.appendChild(option);
 	});
 
 	select.value = sources.includes(selectedSource)
-			? selectedSource
-			: "";
+		? selectedSource
+		: "";
 }
 
 
@@ -27345,31 +27342,24 @@ function renderJournalEntries(entries) {
 			</tr>
 		`;
 		} else {
-			tbody.innerHTML =
-				pageEntries
-					.map(
-						journal =>
-							renderJournalEntryRow(
-								journal
-							)
-						)
+			tbody.innerHTML = pageEntries .map( journal => renderJournalEntryRow(journal))
 			.join("");
 		}
 	updateJournalEntriesPagination( total, totalPages );
 }
 
 function renderJournalEntryRow(journal) {
-const sourceLabel = String(journal.source || "-")
-    .replace(/_/g, " ")
-    .toLowerCase()
-    .replace(/\b\w/g, char => char.toUpperCase());
-	
+	const sourceLabel = String(journal.source || "-")
+		.replace(/_/g, " ")
+		.toLowerCase()
+		.replace(/\b\w/g, char => char.toUpperCase());
+		
 	const statusLabel = {
 		POSTED: "Posted",
 		DRAFT: "Draft",
 		VOID: "Void"
 	}[ journal.status ] || journal.status || "-";
-	
+		
 	const statusClass = {
 		POSTED: "text-emerald-700",
 		DRAFT: "text-yellow-700",
@@ -27378,10 +27368,10 @@ const sourceLabel = String(journal.source || "-")
 	
 	return `
 		<tr class="border-b border-outline-variant hover:bg-outline-variant">
-			<td class="px-5 py-3 font-medium whitespace-nowrap"> ${escapeHtml( journal.journalNo || "-" )} </td>
-			<td class="px-5 py-3 text-muted whitespace-nowrap"> ${formatJournalDate( journal.journalDate )} </td>
-			<td class="px-5 py-3"> ${escapeHtml( sourceLabel )} </td>
-			<td class="px-5 py-3"> ${escapeHtml( journal.description || "-" )} </td>
+			<td class="px-5 py-3 font-medium whitespace-nowrap text-left"> ${escapeHtml( journal.journalNo || "-" )} </td>
+			<td class="px-5 py-3 text-muted whitespace-nowrap text-left"> ${formatJournalDate( journal.journalDate )} </td>
+			<td class="px-5 py-3 text-left"> ${escapeHtml( sourceLabel )} </td>
+			<td class="px-5 py-3 text-center"> ${escapeHtml( journal.description || "-" )} </td>
 			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalDebit )} </td>
 			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
 			<td class="px-5 py-3 uppercase tracking-widest font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
