@@ -15304,7 +15304,11 @@ async function loadBranchTaxSetting() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
     const branchId = state.branchId || state.user?.branchId;
+
     if (!branchId) return;
+
+    // Tandai bahwa pilihan pengguna belum berubah
+    window.taxTypeChanged = false;
 
     const { data, error } = await supabaseClient.rpc(
       "get_branch_tax_setting",
@@ -15315,10 +15319,19 @@ async function loadBranchTaxSetting() {
     );
 
     if (error) throw error;
+
+    // Jangan timpa pilihan jika pengguna sudah mengklik radio
+    if (window.taxTypeChanged) return;
+
+    const pbjtInput = document.getElementById("pbjtTaxInput");
+
     if (data !== null && data !== undefined) {
-      const pbjtInput = document.getElementById("pbjtTaxInput");
-      if (pbjtInput) pbjtInput.value = data; setTaxTypeUI("PBJT");
-    } else { setTaxTypeUI("PPN"); }
+      if (pbjtInput) pbjtInput.value = data;
+      setTaxTypeUI("PBJT");
+    } else {
+      setTaxTypeUI("PPN");
+    }
+
   } catch (err) {
     console.error("loadBranchTaxSetting:", err);
     showToast(err?.message || "Gagal memuat pengaturan pajak.", "error");
@@ -15332,8 +15345,21 @@ function initTaxTypeEvents() {
 
   if (!ppnRadio || !pbjtRadio) return;
 
-  ppnRadio.onchange = () => setTaxTypeUI("PPN");
-  pbjtRadio.onchange = () => setTaxTypeUI("PBJT");
+  window.taxTypeChanged = false;
+
+  ppnRadio.onchange = () => {
+    if (ppnRadio.checked) {
+      window.taxTypeChanged = true;
+      setTaxTypeUI("PPN");
+    }
+  };
+
+  pbjtRadio.onchange = () => {
+    if (pbjtRadio.checked) {
+      window.taxTypeChanged = true;
+      setTaxTypeUI("PBJT");
+    }
+  };
 }
 	
 	// ==================================
