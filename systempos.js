@@ -14048,6 +14048,7 @@ function applySettingsPage(data) {
 	
 	loadBranchesTable(allBranches);
 	loadUserFilterOptions();
+	loadBranchTaxSetting();
 	renderUsers();
   const taxInput = document.getElementById("taxInput");
   const serviceInput = document.getElementById("serviceInput");
@@ -14398,30 +14399,49 @@ function closeEditBranchModal(){
 
 async function saveTaxSettings() {
   const data = {
-    tax: Number( document .getElementById("taxInput") ?.value ) || 0,
-    service: Number( document .getElementById("serviceInput") ?.value ) || 0,
-    discount: Number( document .getElementById("discountInput") ?.value ) || 0
+    tax: Number(document.getElementById("taxInput")?.value) || 0,
+    service: Number(document.getElementById("serviceInput")?.value) || 0,
+    discount: Number(document.getElementById("discountInput")?.value) || 0
   };
 
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    const { data: result, error
-    } = await supabaseClient.rpc(
-      "save_settings",
-      {
-        p_settings: data,
-				p_session_id: sessionId
-      }
-    );
+    const branchId = state.branchId || state.user?.branchId;
+    const taxType = document.querySelector('input[name="taxType"]:checked')?.value;
 
-    if (error) { throw error; }
-		
+    // Simpan pengaturan PPN, service, dan discount yang sudah ada
+    const { error: settingsError } = await supabaseClient.rpc("save_settings", {
+      p_settings: data,
+      p_session_id: sessionId
+    });
+
+    if (settingsError) throw settingsError;
+
+    // Jika PBJT dipilih, simpan tarif PBJT untuk outlet
+    if (taxType === "PBJT") {
+      const pbjtRate = Number(document.getElementById("pbjtTaxInput")?.value);
+
+      if (!branchId) throw new Error("Outlet belum dipilih.");
+      if (!Number.isFinite(pbjtRate) || pbjtRate < 0 || pbjtRate > 100) {
+        throw new Error("Tarif PBJT harus antara 0 sampai 100 persen.");
+      }
+
+      const { error: pbjtError } = await supabaseClient.rpc("save_branch_tax_setting", {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_tax_rate: pbjtRate
+      });
+
+      if (pbjtError) throw pbjtError;
+    }
+
     state.settingsPageData = null;
     await reloadSettingsPage();
-    alert( "Settings saved!" );
-  }
-  catch (err) {
-    alert( err?.message || "Gagal menyimpan settings." );
+
+    alert("Settings saved!");
+
+  } catch (err) {
+    alert(err?.message || "Gagal menyimpan settings.");
   }
 }
 
@@ -15264,6 +15284,43 @@ async function loadTaxSettings() {
     );
   }
 }
+
+function setTaxTypeUI(type) {
+	document.getElementById("taxTypePPN").checked = type === "PPN";
+	document.getElementById("taxTypePBJT").checked = type === "PBJT";
+	document.getElementById("ppnTaxInputContainer")  ?.classList.toggle("hidden", type !== "PPN");
+	document.getElementById("pbjtTaxInputContainer")  ?.classList.toggle("hidden", type !== "PBJT");
+}
+
+// LOAD TAX TYPE DAN TARIF PBJT
+async function loadBranchTaxSetting() {
+	try {
+		const sessionId = localStorage.getItem("pos_session_id");
+		const branchId = state.branchId || state.user?.branchId;
+		if (!branchId) return;
+
+		const { data, error } = await supabaseClient.rpc(
+			"get_branch_tax_setting",
+			{
+				p_session_id: sessionId,
+				p_branch_id: branchId
+			}
+		);
+
+		if (error) throw error;
+
+		const setting = Array.isArray(data) ? data[0] : data;
+		if (setting) { document.getElementById("pbjtTaxInput").value = setting.tax_rate ?? 10; setTaxTypeUI("PBJT");
+		} else { setTaxTypeUI("PPN"); }
+
+	} catch (err) {
+		showToast(err?.message || "Gagal memuat pengaturan pajak.", "error");
+	}
+}
+
+// PILIH JENIS PAJAK
+document.getElementById("taxTypePPN").onchange = () => { setTaxTypeUI("PPN"); };
+document.getElementById("taxTypePBJT").onchange = () => { setTaxTypeUI("PBJT"); };
 	
 	// ==================================
 	// EXPENSES 
