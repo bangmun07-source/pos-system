@@ -27371,7 +27371,7 @@ function renderJournalEntryRow(journal) {
 			<td class="px-5 py-3 font-medium whitespace-nowrap text-left"> ${escapeHtml( journal.journalNo || "-" )} </td>
 			<td class="px-5 py-3 text-muted whitespace-nowrap text-left"> ${formatJournalDate( journal.journalDate )} </td>
 			<td class="px-5 py-3 text-left"> ${escapeHtml( sourceLabel )} </td>
-			<td class="px-5 py-3 text-center"> ${escapeHtml( journal.description || "-" )} </td>
+			<td class="px-5 py-3 text-left"> ${escapeHtml( journal.description || "-" )} </td>
 			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalDebit )} </td>
 			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
 			<td class="px-5 py-3 uppercase tracking-widest text-center font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
