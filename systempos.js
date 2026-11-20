@@ -14049,6 +14049,7 @@ function applySettingsPage(data) {
 	loadBranchesTable(allBranches);
 	loadUserFilterOptions();
 	loadBranchTaxSetting();
+	initTaxTypeEvents();
 	renderUsers();
   const taxInput = document.getElementById("taxInput");
   const serviceInput = document.getElementById("serviceInput");
@@ -14103,7 +14104,6 @@ async function loadSettingsPage() {
 }
 	
 async function reloadSettingsPage() {
-
   try {
     // SUPABASE RPC
     const data = await getSettingsPageDataRPC();
@@ -14114,7 +14114,6 @@ async function reloadSettingsPage() {
 			branch: {},
 			users: []
 		};
-
     // APPLY UI
     applySettingsPage( state.settingsPageData );
   }
@@ -15319,8 +15318,15 @@ async function loadBranchTaxSetting() {
 }
 
 // PILIH JENIS PAJAK
-document.getElementById("taxTypePPN").onchange = () => { setTaxTypeUI("PPN"); };
-document.getElementById("taxTypePBJT").onchange = () => { setTaxTypeUI("PBJT"); };
+function initTaxTypeEvents() {
+  const ppnRadio = document.getElementById("taxTypePPN");
+  const pbjtRadio = document.getElementById("taxTypePBJT");
+
+  if (!ppnRadio || !pbjtRadio) return;
+
+  ppnRadio.onchange = () => setTaxTypeUI("PPN");
+  pbjtRadio.onchange = () => setTaxTypeUI("PBJT");
+}
 	
 	// ==================================
 	// EXPENSES 
