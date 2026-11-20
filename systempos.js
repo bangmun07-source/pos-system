@@ -4046,7 +4046,6 @@ function renderGrossRevenue(data) {
   }, 50);
 }
 
-
  function renderDonut(data) {
   const svg = document.getElementById("grossRevenueDonut");
   const legend = document.getElementById("donutLegend");
@@ -4212,7 +4211,6 @@ data.forEach(item => {
           trending_up
         </span>
       </td>
-
     </tr>
   `;
 });
@@ -4231,16 +4229,14 @@ data.forEach(item => {
   if (prevBtn) {
     prevBtn.disabled = topRevenueCurrentPage <= 1;
     prevBtn.onclick = () => {
-      if (topRevenueCurrentPage > 1) {
-        topRevenueCurrentPage--;
+      if (topRevenueCurrentPage > 1) { topRevenueCurrentPage--;
         renderTopRevenueTable();
       }
     };
   }
 
   if (nextBtn) {
-    nextBtn.disabled =
-      topRevenueCurrentPage >= totalPages;
+    nextBtn.disabled = topRevenueCurrentPage >= totalPages;
     nextBtn.onclick = () => {
       if (topRevenueCurrentPage < totalPages) {
         topRevenueCurrentPage++;
@@ -4250,9 +4246,9 @@ data.forEach(item => {
   }
 }
 
-    // =========================
-    // POS PAGE
-    // =========================
+// =========================
+// POS PAGE
+// =========================
 
 function goPOS(){
   navigate('posPage');
@@ -4261,18 +4257,11 @@ function goPOS(){
 function validateStock() {
   for (const item of state.cart) {
     const product = state.products.find(p => String(p.ID_Produk) === String(item.id));
-    if (!product) {
-      showToast("Produk tidak ditemukan","error");
-      return false;
-    }
+    if (!product) { showToast("Produk tidak ditemukan","error"); return false; }
+		
     const stock =  Number(product.Stok ?? product.stock ?? 0);
     if (item.qty > stock) {
-      showToast(
-        `Stok ${product.Nama_Produk} tidak cukup`,
-        "error"
-      );
-      return false;
-    }
+      showToast( `Stok ${product.Nama_Produk} tidak cukup`, "error" ); return false; }
   }
   return true;
 }
@@ -4297,16 +4286,10 @@ function selectTable(id) {
 
 async function preloadRecipeMap() {
   const branchId = state.branchId;
-  if (!branchId) {
-    return;
-  }
+  if (!branchId) { return; }
   // CACHE
-  if (
-    state.recipeMap &&
-    state.recipeMapBranchId === branchId
-  ) {
-    return;
-  }
+  if ( state.recipeMap && state.recipeMapBranchId === branchId
+  ) { return; }
   
   try {
     // SUPABASE RPC
@@ -4314,27 +4297,38 @@ async function preloadRecipeMap() {
       await getRecipeMasterLedgerRPC(
         branchId
       );
-        
     // NORMALIZE
-    const norm = v =>
-      String(v || "")
-        .trim()
-        .toUpperCase();
+    const norm = v => String(v || "")
+			.trim()
+			.toUpperCase();
     
     // BUILD RECIPE MAP
     state.recipeMap = {};
     (recipe || []).forEach(r => {
-      state.recipeMap[
-        norm(r.productId)
-      ] = r;
-      state.recipeMap[
-        norm(r.name)
-      ] = r;
+      state.recipeMap[ norm(r.productId) ] = r;
+      state.recipeMap[ norm(r.name) ] = r;
     });
-    state.recipeMapBranchId =
-      branchId;
+    state.recipeMapBranchId = branchId;
   } catch (err) {
   }
+}
+
+async function getEffectiveTaxRate() {
+  const globalPPN = Number(state.settings?.tax || 0);
+  // Jika PPN global aktif, gunakan PPN
+  if (globalPPN > 0) return globalPPN;
+
+  // Jika PPN tidak aktif, ambil PBJT outlet
+  const sessionId = localStorage.getItem("pos_session_id");
+  const { data, error } = await supabaseClient.rpc(
+    "get_branch_tax_setting",
+    {
+      p_session_id: sessionId,
+      p_branch_id: state.branchId
+    }
+  );
+  if (error) throw error;
+  return Number(data || 0);
 }
 
 async function checkout() { 
@@ -4364,7 +4358,6 @@ async function checkout() {
 	if (orderType === "dine_in") {
 	  try {
 	    const tableData = await getTableStatus(table);
-	
 	    if (tableData?.status === "occupied") { alert(`Table ${table} sedang digunakan. Silakan clear table terlebih dahulu.`); return; }
 	    if (tableData?.status === "reserved") { alert(`Table ${table} sedang direservasi.`); return; }
 			
@@ -4423,28 +4416,19 @@ async function checkout() {
 	      await checkMemberRPC(memberId);
 				state.currentMemberData = member;
 	    if (!member) {
-	      alert(
-	        "Member tidak ditemukan ❌"
-	      );
+	      alert( "Member tidak ditemukan ❌" );
 	      isProcessing = false;
-	      if (btn) {
-	        btn.disabled = false;
-	      }
+	      if (btn) { btn.disabled = false; }
 	      return;
 	    }
 			payload.memberId = member.id;
 			payload.memberData = member;
 	    await hitungHPPDanKirim(payload);
 	  } catch (error) {
-	    alert(
-	      "Gagal memeriksa member ❌"
-	    );
+	    alert( "Gagal memeriksa member ❌" );
 	
 	    isProcessing = false;
-	    if (btn) {
-	      btn.disabled = false;
-	    }
-	    return;
+	    if (btn) { btn.disabled = false; } return;
 	  }
 	} else {
 	  await hitungHPPDanKirim(payload);
@@ -4465,68 +4449,65 @@ async function sendTransaction(payload){
 		if(btn){ btn.disabled = false; }
 		if(!res){ alert( "Backend mengembalikan NULL" ); return; }
 		if(res.success){ showToast( "Transaksi berhasil ✔", "success" );
-	  if (!payload.memberId) {
-	    openWhatsAppComposer({
-	      phone: "",
-	      title: "Kirim Struk Digital",
-	      message: "Terima kasih telah berbelanja!",
-	      trxId: res.transId,
-	      type: "transaction"
-	    });
-	  }
-		if(payload.memberId){
-			state.memberPageData = null;
-			state.members = null;
-		}
+		  if (!payload.memberId) {
+		    openWhatsAppComposer({
+		      phone: "",
+		      title: "Kirim Struk Digital",
+		      message: "Terima kasih telah berbelanja!",
+		      trxId: res.transId,
+		      type: "transaction"
+		    });
+		  }
+			if(payload.memberId){
+				state.memberPageData = null;
+				state.members = null;
+			}
 										
-		state.recentTransactionsData = null;
-		state.recentTransactionsFilter = null;
-		state.recentSummaryData = null;
-		state.recentSummaryFilter = null;
-		state.analyticsData = null;
-		state.analyticsFilter = null;
-		state.cashFlowData = null;
-		state.cashFlowFilter = null;
-		state.dashboardData = null;
-		state.tableData = null;
-		state.inventoryData = null;
-		state.inventoryFilter = null;
-		// state.products = null;
-		state.cart = [];
-		state.products = null;
-		state.productsBranchId = null;
-		state.productsRole = null;
-		await loadProducts();
-		state.currentMember = null;
-		state.selectedMember = null;
-		state.currentMemberPoint = 0;
-		state.paymentMethod = null;
-		state.discountActive = false;
-		state.accountingReportsData = null;
-		state.accountingReportsFilter = null;
-										
-		const memberInput = document.getElementById("member-input");
-		const tableInput = document.getElementById("table-input");
-										
-		if(memberInput){ memberInput.value = ""; }
-		if(tableInput){ tableInput.value = ""; }
-		const orderTypeInput = document.getElementById("order-type");
-		const onlineSourceInput = document.getElementById("online-source");
-		
-		if (orderTypeInput) {
-		  orderTypeInput.value = "dine_in";
-		  setOrderType("dine_in");
-		}
-		
-		if (onlineSourceInput) { onlineSourceInput.value = ""; }
-		
-		state.currentTable = "";
-										
-		renderCart();
-		updateSummary(0);
-	  } else{
-			showToast( "Gagal: " + res.message, "error" );
-    }
+			state.recentTransactionsData = null;
+			state.recentTransactionsFilter = null;
+			state.recentSummaryData = null;
+			state.recentSummaryFilter = null;
+			state.analyticsData = null;
+			state.analyticsFilter = null;
+			state.cashFlowData = null;
+			state.cashFlowFilter = null;
+			state.dashboardData = null;
+			state.tableData = null;
+			state.inventoryData = null;
+			state.inventoryFilter = null;
+			// state.products = null;
+			state.cart = [];
+			state.products = null;
+			state.productsBranchId = null;
+			state.productsRole = null;
+			await loadProducts();
+			state.currentMember = null;
+			state.selectedMember = null;
+			state.currentMemberPoint = 0;
+			state.paymentMethod = null;
+			state.discountActive = false;
+			state.accountingReportsData = null;
+			state.accountingReportsFilter = null;
+											
+			const memberInput = document.getElementById("member-input");
+			const tableInput = document.getElementById("table-input");
+											
+			if(memberInput){ memberInput.value = ""; }
+			if(tableInput){ tableInput.value = ""; }
+			const orderTypeInput = document.getElementById("order-type");
+			const onlineSourceInput = document.getElementById("online-source");
+			
+			if (orderTypeInput) {
+			  orderTypeInput.value = "dine_in";
+			  setOrderType("dine_in");
+			}
+			if (onlineSourceInput) { onlineSourceInput.value = ""; }
+			
+			state.currentTable = "";
+											
+			renderCart();
+			updateSummary(0);
+	  } else{ showToast( "Gagal: " + res.message, "error" ); }
   } catch(err){
     isProcessing = false;
 		
@@ -4586,14 +4567,8 @@ function selectPayment(method) {
     const btn = document.getElementById("pay-" + m);
     if (!btn) return;
 
-    btn.classList.remove(
-      "bg-outline-variant",
-      "text-foreground"
-    );
-    btn.classList.add(
-      "bg-background",
-      "text-foreground"
-    );
+    btn.classList.remove( "bg-outline-variant", "text-foreground" );
+    btn.classList.add( "bg-background", "text-foreground"  );
   });
   // Aktifkan tombol yang dipilih
   const activeBtn = document.getElementById("pay-" + method);
@@ -4675,9 +4650,7 @@ async function loadOrders() {
       `).join("");
   } catch (err) {
     el.innerHTML = `
-      <p>
-        Gagal memuat order
-      </p>
+      <p> Gagal memuat order </p>
     `;
   }
 }
@@ -4713,27 +4686,16 @@ function addToCartById(id, isRedeem = false, rewardId = null) {
 function addToCart(product, isRedeem = false, rewardId = null) {
   // VALIDASI MEMBER kalau redeem
   if (isRedeem) {
-    if (!state.currentMember) {
-      alert("Pilih member dulu!");
-      return;
-    }
-    if (!state.currentMemberPoint) {
-      alert("Point member belum dimuat");
-      return;
-    }
-    if (!rewardId) {
-      alert("Reward tidak valid!");
-      return;
-    }
+    if (!state.currentMember) { alert("Pilih member dulu!"); return; }
+    if (!state.currentMemberPoint) { alert("Point member belum dimuat"); return; }
+    if (!rewardId) { alert("Reward tidak valid!"); return; }
   }
   const existing = state.cart.find(
     i => i.id === product.ID_Produk && i.isRedeem === isRedeem
   );
   if (existing) {
     existing.qty++;
-    if (isRedeem) {
-      existing.rewardId = rewardId;
-    }
+    if (isRedeem) { existing.rewardId = rewardId; }
   } else {
     state.cart.push({
       id: product.ID_Produk,
@@ -4752,22 +4714,12 @@ function addToCart(product, isRedeem = false, rewardId = null) {
 async function loadProducts(callback) {
 	const role = state.user?.role?.toLowerCase() || "";
 	const branchId = state.branchId;
-	if (!branchId) {
-	  return;
-	}
+	if (!branchId) { return; }
+	
 	await loadPOSCategories();
-	if (
-	  state.products &&
-	  state.productsBranchId === branchId &&
-	  state.productsRole === role
-	) {
-	  renderProducts(
-	    state.products
-	  );
-	  if(callback){
-	    callback();
-	  }
-	  return;
+	if ( state.products && state.productsBranchId === branchId && state.productsRole === role
+	) { renderProducts( state.products );
+	  if(callback){ callback(); } return;
 	}
 	
 	try {
@@ -4814,10 +4766,7 @@ function filterProducts(category) {
 
 async function loadPOSCategories() {
   try {
-    const categoryContainer =
-      document.getElementById(
-        "pos-category-list"
-      );
+    const categoryContainer = document.getElementById( "pos-category-list" );
     if (!categoryContainer) return;
     categoryContainer.innerHTML = "";
   
@@ -4839,31 +4788,18 @@ async function loadPOSCategories() {
       );
 	  state.categories = categories || [];
     categories.forEach(category => {
-      const button =
-        document.createElement(
-          "button"
-        );
+      const button = document.createElement( "button" );
       button.type = "button";
       button.className = "category-btn flex items-center justify-center px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-2.5 md:py-3 rounded-md font-semibold headline-font text-xs lg:text-sm whitespace-nowrap transition-all";
-      button.textContent =
-        (
-          category.category_name ||
-          category.category_key ||
-          ""
-        ).toUpperCase();
+      button.textContent = ( category.category_name || category.category_key || "" ).toUpperCase();
       button.onclick = () => {
         setActiveCategory(button);
-        filterProducts(
-          category.category_name
-        );
+        filterProducts( category.category_name );
       };
       categoryContainer.appendChild(button);
     });
   } catch (error) {
-		showToast(
-			"Gagal memuat Categories",
-			"error"
-		);
+		showToast( "Gagal memuat Categories", "error" );
   }
 }
 
@@ -4871,6 +4807,7 @@ async function loadPOSCategories() {
 function renderCart() {
   const container = document.getElementById("cart-items");
   if (!container) return;
+	
   container.innerHTML = "";
   let subtotal = 0;
   if (state.cart.length === 0) {
@@ -4915,43 +4852,21 @@ function selectProductById(id) {
 }
   
 async function removeItemById(id) {
-  const index =
-    state.cart.findIndex(
-      i => i.id === id
-    );
-
-  if (index === -1) {
-    return;
-  }
+  const index = state.cart.findIndex( i => i.id === id );
+  if (index === -1) { return; }
   // Hapus dari cart lokal
-  state.cart.splice(
-    index,
-    1
-  );
+  state.cart.splice( index, 1 );
 
   renderCart();
   // Hapus dari transaksi di Supabase
   if (state.user) {
 
     try {
-      const res =
-        await removeItemFromCartRPC(
-          state.user.id,
-          id
-        );
-
-      if (res?.success) {
-        showToast(
-          "Item dihapus dari transaksi",
-          "success"
-        );
-      }
+      const res = await removeItemFromCartRPC( state.user.id, id );
+      if (res?.success) { showToast( "Item dihapus dari transaksi", "success" ); }
 
     } catch (error) {
-      showToast(
-        "Gagal menghapus item dari transaksi",
-        "error"
-      );
+      showToast( "Gagal menghapus item dari transaksi", "error" );
     }
   }
 }
@@ -4980,12 +4895,12 @@ function updateSummary(subtotal, member = null) {
       <span>${format(calc.service)}</span>
     </div>
 
-	 <div class="flex justify-between m-3 text-sm text-blue-700">
-	  <span>
-	    Discount${calc.discountRate > 0 ? ` (${calc.discountRate}%)` : ""}
-	  </span>
-	  <span>- ${format(calc.discount)}</span>
-	</div>
+		 <div class="flex justify-between m-3 text-sm text-blue-700">
+		  <span>
+		    Discount${calc.discountRate > 0 ? ` (${calc.discountRate}%)` : ""}
+		  </span>
+		  <span>- ${format(calc.discount)}</span>
+		</div>
 
     <div class="h-[1px] my-2"></div>
 
@@ -5002,35 +4917,26 @@ function updateSummary(subtotal, member = null) {
 
 function getCategoryDiscount(categoryName) {
   if (!categoryName) return 0;
-  const category =
-    (state.categories || []).find(c =>
-      String(c.branch_id) ===
-      String(state.branchId) &&
-      String(c.category_name || "")
-        .trim()
-        .toLowerCase() ===
-      String(categoryName || "")
-        .trim()
-        .toLowerCase()
-    );
-  return Number(
-    category?.discount || 0
-  );
+  const category = (state.categories || []).find(c =>
+		String(c.branch_id) ===
+		String(state.branchId) &&
+		String(c.category_name || "")
+			.trim()
+			.toLowerCase() ===
+		String(categoryName || "")
+			.trim()
+			.toLowerCase()
+	);
+  return Number( category?.discount || 0 );
 }
 
 
 function getCartCategoryDiscount() {
   let maxDiscount = 0;
   state.cart.forEach(item => {
-
     // Redeem tidak mendapatkan discount
     if (item.isRedeem) return;
-    const product =
-      state.products.find(
-        p =>
-          String(p.ID_Produk) ===
-          String(item.id)
-      );
+    const product = state.products.find( p => String(p.ID_Produk) === String(item.id));
 	
     if (!product) return;
     const categoryName =
@@ -5038,169 +4944,76 @@ function getCartCategoryDiscount() {
       product.Category ||
       item.category ||
       "";
-    const discount =
-      getCategoryDiscount(
-        categoryName
-      );
-    maxDiscount =
-      Math.max(
-        maxDiscount,
-        discount
-      );
+    const discount = getCategoryDiscount( categoryName );
+    maxDiscount = Math.max( maxDiscount, discount );
   });
   return maxDiscount;
 }
 
-function calculateTotal() {
-  const subtotal =
-    state.cart.reduce(
-      (sum, item) =>
-        sum + (item.price * item.qty),
-      0
-    );
+async function calculateTotal() {
+  const subtotal = state.cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const isMember = state.currentMember && state.currentMember !== "";
+  const globalDiscountRate = Number(state.settings?.discount || 0);
+  const globalDiscountAmount = subtotal * globalDiscountRate / 100;
 
-  const isMember =
-    state.currentMember &&
-    state.currentMember !== "";
-						
-  // GLOBAL DISCOUNT
-  const globalDiscountRate =
-    Number(
-      state.settings?.discount || 0
-    );
-
-  const globalDiscountAmount =
-    subtotal *
-    globalDiscountRate /
-    100;
-
-  // CATEGORY DISCOUNT PER ITEM
   let categoryDiscountAmount = 0;
+
   state.cart.forEach(item => {
-    // Produk redeem tidak mendapatkan discount
     if (item.isRedeem) return;
-    const product =
-      state.products.find(
-        p =>
-          String(p.ID_Produk) ===
-          String(item.id)
-      );
 
+    const product = state.products.find(p => String(p.ID_Produk) === String(item.id));
     if (!product) return;
-    const categoryName =
-      product.Kategori ||
-      product.Category ||
-      item.category ||
-      "";
 
+    const categoryName = product.Kategori || product.Category || item.category || "";
     const categoryDiscount = getCategoryDiscount(categoryName);
+    const itemSubtotal = Number(item.price || 0) * Number(item.qty || 0);
 
-    const itemSubtotal =
-      Number(item.price || 0) *
-      Number(item.qty || 0);
-
-    categoryDiscountAmount +=
-      itemSubtotal *
-      categoryDiscount /
-      100;
+    categoryDiscountAmount += itemSubtotal * categoryDiscount / 100;
   });
 
-  // MEMBER DISCOUNT
-  const memberDiscountRate =
-    isMember
-      ? Number(
-          state.loyaltySettings?.member_discount || 0
-        )
-      : 0;
+  const memberDiscountRate = isMember
+    ? Number(state.loyaltySettings?.member_discount || 0)
+    : 0;
+  const memberDiscountAmount = subtotal * memberDiscountRate / 100;
+  const birthdayDiscountRate = isMember
+    ? Number(state.loyaltySettings?.birthday_discount || 0)
+    : 0;
 
-  const memberDiscountAmount =
-    subtotal *
-    memberDiscountRate /
-    100;
+  let birthdayDiscountAmount = 0;
 
-	// BIRTHDAY DISCOUNT
-	const birthdayDiscountRate =
-		isMember
-			? Number(
-					state.loyaltySettings?.birthday_discount || 0
-				)
-			: 0;
-	
-	let birthdayDiscountAmount = 0;
-	
-	if (
-		isMember &&
-		state.currentMemberData?.tgl_lahir
-	) {
-		const today = new Date();
-		const birth = new Date(state.currentMemberData.tgl_lahir);
-		if (
-			today.getMonth() === birth.getMonth() &&
-			today.getDate() === birth.getDate()
-		) {
-			birthdayDiscountAmount =
-				subtotal *
-				birthdayDiscountRate /
-				100;
-		}
-	}
+  if (isMember && state.currentMemberData?.tgl_lahir) {
+    const today = new Date();
+    const birth = new Date(state.currentMemberData.tgl_lahir);
 
-  // PILIH DISCOUNT TERBESAR
-  const discount =
-    Math.max(
-      globalDiscountAmount,
-      memberDiscountAmount,
-			birthdayDiscountAmount,
-      categoryDiscountAmount
-    );
-	
-  // RATE UNTUK SUMMARY
+    if ( today.getMonth() === birth.getMonth() && today.getDate() === birth.getDate()
+    ) { birthdayDiscountAmount = subtotal * birthdayDiscountRate / 100; }}
+
+  const discount = Math.max(
+    globalDiscountAmount,
+    memberDiscountAmount,
+    birthdayDiscountAmount,
+    categoryDiscountAmount
+  );
+
   let displayDiscountRate = 0;
-  if (
-    discount === globalDiscountAmount &&
-    globalDiscountAmount > 0
-  ) {
-    displayDiscountRate =
-      globalDiscountRate;
-  }
-  if (
-	  discount === memberDiscountAmount &&
-	  memberDiscountAmount > 0
-	) {
-	  displayDiscountRate =
-	    memberDiscountRate;
-	}
-	if (
-	  discount === birthdayDiscountAmount &&
-	  birthdayDiscountAmount > 0
-	) {
-	  displayDiscountRate =
-	    birthdayDiscountRate;
-	}
 
-  // CALCULATE
+  if (discount === globalDiscountAmount && globalDiscountAmount > 0) { displayDiscountRate = globalDiscountRate; }
+  if (discount === memberDiscountAmount && memberDiscountAmount > 0) { displayDiscountRate = memberDiscountRate; }
+  if (discount === birthdayDiscountAmount && birthdayDiscountAmount > 0) { displayDiscountRate = birthdayDiscountRate; }
+
   const base = subtotal - discount;
-  const tax =
-    base *
-    Number(
-      state.settings?.tax || 0
-    ) /
-    100;
-  const service =
-    base *
-    Number(
-      state.settings?.service || 0
-    ) /
-    100;
-  const total =
-    base +
-    tax +
-    service;
+  // Tarif pajak efektif: PPN global atau PBJT outlet
+  const taxRate = await getEffectiveTaxRate();
+  const tax = base * taxRate / 100;
+  const service = base * Number(state.settings?.service || 0) / 100;
+  const total = base + tax + service;
+
   return {
     subtotal,
     discount,
     discountRate: displayDiscountRate,
     tax,
+    taxRate,
     service,
     total
   };
@@ -5230,11 +5043,8 @@ function increaseQty(index) {
 }
 
 function decreaseQty(index) {
-  if (state.cart[index].qty > 1) {
-    state.cart[index].qty--;
-  } else {
-    state.cart.splice(index, 1);
-  }
+  if (state.cart[index].qty > 1) { state.cart[index].qty--;
+  } else { state.cart.splice(index, 1); }
   renderCart();
 }
 
@@ -5255,8 +5065,7 @@ async function openRedeem() {
     showRedeemPopup(res);
   }
   catch(err){
-    alert( "Gagal ambil reward" );
-  }
+		alert( "Gagal ambil reward" ); }
 }
 
 function resetPOSMember() {
@@ -5312,56 +5121,44 @@ function showRedeemPopup(data) {
     const canRedeem = data.member.point >= r.point;
     const div = document.createElement("div");
     div.innerHTML = `
-      <div class="bg-background
-          rounded-md
-          border border-outline-variant
-          p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)]
-          transition-all
-          duration-200
-          hover:bg-background-high
-          ${!canRedeem ? 'opacity-50' : ''}">
+      <div class="bg-background rounded-md border border-outline-variant p-4 shadow-[0_2px_10px_rgba(0,0,0,0.15)] transition-all duration-200 hover:bg-background-high ${!canRedeem ? 'opacity-50' : ''}">
+				<div class="flex items-start justify-between">
+					<div class="flex gap-3">
+						<div class=" w-11 h-11 rounded-md bg-background-high flex items-center justify-center text-on-surface">
+							<span class="material-symbols-outlined">
+								card_giftcard
+							</span>
+						</div>
 
-          <div class="flex items-start justify-between">
-              <div class="flex gap-3">
-                  <div class=" w-11 h-11
-                      rounded-md
-                      bg-background-high
-                      flex items-center justify-center
-                      text-on-surface">
-                      <span class="material-symbols-outlined">
-                          card_giftcard
-                      </span>
-                  </div>
+						<div>
+							<h5 class="font-semibold text-on-surface">
+								${r.nama}
+							</h5>
 
-                  <div>
-                      <h5 class="font-semibold text-on-surface">
-                          ${r.nama}
-                      </h5>
+							<p class="text-xs text-on-surface-variant mt-1">
+								${Number(r.point).toLocaleString()} Points
+							</p>
+						</div>
+					</div>
+				</div>
 
-                      <p class="text-xs text-on-surface-variant mt-1">
-                          ${Number(r.point).toLocaleString()} Points
-                      </p>
-                  </div>
-              </div>
-          </div>
-
-          <button ${!canRedeem ? 'disabled' : ''}
-            onclick="selectReward('${String(r.ID_Reward)}')"
-            class=" mt-4 w-full h-10 rounded-md transition active:scale-95
-							${
-								canRedeem
-								? `
-								bottom-theme
-								text-on-surface
-								`
-								: `
-								bg-background-high
-								text-on-surface-variant
-								cursor-not-allowed
-								`
-							}">
-              ${canRedeem ? 'Redeem' : 'Insufficient Points'}
-          </button>
+				<button ${!canRedeem ? 'disabled' : ''}
+					onclick="selectReward('${String(r.ID_Reward)}')"
+					class=" mt-4 w-full h-10 rounded-md transition active:scale-95
+						${
+							canRedeem
+							? `
+							bottom-theme
+							text-on-surface
+							`
+							: `
+							bg-background-high
+							text-on-surface-variant
+							cursor-not-allowed
+							`
+						}">
+						${canRedeem ? 'Redeem' : 'Insufficient Points'}
+				</button>
       </div>
       `;
     container.appendChild(div);
@@ -5382,7 +5179,6 @@ function selectReward(rewardId) {
       const prod = state.products.find(p => p.ID_Produk == i.id);
       return sum + ((Number(prod?.Redeem_Point) || 0) * i.qty);
     }, 0);
-
   // CEK POINT
   if ((state.currentMemberPoint - totalPointUsed) < (Number(product.Redeem_Point) || 0)) { alert("Point tidak cukup"); return; }
 
@@ -5417,9 +5213,7 @@ async function getMemberDetailPage(memberId, branchId) {
     const data = await getMemberDetailPageRPC( memberId, branchId );
 		
     return data;
-  } catch (error) {
-    throw error;
-  }
+  } catch (error) { throw error; }
 }
 
 async function uploadMemberImage( base64, memberId ) {
@@ -5541,7 +5335,6 @@ function renderMembers(data = state.members) {
 
   // RENDER
   tbody.innerHTML = paginatedData.map(m => `
-
     <tr class="hover:bg-outline-variant">
       <td class="px-8 py-5 text-sm font-mono text-on-surface">
         ${m.ID_Member}
@@ -5636,7 +5429,6 @@ function loadIngredientStockAlertTemplate(){
 }
 
 function ensureIngredientStockAlertModal() {
-
   let modal = document.getElementById( "ingredientStockAlertModal" );
   if (modal) { return modal; }
 
@@ -5723,14 +5515,12 @@ function ensureWhatsAppModal() {
   // Sudah ada di DOM
   let modal = document.getElementById( "whatsapp-message-modal" );
   if (modal) { return modal; }
-
   // Ambil template
   const template = document.getElementById( "whatsAppMessageModalTemplate" );
   if (!template) { return null; }
   // Clone isi template
   const clone = template.content.cloneNode(true);
   document.body.appendChild(clone);
-
   // Ambil kembali setelah masuk DOM
   modal = document.getElementById( "whatsapp-message-modal" ); return modal;
 }
@@ -5749,7 +5539,6 @@ function openWhatsAppComposer({phone, title, message, type = null, trxId}) {
   // MESSAGE
   const messageEl = document.getElementById( "waMessage" );
   if (messageEl) { messageEl.value = message || ""; }
-
   // OPEN MODAL
   modal.classList.remove("hidden");
   modal.classList.add("flex");
@@ -5766,7 +5555,6 @@ function closeWhatsAppModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   }
-	
   whatsappComposerData = null;
 }
 
