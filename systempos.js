@@ -27374,8 +27374,8 @@ function renderJournalEntryRow(journal) {
 			<td class="px-5 py-3 text-center"> ${escapeHtml( journal.description || "-" )} </td>
 			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalDebit )} </td>
 			<td class="px-5 py-3 text-right whitespace-nowrap"> ${formatJournalCurrency( journal.totalCredit )} </td>
-			<td class="px-5 py-3 uppercase tracking-widest font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
-			<td class="px-5 py-3 text-right">
+			<td class="px-5 py-3 uppercase tracking-widest text-center font-semibold headline-font ${statusClass}"> ${escapeHtml( statusLabel )} </td>
+			<td class="px-5 py-3 text-center">
 				<div class="relative inline-block overflow-visible">
 					<button type="button"
 						onclick="toggleJournalEntryActionMenu('${escapeHtml(journal.journalId)}')"
@@ -28488,13 +28488,13 @@ function renderGeneralLedger() {
 		const balance = Number(row.balance || 0);
 		return `
 			<tr class="border-b border-outline-variant hover:bg-outline-variant transition-all">
-				<td class="px-5 py-4 text-muted whitespace-nowrap"> ${formatGeneralLedgerDate(row.journalDate)} </td>
-				<td class="px-5 py-4 font-medium text-on-surface whitespace-nowrap"> ${escapeHtml(row.journalNo || "-")} </td>
-				<td class="px-5 py-4 text-on-surface whitespace-nowrap">
+				<td class="px-5 py-4 text-muted whitespace-nowrap text-left"> ${formatGeneralLedgerDate(row.journalDate)} </td>
+				<td class="px-5 py-4 font-medium text-on-surface whitespace-nowrap text-left"> ${escapeHtml(row.journalNo || "-")} </td>
+				<td class="px-5 py-4 text-on-surface whitespace-nowrap text-left">
 					<div class="text-sm font-medium"> ${escapeHtml(row.accountCode || "-")} </div>
 					<div class="text-xs text-on-surface-variant mt-1"> ${escapeHtml(row.accountName || "-")} </div>
 				</td>
-				<td class="px-5 py-4 text-on-surface-variant"> ${escapeHtml(row.description || "-")} </td>
+				<td class="px-5 py-4 text-on-surface-variant text-left"> ${escapeHtml(row.description || "-")} </td>
 				<td class="px-5 py-4 text-right text-on-surface whitespace-nowrap"> ${debit > 0 ? formatGeneralLedgerCurrency(debit) : "—"} </td>
 				<td class="px-5 py-4 text-right text-on-surface whitespace-nowrap"> ${credit > 0 ? formatGeneralLedgerCurrency(credit) : "—"} </td>
 				<td class="px-5 py-4 text-right font-medium text-on-surface whitespace-nowrap"> ${formatGeneralLedgerCurrency(balance)} </td>
