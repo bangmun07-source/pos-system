@@ -841,7 +841,7 @@ function initModule(pageId) {
 
 		case "taxservicesettingPage":
 		  waitBranch(async () => {
-		    await loadTaxSettings();
+		    await loadTaxServicePage();
 		  });
 	  break;
 
@@ -15299,6 +15299,12 @@ function setTaxTypeUI(type) {
   if (pbjtContainer) { pbjtContainer.classList.toggle("hidden", type !== "PBJT"); }
 }
 
+async function loadTaxServicePage() {
+  await loadTaxSettings();
+  await loadBranchTaxSetting();
+  initTaxTypeEvents();
+}
+
 // LOAD TAX TYPE DAN TARIF PBJT
 async function loadBranchTaxSetting() {
   try {
@@ -15306,9 +15312,6 @@ async function loadBranchTaxSetting() {
     const branchId = state.branchId || state.user?.branchId;
 
     if (!branchId) return;
-
-    // Tandai bahwa pilihan pengguna belum berubah
-    window.taxTypeChanged = false;
 
     const { data, error } = await supabaseClient.rpc(
       "get_branch_tax_setting",
