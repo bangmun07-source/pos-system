@@ -4368,7 +4368,7 @@ async function checkout() {
   isProcessing = true; //  kunci mulai
   if (btn) btn.disabled = true;
   const memberId = state.currentMember ? String(state.currentMember).trim() : null;
-  const calc = calculateTotal();
+  const calc = await calculateTotal();
   const totalPointUsed = state.cart
 		.filter(i => i.isRedeem)
 		.reduce((sum, i) => sum + (i.pointUsed || 0), 0);
@@ -4871,44 +4871,54 @@ async function removeItemById(id) {
   }
 }
 
-function updateSummary(subtotal, member = null) {
+async function updateSummary(subtotal, member = null) {
   const el = document.getElementById("pos-cart-summary");
   if (!el) return;
 
-  // Gunakan satu sumber perhitungan
-  const calc = calculateTotal();
-  const taxRate = Number(state.settings?.tax || 0);
-  const serviceRate = Number(state.settings?.service || 0);
-  el.innerHTML = `
-    <div class="flex justify-between m-3 text-sm">
-      <span>Subtotal</span>
-      <span>${format(calc.subtotal)}</span>
-    </div>
+  try {
+    const calc = await calculateTotal();
+    const globalPPN = Number(state.settings?.tax || 0);
+    const taxLabel = globalPPN > 0 ? "PPN" : "PBJT";
+    const serviceRate = Number(state.settings?.service || 0);
 
-    <div class="flex justify-between m-3 text-sm">
-      <span>Tax (${taxRate}%)</span>
-      <span>${format(calc.tax)}</span>
-    </div>
+    el.innerHTML = `
+      <div class="flex justify-between m-3 text-sm">
+        <span>Subtotal</span>
+        <span>${format(calc.subtotal)}</span>
+      </div>
 
-    <div class="flex justify-between m-3 text-sm">
-      <span>Service (${serviceRate}%)</span>
-      <span>${format(calc.service)}</span>
-    </div>
+      <div class="flex justify-between m-3 text-sm">
+        <span>${taxLabel} (${calc.taxRate}%)</span>
+        <span>${format(calc.tax)}</span>
+      </div>
 
-		 <div class="flex justify-between m-3 text-sm text-blue-700">
-		  <span>
-		    Discount${calc.discountRate > 0 ? ` (${calc.discountRate}%)` : ""}
-		  </span>
-		  <span>- ${format(calc.discount)}</span>
-		</div>
+      <div class="flex justify-between m-3 text-sm">
+        <span>Service (${serviceRate}%)</span>
+        <span>${format(calc.service)}</span>
+      </div>
 
-    <div class="h-[1px] my-2"></div>
+      <div class="flex justify-between m-3 text-sm text-blue-700">
+        <span>
+          Discount${calc.discountRate > 0 ? ` (${calc.discountRate}%)` : ""}
+        </span>
+        <span>- ${format(calc.discount)}</span>
+      </div>
 
-    <div class="flex justify-between m-3 font-bold text-lg">
-      <span>Total</span>
-      <span>${format(calc.total)}</span>
-    </div>
-  `;
+      <div class="h-[1px] my-2"></div>
+
+      <div class="flex justify-between m-3 font-bold text-lg">
+        <span>Total</span>
+        <span>${format(calc.total)}</span>
+      </div>
+    `;
+  } catch (error) {
+    console.error("updateSummary:", error);
+    el.innerHTML = `
+      <p class="text-red-600 text-sm m-3">
+        Gagal menghitung pajak dan total transaksi.
+      </p>
+    `;
+  }
 }
 
 // ==========================================
