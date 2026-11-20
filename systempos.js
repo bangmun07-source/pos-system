@@ -14048,7 +14048,6 @@ function applySettingsPage(data) {
 	
 	loadBranchesTable(allBranches);
 	loadUserFilterOptions();
-	loadBranchTaxSetting();
 	initTaxTypeEvents();
 	renderUsers();
   const taxInput = document.getElementById("taxInput");
@@ -14058,6 +14057,7 @@ function applySettingsPage(data) {
   if (serviceInput) serviceInput.value = state.settings.service || 0;
   if (discountInput) discountInput.value = state.settings.discount || 0;
   loadBusinessProfile();
+	loadBranchTaxSetting();
 }
 
 function applyUserBranchAccess() {
@@ -15288,36 +15288,41 @@ async function loadTaxSettings() {
 }
 
 function setTaxTypeUI(type) {
-	document.getElementById("taxTypePPN").checked = type === "PPN";
-	document.getElementById("taxTypePBJT").checked = type === "PBJT";
-	document.getElementById("ppnTaxInputContainer")  ?.classList.toggle("hidden", type !== "PPN");
-	document.getElementById("pbjtTaxInputContainer")  ?.classList.toggle("hidden", type !== "PBJT");
+  const ppnRadio = document.getElementById("taxTypePPN");
+  const pbjtRadio = document.getElementById("taxTypePBJT");
+  const ppnContainer = document.getElementById("ppnTaxInputContainer");
+  const pbjtContainer = document.getElementById("pbjtTaxInputContainer");
+
+  if (ppnRadio) ppnRadio.checked = type === "PPN";
+  if (pbjtRadio) pbjtRadio.checked = type === "PBJT";
+  if (ppnContainer) { ppnContainer.classList.toggle("hidden", type !== "PPN"); }
+  if (pbjtContainer) { pbjtContainer.classList.toggle("hidden", type !== "PBJT"); }
 }
 
 // LOAD TAX TYPE DAN TARIF PBJT
 async function loadBranchTaxSetting() {
-	try {
-		const sessionId = localStorage.getItem("pos_session_id");
-		const branchId = state.branchId || state.user?.branchId;
-		if (!branchId) return;
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    const branchId = state.branchId || state.user?.branchId;
+    if (!branchId) return;
 
-		const { data, error } = await supabaseClient.rpc(
-			"get_branch_tax_setting",
-			{
-				p_session_id: sessionId,
-				p_branch_id: branchId
-			}
-		);
+    const { data, error } = await supabaseClient.rpc(
+      "get_branch_tax_setting",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId
+      }
+    );
 
-		if (error) throw error;
-
-		const setting = Array.isArray(data) ? data[0] : data;
-		if (setting) { document.getElementById("pbjtTaxInput").value = setting.tax_rate ?? 10; setTaxTypeUI("PBJT");
-		} else { setTaxTypeUI("PPN"); }
-
-	} catch (err) {
-		showToast(err?.message || "Gagal memuat pengaturan pajak.", "error");
-	}
+    if (error) throw error;
+    if (data !== null && data !== undefined) {
+      const pbjtInput = document.getElementById("pbjtTaxInput");
+      if (pbjtInput) pbjtInput.value = data; setTaxTypeUI("PBJT");
+    } else { setTaxTypeUI("PPN"); }
+  } catch (err) {
+    console.error("loadBranchTaxSetting:", err);
+    showToast(err?.message || "Gagal memuat pengaturan pajak.", "error");
+  }
 }
 
 // PILIH JENIS PAJAK
