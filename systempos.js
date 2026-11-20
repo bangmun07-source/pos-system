@@ -14396,6 +14396,7 @@ function closeEditBranchModal(){
   if(modal){ modal.remove(); }
 }
 
+
 async function saveTaxSettings() {
   const data = {
     tax: Number(document.getElementById("taxInput")?.value) || 0,
@@ -14408,7 +14409,16 @@ async function saveTaxSettings() {
     const branchId = state.branchId || state.user?.branchId;
     const taxType = document.querySelector('input[name="taxType"]:checked')?.value;
 
-    // Simpan pengaturan PPN, service, dan discount yang sudah ada
+    if (!branchId) throw new Error("Outlet belum dipilih.");
+    if (!["PPN", "PBJT"].includes(taxType)) { throw new Error("Silakan pilih jenis pajak."); }
+
+    const pbjtRate = taxType === "PBJT"
+      ? Number(document.getElementById("pbjtTaxInput")?.value)
+      : null;
+    if ( taxType === "PBJT" && (!Number.isFinite(pbjtRate) || pbjtRate < 0 || pbjtRate > 100)
+    ) { throw new Error("Tarif PBJT harus antara 0 sampai 100 persen."); }
+
+    // Simpan PPN, service, dan discount
     const { error: settingsError } = await supabaseClient.rpc("save_settings", {
       p_settings: data,
       p_session_id: sessionId
@@ -14416,29 +14426,22 @@ async function saveTaxSettings() {
 
     if (settingsError) throw settingsError;
 
-    // Jika PBJT dipilih, simpan tarif PBJT untuk outlet
-    if (taxType === "PBJT") {
-      const pbjtRate = Number(document.getElementById("pbjtTaxInput")?.value);
-
-      if (!branchId) throw new Error("Outlet belum dipilih.");
-      if (!Number.isFinite(pbjtRate) || pbjtRate < 0 || pbjtRate > 100) {
-        throw new Error("Tarif PBJT harus antara 0 sampai 100 persen.");
-      }
-
-      const { error: pbjtError } = await supabaseClient.rpc("save_branch_tax_setting", {
+    // Simpan jenis pajak dan tarif PBJT outlet
+    const { error: taxError } = await supabaseClient.rpc(
+      "save_branch_tax_setting",
+      {
         p_session_id: sessionId,
         p_branch_id: branchId,
+        p_tax_type: taxType,
         p_tax_rate: pbjtRate
-      });
+      }
+    );
 
-      if (pbjtError) throw pbjtError;
-    }
+    if (taxError) throw taxError;
 
     state.settingsPageData = null;
     await reloadSettingsPage();
-
     alert("Settings saved!");
-
   } catch (err) {
     alert(err?.message || "Gagal menyimpan settings.");
   }
