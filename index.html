@@ -12474,90 +12474,125 @@
 						</div>
 					</div>
 				</div>
+			
 				<div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+					<!-- PPN -->
 					<div>
-						<label class="block font-label text-xs uppercase tracking-widest text-muted  mb-2">Tax Rate Percentage</label>
-							<div class="relative group">
-								<input id="taxInput" class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
-								<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
-									<div class="absolute left-0 bottom-0 w-0 h-1 bg-primary-container group-focus-within:w-1 transition-all duration-300"></div>
-								</div>
+						<label class="block font-label text-xs uppercase tracking-widest text-muted mb-2">
+							Tax Rate Percentage
+						</label>
+						<div class="relative">
+							<input id="taxInput" type="text" value="0"
+								class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 text-on-surface">
+							<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted font-bold text-xl">%</span>
+						</div>
+					</div>
+					
+					<!-- PBJT -->
+					<div id="pbjtTaxInputContainer" class="hidden">
+						<label class="block font-label text-xs uppercase tracking-widest text-muted mb-2">
+							PBJT Tax Rate
+						</label>
+						<div class="relative">
+							<input id="pbjtTaxInput" type="number" min="0" max="100" step="0.01" value="10"
+								class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 text-on-surface">
+							<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted font-bold text-xl">%</span>
+						</div>
+					</div>
+				</div>
+		
+				<div class="col-span-12 lg:col-span-4 p-4 bg-background overflow-hidden rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+					<h3 class="font-headline font-bold text-xl text-on-surface mb-4">
+							Tax Configuration
+					</h3>
+			
+					<p class="text-on-surface-variant text-sm leading-relaxed mb-6">
+							Select the tax type applicable to this outlet.
+					</p>
+			
+					<div class="space-y-4">
+						<label class="flex items-center justify-between p-4 rounded-md border border-outline-variant cursor-pointer">
+							<div>
+								<p class="font-semibold text-on-surface">PPN</p>
+								<p class="text-xs text-on-surface-variant mt-1">Value Added Tax</p>
+							</div>
+							<input type="radio"
+								name="taxType"
+								value="PPN"
+								id="taxTypePPN"
+								class="w-5 h-5 accent-primary"
+								checked >
+						</label>
+			
+						<label class="flex items-center justify-between p-4 rounded-md border border-outline-variant cursor-pointer">
+							<div>
+								<p class="font-semibold text-on-surface">PBJT</p>
+								<p class="text-xs text-on-surface-variant mt-1">Goods and Services Tax</p>
+							</div>
+							<input type="radio"
+								name="taxType"
+								value="PBJT"
+								id="taxTypePBJT"
+								class="w-5 h-5 accent-primary" >
+						</label>
+					</div>
+				</div>
+				<!-- Service Charge Section -->
+				<div class="col-span-12 md:col-span-6 bg-background overflow-hidden rounded-md p-4 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+					<div class="flex items-start justify-between mb-8">
+						<div class="flex gap-4">
+							<div class="main-icon-box">
+								<span class="main-icon-box material-symbols-outlined text-3xl"
+										style="font-variation-settings:'FILL' 1;" data-icon="volunteer_activism">
+									volunteer_activism
+								</span>
 							</div>
 							<div>
-								<label class="block font-label text-xs uppercase tracking-widest text-muted  mb-2">Currency Reference</label>
-									<div class="h-16 flex items-center px-6 bg-background rounded-md border border-outline-variant text-on-surface-variant font-medium">
-											IDR — Indonesian Rupiah
-									</div>
+								<h3 class="font-headline font-bold text-xl text-on-surface">Service</h3>
+								<p class="text-on-surface-variant text-sm mt-1">Staff gratuity and venue premium.</p>
+							</div>
+						</div>
+					</div>
+					<div class="p-6 group focus-within:border-tertiary/20 transition-all">
+						<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Charge Rate</label>
+							<div class="relative group">
+								<input id="serviceInput"  class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
+								<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
+							</div>
+						</div>
+					</div>
+					<!-- Staff Discount Section -->
+					<div class="col-span-12 md:col-span-6 bg-background rounded-md p-4 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+						<div class="flex items-start justify-between mb-8">
+							<div class="flex gap-4">
+								<div class="main-icon-box">
+									<span class="main-icon-box material-symbols-outlined text-3xl"
+												style="font-variation-settings:'FILL' 1;" data-icon="percent">
+										percent
+									</span>
+								</div>
+							
+								<div>
+									<h3 class="font-headline font-bold text-xl text-on-surface">Discount</h3>
+									<p class="text-on-surface-variant text-sm mt-1">Global store-wide internal discount.</p>
 								</div>
 							</div>
 						</div>
-			
-						<div class="col-span-12 lg:col-span-4 p-4 bg-background overflow-hidden rounded-md border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-						  <h3 class="font-headline font-bold text-xl text-on-surface mb-4">
-						    Tax Information
-						  </h3>
-						
-						  <p class="text-on-surface-variant text-sm leading-relaxed">
-						    Configure VAT settings for this outlet.
-						    Changes will affect all future transactions and printed receipts.
-						  </p>		
+
+						<div class="p-6 rounded-md group focus-within:border-primary-container/20 transition-all">
+							<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Discount Cap</label>
+								<div class="relative group">
+									<input id="discountInput" class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
+									<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
+								</div>
+							</div>
 						</div>
-						<!-- Service Charge Section -->
-						<div class="col-span-12 md:col-span-6 bg-background overflow-hidden rounded-md p-4 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-							<div class="flex items-start justify-between mb-8">
-								<div class="flex gap-4">
-									<div class="main-icon-box">
-								    <span class="main-icon-box material-symbols-outlined text-3xl"
-								      	style="font-variation-settings:'FILL' 1;" data-icon="volunteer_activism">
-											volunteer_activism
-										</span>
-									</div>
-									<div>
-										<h3 class="font-headline font-bold text-xl text-on-surface">Service</h3>
-										<p class="text-on-surface-variant text-sm mt-1">Staff gratuity and venue premium.</p>
-									</div>
-								</div>
-							</div>
-							<div class="p-6 group focus-within:border-tertiary/20 transition-all">
-								<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Charge Rate</label>
-									<div class="relative group">
-										<input id="serviceInput"  class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
-										<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
-									</div>
-								</div>
-							</div>
-							<!-- Staff Discount Section -->
-							<div class="col-span-12 md:col-span-6 bg-background rounded-md p-4 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-								<div class="flex items-start justify-between mb-8">
-									<div class="flex gap-4">
-										<div class="main-icon-box">
-								      <span class="main-icon-box material-symbols-outlined text-3xl"
-								            style="font-variation-settings:'FILL' 1;" data-icon="percent">
-												percent
-											</span>
-										</div>
-									
-										<div>
-											<h3 class="font-headline font-bold text-xl text-on-surface">Discount</h3>
-											<p class="text-on-surface-variant text-sm mt-1">Global store-wide internal discount.</p>
-										</div>
-									</div>
-								</div>
-		
-								<div class="p-6 rounded-md group focus-within:border-primary-container/20 transition-all">
-									<label class="block font-label text-[10px] uppercase tracking-[0.2em] text-muted  mb-3">Discount Cap</label>
-										<div class="relative group">
-											<input id="discountInput" class="w-full h-16 bg-background rounded-md border border-outline-variant text-2xl font-headline font-bold px-6 focus:bg-background focus:ring-0 transition-all text-on-surface" type="text" value="0"/>
-											<span class="absolute right-6 top-1/2 -translate-y-1/2 text-muted  font-headline font-bold text-xl">%</span>
-										</div>
-									</div>
-								</div>
-								<!-- Preview Area (Glassmorphism) -->
-								<div class="col-span-12 bg-background rounded-md p-4 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-									<h3 class="font-headline font-bold text-xl text-on-surface mb-6 flex items-center gap-3">
-										<span class="material-symbols-outlined">info</span>
-										Receipt Information
-									</h3>
+						<!-- Preview Area (Glassmorphism) -->
+						<div class="col-span-12 bg-background rounded-md p-4 border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+							<h3 class="font-headline font-bold text-xl text-on-surface mb-6 flex items-center gap-3">
+								<span class="material-symbols-outlined">info</span>
+								Receipt Information
+							</h3>
 									
 							<div class="bg-background p-6 border border-outline-variant rounded-md">
 								<h4 class="font-bold text-on-surface mb-3">
