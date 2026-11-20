@@ -15292,11 +15292,20 @@ function setTaxTypeUI(type) {
   const pbjtRadio = document.getElementById("taxTypePBJT");
   const ppnContainer = document.getElementById("ppnTaxInputContainer");
   const pbjtContainer = document.getElementById("pbjtTaxInputContainer");
+  const ppnInput = document.getElementById("taxInput");
+  const pbjtInput = document.getElementById("pbjtTaxInput");
 
   if (ppnRadio) ppnRadio.checked = type === "PPN";
   if (pbjtRadio) pbjtRadio.checked = type === "PBJT";
-  if (ppnContainer) { ppnContainer.classList.toggle("hidden", type !== "PPN"); }
-  if (pbjtContainer) { pbjtContainer.classList.toggle("hidden", type !== "PBJT"); }
+
+  if (ppnContainer) ppnContainer.classList.toggle("hidden", type !== "PPN");
+  if (pbjtContainer) pbjtContainer.classList.toggle("hidden", type !== "PBJT");
+
+  if (type === "PPN") {
+    if (pbjtInput) pbjtInput.value = 0;
+  } else {
+    if (ppnInput) ppnInput.value = 0;
+  }
 }
 
 async function loadTaxServicePage() {
