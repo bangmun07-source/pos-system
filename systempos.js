@@ -31275,7 +31275,7 @@ function getTodayAccountingDate() {
 
 /* ==== TAX PAYABLE ==== */
 let taxPayableData = null;
-
+let pbjtPaymentSaving = false;
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
   const sessionId = localStorage.getItem("pos_session_id");
@@ -31523,28 +31523,17 @@ function changePpnPaymentsPage(direction) {
 }
 
 function updateTaxPayableUI() {
-  const ppnOutstanding = Number(
-    taxPayableData?.ppn?.outstanding ?? taxPayableData?.outstanding
-  ) || 0;
-
-  const pbjtOutstanding = Number(
-    taxPayableData?.pbjt?.outstanding
-  ) || 0;
+  const ppnOutstanding = Number( taxPayableData?.ppn?.outstanding ?? taxPayableData?.outstanding ) || 0;
+  const pbjtOutstanding = Number( taxPayableData?.pbjt?.outstanding ) || 0;
 
   const ppnEl = document.getElementById("taxPayableOutstanding");
-  if (ppnEl) {
-    ppnEl.textContent = formatAccountingCurrency(ppnOutstanding);
-  }
+  if (ppnEl) { ppnEl.textContent = formatAccountingCurrency(ppnOutstanding); }
 
   const pbjtEl = document.getElementById("pbjtPayableOutstanding");
-  if (pbjtEl) {
-    pbjtEl.textContent = formatAccountingCurrency(pbjtOutstanding);
-  }
+  if (pbjtEl) { pbjtEl.textContent = formatAccountingCurrency(pbjtOutstanding); }
 
   const modalOutstandingEl = document.getElementById("taxPaymentOutstanding");
-  if (modalOutstandingEl) {
-    modalOutstandingEl.textContent = formatAccountingCurrency(ppnOutstanding);
-  }
+  if (modalOutstandingEl) { modalOutstandingEl.textContent = formatAccountingCurrency(ppnOutstanding); }
 
   const amountEl = document.getElementById("taxPaymentAmount");
   if (amountEl && document.getElementById("taxPaymentModal")) {
@@ -31569,14 +31558,8 @@ async function recordPpnPayment() {
     let branchAllocations = null;
 
     if (branchId === "ALL") {
-      if (
-        !Array.isArray(
-          taxPayableData?.branches
-        ) ||
-        taxPayableData.branches.length === 0
-      ) {
-        throw new Error( "Hasil PPN per outlet tidak ditemukan." );
-      }
+      if ( !Array.isArray( taxPayableData?.branches ) || taxPayableData.branches.length === 0
+      ) { throw new Error( "Hasil PPN per outlet tidak ditemukan." ); }
 
       branchAllocations = taxPayableData.branches.map(
           branch => ({
@@ -31601,12 +31584,8 @@ async function recordPpnPayment() {
 			? 0
 			: Number( taxPayableData?.outstanding || 0 );
 
-    if (
-      branchId !== "ALL" &&
-      amount <= 0
-    ) {
-      throw new Error( "Tax Payable tidak memiliki saldo terutang." );
-    }
+    if ( branchId !== "ALL" && amount <= 0
+    ) { throw new Error( "Tax Payable tidak memiliki saldo terutang." ); }
 		
     const button = document.getElementById("ppnRecordButton");
     ppnPaymentSaving = true;
@@ -31662,6 +31641,102 @@ async function recordPpnPayment() {
           </span>
           Record PPN
         `;
+    }
+  }
+}
+
+async function recordPbjtPayment() {
+  if (pbjtPaymentSaving) return;
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
+
+    const selectedBranchId = getDebtLiabilityFilter().branchId;
+    const branchId = selectedBranchId || "ALL";
+
+    await loadTaxPayable();
+
+    let branchAllocations = null;
+
+    if (branchId === "ALL") {
+      if ( !Array.isArray(taxPayableData?.pbjt?.branches) || taxPayableData.pbjt.branches.length === 0
+      ) { throw new Error("Hasil PBJT per outlet tidak ditemukan."); }
+
+      branchAllocations = taxPayableData.pbjt.branches.map(branch => ({
+        branchId:
+          branch.branchId ??
+          branch.branch_id ??
+          branch.Branch_ID ??
+          "",
+        amount: Number(branch.amount) || 0
+      }));
+
+      const invalidBranch = branchAllocations.some( branch => !branch.branchId || String(branch.branchId).toUpperCase() === "ALL" );
+      if (invalidBranch) { throw new Error("Terdapat branch ID yang tidak valid pada hasil PBJT."); }
+
+      branchAllocations = branchAllocations.filter( branch => branch.amount > 0 );
+      if (branchAllocations.length === 0) { throw new Error("Tidak ada PBJT outstanding yang dapat dicatat."); }
+    }
+
+    const amount = branchId === "ALL"
+      ? 0
+      : Number(taxPayableData?.pbjt?.outstanding || 0);
+    if (branchId !== "ALL" && amount <= 0) { throw new Error("Tax PBJT tidak memiliki saldo terutang."); }
+
+    const button = document.getElementById("pbjtRecordButton");
+    pbjtPaymentSaving = true;
+
+    if (button) {
+      button.disabled = true;
+      button.dataset.originalText = button.innerHTML;
+      button.innerHTML = `
+        <span class="material-symbols-outlined text-sm animate-spin">
+          progress_activity
+        </span>
+        Saving...
+      `;
+    }
+
+    const { data, error } = await supabaseClient.rpc(
+      "record_pbjt_payment",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_amount: amount,
+        p_payment_date: getTodayAccountingDate(),
+        p_note: "PBJT Tax Payable",
+        p_branch_allocations: branchAllocations
+      }
+    );
+    if (error) throw error;
+
+    state.accountingTaxPayableData = null;
+    state.accountingTaxPayableFilter = null;
+
+    await loadTaxPayable();
+
+    showToast(
+      branchId === "ALL"
+        ? `PBJT berhasil dicatat ke ${data?.count || 0} outlet.`
+        : "PBJT berhasil dicatat sebagai outstanding.",
+      "success"
+    );
+
+  } catch (error) {
+    showToast(error?.message || "Gagal mencatat PBJT.", "error");
+  } finally {
+    pbjtPaymentSaving = false;
+
+    const button = document.getElementById("pbjtRecordButton");
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = button.dataset.originalText || `
+        <span class="material-symbols-outlined text-sm">
+          add
+        </span>
+        Record PBJT
+      `;
     }
   }
 }
