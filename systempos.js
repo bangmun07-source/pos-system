@@ -31502,18 +31502,35 @@ function changePpnPaymentsPage(direction) {
   renderPpnPayments();
 }
 
-/* ==== UPDATE TAX PAYABLE UI ==== */
 function updateTaxPayableUI() {
-  const outstanding = Number(taxPayableData?.outstanding) || 0;
-  const outstandingEl = document.getElementById("taxPayableOutstanding");
-  if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
+  const ppnOutstanding = Number(
+    taxPayableData?.ppn?.outstanding ?? taxPayableData?.outstanding
+  ) || 0;
+
+  const pbjtOutstanding = Number(
+    taxPayableData?.pbjt?.outstanding
+  ) || 0;
+
+  const ppnEl = document.getElementById("taxPayableOutstanding");
+  if (ppnEl) {
+    ppnEl.textContent = formatAccountingCurrency(ppnOutstanding);
+  }
+
+  const pbjtEl = document.getElementById("pbjtPayableOutstanding");
+  if (pbjtEl) {
+    pbjtEl.textContent = formatAccountingCurrency(pbjtOutstanding);
+  }
+
   const modalOutstandingEl = document.getElementById("taxPaymentOutstanding");
-  if (modalOutstandingEl) { modalOutstandingEl.textContent = formatAccountingCurrency(outstanding); }
+  if (modalOutstandingEl) {
+    modalOutstandingEl.textContent = formatAccountingCurrency(ppnOutstanding);
+  }
+
   const amountEl = document.getElementById("taxPaymentAmount");
   if (amountEl && document.getElementById("taxPaymentModal")) {
     const modal = document.getElementById("taxPaymentModal");
     if (!modal.classList.contains("hidden")) {
-      amountEl.max = outstanding;
+      amountEl.max = ppnOutstanding;
     }
   }
 }
