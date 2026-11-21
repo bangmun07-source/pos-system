@@ -31402,8 +31402,11 @@ async function loadTaxTransactions() {
     if (error) throw error;
 
     const result = typeof data === "string" ? JSON.parse(data) : data;
-
-    taxTransactionsData = Array.isArray(result) ? result : [];
+		if (!result?.success) { throw new Error(result?.message || "Gagal mengambil Tax Transactions."); }
+		
+		taxTransactionsData = Array.isArray(result.data)
+		  ? result.data
+		  : [];
     taxTransactionsPage = 1;
 
     renderTaxTransactions();
