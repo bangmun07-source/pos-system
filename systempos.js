@@ -31275,15 +31275,16 @@ function getTodayAccountingDate() {
 
 /* ==== TAX PAYABLE ==== */
 let taxPayableData = null;
+
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
   const sessionId = localStorage.getItem("pos_session_id");
   const filter = getDebtLiabilityFilter();
   const branchId = !filter.branchId || filter.branchId === "ALL"
-		? null
-		: filter.branchId;
-
-  if (!sessionId) {  return; }
+    ? "ALL"
+    : filter.branchId;
+	
+  if (!sessionId) return;
 
   const currentFilter = {
     branchId,
@@ -31291,64 +31292,83 @@ async function loadTaxPayable() {
     periodTo: filter.periodTo || null
   };
 
-  if (
-    state.accountingTaxPayableData &&
-    state.accountingTaxPayableFilter &&
-    JSON.stringify(state.accountingTaxPayableFilter) ===
-      JSON.stringify(currentFilter)
-  ) {
-    taxPayableData = state.accountingTaxPayableData;
+  if ( state.accountingTaxPayableData && state.accountingTaxPayableFilter && JSON.stringify(state.accountingTaxPayableFilter) === JSON.stringify(currentFilter)
+  ) { taxPayableData = state.accountingTaxPayableData;
     updateTaxPayableUI();
     return;
   }
 
   try {
-    const { data, error } =
-      await supabaseClient.rpc(
-        "get_tax_payable",
-        {
-          p_session_id: sessionId,
-          p_branch_id: branchId,
-          p_period_from: filter.periodFrom || null,
-          p_period_to: filter.periodTo || null
-        }
-      );
+    const { data, error } = await supabaseClient.rpc(
+      "get_tax_payable",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_period_from: filter.periodFrom || null,
+        p_period_to: filter.periodTo || null
+      }
+    );
 
-    if (error) { throw error; }
+    if (error) throw error;
 
     const result = data || {};
+    const ppn = result.ppn || result;
+    const pbjt = result.pbjt || {};
+    const mapBranches = branches =>
+      Array.isArray(branches)
+        ? branches.map(branch => ({
+            branchId:
+              branch.branchId ??
+              branch.branch_id ??
+              branch.Branch_ID ??
+              "",
+            amount: Number(branch.amount) || 0
+          }))
+        : [];
 
     taxPayableData = {
-      accountId: result.account_id || "ACC-52FE300A7C2A",
-      totalCredit: Number(result.total_credit) || 0,
-      totalDebit: Number(result.total_debit) || 0,
-      outstanding:  Math.max( 0, Number(result.outstanding) || 0 ),
-      branches: Array.isArray(result.branches)
-				? result.branches.map(branch => ({
-					branchId:
-						branch.branchId ??
-						branch.branch_id ??
-						branch.Branch_ID ??
-						"",
-					amount: Number(branch.amount) || 0
-					}))
-				: []
+      // PPN
+      accountId: ppn.account_id || "ACC-52FE300A7C2A",
+      totalCredit: Number(ppn.total_credit) || 0,
+      totalDebit: Number(ppn.total_debit) || 0,
+      outstanding: Math.max(0, Number(ppn.outstanding) || 0),
+      branches: mapBranches(ppn.branches),
+      // PBJT
+      pbjt: {
+        accountId: pbjt.account_id || "ACC-89CA3BB2691E",
+        totalCredit: Number(pbjt.total_credit) || 0,
+        totalDebit: Number(pbjt.total_debit) || 0,
+        outstanding: Math.max(0, Number(pbjt.outstanding) || 0),
+        branches: mapBranches(pbjt.branches)
+      }
     };
 
     state.accountingTaxPayableData = taxPayableData;
     state.accountingTaxPayableFilter = currentFilter;
+
     updateTaxPayableUI();
+
   } catch (error) {
+    console.error("Load Tax Payable Error:", error);
+
     taxPayableData = {
       accountId: "ACC-52FE300A7C2A",
       totalCredit: 0,
       totalDebit: 0,
       outstanding: 0,
-      branches: []
+      branches: [],
+      pbjt: {
+        accountId: "ACC-89CA3BB2691E",
+        totalCredit: 0,
+        totalDebit: 0,
+        outstanding: 0,
+        branches: []
+      }
     };
     updateTaxPayableUI();
   }
 }
+
 
 let currentPpnPayment = null;
 let ppnPaymentsData = [];
