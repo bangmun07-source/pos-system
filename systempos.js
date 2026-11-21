@@ -31376,125 +31376,127 @@ let ppnPaymentsPage = 1;
 const ppnPaymentsPerPage = 10;
 let ppnPaymentSaving = false;
 			
-async function loadPpnPayments() {
+let taxTransactionsData = [];
+let taxTransactionsPage = 1;
+const taxTransactionsPerPage = 10;
+
+async function loadTaxTransactions() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
-    if (!sessionId) { throw new Error("Session tidak ditemukan."); }
-		const filter = getDebtLiabilityFilter();
-		const branchId = ( !filter.branchId || filter.branchId === "ALL" )
-	    ? null
-	    : filter.branchId;
-		
-		const { data, error } =
-			await supabaseClient.rpc(
-				"get_ppn_payments",
-				{
-					p_session_id: sessionId,
-					p_branch_id: branchId,
-					p_period_from: filter.periodFrom || null,
-					p_period_to: filter.periodTo || null
-				}
-			);
+    if (!sessionId) throw new Error("Session tidak ditemukan.");
 
-    if (error) { throw error; }
-    const result = typeof data === "string"
-			? JSON.parse(data)
-			: data;
-		
-    ppnPaymentsData = Array.isArray(result)
-			? result
-			: [];
-    ppnPaymentsPage = 1;
-    renderPpnPayments();
-    return ppnPaymentsData;
+    const filter = getDebtLiabilityFilter();
+    const branchId = (!filter.branchId || filter.branchId === "ALL")
+      ? null
+      : filter.branchId;
+    const { data, error } = await supabaseClient.rpc(
+      "get_tax_transactions",
+      {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_period_from: filter.periodFrom || null,
+        p_period_to: filter.periodTo || null
+      }
+    );
+
+    if (error) throw error;
+
+    const result = typeof data === "string" ? JSON.parse(data) : data;
+
+    taxTransactionsData = Array.isArray(result) ? result : [];
+    taxTransactionsPage = 1;
+
+    renderTaxTransactions();
+    return taxTransactionsData;
 
   } catch (error) {
-    ppnPaymentsData = [];
-    renderPpnPayments();
+    taxTransactionsData = [];
+    renderTaxTransactions();
     throw error;
   }
-}		
+}
 
-function renderPpnPayments() {
-  const tbody = document.getElementById("ppnPaymentsTableBody");
-  const paginationInfo = document.getElementById("ppnPaymentsPaginationInfo");
-  const prevButton = document.getElementById("ppnPaymentsPrevButton");
-  const nextButton = document.getElementById("ppnPaymentsNextButton");
+function renderTaxTransactions() {
+  const tbody = document.getElementById("taxTransactionsTableBody");
+  const paginationInfo = document.getElementById("taxTransactionsPaginationInfo");
+  const prevButton = document.getElementById("taxTransactionsPrevButton");
+  const nextButton = document.getElementById("taxTransactionsNextButton");
 
   if (!tbody) return;
 
-  const data = Array.isArray(ppnPaymentsData)
-    ? ppnPaymentsData
+  const data = Array.isArray(taxTransactionsData)
+    ? taxTransactionsData
     : [];
   const total = data.length;
-  const totalPages = Math.max( 1, Math.ceil(total / ppnPaymentsPerPage) );
+  const totalPages = Math.max(1, Math.ceil(total / taxTransactionsPerPage));
 
-  if (ppnPaymentsPage > totalPages) { ppnPaymentsPage = totalPages; }
+  if (taxTransactionsPage > totalPages) { taxTransactionsPage = totalPages; }
 
-  const startIndex = (ppnPaymentsPage - 1) * ppnPaymentsPerPage;
-  const endIndex = Math.min( startIndex + ppnPaymentsPerPage, total );
+  const startIndex = (taxTransactionsPage - 1) * taxTransactionsPerPage;
+  const endIndex = Math.min(startIndex + taxTransactionsPerPage, total);
   const pageData = data.slice(startIndex, endIndex);
 
   if (pageData.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7"
-          class="px-5 py-10 text-center text-muted">
-          No PPN payment data
+        <td colspan="9" class="px-5 py-10 text-center text-muted">
+          No tax transaction data
         </td>
       </tr>
     `;
   } else {
-    tbody.innerHTML = pageData.map(payment => {
-      const paymentId = payment.payment_id || "";
-      const paymentDate = payment.payment_date
-				? new Date(payment.payment_date) .toLocaleDateString("id-ID")
-				: "-";
-			const branchId = String(
-			  payment.branch_id ||
-			  payment.Branch_ID ||
-			  payment.branchId ||
-			  ""
-			).trim();
-			const branchName = (accountingDebtBranches || []).find(branch => 
-				String(branch.id || "").trim() === branchId )?.name || branchId || "-";
-      const note = payment.note || "-";
-      const amount = Number(payment.amount) || 0;
-      const method = payment.payment_method || "-";
-      const status = String( payment.status || "OUTSTANDING" ).toUpperCase();
+    tbody.innerHTML = pageData.map(transaction => {
+      const taxDate = transaction.tax_date
+        ? new Date(transaction.tax_date).toLocaleDateString("id-ID")
+        : "-";
+      const transactionId = escapeHtml(transaction.transaction_id || "-");
+      const branchId = String( transaction.branch_id || transaction.Branch_ID || "" ).trim();
+      const branchName = (accountingDebtBranches || []).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+      const taxType = String(transaction.tax_type || "").toUpperCase();
+      const amount = Number(transaction.tax_amount) || 0;
+      const status = String(transaction.status || "OUTSTANDING").toUpperCase();
+      const outstanding = status === "OUTSTANDING" ? amount : 0;
+      const paid = status === "PAID" ? amount : 0;
 
       let statusClass = "bg-surface-container-high text-muted";
 
-      if (status === "PAID") {
-        statusClass = "bg-green-600/10 text-green-700";
-      } else if (status === "VOID") {
-        statusClass = "bg-red-600/10 text-red-700";
-      } else if (status === "OUTSTANDING") {
-        statusClass = "bg-yellow-600/10 text-yellow-700";
-      }
-      const action =
-        status === "OUTSTANDING"
-          ? `
-            <button type="button"
-              onclick="openPpnPaymentFromRow('${paymentId}')"
-              class="px-3 py-1.5 rounded-md bottom-theme text-xs font-medium">
-              	Pay
-            </button>
-          `
-          : "-";
+      if (status === "PAID") { statusClass = "bg-green-600/10 text-green-700";
+      } else if (status === "OUTSTANDING") { statusClass = "bg-yellow-600/10 text-yellow-700"; }
+
+      const taxTypeClass = taxType === "PPN"
+        ? "bg-blue-600/10 text-blue-700"
+        : "bg-purple-600/10 text-purple-700";
+
       return `
         <tr class="hover:bg-outline-variant">
-          <td class="px-5 py-3"> ${paymentDate} </td>
-          <td class="px-5 py-3"> ${escapeHtml(branchName)} </td>
-          <td class="px-5 py-3 whitespace-nowrap"> ${note} </td>
-          <td class="px-5 py-3 text-right font-medium whitespace-nowrap"> ${formatAccountingCurrency(amount)} </td>
-          <td class="px-5 py-3 text-center"> ${method} </td>
+          <td class="px-5 py-3 whitespace-nowrap">${taxDate}</td>
+          <td class="px-5 py-3 whitespace-nowrap">${transactionId}</td>
+          <td class="px-5 py-3">${escapeHtml(branchName)}</td>
+
           <td class="px-5 py-3 text-center">
-            <span class="inline-flex items-center text-center px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
-              ${status}
+            <span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${taxTypeClass}">
+              ${escapeHtml(taxType)}
             </span>
           </td>
-          <td class="px-5 py-3 text-center"> ${action} </td>
+
+          <td class="px-5 py-3 text-right font-medium whitespace-nowrap">
+            ${formatAccountingCurrency(amount)}
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap text-yellow-700">
+            ${formatAccountingCurrency(outstanding)}
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap text-green-700">
+            ${formatAccountingCurrency(paid)}
+          </td>
+
+          <td class="px-5 py-3 text-center">
+            <span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
+              ${escapeHtml(status)}
+            </span>
+          </td>
+          <td class="px-5 py-3 text-center">-</td>
         </tr>
       `;
     }).join("");
@@ -31504,22 +31506,22 @@ function renderPpnPayments() {
 		? "Showing 0–0 of 0"
 		: `Showing ${startIndex + 1}–${endIndex} of ${total}`;
   }
-  if (prevButton) { prevButton.disabled = ppnPaymentsPage <= 1; }
-  if (nextButton) { nextButton.disabled = ppnPaymentsPage >= totalPages; }
+  if (prevButton) prevButton.disabled = taxTransactionsPage <= 1;
+  if (nextButton) nextButton.disabled = taxTransactionsPage >= totalPages;
 }
 
-function changePpnPaymentsPage(direction) {
-  const total = Array.isArray(ppnPaymentsData)
-		? ppnPaymentsData.length
-		: 0;
-  const totalPages = Math.max( 1, Math.ceil(total / ppnPaymentsPerPage) );
+function changeTaxTransactionsPage(direction) {
+  const total = Array.isArray(taxTransactionsData)
+    ? taxTransactionsData.length
+    : 0;
+  const totalPages = Math.max( 1, Math.ceil(total / taxTransactionsPerPage) );
 
-  ppnPaymentsPage += direction;
+  taxTransactionsPage += direction;
 
-  if (ppnPaymentsPage < 1) {  ppnPaymentsPage = 1; }
-  if (ppnPaymentsPage > totalPages) { ppnPaymentsPage = totalPages; }
+  if (taxTransactionsPage < 1) taxTransactionsPage = 1;
+  if (taxTransactionsPage > totalPages) taxTransactionsPage = totalPages;
 
-  renderPpnPayments();
+  renderTaxTransactions();
 }
 
 function updateTaxPayableUI() {
