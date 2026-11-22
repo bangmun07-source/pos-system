@@ -30802,26 +30802,17 @@ async function reloadDebtLiabilityData() {
   try {
     const filter = getDebtLiabilityFilter();
 
-    if (
-      filter.periodFrom &&
-      filter.periodTo &&
-      filter.periodFrom > filter.periodTo
-    ) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" );
-      return;
-    }
+    if ( filter.periodFrom && filter.periodTo && filter.periodFrom > filter.periodTo
+    ) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" ); return; }
 
     debtLiabilityFilter = filter;
-
     state.accountingSupplierDebtData = null;
     state.accountingSupplierDebtFilter = null;
-    state.accountingTaxPayableData = null;
-    state.accountingTaxPayableFilter = null;
     state.accountingLiabilitiesData = null;
     state.accountingLiabilitiesFilter = null;
 
     await loadSupplierDebt();
     await loadLiabilities();
-    await loadTaxPayable();
 
   } catch (error) {
     console.error("Reload Debt Liability Error:", error);
@@ -31319,16 +31310,32 @@ function initTaxTransactionsFilters() {
     });
   }
 
-  const handleChange = () => {
-    const filter = getTaxTransactionsFilter();
-    if (filter.periodFrom && filter.periodTo &&
-			filter.periodFrom > filter.periodTo) { showAccountingDebtMessage( "Start Date tidak boleh lebih besar dari End Date", "error" );
-      return;
-    }
-    taxTransactionsFilter = filter;
-    taxTransactionsPage = 1;
-    loadTaxTransactions();
-  };
+	const handleChange = async () => {
+	  const filter = getTaxTransactionsFilter();
+	
+	  if (
+	    filter.periodFrom &&
+	    filter.periodTo &&
+	    filter.periodFrom > filter.periodTo
+	  ) {
+	    showAccountingDebtMessage(
+	      "Start Date tidak boleh lebih besar dari End Date",
+	      "error"
+	    );
+	    return;
+	  }
+	
+	  taxTransactionsFilter = filter;
+	  taxTransactionsPage = 1;
+	
+	  // Bersihkan cache Tax Payable
+	  state.accountingTaxPayableData = null;
+	  state.accountingTaxPayableFilter = null;
+	
+	  // Muat ulang KPI Tax Payable dan tabel Tax Transactions
+	  await loadTaxPayable();
+	  await loadTaxTransactions();
+	};
   [branchEl, fromEl, toEl, typeEl, statusEl].forEach(el => {
     if (el) el.addEventListener("change", handleChange);
   });
