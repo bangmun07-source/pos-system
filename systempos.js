@@ -31677,18 +31677,19 @@ async function recordPpnPayment() {
       `;
     }
 
-    const { data, error } =
-      await supabaseClient.rpc(
-        "record_ppn_payment",
-        {
-          p_session_id: sessionId,
-          p_branch_id: branchId,
-          p_amount: amount,
-          p_payment_date: getTodayAccountingDate(),
-          p_note: "PPN Tax Payable",
-          p_branch_allocations: branchAllocations
-        }
-      );
+		const filter = getDebtLiabilityFilter();
+		const { data, error } =
+		  await supabaseClient.rpc(
+		    "record_ppn_payment",
+		    {
+		      p_session_id: sessionId,
+		      p_branch_id: branchId,
+		      p_amount: amount,
+		      p_payment_date: filter.periodFrom,
+		      p_note: "PPN Tax Payable",
+		      p_branch_allocations: branchAllocations
+		    }
+		  );
 
     if (error) { throw error; }
 		
@@ -31774,17 +31775,19 @@ async function recordPbjtPayment() {
       `;
     }
 
-    const { data, error } = await supabaseClient.rpc(
-      "record_pbjt_payment",
-      {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_amount: amount,
-        p_payment_date: getTodayAccountingDate(),
-        p_note: "PBJT Tax Payable",
-        p_branch_allocations: branchAllocations
-      }
-    );
+		const filter = getDebtLiabilityFilter();
+		const { data, error } = await supabaseClient.rpc(
+		  "record_pbjt_payment",
+		  {
+		    p_session_id: sessionId,
+		    p_branch_id: branchId,
+		    p_amount: amount,
+		    p_payment_date: filter.periodFrom,
+		    p_note: "PBJT Tax Payable",
+		    p_branch_allocations: branchAllocations
+		  }
+		);
+			
     if (error) throw error;
 
     state.accountingTaxPayableData = null;
