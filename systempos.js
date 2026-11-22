@@ -31355,7 +31355,7 @@ function getFilteredTaxTransactionsData() {
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
   const sessionId = localStorage.getItem("pos_session_id");
-  const filter = getDebtLiabilityFilter();
+  const filter = getTaxTransactionsFilter();
   const branchId = !filter.branchId || filter.branchId === "ALL"
     ? "ALL"
     : filter.branchId;
