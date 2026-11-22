@@ -30702,6 +30702,7 @@ async function initAccountingDebtPage() {
   await loadDebtLiabilityBranchFilters();
   initSupplierDebtFilters();
   initDebtLiabilityFilters();
+	initTaxTransactionsFilters();
 
   await loadSupplierDebt();
   await initOtherLiability();
@@ -30805,11 +30806,7 @@ async function reloadDebtLiabilityData() {
       filter.periodFrom &&
       filter.periodTo &&
       filter.periodFrom > filter.periodTo
-    ) {
-      showAccountingDebtMessage(
-        "Period From tidak boleh lebih besar dari Period To",
-        "error"
-      );
+    ) { showAccountingDebtMessage( "Period From tidak boleh lebih besar dari Period To", "error" );
       return;
     }
 
@@ -30825,7 +30822,6 @@ async function reloadDebtLiabilityData() {
     await loadSupplierDebt();
     await loadLiabilities();
     await loadTaxPayable();
-    await loadTaxTransactions();
 
   } catch (error) {
     console.error("Reload Debt Liability Error:", error);
@@ -31285,6 +31281,77 @@ function getTodayAccountingDate() {
 /* ==== TAX PAYABLE ==== */
 let taxPayableData = null;
 let pbjtPaymentSaving = false;
+
+let taxTransactionsFilter = {
+  branchId: "ALL",
+  periodFrom: "",
+  periodTo: "",
+  taxType: "ALL",
+  status: "ALL"
+};
+
+function getTaxTransactionsFilter() {
+  return {
+    branchId: document.getElementById("taxTransactionsBranchFilter")?.value || "ALL",
+    periodFrom: document.getElementById("taxTransactionsStartDate")?.value || "",
+    periodTo: document.getElementById("taxTransactionsEndDate")?.value || "",
+    taxType: document.getElementById("taxTransactionsTypeFilter")?.value || "ALL",
+    status: document.getElementById("taxTransactionsStatusFilter")?.value || "ALL"
+  };
+}
+
+function initTaxTransactionsFilters() {
+  const branchEl = document.getElementById("taxTransactionsBranchFilter");
+  const fromEl = document.getElementById("taxTransactionsStartDate");
+  const toEl = document.getElementById("taxTransactionsEndDate");
+  const typeEl = document.getElementById("taxTransactionsTypeFilter");
+  const statusEl = document.getElementById("taxTransactionsStatusFilter");
+
+  // Gunakan daftar outlet yang sudah dimuat,
+  // tanpa mengubah filter Debt & Liabilities.
+  if (branchEl) {
+    branchEl.innerHTML = '<option value="ALL">All Branches</option>';
+    accountingDebtBranches.forEach(branch => {
+      const option = document.createElement("option");
+      option.value = branch.id || "";
+      option.textContent = branch.name || branch.id || "Unnamed Branch";
+      branchEl.appendChild(option);
+    });
+  }
+
+  const handleChange = () => {
+    const filter = getTaxTransactionsFilter();
+    if (filter.periodFrom && filter.periodTo &&
+			filter.periodFrom > filter.periodTo) { showAccountingDebtMessage( "Start Date tidak boleh lebih besar dari End Date", "error" );
+      return;
+    }
+    taxTransactionsFilter = filter;
+    taxTransactionsPage = 1;
+    loadTaxTransactions();
+  };
+  [branchEl, fromEl, toEl, typeEl, statusEl].forEach(el => {
+    if (el) el.addEventListener("change", handleChange);
+  });
+  taxTransactionsFilter = getTaxTransactionsFilter();
+}
+
+function getFilteredTaxTransactionsData() {
+  const filter = getTaxTransactionsFilter();
+
+  return taxTransactionsData.filter(transaction => {
+    const taxType = String(transaction.tax_type || "").toUpperCase();
+    const status = String(transaction.status || "OUTSTANDING").toUpperCase();
+
+    const matchType =
+      filter.taxType === "ALL" || taxType === filter.taxType;
+
+    const matchStatus =
+      filter.status === "ALL" || status === filter.status;
+
+    return matchType && matchStatus;
+  });
+}
+
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
   const sessionId = localStorage.getItem("pos_session_id");
@@ -31378,7 +31445,6 @@ async function loadTaxPayable() {
   }
 }
 
-
 let currentPpnPayment = null;
 let ppnPaymentsData = [];
 let ppnPaymentsPage = 1;
@@ -31394,10 +31460,10 @@ async function loadTaxTransactions() {
     const sessionId = localStorage.getItem("pos_session_id");
     if (!sessionId) throw new Error("Session tidak ditemukan.");
 
-    const filter = getDebtLiabilityFilter();
-    const branchId = (!filter.branchId || filter.branchId === "ALL")
-      ? null
-      : filter.branchId;
+		const filter = getTaxTransactionsFilter();
+		const branchId = (!filter.branchId || filter.branchId === "ALL")
+		  ? null
+		  : filter.branchId;
     const { data, error } = await supabaseClient.rpc(
       "get_tax_transactions",
       {
@@ -31436,9 +31502,7 @@ function renderTaxTransactions() {
 
   if (!tbody) return;
 
-  const data = Array.isArray(taxTransactionsData)
-    ? taxTransactionsData
-    : [];
+	const data = getFilteredTaxTransactionsData();
   const total = data.length;
   const totalPages = Math.max(1, Math.ceil(total / taxTransactionsPerPage));
 
@@ -31523,9 +31587,7 @@ function renderTaxTransactions() {
 }
 
 function changeTaxTransactionsPage(direction) {
-  const total = Array.isArray(taxTransactionsData)
-    ? taxTransactionsData.length
-    : 0;
+	const total = getFilteredTaxTransactionsData().length;
   const totalPages = Math.max( 1, Math.ceil(total / taxTransactionsPerPage) );
 
   taxTransactionsPage += direction;
