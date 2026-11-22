@@ -19957,7 +19957,7 @@
 				  </div>
 				  <!-- FILTERS -->
 				  <div class="p-5 border-b border-outline-variant">
-				    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+				    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
 				      <!-- START DATE -->
 				      <div>
 				        <label for="taxTransactionsStartDate"
@@ -20011,27 +20011,30 @@
 				          <option value="PAID">Paid</option>
 				        </select>
 				      </div>
+
+							<!-- BRANCH FILTER -->
+							<div>
+							  <label for="taxTransactionsBranchFilter"
+							    class="block text-xs font-medium text-muted mb-2">
+							    Branch
+							  </label>
+							  <select
+							    id="taxTransactionsBranchFilter"
+							    class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+							    <option value="ALL">All Branches</option>
+							  </select>
+							</div>
 				
 				      <!-- APPLY FILTER -->
 				      <div class="flex items-end">
-				        <button
-				          type="button"
-				          onclick="applyTaxTransactionsFilters()"
-				          class="w-full h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
-				          <span class="material-symbols-outlined text-sm">filter_list</span>
-				          Apply Filter
-				        </button>
+					      <button
+					        type="button"
+					        onclick="exportTaxTransactionsPDF()"
+					        class="w-full h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
+					        <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+					        Export PDF
+					      </button>
 				      </div>
-				    </div>
-				    <!-- EXPORT -->
-				    <div class="flex justify-end mt-4">
-				      <button
-				        type="button"
-				        onclick="exportTaxTransactionsPDF()"
-				        class="h-10 px-4 rounded-md border border-outline-variant text-foreground text-sm font-medium flex items-center gap-2 hover:bg-background">
-				        <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
-				        Export PDF
-				      </button>
 				    </div>
 				  </div>
 				  <!-- TABLE -->
