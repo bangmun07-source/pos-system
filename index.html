@@ -17351,13 +17351,14 @@
       </section>
     </main>
   </div>
-	
+
+	<!-- ADD ACCOUNT -->
 	<div id="addAccountingAccountModal"
      class="hidden fixed inset-0 z-[9999] bg-background flex items-center justify-center p-4">
     <div class="w-full max-w-lg bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
 			<div class="flex items-center justify-between px-6 py-4 border-b border-outline-variant">
 				<div>
-					<h3 id="accountModalTitle" class="text-lg font-semibold text-on-surface-variant">
+					<h3 id="accountModalTitle" class="text-lg font-semibold text-on-surface">
 							Add Account
 					</h3>
 
@@ -17403,7 +17404,7 @@
 							Account Type
 					</label>
 
-					<select id="newAccountingAccountType" onchange="updateAccountingNormalBalance()"
+					<select id="newAccountingAccountType" onchange="updateAccountingNormalBalance(); toggleBalanceSheetCategory()"
 						class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface outline-none focus:border-primary">
 						<option value="">Select Account Type</option>
 						<option value="ASSET">Asset</option>
@@ -17412,6 +17413,32 @@
 						<option value="REVENUE">Revenue</option>
 						<option value="COGS">COGS</option>
 						<option value="EXPENSE">Expense</option>
+					</select>
+				</div>
+				<!-- BALANCE SHEET CATEGORY -->
+				<div id="balanceSheetCategoryWrapper" class="hidden">
+					<label class="block text-md text-on-surface-variant mb-2">
+						Balance Sheet Category
+					</label>
+				
+					<select id="newAccountingAccountBalanceSheetCategory"
+						class="w-full bg-background border border-outline-variant rounded-md px-4 py-3 text-on-surface outline-none focus:border-primary">
+				
+						<option value="">Select Balance Sheet Category</option>
+				
+						<optgroup label="Asset">
+							<option value="CURRENT_ASSET">Current Asset</option>
+							<option value="NON_CURRENT_ASSET">Non Current Asset</option>
+						</optgroup>
+				
+						<optgroup label="Liability">
+							<option value="CURRENT_LIABILITY">Current Liability</option>
+							<option value="NON_CURRENT_LIABILITY">Non Current Liability</option>
+						</optgroup>
+				
+						<optgroup label="Equity">
+							<option value="EQUITY">Equity</option>
+						</optgroup>
 					</select>
 				</div>
 				<!-- PARENT -->
