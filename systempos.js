@@ -32044,7 +32044,6 @@ async function loadTaxDetailPaymentHistory(taxId, branchId) {
 
 let currentTaxTransaction = null;
 /* ===== OPEN TAX PAYMENT FROM ROW ===== */
-/* ===== OPEN TAX PAYMENT FROM ROW ===== */
 function payTaxTransaction(transactionId) {
   const transaction = taxTransactionsData.find(item =>
     String(item.transaction_id || item.Transaction_ID) === String(transactionId) ||
