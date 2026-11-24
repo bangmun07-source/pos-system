@@ -31657,10 +31657,7 @@ function toggleTaxTransactionMenu(button, transactionId) {
 
   menu.style.position = "fixed";
   menu.style.zIndex = "99999";
-  menu.style.left = `${Math.max(
-    8,
-    Math.min(rect.right - 176, window.innerWidth - 184)
-  )}px`;
+  menu.style.left = `${Math.max(8, Math.min(rect.right - 176, window.innerWidth - 184))}px`;
 
   document.body.appendChild(menu);
 
@@ -31702,9 +31699,7 @@ document.addEventListener("click", function(event) {
     activeTaxTransactionMenu &&
     !activeTaxTransactionMenu.contains(event.target) &&
     !event.target.closest('button[onclick*="toggleTaxTransactionMenu"]')
-  ) {
-    closeTaxTransactionMenu();
-  }
+  ) { closeTaxTransactionMenu(); }
 });
 
 window.addEventListener("scroll", closeTaxTransactionMenu, true);
@@ -31927,11 +31922,11 @@ async function recordPbjtPayment() {
   }
 }
 
-function viewTaxTransactionDetail(transactionId) {
+async function viewTaxTransactionDetail(transactionId) {
   const transaction = taxTransactionsData.find(item => String(item.transaction_id || "") === String(transactionId));
   if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
-	
-  const branchId = String( transaction.branch_id || transaction.Branch_ID || "" ).trim();
+
+  const branchId = String(transaction.branch_id || transaction.Branch_ID || "").trim();
   const branchName = (accountingDebtBranches || []).find(branch => String(branch.id || "").trim() === branchId)?.name || branchId || "-";
   const taxDate = transaction.tax_date
     ? new Date(transaction.tax_date).toLocaleDateString("id-ID")
@@ -31941,6 +31936,7 @@ function viewTaxTransactionDetail(transactionId) {
   const amount = Number(transaction.tax_amount) || 0;
   const outstanding = status === "OUTSTANDING" ? amount : 0;
   const paid = status === "PAID" ? amount : 0;
+
   const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value;
@@ -31951,11 +31947,14 @@ function viewTaxTransactionDetail(transactionId) {
   setText("taxDetailBranch", branchName);
   setText("taxDetailType", taxType);
   setText("taxDetailStatus", status);
-
   setText("taxDetailAmount", formatAccountingCurrency(amount));
   setText("taxDetailOutstanding", formatAccountingCurrency(outstanding));
   setText("taxDetailPaid", formatAccountingCurrency(paid));
 
+  // LOAD PAYMENT HISTORY
+  await loadTaxDetailPaymentHistory( transaction.tax_id, branchId );
+
+  // SHOW MODAL
   const modal = document.getElementById("taxTransactionDetailModal");
   if (modal) {
     modal.classList.remove("hidden");
@@ -31970,6 +31969,79 @@ function closeTaxTransactionDetail() {
     modal.classList.remove("flex");
   }
 }
+
+async function loadTaxDetailPaymentHistory(taxId, branchId) {
+  const tbody = document.getElementById("taxDetailPaymentHistoryBody");
+  if (!tbody) return;
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="5" class="px-4 py-8 text-center text-muted">
+        Loading payment history...
+      </td>
+    </tr>
+  `;
+
+  try {
+    const sessionId = localStorage.getItem("pos_session_id");
+    if (!sessionId) throw new Error("Session tidak ditemukan.");
+
+    const { data, error } = await supabaseClient.rpc("get_ppn_payments", {
+      p_session_id: sessionId,
+      p_branch_id: branchId || null,
+      p_period_from: null,
+      p_period_to: null
+    });
+
+    if (error) throw error;
+
+    const payments = typeof data === "string" ? JSON.parse(data) : data;
+    const filteredPayments = (Array.isArray(payments) ? payments : []) .filter(payment => payment.tax_id === taxId);
+
+    if (!filteredPayments.length) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" class="px-4 py-8 text-center text-muted">
+            No payment records available
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = filteredPayments.map(payment => `
+      <tr class="border-t border-outline-variant">
+        <td class="px-4 py-3 whitespace-nowrap text-foreground">
+          ${escapeHTML(payment.payment_date || "-")}
+        </td>
+        <td class="px-4 py-3 whitespace-nowrap text-foreground">
+          ${escapeHTML(payment.payment_id || "-")}
+        </td>
+        <td class="px-4 py-3 text-foreground">
+          ${escapeHTML(payment.payment_method || "-")}
+        </td>
+        <td class="px-4 py-3 text-right whitespace-nowrap font-medium text-foreground">
+          ${formatRupiah(Number(payment.amount) || 0)}
+        </td>
+        <td class="px-4 py-3 text-foreground">
+          ${escapeHTML(payment.note || "-")}
+        </td>
+      </tr>
+    `).join("");
+
+  } catch (error) {
+    console.error("Load Tax Payment History Error:", error);
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="px-4 py-8 text-center text-red-600">
+          Failed to load payment history.
+        </td>
+      </tr>
+    `;
+  }
+}
+
 
 function openPpnPaymentFromRow(paymentId) {
   const payment = ppnPaymentsData.find(
