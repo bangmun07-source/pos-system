@@ -31579,7 +31579,50 @@ function renderTaxTransactions() {
               ${escapeHtml(status)}
             </span>
           </td>
-          <td class="px-5 py-3 text-center">-</td>
+          <td class="px-5 py-3 text-center relative">
+					  <div class="relative inline-block">
+					    <button
+					      type="button"
+					      onclick="toggleTaxTransactionMenu('${escapeHtml(transaction.transaction_id || "")}')"
+					      class="p-2 rounded-lg hover:bg-surface-container-high transition"
+					      title="Actions"
+					    >
+					      <i class="fas fa-ellipsis-vertical"></i>
+					    </button>
+					
+					    <div
+					      id="taxTransactionMenu-${escapeHtml(transaction.transaction_id || "")}"
+					      class="hidden absolute right-0 top-full mt-1 w-44 bg-surface border border-outline-variant rounded-lg shadow-lg z-50 text-left"
+					    >
+					      <button
+					        type="button"
+					        onclick="viewTaxTransactionDetail('${escapeHtml(transaction.transaction_id || "")}')"
+					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3"
+					      >
+					        <i class="fas fa-eye w-4"></i>
+					        View Detail
+					      </button>
+					
+					      <button
+					        type="button"
+					        onclick="payTaxTransaction('${escapeHtml(transaction.transaction_id || "")}')"
+					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3"
+					      >
+					        <i class="fas fa-credit-card w-4"></i>
+					        Pay
+					      </button>
+					
+					      <button
+					        type="button"
+					        onclick="submitTaxTransactionProof('${escapeHtml(transaction.transaction_id || "")}')"
+					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3"
+					      >
+					        <i class="fas fa-upload w-4"></i>
+					        Submit Bukti
+					      </button>
+					    </div>
+					  </div>
+					</td>
         </tr>
       `;
     }).join("");
@@ -31603,6 +31646,20 @@ function changeTaxTransactionsPage(direction) {
   if (taxTransactionsPage > totalPages) taxTransactionsPage = totalPages;
 
   renderTaxTransactions();
+}
+
+function toggleTaxTransactionMenu(transactionId) {
+  const menuId = `taxTransactionMenu-${transactionId}`;
+  const targetMenu = document.getElementById(menuId);
+
+  if (!targetMenu) return;
+
+  // Tutup semua dropdown lainnya
+  document.querySelectorAll('[id^="taxTransactionMenu-"]').forEach(menu => {
+    if (menu.id !== menuId) menu.classList.add("hidden");
+  });
+
+  targetMenu.classList.toggle("hidden");
 }
 
 function updateTaxPayableUI() {
