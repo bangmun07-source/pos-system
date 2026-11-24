@@ -32103,27 +32103,25 @@ async function saveTaxPayment() {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) { alert("Session tidak ditemukan."); return; }
 
-  const payment = currentPpnPayment;
-  if (!payment) { alert("PPN payment tidak ditemukan."); return; }
-	
-  const paymentBranchId = payment.branch_id;
-  const paymentId = payment.payment_id;
-  const outstanding = Number(payment.amount) || 0;
+  const transaction = currentTaxTransaction;
+  if (!transaction) { alert("Tax Transaction tidak ditemukan."); return; }
 
-  if (!paymentBranchId || paymentBranchId.toUpperCase() === "ALL") { alert("Cabang pembayaran PPN tidak valid."); return; }
-  if (!paymentId) { alert("PPN Payment ID tidak ditemukan."); return; }
-  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { alert("PPN payment ini sudah tidak outstanding."); return; }
-
+  const taxId = transaction.tax_id || transaction.Tax_ID;
+  const branchId = String(transaction.branch_id || transaction.Branch_ID || "").trim();
+  const taxAmount = Number(transaction.tax_amount ?? transaction.Tax_Amount) || 0;
+  const status = String(transaction.status || transaction.Status || "").toUpperCase();
   const paymentDate = document.getElementById("taxPaymentDate")?.value;
   const amount = Number(document.getElementById("taxPaymentAmount")?.value) || 0;
   const method = document.getElementById("taxPaymentMethod")?.value || "CASH";
   const referenceNo = document.getElementById("taxPaymentReference")?.value?.trim() || null;
   const note = document.getElementById("taxPaymentNote")?.value?.trim() || null;
 
+  if (!taxId) { alert("Tax ID tidak ditemukan."); return; }
+  if (!branchId || branchId.toUpperCase() === "ALL") { alert("Branch Tax Transaction tidak valid."); return; }
+  if (status !== "OUTSTANDING") { alert("Tax Transaction ini sudah tidak outstanding."); return; }
   if (!paymentDate) { alert("Tanggal pembayaran wajib diisi."); return; }
   if (amount <= 0) { alert("Jumlah pembayaran harus lebih dari 0."); return; }
-  if (outstanding <= 0) { alert("PPN tidak memiliki saldo terutang."); return; }
-  if (amount > outstanding) { alert( `Pembayaran tidak boleh melebihi outstanding ${formatAccountingCurrency(outstanding)}` ); return; }
+  if (amount > taxAmount) { alert( `Pembayaran tidak boleh melebihi ${formatAccountingCurrency(taxAmount)}` ); return; }
   if (!["CASH", "BANK", "QRIS"].includes(method)) { alert("Metode pembayaran tidak valid."); return; }
 
   const button = document.getElementById("saveTaxPaymentButton");
@@ -32133,18 +32131,20 @@ async function saveTaxPayment() {
       button.disabled = true;
       button.textContent = "Menyimpan...";
     }
-		console.log("PPN PAYMENT DEBUG", {
-		  sessionId,
-		  paymentId,
-		  paymentBranchId,
-		  amount
-		});
+
+    console.log("TAX TRANSACTION PAYMENT DEBUG", {
+      sessionId,
+      taxId,
+      branchId,
+      amount,
+      method
+    });
+
     const { data, error } = await supabaseClient.rpc(
-      "create_ppn_payment",
+      "create_tax_transaction_payment",
       {
         p_session_id: sessionId,
-        p_branch_id: paymentBranchId,
-        p_payment_id: paymentId,
+        p_tax_id: taxId,
         p_payment_date: paymentDate,
         p_amount: amount,
         p_payment_method: method,
@@ -32152,6 +32152,7 @@ async function saveTaxPayment() {
         p_note: note
       }
     );
+
     if (error) throw error;
 
     state.accountingTaxPayableData = null;
@@ -32161,15 +32162,15 @@ async function saveTaxPayment() {
 
     closeTaxPaymentModal();
 
-    alert(data?.message || "Pembayaran Tax Payable berhasil.");
+    alert(data?.message || "Pembayaran pajak berhasil.");
 
-    currentPpnPayment = null;
+    currentTaxTransaction = null;
 
     await loadTaxPayable();
-    await loadPpnPayments();
 
   } catch (error) {
-    alert(error?.message || "Gagal menyimpan pembayaran Tax Payable.");
+    console.error("Save Tax Transaction Payment Error:", error);
+    alert(error?.message || "Gagal menyimpan pembayaran pajak.");
   } finally {
     if (button) {
       button.disabled = false;
