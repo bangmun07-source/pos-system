@@ -31579,44 +31579,38 @@ function renderTaxTransactions() {
               ${escapeHtml(status)}
             </span>
           </td>
+					
           <td class="px-5 py-3 text-center relative">
 					  <div class="relative inline-block">
-					    <button
-					      type="button"
+					    <button type="button"
 					      onclick="toggleTaxTransactionMenu('${escapeHtml(transaction.transaction_id || "")}')"
 					      class="p-2 rounded-lg hover:bg-surface-container-high transition"
-					      title="Actions"
-					    >
-					      <i class="fas fa-ellipsis-vertical"></i>
+					      title="Actions" >
+								<span class="material-symbols-outlined">
+									more_vert
+								</span>
 					    </button>
 					
 					    <div
 					      id="taxTransactionMenu-${escapeHtml(transaction.transaction_id || "")}"
-					      class="hidden absolute right-0 top-full mt-1 w-44 bg-surface border border-outline-variant rounded-lg shadow-lg z-50 text-left"
-					    >
-					      <button
-					        type="button"
+					      class="hidden absolute right-0 top-full mt-1 w-44 bg-surface border border-outline-variant rounded-md shadow-lg z-50 text-left" >
+					      <button type="button"
 					        onclick="viewTaxTransactionDetail('${escapeHtml(transaction.transaction_id || "")}')"
-					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3"
-					      >
+					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3" >
 					        <i class="fas fa-eye w-4"></i>
 					        View Detail
 					      </button>
 					
-					      <button
-					        type="button"
+					      <button type="button"
 					        onclick="payTaxTransaction('${escapeHtml(transaction.transaction_id || "")}')"
-					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3"
-					      >
+					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3" >
 					        <i class="fas fa-credit-card w-4"></i>
 					        Pay
 					      </button>
 					
-					      <button
-					        type="button"
+					      <button type="button"
 					        onclick="submitTaxTransactionProof('${escapeHtml(transaction.transaction_id || "")}')"
-					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3"
-					      >
+					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3" >
 					        <i class="fas fa-upload w-4"></i>
 					        Submit Bukti
 					      </button>
