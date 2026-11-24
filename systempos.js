@@ -31922,6 +31922,25 @@ async function recordPbjtPayment() {
   }
 }
 
+function openInputPpnModal() {
+  const modal = document.getElementById("inputPpnModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeInputPpnModal() {
+  const modal = document.getElementById("inputPpnModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+
+function calculateInputPpn() {
+  const dpp = Number(document.getElementById("inputPpnTaxBase").value) || 0;
+  const rate = Number(document.getElementById("inputPpnTaxRate").value) || 0;
+  const amount = Math.round(dpp * rate / 100);
+  document.getElementById("inputPpnTaxAmount").textContent = "Rp" + amount.toLocaleString("id-ID");
+}
+
 async function viewTaxTransactionDetail(transactionId) {
   const transaction = taxTransactionsData.find(item => String(item.transaction_id || "") === String(transactionId));
   if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
