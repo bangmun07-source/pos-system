@@ -31634,8 +31634,8 @@ async function recordPpnPayment() {
     const sessionId = localStorage.getItem("pos_session_id");
     if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
 		
-    const selectedBranchId = getDebtLiabilityFilter().branchId;
-    const branchId = selectedBranchId || "ALL";
+		const filter = getTaxTransactionsFilter();
+		const branchId = filter.branchId || "ALL";
 
     await loadTaxPayable();
     let branchAllocations = null;
@@ -31691,7 +31691,7 @@ async function recordPpnPayment() {
 		      p_session_id: sessionId,
 		      p_branch_id: branchId,
 		      p_amount: amount,
-		      p_payment_date: new Date().toLocaleDateString("en-CA"),
+		      p_payment_date: filter.periodFrom || null,
 		      p_note: "PPN Tax Payable",
 		      p_branch_allocations: branchAllocations
 		    }
@@ -31734,9 +31734,9 @@ async function recordPbjtPayment() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
-
-    const selectedBranchId = getDebtLiabilityFilter().branchId;
-    const branchId = selectedBranchId || "ALL";
+		
+		const filter = getTaxTransactionsFilter();
+		const branchId = filter.branchId || "ALL";
 
     await loadTaxPayable();
 
@@ -31788,7 +31788,7 @@ async function recordPbjtPayment() {
 		    p_session_id: sessionId,
 		    p_branch_id: branchId,
 		    p_amount: amount,
-		    p_payment_date: new Date().toLocaleDateString("en-CA"),
+		    p_payment_date: filter.periodFrom || null,
 		    p_note: "PBJT Tax Payable",
 		    p_branch_allocations: branchAllocations
 		  }
