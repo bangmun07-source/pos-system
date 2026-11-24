@@ -31650,8 +31650,7 @@ async function recordPpnPayment() {
               branch.branchId ??
               branch.branch_id ??
               branch.Branch_ID ??
-              "",
-            amount:
+              "", amount:
               Number(branch.amount) || 0
           })
         );
@@ -31692,7 +31691,7 @@ async function recordPpnPayment() {
 		      p_session_id: sessionId,
 		      p_branch_id: branchId,
 		      p_amount: amount,
-		      p_payment_date: filter.periodFrom || null,
+		      p_payment_date: new Date().toLocaleDateString("en-CA"),
 		      p_note: "PPN Tax Payable",
 		      p_branch_allocations: branchAllocations
 		    }
@@ -31789,7 +31788,7 @@ async function recordPbjtPayment() {
 		    p_session_id: sessionId,
 		    p_branch_id: branchId,
 		    p_amount: amount,
-		    p_payment_date: filter.periodFrom || null,
+		    p_payment_date: new Date().toLocaleDateString("en-CA"),
 		    p_note: "PBJT Tax Payable",
 		    p_branch_allocations: branchAllocations
 		  }
