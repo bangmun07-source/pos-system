@@ -32044,11 +32044,25 @@ async function loadTaxDetailPaymentHistory(taxId, branchId) {
 
 let currentTaxTransaction = null;
 /* ===== OPEN TAX PAYMENT FROM ROW ===== */
+/* ===== OPEN TAX PAYMENT FROM ROW ===== */
 function payTaxTransaction(transactionId) {
-  const transaction = taxTransactionsData.find(item => String(item.transaction_id) === String(transactionId));
+  const transaction = taxTransactionsData.find(item =>
+    String(item.transaction_id || item.Transaction_ID) === String(transactionId) ||
+    String(item.tax_id || item.Tax_ID) === String(transactionId)
+  );
 
-  if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
-  if (String(transaction.status).toUpperCase() !== "OUTSTANDING") { showToast("Tax transaction ini sudah tidak outstanding.", "info"); return; }
+  if (!transaction) {
+    showToast("Tax transaction tidak ditemukan.", "error");
+    console.log("Tax transaction ID tidak ditemukan:", transactionId);
+    console.log("Tax transactions data:", taxTransactionsData);
+    return;
+  }
+
+  if (String(transaction.status || transaction.Status).toUpperCase() !== "OUTSTANDING") {
+    showToast("Tax transaction ini sudah tidak outstanding.", "info");
+    return;
+  }
+
   currentTaxTransaction = transaction;
   openTaxPaymentModal();
 }
