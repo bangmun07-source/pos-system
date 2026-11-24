@@ -31692,7 +31692,7 @@ async function recordPpnPayment() {
 		      p_session_id: sessionId,
 		      p_branch_id: branchId,
 		      p_amount: amount,
-		      p_payment_date: filter.periodFrom,
+		      p_payment_date: filter.periodFrom || null,
 		      p_note: "PPN Tax Payable",
 		      p_branch_allocations: branchAllocations
 		    }
@@ -31789,7 +31789,7 @@ async function recordPbjtPayment() {
 		    p_session_id: sessionId,
 		    p_branch_id: branchId,
 		    p_amount: amount,
-		    p_payment_date: filter.periodFrom,
+		    p_payment_date: filter.periodFrom || null,
 		    p_note: "PBJT Tax Payable",
 		    p_branch_allocations: branchAllocations
 		  }
