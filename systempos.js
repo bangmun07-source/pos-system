@@ -26185,7 +26185,6 @@ if (liabilitiesEquityContainer) {
 async function loadAccountingAccounts() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
-		
 		if (!sessionId) { return; }
 		
 		const { data, error } = 
@@ -26209,9 +26208,7 @@ function initAccountingAccountFilters() {
 	const statusFilter = document.getElementById( "accountingAccountStatusFilter" );
 	const resetPage = () => {
 		accountingAccountCurrentPage = 1;
-		renderAccountingAccounts(
-			window.accountingAccounts || []
-		);
+		renderAccountingAccounts( window.accountingAccounts || [] );
 	};
 	search?.addEventListener("input", resetPage);
 	typeFilter?.addEventListener("change", resetPage);
@@ -26220,7 +26217,6 @@ function initAccountingAccountFilters() {
 
 function renderAccountingAccounts(accounts) {
 	const tbody = document.getElementById("accountsTableBody");
-	
 	if (!tbody) { return; }
 	
 	const searchEl = document.getElementById("accountingAccountSearch");
@@ -26231,18 +26227,11 @@ function renderAccountingAccounts(accounts) {
 	const statusFilter = statusFilterEl?.value || "";
 	// FILTER
 	let filteredAccounts = accounts.filter(account => {
-		const matchSearch =
-			!search ||
-			(account.accountCode || "").toLowerCase().includes(search) ||
-			(account.accountName || "").toLowerCase().includes(search);
-		const matchType =
-			!typeFilter ||
-			account.accountType === typeFilter;
-		const matchStatus =
-			!statusFilter ||
-			(statusFilter === "ACTIVE"
-				? account.isActive === true
-				: account.isActive === false);
+		const matchSearch = !search || (account.accountCode || "").toLowerCase().includes(search) || (account.accountName || "").toLowerCase().includes(search);
+		const matchType = !typeFilter || account.accountType === typeFilter;
+		const matchStatus = !statusFilter || (statusFilter === "ACTIVE"
+			? account.isActive === true
+			: account.isActive === false);
 		return matchSearch && matchType && matchStatus;
 	});
 	// EMPTY
@@ -26260,12 +26249,7 @@ function renderAccountingAccounts(accounts) {
 	}
 	// PAGINATION
 	const totalAccounts = filteredAccounts.length;
-	const totalPages = Math.max(
-		1,
-		Math.ceil(
-			totalAccounts / ACCOUNTING_ACCOUNT_PAGE_SIZE
-		)
-	);
+	const totalPages = Math.max( 1, Math.ceil( totalAccounts / ACCOUNTING_ACCOUNT_PAGE_SIZE ) );
 
 	if (accountingAccountCurrentPage > totalPages) { accountingAccountCurrentPage = totalPages; }
 	
@@ -26350,7 +26334,7 @@ function renderAccountingAccounts(accounts) {
 							class="hidden absolute right-0 mt-2 w-40 bg-background border border-outline-variant rounded-md shadow-xl z-50">
 							<button type="button"
 								onclick="editAccountingAccount('${escapeHtml(account.accountId)}')"
-								class="w-full text-left px-4 py-2 text-sm text-on-surface-variant hover:text-on-surface hover:bg-outline-variant">
+								class="w-full text-left px-4 py-2 text-sm text-on-surface hover:text-on-surface hover:bg-outline-variant">
 									Edit Account
 							</button>
 
@@ -26416,22 +26400,15 @@ function accountingAccountNextPage() {
 	const typeFilter = document.getElementById("accountingAccountTypeFilter") ?.value || "";
 	const statusFilter = document.getElementById("accountingAccountStatusFilter") ?.value || "";
 	const filteredAccounts = accounts.filter(account => {
-		const matchSearch =
-			!search ||
-			(account.accountCode || "")
-				.toLowerCase()
-				.includes(search) ||
-			(account.accountName || "")
-				.toLowerCase()
-				.includes(search);
-		const matchType =
-			!typeFilter ||
-			account.accountType === typeFilter;
-		const matchStatus =
-			!statusFilter ||
-			(statusFilter === "ACTIVE"
-				? account.isActive === true
-				: account.isActive === false);
+		const matchSearch = !search || (account.accountCode || "")
+			.toLowerCase()
+			.includes(search) || (account.accountName || "")
+			.toLowerCase()
+			.includes(search);
+		const matchType = !typeFilter || account.accountType === typeFilter;
+		const matchStatus = !statusFilter || (statusFilter === "ACTIVE"
+			? account.isActive === true
+			: account.isActive === false);
 		return matchSearch && matchType && matchStatus;
 	});
 
@@ -26464,29 +26441,33 @@ function updateAccountingAccountSummary(accounts) {
 }
 
 function openAddAccountingAccountModal() {
-	const modal = document.getElementById("addAccountingAccountModal");
-	
-	if (!modal) return;
-	
-	document.getElementById("newAccountingAccountCode").value = "";
-	document.getElementById("newAccountingAccountName").value = "";
-	document.getElementById("newAccountingAccountType").value = "";
-	document.getElementById("newAccountingAccountParent").value = "";
-	document.getElementById("newAccountingAccountNormalBalance").value = "";
-	
-	populateAccountingParentAccounts();
-	modal.classList.remove("hidden");
+    const modal = document.getElementById("addAccountingAccountModal");
+    if (!modal) return;
+
+    editingAccountingAccountId = null;
+
+    document.getElementById("newAccountingAccountCode").value = "";
+    document.getElementById("newAccountingAccountName").value = "";
+    document.getElementById("newAccountingAccountType").value = "";
+    document.getElementById("newAccountingAccountParent").value = "";
+    document.getElementById("newAccountingAccountNormalBalance").value = "";
+    document.getElementById("newAccountingAccountBalanceSheetCategory").value = "";
+
+    toggleBalanceSheetCategory();
+    document.getElementById("accountModalTitle").textContent = "Add Account";
+    document.getElementById("accountModalSaveButton").textContent = "Save Account";
+
+    populateAccountingParentAccounts();
+    modal.classList.remove("hidden");
 }
 
 function closeAddAccountingAccountModal() {
 	const modal = document.getElementById("addAccountingAccountModal");
-	
 	if (modal) { modal.classList.add("hidden"); }
 }
 
 function populateAccountingParentAccounts() {
 	const select = document.getElementById("newAccountingAccountParent");
-	
 	if (!select) return;
 	
 	select.innerHTML = ` <option value="">No Parent Account</option> `;
@@ -26495,8 +26476,7 @@ function populateAccountingParentAccounts() {
 	window.accountingAccounts.forEach(account => {
 		const option = document.createElement("option");
 		option.value = account.accountId;
-		option.textContent =
-			`${account.accountCode} — ${account.accountName}`;
+		option.textContent = `${account.accountCode} — ${account.accountName}`;
 		select.appendChild(option);
 	});
 }
@@ -26537,106 +26517,119 @@ let editingAccountingAccountId = null;
 const ACCOUNTING_ACCOUNT_PAGE_SIZE = 10;
 let accountingAccountCurrentPage = 1;
 function editAccountingAccount(accountId) {
-	const account = (window.accountingAccounts || [])
-		.find(a => a.accountId === accountId);
+	const account = (window.accountingAccounts || []) .find(a => a.accountId === accountId);
+
 	if (!account) { alert("Account tidak ditemukan."); return; }
 
 	editingAccountingAccountId = accountId;
-	const modal = document.getElementById( "addAccountingAccountModal" );
 
+	const modal = document.getElementById("addAccountingAccountModal");
 	if (!modal) return;
 
-	document.getElementById( "newAccountingAccountCode" ).value = account.accountCode || "";
-	document.getElementById( "newAccountingAccountName" ).value = account.accountName || "";
-	document.getElementById( "newAccountingAccountType" ).value = account.accountType || "";
-	document.getElementById( "newAccountingAccountNormalBalance" ).value = account.normalBalance || "";
+	document.getElementById("newAccountingAccountCode").value = account.accountCode || "";
+	document.getElementById("newAccountingAccountName").value = account.accountName || "";
+	document.getElementById("newAccountingAccountType").value = account.accountType || "";
+	document.getElementById("newAccountingAccountNormalBalance").value = account.normalBalance || "";
+	// Tampilkan kategori sesuai Account Type
+	toggleBalanceSheetCategory();
 
+	// Isi kategori yang sudah tersimpan
+	document.getElementById("newAccountingAccountBalanceSheetCategory").value = account.balanceSheetCategory || "";
 	populateAccountingParentAccounts();
 
-	document.getElementById( "newAccountingAccountParent" ).value = account.parentId || "";
-	const title = document.getElementById( "accountModalTitle" );
-	const saveButton = document.getElementById( "accountModalSaveButton" );
-
-	if (title) { title.textContent = "Edit Account"; }
-	if (saveButton) { saveButton.textContent = "Update Account"; }
+	document.getElementById("newAccountingAccountParent").value = account.parentId || "";
+	document.getElementById("accountModalTitle").textContent = "Edit Account";
+	document.getElementById("accountModalSaveButton").textContent = "Update Account";
 	modal.classList.remove("hidden");
 }
 
+function toggleBalanceSheetCategory() {
+	const accountType = document.getElementById( 'newAccountingAccountType').value;
+	const wrapper = document.getElementById( 'balanceSheetCategoryWrapper' );
+	const categorySelect = document.getElementById( 'newAccountingAccountBalanceSheetCategory' );
+	const showCategory = ['ASSET', 'LIABILITY', 'EQUITY'].includes(accountType);
+	wrapper.classList.toggle('hidden', !showCategory);
+
+	if (!showCategory) { categorySelect.value = ''; }
+}
+
 async function saveAccountingAccount() {
-    const sessionId = localStorage.getItem("pos_session_id");
-	
-    if (!sessionId) { alert("Session tidak ditemukan."); return; }
-	
-    const accountCode = document.getElementById( "newAccountingAccountCode" )?.value.trim();
-    const accountName = document.getElementById( "newAccountingAccountName" )?.value.trim();
-    const accountType = document.getElementById( "newAccountingAccountType" )?.value;
-    const parentId = document.getElementById( "newAccountingAccountParent" )?.value || null;
-    const normalBalance = document.getElementById( "newAccountingAccountNormalBalance" )?.value;
-	
-    if (!accountCode) { alert("Account Code wajib diisi."); return; }
-    if (!accountName) { alert("Account Name wajib diisi."); return; }
-    if (!accountType) { alert("Account Type wajib dipilih."); return; }
-    if (!normalBalance) { alert("Normal Balance wajib dipilih."); return; }
+	const sessionId = localStorage.getItem("pos_session_id");
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 
-    try {
-			let data;
-			let error;
-			if (editingAccountingAccountId) {
-				({ data, error } = await supabaseClient.rpc(
-					"update_account",
-					{
-						p_account_id: editingAccountingAccountId,
-						p_account_code: accountCode,
-						p_account_name: accountName,
-						p_account_type: accountType,
-						p_normal_balance: normalBalance,
-						p_parent_id: parentId,
-						p_session_id: sessionId
-					}
-				));
-			} else {
-				({ data, error } = await supabaseClient.rpc(
+	const accountCode = document.getElementById("newAccountingAccountCode")?.value.trim();
+	const accountName = document.getElementById("newAccountingAccountName")?.value.trim();
+	const accountType = document.getElementById("newAccountingAccountType")?.value;
+	const parentId = document.getElementById("newAccountingAccountParent")?.value || null;
+	const normalBalance = document.getElementById("newAccountingAccountNormalBalance")?.value;
+	const categoryEl = document.getElementById("newAccountingAccountBalanceSheetCategory");
+	const balanceSheetCategory = ["ASSET", "LIABILITY", "EQUITY"].includes(accountType)
+		? categoryEl?.value || null
+		: null;
+
+	if (!accountCode) { alert("Account Code wajib diisi."); return; }
+	if (!accountName) { alert("Account Name wajib diisi."); return; }
+	if (!accountType) { alert("Account Type wajib dipilih."); return; }
+	if (!normalBalance) { alert("Normal Balance wajib dipilih."); return; }
+	if (["ASSET", "LIABILITY", "EQUITY"].includes(accountType) && !balanceSheetCategory) { alert("Balance Sheet Category wajib dipilih."); return; }
+
+	try {
+		let data;
+		let error;
+
+		const rpcParams = {
+			p_account_code: accountCode,
+			p_account_name: accountName,
+			p_account_type: accountType,
+			p_normal_balance: normalBalance,
+			p_parent_id: parentId,
+			p_balance_sheet_category: balanceSheetCategory,
+			p_session_id: sessionId
+		};
+
+		if (editingAccountingAccountId) {
+			({ data, error } = await supabaseClient.rpc(
+				"update_account",
+				{
+					...rpcParams,
+					p_account_id: editingAccountingAccountId
+				}
+			));
+		} else {
+			({ data, error } = await supabaseClient.rpc(
 					"create_account",
-					{
-						p_account_code: accountCode,
-						p_account_name: accountName,
-						p_account_type: accountType,
-						p_normal_balance: normalBalance,
-						p_parent_id: parentId,
-						p_session_id: sessionId
-					}
-				));
-			}
-		
-	if (error) {
-		alert( error.message || "Gagal menyimpan account." );
-		return; }
+					rpcParams
+			));
+		}
 
-	const wasEditing = !!editingAccountingAccountId;
-	closeAddAccountingAccountModal();
-	await loadAccountingAccounts();
-	editingAccountingAccountId = null;
-	alert( "Account berhasil " + (wasEditing ? "diubah." : "disimpan.") );
+		if (error) { alert(error.message || "Gagal menyimpan account."); return; }
+		const wasEditing = !!editingAccountingAccountId;
+
+		closeAddAccountingAccountModal();
+		editingAccountingAccountId = null;
+
+		await loadAccountingAccounts();
+
+		alert("Account berhasil " + (wasEditing ? "diubah." : "disimpan."));
+
 	} catch (err) {
-		alert( "Terjadi kesalahan saat menyimpan account." );
+		console.error(err);
+		alert("Terjadi kesalahan saat menyimpan account.");
 	}
 }
 
 async function toggleAccountingAccountStatus(accountId) {
-	const account = (window.accountingAccounts || [])
-		.find(a => a.accountId === accountId);
-	if (!account) {
-		alert("Account tidak ditemukan.");
-		return; }
+	const account = (window.accountingAccounts || []) .find(a => a.accountId === accountId);
+	if (!account) { alert("Account tidak ditemukan."); return; }
+	
 	const action = account.isActive
 		? "menonaktifkan"
 		: "mengaktifkan";
 	const confirmed = confirm( `Yakin ingin ${action} account "${account.accountName}"?` );
 	if (!confirmed) return;
+	
 	const sessionId = localStorage.getItem("pos_session_id");
-	if (!sessionId) {
-		alert("Session tidak ditemukan.");
-		return; }
+	if (!sessionId) { alert("Session tidak ditemukan."); return; }
 	
 	try {
 		const { data, error } = await supabaseClient.rpc(
@@ -26646,11 +26639,9 @@ async function toggleAccountingAccountStatus(accountId) {
 				p_session_id: sessionId
 			}
 		);
-		if (error) {
-			alert( error.message || "Gagal mengubah status account." );
-			return; }
+		if (error) { alert( error.message || "Gagal mengubah status account." ); return; }
 
-			await loadAccountingAccounts();
+		await loadAccountingAccounts();
 	} catch (err) {
 		alert( "Terjadi kesalahan saat mengubah status account." );
 	}
@@ -26665,6 +26656,7 @@ async function loadAccountingMappings() {
 	try {
 		const sessionId = localStorage.getItem("pos_session_id");
 		if (!sessionId) { return; }
+		
 		const { data, error } =
 			await supabaseClient.rpc(
 				"get_account_mappings",
@@ -26683,8 +26675,7 @@ async function loadAccountingMappings() {
 function renderAccountingMappings() {
 	const tbody = document.getElementById( "accountingMappingsTableBody" );
 	if (!tbody) { return; }
-	const search =
-		( document.getElementById( "accountingMappingSearch" )?.value || "" )
+	const search = ( document.getElementById( "accountingMappingSearch" )?.value || "" )
 		.trim()
 		.toLowerCase();
 	const typeFilter = document.getElementById( "accountingMappingTypeFilter" )?.value || "";
@@ -26832,7 +26823,7 @@ function renderAccountingMappings() {
 	
 							<button type="button"
 								onclick="toggleAccountingMappingStatus('${escapeHtml(mapping.mappingId)}')"
-								class="w-full px-4 py-3 text-center text-sm text-on-surface hover:bg-outline-variant">
+								class="w-full px-4 py-3 text-left text-sm text-on-surface hover:bg-outline-variant">
 								${mapping.isActive
 									? "Deactivate"
 									: "Activate"}
