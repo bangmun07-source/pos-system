@@ -31927,6 +31927,50 @@ async function recordPbjtPayment() {
   }
 }
 
+function viewTaxTransactionDetail(transactionId) {
+  const transaction = taxTransactionsData.find(item => String(item.transaction_id || "") === String(transactionId));
+  if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
+	
+  const branchId = String( transaction.branch_id || transaction.Branch_ID || "" ).trim();
+  const branchName = (accountingDebtBranches || []).find(branch => String(branch.id || "").trim() === branchId)?.name || branchId || "-";
+  const taxDate = transaction.tax_date
+    ? new Date(transaction.tax_date).toLocaleDateString("id-ID")
+    : "-";
+  const taxType = String(transaction.tax_type || "-").toUpperCase();
+  const status = String(transaction.status || "OUTSTANDING").toUpperCase();
+  const amount = Number(transaction.tax_amount) || 0;
+  const outstanding = status === "OUTSTANDING" ? amount : 0;
+  const paid = status === "PAID" ? amount : 0;
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+
+  setText("taxDetailTransactionId", transaction.transaction_id || "-");
+  setText("taxDetailDate", taxDate);
+  setText("taxDetailBranch", branchName);
+  setText("taxDetailType", taxType);
+  setText("taxDetailStatus", status);
+
+  setText("taxDetailAmount", formatAccountingCurrency(amount));
+  setText("taxDetailOutstanding", formatAccountingCurrency(outstanding));
+  setText("taxDetailPaid", formatAccountingCurrency(paid));
+
+  const modal = document.getElementById("taxTransactionDetailModal");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+  }
+}
+
+function closeTaxTransactionDetail() {
+  const modal = document.getElementById("taxTransactionDetailModal");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  }
+}
+
 function openPpnPaymentFromRow(paymentId) {
   const payment = ppnPaymentsData.find(
     item => String(item.payment_id) === String(paymentId)
