@@ -20675,8 +20675,7 @@
 	          </div>
 	        </div>
 	      </section>
-				
-	      <!-- PAYMENT SUMMARY -->
+	      <!-- TAX SUMMARY -->
 	      <section>
 	        <div class="pb-3 border-b border-outline-variant mb-4">
 	          <h3 class="text-sm font-semibold text-foreground">
@@ -20686,7 +20685,7 @@
 	            Tax amount and payment position
 	          </p>
 	        </div>
-					
+	
 	        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 	          <div class="border border-outline-variant rounded-md p-4">
 	            <p class="text-xs text-muted">Tax Amount</p>
@@ -20697,14 +20696,46 @@
 	          <div class="border border-outline-variant rounded-md p-4">
 	            <p class="text-xs text-muted">Outstanding</p>
 	            <p id="taxDetailOutstanding"
-	              class="text-xl font-semibold text-yellow-700 mt-2">Rp0</p>
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
 	          </div>
 	
 	          <div class="border border-outline-variant rounded-md p-4">
 	            <p class="text-xs text-muted">Paid</p>
 	            <p id="taxDetailPaid"
-	              class="text-xl font-semibold text-green-700 mt-2">Rp0</p>
+	              class="text-xl font-semibold text-green-800 mt-2">Rp0</p>
 	          </div>
+	        </div>
+	      </section>
+	      <!-- PAYMENT HISTORY -->
+	      <section>
+	        <div class="pb-3 border-b border-outline-variant mb-4">
+	          <h3 class="text-sm font-semibold text-foreground">
+	            Payment History
+	          </h3>
+	          <p class="text-xs text-muted mt-1">
+	            History of payments for this tax transaction
+	          </p>
+	        </div>
+	
+	        <div class="border border-outline-variant rounded-md overflow-x-auto">
+	          <table class="w-full text-sm text-left">
+	            <thead class="bg-surface text-muted">
+	              <tr>
+	                <th class="px-4 py-3 font-medium whitespace-nowrap">Payment Date</th>
+	                <th class="px-4 py-3 font-medium whitespace-nowrap">Payment ID</th>
+	                <th class="px-4 py-3 font-medium whitespace-nowrap">Payment Method</th>
+	                <th class="px-4 py-3 font-medium whitespace-nowrap text-right">Amount</th>
+	                <th class="px-4 py-3 font-medium whitespace-nowrap">Note</th>
+	              </tr>
+	            </thead>
+	            <tbody id="taxDetailPaymentHistoryBody">
+	              <tr>
+	                <td colspan="5" class="px-4 py-8 text-center text-muted">
+	                  No payment records available
+	                </td>
+	              </tr>
+	            </tbody>
+	          </table>
 	        </div>
 	      </section>
 	    </div>
