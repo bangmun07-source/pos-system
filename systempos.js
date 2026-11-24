@@ -31633,11 +31633,10 @@ async function recordPpnPayment() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
     if (!sessionId) { throw new Error( "Session tidak ditemukan." ); }
-		
+
+		await loadTaxPayable();
 		const filter = getTaxTransactionsFilter();
 		const branchId = filter.branchId || "ALL";
-
-    await loadTaxPayable();
     let branchAllocations = null;
 
     if (branchId === "ALL") {
@@ -31733,11 +31732,10 @@ async function recordPbjtPayment() {
   try {
     const sessionId = localStorage.getItem("pos_session_id");
     if (!sessionId) { throw new Error("Session tidak ditemukan."); }
-		
+
+		await loadTaxPayable();
 		const filter = getTaxTransactionsFilter();
 		const branchId = filter.branchId || "ALL";
-
-    await loadTaxPayable();
 
     let branchAllocations = null;
 
