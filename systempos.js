@@ -31683,7 +31683,7 @@ async function recordPpnPayment() {
       `;
     }
 
-		const filter = getDebtLiabilityFilter();
+		const filter = getTaxTransactionsFilter();
 		const { data, error } =
 		  await supabaseClient.rpc(
 		    "record_ppn_payment",
@@ -31781,7 +31781,7 @@ async function recordPbjtPayment() {
       `;
     }
 
-		const filter = getDebtLiabilityFilter();
+		const filter = getTaxTransactionsFilter();
 		const { data, error } = await supabaseClient.rpc(
 		  "record_pbjt_payment",
 		  {
