@@ -32042,34 +32042,38 @@ async function loadTaxDetailPaymentHistory(taxId, branchId) {
   }
 }
 
+let currentTaxTransaction = null;
+/* ===== OPEN TAX PAYMENT FROM ROW ===== */
+function payTaxTransaction(transactionId) {
+  const transaction = taxTransactionsData.find(item => String(item.transaction_id) === String(transactionId));
 
-function openPpnPaymentFromRow(paymentId) {
-  const payment = ppnPaymentsData.find(
-    item => String(item.payment_id) === String(paymentId)
-  );
-
-  if (!payment) { showToast("PPN payment tidak ditemukan.", "error"); return; }
-  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { showToast("PPN payment ini sudah tidak outstanding.", "info"); return; }
-  currentPpnPayment = payment;
+  if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
+  if (String(transaction.status).toUpperCase() !== "OUTSTANDING") { showToast("Tax transaction ini sudah tidak outstanding.", "info"); return; }
+  currentTaxTransaction = transaction;
   openTaxPaymentModal();
 }
 
 /* ===== OPEN TAX PAYMENT MODAL ===== */
-async function openTaxPaymentModal() {
-  const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { alert("Session tidak ditemukan."); return; }
-  // Ambil data dari PPN Payment yang dipilih
-  const payment = currentPpnPayment;
-  if (!payment) { alert("PPN payment tidak ditemukan."); return; }
+function openTaxPaymentModal() {
+  const transaction = currentTaxTransaction;
+  if (!transaction) { alert("Tax transaction tidak ditemukan."); return; }
 
-  const branchId = payment.branch_id;
-  const outstanding = Number(payment.amount) || 0;
+  const taxId = transaction.tax_id || transaction.Tax_ID;
+  const branchId = transaction.branch_id || transaction.Branch_ID;
+  const taxType = String(transaction.tax_type || transaction.Tax_Type || "").toUpperCase();
+  const outstanding = Number(transaction.tax_amount ?? transaction.Tax_Amount) || 0;
 
-  if (!branchId || branchId.toUpperCase() === "ALL") { alert("Branch PPN tidak valid."); return; }
-  if (String(payment.status).toUpperCase() !== "OUTSTANDING") { alert("PPN payment ini sudah tidak outstanding."); return; }
-  if (outstanding <= 0) { alert("PPN tidak memiliki saldo terutang.");  return; }
+  if (!taxId) { alert("Tax ID tidak ditemukan."); return; }
+  if (!branchId || String(branchId).toUpperCase() === "ALL") { alert("Branch Tax Transaction tidak valid."); return; }
+  if (outstanding <= 0) { alert("Tax Transaction tidak memiliki saldo terutang."); return; }
 
-  document.getElementById("taxPaymentAccount").textContent = `2200 · Tax Payable (${branchId})`;
+  const account = taxType === "PPN"
+    ? "2200 · PPN Payable"
+    : taxType === "PBJT"
+      ? "2210 · PBJT Payable"
+      : "Tax Payable";
+
+  document.getElementById("taxPaymentAccount").textContent = `${account} (${branchId})`;
   document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
   document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
   document.getElementById("taxPaymentAmount").value = outstanding;
@@ -32079,14 +32083,13 @@ async function openTaxPaymentModal() {
   document.getElementById("taxPaymentNote").value = "";
 
   const modal = document.getElementById("taxPaymentModal");
-
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   }
 }
 
-/* ==== CLOSE TAX PAYMENT MODAL ==== */
+/* ===== CLOSE TAX PAYMENT MODAL ===== */
 function closeTaxPaymentModal() {
   const modal = document.getElementById("taxPaymentModal");
   if (modal) {
