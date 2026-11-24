@@ -31582,7 +31582,7 @@ function renderTaxTransactions() {
 					
           <td class="px-5 py-3 text-center">
 					  <button type="button"
-					    onclick="toggleTaxTransactionMenu('${escapeHtml(transaction.transaction_id || "")}', this)"
+					    onclick="toggleTaxTransactionMenu(this, '${escapeHtml(transaction.transaction_id || "")}')"
 					    class="p-2 text-muted hover:text-foreground transition"
 					    title="Actions" >
 					    <span class="material-symbols-outlined">more_vert</span>
@@ -31615,65 +31615,79 @@ function changeTaxTransactionsPage(direction) {
 
 let activeTaxTransactionMenu = null;
 
-function toggleTaxTransactionMenu(transactionId, button) {
-  // Tutup menu sebelumnya
-  closeTaxTransactionMenu();
+function toggleTaxTransactionMenu(button, transactionId) {
+  const menuId = `taxTransactionMenu-${transactionId}`;
+  const existingMenu = document.getElementById(menuId);
+
+  document.querySelectorAll('[id^="taxTransactionMenu-"]') .forEach(menu => menu.remove());
+
+  if (existingMenu) return;
 
   const menu = document.createElement("div");
-
-  menu.id = "activeTaxTransactionMenu";
-
+  menu.id = menuId;
   menu.className = `
-    fixed w-44 bg-surface border border-outline-variant
-    rounded-md shadow-xl z-[99999] text-left
+    w-44 bg-background border border-outline-variant
+    rounded-md shadow-lg py-1
   `;
 
   menu.innerHTML = `
     <button type="button"
-      onclick="closeTaxTransactionMenu(); viewTaxTransactionDetail('${escapeHtml(transactionId)}')"
-      class="w-full px-4 py-2.5 text-sm hover:bg-outline-variant flex items-center gap-3">
+      onclick="viewTaxTransactionDetail('${escapeHtml(transactionId)}'); document.getElementById('${menuId}')?.remove();"
+      class="w-full px-3 py-2.5 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
       <span class="material-symbols-outlined text-base">visibility</span>
       View Detail
     </button>
 
     <button type="button"
-      onclick="closeTaxTransactionMenu(); payTaxTransaction('${escapeHtml(transactionId)}')"
-      class="w-full px-4 py-2.5 text-sm hover:bg-outline-variant flex items-center gap-3">
+      onclick="payTaxTransaction('${escapeHtml(transactionId)}'); document.getElementById('${menuId}')?.remove();"
+      class="w-full px-3 py-2.5 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
       <span class="material-symbols-outlined text-base">payments</span>
       Pay
     </button>
 
     <button type="button"
-      onclick="closeTaxTransactionMenu(); submitTaxTransactionProof('${escapeHtml(transactionId)}')"
-      class="w-full px-4 py-2.5 text-sm hover:bg-outline-variant flex items-center gap-3">
+      onclick="submitTaxTransactionProof('${escapeHtml(transactionId)}'); document.getElementById('${menuId}')?.remove();"
+      class="w-full px-3 py-2.5 text-left text-sm hover:bg-outline-variant flex items-center gap-2">
       <span class="material-symbols-outlined text-base">upload_file</span>
       Submit Bukti
     </button>
   `;
 
+  const rect = button.getBoundingClientRect();
+
+  menu.style.position = "fixed";
+  menu.style.zIndex = "99999";
+  menu.style.left = `${Math.max(
+    8,
+    Math.min(rect.right - 176, window.innerWidth - 184)
+  )}px`;
+
   document.body.appendChild(menu);
 
-  const rect = button.getBoundingClientRect();
   const menuHeight = menu.offsetHeight;
-  const menuWidth = menu.offsetWidth;
+  const spaceBelow = window.innerHeight - rect.bottom;
+  const spaceAbove = rect.top;
 
-  let top = rect.bottom + 4;
-
-  // Jika ruang bawah tidak cukup, buka ke atas
-  if (window.innerHeight - rect.bottom < menuHeight + 10) {
-    top = rect.top - menuHeight - 4;
+  if (spaceBelow >= menuHeight + 8) {
+    menu.style.top = `${rect.bottom + 4}px`;
+  } else if (spaceAbove >= menuHeight + 8) {
+    menu.style.top = `${rect.top - menuHeight - 4}px`;
+  } else if (spaceBelow >= spaceAbove) {
+    menu.style.top = `${rect.bottom + 4}px`;
+  } else {
+    menu.style.top = `${Math.max(8, rect.top - menuHeight - 4)}px`;
   }
 
-  let left = rect.right - menuWidth;
+  const handleOutsideClick = (event) => {
+    if (!menu.contains(event.target) && !button.contains(event.target)) {
+      menu.remove();
+      document.removeEventListener("click", handleOutsideClick, true);
+    }
+  };
 
-  // Pastikan tidak keluar layar
-  left = Math.max(8, Math.min(left, window.innerWidth - menuWidth - 8));
-  top = Math.max(8, Math.min(top, window.innerHeight - menuHeight - 8));
-
-  menu.style.top = `${top}px`;
-  menu.style.left = `${left}px`;
-
-  activeTaxTransactionMenu = menu;
+  setTimeout(() => {
+    document.addEventListener("click", handleOutsideClick, true);
+  }, 0);
 }
 
 function closeTaxTransactionMenu() {
