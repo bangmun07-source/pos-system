@@ -31584,7 +31584,7 @@ function renderTaxTransactions() {
 					  <div class="relative inline-block">
 					    <button type="button"
 					      onclick="toggleTaxTransactionMenu('${escapeHtml(transaction.transaction_id || "")}')"
-					      class="p-2 rounded-lg hover:bg-surface-container-high transition"
+					      class="p-2 text-muted hover:text-foreground transition"
 					      title="Actions" >
 								<span class="material-symbols-outlined">
 									more_vert
@@ -31593,26 +31593,26 @@ function renderTaxTransactions() {
 					
 					    <div
 					      id="taxTransactionMenu-${escapeHtml(transaction.transaction_id || "")}"
-					      class="hidden absolute right-0 top-full mt-1 w-44 bg-surface border border-outline-variant rounded-md shadow-lg z-50 text-left" >
+					      class="hidden absolute right-0 bottom-full mb-1 w-44 bg-surface border border-outline-variant rounded-md shadow-lg z-[100] text-left" >
 					      <button type="button"
 					        onclick="viewTaxTransactionDetail('${escapeHtml(transaction.transaction_id || "")}')"
-					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3" >
+					        class="w-full px-4 py-2.5 text-sm hover:bg-outline-variant flex items-center gap-3" >
 					        <i class="fas fa-eye w-4"></i>
-					        View Detail
+					        	View Detail
 					      </button>
 					
 					      <button type="button"
 					        onclick="payTaxTransaction('${escapeHtml(transaction.transaction_id || "")}')"
-					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3" >
+					        class="w-full px-4 py-2.5 text-sm hover:bg-outline-variant flex items-center gap-3" >
 					        <i class="fas fa-credit-card w-4"></i>
-					        Pay
+					        	Pay
 					      </button>
 					
 					      <button type="button"
 					        onclick="submitTaxTransactionProof('${escapeHtml(transaction.transaction_id || "")}')"
-					        class="w-full px-4 py-2.5 text-sm hover:bg-surface-container-high flex items-center gap-3" >
+					        class="w-full px-4 py-2.5 text-sm hover:bg-outline-variant flex items-center gap-3" >
 					        <i class="fas fa-upload w-4"></i>
-					        Submit Bukti
+					        	Submit Bukti
 					      </button>
 					    </div>
 					  </div>
@@ -31655,6 +31655,19 @@ function toggleTaxTransactionMenu(transactionId) {
 
   targetMenu.classList.toggle("hidden");
 }
+
+document.addEventListener("click", function(event) {
+  // Jika klik di dalam tombol atau dropdown, jangan tutup
+  if (event.target.closest('[id^="taxTransactionMenu-"]') ||
+      event.target.closest('button[onclick^="toggleTaxTransactionMenu"]')) {
+    return;
+  }
+
+  // Tutup semua dropdown
+  document.querySelectorAll('[id^="taxTransactionMenu-"]').forEach(menu => {
+    menu.classList.add("hidden");
+  });
+});
 
 function updateTaxPayableUI() {
   const ppnOutstanding = Number( taxPayableData?.ppn?.outstanding ?? taxPayableData?.outstanding ) || 0;
