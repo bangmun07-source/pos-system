@@ -9695,40 +9695,24 @@ function renderUsageLog(data) {
     return; }
 
   data
-  .sort(
-    (a, b) =>
-      new Date(b.timestamp) -
-      new Date(a.timestamp)
-  )
+  .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
   .slice(0, 10).forEach(log => {
     let badgeColor = "text-blue-700";
     let badgeName = "POS Deduction";
-    if (
-      log.action === "add"
-    ) {
-      badgeColor = "text-on-surface";
-      badgeName = "Manual Add";
-    }
-    if (
-      log.action === "subtract"
-    ) {
-      badgeColor = "text-error";
-      badgeName = "Manual Subtract";
-    }
-    if (
-      log.action === "set"
-    ) {
-      badgeColor = "text-secondary";
-      badgeName = "Stock Set";
-    }
-    const qtyColor =
-      log.qtyChange >= 0
-        ? "text-on-surface"
-        : "text-error";
-    const qtyText =
-      log.qtyChange >= 0
-        ? `+${log.qtyChange}`
-        : `${log.qtyChange}`;
+		
+    if ( log.action === "add"
+    ) { badgeColor = "text-on-surface"; badgeName = "Manual Add"; }
+    if ( log.action === "subtract"
+    ) { badgeColor = "text-error"; badgeName = "Manual Subtract"; }
+    if ( log.action === "set"
+    ) { badgeColor = "text-secondary"; badgeName = "Stock Set"; }
+		
+    const qtyColor = log.qtyChange >= 0
+			? "text-on-surface"
+			: "text-error";
+		const qtyText = log.qtyChange >= 0
+			? `+${log.qtyChange}`
+			: `${log.qtyChange}`;
     const parts = String(log.timestamp) .split(" ");
     const date = parts[0] || "-";
     const time = parts[1] || "-";
@@ -9757,14 +9741,8 @@ function renderUsageLog(data) {
         <td class="py-5 px-6 text-on-surface-variant font-mono text-sm">
           ${log.notes || "-"}
         </td>
-
-        <td class="py-5 px-6 text-right font-display font-bold ${qtyColor}">
-          ${qtyText}g
-        </td>
-
-        <td class="py-5 px-6 text-right font-display font-medium text-on-surface">
-          ${log.after}
-        </td>
+        <td class="py-5 px-6 text-right font-display font-bold ${qtyColor}"> ${qtyText} </td>
+        <td class="py-5 px-6 text-right font-display font-medium text-on-surface"> ${log.after} </td>
       </tr>
     `;
   });
