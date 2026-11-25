@@ -31861,7 +31861,6 @@ function openInputPpnModal() {
 	document.getElementById('inputPpnInvoiceNo').value = '';
 	document.getElementById('inputPpnInvoiceDate').value = '';
 	document.getElementById('inputPpnTaxDate').value = new Date().toISOString().split('T')[0];
-
 	document.getElementById('inputPpnVatCategory').value = '';
 	document.getElementById('inputPpnRate').value = '';
 	document.getElementById('inputPpnTaxBase').value = '';
@@ -31881,10 +31880,11 @@ function closeInputPpnModal() {
 }
 
 function calculateInputPpn() {
-  const dpp = Number(document.getElementById("inputPpnTaxBase").value) || 0;
-  const rate = Number(document.getElementById("inputPpnTaxRate").value) || 0;
-  const amount = Math.round(dpp * rate / 100);
-  document.getElementById("inputPpnTaxAmount").textContent = "Rp" + amount.toLocaleString("id-ID");
+	const taxBase = Number(document.getElementById('inputPpnTaxBase').value) || 0;
+	const rate = Number(document.getElementById('inputPpnRate').value) || 0;
+	const taxAmount = Math.round(taxBase * rate / 100);
+
+	document.getElementById('inputPpnTaxAmount').value = taxAmount;
 }
 
 async function viewTaxTransactionDetail(transactionId) {
