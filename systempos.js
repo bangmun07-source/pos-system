@@ -6546,11 +6546,11 @@ function openMemberProfile(memberId) {
     const tier5 = String(settings.tier_5_name_value || "") .toLowerCase();
     const current = String(tier).toLowerCase();
 
-    if (current === tier5) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
-    } else if (current === tier4) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
-    }else if (current === tier3) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
-    } else if (current === tier2) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
-    } else { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" ); }
+    if (current === tier5) { tierBadge.classList.add( "bg-background", "text-on-surface" );
+    } else if (current === tier4) { tierBadge.classList.add( "bg-background", "text-on-surface" );
+    }else if (current === tier3) { tierBadge.classList.add( "bg-background", "text-on-surface" );
+    } else if (current === tier2) { tierBadge.classList.add( "bg-background", "text-on-surface" );
+    } else { tierBadge.classList.add( "bg-background", "text-on-surface" ); }
   }
 	
   const img = modal.querySelector("#memberPhoto");
