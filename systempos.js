@@ -31852,20 +31852,40 @@ async function recordPbjtPayment() {
   }
 }
 
+function populateInputPpnBranches() {
+	const branchSelect = document.getElementById("inputPpnBranch");
+	if (!branchSelect) return;
+
+	branchSelect.innerHTML = '<option value="">Select Branch</option>';
+
+	const branches = Array.isArray(accountingDebtBranches)
+		? accountingDebtBranches
+		: [];
+
+	branches.forEach(branch => {
+		const option = document.createElement("option");
+		option.value = branch.id;
+		option.textContent = branch.name || branch.id;
+		branchSelect.appendChild(option);
+	});
+}
+
 function openInputPpnModal() {
 	const modal = document.getElementById('inputPpnModal');
 	if (!modal) return;
 
-	// Reset form
 	document.getElementById('inputPpnSupplierName').value = '';
 	document.getElementById('inputPpnInvoiceNo').value = '';
 	document.getElementById('inputPpnInvoiceDate').value = '';
 	document.getElementById('inputPpnTaxDate').value = new Date().toISOString().split('T')[0];
+	document.getElementById('inputPpnBranch').value = '';
 	document.getElementById('inputPpnVatCategory').value = '';
 	document.getElementById('inputPpnRate').value = '';
 	document.getElementById('inputPpnTaxBase').value = '';
 	document.getElementById('inputPpnTaxAmount').value = '';
 	document.getElementById('inputPpnNote').value = '';
+
+	populateInputPpnBranches();
 
 	modal.classList.remove('hidden');
 	modal.classList.add('flex');
