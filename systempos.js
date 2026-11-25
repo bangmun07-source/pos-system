@@ -4459,11 +4459,8 @@ async function sendTransaction(payload){
 		    });
 		  }
 										
-			if(payload.memberId){
 				state.memberPageData = null;
 				state.members = null;
-			}
-										
 			state.recentTransactionsData = null;
 			state.recentTransactionsFilter = null;
 			state.recentSummaryData = null;
