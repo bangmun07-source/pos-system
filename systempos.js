@@ -6546,12 +6546,13 @@ function openMemberProfile(memberId) {
     const tier5 = String(settings.tier_5_name_value || "") .toLowerCase();
     const current = String(tier).toLowerCase();
 
-    if (current === tier5) { tierBadge.classList.add( "bg-cyan-400", "text-on-surface" );
-    } else if (current === tier4) { tierBadge.classList.add( "bg-gray-400", "text-on-surface" );
-    }else if (current === tier3) { tierBadge.classList.add( "bg-amber-500", "text-on-surface" );
-    } else if (current === tier2) { tierBadge.classList.add( "bg-slate-500", "text-on-surface" );
-    } else { tierBadge.classList.add( "bg-zinc-700", "text-on-surface" ); }
+    if (current === tier5) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
+    } else if (current === tier4) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
+    }else if (current === tier3) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
+    } else if (current === tier2) { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" );
+    } else { tierBadge.classList.add( "bg-outline-variant", "text-on-surface" ); }
   }
+	
   const img = modal.querySelector("#memberPhoto");
     if (img) {
       let photoUrl = "";
@@ -6564,7 +6565,6 @@ function openMemberProfile(memberId) {
           if (match) { photoUrl = "https://drive.google.com/thumbnail?id=" + match[1] + "&sz=w1000"; }
         } else { photoUrl = "https://drive.google.com/thumbnail?id=" + photo + "&sz=w1000"; }
       }
-
       img.src = photoUrl || "https://ui-avatars.com/api/?name=" + encodeURIComponent( member.Nama || "Member" );
     }
 
@@ -6700,12 +6700,12 @@ function renderTierTimeline(history, modal) {
             : "bg-outline-variant"} "></div>
         <div class=" absolute left-0 top-1 w-8 h-8 rounded-md flex items-center justify-center z-10
           ${current
-            ? "bg-background shadow-[0_0_15px_rgba(255,193,116,0.3)]"
+            ? "bg-background"
             : "bg-background border border-outline-variant"} ">
           <span class=" material-symbols-outlined text-sm
             ${current
-              ? "text-on-surface-variant"
-              : "text-on-surface"} ">
+              ? "text-on-surface"
+              : "text-on-surface-variant"} ">
             ${icon}
           </span>
         </div>
@@ -6826,10 +6826,8 @@ async function saveMemberEdit() {
 	
     // JANGAN KIRIM BASE64 KE RPC
     delete payload.PhotoBase64;
-    // UPDATE MEMBER
     const res = await updateMemberRPC( payload );
 
-    // VALIDATE RESPONSE
     if (!res) { throw new Error( "Backend mengembalikan data kosong" ); }
     if (res.success === false) { throw new Error( res.message || "Gagal update member" ); }
 		
@@ -7029,6 +7027,16 @@ function toggleNotification() {
   if (!el) return;
   el.classList.toggle("hidden");
 }
+
+document.addEventListener("click", function(e) {
+  const dropdown = document.getElementById("notificationDropdown");
+  const icon = document.getElementById("notificationIcon");
+
+  if (!dropdown || !icon) return;
+  if (!dropdown.contains(e.target) && !icon.contains(e.target)) {
+    dropdown.classList.add("hidden");
+  }
+});
 
 let memberPhotoBase64 = null;
     
