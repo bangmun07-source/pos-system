@@ -4458,6 +4458,7 @@ async function sendTransaction(payload){
 		      type: "transaction"
 		    });
 		  }
+										
 			if(payload.memberId){
 				state.memberPageData = null;
 				state.members = null;
@@ -4481,6 +4482,7 @@ async function sendTransaction(payload){
 			state.productsBranchId = null;
 			state.productsRole = null;
 			await loadProducts();
+			await loadNotifications();
 			state.currentMember = null;
 			state.selectedMember = null;
 			state.currentMemberPoint = 0;
@@ -6820,69 +6822,35 @@ async function saveMemberEdit() {
           payload.ID_Member
         );
 
-      if (!photoUrl) {
-        throw new Error(
-          "URL foto member tidak diterima"
-        );
-      }
-
+      if (!photoUrl) { throw new Error( "URL foto member tidak diterima" ); }
       // SIMPAN URL KE PHOTO
       payload.Photo = photoUrl;
     }
 	
     // JANGAN KIRIM BASE64 KE RPC
     delete payload.PhotoBase64;
-
     // UPDATE MEMBER
-    const res =
-      await updateMemberRPC(
-        payload
-      );
+    const res = await updateMemberRPC( payload );
 
     // VALIDATE RESPONSE
-    if (!res) {
-      throw new Error(
-        "Backend mengembalikan data kosong"
-      );
-    }
+    if (!res) { throw new Error( "Backend mengembalikan data kosong" ); }
+    if (res.success === false) { throw new Error( res.message || "Gagal update member" ); }
+		
+    showToast( "Member berhasil diperbarui ✔", "success" );
 
-    if (res.success === false) {
-      throw new Error(
-        res.message ||
-        "Gagal update member"
-      );
-    }
-
-    // SUCCESS
-    showToast(
-      "Member berhasil diperbarui ✔",
-      "success"
-    );
-
-    // CLEAR CACHE
     state.memberPageData = null;
     state.members = null;
-
-    // CLOSE + RELOAD
     closeMemberProfile();
     await loadMembers();
   }
   catch (err) {
-    showToast(
-      err.message ||
-      "Gagal update member",
-      "error"
-    );
+    showToast( err.message || "Gagal update member", "error" );
   }
 }
 
 function renderTierProgression(history = []) {
-
-  const el =
-    document.getElementById("tierProgression");
-
+  const el = document.getElementById("tierProgression");
   if (!el) return;
-
   if (!history.length) {
 
     el.innerHTML = `
@@ -6901,8 +6869,8 @@ function renderTierProgression(history = []) {
           ${isCurrent
             ? "bg-primary shadow-[0_0_8px_rgba(245,158,11,0.6)]"
             : "bg-outline-variant"} ">
-			</div>
-
+				</div>
+				
         <div>
           <p class=" text-[10px] font-bold tracking-widest uppercase
             ${isCurrent
@@ -6929,7 +6897,6 @@ function renderTierProgression(history = []) {
           `
             : ""
         }
-
       </div>
     `;
   }).join("");
@@ -6939,14 +6906,10 @@ async function loadNotifications() {
   let res = state.memberPageData;
   if (!res) {
     try {
-      res = await getMemberPageDataRPC(
-        state.branchId
-      );
+      res = await getMemberPageDataRPC( state.branchId );
       state.memberPageData = res;
 
-    } catch (err) {
-      return;
-    }
+    } catch (err) {  console.error("Failed to refresh notifications:", err); return; }
   }
 
 	const badge = document.getElementById("notificationBadge");
@@ -6960,14 +6923,8 @@ async function loadNotifications() {
 	const ingredients = res?.ingredientStock || [];
 	window.ingredientStockData = ingredients;
 
- 	if ( !res?.success ||
-		(
-		members.length === 0 &&
-		transactions.length === 0 &&
-		ingredients.length === 0
-		)
-		) {
-			badge.classList.add("hidden");
+ 	if ( !res?.success || ( members.length === 0 && transactions.length === 0 && ingredients.length === 0 )
+		) { badge.classList.add("hidden");
 			list.innerHTML = `
 			<div class="p-4 text-sm text-muted">
 				No Notifications
@@ -7009,7 +6966,6 @@ async function loadNotifications() {
 
 	members.forEach(member => {
 		list.innerHTML += `
-
 		 <div class=" p-4 border-b border-outline-variant hover:bg-outline-variant cursor-pointer transition-all"
 				onclick="handleBirthday(this)"
 				data-phone="${member.phone || ''}"
