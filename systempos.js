@@ -31853,15 +31853,31 @@ async function recordPbjtPayment() {
 }
 
 function openInputPpnModal() {
-  const modal = document.getElementById("inputPpnModal");
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
+	const modal = document.getElementById('inputPpnModal');
+	if (!modal) return;
+
+	// Reset form
+	document.getElementById('inputPpnSupplierName').value = '';
+	document.getElementById('inputPpnInvoiceNo').value = '';
+	document.getElementById('inputPpnInvoiceDate').value = '';
+	document.getElementById('inputPpnTaxDate').value = new Date().toISOString().split('T')[0];
+
+	document.getElementById('inputPpnVatCategory').value = '';
+	document.getElementById('inputPpnRate').value = '';
+	document.getElementById('inputPpnTaxBase').value = '';
+	document.getElementById('inputPpnTaxAmount').value = '';
+	document.getElementById('inputPpnNote').value = '';
+
+	modal.classList.remove('hidden');
+	modal.classList.add('flex');
 }
 
 function closeInputPpnModal() {
-  const modal = document.getElementById("inputPpnModal");
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
+	const modal = document.getElementById('inputPpnModal');
+	if (!modal) return;
+
+	modal.classList.add('hidden');
+	modal.classList.remove('flex');
 }
 
 function calculateInputPpn() {
