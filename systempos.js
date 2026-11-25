@@ -7030,12 +7030,12 @@ function toggleNotification() {
 
 document.addEventListener("click", function(e) {
   const dropdown = document.getElementById("notificationDropdown");
-  const icon = document.getElementById("notificationIcon");
+  if (!dropdown) return;
 
-  if (!dropdown || !icon) return;
-  if (!dropdown.contains(e.target) && !icon.contains(e.target)) {
-    dropdown.classList.add("hidden");
-  }
+  const clickedInsideDropdown = dropdown.contains(e.target);
+  const clickedToggle = e.target.closest( '[onclick="toggleNotification()"]' );
+
+  if (!clickedInsideDropdown && !clickedToggle) { dropdown.classList.add("hidden"); }
 });
 
 let memberPhotoBase64 = null;
