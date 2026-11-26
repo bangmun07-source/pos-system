@@ -5010,12 +5010,16 @@ async function calculateTotal() {
   if (discount === memberDiscountAmount && memberDiscountAmount > 0) { displayDiscountRate = memberDiscountRate; }
   if (discount === birthdayDiscountAmount && birthdayDiscountAmount > 0) { displayDiscountRate = birthdayDiscountRate; }
 
-  const base = subtotal - discount;
-  // Tarif pajak efektif: PPN global atau PBJT outlet
-  const taxRate = await getEffectiveTaxRate();
-  const tax = base * taxRate / 100;
-  const service = base * Number(state.settings?.service || 0) / 100;
-  const total = base + tax + service;
+	const base = subtotal - discount;
+	// Tarif pajak efektif: PPN global atau PBJT outlet
+	const taxRate = await getEffectiveTaxRate();
+	// Service dihitung setelah discount
+	const service = base * Number(state.settings?.service || 0) / 100;
+	// Dasar pengenaan PPN/PBJT = subtotal - discount + service
+	const taxBase = base + service;
+	const tax = taxBase * taxRate / 100;
+	const total = taxBase + tax;
+
 
   return {
     subtotal,
