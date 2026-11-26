@@ -5017,7 +5017,7 @@ async function calculateTotal() {
 	const service = base * Number(state.settings?.service || 0) / 100;
 	// Dasar pengenaan PPN/PBJT = subtotal - discount + service
 	const taxBase = base + service;
-	const tax = taxBase * taxRate / 100;
+	const tax = Math.round(taxBase * taxRate / 100);
 	const total = taxBase + tax;
 
 
