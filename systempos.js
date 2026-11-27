@@ -31775,7 +31775,22 @@ async function loadTaxPayableDetail(taxType) {
 
     if (transactionError) throw transactionError;
 
-    const taxRows = (transactions || []).filter(row => String(row.tax_type).toUpperCase() === taxType && String(row.tax_direction || "OUTPUT").toUpperCase() === "OUTPUT" );
+		const transactionResult = typeof transactions === "string"
+		    ? JSON.parse(transactions)
+		    : transactions;
+		if (!transactionResult?.success) {
+		  throw new Error(
+		    transactionResult?.message || "Gagal mengambil Tax Transactions."
+		  );
+		}
+		
+		const transactionData = Array.isArray(transactionResult.data)
+		  ? transactionResult.data
+		  : [];
+		const taxRows = transactionData.filter(row =>
+		  String(row.tax_type).toUpperCase() === taxType &&
+		  String(row.tax_direction || "OUTPUT").toUpperCase() === "OUTPUT"
+		);
     /* == 2. LOAD TAX PAYABLE SUMMARY == */
     const { data: payable, error: payableError } =
       await supabaseClient.rpc("get_tax_payable", {
