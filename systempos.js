@@ -31882,62 +31882,6 @@ async function recordPbjtPayment() {
   }
 }
 
-function populateInputPpnBranches() {
-	const branchSelect = document.getElementById("inputPpnBranch");
-	if (!branchSelect) return;
-
-	branchSelect.innerHTML = '<option value="">Select Branch</option>';
-
-	const branches = Array.isArray(accountingDebtBranches)
-		? accountingDebtBranches
-		: [];
-
-	branches.forEach(branch => {
-		const option = document.createElement("option");
-		option.value = branch.id;
-		option.textContent = branch.name || branch.id;
-		branchSelect.appendChild(option);
-	});
-}
-
-function openInputPpnModal() {
-	const modal = document.getElementById('inputPpnModal');
-	if (!modal) return;
-
-	document.getElementById('inputPpnSupplierName').value = '';
-	document.getElementById('inputPpnInvoiceNo').value = '';
-	document.getElementById('inputPpnInvoiceDate').value = '';
-	document.getElementById('inputPpnTaxDate').value = new Date().toISOString().split('T')[0];
-	document.getElementById('inputPpnBranch').value = '';
-	document.getElementById('inputPpnVatCategory').value = '';
-	document.getElementById('inputPpnRate').value = '';
-	document.getElementById('inputPpnTaxBase').value = '';
-	document.getElementById('inputPpnTaxAmount').value = '';
-	document.getElementById('inputPpnNote').value = '';
-
-	populateInputPpnBranches();
-
-	modal.classList.remove('hidden');
-	modal.classList.add('flex');
-}
-
-function closeInputPpnModal() {
-	const modal = document.getElementById('inputPpnModal');
-	if (!modal) return;
-
-	modal.classList.add('hidden');
-	modal.classList.remove('flex');
-}
-
-function calculateInputPpn() {
-	const taxBase = Number(document.getElementById('inputPpnTaxBase').value) || 0;
-	const rate = Number(document.getElementById('inputPpnRate').value) || 0;
-	const taxAmount = Math.round(taxBase * rate / 100);
-
-	document.getElementById('inputPpnTaxAmount').value = taxAmount;
-}
-
-
 function viewTaxTransactionDetail(taxId) {
   const transaction = taxTransactionsData.find(item => String(item.tax_id || "") === String(taxId));
   if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
