@@ -19857,6 +19857,7 @@
         </section>
 				<!-- TAX PAYABLE -->
 				<section class="bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
+				  <!-- HEADER -->
 				  <div class="p-5 border-b border-outline-variant flex items-center gap-3">
 				    <div class="main-icon-box">
 				      <span class="material-symbols-outlined text-3xl"
@@ -19870,7 +19871,7 @@
 				        Tax Transaction Payable
 				      </h2>
 				      <p class="text-xs text-muted mt-1">
-				        Outstanding Tax Liabilities
+				        Tax liabilities, payments and payment history
 				      </p>
 				    </div>
 				  </div>
@@ -19878,7 +19879,7 @@
 				  <div class="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-outline-variant">
 				    <!-- PPN -->
 				    <div class="p-5">
-				      <div class="flex items-center justify-between mb-4">
+				      <div class="flex items-center justify-between mb-5">
 				        <div>
 				          <p class="text-sm font-semibold text-foreground">Tax PPN</p>
 				          <p class="text-xs text-muted mt-1">2200 · Tax PPN Payable</p>
@@ -19886,26 +19887,45 @@
 				        <span class="material-symbols-outlined text-muted">receipt</span>
 				      </div>
 				
-				      <p class="text-[11px] text-muted uppercase tracking-wider">
-				        Outstanding
-				      </p>
-				      <p id="taxPayableOutstanding"
-				        class="text-2xl font-headline mt-1">
-				        Rp 0
-				      </p>
+				      <div class="grid grid-cols-2 gap-4">
+				        <div>
+				          <p class="text-[11px] text-muted uppercase tracking-wider">Outstanding</p>
+				          <p id="taxPayableOutstanding" class="text-xl font-headline mt-1">
+				            Rp 0
+				          </p>
+				        </div>
 				
-				      <button id="ppnRecordButton"
-				        type="button"
-				        onclick="recordPpnPayment()"
-				        class="mt-4 h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-				        <span class="material-symbols-outlined text-sm">add</span>
-				        Record PPN
-				      </button>
+				        <div>
+				          <p class="text-[11px] text-muted uppercase tracking-wider">Paid</p>
+				          <p id="taxPayablePaid" class="text-xl font-headline mt-1">
+				            Rp 0
+				          </p>
+				        </div>
+				      </div>
+				
+				      <div class="flex flex-wrap gap-2 mt-5">
+				        <button type="button" onclick="payPpn()"
+				          class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				          <span class="material-symbols-outlined text-sm">payments</span>
+				          Pay PPN
+				        </button>
+				
+				        <button type="button" onclick="viewPpnPayableDetail()"
+				          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+				          <span class="material-symbols-outlined text-sm">visibility</span>
+				          View Detail
+				        </button>
+				
+				        <button type="button" onclick="viewPpnPaymentHistory()"
+				          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+				          <span class="material-symbols-outlined text-sm">history</span>
+				          Payment History
+				        </button>
+				      </div>
 				    </div>
-				
 				    <!-- PBJT -->
 				    <div class="p-5">
-				      <div class="flex items-center justify-between mb-4">
+				      <div class="flex items-center justify-between mb-5">
 				        <div>
 				          <p class="text-sm font-semibold text-foreground">Tax PBJT</p>
 				          <p class="text-xs text-muted mt-1">2260 · Tax PBJT Payable</p>
@@ -19913,21 +19933,41 @@
 				        <span class="material-symbols-outlined text-muted">receipt</span>
 				      </div>
 				
-				      <p class="text-[11px] text-muted uppercase tracking-wider">
-				        Outstanding
-				      </p>
-				      <p id="pbjtPayableOutstanding"
-				        class="text-2xl font-headline mt-1">
-				        Rp 0
-				      </p>
+				      <div class="grid grid-cols-2 gap-4">
+				        <div>
+				          <p class="text-[11px] text-muted uppercase tracking-wider">Outstanding</p>
+				          <p id="pbjtPayableOutstanding" class="text-xl font-headline mt-1">
+				            Rp 0
+				          </p>
+				        </div>
 				
-				      <button id="pbjtRecordButton"
-				        type="button"
-				        onclick="recordPbjtPayment()"
-				        class="mt-4 h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
-				        <span class="material-symbols-outlined text-sm">add</span>
-				        Record PBJT
-				      </button>
+				        <div>
+				          <p class="text-[11px] text-muted uppercase tracking-wider">Paid</p>
+				          <p id="pbjtPayablePaid" class="text-xl font-headline mt-1">
+				            Rp 0
+				          </p>
+				        </div>
+				      </div>
+				
+				      <div class="flex flex-wrap gap-2 mt-5">
+				        <button type="button" onclick="payPbjt()"
+				          class="h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center gap-2">
+				          <span class="material-symbols-outlined text-sm">payments</span>
+				          Pay PBJT
+				        </button>
+				
+				        <button type="button" onclick="viewPbjtPayableDetail()"
+				          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+				          <span class="material-symbols-outlined text-sm">visibility</span>
+				          View Detail
+				        </button>
+				
+				        <button type="button" onclick="viewPbjtPaymentHistory()"
+				          class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium flex items-center gap-2">
+				          <span class="material-symbols-outlined text-sm">history</span>
+				          Payment History
+				        </button>
+				      </div>
 				    </div>
 				  </div>
 				</section>
