@@ -31698,6 +31698,236 @@ function toggleTaxPayableMenu(event, taxType) {
   if (menu) { menu.classList.toggle('hidden'); }
 }
 
+function viewPpnPayableDetail() {
+  openTaxPayableDetail('PPN');
+}
+
+function viewPbjtPayableDetail() {
+  openTaxPayableDetail('PBJT');
+}
+
+
+/* == LOAD TAX PAYABLE DETAIL == */
+async function loadTaxPayableDetail(taxType) {
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { alert("Session tidak ditemukan."); return; }
+
+  const filter = getTaxTransactionsFilter();
+  const branchId = !filter.branchId || filter.branchId === "ALL"
+		? null
+		: filter.branchId;
+  const periodFrom = filter.periodFrom || null;
+  const periodTo = filter.periodTo || null;
+  const transactionBody = document.getElementById( "taxPayableTransactionBody" );
+  const paymentBody = document.getElementById( "taxPayablePaymentBody" );
+
+  if (transactionBody) {
+    transactionBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="px-4 py-6 text-center text-muted">
+          Loading transactions...
+        </td>
+      </tr>
+    `;
+  }
+  if (paymentBody) {
+    paymentBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="px-4 py-6 text-center text-muted">
+          Loading payments...
+        </td>
+      </tr>
+    `;
+  }
+
+  const formatMoney = value =>
+    new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      maximumFractionDigits: 0
+    }).format(Number(value) || 0);
+  const formatDate = value => {
+    if (!value) return "-";
+    return new Date(value).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  };
+  const escapeHTML = value =>
+    String(value ?? "-").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+
+  try {
+    /* == 1. LOAD TAX TRANSACTIONS == */
+    const { data: transactions, error: transactionError } =
+      await supabaseClient.rpc("get_tax_transactions", {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_period_from: periodFrom,
+        p_period_to: periodTo
+      });
+
+    if (transactionError) throw transactionError;
+
+    const taxRows = (transactions || []).filter(row => String(row.tax_type).toUpperCase() === taxType && String(row.tax_direction || "OUTPUT").toUpperCase() === "OUTPUT" );
+    /* == 2. LOAD TAX PAYABLE SUMMARY == */
+    const { data: payable, error: payableError } =
+      await supabaseClient.rpc("get_tax_payable", {
+        p_session_id: sessionId,
+        p_branch_id: branchId,
+        p_period_from: periodFrom,
+        p_period_to: periodTo
+      });
+
+    if (payableError) throw payableError;
+
+    const payableData = typeof payable === "string" ? JSON.parse(payable) : payable;
+    const taxSummary = taxType === "PPN"
+			? payableData?.ppn || payableData
+			: payableData?.pbjt || {};
+    const totalTax = taxRows.reduce((sum, row) => sum + (Number(row.tax_amount) || 0), 0 );
+    const totalPaid = Number( taxSummary.total_debit ?? taxSummary.totalDebit ?? 0 );
+    const outstanding = Number( taxSummary.outstanding ?? 0 );
+
+    /* == 3. LOAD PAYMENT HISTORY == */
+		const { data: payments, error: paymentError } =
+		  await supabaseClient.rpc("get_tax_transaction_payments", {
+		    p_session_id: sessionId,
+		    p_branch_id: branchId,
+		    p_tax_type: taxType,
+		    p_period_from: periodFrom,
+		    p_period_to: periodTo
+		  });
+		
+		if (paymentError) throw paymentError;
+
+    /* == 4. TAX INFORMATION == */
+    const taxTypeEl = document.getElementById("detailTaxType");
+    const branchEl = document.getElementById("detailTaxBranch");
+    const periodEl = document.getElementById("detailTaxPeriod");
+
+    if (taxTypeEl) taxTypeEl.textContent = taxType;
+    if (branchEl) { branchEl.textContent = branchId || "Semua Cabang"; }
+    if (periodEl) { periodEl.textContent = `${periodFrom || "Awal"} - ${periodTo || "Sekarang"}`; }
+    /* == 5. TAX SUMMARY == */
+    const totalEl = document.getElementById("detailTaxTotal");
+    const paidEl = document.getElementById("detailTaxPaid");
+    const outstandingEl = document.getElementById( "detailTaxOutstanding" );
+		
+    if (totalEl) totalEl.textContent = formatMoney(totalTax);
+    if (paidEl) paidEl.textContent = formatMoney(totalPaid);
+    if (outstandingEl) { outstandingEl.textContent = formatMoney(outstanding); }
+
+    /* == 6. RENDER TAX TRANSACTIONS == */
+    if (transactionBody) {
+      if (!taxRows.length) {
+        transactionBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-4 py-6 text-center text-muted">
+              No tax transactions found.
+            </td>
+          </tr>
+        `;
+      } else {
+        transactionBody.innerHTML = taxRows.map(row => `
+          <tr class="border-b border-outline-variant">
+            <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(row.tax_date))} </td>
+            <td class="px-4 py-3"> ${escapeHTML(row.transaction_id)} </td>
+            <td class="px-4 py-3"> ${escapeHTML(row.branch_id)} </td>
+            <td class="px-4 py-3"> ${escapeHTML(row.tax_type)} </td>
+            <td class="px-4 py-3 text-right"> ${Number(row.tax_rate || 0)}% </td>
+            <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_base)} </td>
+            <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_amount)} </td>
+          </tr>
+        `).join("");
+      }
+    }
+    /* == 7. RENDER PAYMENT HISTORY == */
+    if (paymentBody) {
+      if (!payments?.length) {
+        paymentBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="px-4 py-6 text-center text-muted">
+              No payment history found.
+            </td>
+          </tr>
+        `;
+      } else {
+        paymentBody.innerHTML = payments.map(payment => {
+          const proofName = payment.Payment_Proof_Name;
+          const proofPath = payment.Payment_Proof_Path;
+
+          return `
+            <tr class="border-b border-outline-variant">
+              <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(payment.Payment_Date))} </td>
+              <td class="px-4 py-3"> ${escapeHTML(payment.Branch_ID)} </td>
+              <td class="px-4 py-3"> ${escapeHTML(payment.Tax_Type)} </td>
+              <td class="px-4 py-3"> ${escapeHTML(payment.Payment_Method || "-")} </td>
+              <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(payment.Amount)} </td>
+              <td class="px-4 py-3"> ${escapeHTML(payment.Status)} </td>
+              <td class="px-4 py-3">
+                ${
+                  proofPath
+                    ? `<span class="text-sm">${escapeHTML(proofName || "Bukti tersedia")}</span>`
+                    : `<span class="text-xs text-muted">Belum ada bukti</span>`
+                }
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+    }
+  } catch (error) {
+    console.error("Load Tax Payable Detail Error:", error);
+    if (transactionBody) {
+      transactionBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-4 py-6 text-center text-error">
+            Failed to load tax transactions.
+          </td>
+        </tr>
+      `;
+    }
+    if (paymentBody) {
+      paymentBody.innerHTML = `
+        <tr>
+          <td colspan="7" class="px-4 py-6 text-center text-error">
+            Failed to load payment history.
+          </td>
+        </tr>
+      `;
+    }
+    alert(error.message || "Gagal memuat Tax Payable Detail.");
+  }
+}
+
+
+function openTaxPayableDetail(taxType) {
+  // Tutup action menu
+  document.getElementById(`taxPayableMenu${taxType}`) ?.classList.add('hidden');
+
+  // Isi jenis pajak
+  const taxTypeEl = document.getElementById('detailTaxType');
+  if (taxTypeEl) taxTypeEl.textContent = taxType;
+  // Tampilkan modal
+  const modal = document.getElementById('taxPayableDetailModal');
+  if (modal) { modal.classList.remove('hidden'); }
+
+  // Load detail sesuai jenis pajak
+  loadTaxPayableDetail(taxType);
+}
+
+function closeTaxPayableDetail() {
+  document.getElementById('taxPayableDetailModal')
+    ?.classList.add('hidden');
+}
+
 // Tutup popup ketika klik di luar menu
 document.addEventListener('click', function () {
   document.getElementById('taxPayableMenuPPN')?.classList.add('hidden');
