@@ -31710,6 +31710,7 @@ function viewPbjtPayableDetail() {
 /* == TAX PAYABLE DETAIL CACHE == */
 const taxPayableDetailCache = new Map();
 const TAX_PAYABLE_DETAIL_CACHE_TTL = 30 * 1000;
+const TAX_PAYABLE_DETAIL_PAGE_SIZE = 10;
 
 function getTaxOutletName(branchId) {
   if (!branchId) return "Semua Cabang";
@@ -31721,6 +31722,7 @@ function getTaxOutletName(branchId) {
 }
 
 /* == LOAD TAX PAYABLE DETAIL == */
+
 async function loadTaxPayableDetail(taxType, forceRefresh = false) {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) { alert("Session tidak ditemukan."); return; }
@@ -31731,13 +31733,20 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
 
   const filter = getTaxTransactionsFilter();
   const branchId = !filter.branchId || filter.branchId === "ALL"
-		? null
-		: filter.branchId;
+    ? null
+    : filter.branchId;
   const periodFrom = filter.periodFrom || null;
   const periodTo = filter.periodTo || null;
-  const transactionBody = document.getElementById( "taxPayableTransactionBody" );
-  const paymentBody = document.getElementById( "taxPayablePaymentBody" );
+  const transactionBody = document.getElementById("taxPayableTransactionBody");
+  const paymentBody = document.getElementById("taxPayablePaymentBody");
+  const transactionPagination = document.getElementById("taxPayableTransactionPagination");
+  const paymentPagination = document.getElementById("taxPayablePaymentPagination");
 
+  // Pagination state, masing-masing independen
+  let transactionPage = 1;
+  let paymentPage = 1;
+
+  const pageSize = TAX_PAYABLE_DETAIL_PAGE_SIZE;
   /* == FORMAT HELPERS == */
   const formatMoney = value =>
     new Intl.NumberFormat("id-ID", {
@@ -31762,6 +31771,57 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
       "'": "&#39;"
     })[char]);
 
+  /* == PAGINATION RENDERER == */
+  function renderPagination(container, currentPage, totalItems, onPageChange) {
+    if (!container) return;
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+    if (totalItems === 0) { container.innerHTML = ""; return; }
+
+    const startItem = (currentPage - 1) * pageSize + 1;
+    const endItem = Math.min(currentPage * pageSize, totalItems);
+
+    container.innerHTML = `
+      <div class="text-xs text-muted whitespace-nowrap">
+        Showing ${startItem}-${endItem} of ${totalItems}
+      </div>
+
+      <div class="flex items-center gap-2">
+			  <button type="button"
+			    data-page="${currentPage - 1}"
+			    ${currentPage <= 1 ? "disabled" : ""}
+			    aria-label="Previous page"
+			    class="w-9 h-9 flex items-center justify-center text-on-surface-variant hover:text-on-surface disabled:opacity-40 disabled:cursor-not-allowed transition">
+			
+			    <span class="material-symbols-outlined text-xl">
+			      chevron_left
+			    </span>
+			  </button>
+			
+			  <span class="text-xs text-muted whitespace-nowrap">
+			    ${currentPage} / ${totalPages}
+			  </span>
+			
+			  <button type="button"
+			    data-page="${currentPage + 1}"
+			    ${currentPage >= totalPages ? "disabled" : ""}
+			    aria-label="Next page"
+			    class="w-9 h-9 flex items-center justify-center text-on-surface-variant hover:text-on-surface disabled:opacity-40 disabled:cursor-not-allowed transition">
+			
+			    <span class="material-symbols-outlined text-xl">
+			      chevron_right
+			    </span>
+			  </button>
+			</div>
+    `;
+    container.querySelectorAll("button[data-page]").forEach(button => {
+      button.addEventListener("click", () => {
+        const nextPage = Number(button.dataset.page);
+        if (nextPage < 1 || nextPage > totalPages) return;
+        onPageChange(nextPage);
+      });
+    });
+  }
   /* == LOADING STATE == */
   if (transactionBody) {
     transactionBody.innerHTML = `
@@ -31781,7 +31841,9 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
       </tr>
     `;
   }
-
+  if (transactionPagination) transactionPagination.innerHTML = "";
+  if (paymentPagination) paymentPagination.innerHTML = "";
+	
   try {
     /* == CACHE KEY == */
     const cacheKey = JSON.stringify({
@@ -31798,7 +31860,6 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
 
     const cached = taxPayableDetailCache.get(cacheKey);
     const cacheValid = !forceRefresh && cached && Date.now() - cached.timestamp < TAX_PAYABLE_DETAIL_CACHE_TTL;
-
     /* == 1. CHECK CACHE == */
     if (cacheValid) {
       taxRows = cached.taxRows;
@@ -31834,18 +31895,16 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
         })
       ]);
 
-      if (transactionResponse.error) { throw transactionResponse.error; }
-      if (payableResponse.error) { throw payableResponse.error; }
-      if (paymentResponse.error) { throw paymentResponse.error; }
-			
+      if (transactionResponse.error) throw transactionResponse.error;
+      if (payableResponse.error) throw payableResponse.error;
+      if (paymentResponse.error) throw paymentResponse.error;
+
       /* == 3. PARSE TAX TRANSACTIONS == */
       const transactionResult = typeof transactionResponse.data === "string"
 				? JSON.parse(transactionResponse.data)
 				: transactionResponse.data;
-      if (!transactionResult?.success) {
-        throw new Error( transactionResult?.message || "Gagal mengambil Tax Transactions." );
-      }
-			
+      if (!transactionResult?.success) { throw new Error( transactionResult?.message || "Gagal mengambil Tax Transactions." ); }
+
       const transactionData = Array.isArray(transactionResult.data)
         ? transactionResult.data
         : [];
@@ -31858,10 +31917,9 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
       const payableData = typeof payableResponse.data === "string"
 				? JSON.parse(payableResponse.data)
 				: payableResponse.data;
-
       taxSummary = taxType === "PPN"
-				? payableData?.ppn || payableData
-				: payableData?.pbjt || {};
+        ? payableData?.ppn || payableData
+        : payableData?.pbjt || {};
 
       /* == 5. PARSE PAYMENT HISTORY == */
       const paymentData = paymentResponse.data;
@@ -31883,7 +31941,7 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
     /* == 7. CALCULATE SUMMARY == */
     const totalTax = taxRows.reduce((sum, row) => sum + (Number(row.tax_amount) || 0), 0);
     const totalPaid = Number( taxSummary.total_debit ?? taxSummary.totalDebit ?? 0 );
-    const outstanding = Number( taxSummary.outstanding ?? 0 );
+    const outstanding = Number(taxSummary.outstanding ?? 0);
     /* == 8. TAX INFORMATION == */
     const taxTypeEl = document.getElementById("detailTaxType");
     const branchEl = document.getElementById("detailTaxBranch");
@@ -31892,21 +31950,21 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
     if (taxTypeEl) { taxTypeEl.textContent = taxType; }
     if (branchEl) { branchEl.textContent = branchId
 			? getTaxOutletName(branchId)
-			: "Semua Cabang";
-    }
-
+			: "Semua Cabang"; 
+		}
     if (periodEl) { periodEl.textContent = `${periodFrom || "Awal"} - ${periodTo || "Sekarang"}`; }
-
     /* == 9. RENDER TAX SUMMARY == */
     const totalEl = document.getElementById("detailTaxTotal");
     const paidEl = document.getElementById("detailTaxPaid");
-    const outstandingEl = document.getElementById( "detailTaxOutstanding" );
+    const outstandingEl = document.getElementById("detailTaxOutstanding");
 
-    if (totalEl) { totalEl.textContent = formatMoney(totalTax); }
-    if (paidEl) { paidEl.textContent = formatMoney(totalPaid); }
-    if (outstandingEl) { outstandingEl.textContent = formatMoney(outstanding); }
-    /* == 10. RENDER TAX TRANSACTIONS == */
-    if (transactionBody) {
+    if (totalEl) totalEl.textContent = formatMoney(totalTax);
+    if (paidEl) paidEl.textContent = formatMoney(totalPaid);
+    if (outstandingEl) outstandingEl.textContent = formatMoney(outstanding);
+
+    /* == 10. RENDER TAX TRANSACTIONS WITH PAGINATION == */
+    function renderTaxTransactions() {
+      if (!transactionBody) return;
       if (!taxRows.length) {
         transactionBody.innerHTML = `
           <tr>
@@ -31915,22 +31973,43 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
             </td>
           </tr>
         `;
-      } else {
-        transactionBody.innerHTML = taxRows.map(row => `
-          <tr class="border-b border-outline-variant">
-            <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(row.tax_date))} </td>
-            <td class="px-4 py-3"> ${escapeHTML(row.transaction_id)} </td>
-            <td class="px-4 py-3"> ${escapeHTML(getTaxOutletName(row.branch_id))} </td>
-            <td class="px-4 py-3"> ${escapeHTML(row.tax_type)} </td>
-            <td class="px-4 py-3 text-right"> ${Number(row.tax_rate || 0)}% </td>
-            <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_base)} </td>
-            <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_amount)} </td>
-          </tr>
-        `).join("");
+        renderPagination(
+          transactionPagination,
+          1,
+          0,
+          () => {}
+        );
+        return;
       }
+
+      const startIndex = (transactionPage - 1) * pageSize;
+      const pageRows = taxRows.slice( startIndex, startIndex + pageSize );
+
+      transactionBody.innerHTML = pageRows.map(row => `
+        <tr class="border-b border-outline-variant">
+          <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(row.tax_date))} </td>
+          <td class="px-4 py-3"> ${escapeHTML(row.transaction_id)} </td>
+          <td class="px-4 py-3"> ${escapeHTML(getTaxOutletName(row.branch_id))} </td>
+          <td class="px-4 py-3"> ${escapeHTML(row.tax_type)} </td>
+          <td class="px-4 py-3 text-right"> ${Number(row.tax_rate || 0)}% </td>
+          <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_base)} </td>
+          <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_amount)} </td>
+        </tr>
+      `).join("");
+      renderPagination(
+        transactionPagination,
+        transactionPage,
+        taxRows.length,
+        nextPage => {
+          transactionPage = nextPage;
+          renderTaxTransactions();
+        }
+      );
     }
-    /* == 11. RENDER PAYMENT HISTORY == */
-    if (paymentBody) {
+		
+    /* == 11. RENDER PAYMENT HISTORY WITH PAGINATION == */
+    function renderTaxPayments() {
+      if (!paymentBody) return;
       if (!payments.length) {
         paymentBody.innerHTML = `
           <tr>
@@ -31939,31 +32018,54 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
             </td>
           </tr>
         `;
-      } else {
-        paymentBody.innerHTML = payments.map(payment => {
-          const proofName = payment.Payment_Proof_Name;
-          const proofPath = payment.Payment_Proof_Path;
-
-          return `
-            <tr class="border-b border-outline-variant">
-              <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(payment.Payment_Date))} </td>
-              <td class="px-4 py-3"> ${escapeHTML(getTaxOutletName(payment.Branch_ID))} </td>
-              <td class="px-4 py-3"> ${escapeHTML(payment.Tax_Type)} </td>
-              <td class="px-4 py-3"> ${escapeHTML(payment.Payment_Method || "-")} </td>
-              <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(payment.Amount)} </td>
-              <td class="px-4 py-3"> ${escapeHTML(payment.Status)} </td>
-              <td class="px-4 py-3">
-                ${
-                  proofPath
-                    ? `<span class="text-sm">${escapeHTML(proofName || "Bukti tersedia")}</span>`
-                    : `<span class="text-xs text-muted">Belum ada bukti</span>`
-                }
-              </td>
-            </tr>
-          `;
-        }).join("");
+        renderPagination(
+          paymentPagination,
+          1,
+          0,
+          () => {}
+        );
+        return;
       }
+
+      const startIndex = (paymentPage - 1) * pageSize;
+      const pagePayments = payments.slice( startIndex, startIndex + pageSize );
+
+      paymentBody.innerHTML = pagePayments.map(payment => {
+        const proofName = payment.Payment_Proof_Name;
+        const proofPath = payment.Payment_Proof_Path;
+
+        return `
+          <tr class="border-b border-outline-variant">
+            <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(payment.Payment_Date))} </td>
+            <td class="px-4 py-3"> ${escapeHTML(getTaxOutletName(payment.Branch_ID))} </td>
+            <td class="px-4 py-3"> ${escapeHTML(payment.Tax_Type)} </td>
+            <td class="px-4 py-3"> ${escapeHTML(payment.Payment_Method || "-")} </td>
+            <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(payment.Amount)} </td>
+            <td class="px-4 py-3"> ${escapeHTML(payment.Status)} </td>
+            <td class="px-4 py-3">
+              ${
+                proofPath
+                  ? `<span class="text-sm">${escapeHTML(proofName || "Bukti tersedia")}</span>`
+                  : `<span class="text-xs text-muted">Belum ada bukti</span>`
+              }
+            </td>
+          </tr>
+        `;
+      }).join("");
+      renderPagination(
+        paymentPagination,
+        paymentPage,
+        payments.length,
+        nextPage => {
+          paymentPage = nextPage;
+          renderTaxPayments();
+        }
+      );
     }
+    /* == 12. INITIAL RENDER == */
+    renderTaxTransactions();
+    renderTaxPayments();
+
   } catch (error) {
     console.error("Load Tax Payable Detail Error:", error);
     if (transactionBody) {
@@ -31975,6 +32077,7 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
         </tr>
       `;
     }
+
     if (paymentBody) {
       paymentBody.innerHTML = `
         <tr>
@@ -31984,9 +32087,12 @@ async function loadTaxPayableDetail(taxType, forceRefresh = false) {
         </tr>
       `;
     }
+    if (transactionPagination) transactionPagination.innerHTML = "";
+    if (paymentPagination) paymentPagination.innerHTML = "";
     alert(error.message || "Gagal memuat Tax Payable Detail.");
   }
 }
+
 
 
 function openTaxPayableDetail(taxType) {
