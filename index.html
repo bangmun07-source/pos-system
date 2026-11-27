@@ -19957,105 +19957,115 @@
 							<span class="material-symbols-outlined text-lg">add</span>
 							PPN Masukan
 						</button>
-				  </div>
-				  <!-- FILTERS -->
-				  <div class="p-5 border-b border-outline-variant">
-				    <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-				      <!-- START DATE -->
-				      <div>
-				        <label for="taxTransactionsStartDate"
-				          class="block text-xs font-medium text-muted mb-2">
-				          Start Date
-				        </label>
-				        <input
-				          type="date"
-				          id="taxTransactionsStartDate"
-				          class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
-				      </div>
-				
-				      <!-- END DATE -->
-				      <div>
-				        <label for="taxTransactionsEndDate"
-				          class="block text-xs font-medium text-muted mb-2">
-				          End Date
-				        </label>
-				        <input
-				          type="date"
-				          id="taxTransactionsEndDate"
-				          class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
-				      </div>
-				
-				      <!-- TAX TYPE -->
-				      <div>
-				        <label for="taxTransactionsTypeFilter"
-				          class="block text-xs font-medium text-muted mb-2">
-				          Tax Type
-				        </label>
-				        <select
-				          id="taxTransactionsTypeFilter"
-				          class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
-				          <option value="ALL">All Tax</option>
-				          <option value="PPN">PPN</option>
-				          <option value="PBJT">PBJT</option>
-				        </select>
-				      </div>
-				
-				      <!-- STATUS -->
-				      <div>
-				        <label for="taxTransactionsStatusFilter"
-				          class="block text-xs font-medium text-muted mb-2">
-				          Status
-				        </label>
-				        <select
-				          id="taxTransactionsStatusFilter"
-				          class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
-				          <option value="ALL">All Status</option>
-				          <option value="OUTSTANDING">Outstanding</option>
-				          <option value="PAID">Paid</option>
-				        </select>
-				      </div>
 
-							<!-- BRANCH FILTER -->
-							<div>
-							  <label for="taxTransactionsBranchFilter"
-							    class="block text-xs font-medium text-muted mb-2">
-							    Branch
-							  </label>
-							  <select
-							    id="taxTransactionsBranchFilter"
-							    class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
-							    <option value="ALL">All Branches</option>
-							  </select>
-							</div>
-				
-				      <!-- APPLY FILTER -->
-				      <div class="flex items-end">
-					      <button
-					        type="button"
-					        onclick="exportTaxTransactionsPDF()"
-					        class="w-full h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
-					        <span class="material-symbols-outlined text-sm">download</span>
-					        Export
-					      </button>
-				      </div>
-				    </div>
+						<button
+							type="button"
+							onclick="exportTaxTransactionsPDF()"
+							class="w-full h-10 px-4 rounded-md bottom-theme text-sm font-medium flex items-center justify-center gap-2">
+							<span class="material-symbols-outlined text-sm">download</span>
+							Export
+						</button>
 				  </div>
+					<!-- FILTERS -->
+					<div class="p-5 border-b border-outline-variant">
+					  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
+					
+					    <!-- START DATE -->
+					    <div>
+					      <label for="taxTransactionsStartDate"
+					        class="block text-xs font-medium text-muted mb-2">
+					        Start Date
+					      </label>
+					      <input
+					        type="date"
+					        id="taxTransactionsStartDate"
+					        class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+					    </div>
+					
+					    <!-- END DATE -->
+					    <div>
+					      <label for="taxTransactionsEndDate"
+					        class="block text-xs font-medium text-muted mb-2">
+					        End Date
+					      </label>
+					      <input
+					        type="date"
+					        id="taxTransactionsEndDate"
+					        class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+					    </div>
+					
+					    <!-- TAX TYPE -->
+					    <div>
+					      <label for="taxTransactionsTypeFilter"
+					        class="block text-xs font-medium text-muted mb-2">
+					        Tax Type
+					      </label>
+					      <select
+					        id="taxTransactionsTypeFilter"
+					        class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+					        <option value="ALL">All Tax</option>
+					        <option value="PPN">PPN</option>
+					        <option value="PBJT">PBJT</option>
+					      </select>
+					    </div>
+					
+					    <!-- TAX DIRECTION -->
+					    <div>
+					      <label for="taxTransactionsDirectionFilter"
+					        class="block text-xs font-medium text-muted mb-2">
+					        Tax Direction
+					      </label>
+					      <select
+					        id="taxTransactionsDirectionFilter"
+					        class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+					        <option value="ALL">All Directions</option>
+					        <option value="OUTPUT">Output</option>
+					        <option value="INPUT">Input</option>
+					      </select>
+					    </div>
+					
+					    <!-- BRANCH FILTER -->
+					    <div>
+					      <label for="taxTransactionsBranchFilter"
+					        class="block text-xs font-medium text-muted mb-2">
+					        Branch
+					      </label>
+					      <select
+					        id="taxTransactionsBranchFilter"
+					        class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+					        <option value="ALL">All Branches</option>
+					      </select>
+					    </div>
+					    <!-- SEARCH -->
+					    <div>
+					      <label for="taxTransactionsSearch"
+					        class="block text-xs font-medium text-muted mb-2">
+					        Search
+					      </label>
+					      <input
+					        type="text"
+					        id="taxTransactionsSearch"
+					        placeholder="Transaction ID / Tax ID"
+					        class="w-full h-10 px-3 rounded-md border border-outline-variant bg-background text-foreground text-sm">
+					    </div>
+					  </div>
+					</div>
 				  <!-- TABLE -->
 				  <div class="overflow-x-auto custom-scrollbar">
 				    <table class="w-full text-sm">
-				      <thead>
-				        <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
-				          <th class="px-5 py-3 text-left whitespace-nowrap">Tax Date</th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap">Transaction ID</th>
-				          <th class="px-5 py-3 text-left whitespace-nowrap">Branch</th>
-				          <th class="px-5 py-3 text-center whitespace-nowrap">Tax Type</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Outstanding</th>
-				          <th class="px-5 py-3 text-right whitespace-nowrap">Paid</th>
-				          <th class="px-5 py-3 text-center whitespace-nowrap">Status</th>
-				          <th class="px-5 py-3 text-center whitespace-nowrap">Action</th>
-				        </tr>
-				      </thead>
+							<thead>
+							  <tr class="border-b border-outline-variant uppercase tracking-widest text-muted text-sm lg:text-base font-medium headline-font">
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Tax Date</th>
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Transaction ID</th>
+							    <th class="px-5 py-3 text-left whitespace-nowrap">Branch</th>
+							    <th class="px-5 py-3 text-center whitespace-nowrap">Tax Type</th>
+							    <th class="px-5 py-3 text-right whitespace-nowrap">Tax Rate</th>
+							    <th class="px-5 py-3 text-right whitespace-nowrap">DPP</th>
+							    <th class="px-5 py-3 text-right whitespace-nowrap">Tax Amount</th>
+							    <th class="px-5 py-3 text-center whitespace-nowrap">Direction</th>
+							    <th class="px-5 py-3 text-center whitespace-nowrap">Action</th>
+							  </tr>
+							</thead>
 				
 				      <tbody id="taxTransactionsTableBody"
 				        class="divide-y divide-outline-variant">
