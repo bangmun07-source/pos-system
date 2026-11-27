@@ -20615,6 +20615,7 @@
       </div>
     </div>
   </div>
+	
 	<!-- TAX TRANSACTION DETAIL MODAL -->
 	<div id="taxTransactionDetailModal"
 	  class="fixed inset-0 z-[110] hidden items-center justify-center bg-background p-4 overflow-y-auto">
@@ -20630,7 +20631,7 @@
 	            Tax Transaction Detail
 	          </h2>
 	          <p class="text-xs text-muted mt-1">
-	            Tax transaction information and payment summary
+	            Complete tax transaction information
 	          </p>
 	        </div>
 	      </div>
@@ -20650,21 +20651,21 @@
 	            Tax Information
 	          </h3>
 	          <p class="text-xs text-muted mt-1">
-	            Tax transaction identity and details
+	            Tax transaction identity and classification
 	          </p>
 	        </div>
 	
 	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 	          <div>
-	            <label class="block text-xs text-muted mb-2">Transaction ID</label>
-	            <div id="taxDetailTransactionId"
+	            <label class="block text-xs text-muted mb-2">Tax ID</label>
+	            <div id="taxDetailId"
 	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
 	          </div>
 	
 	          <div>
-	            <label class="block text-xs text-muted mb-2">Tax Date</label>
-	            <div id="taxDetailDate"
-	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	            <label class="block text-xs text-muted mb-2">Transaction ID</label>
+	            <div id="taxDetailTransactionId"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground break-words">-</div>
 	          </div>
 	
 	          <div>
@@ -20680,73 +20681,97 @@
 	          </div>
 	
 	          <div>
-	            <label class="block text-xs text-muted mb-2">Status</label>
-	            <div id="taxDetailStatus"
+	            <label class="block text-xs text-muted mb-2">Tax Direction</label>
+	            <div id="taxDetailDirection"
 	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
 	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Tax Date</label>
+	            <div id="taxDetailDate"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Created At</label>
+	            <div id="taxDetailCreatedAt"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">VAT Category</label>
+	            <div id="taxDetailVatCategory"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
 	        </div>
 	      </section>
-	      <!-- TAX SUMMARY -->
+	      <!-- TAX AMOUNT -->
 	      <section>
 	        <div class="pb-3 border-b border-outline-variant mb-4">
 	          <h3 class="text-sm font-semibold text-foreground">
-	            Tax Summary
+	            Tax Amount
 	          </h3>
 	          <p class="text-xs text-muted mt-1">
-	            Tax amount and payment position
+	            Tax calculation details
 	          </p>
 	        </div>
 	
 	        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Tax Rate</p>
+	            <p id="taxDetailRate"
+	              class="text-xl font-semibold text-foreground mt-2">0%</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
+	            <p class="text-xs text-muted">Tax Base (DPP)</p>
+	            <p id="taxDetailBase"
+	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
+	          </div>
+	
+	          <div class="border border-outline-variant rounded-md p-4">
 	            <p class="text-xs text-muted">Tax Amount</p>
 	            <p id="taxDetailAmount"
 	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
 	          </div>
-	
-	          <div class="border border-outline-variant rounded-md p-4">
-	            <p class="text-xs text-muted">Outstanding</p>
-	            <p id="taxDetailOutstanding"
-	              class="text-xl font-semibold text-foreground mt-2">Rp0</p>
-	          </div>
-	
-	          <div class="border border-outline-variant rounded-md p-4">
-	            <p class="text-xs text-muted">Paid</p>
-	            <p id="taxDetailPaid"
-	              class="text-xl font-semibold text-green-800 mt-2">Rp0</p>
-	          </div>
 	        </div>
 	      </section>
-	      <!-- PAYMENT HISTORY -->
+	      <!-- ADDITIONAL INFORMATION -->
 	      <section>
 	        <div class="pb-3 border-b border-outline-variant mb-4">
 	          <h3 class="text-sm font-semibold text-foreground">
-	            Payment History
+	            Additional Information
 	          </h3>
 	          <p class="text-xs text-muted mt-1">
-	            History of payments for this tax transaction
+	            Supplier and invoice information
 	          </p>
 	        </div>
 	
-	        <div class="border border-outline-variant rounded-md overflow-x-auto">
-	          <table class="w-full text-sm text-left">
-	            <thead class="bg-background text-muted">
-	              <tr>
-	                <th class="px-4 py-3 font-medium whitespace-nowrap">Payment Date</th>
-	                <th class="px-4 py-3 font-medium whitespace-nowrap">Payment ID</th>
-	                <th class="px-4 py-3 font-medium whitespace-nowrap">Payment Method</th>
-	                <th class="px-4 py-3 font-medium whitespace-nowrap text-right">Amount</th>
-	                <th class="px-4 py-3 font-medium whitespace-nowrap">Note</th>
-	              </tr>
-	            </thead>
-	            <tbody id="taxDetailPaymentHistoryBody">
-	              <tr>
-	                <td colspan="5" class="px-4 py-8 text-center text-muted">
-	                  No payment records available
-	                </td>
-	              </tr>
-	            </tbody>
-	          </table>
+	        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Supplier Name</label>
+	            <div id="taxDetailSupplier"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Invoice No</label>
+	            <div id="taxDetailInvoiceNo"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div>
+	            <label class="block text-xs text-muted mb-2">Invoice Date</label>
+	            <div id="taxDetailInvoiceDate"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground">-</div>
+	          </div>
+	
+	          <div class="md:col-span-2 lg:col-span-3">
+	            <label class="block text-xs text-muted mb-2">Note</label>
+	            <div id="taxDetailNote"
+	              class="min-h-11 px-3 py-3 bg-background border border-outline-variant rounded-md text-sm text-foreground whitespace-pre-wrap">-</div>
+	          </div>
 	        </div>
 	      </section>
 	    </div>
