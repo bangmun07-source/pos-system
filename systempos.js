@@ -31937,45 +31937,50 @@ function calculateInputPpn() {
 	document.getElementById('inputPpnTaxAmount').value = taxAmount;
 }
 
-async function viewTaxTransactionDetail(transactionId) {
-  const transaction = taxTransactionsData.find(item => String(item.transaction_id || "") === String(transactionId));
+
+function viewTaxTransactionDetail(taxId) {
+  const transaction = taxTransactionsData.find(item => String(item.tax_id || "") === String(taxId));
   if (!transaction) { showToast("Tax transaction tidak ditemukan.", "error"); return; }
 
-  const branchId = String(transaction.branch_id || transaction.Branch_ID || "").trim();
+  const branchId = String(transaction.branch_id || "").trim();
   const branchName = (accountingDebtBranches || []).find(branch => String(branch.id || "").trim() === branchId)?.name || branchId || "-";
   const taxDate = transaction.tax_date
-    ? new Date(transaction.tax_date).toLocaleDateString("id-ID")
+    ? new Date(transaction.tax_date + "T00:00:00").toLocaleDateString("id-ID")
+    : "-";
+  const createdAt = transaction.created_at
+    ? new Date(transaction.created_at).toLocaleString("id-ID")
     : "-";
   const taxType = String(transaction.tax_type || "-").toUpperCase();
-  const status = String(transaction.status || "OUTSTANDING").toUpperCase();
-  const amount = Number(transaction.tax_amount) || 0;
-  const outstanding = status === "OUTSTANDING" ? amount : 0;
-  const paid = status === "PAID" ? amount : 0;
-
+  const direction = String(transaction.tax_direction || "-").toUpperCase();
+  const vatCategory = transaction.vat_category || "-";
   const setText = (id, value) => {
     const element = document.getElementById(id);
     if (element) element.textContent = value;
   };
 
+  setText("taxDetailId", transaction.tax_id || "-");
   setText("taxDetailTransactionId", transaction.transaction_id || "-");
-  setText("taxDetailDate", taxDate);
   setText("taxDetailBranch", branchName);
   setText("taxDetailType", taxType);
-  setText("taxDetailStatus", status);
-  setText("taxDetailAmount", formatAccountingCurrency(amount));
-  setText("taxDetailOutstanding", formatAccountingCurrency(outstanding));
-  setText("taxDetailPaid", formatAccountingCurrency(paid));
+  setText("taxDetailDirection", direction);
+  setText("taxDetailRate", `${Number(transaction.tax_rate || 0).toFixed(2)}%`);
+  setText("taxDetailBase", formatAccountingCurrency(transaction.tax_base));
+  setText("taxDetailAmount", formatAccountingCurrency(transaction.tax_amount));
+  setText("taxDetailDate", taxDate);
+  setText("taxDetailCreatedAt", createdAt);
+  setText("taxDetailVatCategory", vatCategory);
+  setText("taxDetailSupplier", transaction.supplier_name || "-");
+  setText("taxDetailInvoiceNo", transaction.invoice_no || "-");
+  setText("taxDetailInvoiceDate", transaction.invoice_date || "-");
+  setText("taxDetailNote", transaction.note || "-");
 
-  // LOAD PAYMENT HISTORY
-  await loadTaxDetailPaymentHistory( transaction.tax_id, branchId );
-
-  // SHOW MODAL
   const modal = document.getElementById("taxTransactionDetailModal");
   if (modal) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
   }
 }
+
 
 function closeTaxTransactionDetail() {
   const modal = document.getElementById("taxTransactionDetailModal");
