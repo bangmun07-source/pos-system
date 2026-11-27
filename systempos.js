@@ -31212,8 +31212,26 @@ let taxTransactionsFilter = {
   periodFrom: "",
   periodTo: "",
   taxType: "ALL",
-  status: "ALL"
+  taxDirection: "ALL",
+  search: ""
 };
+
+function getFilteredTaxTransactionsData() {
+  const filter = getTaxTransactionsFilter();
+
+  return taxTransactionsData.filter(transaction => {
+    const taxType = String(transaction.tax_type || "").toUpperCase();
+    const taxDirection = String(transaction.tax_direction || "").toUpperCase();
+    const transactionId = String(transaction.transaction_id || "").toLowerCase();
+    const taxId = String(transaction.tax_id || "").toLowerCase();
+    const search = filter.search.toLowerCase();
+    const matchType = filter.taxType === "ALL" || taxType === filter.taxType;
+    const matchDirection = filter.taxDirection === "ALL" || taxDirection === filter.taxDirection;
+    const matchSearch = !search || transactionId.includes(search) || taxId.includes(search);
+
+    return matchType && matchDirection && matchSearch;
+  });
+}
 
 function getTaxTransactionsFilter() {
   return {
@@ -31221,22 +31239,24 @@ function getTaxTransactionsFilter() {
     periodFrom: document.getElementById("taxTransactionsStartDate")?.value || "",
     periodTo: document.getElementById("taxTransactionsEndDate")?.value || "",
     taxType: document.getElementById("taxTransactionsTypeFilter")?.value || "ALL",
-    status: document.getElementById("taxTransactionsStatusFilter")?.value || "ALL"
+    taxDirection: document.getElementById("taxTransactionsDirectionFilter")?.value || "ALL",
+    search: document.getElementById("taxTransactionsSearch")?.value?.trim() || ""
   };
 }
+
 
 function initTaxTransactionsFilters() {
   const branchEl = document.getElementById("taxTransactionsBranchFilter");
   const fromEl = document.getElementById("taxTransactionsStartDate");
   const toEl = document.getElementById("taxTransactionsEndDate");
   const typeEl = document.getElementById("taxTransactionsTypeFilter");
-  const statusEl = document.getElementById("taxTransactionsStatusFilter");
+  const directionEl = document.getElementById("taxTransactionsDirectionFilter");
+  const searchEl = document.getElementById("taxTransactionsSearch");
 
-  // Gunakan daftar outlet yang sudah dimuat,
-  // tanpa mengubah filter Debt & Liabilities.
+  // Populate branches
   if (branchEl) {
     branchEl.innerHTML = '<option value="ALL">All Branches</option>';
-    accountingDebtBranches.forEach(branch => {
+    (accountingDebtBranches || []).forEach(branch => {
       const option = document.createElement("option");
       option.value = branch.id || "";
       option.textContent = branch.name || branch.id || "Unnamed Branch";
@@ -31244,54 +31264,44 @@ function initTaxTransactionsFilters() {
     });
   }
 
-	const handleChange = async () => {
-	  const filter = getTaxTransactionsFilter();
-	
-	  if (
-	    filter.periodFrom &&
-	    filter.periodTo &&
-	    filter.periodFrom > filter.periodTo
-	  ) {
-	    showAccountingDebtMessage(
-	      "Start Date tidak boleh lebih besar dari End Date",
-	      "error"
-	    );
-	    return;
-	  }
-	
-	  taxTransactionsFilter = filter;
-	  taxTransactionsPage = 1;
-	
-	  // Bersihkan cache Tax Payable
-	  state.accountingTaxPayableData = null;
-	  state.accountingTaxPayableFilter = null;
-	
-	  // Muat ulang KPI Tax Payable dan tabel Tax Transactions
-	  await loadTaxPayable();
-	  await loadTaxTransactions();
-	};
-  [branchEl, fromEl, toEl, typeEl, statusEl].forEach(el => {
-    if (el) el.addEventListener("change", handleChange);
+  const handleChange = async () => {
+    const filter = getTaxTransactionsFilter();
+    if ( filter.periodFrom && filter.periodTo && filter.periodFrom > filter.periodTo
+    ) { showAccountingDebtMessage( "Start Date tidak boleh lebih besar dari End Date", "error" );
+      return;
+    }
+
+    taxTransactionsFilter = filter;
+    taxTransactionsPage = 1;
+
+    state.accountingTaxPayableData = null;
+    state.accountingTaxPayableFilter = null;
+
+    try {
+      await loadTaxPayable();
+      await loadTaxTransactions();
+    } catch (error) {
+      console.error("Tax Transactions Filter Error:", error);
+    }
+  };
+  // Hindari listener terpasang berulang
+  [branchEl, fromEl, toEl, typeEl, directionEl].forEach(el => {
+    if (el && el.dataset.taxFilterInitialized !== "true") {
+      el.addEventListener("change", handleChange);
+      el.dataset.taxFilterInitialized = "true";
+    }
   });
+  // Search cukup render ulang, tidak perlu request RPC
+  if (searchEl && searchEl.dataset.taxFilterInitialized !== "true") {
+    searchEl.addEventListener("input", () => {
+      taxTransactionsPage = 1;
+      renderTaxTransactions();
+    });
+    searchEl.dataset.taxFilterInitialized = "true";
+  }
   taxTransactionsFilter = getTaxTransactionsFilter();
 }
 
-function getFilteredTaxTransactionsData() {
-  const filter = getTaxTransactionsFilter();
-
-  return taxTransactionsData.filter(transaction => {
-    const taxType = String(transaction.tax_type || "").toUpperCase();
-    const status = String(transaction.status || "OUTSTANDING").toUpperCase();
-
-    const matchType =
-      filter.taxType === "ALL" || taxType === filter.taxType;
-
-    const matchStatus =
-      filter.status === "ALL" || status === filter.status;
-
-    return matchType && matchStatus;
-  });
-}
 
 /* ===== LOAD TAX PAYABLE ===== */
 async function loadTaxPayable() {
@@ -31435,6 +31445,7 @@ async function loadTaxTransactions() {
   }
 }
 
+
 function renderTaxTransactions() {
   const tbody = document.getElementById("taxTransactionsTableBody");
   const paginationInfo = document.getElementById("taxTransactionsPaginationInfo");
@@ -31443,11 +31454,13 @@ function renderTaxTransactions() {
 
   if (!tbody) return;
 
-	const data = getFilteredTaxTransactionsData();
+  const data = getFilteredTaxTransactionsData();
   const total = data.length;
   const totalPages = Math.max(1, Math.ceil(total / taxTransactionsPerPage));
 
-  if (taxTransactionsPage > totalPages) { taxTransactionsPage = totalPages; }
+  if (taxTransactionsPage > totalPages) {
+    taxTransactionsPage = totalPages;
+  }
 
   const startIndex = (taxTransactionsPage - 1) * taxTransactionsPerPage;
   const endIndex = Math.min(startIndex + taxTransactionsPerPage, total);
@@ -31464,21 +31477,23 @@ function renderTaxTransactions() {
   } else {
     tbody.innerHTML = pageData.map(transaction => {
       const taxDate = transaction.tax_date
-        ? new Date(transaction.tax_date).toLocaleDateString("id-ID")
+        ? new Date(transaction.tax_date + "T00:00:00").toLocaleDateString("id-ID")
         : "-";
+
       const transactionId = escapeHtml(transaction.transaction_id || "-");
-      const branchId = String( transaction.branch_id || transaction.Branch_ID || "" ).trim();
-      const branchName = (accountingDebtBranches || []).find(branch => String(branch.id || "").trim() === branchId )?.name || branchId || "-";
+      const taxId = escapeHtml(transaction.tax_id || "");
+
+      const branchId = String(transaction.branch_id || "").trim();
+      const branchName =
+        (accountingDebtBranches || []).find(
+          branch => String(branch.id || "").trim() === branchId
+        )?.name || branchId || "-";
+
       const taxType = String(transaction.tax_type || "").toUpperCase();
+      const taxRate = Number(transaction.tax_rate) || 0;
+      const taxBase = Number(transaction.tax_base) || 0;
       const amount = Number(transaction.tax_amount) || 0;
-      const status = String(transaction.status || "OUTSTANDING").toUpperCase();
-      const outstanding = status === "OUTSTANDING" ? amount : 0;
-      const paid = status === "PAID" ? amount : 0;
-
-      let statusClass = "bg-surface-container-high text-muted";
-
-      if (status === "PAID") { statusClass = "bg-green-600/10 text-green-700";
-      } else if (status === "OUTSTANDING") { statusClass = "bg-yellow-600/10 text-yellow-700"; }
+      const direction = String(transaction.tax_direction || "-").toUpperCase();
 
       const taxTypeClass = taxType === "PPN"
         ? "bg-blue-600/10 text-blue-700"
@@ -31487,8 +31502,14 @@ function renderTaxTransactions() {
       return `
         <tr class="hover:bg-outline-variant">
           <td class="px-5 py-3 whitespace-nowrap">${taxDate}</td>
-          <td class="px-5 py-3 whitespace-nowrap">${transactionId}</td>
-          <td class="px-5 py-3">${escapeHtml(branchName)}</td>
+
+          <td class="px-5 py-3 whitespace-nowrap">
+            ${transactionId}
+          </td>
+
+          <td class="px-5 py-3">
+            ${escapeHtml(branchName)}
+          </td>
 
           <td class="px-5 py-3 text-center">
             <span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${taxTypeClass}">
@@ -31496,44 +31517,49 @@ function renderTaxTransactions() {
             </span>
           </td>
 
+          <td class="px-5 py-3 text-right whitespace-nowrap">
+            ${taxRate.toLocaleString("id-ID", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })}%
+          </td>
+
+          <td class="px-5 py-3 text-right whitespace-nowrap">
+            ${formatAccountingCurrency(taxBase)}
+          </td>
+
           <td class="px-5 py-3 text-right font-medium whitespace-nowrap">
             ${formatAccountingCurrency(amount)}
           </td>
 
-          <td class="px-5 py-3 text-right whitespace-nowrap text-yellow-700">
-            ${formatAccountingCurrency(outstanding)}
-          </td>
-
-          <td class="px-5 py-3 text-right whitespace-nowrap text-green-700">
-            ${formatAccountingCurrency(paid)}
+          <td class="px-5 py-3 text-center">
+            ${escapeHtml(direction)}
           </td>
 
           <td class="px-5 py-3 text-center">
-            <span class="inline-flex px-2.5 py-1 rounded-md text-xs font-medium ${statusClass}">
-              ${escapeHtml(status)}
-            </span>
+            <button
+              type="button"
+              onclick="toggleTaxTransactionMenu(this, '${taxId}')"
+              class="p-2 text-muted hover:text-foreground transition"
+              title="Actions">
+              <span class="material-symbols-outlined">more_vert</span>
+            </button>
           </td>
-					
-          <td class="px-5 py-3 text-center">
-					  <button type="button"
-					    onclick="toggleTaxTransactionMenu(this, '${escapeHtml(transaction.transaction_id || "")}')"
-					    class="p-2 text-muted hover:text-foreground transition"
-					    title="Actions" >
-					    <span class="material-symbols-outlined">more_vert</span>
-					  </button>
-					</td>
         </tr>
       `;
     }).join("");
   }
 
-  if (paginationInfo) { paginationInfo.textContent = total === 0
-		? "Showing 0–0 of 0"
-		: `Showing ${startIndex + 1}–${endIndex} of ${total}`;
+  if (paginationInfo) {
+    paginationInfo.textContent = total === 0
+      ? "Showing 0–0 of 0"
+      : `Showing ${startIndex + 1}–${endIndex} of ${total}`;
   }
+
   if (prevButton) prevButton.disabled = taxTransactionsPage <= 1;
   if (nextButton) nextButton.disabled = taxTransactionsPage >= totalPages;
 }
+
 
 function changeTaxTransactionsPage(direction) {
 	const total = getFilteredTaxTransactionsData().length;
