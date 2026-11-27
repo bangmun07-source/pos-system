@@ -31272,6 +31272,7 @@ function initTaxTransactionsFilters() {
       return;
     }
 
+		taxPayableDetailCache.clear();
     taxTransactionsFilter = filter;
     taxTransactionsPage = 1;
 
@@ -31706,11 +31707,27 @@ function viewPbjtPayableDetail() {
   openTaxPayableDetail('PBJT');
 }
 
+/* == TAX PAYABLE DETAIL CACHE == */
+const taxPayableDetailCache = new Map();
+const TAX_PAYABLE_DETAIL_CACHE_TTL = 30 * 1000;
+
+function getTaxOutletName(branchId) {
+  if (!branchId) return "Semua Cabang";
+
+  const branchFilter = document.getElementById(  "taxTransactionsBranchFilter" );
+  const option = Array.from(branchFilter?.options || []) .find(option => option.value === branchId);
+
+  return option?.textContent?.trim() || branchId;
+}
 
 /* == LOAD TAX PAYABLE DETAIL == */
-async function loadTaxPayableDetail(taxType) {
+async function loadTaxPayableDetail(taxType, forceRefresh = false) {
   const sessionId = localStorage.getItem("pos_session_id");
   if (!sessionId) { alert("Session tidak ditemukan."); return; }
+
+  taxType = String(taxType || "").toUpperCase();
+
+  if (!["PPN", "PBJT"].includes(taxType)) { alert("Tax Type tidak valid."); return; }
 
   const filter = getTaxTransactionsFilter();
   const branchId = !filter.branchId || filter.branchId === "ALL"
@@ -31721,25 +31738,7 @@ async function loadTaxPayableDetail(taxType) {
   const transactionBody = document.getElementById( "taxPayableTransactionBody" );
   const paymentBody = document.getElementById( "taxPayablePaymentBody" );
 
-  if (transactionBody) {
-    transactionBody.innerHTML = `
-      <tr>
-        <td colspan="7" class="px-4 py-6 text-center text-muted">
-          Loading transactions...
-        </td>
-      </tr>
-    `;
-  }
-  if (paymentBody) {
-    paymentBody.innerHTML = `
-      <tr>
-        <td colspan="7" class="px-4 py-6 text-center text-muted">
-          Loading payments...
-        </td>
-      </tr>
-    `;
-  }
-
+  /* == FORMAT HELPERS == */
   const formatMoney = value =>
     new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -31763,83 +31762,150 @@ async function loadTaxPayableDetail(taxType) {
       "'": "&#39;"
     })[char]);
 
+  /* == LOADING STATE == */
+  if (transactionBody) {
+    transactionBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="px-4 py-6 text-center text-muted">
+          Loading transactions...
+        </td>
+      </tr>
+    `;
+  }
+  if (paymentBody) {
+    paymentBody.innerHTML = `
+      <tr>
+        <td colspan="7" class="px-4 py-6 text-center text-muted">
+          Loading payments...
+        </td>
+      </tr>
+    `;
+  }
+
   try {
-    /* == 1. LOAD TAX TRANSACTIONS == */
-    const { data: transactions, error: transactionError } =
-      await supabaseClient.rpc("get_tax_transactions", {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_period_from: periodFrom,
-        p_period_to: periodTo
+    /* == CACHE KEY == */
+    const cacheKey = JSON.stringify({
+      sessionId,
+      taxType,
+      branchId,
+      periodFrom,
+      periodTo
+    });
+
+    let taxRows = [];
+    let taxSummary = {};
+    let payments = [];
+
+    const cached = taxPayableDetailCache.get(cacheKey);
+    const cacheValid = !forceRefresh && cached && Date.now() - cached.timestamp < TAX_PAYABLE_DETAIL_CACHE_TTL;
+
+    /* == 1. CHECK CACHE == */
+    if (cacheValid) {
+      taxRows = cached.taxRows;
+      taxSummary = cached.taxSummary;
+      payments = cached.payments;
+      console.log("Tax Payable Detail: Cache Hit");
+
+    } else {
+      /* == 2. LOAD DATA FROM RPC == */
+      const [
+        transactionResponse,
+        payableResponse,
+        paymentResponse
+      ] = await Promise.all([
+        supabaseClient.rpc("get_tax_transactions", {
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_period_from: periodFrom,
+          p_period_to: periodTo
+        }),
+        supabaseClient.rpc("get_tax_payable", {
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_period_from: periodFrom,
+          p_period_to: periodTo
+        }),
+        supabaseClient.rpc("get_tax_transaction_payments", {
+          p_session_id: sessionId,
+          p_branch_id: branchId,
+          p_tax_type: taxType,
+          p_period_from: periodFrom,
+          p_period_to: periodTo
+        })
+      ]);
+
+      if (transactionResponse.error) { throw transactionResponse.error; }
+      if (payableResponse.error) { throw payableResponse.error; }
+      if (paymentResponse.error) { throw paymentResponse.error; }
+			
+      /* == 3. PARSE TAX TRANSACTIONS == */
+      const transactionResult = typeof transactionResponse.data === "string"
+				? JSON.parse(transactionResponse.data)
+				: transactionResponse.data;
+      if (!transactionResult?.success) {
+        throw new Error( transactionResult?.message || "Gagal mengambil Tax Transactions." );
+      }
+			
+      const transactionData = Array.isArray(transactionResult.data)
+        ? transactionResult.data
+        : [];
+      taxRows = transactionData.filter(row =>
+        String(row.tax_type).toUpperCase() === taxType &&
+        String(row.tax_direction || "OUTPUT").toUpperCase() === "OUTPUT"
+      );
+
+      /* == 4. PARSE TAX PAYABLE SUMMARY == */
+      const payableData = typeof payableResponse.data === "string"
+				? JSON.parse(payableResponse.data)
+				: payableResponse.data;
+
+      taxSummary = taxType === "PPN"
+				? payableData?.ppn || payableData
+				: payableData?.pbjt || {};
+
+      /* == 5. PARSE PAYMENT HISTORY == */
+      const paymentData = paymentResponse.data;
+      payments = Array.isArray(paymentData)
+        ? paymentData
+        : Array.isArray(paymentData?.data)
+          ? paymentData.data
+          : [];
+      /* == 6. SAVE CACHE == */
+      taxPayableDetailCache.set(cacheKey, {
+        timestamp: Date.now(),
+        taxRows,
+        taxSummary,
+        payments
       });
+      console.log("Tax Payable Detail: Cache Updated");
+    }
 
-    if (transactionError) throw transactionError;
-
-		const transactionResult = typeof transactions === "string"
-		    ? JSON.parse(transactions)
-		    : transactions;
-		if (!transactionResult?.success) {
-		  throw new Error(
-		    transactionResult?.message || "Gagal mengambil Tax Transactions."
-		  );
-		}
-		
-		const transactionData = Array.isArray(transactionResult.data)
-		  ? transactionResult.data
-		  : [];
-		const taxRows = transactionData.filter(row =>
-		  String(row.tax_type).toUpperCase() === taxType &&
-		  String(row.tax_direction || "OUTPUT").toUpperCase() === "OUTPUT"
-		);
-    /* == 2. LOAD TAX PAYABLE SUMMARY == */
-    const { data: payable, error: payableError } =
-      await supabaseClient.rpc("get_tax_payable", {
-        p_session_id: sessionId,
-        p_branch_id: branchId,
-        p_period_from: periodFrom,
-        p_period_to: periodTo
-      });
-
-    if (payableError) throw payableError;
-
-    const payableData = typeof payable === "string" ? JSON.parse(payable) : payable;
-    const taxSummary = taxType === "PPN"
-			? payableData?.ppn || payableData
-			: payableData?.pbjt || {};
-    const totalTax = taxRows.reduce((sum, row) => sum + (Number(row.tax_amount) || 0), 0 );
+    /* == 7. CALCULATE SUMMARY == */
+    const totalTax = taxRows.reduce((sum, row) => sum + (Number(row.tax_amount) || 0), 0);
     const totalPaid = Number( taxSummary.total_debit ?? taxSummary.totalDebit ?? 0 );
     const outstanding = Number( taxSummary.outstanding ?? 0 );
-
-    /* == 3. LOAD PAYMENT HISTORY == */
-		const { data: payments, error: paymentError } =
-		  await supabaseClient.rpc("get_tax_transaction_payments", {
-		    p_session_id: sessionId,
-		    p_branch_id: branchId,
-		    p_tax_type: taxType,
-		    p_period_from: periodFrom,
-		    p_period_to: periodTo
-		  });
-		
-		if (paymentError) throw paymentError;
-
-    /* == 4. TAX INFORMATION == */
+    /* == 8. TAX INFORMATION == */
     const taxTypeEl = document.getElementById("detailTaxType");
     const branchEl = document.getElementById("detailTaxBranch");
     const periodEl = document.getElementById("detailTaxPeriod");
 
-    if (taxTypeEl) taxTypeEl.textContent = taxType;
-    if (branchEl) { branchEl.textContent = branchId || "Semua Cabang"; }
+    if (taxTypeEl) { taxTypeEl.textContent = taxType; }
+    if (branchEl) { branchEl.textContent = branchId
+			? getTaxOutletName(branchId)
+			: "Semua Cabang";
+    }
+
     if (periodEl) { periodEl.textContent = `${periodFrom || "Awal"} - ${periodTo || "Sekarang"}`; }
-    /* == 5. TAX SUMMARY == */
+
+    /* == 9. RENDER TAX SUMMARY == */
     const totalEl = document.getElementById("detailTaxTotal");
     const paidEl = document.getElementById("detailTaxPaid");
     const outstandingEl = document.getElementById( "detailTaxOutstanding" );
-		
-    if (totalEl) totalEl.textContent = formatMoney(totalTax);
-    if (paidEl) paidEl.textContent = formatMoney(totalPaid);
-    if (outstandingEl) { outstandingEl.textContent = formatMoney(outstanding); }
 
-    /* == 6. RENDER TAX TRANSACTIONS == */
+    if (totalEl) { totalEl.textContent = formatMoney(totalTax); }
+    if (paidEl) { paidEl.textContent = formatMoney(totalPaid); }
+    if (outstandingEl) { outstandingEl.textContent = formatMoney(outstanding); }
+    /* == 10. RENDER TAX TRANSACTIONS == */
     if (transactionBody) {
       if (!taxRows.length) {
         transactionBody.innerHTML = `
@@ -31854,7 +31920,7 @@ async function loadTaxPayableDetail(taxType) {
           <tr class="border-b border-outline-variant">
             <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(row.tax_date))} </td>
             <td class="px-4 py-3"> ${escapeHTML(row.transaction_id)} </td>
-            <td class="px-4 py-3"> ${escapeHTML(row.branch_id)} </td>
+            <td class="px-4 py-3"> ${escapeHTML(getTaxOutletName(row.branch_id))} </td>
             <td class="px-4 py-3"> ${escapeHTML(row.tax_type)} </td>
             <td class="px-4 py-3 text-right"> ${Number(row.tax_rate || 0)}% </td>
             <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(row.tax_base)} </td>
@@ -31863,9 +31929,9 @@ async function loadTaxPayableDetail(taxType) {
         `).join("");
       }
     }
-    /* == 7. RENDER PAYMENT HISTORY == */
+    /* == 11. RENDER PAYMENT HISTORY == */
     if (paymentBody) {
-      if (!payments?.length) {
+      if (!payments.length) {
         paymentBody.innerHTML = `
           <tr>
             <td colspan="7" class="px-4 py-6 text-center text-muted">
@@ -31881,7 +31947,7 @@ async function loadTaxPayableDetail(taxType) {
           return `
             <tr class="border-b border-outline-variant">
               <td class="px-4 py-3 whitespace-nowrap"> ${escapeHTML(formatDate(payment.Payment_Date))} </td>
-              <td class="px-4 py-3"> ${escapeHTML(payment.Branch_ID)} </td>
+              <td class="px-4 py-3"> ${escapeHTML(getTaxOutletName(payment.Branch_ID))} </td>
               <td class="px-4 py-3"> ${escapeHTML(payment.Tax_Type)} </td>
               <td class="px-4 py-3"> ${escapeHTML(payment.Payment_Method || "-")} </td>
               <td class="px-4 py-3 text-right whitespace-nowrap"> ${formatMoney(payment.Amount)} </td>
