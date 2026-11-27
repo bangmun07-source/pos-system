@@ -4224,7 +4224,7 @@
 							style="font-variation-settings:'FILL' 1;">inventory</span>
 				</div>
 	    		<h2 class="text-lg font-bold font-headline text-foreground">
-						Ingredient Stock
+						Material Stock
 					</h2>
 	  	</div>
 			
@@ -4259,7 +4259,7 @@
 			<table class="w-full text-left border-collapse min-w-[900px]">
 				<thead>
 					<tr class="sticky top-0 border border-outline-variant text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
-						<th class="px-5 py-4 font-bold">Ingredient</th>
+						<th class="px-5 py-4 font-bold">Material</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">(IDR) VALUE</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Current Qty</th>
 						<th class="px-5 py-4 font-bold">Unit</th>
@@ -4288,7 +4288,7 @@
 		</div>
 	</div>
 
-	<!-- Ingredient Purchase Section -->
+	<!-- MATERIAL Purchase Section -->
 	<div class="mb-4" id="Ingredient-Purchase-Section">
 	  <div class="bg-background rounded-md overflow-hidden border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] relative">
 	    <!-- HEADER: TITLE + EXPORT -->
@@ -4362,7 +4362,7 @@
 	            <th class="px-5 py-4 font-bold">PURCHASE ID</th>
 	            <th class="px-5 py-4 font-bold">DATE</th>
 	            <th class="px-5 py-4 font-bold">SUPPLIER</th>
-	            <th class="px-5 py-4 font-bold">INGREDIENT</th>
+	            <th class="px-5 py-4 font-bold">Material</th>
 	            <th class="px-5 py-4 font-bold">QTY</th>
 	            <th class="px-5 py-4 font-bold">TOTAL</th>
 	            <th class="px-5 py-4 font-bold">PAYMENT</th>
@@ -4492,7 +4492,7 @@
 				<thead>
 					<tr class="sticky top-0 border border-outline-variant text-muted text-xs lg:text-base font-medium headline-font uppercase tracking-wides">
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Product Name</th>
-						<th class="px-5 py-4 font-bold">Ingredients</th>
+						<th class="px-5 py-4 font-bold">Material</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Est. Cost (IDR)</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Price (IDR)</th>
 						<th class="px-5 py-4 font-bold whitespace-nowrap">Net Price (IDR)</th>
@@ -4555,7 +4555,7 @@
 					</span>
 		  	</div>
 			</div>
-			<!-- 2. Tambah Ingredient & 3. Qty + Unit -->
+			<!-- 2. Tambah Material & 3. Qty + Unit -->
 			<div>
 			  <div class="flex justify-between items-center mb-4">
 			    <label class="text-[11px] font-bold text-muted  uppercase tracking-[0.2em]">
@@ -4615,7 +4615,7 @@
 						</h3>
 	
 				    <p class="text-sm text-muted  leading-relaxed max-w-[220px]">
-				      Real-time ingredient deduction feed will be enabled after transaction sync activation.
+				      Real-time Material deduction feed will be enabled after transaction sync activation.
 				    </p>
 				
 				    <div class="mt-6 px-4 py-2 rounded-md bottom-theme text-on-surface text-[10px] font-black uppercase tracking-[0.2em]">
@@ -4728,7 +4728,7 @@
 </template>
 
 
-<!-- POPPUP INGREDIENT INVENTORY -->
+<!-- POPPUP Material INVENTORY -->
 
 <template id="ingredientinventoryModal">
 <div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background backdrop-blur-md">
@@ -5020,7 +5020,7 @@
 </template>
 
 
-	<!-- POPUP INGREDIENT PURCHASE -->
+	<!-- POPUP Material PURCHASE -->
 
 <template id="ingredientPurchaseActionModal">
   <div class="fixed inset-0 z-[60] flex items-center justify-center p-6 bg-background backdrop-blur-md">
@@ -5203,7 +5203,7 @@
 </template>
 
 
-	<!-- POPUP INGREDIENT PURCHASE NOTE -->
+	<!-- POPUP Material PURCHASE NOTE -->
 	
 <template id="purchaseNoteModal">
   <div class="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-background backdrop-blur-md">
@@ -5263,113 +5263,109 @@
 <!-- POPUP DETAIL USAGE INVENTORY -->
 
 <template id="inventorydetailusageModal">
-<div class="fixed inset-0 bg-background z-[100] flex items-center justify-center p-4 md:p-8 backdrop-blur-md">
-  <main class="w-full max-w-5xl bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex flex-col max-h-[90vh] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-    <!-- HEADER -->
-    <header class="p-8 pb-4 flex items-center justify-between">
-      <div class="flex items-center gap-4">
-        <div class="main-icon-box">
-	      	<span class="material-symbols-outlined text-3xl"
-	            style="font-variation-settings:'FILL' 1;">history_edu</span>
-        </div>
-
-        <div>
-          <h1 class="font-headline font-extrabold text-2xl text-on-surface">
-            Stock Movement Log
-          </h1>
-
-          <p id="usageLogItemName"
-            class="text-xs lg:text-sm text-on-surface-variant font-medium">
-            <span class="mx-2 text-on-surface/40">|</span> SKU: ER-ARB-001
-          </p>
-        </div>
-      </div>
-
-      <button onclick="closeUsageLogModal()"
-        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
-        <span class="material-symbols-outlined">close</span>
-      </button>
-    </header>
-
-    <!-- SUMMARY -->
-    <div class="px-8 grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-      <!-- 1 -->
-      <div class="bg-background p-6 rounded-md border border-outline-variant relative overflow-hidden">
-        <span class="text-xs uppercase tracking-wider text-on-surface-variant">
-          Total QTY
-        </span>
-
-        <div class="mt-2 flex items-end gap-2">
-          <span id="usageCurrentStock" class="text-4xl font-bold text-on-surface">
-            12.4
-          </span>
-        </div>
-      </div>
-      <!-- 2 -->
-      <div class="bg-background p-6 rounded-md border border-outline-variant relative overflow-hidden">
-        <span class="text-xs uppercase tracking-wider text-on-surface-variant">
-          Average Daily Deduction
-        </span>
-
-        <div class="mt-2 text-3xl font-bold text-on-surface">
-          <span id="usageTotalOut">1,770</span>
-        </div>
-      </div>
-      <!-- 3 -->
-      <div class="bg-background p-6 rounded-md border border-outline-variant relative overflow-hidden">
-        <span class="text-xs uppercase tracking-wider text-on-surface-variant">
-          Remaining Supply
-        </span>
-
-        <div class="mt-2 flex items-end gap-2">
-          <span id="usageAvgDaily" class="text-3xl font-bold text-on-surface">
-            4.2
-          </span>
-          <span class="text-xs lg:text-sm text-on-surface-variant">days</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="flex-1 px-8 overflow-y-auto custom-scrollbar">
-      <div class="bg-background rounded-md overflow-hidden border-b border-outline-variant">
-        <table class="w-full text-left">
-          <thead class="sticky top-0 bg-background">
-            <tr>
-              <th class="p-5 text-xs uppercase text-on-surface-variant">Timestamp</th>
-              <th class="p-5 text-xs uppercase text-on-surface-variant">Type</th>
-              <th class="p-5 text-xs uppercase text-on-surface-variant">Order ID</th>
-              <th class="p-5 text-xs uppercase text-on-surface-variant text-right">Qty</th>
-              <th class="p-5 text-xs uppercase text-on-surface-variant text-right">Stock</th>
-            </tr>
-          </thead>
-
-          <tbody id="usageLogTableBody"
-            class="divide-y divide-white/5 text-on-surface">
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="p-10 flex justify-between items-center bg-background border border-outline-variant relative overflow-hidden">
-      <button onclick="closeUsageLogModal()"
-        class="px-6 py-3 rounded-md text-on-surface-variant hover:text-on-surface transition">
-        Close Log
-      </button>
-    </footer>
-  </main>
-</div>
+	<div class="fixed inset-0 bg-background z-[100] flex items-center justify-center p-4 md:p-8 backdrop-blur-md">
+	  <main class="w-full max-w-5xl bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] flex flex-col max-h-[90vh] overflow-hidden shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	    <!-- HEADER -->
+	    <header class="p-8 pb-4 flex items-center justify-between">
+	      <div class="flex items-center gap-4">
+	        <div class="main-icon-box">
+		      	<span class="material-symbols-outlined text-3xl"
+		            style="font-variation-settings:'FILL' 1;">history_edu</span>
+	        </div>
+	
+	        <div>
+	          <h1 class="font-headline font-extrabold text-2xl text-on-surface">
+	            Stock Movement Log
+	          </h1>
+	
+	          <p id="usageLogItemName"
+	            class="text-xs lg:text-sm text-on-surface-variant font-medium">
+	            <span class="mx-2 text-on-surface/40">|</span> SKU: ER-ARB-001
+	          </p>
+	        </div>
+	      </div>
+	
+	      <button onclick="closeUsageLogModal()"
+	        class="w-10 h-10 rounded-md flex items-center justify-center text-on-surface-variant hover:text-on-surface transition">
+	        <span class="material-symbols-outlined">close</span>
+	      </button>
+	    </header>
+	
+	    <!-- SUMMARY -->
+	    <div class="px-8 grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+	      <!-- 1 -->
+	      <div class="bg-background p-6 rounded-md border border-outline-variant relative overflow-hidden">
+	        <span class="text-xs uppercase tracking-wider text-on-surface-variant">
+	          Total QTY
+	        </span>
+	
+	        <div class="mt-2 flex items-end gap-2">
+	          <span id="usageCurrentStock" class="text-4xl font-bold text-on-surface">
+	            12.4
+	          </span>
+	        </div>
+	      </div>
+	      <!-- 2 -->
+	      <div class="bg-background p-6 rounded-md border border-outline-variant relative overflow-hidden">
+	        <span class="text-xs uppercase tracking-wider text-on-surface-variant">
+	          Average Daily Deduction
+	        </span>
+	
+	        <div class="mt-2 text-3xl font-bold text-on-surface">
+	          <span id="usageTotalOut">1,770</span>
+	        </div>
+	      </div>
+	      <!-- 3 -->
+	      <div class="bg-background p-6 rounded-md border border-outline-variant relative overflow-hidden">
+	        <span class="text-xs uppercase tracking-wider text-on-surface-variant">
+	          Remaining Supply
+	        </span>
+	
+	        <div class="mt-2 flex items-end gap-2">
+	          <span id="usageAvgDaily" class="text-3xl font-bold text-on-surface">
+	            4.2
+	          </span>
+	          <span class="text-xs lg:text-sm text-on-surface-variant">days</span>
+	        </div>
+	      </div>
+	    </div>
+	
+	    <!-- TABLE -->
+	    <div class="flex-1 px-8 overflow-y-auto custom-scrollbar">
+	      <div class="bg-background rounded-md overflow-hidden border-b border-outline-variant">
+	        <table class="w-full text-left">
+	          <thead class="sticky top-0 bg-background">
+	            <tr>
+	              <th class="p-5 text-xs uppercase text-on-surface-variant">Timestamp</th>
+	              <th class="p-5 text-xs uppercase text-on-surface-variant">Type</th>
+	              <th class="p-5 text-xs uppercase text-on-surface-variant">Order ID</th>
+	              <th class="p-5 text-xs uppercase text-on-surface-variant text-right">Qty</th>
+	              <th class="p-5 text-xs uppercase text-on-surface-variant text-right">Stock</th>
+	            </tr>
+	          </thead>
+	
+	          <tbody id="usageLogTableBody"
+	            class="divide-y divide-white/5 text-on-surface">
+	          </tbody>
+	        </table>
+	      </div>
+	    </div>
+	    <!-- FOOTER -->
+	    <footer class="p-10 flex justify-between items-center bg-background border border-outline-variant relative overflow-hidden">
+	      <button onclick="closeUsageLogModal()"
+	        class="px-6 py-3 rounded-md text-on-surface-variant hover:text-on-surface transition">
+	        Close Log
+	      </button>
+	    </footer>
+	  </main>
+	</div>
 </template>
 
-
 <!-- POPUP CHANGE PURCHASE STATUS -->
-
 <template id="purchaseStatusModal">
   <div class="fixed inset-0 z-[70] flex items-center justify-center p-6 bg-background backdrop-blur-md">
     <div onclick="event.stopPropagation()"
       class="w-full max-w-md bg-background rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden animate-in fade-in zoom-in duration-300">
-
       <!-- HEADER -->
       <div class="p-6 border border-outline-variant flex items-center justify-between">
         <div class="flex items-center gap-4">
@@ -5408,19 +5404,16 @@
           -
         </p>
       </div>
-
       <!-- STATUS OPTIONS -->
       <div class="p-4">
         <p class="text-xs font-bold uppercase tracking-wider text-on-surface-variant px-2 mb-2">
           Select New Status
         </p>
-
         <!-- PENDING -->
         <button type="button"
           onclick="selectPurchaseStatus('PENDING')"
           data-status="PENDING"
           class="purchase-status-option w-full flex items-center justify-between p-4 rounded-md hover:bg-background-high transition group">
-
           <div class="flex items-center gap-4">
             <div class="w-10 h-10 flex items-center justify-center text-on-surface">
               <span class="material-symbols-outlined text-lg"
@@ -5444,7 +5437,6 @@
             check
           </span>
         </button>
-
         <!-- CANCELLED -->
         <button type="button"
           onclick="selectPurchaseStatus('CANCELLED')"
@@ -5474,7 +5466,6 @@
           </span>
         </button>
       </div>
-
       <!-- FOOTER -->
       <div class="p-4 flex gap-2">
         <button onclick="closePurchaseStatus()"
@@ -5492,9 +5483,7 @@
 </template>
 
 
-
 <!-- POPUP EDIT SUPPLIER -->
-
 <template id="editsupplierModal">
 <div class="fixed inset-0 z-[9999] flex items-center justify-center p-6 bg-background backdrop-blur-md">
   <div class="bg-background w-full max-w-lg rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden border border-outline-variant flex flex-col shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
@@ -5627,224 +5616,214 @@
 </div>
 </template>
 
-
 <!-- POPPUP RECIPE MASTER INVENTORY -->
-
 <template id="recipemasterledgerModal">
-<!-- Modal Backdrop -->
-<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background backdrop-blur-md">
-  <main class="relative w-full max-w-2xl bg-background rounded-md overflow-hidden flex flex-col border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
-    <header class="px-8 pt-8 pb-6 flex flex-col gap-1 border border-outline-variant">
-      <div class="flex justify-between items-start">
-        <span class="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
-          Product Detail Management
-        </span>
-
-        <button onclick="closeRecipeMasterModal()"
-          class="p-1 text-on-surface-variant hover:text-on-surface transition-colors">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-
-      <h1 id="recipeTitle"
-        class="text-xk md:text-3xl font-headline font-semibold text-on-surface uppercase tracking-[0.10em]">
-        #PRD-4021 - Signature Wagyu Ribs
-      </h1>
-    </header>
-
-    <!-- TAB -->
-    <div class="px-8 flex gap-8 border border-outline-variant">
-      <button id="tab-overview"
-        class="pb-4 text-sm font-semibold border-b-2 border-white text-on-surface"
-        onclick="switchTab('overview')">
-        Overview
-      </button>
-
-      <button id="tab-history"
-        class="pb-4 text-sm font-semibold border-b-2 border-transparent text-on-surface-variant hover:text-on-surface transition-all"
-        onclick="switchTab('history')">
-        Price History
-      </button>
-    </div>
-
-    <!-- PRODUCT IMAGE -->
-    <div class="space-y-3 pt-8 px-8">
-      <label
-        class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-        Product Image
-      </label>
-      <div class="flex items-center gap-5">
-        <!-- Preview -->
-        <div
-          class="relative w-28 h-28 rounded-2xl overflow-hidden bg-background border border-outline-variant">
-          <img
-            id="recipeImagePreview"
-            src="https://placehold.co/300x300?text=No+Image"
-            class="w-full h-full object-cover">
-          <button
-            type="button"
-            onclick="removeRecipeImage()"
-            class="absolute top-2 right-2 w-7 h-7 rounded-md bg-background text-white flex items-center justify-center">
-            <span class="material-symbols-outlined text-sm">
-              close
-            </span>
-          </button>
-        </div>
-
-        <!-- Upload Area -->
-        <div class="flex-1">
-          <label
-            for="recipeImageInput"
-            class="flex flex-col items-center justify-center gap-2 p-6 rounded-md border border-dashed border-outline-variant cursor-pointer hover:border-on-surface hover:bg-outline-variant transition">
-            <span
-              class="material-symbols-outlined text-on-surface text-3xl">
-              add_photo_alternate
-            </span>
-
-            <span
-              class="text-xs lg:text-sm text-on-surface-variant text-center">
-              Click to upload image
-            </span>
-
-          </label>
-
-          <input
-            id="recipeImageInput"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            onchange="previewRecipeImage(event)">
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTENT -->
-    <div class="p-8 min-h-[420px]">
-      <section id="content-overview" class="space-y-8">
-        <!-- PRODUCT NAME -->
-        <div class="space-y-2">
-          <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-            Product Name
-          </label>
-
-          <div class="relative">
-            <input id="recipeNameInput"
-              class="w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant focus:ring-1 focus:ring-primary-container outline-none transition-all"
-              type="text">
-
-            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              <span class="material-symbols-outlined">edit</span>
-            </span>
-          </div>
-        </div>
-
-        <!-- PRICE -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="space-y-2">
-            <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-              Selling Price (IDR)
-            </label>
-
-            <div class="relative">
-              <div class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface font-bold">
-                Rp
-              </div>
-
-              <input id="recipeSellingPrice"
-                class="w-full bg-background p-4 pl-12 rounded-md text-on-surface font-bold border border-outline-variant focus:ring-1 focus:ring-primary-container "
-                type="text">
-            </div>
-          </div>
-
-          <div class="space-y-2">
-            <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-              Net Price (IDR)
-            </label>
-
-            <div class="relative">
-              <div class="absolute left-4 top-1/2 -translate-y-1/2 text-tertiary">
-                Rp
-              </div>
-
-              <input id="recipeNetPrice"
-                class="w-full bg-background p-4 pl-12 rounded-md text-on-surface-variant border border-outline-variant focus:ring-1 focus:ring-primary-container "
-                type="text">
-            </div>
-          </div>
-        </div>
-
-        <!-- MARGIN CARD -->
-        <div class="relative overflow-hidden p-6 rounded-md bg-background border border-outline-variant">
-          <div class="flex justify-between items-center">
-            <div class="flex items-center gap-4">
-              <div class="main-icon-box">
-					      <span class="main-icon-box material-symbols-outlined text-3xl"
-					            style="font-variation-settings:'FILL' 1;">insights</span>
-              </div>
-
-              <div>
-                <h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
-                  Margin Intelligence
-                </h4>
-                <p class="text-xs lg:text-sm text-on-surface-variant">
-                  Profit per unit sold
-                </p>
-              </div>
-            </div>
-
-            <div class="text-right">
-              <div id="recipeMarginPercent"
-                class="text-3xl font-headline font-black text-on-surface">
-                0%
-              </div>
-
-              <p id="recipeProfitValue"
-                class="text-xs lg:text-sm text-on-surface-variant">
-                Rp 0
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- HISTORY -->
-      <section id="content-history" class="hidden">
-        <div class="rounded-md overflow-hidden border border-outline-variant bg-background">
-          <div class="max-h-[350px] overflow-y-auto custom-scrollbar">
-            <table class="w-full text-left">
-              <thead class="bg-background border border-outline-variant">
-                <tr class="text-xs uppercase text-on-surface-variant">
-                  <th class="px-6 py-4">Date</th>
-                  <th class="px-6 py-4">Old Net Price</th>
-                  <th class="px-6 py-4">New Net Price</th>
-                  <th class="px-6 py-4">Authorized By</th>
-                </tr>
-              </thead>
-
-              <tbody id="recipePriceHistoryTable"
-                class="divide-y divide-outline-variant">
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- FOOTER -->
-    <footer class="px-8 py-6 flex gap-4 bg-background border-t border-outline-variant">
-      <button onclick="closeRecipeMasterModal()"
-        class="flex-1 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-all">
-        Discard Changes
-      </button>
-
-      <button onclick="saveRecipeMaster()"
-        class="flex-[1.5] py-3 bottom-theme uppercase tracking-widest font-bold text-on-surface-variant tracking-[0.20em] flex items-center justify-center gap-2">
-        <span class="material-symbols-outlined text-sm lg:text-base">save</span>
-        Update Product Details
-      </button>
-    </footer>
-  </main>
-</div>
+	<!-- Modal Backdrop -->
+	<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background backdrop-blur-md">
+	  <main class="relative w-full max-w-2xl bg-background rounded-md overflow-hidden flex flex-col border border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)]">
+	    <header class="px-8 pt-8 pb-6 flex flex-col gap-1 border border-outline-variant">
+	      <div class="flex justify-between items-start">
+	        <span class="text-xs font-bold uppercase tracking-[0.2em] text-on-surface-variant">
+	          Product Detail Management
+	        </span>
+	
+	        <button onclick="closeRecipeMasterModal()"
+	          class="p-1 text-on-surface-variant hover:text-on-surface transition-colors">
+	          <span class="material-symbols-outlined">close</span>
+	        </button>
+	      </div>
+	
+	      <h1 id="recipeTitle"
+	        class="text-xk md:text-3xl font-headline font-semibold text-on-surface uppercase tracking-[0.10em]">
+	        #PRD-4021 - Signature Wagyu Ribs
+	      </h1>
+	    </header>
+	    <!-- TAB -->
+	    <div class="px-8 flex gap-8 border border-outline-variant">
+	      <button id="tab-overview"
+	        class="pb-4 text-sm font-semibold border-b-2 border-white text-on-surface"
+	        onclick="switchTab('overview')">
+	        Overview
+	      </button>
+	
+	      <button id="tab-history"
+	        class="pb-4 text-sm font-semibold border-b-2 border-transparent text-on-surface-variant hover:text-on-surface transition-all"
+	        onclick="switchTab('history')">
+	        Price History
+	      </button>
+	    </div>
+	    <!-- PRODUCT IMAGE -->
+	    <div class="space-y-3 pt-8 px-8">
+	      <label
+	        class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+	        Product Image
+	      </label>
+	      <div class="flex items-center gap-5">
+	        <!-- Preview -->
+	        <div
+	          class="relative w-28 h-28 rounded-2xl overflow-hidden bg-background border border-outline-variant">
+	          <img
+	            id="recipeImagePreview"
+	            src="https://placehold.co/300x300?text=No+Image"
+	            class="w-full h-full object-cover">
+	          <button
+	            type="button"
+	            onclick="removeRecipeImage()"
+	            class="absolute top-2 right-2 w-7 h-7 rounded-md bg-background text-white flex items-center justify-center">
+	            <span class="material-symbols-outlined text-sm">
+	              close
+	            </span>
+	          </button>
+	        </div>
+	        <!-- Upload Area -->
+	        <div class="flex-1">
+	          <label
+	            for="recipeImageInput"
+	            class="flex flex-col items-center justify-center gap-2 p-6 rounded-md border border-dashed border-outline-variant cursor-pointer hover:border-on-surface hover:bg-outline-variant transition">
+	            <span
+	              class="material-symbols-outlined text-on-surface text-3xl">
+	              add_photo_alternate
+	            </span>
+	
+	            <span
+	              class="text-xs lg:text-sm text-on-surface-variant text-center">
+	              Click to upload image
+	            </span>
+	
+	          </label>
+	
+	          <input
+	            id="recipeImageInput"
+	            type="file"
+	            accept="image/*"
+	            class="hidden"
+	            onchange="previewRecipeImage(event)">
+	        </div>
+	      </div>
+	    </div>
+	    <!-- CONTENT -->
+	    <div class="p-8 min-h-[420px]">
+	      <section id="content-overview" class="space-y-8">
+	        <!-- PRODUCT NAME -->
+	        <div class="space-y-2">
+	          <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+	            Product Name
+	          </label>
+	
+	          <div class="relative">
+	            <input id="recipeNameInput"
+	              class="w-full bg-background p-4 rounded-md text-on-surface border border-outline-variant focus:ring-1 focus:ring-primary-container outline-none transition-all"
+	              type="text">
+	
+	            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant">
+	              <span class="material-symbols-outlined">edit</span>
+	            </span>
+	          </div>
+	        </div>
+	        <!-- PRICE -->
+	        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+	          <div class="space-y-2">
+	            <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+	              Selling Price (IDR)
+	            </label>
+	
+	            <div class="relative">
+	              <div class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface font-bold">
+	                Rp
+	              </div>
+	
+	              <input id="recipeSellingPrice"
+	                class="w-full bg-background p-4 pl-12 rounded-md text-on-surface font-bold border border-outline-variant focus:ring-1 focus:ring-primary-container "
+	                type="text">
+	            </div>
+	          </div>
+	
+	          <div class="space-y-2">
+	            <label class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+	              Net Price (IDR)
+	            </label>
+	
+	            <div class="relative">
+	              <div class="absolute left-4 top-1/2 -translate-y-1/2 text-tertiary">
+	                Rp
+	              </div>
+	
+	              <input id="recipeNetPrice"
+	                class="w-full bg-background p-4 pl-12 rounded-md text-on-surface-variant border border-outline-variant focus:ring-1 focus:ring-primary-container "
+	                type="text">
+	            </div>
+	          </div>
+	        </div>
+	        <!-- MARGIN CARD -->
+	        <div class="relative overflow-hidden p-6 rounded-md bg-background border border-outline-variant">
+	          <div class="flex justify-between items-center">
+	            <div class="flex items-center gap-4">
+	              <div class="main-icon-box">
+						      <span class="main-icon-box material-symbols-outlined text-3xl"
+						            style="font-variation-settings:'FILL' 1;">insights</span>
+	              </div>
+	
+	              <div>
+	                <h4 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">
+	                  Margin Intelligence
+	                </h4>
+	                <p class="text-xs lg:text-sm text-on-surface-variant">
+	                  Profit per unit sold
+	                </p>
+	              </div>
+	            </div>
+	
+	            <div class="text-right">
+	              <div id="recipeMarginPercent"
+	                class="text-3xl font-headline font-black text-on-surface">
+	                0%
+	              </div>
+	
+	              <p id="recipeProfitValue"
+	                class="text-xs lg:text-sm text-on-surface-variant">
+	                Rp 0
+	              </p>
+	            </div>
+	          </div>
+	        </div>
+	      </section>
+	      <!-- HISTORY -->
+	      <section id="content-history" class="hidden">
+	        <div class="rounded-md overflow-hidden border border-outline-variant bg-background">
+	          <div class="max-h-[350px] overflow-y-auto custom-scrollbar">
+	            <table class="w-full text-left">
+	              <thead class="bg-background border border-outline-variant">
+	                <tr class="text-xs uppercase text-on-surface-variant">
+	                  <th class="px-6 py-4">Date</th>
+	                  <th class="px-6 py-4">Old Net Price</th>
+	                  <th class="px-6 py-4">New Net Price</th>
+	                  <th class="px-6 py-4">Authorized By</th>
+	                </tr>
+	              </thead>
+	
+	              <tbody id="recipePriceHistoryTable"
+	                class="divide-y divide-outline-variant">
+	              </tbody>
+	            </table>
+	          </div>
+	        </div>
+	      </section>
+	    </div>
+	    <!-- FOOTER -->
+	    <footer class="px-8 py-6 flex gap-4 bg-background border-t border-outline-variant">
+	      <button onclick="closeRecipeMasterModal()"
+	        class="flex-1 py-3 rounded-md text-on-surface-variant hover:text-on-surface hover:bg-outline-variant transition-all">
+	        Discard Changes
+	      </button>
+	
+	      <button onclick="saveRecipeMaster()"
+	        class="flex-[1.5] py-3 bottom-theme uppercase tracking-widest font-bold text-on-surface-variant tracking-[0.20em] flex items-center justify-center gap-2">
+	        <span class="material-symbols-outlined text-sm lg:text-base">save</span>
+	        Update Product Details
+	      </button>
+	    </footer>
+	  </main>
+	</div>
 </template>
 
 
@@ -5887,7 +5866,6 @@
   	  <div id="ingredientStockAlertList"
     			class="p-4 space-y-0 max-h-[420px] overflow-y-auto custom-scrollbar">
     	</div>
-			
 	    <!-- FOOTER -->
 	    <div class="p-4 border-t border-outline-variant">
 	      <button onclick="closeIngredientStockAlert()"
@@ -5902,7 +5880,6 @@
 
 
 <!-- ANALYTICS -->
-
 <template id="analyticsPage" >
 	<aside id="sidebar"
 		class="fixed left-0 top-20 bottom-0 z-50 w-16 hover:w-72 bg-background border-r border-outline-variant shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden transition-[width] duration-200 ease-out group">
