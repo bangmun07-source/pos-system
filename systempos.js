@@ -31665,6 +31665,28 @@ document.addEventListener("click", function(event) {
 window.addEventListener("scroll", closeTaxTransactionMenu, true);
 window.addEventListener("resize", closeTaxTransactionMenu);
 
+function toggleTaxPayableMenu(event, taxType) {
+  event.stopPropagation();
+
+  const menuIds = {
+    PPN: 'taxPayableMenuPPN',
+    PBJT: 'taxPayableMenuPBJT'
+  };
+  // Tutup semua popup
+  Object.values(menuIds).forEach(id => {
+    document.getElementById(id)?.classList.add('hidden');
+  });
+  // Buka popup yang diklik jika sebelumnya tertutup
+  const menu = document.getElementById(menuIds[taxType]);
+  if (menu) { menu.classList.toggle('hidden'); }
+}
+
+// Tutup popup ketika klik di luar menu
+document.addEventListener('click', function () {
+  document.getElementById('taxPayableMenuPPN')?.classList.add('hidden');
+  document.getElementById('taxPayableMenuPBJT')?.classList.add('hidden');
+});
+
 function updateTaxPayableUI() {
   const ppnOutstanding = Number( taxPayableData?.ppn?.outstanding ?? taxPayableData?.outstanding ) || 0;
   const pbjtOutstanding = Number( taxPayableData?.pbjt?.outstanding ) || 0;
