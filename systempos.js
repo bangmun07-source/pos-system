@@ -32307,33 +32307,36 @@ function openTaxPaymentModal(taxType) {
 function handleTaxPaymentBranchChange() {
   const type = document.getElementById("taxPaymentType")?.value;
   const branchId = document.getElementById("taxPaymentBranch")?.value;
-	const summary = type === "PPN"
-	  ? taxPayableData
-	  : taxPayableData?.pbjt;
-	const branch = summary?.branches?.find(item => String(item.branchId) === String(branchId));
-	const outstanding = Number(branch?.amount ?? summary?.outstanding) || 0;
+  const summary = type === "PPN"
+    ? taxPayableData
+    : taxPayableData?.pbjt;
+  const branch = summary?.branches?.find(item => String(item.branchId) === String(branchId));
+  const outstanding = Number(branch?.amount ?? summary?.outstanding) || 0;
+  const accountId = type === "PPN"
+    ? taxPayableData?.accountId
+    : taxPayableData?.pbjt?.accountId;
+  const accountName = type === "PPN"
+    ? "Tax PPN Payable"
+    : "Tax PBJT Payable";
 
-  // Gunakan variabel currentTaxPayment yang sudah ada.
   currentTaxPayment = {
     taxType: type,
     branchId,
-    outstanding
+    outstanding,
+    accountId
   };
 
-	const accountId = type === "PPN"
-	  ? taxPayableData.accountId
-	  : taxPayableData.pbjt.accountId;
-	const accountName = type === "PPN"
-	  ? "Tax PPN Payable"
-	  : "Tax PBJT Payable";
-	
-	document.getElementById("taxPaymentAccount").textContent = `${accountName} (${getTaxOutletName(branchId)})`;
-  document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
+  const accountEl = document.getElementById("taxPaymentAccount");
+  if (accountEl) { accountEl.textContent = `${accountName} (${getTaxOutletName(branchId)})`; }
+
+  const outstandingEl = document.getElementById("taxPaymentOutstanding");
+  if (outstandingEl) { outstandingEl.textContent = formatAccountingCurrency(outstanding); }
 
   const amountInput = document.getElementById("taxPaymentAmount");
-
-  amountInput.value = outstanding;
-  amountInput.max = outstanding;
+  if (amountInput) {
+    amountInput.value = outstanding;
+    amountInput.max = outstanding;
+  }
 }
 
 /* ===== PAYMENT METHOD CHANGE ===== */
@@ -32360,6 +32363,71 @@ function closeTaxPaymentModal() {
   }
   currentTaxPayment = null;
 }
+
+/* ===== SAVE TAX PAYMENT ===== */
+async function saveTaxPayment() {
+  if (pbjtPaymentSaving) return;
+
+  const sessionId = localStorage.getItem("pos_session_id");
+  if (!sessionId) { showToast("Session tidak ditemukan.", "error"); return; }
+  if (!currentTaxPayment?.branchId) { showToast("Cabang pembayaran belum dipilih.", "error"); return; }
+
+  const filter = getTaxTransactionsFilter();
+  // Tax Period menggunakan batas akhir filter
+  const taxPeriod = filter.periodTo || "";
+  if (!taxPeriod) { showToast( "Tanggal akhir periode Tax Transactions wajib diisi.", "warning" ); return; }
+	
+  const paymentDate = document.getElementById("taxPaymentDate")?.value;
+  const amount = Number( document.getElementById("taxPaymentAmount")?.value );
+  const method = document.getElementById("taxPaymentMethod")?.value;
+  const reference = document.getElementById("taxPaymentReference")?.value?.trim() || null;
+  const note = document.getElementById("taxPaymentNote")?.value?.trim() || null;
+
+  if (!paymentDate) { showToast("Tanggal pembayaran wajib diisi.", "warning"); return; }
+  if (!Number.isSafeInteger(amount) || amount <= 0) { showToast("Jumlah pembayaran tidak valid.", "warning"); return; }
+  if (amount > currentTaxPayment.outstanding) { showToast( "Jumlah pembayaran melebihi outstanding pajak.", "warning" ); return; }
+  if ( !["CASH", "BANK", "QRIS", "PPN_CREDIT"].includes(method)
+  ) { showToast("Metode pembayaran tidak valid.", "error"); return; }
+  if ( method === "PPN_CREDIT" && currentTaxPayment.taxType !== "PPN"
+  ) { showToast( "PPN Credit hanya berlaku untuk pembayaran PPN.",  "warning" ); return; }
+
+  pbjtPaymentSaving = true;
+  try {
+    const { data, error } = await supabaseClient.rpc(
+      "create_tax_transaction_payment",
+      {
+        p_session_id: sessionId,
+        p_branch_id: currentTaxPayment.branchId,
+        p_tax_type: currentTaxPayment.taxType,
+        p_period_from: filter.periodFrom || null,
+        p_period_to: taxPeriod,
+        p_payment_date: paymentDate,
+        p_amount: amount,
+        p_payment_method: method,
+        p_reference_no: reference,
+        p_note: note
+      }
+    );
+
+    if (error) throw error;
+    if (!data?.success) { throw new Error( data?.message || "Pembayaran pajak gagal." ); }
+
+    showToast( data.message || "Pembayaran pajak berhasil.", "success" );
+
+    closeTaxPaymentModal();
+    // Bersihkan cache detail
+    if (taxPayableDetailCache instanceof Map) {  taxPayableDetailCache.clear(); }
+    // Refresh data setelah pembayaran
+    await loadTaxPayable();
+    await loadTaxTransactions();
+
+  } catch (error) {
+    console.error("Save Tax Payment Error:", error);
+    showToast( error?.message || "Gagal menyimpan pembayaran pajak.", "error" );
+  } finally { pbjtPaymentSaving = false; }
+}
+
+
 
 
 
