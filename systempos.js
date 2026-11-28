@@ -32256,31 +32256,37 @@ function openTaxPaymentModal(taxType) {
   const summary = type === "PPN" ? payable : payable.pbjt;
   if (!summary) { showToast("Data Tax Payable tidak ditemukan.", "error"); return; }
 
-  const branches = Array.isArray(summary.branches)
-    ? summary.branches
-    : [];
-  const branchSelect = document.getElementById("taxPaymentBranch");
-  if (!branchSelect) { showToast("Elemen pilihan cabang tidak ditemukan.", "error"); return; }
-
-  branchSelect.innerHTML = "";
-  branches
-    .filter(item => Number(item.amount) > 0)
-    .forEach(item => {
-      const option = document.createElement("option");
-      option.value = item.branchId;
-      option.textContent = getTaxOutletName(item.branchId);
-      branchSelect.appendChild(option);
-    });
-
-  if (selectedBranch) {
-    const exists = branches.some( item => String(item.branchId) === selectedBranch && Number(item.amount) > 0 );
-    if (!exists) { showToast("Cabang tidak memiliki outstanding pajak.", "error"); return; }
-		
-    branchSelect.value = selectedBranch;
-    branchSelect.disabled = true;
-  } else { branchSelect.disabled = false; }
-
-  if (!branchSelect.options.length) { showToast(`Tidak ada outstanding ${type}.`, "info"); return; }
+  let branches = Array.isArray(summary.branches)
+	  ? summary.branches.filter(item => Number(item.amount) > 0)
+	  : [];
+	const branchSelect = document.getElementById("taxPaymentBranch");
+	if (!branchSelect) { showToast("Elemen pilihan cabang tidak ditemukan.", "error"); return; }
+	
+	branchSelect.innerHTML = "";
+	
+	if (selectedBranch) {
+	  let branch = branches.find(item => String(item.branchId) === selectedBranch);
+	  // Jika RPC tidak mengirim branches, gunakan outstanding branch terpilih.
+	  if (!branch && Number(summary.outstanding) > 0) {
+	    branch = {
+	      branchId: selectedBranch,
+	      amount: Number(summary.outstanding)
+	    };
+	  }
+	  if (!branch) { showToast("Cabang tidak memiliki outstanding pajak.", "error"); return; }
+	
+	  branches = [branch];
+	  branchSelect.disabled = true;
+	} else { branchSelect.disabled = false; }
+	
+	branches.forEach(item => {
+	  const option = document.createElement("option");
+	  option.value = item.branchId;
+	  option.textContent = getTaxOutletName(item.branchId);
+	  branchSelect.appendChild(option);
+	});
+	
+	if (!branchSelect.options.length) { showToast(`Tidak ada outstanding ${type}.`, "info"); return; }
 
   document.getElementById("taxPaymentType").value = type;
   document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
@@ -32301,11 +32307,11 @@ function openTaxPaymentModal(taxType) {
 function handleTaxPaymentBranchChange() {
   const type = document.getElementById("taxPaymentType")?.value;
   const branchId = document.getElementById("taxPaymentBranch")?.value;
-  const summary = type === "PPN"
-    ? taxPayableData
-    : taxPayableData?.pbjt;
-  const branch = summary?.branches?.find(item => String(item.branchId) === String(branchId));
-  const outstanding = Number(branch?.amount) || 0;
+	const summary = type === "PPN"
+	  ? taxPayableData
+	  : taxPayableData?.pbjt;
+	const branch = summary?.branches?.find(item => String(item.branchId) === String(branchId));
+	const outstanding = Number(branch?.amount ?? summary?.outstanding) || 0;
 
   // Gunakan variabel currentTaxPayment yang sudah ada.
   currentTaxPayment = {
