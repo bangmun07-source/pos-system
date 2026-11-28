@@ -32233,15 +32233,12 @@ async function loadTaxDetailPaymentHistory(taxId, branchId) {
   }
 }
 
-
-/* ===== CURRENT TAX PAYABLE PAYMENT ===== */
+/* ===== CURRENT TAX PAYMENT ===== */
 let currentTaxPayment = null;
-
 /* ===== PAY PPN ===== */
 function payPpn() {
   openTaxPaymentModal("PPN");
 }
-
 /* ===== PAY PBJT ===== */
 function payPbjt() {
   openTaxPaymentModal("PBJT");
@@ -32250,100 +32247,95 @@ function payPbjt() {
 /* ===== OPEN TAX PAYMENT MODAL ===== */
 function openTaxPaymentModal(taxType) {
   const type = String(taxType || "").toUpperCase();
+  if (!["PPN", "PBJT"].includes(type)) { showToast("Jenis pajak tidak valid.", "error"); return; }
 
-  if (!["PPN", "PBJT"].includes(type)) {
-    showToast("Jenis pajak tidak valid.", "error");
-    return;
-  }
-
-  // Pastikan data Tax Payable tersedia
   const payable = taxPayableData;
+  if (!payable) { showToast("Data Tax Payable belum tersedia.", "error"); return; }
 
-  if (!payable) {
-    showToast("Data Tax Payable belum tersedia.", "error");
-    return;
-  }
-
-  // Ambil filter cabang aktif
   const filter = getTaxTransactionsFilter();
+  const selectedBranch = !filter.branchId || filter.branchId === "ALL"
+	  ? null
+	  : String(filter.branchId);
 
-  const selectedBranch =
-    !filter.branchId || filter.branchId === "ALL"
-      ? null
-      : String(filter.branchId);
+  const summary = type === "PPN" ? payable : payable.pbjt;
+  if (!summary) { showToast("Data Tax Payable tidak ditemukan.", "error"); return; }
+	
+  const branches = Array.isArray(summary.branches)
+    ? summary.branches
+    : [];
+  const branchSelect = document.getElementById("taxPaymentBranch");
+  if (!branchSelect) return;
 
-  // Ambil data sesuai jenis pajak
-  const taxSummary = type === "PPN"
-    ? payable
-    : payable.pbjt;
+  branchSelect.innerHTML = "";
+  branches
+    .filter(item => Number(item.amount) > 0)
+    .forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.branchId;
+      option.textContent = getTaxOutletName(item.branchId);
+      branchSelect.appendChild(option);
+    });
 
-  if (!taxSummary) {
-    showToast("Data Tax Payable tidak ditemukan.", "error");
-    return;
-  }
+  if (selectedBranch) {
+    const exists = branches.some(item => String(item.branchId) === selectedBranch);
+    if (!exists) { showToast("Cabang tidak memiliki data Tax Payable.", "error"); return; }
+	  
+    branchSelect.value = selectedBranch;
+    branchSelect.disabled = true;
+  } else { branchSelect.disabled = false; }
 
-  let branchId = selectedBranch;
-  let outstanding = 0;
+  if (!branchSelect.options.length) { showToast(`Tidak ada outstanding ${type}.`, "info"); return; }
 
-  if (branchId) {
-    // Filter satu cabang
-    const branch = (taxSummary.branches || []).find(
-      item => String(item.branchId) === branchId
-    );
+  document.getElementById("taxPaymentType").value = type;
+  document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
+  document.getElementById("taxPaymentMethod").value = "CASH";
+  document.getElementById("taxPaymentReference").value = "";
+  document.getElementById("taxPaymentNote").value = "";
 
-    outstanding = Number(branch?.amount) || 0;
+  handleTaxPaymentBranchChange();
 
-  } else {
-    // Filter ALL: cabang harus dipilih dahulu
-    showToast("Pilih satu cabang untuk pembayaran pajak.", "info");
-    return;
-  }
+  const modal = document.getElementById("taxPaymentModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
 
-  if (outstanding <= 0) {
-    showToast(
-      `Tidak ada outstanding ${type} untuk cabang ini.`,
-      "info"
-    );
-    return;
-  }
+/* ===== BRANCH CHANGE ===== */
+function handleTaxPaymentBranchChange() {
+  const type = document.getElementById("taxPaymentType")?.value;
+  const branchId = document.getElementById("taxPaymentBranch")?.value;
+  const summary = type === "PPN"
+    ? taxPayableData
+    : taxPayableData?.pbjt;
+  const branch = summary?.branches?.find(item => String(item.branchId) === String(branchId));
 
+  const outstanding = Number(branch?.amount) || 0;
   currentTaxPayment = {
     taxType: type,
     branchId,
     outstanding
   };
 
-  // Informasi akun
   const account = type === "PPN"
     ? "2200 · Tax PPN Payable"
     : "2260 · Tax PBJT Payable";
 
-  document.getElementById("taxPaymentAccount").textContent =
-    `${account} (${getTaxOutletName(branchId)})`;
+  document.getElementById("taxPaymentAccount").textContent = `${account} (${getTaxOutletName(branchId)})`;
+  document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
 
-  document.getElementById("taxPaymentOutstanding").textContent =
-    formatAccountingCurrency(outstanding);
+  const amountInput = document.getElementById("taxPaymentAmount");
+  amountInput.value = outstanding;
+  amountInput.max = outstanding;
+}
 
-  document.getElementById("taxPaymentDate").value =
-    getTodayAccountingDate();
+/* ===== PAYMENT METHOD CHANGE ===== */
+function handleTaxPaymentMethodChange() {
+  const type = document.getElementById("taxPaymentType")?.value;
+  const method = document.getElementById("taxPaymentMethod")?.value;
 
-  document.getElementById("taxPaymentAmount").value = outstanding;
-  document.getElementById("taxPaymentAmount").max = outstanding;
-
-  document.getElementById("taxPaymentMethod").value = "CASH";
-  document.getElementById("taxPaymentReference").value = "";
-  document.getElementById("taxPaymentNote").value = "";
-
-  // Buka modal
-  const modal = document.getElementById("taxPaymentModal");
-
-  if (!modal) {
-    showToast("HTML Tax Payment Modal tidak ditemukan.", "error");
-    return;
+  if (method === "PPN_CREDIT" && type !== "PPN") {
+    document.getElementById("taxPaymentMethod").value = "CASH";
+    showToast("PPN Credit hanya berlaku untuk pembayaran PPN.", "warning");
   }
-
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
 }
 
 /* ===== CLOSE TAX PAYMENT MODAL ===== */
@@ -32354,9 +32346,9 @@ function closeTaxPaymentModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   }
-
   currentTaxPayment = null;
 }
+
 
 
 
