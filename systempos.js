@@ -32392,6 +32392,13 @@ async function saveTaxPayment() {
   ) { showToast( "PPN Credit hanya berlaku untuk pembayaran PPN.",  "warning" ); return; }
 
   pbjtPaymentSaving = true;
+	const saveButton = document.getElementById("saveTaxPaymentButton");
+	if (saveButton) {
+	  saveButton.disabled = true;
+	  saveButton.textContent = "Processing...";
+	  saveButton.classList.add("opacity-50", "cursor-not-allowed");
+	}
+	
   try {
     const { data, error } = await supabaseClient.rpc(
       "create_tax_transaction_payment",
@@ -32424,8 +32431,18 @@ async function saveTaxPayment() {
   } catch (error) {
     console.error("Save Tax Payment Error:", error);
     showToast( error?.message || "Gagal menyimpan pembayaran pajak.", "error" );
-  } finally { pbjtPaymentSaving = false; }
+  } finally {
+    pbjtPaymentSaving = false;
+
+    const saveButton = document.getElementById("saveTaxPaymentButton");
+    if (saveButton) {
+      saveButton.disabled = false;
+      saveButton.textContent = "Pay";
+      saveButton.classList.remove("opacity-50", "cursor-not-allowed");
+    }
+  }
 }
+
 
 
 
