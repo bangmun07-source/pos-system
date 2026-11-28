@@ -31592,7 +31592,6 @@ function changeTaxTransactionsPage(direction) {
 }
 
 let activeTaxTransactionMenu = null;
-
 function toggleTaxTransactionMenu(button, transactionId) {
   const menuId = `taxTransactionMenu-${transactionId}`;
   const existingMenu = document.getElementById(menuId);
@@ -32318,9 +32317,7 @@ function openTaxPaymentModal(taxType) {
   }
 
   document.getElementById("taxPaymentType").value = type;
-  document.getElementById("taxPaymentDate").value =
-    getTodayAccountingDate();
-
+  document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
   document.getElementById("taxPaymentMethod").value = "CASH";
   document.getElementById("taxPaymentReference").value = "";
   document.getElementById("taxPaymentNote").value = "";
@@ -32339,7 +32336,6 @@ function openTaxPaymentModal(taxType) {
 function handleTaxPaymentBranchChange() {
   const type = document.getElementById("taxPaymentType")?.value;
   const branchId = document.getElementById("taxPaymentBranch")?.value;
-
   const summary = type === "PPN"
     ? taxPayableData
     : taxPayableData?.pbjt;
@@ -32396,165 +32392,12 @@ function closeTaxPaymentModal() {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
   }
-
   currentTaxPayment = null;
 }
 
 
 
 
-
-
-
-let currentTaxTransaction = null;
-/* ===== OPEN TAX PAYMENT FROM ROW ===== */
-function payTaxTransaction(transactionId) {
-  const transaction = taxTransactionsData.find(item =>
-    String(item.transaction_id || item.Transaction_ID) === String(transactionId) ||
-    String(item.tax_id || item.Tax_ID) === String(transactionId)
-  );
-
-  if (!transaction) {
-    showToast("Tax transaction tidak ditemukan.", "error");
-    console.log("Tax transaction ID tidak ditemukan:", transactionId);
-    console.log("Tax transactions data:", taxTransactionsData);
-    return;
-  }
-
-  if (String(transaction.status || transaction.Status).toUpperCase() !== "OUTSTANDING") {
-    showToast("Tax transaction ini sudah tidak outstanding.", "info");
-    return;
-  }
-
-  currentTaxTransaction = transaction;
-  openTaxPaymentModal();
-}
-
-/* ===== OPEN TAX PAYMENT MODAL ===== */
-function openTaxPaymentModal() {
-  const transaction = currentTaxTransaction;
-  if (!transaction) { alert("Tax transaction tidak ditemukan."); return; }
-
-  const taxId = transaction.tax_id || transaction.Tax_ID;
-  const branchId = transaction.branch_id || transaction.Branch_ID;
-  const taxType = String(transaction.tax_type || transaction.Tax_Type || "").toUpperCase();
-  const outstanding = Number(transaction.tax_amount ?? transaction.Tax_Amount) || 0;
-
-  if (!taxId) { alert("Tax ID tidak ditemukan."); return; }
-  if (!branchId || String(branchId).toUpperCase() === "ALL") { alert("Branch Tax Transaction tidak valid."); return; }
-  if (outstanding <= 0) { alert("Tax Transaction tidak memiliki saldo terutang."); return; }
-
-  const account = taxType === "PPN"
-    ? "2200 · PPN Payable"
-    : taxType === "PBJT"
-      ? "2210 · PBJT Payable"
-      : "Tax Payable";
-
-  document.getElementById("taxPaymentAccount").textContent = `${account} (${branchId})`;
-  document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
-  document.getElementById("taxPaymentDate").value = getTodayAccountingDate();
-  document.getElementById("taxPaymentAmount").value = outstanding;
-  document.getElementById("taxPaymentAmount").max = outstanding;
-  document.getElementById("taxPaymentMethod").value = "CASH";
-  document.getElementById("taxPaymentReference").value = "";
-  document.getElementById("taxPaymentNote").value = "";
-
-  const modal = document.getElementById("taxPaymentModal");
-  if (modal) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
-}
-
-/* ===== CLOSE TAX PAYMENT MODAL ===== */
-function closeTaxPaymentModal() {
-  const modal = document.getElementById("taxPaymentModal");
-  if (modal) {
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
-}
-
-/* ==== SAVE TAX PAYMENT ==== */
-async function saveTaxPayment() {
-  const sessionId = localStorage.getItem("pos_session_id");
-  if (!sessionId) { alert("Session tidak ditemukan."); return; }
-
-  const transaction = currentTaxTransaction;
-  if (!transaction) { alert("Tax Transaction tidak ditemukan."); return; }
-
-  const taxId = transaction.tax_id || transaction.Tax_ID;
-  const branchId = String(transaction.branch_id || transaction.Branch_ID || "").trim();
-  const taxAmount = Number(transaction.tax_amount ?? transaction.Tax_Amount) || 0;
-  const status = String(transaction.status || transaction.Status || "").toUpperCase();
-  const paymentDate = document.getElementById("taxPaymentDate")?.value;
-  const amount = Number(document.getElementById("taxPaymentAmount")?.value) || 0;
-  const method = document.getElementById("taxPaymentMethod")?.value || "CASH";
-  const referenceNo = document.getElementById("taxPaymentReference")?.value?.trim() || null;
-  const note = document.getElementById("taxPaymentNote")?.value?.trim() || null;
-
-  if (!taxId) { alert("Tax ID tidak ditemukan."); return; }
-  if (!branchId || branchId.toUpperCase() === "ALL") { alert("Branch Tax Transaction tidak valid."); return; }
-  if (status !== "OUTSTANDING") { alert("Tax Transaction ini sudah tidak outstanding."); return; }
-  if (!paymentDate) { alert("Tanggal pembayaran wajib diisi."); return; }
-  if (amount <= 0) { alert("Jumlah pembayaran harus lebih dari 0."); return; }
-  if (amount > taxAmount) { alert( `Pembayaran tidak boleh melebihi ${formatAccountingCurrency(taxAmount)}` ); return; }
-  if (!["CASH", "BANK", "QRIS"].includes(method)) { alert("Metode pembayaran tidak valid."); return; }
-
-  const button = document.getElementById("saveTaxPaymentButton");
-
-  try {
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Menyimpan...";
-    }
-
-    console.log("TAX TRANSACTION PAYMENT DEBUG", {
-      sessionId,
-      taxId,
-      branchId,
-      amount,
-      method
-    });
-
-    const { data, error } = await supabaseClient.rpc(
-      "create_tax_transaction_payment",
-      {
-        p_session_id: sessionId,
-        p_tax_id: taxId,
-        p_payment_date: paymentDate,
-        p_amount: amount,
-        p_payment_method: method,
-        p_reference_no: referenceNo,
-        p_note: note
-      }
-    );
-
-    if (error) throw error;
-
-    state.accountingTaxPayableData = null;
-    state.accountingTaxPayableFilter = null;
-    state.accountingReportsData = null;
-    state.accountingReportsFilter = null;
-
-    closeTaxPaymentModal();
-
-    alert(data?.message || "Pembayaran pajak berhasil.");
-
-    currentTaxTransaction = null;
-
-    await loadTaxPayable();
-
-  } catch (error) {
-    console.error("Save Tax Transaction Payment Error:", error);
-    alert(error?.message || "Gagal menyimpan pembayaran pajak.");
-  } finally {
-    if (button) {
-      button.disabled = false;
-      button.textContent = "Pay Tax";
-    }
-  }
-}
 
 /* =============================
 			EMPLOYEE TAX PAYABLE 
