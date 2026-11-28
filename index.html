@@ -21076,8 +21076,8 @@
 
 	<!-- TAX PAYMENT MODAL -->
 	<div id="taxPaymentModal"
-	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background/70 px-4">
-	  <div class="w-full max-w-lg max-h-[90vh] overflow-y-auto bg-background border border-outline-variant rounded-md shadow-lg">
+	  class="fixed inset-0 z-[100] hidden items-center justify-center bg-background px-4">
+	  <div class="w-full max-w-5xl max-h-[90vh] bg-background border border-outline-variant rounded-md shadow-[0_2px_10px_rgba(0,0,0,0.15)] overflow-hidden">
 	    <!-- HEADER -->
 	    <div class="p-5 border-b border-outline-variant flex items-center justify-between">
 	      <div>
@@ -21096,14 +21096,14 @@
 	      </button>
 	    </div>
 	    <!-- CONTENT -->
-	    <div class="p-5 space-y-4">
+	    <div class="p-5 space-y-4 overflow-y-auto custom-scrollbar">
 	      <!-- TAX TYPE -->
 	      <div>
 	        <label class="block text-xs text-muted mb-2">Tax Type</label>
 	        <input id="taxPaymentType"
 	          type="text"
 	          readonly
-	          class="w-full h-10 px-3 rounded-md bg-surface-container border border-outline-variant text-sm text-foreground">
+	          class="w-full h-10 px-3 rounded-md bg-Background border border-outline-variant text-sm text-foreground">
 	      </div>
 	      <!-- BRANCH -->
 	      <div>
@@ -21183,7 +21183,7 @@
 	    <div class="p-5 border-t border-outline-variant flex justify-end gap-3">
 	      <button type="button"
 	        onclick="closeTaxPaymentModal()"
-	        class="h-10 px-4 rounded-md border border-outline-variant text-sm font-medium">
+	        class="h-10 px-4 text-muted hover:text-foreground text-sm font-medium">
 	        Cancel
 	      </button>
 	
@@ -21191,7 +21191,7 @@
 	        type="button"
 	        onclick="saveTaxPayment()"
 	        class="h-10 px-4 rounded-md bottom-theme text-sm font-medium">
-	        Pay Tax
+	        Pay
 	      </button>
 	    </div>
 	  </div>
