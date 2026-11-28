@@ -32317,7 +32317,9 @@ function handleTaxPaymentBranchChange() {
 	const accountId = type === "PPN"
 	  ? taxPayableData.accountId
 	  : taxPayableData.pbjt.accountId;
-	const accountName = getAccountNameById(accountId);
+	const accountName = type === "PPN"
+	  ? "Tax PPN Payable"
+	  : "Tax PBJT Payable";
 	
 	document.getElementById("taxPaymentAccount").textContent = `${accountName} (${getTaxOutletName(branchId)})`;
   document.getElementById("taxPaymentOutstanding").textContent = formatAccountingCurrency(outstanding);
